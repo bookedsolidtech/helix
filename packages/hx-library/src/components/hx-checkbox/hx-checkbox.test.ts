@@ -90,6 +90,14 @@ describe('hx-checkbox', () => {
       await el.updateComplete;
       expect(el.hasAttribute('indeterminate')).toBe(true);
     });
+
+    it('sets aria-checked="mixed" on input when indeterminate', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
+      el.indeterminate = true;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-checked')).toBe('mixed');
+    });
   });
 
   // ─── Property: label (3) ───
@@ -410,6 +418,16 @@ describe('hx-checkbox', () => {
       el.formStateRestoreCallback(null, 'restore');
       await el.updateComplete;
       expect(el.checked).toBe(false);
+    });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
     });
   });
 

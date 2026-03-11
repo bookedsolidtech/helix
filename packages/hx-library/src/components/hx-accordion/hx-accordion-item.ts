@@ -79,15 +79,13 @@ export class HelixAccordionItem extends LitElement {
 
   _dispatchToggleEvent(expanded: boolean): void {
     const detail = { expanded, itemId: this.id || '' };
-    const eventName = expanded ? 'hx-expand' : 'hx-collapse';
+    const options = { bubbles: true, composed: true, detail };
 
-    this.dispatchEvent(
-      new CustomEvent(eventName, {
-        bubbles: true,
-        composed: true,
-        detail,
-      }),
-    );
+    if (expanded) {
+      this.dispatchEvent(new CustomEvent('hx-expand', options));
+    } else {
+      this.dispatchEvent(new CustomEvent('hx-collapse', options));
+    }
   }
 
   // ─── Event Handlers ───
@@ -122,6 +120,7 @@ export class HelixAccordionItem extends LitElement {
           tabindex=${this.disabled ? '-1' : '0'}
           aria-expanded=${this.expanded ? 'true' : 'false'}
           aria-disabled=${this.disabled ? 'true' : 'false'}
+          aria-controls="content"
           @click=${this._handleSummaryClick}
           @keydown=${this._handleKeyDown}
         >
@@ -131,6 +130,7 @@ export class HelixAccordionItem extends LitElement {
         <div class="content-wrapper">
           <div class="content-inner">
             <div
+              id="content"
               part="content"
               class="content"
               role="region"

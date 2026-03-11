@@ -8,11 +8,11 @@
 
 ## wc-mcp Health Scores
 
-| Component | Score | Grade |
-| --------- | ----- | ----- |
-| hx-tabs | 81 | B |
-| hx-tab | 90 | A |
-| hx-tab-panel | 100 | A |
+| Component    | Score | Grade |
+| ------------ | ----- | ----- |
+| hx-tabs      | 81    | B     |
+| hx-tab       | 90    | A     |
+| hx-tab-panel | 100   | A     |
 
 ---
 
@@ -25,6 +25,7 @@
 The active indicator used `border-bottom` unconditionally, rendering at the bottom edge even in vertical orientation. Vertical tabs expect the indicator on the inline-end (right) side.
 
 **Fix:** Added CSS custom property inheritance from `hx-tabs` to `hx-tab` shadow DOM:
+
 - `hx-tabs` sets `--_tab-indicator-*` variables in `:host([orientation='vertical'])`
 - `hx-tab` reads these variables to switch between `border-bottom` and `border-inline-end`
 - Uses `border-inline-end` (not `border-right`) for RTL compatibility
@@ -127,18 +128,24 @@ Host `pointer-events: none` prevents `cursor: not-allowed` from ever showing.
 
 ```
 Test Files  1 passed (1)
-     Tests  58 passed (58)
+     Tests  70 passed (70)
 ```
+
+### Tests Added in Deep Audit
+
+- **Label Property** (3 tests): tablist aria-label absent by default, present when set, reflects as attribute
+- **selectedIndex API** (5 tests): getter returns correct index, setter activates tab, disabled tab guard, out-of-range guard
+- **Accessibility (axe-core)** (4 tests): default, vertical, disabled, manual activation — with shadow DOM rule exclusions for `aria-required-children` and `aria-valid-attr-value`
 
 ## Verification Gates
 
-| Gate | Status |
-| ---- | ------ |
+| Gate              | Status          |
+| ----------------- | --------------- |
 | TypeScript strict | PASS (0 errors) |
-| Lint | PASS |
-| Format | PASS |
-| Tests | PASS (58/58) |
-| CEM | Regenerated |
+| Lint              | PASS            |
+| Format            | PASS            |
+| Tests             | PASS (70/70)    |
+| CEM               | Regenerated     |
 
 ---
 

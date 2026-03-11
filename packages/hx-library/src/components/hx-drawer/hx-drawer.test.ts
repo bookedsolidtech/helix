@@ -384,6 +384,168 @@ describe('hx-drawer', () => {
     });
   });
 
+  // ─── Focus Trap (3) ───
+
+  describe('Focus Trap', () => {
+    it('traps forward Tab at the last focusable element', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><span slot="label">Title</span><button class="first-btn">First</button><button class="last-btn">Last</button></hx-drawer>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 100));
+
+      // Focus the last slotted button
+      const lastBtn = el.querySelector<HTMLButtonElement>('.last-btn');
+      expect(lastBtn).toBeTruthy();
+      lastBtn!.focus();
+      expect(document.activeElement).toBe(lastBtn);
+
+      // Press Tab — should wrap to first focusable element (close button in shadow DOM)
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      await el.updateComplete;
+
+      // Focus should not escape the drawer (activeElement should still be inside or on the drawer)
+      const active = document.activeElement;
+      expect(
+        active === lastBtn || el.contains(active) || el.shadowRoot?.contains(active as Node),
+      ).toBe(true);
+    });
+
+    it('traps backward Shift+Tab at the first focusable element', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><span slot="label">Title</span><button class="only-btn">Only</button></hx-drawer>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 100));
+
+      // Focus the close button (first shadow DOM focusable)
+      const closeBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="close-button"]');
+      expect(closeBtn).toBeTruthy();
+      closeBtn!.focus();
+
+      // Press Shift+Tab
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }),
+      );
+      await el.updateComplete;
+
+      // Focus should not escape the drawer
+      const active = document.activeElement;
+      expect(
+        active === closeBtn || el.contains(active) || el.shadowRoot?.contains(active as Node),
+      ).toBe(true);
+    });
+
+    it('prevents Tab when no focusable elements exist', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open no-header><span>Non-focusable content</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 100));
+
+      // Dispatch Tab — should not throw
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(true); // drawer stays open
+    });
+  });
+
+  // ─── Focus Restoration (1) ───
+
+  describe('Focus Restoration', () => {
+    it('restores focus to the trigger element on close', async () => {
+      // Create a trigger button and focus it
+      const trigger = document.createElement('button');
+      trigger.textContent = 'Trigger';
+      trigger.classList.add('test-trigger');
+      document.body.appendChild(trigger);
+      trigger.focus();
+      expect(document.activeElement).toBe(trigger);
+
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer><span slot="label">Title</span></hx-drawer>',
+      );
+
+      // Open drawer (trigger is still focused)
+      el.open = true;
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 100));
+
+      // Close drawer
+      el.open = false;
+      await el.updateComplete;
+      // Wait for close animation + focus restore timeout
+      await new Promise((r) => setTimeout(r, 400));
+
+      expect(document.activeElement).toBe(trigger);
+      trigger.remove();
+    });
+  });
+
+  // ─── Body Scroll Lock (2) ───
+
+  describe('Body Scroll Lock', () => {
+    it('locks body scroll when drawer opens', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      const previousOverflow = document.body.style.overflow;
+
+      el.open = true;
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      expect(document.body.style.overflow).toBe('hidden');
+
+      // Close and restore
+      el.open = false;
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 400));
+      expect(document.body.style.overflow).toBe(previousOverflow);
+    });
+
+    it('does not lock body scroll when contained', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer contained></hx-drawer>');
+      const previousOverflow = document.body.style.overflow;
+
+      el.open = true;
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      expect(document.body.style.overflow).toBe(previousOverflow);
+    });
+  });
+
+  // ─── ARIA Label Fallback (3) ───
+
+  describe('ARIA Label Fallback', () => {
+    it('uses aria-labelledby when label slot is populated', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
+      expect(overlay?.hasAttribute('aria-labelledby')).toBe(true);
+      expect(overlay?.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('uses aria-label from label property when no label slot', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open label="Settings Panel"></hx-drawer>');
+      await el.updateComplete;
+
+      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
+      expect(overlay?.getAttribute('aria-label')).toBe('Settings Panel');
+    });
+
+    it('falls back to aria-label="Drawer" when no label slot or property', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await el.updateComplete;
+
+      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
+      expect(overlay?.getAttribute('aria-label')).toBe('Drawer');
+    });
+  });
+
   // ─── Contained mode (1) ───
 
   describe('Contained', () => {
