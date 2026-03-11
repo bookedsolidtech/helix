@@ -105,6 +105,10 @@ export const Condensed: Story = {
   args: {
     condensed: true,
   },
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el?.hasAttribute('condensed')).toBe(true);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -114,6 +118,12 @@ export const Condensed: Story = {
 export const Striped: Story = {
   args: {
     striped: true,
+  },
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el?.hasAttribute('striped')).toBe(true);
+    const rows = el?.querySelectorAll('hx-structured-list-row');
+    await expect(rows?.length).toBeGreaterThan(0);
   },
 };
 
@@ -125,6 +135,11 @@ export const BorderedCondensed: Story = {
   args: {
     bordered: true,
     condensed: true,
+  },
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el?.hasAttribute('bordered')).toBe(true);
+    await expect(el?.hasAttribute('condensed')).toBe(true);
   },
 };
 
@@ -165,6 +180,14 @@ export const UserProfile: Story = {
       </hx-structured-list-row>
     </hx-structured-list>
   `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el?.hasAttribute('bordered')).toBe(true);
+    const rows = el?.querySelectorAll('hx-structured-list-row');
+    await expect(rows?.length).toBe(4);
+    const actionButtons = el?.querySelectorAll('[slot="actions"]');
+    await expect(actionButtons?.length).toBe(2);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -213,6 +236,13 @@ export const SettingsPanel: Story = {
       </hx-structured-list>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el?.hasAttribute('bordered')).toBe(true);
+    await expect(el?.hasAttribute('striped')).toBe(true);
+    const rows = el?.querySelectorAll('hx-structured-list-row');
+    await expect(rows?.length).toBe(4);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -251,4 +281,37 @@ export const PatientDetail: Story = {
       </hx-structured-list>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el?.hasAttribute('bordered')).toBe(true);
+    await expect(el?.hasAttribute('condensed')).toBe(true);
+    const rows = el?.querySelectorAll('hx-structured-list-row');
+    await expect(rows?.length).toBe(6);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 9. ISOLATED ROW
+// ─────────────────────────────────────────────────
+
+export const IsolatedRow: Story = {
+  render: () => html`
+    <hx-structured-list-row>
+      <span slot="label">Patient name</span>
+      Jane Doe
+      <button slot="actions" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; cursor: pointer;">
+        Edit
+      </button>
+    </hx-structured-list-row>
+  `,
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector('hx-structured-list-row');
+    await expect(row).toBeTruthy();
+    await expect(row?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
+    await expect(row?.shadowRoot?.querySelector('[part="label"]')).toBeTruthy();
+    await expect(row?.shadowRoot?.querySelector('[part="value"]')).toBeTruthy();
+    await expect(row?.shadowRoot?.querySelector('[part="actions"]')).toBeTruthy();
+    const actionBtn = row?.querySelector('[slot="actions"]');
+    await expect(actionBtn?.textContent).toBe('Edit');
+  },
 };
