@@ -37,6 +37,16 @@ const meta = {
         type: { summary: "'automatic' | 'manual'" },
       },
     },
+    label: {
+      control: { type: 'text' },
+      description:
+        'Accessible label for the tablist container. Rendered as `aria-label` on the tablist element.',
+      table: {
+        category: 'Properties',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
     // ── Events ──
     'hx-tab-change': {
       description:
@@ -804,5 +814,38 @@ export const InteractionTest: Story = {
     const panel3 = canvasElement.querySelector('hx-tab-panel[name="tab3"]');
     await expect(panel3).not.toHaveAttribute('hidden');
     await expect(panel2).toHaveAttribute('hidden');
+  },
+};
+
+// ─────────────────────────────────────────────────
+//  9. WITH LABEL (aria-label on tablist)
+// ─────────────────────────────────────────────────
+
+export const WithLabel: Story = {
+  name: 'With Label (aria-label)',
+  render: () => html`
+    <hx-tabs label="Patient record sections">
+      <hx-tab slot="tab" panel="demographics">Demographics</hx-tab>
+      <hx-tab slot="tab" panel="insurance">Insurance</hx-tab>
+      <hx-tab slot="tab" panel="vitals">Vitals</hx-tab>
+      <hx-tab-panel name="demographics">
+        <p>Demographics panel: patient name, date of birth, and contact details.</p>
+      </hx-tab-panel>
+      <hx-tab-panel name="insurance">
+        <p>Insurance panel: primary and secondary coverage information.</p>
+      </hx-tab-panel>
+      <hx-tab-panel name="vitals">
+        <p>Vitals panel: blood pressure, heart rate, and temperature readings.</p>
+      </hx-tab-panel>
+    </hx-tabs>
+  `,
+  play: async ({ canvasElement }) => {
+    await new Promise((r) => setTimeout(r, 50));
+    const tabsEl = canvasElement.querySelector('hx-tabs');
+    if (!tabsEl) throw new Error('hx-tabs element not found');
+    await expect(tabsEl.getAttribute('label')).toBe('Patient record sections');
+
+    const tablist = tabsEl.shadowRoot?.querySelector('[role="tablist"]');
+    await expect(tablist?.getAttribute('aria-label')).toBe('Patient record sections');
   },
 };
