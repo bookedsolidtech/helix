@@ -12,12 +12,25 @@ const meta = {
   argTypes: {
     placement: {
       control: { type: 'select' },
-      options: ['top', 'bottom', 'left', 'right'],
+      options: [
+        'top',
+        'top-start',
+        'top-end',
+        'bottom',
+        'bottom-start',
+        'bottom-end',
+        'left',
+        'left-start',
+        'left-end',
+        'right',
+        'right-start',
+        'right-end',
+      ],
       description: 'Preferred placement of the tooltip.',
       table: {
         category: 'Positioning',
         defaultValue: { summary: 'top' },
-        type: { summary: "'top' | 'bottom' | 'left' | 'right'" },
+        type: { summary: 'Placement' },
       },
     },
     showDelay: {
