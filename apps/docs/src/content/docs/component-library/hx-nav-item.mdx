@@ -1,14 +1,196 @@
 ---
 title: 'hx-nav-item'
-description: 'Individual navigation link within a nav component'
+description: 'Navigation item for hx-side-nav with support for icons, badges, sub-navigation, active/disabled states, and collapsed-mode tooltips.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-nav-item" section="summary" />
+
+## Overview
+
+`hx-nav-item` is a navigation item designed for use inside `hx-side-nav`. It renders as an anchor (`<a>`) when a URL is provided, or a button (`<button>`) when it has nested child navigation. It supports icons, badges, active/disabled states, sub-navigation expand/collapse, and collapsed-mode tooltips with `aria-describedby`.
+
+**Use `hx-nav-item` when:** building navigation inside `hx-side-nav` — clinical portals, admin dashboards, department navigation trees.
+
+For full usage context including keyboard navigation and collapsed mode behavior, see the [hx-side-nav documentation](/component-library/hx-side-nav/).
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Nav Item">
+  <div style="background: #111827; padding: 0.5rem; width: 220px;">
+    <hx-nav-item href="/dashboard">
+      <svg
+        slot="icon"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        width="20"
+        height="20"
+        aria-hidden="true"
+      >
+        <circle cx="10" cy="10" r="7" />
+      </svg>
+      Dashboard
+    </hx-nav-item>
+  </div>
+</ComponentDemo>
+
+### Active State
+
+<ComponentDemo title="Active">
+  <div style="background: #111827; padding: 0.5rem; width: 220px;">
+    <hx-nav-item href="/patients" active>
+      <svg
+        slot="icon"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        width="20"
+        height="20"
+        aria-hidden="true"
+      >
+        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+      </svg>
+      Patients
+    </hx-nav-item>
+  </div>
+</ComponentDemo>
+
+### Disabled State
+
+<ComponentDemo title="Disabled">
+  <div style="background: #111827; padding: 0.5rem; width: 220px;">
+    <hx-nav-item href="/admin" disabled>
+      <svg
+        slot="icon"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        width="20"
+        height="20"
+        aria-hidden="true"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Admin (disabled)
+    </hx-nav-item>
+  </div>
+</ComponentDemo>
+
+### With Badge
+
+<ComponentDemo title="With Badge">
+  <div style="background: #111827; padding: 0.5rem; width: 220px;">
+    <hx-nav-item href="/notifications">
+      <svg
+        slot="icon"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        width="20"
+        height="20"
+        aria-hidden="true"
+      >
+        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z" />
+      </svg>
+      Notifications
+      <span
+        slot="badge"
+        style="background: #ef4444; color: white; border-radius: 9999px; padding: 0 0.375rem; font-size: 0.75rem; font-weight: 700; min-width: 1.25rem; text-align: center; display: inline-block;"
+      >
+        5
+      </span>
+    </hx-nav-item>
+  </div>
+</ComponentDemo>
+
+### With Sub-Navigation
+
+<ComponentDemo title="With Children">
+  <div style="background: #111827; padding: 0.5rem; width: 220px;">
+    <hx-nav-item expanded>
+      <svg
+        slot="icon"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        width="20"
+        height="20"
+        aria-hidden="true"
+      >
+        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+      </svg>
+      Patients
+      <hx-nav-item slot="children" href="/patients/list" active>
+        All Patients
+      </hx-nav-item>
+      <hx-nav-item slot="children" href="/patients/new">
+        New Patient
+      </hx-nav-item>
+      <hx-nav-item slot="children" href="/patients/schedule">
+        Schedule
+      </hx-nav-item>
+    </hx-nav-item>
+  </div>
+</ComponentDemo>
+
+## Properties
+
+| Property   | Attribute  | Type      | Default | Description                                                                                            |
+| ---------- | ---------- | --------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| `href`     | `href`     | `string`  | `''`    | The URL this item links to. When set (and no children), renders as `<a>`.                              |
+| `active`   | `active`   | `boolean` | `false` | Whether this item is the current/active page. Sets `aria-current="page"`. Reflects to attribute.       |
+| `expanded` | `expanded` | `boolean` | `false` | Whether the sub-navigation panel is expanded. Reflects to attribute.                                   |
+| `disabled` | `disabled` | `boolean` | `false` | Whether this item is disabled. Sets `aria-disabled="true"` and `tabindex="-1"`. Reflects to attribute. |
+
+## Slots
+
+| Slot        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| _(default)_ | The label text for this navigation item.                                           |
+| `icon`      | An icon displayed before the label. Should be an SVG or icon component.            |
+| `badge`     | Badge content (e.g. notification count). Hidden automatically in collapsed mode.   |
+| `children`  | Nested `hx-nav-item` elements for sub-navigation. Presence triggers button render. |
+
+## CSS Parts
+
+| Part       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| `link`     | The `<a>` or `<button>` element (the interactive part).   |
+| `icon`     | The icon container (wraps the `icon` slot).               |
+| `label`    | The label container (wraps the default slot text).        |
+| `badge`    | The badge container (wraps the `badge` slot).             |
+| `children` | The sub-navigation container (wraps the `children` slot). |
+
+## CSS Custom Properties
+
+| Property                     | Default                               | Description                      |
+| ---------------------------- | ------------------------------------- | -------------------------------- |
+| `--hx-nav-item-color`        | `var(--hx-color-neutral-300)`         | Item text color.                 |
+| `--hx-nav-item-hover-bg`     | `rgba(255, 255, 255, 0.08)`           | Item hover background.           |
+| `--hx-nav-item-hover-color`  | `var(--hx-color-neutral-100)`         | Item hover text color.           |
+| `--hx-nav-item-active-bg`    | `var(--hx-color-primary-600)`         | Active item background.          |
+| `--hx-nav-item-active-color` | `var(--hx-color-neutral-50)`          | Active item text color.          |
+| `--hx-nav-item-padding`      | `var(--hx-space-2) var(--hx-space-4)` | Item padding.                    |
+| `--hx-nav-item-host-bg`      | `var(--hx-color-neutral-900)`         | Component host background color. |
+
+## Accessibility
+
+| Topic              | Details                                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Element type       | Renders as `<a>` when `href` is set without children; `<button>` when children are present or no `href`.                            |
+| `aria-current`     | Active anchors set `aria-current="page"` to indicate the current page to screen readers.                                            |
+| `aria-disabled`    | Disabled items set `aria-disabled="true"`. Anchors use `tabindex="-1"` since native `disabled` is invalid on `<a>`.                 |
+| `aria-expanded`    | Button items with children reflect `aria-expanded` for sub-navigation state.                                                        |
+| `role="group"`     | The children container uses `role="group"` to semantically group nested items.                                                      |
+| Collapsed tooltips | In collapsed mode, a tooltip (`role="tooltip"`) is rendered and referenced via `aria-describedby` for screen reader identification. |
+| WCAG 2.1 AA        | Verified with axe-core: zero violations in default and active states.                                                               |
 
 ## API Reference
 
