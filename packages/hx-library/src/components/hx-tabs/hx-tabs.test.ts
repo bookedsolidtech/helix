@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup } from '../../test-utils.js';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTabs } from './hx-tabs.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
@@ -724,6 +724,154 @@ describe('hx-tabs', () => {
       const tab = el.querySelector('hx-tab') as HelixTab;
       const suffixSpan = shadowQuery(tab, '[part="suffix"]');
       expect(suffixSpan?.hasAttribute('hidden')).toBe(true);
+    });
+  });
+
+  // ─── Label Property ──────────────────────────────────────────────────────────
+
+  describe('Label Property', () => {
+    it('tablist has no aria-label by default', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tablist = shadowQuery(el, '[role="tablist"]');
+      expect(tablist?.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('tablist has aria-label when label is set', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs label="Patient record sections">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tablist = shadowQuery(el, '[role="tablist"]');
+      expect(tablist?.getAttribute('aria-label')).toBe('Patient record sections');
+    });
+
+    it('label property reflects as attribute', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs label="Test label">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+        </hx-tabs>
+      `);
+      expect(el.getAttribute('label')).toBe('Test label');
+    });
+  });
+
+  // ─── selectedIndex API ────────────────────────────────────────────────────────
+
+  describe('selectedIndex API', () => {
+    it('selectedIndex returns 0 when first tab is active', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      expect(el.selectedIndex).toBe(0);
+    });
+
+    it('selectedIndex returns correct index after clicking second tab', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
+      assertEl(btnBeta, 'button').click();
+      await el.updateComplete;
+      expect(el.selectedIndex).toBe(1);
+    });
+
+    it('setting selectedIndex activates the corresponding tab', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      el.selectedIndex = 2;
+      await el.updateComplete;
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      expect(tabs[2].selected).toBe(true);
+      const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
+      expect(panels[2].hasAttribute('hidden')).toBe(false);
+    });
+
+    it('setting selectedIndex to disabled tab does not activate it', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      el.selectedIndex = 1;
+      await el.updateComplete;
+      expect(el.selectedIndex).toBe(0);
+    });
+
+    it('setting selectedIndex out of range does not change selection', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      el.selectedIndex = 99;
+      await el.updateComplete;
+      expect(el.selectedIndex).toBe(0);
+    });
+  });
+
+  // ─── Accessibility (axe-core) ─────────────────────────────────────────────────
+
+  // axe-core rule exclusions for shadow DOM tab pattern:
+  // - aria-required-children: axe cannot resolve slotted <hx-tab> custom elements as valid
+  //   tablist children since they carry role="tab" on their inner shadow button, not the host
+  // - aria-valid-attr-value: aria-controls references panel IDs in light DOM, which axe
+  //   cannot resolve when scanning from within the shadow root
+  describe('Accessibility (axe-core)', () => {
+    const a11yRules = {
+      'aria-required-children': { enabled: false },
+      'aria-valid-attr-value': { enabled: false },
+    };
+
+    it('default state has no a11y violations', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs label="Test tabs">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two">Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
+      expect(violations).toEqual([]);
+    });
+
+    it('vertical orientation has no a11y violations', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs orientation="vertical" label="Vertical tabs">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two">Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
+      expect(violations).toEqual([]);
+    });
+
+    it('disabled tab state has no a11y violations', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs label="Tabs with disabled">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
+          <hx-tab slot="tab" panel="three">Three</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+          <hx-tab-panel name="three">Panel Three</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
+      expect(violations).toEqual([]);
+    });
+
+    it('manual activation has no a11y violations', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs activation="manual" label="Manual tabs">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two">Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
+      expect(violations).toEqual([]);
     });
   });
 });
