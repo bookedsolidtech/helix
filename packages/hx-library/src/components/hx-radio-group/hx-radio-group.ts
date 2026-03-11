@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
@@ -103,8 +103,9 @@ export class HelixRadioGroup extends LitElement {
   @property({ type: String, reflect: true })
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
-  @query('.fieldset__group')
-  private _groupEl!: HTMLElement;
+  private get _groupEl(): HTMLElement | null {
+    return this.renderRoot?.querySelector('.fieldset__group') ?? null;
+  }
 
   @state() private _hasErrorSlot = false;
 
