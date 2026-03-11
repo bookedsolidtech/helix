@@ -5,9 +5,11 @@
  * WC_TOOLS_ROOT must be set via environment variable or defaults to a
  * sibling directory. CEM_PATH is resolved relative to the monorepo root.
  */
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const MONOREPO_ROOT = resolve(import.meta.dirname, '../../../../');
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const MONOREPO_ROOT = resolve(__dirname, '../../../../');
 export const WC_TOOLS_ROOT = process.env.WC_TOOLS_ROOT ?? resolve(MONOREPO_ROOT, '../wc-tools');
 export const WC_TOOLS_BINARY = resolve(WC_TOOLS_ROOT, 'build/index.js');
 export const CEM_PATH = resolve(MONOREPO_ROOT, 'packages/hx-library/custom-elements.json');
