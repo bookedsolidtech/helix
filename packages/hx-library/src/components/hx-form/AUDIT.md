@@ -4,6 +4,7 @@
 **Component:** `packages/hx-library/src/components/hx-form/`
 **Audit tier:** T2-35 (Deep antagonistic — validation orchestration wrapper)
 **Files reviewed:**
+
 - `hx-form.ts`
 - `hx-form.test.ts`
 - `hx-form.stories.ts`
@@ -42,12 +43,14 @@ This is a WCAG 2.1 AA violation for forms where hx-form is the sole orchestratio
 **File:** `src/styles/form/form.scoped.css:113, 200, 252`
 
 All focus states replace the browser's `outline` with a `box-shadow` ring:
+
 ```css
 hx-form input[type='text']:focus {
   outline: none;
   box-shadow: ...;
 }
 ```
+
 `box-shadow` is invisible in Windows High Contrast Mode (forced-colors). No `@media (forced-colors: active)` block restores a visible outline. This fails WCAG 2.1 AA Success Criterion 2.4.7 (Focus Visible) for users on Windows HCM.
 
 Affects: all text inputs, textarea, select, summary element focus styles.
@@ -57,11 +60,13 @@ Affects: all text inputs, textarea, select, summary element focus styles.
 **File:** `hx-form.ts:28-31`, `form.scoped.css`
 
 The JSDoc block declares three CSS custom properties:
+
 ```
 @cssprop [--hx-form-gap=var(--hx-space-4)]
 @cssprop [--hx-form-max-width=none]
 @cssprop [--hx-form-padding=0]
 ```
+
 None of these tokens appear anywhere in `form.scoped.css`. The CEM will expose these as valid theming API but setting them has zero effect. This is a broken contract between documentation and implementation.
 
 #### P1-03: No `aria-invalid` management on validation failure
@@ -76,17 +81,18 @@ On submit failure, the component collects errors and fires `hx-invalid`. It does
 
 Drupal commonly returns server-side validation errors after form submission. There is no `setErrors()`, `setFieldError()`, or equivalent method to programmatically mark fields invalid and render error messages. The only error path is client-side via constraint validation. Healthcare forms virtually always require server validation (e.g., duplicate MRN, insurance verification). Without this, `hx-form` cannot fully orchestrate the form lifecycle for Drupal server responses.
 
-#### P1-05: No test for hx-* component validation chain
+#### P1-05: No test for hx-\* component validation chain
 
 **File:** `hx-form.test.ts:264-296`
 
-The `Validation` suite tests only native `<input>` elements. There is no test verifying that nested `hx-text-input`, `hx-select`, `hx-checkbox`, etc. with `checkValidity()` are actually called during `hx-form.checkValidity()` / `reportValidity()`. The `_getAllValidatableElements()` path for wc-* components is untested. If a custom element's `checkValidity` returns `false`, it's unclear whether this is correctly surfaced.
+The `Validation` suite tests only native `<input>` elements. There is no test verifying that nested `hx-text-input`, `hx-select`, `hx-checkbox`, etc. with `checkValidity()` are actually called during `hx-form.checkValidity()` / `reportValidity()`. The `_getAllValidatableElements()` path for wc-\* components is untested. If a custom element's `checkValidity` returns `false`, it's unclear whether this is correctly surfaced.
 
 #### P1-06: No story demonstrating the validation/error cycle
 
 **File:** `hx-form.stories.ts`
 
 There is a `RequiredFields` story (partially read) but no story demonstrates the complete cycle:
+
 1. Submit empty form
 2. `hx-invalid` fires
 3. Error summary appears (`role="alert"`)
@@ -157,7 +163,7 @@ The reset test confirms `hx-reset` is dispatched. It does not verify that field 
 **File:** `hx-form.ts:163-166`
 
 ```ts
-'hx-text-input, hx-select, hx-checkbox, hx-textarea, hx-radio-group, hx-switch'
+'hx-text-input, hx-select, hx-checkbox, hx-textarea, hx-radio-group, hx-switch';
 ```
 
 This selector must be manually updated whenever a new form component is introduced. A protocol-based approach (e.g., querying for elements with a known `formAssociated` marker or shared mixin) would be more resilient.
@@ -167,6 +173,7 @@ This selector must be manually updated whenever a new form component is introduc
 **Directory:** `__screenshots__/hx-form.test.ts/`
 
 Screenshot filenames include:
+
 - `hx-form-Events-dispatches-wc-submit-on-valid-client-side-submit-1.png`
 - `hx-form-Events-dispatches-wc-reset-when-form-is-reset-1.png`
 - `hx-form-Events-dispatches-wc-invalid-when-validation-fails-on-submit-1.png`
@@ -216,20 +223,20 @@ A type alias marked deprecated-for-tests suggests the migration was incomplete. 
 
 ## Missing Coverage Summary
 
-| Audit Area | Status | Gap |
-|---|---|---|
-| TypeScript strict | Pass | Stale JSDoc copy (P2-01, P2-02) |
-| FormData event typing | Partial | `values` is a plain object, not FormData (P2-04) |
-| Accessibility — error summary | Fail | No `role="alert"` rendered in DOM (P0-01) |
-| Accessibility — `aria-invalid` | Fail | Not set on validation failure (P1-03) |
-| Accessibility — forced-colors | Fail | `outline: none` without HCM fallback (P1-01) |
-| Tests — hx-submit with FormData | Partial | No FormData instance in event (P2-04) |
-| Tests — hx-* component validation | Fail | Not tested (P1-05) |
-| Tests — reset clears fields | Partial | Event tested, field values not verified (P2-06) |
-| Storybook — error summary story | Fail | Missing (P1-06) |
-| Storybook — reset story | Partial | Button present, no play function (P2-09) |
-| CSS — `--hx-form-*` tokens | Fail | Declared but never consumed (P1-02) |
-| CSS — CSS parts | N/A | Light DOM — no shadow parts (by design) |
-| Performance — bundle size | Not measured | Requires build analysis |
-| Drupal — server-side validation | Fail | No `setErrors()` API (P1-04) |
-| Drupal — file uploads | Fail | No `enctype` support (P2-05) |
+| Audit Area                         | Status       | Gap                                              |
+| ---------------------------------- | ------------ | ------------------------------------------------ |
+| TypeScript strict                  | Pass         | Stale JSDoc copy (P2-01, P2-02)                  |
+| FormData event typing              | Partial      | `values` is a plain object, not FormData (P2-04) |
+| Accessibility — error summary      | Fail         | No `role="alert"` rendered in DOM (P0-01)        |
+| Accessibility — `aria-invalid`     | Fail         | Not set on validation failure (P1-03)            |
+| Accessibility — forced-colors      | Fail         | `outline: none` without HCM fallback (P1-01)     |
+| Tests — hx-submit with FormData    | Partial      | No FormData instance in event (P2-04)            |
+| Tests — hx-\* component validation | Fail         | Not tested (P1-05)                               |
+| Tests — reset clears fields        | Partial      | Event tested, field values not verified (P2-06)  |
+| Storybook — error summary story    | Fail         | Missing (P1-06)                                  |
+| Storybook — reset story            | Partial      | Button present, no play function (P2-09)         |
+| CSS — `--hx-form-*` tokens         | Fail         | Declared but never consumed (P1-02)              |
+| CSS — CSS parts                    | N/A          | Light DOM — no shadow parts (by design)          |
+| Performance — bundle size          | Not measured | Requires build analysis                          |
+| Drupal — server-side validation    | Fail         | No `setErrors()` API (P1-04)                     |
+| Drupal — file uploads              | Fail         | No `enctype` support (P2-05)                     |
