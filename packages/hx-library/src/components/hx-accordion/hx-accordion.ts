@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
 import './hx-accordion-item.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { tokenEntries, tokensByCategory, tokenMap } from '@helix/tokens';
-import { getTokenStats, isHexColor, resolveTokenRef } from '@helix/tokens/utils';
+import { tokenEntries, tokensByCategory, tokenMap } from '@helixui/tokens';
+import { getTokenStats, isHexColor, resolveTokenRef } from '@helixui/tokens/utils';
 import { Hash, Layers, Link2, FileJson2 } from 'lucide-react';
 import { TokenReferenceTable } from '@/components/tokens/TokenReferenceTable';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
@@ -33,7 +33,7 @@ export default function TokensDashboard() {
         <p className="text-muted-foreground mt-1">
           {allTokens.length} tokens from{' '}
           <code className="text-xs bg-secondary px-1.5 py-0.5 rounded font-mono">
-            @helix/tokens
+            @helixui/tokens
           </code>
         </p>
       </div>

@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { tokenEntries, type TokenEntry } from '@helix/tokens';
+import { tokenEntries, type TokenEntry } from '@helixui/tokens';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { getTokenBreadcrumbs } from '@/lib/breadcrumb-utils';
 

@@ -61,10 +61,10 @@ jobs:
       - name: Format check
         run: npm run format:check
 
-      # ---- Build (must run before tests — @helix/tokens exports from dist/) ----
+      # ---- Build (must run before tests — @helixui/tokens exports from dist/) ----
 
       - name: Build
-        run: npx turbo run build --filter='!docs' --filter='!@helix/storybook'
+        run: npx turbo run build --filter='!docs' --filter='!@helixui/storybook'
 
       # ---- Tests ----
 

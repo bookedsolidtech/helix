@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { z } from 'zod';
-import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
+import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helixui/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
 const HEALTH_HISTORY_DIR = '.claude/health-history';

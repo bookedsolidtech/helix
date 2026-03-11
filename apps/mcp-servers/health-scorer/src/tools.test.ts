@@ -19,7 +19,7 @@ describe('Tool Registration - health-scorer', () => {
 
   beforeEach(() => {
     server = new Server(
-      { name: '@helix/mcp-health-scorer', version: '0.1.0' },
+      { name: '@helixui/mcp-health-scorer', version: '0.1.0' },
       { capabilities: { tools: {} } },
     );
     registerHealthTools(server);

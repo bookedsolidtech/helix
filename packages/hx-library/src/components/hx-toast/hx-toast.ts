@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStyles, helixToastStackStyles } from './hx-toast.styles.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';

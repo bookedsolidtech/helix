@@ -1,9 +1,9 @@
-import '@helix/tokens/tokens.css';
+import '@helixui/tokens/tokens.css';
 import type { Preview } from '@storybook/web-components';
 import { setCustomElementsManifest } from '@storybook/web-components';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { html } from 'lit';
-import customElements from '@helix/library/custom-elements.json';
+import customElements from '@helixui/library/custom-elements.json';
 
 // Register the Custom Elements Manifest so autodocs API tables
 // are populated with properties, events, slots, CSS parts, and
@@ -72,7 +72,7 @@ const preview: Preview = {
     (story) => html`<div style="padding: 2rem;">${story()}</div>`,
 
     // Theme switching via data-theme attribute on <html>.
-    // @helix/tokens/tokens.css defines :root[data-theme="dark"]
+    // @helixui/tokens/tokens.css defines :root[data-theme="dark"]
     // overrides, so this decorator activates them automatically.
     withThemeByDataAttribute({
       themes: {
