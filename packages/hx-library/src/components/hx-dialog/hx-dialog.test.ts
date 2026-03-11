@@ -521,6 +521,84 @@ describe('hx-dialog', () => {
     });
   });
 
+  // ─── Close Button (D17) ───
+
+  describe('Close Button', () => {
+    it('built-in close button closes the dialog when clicked', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Close Test"></hx-dialog>');
+      await el.updateComplete;
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-button"]');
+      expect(closeBtn).toBeTruthy();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
+      closeBtn?.click();
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(el.open).toBe(false);
+    });
+
+    it('close button has aria-label="Close dialog"', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="A11y Test"></hx-dialog>');
+      await el.updateComplete;
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-button"]');
+      expect(closeBtn?.getAttribute('aria-label')).toBe('Close dialog');
+    });
+  });
+
+  // ─── Body Scroll Lock (D4) ───
+
+  describe('Body Scroll Lock', () => {
+    it('sets body overflow to hidden when modal dialog opens', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog heading="Scroll Test"></hx-dialog>');
+      el.showModal();
+      await el.updateComplete;
+      expect(document.body.style.overflow).toBe('hidden');
+      el.close();
+      await el.updateComplete;
+    });
+
+    it('restores body overflow when modal dialog closes', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog heading="Scroll Test"></hx-dialog>');
+      el.showModal();
+      await el.updateComplete;
+      expect(document.body.style.overflow).toBe('hidden');
+      el.close();
+      await el.updateComplete;
+      expect(document.body.style.overflow).toBe('');
+    });
+  });
+
+  // ─── Non-Modal Backdrop (D5) ───
+
+  describe('Non-Modal Backdrop', () => {
+    it('renders a backdrop element for non-modal open dialog', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Non-modal"></hx-dialog>');
+      el.modal = false;
+      await el.updateComplete;
+      const backdrop = shadowQuery(el, '[part="backdrop"]');
+      expect(backdrop).toBeTruthy();
+    });
+
+    it('does not render a backdrop element for modal dialog', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Modal"></hx-dialog>');
+      await el.updateComplete;
+      const backdrop = shadowQuery(el, '[part="backdrop"]');
+      expect(backdrop).toBeFalsy();
+    });
+
+    it('closes non-modal dialog when backdrop is clicked', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Backdrop Test"></hx-dialog>');
+      el.modal = false;
+      await el.updateComplete;
+      const backdrop = shadowQuery<HTMLElement>(el, '[part="backdrop"]');
+      expect(backdrop).toBeTruthy();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-cancel');
+      backdrop?.click();
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(el.open).toBe(false);
+    });
+  });
+
   // ─── Form Submission (D13) ───
 
   describe('Form Submission', () => {
