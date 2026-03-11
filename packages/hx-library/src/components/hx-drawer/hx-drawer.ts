@@ -9,9 +9,10 @@ import { helixDrawerStyles } from './hx-drawer.styles.js';
 let _hxDrawerIdCounter = 0;
 
 type DrawerPlacement = 'start' | 'end' | 'top' | 'bottom';
-type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
+type DrawerSizePreset = 'sm' | 'md' | 'lg' | 'full';
+type DrawerSize = DrawerSizePreset | (string & Record<never, never>);
 
-const DRAWER_SIZE_MAP: Record<DrawerSize, string> = {
+const DRAWER_SIZE_MAP: Record<DrawerSizePreset, string> = {
   sm: '20rem',
   md: '30rem',
   lg: '40rem',
@@ -126,7 +127,7 @@ export class HelixDrawer extends LitElement {
    * @attr size
    */
   @property({ type: String, reflect: true })
-  size: DrawerSize | string = 'md';
+  size: DrawerSize = 'md';
 
   /**
    * When true, the drawer is constrained to its positioned parent instead of the viewport.
@@ -200,7 +201,7 @@ export class HelixDrawer extends LitElement {
   // ─── Private: Size CSS variable ───
 
   private _applySizeVar(): void {
-    const resolvedSize = DRAWER_SIZE_MAP[this.size as DrawerSize] ?? this.size;
+    const resolvedSize = DRAWER_SIZE_MAP[this.size as DrawerSizePreset] ?? this.size;
     this.style.setProperty('--_drawer-size', resolvedSize);
   }
 
