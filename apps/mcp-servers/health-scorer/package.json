@@ -13,7 +13,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@helixui/mcp-shared": "file:../shared",
+    "@helixui/mcp-shared": "*",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "zod": "^3.22.0"
   },
