@@ -49,17 +49,7 @@ jobs:
       - name: Build
         run: npx turbo run build --filter='!docs'
 
-      - name: Check for unreleased changesets
-        id: changesets
-        run: |
-          if ls .changeset/*.md 1>/dev/null 2>&1 && [ "$(ls .changeset/*.md 2>/dev/null | grep -v README.md)" ]; then
-            echo "has_changesets=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changesets=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Version and Publish
-        if: steps.changesets.outputs.has_changesets == 'true'
         uses: changesets/action@v1
         with:
           publish: npm run changeset:publish
@@ -70,7 +60,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
-
-      - name: No changesets found
-        if: steps.changesets.outputs.has_changesets == 'false'
-        run: echo "No unreleased changesets — nothing to publish."
