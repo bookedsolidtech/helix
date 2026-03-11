@@ -1,6 +1,7 @@
 # AUDIT: hx-spinner (T1-09) — Deep Audit Review
 
 **Reviewed files:**
+
 - `hx-spinner.ts`
 - `hx-spinner.styles.ts`
 - `hx-spinner.test.ts`
@@ -23,7 +24,7 @@
 
 **Fix:** Removed `.spinner__sr-text` live region entirely. Component now uses `aria-label` only approach on the `role="status"` container. No duplicate AT announcements.
 
-**Verified by:** Test "does not render .spinner__sr-text (aria-label only approach)"
+**Verified by:** Test "does not render .spinner\_\_sr-text (aria-label only approach)"
 
 ---
 
@@ -117,20 +118,20 @@
 
 ## Summary Matrix
 
-| ID    | Area          | Severity | Status     | Description                                              |
-|-------|---------------|----------|------------|----------------------------------------------------------|
-| P0-1  | Accessibility | P0       | RESOLVED   | Dual announcement: removed sr-text, aria-label only      |
-| P0-2  | Accessibility | P0       | RESOLVED   | Decorative mode: `decorative` property added             |
-| P1-1  | CEM/API       | P1       | RESOLVED   | `--hx-duration-spinner` documented in JSDoc + CEM        |
-| P1-2  | Accessibility | P1       | RESOLVED   | Reduced-motion: full opacity static arc                  |
-| P1-3  | CSS           | P1       | RESOLVED   | `color-mix()`: `@supports` guard + rgba fallback         |
-| P1-4  | Tests         | P1       | RESOLVED   | Reduced-motion CSS rules verified in stylesheet tests    |
-| P1-5  | Tests         | P1       | RESOLVED   | Label reactivity + WCAG empty-string guard tested        |
-| P2-1  | TypeScript    | P2       | RESOLVED   | `size` union documented as intentional design choice     |
-| P2-2  | Drupal/DX     | P2       | RESOLVED   | `label` now reflected (`reflect: true`)                  |
-| P2-3  | DX            | P2       | RESOLVED   | Hardcoded ellipsis removed with sr-text element          |
-| P2-4  | Storybook     | P2       | RESOLVED   | `size` control changed to `text` for custom sizes        |
-| P2-5  | CSS           | P2       | RESOLVED   | SVG dash math documented with inline CSS comments        |
-| P2-6  | Drupal        | P2       | RESOLVED   | Twig template + Drupal integration docs added            |
+| ID   | Area          | Severity | Status   | Description                                           |
+| ---- | ------------- | -------- | -------- | ----------------------------------------------------- |
+| P0-1 | Accessibility | P0       | RESOLVED | Dual announcement: removed sr-text, aria-label only   |
+| P0-2 | Accessibility | P0       | RESOLVED | Decorative mode: `decorative` property added          |
+| P1-1 | CEM/API       | P1       | RESOLVED | `--hx-duration-spinner` documented in JSDoc + CEM     |
+| P1-2 | Accessibility | P1       | RESOLVED | Reduced-motion: full opacity static arc               |
+| P1-3 | CSS           | P1       | RESOLVED | `color-mix()`: `@supports` guard + rgba fallback      |
+| P1-4 | Tests         | P1       | RESOLVED | Reduced-motion CSS rules verified in stylesheet tests |
+| P1-5 | Tests         | P1       | RESOLVED | Label reactivity + WCAG empty-string guard tested     |
+| P2-1 | TypeScript    | P2       | RESOLVED | `size` union documented as intentional design choice  |
+| P2-2 | Drupal/DX     | P2       | RESOLVED | `label` now reflected (`reflect: true`)               |
+| P2-3 | DX            | P2       | RESOLVED | Hardcoded ellipsis removed with sr-text element       |
+| P2-4 | Storybook     | P2       | RESOLVED | `size` control changed to `text` for custom sizes     |
+| P2-5 | CSS           | P2       | RESOLVED | SVG dash math documented with inline CSS comments     |
+| P2-6 | Drupal        | P2       | RESOLVED | Twig template + Drupal integration docs added         |
 
 **All 13 issues resolved. Component passes all 7 quality gates.**
