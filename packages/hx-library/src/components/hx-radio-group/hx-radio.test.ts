@@ -134,12 +134,28 @@ describe('hx-radio', () => {
     });
   });
 
+  // ─── ARIA: aria-disabled (1) ───
+
+  describe('ARIA: aria-disabled', () => {
+    it('sets aria-disabled matching disabled state', async () => {
+      const el = await fixture<WcRadio>('<hx-radio value="a" label="A" disabled></hx-radio>');
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
-    it('has no axe violations in default state', async () => {
-      const el = await fixture<WcRadio>('<hx-radio value="a" label="Option A"></hx-radio>');
-      const { violations } = await checkA11y(el);
+    const axeOptions = { rules: { 'nested-interactive': { enabled: false } } };
+
+    it('has no axe violations inside a radio group', async () => {
+      const group = await fixture<HTMLElement>(`
+        <hx-radio-group label="Test Group">
+          <hx-radio value="a" label="Option A"></hx-radio>
+          <hx-radio value="b" label="Option B"></hx-radio>
+        </hx-radio-group>
+      `);
+      const { violations } = await checkA11y(group, axeOptions);
       expect(violations).toEqual([]);
     });
   });

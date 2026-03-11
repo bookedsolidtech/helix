@@ -1,6 +1,6 @@
 ---
 title: 'hx-radio-group'
-description: A form-associated radio group that manages a set of `<hx-radio>` children.
+description: Form-associated radio group with label, validation, help text, and keyboard navigation. Manages a set of `<hx-radio>` children.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,7 +11,16 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-radio-group" section="summary" />
 
-## Vertical Orientation
+## Overview
+
+`hx-radio-group` is a form-associated custom element that manages a set of `<hx-radio>` children with full keyboard navigation (APG radio group pattern), roving tabindex, and constraint validation via `ElementInternals`.
+
+**Use `hx-radio-group` when:** the user must select exactly one option from a set of mutually exclusive choices.
+**Use `hx-checkbox-group` instead when:** the user can select multiple options.
+
+## Live Demo
+
+### Vertical Orientation
 
 Default vertical layout for radio groups.
 
@@ -29,7 +38,7 @@ Default vertical layout for radio groups.
   </hx-radio-group>
 </ComponentDemo>
 
-## Horizontal Orientation
+### Horizontal Orientation
 
 Horizontal layout for compact radio groups.
 
@@ -41,7 +50,7 @@ Horizontal layout for compact radio groups.
   </hx-radio-group>
 </ComponentDemo>
 
-## Validation
+### Validation
 
 Required group with error state.
 
@@ -63,6 +72,180 @@ Required group with error state.
     </hx-radio-group>
   </div>
 </ComponentDemo>
+
+### Mixed Disabled State
+
+Individual radios can be disabled within an enabled group.
+
+<ComponentDemo title="Mixed Disabled">
+  <hx-radio-group
+    label="Treatment plan"
+    name="treatment"
+    help-text="Some options may not be available."
+  >
+    <hx-radio value="a" label="Conservative treatment"></hx-radio>
+    <hx-radio value="b" label="Surgical intervention" disabled></hx-radio>
+    <hx-radio value="c" label="Physical therapy"></hx-radio>
+  </hx-radio-group>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-radio-group';
+```
+
+## Basic Usage
+
+```html
+<hx-radio-group label="Select option" name="option" required>
+  <hx-radio value="a" label="Option A"></hx-radio>
+  <hx-radio value="b" label="Option B"></hx-radio>
+  <hx-radio value="c" label="Option C"></hx-radio>
+</hx-radio-group>
+```
+
+## Properties
+
+| Property      | Attribute     | Type                         | Default      | Description                                          |
+| ------------- | ------------- | ---------------------------- | ------------ | ---------------------------------------------------- |
+| `value`       | `value`       | `string`                     | `''`         | The selected radio's value.                          |
+| `name`        | `name`        | `string`                     | `''`         | The name used for form submission.                   |
+| `label`       | `label`       | `string`                     | `''`         | The fieldset legend/label text.                      |
+| `required`    | `required`    | `boolean`                    | `false`      | Whether a selection is required for form submission. |
+| `disabled`    | `disabled`    | `boolean`                    | `false`      | Whether the entire group is disabled.                |
+| `error`       | `error`       | `string`                     | `''`         | Error message. When set, enters error state.         |
+| `helpText`    | `help-text`   | `string`                     | `''`         | Help text displayed below the group.                 |
+| `orientation` | `orientation` | `'vertical' \| 'horizontal'` | `'vertical'` | Layout orientation of the radio items.               |
+
+## Events
+
+| Event       | Detail Type                           | Description                                                     |
+| ----------- | ------------------------------------- | --------------------------------------------------------------- |
+| `hx-change` | `{ value: string, checked: boolean }` | Fired when the selected radio changes. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                       | Default                                | Description              |
+| ------------------------------ | -------------------------------------- | ------------------------ |
+| `--hx-radio-group-gap`         | `var(--hx-space-3, 0.75rem)`           | Gap between radio items. |
+| `--hx-radio-group-label-color` | `var(--hx-color-neutral-700, #343a40)` | Label text color.        |
+| `--hx-radio-group-error-color` | `var(--hx-color-error-500, #dc3545)`   | Error message color.     |
+
+## CSS Parts
+
+| Part        | Description                    |
+| ----------- | ------------------------------ |
+| `fieldset`  | The outer fieldset wrapper.    |
+| `legend`    | The legend/label element.      |
+| `group`     | The container for radio items. |
+| `error`     | The error message div.         |
+| `help-text` | The help text div.             |
+
+## Slots
+
+| Slot        | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| _(default)_ | `<hx-radio>` child elements.                                 |
+| `error`     | Custom error content. Overrides the `error` property.        |
+| `help-text` | Custom help text content. Overrides the `helpText` property. |
+
+## Accessibility
+
+| Topic              | Details                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| ARIA role          | `role="radiogroup"` on the shadow fieldset.                                                    |
+| `aria-labelledby`  | Points to the internal legend element for accessible naming.                                   |
+| `aria-required`    | Set to `"true"` on the fieldset when the `required` property is set.                           |
+| `aria-describedby` | Wired to the error div when `error` is set; otherwise wired to the help text div.              |
+| Error announcement | Error div uses `role="alert"` for immediate screen reader announcement.                        |
+| Keyboard           | Arrow keys navigate radios. Space selects. Home/End jump to first/last. Circular wrapping.     |
+| Roving tabindex    | Selected radio gets `tabindex="0"`, others get `tabindex="-1"`.                                |
+| Focus visible      | Focus ring renders on `:host(:focus-visible)` of the focused `hx-radio`.                       |
+| Disabled           | Group-level disabled propagates to all children. Individual radios restore state on re-enable. |
+| Form validation    | `checkValidity()` and `reportValidity()` delegate to `ElementInternals`.                       |
+| WCAG 2.1 AA        | Verified with axe-core across all states: default, selected, error, disabled.                  |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-radio-group
+  name="{{ field_name }}"
+  label="{{ field_label }}"
+  {% if field_required %}required{% endif %}
+  {% if field_disabled %}disabled{% endif %}
+  {% if field_error %}error="{{ field_error }}"{% endif %}
+  {% if field_help %}help-text="{{ field_help }}"{% endif %}
+>
+  {% for option in options %}
+    <hx-radio
+      value="{{ option.value }}"
+      label="{{ option.label }}"
+      {% if option.disabled %}disabled{% endif %}
+    ></hx-radio>
+  {% endfor %}
+</hx-radio-group>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for the `hx-change` event in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.myRadioGroup = {
+  attach(context) {
+    once('myRadioGroup', 'hx-radio-group', context).forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        const { value } = e.detail;
+        // update hidden field or trigger AJAX
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-radio-group example</title>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; display: grid; gap: 1rem; max-width: 400px;">
+    <hx-radio-group
+      id="demo"
+      label="Select a department"
+      name="department"
+      required
+      help-text="Choose the department for this request."
+    >
+      <hx-radio value="eng" label="Engineering"></hx-radio>
+      <hx-radio value="design" label="Design"></hx-radio>
+      <hx-radio value="product" label="Product"></hx-radio>
+    </hx-radio-group>
+
+    <script>
+      document.getElementById('demo').addEventListener('hx-change', (e) => {
+        console.log('Selected:', e.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 
