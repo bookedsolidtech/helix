@@ -73,6 +73,9 @@ export class HelixContainer extends LitElement {
   }
 }
 
+/** @deprecated Use `HelixContainer` directly. Alias kept for backward compatibility. */
+export type WcContainer = HelixContainer;
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-container': HelixContainer;
