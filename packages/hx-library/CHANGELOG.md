@@ -1,5 +1,13 @@
 # @helixui/library
 
+## 0.1.3
+
+### Patch Changes
+
+- 553b322: fix: remove manual changeset gating from publish pipeline — let changesets/action handle both version PR creation and npm publish internally
+- Updated dependencies [553b322]
+  - @helixui/tokens@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
