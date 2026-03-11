@@ -1,328 +1,231 @@
-# AUDIT: hx-action-bar — T3-07 Antagonistic Quality Review
+# AUDIT: hx-action-bar — Deep Opus-Level Quality Review
 
-**Reviewer:** Automated antagonistic audit agent
-**Date:** 2026-03-06
+**Reviewer:** Deep audit agent (opus-level)
+**Date:** 2026-03-11
 **Scope:** All files in `packages/hx-library/src/components/hx-action-bar/`
-**Mandate:** Document defects only. Do NOT fix.
+**Mandate:** Comprehensive audit covering API completeness, accessibility, TypeScript, tests, Storybook, tokens, Shadow DOM, performance, edge cases. Document defects with severity → GitHub Issues.
 
 ---
 
-## Summary
+## Previous Audit Status (T3-07, 2026-03-06)
 
-| Severity     | Count  |
-| ------------ | ------ |
-| P0 (Blocker) | 2      |
-| P1 (High)    | 8      |
-| P2 (Medium)  | 8      |
-| **Total**    | **18** |
+The previous antagonistic review found 18 issues (2 P0, 8 P1, 8 P2). **15 of 18 have been resolved:**
 
----
-
-## P0 — Blockers
-
-### P0-01: `overflow` slot is permanently hidden — documented API that is non-functional
-
-**File:** `hx-action-bar.ts:202`
-
-```html
-<div class="section section--overflow" hidden>
-  <slot name="overflow" @slotchange="${this._handleSlotChange}"></slot>
-</div>
-```
-
-The `overflow` slot is declared in the JSDoc (`@slot overflow — Actions hidden in an overflow menu when space is limited`) and will appear in the CEM, but the wrapper `<div>` has `hidden` unconditionally set with no code to ever remove it. There is no `ResizeObserver`, no overflow detection, and no logic to reveal this slot. Any consumer placing content in `slot="overflow"` will see nothing rendered. The public API promise is broken.
-
-**Impact:** Any downstream consumer (Drupal Twig template, application code) that uses `slot="overflow"` will silently drop content.
+| ID | Status | Resolution |
+|----|--------|------------|
+| P0-01 | RESOLVED | Overflow slot now uses `?hidden=${!this._hasOverflow}` with reactive `_hasOverflow` state |
+| P0-02 | RESOLVED | Home/End keys now handle focus directly without calling `_moveFocus` |
+| P1-01 | RESOLVED | `position: 'top' \| 'bottom' \| 'sticky'` property added |
+| P1-02 | RESOLVED | Safe area insets added for both sticky and bottom positions |
+| P1-03 | RESOLVED | `ariaLabel` is now a reactive `@property({ attribute: 'aria-label' })` |
+| P1-04 | RESOLVED | `_isFocusable()` now uses `el.tabIndex >= 0` IDL property (covers ElementInternals) |
+| P1-05 | RESOLVED | Twig template `hx-action-bar.twig` added |
+| P1-06 | RESOLVED | Test coverage added for Home, End, ArrowLeft wrap, tabindex init, disabled, disconnectedCallback |
+| P1-07 | PARTIALLY RESOLVED | Stories now use `var(--hx-token, #fallback)` pattern but still use raw `<button>` not `hx-button` |
+| P1-08 | RESOLVED | `_getFocusableItems()` no longer double-counts — only recurses into non-focusable wrappers |
+| P2-01 | RESOLVED | `_focusableCache` added with invalidation on slot change |
+| P2-02 | RESOLVED | Dead `prefers-reduced-motion` block removed |
+| P2-03 | RESOLVED | Center alignment fixed with `flex: 1 1 0` on start/end for equal flex-basis |
+| P2-04 | RESOLVED | `_handleKeydown` is now an arrow function class field |
+| P2-05 | RESOLVED | Default story play function now uses `canvas` variable properly |
+| P2-06 | RESOLVED | KeyboardNavigation story now has comprehensive `userEvent.keyboard` play function |
+| P2-07 | RESOLVED | CSS comment documents `scroll-padding-top` guidance; Sticky story mentions it |
+| P2-08 | OPEN (downgraded to P3) | Default `'Actions'` label is still generic but documented in JSDoc as required |
 
 ---
 
-### P0-02: `Home` key handler fires a spurious `.focus()` call on an incorrect element
+## Current Audit Summary
 
-**File:** `hx-action-bar.ts:160-167`
-
-```typescript
-} else if (e.key === 'Home') {
-  e.preventDefault();
-  this._moveFocus('prev'); // go to first via wrap  <-- WRONG
-  const items = this._getFocusableItems();
-  if (items.length) {
-    items.forEach((el, i) => el.setAttribute('tabindex', i === 0 ? '0' : '-1'));
-    items[0]?.focus();
-  }
-}
-```
-
-`_moveFocus('prev')` is called first. When the current focused item is `items[0]`, this call wraps backward and calls `.focus()` on `items[items.length - 1]` — the last item. Immediately afterward, `items[0]?.focus()` is called, correcting to the first item. This results in two programmatic `.focus()` calls: one on the last element, one on the first. Both trigger `focusin`/`focus` events. The `focusin` event on the last element is spurious and incorrect per the ARIA toolbar specification, which states `Home` moves focus directly to the first item without visiting others.
-
-**Impact:** Screen readers announce the last item before the first on `Home` keypress. Assistive technology users receive incorrect navigation feedback. This is a WCAG 2.1 AA failure (SC 2.1.1 Keyboard, 4.1.3 Status Messages via AT announcements).
+| Severity     | Count |
+|-------------|-------|
+| P1 (High)   | 1     |
+| P2 (Medium) | 5     |
+| P3 (Low)    | 3     |
+| **Total**   | **9** |
 
 ---
 
 ## P1 — High Priority
 
-### P1-01: `position` property absent — spec requires `top | bottom | sticky`, implementation uses boolean `sticky`
+### P1-01: `_initRovingTabindex()` breaks keyboard access after dynamic slot changes
 
-**File:** `hx-action-bar.ts:63-65`
-
-The audit spec requires: _"position typed (top/bottom/sticky)"_. The implementation provides:
+**File:** `hx-action-bar.ts:186-194`
 
 ```typescript
-@property({ type: Boolean, reflect: true })
-sticky = false;
-```
-
-There is no `position: 'top' | 'bottom' | 'sticky'` property. There is no support for `position="bottom"` — sticking to the bottom of a scroll container, which is the dominant pattern for mobile action bars. The boolean `sticky` only supports `top: 0`. An action bar at the bottom of a patient form (common healthcare UX) cannot be achieved.
-
----
-
-### P1-02: No mobile safe area insets — iOS home indicator will obscure sticky bottom bars
-
-**File:** `hx-action-bar.styles.ts:24-28`
-
-```css
-.base--sticky {
-  position: sticky;
-  top: 0;
-  z-index: var(--hx-action-bar-z-index, 10);
+private _initRovingTabindex(): void {
+  this._focusableCache = null;
+  const items = this._getFocusableItems();
+  if (!items.length) return;
+  const hasActive = items.some((el) => el.getAttribute('tabindex') === '0');
+  items.forEach((el, i) => {
+    el.setAttribute('tabindex', !hasActive && i === 0 ? '0' : '-1');
+  });
 }
 ```
 
-There is no `env(safe-area-inset-top)` or `env(safe-area-inset-bottom)` anywhere in the styles. The audit spec explicitly requires _"safe area insets for mobile."_ On iOS Safari with a home indicator, a sticky bar positioned at the bottom would be partially obscured. In healthcare apps displayed on tablets/iPads at the bedside, this is a patient safety issue.
+**Bug:** When `hasActive` is `true` (an item already has `tabindex="0"` from a previous initialization), the ternary `!hasActive && i === 0` evaluates to `false` for ALL items. Every item — including the one that had `tabindex="0"` — gets set to `tabindex="-1"`. After this runs, zero items are keyboard-reachable via Tab.
+
+**Reproduction:** Dynamically add a button to a slot after initial render. The `slotchange` event fires, `_initRovingTabindex()` runs, `hasActive` is `true` (from the initial setup), and all items lose `tabindex="0"`.
+
+**Impact:** In healthcare apps that dynamically show/hide toolbar actions based on patient context (common pattern), the toolbar becomes keyboard-inaccessible after the first dynamic update. WCAG 2.1 AA failure (SC 2.1.1 Keyboard).
+
+**Fix:** When `hasActive` is true, preserve the existing `tabindex="0"` item instead of clearing all:
+```typescript
+if (!hasActive) {
+  items.forEach((el, i) => el.setAttribute('tabindex', i === 0 ? '0' : '-1'));
+} else {
+  // Ensure new items get tabindex="-1" without disturbing the active item
+  items.forEach((el) => {
+    if (el.getAttribute('tabindex') === null) el.setAttribute('tabindex', '-1');
+  });
+}
+```
 
 ---
 
-### P1-03: `aria-label` is not reactive — host attribute changes after first render are silently ignored
+## P2 — Medium Priority
 
-**File:** `hx-action-bar.ts:190`
+### P2-01: `ariaLabel` property shadows native `HTMLElement.ariaLabel` — dual `aria-label` on host and inner toolbar
 
-```typescript
-aria-label=${this.getAttribute('aria-label') ?? 'Actions'}
-```
-
-`this.getAttribute('aria-label')` is a DOM read inside `render()`. Lit does not track imperative DOM reads as reactive dependencies. If the consumer sets `aria-label` after the component has rendered (e.g., via JavaScript, or late binding in Drupal), the toolbar's inner `role="toolbar"` element will not update. The correct Lit pattern is:
+**File:** `hx-action-bar.ts:83-84`
 
 ```typescript
 @property({ attribute: 'aria-label' })
 ariaLabel: string = 'Actions';
 ```
 
-Additionally, the host element itself now carries an `aria-label` attribute (from the consumer) without any `role`, which is technically valid but may confuse linters and automated accessibility checkers expecting `aria-label` to be on an element with a matching role.
+The consumer writes `<hx-action-bar aria-label="Patient actions">`. This sets `aria-label` on the host element (which has no `role`). The component then copies this value to the inner `<div role="toolbar" aria-label="Patient actions">`. The result is two `aria-label` attributes in the accessibility tree — one on a role-less host, one on the toolbar. While technically valid, some screen readers may announce the label twice when navigating by landmark or toolbar.
+
+The `ariaLabel` property name also shadows `HTMLElement.prototype.ariaLabel` (the native ARIA reflection API). Lit's property system handles this, but it can cause confusion for TypeScript consumers who expect `el.ariaLabel` to behave like native ARIA reflection.
+
+**Impact:** Potential double-announcement in assistive technology. Low risk but worth noting for healthcare compliance audits.
 
 ---
 
-### P1-04: Custom element focusable items not discoverable — `hx-button` and similar components invisible to roving tabindex
+### P2-02: Missing `overflow` CSS part — inconsistent part API
 
-**File:** `hx-action-bar.ts:82-101`
+**File:** `hx-action-bar.ts:250`
 
-`_getFocusableItems()` discovers focusable items using a CSS selector:
-
-```typescript
-'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+```html
+<div class="section section--overflow" ?hidden=${!this._hasOverflow}>
+  <slot name="overflow" @slotchange=${this._handleSlotChange}></slot>
+</div>
 ```
 
-This selector targets native HTML elements only. A `<hx-button>` custom element does not match `button` (its tag is `hx-button`), does not have `[href]`, and its `tabindex` may only be set via `ElementInternals` (not a DOM attribute). These elements are completely invisible to the roving tabindex system. Any action bar populated with design system components (`hx-button`, `hx-icon-button`) will have no keyboard navigation.
+The `start`, `center`, and `end` section wrappers all expose CSS `part` attributes (`part="start"`, `part="center"`, `part="end"`). The overflow section wrapper does not expose a part. Consumers cannot style the overflow section via `::part(overflow)` even though they can style all other sections.
 
-Additionally, `_isFocusable()` checks `el.hasAttribute('disabled')`, which does not detect disabled state managed through `ElementInternals.ariaDisabled` or through a `disabled` property that doesn't reflect to attribute.
+The JSDoc documents only `base`, `start`, `center`, `end` parts — which matches the implementation — but the inconsistency means a consumer adding overflow content has no styling hook for that section.
 
----
-
-### P1-05: No Drupal Twig template provided
-
-**File:** (missing)
-
-The audit spec requires: _"Drupal — Twig-renderable."_ No Twig template exists. The component directory contains no `.twig` file, no `drupal-behaviors.js`, and no Drupal-specific documentation. The primary consumer of this design system is Drupal CMS. Without a Twig template, Drupal integrators must hand-craft the markup, risking incorrect slot usage, missing `aria-label`, and incorrect attribute binding.
+**Fix:** Add `part="overflow"` to the overflow div and document it in JSDoc.
 
 ---
 
-### P1-06: Test suite missing coverage for `Home`, `End`, ArrowLeft wrap, tabindex state, and disabled exclusion
+### P2-03: No `aria-orientation` on toolbar
 
-**File:** `hx-action-bar.test.ts`
+**File:** `hx-action-bar.ts:237`
 
-Critical code paths with zero test coverage:
+```html
+<div part="base" role="toolbar" aria-label=${this.ariaLabel} ...>
+```
 
-| Missing Test                                     | Code Path                        |
-| ------------------------------------------------ | -------------------------------- |
-| `Home` key moves focus to first item             | `_handleKeydown` Home branch     |
-| `End` key moves focus to last item               | `_handleKeydown` End branch      |
-| `ArrowLeft` wraps last-to-first                  | `_moveFocus('prev')` wrap        |
-| `_initRovingTabindex` sets first item tabindex=0 | `_initRovingTabindex()`          |
-| Disabled item excluded from navigation           | `_isFocusable()` disabled branch |
-| `disconnectedCallback` removes keydown listener  | Memory leak guard                |
-| Custom element in slot gets proper tabindex      | Focusable item discovery         |
-| Sticky axe-core accessibility                    | Sticky state a11y                |
+The ARIA Authoring Practices Guide for toolbar recommends setting `aria-orientation="horizontal"` when the toolbar layout is horizontal. While `horizontal` is the default implied value, explicitly setting it improves compatibility with older assistive technology and makes the intent unambiguous.
 
-The Home key P0 bug (P0-02) is untested, meaning a broken behavior has shipped without detection.
+**Fix:** Add `aria-orientation="horizontal"` to the toolbar div.
 
 ---
 
-### P1-07: Storybook stories use hardcoded raw colors instead of design tokens or hx-button
+### P2-04: Deprecated `sticky` property has no runtime deprecation warning
+
+**File:** `hx-action-bar.ts:74-76`
+
+```typescript
+/**
+ * @deprecated Use `position="sticky"` instead.
+ */
+@property({ type: Boolean, reflect: true })
+sticky = false;
+```
+
+The `@deprecated` JSDoc tag only affects CEM output and editor hints. Consumers using the attribute in HTML (`<hx-action-bar sticky>`) receive no runtime feedback that this API is deprecated. A `console.warn` in `updated()` when `sticky` changes to `true` would help Drupal/CMS teams identify usage during QA.
+
+---
+
+### P2-05: No story demonstrating empty action bar or overflow slot
+
+**File:** `hx-action-bar.stories.ts`
+
+Edge cases not covered by any story:
+1. **Empty action bar** — no slotted content at all. Verifies the component degrades gracefully.
+2. **Overflow slot** — the overflow slot is a documented API feature with reactive visibility, but no story demonstrates it.
+3. **Bottom position** — `position="bottom"` has no dedicated story despite being a key mobile pattern.
+4. **Mixed hx-button + native button** — no story shows integration with the design system's own button component.
+
+These gaps mean consumers have no reference for these use cases in the Storybook playground.
+
+---
+
+## P3 — Low Priority
+
+### P3-01: Stories use raw `<button>` elements instead of `hx-button`
 
 **File:** `hx-action-bar.stories.ts` (throughout)
 
-Every story renders action buttons with hardcoded inline styles:
-
-```html
-<button
-  style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer;"
-></button>
-```
-
-And `PatientRecordToolbar` uses raw hex values:
-
-- `#2563eb` (hardcoded brand blue)
-- `#fca5a5`, `#fef2f2`, `#dc2626` (hardcoded danger red)
-
-This violates the project's zero-tolerance policy on hardcoded values and defeats the purpose of demonstrating design system integration. The stories teach consumers incorrect usage patterns — a consumer reading these stories learns to use raw HTML buttons with hardcoded styles alongside `hx-action-bar`, rather than using `hx-button`.
+All stories render native `<button>` elements with inline styles using token vars as fallbacks. While the token usage is correct (`var(--hx-token, #fallback)`), the stories should demonstrate real-world usage with `hx-button` to validate the roving tabindex works with custom elements and teach consumers the intended integration pattern.
 
 ---
 
-### P1-08: `_getFocusableItems()` includes direct focusable slots AND their focusable descendants — double-counts compound components
+### P3-02: `_isFocusable()` does not check `ariaDisabled` for ARIA-only disabled state
 
-**File:** `hx-action-bar.ts:82-101`
+**File:** `hx-action-bar.ts:140-144`
 
 ```typescript
-for (const el of assigned) {
-  if (el instanceof HTMLElement && this._isFocusable(el)) {
-    items.push(el);  // push the element itself
-  }
-  // Also gather focusable descendants
-  const descendants = (el as HTMLElement).querySelectorAll<HTMLElement>(...)
-  for (const d of Array.from(descendants)) {
-    items.push(d);  // push its descendants too
-  }
-}
-```
-
-If an assigned slotted element is itself focusable (e.g., `<a href>` wrapping a button), it is pushed to `items`. Then its descendants are ALSO queried, potentially adding the same logical interactive target multiple times under different DOM nodes. More importantly: if a slotted `<div>` wraps a `<button>` and the `<button>` is focusable, the button gets added twice — once from the descendant query and once if the wrapping `<div>` had tabindex. The roving tabindex logic would then assign `-1` to the second copy while navigating by index, corrupting state.
-
----
-
-## P2 — Medium Priority
-
-### P2-01: `_getFocusableItems()` called on every keydown with no caching
-
-**File:** `hx-action-bar.ts:130-148`
-
-`_moveFocus()` calls `_getFocusableItems()` on every `ArrowLeft`/`ArrowRight`/`Home`/`End` keypress. `_getFocusableItems()` queries all `<slot>` elements, calls `assignedElements({ flatten: true })`, and runs `querySelectorAll` on each. For large toolbars with many items, rapid keyboard navigation will cause repeated DOM thrashing. The item list should be cached after slot changes and invalidated on `slotchange`.
-
----
-
-### P2-02: `transition: none` in `prefers-reduced-motion` is dead code
-
-**File:** `hx-action-bar.styles.ts:96-101`
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .base {
-    transition: none;
-  }
-}
-```
-
-No `transition` property is defined on `.base` or any other element in the stylesheet. This `prefers-reduced-motion` block applies `transition: none` to a component that has no transitions. It is inert dead code that adds confusion and a false signal that transitions were intended but reduced.
-
----
-
-### P2-03: Three-section layout with competing auto margins does not guarantee true center alignment
-
-**File:** `hx-action-bar.styles.ts:74-87`
-
-```css
-.section--start {
-  flex: 0 0 auto;
-  margin-inline-end: auto;
-}
-.section--center {
-  flex: 1 1 auto;
-  justify-content: center;
-}
-.section--end {
-  flex: 0 0 auto;
-  margin-inline-start: auto;
-}
-```
-
-With all three sections populated, the `margin-inline-end: auto` on `.section--start` pushes content rightward. The `margin-inline-start: auto` on `.section--end` pushes content leftward. The center section (`flex: 1 1 auto`) takes the remaining space. However, `justify-content: center` on the center section centers content _within_ the center section's available space, not within the total bar width. If the start section is wider than the end section, the center content will visually appear off-center. For a healthcare record identifier displayed in center (as in `PatientRecordToolbar`), this is a visual accuracy defect.
-
----
-
-### P2-04: `_handleKeydown` bound in `connectedCallback` is an unusual and fragile pattern
-
-**File:** `hx-action-bar.ts:69-73`
-
-```typescript
-override connectedCallback(): void {
-  super.connectedCallback();
-  this._handleKeydown = this._handleKeydown.bind(this);
-  this.addEventListener('keydown', this._handleKeydown);
-}
-```
-
-The standard pattern for bound event handlers in Lit is to declare them as arrow function class fields:
-
-```typescript
-private _handleKeydown = (e: KeyboardEvent) => { ... };
-```
-
-The current approach reassigns the prototype method to an instance property on every `connectedCallback`. This means the instance shadows the prototype method. It works, but if `connectedCallback` is called multiple times (element moved in DOM), a new bound function is created and assigned — the previous bound reference used for `removeEventListener` in `disconnectedCallback` is the same instance property, so it works correctly. However, this is an unusual pattern that is not idiomatic Lit and could break if the code is refactored (e.g., if someone adds a super call that reads `_handleKeydown` before it is rebound).
-
----
-
-### P2-05: Dead code in Default story play function
-
-**File:** `hx-action-bar.stories.ts:82`
-
-```typescript
-play: async ({ canvasElement }) => {
-  const _canvas = within(canvasElement);  // never used
+private _isFocusable(el: HTMLElement): boolean {
+  if (el.hasAttribute('disabled')) return false;
+  const elWithDisabled = el as HTMLElement & { disabled?: boolean };
+  if (elWithDisabled.disabled === true) return false;
   ...
 }
 ```
 
-`_canvas` is declared but never used. The underscore prefix is a convention for intentionally unused variables, but this is a linting violation (`no-unused-vars`) in strict mode and indicates the play function was copied from a template and not properly implemented. The Default story play function should verify more than just the presence of `role="toolbar"`.
+Elements that use `aria-disabled="true"` without the native `disabled` attribute (common in custom elements for keeping focus while indicating disabled state) will still be included in the roving tabindex. This is arguably correct per ARIA semantics (aria-disabled elements are focusable but non-interactive), but it's worth documenting the design decision.
 
 ---
 
-### P2-06: `KeyboardNavigation` story play function does not test keyboard navigation
+### P3-03: Default `aria-label` of `'Actions'` is non-descriptive
 
-**File:** `hx-action-bar.stories.ts:267-273`
+**File:** `hx-action-bar.ts:84`
 
-```typescript
-play: async ({ canvasElement }) => {
-  const el = canvasElement.querySelector('hx-action-bar');
-  await expect(el).toBeTruthy();
-  const base = el?.shadowRoot?.querySelector('[part="base"]');
-  await expect(base?.getAttribute('role')).toBe('toolbar');
-},
-```
-
-A story named `KeyboardNavigation` should use `userEvent.keyboard` to actually navigate the toolbar, verify focus moves correctly between buttons, and assert the roving tabindex state. Instead it only verifies the role attribute — identical to what the `Default` story already checks. This story provides false confidence that keyboard navigation has been validated in Storybook.
+Carried forward from previous audit (P2-08, downgraded). The default `'Actions'` label is generic. Multiple action bars on a page without explicit labels will all announce identically. The JSDoc now documents this as "Required when multiple toolbars appear on the same page" which is sufficient, but a lint rule or dev-mode console warning would be stronger.
 
 ---
 
-### P2-07: No `scroll-padding-top` compensation documented or provided for sticky bar
+## Verified Clean Areas
 
-**File:** `hx-action-bar.styles.ts`
-
-When `sticky` is `true`, the bar sits at `top: 0` and overlaps content scrolled behind it. There is no documentation, no CSS custom property, and no example showing consumers how to add `scroll-padding-top` or `padding-top` to the scroll container to prevent anchor links from scrolling behind the sticky bar. In healthcare forms where section anchors are common, this creates a usability defect where navigation jumps to content hidden behind the bar.
-
----
-
-### P2-08: Default `aria-label` fallback of `'Actions'` is non-descriptive and should be documented as required
-
-**File:** `hx-action-bar.ts:190`
-
-```typescript
-aria-label=${this.getAttribute('aria-label') ?? 'Actions'}
-```
-
-The fallback value `'Actions'` is generic. If multiple action bars exist on a page (patient header bar + patient footer bar), all without explicit `aria-label`, they all announce as "Actions toolbar" to screen readers, providing no distinguishing context. The ARIA spec for `role="toolbar"` recommends a label when multiple toolbars are present. This should be a documented required attribute, not a silently defaulted optional.
+| Area | Status | Evidence |
+|------|--------|----------|
+| TypeScript strict | PASS | `npm run type-check` — zero errors |
+| Bundle size | PASS | 2.7 KB gzipped (budget: <5KB) |
+| CEM accuracy | PASS | `custom-elements.json` reflects all public properties, slots, parts, CSS custom properties |
+| Shadow DOM encapsulation | PASS | All styles scoped, no light DOM style leakage |
+| Design token usage | PASS | All colors, spacing, typography use `--hx-*` tokens with semantic fallbacks |
+| CSS parts/slots | PASS (see P2-02) | `base`, `start`, `center`, `end` parts exposed; 4 slots (start, default, end, overflow) |
+| Keyboard navigation | PASS (see P1-01) | ArrowLeft/Right with wrap, Home/End direct jump, disabled item skip |
+| Test count | 30 tests | Rendering (5), size (3), variant (3), position (5), slots (5), keyboard nav (9), a11y axe-core (4) |
+| Drupal compatibility | PASS | Twig template with proper variable defaults and attribute passthrough |
+| Roving tabindex caching | PASS | `_focusableCache` invalidated on `slotchange` |
 
 ---
 
-## Findings Not Investigated (Out of Scope / Cannot Verify Without Running)
+## Recommendations Summary
 
-- Actual bundle size (need `npm run build` + analysis)
-- CEM accuracy against generated `custom-elements.json` (need `npm run cem`)
-- Visual regression of center section alignment across real browsers
-- `env(safe-area-inset-*)` rendering on real iOS devices
+| Priority | Issue | Effort |
+|----------|-------|--------|
+| P1-01 | Fix `_initRovingTabindex` to preserve active item on slot change | Small (5 lines) |
+| P2-01 | Consider removing host `aria-label` reflection or adding `role="none"` to host | Medium |
+| P2-02 | Add `part="overflow"` to overflow section div | Trivial |
+| P2-03 | Add `aria-orientation="horizontal"` to toolbar div | Trivial |
+| P2-04 | Add `console.warn` for deprecated `sticky` property | Small |
+| P2-05 | Add Empty, Overflow, Bottom, and hx-button integration stories | Medium |
+| P3-01 | Migrate stories to use `hx-button` | Medium |
+| P3-02 | Document `ariaDisabled` handling design decision | Trivial |
+| P3-03 | Consider dev-mode warning for default aria-label | Small |
