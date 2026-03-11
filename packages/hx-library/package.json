@@ -5,7 +5,9 @@
   "type": "module",
   "sideEffects": [
     "**/*.css",
-    "src/components/**/*.ts"
+    "src/components/**/*.ts",
+    "dist/components/**/*.js",
+    "dist/shared/**/*.js"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
