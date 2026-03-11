@@ -1,27 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 import type { HelixFieldLabel } from './hx-field-label.js';
 import './hx-field-label.js';
-
-// ─────────────────────────────────────────────────
-// Test Helpers
-// ─────────────────────────────────────────────────
-
-function getLabelHost(canvasElement: Element): HTMLElement {
-  const host = canvasElement.querySelector('hx-field-label');
-  if (!host) {
-    throw new Error('hx-field-label element not found');
-  }
-  return host as HTMLElement;
-}
-
-function getShadowRoot(host: HTMLElement): HTMLElement {
-  if (!host.shadowRoot) {
-    throw new Error('shadowRoot not available on hx-field-label');
-  }
-  return host.shadowRoot as unknown as HTMLElement;
-}
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
@@ -35,7 +16,7 @@ const meta = {
     for: {
       control: 'text',
       description:
-        'ID of the associated form control. When set, renders a native `<label for="...">` element for direct label association. When unset, renders a `<span>` for aria-labelledby use.',
+        'ID of the associated form control. Renders a native `<label for="...">` in shadow DOM. **Important:** Due to shadow DOM scoping, this only works for inputs in the same shadow root. For light-DOM inputs, use `aria-labelledby` on the input pointing to the `hx-field-label` host `id`.',
       table: {
         category: 'Association',
         defaultValue: { summary: "''" },
@@ -86,7 +67,7 @@ export const Default: Story = {
   name: 'Default (span)',
   args: {},
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement);
+    const host = canvasElement.querySelector('hx-field-label')!;
     await expect(host).toBeTruthy();
 
     const base = host.shadowRoot!.querySelector('[part="base"]');
@@ -95,19 +76,20 @@ export const Default: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 2. WITH FOR — native label association
+// 2. ARIA-LABELLEDBY — correct cross-shadow-DOM pattern
 // ─────────────────────────────────────────────────
 
-export const WithFor: Story = {
-  name: 'With For Attribute (label)',
+export const AriaLabelledBy: Story = {
+  name: 'aria-labelledby Pattern (recommended)',
   render: () => html`
     <div>
-      <hx-field-label for="patient-email">Patient Email</hx-field-label>
+      <hx-field-label id="label-patient-email">Patient Email</hx-field-label>
       <input
         id="patient-email"
         type="email"
         placeholder="clinician@hospital.org"
-        style="display: block; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+        aria-labelledby="label-patient-email"
+        style="display: block; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
       />
     </div>
   `,
@@ -115,22 +97,57 @@ export const WithFor: Story = {
     docs: {
       description: {
         story:
-          "**Note:** Due to the shadow DOM boundary, the `for` attribute on `hx-field-label` only creates a label association when the input is in the same shadow root. For inputs in light DOM, use `aria-labelledby` pointing to the `hx-field-label` host's `id` instead.",
+          'The recommended pattern for associating `hx-field-label` with light-DOM inputs. Use `aria-labelledby` on the input, pointing to the `id` on the `hx-field-label` host element. This works correctly across the shadow DOM boundary.',
       },
     },
   },
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement);
+    const host = canvasElement.querySelector('hx-field-label')!;
     await expect(host).toBeTruthy();
+    await expect(host.id).toBe('label-patient-email');
 
-    const base = host.shadowRoot!.querySelector('[part="base"]');
-    await expect(base?.tagName.toLowerCase()).toBe('label');
-    await expect(base?.getAttribute('for')).toBe('patient-email');
+    const input = canvasElement.querySelector('input')!;
+    await expect(input.getAttribute('aria-labelledby')).toBe('label-patient-email');
   },
 };
 
 // ─────────────────────────────────────────────────
-// 3. REQUIRED
+// 3. WITH FOR — same-shadow-root label association
+// ─────────────────────────────────────────────────
+
+export const WithFor: Story = {
+  name: 'With For Attribute (same shadow root only)',
+  render: () => html`
+    <div>
+      <hx-field-label for="demo-input">Patient Email</hx-field-label>
+      <p
+        style="margin-top: var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6b7280);"
+      >
+        The <code>for</code> attribute renders a native
+        <code>&lt;label&gt;</code> inside shadow DOM. This only creates a
+        functional association when the target input is in the <strong>same shadow root</strong>. For
+        light-DOM inputs, use the <code>aria-labelledby</code> pattern instead.
+      </p>
+    </div>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The `for` attribute renders a native `<label for="...">` inside shadow DOM. Due to shadow DOM scoping, this only creates a label-input association when the input is in the **same shadow root**. For light-DOM inputs (the typical deployment), use the `aria-labelledby` pattern.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-field-label')!;
+    const base = host.shadowRoot!.querySelector('[part="base"]');
+    await expect(base?.tagName.toLowerCase()).toBe('label');
+    await expect(base?.getAttribute('for')).toBe('demo-input');
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 4. REQUIRED
 // ─────────────────────────────────────────────────
 
 export const Required: Story = {
@@ -138,20 +155,27 @@ export const Required: Story = {
   args: {
     required: true,
   },
-  render: () => html` <hx-field-label required for="mrn">Medical Record Number</hx-field-label> `,
+  render: () => html` <hx-field-label required>Medical Record Number</hx-field-label> `,
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement);
+    const host = canvasElement.querySelector('hx-field-label')! as HelixFieldLabel;
     await expect(host.hasAttribute('required')).toBe(true);
 
-    const shadow = within(getShadowRoot(host));
-    const indicator = shadow.getByText('*');
+    const indicator = host.shadowRoot!.querySelector('[part="required-indicator"]');
     await expect(indicator).toBeTruthy();
-    await expect(indicator.getAttribute('aria-hidden')).toBe('true');
+
+    // Visual asterisk is aria-hidden
+    const ariaHidden = indicator!.querySelector('[aria-hidden="true"]');
+    await expect(ariaHidden).toBeTruthy();
+
+    // Visually-hidden "required" text is available to AT
+    const srText = indicator!.querySelector('.visually-hidden');
+    await expect(srText).toBeTruthy();
+    await expect(srText!.textContent?.trim()).toBe('required');
   },
 };
 
 // ─────────────────────────────────────────────────
-// 4. OPTIONAL
+// 5. OPTIONAL
 // ─────────────────────────────────────────────────
 
 export const Optional: Story = {
@@ -159,25 +183,25 @@ export const Optional: Story = {
   args: {
     optional: true,
   },
-  render: () => html` <hx-field-label optional for="notes">Additional Notes</hx-field-label> `,
+  render: () => html` <hx-field-label optional>Additional Notes</hx-field-label> `,
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement);
+    const host = canvasElement.querySelector('hx-field-label')! as HelixFieldLabel;
     await expect(host.hasAttribute('optional')).toBe(true);
 
-    const shadow = within(getShadowRoot(host));
-    const indicator = shadow.getByText('(optional)');
+    const indicator = host.shadowRoot!.querySelector('[part="optional-indicator"]');
     await expect(indicator).toBeTruthy();
+    await expect(indicator!.textContent?.trim()).toBe('(optional)');
   },
 };
 
 // ─────────────────────────────────────────────────
-// 5. CUSTOM REQUIRED INDICATOR (slot)
+// 6. CUSTOM REQUIRED INDICATOR (slot)
 // ─────────────────────────────────────────────────
 
 export const CustomRequiredIndicator: Story = {
   name: 'Custom Required Indicator (slot)',
   render: () => html`
-    <hx-field-label required for="insurance-id">
+    <hx-field-label required>
       Insurance ID
       <span slot="required-indicator" style="color: var(--hx-color-error-500, #ef4444);">
         (required)
@@ -187,7 +211,7 @@ export const CustomRequiredIndicator: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. CSS PARTS DEMO
+// 7. CSS PARTS DEMO
 // ─────────────────────────────────────────────────
 
 export const CSSParts: Story = {
@@ -195,14 +219,14 @@ export const CSSParts: Story = {
   render: () => html`
     <style>
       .parts-demo hx-field-label::part(base) {
-        font-size: 0.6875rem;
+        font-size: var(--hx-font-size-xs, 0.6875rem);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--hx-color-primary-600, #0d6efd);
-        font-weight: 700;
+        font-weight: var(--hx-font-weight-bold, 700);
       }
       .parts-demo hx-field-label::part(required-indicator) {
-        font-size: 1rem;
+        font-size: var(--hx-font-size-base, 1rem);
         color: var(--hx-color-error-600, #dc3545);
       }
       .parts-demo hx-field-label::part(optional-indicator) {
@@ -210,11 +234,11 @@ export const CSSParts: Story = {
         color: var(--hx-color-neutral-500, #6c757d);
       }
     </style>
-    <div class="parts-demo" style="display: flex; flex-direction: column; gap: 1rem;">
-      <hx-field-label required for="demo-required">
+    <div class="parts-demo" style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem);">
+      <hx-field-label required>
         Required Field (styled via ::part)
       </hx-field-label>
-      <hx-field-label optional for="demo-optional">
+      <hx-field-label optional>
         Optional Field (styled via ::part)
       </hx-field-label>
     </div>
@@ -222,13 +246,13 @@ export const CSSParts: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. HEALTHCARE SCENARIOS
+// 8. HEALTHCARE SCENARIOS — aria-labelledby pattern
 // ─────────────────────────────────────────────────
 
 export const HealthcareFormLabels: Story = {
   name: 'Healthcare: Form Labels',
   render: () => html`
-    <form style="display: flex; flex-direction: column; gap: 1.25rem; max-width: 400px;">
+    <form style="display: flex; flex-direction: column; gap: var(--hx-space-5, 1.25rem); max-width: 400px;">
       <div>
         <hx-field-label id="label-patient-name" required>Full Name</hx-field-label>
         <input
@@ -237,7 +261,7 @@ export const HealthcareFormLabels: Story = {
           placeholder="First Middle Last"
           required
           aria-labelledby="label-patient-name"
-          style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
         />
       </div>
 
@@ -248,7 +272,7 @@ export const HealthcareFormLabels: Story = {
           type="date"
           required
           aria-labelledby="label-dob"
-          style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
         />
       </div>
 
@@ -259,7 +283,7 @@ export const HealthcareFormLabels: Story = {
           type="text"
           placeholder="Dr. Eleanor Vance, MD"
           aria-labelledby="label-pcp"
-          style="display: block; width: 100%; margin-top: 0.25rem; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
         />
       </div>
     </form>
@@ -268,23 +292,23 @@ export const HealthcareFormLabels: Story = {
     docs: {
       description: {
         story:
-          'Healthcare form labels using the `aria-labelledby` pattern — the correct approach when the input is in light DOM outside the shadow root.',
+          'Healthcare form labels using the `aria-labelledby` pattern — the correct approach when inputs are in light DOM outside the shadow root.',
       },
     },
   },
 };
 
 // ─────────────────────────────────────────────────
-// 8. CSS CUSTOM PROPERTIES
+// 9. CSS CUSTOM PROPERTIES
 // ─────────────────────────────────────────────────
 
 export const CSSCustomProperties: Story = {
   name: 'CSS Custom Properties',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem);">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Default
         </p>
@@ -293,7 +317,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           --hx-field-label-color
         </p>
@@ -307,9 +331,9 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
         >
-          --hx-field-label-required-color (required indicator)
+          --hx-field-label-required-color
         </p>
         <hx-field-label
           required
@@ -330,9 +354,8 @@ export const SpanRenderedWithoutFor: Story = {
   name: 'Interaction: Renders span without for',
   render: () => html`<hx-field-label>Diagnosis Code</hx-field-label>`,
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement);
-    const shadow = host.shadowRoot!;
-    const base = shadow.querySelector('[part="base"]');
+    const host = canvasElement.querySelector('hx-field-label')!;
+    const base = host.shadowRoot!.querySelector('[part="base"]');
     await expect(base?.tagName.toLowerCase()).toBe('span');
   },
 };
@@ -341,9 +364,8 @@ export const LabelRenderedWithFor: Story = {
   name: 'Interaction: Renders label with for',
   render: () => html`<hx-field-label for="some-input">Patient ID</hx-field-label>`,
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement);
-    const shadow = host.shadowRoot!;
-    const base = shadow.querySelector('[part="base"]');
+    const host = canvasElement.querySelector('hx-field-label')!;
+    const base = host.shadowRoot!.querySelector('[part="base"]');
     await expect(base?.tagName.toLowerCase()).toBe('label');
     await expect(base?.getAttribute('for')).toBe('some-input');
   },
@@ -353,13 +375,15 @@ export const RequiredIndicatorPresent: Story = {
   name: 'Interaction: Required indicator present',
   render: () => html`<hx-field-label required>MRN</hx-field-label>`,
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement) as HelixFieldLabel;
+    const host = canvasElement.querySelector('hx-field-label')! as HelixFieldLabel;
     await expect(host.required).toBe(true);
 
-    const shadow = host.shadowRoot!;
-    const indicator = shadow.querySelector('[part="required-indicator"]');
+    const indicator = host.shadowRoot!.querySelector('[part="required-indicator"]');
     await expect(indicator).toBeTruthy();
-    await expect(indicator?.getAttribute('aria-hidden')).toBe('true');
+
+    // Visual asterisk is aria-hidden, with separate AT text
+    const ariaHidden = indicator!.querySelector('[aria-hidden="true"]');
+    await expect(ariaHidden).toBeTruthy();
   },
 };
 
@@ -367,12 +391,11 @@ export const OptionalIndicatorPresent: Story = {
   name: 'Interaction: Optional indicator present',
   render: () => html`<hx-field-label optional>Notes</hx-field-label>`,
   play: async ({ canvasElement }) => {
-    const host = getLabelHost(canvasElement) as HelixFieldLabel;
+    const host = canvasElement.querySelector('hx-field-label')! as HelixFieldLabel;
     await expect(host.optional).toBe(true);
 
-    const shadow = host.shadowRoot!;
-    const indicator = shadow.querySelector('[part="optional-indicator"]');
+    const indicator = host.shadowRoot!.querySelector('[part="optional-indicator"]');
     await expect(indicator).toBeTruthy();
-    await expect(indicator?.textContent?.trim()).toBe('(optional)');
+    await expect(indicator!.textContent?.trim()).toBe('(optional)');
   },
 };
