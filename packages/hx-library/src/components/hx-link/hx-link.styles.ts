@@ -71,7 +71,6 @@ export const helixLinkStyles = css`
   .link--disabled {
     color: var(--hx-link-color-disabled, var(--hx-color-neutral-400, #94a3b8));
     text-decoration: none;
-    cursor: not-allowed;
     pointer-events: none;
   }
 

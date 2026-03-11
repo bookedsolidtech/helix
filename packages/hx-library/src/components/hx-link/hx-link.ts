@@ -33,8 +33,12 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  * @cssprop [--hx-link-color-active=var(--hx-color-primary-800)] - Active color.
  * @cssprop [--hx-link-color-disabled=var(--hx-color-neutral-400)] - Disabled color.
  * @cssprop [--hx-link-color-subtle=var(--hx-color-neutral-600)] - Subtle variant color.
- * @cssprop [--hx-link-color-danger=var(--hx-color-error-500)] - Danger variant color.
+ * @cssprop [--hx-link-color-danger=var(--hx-color-error-text)] - Danger variant color.
+ * @cssprop [--hx-link-color-danger-hover=var(--hx-color-error-700)] - Danger variant hover color.
+ * @cssprop [--hx-link-font-family=var(--hx-font-family-sans)] - Link font family.
  * @cssprop [--hx-link-text-decoration=underline] - Link text decoration.
+ * @cssprop [--hx-link-text-decoration-hover=underline] - Hover text decoration.
+ * @cssprop [--hx-link-underline-offset=2px] - Text underline offset.
  * @cssprop [--hx-link-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  *
  * @note The `:visited` pseudo-class does not work inside Shadow DOM due to
