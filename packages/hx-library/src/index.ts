@@ -78,10 +78,10 @@ export { HelixSpinner } from './components/hx-spinner/index.js';
 export { HelixSplitButton } from './components/hx-split-button/index.js';
 export { HelixSplitPanel } from './components/hx-split-panel/index.js';
 export { HelixStack } from './components/hx-stack/index.js';
-export { HelixStatusIndicator } from './components/hx-status-indicator/index.js';
-export type {
-  StatusIndicatorStatus,
-  StatusIndicatorSize,
+export {
+  HelixStatusIndicator,
+  type StatusIndicatorStatus,
+  type StatusIndicatorSize,
 } from './components/hx-status-indicator/index.js';
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
