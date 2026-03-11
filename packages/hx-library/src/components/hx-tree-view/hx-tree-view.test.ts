@@ -305,6 +305,253 @@ describe('hx-tree-view', () => {
     });
   });
 
+  // ─── Keyboard Navigation (Tree-Level) ───
+
+  describe('Keyboard Navigation', () => {
+    async function createTreeWithItems() {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nav tree" selection="single">
+          <hx-tree-item>Item 1</hx-tree-item>
+          <hx-tree-item>Item 2</hx-tree-item>
+          <hx-tree-item>Item 3</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+      return el;
+    }
+
+    it('ArrowDown moves focus to next visible item', async () => {
+      const el = await createTreeWithItems();
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      // Focus tree container, which redirects focus to first item
+      tree.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(items[1]!, '.item-row');
+      expect(document.activeElement === items[1] || focusedRow === items[1]!.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('ArrowUp moves focus to previous visible item', async () => {
+      const el = await createTreeWithItems();
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      // Focus second item first
+      items[1]!.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(items[0]!, '.item-row');
+      expect(document.activeElement === items[0] || focusedRow === items[0]!.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('Home moves focus to first item', async () => {
+      const el = await createTreeWithItems();
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      // Focus last item
+      items[2]!.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(items[0]!, '.item-row');
+      expect(document.activeElement === items[0] || focusedRow === items[0]!.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('End moves focus to last visible item', async () => {
+      const el = await createTreeWithItems();
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      tree.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(items[2]!, '.item-row');
+      expect(document.activeElement === items[2] || focusedRow === items[2]!.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('ArrowDown wraps to first item from last', async () => {
+      const el = await createTreeWithItems();
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      items[2]!.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(items[0]!, '.item-row');
+      expect(document.activeElement === items[0] || focusedRow === items[0]!.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('ArrowUp wraps to last item from first', async () => {
+      const el = await createTreeWithItems();
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+      items[0]!.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(items[2]!, '.item-row');
+      expect(document.activeElement === items[2] || focusedRow === items[2]!.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('ArrowLeft on collapsed item moves focus to parent', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nested tree" selection="single">
+          <hx-tree-item expanded>
+            Parent
+            <hx-tree-item slot="children">Child</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const parent = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const child = el.querySelectorAll<WcTreeItem>('hx-tree-item')[1]!;
+
+      child.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(parent, '.item-row');
+      expect(document.activeElement === parent || focusedRow === parent.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('ArrowLeft on expanded item collapses it', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nested tree" selection="single">
+          <hx-tree-item expanded>
+            Parent
+            <hx-tree-item slot="children">Child</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const parent = el.querySelector<WcTreeItem>('hx-tree-item')!;
+
+      parent.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await el.updateComplete;
+
+      expect(parent.expanded).toBe(false);
+    });
+
+    it('ArrowRight on collapsed item expands it', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nested tree" selection="single">
+          <hx-tree-item>
+            Parent
+            <hx-tree-item slot="children">Child</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const parent = el.querySelector<WcTreeItem>('hx-tree-item')!;
+
+      parent.focus();
+      await el.updateComplete;
+
+      expect(parent.expanded).toBe(false);
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+
+      expect(parent.expanded).toBe(true);
+    });
+
+    it('ArrowRight on expanded item moves to first child', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nested tree" selection="single">
+          <hx-tree-item expanded>
+            Parent
+            <hx-tree-item slot="children">Child</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const parent = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const child = el.querySelectorAll<WcTreeItem>('hx-tree-item')[1]!;
+
+      parent.focus();
+      await el.updateComplete;
+
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(child, '.item-row');
+      expect(document.activeElement === child || focusedRow === child.shadowRoot?.activeElement).toBe(true);
+    });
+
+    it('does nothing on ArrowDown with empty tree', async () => {
+      const el = await fixture<WcTreeView>('<hx-tree-view label="Empty"></hx-tree-view>');
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      tree.focus();
+
+      // Should not throw
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+    });
+  });
+
+  // ─── Focus Management ───
+
+  describe('Focus management', () => {
+    it('redirects focus to first item when tree container receives focus', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Focus test">
+          <hx-tree-item>Item 1</hx-tree-item>
+          <hx-tree-item>Item 2</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      const firstItem = el.querySelector<WcTreeItem>('hx-tree-item')!;
+
+      // Simulate focus on the tree container itself
+      tree.dispatchEvent(new FocusEvent('focusin', { bubbles: true, relatedTarget: null }));
+      await el.updateComplete;
+
+      const focusedRow = shadowQuery<HTMLElement>(firstItem, '.item-row');
+      expect(
+        document.activeElement === firstItem ||
+        focusedRow === firstItem.shadowRoot?.activeElement,
+      ).toBe(true);
+    });
+  });
+
   // ─── Accessibility ───
 
   describe('Accessibility', () => {
@@ -339,6 +586,31 @@ describe('hx-tree-view', () => {
       );
       // Allow microtask queue to flush and Lit reactive updates to complete before axe audit
       await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations with multiple selection mode', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Multi-select tree" selection="multiple">
+          <hx-tree-item selected>Selected 1</hx-tree-item>
+          <hx-tree-item selected>Selected 2</hx-tree-item>
+          <hx-tree-item>Unselected</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toHaveLength(0);
+    });
+
+    it('has no axe violations with no-selection tree', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nav tree" selection="none">
+          <hx-tree-item>Item 1</hx-tree-item>
+          <hx-tree-item>Item 2</hx-tree-item>
+        </hx-tree-view>`,
+      );
       await el.updateComplete;
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
@@ -726,6 +998,135 @@ describe('hx-tree-item', () => {
 
       const event = await eventPromise;
       expect(event.detail.item).toBe(el);
+    });
+
+    it('does not respond to keyboard when disabled', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item disabled>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const row = shadowQuery<HTMLElement>(el, '.item-row')!;
+      let fired = false;
+      el.addEventListener('hx-tree-item-select', () => {
+        fired = true;
+      });
+
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+
+      expect(fired).toBe(false);
+      expect(el.expanded).toBe(false);
+    });
+
+    it('does not expand on ArrowRight when disabled', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item disabled>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const row = shadowQuery<HTMLElement>(el, '.item-row')!;
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+
+      expect(el.expanded).toBe(false);
+    });
+  });
+
+  // ─── Expand/Collapse Button ───
+
+  describe('Expand/Collapse', () => {
+    it('expand button toggles expanded state', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const btn = shadowQuery<HTMLElement>(el, '.expand-btn')!;
+      expect(el.expanded).toBe(false);
+
+      btn.click();
+      await el.updateComplete;
+      expect(el.expanded).toBe(true);
+
+      btn.click();
+      await el.updateComplete;
+      expect(el.expanded).toBe(false);
+    });
+
+    it('expand button has accessible label', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const btn = shadowQuery<HTMLElement>(el, '.expand-btn')!;
+      expect(btn.getAttribute('aria-label')).toBe('Expand');
+
+      el.expanded = true;
+      await el.updateComplete;
+      expect(btn.getAttribute('aria-label')).toBe('Collapse');
+    });
+
+    it('expand button does not toggle when disabled', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item disabled>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const btn = shadowQuery<HTMLElement>(el, '.expand-btn')!;
+      btn.click();
+      await el.updateComplete;
+
+      expect(el.expanded).toBe(false);
+    });
+
+    it('sets aria-expanded on treeitem row when has children', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const row = shadowQuery(el, '.item-row');
+      expect(row?.getAttribute('aria-expanded')).toBe('false');
+
+      el.expanded = true;
+      await el.updateComplete;
+      expect(row?.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('does not set aria-expanded on leaf items', async () => {
+      const el = await fixture<WcTreeItem>('<hx-tree-item>Leaf</hx-tree-item>');
+      await el.updateComplete;
+
+      const row = shadowQuery(el, '.item-row');
+      expect(row?.getAttribute('aria-expanded')).toBeNull();
     });
   });
 });
