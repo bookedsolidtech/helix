@@ -50,7 +50,7 @@ export const snippetOverrides: SnippetOverrideMap = {
     });
 </script>`,
 
-    react: `import { HxButton } from '@helix/library/react';
+    react: `import { HxButton } from '@helixui/library/react';
 
 function ArticleForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,7 +153,7 @@ function ArticleForm() {
   });
 </script>`,
 
-    react: `import { HxTextInput } from '@helix/library/react';
+    react: `import { HxTextInput } from '@helixui/library/react';
 
 function AuthorProfile() {
   const [name, setName] = useState('');
@@ -272,7 +272,7 @@ function AuthorProfile() {
     });
 </script>`,
 
-    react: `import { HxAlert } from '@helix/library/react';
+    react: `import { HxAlert } from '@helixui/library/react';
 
 function ContentAlerts({ article }) {
   const [showDraftWarning, setShowDraftWarning] = useState(true);

@@ -1,6 +1,6 @@
 ---
 title: Advanced Slot Patterns
-description: Master imperative slot assignment, dynamic slot patterns, portal implementations, and slot forwarding techniques for building sophisticated web component compositions in wc-2026.
+description: Master imperative slot assignment, dynamic slot patterns, portal implementations, and slot forwarding techniques for building sophisticated web component compositions in HELiX.
 sidebar:
   order: 3
 ---
@@ -1128,7 +1128,7 @@ export class ControlledTabs extends LitElement {
 </controlled-tabs>
 ```
 
-## wc-2026 Examples
+## HELiX Examples
 
 ### Example 1: hx-select (Option Cloning)
 

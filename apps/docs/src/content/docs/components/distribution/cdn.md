@@ -143,7 +143,7 @@ The trade-off: per-component bundles share a Lit instance via CDN (good for cach
 
 ## jsDelivr and unpkg Usage Patterns
 
-Once `@helix/library` is published to npm, the CDN bundles are automatically available via jsDelivr and unpkg.
+Once `@helixui/library` is published to npm, the CDN bundles are automatically available via jsDelivr and unpkg.
 
 ### jsDelivr
 
@@ -153,13 +153,13 @@ jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`:
 <!-- Latest within the 2.x major (auto-updates on minor/patch) -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helix/library@2/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@2/dist-cdn/hx-library.es.js"
 ></script>
 
 <!-- Pinned to exact version (recommended for production) -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js"
 ></script>
 ```
 
@@ -177,7 +177,7 @@ unpkg proxies npm at `https://unpkg.com/`:
 ```html
 <script
   type="module"
-  src="https://unpkg.com/@helix/library@2.3.1/dist-cdn/hx-library.es.js"
+  src="https://unpkg.com/@helixui/library@2.3.1/dist-cdn/hx-library.es.js"
 ></script>
 ```
 
@@ -205,7 +205,7 @@ helix-components:
       attributes:
         type: module
     # Then load the HELiX bundle
-    https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js:
       type: external
       minified: true
       attributes:
@@ -224,7 +224,7 @@ helix-components:
   version: '2.3.1'
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js:
       type: external
       minified: true
       attributes:
@@ -243,7 +243,7 @@ Copy the CDN file to `js/vendor/hx-library.es.js` during your theme build proces
 ```bash
 # In your theme's build script
 curl -o themes/custom/helix_theme/js/vendor/hx-library.es.js \
-  "https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js"
+  "https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js"
 ```
 
 **Note:** Drupal's `type: external` libraries do not automatically implement fallback logic. For true failover, use a small inline script that checks if `customElements.get('hx-button')` is defined after the CDN script tag and loads the local version if not.
@@ -304,7 +304,7 @@ Object.entries(hashes).forEach(([file, hash]) => {
 <!-- With SRI: browser refuses to execute if file has been tampered with -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js"
   integrity="sha384-ABC123..."
   crossorigin="anonymous"
 ></script>
@@ -318,7 +318,7 @@ The `crossorigin="anonymous"` attribute is required when using `integrity` with 
 helix-components:
   version: '2.3.1'
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js:
       type: external
       minified: true
       attributes:
@@ -336,7 +336,7 @@ CDN URLs should be immutable and versioned. Never serve different content at the
 **Versioned URL pattern (recommended):**
 
 ```
-https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js
+https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js
                                                    ^^^^^^
                                                    Exact semver version
 ```
@@ -349,13 +349,13 @@ This URL is permanently cached. When `2.3.2` ships, a new URL is served. Old URL
 <!-- ❌ BAD — a new release changes what this URL serves -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helix/library@latest/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist-cdn/hx-library.es.js"
 ></script>
 
 <!-- ❌ BAD — minor/patch updates silently change the file -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helix/library@2/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@2/dist-cdn/hx-library.es.js"
 ></script>
 ```
 
@@ -365,10 +365,10 @@ Floating ranges work in `package.json` (with a lockfile) because `npm ci` resolv
 
 ```
 # Exact version — immutable, cache-forever
-https://cdn.jsdelivr.net/npm/@helix/library@{VERSION}/dist-cdn/hx-library.es.js
+https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist-cdn/hx-library.es.js
 
 # Per-component (when using import maps)
-https://cdn.jsdelivr.net/npm/@helix/library@{VERSION}/dist-cdn/components/hx-button.js
+https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist-cdn/components/hx-button.js
 ```
 
 ---
@@ -399,7 +399,7 @@ https://cdn.jsdelivr.net/npm/@helix/library@{VERSION}/dist-cdn/components/hx-but
 ```html
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/hx-library.es.js"
 ></script>
 ```
 
@@ -431,15 +431,15 @@ https://cdn.jsdelivr.net/npm/@helix/library@{VERSION}/dist-cdn/components/hx-but
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
       "lit/decorators.js": "https://cdn.jsdelivr.net/npm/lit@3/decorators.js",
       "lit/directives/class-map.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/class-map.js",
-      "@helix/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/components/hx-button.js",
-      "@helix/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist-cdn/components/hx-card.js"
+      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/components/hx-button.js",
+      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist-cdn/components/hx-card.js"
     }
   }
 </script>
 
 <script type="module">
-  import '@helix/library/components/hx-button';
-  import '@helix/library/components/hx-card';
+  import '@helixui/library/components/hx-button';
+  import '@helixui/library/components/hx-card';
 </script>
 ```
 
@@ -464,15 +464,15 @@ Import maps let browsers resolve bare module specifiers (`import from 'lit'`) wi
           "@lit/reactive-element/decorators/": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@2/decorators/",
           "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3/lit-html.js",
           "lit-html/": "https://cdn.jsdelivr.net/npm/lit-html@3/",
-          "@helix/library/": "https://cdn.jsdelivr.net/npm/@helix/library@2.3.1/dist/"
+          "@helixui/library/": "https://cdn.jsdelivr.net/npm/@helixui/library@2.3.1/dist/"
         }
       }
     </script>
 
     <!-- Load components as ES modules — Lit is resolved from the import map -->
     <script type="module">
-      import '@helix/library/components/hx-button/index';
-      import '@helix/library/components/hx-card/index';
+      import '@helixui/library/components/hx-button/index';
+      import '@helixui/library/components/hx-card/index';
     </script>
   </head>
   <body>
@@ -512,7 +512,7 @@ Before publishing a release, verify the CDN bundles work exactly as consumers wi
 npm install -g live-server
 
 # Build the CDN bundles
-npm run build:cdn --workspace=@helix/library
+npm run build:cdn --workspace=@helixui/library
 
 # Serve from the dist-cdn directory
 live-server packages/hx-library/dist-cdn --port=8080

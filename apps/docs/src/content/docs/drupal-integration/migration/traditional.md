@@ -334,7 +334,7 @@ Avoid loading the full HELIX bundle until you're using most components. Start wi
 # Core library (always loaded if using any HELIX components)
 helix-core:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/core.js:
       type: external
       attributes:
         type: module
@@ -342,7 +342,7 @@ helix-core:
 # Per-component libraries (attach only where used)
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-button.js:
       type: external
       attributes:
         type: module
@@ -351,7 +351,7 @@ helix-button:
 
 helix-card:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/components/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-card.js:
       type: external
       attributes:
         type: module
@@ -360,7 +360,7 @@ helix-card:
 
 helix-alert:
   js:
-    https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/components/hx-alert.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-alert.js:
       type: external
       attributes:
         type: module
@@ -1486,7 +1486,7 @@ If HELIX library itself is broken (CDN issue, browser bug), remove entirely.
 # Comment out all HELIX libraries
 # helix-core:
 #   js:
-#     https://cdn.jsdelivr.net/npm/@helix/library@0.0.1/dist/core.js:
+#     https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/core.js:
 #       type: external
 ```
 

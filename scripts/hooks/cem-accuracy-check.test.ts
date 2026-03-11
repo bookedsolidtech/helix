@@ -145,7 +145,7 @@ export class HelixCard extends LitElement {
   describe('normalizeCEMPath', () => {
     it('should extract relative path from absolute path', () => {
       const result = normalizeCEMPath(
-        '/Users/dev/wc-2026/packages/hx-library/src/components/hx-button/hx-button.ts',
+        '/Users/dev/helix/packages/hx-library/src/components/hx-button/hx-button.ts',
       );
       expect(result).toBe('src/components/hx-button/hx-button.ts');
     });
@@ -1251,7 +1251,7 @@ export class HelixCard extends LitElement {
 
     it('should normalize paths correctly for CEM lookup', () => {
       const absolutePath =
-        '/Users/dev/wc-2026/packages/hx-library/src/components/hx-alert/hx-alert.ts';
+        '/Users/dev/helix/packages/hx-library/src/components/hx-alert/hx-alert.ts';
       const normalized = normalizeCEMPath(absolutePath);
       expect(normalized).toBe('src/components/hx-alert/hx-alert.ts');
     });

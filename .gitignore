@@ -3,6 +3,11 @@ node_modules/
 .pnp
 .pnp.js
 
+# Auth tokens (never commit)
+.npmrc
+.env
+.env*.local
+
 # Build outputs
 dist/
 build/
@@ -18,10 +23,6 @@ apps/admin/public/helix/
 .netlify/
 storybook-static/
 *.tsbuildinfo
-
-# Environment
-.env
-.env*.local
 
 # IDE
 .vscode/
@@ -48,12 +49,9 @@ scripts/coverage/
 test-results/
 packages/hx-library/test-results/
 
-<<<<<<< HEAD
-=======
 # Vitest browser-mode screenshots (generated per test run, cause binary conflicts)
 **/__screenshots__/
 
->>>>>>> origin/dev
 # Generated integration test bundles (esbuild output)
 testing/static-html/helix-bundle.js
 testing/static-html/helix-bundle.css
@@ -67,38 +65,47 @@ apps/mcp-servers/*/coverage/
 # Library registry (per-install, not shared)
 apps/admin/src/data/library-registry.json
 
-# protoLabs Studio runtime state (never track)
-.automaker/knowledge.db
-.automaker/knowledge.db-shm
-.automaker/knowledge.db-wal
-.automaker/knowledge-eval.jsonl
-.automaker/worktrees/
-.automaker/checkpoints/
-.automaker/recovery/
-.automaker/.backups/
-.automaker/ledger/
-.automaker/quarantine/
-.automaker/images/
-.automaker/memory/
-.automaker/notes/
-.automaker/projects/
-.automaker/authority/
-.automaker/notifications.json
-.automaker/*.corrupted.*
-.automaker/settings.json.bak*
-.automaker/trajectory/
-.automaker/events/
-.automaker/hitl-forms.json
-.automaker/execution-state.json
-.automaker/actionable-items.json
-.automaker/actionable-items.json.corrupted.*
+# protoLabs Studio (entire directory — runtime state, settings, features, archives)
+.automaker/
+.automaker-lock
 
 # MCP health scorer output (regenerated on demand)
 packages/.mcp-wc/
-.automaker-lock
-<<<<<<< HEAD
-=======
 
-# Temp directory (not tracked)
+# Local MCP config (contains absolute paths, machine-specific)
+.mcp.json
+mcpwc.config.json
+
+# Internal workstream results (analysis artifacts, not source)
+.workstream-results/
+
+# Claude Code internal files (reports, reviews, health history)
+# Agent definitions (.claude/agents/) are kept — they are project source
+.claude/settings.json
+.claude/docs-generation-progress.json
+.claude/docs-outline.json
+.claude/docs/
+.claude/health-history/
+.claude/issues/
+.claude/reports/
+.claude/platform-review-*.json
+.claude/*.md
+!.claude/agents/
+
+# Internal build planning docs (not public-facing)
+build-plan/
+
+# Archived internal docs
+.archive/
+
+# Internal implementation reports (not public-facing)
+DEVOPS-REVIEW-*.md
+PIPELINE-INCIDENT-REPORT.md
+H01-*.md
+HELIX-PLATFORM-PROTO-LESSONS.md
+apps/admin/comprehensive-debug.md
+apps/admin/debug-scorer.mjs
+apps/mcp-servers/*/TEST_COVERAGE_REPORT.md
+
+# Temp directory
 delete-me-HELiX/
->>>>>>> origin/dev

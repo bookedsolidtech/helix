@@ -8,11 +8,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://wc-2026.dev',
+  site: 'https://helixui.dev',
   vite: {
     resolve: {
       alias: {
-        '@helix/library/components/': path.resolve(
+        '@helixui/library/components/': path.resolve(
           __dirname,
           '../../packages/hx-library/dist/components/',
         ),

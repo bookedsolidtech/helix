@@ -168,7 +168,7 @@ node apps/mcp-servers/cem-analyzer/build/index.js
 
 ### Shared Dependencies
 
-All MCP servers depend on `@helix/mcp-shared`:
+All MCP servers depend on `@helixui/mcp-shared`:
 
 - Git utilities
 - File operations

@@ -1,5 +1,5 @@
 {
-  "name": "@helix/library",
+  "name": "@helixui/library",
   "version": "0.1.0",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
@@ -42,12 +42,27 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
-    "@helix/tokens": "*",
+    "@helixui/tokens": "*",
     "lit": "^3.3.2"
   },
   "peerDependencies": {
     "@floating-ui/dom": "^1.7.6"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/hx-library"
+  },
+  "license": "MIT",
+  "homepage": "https://helix.bookedsolid.com",
+  "bugs": "https://github.com/bookedsolidtech/helix/issues",
+  "keywords": [
+    "web-components",
+    "lit",
+    "healthcare",
+    "design-system",
+    "custom-elements"
+  ],
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@vitest/browser": "^3.0.0",

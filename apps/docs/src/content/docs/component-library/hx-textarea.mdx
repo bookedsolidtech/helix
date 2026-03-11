@@ -1,6 +1,6 @@
 ---
 title: 'hx-textarea'
-description: A multi-line text area component with label, validation, and form association.
+description: 'Multi-line text input with label, validation, help text, character counter, and auto-resize. Form-associated and fully WCAG 2.1 AA accessible.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
@@ -11,19 +11,31 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-textarea" section="summary" />
 
-## Basic
+## Overview
 
-Simple textarea with label and placeholder.
+`hx-textarea` is a form-associated multi-line text input component for enterprise healthcare interfaces. It provides built-in label rendering, error messaging, help text, character counting, and auto-grow resize — all with full WCAG 2.1 AA accessibility via `ElementInternals` form association, `aria-invalid` error state, and `aria-describedby` linkage to error and help text regions.
 
-<ComponentDemo title="Basic">
+**Use `hx-textarea` when:** you need a multi-line text field for clinical notes, patient comments, free-form data entry, or any form field that benefits from a larger input area with constraint validation and screen reader support.
+
+**Use `hx-text-input` instead when:** the data is a single line (names, IDs, dates, phone numbers). `hx-textarea` is specifically for multi-line content.
+
+**Drupal note:** All three slots (`label`, `error`, `help-text`) are designed to accept Drupal Form API-rendered markup. Slotted content works independently of the matching property — you do not need to set both.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Textarea">
   <div style="max-width: 480px;">
-    <hx-textarea label="Comments" placeholder="Enter your comments here..." rows="3"></hx-textarea>
+    <hx-textarea
+      label="Clinical Notes"
+      placeholder="Enter your notes here..."
+      rows="3"
+    ></hx-textarea>
   </div>
 </ComponentDemo>
 
-## Resize Options
-
-Different resize behaviors: none, vertical, both, and auto-grow.
+### Resize Options
 
 <ComponentDemo title="Resize Options">
   <div style="display: grid; gap: 1rem; max-width: 480px;">
@@ -54,9 +66,7 @@ Different resize behaviors: none, vertical, both, and auto-grow.
   </div>
 </ComponentDemo>
 
-## Validation and States
-
-Required, error, disabled, and character count states.
+### Validation and States
 
 <ComponentDemo title="Validation and States">
   <div style="display: grid; gap: 1rem; max-width: 480px;">
@@ -75,9 +85,7 @@ Required, error, disabled, and character count states.
   </div>
 </ComponentDemo>
 
-## Character Count
-
-Show remaining characters with `maxlength` and `show-count`.
+### Character Count
 
 <ComponentDemo title="Character Count">
   <div style="max-width: 480px;">
@@ -91,6 +99,472 @@ Show remaining characters with `maxlength` and `show-count`.
     ></hx-textarea>
   </div>
 </ComponentDemo>
+
+### Slotted Label and Help Text
+
+<ComponentDemo title="Slotted Label and Help Text">
+  <div style="max-width: 480px;">
+    <hx-textarea>
+      <label slot="label">
+        Patient Intake Notes <em style="font-weight: normal; color: #6b7280;">(required)</em>
+      </label>
+      <span slot="help-text">
+        Include presenting symptoms, duration, and severity on a scale of 1–10.
+      </span>
+    </hx-textarea>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-textarea';
+```
+
+## Basic Usage
+
+Minimal HTML — no build tool required:
+
+```html
+<!-- Basic textarea with label -->
+<hx-textarea label="Clinical Notes" placeholder="Enter notes..."></hx-textarea>
+
+<!-- Required field with help text -->
+<hx-textarea
+  label="Diagnosis"
+  required
+  help-text="Include ICD-10 codes where applicable."
+></hx-textarea>
+
+<!-- Error state -->
+<hx-textarea label="Notes" error="This field is required."></hx-textarea>
+
+<!-- With character count and maxlength -->
+<hx-textarea
+  label="Short bio"
+  maxlength="200"
+  show-count
+  help-text="Max 200 characters."
+></hx-textarea>
+
+<!-- Auto-grow (expands as user types) -->
+<hx-textarea label="Free text" resize="auto" rows="2"></hx-textarea>
+
+<!-- Disabled -->
+<hx-textarea label="Read-only notes" value="Cannot be changed." disabled></hx-textarea>
+
+<!-- Accessible name without visible label -->
+<hx-textarea aria-label="Patient notes"></hx-textarea>
+```
+
+Set properties via JavaScript for dynamic control:
+
+```javascript
+const textarea = document.querySelector('hx-textarea');
+
+// Listen for input events
+textarea.addEventListener('hx-input', (event) => {
+  console.log('Current value:', event.detail.value);
+});
+
+// Listen for change events (fires on blur after value changes)
+textarea.addEventListener('hx-change', (event) => {
+  console.log('Final value:', event.detail.value);
+});
+
+// Programmatic value update
+textarea.value = 'Pre-populated text';
+
+// Set error state dynamically
+textarea.error = 'Value must be at least 50 characters.';
+
+// Focus the textarea
+textarea.focus();
+
+// Select all text
+textarea.select();
+
+// Form validation
+if (!textarea.checkValidity()) {
+  textarea.reportValidity();
+}
+```
+
+## Properties
+
+| Property      | Attribute     | Type                                       | Default      | Description                                                                                                                       |
+| ------------- | ------------- | ------------------------------------------ | ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `label`       | `label`       | `string`                                   | `''`         | Visible label text. Renders a `<label>` associated to the textarea via `for`/`id`. Overridden by the `label` slot.                |
+| `placeholder` | `placeholder` | `string`                                   | `''`         | Placeholder text shown when the textarea is empty.                                                                                |
+| `value`       | `value`       | `string`                                   | `''`         | Current value of the textarea. Kept in sync with the native `<textarea>` via `live()`.                                            |
+| `required`    | `required`    | `boolean`                                  | `false`      | Marks the field as required. Shows a `*` marker next to the label. Sets `required` on the native textarea. Reflects to attribute. |
+| `disabled`    | `disabled`    | `boolean`                                  | `false`      | Disables the textarea. Suppresses interaction and applies reduced opacity to the host. Reflects to attribute.                     |
+| `error`       | `error`       | `string`                                   | `''`         | Error message to display. Triggers `aria-invalid="true"` on the textarea and renders an error div with `role="alert"`.            |
+| `helpText`    | `help-text`   | `string`                                   | `''`         | Help text displayed below the textarea. Hidden when `error` is set. Overridden by the `help-text` slot.                           |
+| `name`        | `name`        | `string`                                   | `''`         | Name for form submission. Passed to the native textarea.                                                                          |
+| `rows`        | `rows`        | `number`                                   | `4`          | Number of visible text rows.                                                                                                      |
+| `maxlength`   | `maxlength`   | `number \| undefined`                      | `undefined`  | Maximum character count. Enforced by form validation (`tooLong`) and displayed in the character counter when `show-count` is set. |
+| `resize`      | `resize`      | `'none' \| 'vertical' \| 'both' \| 'auto'` | `'vertical'` | Resize behavior. `'auto'` grows with content. Reflects to attribute.                                                              |
+| `showCount`   | `show-count`  | `boolean`                                  | `false`      | Shows a character counter below the textarea. Displays `count / maxlength` when `maxlength` is set, or just `count` otherwise.    |
+| `ariaLabel`   | `aria-label`  | `string \| null`                           | `null`       | Accessible name for screen readers when no visible label is present. Set directly on the native `<textarea>`.                     |
+
+## Events
+
+| Event       | Detail Type         | Bubbles | Composed | Description                                                                       |
+| ----------- | ------------------- | ------- | -------- | --------------------------------------------------------------------------------- |
+| `hx-input`  | `{ value: string }` | `true`  | `true`   | Dispatched on every keystroke as the user types. `detail.value` is the new value. |
+| `hx-change` | `{ value: string }` | `true`  | `true`   | Dispatched when the textarea loses focus after its value changed.                 |
+
+```javascript
+const textarea = document.querySelector('hx-textarea');
+
+// Real-time input tracking (every keystroke)
+textarea.addEventListener('hx-input', (e) => {
+  console.log('Typing:', e.detail.value);
+});
+
+// Committed value (on blur after change)
+textarea.addEventListener('hx-change', (e) => {
+  saveToServer(e.detail.value);
+});
+```
+
+## CSS Custom Properties
+
+| Property                      | Default                       | Description                               |
+| ----------------------------- | ----------------------------- | ----------------------------------------- |
+| `--hx-input-bg`               | `var(--hx-color-neutral-0)`   | Textarea background color.                |
+| `--hx-input-color`            | `var(--hx-color-neutral-800)` | Textarea text color.                      |
+| `--hx-input-border-color`     | `var(--hx-color-neutral-300)` | Textarea border color.                    |
+| `--hx-input-border-radius`    | `var(--hx-border-radius-md)`  | Textarea border radius.                   |
+| `--hx-input-font-family`      | `var(--hx-font-family-sans)`  | Textarea font family.                     |
+| `--hx-input-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color on the textarea wrapper. |
+| `--hx-input-error-color`      | `var(--hx-color-error-500)`   | Error state border and text color.        |
+| `--hx-input-label-color`      | `var(--hx-color-neutral-700)` | Label text color.                         |
+| `--hx-textarea-min-height`    | `var(--hx-size-20, 5rem)`     | Minimum height of the textarea element.   |
+
+Override at the `:root` level to theme all instances, or on a specific selector to style one:
+
+```css
+/* Monospaced font for clinical code entry */
+hx-textarea.clinical-code {
+  --hx-input-font-family: var(--hx-font-family-mono);
+}
+
+/* Larger minimum height for notes fields */
+.patient-notes hx-textarea {
+  --hx-textarea-min-height: 10rem;
+}
+
+/* Custom error color */
+:root {
+  --hx-input-error-color: var(--hx-color-error-600);
+}
+```
+
+## CSS Parts
+
+| Part               | Description                                                              |
+| ------------------ | ------------------------------------------------------------------------ |
+| `field`            | The outer `<div>` container wrapping all field elements.                 |
+| `label`            | The `<label>` element (only present when `label` property is set).       |
+| `textarea-wrapper` | The wrapper `<div>` around the native textarea that renders the border.  |
+| `textarea`         | The native `<textarea>` element.                                         |
+| `counter`          | The character count display (only present when `show-count` is set).     |
+| `help-text`        | The help text container (only present when help text is available).      |
+| `error`            | The error message container with `role="alert"` (only present on error). |
+
+Use CSS parts to style internals not exposed by custom properties:
+
+```css
+/* Adjust the textarea padding */
+hx-textarea::part(textarea) {
+  padding: 0.75rem 1rem;
+}
+
+/* Style the character counter */
+hx-textarea::part(counter) {
+  font-style: italic;
+}
+
+/* Style the error message */
+hx-textarea::part(error) {
+  font-weight: 600;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                                                                                                                              |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`     | Custom label content. Overrides the `label` property. Use for Drupal Form API rendered labels or rich label markup. The slotted element receives a generated `id` for `aria-labelledby`. |
+| `help-text` | Custom help text. Overrides the `help-text` property. Renders independently — the `help-text` property does not need to be set. Hidden when an error is active.                          |
+| `error`     | Custom error content. Overrides the `error` property. Renders the error container (with `role="alert"`) when slotted content is present. Use for Drupal Form API errors.                 |
+
+```html
+<!-- Slotted label with rich markup -->
+<hx-textarea>
+  <label slot="label"> Diagnosis <abbr title="required" aria-hidden="true">*</abbr> </label>
+</hx-textarea>
+
+<!-- Slotted help text (no property needed) -->
+<hx-textarea>
+  <span slot="help-text">Include ICD-10 codes where applicable.</span>
+</hx-textarea>
+
+<!-- Slotted error (no property needed) -->
+<hx-textarea>
+  <span slot="error">This field is required.</span>
+</hx-textarea>
+```
+
+## Accessibility
+
+`hx-textarea` is built for WCAG 2.1 AA compliance in healthcare contexts where accurate communication to assistive technology users is mandatory.
+
+| Topic              | Details                                                                                                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role               | The native `<textarea>` element has an implicit `textbox` role with `aria-multiline="true"`. No additional ARIA role is set.                                                                                                    |
+| Label association  | When the `label` property is set, a `<label for>` association is created via matching `id`/`for` attributes. When the `label` slot is used, `aria-labelledby` is set on the textarea pointing to the slotted element's `id`.    |
+| `aria-label`       | The `ariaLabel` property sets `aria-label` directly on the native textarea for cases without a visible label.                                                                                                                   |
+| Error state        | `aria-invalid="true"` is set on the textarea when an error is present (via property or slot). The error container uses `role="alert"` for immediate announcement without a conflicting `aria-live` attribute.                   |
+| `aria-describedby` | The textarea's `aria-describedby` is automatically computed to reference: the error container ID (when error is active), the help text container ID (when help text is visible), and the counter ID (when `show-count` is set). |
+| Required           | The native `required` attribute is set on the `<textarea>`. `aria-required` is intentionally not added (redundant per HTML-AAM specification).                                                                                  |
+| Character counter  | The counter has `aria-live="polite"` to announce count updates as the user types. It is also included in `aria-describedby` so screen readers can discover it when focused.                                                     |
+| Focus indicator    | The textarea wrapper renders a visible focus ring using `--hx-focus-ring-color`, `--hx-focus-ring-width`, and `--hx-focus-ring-opacity` design tokens.                                                                          |
+| WCAG               | Meets WCAG 2.1 AA. SC 1.3.1 (Info and Relationships), SC 1.3.5 (Identify Input Purpose), SC 4.1.2 (Name, Role, Value), SC 4.1.3 (Status Messages) all satisfied. Zero axe-core violations across all states.                    |
+
+### Keyboard Navigation
+
+| Key                 | Action                                                                         |
+| ------------------- | ------------------------------------------------------------------------------ |
+| `Tab`               | Moves focus to the textarea.                                                   |
+| Any key             | Standard browser textarea keyboard behavior (typing, navigation within text).  |
+| `Tab` (in textarea) | Moves focus out of the textarea to the next focusable element in the document. |
+
+### Screen Reader Guidance
+
+```html
+<!-- With label property: announced as "Clinical Notes, text area" -->
+<hx-textarea label="Clinical Notes"></hx-textarea>
+
+<!-- With error: announced as "Clinical Notes, text area, Required field" -->
+<!-- (error is also immediately announced via role="alert") -->
+<hx-textarea label="Clinical Notes" error="Required field"></hx-textarea>
+
+<!-- With character counter: announced as "Clinical Notes, text area, 0 / 200" -->
+<hx-textarea label="Clinical Notes" maxlength="200" show-count></hx-textarea>
+
+<!-- Slotted label with aria-labelledby -->
+<hx-textarea>
+  <label slot="label">Diagnosis</label>
+</hx-textarea>
+```
+
+## Drupal Integration
+
+Use `hx-textarea` in a Twig template after registering the library.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+{# Basic textarea #}
+<hx-textarea
+  label="{{ label }}"
+  placeholder="{{ placeholder|default('') }}"
+  {% if required %}required{% endif %}
+>
+</hx-textarea>
+
+{# With Drupal Form API help text via slot (no help-text property needed) #}
+<hx-textarea
+  label="{{ label }}"
+  {% if required %}required{% endif %}
+>
+  {% if description %}
+    <span slot="help-text">{{ description }}</span>
+  {% endif %}
+</hx-textarea>
+
+{# With Drupal Form API error messages via slot #}
+<hx-textarea
+  label="{{ label }}"
+  {% if required %}required{% endif %}
+>
+  {% if errors %}
+    <span slot="error">{{ errors }}</span>
+  {% endif %}
+  {% if description and not errors %}
+    <span slot="help-text">{{ description }}</span>
+  {% endif %}
+</hx-textarea>
+
+{# With character count for clinical note fields #}
+<hx-textarea
+  label="{{ label }}"
+  name="{{ field_name }}"
+  maxlength="{{ maxlength|default(500) }}"
+  show-count
+  resize="auto"
+  rows="4"
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+</hx-textarea>
+
+{# With fully custom label slot for rich markup #}
+<hx-textarea>
+  <label slot="label">
+    {{ label }}
+    {% if required %}<abbr title="{{ 'Required'|t }}" aria-hidden="true">*</abbr>{% endif %}
+  </label>
+</hx-textarea>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixTextarea = {
+  attach(context) {
+    // once() is a Drupal core utility — prevents duplicate event binding during AJAX attach cycles
+    once('helixTextareaChange', 'hx-textarea', context).forEach((el) => {
+      el.addEventListener('hx-change', (e) => {
+        // Save the value or update form state
+        const fieldName = el.getAttribute('name');
+        console.log(`${fieldName} updated:`, e.detail.value);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-textarea example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;"
+  >
+    <h1 style="margin: 0;">hx-textarea Examples</h1>
+
+    <!-- 1. Basic textarea with label -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Basic</h2>
+      <hx-textarea
+        id="notes"
+        label="Clinical Notes"
+        placeholder="Enter patient notes..."
+        rows="3"
+      ></hx-textarea>
+    </section>
+
+    <!-- 2. Required with help text -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Required with Help Text</h2>
+      <hx-textarea
+        id="diagnosis"
+        label="Diagnosis"
+        name="diagnosis"
+        required
+        help-text="Include ICD-10 codes where applicable."
+        rows="3"
+      ></hx-textarea>
+    </section>
+
+    <!-- 3. Error state -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Error State</h2>
+      <hx-textarea
+        id="error-field"
+        label="Summary"
+        value="Too short"
+        error="Summary must be at least 50 characters."
+      ></hx-textarea>
+    </section>
+
+    <!-- 4. Character count with maxlength -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Character Count</h2>
+      <hx-textarea
+        id="bio"
+        label="Short Bio"
+        maxlength="200"
+        show-count
+        help-text="Keep it concise — max 200 characters."
+        rows="3"
+      ></hx-textarea>
+    </section>
+
+    <!-- 5. Auto-grow -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Auto-Grow</h2>
+      <hx-textarea
+        id="auto"
+        label="Unlimited Notes"
+        resize="auto"
+        rows="2"
+        placeholder="Keep typing — this field grows automatically..."
+      ></hx-textarea>
+    </section>
+
+    <!-- 6. Disabled -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Disabled</h2>
+      <hx-textarea
+        id="disabled-field"
+        label="Read-Only Record"
+        value="This record has been locked and cannot be edited."
+        disabled
+      ></hx-textarea>
+    </section>
+
+    <script>
+      // Log all hx-change events from any textarea on the page
+      document.addEventListener('hx-change', (event) => {
+        const el = event.target;
+        console.log(`hx-change from #${el.id}:`, event.detail.value);
+      });
+
+      // Log all hx-input events
+      document.addEventListener('hx-input', (event) => {
+        const el = event.target;
+        console.log(`hx-input from #${el.id}:`, event.detail.value);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component       | When to Use                                                                                               |
+| --------------- | --------------------------------------------------------------------------------------------------------- |
+| `hx-text-input` | When you need a single-line text input for names, IDs, emails, or short values.                           |
+| `hx-field`      | When you need a layout wrapper to compose a label, input, help text, and error into a form field group.   |
+| `hx-form`       | When you need a complete form container with submit handling, validation orchestration, and AJAX support. |
+| `hx-select`     | When the user must choose from a predefined set of options rather than free-form text.                    |
 
 ## API Reference
 

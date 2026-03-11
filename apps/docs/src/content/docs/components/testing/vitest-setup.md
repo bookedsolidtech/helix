@@ -1,13 +1,13 @@
 ---
 title: Vitest Browser Mode Setup
-description: Comprehensive guide to configuring Vitest browser mode with Playwright for testing web components. Covers vitest.config.ts structure, provider configuration, headless vs headed testing, test environment setup, coverage reporting, and the complete wc-2026 test infrastructure configuration.
+description: Comprehensive guide to configuring Vitest browser mode with Playwright for testing web components. Covers vitest.config.ts structure, provider configuration, headless vs headed testing, test environment setup, coverage reporting, and the complete HELiX test infrastructure configuration.
 sidebar:
   order: 1
 ---
 
 # Vitest Browser Mode Setup
 
-Testing web components requires a real browser environment. Shadow DOM behavior, focus management, form participation, and accessibility features cannot be accurately tested in synthetic DOM environments like jsdom or happy-dom. **wc-2026 uses Vitest browser mode with Playwright** to run tests in actual Chromium, ensuring behavior matches production.
+Testing web components requires a real browser environment. Shadow DOM behavior, focus management, form participation, and accessibility features cannot be accurately tested in synthetic DOM environments like jsdom or happy-dom. **HELiX uses Vitest browser mode with Playwright** to run tests in actual Chromium, ensuring behavior matches production.
 
 This guide covers the complete Vitest browser mode setup: configuration structure, provider selection, headless vs headed testing, test environment configuration, and the production-ready setup used in `hx-library`.
 
@@ -61,7 +61,7 @@ Vitest supports three browser providers:
 2. **`webdriverio`** — Cross-browser testing, W3C WebDriver standard
 3. **`preview`** (default) — Vite dev server preview, no headless support, simulated events only
 
-**wc-2026 uses Playwright** for its robust Chrome DevTools Protocol integration, headless mode support, and accurate event dispatch.
+**HELiX uses Playwright** for its robust Chrome DevTools Protocol integration, headless mode support, and accurate event dispatch.
 
 ## Configuration Structure
 
@@ -255,7 +255,7 @@ describe('hx-button', () => {
 });
 ```
 
-**wc-2026 uses explicit imports** to avoid TypeScript configuration complexity and improve IDE autocomplete.
+**HELiX uses explicit imports** to avoid TypeScript configuration complexity and improve IDE autocomplete.
 
 ### Test Isolation
 
@@ -334,7 +334,7 @@ test: {
 }
 ```
 
-**wc-2026 uses this for the Admin Dashboard Test Theater**, which reads `.cache/test-results.json` to display live test results.
+**HELiX uses this for the Admin Dashboard Test Theater**, which reads `.cache/test-results.json` to display live test results.
 
 ### Coverage Configuration
 
@@ -384,9 +384,9 @@ coverage: {
 }
 ```
 
-If coverage falls below these thresholds, the test run fails. **wc-2026 enforces 80% minimum coverage** for all components.
+If coverage falls below these thresholds, the test run fails. **HELiX enforces 80% minimum coverage** for all components.
 
-## wc-2026 Production Configuration
+## HELiX Production Configuration
 
 ### Complete vitest.config.ts
 

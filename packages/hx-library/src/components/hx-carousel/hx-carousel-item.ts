@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 
 /**
  * A wrapper for individual carousel slides.
@@ -28,9 +28,16 @@ export class HelixCarouselItem extends LitElement {
         outline: none;
       }
 
-      .slide-group:focus-visible {
-        outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
-        outline-offset: var(--hx-focus-ring-offset, 2px);
+      /*
+       * Show focus ring for both keyboard-initiated focus (:focus-visible) and
+       * programmatic focus (.focus() calls from JS). tabindex="-1" elements only
+       * receive focus programmatically, so :focus-visible may not trigger in all
+       * browsers — :focus-within on the host ensures the ring is always visible.
+       */
+      .slide-group:focus-visible,
+      .slide-group:focus {
+        outline: var(--hx-focus-ring-width) solid var(--hx-focus-ring-color);
+        outline-offset: var(--hx-focus-ring-offset);
       }
     `,
   ];

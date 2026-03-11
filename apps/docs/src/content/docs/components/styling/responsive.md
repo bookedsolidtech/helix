@@ -268,9 +268,9 @@ Container queries provide new length units based on container dimensions:
 
 **Result:** Typography scales proportionally to the component's width, not the viewport. A card in a narrow sidebar has smaller text; the same card in a wide hero section has larger text.
 
-### wc-2026 Container Query Pattern
+### HELiX Container Query Pattern
 
-wc-2026 components use container queries for all layout-level responsiveness:
+HELiX components use container queries for all layout-level responsiveness:
 
 ```typescript
 // hx-card.ts
@@ -1395,7 +1395,7 @@ Modern responsive web components require a fundamentally different approach than
 - **Viewport units** are appropriate for full-screen components but fail for nested contexts; prefer container query units (`cqi`, `cqw`) for component-internal sizing
 - **Responsive patterns** include fluid typography, aspect-ratio containers, flex wrapping, and conditional slot display
 
-**wc-2026 responsive strategy:**
+**HELiX responsive strategy:**
 
 1. Use container queries for all layout-level responsiveness
 2. Use media queries for viewport-based and user preference queries

@@ -1,7 +1,7 @@
 import { LitElement, html, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTopNavStyles } from './hx-top-nav.styles.js';
 
 /**

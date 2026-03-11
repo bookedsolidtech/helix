@@ -1,14 +1,408 @@
 ---
 title: 'hx-visually-hidden'
-description: 'Utility that hides content visually while keeping it accessible to screen readers'
+description: Utility that hides content visually while keeping it accessible to screen readers. Uses the standard visually-hidden CSS technique — does not use display:none or visibility:hidden.
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-visually-hidden" section="summary" />
+
+## Overview
+
+`hx-visually-hidden` is a zero-visual-footprint utility component that removes content from the visual display while preserving it in the accessibility tree. It wraps content in a `<span>` using the industry-standard visually-hidden CSS technique — `position: absolute`, `width: 1px`, `height: 1px`, `overflow: hidden`, `clip`, `clip-path`, and `white-space: nowrap` — so that screen readers announce the content while sighted users see nothing.
+
+This is fundamentally different from `display: none` or `visibility: hidden`, which remove content from the accessibility tree entirely. `hx-visually-hidden` content is always announced by screen readers, discoverable by keyboard navigation (when `focusable` is set), and included in the document's logical reading order.
+
+The optional `focusable` property enables the **skip link pattern**: when set, the component reverts to normal static positioning and visible rendering whenever a focusable child element (such as an `<a>` or `<button>`) receives focus. This allows skip links, bypass blocks, and similar keyboard-only affordances to remain invisible to mouse users while becoming visible to keyboard users at exactly the moment they are needed.
+
+**Use `hx-visually-hidden` when:** you need to provide context to screen reader users that is already conveyed visually — icon button labels, status text alongside colored indicators, breadcrumb separators, "current page" annotations, or live region announcements.
+
+**Do not use `hx-visually-hidden`** to hide content that should not be announced by screen readers. Use `aria-hidden="true"` for purely decorative content that screen readers should skip.
+
+## Live Demo
+
+### Default
+
+Content placed inside `hx-visually-hidden` is invisible to sighted users but announced by screen readers. The surrounding text marks where the hidden content sits in the flow.
+
+<ComponentDemo title="Default">
+  <p style="font-size: 0.875rem; color: #6c757d; margin: 0 0 1rem 0;">
+    The component renders nothing visible. Screen readers will announce "Important notice for screen
+    reader users only" at this point in the reading order.
+  </p>
+  <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+    <span>Before hidden content</span>
+    <hx-visually-hidden>Important notice for screen reader users only</hx-visually-hidden>
+    <span>After hidden content</span>
+  </div>
+</ComponentDemo>
+
+### Icon Button Label
+
+Provide an accessible label for icon-only buttons. The visible button shows only an icon; screen readers announce the full label from the hidden text.
+
+<ComponentDemo title="Icon Button Label">
+  <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <button
+      type="button"
+      aria-label=""
+      style="display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; background: none; border: 1px solid #dee2e6; border-radius: 0.375rem; cursor: pointer; padding: 0;"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+      <hx-visually-hidden>Close dialog</hx-visually-hidden>
+    </button>
+    <button
+      type="button"
+      style="display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; background: none; border: 1px solid #dee2e6; border-radius: 0.375rem; cursor: pointer; padding: 0;"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <hx-visually-hidden>Search patients</hx-visually-hidden>
+    </button>
+    <span style="font-size: 0.75rem; color: #6c757d;">
+      Buttons have no visible text — screen readers announce "Close dialog" and "Search patients"
+    </span>
+  </div>
+</ComponentDemo>
+
+### Screen Reader Announcement
+
+Annotate breadcrumb navigation with a hidden ", current page" suffix so screen readers convey the active page without visual redundancy.
+
+<ComponentDemo title="Screen Reader Announcement">
+  <nav aria-label="Breadcrumb">
+    <ol style="display: flex; align-items: center; gap: 0.5rem; list-style: none; margin: 0; padding: 0; font-size: 0.875rem;">
+      <li>
+        <a href="/" style="color: #0d6efd; text-decoration: none;">
+          Home
+        </a>
+      </li>
+      <li aria-hidden="true" style="color: #6c757d;">
+        /
+      </li>
+      <li>
+        <a href="/patients" style="color: #0d6efd; text-decoration: none;">
+          Patients
+        </a>
+      </li>
+      <li aria-hidden="true" style="color: #6c757d;">
+        /
+      </li>
+      <li>
+        <a
+          href="/patients/detail"
+          aria-current="page"
+          style="color: #212529; text-decoration: none; font-weight: 600;"
+        >
+          Patient Detail
+          <hx-visually-hidden>, current page</hx-visually-hidden>
+        </a>
+      </li>
+    </ol>
+  </nav>
+</ComponentDemo>
+
+### Skip Link (focusable)
+
+With `focusable` set, the component becomes visible when a child element receives keyboard focus. Tab into the demo to reveal the skip link.
+
+<ComponentDemo title="Skip Link">
+  <div style="position: relative; min-height: 4rem; padding: 0.5rem; border: 1px dashed #dee2e6; border-radius: 0.375rem; font-size: 0.875rem; color: #6c757d;">
+    <hx-visually-hidden focusable>
+      <a
+        href="#main-content"
+        style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 100; padding: 0.5rem 1rem; background: #0d6efd; color: #fff; border-radius: 0.375rem; text-decoration: none; font-weight: 600; font-size: 0.875rem;"
+      >
+        Skip to main content
+      </a>
+    </hx-visually-hidden>
+    <span style="display: block; padding-top: 0.25rem;">
+      Tab into this area to reveal the skip link
+    </span>
+  </div>
+</ComponentDemo>
+
+### Healthcare Context
+
+Status indicators that pair a colored visual dot with screen-reader-only status text. Sighted users see the color; screen reader users hear the status label.
+
+<ComponentDemo title="Healthcare Context">
+  <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem;">
+    <li style="display: flex; align-items: center; gap: 0.625rem;">
+      <span
+        style="display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: #198754; flex-shrink: 0;"
+        aria-hidden="true"
+      ></span>
+      <span>Patient A — Smith, Jane</span>
+      <hx-visually-hidden>Status: Stable</hx-visually-hidden>
+    </li>
+    <li style="display: flex; align-items: center; gap: 0.625rem;">
+      <span
+        style="display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: #ffc107; flex-shrink: 0;"
+        aria-hidden="true"
+      ></span>
+      <span>Patient B — Doe, John</span>
+      <hx-visually-hidden>Status: Needs Attention</hx-visually-hidden>
+    </li>
+    <li style="display: flex; align-items: center; gap: 0.625rem;">
+      <span
+        style="display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: #dc3545; flex-shrink: 0;"
+        aria-hidden="true"
+      ></span>
+      <span>Patient C — Rivera, Maria</span>
+      <hx-visually-hidden>Status: Critical</hx-visually-hidden>
+    </li>
+  </ul>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-visually-hidden';
+```
+
+## Basic Usage
+
+```html
+<!-- Basic: hide text from sighted users, expose to screen readers -->
+<hx-visually-hidden>Page is loading, please wait.</hx-visually-hidden>
+
+<!-- Icon button with hidden label -->
+<button type="button">
+  <svg aria-hidden="true"><!-- icon --></svg>
+  <hx-visually-hidden>Close dialog</hx-visually-hidden>
+</button>
+
+<!-- Skip link: becomes visible when the link inside receives focus -->
+<hx-visually-hidden focusable>
+  <a href="#main-content">Skip to main content</a>
+</hx-visually-hidden>
+```
+
+## Properties
+
+| Property    | Attribute   | Type      | Default | Description                                                                                                                                                        |
+| ----------- | ----------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `focusable` | `focusable` | `boolean` | `false` | When true, the component reverts to visible static positioning whenever a focusable child receives focus. Enables the skip link pattern. Reflects as an attribute. |
+
+## CSS Parts
+
+| Part   | Description                                                                                                                                                        |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `base` | The inner `<span>` wrapper that contains slotted content. Target this part to apply custom styles to the container without breaking the visually-hidden technique. |
+
+```css
+/* Example: adjust the focus-visible reveal position */
+hx-visually-hidden::part(base) {
+  border-radius: 0.25rem;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | The content to hide visually but expose to screen readers. Can be plain text, inline elements, or focusable elements (links, buttons) when `focusable` is also set. |
+
+## Accessibility
+
+`hx-visually-hidden` implements the industry-standard visually-hidden CSS technique endorsed by the [WebAIM](https://webaim.org/techniques/css/invisiblecontent/) and the [W3C Techniques for WCAG 2.1](https://www.w3.org/WAI/WCAG21/Techniques/css/C7).
+
+| Topic                   | Details                                                                                                                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Not `display:none`      | Content is positioned off-screen at 1×1 px — it remains in the accessibility tree and is announced by all major screen readers (NVDA, JAWS, VoiceOver, TalkBack).                              |
+| Not `visibility:hidden` | `visibility: hidden` removes elements from the accessibility tree. `hx-visually-hidden` never sets this property, so content is always accessible.                                             |
+| Skip link pattern       | Set `focusable` to reveal the component when a child receives focus. Use this for skip navigation links, bypass blocks, and keyboard-only affordances per WCAG 2.4.1 (Bypass Blocks).          |
+| Live region support     | Wrap live region text with `hx-visually-hidden` to announce dynamic status updates (e.g., form errors, patient status changes) to screen reader users without changing the visual layout.      |
+| Icon button labels      | Place `hx-visually-hidden` inside icon-only `<button>` elements as an alternative to `aria-label`. This approach is more robust with translation tools and Drupal's string translation system. |
+| WCAG 2.1 AA             | Zero axe-core violations in default and focusable states. Satisfies WCAG 1.1.1 (Non-text Content), WCAG 2.4.1 (Bypass Blocks), and WCAG 2.4.6 (Headings and Labels).                           |
+
+### Healthcare A11y Notes
+
+In healthcare interfaces, color alone must never convey clinical status — this violates WCAG 1.4.1 (Use of Color). Always pair colored status indicators (alert badges, patient severity dots, order priority flags) with `hx-visually-hidden` text that names the status for screen reader users.
+
+```html
+<!-- Correct: color AND text for screen readers -->
+<span class="status-dot status-critical" aria-hidden="true"></span>
+Patient Rivera
+<hx-visually-hidden>Status: Critical</hx-visually-hidden>
+
+<!-- Wrong: color-only, fails WCAG 1.4.1 -->
+<span class="status-dot status-critical"></span>
+Patient Rivera
+```
+
+Every page in a clinical application should include a skip link using the `focusable` pattern to meet WCAG 2.4.1 (Bypass Blocks), which is a Level A requirement and a legal obligation in many healthcare procurement contracts.
+
+## Keyboard Navigation
+
+| Key   | Behavior                                                                                                                                                                                                            |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Tab` | When `focusable` is set and slotted content contains a focusable element (link or button), tabbing to that element reveals the component visually. The component returns to its hidden state when focus moves away. |
+
+## Drupal Integration
+
+```twig
+{# Skip link — add at the very top of page.html.twig, before the header #}
+<hx-visually-hidden focusable>
+  <a href="#main-content" class="skip-link">
+    {{ 'Skip to main content'|t }}
+  </a>
+</hx-visually-hidden>
+
+{# Icon button label — alternative to aria-label, works with Drupal t() #}
+<button type="button" class="close-btn js-close-dialog">
+  <span class="icon icon--close" aria-hidden="true"></span>
+  <hx-visually-hidden>{{ 'Close'|t }}</hx-visually-hidden>
+</button>
+
+{# Status indicator with screen-reader text #}
+{% for patient in patients %}
+  <li class="patient-row">
+    <span class="status-dot status-dot--{{ patient.severity }}" aria-hidden="true"></span>
+    {{ patient.name }}
+    <hx-visually-hidden>
+      {{ 'Status: '|t }}{{ patient.severity_label }}
+    </hx-visually-hidden>
+  </li>
+{% endfor %}
+
+{# Breadcrumb current page annotation #}
+{% for item in breadcrumb %}
+  <li>
+    {% if loop.last %}
+      <a href="{{ item.url }}" aria-current="page">
+        {{ item.title }}
+        <hx-visually-hidden>, {{ 'current page'|t }}</hx-visually-hidden>
+      </a>
+    {% else %}
+      <a href="{{ item.url }}">{{ item.title }}</a>
+    {% endif %}
+  </li>
+{% endfor %}
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-visually-hidden example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; margin: 0; padding: 0;">
+    <!-- Skip link: only visible to keyboard users when focused -->
+    <hx-visually-hidden focusable>
+      <a
+        href="#main-content"
+        style="position: fixed; top: 1rem; left: 1rem; z-index: 9999; padding: 0.5rem 1.25rem; background: #0d6efd; color: #fff; border-radius: 0.375rem; text-decoration: none; font-weight: 600;"
+      >
+        Skip to main content
+      </a>
+    </hx-visually-hidden>
+
+    <header
+      style="background: #1e40af; color: #fff; padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem;"
+    >
+      <span style="font-weight: 700; font-size: 1.125rem;">Memorial Health</span>
+
+      <!-- Icon button with visually-hidden label -->
+      <button
+        type="button"
+        id="search-btn"
+        style="margin-left: auto; display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid rgba(255,255,255,0.4); border-radius: 0.375rem; cursor: pointer; padding: 0.4rem; color: #fff;"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <hx-visually-hidden>Search patients</hx-visually-hidden>
+      </button>
+    </header>
+
+    <main id="main-content" style="padding: 2rem; max-width: 48rem;">
+      <h1>Patient List</h1>
+
+      <!-- Status indicators with screen-reader text -->
+      <ul
+        style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;"
+      >
+        <li
+          style="display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem; border: 1px solid #dee2e6; border-radius: 0.375rem;"
+        >
+          <span
+            style="display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: #198754;"
+            aria-hidden="true"
+          ></span>
+          Smith, Jane — Room 204
+          <hx-visually-hidden>Status: Stable</hx-visually-hidden>
+        </li>
+        <li
+          style="display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem; border: 1px solid #dee2e6; border-radius: 0.375rem;"
+        >
+          <span
+            style="display: inline-block; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: #dc3545;"
+            aria-hidden="true"
+          ></span>
+          Rivera, Maria — Room 112
+          <hx-visually-hidden>Status: Critical</hx-visually-hidden>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
+```
 
 ## API Reference
 

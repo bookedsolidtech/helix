@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStyles, helixToastStackStyles } from './hx-toast.styles.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
@@ -376,7 +376,7 @@ export interface ToastOptions {
  * `stackLimit` by hiding the oldest visible toast when the limit is exceeded.
  *
  * @example
- * import { toast } from '@wc-2026/library/components/hx-toast/index.js';
+ * import { toast } from '@helixui/library/components/hx-toast/index.js';
  * toast({ message: 'Patient record saved.', variant: 'success' });
  */
 export function toast(options: ToastOptions): HelixToast {

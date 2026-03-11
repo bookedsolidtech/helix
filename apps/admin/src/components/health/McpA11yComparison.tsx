@@ -99,7 +99,7 @@ export function McpA11yComparison({
             </div>
             <ScoreIndicator score={mcpProfile.score} label="Documented" />
             <div className="mt-3 space-y-1">
-              {mcpProfile.dimensions.map((dim: McpAccessibilityDimension) => (
+              {(mcpProfile.dimensions ?? []).map((dim: McpAccessibilityDimension) => (
                 <div key={dim.name} className="flex items-center justify-between text-[11px]">
                   <span className="flex items-center gap-1.5">
                     {dim.score >= 80 ? (

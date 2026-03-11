@@ -2,7 +2,7 @@ import { LitElement, html, nothing, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixLinkStyles } from './hx-link.styles.js';
 
 /**

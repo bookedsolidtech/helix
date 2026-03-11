@@ -1,13 +1,13 @@
 ---
 title: Slots and Composition
-description: Master content projection in Shadow DOM with comprehensive coverage of slots, named slots, fallback content, slotchange events, slot assignment, styling slotted content, and real-world composition patterns used in wc-2026.
+description: Master content projection in Shadow DOM with comprehensive coverage of slots, named slots, fallback content, slotchange events, slot assignment, styling slotted content, and real-world composition patterns used in HELiX.
 sidebar:
   order: 2
 ---
 
 # Slots and Composition
 
-Content projection is the mechanism that makes web components truly composable. While Shadow DOM provides style and DOM encapsulation, slots create controlled openings in that boundary—allowing consumers to inject their own content while maintaining the component's internal structure and styling. This guide covers everything from basic slot usage to advanced composition patterns, with real examples from the wc-2026 library.
+Content projection is the mechanism that makes web components truly composable. While Shadow DOM provides style and DOM encapsulation, slots create controlled openings in that boundary—allowing consumers to inject their own content while maintaining the component's internal structure and styling. This guide covers everything from basic slot usage to advanced composition patterns, with real examples from the HELiX library.
 
 ## What Are Slots?
 
@@ -83,7 +83,7 @@ The simplest slot pattern is a single unnamed slot that accepts all children.
 ### Default (Unnamed) Slot
 
 ```typescript
-// wc-2026 style component
+// HELiX style component
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
@@ -339,7 +339,7 @@ export class HelixTabs extends LitElement {
 
 ### Real-World Pattern: Conditional Layout
 
-The `hx-card` component in wc-2026 uses `slotchange` to conditionally show/hide sections:
+The `hx-card` component in HELiX uses `slotchange` to conditionally show/hide sections:
 
 ```typescript
 @customElement('hx-card')
@@ -841,7 +841,7 @@ Result:
 
 ### Pattern 1: Hybrid Slot/Property Strategy (ADR-001)
 
-wc-2026 follows a **hybrid approach**: use properties for data, slots for rich content.
+HELiX follows a **hybrid approach**: use properties for data, slots for rich content.
 
 **When to use properties:**
 

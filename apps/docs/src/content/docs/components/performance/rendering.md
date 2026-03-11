@@ -334,7 +334,7 @@ private async _handleClick(e: MouseEvent) {
 **Strategy 2: Debounce expensive operations**
 
 ```typescript
-import { debounce } from '@helix/utils';
+import { debounce } from '@helixui/utils';
 
 @customElement('hx-search')
 export class HelixSearch extends LitElement {

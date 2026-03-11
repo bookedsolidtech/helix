@@ -1,5 +1,5 @@
 {
-  "name": "@helix/tokens",
+  "name": "@helixui/tokens",
   "version": "0.1.0",
   "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
   "type": "module",
@@ -41,6 +41,21 @@
   "dependencies": {
     "lit": "^3.3.2"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/hx-tokens"
+  },
+  "license": "MIT",
+  "homepage": "https://helix.bookedsolid.com",
+  "bugs": "https://github.com/bookedsolidtech/helix/issues",
+  "keywords": [
+    "web-components",
+    "lit",
+    "healthcare",
+    "design-system",
+    "custom-elements"
+  ],
   "devDependencies": {
     "tsx": "^4.19.0",
     "typescript": "^5.7.2"

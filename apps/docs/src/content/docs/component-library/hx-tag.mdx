@@ -1,14 +1,584 @@
 ---
 title: 'hx-tag'
-description: 'Compact label for categorization, filtering, and metadata display'
+description: 'Compact label for categorization, filtering, and metadata display. Supports five color variants, three sizes, pill mode, prefix/suffix slots, and a removable dismiss button with full WCAG 2.1 AA accessibility.'
 ---
 
 import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
 import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentLoader />
 
 <ComponentDoc tagName="hx-tag" section="summary" />
+
+## Overview
+
+`hx-tag` is a compact inline label used to categorize content, represent applied filters, and display metadata in enterprise healthcare interfaces. It supports five semantic color variants — `default`, `primary`, `success`, `warning`, and `danger` — as well as three sizes, pill mode, prefix and suffix slots, and an optional removable dismiss button.
+
+The removable button meets **WCAG 2.5.8 (Level AA)** minimum touch target requirements (24×24 CSS pixels) and receives a descriptive `aria-label` built from the tag's visible text only — prefix slot icon content is intentionally excluded from the accessible name to prevent screen reader pollution.
+
+**Use `hx-tag` when:** you need compact inline labels for applied filters, category metadata, clinical specialty identifiers, or any list of dismissible items in a patient or provider workflow.
+
+**Use `hx-badge` instead when:** you need a status indicator with a count or a persistent label that is never dismissed by the user.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Tag">
+  <hx-tag>Healthcare</hx-tag>
+</ComponentDemo>
+
+### Color Variants
+
+<ComponentDemo title="Color Variants">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-tag variant="default">Default</hx-tag>
+    <hx-tag variant="primary">Primary</hx-tag>
+    <hx-tag variant="success">Success</hx-tag>
+    <hx-tag variant="warning">Warning</hx-tag>
+    <hx-tag variant="danger">Danger</hx-tag>
+  </div>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <hx-tag hx-size="sm">Small</hx-tag>
+    <hx-tag hx-size="md">Medium (default)</hx-tag>
+    <hx-tag hx-size="lg">Large</hx-tag>
+  </div>
+</ComponentDemo>
+
+### Pill Mode
+
+<ComponentDemo title="Pill Mode">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-tag pill variant="default">
+      Default
+    </hx-tag>
+    <hx-tag pill variant="primary">
+      Primary
+    </hx-tag>
+    <hx-tag pill variant="success">
+      Success
+    </hx-tag>
+    <hx-tag pill variant="warning">
+      Warning
+    </hx-tag>
+    <hx-tag pill variant="danger">
+      Danger
+    </hx-tag>
+  </div>
+</ComponentDemo>
+
+### Removable Tags
+
+<ComponentDemo title="Removable Tags">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-tag removable variant="default">
+      Default
+    </hx-tag>
+    <hx-tag removable variant="primary">
+      Primary
+    </hx-tag>
+    <hx-tag removable variant="success">
+      Success
+    </hx-tag>
+    <hx-tag removable variant="warning">
+      Warning
+    </hx-tag>
+    <hx-tag removable variant="danger">
+      Danger
+    </hx-tag>
+  </div>
+</ComponentDemo>
+
+### With Prefix and Suffix Slots
+
+<ComponentDemo title="Prefix and Suffix Slots">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-tag variant="primary">
+      <span slot="prefix">★</span>
+      Featured
+    </hx-tag>
+    <hx-tag variant="success" removable>
+      <span slot="prefix">✓</span>
+      Verified
+    </hx-tag>
+    <hx-tag variant="default">
+      Category
+      <span slot="suffix">42</span>
+    </hx-tag>
+  </div>
+</ComponentDemo>
+
+### Disabled State
+
+<ComponentDemo title="Disabled State">
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+    <hx-tag disabled>Disabled</hx-tag>
+    <hx-tag disabled removable>
+      Disabled Removable
+    </hx-tag>
+    <hx-tag disabled variant="primary">
+      Disabled Primary
+    </hx-tag>
+  </div>
+</ComponentDemo>
+
+### Healthcare Filter Pattern
+
+<ComponentDemo title="Applied Clinical Filters">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 420px;">
+    <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">Active filters:</p>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <hx-tag removable variant="primary" pill>
+        Cardiology
+      </hx-tag>
+      <hx-tag removable variant="primary" pill>
+        Oncology
+      </hx-tag>
+      <hx-tag removable variant="success" pill>
+        <span slot="prefix">✓</span>
+        Active Patients
+      </hx-tag>
+      <hx-tag removable variant="warning" pill>
+        Pending Review
+      </hx-tag>
+    </div>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-tag';
+```
+
+## Basic Usage
+
+Minimal HTML — no build tool required:
+
+```html
+<!-- Default tag -->
+<hx-tag>Healthcare</hx-tag>
+
+<!-- Color variants -->
+<hx-tag variant="primary">Primary</hx-tag>
+<hx-tag variant="success">Success</hx-tag>
+<hx-tag variant="warning">Warning</hx-tag>
+<hx-tag variant="danger">Danger</hx-tag>
+
+<!-- Sizes (use hx-size attribute, not size) -->
+<hx-tag hx-size="sm">Small</hx-tag>
+<hx-tag hx-size="md">Medium</hx-tag>
+<hx-tag hx-size="lg">Large</hx-tag>
+
+<!-- Pill mode -->
+<hx-tag pill>Rounded</hx-tag>
+
+<!-- Removable with dismiss button -->
+<hx-tag removable>Dismissible</hx-tag>
+
+<!-- Prefix slot for icons or avatars -->
+<hx-tag variant="primary">
+  <span slot="prefix">★</span>
+  Featured
+</hx-tag>
+
+<!-- Suffix slot for counts or metadata -->
+<hx-tag variant="default">
+  Category
+  <span slot="suffix">42</span>
+</hx-tag>
+
+<!-- Disabled -->
+<hx-tag disabled removable>Disabled</hx-tag>
+```
+
+Set properties via JavaScript for dynamic control:
+
+```javascript
+const tag = document.querySelector('hx-tag');
+
+// Listen for the remove event
+tag.addEventListener('hx-remove', (event) => {
+  // Remove from DOM or update application state
+  event.target.remove();
+});
+
+// Update variant at runtime
+tag.variant = 'success';
+
+// Toggle pill mode
+tag.pill = true;
+
+// Enable removable state
+tag.removable = true;
+```
+
+## Properties
+
+| Property    | Attribute   | Type                                                           | Default     | Description                                                                                                                                                                                                                            |
+| ----------- | ----------- | -------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`   | `variant`   | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger'` | `'default'` | Color scheme of the tag. Controls background, text, and border colors via design tokens. Reflects to attribute.                                                                                                                        |
+| `size`      | `hx-size`   | `'sm' \| 'md' \| 'lg'`                                         | `'md'`      | Size of the tag. Maps to font size and padding design tokens. **Use the `hx-size` attribute in HTML and Twig** — the property name is `size`. Reflects to attribute.                                                                   |
+| `pill`      | `pill`      | `boolean`                                                      | `false`     | Applies fully rounded (pill) border radius. Uses a separate token (`--hx-tag-border-radius-pill`) so it is not affected by consumer overrides of `--hx-tag-border-radius`. In Twig, render as a bare attribute. Reflects to attribute. |
+| `removable` | `removable` | `boolean`                                                      | `false`     | Renders a dismiss button (×). Fires `hx-remove` when clicked. The button receives an `aria-label` of `"Remove {label text}"`. In Twig, render as a bare attribute. Reflects to attribute.                                              |
+| `disabled`  | `disabled`  | `boolean`                                                      | `false`     | Disables interactions. The dismiss button is natively disabled. The host receives reduced opacity. In Twig, render as a bare attribute. Reflects to attribute.                                                                         |
+
+**Note on `hx-size`:** The attribute is intentionally named `hx-size` (not `size`) to avoid conflict with the native HTML `size` attribute on form elements. When writing HTML or Drupal Twig templates, always use `hx-size`. In JavaScript, access the property as `tag.size`.
+
+## Events
+
+| Event       | Detail Type | Bubbles | Composed | Description                                                                                                                                                                                         |
+| ----------- | ----------- | ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-remove` | `void`      | `true`  | `true`   | Dispatched when the user clicks the dismiss button. Not fired when the tag is `disabled`. Consuming applications should remove the tag from the DOM or update application filter state in response. |
+
+```javascript
+document.addEventListener('hx-remove', (event) => {
+  const tag = event.target;
+  // Announce the removal to screen readers via your application's aria-live region
+  announceToScreenReader(`Removed filter: ${tag.textContent.trim()}`);
+  tag.remove();
+});
+```
+
+**aria-live responsibility:** `hx-tag` intentionally does not include a built-in `aria-live` region for removal announcements. Consuming applications are responsible for announcing filter changes via their own `aria-live` region. This is the correct pattern for healthcare applications where the live region context (e.g., "3 of 5 filters removed") belongs to the application, not the component.
+
+## Slots
+
+| Slot        | Description                                                                                                                                                                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | The label text of the tag. Text content from this slot is used to build the remove button's `aria-label`. Only plain text nodes are captured — nested elements are excluded from the accessible name computation.                                    |
+| `prefix`    | Icon, avatar, or other content rendered before the label. Content in this slot is **excluded** from the remove button's `aria-label` to prevent screen reader pollution (e.g., icon characters like ★ are not announced as part of the button name). |
+| `suffix`    | Content rendered after the label, such as a count badge or metadata indicator.                                                                                                                                                                       |
+
+```html
+<!-- Default slot: text label -->
+<hx-tag>Cardiology</hx-tag>
+
+<!-- Prefix slot: icon before label -->
+<hx-tag variant="success">
+  <svg slot="prefix" aria-hidden="true" width="12" height="12">...</svg>
+  Verified
+</hx-tag>
+
+<!-- Suffix slot: count after label -->
+<hx-tag>
+  Active Patients
+  <span slot="suffix" aria-hidden="true">128</span>
+</hx-tag>
+```
+
+## CSS Parts
+
+| Part            | Description                                                                           |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `base`          | The root `<span>` element wrapping all tag content.                                   |
+| `prefix`        | The wrapper `<span>` around the `prefix` slot.                                        |
+| `label`         | The wrapper `<span>` around the default slot (label text).                            |
+| `suffix`        | The wrapper `<span>` around the `suffix` slot.                                        |
+| `remove-button` | The `<button>` element for the dismiss action (only present when `removable` is set). |
+
+Use CSS parts to style internals that CSS custom properties do not expose:
+
+```css
+/* Style the base tag element directly */
+hx-tag::part(base) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+/* Style the remove button */
+hx-tag::part(remove-button) {
+  border-radius: 50%;
+}
+
+/* Style prefix wrapper */
+hx-tag::part(prefix) {
+  opacity: 0.8;
+}
+```
+
+## CSS Custom Properties
+
+| Property                      | Default                        | Description                                                                                   |
+| ----------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `--hx-tag-bg`                 | `var(--hx-color-neutral-100)`  | Tag background color. Overridden per variant.                                                 |
+| `--hx-tag-color`              | `var(--hx-color-neutral-700)`  | Tag text color. Overridden per variant.                                                       |
+| `--hx-tag-border-color`       | `var(--hx-color-neutral-200)`  | Tag border color. Overridden per variant.                                                     |
+| `--hx-tag-font-size`          | _(set per size variant)_       | Tag font size. Defaults to `xs` for `sm`, `sm` for `md`, `base` for `lg`.                     |
+| `--hx-tag-font-weight`        | `var(--hx-font-weight-medium)` | Tag font weight.                                                                              |
+| `--hx-tag-font-family`        | `var(--hx-font-family-sans)`   | Tag font family.                                                                              |
+| `--hx-tag-border-radius`      | `var(--hx-border-radius-sm)`   | Tag border radius in non-pill mode. Consumer overrides to this token do not affect pill mode. |
+| `--hx-tag-border-radius-pill` | `var(--hx-border-radius-full)` | Tag border radius in pill mode. Independent from `--hx-tag-border-radius`.                    |
+| `--hx-tag-padding-x`          | _(set per size variant)_       | Tag horizontal padding.                                                                       |
+| `--hx-tag-padding-y`          | _(set per size variant)_       | Tag vertical padding.                                                                         |
+
+Override at the `:root` level to theme all instances, or on a specific selector to style a single instance:
+
+```css
+/* Brand-specific primary tag colors */
+:root {
+  --hx-tag-bg: #f0f4ff;
+  --hx-tag-color: #1a3a8f;
+  --hx-tag-border-color: #c7d7f5;
+}
+
+/* Custom border radius for a specific tag list */
+.filter-list hx-tag {
+  --hx-tag-border-radius: 0.125rem;
+}
+
+/* Tighter padding for a dense table view */
+hx-tag.dense {
+  --hx-tag-padding-x: var(--hx-space-1);
+  --hx-tag-padding-y: var(--hx-space-0-5);
+}
+```
+
+## Accessibility
+
+`hx-tag` is built for WCAG 2.1 AA compliance in healthcare contexts where accurate communication to assistive technology users is mandatory.
+
+| Topic              | Details                                                                                                                                                                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role               | The tag renders as an inline `<span>`. It has no interactive ARIA role. When `removable`, the internal `<button>` element provides the interactive semantics.                                                                                         |
+| Remove button name | The dismiss button's `aria-label` is `"Remove {label text}"` where `{label text}` is the text content of the default slot only. Prefix slot content (e.g., icons) is explicitly excluded from the accessible name to prevent screen reader pollution. |
+| Touch target       | The remove button meets WCAG 2.5.8 (Level AA) with a minimum touch target of 24×24 CSS pixels (`min-width: 24px; min-height: 24px`).                                                                                                                  |
+| Focus indicator    | The remove button receives a visible focus ring via `focus-visible`, using `--hx-focus-ring-width`, `--hx-focus-ring-color`, and `--hx-focus-ring-offset` design tokens.                                                                              |
+| Disabled state     | The `disabled` attribute natively disables the internal `<button>`. `aria-disabled` is intentionally NOT set on the base `<span>` — per ARIA 1.2, `aria-disabled` is only meaningful on elements with interactive ARIA roles.                         |
+| Color alone        | Color variants are used for visual grouping and urgency signaling. Tag labels provide the semantic content; color is supplementary. This satisfies WCAG 1.4.1 (Use of Color).                                                                         |
+| aria-live          | Removal announcements are the consuming application's responsibility. When a tag is removed from the DOM, applications should announce the change via their own `aria-live` region. See Events section for a recommended pattern.                     |
+| WCAG               | Meets WCAG 2.1 AA. SC 2.5.8 (Target Size), SC 4.1.2 (Name, Role, Value), SC 1.4.1 (Use of Color) satisfied. Zero axe-core violations across all variants, sizes, and states.                                                                          |
+
+### Keyboard Navigation
+
+| Key     | Target        | Action                                                             |
+| ------- | ------------- | ------------------------------------------------------------------ |
+| `Tab`   | Remove button | Moves focus to the dismiss button (when present and not disabled). |
+| `Enter` | Remove button | Activates the dismiss button, fires `hx-remove`.                   |
+| `Space` | Remove button | Activates the dismiss button, fires `hx-remove`.                   |
+
+Non-removable tags are not interactive and do not receive keyboard focus.
+
+### Screen Reader Guidance
+
+```html
+<!-- Removable tag: announces as "Remove Healthcare, button" -->
+<hx-tag removable>Healthcare</hx-tag>
+
+<!-- With prefix icon: remove button still announces as "Remove Healthcare, button" -->
+<!-- The ★ character is excluded from the accessible name -->
+<hx-tag removable>
+  <span slot="prefix" aria-hidden="true">★</span>
+  Healthcare
+</hx-tag>
+
+<!-- Recommended: announce removal via aria-live region in the application -->
+<div aria-live="polite" aria-atomic="true" class="sr-only" id="filter-announcer"></div>
+<script>
+  document.querySelectorAll('hx-tag[removable]').forEach((tag) => {
+    tag.addEventListener('hx-remove', (e) => {
+      const label = e.target.textContent.trim();
+      document.getElementById('filter-announcer').textContent = `Removed filter: ${label}`;
+      e.target.remove();
+    });
+  });
+</script>
+```
+
+## Drupal Integration
+
+Use `hx-tag` in a Twig template after registering the library.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+{# Basic tag #}
+<hx-tag variant="{{ variant|default('default') }}">
+  {{ label }}
+</hx-tag>
+
+{# With size — always use hx-size attribute, not size #}
+<hx-tag
+  variant="{{ variant|default('default') }}"
+  hx-size="{{ size|default('md') }}"
+>
+  {{ label }}
+</hx-tag>
+
+{# Pill mode — render as bare attribute #}
+<hx-tag
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if pill %}pill{% endif %}
+>
+  {{ label }}
+</hx-tag>
+
+{# Removable — render as bare attribute #}
+<hx-tag
+  variant="{{ variant|default('default') }}"
+  {% if removable %}removable{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {{ label }}
+</hx-tag>
+
+{# With prefix icon slot #}
+<hx-tag variant="success">
+  <span slot="prefix" aria-hidden="true">{{ icon }}</span>
+  {{ label }}
+</hx-tag>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Handle removal and announce to screen readers in a Drupal behavior:
+
+```javascript
+Drupal.behaviors.helixTagFilters = {
+  attach(context) {
+    once('helixTagRemove', 'hx-tag[removable]', context).forEach((tag) => {
+      tag.addEventListener('hx-remove', (event) => {
+        const removedTag = event.target;
+        const label = removedTag.textContent.trim();
+
+        // Announce removal via an aria-live region
+        const announcer = document.querySelector('[data-hx-announcer]');
+        if (announcer) {
+          announcer.textContent = `Removed filter: ${label}`;
+        }
+
+        // Remove from DOM and update any server-side filter state
+        removedTag.remove();
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-tag example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 2rem;"
+  >
+    <!-- aria-live region for removal announcements -->
+    <div
+      id="tag-announcer"
+      aria-live="polite"
+      aria-atomic="true"
+      style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;"
+    ></div>
+
+    <!-- 1. Color variants -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Color Variants</h2>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <hx-tag variant="default">Default</hx-tag>
+        <hx-tag variant="primary">Primary</hx-tag>
+        <hx-tag variant="success">Success</hx-tag>
+        <hx-tag variant="warning">Warning</hx-tag>
+        <hx-tag variant="danger">Danger</hx-tag>
+      </div>
+    </section>
+
+    <!-- 2. Size variants -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Sizes</h2>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <hx-tag hx-size="sm">Small</hx-tag>
+        <hx-tag hx-size="md">Medium</hx-tag>
+        <hx-tag hx-size="lg">Large</hx-tag>
+      </div>
+    </section>
+
+    <!-- 3. Pill mode -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Pill Mode</h2>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <hx-tag pill variant="primary">Primary</hx-tag>
+        <hx-tag pill variant="success">Success</hx-tag>
+        <hx-tag pill variant="warning">Warning</hx-tag>
+      </div>
+    </section>
+
+    <!-- 4. Applied clinical filters (removable) -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Clinical Filters (Removable)</h2>
+      <div id="filter-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <hx-tag removable variant="primary" pill>Cardiology</hx-tag>
+        <hx-tag removable variant="primary" pill>Oncology</hx-tag>
+        <hx-tag removable variant="success" pill>
+          <span slot="prefix" aria-hidden="true">✓</span>
+          Active Patients
+        </hx-tag>
+        <hx-tag removable variant="warning" pill>Pending Review</hx-tag>
+      </div>
+      <p id="filter-count" style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;">
+        4 filters active
+      </p>
+    </section>
+
+    <script>
+      const announcer = document.getElementById('tag-announcer');
+      const filterCount = document.getElementById('filter-count');
+      const filterContainer = document.getElementById('filter-container');
+
+      filterContainer.addEventListener('hx-remove', (event) => {
+        const tag = event.target;
+        const label = tag.textContent.trim();
+
+        // Announce to screen readers
+        announcer.textContent = `Removed filter: ${label}`;
+
+        // Remove from DOM
+        tag.remove();
+
+        // Update count
+        const remaining = filterContainer.querySelectorAll('hx-tag').length;
+        filterCount.textContent = `${remaining} filter${remaining !== 1 ? 's' : ''} active`;
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Related Components
+
+| Component             | When to Use                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| `hx-badge`            | When you need a status indicator with a numeric count or a persistent label that users cannot dismiss. |
+| `hx-status-indicator` | When you need a colored dot to convey operational status (online, offline, busy, etc.).                |
+| `hx-chip`             | When you need a selectable/toggleable chip that maintains selected state (toggle behavior).            |
+| `hx-alert`            | When status requires a persistent, prominent callout with a full message body.                         |
+| `hx-button`           | When the action requires a full-sized button with text label and strong visual affordance.             |
 
 ## API Reference
 

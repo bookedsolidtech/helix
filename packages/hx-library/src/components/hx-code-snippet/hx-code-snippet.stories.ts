@@ -136,7 +136,7 @@ export const Bash: Story = {
   name: 'Language: Bash',
   render: () => html`
     <hx-code-snippet language="bash">
-      npm install @wc-2026/library npm run build npm run test
+      npm install @helixui/library npm run build npm run test
     </hx-code-snippet>
   `,
 };
@@ -229,7 +229,7 @@ export const MaxLines: Story = {
 export const CopyInteraction: Story = {
   name: 'Copy: Interaction Test',
   render: () => html`
-    <hx-code-snippet language="javascript">npm install @wc-2026/library</hx-code-snippet>
+    <hx-code-snippet language="javascript">npm install @helixui/library</hx-code-snippet>
   `,
   play: async ({ canvasElement }) => {
     const snippet = canvasElement.querySelector('hx-code-snippet');
