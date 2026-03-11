@@ -25,11 +25,7 @@ export { HelixCheckbox } from './components/hx-checkbox/index.js';
 export { HelixCheckboxGroup } from './components/hx-checkbox-group/index.js';
 export { HelixCodeSnippet } from './components/hx-code-snippet/index.js';
 export { HelixColorPicker } from './components/hx-color-picker/index.js';
-export {
-  HelixCombobox,
-  type ComboboxOption,
-  type HxComboboxSize,
-} from './components/hx-combobox/index.js';
+export { HelixCombobox, type ComboboxOption, type HxComboboxSize } from './components/hx-combobox/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
 export { HelixCopyButton } from './components/hx-copy-button/index.js';
 export { HelixDataTable } from './components/hx-data-table/index.js';
@@ -78,10 +74,7 @@ export { HelixStack } from './components/hx-stack/index.js';
 export { HelixStatusIndicator } from './components/hx-status-indicator/index.js';
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
-export {
-  HelixStructuredList,
-  HelixStructuredListRow,
-} from './components/hx-structured-list/index.js';
+export { HelixStructuredList, HelixStructuredListRow } from './components/hx-structured-list/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export { HelixTabs } from './components/hx-tabs/index.js';
 export { HelixTab } from './components/hx-tabs/index.js';
