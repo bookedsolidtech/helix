@@ -13,7 +13,7 @@
 import CodeBlock from './CodeBlock.astro';
 
 const terminalCode = `# Install the component library
-npm install @helix/components
+npm install @helixui/components
 
 # Or use the CDN for quick prototyping
 npx create-helix-app my-project`;
@@ -22,7 +22,7 @@ const scriptOpen = '<' + 'script type="module">';
 const scriptClose = '</' + 'script>';
 const htmlCode = `<!-- Import once, use everywhere -->
 ${scriptOpen}
-  import '@helix/components';
+  import '@helixui/components';
 ${scriptClose}
 
 <!-- Accessible alert component -->
