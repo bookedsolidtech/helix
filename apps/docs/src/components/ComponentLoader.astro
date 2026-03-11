@@ -4,24 +4,11 @@
  * so custom elements register in the browser.
  * Include on any page that renders live web component demos.
  *
- * Uses pure side-effect imports (no bindings) so Rollup cannot
- * tree-shake away the @customElement decorator registrations in
- * production builds, even when named exports appear unused.
+ * Uses the main barrel import so ALL components register at once.
+ * This is fine for docs — tree-shaking isn't needed here.
  */
 ---
 
 <script>
-  import '@helix/library/components/hx-button';
-  import '@helix/library/components/hx-card';
-  import '@helix/library/components/hx-text-input';
-  import '@helix/library/components/hx-checkbox';
-  import '@helix/library/components/hx-select';
-  import '@helix/library/components/hx-radio-group';
-  import '@helix/library/components/hx-alert';
-  import '@helix/library/components/hx-textarea';
-  import '@helix/library/components/hx-badge';
-  import '@helix/library/components/hx-switch';
-  import '@helix/library/components/hx-container';
-  import '@helix/library/components/hx-form';
-  import '@helix/library/components/hx-prose';
+  import '@helix/library';
 </script>

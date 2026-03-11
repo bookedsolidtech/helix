@@ -1,9 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Visual Regression Tests for HELiX (wc-2026) Components.
+ * Visual Regression Tests for HELiX Components.
  * Captures screenshots of each component variant in Storybook
  * and compares against committed baselines.
+ *
+ * In CI, set CHANGED_COMPONENTS env var (comma-separated hx-* names)
+ * to only test components modified in the current PR.
+ * When unset, all variants are tested (local dev / full suite).
  *
  * Prerequisites: Storybook must be running on port 3151
  * Run: npm run dev:storybook (or npx storybook dev -p 3151)
@@ -17,7 +21,7 @@ interface ComponentVariant {
   id: string;
 }
 
-const COMPONENT_VARIANTS: ComponentVariant[] = [
+const ALL_VARIANTS: ComponentVariant[] = [
   // hx-button
   { component: 'hx-button', story: 'Primary', id: 'components-button--primary' },
   { component: 'hx-button', story: 'Secondary', id: 'components-button--secondary' },
@@ -63,6 +67,18 @@ const COMPONENT_VARIANTS: ComponentVariant[] = [
   { component: 'hx-alert', story: 'Warning', id: 'components-alert--warning' },
   { component: 'hx-alert', story: 'Error', id: 'components-alert--error' },
 ];
+
+// Filter to only changed components when CHANGED_COMPONENTS is set
+const changedFilter = process.env.CHANGED_COMPONENTS;
+const COMPONENT_VARIANTS = changedFilter
+  ? ALL_VARIANTS.filter((v) => changedFilter.split(',').includes(v.component))
+  : ALL_VARIANTS;
+
+if (COMPONENT_VARIANTS.length === 0) {
+  test('no VRT variants for changed components', () => {
+    // No changed components have VRT coverage — pass
+  });
+}
 
 for (const variant of COMPONENT_VARIANTS) {
   test(`${variant.component} - ${variant.story}`, async ({ page }) => {

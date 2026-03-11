@@ -2,7 +2,7 @@
  * CEM (Custom Elements Manifest) parser for the admin dashboard.
  * Reads custom-elements.json from the wc-library package at runtime.
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 // ── CEM Type Interfaces ──────────────────────────────────────────────
@@ -163,6 +163,9 @@ export interface ManifestStats {
 
 function getManifest(): CemManifest {
   const cemPath = resolve(process.cwd(), '../../packages/hx-library/custom-elements.json');
+  if (!existsSync(cemPath)) {
+    return { schemaVersion: '', modules: [] } as unknown as CemManifest;
+  }
   const raw = readFileSync(cemPath, 'utf-8');
   return JSON.parse(raw) as CemManifest;
 }

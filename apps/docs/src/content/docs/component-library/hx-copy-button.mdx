@@ -1,0 +1,591 @@
+---
+title: 'hx-copy-button'
+description: 'One-click clipboard copy button with accessible success feedback, state-aware aria-label, and slot-based icon overrides.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-copy-button" section="summary" />
+
+## Overview
+
+`hx-copy-button` writes a configurable text value to the system clipboard and provides both visual and audible confirmation of success. It uses the modern `navigator.clipboard` API with a `document.execCommand` fallback for legacy environments. A polite `aria-live` region announces copy completion to screen reader users, and the `aria-label` updates to reflect the copied state so users who re-focus the button receive an accurate accessible name.
+
+**Use `hx-copy-button` when:** you need a standalone or inline button that copies a text value — patient MRNs, record IDs, medication orders, API keys, share URLs, or any other string where one-click copy improves efficiency.
+
+**Do not use** this component when you need a full code block with syntax highlighting — use `hx-code-snippet` instead, which includes a built-in copy button alongside formatted code display.
+
+## Live Demo
+
+### Default
+
+Icon-only copy button using the default label "Copy to clipboard".
+
+<ComponentDemo title="Default">
+  <hx-copy-button value="Hello, Helix!" label="Copy to clipboard">
+    <svg
+      slot="copy-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+    </svg>
+    <svg
+      slot="success-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </hx-copy-button>
+</ComponentDemo>
+
+### With Label Text
+
+A copy button that renders visible label text alongside the icon — useful when space allows or when context requires a clear action label.
+
+<ComponentDemo title="With Label Text">
+  <hx-copy-button value="patient@example.com" label="Copy email address">
+    <svg
+      slot="copy-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+    </svg>
+    <svg
+      slot="success-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    Copy email
+  </hx-copy-button>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium (default), and large variants for layout flexibility.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 1.5rem; align-items: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-copy-button value="Small" label="Copy to clipboard" hx-size="sm">
+        <svg
+          slot="copy-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+        </svg>
+        <svg
+          slot="success-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </hx-copy-button>
+      <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-copy-button value="Medium" label="Copy to clipboard" hx-size="md">
+        <svg
+          slot="copy-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+        </svg>
+        <svg
+          slot="success-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </hx-copy-button>
+      <span style="font-size: 0.75rem; color: #6b7280;">md</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+      <hx-copy-button value="Large" label="Copy to clipboard" hx-size="lg">
+        <svg
+          slot="copy-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+        </svg>
+        <svg
+          slot="success-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </hx-copy-button>
+      <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Disabled
+
+Prevents clipboard writes and interaction. The native `disabled` attribute fully communicates the state to assistive technology.
+
+<ComponentDemo title="Disabled">
+  <hx-copy-button value="Cannot copy this" label="Copy unavailable" disabled>
+    <svg
+      slot="copy-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+    </svg>
+    <svg
+      slot="success-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </hx-copy-button>
+</ComponentDemo>
+
+### Healthcare: Copy Patient MRN
+
+Inline copy button embedded in a clinical data row, using a descriptive `label` attribute for full screen reader context.
+
+<ComponentDemo title="Healthcare MRN">
+  <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">
+    <span style="font-size: 0.875rem; font-weight: 600; color: #111827; letter-spacing: 0.05em;">
+      MRN-2026-7823-HD
+    </span>
+    <hx-copy-button value="MRN-2026-7823-HD" label="Copy patient MRN" hx-size="sm">
+      <svg
+        slot="copy-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+      </svg>
+      <svg
+        slot="success-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </hx-copy-button>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-copy-button';
+```
+
+## Basic Usage
+
+```html
+<hx-copy-button value="text to copy" label="Copy to clipboard">
+  <!-- Optional: provide icons via named slots -->
+  <svg slot="copy-icon" aria-hidden="true">...</svg>
+  <svg slot="success-icon" aria-hidden="true">...</svg>
+</hx-copy-button>
+```
+
+## Properties
+
+| Property           | Attribute           | Type                   | Default               | Description                                                                                                      |
+| ------------------ | ------------------- | ---------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `value`            | `value`             | `string`               | `''`                  | The text to write to the clipboard on click. Required for any copy operation.                                    |
+| `label`            | `label`             | `string`               | `'Copy to clipboard'` | Accessible label applied as `aria-label` and `title` on the button. Updated to reflect copied state on re-focus. |
+| `feedbackDuration` | `feedback-duration` | `number`               | `2000`                | Duration (ms) to show the success state before reverting. Values below 300 ms are clamped to 300 ms.             |
+| `size`             | `hx-size`           | `'sm' \| 'md' \| 'lg'` | `'md'`                | Visual size of the button. Controls height and padding via design tokens. Invalid values fall back to `'md'`.    |
+| `disabled`         | `disabled`          | `boolean`              | `false`               | When true, click events are suppressed and clipboard writes do not occur. Reflects to the host element.          |
+
+## Events
+
+| Event           | Detail Type                         | Description                                                                                                                            |
+| --------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-copy`       | `{ value: string }`                 | Fired after the value has been successfully written to the clipboard.                                                                  |
+| `hx-copy-error` | `{ value: string; error: unknown }` | Fired when the clipboard write fails (permission denied, iframe restriction, etc.). `error` holds the caught error for diagnostic use. |
+
+## CSS Custom Properties
+
+| Property                            | Default                       | Description              |
+| ----------------------------------- | ----------------------------- | ------------------------ |
+| `--hx-copy-button-bg`               | `transparent`                 | Button background color. |
+| `--hx-copy-button-color`            | `var(--hx-color-primary-500)` | Icon and text color.     |
+| `--hx-copy-button-border-color`     | `transparent`                 | Button border color.     |
+| `--hx-copy-button-border-radius`    | `var(--hx-border-radius-md)`  | Button border radius.    |
+| `--hx-copy-button-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color.        |
+
+## CSS Parts
+
+| Part     | Description                                                                                          |
+| -------- | ---------------------------------------------------------------------------------------------------- |
+| `button` | The native `<button>` element. Use to override shape, color, or padding from outside the shadow DOM. |
+| `icon`   | The `<span>` container wrapping the active icon slot (copy-icon or success-icon).                    |
+
+## Slots
+
+| Slot           | Description                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| _(default)_    | Optional label text rendered inside the button alongside the icon.                       |
+| `copy-icon`    | Icon shown in the idle (pre-copy) state. Provide an SVG with `aria-hidden="true"`.       |
+| `success-icon` | Icon shown after a successful clipboard write. Provide an SVG with `aria-hidden="true"`. |
+
+## Accessibility
+
+| Topic          | Details                                                                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role      | Uses a native `<button>` element — role is implicit and universally supported by assistive technology.                                                                              |
+| `aria-label`   | Set from the `label` property. In the copied state it becomes `"${label} — Copied"` so users who re-focus the button after copy hear an accurate accessible name (WCAG 1.3.1).      |
+| `title`        | Mirrors the `label` property to provide a tooltip for sighted mouse users.                                                                                                          |
+| Live region    | A visually-hidden `aria-live="polite" aria-atomic="true"` span announces "Copied" on success and "Copy failed" on clipboard error. Empty when idle to avoid spurious announcements. |
+| `aria-pressed` | Intentionally absent. Copied is a transient feedback state, not a persistent toggle — `aria-pressed` is reserved for true on/off toggle buttons.                                    |
+| Disabled       | Native `disabled` attribute is used. This fully removes the element from the tab order and prevents activation — `aria-disabled` is intentionally omitted (it would be redundant).  |
+| Keyboard       | `Tab` to focus the button; `Enter` or `Space` to activate. The native `<button>` handles both keys without custom event listeners.                                                  |
+| Focus ring     | `:focus-visible` outline using `--hx-copy-button-focus-ring-color` (defaults to the global `--hx-focus-ring-color` token).                                                          |
+| Color contrast | Success state uses a border in addition to a color change, satisfying WCAG 1.4.1 (use of color) for users with color blindness.                                                     |
+| Reduced motion | Transitions on the button are disabled when `prefers-reduced-motion: reduce` is set.                                                                                                |
+| WCAG 2.1 AA    | Verified with axe-core: zero violations across default, disabled, and all three size variants.                                                                                      |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+{#
+  Use the |e('html_attr') filter (not |raw) for the value attribute.
+  Twig autoescape HTML-encodes & → &amp; etc. by default; the browser
+  decodes HTML attribute entities before the component reads them, so
+  the correct raw string reaches the clipboard.
+#}
+<hx-copy-button
+  value="{{ node.field_patient_mrn.value|e('html_attr') }}"
+  label="{{ 'Copy patient MRN'|t }}"
+  hx-size="{{ size|default('sm') }}"
+  {% if disabled %}disabled{% endif %}
+>
+  {# Provide copy and success icons via named slots #}
+</hx-copy-button>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for `hx-copy` and `hx-copy-error` in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixCopyButton = {
+  attach(context) {
+    context.querySelectorAll('hx-copy-button').forEach((el) => {
+      el.addEventListener('hx-copy', (e) => {
+        // Optional: analytics, audit log, toast notification.
+        console.log('Copied:', e.detail.value);
+      });
+      el.addEventListener('hx-copy-error', (e) => {
+        // Show fallback UI when the clipboard API is blocked.
+        Drupal.announce(Drupal.t('Copy to clipboard failed. Please copy manually.'), 'assertive');
+      });
+    });
+  },
+};
+```
+
+> **Note:** The `navigator.clipboard` API requires a secure context (HTTPS or localhost). On HTTP
+> Drupal staging environments the component falls back to `document.execCommand('copy')`. If both
+> methods are unavailable, `hx-copy-error` fires and no copy occurs. Handle this event to show
+> an appropriate fallback message.
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-copy-button example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        display: grid;
+        gap: 1.5rem;
+        max-width: 600px;
+      }
+      .field-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-family: ui-monospace, monospace;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #111827;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Basic icon-only copy button -->
+    <hx-copy-button id="basic-copy" value="Hello, Helix!" label="Copy to clipboard">
+      <svg
+        slot="copy-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+      </svg>
+      <svg
+        slot="success-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </hx-copy-button>
+
+    <!-- Inline copy button in a clinical data row -->
+    <div class="field-row">
+      <span>MRN-2026-7823-HD</span>
+      <hx-copy-button id="mrn-copy" value="MRN-2026-7823-HD" label="Copy patient MRN" hx-size="sm">
+        <svg
+          slot="copy-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+        </svg>
+        <svg
+          slot="success-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </hx-copy-button>
+    </div>
+
+    <!-- Disabled state -->
+    <hx-copy-button value="" label="Copy unavailable" disabled>
+      <svg
+        slot="copy-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+      </svg>
+    </hx-copy-button>
+
+    <script>
+      document.getElementById('basic-copy').addEventListener('hx-copy', (e) => {
+        console.log('Copied to clipboard:', e.detail.value);
+      });
+
+      document.getElementById('mrn-copy').addEventListener('hx-copy', (e) => {
+        console.log('Copied MRN:', e.detail.value);
+      });
+
+      document.querySelectorAll('hx-copy-button').forEach((el) => {
+        el.addEventListener('hx-copy-error', (e) => {
+          console.error('Copy failed:', e.detail.error);
+          alert('Unable to copy to clipboard. Please copy the text manually.');
+        });
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-copy-button" section="api" />

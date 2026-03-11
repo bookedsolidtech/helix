@@ -5,12 +5,22 @@ export const helixAvatarStyles = css`
     display: inline-block;
   }
 
+  /* P2-5: Respect the HTML hidden attribute — custom elements with explicit display ignore it otherwise. */
+  :host([hidden]) {
+    display: none !important;
+  }
+
+  /* P0-2: Wrapper provides the positioning context for the badge slot, outside overflow: hidden. */
+  .avatar-wrapper {
+    position: relative;
+    display: inline-flex;
+  }
+
   .avatar {
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    position: relative;
     width: var(--hx-avatar-size);
     height: var(--hx-avatar-size);
     background-color: var(--hx-avatar-bg, var(--hx-color-primary-100));
@@ -87,9 +97,15 @@ export const helixAvatarStyles = css`
 
   /* ─── Badge Slot ─── */
 
+  /* P0-2: Positioned relative to .avatar-wrapper — outside the overflow: hidden on .avatar. */
   .avatar__badge {
     position: absolute;
     bottom: 0;
     right: 0;
+  }
+
+  /* P2-2: Hide the badge wrapper when no slot content is present, preserving slotchange detection. */
+  .avatar__badge--hidden {
+    display: none;
   }
 `;

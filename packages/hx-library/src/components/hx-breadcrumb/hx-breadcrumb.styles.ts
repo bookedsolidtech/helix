@@ -3,8 +3,11 @@ import { css } from 'lit';
 export const helixBreadcrumbStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-breadcrumb-font-family, var(--hx-font-family-sans));
-    font-size: var(--hx-breadcrumb-font-size, var(--hx-font-size-sm));
+    font-family: var(
+      --hx-breadcrumb-font-family,
+      var(--hx-font-family-sans, system-ui, sans-serif)
+    );
+    font-size: var(--hx-breadcrumb-font-size, var(--hx-font-size-sm, 0.875rem));
   }
 
   [part='nav'] {
@@ -19,5 +22,18 @@ export const helixBreadcrumbStyles = css`
     margin: 0;
     padding: 0;
     gap: 0;
+  }
+
+  /* Hide middle items when collapsed via maxItems */
+  ::slotted([data-bc-hidden]) {
+    display: none;
+  }
+
+  /* Visually hide the separator slot — used only to read text content.
+   * display:none is intentional: the slot contains no interactive or focusable
+   * content. If a future change adds focusable elements to this slot, switch to
+   * visibility:hidden + position:absolute to preserve focus reachability. */
+  .separator-slot {
+    display: none;
   }
 `;

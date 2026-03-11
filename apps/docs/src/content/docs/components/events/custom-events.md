@@ -473,7 +473,7 @@ export class HelixCheckbox extends LitElement {
 Consumers can import the detail type for type safety:
 
 ```typescript
-import type { HxChangeEventDetail } from '@helix/library';
+import type { HxChangeEventDetail } from '@helixui/library';
 
 const checkbox = document.querySelector('hx-checkbox');
 
@@ -967,7 +967,7 @@ Testing that events are dispatched with correct detail payloads is essential for
 ### Basic Event Assertion
 
 ```typescript
-import { fixture, oneEvent } from '@helix/test-utils';
+import { fixture, oneEvent } from '@helixui/test-utils';
 
 it('dispatches hx-change when checkbox is toggled', async () => {
   const el = await fixture<HelixCheckbox>(html`<hx-checkbox></hx-checkbox>`);

@@ -1,0 +1,117 @@
+{#
+  hx-copy-button — Drupal Twig Template
+  ======================================
+
+  Server-renders the hx-copy-button custom element with correct attributes.
+  The Web Component self-registers; no Drupal behavior is required for basic
+  clipboard copy functionality.
+
+  Parameters:
+    value            (string)  Required. The text to write to the clipboard.
+                               IMPORTANT: Use the `|e('html_attr')` filter (not `|raw`)
+                               to safely pass values that may contain special characters.
+                               The component reads the attribute as a raw string, so
+                               Twig's default autoescape will HTML-encode characters
+                               like & → &amp;. Use `|e('html_attr')` to HTML-attribute-
+                               encode while preserving the intended raw value in the DOM.
+                               Example: value="{{ node.field_mrn.value|e('html_attr') }}"
+    label            (string)  Optional. Accessible label for the button (aria-label +
+                               title). Defaults to 'Copy to clipboard'. Always provide
+                               a label that describes WHAT is being copied, e.g.
+                               "Copy patient MRN" for clinical context.
+    feedback_duration (number) Optional. Duration in milliseconds to display the
+                               success state. Defaults to 2000. Minimum: 300 ms.
+                               Maps to the `feedback-duration` attribute.
+    size             (string)  Optional. One of: sm | md | lg. Defaults to 'md'.
+                               Maps to the `hx-size` attribute.
+    disabled         (bool)    Optional. Renders the button in a disabled,
+                               non-interactive state. Defaults to false.
+    attributes       (object)  Optional. Additional HTML attributes to spread
+                               onto the element (e.g., data-* attributes).
+
+  Usage examples:
+
+    Basic copy button (icon-only, accessible via label):
+      {% include 'hx-copy-button.twig' with {
+        value: 'Hello world',
+        label: 'Copy to clipboard',
+      } %}
+
+    Copy patient MRN in a clinical data row:
+      {% include 'hx-copy-button.twig' with {
+        value: node.field_patient_mrn.value,
+        label: 'Copy patient MRN',
+        size: 'sm',
+        feedback_duration: 3000,
+      } %}
+
+    Disabled copy button (e.g., clipboard unavailable or field empty):
+      {% include 'hx-copy-button.twig' with {
+        value: '',
+        label: 'Copy unavailable',
+        disabled: true,
+      } %}
+
+  Drupal behavior for advanced JS integration:
+    The element dispatches two CustomEvents (bubbles: true, composed: true):
+      hx-copy       — After successful clipboard write. detail: { value }
+      hx-copy-error — On clipboard failure. detail: { value, error }
+
+    Example Drupal behavior:
+      (function (Drupal) {
+        Drupal.behaviors.helixCopyButton = {
+          attach: function (context) {
+            context.querySelectorAll('hx-copy-button').forEach((el) => {
+              el.addEventListener('hx-copy', (e) => {
+                // Optional: analytics, audit log, toast notification, etc.
+                console.log('Copied:', e.detail.value);
+              });
+              el.addEventListener('hx-copy-error', (e) => {
+                // Show fallback UI or error message when clipboard is blocked.
+                Drupal.announce(
+                  Drupal.t('Copy to clipboard failed. Please copy manually.'),
+                  'assertive',
+                );
+              });
+            });
+          },
+        };
+      })(Drupal);
+
+  Note on Twig auto-escaping and special characters:
+    Twig's autoescape converts & → &amp;, < → &lt;, " → &quot; etc. when
+    interpolating into text content. When setting HTML *attributes* with
+    {{ value }}, Twig applies html attribute escaping. The component reads the
+    attribute value as a raw DOM string via the `value` property, which means
+    the browser will have already decoded HTML entities. This is safe and
+    correct: {{ node.field_data.value }} will produce the intended string.
+    If you are unsure, always prefer {{ value|e('html_attr') }} for attribute
+    values as an explicit safe guard.
+#}
+
+<hx-copy-button
+  value="{{ value|default('')|e('html_attr') }}"
+  {% if label %}label="{{ label|e('html_attr') }}"{% endif %}
+  {% if feedback_duration %}feedback-duration="{{ feedback_duration }}"{% endif %}
+  hx-size="{{ size|default('md') }}"
+  {% if disabled %}disabled{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val|e('html_attr') }}" {% endfor %}
+>
+  {% block copy_icon %}
+    {#
+      Provide a copy icon via the copy-icon named slot. Example:
+        {% block copy_icon %}
+          <svg slot="copy-icon" aria-hidden="true" ...>...</svg>
+        {% endblock %}
+    #}
+  {% endblock %}
+  {% block success_icon %}
+    {#
+      Provide a success/checkmark icon via the success-icon named slot. Example:
+        {% block success_icon %}
+          <svg slot="success-icon" aria-hidden="true" ...>...</svg>
+        {% endblock %}
+    #}
+  {% endblock %}
+  {% block label_text %}{% endblock %}
+</hx-copy-button>

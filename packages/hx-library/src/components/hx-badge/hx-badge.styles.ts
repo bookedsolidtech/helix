@@ -50,9 +50,9 @@ export const helixBadgeStyles = css`
   }
 
   .badge--secondary {
-    --hx-badge-bg: var(--hx-color-neutral-100, #f3f4f6);
-    --hx-badge-color: var(--hx-color-neutral-700, #374151);
-    --hx-badge-pulse-color: var(--hx-color-neutral-100, #f3f4f6);
+    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6));
+    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #374151));
+    --hx-badge-pulse-color: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6));
   }
 
   .badge--success {
@@ -65,12 +65,6 @@ export const helixBadgeStyles = css`
     --hx-badge-bg: var(--hx-color-warning-500, #eab308);
     --hx-badge-color: var(--hx-color-neutral-900, #1a1a1a);
     --hx-badge-pulse-color: var(--hx-color-warning-500, #eab308);
-  }
-
-  .badge--danger {
-    --hx-badge-bg: var(--hx-color-error-500, #dc2626);
-    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-error-500, #dc2626);
   }
 
   .badge--error {
@@ -86,9 +80,9 @@ export const helixBadgeStyles = css`
   }
 
   .badge--info {
-    --hx-badge-bg: var(--hx-color-info-700, #0369a1);
-    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-info-700, #0369a1);
+    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1));
+    --hx-badge-color: var(--hx-badge-info-color, var(--hx-color-neutral-0, #ffffff));
+    --hx-badge-pulse-color: var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1));
   }
 
   /* ─── Pill Mode ─── */
@@ -119,7 +113,8 @@ export const helixBadgeStyles = css`
   }
 
   .badge--pulse {
-    animation: wc-badge-pulse 2s ease-in-out infinite;
+    animation: wc-badge-pulse var(--hx-badge-pulse-duration, var(--hx-duration-slow, 2s))
+      var(--hx-badge-pulse-easing, var(--hx-ease-in-out, ease-in-out)) infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -150,7 +145,7 @@ export const helixBadgeStyles = css`
   }
 
   .badge__remove-button:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 1px;
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
+    outline-offset: var(--hx-focus-ring-offset, 1px);
   }
 `;

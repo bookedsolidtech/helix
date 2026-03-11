@@ -9,20 +9,20 @@ HELIX components work naturally in Drupal TWIG templates. This guide covers comm
 
 ```twig
 {# node--article.html.twig #}
-<wc-card variant="elevated">
-  <wc-heading level="2" slot="header">
+<hx-card variant="elevated">
+  <hx-heading level="2" slot="header">
     {{ label }}
-  </wc-heading>
+  </hx-heading>
   <div>
     {{ content.body }}
   </div>
   {% if content.field_cta_link %}
-    <wc-button slot="actions" variant="primary"
+    <hx-button slot="actions" variant="primary"
       href="{{ content.field_cta_link.0['#url'] }}">
       {{ content.field_cta_link.0['#title'] }}
-    </wc-button>
+    </hx-button>
   {% endif %}
-</wc-card>
+</hx-card>
 ```
 
 ## Field Mapping
@@ -40,9 +40,9 @@ HELIX components work naturally in Drupal TWIG templates. This guide covers comm
 ```twig
 {# Only render if field has value #}
 {% if content.field_alert_type|render|trim %}
-  <wc-alert variant="{{ content.field_alert_type.0['#markup'] }}">
+  <hx-alert variant="{{ content.field_alert_type.0['#markup'] }}">
     {{ content.field_alert_message }}
-  </wc-alert>
+  </hx-alert>
 {% endif %}
 ```
 
@@ -50,12 +50,12 @@ HELIX components work naturally in Drupal TWIG templates. This guide covers comm
 
 ```twig
 {# Named slots for component composition #}
-<wc-card>
+<hx-card>
   <span slot="header">{{ content.field_title }}</span>
   <span slot="media">{{ content.field_image }}</span>
   {{ content.body }}
   <span slot="actions">{{ content.field_cta }}</span>
-</wc-card>
+</hx-card>
 ```
 
 ## Detailed Guide

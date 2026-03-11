@@ -13,7 +13,7 @@ Lazy loading defers component registration until a component is actually needed.
 
 ## Why Components Are Expensive to Load
 
-When you write `import '@wc-2026/library/components/hx-data-table'`, three things happen:
+When you write `import '@helixui/library/components/hx-data-table'`, three things happen:
 
 1. **Network fetch** — The module file is downloaded from the server or cache.
 2. **Parse** — The browser's JavaScript engine parses the file into an AST.
@@ -21,12 +21,12 @@ When you write `import '@wc-2026/library/components/hx-data-table'`, three thing
 
 For a component like `hx-data-table`, steps 1–3 might take 80–200ms on a mid-range device over a hospital wireless network. If that component only appears when a user clicks "Show patient history," loading it at page startup wastes that budget every time — even for users who never open the panel.
 
-The per-component entry points in `@wc-2026/library` make granular lazy loading possible without any custom build configuration. Each component is independently importable:
+The per-component entry points in `@helixui/library` make granular lazy loading possible without any custom build configuration. Each component is independently importable:
 
 ```
-@wc-2026/library/components/hx-button
-@wc-2026/library/components/hx-card
-@wc-2026/library/components/hx-data-table
+@helixui/library/components/hx-button
+@helixui/library/components/hx-card
+@helixui/library/components/hx-data-table
 ```
 
 ---
@@ -37,11 +37,11 @@ The simplest lazy loading technique is a dynamic `import()` at the point of use.
 
 ```typescript
 // Static import — always downloaded, always executed
-import '@wc-2026/library/components/hx-data-table';
+import '@helixui/library/components/hx-data-table';
 
 // Dynamic import — fetched only when this code runs
 async function showPatientHistory() {
-  await import('@wc-2026/library/components/hx-data-table');
+  await import('@helixui/library/components/hx-data-table');
   const table = document.createElement('hx-data-table');
   table.data = await fetchPatientRecords();
   document.getElementById('history-panel')?.appendChild(table);
@@ -64,7 +64,7 @@ async function ensureDataTable() {
     return;
   }
   dataTableLoaded = true;
-  await import('@wc-2026/library/components/hx-data-table');
+  await import('@helixui/library/components/hx-data-table');
 }
 ```
 
@@ -112,8 +112,8 @@ function lazyDefine(tagName: string, loader: () => Promise<unknown>): void {
 }
 
 // Call at page init time
-lazyDefine('hx-data-table', () => import('@wc-2026/library/components/hx-data-table'));
-lazyDefine('hx-chart', () => import('@wc-2026/library/components/hx-chart'));
+lazyDefine('hx-data-table', () => import('@helixui/library/components/hx-data-table'));
+lazyDefine('hx-chart', () => import('@helixui/library/components/hx-chart'));
 ```
 
 ### How the Browser Handles Undefined Elements
@@ -137,7 +137,7 @@ This means your HTML can contain `<hx-data-table>` elements long before the Java
 // app.ts
 import { lazyDefine } from './lazy-define.js';
 
-lazyDefine('hx-data-table', () => import('@wc-2026/library/components/hx-data-table'));
+lazyDefine('hx-data-table', () => import('@helixui/library/components/hx-data-table'));
 
 // Separately, populate data when the component is ready
 customElements.whenDefined('hx-data-table').then(async () => {
@@ -231,7 +231,7 @@ And every HELiX element used in the document will load its module automatically 
 
 ## Per-Component Entry Points in Vite Library Mode
 
-The `@wc-2026/library` build exposes each component as a named entry point, which is what makes any lazy loading strategy work:
+The `@helixui/library` build exposes each component as a named entry point, which is what makes any lazy loading strategy work:
 
 ```typescript
 // packages/hx-library/vite.config.ts
@@ -285,7 +285,7 @@ Consumers then import:
 ```typescript
 // Lazy-imports only the data-table module (~4KB gzipped)
 // Lit is loaded separately and shared across all components
-await import('@wc-2026/library/components/hx-data-table');
+await import('@helixui/library/components/hx-data-table');
 ```
 
 ---

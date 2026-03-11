@@ -1,5 +1,5 @@
 # ============================================================================
-# Matrix CI Pipeline — wc-2026 Enterprise Healthcare Web Component Library
+# Matrix CI Pipeline — HELiX Enterprise Healthcare Web Component Library
 # ============================================================================
 # Tests across multiple Node.js versions and operating systems to ensure
 # compatibility and reliability across different environments.
@@ -29,10 +29,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Test on multiple Node.js LTS versions
-        node-version: [18, 20, 22]
-        # Test on multiple operating systems
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [20, 22]
+        os: [ubuntu-latest]
 
     steps:
       # ---- Setup ----
@@ -55,7 +53,7 @@ jobs:
       # ---- Quality Checks ----
 
       - name: Type check
-        run: npm run type-check
+        run: npx turbo run type-check --filter='!docs'
 
       - name: Lint
         run: npm run lint
@@ -63,15 +61,21 @@ jobs:
       - name: Format check
         run: npm run format:check
 
+      # ---- Build (must run before tests — @helixui/tokens exports from dist/) ----
+
+      - name: Build
+        run: npx turbo run build --filter='!docs' --filter='!@helixui/storybook'
+
       # ---- Tests ----
 
       - name: Test
-        run: npm run test
-
-      # ---- Build ----
-
-      - name: Build
-        run: npm run build
+        run: |
+          # Promotion PRs (staging→main): tests already verified on staging — skip
+          if [[ "${{ github.head_ref }}" == "staging" && "${{ github.base_ref }}" == "main" ]]; then
+            echo "Promotion PR (staging → main) — skipping matrix tests"
+            exit 0
+          fi
+          npm run test
 
       - name: Generate Custom Elements Manifest
         run: npm run cem

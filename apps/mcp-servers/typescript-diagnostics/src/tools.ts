@@ -8,7 +8,7 @@ import {
   handleToolError,
   createSuccessResponse,
   createErrorResponse,
-} from '@helix/mcp-shared';
+} from '@helixui/mcp-shared';
 import {
   getDiagnostics,
   getDiagnosticsForComponent,

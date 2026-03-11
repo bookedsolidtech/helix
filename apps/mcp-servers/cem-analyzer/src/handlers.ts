@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { z } from 'zod';
-import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helix/mcp-shared';
+import { GitOperations, SafeFileOperations, MCPError, ErrorCategory } from '@helixui/mcp-shared';
 
 const PROJECT_ROOT = resolve(process.cwd(), '../..');
 const CEM_PATH = 'packages/hx-library/custom-elements.json';

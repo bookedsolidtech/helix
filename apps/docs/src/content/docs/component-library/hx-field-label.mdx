@@ -1,0 +1,258 @@
+---
+title: 'hx-field-label'
+description: 'Standardized label for form fields with built-in required and optional indicators, accessible across the shadow DOM boundary.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-field-label" section="summary" />
+
+## Overview
+
+`hx-field-label` is a standardized label sub-component for form fields. It renders a native
+`<label>` element when the `for` attribute is set, enabling direct label association within the
+same shadow root. When `for` is omitted it renders a `<span>` that can be referenced via
+`aria-labelledby` — the recommended pattern for inputs in light DOM (the typical Drupal consumer
+deployment).
+
+Built-in `required` and `optional` indicators remove boilerplate from every form field. The
+required asterisk is `aria-hidden="true"` and paired with a visually-hidden "required" text so
+screen readers receive a clear, non-punctuation announcement.
+
+Use `hx-field-label` as a building block inside custom form field compositions. For full,
+pre-assembled form fields prefer the higher-level `hx-field` component, which manages label
+association automatically.
+
+## Live Demo
+
+<ComponentDemo title="Default label">
+  <hx-field-label>Patient Name</hx-field-label>
+</ComponentDemo>
+
+<ComponentDemo title="Required field">
+  <hx-field-label required>Date of Birth</hx-field-label>
+</ComponentDemo>
+
+<ComponentDemo title="Optional field">
+  <hx-field-label optional>Middle Name</hx-field-label>
+</ComponentDemo>
+
+<ComponentDemo title="Associated with an input (for attribute)">
+  <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+    <hx-field-label for="demo-mrn" required>
+      Medical Record Number
+    </hx-field-label>
+    <input
+      id="demo-mrn"
+      type="text"
+      placeholder="MRN-0000000"
+      style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+    />
+  </div>
+</ComponentDemo>
+
+<ComponentDemo title="aria-labelledby pattern (cross-boundary)">
+  <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+    <hx-field-label id="lbl-notes" optional>
+      Clinical Notes
+    </hx-field-label>
+    <input
+      type="text"
+      aria-labelledby="lbl-notes"
+      placeholder="Enter notes"
+      style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+    />
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+```
+
+```js
+import '@helixui/library/components/hx-field-label';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Pattern 1: aria-labelledby (recommended for light-DOM / Drupal consumers) -->
+<hx-field-label id="lbl-name" required>Patient Name</hx-field-label>
+<input type="text" aria-labelledby="lbl-name" aria-required="true" />
+
+<!-- Pattern 2: native label association (label and input must be in the same shadow root only) -->
+<!-- Note: The `for` attribute cannot cross shadow DOM boundaries. Use aria-labelledby for -->
+<!-- inputs outside the component's shadow DOM (see Pattern 1). -->
+<hx-field-label for="dob-input">Date of Birth</hx-field-label>
+<input id="dob-input" type="date" />
+
+<!-- Optional indicator -->
+<hx-field-label optional>Middle Name</hx-field-label>
+```
+
+## Properties
+
+| Property   | Attribute  | Type      | Default | Description                                                                                                                                               |
+| ---------- | ---------- | --------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `for`      | `for`      | `string`  | `''`    | ID of the associated form control. When non-empty, renders a native `<label for="...">` element for direct label association within the same shadow root. |
+| `required` | `required` | `boolean` | `false` | Shows a required indicator (`*`) and includes a visually-hidden "required" announcement for screen readers. Reflects to attribute.                        |
+| `optional` | `optional` | `boolean` | `false` | Shows an `(optional)` text indicator. Reflects to attribute.                                                                                              |
+
+## Events
+
+This component does not emit custom events.
+
+## CSS Custom Properties
+
+| Property                          | Default                                                      | Description               |
+| --------------------------------- | ------------------------------------------------------------ | ------------------------- |
+| `--hx-field-label-color`          | `var(--hx-color-neutral-700)`                                | Label text color.         |
+| `--hx-field-label-required-color` | `var(--hx-color-danger, var(--hx-color-error-500, #ef4444))` | Required indicator color. |
+| `--hx-font-label-size`            | `var(--hx-font-size-sm)`                                     | Label font size.          |
+| `--hx-font-label-weight`          | `var(--hx-font-weight-medium)`                               | Label font weight.        |
+| `--hx-font-label-line-height`     | `var(--hx-line-height-normal)`                               | Label line height.        |
+| `--hx-font-label-family`          | `var(--hx-font-family-sans)`                                 | Label font family.        |
+
+## CSS Parts
+
+| Part                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `base`               | The root `<label>` or `<span>` element. Use to override typography or color from outside the shadow DOM. |
+| `required-indicator` | Wrapper around the required marker (`*`) and its visually-hidden counterpart.                            |
+| `optional-indicator` | The `(optional)` text `<span>`.                                                                          |
+
+## Slots
+
+| Slot                 | Description                                                                                          |
+| -------------------- | ---------------------------------------------------------------------------------------------------- |
+| _(default)_          | Label text content.                                                                                  |
+| `required-indicator` | Custom required marker. Replaces the default `*` character. Only rendered when `required` is `true`. |
+
+## Accessibility
+
+| Topic               | Details                                                                                                                                                                                                                                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role           | Renders as a native `<label>` element when `for` is set, providing implicit label semantics for the associated input within the same shadow root. When `for` is omitted, renders as a generic `<span>` container — consumer must associate the input using `aria-labelledby` referencing the component's `id`. |
+| Keyboard            | No keyboard interaction. This is a semantic label element; consumers manage focus on the associated input.                                                                                                                                                                                                     |
+| Screen reader       | When `required` is true, the visual asterisk is `aria-hidden="true"`. A visually-hidden `<span>required</span>` is included so screen readers announce "required" rather than reading `*`.                                                                                                                     |
+| Focus               | No focus management. Associate inputs using `aria-labelledby` (light DOM) or the `for` attribute (same shadow root).                                                                                                                                                                                           |
+| Shadow DOM labeling | The `for` attribute only associates labels to inputs **within the same shadow root**. For inputs in light DOM (standard Drupal pattern), set an `id` on the `<hx-field-label>` host and use `aria-labelledby` on the input.                                                                                    |
+| WCAG 2.1 AA         | Checked with axe-core during development; no violations observed in tested states (default, required, optional, and `for`-attribute scenarios).                                                                                                                                                                |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the Helix library:
+
+```twig
+{# my-module/templates/form-field.html.twig #}
+
+{#
+  Recommended pattern: aria-labelledby for cross-shadow-boundary association.
+  The label host gets an id; the native input references it via aria-labelledby.
+#}
+<hx-field-label
+  id="lbl-{{ field_id }}"
+  {% if required %}required{% endif %}
+  {% if optional %}optional{% endif %}
+>
+  {{ label }}
+</hx-field-label>
+<input
+  id="{{ field_id }}"
+  type="{{ input_type|default('text') }}"
+  aria-labelledby="lbl-{{ field_id }}"
+  {% if required %}aria-required="true"{% endif %}
+  {% if value is not empty %}value="{{ value|e('html_attr') }}"{% endif %}
+/>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-field-label example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 480px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-bottom: 1.25rem;
+      }
+      input {
+        padding: 0.5rem 0.625rem;
+        font-size: 0.875rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        outline: none;
+      }
+      input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Required field: aria-labelledby pattern -->
+    <div class="field">
+      <hx-field-label id="lbl-mrn" required>Medical Record Number</hx-field-label>
+      <input
+        id="mrn"
+        type="text"
+        aria-labelledby="lbl-mrn"
+        aria-required="true"
+        placeholder="MRN-0000000"
+      />
+    </div>
+
+    <!-- Optional field -->
+    <div class="field">
+      <hx-field-label id="lbl-middle" optional>Middle Name</hx-field-label>
+      <input id="middle-name" type="text" aria-labelledby="lbl-middle" placeholder="Middle name" />
+    </div>
+
+    <!-- Standard field: no indicator -->
+    <div class="field">
+      <hx-field-label id="lbl-notes">Clinical Notes</hx-field-label>
+      <input id="notes" type="text" aria-labelledby="lbl-notes" placeholder="Enter notes" />
+    </div>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-field-label" section="api" />

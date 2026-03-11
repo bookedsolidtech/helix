@@ -10,17 +10,17 @@ Enterprise web component libraries require sophisticated packaging strategies to
 
 ## Distribution Overview
 
-hx-library is packaged as an npm module (`@helix/library`) with multiple consumption patterns:
+hx-library is packaged as an npm module (`@helixui/library`) with multiple consumption patterns:
 
 ```js
 // Full library import (all components)
-import '@helix/library';
+import '@helixui/library';
 
 // Individual component import (tree-shakeable)
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 // Direct component class import (advanced)
-import { HxButton } from '@helix/library/components/hx-button';
+import { HxButton } from '@helixui/library/components/hx-button';
 ```
 
 This flexibility is achieved through:
@@ -88,7 +88,7 @@ hx-library targets ESM exclusively (`formats: ['es']`) for several reasons:
 
 ```html
 <script type="module">
-  import '@helix/library';
+  import '@helixui/library';
 </script>
 ```
 
@@ -113,7 +113,7 @@ export * from './components/hx-text-input';
 **Result:** When a consumer imports one component, they bundle **all components**:
 
 ```js
-import { HxButton } from '@helix/library'; // Bundles entire library (500KB+)
+import { HxButton } from '@helixui/library'; // Bundles entire library (500KB+)
 ```
 
 This defeats tree-shaking and bloats production bundles.
@@ -176,7 +176,7 @@ dist/
 
 ```js
 // Only bundles hx-button and its dependencies (~4KB)
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 ```
 
 ### Component Entry Point Convention
@@ -315,7 +315,7 @@ Every component module includes a side effect (`customElements.define()`), so te
 **However**, hx-library uses `sideEffects: false` because:
 
 1. **Consumers always want registration** — importing a component module means you want it registered; there's no scenario where you import `hx-button` but don't want `<hx-button>` available
-2. **Explicit imports signal intent** — `import '@helix/library/components/hx-button'` is a deliberate action (unlike auto-imported polyfills)
+2. **Explicit imports signal intent** — `import '@helixui/library/components/hx-button'` is a deliberate action (unlike auto-imported polyfills)
 3. **Bundler compatibility** — some bundlers (Webpack 4) mishandle array-based `sideEffects` with glob patterns
 
 **Result:** Unused components are tree-shaken; imported components always register.
@@ -326,8 +326,8 @@ Test tree-shaking with a minimal consumer:
 
 ```js
 // consumer/src/main.js
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
 ```
 
 **Build and analyze:**
@@ -369,7 +369,7 @@ export default defineConfig({
 
 hx-library avoids hashes for library builds because:
 
-- npm versions serve as cache keys (consumers install `@helix/library@1.2.3`, not `@helix/library@latest`)
+- npm versions serve as cache keys (consumers install `@helixui/library@1.2.3`, not `@helixui/library@latest`)
 - File paths are documented in API guides (stable names reduce docs churn)
 
 ### Chunk File Names
@@ -392,10 +392,10 @@ export default defineConfig({
 
 ```ts
 // src/components/hx-button/hx-button.ts
-import { tokens } from '@helix/tokens';
+import { tokens } from '@helixui/tokens';
 
 // src/components/hx-card/hx-card.ts
-import { tokens } from '@helix/tokens';
+import { tokens } from '@helixui/tokens';
 ```
 
 **Without chunking:** Tokens duplicated in both `hx-button/index.js` and `hx-card/index.js` (+12KB each).
@@ -452,7 +452,7 @@ The `package.json` file serves as the contract between hx-library and its consum
 
 ```json
 {
-  "name": "@helix/library",
+  "name": "@helixui/library",
   "version": "0.0.1",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
@@ -512,16 +512,16 @@ The `exports` field is the modern standard for module resolution (Node.js 12+, W
 
 | Import Path                           | Resolves To                          | Purpose                     |
 | ------------------------------------- | ------------------------------------ | --------------------------- |
-| `@helix/library`                      | `dist/index.js`                      | Main entry (all components) |
-| `@helix/library/components/hx-button` | `dist/components/hx-button/index.js` | Per-component entry         |
-| `@helix/library/custom-elements.json` | `custom-elements.json`               | CEM for tooling             |
+| `@helixui/library`                      | `dist/index.js`                      | Main entry (all components) |
+| `@helixui/library/components/hx-button` | `dist/components/hx-button/index.js` | Per-component entry         |
+| `@helixui/library/custom-elements.json` | `custom-elements.json`               | CEM for tooling             |
 
 **Wildcard pattern:** `"./components/*"` enables any component import without explicit listing:
 
 ```js
-import '@helix/library/components/hx-button'; // ✅ Resolves
-import '@helix/library/components/hx-card'; // ✅ Resolves
-import '@helix/library/components/hx-future-comp'; // ✅ Resolves (if it exists)
+import '@helixui/library/components/hx-button'; // ✅ Resolves
+import '@helixui/library/components/hx-card'; // ✅ Resolves
+import '@helixui/library/components/hx-future-comp'; // ✅ Resolves (if it exists)
 ```
 
 **Conditional exports:** The `types` and `import` conditions ensure TypeScript resolves `.d.ts` files while runtime resolves `.js` files.
@@ -625,7 +625,7 @@ export declare class HxButton extends LitElement {
 **Consumer usage:**
 
 ```ts
-import { HxButton } from '@helix/library/components/hx-button';
+import { HxButton } from '@helixui/library/components/hx-button';
 
 const button: HxButton = document.querySelector('hx-button')!;
 button.variant = 'primary'; // ✅ Type-checked
@@ -710,7 +710,7 @@ npm publish --access public
 
 **Flags:**
 
-- **`--access public`** — required for scoped packages (`@helix/library`) on free npm tier
+- **`--access public`** — required for scoped packages (`@helixui/library`) on free npm tier
 - **`--tag next`** — publish to `@next` channel (pre-release testing)
 - **`--dry-run`** — preview what will be published (without uploading)
 
@@ -730,7 +730,7 @@ npm run build
 npm link
 
 # In test-project/
-npm link @helix/library
+npm link @helixui/library
 ```
 
 **Limitation:** `npm link` uses symlinks (not a real install); some resolution bugs slip through.
@@ -757,7 +757,7 @@ In the test project:
 
 ```js
 // test-project/src/main.js
-import '@helix/library/components/hx-button';
+import '@helixui/library/components/hx-button';
 
 const button = document.createElement('hx-button');
 button.textContent = 'Click Me';
@@ -877,7 +877,7 @@ Here's hx-library's complete `package.json` with annotations:
 
 ```json
 {
-  "name": "@helix/library",
+  "name": "@helixui/library",
   "version": "0.0.1",
   "private": true,
   "description": "Enterprise Web Component Library built with Lit 3.x",
@@ -918,7 +918,7 @@ Here's hx-library's complete `package.json` with annotations:
   },
 
   "dependencies": {
-    "@helix/tokens": "*",
+    "@helixui/tokens": "*",
     "lit": "^3.3.2"
   },
 

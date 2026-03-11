@@ -1,13 +1,13 @@
 ---
 title: Design Token Architecture
-description: Complete guide to the three-tier design token system powering wc-2026 components, including primitive tokens, semantic tokens, component tokens, token naming conventions, fallback chains, and theming strategies.
+description: Complete guide to the three-tier design token system powering HELiX components, including primitive tokens, semantic tokens, component tokens, token naming conventions, fallback chains, and theming strategies.
 sidebar:
   order: 3
 ---
 
-Design tokens are the **single source of truth** for all visual design decisions in wc-2026. They form a cascading three-tier system that enables global theming, component-level customization, and multi-brand deployments without modifying component internals.
+Design tokens are the **single source of truth** for all visual design decisions in HELiX. They form a cascading three-tier system that enables global theming, component-level customization, and multi-brand deployments without modifying component internals.
 
-This guide covers the complete token architecture: primitive tokens, semantic tokens, component tokens, naming conventions, fallback chains, token categories (color, spacing, typography, timing), real-world examples from wc-2026, and theming strategies for consumers.
+This guide covers the complete token architecture: primitive tokens, semantic tokens, component tokens, naming conventions, fallback chains, token categories (color, spacing, typography, timing), real-world examples from HELiX, and theming strategies for consumers.
 
 ---
 
@@ -23,7 +23,7 @@ Before diving into token architecture, ensure you understand:
 
 ## What Are Design Tokens?
 
-Design tokens are **named entities that store visual design decisions**. Instead of hardcoding values like `#2563eb` or `0.5rem` directly in component styles, you reference tokens like `--wc-color-primary-500` or `--wc-space-2`.
+Design tokens are **named entities that store visual design decisions**. Instead of hardcoding values like `#2563eb` or `0.5rem` directly in component styles, you reference tokens like `--hx-color-primary-500` or `--hx-space-2`.
 
 ### Why Tokens Matter
 
@@ -51,16 +51,16 @@ Design tokens are **named entities that store visual design decisions**. Instead
 ```css
 /* Component styles — token-based */
 .button {
-  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
-  font-weight: var(--wc-button-font-weight, var(--wc-font-weight-semibold, 600));
-  border-radius: var(--wc-button-border-radius, var(--wc-border-radius-md, 0.375rem));
+  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+  font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
+  border-radius: var(--hx-button-border-radius, var(--hx-border-radius-md, 0.375rem));
 }
 ```
 
 **Benefits:**
 
-- Global theme change: override `--wc-color-primary-500` once
+- Global theme change: override `--hx-color-primary-500` once
 - Dark mode: swap token values, components adapt automatically
 - White-label: each brand defines their own token values
 - Design decisions are explicit and documented
@@ -72,20 +72,20 @@ CSS custom properties (the mechanism behind tokens) are unique among CSS propert
 ```html
 <style>
   :root {
-    --wc-color-primary-500: #007878; /* Teal brand color */
+    --hx-color-primary-500: #007878; /* Teal brand color */
   }
 </style>
 
-<wc-button>
+<hx-button>
   #shadow-root
   <style>
     .button {
-      background: var(--wc-color-primary-500, #2563eb);
+      background: var(--hx-color-primary-500, #2563eb);
       /* Resolves to #007878 (inherited from :root) */
     }
   </style>
   <button class="button">Click Me</button>
-</wc-button>
+</hx-button>
 ```
 
 Even though the shadow boundary blocks external selectors from reaching into the component, CSS custom properties **inherit naturally** from parent to child, crossing shadow boundaries. This makes tokens the perfect theming mechanism for Web Components.
@@ -94,7 +94,7 @@ Even though the shadow boundary blocks external selectors from reaching into the
 
 ## Three-Tier Token Architecture
 
-wc-2026 uses a **three-tier cascade** that separates raw values (primitives), purpose-based values (semantic), and component-specific overrides (component tokens).
+HELiX uses a **three-tier cascade** that separates raw values (primitives), purpose-based values (semantic), and component-specific overrides (component tokens).
 
 ### Architecture Overview
 
@@ -109,7 +109,7 @@ wc-2026 uses a **three-tier cascade** that separates raw values (primitives), pu
          ↓
 ┌──────────────────────────────────────────────────────────────┐
 │  TIER 2: SEMANTIC TOKENS                                     │
-│  Purpose-based — --wc-color-primary-500, --wc-space-4       │
+│  Purpose-based — --hx-color-primary-500, --hx-space-4       │
 │  PUBLIC API — the primary theming interface                 │
 │  Mode-aware — light/dark/high-contrast variants             │
 └──────────────────────────────────────────────────────────────┘
@@ -117,7 +117,7 @@ wc-2026 uses a **three-tier cascade** that separates raw values (primitives), pu
          ↓
 ┌──────────────────────────────────────────────────────────────┐
 │  TIER 3: COMPONENT TOKENS                                    │
-│  Component-specific — --wc-button-bg, --wc-card-padding     │
+│  Component-specific — --hx-button-bg, --hx-card-padding     │
 │  OPTIONAL — defaults to semantic tokens if unset            │
 │  Override points — surgical component customization          │
 └──────────────────────────────────────────────────────────────┘
@@ -135,12 +135,12 @@ wc-2026 uses a **three-tier cascade** that separates raw values (primitives), pu
 
 - No global theming layer
 - To change the primary color, you must override every component token individually
-- Duplicated work: `--wc-button-bg`, `--wc-link-color`, `--wc-badge-bg` all set to the same value
+- Duplicated work: `--hx-button-bg`, `--hx-link-color`, `--hx-badge-bg` all set to the same value
 
 **Three tiers** (primitives + semantic + component):
 
-- **Global theming**: Override `--wc-color-primary-500` once, all components adapt
-- **Component precision**: Override `--wc-button-bg` for one specific component
+- **Global theming**: Override `--hx-color-primary-500` once, all components adapt
+- **Component precision**: Override `--hx-button-bg` for one specific component
 - **Consistency**: All "primary" uses reference the same semantic token by default
 - **Flexibility**: Choose the right level of granularity for each use case
 
@@ -161,120 +161,120 @@ Primitive tokens define **what** styles are available. They are raw, context-fre
 
 ```css
 /* Primitive tokens (used internally, not exposed) */
---wc-blue-50: #eff6ff;
---wc-blue-100: #dbeafe;
---wc-blue-200: #bfdbfe;
---wc-blue-300: #93c5fd;
---wc-blue-400: #60a5fa;
---wc-blue-500: #3b82f6; /* Base blue */
---wc-blue-600: #2563eb;
---wc-blue-700: #1d4ed8;
---wc-blue-800: #1e40af;
---wc-blue-900: #1e3a8a;
---wc-blue-950: #172554;
+--hx-blue-50: #eff6ff;
+--hx-blue-100: #dbeafe;
+--hx-blue-200: #bfdbfe;
+--hx-blue-300: #93c5fd;
+--hx-blue-400: #60a5fa;
+--hx-blue-500: #3b82f6; /* Base blue */
+--hx-blue-600: #2563eb;
+--hx-blue-700: #1d4ed8;
+--hx-blue-800: #1e40af;
+--hx-blue-900: #1e3a8a;
+--hx-blue-950: #172554;
 ```
 
 ```css
 /* Neutral palette (grayscale) */
---wc-neutral-0: #ffffff;
---wc-neutral-50: #f8f9fa;
---wc-neutral-100: #f1f5f9;
---wc-neutral-200: #e9ecef;
---wc-neutral-300: #dee2e6;
---wc-neutral-400: #ced4da;
---wc-neutral-500: #adb5bd;
---wc-neutral-600: #6c757d;
---wc-neutral-700: #495057;
---wc-neutral-800: #343a40;
---wc-neutral-900: #212529;
---wc-neutral-950: #1a1a1a;
+--hx-neutral-0: #ffffff;
+--hx-neutral-50: #f8f9fa;
+--hx-neutral-100: #f1f5f9;
+--hx-neutral-200: #e9ecef;
+--hx-neutral-300: #dee2e6;
+--hx-neutral-400: #ced4da;
+--hx-neutral-500: #adb5bd;
+--hx-neutral-600: #6c757d;
+--hx-neutral-700: #495057;
+--hx-neutral-800: #343a40;
+--hx-neutral-900: #212529;
+--hx-neutral-950: #1a1a1a;
 ```
 
 ### Spacing Primitives
 
 ```css
 /* 4px base unit scale */
---wc-spacing-0: 0;
---wc-spacing-px: 1px;
---wc-spacing-0-5: 0.125rem; /* 2px */
---wc-spacing-1: 0.25rem; /* 4px */
---wc-spacing-1-5: 0.375rem; /* 6px */
---wc-spacing-2: 0.5rem; /* 8px */
---wc-spacing-3: 0.75rem; /* 12px */
---wc-spacing-4: 1rem; /* 16px */
---wc-spacing-5: 1.25rem; /* 20px */
---wc-spacing-6: 1.5rem; /* 24px */
---wc-spacing-8: 2rem; /* 32px */
---wc-spacing-10: 2.5rem; /* 40px */
---wc-spacing-12: 3rem; /* 48px */
---wc-spacing-16: 4rem; /* 64px */
---wc-spacing-20: 5rem; /* 80px */
---wc-spacing-24: 6rem; /* 96px */
+--hx-spacing-0: 0;
+--hx-spacing-px: 1px;
+--hx-spacing-0-5: 0.125rem; /* 2px */
+--hx-spacing-1: 0.25rem; /* 4px */
+--hx-spacing-1-5: 0.375rem; /* 6px */
+--hx-spacing-2: 0.5rem; /* 8px */
+--hx-spacing-3: 0.75rem; /* 12px */
+--hx-spacing-4: 1rem; /* 16px */
+--hx-spacing-5: 1.25rem; /* 20px */
+--hx-spacing-6: 1.5rem; /* 24px */
+--hx-spacing-8: 2rem; /* 32px */
+--hx-spacing-10: 2.5rem; /* 40px */
+--hx-spacing-12: 3rem; /* 48px */
+--hx-spacing-16: 4rem; /* 64px */
+--hx-spacing-20: 5rem; /* 80px */
+--hx-spacing-24: 6rem; /* 96px */
 ```
 
 ### Typography Primitives
 
 ```css
 /* Font families */
---wc-font-family-sans-primitive:
+--hx-font-family-sans-primitive:
   system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
---wc-font-family-serif-primitive: Georgia, 'Times New Roman', Times, serif;
---wc-font-family-mono-primitive: 'Courier New', Courier, monospace;
+--hx-font-family-serif-primitive: Georgia, 'Times New Roman', Times, serif;
+--hx-font-family-mono-primitive: 'Courier New', Courier, monospace;
 
 /* Font weights */
---wc-font-weight-normal-primitive: 400;
---wc-font-weight-medium-primitive: 500;
---wc-font-weight-semibold-primitive: 600;
---wc-font-weight-bold-primitive: 700;
+--hx-font-weight-normal-primitive: 400;
+--hx-font-weight-medium-primitive: 500;
+--hx-font-weight-semibold-primitive: 600;
+--hx-font-weight-bold-primitive: 700;
 
 /* Font sizes (Major Third scale, ratio 1.250) */
---wc-font-size-2xs-primitive: 0.625rem; /* 10px */
---wc-font-size-xs-primitive: 0.75rem; /* 12px */
---wc-font-size-sm-primitive: 0.875rem; /* 14px */
---wc-font-size-md-primitive: 1rem; /* 16px */
---wc-font-size-lg-primitive: 1.125rem; /* 18px */
---wc-font-size-xl-primitive: 1.25rem; /* 20px */
---wc-font-size-2xl-primitive: 1.5rem; /* 24px */
---wc-font-size-3xl-primitive: 1.875rem; /* 30px */
---wc-font-size-4xl-primitive: 2.25rem; /* 36px */
---wc-font-size-5xl-primitive: 3rem; /* 48px */
+--hx-font-size-2xs-primitive: 0.625rem; /* 10px */
+--hx-font-size-xs-primitive: 0.75rem; /* 12px */
+--hx-font-size-sm-primitive: 0.875rem; /* 14px */
+--hx-font-size-md-primitive: 1rem; /* 16px */
+--hx-font-size-lg-primitive: 1.125rem; /* 18px */
+--hx-font-size-xl-primitive: 1.25rem; /* 20px */
+--hx-font-size-2xl-primitive: 1.5rem; /* 24px */
+--hx-font-size-3xl-primitive: 1.875rem; /* 30px */
+--hx-font-size-4xl-primitive: 2.25rem; /* 36px */
+--hx-font-size-5xl-primitive: 3rem; /* 48px */
 
 /* Line heights */
---wc-line-height-tight-primitive: 1.25;
---wc-line-height-snug-primitive: 1.375;
---wc-line-height-normal-primitive: 1.5;
---wc-line-height-relaxed-primitive: 1.625;
---wc-line-height-loose-primitive: 2;
+--hx-line-height-tight-primitive: 1.25;
+--hx-line-height-snug-primitive: 1.375;
+--hx-line-height-normal-primitive: 1.5;
+--hx-line-height-relaxed-primitive: 1.625;
+--hx-line-height-loose-primitive: 2;
 ```
 
 ### Other Primitive Categories
 
 ```css
 /* Border radii */
---wc-border-radius-none-primitive: 0;
---wc-border-radius-sm-primitive: 0.125rem; /* 2px */
---wc-border-radius-md-primitive: 0.25rem; /* 4px */
---wc-border-radius-lg-primitive: 0.375rem; /* 6px */
---wc-border-radius-xl-primitive: 0.5rem; /* 8px */
---wc-border-radius-2xl-primitive: 0.75rem; /* 12px */
---wc-border-radius-full-primitive: 9999px;
+--hx-border-radius-none-primitive: 0;
+--hx-border-radius-sm-primitive: 0.125rem; /* 2px */
+--hx-border-radius-md-primitive: 0.25rem; /* 4px */
+--hx-border-radius-lg-primitive: 0.375rem; /* 6px */
+--hx-border-radius-xl-primitive: 0.5rem; /* 8px */
+--hx-border-radius-2xl-primitive: 0.75rem; /* 12px */
+--hx-border-radius-full-primitive: 9999px;
 
 /* Border widths */
---wc-border-width-thin-primitive: 1px;
---wc-border-width-medium-primitive: 2px;
---wc-border-width-thick-primitive: 4px;
+--hx-border-width-thin-primitive: 1px;
+--hx-border-width-medium-primitive: 2px;
+--hx-border-width-thick-primitive: 4px;
 
 /* Shadows */
---wc-shadow-sm-primitive: 0 1px 2px 0 rgb(0 0 0 / 0.05);
---wc-shadow-md-primitive: 0 4px 6px -1px rgb(0 0 0 / 0.1);
---wc-shadow-lg-primitive: 0 10px 15px -3px rgb(0 0 0 / 0.1);
---wc-shadow-xl-primitive: 0 20px 25px -5px rgb(0 0 0 / 0.1);
---wc-shadow-2xl-primitive: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+--hx-shadow-sm-primitive: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+--hx-shadow-md-primitive: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+--hx-shadow-lg-primitive: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+--hx-shadow-xl-primitive: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+--hx-shadow-2xl-primitive: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
 /* Transitions */
---wc-transition-fast-primitive: 150ms ease;
---wc-transition-normal-primitive: 250ms ease;
---wc-transition-slow-primitive: 350ms ease;
+--hx-transition-fast-primitive: 150ms ease;
+--hx-transition-normal-primitive: 250ms ease;
+--hx-transition-slow-primitive: 350ms ease;
 ```
 
 ### Primitive Token Rules
@@ -303,183 +303,183 @@ Semantic tokens define **how** primitive values are applied. They carry purpose 
 
 ```css
 /* Primary color (brand identity) */
---wc-color-primary-50: var(--wc-blue-50-primitive, #eff6ff);
---wc-color-primary-100: var(--wc-blue-100-primitive, #dbeafe);
---wc-color-primary-200: var(--wc-blue-200-primitive, #bfdbfe);
---wc-color-primary-300: var(--wc-blue-300-primitive, #93c5fd);
---wc-color-primary-400: var(--wc-blue-400-primitive, #60a5fa);
---wc-color-primary-500: var(--wc-blue-500-primitive, #3b82f6);
---wc-color-primary-600: var(--wc-blue-600-primitive, #2563eb);
---wc-color-primary-700: var(--wc-blue-700-primitive, #1d4ed8);
---wc-color-primary-800: var(--wc-blue-800-primitive, #1e40af);
---wc-color-primary-900: var(--wc-blue-900-primitive, #1e3a8a);
---wc-color-primary-950: var(--wc-blue-950-primitive, #172554);
+--hx-color-primary-50: var(--hx-blue-50-primitive, #eff6ff);
+--hx-color-primary-100: var(--hx-blue-100-primitive, #dbeafe);
+--hx-color-primary-200: var(--hx-blue-200-primitive, #bfdbfe);
+--hx-color-primary-300: var(--hx-blue-300-primitive, #93c5fd);
+--hx-color-primary-400: var(--hx-blue-400-primitive, #60a5fa);
+--hx-color-primary-500: var(--hx-blue-500-primitive, #3b82f6);
+--hx-color-primary-600: var(--hx-blue-600-primitive, #2563eb);
+--hx-color-primary-700: var(--hx-blue-700-primitive, #1d4ed8);
+--hx-color-primary-800: var(--hx-blue-800-primitive, #1e40af);
+--hx-color-primary-900: var(--hx-blue-900-primitive, #1e3a8a);
+--hx-color-primary-950: var(--hx-blue-950-primitive, #172554);
 ```
 
 #### Neutral Colors
 
 ```css
 /* Neutral colors (text, backgrounds, borders) */
---wc-color-neutral-0: var(--wc-neutral-0-primitive, #ffffff);
---wc-color-neutral-50: var(--wc-neutral-50-primitive, #f8f9fa);
---wc-color-neutral-100: var(--wc-neutral-100-primitive, #f1f5f9);
---wc-color-neutral-200: var(--wc-neutral-200-primitive, #e9ecef);
---wc-color-neutral-300: var(--wc-neutral-300-primitive, #dee2e6);
---wc-color-neutral-400: var(--wc-neutral-400-primitive, #ced4da);
---wc-color-neutral-500: var(--wc-neutral-500-primitive, #adb5bd);
---wc-color-neutral-600: var(--wc-neutral-600-primitive, #6c757d);
---wc-color-neutral-700: var(--wc-neutral-700-primitive, #495057);
---wc-color-neutral-800: var(--wc-neutral-800-primitive, #343a40);
---wc-color-neutral-900: var(--wc-neutral-900-primitive, #212529);
+--hx-color-neutral-0: var(--hx-neutral-0-primitive, #ffffff);
+--hx-color-neutral-50: var(--hx-neutral-50-primitive, #f8f9fa);
+--hx-color-neutral-100: var(--hx-neutral-100-primitive, #f1f5f9);
+--hx-color-neutral-200: var(--hx-neutral-200-primitive, #e9ecef);
+--hx-color-neutral-300: var(--hx-neutral-300-primitive, #dee2e6);
+--hx-color-neutral-400: var(--hx-neutral-400-primitive, #ced4da);
+--hx-color-neutral-500: var(--hx-neutral-500-primitive, #adb5bd);
+--hx-color-neutral-600: var(--hx-neutral-600-primitive, #6c757d);
+--hx-color-neutral-700: var(--hx-neutral-700-primitive, #495057);
+--hx-color-neutral-800: var(--hx-neutral-800-primitive, #343a40);
+--hx-color-neutral-900: var(--hx-neutral-900-primitive, #212529);
 ```
 
 #### Feedback Colors
 
 ```css
 /* Success (green) */
---wc-color-success-50: #ecfdf5;
---wc-color-success-100: #d1fae5;
---wc-color-success-500: #10b981;
---wc-color-success-700: #15803d;
---wc-color-success-800: #166534;
+--hx-color-success-50: #ecfdf5;
+--hx-color-success-100: #d1fae5;
+--hx-color-success-500: #10b981;
+--hx-color-success-700: #15803d;
+--hx-color-success-800: #166534;
 
 /* Warning (yellow/amber) */
---wc-color-warning-50: #fffbeb;
---wc-color-warning-100: #fef3c7;
---wc-color-warning-500: #f59e0b;
---wc-color-warning-700: #b45309;
---wc-color-warning-800: #92400e;
+--hx-color-warning-50: #fffbeb;
+--hx-color-warning-100: #fef3c7;
+--hx-color-warning-500: #f59e0b;
+--hx-color-warning-700: #b45309;
+--hx-color-warning-800: #92400e;
 
 /* Error (red) */
---wc-color-error-50: #fef2f2;
---wc-color-error-100: #fee2e2;
---wc-color-error-500: #ef4444;
---wc-color-error-700: #b91c1c;
---wc-color-error-800: #991b1b;
+--hx-color-error-50: #fef2f2;
+--hx-color-error-100: #fee2e2;
+--hx-color-error-500: #ef4444;
+--hx-color-error-700: #b91c1c;
+--hx-color-error-800: #991b1b;
 
 /* Info (blue) */
---wc-color-info-50: #e8f4fd;
---wc-color-info-100: #d1e9fb;
---wc-color-info-500: #3b82f6;
---wc-color-info-700: #1d4ed8;
---wc-color-info-800: #1e40af;
+--hx-color-info-50: #e8f4fd;
+--hx-color-info-100: #d1e9fb;
+--hx-color-info-500: #3b82f6;
+--hx-color-info-700: #1d4ed8;
+--hx-color-info-800: #1e40af;
 ```
 
 ### Spacing Semantics
 
 ```css
 /* Space scale (general-purpose spacing) */
---wc-space-0: 0;
---wc-space-px: 1px;
---wc-space-0-5: 0.125rem;
---wc-space-1: 0.25rem;
---wc-space-1-5: 0.375rem;
---wc-space-2: 0.5rem;
---wc-space-3: 0.75rem;
---wc-space-4: 1rem;
---wc-space-5: 1.25rem;
---wc-space-6: 1.5rem;
---wc-space-8: 2rem;
---wc-space-10: 2.5rem;
---wc-space-12: 3rem;
---wc-space-16: 4rem;
---wc-space-20: 5rem;
---wc-space-24: 6rem;
+--hx-space-0: 0;
+--hx-space-px: 1px;
+--hx-space-0-5: 0.125rem;
+--hx-space-1: 0.25rem;
+--hx-space-1-5: 0.375rem;
+--hx-space-2: 0.5rem;
+--hx-space-3: 0.75rem;
+--hx-space-4: 1rem;
+--hx-space-5: 1.25rem;
+--hx-space-6: 1.5rem;
+--hx-space-8: 2rem;
+--hx-space-10: 2.5rem;
+--hx-space-12: 3rem;
+--hx-space-16: 4rem;
+--hx-space-20: 5rem;
+--hx-space-24: 6rem;
 
 /* Size scale (for fixed dimensions like min-height) */
---wc-size-4: 1rem; /* 16px */
---wc-size-5: 1.25rem; /* 20px */
---wc-size-8: 2rem; /* 32px */
---wc-size-10: 2.5rem; /* 40px */
---wc-size-12: 3rem; /* 48px */
---wc-size-16: 4rem; /* 64px */
---wc-size-20: 5rem; /* 80px */
+--hx-size-4: 1rem; /* 16px */
+--hx-size-5: 1.25rem; /* 20px */
+--hx-size-8: 2rem; /* 32px */
+--hx-size-10: 2.5rem; /* 40px */
+--hx-size-12: 3rem; /* 48px */
+--hx-size-16: 4rem; /* 64px */
+--hx-size-20: 5rem; /* 80px */
 ```
 
 ### Typography Semantics
 
 ```css
 /* Font families */
---wc-font-family-sans: var(--wc-font-family-sans-primitive, system-ui, sans-serif);
---wc-font-family-serif: var(--wc-font-family-serif-primitive, Georgia, serif);
---wc-font-family-mono: var(--wc-font-family-mono-primitive, 'Courier New', monospace);
+--hx-font-family-sans: var(--hx-font-family-sans-primitive, system-ui, sans-serif);
+--hx-font-family-serif: var(--hx-font-family-serif-primitive, Georgia, serif);
+--hx-font-family-mono: var(--hx-font-family-mono-primitive, 'Courier New', monospace);
 
 /* Font weights */
---wc-font-weight-normal: var(--wc-font-weight-normal-primitive, 400);
---wc-font-weight-medium: var(--wc-font-weight-medium-primitive, 500);
---wc-font-weight-semibold: var(--wc-font-weight-semibold-primitive, 600);
---wc-font-weight-bold: var(--wc-font-weight-bold-primitive, 700);
+--hx-font-weight-normal: var(--hx-font-weight-normal-primitive, 400);
+--hx-font-weight-medium: var(--hx-font-weight-medium-primitive, 500);
+--hx-font-weight-semibold: var(--hx-font-weight-semibold-primitive, 600);
+--hx-font-weight-bold: var(--hx-font-weight-bold-primitive, 700);
 
 /* Font sizes */
---wc-font-size-2xs: var(--wc-font-size-2xs-primitive, 0.625rem);
---wc-font-size-xs: var(--wc-font-size-xs-primitive, 0.75rem);
---wc-font-size-sm: var(--wc-font-size-sm-primitive, 0.875rem);
---wc-font-size-md: var(--wc-font-size-md-primitive, 1rem);
---wc-font-size-lg: var(--wc-font-size-lg-primitive, 1.125rem);
---wc-font-size-xl: var(--wc-font-size-xl-primitive, 1.25rem);
---wc-font-size-2xl: var(--wc-font-size-2xl-primitive, 1.5rem);
---wc-font-size-3xl: var(--wc-font-size-3xl-primitive, 1.875rem);
---wc-font-size-4xl: var(--wc-font-size-4xl-primitive, 2.25rem);
---wc-font-size-5xl: var(--wc-font-size-5xl-primitive, 3rem);
+--hx-font-size-2xs: var(--hx-font-size-2xs-primitive, 0.625rem);
+--hx-font-size-xs: var(--hx-font-size-xs-primitive, 0.75rem);
+--hx-font-size-sm: var(--hx-font-size-sm-primitive, 0.875rem);
+--hx-font-size-md: var(--hx-font-size-md-primitive, 1rem);
+--hx-font-size-lg: var(--hx-font-size-lg-primitive, 1.125rem);
+--hx-font-size-xl: var(--hx-font-size-xl-primitive, 1.25rem);
+--hx-font-size-2xl: var(--hx-font-size-2xl-primitive, 1.5rem);
+--hx-font-size-3xl: var(--hx-font-size-3xl-primitive, 1.875rem);
+--hx-font-size-4xl: var(--hx-font-size-4xl-primitive, 2.25rem);
+--hx-font-size-5xl: var(--hx-font-size-5xl-primitive, 3rem);
 
 /* Line heights */
---wc-line-height-tight: var(--wc-line-height-tight-primitive, 1.25);
---wc-line-height-snug: var(--wc-line-height-snug-primitive, 1.375);
---wc-line-height-normal: var(--wc-line-height-normal-primitive, 1.5);
---wc-line-height-relaxed: var(--wc-line-height-relaxed-primitive, 1.625);
---wc-line-height-loose: var(--wc-line-height-loose-primitive, 2);
+--hx-line-height-tight: var(--hx-line-height-tight-primitive, 1.25);
+--hx-line-height-snug: var(--hx-line-height-snug-primitive, 1.375);
+--hx-line-height-normal: var(--hx-line-height-normal-primitive, 1.5);
+--hx-line-height-relaxed: var(--hx-line-height-relaxed-primitive, 1.625);
+--hx-line-height-loose: var(--hx-line-height-loose-primitive, 2);
 ```
 
 ### Other Semantic Categories
 
 ```css
 /* Border radii */
---wc-border-radius-none: 0;
---wc-border-radius-sm: 0.125rem;
---wc-border-radius-md: 0.25rem;
---wc-border-radius-lg: 0.375rem;
---wc-border-radius-xl: 0.5rem;
---wc-border-radius-2xl: 0.75rem;
---wc-border-radius-full: 9999px;
+--hx-border-radius-none: 0;
+--hx-border-radius-sm: 0.125rem;
+--hx-border-radius-md: 0.25rem;
+--hx-border-radius-lg: 0.375rem;
+--hx-border-radius-xl: 0.5rem;
+--hx-border-radius-2xl: 0.75rem;
+--hx-border-radius-full: 9999px;
 
 /* Border widths */
---wc-border-width-thin: 1px;
---wc-border-width-medium: 2px;
---wc-border-width-thick: 4px;
+--hx-border-width-thin: 1px;
+--hx-border-width-medium: 2px;
+--hx-border-width-thick: 4px;
 
 /* Shadows */
---wc-shadow-none: none;
---wc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
---wc-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
---wc-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
---wc-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
---wc-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+--hx-shadow-none: none;
+--hx-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+--hx-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+--hx-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+--hx-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+--hx-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
 /* Transitions */
---wc-transition-fast: 150ms ease;
---wc-transition-normal: 250ms ease;
---wc-transition-slow: 350ms ease;
+--hx-transition-fast: 150ms ease;
+--hx-transition-normal: 250ms ease;
+--hx-transition-slow: 350ms ease;
 
 /* Focus ring */
---wc-focus-ring-width: 2px;
---wc-focus-ring-offset: 2px;
---wc-focus-ring-color: var(--wc-color-primary-500, #2563eb);
---wc-focus-ring-opacity: 0.25;
+--hx-focus-ring-width: 2px;
+--hx-focus-ring-offset: 2px;
+--hx-focus-ring-color: var(--hx-color-primary-500, #2563eb);
+--hx-focus-ring-opacity: 0.25;
 
 /* Opacity */
---wc-opacity-disabled: 0.5;
---wc-opacity-hover: 0.9;
---wc-opacity-active: 0.8;
+--hx-opacity-disabled: 0.5;
+--hx-opacity-hover: 0.9;
+--hx-opacity-active: 0.8;
 
 /* Transforms */
---wc-transform-lift-sm: -1px;
---wc-transform-lift-md: -2px;
---wc-transform-lift-lg: -4px;
+--hx-transform-lift-sm: -1px;
+--hx-transform-lift-md: -2px;
+--hx-transform-lift-lg: -4px;
 ```
 
 ### Semantic Token Rules
 
-1. **Name by purpose, not appearance** — `--wc-color-primary-500` not `--wc-color-blue`
+1. **Name by purpose, not appearance** — `--hx-color-primary-500` not `--hx-color-blue`
 2. **Provide complete scales** — Include all shades of each palette
 3. **Mode-aware defaults** — Semantic tokens can change in dark mode
 4. **Document thoroughly** — Every token has JSDoc describing usage
@@ -500,22 +500,22 @@ Component tokens define **where** semantic values are applied to specific compon
 ### Button Component Tokens
 
 ```css
-/* wc-button tokens (all optional) */
---wc-button-bg: var(--wc-color-primary-500, #2563eb);
---wc-button-color: var(--wc-color-neutral-0, #ffffff);
---wc-button-border-color: transparent;
---wc-button-border-radius: var(--wc-border-radius-md, 0.375rem);
---wc-button-font-family: var(--wc-font-family-sans, sans-serif);
---wc-button-font-weight: var(--wc-font-weight-semibold, 600);
---wc-button-focus-ring-color: var(--wc-focus-ring-color, #2563eb);
---wc-button-padding-x: var(--wc-space-4, 1rem);
---wc-button-padding-y: var(--wc-space-2, 0.5rem);
+/* hx-button tokens (all optional) */
+--hx-button-bg: var(--hx-color-primary-500, #2563eb);
+--hx-button-color: var(--hx-color-neutral-0, #ffffff);
+--hx-button-border-color: transparent;
+--hx-button-border-radius: var(--hx-border-radius-md, 0.375rem);
+--hx-button-font-family: var(--hx-font-family-sans, sans-serif);
+--hx-button-font-weight: var(--hx-font-weight-semibold, 600);
+--hx-button-focus-ring-color: var(--hx-focus-ring-color, #2563eb);
+--hx-button-padding-x: var(--hx-space-4, 1rem);
+--hx-button-padding-y: var(--hx-space-2, 0.5rem);
 ```
 
-**Usage in wc-button component:**
+**Usage in hx-button component:**
 
 ```typescript
-// wc-button.styles.ts
+// hx-button.styles.ts
 export const wcButtonStyles = css`
   :host {
     display: inline-block;
@@ -525,33 +525,33 @@ export const wcButtonStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--wc-space-2, 0.5rem);
-    padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
+    gap: var(--hx-space-2, 0.5rem);
+    padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
 
     /* Component token → Semantic token → Primitive fallback */
-    background-color: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
-    color: var(--wc-button-color, var(--wc-color-neutral-0, #ffffff));
-    border: var(--wc-border-width-thin, 1px) solid var(--wc-button-border-color, transparent);
-    border-radius: var(--wc-button-border-radius, var(--wc-border-radius-md, 0.375rem));
+    background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+    color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-button-border-color, transparent);
+    border-radius: var(--hx-button-border-radius, var(--hx-border-radius-md, 0.375rem));
 
-    font-family: var(--wc-button-font-family, var(--wc-font-family-sans, sans-serif));
-    font-weight: var(--wc-button-font-weight, var(--wc-font-weight-semibold, 600));
+    font-family: var(--hx-button-font-family, var(--hx-font-family-sans, sans-serif));
+    font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
 
     cursor: pointer;
     transition:
-      background-color var(--wc-transition-fast, 150ms ease),
-      color var(--wc-transition-fast, 150ms ease),
-      border-color var(--wc-transition-fast, 150ms ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease),
+      border-color var(--hx-transition-fast, 150ms ease);
   }
 
   .button:focus-visible {
-    outline: var(--wc-focus-ring-width, 2px) solid
-      var(--wc-button-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-    outline-offset: var(--wc-focus-ring-offset, 2px);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .button:hover {
-    filter: brightness(var(--wc-filter-brightness-hover, 0.9));
+    filter: brightness(var(--hx-filter-brightness-hover, 0.9));
   }
 `;
 ```
@@ -559,48 +559,48 @@ export const wcButtonStyles = css`
 ### Card Component Tokens
 
 ```css
-/* wc-card tokens (all optional) */
---wc-card-bg: var(--wc-color-neutral-0, #ffffff);
---wc-card-color: var(--wc-color-neutral-800, #212529);
---wc-card-border-color: var(--wc-color-neutral-200, #dee2e6);
---wc-card-border-radius: var(--wc-border-radius-lg, 0.5rem);
---wc-card-padding: var(--wc-space-6, 1.5rem);
---wc-card-shadow: var(--wc-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+/* hx-card tokens (all optional) */
+--hx-card-bg: var(--hx-color-neutral-0, #ffffff);
+--hx-card-color: var(--hx-color-neutral-800, #212529);
+--hx-card-border-color: var(--hx-color-neutral-200, #dee2e6);
+--hx-card-border-radius: var(--hx-border-radius-lg, 0.5rem);
+--hx-card-padding: var(--hx-space-6, 1.5rem);
+--hx-card-shadow: var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
 ```
 
 ### Input Component Tokens
 
 ```css
-/* wc-text-input tokens (all optional) */
---wc-input-bg: var(--wc-color-neutral-0, #ffffff);
---wc-input-color: var(--wc-color-neutral-800, #212529);
---wc-input-border-color: var(--wc-color-neutral-300, #ced4da);
---wc-input-border-radius: var(--wc-border-radius-md, 0.375rem);
---wc-input-font-family: var(--wc-font-family-sans, sans-serif);
---wc-input-label-color: var(--wc-color-neutral-700, #343a40);
---wc-input-focus-ring-color: var(--wc-focus-ring-color, #2563eb);
---wc-input-error-color: var(--wc-color-error-500, #dc3545);
+/* hx-text-input tokens (all optional) */
+--hx-input-bg: var(--hx-color-neutral-0, #ffffff);
+--hx-input-color: var(--hx-color-neutral-800, #212529);
+--hx-input-border-color: var(--hx-color-neutral-300, #ced4da);
+--hx-input-border-radius: var(--hx-border-radius-md, 0.375rem);
+--hx-input-font-family: var(--hx-font-family-sans, sans-serif);
+--hx-input-label-color: var(--hx-color-neutral-700, #343a40);
+--hx-input-focus-ring-color: var(--hx-focus-ring-color, #2563eb);
+--hx-input-error-color: var(--hx-color-error-500, #dc3545);
 ```
 
 ### Alert Component Tokens
 
 ```css
-/* wc-alert tokens (all optional) */
---wc-alert-gap: var(--wc-space-3, 0.75rem);
---wc-alert-padding: var(--wc-space-4, 1rem);
---wc-alert-border-width: var(--wc-border-width-thin, 1px);
---wc-alert-border-radius: var(--wc-border-radius-md, 0.375rem);
---wc-alert-font-family: var(--wc-font-family-sans, sans-serif);
---wc-alert-bg: var(--wc-color-info-50, #e8f4fd);
---wc-alert-border-color: var(--wc-color-info-200, #b3d9ef);
---wc-alert-color: var(--wc-color-info-800, #1a3a4a);
---wc-alert-icon-color: var(--wc-color-info-500, #3b82f6);
+/* hx-alert tokens (all optional) */
+--hx-alert-gap: var(--hx-space-3, 0.75rem);
+--hx-alert-padding: var(--hx-space-4, 1rem);
+--hx-alert-border-width: var(--hx-border-width-thin, 1px);
+--hx-alert-border-radius: var(--hx-border-radius-md, 0.375rem);
+--hx-alert-font-family: var(--hx-font-family-sans, sans-serif);
+--hx-alert-bg: var(--hx-color-info-50, #e8f4fd);
+--hx-alert-border-color: var(--hx-color-info-200, #b3d9ef);
+--hx-alert-color: var(--hx-color-info-800, #1a3a4a);
+--hx-alert-icon-color: var(--hx-color-info-500, #3b82f6);
 ```
 
 ### Component Token Rules
 
 1. **Always fallback to semantic tokens** — Never hardcode component token values
-2. **Flat hierarchy** — `--wc-button-bg` not `--wc-button-primary-bg` (variants handled in component CSS)
+2. **Flat hierarchy** — `--hx-button-bg` not `--hx-button-primary-bg` (variants handled in component CSS)
 3. **Consistent naming** — `{component}-{property}` pattern
 4. **Optional adoption** — Add component tokens only when consumers need them
 
@@ -608,7 +608,7 @@ export const wcButtonStyles = css`
 
 ## Token Naming Conventions
 
-All wc-2026 tokens follow a strict naming pattern for consistency and discoverability.
+All HELiX tokens follow a strict naming pattern for consistency and discoverability.
 
 ### Naming Structure
 
@@ -626,83 +626,83 @@ All wc-2026 tokens follow a strict naming pattern for consistency and discoverab
 
 ### Color Token Names
 
-**Pattern**: `--wc-color-{palette}-{shade}`
+**Pattern**: `--hx-color-{palette}-{shade}`
 
 ```css
---wc-color-primary-500      /* Primary brand color (base) */
---wc-color-primary-50       /* Very light primary */
---wc-color-primary-900      /* Very dark primary */
+--hx-color-primary-500      /* Primary brand color (base) */
+--hx-color-primary-50       /* Very light primary */
+--hx-color-primary-900      /* Very dark primary */
 
---wc-color-neutral-0        /* Pure white */
---wc-color-neutral-800      /* Near black */
+--hx-color-neutral-0        /* Pure white */
+--hx-color-neutral-800      /* Near black */
 
---wc-color-success-500      /* Success green */
---wc-color-error-500        /* Error red */
---wc-color-warning-500      /* Warning yellow/amber */
---wc-color-info-500         /* Info blue */
+--hx-color-success-500      /* Success green */
+--hx-color-error-500        /* Error red */
+--hx-color-warning-500      /* Warning yellow/amber */
+--hx-color-info-500         /* Info blue */
 ```
 
 ### Spacing Token Names
 
-**Pattern**: `--wc-space-{scale}` or `--wc-size-{scale}`
+**Pattern**: `--hx-space-{scale}` or `--hx-size-{scale}`
 
 ```css
---wc-space-1       /* 0.25rem = 4px */
---wc-space-2       /* 0.5rem = 8px */
---wc-space-4       /* 1rem = 16px */
---wc-space-6       /* 1.5rem = 24px */
+--hx-space-1       /* 0.25rem = 4px */
+--hx-space-2       /* 0.5rem = 8px */
+--hx-space-4       /* 1rem = 16px */
+--hx-space-6       /* 1.5rem = 24px */
 
---wc-size-10       /* Fixed size 2.5rem = 40px (for min-height, etc.) */
---wc-size-12       /* Fixed size 3rem = 48px */
+--hx-size-10       /* Fixed size 2.5rem = 40px (for min-height, etc.) */
+--hx-size-12       /* Fixed size 3rem = 48px */
 ```
 
 ### Typography Token Names
 
-**Pattern**: `--wc-font-{property}-{scale}`
+**Pattern**: `--hx-font-{property}-{scale}`
 
 ```css
---wc-font-family-sans       /* Sans-serif stack */
---wc-font-family-serif      /* Serif stack */
---wc-font-family-mono       /* Monospace stack */
+--hx-font-family-sans       /* Sans-serif stack */
+--hx-font-family-serif      /* Serif stack */
+--hx-font-family-mono       /* Monospace stack */
 
---wc-font-weight-normal     /* 400 */
---wc-font-weight-semibold   /* 600 */
---wc-font-weight-bold       /* 700 */
+--hx-font-weight-normal     /* 400 */
+--hx-font-weight-semibold   /* 600 */
+--hx-font-weight-bold       /* 700 */
 
---wc-font-size-xs           /* Extra small */
---wc-font-size-sm           /* Small */
---wc-font-size-md           /* Medium (base) */
---wc-font-size-lg           /* Large */
---wc-font-size-xl           /* Extra large */
+--hx-font-size-xs           /* Extra small */
+--hx-font-size-sm           /* Small */
+--hx-font-size-md           /* Medium (base) */
+--hx-font-size-lg           /* Large */
+--hx-font-size-xl           /* Extra large */
 
---wc-line-height-tight      /* 1.25 */
---wc-line-height-normal     /* 1.5 */
---wc-line-height-loose      /* 2 */
+--hx-line-height-tight      /* 1.25 */
+--hx-line-height-normal     /* 1.5 */
+--hx-line-height-loose      /* 2 */
 ```
 
 ### Component Token Names
 
-**Pattern**: `--wc-{component}-{property}`
+**Pattern**: `--hx-{component}-{property}`
 
 ```css
---wc-button-bg              /* Button background */
---wc-button-color           /* Button text color */
---wc-button-border-radius   /* Button corner radius */
+--hx-button-bg              /* Button background */
+--hx-button-color           /* Button text color */
+--hx-button-border-radius   /* Button corner radius */
 
---wc-card-bg                /* Card background */
---wc-card-padding           /* Card inner padding */
---wc-card-border-color      /* Card border */
+--hx-card-bg                /* Card background */
+--hx-card-padding           /* Card inner padding */
+--hx-card-border-color      /* Card border */
 
---wc-input-border-color     /* Input border */
---wc-input-focus-ring-color /* Input focus ring */
---wc-input-error-color      /* Input error state */
+--hx-input-border-color     /* Input border */
+--hx-input-focus-ring-color /* Input focus ring */
+--hx-input-error-color      /* Input error state */
 ```
 
 ### Naming Rules
 
 1. **All lowercase** — No camelCase, PascalCase, or UPPER_CASE
 2. **Hyphen-separated** — Use `-` between segments
-3. **Prefix always first** — `--wc-` comes before everything
+3. **Prefix always first** — `--hx-` comes before everything
 4. **No abbreviations** (except universal ones) — `bg` ✓, `clr` ✗
 5. **Scale as suffix** — `primary-500` not `500-primary`
 6. **State as final suffix** — `primary-hover` not `hover-primary`
@@ -711,19 +711,19 @@ All wc-2026 tokens follow a strict naming pattern for consistency and discoverab
 
 ## Fallback Chains
 
-Every CSS custom property in wc-2026 uses a **two-level fallback chain** (or three-level for component tokens).
+Every CSS custom property in HELiX uses a **two-level fallback chain** (or three-level for component tokens).
 
 ### The Two-Level Pattern
 
 ```css
-property: var(--wc-semantic-token, primitive-value);
+property: var(--hx-semantic-token, primitive-value);
 ```
 
 **Example:**
 
 ```css
 .button {
-  background: var(--wc-color-primary-500, #2563eb);
+  background: var(--hx-color-primary-500, #2563eb);
   /*          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    *          Semantic token         | Primitive fallback
    */
@@ -732,20 +732,20 @@ property: var(--wc-semantic-token, primitive-value);
 
 **Resolution order:**
 
-1. `--wc-color-primary-500` (semantic token — can be overridden by consumer)
+1. `--hx-color-primary-500` (semantic token — can be overridden by consumer)
 2. `#2563eb` (primitive fallback — last resort if token unset)
 
 ### The Three-Level Pattern
 
 ```css
-property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
+property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
 ```
 
 **Example:**
 
 ```css
 .button {
-  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
   /*          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    *          Component token  | Semantic token      | Primitive fallback
    */
@@ -754,8 +754,8 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 
 **Resolution order:**
 
-1. `--wc-button-bg` (component token — most specific, optional)
-2. `--wc-color-primary-500` (semantic token — global theming)
+1. `--hx-button-bg` (component token — most specific, optional)
+2. `--hx-color-primary-500` (semantic token — global theming)
 3. `#2563eb` (primitive fallback — last resort)
 
 ### Why This Pattern?
@@ -765,7 +765,7 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 ```css
 /* One-level fallback */
 .button {
-  background: var(--wc-button-bg, #2563eb);
+  background: var(--hx-button-bg, #2563eb);
 }
 ```
 
@@ -777,7 +777,7 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 ```css
 /* Three levels, but missing semantic */
 .button {
-  background: var(--wc-button-bg, var(--wc-blue-600, #2563eb));
+  background: var(--hx-button-bg, var(--hx-blue-600, #2563eb));
 }
 ```
 
@@ -788,17 +788,17 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 ```css
 /* Two levels (most common) */
 .card {
-  background: var(--wc-color-neutral-0, #ffffff);
+  background: var(--hx-color-neutral-0, #ffffff);
 }
 
 /* Three levels (for component customization) */
 .button {
-  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
 }
 ```
 
-- **Pro**: Global theming works (override `--wc-color-primary-500`)
-- **Pro**: Component precision works (override `--wc-button-bg`)
+- **Pro**: Global theming works (override `--hx-color-primary-500`)
+- **Pro**: Component precision works (override `--hx-button-bg`)
 - **Pro**: Fallback works (primitive value if everything unset)
 
 ### Fallback Chain Examples
@@ -807,7 +807,7 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 
 ```css
 .card {
-  padding: var(--wc-card-padding, var(--wc-space-6, 1.5rem));
+  padding: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
 }
 ```
 
@@ -815,9 +815,9 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 
 ```css
 .button {
-  font-family: var(--wc-button-font-family, var(--wc-font-family-sans, sans-serif));
-  font-weight: var(--wc-button-font-weight, var(--wc-font-weight-semibold, 600));
-  font-size: var(--wc-font-size-md, 1rem);
+  font-family: var(--hx-button-font-family, var(--hx-font-family-sans, sans-serif));
+  font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
+  font-size: var(--hx-font-size-md, 1rem);
 }
 ```
 
@@ -825,9 +825,9 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 
 ```css
 .card {
-  border: var(--wc-border-width-thin, 1px) solid
-    var(--wc-card-border-color, var(--wc-color-neutral-200, #dee2e6));
-  border-radius: var(--wc-card-border-radius, var(--wc-border-radius-lg, 0.5rem));
+  border: var(--hx-border-width-thin, 1px) solid
+    var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+  border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
 }
 ```
 
@@ -835,7 +835,7 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 
 ```css
 .card {
-  box-shadow: var(--wc-card-shadow, var(--wc-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1)));
+  box-shadow: var(--hx-card-shadow, var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1)));
 }
 ```
 
@@ -843,9 +843,9 @@ property: var(--wc-component-token, var(--wc-semantic-token, primitive-value));
 
 ```css
 .button:focus-visible {
-  outline: var(--wc-focus-ring-width, 2px) solid
-    var(--wc-button-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
-  outline-offset: var(--wc-focus-ring-offset, 2px);
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 ```
 
@@ -863,21 +863,21 @@ Tokens enable powerful theming capabilities. Here are common theming patterns fo
 /* Consumer's theme file */
 :root {
   /* Override primary color (teal instead of blue) */
-  --wc-color-primary-50: #e6f7f7;
-  --wc-color-primary-100: #cceff0;
-  --wc-color-primary-200: #99dfe0;
-  --wc-color-primary-300: #66cfd1;
-  --wc-color-primary-400: #33bfc1;
-  --wc-color-primary-500: #007878; /* Base teal */
-  --wc-color-primary-600: #006666;
-  --wc-color-primary-700: #005555;
-  --wc-color-primary-800: #004444;
-  --wc-color-primary-900: #003333;
-  --wc-color-primary-950: #002222;
+  --hx-color-primary-50: #e6f7f7;
+  --hx-color-primary-100: #cceff0;
+  --hx-color-primary-200: #99dfe0;
+  --hx-color-primary-300: #66cfd1;
+  --hx-color-primary-400: #33bfc1;
+  --hx-color-primary-500: #007878; /* Base teal */
+  --hx-color-primary-600: #006666;
+  --hx-color-primary-700: #005555;
+  --hx-color-primary-800: #004444;
+  --hx-color-primary-900: #003333;
+  --hx-color-primary-950: #002222;
 }
 ```
 
-**Result:** All components that use `--wc-color-primary-*` now render in teal.
+**Result:** All components that use `--hx-color-primary-*` now render in teal.
 
 ### Component-Specific Theming
 
@@ -885,16 +885,16 @@ Tokens enable powerful theming capabilities. Here are common theming patterns fo
 
 ```css
 /* Hero CTA button — gradient background */
-wc-button.hero-cta {
-  --wc-button-bg: linear-gradient(135deg, #ff6b35, #f7931e);
-  --wc-button-color: #ffffff;
-  --wc-button-border-radius: 2rem; /* Pill shape */
-  --wc-button-font-size: 1.25rem;
+hx-button.hero-cta {
+  --hx-button-bg: linear-gradient(135deg, #ff6b35, #f7931e);
+  --hx-button-color: #ffffff;
+  --hx-button-border-radius: 2rem; /* Pill shape */
+  --hx-button-font-size: 1.25rem;
 }
 ```
 
 ```html
-<wc-button class="hero-cta" variant="primary"> Get Started Free </wc-button>
+<hx-button class="hero-cta" variant="primary"> Get Started Free </hx-button>
 ```
 
 ### Dark Mode Theming
@@ -904,28 +904,28 @@ wc-button.hero-cta {
 ```css
 /* Light mode (default) */
 :root {
-  --wc-color-neutral-0: #ffffff;
-  --wc-color-neutral-50: #f8f9fa;
-  --wc-color-neutral-800: #343a40;
-  --wc-color-neutral-900: #212529;
+  --hx-color-neutral-0: #ffffff;
+  --hx-color-neutral-50: #f8f9fa;
+  --hx-color-neutral-800: #343a40;
+  --hx-color-neutral-900: #212529;
 }
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --wc-color-neutral-0: #212529; /* Inverted */
-    --wc-color-neutral-50: #343a40;
-    --wc-color-neutral-800: #f8f9fa;
-    --wc-color-neutral-900: #ffffff;
+    --hx-color-neutral-0: #212529; /* Inverted */
+    --hx-color-neutral-50: #343a40;
+    --hx-color-neutral-800: #f8f9fa;
+    --hx-color-neutral-900: #ffffff;
   }
 }
 
 /* Explicit dark theme via data attribute */
 [data-theme='dark'] {
-  --wc-color-neutral-0: #212529;
-  --wc-color-neutral-50: #343a40;
-  --wc-color-neutral-800: #f8f9fa;
-  --wc-color-neutral-900: #ffffff;
+  --hx-color-neutral-0: #212529;
+  --hx-color-neutral-50: #343a40;
+  --hx-color-neutral-800: #f8f9fa;
+  --hx-color-neutral-900: #ffffff;
 }
 ```
 
@@ -948,7 +948,7 @@ wc-button.hero-cta {
 
 ```css
 :root {
-  --wc-font-family-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --hx-font-family-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 ```
 
@@ -968,7 +968,7 @@ wc-button.hero-cta {
     }
 
     :root {
-      --wc-font-family-sans: 'Inter', system-ui, sans-serif;
+      --hx-font-family-sans: 'Inter', system-ui, sans-serif;
     }
   </style>
 </head>
@@ -980,11 +980,11 @@ wc-button.hero-cta {
 
 ```css
 :root {
-  --wc-space-1: 0.125rem; /* Half of default */
-  --wc-space-2: 0.25rem;
-  --wc-space-3: 0.5rem;
-  --wc-space-4: 0.75rem;
-  --wc-space-6: 1rem;
+  --hx-space-1: 0.125rem; /* Half of default */
+  --hx-space-2: 0.25rem;
+  --hx-space-3: 0.5rem;
+  --hx-space-4: 0.75rem;
+  --hx-space-6: 1rem;
 }
 ```
 
@@ -996,16 +996,16 @@ wc-button.hero-cta {
 @media (prefers-contrast: more) {
   :root {
     /* Increase border thickness */
-    --wc-border-width-thin: 2px;
-    --wc-border-width-medium: 3px;
+    --hx-border-width-thin: 2px;
+    --hx-border-width-medium: 3px;
 
     /* Use stronger borders */
-    --wc-color-neutral-200: #000000;
-    --wc-color-neutral-300: #000000;
+    --hx-color-neutral-200: #000000;
+    --hx-color-neutral-300: #000000;
 
     /* Increase focus ring visibility */
-    --wc-focus-ring-width: 3px;
-    --wc-focus-ring-offset: 3px;
+    --hx-focus-ring-width: 3px;
+    --hx-focus-ring-offset: 3px;
   }
 }
 ```
@@ -1016,7 +1016,7 @@ wc-button.hero-cta {
 
 Every component documents its tokens via JSDoc so they appear in Custom Elements Manifest (CEM) and IDE autocomplete.
 
-### Example: wc-button
+### Example: hx-button
 
 ```typescript
 /**
@@ -1025,22 +1025,22 @@ Every component documents its tokens via JSDoc so they appear in Custom Elements
  * @slot - Button text content
  * @slot icon - Icon slot (before text)
  *
- * @cssprop [--wc-button-bg=var(--wc-color-primary-500)] - Button background color.
- * @cssprop [--wc-button-color=var(--wc-color-neutral-0)] - Button text color.
- * @cssprop [--wc-button-border-color=transparent] - Button border color.
- * @cssprop [--wc-button-border-radius=var(--wc-border-radius-md)] - Button corner radius.
- * @cssprop [--wc-button-font-family=var(--wc-font-family-sans)] - Button font family.
- * @cssprop [--wc-button-font-weight=var(--wc-font-weight-semibold)] - Button font weight.
- * @cssprop [--wc-button-focus-ring-color=var(--wc-focus-ring-color)] - Focus ring color.
- * @cssprop [--wc-button-padding-x=var(--wc-space-4)] - Horizontal padding.
- * @cssprop [--wc-button-padding-y=var(--wc-space-2)] - Vertical padding.
+ * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
+ * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
+ * @cssprop [--hx-button-border-color=transparent] - Button border color.
+ * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button corner radius.
+ * @cssprop [--hx-button-font-family=var(--hx-font-family-sans)] - Button font family.
+ * @cssprop [--hx-button-font-weight=var(--hx-font-weight-semibold)] - Button font weight.
+ * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ * @cssprop [--hx-button-padding-x=var(--hx-space-4)] - Horizontal padding.
+ * @cssprop [--hx-button-padding-y=var(--hx-space-2)] - Vertical padding.
  *
  * @csspart button - The native button element.
  *
- * @fires wc-click - Fired when button is clicked (event forwarding from native click)
+ * @fires hx-click - Fired when button is clicked (event forwarding from native click)
  */
-@customElement('wc-button')
-export class WcButton extends LitElement {
+@customElement('hx-button')
+export class HxButton extends LitElement {
   // Component implementation
 }
 ```
@@ -1077,10 +1077,10 @@ export class WcButton extends LitElement {
 
 /* GOOD */
 .button {
-  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
-  padding: var(--wc-space-2, 0.5rem) var(--wc-space-4, 1rem);
-  font-weight: var(--wc-button-font-weight, var(--wc-font-weight-semibold, 600));
-  border-radius: var(--wc-button-border-radius, var(--wc-border-radius-md, 0.375rem));
+  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+  padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+  font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
+  border-radius: var(--hx-button-border-radius, var(--hx-border-radius-md, 0.375rem));
 }
 ```
 
@@ -1089,12 +1089,12 @@ export class WcButton extends LitElement {
 ```css
 /* BAD (missing semantic fallback) */
 .card {
-  background: var(--wc-card-bg, #ffffff);
+  background: var(--hx-card-bg, #ffffff);
 }
 
 /* GOOD */
 .card {
-  background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
+  background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
 }
 ```
 
@@ -1102,13 +1102,13 @@ export class WcButton extends LitElement {
 
 ```typescript
 /**
- * @cssprop [--wc-card-bg=var(--wc-color-neutral-0)] - Card background color.
- * @cssprop [--wc-card-border-color=var(--wc-color-neutral-200)] - Card border color.
- * @cssprop [--wc-card-border-radius=var(--wc-border-radius-lg)] - Card corner radius.
- * @cssprop [--wc-card-padding=var(--wc-space-6)] - Card inner padding.
+ * @cssprop [--hx-card-bg=var(--hx-color-neutral-0)] - Card background color.
+ * @cssprop [--hx-card-border-color=var(--hx-color-neutral-200)] - Card border color.
+ * @cssprop [--hx-card-border-radius=var(--hx-border-radius-lg)] - Card corner radius.
+ * @cssprop [--hx-card-padding=var(--hx-space-6)] - Card inner padding.
  */
-@customElement('wc-card')
-export class WcCard extends LitElement {}
+@customElement('hx-card')
+export class HxCard extends LitElement {}
 ```
 
 ### 4. Maintain Contrast Ratios
@@ -1122,8 +1122,8 @@ All token combinations must meet WCAG 2.1 AA contrast requirements:
 ```css
 /* VERIFY: Does this meet 4.5:1? */
 .button {
-  background: var(--wc-color-primary-500, #2563eb);
-  color: var(--wc-color-neutral-0, #ffffff);
+  background: var(--hx-color-primary-500, #2563eb);
+  color: var(--hx-color-neutral-0, #ffffff);
 }
 /* Answer: Yes — #2563eb on #ffffff = 7.2:1 ratio */
 ```
@@ -1136,7 +1136,7 @@ Every component with transitions or animations respects `prefers-reduced-motion`
 
 ```css
 .button {
-  transition: background-color var(--wc-transition-fast, 150ms ease);
+  transition: background-color var(--hx-transition-fast, 150ms ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1151,12 +1151,12 @@ Every component with transitions or animations respects `prefers-reduced-motion`
 ```css
 /* BAD — prevents consumer customization */
 :host {
-  background: var(--wc-card-bg, #ffffff) !important;
+  background: var(--hx-card-bg, #ffffff) !important;
 }
 
 /* GOOD — allows override cascade */
 :host {
-  background: var(--wc-card-bg, var(--wc-color-neutral-0, #ffffff));
+  background: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
 }
 ```
 
@@ -1165,12 +1165,12 @@ Every component with transitions or animations respects `prefers-reduced-motion`
 ```css
 /* BAD — references primitive directly */
 .button {
-  background: var(--wc-blue-600, #2563eb);
+  background: var(--hx-blue-600, #2563eb);
 }
 
 /* GOOD — references semantic token */
 .button {
-  background: var(--wc-button-bg, var(--wc-color-primary-500, #2563eb));
+  background: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
 }
 ```
 
@@ -1181,15 +1181,15 @@ If multiple components use the same concept, they should reference the same sema
 ```css
 /* All primary buttons use the same token */
 .button--primary {
-  background: var(--wc-color-primary-500, #2563eb);
+  background: var(--hx-color-primary-500, #2563eb);
 }
 
 .badge--primary {
-  background: var(--wc-color-primary-500, #2563eb);
+  background: var(--hx-color-primary-500, #2563eb);
 }
 
 .link--primary {
-  color: var(--wc-color-primary-500, #2563eb);
+  color: var(--hx-color-primary-500, #2563eb);
 }
 ```
 
@@ -1227,7 +1227,7 @@ Design tokens are versioned independently from components using semantic version
 
 ## Summary
 
-Design tokens are the foundation of wc-2026's theming architecture. They provide:
+Design tokens are the foundation of HELiX's theming architecture. They provide:
 
 - **Consistency** — All components use the same visual language
 - **Flexibility** — Global theming and component-level customization

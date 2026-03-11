@@ -1,0 +1,641 @@
+---
+title: 'hx-field'
+description: 'Layout wrapper providing consistent label, input, help text, and validation message structure for any form control in the Helix design system.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-field" section="summary" />
+
+## Overview
+
+`hx-field` is a layout wrapper that coordinates the four structural elements of any form field: label, form control, help text, and error message. It is designed to wrap any native HTML form element (`<input>`, `<textarea>`, `<select>`) or Helix custom element and provide consistent spacing, labeling, and accessibility plumbing across the shadow DOM boundary.
+
+**Use `hx-field` when:**
+
+- You need consistent label + control + help text + error layout in a form
+- You are wrapping a native HTML input element that lacks built-in Helix field structure
+- You need to coordinate `aria-label`, `aria-required`, `aria-invalid`, and `aria-describedby` on a slotted control without managing them manually
+- You want a single token-driven API to control field-level spacing, label color, and error color across a form
+
+**Do not use `hx-field`** as a form control itself — it is a pure layout wrapper and is not form-associated. Use it to wrap controls, not to replace them. For Helix native controls (`hx-text-input`, etc.) that already handle their own ARIA and labeling, check whether the native component already includes built-in field structure before wrapping it in `hx-field`.
+
+**Note on the light DOM side effect:** `hx-field` injects a visually-hidden `<span>` into its light DOM children on connection. This span (identifiable by its `id` ending in `-desc`) serves as the `aria-describedby` anchor for the slotted control, bridging the shadow DOM accessibility boundary. It is removed on disconnect. Do not remove or modify this span.
+
+## Live Demo
+
+### Default
+
+A field with a label and a native text input. The label is wired to the input via `aria-label` automatically.
+
+<ComponentDemo title="Default">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field label="Full Name">
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### With Help Text
+
+Help text is displayed below the control and announced to screen readers via `aria-describedby`.
+
+<ComponentDemo title="With Help Text">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field
+      label="Medical Record Number"
+      help-text="Enter the 8-digit MRN from the patient wristband."
+    >
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Required Field
+
+The required asterisk is visually rendered next to the label and `aria-required="true"` is set on the slotted control automatically.
+
+<ComponentDemo title="Required">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field label="Date of Birth" required help-text="Format: YYYY-MM-DD">
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Error State
+
+When `error` is set, the field enters an error state: label turns red, a `role="alert"` error message appears, and `aria-invalid="true"` is set on the slotted control. Help text is hidden while the error is showing.
+
+<ComponentDemo title="Error State">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field
+      label="Date of Birth"
+      error="Please enter a valid date in YYYY-MM-DD format."
+      help-text="Format: YYYY-MM-DD"
+    >
+      <input
+        type="text"
+        value="not-a-date"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #ef4444; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Disabled State
+
+`disabled` applies visual opacity to the entire field. Set `disabled` on the slotted control separately to disable interactivity — `hx-field` does not propagate the attribute.
+
+<ComponentDemo title="Disabled">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field label="Assigned Clinician" disabled help-text="This field is read-only.">
+      <input
+        type="text"
+        value="Dr. Sarah Patel"
+        disabled
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background: #f9fafb;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Size Variants
+
+Three size variants control label and help text font sizes. The `sm` variant is useful for compact data-dense forms; `lg` is appropriate for accessible intake forms.
+
+<ComponentDemo title="Size Variants">
+  <div style="padding: 1rem; max-width: 400px; display: flex; flex-direction: column; gap: 1rem;">
+    <hx-field label="Small field" hx-size="sm" help-text='hx-size="sm"'>
+      <input
+        type="text"
+        style="width: 100%; padding: 0.375rem 0.625rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.75rem;"
+      />
+    </hx-field>
+    <hx-field label="Medium field (default)" hx-size="md" help-text='hx-size="md"'>
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+    <hx-field label="Large field" hx-size="lg" help-text='hx-size="lg"'>
+      <input
+        type="text"
+        style="width: 100%; padding: 0.625rem 0.875rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Inline Layout
+
+`layout="inline"` places the label beside the control. Useful for compact horizontal form rows.
+
+<ComponentDemo title="Inline Layout">
+  <div style="padding: 1rem; max-width: 500px; display: flex; flex-direction: column; gap: 0.75rem;">
+    <hx-field label="Patient ID" layout="inline">
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+    <hx-field label="Room" layout="inline">
+      <input
+        type="text"
+        value="214-B"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Textarea
+
+Wrap a `<textarea>` the same way as an `<input>`. ARIA bridging works identically.
+
+<ComponentDemo title="Textarea">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field
+      label="Clinical Notes"
+      help-text="Document any relevant observations for the attending physician."
+      required
+    >
+      <textarea
+        rows="4"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; resize: vertical;"
+      ></textarea>
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Select
+
+Wrap a native `<select>` for consistent field structure. The label click will focus the select.
+
+<ComponentDemo title="Select">
+  <div style="padding: 1rem; max-width: 400px;">
+    <hx-field label="Department" required>
+      <select style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background: white;">
+        <option value="">Select a department…</option>
+        <option value="cardiology">Cardiology</option>
+        <option value="oncology">Oncology</option>
+        <option value="neurology">Neurology</option>
+        <option value="pediatrics">Pediatrics</option>
+      </select>
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Patient Intake Form
+
+A realistic healthcare intake form pattern using `hx-field` wrappers for all controls.
+
+<ComponentDemo title="Patient Intake">
+  <div style="padding: 1rem; max-width: 480px; font-family: sans-serif; display: flex; flex-direction: column; gap: 1rem;">
+    <hx-field label="Patient Name" required>
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+    <hx-field label="Date of Birth" required help-text="Format: YYYY-MM-DD">
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+    <hx-field label="Insurance ID" help-text="Found on the front of your insurance card.">
+      <input
+        type="text"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;"
+      />
+    </hx-field>
+    <hx-field label="Chief Complaint" required>
+      <textarea
+        rows="3"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; resize: vertical;"
+      ></textarea>
+    </hx-field>
+    <hx-field label="Referring Department">
+      <select style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background: white;">
+        <option value="">Select…</option>
+        <option value="er">Emergency</option>
+        <option value="cardiology">Cardiology</option>
+        <option value="oncology">Oncology</option>
+      </select>
+    </hx-field>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-field';
+```
+
+## Basic Usage
+
+```html
+<!-- Label + native input -->
+<hx-field label="Full Name">
+  <input type="text" />
+</hx-field>
+
+<!-- Required with help text -->
+<hx-field label="Date of Birth" required help-text="Format: YYYY-MM-DD">
+  <input type="text" />
+</hx-field>
+
+<!-- Error state -->
+<hx-field label="Email" error="Please enter a valid email address.">
+  <input type="email" />
+</hx-field>
+
+<!-- Disabled -->
+<hx-field label="Read-only field" disabled>
+  <input type="text" value="System generated" disabled />
+</hx-field>
+
+<!-- Textarea -->
+<hx-field label="Clinical Notes" required>
+  <textarea rows="4"></textarea>
+</hx-field>
+
+<!-- Select -->
+<hx-field label="Department" required>
+  <select>
+    <option value="">Choose…</option>
+    <option value="cardiology">Cardiology</option>
+  </select>
+</hx-field>
+
+<!-- Inline layout -->
+<hx-field label="Patient ID" layout="inline">
+  <input type="text" />
+</hx-field>
+
+<!-- Size variants -->
+<hx-field label="Compact field" hx-size="sm">
+  <input type="text" />
+</hx-field>
+<hx-field label="Large accessible field" hx-size="lg">
+  <input type="text" />
+</hx-field>
+```
+
+## Properties
+
+| Property   | Attribute   | Type                   | Default    | Description                                                                                                                                  |
+| ---------- | ----------- | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`    | `label`     | `string`               | `''`       | The visible label text. When set, a `<label>` element is rendered in the shadow root and `aria-label` is applied to the slotted control.     |
+| `required` | `required`  | `boolean`              | `false`    | When true, shows a required asterisk on the label and sets `aria-required="true"` on the slotted control. Reflects to host attribute.        |
+| `error`    | `error`     | `string`               | `''`       | Error message text. When set, renders a `role="alert"` container, adds `aria-invalid="true"` to the slotted control, and hides help text.    |
+| `helpText` | `help-text` | `string`               | `''`       | Help text displayed below the control. Hidden when `error` is active. Announced to AT via `aria-describedby`.                                |
+| `disabled` | `disabled`  | `boolean`              | `false`    | Applies visual opacity to the entire field. Does not disable the slotted control — set `disabled` on the control directly. Reflects to host. |
+| `hxSize`   | `hx-size`   | `'sm' \| 'md' \| 'lg'` | `'md'`     | Size variant controlling label and help text font sizes. Reflects to host attribute.                                                         |
+| `layout`   | `layout`    | `'column' \| 'inline'` | `'column'` | Layout variant. `'column'` stacks label above control; `'inline'` places them side-by-side. Reflects to host attribute.                      |
+
+## Slots
+
+| Slot          | Description                                                                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(default)_   | The form control element — a native `<input>`, `<textarea>`, `<select>`, or custom element. ARIA attributes are bridged to the first form control in this slot.       |
+| `label`       | Custom label content. When populated, overrides the `label` property and `aria-label` is removed from the slotted control. Wire up `for`/`id` yourself (see example). |
+| `help`        | Custom help text content. When populated, overrides the `helpText` property.                                                                                          |
+| `error`       | Custom error content. When populated, the field enters error state (`aria-invalid="true"`, `field--error` class). Add `role="alert"` to slotted error content.        |
+| `description` | Additional descriptive content rendered above the control, below the label.                                                                                           |
+
+### Custom Label Slot — for/id Association Required
+
+When using the `label` slot, `aria-label` is NOT automatically applied to the slotted control (because `hx-field` cannot know the ID of your custom label element). You must wire up the association yourself using `for`/`id` — both elements are in the same light DOM so the native HTML association works:
+
+```html
+<hx-field>
+  <!-- Wire the label to the input via for/id -->
+  <label slot="label" for="patient-name-input">
+    Patient Name <em style="color: #6b7280;">(legal name)</em>
+  </label>
+  <input id="patient-name-input" type="text" />
+</hx-field>
+```
+
+### Custom Error Slot — role="alert" Required
+
+When using the `error` slot, add `role="alert"` to your slotted error content so screen readers announce it when it appears dynamically:
+
+```html
+<hx-field>
+  <input type="text" />
+  <span slot="error" role="alert"> <strong>Error:</strong> This field is required. </span>
+</hx-field>
+```
+
+## CSS Custom Properties
+
+| Property                     | Default                       | Description                                                             |
+| ---------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
+| `--hx-field-label-color`     | `var(--hx-color-neutral-700)` | Label text color (default state).                                       |
+| `--hx-field-error-color`     | `var(--hx-color-error-500)`   | Error message color, required marker color, label color in error state. |
+| `--hx-field-font-family`     | `var(--hx-font-family-sans)`  | Font family applied to the entire field.                                |
+| `--hx-field-gap`             | `var(--hx-space-1, 0.25rem)`  | Gap between label, control, help text, and error message segments.      |
+| `--hx-field-help-text-color` | `var(--hx-color-neutral-500)` | Help text color.                                                        |
+
+**Example — custom theming:**
+
+```css
+/* Healthcare high-contrast theme */
+hx-field {
+  --hx-field-label-color: #111827;
+  --hx-field-error-color: #dc2626;
+  --hx-field-gap: 0.375rem;
+  --hx-field-help-text-color: #4b5563;
+}
+```
+
+## CSS Parts
+
+| Part                 | Description                                                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------------- |
+| `field`              | The outer flex container wrapping all field segments. Carries state classes (`field--error`, etc.). |
+| `label`              | The `<label>` element. Present only when the `label` property is set and the label slot is empty.   |
+| `control`            | The wrapper `<div>` around the default slot (slotted form control).                                 |
+| `help-text`          | The help text container. Hidden when error is active or neither `helpText` nor help slot is set.    |
+| `error-message`      | The error message `<div>`. Present only when the `error` property is set.                           |
+| `required-indicator` | The required asterisk `<span>`. Present only when `required` is true and a label is rendered.       |
+
+**Example — part customization:**
+
+```css
+/* Style the label to bold in this context */
+.my-form hx-field::part(label) {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Style the control wrapper */
+.my-form hx-field::part(control) {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+```
+
+## Events
+
+`hx-field` does not emit any custom events. It is a pure layout wrapper. Attach event listeners directly to the slotted control.
+
+```html
+<hx-field label="Search Patients">
+  <input
+    type="search"
+    id="patient-search"
+    oninput="handleInput(event)"
+    onchange="handleChange(event)"
+  />
+</hx-field>
+```
+
+## Accessibility
+
+| Topic                 | Details                                                                                                                                                                                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Label association     | When the `label` property is set, `aria-label` is applied directly to the slotted control, bridging the shadow DOM boundary. The rendered `<label>` is a visual target; focus is delegated via a click handler.                                                        |
+| Label slot            | When using the `label` slot, you must wire `for`/`id` between your slotted label and control. Both are in the same light DOM scope so native HTML association works. `aria-label` is not applied in this case.                                                         |
+| Required state        | `aria-required="true"` is set on the slotted control when `required` is true. The visual asterisk has `aria-hidden="true"`.                                                                                                                                            |
+| Invalid / error state | `aria-invalid="true"` is set on the slotted control when `error` is set or the error slot is populated. The error message container uses `role="alert"` for immediate announcement.                                                                                    |
+| Description           | A visually-hidden `<span>` is injected into the component's light DOM (id ending in `-desc`) and referenced via `aria-describedby` on the slotted control. This bridges the shadow DOM IDREF limitation. Error text takes priority over help text in this description. |
+| Slot announcer        | A separate `aria-live="assertive"` region in the shadow DOM serves slotted error content. When using the `error` slot, also add `role="alert"` to your content for reliable cross-AT announcement.                                                                     |
+| Third-party controls  | ARIA bridging is skipped for `hx-*` elements (they manage their own ARIA). Third-party custom elements can opt out by setting `data-aria-managed` on the element.                                                                                                      |
+| Disabled              | `hx-field[disabled]` applies opacity via CSS. The slotted control must have its own `disabled` attribute for interactive disabling.                                                                                                                                    |
+| Keyboard navigation   | `hx-field` itself is not a focusable element. All keyboard interaction is handled by the slotted control.                                                                                                                                                              |
+| WCAG 2.1 AA           | Verified with axe-core: zero violations across default, required, error, disabled, and all native control variants (input, textarea, select).                                                                                                                          |
+
+## Drupal Integration
+
+```twig
+{# Basic labeled field from Drupal field data #}
+<hx-field
+  label="{{ field_label|t }}"
+  {% if field_required %}required{% endif %}
+  {% if field_help_text %}help-text="{{ field_help_text|t }}"{% endif %}
+  {% if field_error %}error="{{ field_error|t }}"{% endif %}
+>
+  <input
+    type="{{ field_type|default('text') }}"
+    name="{{ field_name }}"
+    id="{{ field_id }}"
+    value="{{ field_value|default('') }}"
+  />
+</hx-field>
+
+{# Patient intake select field #}
+<hx-field label="{{ 'Department'|t }}" required>
+  <select name="department">
+    <option value="">{{ 'Select a department...'|t }}</option>
+    {% for dept in departments %}
+      <option value="{{ dept.id }}">{{ dept.label|t }}</option>
+    {% endfor %}
+  </select>
+</hx-field>
+
+{# Clinical notes textarea #}
+<hx-field
+  label="{{ 'Clinical Notes'|t }}"
+  help-text="{{ 'Document observations for the attending physician.'|t }}"
+>
+  <textarea name="clinical_notes" rows="4"></textarea>
+</hx-field>
+
+{# Programmatic error from Drupal Behaviors (e.g., AJAX validation) #}
+<script>
+  (function ($, Drupal) {
+    Drupal.behaviors.helixFieldValidation = {
+      attach: function (context) {
+        once('hx-field-validation', 'hx-field[data-drupal-field]', context).forEach(function (field) {
+          field.closest('form').addEventListener('submit', function (e) {
+            var input = field.querySelector('input, textarea, select');
+            if (input && !input.value.trim()) {
+              e.preventDefault();
+              field.error = Drupal.t('This field is required.');
+            }
+          });
+        });
+      }
+    };
+  })(jQuery, Drupal);
+</script>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-field example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 480px;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        box-sizing: border-box;
+        font-family: inherit;
+      }
+      button {
+        padding: 0.625rem 1.25rem;
+        background: #1d4ed8;
+        color: white;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Patient Intake</h1>
+    <form id="intake-form" novalidate>
+      <!-- Required text input -->
+      <hx-field id="name-field" label="Patient Name" required>
+        <input type="text" name="patient_name" id="patient-name" />
+      </hx-field>
+
+      <!-- Date with help text -->
+      <hx-field label="Date of Birth" required help-text="Format: YYYY-MM-DD">
+        <input type="text" name="dob" id="dob" />
+      </hx-field>
+
+      <!-- Select -->
+      <hx-field label="Department">
+        <select name="department" id="department">
+          <option value="">Select a department…</option>
+          <option value="cardiology">Cardiology</option>
+          <option value="oncology">Oncology</option>
+          <option value="neurology">Neurology</option>
+        </select>
+      </hx-field>
+
+      <!-- Textarea -->
+      <hx-field label="Chief Complaint" required>
+        <textarea name="complaint" id="complaint" rows="3"></textarea>
+      </hx-field>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      // Example: programmatic error setting on validation failure
+      document.getElementById('intake-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const nameField = document.getElementById('name-field');
+        const nameInput = nameField.querySelector('input');
+        if (!nameInput.value.trim()) {
+          nameField.error = 'Patient name is required.';
+        } else {
+          nameField.error = '';
+        }
+      });
+    </script>
+  </body>
+</html>
+```
+
+## Design Tokens
+
+`hx-field` consumes the following design tokens from the Helix token system. Override at the semantic level using `--hx-*` custom properties on `:root` or a scoped selector.
+
+| Token                     | Usage                                                             |
+| ------------------------- | ----------------------------------------------------------------- |
+| `--hx-color-neutral-700`  | Default label text color                                          |
+| `--hx-color-neutral-500`  | Default help text color                                           |
+| `--hx-color-error-500`    | Error state: label, asterisk, error message                       |
+| `--hx-font-family-sans`   | Field font family                                                 |
+| `--hx-font-size-xs`       | Help text and error message font size (default, sm variant label) |
+| `--hx-font-size-sm`       | Default label font size                                           |
+| `--hx-font-size-md`       | Label font size in `hx-size="lg"`                                 |
+| `--hx-font-weight-medium` | Label font weight                                                 |
+| `--hx-font-weight-bold`   | Required asterisk font weight                                     |
+| `--hx-line-height-normal` | Label and help text line height                                   |
+| `--hx-space-1`            | Internal gap between field segments                               |
+| `--hx-opacity-disabled`   | Opacity when `disabled` is set                                    |
+
+## Best Practices
+
+**Do** use `hx-field` for every form input that requires a visible label, help text, or validation feedback. Consistent wrapping ensures uniform spacing and accessible labeling across your form.
+
+**Do** set `error` programmatically on validation failure rather than toggling visibility of custom error elements. The built-in `role="alert"` ensures screen readers announce errors immediately.
+
+**Do** add `disabled` to both `hx-field` and the slotted control when disabling a field. `hx-field[disabled]` applies visual treatment; the control's own `disabled` attribute prevents interaction.
+
+**Do not** nest `hx-field` inside another `hx-field`. Each field should be a single flat wrapper.
+
+**Do not** use `hx-field` for checkbox groups or radio groups where multiple controls share one label — use a `<fieldset>`/`<legend>` pattern instead and consider `hx-checkbox-group` or `hx-radio-group`.
+
+**Do not** modify or remove the visually-hidden `<span>` injected into `hx-field`'s light DOM (identifiable by `id` ending in `-desc`). This span is the `aria-describedby` anchor for the slotted control.
+
+**Do** use the `label` slot only when you need rich label content (icons, custom markup). When you do, wire `for`/`id` between your label element and the slotted control — `aria-label` is not applied automatically in this case.
+
+**Do** prefer `hx-size="lg"` for patient-facing intake forms to improve touch target sizing and readability for users with low vision.
+
+## Related Components
+
+| Component           | Relationship                                                                                              |
+| ------------------- | --------------------------------------------------------------------------------------------------------- |
+| `hx-text-input`     | Helix-native text input — already includes internal field structure; check before wrapping in `hx-field`. |
+| `hx-field-label`    | Standalone accessible label element. Use when you need a Helix-styled label outside of `hx-field`.        |
+| `hx-checkbox`       | Use `hx-checkbox` directly; it manages its own label association internally.                              |
+| `hx-checkbox-group` | Groups of checkboxes with a shared label — use instead of multiple `hx-field` wrappers.                   |
+| `hx-radio`          | Use within `hx-radio-group` for grouped radio inputs with shared label/error state.                       |
+| `hx-combobox`       | Helix combobox — manages its own label and error state; wrapping in `hx-field` is not needed.             |
+| `hx-select`         | Helix-native select — includes field structure; review before wrapping in `hx-field`.                     |
+
+## API Reference
+
+<ComponentDoc tagName="hx-field" section="api" />

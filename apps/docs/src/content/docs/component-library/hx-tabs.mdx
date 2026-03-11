@@ -1,0 +1,466 @@
+---
+title: 'hx-tabs'
+description: A tabbed content organizer for switching between related panels of content.
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-tabs" section="summary" />
+
+## Overview
+
+`hx-tabs` is a composite component consisting of three coordinated elements:
+
+- **`hx-tabs`** — The container that manages state, keyboard navigation, and ARIA relationships.
+- **`hx-tab`** — An individual tab trigger placed in the `tab` named slot. Renders as a `<button role="tab">`.
+- **`hx-tab-panel`** — A content panel associated with a tab via matching `panel`/`name` attributes.
+
+The component fully implements the [WAI-ARIA Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) with roving `tabindex`, `aria-selected`, `aria-controls`/`aria-labelledby` cross-linking, and both automatic and manual keyboard activation modes.
+
+**Use `hx-tabs` when:** users need to switch between a fixed set of related views without leaving the page — patient chart sections, record detail views, settings categories, or dashboard panes.
+
+**Do not use tabs when:** content sections should be compared simultaneously (use a layout instead), there are more than 7–8 tabs (consider a `hx-side-nav` or pagination), or sections are independent pages (use navigation).
+
+## Live Demo
+
+### Horizontal Tabs (Default)
+
+<ComponentDemo title="Horizontal Tabs">
+  <hx-tabs label="Patient record sections">
+    <hx-tab slot="tab" panel="overview">
+      Overview
+    </hx-tab>
+    <hx-tab slot="tab" panel="medications">
+      Medications
+    </hx-tab>
+    <hx-tab slot="tab" panel="history">
+      History
+    </hx-tab>
+    <hx-tab-panel name="overview">
+      <p>Patient overview content: demographics, primary diagnoses, and care team.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="medications">
+      <p>Current medications: Lisinopril 10mg daily, Metformin 500mg twice daily.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="history">
+      <p>Medical history: appendectomy 2018, hypertension diagnosis 2021.</p>
+    </hx-tab-panel>
+  </hx-tabs>
+</ComponentDemo>
+
+### Vertical Orientation
+
+<ComponentDemo title="Vertical Tabs">
+  <hx-tabs orientation="vertical" label="Settings categories">
+    <hx-tab slot="tab" panel="profile">
+      Profile
+    </hx-tab>
+    <hx-tab slot="tab" panel="notifications">
+      Notifications
+    </hx-tab>
+    <hx-tab slot="tab" panel="security">
+      Security
+    </hx-tab>
+    <hx-tab-panel name="profile">
+      <p>Update your name, contact information, and display preferences.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="notifications">
+      <p>Configure email, SMS, and in-app notification preferences.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="security">
+      <p>Manage password, multi-factor authentication, and active sessions.</p>
+    </hx-tab-panel>
+  </hx-tabs>
+</ComponentDemo>
+
+### Manual Activation Mode
+
+In manual mode, arrow keys move focus without selecting the tab. Press Enter or Space to activate the focused tab.
+
+<ComponentDemo title="Manual Activation">
+  <hx-tabs activation="manual" label="Document sections">
+    <hx-tab slot="tab" panel="summary">
+      Summary
+    </hx-tab>
+    <hx-tab slot="tab" panel="details">
+      Details
+    </hx-tab>
+    <hx-tab slot="tab" panel="attachments">
+      Attachments
+    </hx-tab>
+    <hx-tab-panel name="summary">
+      <p>Document summary content.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="details">
+      <p>Detailed document content.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="attachments">
+      <p>No attachments uploaded.</p>
+    </hx-tab-panel>
+  </hx-tabs>
+</ComponentDemo>
+
+### With Disabled Tab
+
+<ComponentDemo title="Disabled Tab">
+  <hx-tabs label="Report sections">
+    <hx-tab slot="tab" panel="report-a">
+      Report A
+    </hx-tab>
+    <hx-tab slot="tab" panel="report-b" disabled>
+      Report B (restricted)
+    </hx-tab>
+    <hx-tab slot="tab" panel="report-c">
+      Report C
+    </hx-tab>
+    <hx-tab-panel name="report-a">
+      <p>Report A data is available for review.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="report-b">
+      <p>Report B content (not reachable when disabled).</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="report-c">
+      <p>Report C data is available for review.</p>
+    </hx-tab-panel>
+  </hx-tabs>
+</ComponentDemo>
+
+### With Icons (Prefix/Suffix Slots)
+
+<ComponentDemo title="Tabs with Icons">
+  <hx-tabs label="Workflow steps">
+    <hx-tab slot="tab" panel="intake">
+      <span slot="prefix">🏥</span>
+      Intake
+    </hx-tab>
+    <hx-tab slot="tab" panel="triage">
+      <span slot="prefix">📋</span>
+      Triage
+      <hx-badge slot="suffix" variant="danger">
+        3
+      </hx-badge>
+    </hx-tab>
+    <hx-tab slot="tab" panel="discharge">
+      <span slot="prefix">✓</span>
+      Discharge
+    </hx-tab>
+    <hx-tab-panel name="intake">
+      <p>Intake form and patient registration.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="triage">
+      <p>3 patients awaiting triage assessment.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="discharge">
+      <p>Discharge instructions and follow-up scheduling.</p>
+    </hx-tab-panel>
+  </hx-tabs>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only the tabs components (tree-shaking friendly)
+import '@helix/library/components/hx-tabs';
+```
+
+## Basic Usage
+
+```html
+<hx-tabs label="Patient record sections">
+  <hx-tab slot="tab" panel="overview">Overview</hx-tab>
+  <hx-tab slot="tab" panel="medications">Medications</hx-tab>
+  <hx-tab slot="tab" panel="history">History</hx-tab>
+
+  <hx-tab-panel name="overview">
+    <p>Overview content here.</p>
+  </hx-tab-panel>
+  <hx-tab-panel name="medications">
+    <p>Medications content here.</p>
+  </hx-tab-panel>
+  <hx-tab-panel name="history">
+    <p>History content here.</p>
+  </hx-tab-panel>
+</hx-tabs>
+```
+
+The `panel` attribute on `<hx-tab>` must match the `name` attribute on the corresponding `<hx-tab-panel>`. If no match is found, tabs and panels are paired by index order.
+
+## Properties
+
+### hx-tabs
+
+| Property        | Attribute     | Type                         | Default        | Description                                                                                                                          |
+| --------------- | ------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `orientation`   | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout orientation of the tablist. Horizontal renders tabs along the top; vertical renders them along the side.                      |
+| `activation`    | `activation`  | `'automatic' \| 'manual'`    | `'automatic'`  | Keyboard activation mode. `'automatic'` activates a tab on arrow-key focus; `'manual'` requires Enter or Space to confirm selection. |
+| `label`         | `label`       | `string`                     | `''`           | Accessible label for the tablist (`aria-label`). Provide a brief description of the tab group (e.g., `"Patient record sections"`).   |
+| `selectedIndex` | —             | `number`                     | —              | Gets or sets the zero-based index of the currently selected tab. Setting this programmatically activates the tab at the given index. |
+
+### hx-tab
+
+| Property   | Attribute  | Type      | Default | Description                                                                                                       |
+| ---------- | ---------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `panel`    | `panel`    | `string`  | `''`    | The `name` of the `<hx-tab-panel>` this tab controls. Must match the `name` attribute on the corresponding panel. |
+| `selected` | `selected` | `boolean` | `false` | Whether this tab is currently selected. Managed by the parent `<hx-tabs>`; avoid setting manually.                |
+| `disabled` | `disabled` | `boolean` | `false` | Prevents the tab from being selected or reached via keyboard navigation.                                          |
+
+### hx-tab-panel
+
+| Property | Attribute | Type     | Default | Description                                                                                                                    |
+| -------- | --------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `name`   | `name`    | `string` | `''`    | The name that corresponds to the `panel` attribute on the associated `<hx-tab>`. Must be unique within a `<hx-tabs>` instance. |
+
+## Events
+
+`hx-tabs` dispatches the following event:
+
+| Event           | Detail Type                        | Description                                                                                                             |
+| --------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `hx-tab-change` | `{ tabId: string, index: number }` | Fired when the active tab changes. `tabId` is the `id` of the activated `<hx-tab>`; `index` is its zero-based position. |
+
+```js
+document.querySelector('hx-tabs').addEventListener('hx-tab-change', (e) => {
+  console.log('Tab changed to index:', e.detail.index);
+  console.log('Tab element id:', e.detail.tabId);
+});
+```
+
+## CSS Custom Properties
+
+### hx-tabs
+
+| Property                           | Default                                | Description                                   |
+| ---------------------------------- | -------------------------------------- | --------------------------------------------- |
+| `--hx-tabs-border-color`           | `var(--hx-color-neutral-200, #e9ecef)` | Tablist border color.                         |
+| `--hx-tabs-border-width`           | `1px`                                  | Tablist border width.                         |
+| `--hx-tabs-vertical-width`         | `12rem`                                | Width of the tablist in vertical orientation. |
+| `--hx-tabs-gap`                    | `0`                                    | Gap between the tablist and panels container. |
+| `--hx-tabs-tab-color`              | `var(--hx-color-neutral-600, #495057)` | Inactive tab text color.                      |
+| `--hx-tabs-tab-active-color`       | `var(--hx-color-primary-600, #1d4ed8)` | Active tab text color.                        |
+| `--hx-tabs-tab-hover-color`        | `var(--hx-color-neutral-800, #212529)` | Tab hover text color.                         |
+| `--hx-tabs-tab-hover-bg`           | `var(--hx-color-neutral-50, #f8f9fa)`  | Tab hover background color.                   |
+| `--hx-tabs-tab-font-size`          | `var(--hx-font-size-md, 1rem)`         | Tab label font size.                          |
+| `--hx-tabs-tab-font-weight`        | `var(--hx-font-weight-medium, 500)`    | Inactive tab font weight.                     |
+| `--hx-tabs-tab-active-font-weight` | `var(--hx-font-weight-semibold, 600)`  | Active tab font weight.                       |
+| `--hx-tabs-tab-padding-x`          | `var(--hx-space-4, 1rem)`              | Horizontal padding inside each tab.           |
+| `--hx-tabs-tab-padding-y`          | `var(--hx-space-2, 0.5rem)`            | Vertical padding inside each tab.             |
+| `--hx-tabs-indicator-color`        | `var(--hx-color-primary-500, #2563eb)` | Active selection indicator color.             |
+| `--hx-tabs-indicator-size`         | `2px`                                  | Active selection indicator thickness.         |
+| `--hx-tabs-focus-ring-color`       | `var(--hx-focus-ring-color, #2563eb)`  | Focus ring color for tabs and panels.         |
+| `--hx-tabs-panel-padding`          | `var(--hx-space-4, 1rem)`              | Inner padding of each panel.                  |
+| `--hx-tabs-panel-color`            | `var(--hx-color-neutral-700, #343a40)` | Panel text color.                             |
+
+## CSS Parts
+
+### hx-tabs
+
+| Part      | Description                                                     |
+| --------- | --------------------------------------------------------------- |
+| `tablist` | The `<div role="tablist">` container wrapping all tab triggers. |
+| `panels`  | The `<div>` container wrapping all `<hx-tab-panel>` elements.   |
+
+### hx-tab
+
+| Part     | Description                                                             |
+| -------- | ----------------------------------------------------------------------- |
+| `tab`    | The underlying `<button role="tab">` element.                           |
+| `prefix` | The `<span>` container for content in the `prefix` slot (e.g., icons).  |
+| `suffix` | The `<span>` container for content in the `suffix` slot (e.g., badges). |
+
+### hx-tab-panel
+
+| Part    | Description                                   |
+| ------- | --------------------------------------------- |
+| `panel` | The `<div>` content wrapper inside the panel. |
+
+## Slots
+
+### hx-tabs
+
+| Slot        | Description                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| `tab`       | Named slot for `<hx-tab>` elements. All tab triggers must be assigned to this slot.                   |
+| _(default)_ | Default slot for `<hx-tab-panel>` elements. Panel order should match the tab order for index pairing. |
+
+### hx-tab
+
+| Slot        | Description                                            |
+| ----------- | ------------------------------------------------------ |
+| _(default)_ | The tab label text or content.                         |
+| `prefix`    | Icon or element rendered before the label text.        |
+| `suffix`    | Icon, badge, or element rendered after the label text. |
+
+### hx-tab-panel
+
+| Slot        | Description                                                      |
+| ----------- | ---------------------------------------------------------------- |
+| _(default)_ | The panel's content, shown when the corresponding tab is active. |
+
+## Accessibility
+
+`hx-tabs` implements the [WAI-ARIA Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) (APG). All ARIA roles, states, and properties are managed automatically by the container.
+
+| Topic                 | Details                                                                                                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA roles            | `role="tablist"` on the tablist container; `role="tab"` on each `<button>` inside `<hx-tab>`; `role="tabpanel"` on each `<hx-tab-panel>` host.                 |
+| `aria-selected`       | Set to `'true'` on the active tab's inner button; `'false'` on all others.                                                                                     |
+| `aria-controls`       | Set on the `role="tab"` button to reference the `id` of the corresponding `<hx-tab-panel>`.                                                                    |
+| `aria-labelledby`     | Set on each `<hx-tab-panel>` to reference the `id` of its corresponding `<hx-tab>`, providing an accessible panel label.                                       |
+| `aria-orientation`    | Set to `'horizontal'` or `'vertical'` on the tablist to communicate layout direction to screen readers.                                                        |
+| `aria-label`          | Set on the tablist via the `label` attribute. Always provide a meaningful label (e.g., `"Patient record sections"`).                                           |
+| `aria-disabled`       | Set to `'true'` on the inner button of disabled tabs. The disabled tab remains visually present and announced to screen readers.                               |
+| Roving tabindex       | Only the active tab receives `tabindex="0"`; all others are `tabindex="-1"`. Arrow keys move focus between tabs without leaving the tablist.                   |
+| Keyboard — tabs       | `ArrowRight` / `ArrowLeft` (horizontal) or `ArrowDown` / `ArrowUp` (vertical) move focus; `Home` jumps to first tab; `End` jumps to last tab.                  |
+| Keyboard — activation | In `automatic` mode (default), arrow-key focus immediately activates the tab. In `manual` mode, press `Enter` or `Space` to activate the focused tab.          |
+| Keyboard — panels     | `Tab` moves focus into the active panel; `Shift+Tab` returns focus to the active tab.                                                                          |
+| Hidden panels         | Inactive panels have `hidden` set and `tabindex="-1"`, removing them from the accessibility tree and tab order until activated.                                |
+| Focus ring            | Both tabs and focused panels display a visible focus ring meeting WCAG 2.1 AA minimum contrast. Customizable via `--hx-tabs-focus-ring-color`.                 |
+| Reduced motion        | CSS transitions on tab button state changes are suppressed when `prefers-reduced-motion: reduce` is set.                                                       |
+| WCAG                  | Meets WCAG 2.1 AA. Focus indicators are visible; color is not the sole conveyor of active state (font weight and indicator border also communicate selection). |
+
+### Healthcare A11y Notes
+
+In healthcare applications, always provide a meaningful `label` attribute describing the content domain (e.g., `"Patient Smith chart sections"`, not just `"Tabs"`). This ensures screen reader users navigating multiple tab groups on a complex clinical page can distinguish between them.
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/patient-record-tabs.html.twig #}
+<hx-tabs
+  label="{{ tabs_label|default('Record sections') }}"
+  orientation="{{ orientation|default('horizontal') }}"
+  activation="{{ activation|default('automatic') }}"
+>
+  {% for tab in tabs %}
+    <hx-tab
+      slot="tab"
+      panel="{{ tab.panel_name }}"
+      {% if tab.disabled %}disabled{% endif %}
+    >
+      {{ tab.label }}
+    </hx-tab>
+  {% endfor %}
+
+  {% for panel in panels %}
+    <hx-tab-panel name="{{ panel.name }}">
+      {{ panel.content|raw }}
+    </hx-tab-panel>
+  {% endfor %}
+</hx-tabs>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for tab changes in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixTabs = {
+  attach(context) {
+    // once() is a Drupal core utility — prevents duplicate event binding during AJAX attach cycles
+    once('helixTabs', 'hx-tabs', context).forEach((el) => {
+      el.addEventListener('hx-tab-change', (e) => {
+        console.log('Active tab changed:', e.detail.tabId, 'at index', e.detail.index);
+        // Example: update URL hash to preserve selected tab on reload
+        history.replaceState(null, '', `#${e.detail.tabId}`);
+      });
+    });
+  },
+};
+```
+
+## Programmatic Control
+
+```js
+const tabs = document.querySelector('hx-tabs');
+
+// Get the currently active tab index (zero-based)
+console.log(tabs.selectedIndex); // e.g., 0
+
+// Programmatically activate the second tab
+tabs.selectedIndex = 1;
+
+// Listen for changes
+tabs.addEventListener('hx-tab-change', (e) => {
+  console.log('Changed to:', e.detail.index, e.detail.tabId);
+});
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-tabs example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto;">
+    <h1>Patient Record</h1>
+
+    <hx-tabs id="patient-tabs" label="Patient record sections">
+      <hx-tab slot="tab" panel="overview">Overview</hx-tab>
+      <hx-tab slot="tab" panel="medications">Medications</hx-tab>
+      <hx-tab slot="tab" panel="history">History</hx-tab>
+      <hx-tab slot="tab" panel="notes" disabled>Notes (locked)</hx-tab>
+
+      <hx-tab-panel name="overview">
+        <h2>Patient Overview</h2>
+        <p>Jane Doe, DOB: 1975-04-12. Primary care provider: Dr. Smith.</p>
+      </hx-tab-panel>
+
+      <hx-tab-panel name="medications">
+        <h2>Current Medications</h2>
+        <ul>
+          <li>Lisinopril 10mg — once daily</li>
+          <li>Metformin 500mg — twice daily</li>
+          <li>Atorvastatin 20mg — at bedtime</li>
+        </ul>
+      </hx-tab-panel>
+
+      <hx-tab-panel name="history">
+        <h2>Medical History</h2>
+        <p>Hypertension (2021), Type 2 Diabetes (2020), Appendectomy (2018).</p>
+      </hx-tab-panel>
+
+      <hx-tab-panel name="notes">
+        <h2>Clinical Notes</h2>
+        <p>Access restricted — contact your administrator.</p>
+      </hx-tab-panel>
+    </hx-tabs>
+
+    <script>
+      const tabs = document.getElementById('patient-tabs');
+
+      tabs.addEventListener('hx-tab-change', (e) => {
+        console.log('Tab changed to index:', e.detail.index, '— id:', e.detail.tabId);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-tabs" section="api" />
+
+<ComponentDoc tagName="hx-tab" section="api" />
+
+<ComponentDoc tagName="hx-tab-panel" section="api" />

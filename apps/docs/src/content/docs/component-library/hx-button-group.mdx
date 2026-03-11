@@ -1,0 +1,256 @@
+---
+title: 'hx-button-group'
+description: Groups related hx-button elements into a cohesive horizontal or vertical action set with shared borders and unified styling.
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-button-group" section="summary" />
+
+## Overview
+
+`hx-button-group` is a container component that wraps related `hx-button` elements into a visually unified horizontal or vertical action set. It eliminates double borders between adjacent buttons and adjusts inner border-radius to produce a cohesive group appearance.
+
+**Use `hx-button-group` when:** you have two or more closely related actions (Save / Cancel, Bold / Italic / Underline, Day / Week / Month) that should appear as a single visual unit.
+**Use standalone `hx-button` elements instead when:** actions are independent and do not benefit from visual grouping.
+
+## Live Demo
+
+### Horizontal Group (Default)
+
+The default horizontal layout for form action buttons.
+
+<ComponentDemo title="Horizontal Button Group">
+  <hx-button-group>
+    <hx-button variant="secondary">Save</hx-button>
+    <hx-button variant="secondary">Cancel</hx-button>
+    <hx-button variant="secondary">Reset</hx-button>
+  </hx-button-group>
+</ComponentDemo>
+
+### Vertical Group
+
+Stack buttons vertically with `orientation="vertical"`.
+
+<ComponentDemo title="Vertical Button Group">
+  <hx-button-group orientation="vertical">
+    <hx-button variant="secondary">Top Action</hx-button>
+    <hx-button variant="secondary">Middle Action</hx-button>
+    <hx-button variant="secondary">Bottom Action</hx-button>
+  </hx-button-group>
+</ComponentDemo>
+
+### Sizes
+
+Three sizes — `sm`, `md` (default), and `lg` — cascade to child buttons via the `--hx-button-group-size` CSS custom property.
+
+<ComponentDemo title="Button Group Sizes">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <hx-button-group hx-size="sm">
+      <hx-button variant="secondary" hx-size="sm">
+        Edit
+      </hx-button>
+      <hx-button variant="secondary" hx-size="sm">
+        Copy
+      </hx-button>
+      <hx-button variant="secondary" hx-size="sm">
+        Delete
+      </hx-button>
+    </hx-button-group>
+    <hx-button-group hx-size="md">
+      <hx-button variant="secondary" hx-size="md">
+        Edit
+      </hx-button>
+      <hx-button variant="secondary" hx-size="md">
+        Copy
+      </hx-button>
+      <hx-button variant="secondary" hx-size="md">
+        Delete
+      </hx-button>
+    </hx-button-group>
+    <hx-button-group hx-size="lg">
+      <hx-button variant="secondary" hx-size="lg">
+        Edit
+      </hx-button>
+      <hx-button variant="secondary" hx-size="lg">
+        Copy
+      </hx-button>
+      <hx-button variant="secondary" hx-size="lg">
+        Delete
+      </hx-button>
+    </hx-button-group>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Patient Record Actions
+
+A real-world healthcare UI pattern using `aria-label` on each group for screen reader context.
+
+<ComponentDemo title="Patient Record Actions">
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+    <hx-button-group aria-label="Chart view controls">
+      <hx-button variant="secondary" hx-size="sm">
+        Summary
+      </hx-button>
+      <hx-button variant="secondary" hx-size="sm">
+        Labs
+      </hx-button>
+      <hx-button variant="secondary" hx-size="sm">
+        Imaging
+      </hx-button>
+      <hx-button variant="secondary" hx-size="sm">
+        Notes
+      </hx-button>
+    </hx-button-group>
+    <hx-button-group aria-label="Record actions">
+      <hx-button variant="primary" hx-size="sm">
+        Save
+      </hx-button>
+      <hx-button variant="secondary" hx-size="sm">
+        Print
+      </hx-button>
+      <hx-button variant="ghost" hx-size="sm">
+        Discard
+      </hx-button>
+    </hx-button-group>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+Install the full library or import the component individually:
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-button-group';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<hx-button-group>
+  <hx-button variant="secondary">Save</hx-button>
+  <hx-button variant="secondary">Cancel</hx-button>
+</hx-button-group>
+```
+
+## Properties
+
+| Property      | Attribute     | Type                         | Default        | Description                                                                                                                    |
+| ------------- | ------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the button group.                                                                                          |
+| `size`        | `hx-size`     | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size cascaded to child buttons via `--hx-button-group-size`. Set the matching `hx-size` on each child button for consistency.  |
+| `label`       | `label`       | `string`                     | `''`           | Accessible label set via `ElementInternals.ariaLabel`. Prefer `aria-label` as an HTML attribute for Drupal/Twig compatibility. |
+
+## Events
+
+`hx-button-group` does not dispatch any custom events. Listen for events on the individual `hx-button` children.
+
+## CSS Custom Properties
+
+| Property                 | Default | Description                                                                            |
+| ------------------------ | ------- | -------------------------------------------------------------------------------------- |
+| `--hx-button-group-size` | `md`    | Size token forwarded to child buttons. Set automatically from the `hx-size` attribute. |
+
+## CSS Parts
+
+| Part    | Description                                         |
+| ------- | --------------------------------------------------- |
+| `group` | The container `<div>` wrapping all slotted buttons. |
+
+## Slots
+
+| Slot        | Description                                                             |
+| ----------- | ----------------------------------------------------------------------- |
+| _(default)_ | Accepts `hx-button` children. Expects at least one `hx-button` element. |
+
+## Accessibility
+
+| Topic          | Details                                                                                                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role      | `group` — applied via `ElementInternals.role` (no DOM attribute on the host element).                                                                                                             |
+| `aria-label`   | Set via `ElementInternals.ariaLabel` when the `label` property is provided. For Drupal/Twig usage, apply `aria-label` directly as an HTML attribute — it takes precedence and works the same way. |
+| Keyboard       | No custom keyboard handling. Each `hx-button` child handles its own `Tab`, `Enter`, and `Space` interactions natively.                                                                            |
+| Screen reader  | The group role announces the group boundary to screen readers. Provide a meaningful `aria-label` whenever the group purpose is not obvious from surrounding context.                              |
+| Focus          | Focused child buttons are raised above siblings (`z-index: 1`) so the full focus ring is visible even when buttons share a border.                                                                |
+| Reduced motion | Transitions on slotted children are suppressed when `prefers-reduced-motion: reduce` is active.                                                                                                   |
+| WCAG           | Meets WCAG 2.1 AA. Verified with axe-core: zero violations across horizontal, vertical, and labeled group variants.                                                                               |
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library:
+
+```twig
+{# my-module/templates/button-group.html.twig #}
+<hx-button-group
+  orientation="{{ orientation|default('horizontal') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if label %}aria-label="{{ label }}"{% endif %}
+>
+  <hx-button variant="primary" type="submit">{{ 'Save'|t }}</hx-button>
+  <hx-button variant="secondary" type="button">{{ 'Cancel'|t }}</hx-button>
+  <hx-button variant="ghost" type="reset">{{ 'Reset'|t }}</hx-button>
+</hx-button-group>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-button-group example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;"
+  >
+    <!-- Horizontal group — form actions -->
+    <hx-button-group aria-label="Form actions">
+      <hx-button variant="primary" type="submit">Save</hx-button>
+      <hx-button variant="secondary" type="button">Cancel</hx-button>
+      <hx-button variant="ghost" type="reset">Reset</hx-button>
+    </hx-button-group>
+
+    <!-- Vertical group -->
+    <hx-button-group orientation="vertical" aria-label="Navigation options">
+      <hx-button variant="secondary">Summary</hx-button>
+      <hx-button variant="secondary">Labs</hx-button>
+      <hx-button variant="secondary">Imaging</hx-button>
+    </hx-button-group>
+
+    <!-- Small size group -->
+    <hx-button-group hx-size="sm" aria-label="View controls">
+      <hx-button variant="secondary" hx-size="sm">Day</hx-button>
+      <hx-button variant="secondary" hx-size="sm">Week</hx-button>
+      <hx-button variant="secondary" hx-size="sm">Month</hx-button>
+    </hx-button-group>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-button-group" section="api" />

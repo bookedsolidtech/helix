@@ -1,0 +1,806 @@
+---
+title: 'hx-dropdown'
+description: 'Button-triggered floating dropdown menu with full keyboard navigation following the APG Menu Button pattern.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-dropdown" section="summary" />
+
+## Overview
+
+`hx-dropdown` is a button-triggered floating panel that presents a menu of actions or options. It implements the [APG Menu Button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/), providing a fully accessible keyboard-navigable menu anchored to a trigger element. The panel floats above surrounding content using configurable placement and automatically closes on outside click, Escape key, or item selection.
+
+**Use `hx-dropdown` when:**
+
+- You need a compact action menu attached to a button (e.g., "Actions ▾" on a patient record)
+- You need a context menu for row-level actions in a data table (edit, archive, delete)
+- You need an overflow menu for toolbar commands that don't fit inline
+- You need a clinical workflow shortcut menu (order labs, create referral, discharge)
+
+**Do not use** `hx-dropdown` when you need a select input for form data — use `hx-select` instead. Do not use it for navigation links that persist in a sidebar — use `hx-nav` instead. Do not use it when the options list is long enough to benefit from search or filtering.
+
+## Live Demo
+
+### Default
+
+A basic dropdown with three action items triggered by a button.
+
+<ComponentDemo title="Default">
+  <hx-dropdown>
+    <button
+      slot="trigger"
+      type="button"
+      style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer; font-size: 0.875rem;"
+    >
+      Actions ▾
+    </button>
+    <ul
+      role="menu"
+      aria-label="Actions"
+      style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 160px;"
+    >
+      <li
+        data-value="edit"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+      >
+        Edit
+      </li>
+      <li
+        data-value="duplicate"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+      >
+        Duplicate
+      </li>
+      <li
+        data-value="delete"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #dc2626;"
+      >
+        Delete
+      </li>
+    </ul>
+  </hx-dropdown>
+</ComponentDemo>
+
+### Icon Trigger
+
+An icon button (⋯) as the trigger with `placement="bottom-end"` so the panel aligns to the right edge of the trigger.
+
+<ComponentDemo title="Icon Trigger">
+  <hx-dropdown placement="bottom-end">
+    <button
+      slot="trigger"
+      type="button"
+      aria-label="More options"
+      style="padding: 0.375rem 0.625rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer; font-size: 1rem; line-height: 1;"
+    >
+      ⋯
+    </button>
+    <ul
+      role="menu"
+      aria-label="More options"
+      style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 160px;"
+    >
+      <li
+        data-value="view"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+      >
+        View details
+      </li>
+      <li
+        data-value="edit"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+      >
+        Edit
+      </li>
+      <li
+        data-value="archive"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+      >
+        Archive
+      </li>
+      <li
+        data-value="delete"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #dc2626;"
+      >
+        Delete
+      </li>
+    </ul>
+  </hx-dropdown>
+</ComponentDemo>
+
+### Disabled
+
+The `disabled` attribute prevents the dropdown from opening. The trigger should also carry `disabled` to communicate the state visually and to assistive technology.
+
+<ComponentDemo title="Disabled">
+  <hx-dropdown disabled>
+    <button
+      slot="trigger"
+      type="button"
+      disabled
+      style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #f9fafb; cursor: not-allowed; font-size: 0.875rem; color: #9ca3af;"
+    >
+      Actions ▾
+    </button>
+    <ul
+      role="menu"
+      aria-label="Actions"
+      style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 160px;"
+    >
+      <li
+        data-value="edit"
+        role="menuitem"
+        tabindex="-1"
+        style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #111827;"
+      >
+        Edit
+      </li>
+    </ul>
+  </hx-dropdown>
+</ComponentDemo>
+
+### Placement Variants
+
+The `placement` attribute controls which side of the trigger the panel appears on. `bottom-start` (default) aligns the panel's left edge to the trigger; `bottom-end` aligns the panel's right edge.
+
+<ComponentDemo title="Placement Variants">
+  <div style="display: flex; gap: 1rem; align-items: flex-start; padding: 0.5rem;">
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280;">bottom-start (default)</p>
+      <hx-dropdown placement="bottom-start">
+        <button
+          slot="trigger"
+          type="button"
+          style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer; font-size: 0.875rem;"
+        >
+          Open ▾
+        </button>
+        <ul
+          role="menu"
+          aria-label="Bottom start menu"
+          style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 160px;"
+        >
+          <li
+            data-value="one"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Option one
+          </li>
+          <li
+            data-value="two"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Option two
+          </li>
+        </ul>
+      </hx-dropdown>
+    </div>
+    <div>
+      <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280;">bottom-end</p>
+      <hx-dropdown placement="bottom-end">
+        <button
+          slot="trigger"
+          type="button"
+          style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer; font-size: 0.875rem;"
+        >
+          Open ▾
+        </button>
+        <ul
+          role="menu"
+          aria-label="Bottom end menu"
+          style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 160px;"
+        >
+          <li
+            data-value="one"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Option one
+          </li>
+          <li
+            data-value="two"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Option two
+          </li>
+        </ul>
+      </hx-dropdown>
+    </div>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Patient Actions
+
+A clinical action menu on a patient record card. High-risk actions such as "Discharge Patient" are styled in red to communicate severity.
+
+<ComponentDemo title="Patient Actions">
+  <div style="padding: 1rem; max-width: 480px; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-family: sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <div>
+        <p style="margin: 0; font-weight: 600; color: #111827;">Jane Doe</p>
+        <p style="margin: 0; font-size: 0.75rem; color: #6b7280;">
+          MRN: 885521 · Room 214-B · Dr. Patel
+        </p>
+      </div>
+      <hx-dropdown placement="bottom-end">
+        <button
+          slot="trigger"
+          type="button"
+          style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer; font-size: 0.875rem;"
+        >
+          Actions ▾
+        </button>
+        <ul
+          role="menu"
+          aria-label="Patient actions"
+          style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;"
+        >
+          <li
+            data-value="schedule"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Schedule Appointment
+          </li>
+          <li
+            data-value="note"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Add Clinical Note
+          </li>
+          <li
+            data-value="labs"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Order Labs
+          </li>
+          <li
+            data-value="referral"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+          >
+            Create Referral
+          </li>
+          <li role="separator" style="height: 1px; background: #e5e7eb; margin: 0.25rem 0;"></li>
+          <li
+            data-value="discharge"
+            role="menuitem"
+            tabindex="-1"
+            style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #dc2626; font-weight: 500;"
+          >
+            Discharge Patient
+          </li>
+        </ul>
+      </hx-dropdown>
+    </div>
+    <p style="margin: 0; font-size: 0.875rem; color: #374151;">
+      Admitted: 2026-03-07 · Diagnosis: T2DM management
+    </p>
+  </div>
+</ComponentDemo>
+
+### Healthcare: Order Context Menu
+
+A context menu on a lab order row, providing row-level actions without cluttering the table layout.
+
+<ComponentDemo title="Order Context Menu">
+  <div style="padding: 1rem; max-width: 560px; font-family: sans-serif;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid #e5e7eb;">
+          <th style="text-align: left; padding: 0.5rem 0.75rem; color: #374151; font-weight: 600;">
+            Order
+          </th>
+          <th style="text-align: left; padding: 0.5rem 0.75rem; color: #374151; font-weight: 600;">
+            Status
+          </th>
+          <th style="text-align: left; padding: 0.5rem 0.75rem; color: #374151; font-weight: 600;">
+            Ordered by
+          </th>
+          <th style="padding: 0.5rem 0.75rem;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #f3f4f6;">
+          <td style="padding: 0.5rem 0.75rem; color: #111827;">HbA1c</td>
+          <td style="padding: 0.5rem 0.75rem;">
+            <span style="background: #fef3c7; color: #92400e; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem;">
+              Pending
+            </span>
+          </td>
+          <td style="padding: 0.5rem 0.75rem; color: #374151;">Dr. Patel</td>
+          <td style="padding: 0.5rem 0.75rem; text-align: right;">
+            <hx-dropdown placement="bottom-end">
+              <button
+                slot="trigger"
+                type="button"
+                aria-label="HbA1c order options"
+                style="padding: 0.25rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; background: #ffffff; cursor: pointer; font-size: 0.875rem; line-height: 1;"
+              >
+                ⋯
+              </button>
+              <ul
+                role="menu"
+                aria-label="HbA1c order options"
+                style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 180px;"
+              >
+                <li
+                  data-value="view"
+                  role="menuitem"
+                  tabindex="-1"
+                  style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+                >
+                  View order details
+                </li>
+                <li
+                  data-value="results"
+                  role="menuitem"
+                  tabindex="-1"
+                  style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+                >
+                  Enter results
+                </li>
+                <li
+                  data-value="cancel"
+                  role="menuitem"
+                  tabindex="-1"
+                  style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #dc2626;"
+                >
+                  Cancel order
+                </li>
+              </ul>
+            </hx-dropdown>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0.5rem 0.75rem; color: #111827;">Basic Metabolic Panel</td>
+          <td style="padding: 0.5rem 0.75rem;">
+            <span style="background: #d1fae5; color: #065f46; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem;">
+              Complete
+            </span>
+          </td>
+          <td style="padding: 0.5rem 0.75rem; color: #374151;">Dr. Patel</td>
+          <td style="padding: 0.5rem 0.75rem; text-align: right;">
+            <hx-dropdown placement="bottom-end">
+              <button
+                slot="trigger"
+                type="button"
+                aria-label="Basic Metabolic Panel options"
+                style="padding: 0.25rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.25rem; background: #ffffff; cursor: pointer; font-size: 0.875rem; line-height: 1;"
+              >
+                ⋯
+              </button>
+              <ul
+                role="menu"
+                aria-label="Basic Metabolic Panel options"
+                style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 180px;"
+              >
+                <li
+                  data-value="view"
+                  role="menuitem"
+                  tabindex="-1"
+                  style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+                >
+                  View order details
+                </li>
+                <li
+                  data-value="results"
+                  role="menuitem"
+                  tabindex="-1"
+                  style="padding: 0.5rem 1rem; cursor: pointer; font-size: 0.875rem; color: #111827;"
+                >
+                  View results
+                </li>
+              </ul>
+            </hx-dropdown>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-dropdown';
+```
+
+## Basic Usage
+
+```html
+<!-- Basic button trigger -->
+<hx-dropdown>
+  <button slot="trigger" type="button">Open Menu</button>
+  <ul role="menu" aria-label="Actions">
+    <li data-value="edit" role="menuitem" tabindex="-1">Edit</li>
+    <li data-value="duplicate" role="menuitem" tabindex="-1">Duplicate</li>
+    <li data-value="delete" role="menuitem" tabindex="-1">Delete</li>
+  </ul>
+</hx-dropdown>
+
+<!-- Disabled state -->
+<hx-dropdown disabled>
+  <button slot="trigger" type="button" disabled>Menu</button>
+  <ul role="menu" aria-label="Actions">
+    <li data-value="edit" role="menuitem" tabindex="-1">Edit</li>
+  </ul>
+</hx-dropdown>
+
+<!-- Custom placement — panel aligns to trigger's right edge -->
+<hx-dropdown placement="bottom-end">
+  <button slot="trigger" type="button" aria-label="More options">⋯</button>
+  <ul role="menu" aria-label="More options">
+    <li data-value="view" role="menuitem" tabindex="-1">View</li>
+    <li data-value="edit" role="menuitem" tabindex="-1">Edit</li>
+    <li data-value="delete" role="menuitem" tabindex="-1">Delete</li>
+  </ul>
+</hx-dropdown>
+
+<!-- Custom gap between trigger and panel -->
+<hx-dropdown distance="8">
+  <button slot="trigger" type="button">Open</button>
+  <ul role="menu" aria-label="Options">
+    <li data-value="one" role="menuitem" tabindex="-1">Option one</li>
+    <li data-value="two" role="menuitem" tabindex="-1">Option two</li>
+  </ul>
+</hx-dropdown>
+```
+
+Listen for selection events:
+
+```js
+const dropdown = document.querySelector('hx-dropdown');
+
+dropdown.addEventListener('hx-select', (event) => {
+  const { value, label } = event.detail;
+  console.log(`Selected: ${label} (${value})`);
+});
+
+dropdown.addEventListener('hx-show', () => console.log('Dropdown opened'));
+dropdown.addEventListener('hx-hide', () => console.log('Dropdown closed'));
+```
+
+## Properties
+
+| Property    | Attribute   | Type                                                                                                  | Default          | Description                                               |
+| ----------- | ----------- | ----------------------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------- |
+| `open`      | `open`      | `boolean`                                                                                             | `false`          | Whether the dropdown panel is open.                       |
+| `placement` | `placement` | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'start' \| 'end'` | `'bottom-start'` | Preferred placement of the panel relative to the trigger. |
+| `disabled`  | `disabled`  | `boolean`                                                                                             | `false`          | Whether the dropdown is disabled. Prevents opening.       |
+| `distance`  | `distance`  | `number`                                                                                              | `4`              | Gap in pixels between the trigger and the panel.          |
+
+## Events
+
+| Event       | Detail                                     | Description                         |
+| ----------- | ------------------------------------------ | ----------------------------------- |
+| `hx-show`   | `void`                                     | Fired when the dropdown opens.      |
+| `hx-hide`   | `void`                                     | Fired when the dropdown closes.     |
+| `hx-select` | `{ value: string \| null; label: string }` | Fired when a menu item is selected. |
+
+`hx-select` detail fields:
+
+- `value` — the `data-value` attribute of the selected `[role="menuitem"]`, or `null` if the attribute is absent
+- `label` — the trimmed `textContent` of the selected item
+
+## CSS Parts
+
+| Part      | Description                  |
+| --------- | ---------------------------- |
+| `trigger` | The trigger wrapper element. |
+| `panel`   | The floating panel element.  |
+
+## CSS Custom Properties
+
+| Property                            | Default                              | Description             |
+| ----------------------------------- | ------------------------------------ | ----------------------- |
+| `--hx-dropdown-panel-bg`            | `var(--hx-color-neutral-0, #ffffff)` | Panel background color. |
+| `--hx-dropdown-panel-border-color`  | `var(--hx-color-neutral-200)`        | Panel border color.     |
+| `--hx-dropdown-panel-border-radius` | `var(--hx-border-radius-md)`         | Panel border radius.    |
+| `--hx-dropdown-panel-shadow`        | `0 4px 16px rgba(0,0,0,0.12)`        | Panel box shadow.       |
+| `--hx-dropdown-panel-z-index`       | `1000`                               | Panel z-index.          |
+| `--hx-dropdown-panel-min-width`     | `160px`                              | Panel minimum width.    |
+
+Override tokens to match your theme:
+
+```css
+hx-dropdown {
+  --hx-dropdown-panel-bg: var(--hx-color-surface-overlay);
+  --hx-dropdown-panel-border-color: var(--hx-color-neutral-300);
+  --hx-dropdown-panel-border-radius: var(--hx-border-radius-lg);
+  --hx-dropdown-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --hx-dropdown-panel-min-width: 200px;
+}
+```
+
+## Slots
+
+| Slot        | Description                                                                                                       |
+| ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| `trigger`   | The element that opens the dropdown (e.g., a button). Receives `aria-haspopup`, `aria-expanded`, `aria-controls`. |
+| _(default)_ | Dropdown panel content — typically a `<ul role="menu">` with `<li role="menuitem" tabindex="-1">` items.          |
+
+## Accessibility
+
+| Topic              | Details                                                                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pattern            | Implements the [APG Menu Button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/). The trigger carries `aria-haspopup="menu"`, `aria-expanded`, and `aria-controls`.           |
+| `aria-haspopup`    | Set to `"menu"` on the trigger element to communicate that activating it opens a menu to assistive technology.                                                                               |
+| `aria-expanded`    | Reflects the `open` state on the trigger. `"true"` when the panel is visible; `"false"` when collapsed.                                                                                      |
+| `aria-controls`    | Set on the trigger to point at the panel's `id`, establishing the programmatic relationship between trigger and panel.                                                                       |
+| Keyboard — trigger | `Enter` or `Space` toggles the panel open/closed. `ArrowDown` opens the panel and moves focus to the first item. `ArrowUp` opens the panel and moves focus to the last item.                 |
+| Keyboard — menu    | `ArrowDown` / `ArrowUp` cycle focus through `[role="menuitem"]` elements. `Home` focuses the first item. `End` focuses the last item. `Enter` or `Space` activates the focused item.         |
+| Keyboard — close   | `Escape` closes the panel and returns focus to the trigger. `Tab` closes the panel and advances focus naturally — focus does NOT return to the trigger on Tab.                               |
+| Outside click      | Clicking outside the component closes the panel without firing `hx-select`.                                                                                                                  |
+| Disabled state     | When `disabled` is set, the component does not open and `aria-disabled="true"` is applied to the trigger wrapper. The slotted trigger button should also carry its own `disabled` attribute. |
+| WCAG 2.1 AA        | Verified with axe-core: zero violations across default, icon trigger, disabled, and all placement variants.                                                                                  |
+
+## Drupal Integration
+
+```twig
+{# Basic action menu on a patient record #}
+<hx-dropdown placement="{{ placement|default('bottom-start') }}">
+  <button slot="trigger" type="button" class="btn btn-secondary">
+    {{ 'Actions'|t }} ▾
+  </button>
+  <ul role="menu" aria-label="{{ 'Patient actions'|t }}">
+    {% for action in patient_actions %}
+      <li
+        data-value="{{ action.value }}"
+        role="menuitem"
+        tabindex="-1"
+        {% if action.destructive %}style="color: var(--hx-color-danger-600);"{% endif %}
+      >
+        {{ action.label|t }}
+      </li>
+    {% endfor %}
+  </ul>
+</hx-dropdown>
+
+{# Context menu on a data table row — icon trigger, right-aligned panel #}
+<hx-dropdown placement="bottom-end">
+  <button slot="trigger" type="button" aria-label="{{ 'Row options'|t }}">⋯</button>
+  <ul role="menu" aria-label="{{ 'Row options'|t }}">
+    <li data-value="edit" role="menuitem" tabindex="-1">{{ 'Edit'|t }}</li>
+    <li data-value="archive" role="menuitem" tabindex="-1">{{ 'Archive'|t }}</li>
+    <li data-value="delete" role="menuitem" tabindex="-1" style="color: var(--hx-color-danger-600);">{{ 'Delete'|t }}</li>
+  </ul>
+</hx-dropdown>
+
+{# Disabled state when user lacks permission #}
+<hx-dropdown {% if not user_can_edit %}disabled{% endif %}>
+  <button slot="trigger" type="button" {% if not user_can_edit %}disabled{% endif %}>
+    {{ 'Actions'|t }} ▾
+  </button>
+  <ul role="menu" aria-label="{{ 'Actions'|t }}">
+    <li data-value="edit" role="menuitem" tabindex="-1">{{ 'Edit'|t }}</li>
+  </ul>
+</hx-dropdown>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Attach the library in a hook or template:
+
+```php
+// In a preprocess hook
+function mymodule_preprocess_node(&$variables) {
+  $variables['#attached']['library'][] = 'mymodule/helix-components';
+}
+```
+
+Listen for selection in a Drupal behavior:
+
+```js
+(function (Drupal) {
+  Drupal.behaviors.helixDropdown = {
+    attach(context) {
+      context.querySelectorAll('hx-dropdown').forEach((dropdown) => {
+        dropdown.addEventListener('hx-select', (event) => {
+          const { value, label } = event.detail;
+          // Route to Drupal AJAX command or form action
+          Drupal.ajax({ url: `/api/action/${value}` }).execute();
+        });
+      });
+    },
+  };
+})(Drupal);
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-dropdown example</title>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library/dist/helix.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+        max-width: 600px;
+      }
+
+      .demo-row {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+      }
+
+      button.trigger {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        background: #ffffff;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-family: inherit;
+      }
+
+      button.trigger:disabled {
+        background: #f9fafb;
+        color: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      ul[role='menu'] {
+        margin: 0;
+        padding: 0.25rem 0;
+        list-style: none;
+        min-width: 160px;
+      }
+
+      li[role='menuitem'] {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        color: #111827;
+      }
+
+      li[role='menuitem']:hover {
+        background: #f3f4f6;
+      }
+
+      li[role='menuitem'].danger {
+        color: #dc2626;
+      }
+
+      .output {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        color: #374151;
+        min-height: 2.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="font-size: 1.25rem; margin-bottom: 1.5rem;">hx-dropdown examples</h1>
+
+    <!-- Default -->
+    <h2 style="font-size: 1rem; margin-bottom: 0.5rem;">Default</h2>
+    <div class="demo-row">
+      <hx-dropdown id="demo-default">
+        <button slot="trigger" type="button" class="trigger">Actions ▾</button>
+        <ul role="menu" aria-label="Actions">
+          <li data-value="edit" role="menuitem" tabindex="-1">Edit</li>
+          <li data-value="duplicate" role="menuitem" tabindex="-1">Duplicate</li>
+          <li data-value="delete" role="menuitem" tabindex="-1" class="danger">Delete</li>
+        </ul>
+      </hx-dropdown>
+    </div>
+
+    <!-- Icon trigger, right-aligned -->
+    <h2 style="font-size: 1rem; margin-bottom: 0.5rem;">Icon trigger (bottom-end)</h2>
+    <div class="demo-row" style="justify-content: flex-end;">
+      <hx-dropdown placement="bottom-end">
+        <button slot="trigger" type="button" class="trigger" aria-label="More options">⋯</button>
+        <ul role="menu" aria-label="More options">
+          <li data-value="view" role="menuitem" tabindex="-1">View details</li>
+          <li data-value="edit" role="menuitem" tabindex="-1">Edit</li>
+          <li data-value="archive" role="menuitem" tabindex="-1">Archive</li>
+          <li data-value="delete" role="menuitem" tabindex="-1" class="danger">Delete</li>
+        </ul>
+      </hx-dropdown>
+    </div>
+
+    <!-- Disabled -->
+    <h2 style="font-size: 1rem; margin-bottom: 0.5rem;">Disabled</h2>
+    <div class="demo-row">
+      <hx-dropdown disabled>
+        <button slot="trigger" type="button" class="trigger" disabled>Actions ▾</button>
+        <ul role="menu" aria-label="Actions">
+          <li data-value="edit" role="menuitem" tabindex="-1">Edit</li>
+        </ul>
+      </hx-dropdown>
+    </div>
+
+    <!-- Healthcare patient actions -->
+    <h2 style="font-size: 1rem; margin-bottom: 0.5rem;">Healthcare: Patient Actions</h2>
+    <div class="demo-row">
+      <hx-dropdown id="demo-patient" placement="bottom-end">
+        <button slot="trigger" type="button" class="trigger">Actions ▾</button>
+        <ul role="menu" aria-label="Patient actions">
+          <li data-value="schedule" role="menuitem" tabindex="-1">Schedule Appointment</li>
+          <li data-value="note" role="menuitem" tabindex="-1">Add Clinical Note</li>
+          <li data-value="labs" role="menuitem" tabindex="-1">Order Labs</li>
+          <li data-value="referral" role="menuitem" tabindex="-1">Create Referral</li>
+          <li role="separator" style="height:1px;background:#e5e7eb;margin:0.25rem 0;"></li>
+          <li data-value="discharge" role="menuitem" tabindex="-1" class="danger">
+            Discharge Patient
+          </li>
+        </ul>
+      </hx-dropdown>
+    </div>
+
+    <div class="output" id="output">Select an action to see the event detail here.</div>
+
+    <script>
+      document.querySelectorAll('hx-dropdown').forEach((dropdown) => {
+        dropdown.addEventListener('hx-select', (event) => {
+          document.getElementById('output').textContent =
+            `hx-select fired — value: "${event.detail.value}", label: "${event.detail.label}"`;
+        });
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-dropdown" section="api" />

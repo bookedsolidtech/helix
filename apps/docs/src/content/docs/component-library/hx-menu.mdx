@@ -1,0 +1,308 @@
+---
+title: 'hx-menu'
+description: 'Keyboard-navigable context menu container for a set of actionable menu items, with full WAI-ARIA APG compliance.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-menu" section="summary" />
+
+## Overview
+
+`hx-menu` is the container element for a keyboard-navigable list of menu items. It implements the [WAI-ARIA APG Menu pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu/), providing full Arrow key navigation, Home/End focus management, typeahead search, and Escape-to-close behavior.
+
+Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` to visually separate groups of related items.
+
+**Use `hx-menu` when:** presenting a list of contextual actions the user can trigger (e.g., a context menu, an action dropdown, or an overflow actions panel).
+**Use `hx-dropdown` instead when:** the trigger and positioning are managed automatically by the component.
+
+## Live Demo
+
+### Basic Menu
+
+<ComponentDemo title="Basic Menu">
+  <hx-menu aria-label="Action menu" style="max-width: 200px;">
+    <hx-menu-item value="edit">Edit</hx-menu-item>
+    <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
+    <hx-menu-divider></hx-menu-divider>
+    <hx-menu-item value="delete">Delete</hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### With Prefix Icons
+
+<ComponentDemo title="With Prefix Icons">
+  <hx-menu aria-label="File menu" style="max-width: 220px;">
+    <hx-menu-item value="new">
+      <span slot="prefix">+</span>
+      New File
+    </hx-menu-item>
+    <hx-menu-item value="open">
+      <span slot="prefix">&#128194;</span>
+      Open
+    </hx-menu-item>
+    <hx-menu-item value="save">
+      <span slot="prefix">&#128190;</span>
+      Save
+    </hx-menu-item>
+    <hx-menu-divider></hx-menu-divider>
+    <hx-menu-item value="close" disabled>
+      <span slot="prefix">&#10005;</span>
+      Close
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### Checkbox Items
+
+<ComponentDemo title="Checkbox Items">
+  <hx-menu aria-label="View options" style="max-width: 240px;">
+    <hx-menu-item type="checkbox" value="sidebar" checked>
+      Show Sidebar
+    </hx-menu-item>
+    <hx-menu-item type="checkbox" value="toolbar">
+      Show Toolbar
+    </hx-menu-item>
+    <hx-menu-item type="checkbox" value="statusbar">
+      Show Status Bar
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### Radio Items
+
+<ComponentDemo title="Radio Items">
+  <hx-menu aria-label="Sort order" style="max-width: 240px;">
+    <hx-menu-item type="radio" value="name" checked>
+      Sort by Name
+    </hx-menu-item>
+    <hx-menu-item type="radio" value="date">
+      Sort by Date
+    </hx-menu-item>
+    <hx-menu-item type="radio" value="size">
+      Sort by Size
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### With Keyboard Shortcuts (Suffix)
+
+<ComponentDemo title="With Keyboard Shortcuts">
+  <hx-menu aria-label="Edit menu" style="max-width: 220px;">
+    <hx-menu-item value="cut">
+      Cut
+      <span slot="suffix" style="color: var(--hx-color-neutral-500); font-size: 0.75rem;">
+        Ctrl+X
+      </span>
+    </hx-menu-item>
+    <hx-menu-item value="copy">
+      Copy
+      <span slot="suffix" style="color: var(--hx-color-neutral-500); font-size: 0.75rem;">
+        Ctrl+C
+      </span>
+    </hx-menu-item>
+    <hx-menu-item value="paste">
+      Paste
+      <span slot="suffix" style="color: var(--hx-color-neutral-500); font-size: 0.75rem;">
+        Ctrl+V
+      </span>
+    </hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+### Loading State
+
+<ComponentDemo title="Loading State">
+  <hx-menu aria-label="Processing menu" style="max-width: 200px;">
+    <hx-menu-item value="save" loading>
+      Saving...
+    </hx-menu-item>
+    <hx-menu-item value="export">Export</hx-menu-item>
+  </hx-menu>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-menu';
+```
+
+## Basic Usage
+
+```html
+<hx-menu aria-label="Actions">
+  <hx-menu-item value="edit">Edit</hx-menu-item>
+  <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
+  <hx-menu-divider></hx-menu-divider>
+  <hx-menu-item value="delete">Delete</hx-menu-item>
+</hx-menu>
+```
+
+## Properties
+
+`hx-menu` has no declarative properties. Use `aria-label` or `aria-labelledby` to provide an accessible name.
+
+| Method         | Signature    | Description                                    |
+| -------------- | ------------ | ---------------------------------------------- |
+| `focusFirst()` | `() => void` | Programmatically focus the first enabled item. |
+| `focusLast()`  | `() => void` | Programmatically focus the last enabled item.  |
+
+## Events
+
+| Event       | Detail Type                              | Description                                            |
+| ----------- | ---------------------------------------- | ------------------------------------------------------ |
+| `hx-select` | `{ item: HelixMenuItem, value: string }` | Fired when an item is activated via click or keyboard. |
+| `hx-close`  | `void`                                   | Fired when the Escape key is pressed inside the menu.  |
+
+## CSS Custom Properties
+
+| Property                  | Default                           | Description            |
+| ------------------------- | --------------------------------- | ---------------------- |
+| `--hx-menu-bg`            | `var(--hx-color-neutral-0)`       | Menu background color. |
+| `--hx-menu-border-color`  | `var(--hx-color-neutral-200)`     | Menu border color.     |
+| `--hx-menu-border-radius` | `var(--hx-border-radius-md)`      | Menu corner radius.    |
+| `--hx-menu-shadow`        | `0 4px 6px -1px rgb(0 0 0 / 0.1)` | Menu box shadow.       |
+| `--hx-menu-min-width`     | `10rem`                           | Minimum menu width.    |
+
+## CSS Parts
+
+| Part   | Description                           |
+| ------ | ------------------------------------- |
+| `base` | The root `<div role="menu">` element. |
+
+## Slots
+
+| Slot        | Description                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Accepts `hx-menu-item` and `hx-menu-divider` elements. A console warning is emitted if unexpected elements are slotted. |
+
+## Keyboard Navigation
+
+| Key                  | Behavior                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------- |
+| `ArrowDown`          | Move focus to the next enabled item; wraps to first.                                                    |
+| `ArrowUp`            | Move focus to the previous enabled item; wraps to last.                                                 |
+| `Home`               | Move focus to the first enabled item.                                                                   |
+| `End`                | Move focus to the last enabled item.                                                                    |
+| `Enter`              | Activate the focused item.                                                                              |
+| `Space`              | Activate the focused item.                                                                              |
+| `Escape`             | Fires `hx-close` — the consuming component should close the menu.                                       |
+| Printable characters | Typeahead: jump to first item whose label starts with the typed characters. Buffer resets after 500 ms. |
+
+## Accessibility
+
+| Topic           | Details                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role       | `role="menu"` on the inner container. Conforms to WAI-ARIA APG Menu pattern.                                                                     |
+| Accessible name | Supply `aria-label` or `aria-labelledby` on `<hx-menu>` to name the menu for screen readers.                                                     |
+| Keyboard        | Full Arrow / Home / End / Enter / Space / Escape / typeahead per WAI-ARIA APG.                                                                   |
+| Screen reader   | Item selection is announced by role (`menuitem`, `menuitemcheckbox`, `menuitemradio`). `aria-checked` state changes are announced automatically. |
+| Focus           | `focusFirst()` and `focusLast()` are available for programmatic focus on menu open.                                                              |
+| Disabled items  | Disabled items are excluded from keyboard navigation entirely.                                                                                   |
+| Loading items   | Loading items are excluded from keyboard navigation; `aria-busy="true"` is set on the item.                                                      |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/action-menu.html.twig #}
+<hx-menu aria-label="{{ label }}">
+  {% for item in items %}
+    {% if item.divider %}
+      <hx-menu-divider></hx-menu-divider>
+    {% else %}
+      <hx-menu-item
+        value="{{ item.value }}"
+        {% if item.disabled %}disabled{% endif %}
+      >{{ item.label }}</hx-menu-item>
+    {% endif %}
+  {% endfor %}
+</hx-menu>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors using `once()`:
+
+```javascript
+Drupal.behaviors.helixMenu = {
+  attach(context) {
+    once('helixMenu', 'hx-menu', context).forEach((menu) => {
+      menu.addEventListener('hx-select', (e) => {
+        const { value } = e.detail;
+        // handle selection
+      });
+      menu.addEventListener('hx-close', () => {
+        // hide the menu
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-menu example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-menu id="my-menu" aria-label="Document actions" style="max-width: 200px;">
+      <hx-menu-item value="edit">Edit</hx-menu-item>
+      <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
+      <hx-menu-divider></hx-menu-divider>
+      <hx-menu-item value="delete">Delete</hx-menu-item>
+    </hx-menu>
+
+    <script>
+      const menu = document.getElementById('my-menu');
+
+      menu.addEventListener('hx-select', (e) => {
+        console.log('Selected:', e.detail.value, e.detail.item);
+      });
+
+      menu.addEventListener('hx-close', () => {
+        console.log('Menu closed via Escape');
+      });
+
+      // Focus first item on open (call when menu becomes visible)
+      menu.focusFirst();
+    </script>
+  </body>
+</html>
+```
+
+## Sub-components
+
+This family includes three elements that work together:
+
+| Component         | Purpose                                                          |
+| ----------------- | ---------------------------------------------------------------- |
+| `hx-menu`         | The container. Manages keyboard navigation and events.           |
+| `hx-menu-item`    | An interactive item. Supports normal, checkbox, and radio types. |
+| `hx-menu-divider` | A visual horizontal separator between groups of items.           |
+
+See [`hx-menu-item`](/component-library/hx-menu-item/) and [`hx-menu-divider`](/component-library/hx-menu-divider/) for their individual API references.
+
+## API Reference
+
+<ComponentDoc tagName="hx-menu" section="api" />

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { tokenEntries } from '@helix/tokens';
-import { getTokensByPrefix } from '@helix/tokens/utils';
+import { tokenEntries } from '@helixui/tokens';
+import { getTokensByPrefix } from '@helixui/tokens/utils';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { getTokenBreadcrumbs } from '@/lib/breadcrumb-utils';
 

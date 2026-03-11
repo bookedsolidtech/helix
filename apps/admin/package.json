@@ -1,11 +1,12 @@
 {
-  "name": "@helix/admin",
-  "version": "0.0.1",
+  "name": "@helixui/admin",
+  "version": "0.1.0",
   "private": true,
   "description": "Panopticon Platform — WC-2026 Component Library",
   "scripts": {
     "dev": "next dev --port 3159 --turbopack",
-    "build": "next build",
+    "copy-helix-dist": "cp -r ../../packages/hx-library/dist/. ./public/helix/",
+    "build": "npm run copy-helix-dist && next build",
     "start": "next start --port 3159",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -13,7 +14,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@helix/tokens": "*",
+    "@helixui/library": "*",
+    "@helixui/tokens": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",

@@ -1,9 +1,0 @@
-{
-  "startTime": "2026-02-16T00:00:00Z",
-  "totalPages": 184,
-  "completedPages": 79,
-  "pagesRemaining": 105,
-  "currentBatch": 8,
-  "status": "in_progress",
-  "note": "Generating in controlled batches of 10 pages"
-}

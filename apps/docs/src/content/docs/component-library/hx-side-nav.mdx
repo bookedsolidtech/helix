@@ -1,0 +1,503 @@
+---
+title: 'hx-side-nav'
+description: 'Collapsible side navigation panel for enterprise healthcare applications with icon-only collapsed mode and nested sub-navigation'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-side-nav" section="summary" />
+
+## Overview
+
+`hx-side-nav` is a collapsible left-side navigation panel built for clinical portals, admin dashboards, and department navigation in enterprise healthcare applications. It renders a full-height `<nav>` landmark and supports three content areas — header (branding), body (nav items), and footer (user profile/settings).
+
+The component manages a collapsed/expanded toggle. In collapsed mode, the nav narrows to icon-only width (`3.5rem` by default). The collapsed state is propagated to all slotted `hx-nav-item` children via a `data-collapsed` attribute, which triggers tooltip display for each icon.
+
+`hx-nav-item` is a companion sub-component that renders as an anchor (`<a>`) when a URL is provided, or a button when it has nested children. It supports icons, badges, active/disabled states, and a sub-navigation `children` slot.
+
+**Use `hx-side-nav` when:** building an application shell with persistent lateral navigation — clinical portals, EMR systems, admin dashboards, patient management interfaces.
+
+**Use `hx-top-nav` instead when:** the navigation is horizontal and anchored to the top of the viewport.
+
+## Live Demo
+
+### Default (Expanded)
+
+<ComponentDemo title="Default Side Nav">
+  <div style="height: 320px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <hx-side-nav label="Clinical Portal">
+      <div
+        slot="header"
+        style="font-weight: 600; font-size: 0.875rem; color: #f9fafb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+      >
+        Clinical Portal
+      </div>
+      <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+      <hx-nav-item href="/patients" active>
+        Patients
+      </hx-nav-item>
+      <hx-nav-item href="/appointments">Appointments</hx-nav-item>
+      <hx-nav-item href="/settings" disabled>
+        Settings
+      </hx-nav-item>
+    </hx-side-nav>
+  </div>
+</ComponentDemo>
+
+### Collapsed (Icon-Only)
+
+<ComponentDemo title="Collapsed Side Nav">
+  <div style="height: 320px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <hx-side-nav label="Clinical Portal" collapsed>
+      <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+      <hx-nav-item href="/patients" active>
+        Patients
+      </hx-nav-item>
+      <hx-nav-item href="/appointments">Appointments</hx-nav-item>
+    </hx-side-nav>
+  </div>
+</ComponentDemo>
+
+### With Sub-Navigation
+
+<ComponentDemo title="Nested Nav Items">
+  <div style="height: 380px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <hx-side-nav label="Clinical Portal">
+      <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+      <hx-nav-item expanded>
+        Patients
+        <hx-nav-item slot="children" href="/patients/list">
+          All Patients
+        </hx-nav-item>
+        <hx-nav-item slot="children" href="/patients/new">
+          New Patient
+        </hx-nav-item>
+        <hx-nav-item slot="children" href="/patients/search">
+          Search
+        </hx-nav-item>
+      </hx-nav-item>
+      <hx-nav-item href="/reports">Reports</hx-nav-item>
+    </hx-side-nav>
+  </div>
+</ComponentDemo>
+
+### With Badges
+
+<ComponentDemo title="Nav Items with Badges">
+  <div style="height: 280px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <hx-side-nav label="Clinical Portal">
+      <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+      <hx-nav-item href="/alerts">
+        Alerts
+        <span
+          slot="badge"
+          style="background: #ef4444; color: #fff; border-radius: 9999px; padding: 0 0.4rem; font-size: 0.7rem; font-weight: 700;"
+        >
+          3
+        </span>
+      </hx-nav-item>
+      <hx-nav-item href="/messages">
+        Messages
+        <span
+          slot="badge"
+          style="background: #3b82f6; color: #fff; border-radius: 9999px; padding: 0 0.4rem; font-size: 0.7rem; font-weight: 700;"
+        >
+          12
+        </span>
+      </hx-nav-item>
+    </hx-side-nav>
+  </div>
+</ComponentDemo>
+
+### With Header and Footer Slots
+
+<ComponentDemo title="Header and Footer Slots">
+  <div style="height: 360px; position: relative; overflow: hidden; border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+    <hx-side-nav label="Clinical Portal">
+      <div slot="header" style="font-weight: 700; font-size: 1rem; color: #f9fafb;">
+        HealthCo EMR
+      </div>
+      <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+      <hx-nav-item href="/patients" active>
+        Patients
+      </hx-nav-item>
+      <hx-nav-item href="/schedule">Schedule</hx-nav-item>
+      <div slot="footer" style="font-size: 0.75rem; color: #9ca3af;">
+        Dr. Jane Smith
+      </div>
+    </hx-side-nav>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-side-nav';
+```
+
+## Basic Usage
+
+```html
+<!-- Expanded side nav with nav items -->
+<hx-side-nav label="Main Navigation">
+  <div slot="header">My App</div>
+  <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+  <hx-nav-item href="/patients" active>Patients</hx-nav-item>
+  <hx-nav-item href="/settings" disabled>Settings</hx-nav-item>
+  <div slot="footer">User Profile</div>
+</hx-side-nav>
+
+<!-- Collapsed (icon-only) mode -->
+<hx-side-nav label="Main Navigation" collapsed>
+  <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+  <hx-nav-item href="/patients">Patients</hx-nav-item>
+</hx-side-nav>
+
+<!-- Nav item with sub-navigation -->
+<hx-nav-item>
+  Patients
+  <hx-nav-item slot="children" href="/patients/list">All Patients</hx-nav-item>
+  <hx-nav-item slot="children" href="/patients/new">New Patient</hx-nav-item>
+</hx-nav-item>
+```
+
+## Variants
+
+### Collapsed vs Expanded
+
+`hx-side-nav` supports two visual modes controlled by the `collapsed` boolean property. When collapsed, the nav renders at `3.5rem` width showing only icons. Each `hx-nav-item` renders a tooltip in collapsed mode so users can identify items without visible labels.
+
+```html
+<!-- Expanded (default) -->
+<hx-side-nav label="Main Navigation">...</hx-side-nav>
+
+<!-- Collapsed -->
+<hx-side-nav label="Main Navigation" collapsed>...</hx-side-nav>
+```
+
+### Nav Item as Anchor vs Button
+
+`hx-nav-item` automatically selects its internal element type:
+
+- **Anchor** (`<a>`): rendered when `href` is set and there are no children in the `children` slot. Supports `aria-current="page"` for the active state.
+- **Button** (`<button>`): rendered when `href` is absent OR when the `children` slot has content (expand/collapse behavior).
+
+```html
+<!-- Renders as anchor -->
+<hx-nav-item href="/patients">Patients</hx-nav-item>
+
+<!-- Renders as button (has children) -->
+<hx-nav-item>
+  Clinical
+  <hx-nav-item slot="children" href="/clinical/notes">Notes</hx-nav-item>
+</hx-nav-item>
+```
+
+### Active and Disabled States
+
+```html
+<!-- Active item (aria-current="page" on anchor) -->
+<hx-nav-item href="/patients" active>Patients</hx-nav-item>
+
+<!-- Disabled item (aria-disabled="true", tabindex="-1") -->
+<hx-nav-item href="/admin" disabled>Admin</hx-nav-item>
+```
+
+## Properties
+
+### hx-side-nav Properties
+
+| Property    | Attribute   | Type      | Default             | Description                                                            |
+| ----------- | ----------- | --------- | ------------------- | ---------------------------------------------------------------------- |
+| `collapsed` | `collapsed` | `boolean` | `false`             | When true, the nav collapses to icon-only mode. Reflects to attribute. |
+| `label`     | `label`     | `string`  | `'Main Navigation'` | The accessible label applied to the `<nav>` landmark via `aria-label`. |
+
+### hx-nav-item Properties
+
+| Property   | Attribute  | Type      | Default | Description                                                                                            |
+| ---------- | ---------- | --------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| `href`     | `href`     | `string`  | `''`    | The URL this item links to. When set (and no children), renders as `<a>`.                              |
+| `active`   | `active`   | `boolean` | `false` | Whether this item is the current/active page. Sets `aria-current="page"`. Reflects to attribute.       |
+| `expanded` | `expanded` | `boolean` | `false` | Whether the sub-navigation panel is expanded. Reflects to attribute.                                   |
+| `disabled` | `disabled` | `boolean` | `false` | Whether this item is disabled. Sets `aria-disabled="true"` and `tabindex="-1"`. Reflects to attribute. |
+
+## Events
+
+### hx-side-nav Events
+
+| Event         | Detail Type              | Description                                                                                                 |
+| ------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `hx-collapse` | `{ collapsed: boolean }` | Dispatched when the nav collapses to icon-only mode. `detail.collapsed` is `true`. Bubbles and is composed. |
+| `hx-expand`   | `{ collapsed: boolean }` | Dispatched when the nav expands to full width. `detail.collapsed` is `false`. Bubbles and is composed.      |
+
+```javascript
+const nav = document.querySelector('hx-side-nav');
+
+nav.addEventListener('hx-collapse', (e) => {
+  console.log('Nav collapsed:', e.detail.collapsed); // true
+});
+
+nav.addEventListener('hx-expand', (e) => {
+  console.log('Nav expanded, collapsed is:', e.detail.collapsed); // false
+});
+```
+
+## CSS Custom Properties
+
+### hx-side-nav CSS Custom Properties
+
+| Property                        | Default                       | Description                          |
+| ------------------------------- | ----------------------------- | ------------------------------------ |
+| `--hx-side-nav-width`           | `16rem`                       | Full expanded width.                 |
+| `--hx-side-nav-collapsed-width` | `3.5rem`                      | Collapsed icon-only width.           |
+| `--hx-side-nav-bg`              | `var(--hx-color-neutral-900)` | Background color.                    |
+| `--hx-side-nav-color`           | `var(--hx-color-neutral-100)` | Text color.                          |
+| `--hx-side-nav-border-color`    | `var(--hx-color-neutral-700)` | Border color (header, footer, side). |
+| `--hx-side-nav-header-padding`  | `var(--hx-space-4)`           | Header section padding.              |
+| `--hx-side-nav-footer-padding`  | `var(--hx-space-4)`           | Footer section padding.              |
+| `--hx-side-nav-toggle-color`    | `var(--hx-color-neutral-400)` | Toggle button icon color.            |
+
+### hx-nav-item CSS Custom Properties
+
+| Property                     | Default                               | Description                      |
+| ---------------------------- | ------------------------------------- | -------------------------------- |
+| `--hx-nav-item-color`        | `var(--hx-color-neutral-300)`         | Item text color.                 |
+| `--hx-nav-item-hover-bg`     | `rgba(255, 255, 255, 0.08)`           | Item hover background.           |
+| `--hx-nav-item-hover-color`  | `var(--hx-color-neutral-100)`         | Item hover text color.           |
+| `--hx-nav-item-active-bg`    | `var(--hx-color-primary-600)`         | Active item background.          |
+| `--hx-nav-item-active-color` | `var(--hx-color-neutral-50)`          | Active item text color.          |
+| `--hx-nav-item-padding`      | `var(--hx-space-2) var(--hx-space-4)` | Item padding.                    |
+| `--hx-nav-item-host-bg`      | `var(--hx-color-neutral-900)`         | Component host background color. |
+
+## CSS Parts
+
+### hx-side-nav CSS Parts
+
+| Part     | Description                        |
+| -------- | ---------------------------------- |
+| `nav`    | The outer `<nav>` element.         |
+| `header` | The header section container.      |
+| `body`   | The scrollable body section.       |
+| `footer` | The footer section container.      |
+| `toggle` | The collapse/expand toggle button. |
+
+### hx-nav-item CSS Parts
+
+| Part       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| `link`     | The `<a>` or `<button>` element (the interactive part).   |
+| `icon`     | The icon container (wraps the `icon` slot).               |
+| `label`    | The label container (wraps the default slot text).        |
+| `badge`    | The badge container (wraps the `badge` slot).             |
+| `children` | The sub-navigation container (wraps the `children` slot). |
+
+## Slots
+
+### hx-side-nav Slots
+
+| Slot        | Description                                         |
+| ----------- | --------------------------------------------------- |
+| _(default)_ | `hx-nav-item` elements that make up the navigation. |
+| `header`    | Logo, app name, or branding content.                |
+| `footer`    | User profile, sign-out button, or settings content. |
+
+### hx-nav-item Slots
+
+| Slot        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| _(default)_ | The label text for this navigation item.                                           |
+| `icon`      | An icon displayed before the label. Should be an SVG or icon component.            |
+| `badge`     | Badge content (e.g. notification count). Hidden automatically in collapsed mode.   |
+| `children`  | Nested `hx-nav-item` elements for sub-navigation. Presence triggers button render. |
+
+## Accessibility
+
+`hx-side-nav` and `hx-nav-item` implement WCAG 2.1 AA accessibility patterns designed for healthcare environments where keyboard and screen reader access is a compliance requirement.
+
+| Topic                    | Details                                                                                                                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA landmark            | `hx-side-nav` renders a `<nav>` landmark with `aria-label` set from the `label` property (default: "Main Navigation"). Provides named landmark navigation for screen reader users.     |
+| Toggle button            | The collapse/expand button has a dynamic `aria-label` ("Collapse navigation" / "Expand navigation") and `aria-expanded` that reflects the current state.                               |
+| Nav item as anchor       | When rendered as `<a>`, the active state sets `aria-current="page"`. Disabled state sets `aria-disabled="true"` and `tabindex="-1"` (native `disabled` is invalid on anchors).         |
+| Nav item as button       | When rendered as `<button>` (has children), `aria-expanded` reflects the sub-navigation state. The `children` container uses `role="group"` to group nested items semantically.        |
+| Collapsed tooltips       | In collapsed mode, each `hx-nav-item` renders a tooltip (`role="tooltip"`) and the trigger element references it via `aria-describedby`. Screen readers announce the label on focus.   |
+| Keyboard navigation      | `ArrowDown`/`ArrowUp` navigate between `hx-nav-item` siblings in the body. Disabled items are skipped. Navigation wraps at both ends.                                                  |
+| Focus management         | Focus is moved to the `[part="link"]` element inside each nav item's shadow DOM via `focus()`. The shadow host receives `document.activeElement` in browsers that report shadow hosts. |
+| `prefers-reduced-motion` | All CSS transitions (width, opacity, transform) are disabled when the user prefers reduced motion.                                                                                     |
+| WCAG compliance          | Meets WCAG 2.1 AA. SC 2.1.1 (Keyboard), SC 4.1.2 (Name, Role, Value), SC 1.4.3 (Contrast), SC 1.3.1 (Info and Relationships) satisfied. Zero axe-core violations in all states.        |
+
+## Keyboard Navigation
+
+### hx-side-nav Keyboard Interactions
+
+| Key             | Behavior                                                                      |
+| --------------- | ----------------------------------------------------------------------------- |
+| `Tab`           | Moves focus to the toggle button and then through all focusable nav items.    |
+| `ArrowDown`     | Moves focus to the next enabled `hx-nav-item` in the body. Wraps to first.    |
+| `ArrowUp`       | Moves focus to the previous enabled `hx-nav-item` in the body. Wraps to last. |
+| `Enter`/`Space` | Activates the toggle button (collapse/expand) when focused.                   |
+
+### hx-nav-item Keyboard Interactions
+
+| Key             | Behavior                                                                       |
+| --------------- | ------------------------------------------------------------------------------ |
+| `Enter`/`Space` | Activates the nav item. If a button (has children), toggles the sub-nav panel. |
+| `Tab`           | Moves focus to the next focusable element.                                     |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/side-nav.html.twig #}
+<hx-side-nav
+  label="{{ nav_label|default('Main Navigation') }}"
+  {% if collapsed %}collapsed{% endif %}
+>
+  {% if header_content %}
+    <div slot="header">{{ header_content }}</div>
+  {% endif %}
+
+  {% for item in nav_items %}
+    <hx-nav-item
+      {% if item.url %}href="{{ item.url }}"{% endif %}
+      {% if item.active %}active{% endif %}
+      {% if item.disabled %}disabled{% endif %}
+      {% if item.expanded %}expanded{% endif %}
+    >
+      {% if item.icon %}
+        <span slot="icon">{{ item.icon }}</span>
+      {% endif %}
+      {{ item.label }}
+      {% if item.badge %}
+        <span slot="badge">{{ item.badge }}</span>
+      {% endif %}
+      {% if item.children %}
+        {% for child in item.children %}
+          <hx-nav-item slot="children" href="{{ child.url }}" {% if child.active %}active{% endif %}>
+            {{ child.label }}
+          </hx-nav-item>
+        {% endfor %}
+      {% endif %}
+    </hx-nav-item>
+  {% endfor %}
+
+  {% if footer_content %}
+    <div slot="footer">{{ footer_content }}</div>
+  {% endif %}
+</hx-side-nav>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for collapse/expand events in Drupal behaviors using `once()` to prevent duplicate listeners on AJAX:
+
+```javascript
+Drupal.behaviors.helixSideNav = {
+  attach(context) {
+    // once() is a Drupal core utility (no import needed) — prevents duplicate event binding during AJAX attach cycles
+    once('helixSideNav', 'hx-side-nav', context).forEach((nav) => {
+      nav.addEventListener('hx-collapse', () => {
+        // Persist collapsed state, e.g. in localStorage or Drupal user data
+        localStorage.setItem('nav-collapsed', 'true');
+      });
+
+      nav.addEventListener('hx-expand', () => {
+        localStorage.setItem('nav-collapsed', 'false');
+      });
+
+      // Restore persisted state
+      const wasCollapsed = localStorage.getItem('nav-collapsed') === 'true';
+      if (wasCollapsed) {
+        nav.collapsed = true;
+      }
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-side-nav example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+      .app-shell {
+        display: flex;
+        height: 100vh;
+      }
+      .main-content {
+        flex: 1;
+        padding: 2rem;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <hx-side-nav id="main-nav" label="Clinical Portal Navigation">
+        <div slot="header" style="font-weight: 700; color: #f9fafb;">HealthCo EMR</div>
+
+        <hx-nav-item href="/dashboard" active>Dashboard</hx-nav-item>
+
+        <hx-nav-item id="patients-nav">
+          Patients
+          <hx-nav-item slot="children" href="/patients/list">All Patients</hx-nav-item>
+          <hx-nav-item slot="children" href="/patients/new">New Patient</hx-nav-item>
+        </hx-nav-item>
+
+        <hx-nav-item href="/appointments">Appointments</hx-nav-item>
+        <hx-nav-item href="/reports">Reports</hx-nav-item>
+        <hx-nav-item href="/admin" disabled>Admin (disabled)</hx-nav-item>
+
+        <div slot="footer" style="font-size: 0.75rem; color: #9ca3af;">Dr. Jane Smith</div>
+      </hx-side-nav>
+
+      <main class="main-content">
+        <h1>Dashboard</h1>
+        <p>Select a navigation item.</p>
+      </main>
+    </div>
+
+    <script>
+      const nav = document.getElementById('main-nav');
+
+      nav.addEventListener('hx-collapse', () => {
+        console.log('Nav collapsed to icon-only mode');
+      });
+
+      nav.addEventListener('hx-expand', () => {
+        console.log('Nav expanded to full width');
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-side-nav" section="api" />
+
+<ComponentDoc tagName="hx-nav-item" section="api" />

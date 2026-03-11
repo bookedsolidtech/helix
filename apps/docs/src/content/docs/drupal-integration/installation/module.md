@@ -388,11 +388,11 @@ Install HELIX locally and copy build artifacts:
 
 ```bash
 # In temporary directory
-npm install @helix/library
+npm install @helixui/library
 
 # Copy to module
 mkdir -p web/modules/custom/hx_library/libraries/hx/dist
-cp -r node_modules/@helix/library/dist/* \
+cp -r node_modules/@helixui/library/dist/* \
   web/modules/custom/hx_library/libraries/hx/dist/
 
 # Verify files
@@ -488,13 +488,13 @@ Create npm build directly in module:
   "name": "hx-library-module",
   "private": true,
   "scripts": {
-    "install-library": "npm install @helix/library",
+    "install-library": "npm install @helixui/library",
     "build": "npm run build:full && npm run build:components",
-    "build:full": "cp node_modules/@helix/library/dist/hx.bundled.js libraries/hx/dist/",
-    "build:components": "cp -r node_modules/@helix/library/dist/components/* libraries/hx/dist/components/"
+    "build:full": "cp node_modules/@helixui/library/dist/hx.bundled.js libraries/hx/dist/",
+    "build:components": "cp -r node_modules/@helixui/library/dist/components/* libraries/hx/dist/components/"
   },
   "dependencies": {
-    "@helix/library": "^0.0.1"
+    "@helixui/library": "^0.0.1"
   }
 }
 ```
@@ -548,7 +548,7 @@ function hx_library_library_info_build() {
   $version = $config->get('version') ?? '0.0.1';
 
   if ($use_cdn) {
-    $cdn_url = $config->get('cdn_url') ?? 'https://cdn.jsdelivr.net/npm/@helix/library';
+    $cdn_url = $config->get('cdn_url') ?? 'https://cdn.jsdelivr.net/npm/@helixui/library';
 
     $libraries['components'] = [
       'version' => $version,
@@ -589,7 +589,7 @@ function hx_library_library_info_build() {
 ```yaml
 use_cdn: false
 version: '0.0.1'
-cdn_url: 'https://cdn.jsdelivr.net/npm/@helix/library'
+cdn_url: 'https://cdn.jsdelivr.net/npm/@helixui/library'
 ```
 
 **Admin UI for toggling (requires Config UI):**
@@ -890,7 +890,7 @@ function hx_library_update_9002() {
   $environment = getenv('DRUPAL_ENV') ?: 'development';
   if ($environment === 'production') {
     $config->set('use_cdn', TRUE);
-    $config->set('cdn_url', 'https://cdn.jsdelivr.net/npm/@helix/library');
+    $config->set('cdn_url', 'https://cdn.jsdelivr.net/npm/@helixui/library');
   }
 
   $config->save();
@@ -932,7 +932,7 @@ drush updatedb
 ```yaml
 version: '0.0.1'
 use_cdn: false
-cdn_url: 'https://cdn.jsdelivr.net/npm/@helix/library'
+cdn_url: 'https://cdn.jsdelivr.net/npm/@helixui/library'
 ```
 
 **Update workflow:**
@@ -1079,7 +1079,7 @@ $config['hx_library.settings']['version'] = '0.0.1';
 ```php
 if (getenv('DRUPAL_ENV') === 'production') {
   $config['hx_library.settings']['use_cdn'] = TRUE;
-  $config['hx_library.settings']['cdn_url'] = 'https://cdn.jsdelivr.net/npm/@helix/library';
+  $config['hx_library.settings']['cdn_url'] = 'https://cdn.jsdelivr.net/npm/@helixui/library';
 }
 ```
 
@@ -1187,7 +1187,7 @@ data-table:
 ```yaml
 version: '0.0.1'
 use_cdn: false
-cdn_url: 'https://cdn.jsdelivr.net/npm/@helix/library'
+cdn_url: 'https://cdn.jsdelivr.net/npm/@helixui/library'
 enable_debug_mode: false
 ```
 
@@ -1381,7 +1381,7 @@ $config['hx_library.settings']['cdn_auth_token'] = getenv('HX_CDN_TOKEN');
 composer install
 
 # If using manual copy
-# Copy files from node_modules/@helix/library/dist to libraries/hx/dist
+# Copy files from node_modules/@helixui/library/dist to libraries/hx/dist
 
 # Verify
 ls -la web/modules/custom/hx_library/libraries/hx/dist/

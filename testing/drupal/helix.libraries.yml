@@ -1,0 +1,27 @@
+# HELIX Component Library — Drupal 11 libraries.yml definition
+#
+# Add this to your theme's [theme_name].libraries.yml
+# Then attach via: '#attached': { library: ['my_theme/helix'] }
+# Or globally in [theme_name].info.yml under libraries: [my_theme/helix]
+
+helix:
+  version: '0.0.1'
+  js:
+    # CDN pattern — replace with your actual CDN URL or local path
+    # When @helixui/library is published to npm, use unpkg/jsdelivr:
+    # https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/index.js
+    # For local Drupal development, copy dist/ to your theme's js/ directory:
+    js/helix/index.js:
+      attributes:
+        type: module
+  dependencies:
+    - core/drupal
+
+helix-tokens:
+  version: '0.0.1'
+  css:
+    theme:
+      # Copy @helixui/tokens dist CSS to your theme
+      css/helix-tokens.css: {}
+  dependencies:
+    - core/drupal

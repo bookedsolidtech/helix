@@ -1,8 +1,11 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { helixRadioStyles } from './hx-radio.styles.js';
+
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxRadioIdCounter = 0;
 
 /**
  * An individual radio button, designed to be used inside a `<hx-radio-group>`.
@@ -63,9 +66,12 @@ export class HelixRadio extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute('role', 'radio');
+    this.setAttribute('aria-checked', String(this.checked));
+    this.setAttribute('aria-disabled', String(this.disabled));
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('checked')) {
       this.setAttribute('aria-checked', String(this.checked));
     }
@@ -76,7 +82,7 @@ export class HelixRadio extends LitElement {
 
   // ─── Internal IDs ───
 
-  private _inputId = `hx-radio-${Math.random().toString(36).slice(2, 9)}`;
+  private _inputId = `hx-radio-${++_hxRadioIdCounter}`;
 
   // ─── Event Handling ───
 
@@ -135,3 +141,6 @@ declare global {
     'hx-radio': HelixRadio;
   }
 }
+
+/** @public Type alias for use in test files and consumers. */
+export type WcRadio = HelixRadio;

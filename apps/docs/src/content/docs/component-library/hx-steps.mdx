@@ -1,0 +1,518 @@
+---
+title: 'hx-steps'
+description: 'Multi-step progress indicator for wizard and workflow sequences with full WCAG 2.1 AA accessibility.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-steps" section="summary" />
+
+## Overview
+
+`hx-steps` is a multi-step progress indicator designed for enterprise healthcare workflows. It renders a sequence of `<hx-step>` children as a horizontal or vertical step tracker with connector lines and status-based styling.
+
+Typical use cases include patient intake wizards, prior authorization flows, multi-step form progressions, and onboarding sequences where tracking position in a workflow is critical for patient safety and workflow clarity.
+
+**Use `hx-steps` when:** a user must progress through a defined sequence of steps and needs a persistent visual indicator of their position and progress.
+
+**Use a simple list or `hx-progress-bar` instead when:** the workflow is linear with no step-level status tracking, or progress is represented as a single percentage value.
+
+## Live Demo
+
+### Default (Horizontal)
+
+<ComponentDemo title="Default Steps">
+  <hx-steps aria-label="Checkout progress">
+    <hx-step label="Cart" status="complete" description="Items added"></hx-step>
+    <hx-step label="Payment" status="active" description="Enter payment info"></hx-step>
+    <hx-step label="Confirm" status="pending" description="Review order"></hx-step>
+  </hx-steps>
+</ComponentDemo>
+
+### Vertical Orientation
+
+<ComponentDemo title="Vertical Steps">
+  <hx-steps orientation="vertical" aria-label="Patient intake progress">
+    <hx-step
+      label="Demographics"
+      status="complete"
+      description="Personal information collected"
+    ></hx-step>
+    <hx-step label="Insurance" status="complete" description="Coverage verified"></hx-step>
+    <hx-step
+      label="Clinical History"
+      status="active"
+      description="Medical history review"
+    ></hx-step>
+    <hx-step label="Consent" status="pending" description="Forms to be signed"></hx-step>
+  </hx-steps>
+</ComponentDemo>
+
+### Size Variants
+
+<ComponentDemo title="Size Variants">
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <div>
+      <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem;">sm</p>
+      <hx-steps size="sm" aria-label="Small steps">
+        <hx-step label="Step 1" status="complete"></hx-step>
+        <hx-step label="Step 2" status="active"></hx-step>
+        <hx-step label="Step 3" status="pending"></hx-step>
+      </hx-steps>
+    </div>
+    <div>
+      <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem;">md (default)</p>
+      <hx-steps size="md" aria-label="Medium steps">
+        <hx-step label="Step 1" status="complete"></hx-step>
+        <hx-step label="Step 2" status="active"></hx-step>
+        <hx-step label="Step 3" status="pending"></hx-step>
+      </hx-steps>
+    </div>
+    <div>
+      <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem;">lg</p>
+      <hx-steps size="lg" aria-label="Large steps">
+        <hx-step label="Step 1" status="complete"></hx-step>
+        <hx-step label="Step 2" status="active"></hx-step>
+        <hx-step label="Step 3" status="pending"></hx-step>
+      </hx-steps>
+    </div>
+  </div>
+</ComponentDemo>
+
+### All Status Variants
+
+<ComponentDemo title="All Status Variants">
+  <hx-steps aria-label="All step statuses">
+    <hx-step label="Complete" status="complete" description="This step is done"></hx-step>
+    <hx-step label="Active" status="active" description="Currently in progress"></hx-step>
+    <hx-step label="Error" status="error" description="Requires attention"></hx-step>
+    <hx-step label="Pending" status="pending" description="Not yet started"></hx-step>
+  </hx-steps>
+</ComponentDemo>
+
+### With Disabled Step
+
+<ComponentDemo title="Disabled Steps">
+  <hx-steps aria-label="Authorization workflow">
+    <hx-step label="Patient Info" status="complete"></hx-step>
+    <hx-step label="Diagnosis Codes" status="active"></hx-step>
+    <hx-step label="Supporting Docs" status="pending" disabled></hx-step>
+    <hx-step label="Submit" status="pending" disabled></hx-step>
+  </hx-steps>
+</ComponentDemo>
+
+### Healthcare Example: Prior Authorization Workflow
+
+<ComponentDemo title="Prior Authorization Flow">
+  <hx-steps orientation="vertical" aria-label="Prior authorization submission">
+    <hx-step
+      label="Patient Eligibility"
+      status="complete"
+      description="Coverage verified — Aetna PPO active"
+    ></hx-step>
+    <hx-step
+      label="Diagnosis & Procedure"
+      status="complete"
+      description="ICD-10: M54.5 · CPT: 97110"
+    ></hx-step>
+    <hx-step
+      label="Clinical Documentation"
+      status="active"
+      description="Upload supporting clinical notes"
+    ></hx-step>
+    <hx-step
+      label="Physician Sign-off"
+      status="pending"
+      description="Awaiting Dr. Nguyen review"
+      disabled
+    ></hx-step>
+    <hx-step
+      label="Submission"
+      status="pending"
+      description="Submit to payer portal"
+      disabled
+    ></hx-step>
+  </hx-steps>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only these components (tree-shaking friendly)
+import '@helix/library/components/hx-steps';
+```
+
+## Basic Usage
+
+Minimal HTML snippet — no build tool required:
+
+```html
+<!-- Horizontal steps (default) -->
+<hx-steps aria-label="Checkout progress">
+  <hx-step label="Cart" status="complete"></hx-step>
+  <hx-step label="Payment" status="active"></hx-step>
+  <hx-step label="Confirm" status="pending"></hx-step>
+</hx-steps>
+
+<!-- Vertical orientation -->
+<hx-steps orientation="vertical" aria-label="Patient intake">
+  <hx-step label="Demographics" status="complete" description="Information collected"></hx-step>
+  <hx-step label="Insurance" status="active" description="Verify coverage"></hx-step>
+  <hx-step label="Consent" status="pending"></hx-step>
+</hx-steps>
+
+<!-- Large size with error state -->
+<hx-steps size="lg" aria-label="Authorization steps">
+  <hx-step label="Submitted" status="complete"></hx-step>
+  <hx-step label="Payer Review" status="error" description="Additional info required"></hx-step>
+  <hx-step label="Decision" status="pending" disabled></hx-step>
+</hx-steps>
+```
+
+Respond to step clicks via JavaScript:
+
+```javascript
+const steps = document.querySelector('hx-steps');
+
+steps.addEventListener('hx-step-click', (event) => {
+  const { step, index } = event.detail;
+  console.log(`Step ${index + 1} clicked: ${step.label}`);
+
+  // Navigate to the clicked step in your application
+  navigateToStep(index);
+});
+```
+
+Update step status programmatically:
+
+```javascript
+const steps = document.querySelectorAll('hx-step');
+
+// Mark step as complete
+steps[0].status = 'complete';
+
+// Set the active step
+steps[1].status = 'active';
+
+// Disable future steps
+steps[2].disabled = true;
+```
+
+## Properties
+
+### hx-steps
+
+| Property      | Attribute     | Type                         | Default        | Description                                                                                                       |
+| ------------- | ------------- | ---------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the steps. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute. |
+| `size`        | `size`        | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size variant. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute.                  |
+
+### hx-step
+
+| Property      | Attribute     | Type                                             | Default     | Description                                                                                                                         |
+| ------------- | ------------- | ------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `label`       | `label`       | `string`                                         | `''`        | Step label text. Also available as a named slot for rich content. Reflects to attribute.                                            |
+| `status`      | `status`      | `'pending' \| 'active' \| 'complete' \| 'error'` | `'pending'` | Current status of the step. Controls indicator icon, colors, and ARIA state. Reflects to attribute.                                 |
+| `description` | `description` | `string`                                         | `''`        | Optional description shown below the label. Also available as a named slot. Reflects to attribute.                                  |
+| `disabled`    | `disabled`    | `boolean`                                        | `false`     | Marks the step as non-interactive. Suppresses click events, sets `aria-disabled="true"` and `tabindex="-1"`. Reflects to attribute. |
+
+> **Note:** `orientation`, `size`, and `index` on `<hx-step>` are managed by the parent `<hx-steps>` container. Do not set these attributes directly on `<hx-step>` elements — they will be overridden.
+
+## Events
+
+### hx-steps
+
+| Event           | Detail Type                          | Description                                                                                                                                     |
+| --------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-step-click` | `{ step: HelixStep, index: number }` | Dispatched on the `<hx-steps>` container when a non-disabled step is clicked or activated via keyboard (Enter or Space). `index` is zero-based. |
+
+### hx-step
+
+`hx-step` does not dispatch public events directly. All interaction is surfaced through the parent `<hx-steps>` via the `hx-step-click` event.
+
+## CSS Custom Properties
+
+The following tokens can be overridden at the `:root` level (to theme all instances) or on a specific `hx-steps` element.
+
+| Property                              | Default                       | Description                                                     |
+| ------------------------------------- | ----------------------------- | --------------------------------------------------------------- |
+| `--hx-steps-indicator-size`           | `2rem`                        | Step indicator circle diameter. Overridden per size variant.    |
+| `--hx-steps-indicator-font-size`      | `var(--hx-font-size-sm)`      | Font size for step number text inside the indicator.            |
+| `--hx-steps-indicator-icon-size`      | `1rem`                        | Size of icons rendered inside the indicator (custom icon slot). |
+| `--hx-steps-label-font-size`          | `var(--hx-font-size-sm)`      | Font size for step label text.                                  |
+| `--hx-steps-description-font-size`    | `var(--hx-font-size-xs)`      | Font size for step description text.                            |
+| `--hx-steps-connector-color`          | `var(--hx-color-neutral-200)` | Connector line color between steps (default/pending).           |
+| `--hx-steps-connector-complete-color` | `var(--hx-color-primary-500)` | Connector line color after a complete step.                     |
+| `--hx-steps-connector-thickness`      | `var(--hx-border-width, 2px)` | Connector line thickness.                                       |
+| `--hx-steps-label-color`              | `var(--hx-color-neutral-600)` | Step label text color.                                          |
+| `--hx-steps-description-color`        | `var(--hx-color-neutral-500)` | Step description text color.                                    |
+
+```css
+/* Theme all steps to a custom brand color */
+:root {
+  --hx-steps-connector-complete-color: #0077b6;
+}
+
+/* Override a specific steps instance */
+hx-steps#intake-flow {
+  --hx-steps-indicator-size: 2.5rem;
+  --hx-steps-connector-color: #e5e7eb;
+}
+```
+
+## CSS Parts
+
+### hx-steps
+
+| Part   | Description                                    |
+| ------ | ---------------------------------------------- |
+| `base` | The inner `<div>` wrapper containing the slot. |
+
+### hx-step
+
+| Part          | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| `base`        | The outermost wrapper element for the step.                  |
+| `indicator`   | The circular step indicator showing number, checkmark, or X. |
+| `connector`   | The line connecting this step to the next step.              |
+| `label`       | The step label text container.                               |
+| `description` | The step description text container.                         |
+
+```css
+/* Style the active step indicator */
+hx-step[status='active']::part(indicator) {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* Style the connector line */
+hx-step::part(connector) {
+  opacity: 0.5;
+}
+```
+
+## Slots
+
+### hx-step slots
+
+| Slot          | Description                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| _(default)_   | Not used. Steps are configured through properties.                                                            |
+| `icon`        | Custom icon displayed inside the indicator when `status` is `pending` or `active`. Falls back to step number. |
+| `label`       | Rich label content. Falls back to the `label` property value.                                                 |
+| `description` | Rich description content. Falls back to the `description` property value.                                     |
+
+```html
+<!-- Custom icon slot -->
+<hx-steps aria-label="Upload progress">
+  <hx-step status="complete">
+    <span slot="label">Upload Files</span>
+    <span slot="description">Drag and drop or browse</span>
+  </hx-step>
+  <hx-step status="active">
+    <svg
+      slot="icon"
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 8v4l3 3" />
+    </svg>
+    <span slot="label">Processing</span>
+  </hx-step>
+</hx-steps>
+```
+
+## Accessibility
+
+`hx-steps` is built for WCAG 2.1 AA compliance. Healthcare workflows require that step progress be communicated accurately to all users, including those relying on assistive technology.
+
+| Topic           | Details                                                                                                                                                                                       |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA roles      | `<hx-steps>` uses `role="list"`. Each `<hx-step>` uses `role="listitem"`. This pattern is supported across all major screen readers and communicates a navigable sequence of items.           |
+| `aria-label`    | **Always provide `aria-label` on `<hx-steps>`** describing the workflow (e.g., `"Checkout progress"`, `"Prior authorization steps"`). Without it, the list is announced without context.      |
+| `aria-current`  | The active step receives `aria-current="step"` on the host element. Screen readers announce the current position within the sequence.                                                         |
+| `aria-disabled` | Disabled steps receive `aria-disabled="true"` and `tabindex="-1"`, preventing focus and signaling non-interactivity to assistive technology.                                                  |
+| Keyboard        | Each non-disabled step is focusable (`tabindex="0"`). `Enter` and `Space` trigger `hx-step-click`. Tab order follows DOM order through the step list.                                         |
+| Focus styles    | `:focus-visible` styles are provided on the step indicator. The focus ring is visible at the 3:1 minimum contrast ratio required by WCAG 2.4.11 (Enhanced Focus Appearance).                  |
+| Status icons    | Complete steps show a checkmark SVG with visually hidden text "Complete". Error steps show an X SVG with visually hidden text "Error". These supplement color-only status communication.      |
+| Color           | Status is never communicated by color alone — icons and visually hidden text ensure compliance with WCAG 1.4.1 (Use of Color).                                                                |
+| Reduced motion  | Transition animations on connector lines and indicators are suppressed when `prefers-reduced-motion: reduce` is active.                                                                       |
+| WCAG            | Meets WCAG 2.1 AA. SC 1.3.1 (Info and Relationships), SC 1.4.1 (Use of Color), SC 2.1.1 (Keyboard), SC 2.4.3 (Focus Order), SC 4.1.2 (Name, Role, Value) satisfied. Zero axe-core violations. |
+
+### Accessible Label Best Practices
+
+Always provide a descriptive `aria-label` on `<hx-steps>` that names the overall process:
+
+```html
+<!-- Preferred: process-specific label -->
+<hx-steps aria-label="Prior authorization submission">...</hx-steps>
+<hx-steps aria-label="Patient intake workflow">...</hx-steps>
+<hx-steps aria-label="Checkout progress">...</hx-steps>
+
+<!-- Acceptable: generic label -->
+<hx-steps aria-label="Progress steps">...</hx-steps>
+
+<!-- Incorrect: missing label — list is announced without context -->
+<hx-steps>...</hx-steps>
+```
+
+## Drupal Integration
+
+Use the component in a Twig template after registering the library. A pre-built Twig template is included at `packages/hx-library/src/components/hx-steps/hx-steps.twig`.
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+
+<hx-steps
+  orientation="{{ orientation|default('horizontal') }}"
+  size="{{ size|default('md') }}"
+  aria-label="{{ aria_label|default('Progress steps') }}"
+>
+  {% for step in steps %}
+    <hx-step
+      label="{{ step.label }}"
+      status="{{ step.status|default('pending') }}"
+      {% if step.description is defined and step.description %}
+        description="{{ step.description }}"
+      {% endif %}
+      {% if step.disabled is defined and step.disabled %}
+        disabled
+      {% endif %}
+    ></hx-step>
+  {% endfor %}
+</hx-steps>
+```
+
+> **Important:** Do NOT set `orientation`, `size`, or `index` attributes directly on `<hx-step>` in Twig. These properties are managed by the parent `<hx-steps>` container and will be overridden. Always set them on `<hx-steps>` only.
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Use `once()` to safely manage step interactions in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixSteps = {
+  attach(context) {
+    // once() prevents duplicate event binding during AJAX attach cycles
+    once('helixSteps', 'hx-steps[data-drupal-steps]', context).forEach((stepsEl) => {
+      stepsEl.addEventListener('hx-step-click', (event) => {
+        const { index } = event.detail;
+        // Navigate to the selected step's form section
+        const targetSection = document.querySelector(`[data-step-index="${index}"]`);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+Copy-paste this into a `.html` file and open it in a browser — no build tool needed:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-steps example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 3rem; max-width: 800px;"
+  >
+    <!-- 1. Horizontal checkout flow -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Checkout Progress</h2>
+      <hx-steps id="checkout-steps" aria-label="Checkout progress">
+        <hx-step label="Cart" status="complete" description="3 items"></hx-step>
+        <hx-step label="Shipping" status="complete" description="Standard delivery"></hx-step>
+        <hx-step label="Payment" status="active" description="Enter card details"></hx-step>
+        <hx-step
+          label="Confirm"
+          status="pending"
+          description="Review and place order"
+          disabled
+        ></hx-step>
+      </hx-steps>
+    </section>
+
+    <!-- 2. Vertical patient intake workflow -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Patient Intake</h2>
+      <hx-steps orientation="vertical" aria-label="Patient intake workflow">
+        <hx-step
+          label="Demographics"
+          status="complete"
+          description="Personal information collected"
+        ></hx-step>
+        <hx-step
+          label="Insurance Verification"
+          status="complete"
+          description="Aetna PPO — active coverage"
+        ></hx-step>
+        <hx-step
+          label="Clinical History"
+          status="active"
+          description="Review past diagnoses and medications"
+        ></hx-step>
+        <hx-step
+          label="Consent Forms"
+          status="pending"
+          description="Requires patient signature"
+          disabled
+        ></hx-step>
+        <hx-step label="Appointment Scheduled" status="pending" disabled></hx-step>
+      </hx-steps>
+    </section>
+
+    <!-- 3. Interactive steps (click to navigate) -->
+    <section>
+      <h2 style="margin: 0 0 1rem;">Interactive Navigation</h2>
+      <hx-steps id="nav-steps" aria-label="Form sections">
+        <hx-step label="Section 1" status="complete"></hx-step>
+        <hx-step label="Section 2" status="active"></hx-step>
+        <hx-step label="Section 3" status="pending"></hx-step>
+      </hx-steps>
+      <p id="step-output" style="margin-top: 1rem; color: #374151; font-size: 0.875rem;">
+        Click a step to navigate.
+      </p>
+    </section>
+
+    <script>
+      const navSteps = document.getElementById('nav-steps');
+      const stepOutput = document.getElementById('step-output');
+
+      navSteps.addEventListener('hx-step-click', (event) => {
+        const { step, index } = event.detail;
+        stepOutput.textContent = `Navigated to step ${index + 1}: "${step.label}"`;
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-steps" section="api" />
+
+<ComponentDoc tagName="hx-step" section="api" />

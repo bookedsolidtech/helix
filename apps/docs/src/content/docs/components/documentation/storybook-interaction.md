@@ -356,7 +356,7 @@ export const FormDataParticipation: Story = {
 
 The `@storybook/addon-a11y` addon runs axe-core against every story automatically when installed. It shows the violations panel in the Storybook UI and can block CI if violations are found.
 
-Interaction tests can also trigger programmatic accessibility checks using the `checkA11y()` helper from `@helix/library/test-utils`. However, within a `play()` function, you can use the `storybook/test` `expect` to assert on aria attributes directly:
+Interaction tests can also trigger programmatic accessibility checks using the `checkA11y()` helper from `@helixui/library/test-utils`. However, within a `play()` function, you can use the `storybook/test` `expect` to assert on aria attributes directly:
 
 ```typescript
 export const AccessibilityVerification: Story = {

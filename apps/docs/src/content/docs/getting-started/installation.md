@@ -13,7 +13,7 @@ description: How to install and set up the HELIX enterprise web component librar
 
 ```bash
 # Clone the repository
-git clone https://github.com/himerus/helix.git
+git clone https://github.com/bookedsolidtech/helix.git
 cd helix
 
 # Use the correct Node version
@@ -30,11 +30,11 @@ turbo run dev --filter=docs
 
 HELIX uses **Turborepo** with **npm workspaces** for build orchestration:
 
-| Package               | Description                       | Status  |
-| --------------------- | --------------------------------- | ------- |
-| `apps/docs`           | Astro/Starlight documentation hub | Active  |
-| `apps/storybook`      | Storybook component playground    | Phase 3 |
-| `packages/wc-library` | Lit 3.x component library         | Phase 2 |
+| Package               | Description                       | Status |
+| --------------------- | --------------------------------- | ------ |
+| `apps/docs`           | Astro/Starlight documentation hub | Active |
+| `apps/storybook`      | Storybook component playground    | Active |
+| `packages/hx-library` | Lit 3.x component library         | Active |
 
 ## Next Steps
 

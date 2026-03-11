@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && npm ci",
-  "buildCommand": "cd ../.. && npx turbo run build --filter=@helix/storybook",
+  "buildCommand": "cd ../.. && npx turbo run build --filter=@helixui/storybook",
   "outputDirectory": "dist",
   "headers": [
     {

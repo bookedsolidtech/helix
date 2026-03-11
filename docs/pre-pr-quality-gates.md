@@ -22,7 +22,7 @@ A three-layer quality gate system that catches errors at progressively wider sco
    - [Code Review (CodeRabbit)](#code-review-coderabbit)
 4. [Layer 3: Branch Protection & Deploy Gates](#layer-3-branch-protection--deploy-gates)
    - [Required Status Checks](#required-status-checks)
-   - [Squash-Only Merges](#squash-only-merges)
+   - [Merge Commit Strategy](#merge-commit-strategy)
    - [Deploy Verification](#deploy-verification)
 5. [Tool-by-Tool Setup](#tool-by-tool-setup)
    - [ESLint v9 (Flat Config)](#eslint-v9-flat-config)
@@ -588,12 +588,12 @@ Configure via GitHub Settings > Branches > Branch protection rules, or use the G
 #!/usr/bin/env bash
 REPO="your-org/your-repo"
 
-# Set squash-only merges
+# Set merge commit strategy (squash disabled to preserve conventional commits for semantic-release)
 gh api "repos/${REPO}" \
   --method PATCH \
-  --field allow_squash_merge=true \
-  --field allow_merge_commit=false \
-  --field allow_rebase_merge=false
+  --field allow_squash_merge=false \
+  --field allow_merge_commit=true \
+  --field allow_rebase_merge=true
 
 # Create ruleset with required checks
 gh api "repos/${REPO}/rulesets" \
@@ -639,11 +639,11 @@ gh api "repos/${REPO}/rulesets" \
 EOF
 ```
 
-### Squash-Only Merges
+### Merge Commit Strategy
 
-Squash merges keep the main branch history clean — one commit per PR. Configure at the repo level:
+Merge commits are used to preserve conventional commit messages through the branch pipeline, which is required for semantic-release to correctly determine version bumps. Squash merging is disabled. Configure at the repo level:
 
-- GitHub Settings > General > Pull Requests > Allow squash merging (only)
+- GitHub Settings > General > Pull Requests > Allow merge commits (enabled), Allow squash merging (disabled)
 - Or via API as shown above
 
 ### Deploy Verification

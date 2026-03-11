@@ -11,31 +11,58 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 <ComponentDoc tagName="hx-button" section="summary" />
 
-## Variants
+## Overview
 
-Primary, secondary, and ghost visual styles.
+`hx-button` is the primary interactive element for triggering actions and form submissions in Helix. It supports six visual variants, three sizes, a loading state with spinner, prefix/suffix icon slots, and anchor rendering via `href`. When used inside a `<form>`, it participates via `ElementInternals` for full form association.
+
+**Use `hx-button` when:** the user triggers an action (submit, delete, open dialog).
+**Use `hx-link` instead when:** the user navigates to another page or URL.
+
+## Live Demo
+
+### Variants
+
+Primary, secondary, tertiary, danger, ghost, and outline visual styles.
 
 <ComponentDemo title="Variants">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
     <hx-button variant="primary">Primary</hx-button>
     <hx-button variant="secondary">Secondary</hx-button>
+    <hx-button variant="tertiary">Tertiary</hx-button>
+    <hx-button variant="danger">Danger</hx-button>
     <hx-button variant="ghost">Ghost</hx-button>
+    <hx-button variant="outline">Outline</hx-button>
   </div>
 </ComponentDemo>
 
-## Sizes
+### Sizes
 
 Small, medium, and large button sizes.
 
 <ComponentDemo title="Sizes">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-    <hx-button size="sm">Small</hx-button>
-    <hx-button size="md">Medium</hx-button>
-    <hx-button size="lg">Large</hx-button>
+    <hx-button hx-size="sm">Small</hx-button>
+    <hx-button hx-size="md">Medium</hx-button>
+    <hx-button hx-size="lg">Large</hx-button>
   </div>
 </ComponentDemo>
 
-## Disabled
+### Loading
+
+Buttons in loading state show a spinner and prevent interaction.
+
+<ComponentDemo title="Loading">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-button variant="primary" loading>
+      Saving...
+    </hx-button>
+    <hx-button variant="secondary" loading>
+      Loading
+    </hx-button>
+  </div>
+</ComponentDemo>
+
+### Disabled
 
 Buttons in disabled state across all variants.
 
@@ -47,47 +74,168 @@ Buttons in disabled state across all variants.
     <hx-button variant="secondary" disabled>
       Secondary
     </hx-button>
+    <hx-button variant="danger" disabled>
+      Danger
+    </hx-button>
     <hx-button variant="ghost" disabled>
       Ghost
     </hx-button>
   </div>
 </ComponentDemo>
 
-## All Combinations
+### Prefix and Suffix Slots
 
-Full variant × size matrix.
+Use `prefix` and `suffix` slots to add icons or content before/after the label.
 
-<ComponentDemo title="All Combinations">
-  <div style="display: grid; grid-template-columns: repeat(3, auto); gap: 0.75rem; justify-items: start; align-items: center;">
-    <hx-button variant="primary" size="sm">
-      Primary SM
+<ComponentDemo title="Prefix & Suffix">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-button variant="primary">
+      <span slot="prefix">+</span>
+      Add Item
     </hx-button>
-    <hx-button variant="primary" size="md">
-      Primary MD
-    </hx-button>
-    <hx-button variant="primary" size="lg">
-      Primary LG
-    </hx-button>
-    <hx-button variant="secondary" size="sm">
-      Secondary SM
-    </hx-button>
-    <hx-button variant="secondary" size="md">
-      Secondary MD
-    </hx-button>
-    <hx-button variant="secondary" size="lg">
-      Secondary LG
-    </hx-button>
-    <hx-button variant="ghost" size="sm">
-      Ghost SM
-    </hx-button>
-    <hx-button variant="ghost" size="md">
-      Ghost MD
-    </hx-button>
-    <hx-button variant="ghost" size="lg">
-      Ghost LG
+    <hx-button variant="secondary">
+      Download
+      <span slot="suffix">↓</span>
     </hx-button>
   </div>
 </ComponentDemo>
+
+### As Link
+
+Set `href` to render the button as an anchor element.
+
+<ComponentDemo title="Link Button">
+  <hx-button variant="primary" href="https://example.com" target="_blank">
+    Visit Site
+  </hx-button>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-button';
+```
+
+## Basic Usage
+
+```html
+<hx-button variant="primary">Save Changes</hx-button>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                                                         | Default     | Description                                                    |
+| ---------- | ---------- | ---------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------- |
+| `variant`  | `variant`  | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| 'ghost' \| 'outline'` | `'primary'` | Visual style variant.                                          |
+| `hxSize`   | `hx-size`  | `'sm' \| 'md' \| 'lg'`                                                       | `'md'`      | Button size.                                                   |
+| `disabled` | `disabled` | `boolean`                                                                    | `false`     | Prevents all interaction.                                      |
+| `loading`  | `loading`  | `boolean`                                                                    | `false`     | Shows spinner; sets `aria-busy`. Does not disable the element. |
+| `type`     | `type`     | `'button' \| 'submit' \| 'reset'`                                            | `'button'`  | Native button type. Ignored when `href` is set.                |
+| `href`     | `href`     | `string \| undefined`                                                        | `undefined` | When set, renders an `<a>` element instead of `<button>`.      |
+| `target`   | `target`   | `string \| undefined`                                                        | `undefined` | Anchor `target`. Used only when `href` is set.                 |
+| `name`     | `name`     | `string \| undefined`                                                        | `undefined` | Form field name for `ElementInternals.setFormValue`.           |
+| `value`    | `value`    | `string \| undefined`                                                        | `undefined` | Form field value submitted on form submit.                     |
+
+## Events
+
+| Event      | Detail Type                     | Description                                                                              |
+| ---------- | ------------------------------- | ---------------------------------------------------------------------------------------- |
+| `hx-click` | `{ originalEvent: MouseEvent }` | Fired on click when the button is neither disabled nor loading. Bubbles and is composed. |
+
+## CSS Custom Properties
+
+| Property                       | Default                          | Description              |
+| ------------------------------ | -------------------------------- | ------------------------ |
+| `--hx-button-bg`               | `var(--hx-color-primary-500)`    | Button background color. |
+| `--hx-button-color`            | `var(--hx-color-neutral-0)`      | Button text color.       |
+| `--hx-button-border-color`     | `transparent`                    | Button border color.     |
+| `--hx-button-border-radius`    | `var(--hx-border-radius-md)`     | Button border radius.    |
+| `--hx-button-font-family`      | `var(--hx-font-family-sans)`     | Button font family.      |
+| `--hx-button-font-weight`      | `var(--hx-font-weight-semibold)` | Button font weight.      |
+| `--hx-button-focus-ring-color` | `var(--hx-focus-ring-color)`     | Focus ring color.        |
+
+## CSS Parts
+
+| Part      | Description                             |
+| --------- | --------------------------------------- |
+| `button`  | The native `<button>` or `<a>` element. |
+| `label`   | The label text wrapper `<span>`.        |
+| `prefix`  | The prefix slot container `<span>`.     |
+| `suffix`  | The suffix slot container `<span>`.     |
+| `spinner` | The loading spinner `<svg>` element.    |
+
+## Slots
+
+| Slot        | Description                                |
+| ----------- | ------------------------------------------ |
+| _(default)_ | Button label text or content.              |
+| `prefix`    | Icon or content rendered before the label. |
+| `suffix`    | Icon or content rendered after the label.  |
+
+## Accessibility
+
+| Topic           | Details                                                                   |
+| --------------- | ------------------------------------------------------------------------- |
+| ARIA role       | Inherits native `button` role (or `link` when `href` is set).             |
+| `aria-busy`     | Set to `true` automatically when `loading` is active.                     |
+| `aria-disabled` | Set to `true` on the `<a>` element when `disabled` + `href` are combined. |
+| Keyboard        | `Tab` to focus; `Enter` / `Space` to activate.                            |
+| Screen reader   | Loading state is announced via `aria-busy`; spinner SVG is `aria-hidden`. |
+| Focus           | Focus stays on the button after click; no focus movement.                 |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/my-template.html.twig #}
+<hx-button
+  variant="{{ variant|default('primary') }}"
+  {% if disabled %}disabled{% endif %}
+>
+  {{ label }}
+</hx-button>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-button example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+    <hx-button variant="primary" id="save-btn">Save Changes</hx-button>
+    <hx-button variant="secondary">Cancel</hx-button>
+    <hx-button variant="danger">Delete</hx-button>
+    <hx-button variant="primary" loading>Saving...</hx-button>
+    <hx-button variant="primary" disabled>Disabled</hx-button>
+
+    <script>
+      document.getElementById('save-btn').addEventListener('hx-click', (e) => {
+        console.log('Button clicked:', e.detail.originalEvent);
+      });
+    </script>
+  </body>
+</html>
+```
 
 ## API Reference
 

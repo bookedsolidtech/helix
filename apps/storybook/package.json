@@ -1,6 +1,6 @@
 {
-  "name": "@helix/storybook",
-  "version": "0.0.1",
+  "name": "@helixui/storybook",
+  "version": "0.1.0",
   "private": true,
   "description": "Storybook design system playground for WC-2026 components",
   "type": "module",
@@ -11,8 +11,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@helix/library": "*",
-    "@helix/tokens": "*"
+    "@helixui/library": "*",
+    "@helixui/tokens": "*"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^10.2.8",

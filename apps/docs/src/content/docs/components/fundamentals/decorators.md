@@ -719,7 +719,7 @@ private _handleEvent(e: Event) {
 
 - You're defining a reusable component for a library
 - You want automatic registration on module import
-- You're following wc-2026 conventions
+- You're following HELiX conventions
 
 ### Choose @eventOptions when:
 

@@ -38,7 +38,7 @@ export const helixTextInputStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-input-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -91,9 +91,17 @@ export const helixTextInputStyles = css`
   .field__suffix {
     display: flex;
     align-items: center;
-    padding: 0 var(--hx-space-3, 0.75rem);
     color: var(--hx-color-neutral-500, #6c757d);
     flex-shrink: 0;
+  }
+
+  /* Only add padding when slot has content — avoids phantom space on empty slots */
+  .field__prefix--filled {
+    padding: 0 var(--hx-space-3, 0.75rem);
+  }
+
+  .field__suffix--filled {
+    padding: 0 var(--hx-space-3, 0.75rem);
   }
 
   /* ─── Native Input ─── */
@@ -148,7 +156,15 @@ export const helixTextInputStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-input-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ─── Motion ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .field__input-wrapper {
+      transition: none;
+    }
   }
 `;

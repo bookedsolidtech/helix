@@ -1,0 +1,431 @@
+---
+title: 'hx-toggle-button'
+description: 'Two-state toggle button with pressed/unpressed ARIA semantics, form association, and slot-based icon composition'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-toggle-button" section="summary" />
+
+## Overview
+
+`hx-toggle-button` is a form-associated button that maintains a boolean `pressed` state. It renders a native `<button role="button">` inside Shadow DOM with `aria-pressed` managed automatically, making it fully accessible to screen readers and assistive technologies without any additional ARIA work from consumers.
+
+Unlike a checkbox or radio, a toggle button communicates a binary active/inactive action — muting audio, bookmarking a patient, activating a filter view — rather than a form field selection. It participates in HTML forms via the `ElementInternals` API: when a `name` and `value` are set, the current `pressed` state determines whether the value is submitted with the form. Five visual variants (`primary`, `secondary`, `tertiary`, `ghost`, `outline`) and three sizes (`sm`, `md`, `lg`) cover every clinical UI context from toolbar actions to inline patient record controls.
+
+**Use `hx-toggle-button` when:** you need a button that visually and semantically represents an on/off or active/inactive state — audio mute, filter activation, view switching, or patient record bookmarking.
+**Use `hx-switch` instead when:** the interaction represents a system setting or configuration toggle with an immediate effect (e.g., enabling notifications).
+**Use `hx-checkbox` instead when:** the toggle is part of a multi-select form field group.
+
+## Live Demo
+
+### Basic
+
+A minimal toggle button with default styling.
+
+<ComponentDemo title="Basic">
+  <hx-toggle-button>Mute Audio</hx-toggle-button>
+</ComponentDemo>
+
+### Variants
+
+All five visual variants in their unpressed and pressed states.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+    <hx-toggle-button variant="primary">Primary</hx-toggle-button>
+    <hx-toggle-button variant="primary" pressed>
+      Primary Pressed
+    </hx-toggle-button>
+    <hx-toggle-button variant="secondary">Secondary</hx-toggle-button>
+    <hx-toggle-button variant="secondary" pressed>
+      Secondary Pressed
+    </hx-toggle-button>
+    <hx-toggle-button variant="tertiary">Tertiary</hx-toggle-button>
+    <hx-toggle-button variant="tertiary" pressed>
+      Tertiary Pressed
+    </hx-toggle-button>
+    <hx-toggle-button variant="ghost">Ghost</hx-toggle-button>
+    <hx-toggle-button variant="ghost" pressed>
+      Ghost Pressed
+    </hx-toggle-button>
+    <hx-toggle-button variant="outline">Outline</hx-toggle-button>
+    <hx-toggle-button variant="outline" pressed>
+      Outline Pressed
+    </hx-toggle-button>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large size variants.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+    <hx-toggle-button hx-size="sm">Small</hx-toggle-button>
+    <hx-toggle-button hx-size="md">Medium (Default)</hx-toggle-button>
+    <hx-toggle-button hx-size="lg">Large</hx-toggle-button>
+  </div>
+</ComponentDemo>
+
+### Pressed State
+
+Buttons can be initialized in the pressed state using the `pressed` attribute.
+
+<ComponentDemo title="Pressed State">
+  <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+    <hx-toggle-button variant="primary">Active Patients Filter</hx-toggle-button>
+    <hx-toggle-button variant="primary" pressed>
+      Active Patients Filter
+    </hx-toggle-button>
+    <hx-toggle-button variant="outline">Grid View</hx-toggle-button>
+    <hx-toggle-button variant="outline" pressed>
+      Grid View
+    </hx-toggle-button>
+  </div>
+</ComponentDemo>
+
+### Disabled
+
+A disabled toggle button cannot be interacted with and does not fire `hx-toggle` events.
+
+<ComponentDemo title="Disabled">
+  <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+    <hx-toggle-button disabled>Bookmark Patient</hx-toggle-button>
+    <hx-toggle-button disabled pressed>
+      Bookmark Patient
+    </hx-toggle-button>
+  </div>
+</ComponentDemo>
+
+### With Prefix and Suffix Slots
+
+Icon slots allow icon-augmented or icon-only toggle buttons. When used as an icon-only button, always provide a `label` for screen reader accessibility.
+
+<ComponentDemo title="Prefix & Suffix Slots">
+  <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+    <hx-toggle-button variant="outline">
+      <span slot="prefix">&#9776;</span>
+      List View
+    </hx-toggle-button>
+    <hx-toggle-button variant="outline">
+      Grid View
+      <span slot="suffix">&#9632;</span>
+    </hx-toggle-button>
+    <hx-toggle-button variant="ghost" label="Mute audio alerts">
+      <span slot="prefix">&#128263;</span>
+    </hx-toggle-button>
+    <hx-toggle-button variant="ghost" label="Bookmark patient" pressed>
+      <span slot="prefix">&#9733;</span>
+    </hx-toggle-button>
+  </div>
+</ComponentDemo>
+
+### In a Form
+
+`hx-toggle-button` participates in form submission via `ElementInternals`. When `pressed`, the `value` is included in `FormData` under the `name` key.
+
+<ComponentDemo title="Form Participation">
+  <form
+    onsubmit="event.preventDefault(); document.getElementById('tb-output').textContent = JSON.stringify(Object.fromEntries(new FormData(event.target).entries()), null, 2);"
+    style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;"
+  >
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+      <hx-toggle-button name="filter" value="active-patients" variant="outline">
+        Active Patients
+      </hx-toggle-button>
+      <hx-toggle-button name="filter" value="critical-alerts" variant="outline">
+        Critical Alerts
+      </hx-toggle-button>
+      <hx-toggle-button name="filter" value="pending-orders" variant="outline">
+        Pending Orders
+      </hx-toggle-button>
+    </div>
+    <button
+      type="submit"
+      style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: var(--hx-color-primary-500, #2563EB); color: white; cursor: pointer; font-size: 0.875rem; width: fit-content;"
+    >
+      Apply Filters
+    </button>
+    <pre
+      id="tb-output"
+      style="background: var(--hx-color-neutral-50, #f8f9fa); padding: 1rem; border-radius: 0.375rem; font-size: 0.75rem; min-height: 2rem; border: 1px solid var(--hx-color-neutral-200, #e9ecef);"
+    ></pre>
+  </form>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-toggle-button';
+```
+
+## Basic Usage
+
+```html
+<!-- Default toggle button -->
+<hx-toggle-button>Mute Audio</hx-toggle-button>
+
+<!-- Pre-pressed (active) state -->
+<hx-toggle-button pressed>Active Patients Filter</hx-toggle-button>
+
+<!-- Variant and size -->
+<hx-toggle-button variant="outline" hx-size="sm">Grid View</hx-toggle-button>
+
+<!-- Icon-only (label required for accessibility) -->
+<hx-toggle-button variant="ghost" label="Bookmark patient">
+  <span slot="prefix">&#9733;</span>
+</hx-toggle-button>
+
+<!-- Form-associated -->
+<hx-toggle-button name="showCritical" value="true">Show Critical Only</hx-toggle-button>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                                             | Default       | Description                                                                                         |
+| ---------- | ---------- | ---------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------- |
+| `pressed`  | `pressed`  | `boolean`                                                        | `false`       | Toggle state. `true` = pressed/active. Reflects as attribute.                                       |
+| `variant`  | `variant`  | `'primary' \| 'secondary' \| 'tertiary' \| 'ghost' \| 'outline'` | `'secondary'` | Visual style variant. Reflects as attribute.                                                        |
+| `size`     | `hx-size`  | `'sm' \| 'md' \| 'lg'`                                           | `'md'`        | Size variant. Reflects as the `hx-size` attribute to avoid collision with the native `size` IDL.    |
+| `disabled` | `disabled` | `boolean`                                                        | `false`       | Prevents all interaction. No `hx-toggle` events fire when disabled. Reflects as attribute.          |
+| `name`     | `name`     | `string \| undefined`                                            | `undefined`   | Form field name. When set with `value`, participates in `FormData` on submit.                       |
+| `value`    | `value`    | `string \| undefined`                                            | `undefined`   | Form field value submitted when the button is pressed.                                              |
+| `label`    | `label`    | `string \| undefined`                                            | `undefined`   | Accessible label forwarded to the inner `<button>` as `aria-label`. Required for icon-only buttons. |
+
+## Events
+
+| Event       | Detail Type            | Description                                                                                     |
+| ----------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
+| `hx-toggle` | `{ pressed: boolean }` | Dispatched when the toggle state changes. Not dispatched when `disabled`. Bubbles and composed. |
+
+## CSS Custom Properties
+
+| Property                              | Default                          | Description                                                                   |
+| ------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------- |
+| `--hx-toggle-button-bg`               | `var(--hx-color-primary-500)`    | Button background color in the unpressed state.                               |
+| `--hx-toggle-button-color`            | `var(--hx-color-neutral-0)`      | Button text color in the unpressed state.                                     |
+| `--hx-toggle-button-border-color`     | `transparent`                    | Button border color. Use with the `outline` variant to customize border tone. |
+| `--hx-toggle-button-border-radius`    | `var(--hx-border-radius-md)`     | Button border radius.                                                         |
+| `--hx-toggle-button-font-family`      | `var(--hx-font-family-sans)`     | Button font family.                                                           |
+| `--hx-toggle-button-font-weight`      | `var(--hx-font-weight-semibold)` | Button font weight.                                                           |
+| `--hx-toggle-button-focus-ring-color` | `var(--hx-focus-ring-color)`     | Focus ring color applied on keyboard focus.                                   |
+| `--hx-toggle-button-pressed-bg`       | `var(--hx-color-primary-500)`    | Background color when the button is in the pressed state (variant-specific).  |
+| `--hx-toggle-button-pressed-color`    | `var(--hx-color-neutral-0)`      | Text color when the button is in the pressed state (variant-specific).        |
+
+## CSS Parts
+
+| Part     | Description                                                         |
+| -------- | ------------------------------------------------------------------- |
+| `button` | The inner `<button>` element. Target for custom focus or shape CSS. |
+| `label`  | The text label container within the button.                         |
+| `prefix` | The slot wrapper rendered before the label text.                    |
+| `suffix` | The slot wrapper rendered after the label text.                     |
+
+## Slots
+
+| Slot        | Description                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| _(default)_ | Label text content of the button.                                                                                   |
+| `prefix`    | Content rendered before the label (e.g., an icon). For icon-only usage, omit the default slot and set `label` prop. |
+| `suffix`    | Content rendered after the label (e.g., a trailing icon or badge).                                                  |
+
+## Accessibility
+
+| Topic           | Details                                                                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role            | The inner `<button>` has `role="button"` (implicit). The `aria-pressed` attribute is set to `"true"` or `"false"` based on the `pressed` property.   |
+| `aria-pressed`  | Managed automatically. Screen readers announce the state as "pressed" or "not pressed" alongside the button label.                                   |
+| `aria-label`    | When the `label` property is set, it is forwarded to the inner `<button>` as `aria-label`. Required for icon-only buttons that have no visible text. |
+| `aria-disabled` | When `disabled` is set, the button is non-interactive. Assistive technology announces the disabled state.                                            |
+| Focus           | The inner `<button>` is the focus target. The focus ring is visible via CSS and customizable via `--hx-toggle-button-focus-ring-color`.              |
+| Icon-only usage | Icon-only buttons must have the `label` property set. Without it, screen readers have no text to announce and the button fails WCAG 2.1 SC 4.1.2.    |
+| Color contrast  | All variants meet WCAG 2.1 AA contrast requirements in both pressed and unpressed states against standard backgrounds.                               |
+| Motion          | `@media (prefers-reduced-motion: reduce)` disables transition animations on state change.                                                            |
+| WCAG            | WCAG 2.1 AA compliant. Zero axe-core violations across all variants, sizes, and states.                                                              |
+
+## Keyboard Navigation
+
+| Key         | Behavior                                                                             |
+| ----------- | ------------------------------------------------------------------------------------ |
+| `Tab`       | Moves focus to the toggle button.                                                    |
+| `Shift+Tab` | Moves focus to the previous focusable element.                                       |
+| `Space`     | Activates the toggle button, flipping the pressed state and dispatching `hx-toggle`. |
+| `Enter`     | Activates the toggle button, flipping the pressed state and dispatching `hx-toggle`. |
+
+## Drupal Integration
+
+Use the provided Twig template to render `hx-toggle-button` from Drupal templates or render arrays.
+
+```twig
+{# my-module/templates/hx-toggle-button.html.twig #}
+<hx-toggle-button
+  variant="{{ variant|default('secondary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if pressed %}pressed{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if aria_label %}label="{{ aria_label }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% block prefix %}{% endblock %}
+  {%- if label %}{{ label }}{% endif -%}
+  {% block suffix %}{% endblock %}
+</hx-toggle-button>
+```
+
+For exclusive toggle groups — where only one button in a group can be pressed at a time — attach the Drupal behavior below. Add `data-toggle-group="<group-name>"` to each sibling button.
+
+```js
+// my-module/js/helix-toggle-button.js
+(function (Drupal) {
+  Drupal.behaviors.helixToggleButton = {
+    attach: function (context) {
+      context.querySelectorAll('hx-toggle-button[data-toggle-group]').forEach((btn) => {
+        btn.addEventListener('hx-toggle', (e) => {
+          const group = btn.dataset.toggleGroup;
+          if (e.detail.pressed) {
+            context
+              .querySelectorAll(`hx-toggle-button[data-toggle-group="${group}"]`)
+              .forEach((sibling) => {
+                if (sibling !== btn) sibling.pressed = false;
+              });
+          }
+        });
+      });
+    },
+  };
+})(Drupal);
+```
+
+Example Twig usage with an exclusive toggle group:
+
+```twig
+<div>
+  <hx-toggle-button variant="outline" data-toggle-group="view-mode" pressed>List View</hx-toggle-button>
+  <hx-toggle-button variant="outline" data-toggle-group="view-mode">Grid View</hx-toggle-button>
+  <hx-toggle-button variant="outline" data-toggle-group="view-mode">Card View</hx-toggle-button>
+</div>
+```
+
+Load the library and behavior in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+    js/helix-toggle-button.js: {}
+```
+
+## Standalone HTML Example
+
+`@helix/library` is a private package — it is not available on a public CDN. Install it via your project's npm workspace and import it in your bundler entry point. The example below shows realistic markup; wire up the import in your build configuration.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-toggle-button example</title>
+    <!--
+      @helix/library is a private package — not available via CDN.
+      In your project bundler entry point:
+        import '@helix/library';
+      Or per-component:
+        import '@helix/library/components/hx-toggle-button';
+    -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;"
+  >
+    <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">Patient Dashboard Controls</p>
+
+    <!-- Basic toggle: mute audio alerts -->
+    <hx-toggle-button id="mute-btn" variant="outline"> Mute Audio Alerts </hx-toggle-button>
+
+    <!-- View mode group: only one active at a time -->
+    <div style="display: flex; gap: 0.5rem;">
+      <hx-toggle-button variant="secondary" data-toggle-group="view-mode" pressed
+        >List View</hx-toggle-button
+      >
+      <hx-toggle-button variant="secondary" data-toggle-group="view-mode"
+        >Grid View</hx-toggle-button
+      >
+    </div>
+
+    <!-- Filter toggles: form-associated, multiple active -->
+    <form id="filter-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <p style="margin: 0; font-size: 0.875rem; font-weight: 600;">Active Filters</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <hx-toggle-button name="filter" value="active" variant="outline" hx-size="sm"
+          >Active Patients</hx-toggle-button
+        >
+        <hx-toggle-button name="filter" value="critical" variant="outline" hx-size="sm" pressed
+          >Critical Alerts</hx-toggle-button
+        >
+        <hx-toggle-button name="filter" value="pending" variant="outline" hx-size="sm"
+          >Pending Orders</hx-toggle-button
+        >
+      </div>
+      <button
+        type="submit"
+        style="padding: 0.4rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: white; cursor: pointer; font-size: 0.875rem; width: fit-content;"
+      >
+        Apply Filters
+      </button>
+      <pre
+        id="form-output"
+        style="background: #f8f9fa; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.75rem; border: 1px solid #e9ecef; min-height: 1.5rem;"
+      ></pre>
+    </form>
+
+    <!-- Icon-only: bookmark patient record -->
+    <hx-toggle-button id="bookmark-btn" variant="ghost" label="Bookmark patient record">
+      <span slot="prefix">&#9733;</span>
+    </hx-toggle-button>
+
+    <script>
+      // Log toggle state changes
+      document.getElementById('mute-btn').addEventListener('hx-toggle', (e) => {
+        console.log('Mute toggled:', e.detail.pressed);
+      });
+
+      document.getElementById('bookmark-btn').addEventListener('hx-toggle', (e) => {
+        console.log('Bookmark toggled:', e.detail.pressed);
+      });
+
+      // Exclusive toggle group: only one view mode active
+      document.querySelectorAll('[data-toggle-group="view-mode"]').forEach((btn) => {
+        btn.addEventListener('hx-toggle', (e) => {
+          if (e.detail.pressed) {
+            document.querySelectorAll('[data-toggle-group="view-mode"]').forEach((sibling) => {
+              if (sibling !== btn) sibling.pressed = false;
+            });
+          }
+        });
+      });
+
+      // Form submission: read pressed filters from FormData
+      document.getElementById('filter-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        document.getElementById('form-output').textContent = JSON.stringify(data, null, 2);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-toggle-button" section="api" />

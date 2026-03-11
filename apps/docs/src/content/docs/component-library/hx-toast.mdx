@@ -1,0 +1,425 @@
+---
+title: 'hx-toast'
+description: 'Transient notification message that appears briefly and auto-dismisses'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-toast" section="summary" />
+
+## Overview
+
+`hx-toast` is the Helix notification toast system. It provides transient feedback messages that appear briefly and auto-dismiss — or remain persistent when set to `duration="0"`. A companion `hx-toast-stack` container manages fixed viewport positioning and enforces a maximum visible toast count.
+
+Accessibility is first-class: `hx-toast` automatically applies `role="alert"` with `aria-live="assertive"` for danger-level notifications, and `role="status"` with `aria-live="polite"` for all others. Auto-dismiss timers pause when the user hovers or focuses the toast, satisfying WCAG 2.2.1 (Timing Adjustable).
+
+Five visual variants (`default`, `success`, `warning`, `danger`, `info`), three named slots (`icon`, default message, `action`), and a closable dismiss button give you full flexibility for every clinical notification pattern — from routine confirmations to critical patient safety alerts.
+
+An imperative `toast()` utility function is included for programmatic use: it creates and manages a shared `hx-toast-stack` automatically.
+
+**Use `hx-toast` when:** you need a brief, non-blocking notification that auto-dismisses.
+**Use `role="alert"` variant `danger` when:** the message requires immediate screen reader announcement.
+**Use `duration="0"` when:** the notification must persist until the user explicitly dismisses it.
+
+## Live Demo
+
+### Basic
+
+A simple notification with auto-dismiss.
+
+<ComponentDemo title="Basic">
+  <hx-toast open>Patient record saved successfully.</hx-toast>
+</ComponentDemo>
+
+### Variants
+
+All five visual variants in open state.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 22rem;">
+    <hx-toast open variant="default">
+      Default: System update scheduled.
+    </hx-toast>
+    <hx-toast open variant="success">
+      Success: Lab results submitted.
+    </hx-toast>
+    <hx-toast open variant="warning">
+      Warning: Session expires in 5 minutes.
+    </hx-toast>
+    <hx-toast open variant="danger">
+      Danger: Critical alert — check patient vitals.
+    </hx-toast>
+    <hx-toast open variant="info">
+      Info: New message from Dr. Chen.
+    </hx-toast>
+  </div>
+</ComponentDemo>
+
+### Closable
+
+Toasts with a dismiss button.
+
+<ComponentDemo title="Closable">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 22rem;">
+    <hx-toast open closable>
+      Appointment confirmed. You may dismiss this.
+    </hx-toast>
+    <hx-toast open closable variant="success">
+      Record exported to PDF.
+    </hx-toast>
+    <hx-toast open closable variant="danger">
+      Medication conflict detected. Review immediately.
+    </hx-toast>
+  </div>
+</ComponentDemo>
+
+### With Icon and Action Slots
+
+Using the `icon` and `action` slots for richer notifications.
+
+<ComponentDemo title="Icon and Action Slots">
+  <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 22rem;">
+    <hx-toast open variant="success" closable>
+      <span slot="icon">✓</span>
+      Patient discharged successfully.
+      <button
+        slot="action"
+        style="background:none;border:none;color:inherit;cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;"
+      >
+        View
+      </button>
+    </hx-toast>
+    <hx-toast open variant="warning" closable>
+      <span slot="icon">⚠</span>
+      Unsaved changes detected.
+      <button
+        slot="action"
+        style="background:none;border:none;color:inherit;cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;"
+      >
+        Save
+      </button>
+    </hx-toast>
+  </div>
+</ComponentDemo>
+
+### Persistent Toast (duration="0")
+
+Set `duration="0"` to prevent auto-dismiss.
+
+<ComponentDemo title="Persistent">
+  <hx-toast open closable duration="0" variant="danger" style="max-width: 22rem;">
+    Critical: Patient allergy alert requires acknowledgment.
+  </hx-toast>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helix/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helix/library/components/hx-toast';
+```
+
+## Basic Usage
+
+```html
+<!-- Declarative toast (always visible when open) -->
+<hx-toast open>Record saved.</hx-toast>
+
+<!-- All variants -->
+<hx-toast open variant="success">Operation completed.</hx-toast>
+<hx-toast open variant="warning">Session expiring soon.</hx-toast>
+<hx-toast open variant="danger">Critical error detected.</hx-toast>
+<hx-toast open variant="info">New message received.</hx-toast>
+
+<!-- Closable with custom duration -->
+<hx-toast open closable duration="5000">File uploaded. Click × to dismiss.</hx-toast>
+
+<!-- Persistent — requires explicit user dismissal -->
+<hx-toast open closable duration="0">This will not auto-dismiss.</hx-toast>
+
+<!-- With stack container -->
+<hx-toast-stack placement="bottom-end">
+  <hx-toast open variant="success">Saved.</hx-toast>
+</hx-toast-stack>
+```
+
+```typescript
+// Imperative API
+import { toast } from '@helix/library/components/hx-toast';
+
+toast({ message: 'Patient record saved.', variant: 'success' });
+toast({ message: 'Session expires soon.', variant: 'warning', duration: 8000 });
+toast({ message: 'Critical alert.', variant: 'danger', duration: 0 });
+```
+
+## hx-toast Properties
+
+| Property     | Attribute     | Type                                                        | Default                  | Description                                                           |
+| ------------ | ------------- | ----------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------- |
+| `variant`    | `variant`     | `'default' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'default'`              | Visual style variant. Reflects as attribute.                          |
+| `duration`   | `duration`    | `number`                                                    | `3000`                   | Auto-dismiss delay in milliseconds. Set to `0` for persistent toasts. |
+| `closable`   | `closable`    | `boolean`                                                   | `false`                  | Shows a dismiss button. Reflects as attribute.                        |
+| `open`       | `open`        | `boolean`                                                   | `false`                  | Whether the toast is visible. Reflects as attribute.                  |
+| `closeLabel` | `close-label` | `string`                                                    | `'Dismiss notification'` | Accessible label for the dismiss button. Override for localization.   |
+
+### Methods
+
+| Method   | Description       |
+| -------- | ----------------- |
+| `show()` | Opens the toast.  |
+| `hide()` | Closes the toast. |
+
+## hx-toast-stack Properties
+
+| Property     | Attribute     | Type                                                                                            | Default        | Description                                                        |
+| ------------ | ------------- | ----------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------ |
+| `placement`  | `placement`   | `'top-start' \| 'top-center' \| 'top-end' \| 'bottom-start' \| 'bottom-center' \| 'bottom-end'` | `'bottom-end'` | Corner of the viewport where toasts appear. Reflects as attribute. |
+| `stackLimit` | `stack-limit` | `number`                                                                                        | `3`            | Maximum simultaneously visible toasts. `0` = unlimited.            |
+
+## toast() Utility Options
+
+| Option      | Type                  | Default        | Description                                    |
+| ----------- | --------------------- | -------------- | ---------------------------------------------- |
+| `message`   | `string`              | —              | The notification message text. Required.       |
+| `variant`   | `ToastVariant`        | `'default'`    | Visual variant.                                |
+| `duration`  | `number`              | `3000`         | Auto-dismiss delay in ms. `0` = persistent.    |
+| `placement` | `ToastStackPlacement` | `'bottom-end'` | Placement of the auto-created stack container. |
+
+## Events
+
+| Event           | Detail | Description                                                       |
+| --------------- | ------ | ----------------------------------------------------------------- |
+| `hx-show`       | —      | Dispatched when the toast becomes visible. Bubbles, composed.     |
+| `hx-hide`       | —      | Dispatched when the toast begins hiding. Bubbles, composed.       |
+| `hx-after-hide` | —      | Dispatched after the hide animation completes. Bubbles, composed. |
+
+```typescript
+const toast = document.querySelector('hx-toast');
+
+toast.addEventListener('hx-show', () => console.log('Toast shown'));
+toast.addEventListener('hx-hide', () => console.log('Toast hiding'));
+toast.addEventListener('hx-after-hide', () => toast.remove());
+```
+
+## CSS Custom Properties
+
+| Property                   | Default                                                            | Description                                                |
+| -------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `--hx-toast-bg`            | `var(--hx-color-neutral-900)`                                      | Toast background color.                                    |
+| `--hx-toast-color`         | `var(--hx-color-neutral-0)`                                        | Toast text color.                                          |
+| `--hx-toast-border-radius` | `var(--hx-border-radius-md)`                                       | Toast border radius.                                       |
+| `--hx-toast-shadow`        | `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)` | Toast box shadow.                                          |
+| `--hx-toast-width`         | `20rem`                                                            | Toast width.                                               |
+| `--hx-z-index-toast`       | `9000`                                                             | Z-index for the stack container (set on `hx-toast-stack`). |
+
+## CSS Parts
+
+### hx-toast Parts
+
+| Part           | Description                                             |
+| -------------- | ------------------------------------------------------- |
+| `base`         | The inner toast container `<div>`.                      |
+| `icon`         | The icon slot wrapper `<span>`.                         |
+| `message`      | The message slot wrapper `<span>`.                      |
+| `close-button` | The dismiss `<button>` (only rendered when `closable`). |
+| `action`       | The action slot wrapper `<span>`.                       |
+
+### hx-toast-stack Parts
+
+| Part   | Description                        |
+| ------ | ---------------------------------- |
+| `base` | The inner stack container `<div>`. |
+
+## Slots
+
+### hx-toast Slots
+
+| Slot      | Description                                        |
+| --------- | -------------------------------------------------- |
+| (default) | The notification message text.                     |
+| `icon`    | Optional icon rendered before the message.         |
+| `action`  | Optional action button rendered after the message. |
+
+### hx-toast-stack Slots
+
+| Slot      | Description                                     |
+| --------- | ----------------------------------------------- |
+| (default) | Accepts `hx-toast` elements as direct children. |
+
+## Accessibility
+
+| Topic                 | Details                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Live region           | The inner `[part="base"]` element carries `aria-live="polite"` for standard variants and `aria-live="assertive"` for `variant="danger"`.   |
+| Role                  | `role="status"` for all non-danger variants; `role="alert"` for `variant="danger"` to trigger immediate screen reader announcement.        |
+| `aria-atomic`         | Always `"true"` — the entire toast message is read as a single unit.                                                                       |
+| `aria-hidden` on host | Host element is `aria-hidden="true"` when closed; attribute is removed when open, preventing screen readers from announcing hidden toasts. |
+| Close button label    | Dismiss button includes `aria-label` (default: `"Dismiss notification"`). Override with `close-label` attribute for localization.          |
+| SVG icon hidden       | The close button SVG carries `aria-hidden="true"` — the button label is the accessible name.                                               |
+| Timer pause on hover  | Auto-dismiss timer pauses on `mouseenter` and resumes on `mouseleave` (WCAG 2.2.1 — Timing Adjustable).                                    |
+| Timer pause on focus  | Timer also pauses on `focusin` within the toast and resumes on `focusout`, ensuring keyboard users have time to read and interact.         |
+| Reduced motion        | Auto-dismiss timer does not start when `prefers-reduced-motion: reduce` is active. CSS transitions are also disabled.                      |
+| WCAG                  | WCAG 2.1 AA compliant. Zero axe-core violations across all variants and closable state.                                                    |
+
+## Keyboard Navigation
+
+| Key               | Behavior                                                                          |
+| ----------------- | --------------------------------------------------------------------------------- |
+| `Tab`             | Moves focus into the toast (to the close button or action slot, if present).      |
+| `Shift+Tab`       | Moves focus to the previous focusable element.                                    |
+| `Enter` / `Space` | Activates the focused close button or action button.                              |
+| `Escape`          | No default behavior — implement custom handlers if dismiss-on-escape is required. |
+
+When focus enters the toast, the auto-dismiss timer pauses automatically. It resumes when focus leaves.
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/notification.html.twig #}
+<hx-toast
+  {% if open %}open{% endif %}
+  variant="{{ variant|default('default') }}"
+  {% if closable %}closable{% endif %}
+  {% if duration is defined %}duration="{{ duration }}"{% endif %}
+  {% if close_label %}close-label="{{ close_label }}"{% endif %}
+>
+  {% if icon %}
+    <span slot="icon">{{ icon }}</span>
+  {% endif %}
+  {{ message }}
+  {% if action_label %}
+    <button slot="action" class="hx-toast-action">{{ action_label }}</button>
+  {% endif %}
+</hx-toast>
+```
+
+Use `hx-toast-stack` for fixed-position stacking:
+
+```twig
+<hx-toast-stack placement="{{ placement|default('bottom-end') }}" stack-limit="{{ stack_limit|default(3) }}">
+  {% for notification in notifications %}
+    <hx-toast
+      open
+      variant="{{ notification.variant|default('default') }}"
+      {% if notification.closable %}closable{% endif %}
+      duration="{{ notification.duration|default(3000) }}"
+    >
+      {{ notification.message }}
+    </hx-toast>
+  {% endfor %}
+</hx-toast-stack>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+Copy-paste into a `.html` file and open in any browser — no build tool required:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-toast example</title>
+    <!-- @helix/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helix/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <h1>Toast Notifications</h1>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem;">
+      <button id="btn-default">Show Default</button>
+      <button id="btn-success">Show Success</button>
+      <button id="btn-warning">Show Warning</button>
+      <button id="btn-danger">Show Danger</button>
+      <button id="btn-info">Show Info</button>
+      <button id="btn-persistent">Show Persistent</button>
+    </div>
+
+    <!-- Fixed-position stack container -->
+    <hx-toast-stack id="stack" placement="bottom-end" stack-limit="3"></hx-toast-stack>
+
+    <script type="module">
+      import { toast } from '@helix/library/components/hx-toast/index.js';
+
+      document.getElementById('btn-default').addEventListener('click', () => {
+        toast({ message: 'Default notification message.', placement: 'bottom-end' });
+      });
+
+      document.getElementById('btn-success').addEventListener('click', () => {
+        toast({
+          message: 'Patient record saved successfully.',
+          variant: 'success',
+          placement: 'bottom-end',
+        });
+      });
+
+      document.getElementById('btn-warning').addEventListener('click', () => {
+        toast({
+          message: 'Session expires in 5 minutes.',
+          variant: 'warning',
+          duration: 6000,
+          placement: 'bottom-end',
+        });
+      });
+
+      document.getElementById('btn-danger').addEventListener('click', () => {
+        toast({
+          message: 'Critical alert — check patient vitals.',
+          variant: 'danger',
+          duration: 0,
+          placement: 'bottom-end',
+        });
+      });
+
+      document.getElementById('btn-info').addEventListener('click', () => {
+        toast({ message: 'New message from Dr. Chen.', variant: 'info', placement: 'bottom-end' });
+      });
+
+      document.getElementById('btn-persistent').addEventListener('click', () => {
+        toast({
+          message: 'This will not auto-dismiss. Close manually.',
+          variant: 'warning',
+          duration: 0,
+          placement: 'bottom-end',
+        });
+      });
+    </script>
+
+    <!-- Or use the declarative API directly -->
+    <script type="module">
+      import '@helix/library/components/hx-toast/index.js';
+
+      const myToast = document.createElement('hx-toast');
+      myToast.variant = 'success';
+      myToast.closable = true;
+      myToast.duration = 5000;
+      myToast.textContent = 'Appointment confirmed.';
+
+      myToast.addEventListener('hx-show', () => console.log('toast shown'));
+      myToast.addEventListener('hx-after-hide', () => myToast.remove());
+
+      document.getElementById('stack').appendChild(myToast);
+      myToast.show();
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-toast" section="api" />

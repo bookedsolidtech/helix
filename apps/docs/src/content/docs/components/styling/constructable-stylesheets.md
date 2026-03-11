@@ -7,7 +7,7 @@ sidebar:
 
 Constructable Stylesheets represent a paradigm shift in how styles are applied to Shadow DOM web components. Instead of parsing CSS strings on every component instantiation, the browser parses a stylesheet **once** at creation time and reuses the same stylesheet object across thousands of component instances. This architectural change delivers measurable performance improvements, dramatically reduced memory overhead, and powerful dynamic styling capabilities that are impossible with traditional `<style>` elements.
 
-For wc-2026, Constructable Stylesheets are the **foundation** of our styling architecture. Every component leverages them through Lit's `css` tagged template, and understanding their mechanics, performance characteristics, and composition patterns is essential for building enterprise-grade healthcare components that scale.
+For HELiX, Constructable Stylesheets are the **foundation** of our styling architecture. Every component leverages them through Lit's `css` tagged template, and understanding their mechanics, performance characteristics, and composition patterns is essential for building enterprise-grade healthcare components that scale.
 
 ---
 
@@ -30,7 +30,7 @@ Before Constructable Stylesheets became widely available (baseline support acros
 The most common approach was creating `<style>` elements in the component constructor:
 
 ```javascript
-class WcButton extends HTMLElement {
+class HxButton extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
@@ -42,8 +42,8 @@ class WcButton extends HTMLElement {
         display: inline-block;
       }
       .button {
-        background: var(--wc-color-primary-500);
-        padding: var(--wc-space-2) var(--wc-space-4);
+        background: var(--hx-color-primary-500);
+        padding: var(--hx-space-2) var(--hx-space-4);
       }
     `;
     shadow.appendChild(style);
@@ -59,7 +59,7 @@ class WcButton extends HTMLElement {
 
 **Critical problems:**
 
-1. **CSS re-parsed for every instance** — Rendering 1,000 `<wc-button>` elements means the browser parses the same CSS 1,000 times. Each parse operation takes ~0.15ms (varies by browser and CSS complexity), adding 150ms of pure parsing overhead.
+1. **CSS re-parsed for every instance** — Rendering 1,000 `<hx-button>` elements means the browser parses the same CSS 1,000 times. Each parse operation takes ~0.15ms (varies by browser and CSS complexity), adding 150ms of pure parsing overhead.
 
 2. **Memory waste** — Each `<style>` element is a full DOM node with its own memory allocation. 1,000 components × ~4KB per style element = ~4MB of redundant CSS in memory.
 
@@ -74,14 +74,14 @@ class WcButton extends HTMLElement {
 Another approach was linking external CSS files:
 
 ```javascript
-class WcCard extends HTMLElement {
+class HxCard extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
 
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = '/styles/wc-card.css';
+    link.href = '/styles/hx-card.css';
     shadow.appendChild(link);
   }
 }
@@ -160,8 +160,8 @@ sheet.replaceSync(`
     display: block;
   }
   .card {
-    background: var(--wc-card-bg, var(--wc-color-neutral-0));
-    border-radius: var(--wc-border-radius-lg);
+    background: var(--hx-card-bg, var(--hx-color-neutral-0));
+    border-radius: var(--hx-border-radius-lg);
   }
 `);
 ```
@@ -218,7 +218,7 @@ function switchTheme(newCSS) {
 Once a `CSSStyleSheet` is constructed and populated, you **adopt** it into a Shadow DOM via the `adoptedStyleSheets` property:
 
 ```javascript
-class WcButton extends HTMLElement {
+class HxButton extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
@@ -250,13 +250,13 @@ The defining feature of Constructable Stylesheets is **reusability**:
 const sharedTokens = new CSSStyleSheet();
 sharedTokens.replaceSync(`
   :host {
-    --wc-color-primary-500: #007878;
-    --wc-space-4: 1rem;
+    --hx-color-primary-500: #007878;
+    --hx-space-4: 1rem;
   }
 `);
 
 // Component A adopts it
-class WcButton extends HTMLElement {
+class HxButton extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' }).adoptedStyleSheets = [sharedTokens];
@@ -264,7 +264,7 @@ class WcButton extends HTMLElement {
 }
 
 // Component B also adopts it
-class WcCard extends HTMLElement {
+class HxCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' }).adoptedStyleSheets = [sharedTokens];
@@ -272,7 +272,7 @@ class WcCard extends HTMLElement {
 }
 
 // Component C also adopts it
-class WcAlert extends HTMLElement {
+class HxAlert extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' }).adoptedStyleSheets = [sharedTokens];
@@ -295,9 +295,9 @@ Traditional inline styles require the browser's CSS parser to run for every comp
 ```javascript
 // Traditional: 1,000 instances = 1,000 parse operations
 for (let i = 0; i < 1000; i++) {
-  document.body.appendChild(document.createElement('wc-button'));
+  document.body.appendChild(document.createElement('hx-button'));
 }
-// Each <wc-button> parses its <style> element on construction
+// Each <hx-button> parses its <style> element on construction
 ```
 
 With Constructable Stylesheets, parsing happens **once**:
@@ -308,7 +308,7 @@ const buttonStyles = new CSSStyleSheet();
 buttonStyles.replaceSync(buttonCSS); // Parsed ONCE
 
 for (let i = 0; i < 1000; i++) {
-  const btn = document.createElement('wc-button');
+  const btn = document.createElement('hx-button');
   // btn.shadowRoot.adoptedStyleSheets = [buttonStyles]; (internal)
   document.body.appendChild(btn);
 }
@@ -374,15 +374,15 @@ Modifying a Constructable Stylesheet updates **all adopting components instantly
 
 ```javascript
 const theme = new CSSStyleSheet();
-theme.replaceSync(`:host { --wc-color-primary-500: #007878; }`);
+theme.replaceSync(`:host { --hx-color-primary-500: #007878; }`);
 
 // 1,000 components adopt this theme
-document.querySelectorAll('wc-button, wc-card, wc-alert').forEach((el) => {
+document.querySelectorAll('hx-button, hx-card, hx-alert').forEach((el) => {
   el.shadowRoot.adoptedStyleSheets = [theme];
 });
 
 // Later: switch to dark mode
-theme.replace(`:host { --wc-color-primary-500: #60a5fa; }`);
+theme.replace(`:host { --hx-color-primary-500: #60a5fa; }`);
 // All 1,000 components update INSTANTLY — no re-rendering, no per-component updates
 ```
 
@@ -394,7 +394,7 @@ theme.replace(`:host { --wc-color-primary-500: #60a5fa; }`);
 | Constructable Stylesheet `replace()`         | ~8ms (parse + propagate)                 |
 | Per-component `<style>` modification         | ~200ms (find + modify + re-parse × 1000) |
 
-Constructable Stylesheets are 25× faster than per-component updates, though slightly slower than CSS custom property overrides (which is why wc-2026 uses **both** in combination).
+Constructable Stylesheets are 25× faster than per-component updates, though slightly slower than CSS custom property overrides (which is why HELiX uses **both** in combination).
 
 ---
 
@@ -404,37 +404,37 @@ Constructable Stylesheets enable sophisticated style-sharing patterns that reduc
 
 ### Pattern 1: Shared Token Stylesheet
 
-wc-2026 components share a base token stylesheet that defines all design tokens:
+HELiX components share a base token stylesheet that defines all design tokens:
 
 ```typescript
-// packages/wc-library/src/styles/tokens.ts
+// packages/hx-library/src/styles/tokens.ts
 import { css } from 'lit';
 
 export const tokenStyles = css`
   :host {
     /* Colors */
-    --wc-color-primary-500: #007878;
-    --wc-color-neutral-0: #ffffff;
-    --wc-color-neutral-800: #212529;
-    --wc-color-error-500: #dc3545;
+    --hx-color-primary-500: #007878;
+    --hx-color-neutral-0: #ffffff;
+    --hx-color-neutral-800: #212529;
+    --hx-color-error-500: #dc3545;
 
     /* Spacing */
-    --wc-space-1: 0.25rem;
-    --wc-space-2: 0.5rem;
-    --wc-space-4: 1rem;
-    --wc-space-6: 1.5rem;
+    --hx-space-1: 0.25rem;
+    --hx-space-2: 0.5rem;
+    --hx-space-4: 1rem;
+    --hx-space-6: 1.5rem;
 
     /* Typography */
-    --wc-font-family-sans: system-ui, sans-serif;
-    --wc-font-weight-semibold: 600;
-    --wc-line-height-tight: 1.25;
+    --hx-font-family-sans: system-ui, sans-serif;
+    --hx-font-weight-semibold: 600;
+    --hx-line-height-tight: 1.25;
 
     /* Borders */
-    --wc-border-radius-md: 0.375rem;
-    --wc-border-radius-lg: 0.5rem;
+    --hx-border-radius-md: 0.375rem;
+    --hx-border-radius-lg: 0.5rem;
 
     /* Transitions */
-    --wc-transition-fast: 150ms ease;
+    --hx-transition-fast: 150ms ease;
   }
 `;
 ```
@@ -442,14 +442,14 @@ export const tokenStyles = css`
 Every component adopts this shared stylesheet:
 
 ```typescript
-// packages/wc-library/src/components/wc-button/wc-button.ts
+// packages/hx-library/src/components/hx-button/hx-button.ts
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { tokenStyles } from '../../styles/tokens.js';
-import { wcButtonStyles } from './wc-button.styles.js';
+import { wcButtonStyles } from './hx-button.styles.js';
 
-@customElement('wc-button')
-export class WcButton extends LitElement {
+@customElement('hx-button')
+export class HxButton extends LitElement {
   static override styles = [tokenStyles, wcButtonStyles];
 
   render() {
@@ -470,7 +470,7 @@ export class WcButton extends LitElement {
 Each component has its own stylesheet for component-specific styles:
 
 ```typescript
-// packages/wc-library/src/components/wc-button/wc-button.styles.ts
+// packages/hx-library/src/components/hx-button/hx-button.styles.ts
 import { css } from 'lit';
 
 export const wcButtonStyles = css`
@@ -480,21 +480,21 @@ export const wcButtonStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--wc-opacity-disabled, 0.5);
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   .button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--wc-space-2);
-    padding: var(--wc-space-2) var(--wc-space-4);
-    background: var(--wc-button-bg, var(--wc-color-primary-500));
-    color: var(--wc-button-color, var(--wc-color-neutral-0));
-    border-radius: var(--wc-button-border-radius, var(--wc-border-radius-md));
-    font-family: var(--wc-font-family-sans);
-    font-weight: var(--wc-font-weight-semibold);
-    transition: background var(--wc-transition-fast);
+    gap: var(--hx-space-2);
+    padding: var(--hx-space-2) var(--hx-space-4);
+    background: var(--hx-button-bg, var(--hx-color-primary-500));
+    color: var(--hx-button-color, var(--hx-color-neutral-0));
+    border-radius: var(--hx-button-border-radius, var(--hx-border-radius-md));
+    font-family: var(--hx-font-family-sans);
+    font-weight: var(--hx-font-weight-semibold);
+    transition: background var(--hx-transition-fast);
   }
 
   .button:hover {
@@ -505,7 +505,7 @@ export const wcButtonStyles = css`
 
 **Conventions:**
 
-- **Two-level token fallbacks** — `var(--wc-button-bg, var(--wc-color-primary-500))` allows component-level and global overrides
+- **Two-level token fallbacks** — `var(--hx-button-bg, var(--hx-color-primary-500))` allows component-level and global overrides
 - **No hardcoded values** — Every value uses a CSS custom property with fallback
 - **Semantic class names** — `.button`, `.card`, `.input-wrapper` (Shadow DOM scoping eliminates conflicts)
 
@@ -514,13 +514,13 @@ export const wcButtonStyles = css`
 Extract common patterns into reusable utility stylesheets:
 
 ```typescript
-// packages/wc-library/src/styles/focus-ring.ts
+// packages/hx-library/src/styles/focus-ring.ts
 import { css } from 'lit';
 
 export const focusRingStyles = css`
   :host(:focus-visible) {
-    outline: var(--wc-focus-ring-width, 2px) solid var(--wc-focus-ring-color, #007878);
-    outline-offset: var(--wc-focus-ring-offset, 2px);
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #007878);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 `;
 ```
@@ -530,7 +530,7 @@ Components adopt shared utilities:
 ```typescript
 import { tokenStyles } from '../../styles/tokens.js';
 import { focusRingStyles } from '../../styles/focus-ring.js';
-import { wcButtonStyles } from './wc-button.styles.js';
+import { wcButtonStyles } from './hx-button.styles.js';
 
 static override styles = [tokenStyles, focusRingStyles, wcButtonStyles];
 ```
@@ -549,7 +549,7 @@ Replace a stylesheet's entire content after construction:
 
 ```javascript
 const theme = new CSSStyleSheet();
-theme.replaceSync(`:host { --wc-color-primary-500: #007878; }`);
+theme.replaceSync(`:host { --hx-color-primary-500: #007878; }`);
 
 // Components adopt the theme
 shadowRoot.adoptedStyleSheets = [theme];
@@ -559,8 +559,8 @@ theme
   .replace(
     `
   :host {
-    --wc-color-primary-500: #60a5fa;
-    --wc-color-neutral-0: #1e293b;
+    --hx-color-primary-500: #60a5fa;
+    --hx-color-neutral-0: #1e293b;
   }
 `,
   )
@@ -623,9 +623,9 @@ class ThemeManager {
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(`
       :host {
-        --wc-color-primary-500: ${colors.primary};
-        --wc-color-neutral-0: ${colors.background};
-        --wc-color-neutral-800: ${colors.text};
+        --hx-color-primary-500: ${colors.primary};
+        --hx-color-neutral-0: ${colors.background};
+        --hx-color-neutral-800: ${colors.text};
       }
     `);
     return sheet;
@@ -672,7 +672,7 @@ const styles = css`
     display: block;
   }
   .card {
-    padding: var(--wc-space-6);
+    padding: var(--hx-space-6);
   }
 `;
 ```
@@ -732,7 +732,7 @@ Lit's `css` results compose naturally into arrays:
 
 ```typescript
 const base = css`:host { display: block; }`;
-const themed = css`.card { background: var(--wc-card-bg); }`;
+const themed = css`.card { background: var(--hx-card-bg); }`;
 
 static override styles = [base, themed];
 ```
@@ -756,10 +756,10 @@ Lit components define styles using the static `styles` property:
 import { LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { tokenStyles } from '../../styles/tokens.js';
-import { wcCardStyles } from './wc-card.styles.js';
+import { wcCardStyles } from './hx-card.styles.js';
 
-@customElement('wc-card')
-export class WcCard extends LitElement {
+@customElement('hx-card')
+export class HxCard extends LitElement {
   static override styles = [tokenStyles, wcCardStyles];
 }
 ```
@@ -772,18 +772,18 @@ Lit automatically:
 
 ---
 
-## wc-2026 Conventions
+## HELiX Conventions
 
 ### Separate .styles.ts Files
 
 Every component has a dedicated `.styles.ts` file:
 
 ```
-src/components/wc-button/
-├── wc-button.ts          # Component class
-├── wc-button.styles.ts   # Constructable Stylesheet
-├── wc-button.stories.ts  # Storybook stories
-└── wc-button.test.ts     # Vitest tests
+src/components/hx-button/
+├── hx-button.ts          # Component class
+├── hx-button.styles.ts   # Constructable Stylesheet
+├── hx-button.stories.ts  # Storybook stories
+└── hx-button.test.ts     # Vitest tests
 ```
 
 **Benefits:**
@@ -800,16 +800,16 @@ Every CSS custom property uses a two-level fallback chain:
 
 ```css
 /* CORRECT */
-background: var(--wc-button-bg, var(--wc-color-primary-500));
+background: var(--hx-button-bg, var(--hx-color-primary-500));
 
 /* INCORRECT (missing semantic fallback) */
-background: var(--wc-button-bg, #007878);
+background: var(--hx-button-bg, #007878);
 ```
 
 This enables:
 
-- **Component-level overrides** — `--wc-button-bg` targets specific components
-- **Global theming** — `--wc-color-primary-500` overrides all primary colors
+- **Component-level overrides** — `--hx-button-bg` targets specific components
+- **Global theming** — `--hx-color-primary-500` overrides all primary colors
 - **Fallback safety** — Primitive value ensures rendering even without tokens
 
 ### CSS Custom Property Documentation
@@ -818,12 +818,12 @@ All public CSS custom properties are documented via JSDoc:
 
 ```typescript
 /**
- * @cssprop [--wc-button-bg=var(--wc-color-primary-500)] - Button background color.
- * @cssprop [--wc-button-color=var(--wc-color-neutral-0)] - Button text color.
- * @cssprop [--wc-button-border-radius=var(--wc-border-radius-md)] - Button corner radius.
+ * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
+ * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
+ * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button corner radius.
  */
-@customElement('wc-button')
-export class WcButton extends LitElement {
+@customElement('hx-button')
+export class HxButton extends LitElement {
   static override styles = [tokenStyles, wcButtonStyles];
 }
 ```
@@ -847,7 +847,7 @@ This documentation appears in:
 | Safari  | 16.4+   | March 2023   |
 | Firefox | 101+    | June 2022    |
 
-**wc-2026 policy:** No polyfill required. Target browsers include Safari 16.4+ (March 2023 baseline).
+**HELiX policy:** No polyfill required. Target browsers include Safari 16.4+ (March 2023 baseline).
 
 ---
 
@@ -866,7 +866,7 @@ const styles = css`
   }
 `;
 
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   static override styles = styles;
 }
 ```
@@ -874,7 +874,7 @@ export class WcButton extends LitElement {
 **Bad:**
 
 ```typescript
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   constructor() {
     super();
     const styles = css`
@@ -914,8 +914,8 @@ Every value must use a CSS custom property:
 **Good:**
 
 ```css
-padding: var(--wc-space-4);
-background: var(--wc-button-bg, var(--wc-color-primary-500));
+padding: var(--hx-space-4);
+background: var(--hx-button-bg, var(--hx-color-primary-500));
 ```
 
 **Bad:**
@@ -945,7 +945,7 @@ Constructable Stylesheets fundamentally improve Shadow DOM styling through:
 - **Dynamic updates** — Runtime theme switching without re-rendering
 - **Composition** — Mix token stylesheets, utilities, and component styles
 
-wc-2026 leverages Constructable Stylesheets through Lit's `css` tag to deliver enterprise-grade performance, maintainability, and developer experience. Understanding this architecture is essential for building healthcare components that scale to thousands of instances.
+HELiX leverages Constructable Stylesheets through Lit's `css` tag to deliver enterprise-grade performance, maintainability, and developer experience. Understanding this architecture is essential for building healthcare components that scale to thousands of instances.
 
 ---
 

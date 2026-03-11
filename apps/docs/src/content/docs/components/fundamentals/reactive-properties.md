@@ -1080,7 +1080,7 @@ export class HelixValidatedInput extends BaseInput {
 }
 ```
 
-## Real-World Examples from wc-2026
+## Real-World Examples from HELiX
 
 ### Form-Associated Text Input
 
