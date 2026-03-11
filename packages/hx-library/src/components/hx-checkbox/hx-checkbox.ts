@@ -39,6 +39,7 @@ let _checkboxCounter = 0;
  * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
  * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
+ * @cssprop [--hx-checkbox-hover-border-color=var(--hx-checkbox-border-color)] - Border color on hover.
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
 @customElement('hx-checkbox')
@@ -212,6 +213,11 @@ export class HelixCheckbox extends LitElement {
   /** Called when the form restores state (e.g., back/forward navigation). */
   formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
     this.checked = typeof state === 'string' && state === this.value;
+  }
+
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
   }
 
   // ─── Event Handling ───
