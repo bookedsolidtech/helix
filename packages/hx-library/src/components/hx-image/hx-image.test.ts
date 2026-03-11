@@ -436,6 +436,45 @@ describe('hx-image', () => {
     });
   });
 
+  // ─── Caption slot (3) ───
+
+  describe('Caption slot', () => {
+    it('shows figcaption when caption slot content is provided', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"><span slot="caption">Photo credit</span></hx-image>',
+      );
+      await el.updateComplete;
+      // Wait for slotchange event to fire
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const caption = shadowQuery(el, '.image__caption--visible');
+      expect(caption).toBeTruthy();
+      expect(caption?.tagName.toLowerCase()).toBe('figcaption');
+    });
+
+    it('hides figcaption when no caption slot content is provided', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
+      await el.updateComplete;
+
+      const caption = shadowQuery(el, '.image__caption');
+      expect(caption).toBeTruthy();
+      // Caption should NOT have the visible modifier class
+      expect(caption?.classList.contains('image__caption--visible')).toBe(false);
+    });
+
+    it('wraps content in a semantic figure element', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
+      const figure = shadowQuery(el, 'figure');
+      expect(figure).toBeTruthy();
+      expect(figure?.tagName.toLowerCase()).toBe('figure');
+    });
+  });
+
   // ─── CSS Parts (1) ───
 
   describe('CSS Parts', () => {
@@ -453,7 +492,28 @@ describe('hx-image', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (2) ───
+  // ─── Property: alt defaults (2) ───
+
+  describe('Property: alt defaults', () => {
+    it('renders empty alt text when alt is undefined (no alt attribute)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png"></hx-image>',
+      );
+      const img = shadowQuery(el, 'img');
+      // When alt is undefined and not decorative, altText is empty string
+      expect(img?.getAttribute('alt')).toBe('');
+    });
+
+    it('does not add role=presentation when alt is undefined', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png"></hx-image>',
+      );
+      const img = shadowQuery(el, 'img');
+      expect(img?.getAttribute('role')).toBeNull();
+    });
+  });
+
+  // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations with informative image (alt provided)', async () => {
