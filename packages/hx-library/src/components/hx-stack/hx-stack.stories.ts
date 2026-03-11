@@ -88,13 +88,19 @@ const meta = {
       ?wrap=${args.wrap}
       ?inline=${args.inline}
     >
-      <div style="padding: 0.75rem 1rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.75rem 1rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Item 1
       </div>
-      <div style="padding: 0.75rem 1rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.75rem 1rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Item 2
       </div>
-      <div style="padding: 0.75rem 1rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.75rem 1rem; background: #e0f2fe; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Item 3
       </div>
     </hx-stack>
@@ -152,10 +158,14 @@ export const Centered: Story = {
       justify=${args.justify}
       style="min-height: 200px; border: 1px dashed #cbd5e1; padding: 1rem;"
     >
-      <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Centered Item A
       </div>
-      <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Centered Item B
       </div>
     </hx-stack>
@@ -186,10 +196,14 @@ export const SpaceBetween: Story = {
       justify=${args.justify}
       style="border: 1px dashed #cbd5e1; padding: 1rem;"
     >
-      <div style="padding: 0.5rem 1rem; background: #fef9c3; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.5rem 1rem; background: #fef9c3; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Left
       </div>
-      <div style="padding: 0.5rem 1rem; background: #fef9c3; border-radius: 0.25rem; font-size: 0.875rem;">
+      <div
+        style="padding: 0.5rem 1rem; background: #fef9c3; border-radius: 0.25rem; font-size: 0.875rem;"
+      >
         Right
       </div>
     </hx-stack>
@@ -210,13 +224,27 @@ export const AllGapSizes: Story = {
       ${(['none', 'xs', 'sm', 'md', 'lg', 'xl'] as const).map(
         (gap) => html`
           <div>
-            <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">
+            <div
+              style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;"
+            >
               gap="${gap}"
             </div>
             <hx-stack direction="horizontal" gap=${gap}>
-              <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">A</div>
-              <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">B</div>
-              <div style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;">C</div>
+              <div
+                style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                A
+              </div>
+              <div
+                style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                B
+              </div>
+              <div
+                style="padding: 0.5rem 1rem; background: #dbeafe; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                C
+              </div>
             </hx-stack>
           </div>
         `,
@@ -239,13 +267,32 @@ export const AllAlignments: Story = {
       ${(['start', 'center', 'end', 'stretch', 'baseline'] as const).map(
         (align) => html`
           <div>
-            <div style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">
+            <div
+              style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;"
+            >
               align="${align}"
             </div>
-            <hx-stack direction="horizontal" gap="sm" align=${align} style="border: 1px dashed #cbd5e1; padding: 0.5rem; min-height: 80px;">
-              <div style="padding: 0.5rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;">Short</div>
-              <div style="padding: 1rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;">Taller</div>
-              <div style="padding: 0.25rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;">Tiny</div>
+            <hx-stack
+              direction="horizontal"
+              gap="sm"
+              align=${align}
+              style="border: 1px dashed #cbd5e1; padding: 0.5rem; min-height: 80px;"
+            >
+              <div
+                style="padding: 0.5rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                Short
+              </div>
+              <div
+                style="padding: 1rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                Taller
+              </div>
+              <div
+                style="padding: 0.25rem 1rem; background: #fce7f3; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                Tiny
+              </div>
             </hx-stack>
           </div>
         `,
@@ -255,6 +302,54 @@ export const AllAlignments: Story = {
   play: async ({ canvasElement }) => {
     const stacks = canvasElement.querySelectorAll('hx-stack[direction="horizontal"]');
     await expect(stacks.length).toBe(5);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 6b. ALL JUSTIFY VALUES
+// ─────────────────────────────────────────────────
+
+export const AllJustifyValues: Story = {
+  render: () => html`
+    <hx-stack direction="vertical" gap="lg">
+      ${(['start', 'center', 'end', 'between', 'around', 'evenly'] as const).map(
+        (justify) => html`
+          <div>
+            <div
+              style="font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;"
+            >
+              justify="${justify}"
+            </div>
+            <hx-stack
+              direction="horizontal"
+              gap="sm"
+              justify=${justify}
+              style="border: 1px dashed #cbd5e1; padding: 0.5rem;"
+            >
+              <div
+                style="padding: 0.5rem 1rem; background: #d1fae5; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                A
+              </div>
+              <div
+                style="padding: 0.5rem 1rem; background: #d1fae5; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                B
+              </div>
+              <div
+                style="padding: 0.5rem 1rem; background: #d1fae5; border-radius: 0.25rem; font-size: 0.875rem;"
+              >
+                C
+              </div>
+            </hx-stack>
+          </div>
+        `,
+      )}
+    </hx-stack>
+  `,
+  play: async ({ canvasElement }) => {
+    const stacks = canvasElement.querySelectorAll('hx-stack[direction="horizontal"]');
+    await expect(stacks.length).toBe(6);
   },
 };
 
@@ -275,11 +370,16 @@ export const Wrapping: Story = {
       ?wrap=${args.wrap}
       style="max-width: 320px; border: 1px dashed #cbd5e1; padding: 1rem;"
     >
-      ${Array.from({ length: 8 }, (_, i) => html`
-        <div style="padding: 0.5rem 1rem; background: #d1fae5; border-radius: 0.25rem; font-size: 0.875rem; white-space: nowrap;">
-          Item ${i + 1}
-        </div>
-      `)}
+      ${Array.from(
+        { length: 8 },
+        (_, i) => html`
+          <div
+            style="padding: 0.5rem 1rem; background: #d1fae5; border-radius: 0.25rem; font-size: 0.875rem; white-space: nowrap;"
+          >
+            Item ${i + 1}
+          </div>
+        `,
+      )}
     </hx-stack>
   `,
   play: async ({ canvasElement }) => {
@@ -297,8 +397,16 @@ export const Inline: Story = {
     <div style="font-size: 0.875rem;">
       Text before
       <hx-stack direction="horizontal" gap="xs" inline>
-        <div style="padding: 0.25rem 0.5rem; background: #fef3c7; border-radius: 0.25rem; font-size: 0.875rem;">Tag A</div>
-        <div style="padding: 0.25rem 0.5rem; background: #fef3c7; border-radius: 0.25rem; font-size: 0.875rem;">Tag B</div>
+        <div
+          style="padding: 0.25rem 0.5rem; background: #fef3c7; border-radius: 0.25rem; font-size: 0.875rem;"
+        >
+          Tag A
+        </div>
+        <div
+          style="padding: 0.25rem 0.5rem; background: #fef3c7; border-radius: 0.25rem; font-size: 0.875rem;"
+        >
+          Tag B
+        </div>
       </hx-stack>
       text after.
     </div>
@@ -317,34 +425,48 @@ export const PatientFormLayout: Story = {
   render: () => html`
     <hx-stack direction="vertical" gap="lg" style="max-width: 480px; font-family: sans-serif;">
       <hx-stack direction="horizontal" gap="md" align="center">
-        <div style="padding: 0.5rem 0.75rem; background: #dcfce7; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">
+        <div
+          style="padding: 0.5rem 0.75rem; background: #dcfce7; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;"
+        >
           Active
         </div>
-        <span style="font-size: 0.875rem; color: #374151; font-weight: 600;">Jane Doe — MRN: 885521</span>
+        <span style="font-size: 0.875rem; color: #374151; font-weight: 600;"
+          >Jane Doe — MRN: 885521</span
+        >
       </hx-stack>
       <hx-stack direction="vertical" gap="sm">
-        <label style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">
+        <label
+          style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+        >
           Chief Complaint
         </label>
-        <div style="padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem;">
+        <div
+          style="padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem;"
+        >
           Chest pain, shortness of breath
         </div>
       </hx-stack>
       <hx-stack direction="horizontal" gap="md">
         <hx-stack direction="vertical" gap="xs">
-          <label style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">
+          <label
+            style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+          >
             BP
           </label>
           <span style="font-size: 0.875rem;">120/80</span>
         </hx-stack>
         <hx-stack direction="vertical" gap="xs">
-          <label style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">
+          <label
+            style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+          >
             HR
           </label>
           <span style="font-size: 0.875rem;">72 bpm</span>
         </hx-stack>
         <hx-stack direction="vertical" gap="xs">
-          <label style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">
+          <label
+            style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+          >
             Temp
           </label>
           <span style="font-size: 0.875rem;">98.6°F</span>
