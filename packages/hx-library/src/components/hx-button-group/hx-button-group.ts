@@ -9,6 +9,9 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
  * horizontal or vertical action set. Eliminates double borders between adjacent
  * buttons and squares off inner border-radius for a unified visual appearance.
  *
+ * **Accessibility:** Always provide an accessible label via `aria-label` or
+ * `aria-labelledby` so screen readers can announce the group purpose.
+ *
  * @summary Groups hx-button elements into a horizontal or vertical action set with shared borders.
  *
  * @tag hx-button-group
@@ -42,8 +45,9 @@ export class HelixButtonGroup extends LitElement {
 
   /**
    * Accessible label for the button group. Sets aria-label via ElementInternals.
-   * Required for WCAG 2.1 AA compliance when the group purpose is not clear from context.
-   * Alternatively, consumers may apply aria-label directly as an HTML attribute.
+   * **Strongly recommended** for WCAG 2.1 AA compliance — without it, screen
+   * readers announce an unnamed "group". For Drupal/Twig compatibility, prefer
+   * applying `aria-label` directly as an HTML attribute instead.
    * @attr label
    */
   @property({ type: String })
@@ -79,14 +83,6 @@ export class HelixButtonGroup extends LitElement {
     }
   }
 
-  // ─── Event Handling ───
-
-  private _handleSlotChange(): void {
-    // Notify the component that the slot content has changed so Lit can
-    // re-evaluate slot-dependent CSS selectors (::slotted pseudo-elements).
-    this.requestUpdate();
-  }
-
   // ─── Render ───
 
   override render() {
@@ -99,7 +95,7 @@ export class HelixButtonGroup extends LitElement {
           'group--vertical': this.orientation === 'vertical',
         })}
       >
-        <slot @slotchange=${this._handleSlotChange}></slot>
+        <slot></slot>
       </div>
     `;
   }

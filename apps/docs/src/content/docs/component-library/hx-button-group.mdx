@@ -51,35 +51,44 @@ Three sizes — `sm`, `md` (default), and `lg` — cascade to child buttons via 
 <ComponentDemo title="Button Group Sizes">
   <div style="display: flex; flex-direction: column; gap: 1rem;">
     <hx-button-group hx-size="sm">
-      <hx-button variant="secondary" hx-size="sm">
-        Edit
-      </hx-button>
-      <hx-button variant="secondary" hx-size="sm">
-        Copy
-      </hx-button>
-      <hx-button variant="secondary" hx-size="sm">
-        Delete
-      </hx-button>
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary">Copy</hx-button>
+      <hx-button variant="secondary">Delete</hx-button>
     </hx-button-group>
     <hx-button-group hx-size="md">
-      <hx-button variant="secondary" hx-size="md">
-        Edit
-      </hx-button>
-      <hx-button variant="secondary" hx-size="md">
-        Copy
-      </hx-button>
-      <hx-button variant="secondary" hx-size="md">
-        Delete
-      </hx-button>
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary">Copy</hx-button>
+      <hx-button variant="secondary">Delete</hx-button>
     </hx-button-group>
     <hx-button-group hx-size="lg">
-      <hx-button variant="secondary" hx-size="lg">
-        Edit
-      </hx-button>
-      <hx-button variant="secondary" hx-size="lg">
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary">Copy</hx-button>
+      <hx-button variant="secondary">Delete</hx-button>
+    </hx-button-group>
+  </div>
+</ComponentDemo>
+
+### Disabled Buttons
+
+Groups with one or more disabled buttons maintain visual cohesion.
+
+<ComponentDemo title="Disabled Children">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <hx-button-group aria-label="Actions with disabled">
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary" disabled>
         Copy
       </hx-button>
-      <hx-button variant="secondary" hx-size="lg">
+      <hx-button variant="secondary">Delete</hx-button>
+    </hx-button-group>
+    <hx-button-group aria-label="All disabled">
+      <hx-button variant="secondary" disabled>
+        Edit
+      </hx-button>
+      <hx-button variant="secondary" disabled>
+        Copy
+      </hx-button>
+      <hx-button variant="secondary" disabled>
         Delete
       </hx-button>
     </hx-button-group>
@@ -145,11 +154,11 @@ Minimal HTML snippet — no build tool required:
 
 ## Properties
 
-| Property      | Attribute     | Type                         | Default        | Description                                                                                                                    |
-| ------------- | ------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the button group.                                                                                          |
-| `size`        | `hx-size`     | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size cascaded to child buttons via `--hx-button-group-size`. Set the matching `hx-size` on each child button for consistency.  |
-| `label`       | `label`       | `string`                     | `''`           | Accessible label set via `ElementInternals.ariaLabel`. Prefer `aria-label` as an HTML attribute for Drupal/Twig compatibility. |
+| Property      | Attribute     | Type                         | Default        | Description                                                                                                                                                       |
+| ------------- | ------------- | ---------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the button group.                                                                                                                             |
+| `size`        | `hx-size`     | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Sets `--hx-button-group-size` CSS custom property on the group host. Child `hx-button` elements should also set `hx-size` until automatic cascade is implemented. |
+| `label`       | `label`       | `string`                     | `''`           | Accessible label set via `ElementInternals.ariaLabel`. Prefer `aria-label` as an HTML attribute for Drupal/Twig compatibility.                                    |
 
 ## Events
 
@@ -182,7 +191,7 @@ Minimal HTML snippet — no build tool required:
 | Keyboard       | No custom keyboard handling. Each `hx-button` child handles its own `Tab`, `Enter`, and `Space` interactions natively.                                                                            |
 | Screen reader  | The group role announces the group boundary to screen readers. Provide a meaningful `aria-label` whenever the group purpose is not obvious from surrounding context.                              |
 | Focus          | Focused child buttons are raised above siblings (`z-index: 1`) so the full focus ring is visible even when buttons share a border.                                                                |
-| Reduced motion | Transitions on slotted children are suppressed when `prefers-reduced-motion: reduce` is active.                                                                                                   |
+| Reduced motion | Child `hx-button` components handle their own `prefers-reduced-motion` behavior internally (e.g., suppressing spinner animations).                                                                |
 | WCAG           | Meets WCAG 2.1 AA. Verified with axe-core: zero violations across horizontal, vertical, and labeled group variants.                                                                               |
 
 ## Drupal Integration
