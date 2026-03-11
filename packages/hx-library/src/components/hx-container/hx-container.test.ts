@@ -224,6 +224,107 @@ describe('hx-container', () => {
     });
   });
 
+  // ─── Computed Padding Values (5) ───
+
+  describe('Computed Padding Values', () => {
+    it('padding="sm" applies 24px vertical padding', async () => {
+      const el = await fixture<WcContainer>('<hx-container padding="sm">Content</hx-container>');
+      const styles = getComputedStyle(el);
+      expect(styles.paddingTop).toBe('24px');
+      expect(styles.paddingBottom).toBe('24px');
+    });
+
+    it('padding="md" applies 48px vertical padding', async () => {
+      const el = await fixture<WcContainer>('<hx-container padding="md">Content</hx-container>');
+      const styles = getComputedStyle(el);
+      expect(styles.paddingTop).toBe('48px');
+      expect(styles.paddingBottom).toBe('48px');
+    });
+
+    it('padding="lg" applies 64px vertical padding', async () => {
+      const el = await fixture<WcContainer>('<hx-container padding="lg">Content</hx-container>');
+      const styles = getComputedStyle(el);
+      expect(styles.paddingTop).toBe('64px');
+      expect(styles.paddingBottom).toBe('64px');
+    });
+
+    it('padding="xl" applies 96px vertical padding', async () => {
+      const el = await fixture<WcContainer>('<hx-container padding="xl">Content</hx-container>');
+      const styles = getComputedStyle(el);
+      expect(styles.paddingTop).toBe('96px');
+      expect(styles.paddingBottom).toBe('96px');
+    });
+
+    it('padding="2xl" applies 128px vertical padding', async () => {
+      const el = await fixture<WcContainer>('<hx-container padding="2xl">Content</hx-container>');
+      const styles = getComputedStyle(el);
+      expect(styles.paddingTop).toBe('128px');
+      expect(styles.paddingBottom).toBe('128px');
+    });
+  });
+
+  // ─── Programmatic Property Updates (2) ───
+
+  describe('Programmatic Property Updates', () => {
+    it('changing width property updates inner class and max-width', async () => {
+      const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
+      const inner = shadowQuery(el, '.container__inner')!;
+
+      // Default is 'content'
+      expect(inner.classList.contains('container__inner--content')).toBe(true);
+      expect(getComputedStyle(inner).maxWidth).toBe('1152px');
+
+      // Change to 'sm' programmatically
+      el.width = 'sm';
+      await el.updateComplete;
+      expect(inner.classList.contains('container__inner--sm')).toBe(true);
+      expect(inner.classList.contains('container__inner--content')).toBe(false);
+      expect(getComputedStyle(inner).maxWidth).toBe('640px');
+    });
+
+    it('changing padding property updates host attribute and computed padding', async () => {
+      const el = await fixture<WcContainer>('<hx-container>Content</hx-container>');
+
+      // Default is 'none'
+      expect(el.getAttribute('padding')).toBe('none');
+
+      // Change to 'lg' programmatically
+      el.padding = 'lg';
+      await el.updateComplete;
+      expect(el.getAttribute('padding')).toBe('lg');
+      expect(getComputedStyle(el).paddingTop).toBe('64px');
+      expect(getComputedStyle(el).paddingBottom).toBe('64px');
+    });
+  });
+
+  // ─── CSS Custom Property Preset Overrides (3) ───
+
+  describe('CSS Custom Property Preset Overrides', () => {
+    it('--hx-container-sm overrides sm preset max-width', async () => {
+      const el = await fixture<WcContainer>(
+        '<hx-container width="sm" style="--hx-container-sm: 500px;">Content</hx-container>',
+      );
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(getComputedStyle(inner).maxWidth).toBe('500px');
+    });
+
+    it('--hx-container-lg overrides lg preset max-width', async () => {
+      const el = await fixture<WcContainer>(
+        '<hx-container width="lg" style="--hx-container-lg: 900px;">Content</hx-container>',
+      );
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(getComputedStyle(inner).maxWidth).toBe('900px');
+    });
+
+    it('--hx-container-content overrides content preset max-width', async () => {
+      const el = await fixture<WcContainer>(
+        '<hx-container width="content" style="--hx-container-content: 800px;">Content</hx-container>',
+      );
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(getComputedStyle(inner).maxWidth).toBe('800px');
+    });
+  });
+
   // ─── Accessibility (3) ───
 
   describe('Accessibility', () => {
