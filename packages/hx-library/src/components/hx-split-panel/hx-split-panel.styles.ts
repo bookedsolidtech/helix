@@ -128,8 +128,8 @@ export const helixSplitPanelStyles = css`
 
   .collapse-btn {
     background: var(--_divider-hover-color);
-    border: 2px solid white;
-    color: white;
+    border: 2px solid var(--hx-color-neutral-0);
+    color: var(--hx-color-neutral-0);
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -148,7 +148,7 @@ export const helixSplitPanelStyles = css`
   }
 
   .collapse-btn:focus-visible {
-    outline: 2px solid white;
+    outline: 2px solid var(--hx-color-neutral-0);
     outline-offset: 2px;
   }
 `;
