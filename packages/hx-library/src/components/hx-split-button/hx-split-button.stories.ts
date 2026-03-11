@@ -356,6 +356,39 @@ export const AllVariants: Story = {
   `,
 };
 
+export const Sizes: Story = {
+  render: () => html`
+    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;">
+        <span style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Small</span>
+        <hx-split-button hx-size="sm">
+          Save
+          <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+          <hx-menu-item slot="menu" value="save-publish">Save &amp; Publish</hx-menu-item>
+        </hx-split-button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;">
+        <span style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Medium (default)</span>
+        <hx-split-button hx-size="md">
+          Save Record
+          <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+          <hx-menu-item slot="menu" value="save-publish">Save &amp; Publish</hx-menu-item>
+        </hx-split-button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;">
+        <span style="font-size: 0.75rem; font-weight: 600; color: #6b7280;">Large</span>
+        <hx-split-button hx-size="lg">
+          Save Patient Record
+          <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+          <hx-menu-item slot="menu" value="save-publish">Save &amp; Publish</hx-menu-item>
+        </hx-split-button>
+      </div>
+    </div>
+  `,
+};
+
 // ─────────────────────────────────────────────────
 // 8. HEALTHCARE SCENARIOS
 // ─────────────────────────────────────────────────
