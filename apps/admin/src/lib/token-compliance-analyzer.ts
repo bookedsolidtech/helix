@@ -1,7 +1,7 @@
 /**
  * Token Compliance Analyzer.
  * Checks whether component-level CSS custom properties properly
- * reference the main @helix/tokens system.
+ * reference the main @helixui/tokens system.
  *
  * Tier 3 (component tokens like --hx-button-bg) should always resolve
  * to a Tier 2/1 system token (--hx-color-primary-500, --hx-space-4, etc.).

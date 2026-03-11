@@ -1,9 +1,9 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenEntries, darkTokenEntries } from '@helix/tokens';
+import { tokenEntries, darkTokenEntries } from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
 
-export type { TokenDefinition, TokenEntry } from '@helix/tokens';
+export type { TokenDefinition, TokenEntry } from '@helixui/tokens';
 
 /**
  * Supported theme names.
@@ -23,7 +23,7 @@ export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'auto';
  * High-contrast token overrides. Targets WCAG 7:1+ contrast ratios for low-vision users.
  * These are injected on top of the light primitives when theme="high-contrast".
  * Values here mirror the `high-contrast` section of tokens.json; kept in sync manually
- * until HC tokens are promoted to the published @helix/tokens package.
+ * until HC tokens are promoted to the published @helixui/tokens package.
  */
 const _hcOverrides: Array<[string, string]> = [
   ['--hx-color-text-primary', '#FFFFFF'],
@@ -77,7 +77,7 @@ function _buildThemeCss(theme: ThemeName): string {
   const cached = _cssCache.get(theme);
   if (cached) return cached;
 
-  // Build light token base map from the @helix/tokens package
+  // Build light token base map from the @helixui/tokens package
   const lightMap = new Map(tokenEntries.map((t) => [t.name, t.value]));
 
   let css: string;

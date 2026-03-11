@@ -2,7 +2,7 @@
  * Custom Elements Manifest (CEM) parser utility.
  * Runs in Astro's server context (Node) at build time — never shipped to browser.
  */
-import cemJson from '@helix/library/custom-elements.json';
+import cemJson from '@helixui/library/custom-elements.json';
 
 // ── CEM type interfaces ──────────────────────────────────────────────
 

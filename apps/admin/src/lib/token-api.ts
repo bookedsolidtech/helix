@@ -1,19 +1,19 @@
 /**
  * Token API — Shared response builder for /api/tokens endpoints.
  *
- * Builds enriched token payloads by combining the raw @helix/tokens data
+ * Builds enriched token payloads by combining the raw @helixui/tokens data
  * with resolved color values and contrast information. Used by both the
  * main /api/tokens route and the per-category /api/tokens/[category] route.
  */
-import { tokenEntries, darkTokenEntries, tokensByCategory, tokenMap } from '@helix/tokens';
-import type { TokenEntry } from '@helix/tokens';
+import { tokenEntries, darkTokenEntries, tokensByCategory, tokenMap } from '@helixui/tokens';
+import type { TokenEntry } from '@helixui/tokens';
 import {
   getTokenStats,
   isHexColor,
   resolveTokenRef,
   getColorSubgroups,
   getContrastColor,
-} from '@helix/tokens/utils';
+} from '@helixui/tokens/utils';
 
 // ---------------------------------------------------------------------------
 // Types
