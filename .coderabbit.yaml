@@ -1,8 +1,6 @@
 # CodeRabbit Configuration
 # https://docs.coderabbit.ai/getting-started/configure-coderabbit
 
-version: '2'
-
 reviews:
   profile: 'assertive'
   request_changes_workflow: true
