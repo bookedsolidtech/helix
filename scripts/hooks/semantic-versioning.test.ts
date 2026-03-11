@@ -71,13 +71,13 @@ function extractPropertyTypes(content: string): Map<string, string> {
 describe('semantic-versioning (H23)', () => {
   describe('Hook Structure', () => {
     it('should have executable shebang', () => {
-      const hookPath = '/Volumes/Development/booked/helix/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content.startsWith('#!/usr/bin/env tsx')).toBe(true);
     });
 
     it('should export validation types', () => {
-      const hookPath = '/Volumes/Development/booked/helix/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content).toContain('interface Violation');
       expect(content).toContain('interface ValidationResult');
@@ -85,14 +85,14 @@ describe('semantic-versioning (H23)', () => {
     });
 
     it('should have main execution function', () => {
-      const hookPath = '/Volumes/Development/booked/helix/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content).toContain('function main()');
       expect(content).toContain('main();');
     });
 
     it('should support JSON output mode', () => {
-      const hookPath = '/Volumes/Development/booked/helix/scripts/hooks/semantic-versioning.ts';
+      const hookPath = 'scripts/hooks/semantic-versioning.ts';
       const content = readFileSync(hookPath, 'utf-8');
       expect(content).toContain('--json');
       expect(content).toContain('JSON.stringify');
@@ -277,7 +277,7 @@ describe('semantic-versioning (H23)', () => {
   describe('Changeset Parsing', () => {
     it('should parse valid changeset with single package', () => {
       const content = `---
-"@helixui/library": minor
+"@helix/library": minor
 ---
 
 Added new button variant`;
@@ -293,8 +293,8 @@ Added new button variant`;
 
     it('should parse changeset with multiple packages', () => {
       const content = `---
-"@helixui/library": major
-"@helixui/tokens": minor
+"@helix/library": major
+"@helix/tokens": minor
 ---
 
 Breaking change in component API`;
@@ -304,27 +304,27 @@ Breaking change in component API`;
     });
 
     it('should detect major bump', () => {
-      const frontmatter = '"@helixui/library": major';
+      const frontmatter = '"@helix/library": major';
       const match = frontmatter.match(/["'](.+?)["']:\s*(major|minor|patch)/);
       expect(match).not.toBeNull();
       expect(match?.[2]).toBe('major');
     });
 
     it('should detect minor bump', () => {
-      const frontmatter = '"@helixui/library": minor';
+      const frontmatter = '"@helix/library": minor';
       const match = frontmatter.match(/["'](.+?)["']:\s*(major|minor|patch)/);
       expect(match?.[2]).toBe('minor');
     });
 
     it('should detect patch bump', () => {
-      const frontmatter = '"@helixui/library": patch';
+      const frontmatter = '"@helix/library": patch';
       const match = frontmatter.match(/["'](.+?)["']:\s*(major|minor|patch)/);
       expect(match?.[2]).toBe('patch');
     });
 
     it('should extract multi-line summary', () => {
       const content = `---
-"@helixui/library": minor
+"@helix/library": minor
 ---
 
 This is a longer summary that spans
@@ -343,7 +343,7 @@ context about the changes.`;
 
     it('should handle empty summary', () => {
       const content = `---
-"@helixui/library": patch
+"@helix/library": patch
 ---
 
 `;
@@ -662,28 +662,28 @@ context about the changes.`;
 
   describe('YAML Parsing (yaml library)', () => {
     it('should parse valid YAML frontmatter', () => {
-      const _frontmatter = '"@helixui/library": minor';
+      const _frontmatter = '"@helix/library": minor';
 
       // Simulate what yaml library would do
       const parsed: Record<string, string> = {
-        '@helixui/library': 'minor',
+        '@helix/library': 'minor',
       };
 
-      expect(parsed['@helixui/library']).toBe('minor');
+      expect(parsed['@helix/library']).toBe('minor');
     });
 
     it('should handle multiple packages in YAML', () => {
-      const _frontmatter = `"@helixui/library": major
-"@helixui/tokens": patch`;
+      const _frontmatter = `"@helix/library": major
+"@helix/tokens": patch`;
 
       const parsed: Record<string, string> = {
-        '@helixui/library': 'major',
-        '@helixui/tokens': 'patch',
+        '@helix/library': 'major',
+        '@helix/tokens': 'patch',
       };
 
       expect(Object.keys(parsed).length).toBe(2);
-      expect(parsed['@helixui/library']).toBe('major');
-      expect(parsed['@helixui/tokens']).toBe('patch');
+      expect(parsed['@helix/library']).toBe('major');
+      expect(parsed['@helix/tokens']).toBe('patch');
     });
 
     it('should reject invalid YAML', () => {
@@ -819,13 +819,13 @@ context about the changes.`;
 
   describe('Validation Logic', () => {
     it('should validate package names against workspace', () => {
-      const validPackages = ['@helixui/library', '@helixui/tokens'];
-      const testPackage = '@helixui/library';
+      const validPackages = ['@helix/library', '@helix/tokens'];
+      const testPackage = '@helix/library';
       expect(validPackages.includes(testPackage)).toBe(true);
     });
 
     it('should reject invalid package names', () => {
-      const validPackages = ['@helixui/library', '@helixui/tokens'];
+      const validPackages = ['@helix/library', '@helix/tokens'];
       const testPackage = '@unknown/package';
       expect(validPackages.includes(testPackage)).toBe(false);
     });
