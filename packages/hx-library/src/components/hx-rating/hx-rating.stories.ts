@@ -252,3 +252,50 @@ export const InteractiveEvents: Story = {
     `;
   },
 };
+
+export const Sizes: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <p style="margin: 0 0 0.25rem; font-size: 0.875rem; color: #6b7280;">Small (0.875rem)</p>
+        <hx-rating
+          value="3"
+          label="Small rating"
+          readonly
+          style="--hx-rating-size: 0.875rem;"
+        ></hx-rating>
+      </div>
+      <div>
+        <p style="margin: 0 0 0.25rem; font-size: 0.875rem; color: #6b7280;">
+          Medium (1.25rem) — default
+        </p>
+        <hx-rating
+          value="3"
+          label="Medium rating"
+          readonly
+          style="--hx-rating-size: 1.25rem;"
+        ></hx-rating>
+      </div>
+      <div>
+        <p style="margin: 0 0 0.25rem; font-size: 0.875rem; color: #6b7280;">Large (1.75rem)</p>
+        <hx-rating
+          value="3"
+          label="Large rating"
+          readonly
+          style="--hx-rating-size: 1.75rem;"
+        ></hx-rating>
+      </div>
+      <div>
+        <p style="margin: 0 0 0.25rem; font-size: 0.875rem; color: #6b7280;">
+          Extra-large (2.5rem)
+        </p>
+        <hx-rating
+          value="3"
+          label="Extra-large rating"
+          readonly
+          style="--hx-rating-size: 2.5rem;"
+        ></hx-rating>
+      </div>
+    </div>
+  `,
+};

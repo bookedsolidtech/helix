@@ -202,6 +202,21 @@ describe('hx-rating', () => {
       await el.updateComplete;
       expect(el.value).toBe(5);
     });
+
+    it('restores focus to active star after ArrowRight', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="2" max="5"></hx-rating>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      base?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      // Wait for value update and the subsequent focus restoration
+      await el.updateComplete;
+      await el.updateComplete;
+      const activeSymbol = el.shadowRoot?.querySelector<HTMLElement>(
+        '[part="symbol"][tabindex="0"]',
+      );
+      expect(activeSymbol).toBeTruthy();
+      expect(activeSymbol?.getAttribute('data-index')).toBe('3');
+      expect(el.shadowRoot?.activeElement).toBe(activeSymbol);
+    });
   });
 
   // ─── Half-Star Precision (3) ───
@@ -232,6 +247,27 @@ describe('hx-rating', () => {
       const event = await eventPromise;
       expect(event.detail.value).toBe(2.5);
     });
+
+    it('clicking right half of star sets full integer value with precision=0.5', async () => {
+      const el = await fixture<HelixRating>('<hx-rating max="5" precision="0.5"></hx-rating>');
+      const symbols = shadowQueryAll<HTMLElement>(el, '[part="symbol"]');
+      const star = symbols[2]!;
+      const rect = star.getBoundingClientRect();
+      // Position clientX in the right half of the 3rd star
+      const rightHalfX = rect.left + rect.width * 0.75;
+      const centerY = rect.top + rect.height / 2;
+      const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-change');
+      star.dispatchEvent(
+        new MouseEvent('click', {
+          bubbles: true,
+          composed: true,
+          clientX: rightHalfX,
+          clientY: centerY,
+        }),
+      );
+      const event = await eventPromise;
+      expect(event.detail.value).toBe(3);
+    });
   });
 
   // ─── Hover Preview (2) ───
@@ -255,6 +291,27 @@ describe('hx-rating', () => {
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
+    });
+
+    it('mousemove dispatches hx-hover with half-star precision on left half', async () => {
+      const el = await fixture<HelixRating>('<hx-rating max="5" precision="0.5"></hx-rating>');
+      const symbols = shadowQueryAll<HTMLElement>(el, '[part="symbol"]');
+      const star = symbols[2]!;
+      const rect = star.getBoundingClientRect();
+      // Position clientX in the left half of the 3rd star
+      const leftHalfX = rect.left + rect.width * 0.25;
+      const centerY = rect.top + rect.height / 2;
+      const eventPromise = oneEvent<CustomEvent<{ value: number }>>(el, 'hx-hover');
+      star.dispatchEvent(
+        new MouseEvent('mousemove', {
+          bubbles: true,
+          composed: true,
+          clientX: leftHalfX,
+          clientY: centerY,
+        }),
+      );
+      const event = await eventPromise;
+      expect(event.detail.value).toBe(2.5);
     });
   });
 
