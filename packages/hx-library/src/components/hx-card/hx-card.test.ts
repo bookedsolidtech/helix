@@ -319,6 +319,18 @@ describe('hx-card', () => {
   // ─── CSS Parts (3) ───
 
   describe('CSS Parts', () => {
+    it('card part exposed', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      const card = shadowQuery(el, '[part="card"]');
+      expect(card).toBeTruthy();
+    });
+
+    it('image part exposed', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      const image = shadowQuery(el, '[part="image"]');
+      expect(image).toBeTruthy();
+    });
+
     it('heading part exposed', async () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const heading = shadowQuery(el, '[part="heading"]');
@@ -335,6 +347,12 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const footer = shadowQuery(el, '[part="footer"]');
       expect(footer).toBeTruthy();
+    });
+
+    it('actions part exposed', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      const actions = shadowQuery(el, '[part="actions"]');
+      expect(actions).toBeTruthy();
     });
   });
 
