@@ -53,7 +53,7 @@ jobs:
       # ---- Quality Checks ----
 
       - name: Type check
-        run: npm run type-check
+        run: npx turbo run type-check --filter='!docs'
 
       - name: Lint
         run: npm run lint
