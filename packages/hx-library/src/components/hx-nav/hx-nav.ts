@@ -39,12 +39,14 @@ type NavOrientation = 'horizontal' | 'vertical';
  *
  * @cssprop [--hx-nav-bg=var(--hx-color-neutral-900)] - Navigation background color.
  * @cssprop [--hx-nav-color=var(--hx-color-neutral-100)] - Navigation text color.
+ * @cssprop [--hx-nav-font-family=var(--hx-font-family-sans)] - Navigation font family.
  * @cssprop [--hx-nav-link-color=var(--hx-color-neutral-100)] - Link text color.
  * @cssprop [--hx-nav-link-hover-bg=var(--hx-color-neutral-700)] - Link hover background.
  * @cssprop [--hx-nav-link-hover-color=var(--hx-color-white)] - Link hover text color.
  * @cssprop [--hx-nav-link-active-bg=var(--hx-color-primary-600)] - Active link background.
  * @cssprop [--hx-nav-link-active-color=var(--hx-color-white)] - Active link text color.
  * @cssprop [--hx-nav-submenu-bg=var(--hx-color-neutral-800)] - Submenu background color.
+ * @cssprop [--hx-nav-submenu-min-width=12rem] - Submenu minimum width.
  * @cssprop [--hx-nav-font-size=var(--hx-font-size-sm)] - Navigation font size.
  * @cssprop [--hx-nav-padding=var(--hx-space-2) var(--hx-space-4)] - Navigation padding.
  * @cssprop [--hx-nav-item-padding=var(--hx-space-2) var(--hx-space-3)] - Item padding.
@@ -151,7 +153,8 @@ export class HelixNav extends LitElement {
     }
   }
 
-  private _handleSubItemClick(item: NavItem): void {
+  private _handleSubItemClick(item: NavItem, e: Event): void {
+    e.preventDefault();
     this._mobileOpen = false;
     this._expandedIndex = null;
     this.dispatchEvent(
@@ -165,7 +168,7 @@ export class HelixNav extends LitElement {
 
   private _handleKeydown(e: KeyboardEvent, index: number, item: NavItem): void {
     const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
-      ':scope > nav > [part="list"] > [part="item"] > [part="link"]',
+      ':scope > [part="nav"] > [part="list"] > [part="item"] > [part="link"]',
     );
     if (!items) return;
     const itemsArr = Array.from(items);
@@ -206,7 +209,16 @@ export class HelixNav extends LitElement {
       case ' ': {
         if (item.children?.length) {
           e.preventDefault();
-          this._expandedIndex = this._expandedIndex === index ? null : index;
+          const wasExpanded = this._expandedIndex === index;
+          this._expandedIndex = wasExpanded ? null : index;
+          if (!wasExpanded) {
+            this.updateComplete.then(() => {
+              const firstSub = this.shadowRoot?.querySelector<HTMLElement>(
+                `.nav__submenu:not([hidden]) [part="link"]`,
+              );
+              firstSub?.focus();
+            });
+          }
         }
         break;
       }
@@ -248,7 +260,8 @@ export class HelixNav extends LitElement {
   }
 
   private _handleOutsideClick(e: MouseEvent): void {
-    if (!this.contains(e.target as Node) && !this.shadowRoot?.contains(e.target as Node)) {
+    const path = e.composedPath();
+    if (!path.includes(this)) {
       this._expandedIndex = null;
     }
   }
@@ -307,10 +320,15 @@ export class HelixNav extends LitElement {
     </svg>`;
   }
 
-  private _renderSubMenu(children: NavItem[], parentIndex: number) {
+  private _renderSubMenu(children: NavItem[], parentIndex: number, parentLabel: string) {
     const isExpanded = this._expandedIndex === parentIndex;
     return html`
-      <ul class="nav__submenu" role="list" aria-label="Submenu" ?hidden=${!isExpanded}>
+      <ul
+        class="nav__submenu"
+        role="list"
+        aria-label="${parentLabel} submenu"
+        ?hidden=${!isExpanded}
+      >
         ${children.map(
           (child) => html`
             <li class="nav__submenu-item">
@@ -322,7 +340,7 @@ export class HelixNav extends LitElement {
                   'nav__link--active': !!child.current,
                 })}
                 aria-current=${child.current ? 'page' : nothing}
-                @click=${() => this._handleSubItemClick(child)}
+                @click=${(e: Event) => this._handleSubItemClick(child, e)}
                 @keydown=${(e: KeyboardEvent) => this._handleSubKeydown(e, parentIndex)}
               >
                 ${child.label}
@@ -351,13 +369,12 @@ export class HelixNav extends LitElement {
             part="link"
             class=${classMap(linkClasses)}
             aria-expanded=${isExpanded ? 'true' : 'false'}
-            aria-haspopup="menu"
             @click=${(e: Event) => this._handleItemClick(item, index, e)}
             @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, index, item)}
           >
             ${item.label} ${this._renderChevronIcon()}
           </button>
-          ${this._renderSubMenu(item.children ?? [], index)}
+          ${this._renderSubMenu(item.children ?? [], index, item.label)}
         `
       : html`
           <a
@@ -399,7 +416,7 @@ export class HelixNav extends LitElement {
         <ul part="list" id="nav-list" class=${classMap(listClasses)} role="list">
           ${repeat(
             this.items,
-            (item) => item.label,
+            (_item, i) => i,
             (item, i) => this._renderItem(item, i),
           )}
         </ul>
