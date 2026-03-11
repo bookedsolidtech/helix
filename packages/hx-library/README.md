@@ -1,8 +1,8 @@
-# @helix/library
+# @helixui/library
 
 **Enterprise Web Component Library** built with [Lit 3.x](https://lit.dev/), TypeScript, and Shadow DOM — designed for healthcare applications where accessibility and reliability are non-negotiable.
 
-[![npm version](https://img.shields.io/npm/v/@helix/library)](https://www.npmjs.com/package/@helix/library)
+[![npm version](https://img.shields.io/npm/v/@helixui/library)](https://www.npmjs.com/package/@helixui/library)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
@@ -10,10 +10,10 @@
 ## Installation
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
-Design tokens are included automatically as a dependency via `@helix/tokens`.
+Design tokens are included automatically as a dependency via `@helixui/tokens`.
 
 ---
 
@@ -22,15 +22,15 @@ Design tokens are included automatically as a dependency via `@helix/tokens`.
 ### Barrel import (all components)
 
 ```js
-import '@helix/library';
+import '@helixui/library';
 ```
 
 ### Per-component import (recommended for tree-shaking)
 
 ```js
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-card';
-import '@helix/library/components/hx-text-input';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
+import '@helixui/library/components/hx-text-input';
 ```
 
 ### HTML / Twig (after script load)
@@ -46,7 +46,7 @@ import '@helix/library/components/hx-text-input';
 ### CDN (placeholder — coming soon)
 
 ```html
-<script type="module" src="https://cdn.example.com/@helix/library/dist/index.js"></script>
+<script type="module" src="https://cdn.example.com/@helixui/library/dist/index.js"></script>
 ```
 
 ---
@@ -134,7 +134,7 @@ import '@helix/library/components/hx-text-input';
 
 ## Design Tokens
 
-All components consume design tokens from `@helix/tokens` via CSS custom properties. Override at the semantic level to theme your application:
+All components consume design tokens from `@helixui/tokens` via CSS custom properties. Override at the semantic level to theme your application:
 
 ```css
 :root {
@@ -145,7 +145,7 @@ All components consume design tokens from `@helix/tokens` via CSS custom propert
 }
 ```
 
-See the [@helix/tokens](../hx-tokens/README.md) package for the full token reference.
+See the [@helixui/tokens](../hx-tokens/README.md) package for the full token reference.
 
 ---
 

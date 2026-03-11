@@ -74,7 +74,7 @@ const indexTs = `export { ${className} } from './${name}.js';
 
 const componentTs = `import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helix/tokens/lit';
+import { tokenStyles } from '@helixui/tokens/lit';
 import { ${stylesExport} } from './${name}.styles.js';
 
 /**
