@@ -57,6 +57,9 @@ export function computeStats(issues: TrackedIssue[]): IssuesIndex['stats'] {
  * Load and parse the issues index from disk.
  */
 export function loadIssues(): IssuesIndex {
+  if (!existsSync(ISSUES_PATH)) {
+    return { issues: [], stats: computeStats([]), lastUpdated: new Date().toISOString() };
+  }
   const content = readFileSync(ISSUES_PATH, 'utf-8');
   return JSON.parse(content) as IssuesIndex;
 }
@@ -80,6 +83,9 @@ export function saveIssues(data: IssuesIndex): void {
  * Load the reviews index (list of all review snapshots).
  */
 export function loadReviewsIndex(): ReviewsIndex {
+  if (!existsSync(REVIEWS_INDEX_PATH)) {
+    return { reviews: [] } as ReviewsIndex;
+  }
   const content = readFileSync(REVIEWS_INDEX_PATH, 'utf-8');
   return JSON.parse(content) as ReviewsIndex;
 }
