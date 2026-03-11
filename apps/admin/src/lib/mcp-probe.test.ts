@@ -7,7 +7,10 @@ import {
 } from './mcp-probe';
 import type { McpProbeResult, McpProbeStatus } from './mcp-probe';
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // ── categorizeToolName ───────────────────────────────────────────────────
 
@@ -165,7 +168,7 @@ describe('probeMcpServer — binary check', () => {
 // ── probeMcpServer — live server integration ─────────────────────────────
 // These tests require the wc-tools server to be built at the expected path.
 
-const WC_TOOLS_BINARY = resolve(import.meta.dirname, '../../../../../../wc-tools/build/index.js');
+const WC_TOOLS_BINARY = resolve(__dirname, '../../../../../../wc-tools/build/index.js');
 const serverAvailable = existsSync(WC_TOOLS_BINARY);
 
 describe.skipIf(!serverAvailable)('probeMcpServer — live server', () => {
@@ -308,7 +311,7 @@ describe.skipIf(!serverAvailable)('probeMcpServer — live server', () => {
 
 // ── CEM metadata ─────────────────────────────────────────────────────────
 
-const CEM_FILE = resolve(import.meta.dirname, '../../../../packages/hx-library/custom-elements.json');
+const CEM_FILE = resolve(__dirname, '../../../../packages/hx-library/custom-elements.json');
 const cemAvailable = existsSync(CEM_FILE);
 
 describe('probeMcpServer — CEM metadata', () => {
