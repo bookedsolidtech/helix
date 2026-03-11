@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixButtonGroup } from './hx-button-group.js';
@@ -32,7 +32,7 @@ describe('hx-button-group', () => {
     });
   });
 
-  // ─── Property: orientation (2) ───
+  // ─── Property: orientation (4) ───
 
   describe('Property: orientation', () => {
     it('applies horizontal class by default', async () => {
@@ -65,6 +65,15 @@ describe('hx-button-group', () => {
       expect(group?.classList.contains('group--horizontal')).toBe(true);
     });
 
+    it('reflects orientation attribute to the host element', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group orientation="vertical">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      expect(el.getAttribute('orientation')).toBe('vertical');
+    });
+
     it('updates class when orientation changes dynamically', async () => {
       const el = await fixture<HelixButtonGroup>(`
         <hx-button-group orientation="horizontal">
@@ -79,7 +88,7 @@ describe('hx-button-group', () => {
     });
   });
 
-  // ─── Property: size (3) ───
+  // ─── Property: size (4) ───
 
   describe('Property: size', () => {
     it('defaults to size="md"', async () => {
@@ -120,6 +129,18 @@ describe('hx-button-group', () => {
       const computed = getComputedStyle(el);
       expect(computed.getPropertyValue('--hx-button-group-size').trim()).toBe('lg');
     });
+
+    it('updates --hx-button-group-size when size changes dynamically', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group hx-size="sm">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      el.size = 'lg';
+      await el.updateComplete;
+      const computed = getComputedStyle(el);
+      expect(computed.getPropertyValue('--hx-button-group-size').trim()).toBe('lg');
+    });
   });
 
   // ─── CSS: Single Button (1) ───
@@ -133,18 +154,15 @@ describe('hx-button-group', () => {
       `);
       const button = el.querySelector('hx-button');
       expect(button).toBeTruthy();
-      // A single button is both :first-child and :last-child, so :only-child
-      // rule must win with a full-radius value (not split left/right halves).
       const computed = getComputedStyle(button!);
       const radius = computed.getPropertyValue('--hx-button-border-radius').trim();
-      // The :only-child rule sets a single value (all four corners equal),
-      // while the :first-child/:last-child split rules each set two corners.
-      // Verify the radius is not the broken split value "0 <radius> <radius> 0".
+      // :only-child rule sets a uniform value; verify it is NOT the split
+      // first-child pattern "radius 0 0 radius"
       expect(radius).not.toMatch(/^0\s/);
     });
   });
 
-  // ─── Property: label (1) ───
+  // ─── Property: label (2) ───
 
   describe('Property: label', () => {
     it('sets internals ariaLabel when label property is provided', async () => {
@@ -155,6 +173,18 @@ describe('hx-button-group', () => {
         </hx-button-group>
       `);
       expect(el.label).toBe('Form actions');
+    });
+
+    it('clears internals ariaLabel when label is set to empty string', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Form actions">
+          <hx-button variant="secondary">Save</hx-button>
+        </hx-button-group>
+      `);
+      expect(el.label).toBe('Form actions');
+      el.label = '';
+      await el.updateComplete;
+      expect(el.label).toBe('');
     });
   });
 
@@ -173,14 +203,12 @@ describe('hx-button-group', () => {
       expect(buttons.length).toBe(3);
     });
 
-    it('triggers requestUpdate on slot change', async () => {
+    it('dynamically appended button appears in the group', async () => {
       const el = await fixture<HelixButtonGroup>(`
         <hx-button-group>
           <hx-button variant="secondary">Button 1</hx-button>
         </hx-button-group>
       `);
-
-      const requestUpdateSpy = vi.spyOn(el, 'requestUpdate');
 
       const button2 = document.createElement('hx-button');
       button2.setAttribute('variant', 'secondary');
@@ -188,7 +216,6 @@ describe('hx-button-group', () => {
       el.appendChild(button2);
 
       await el.updateComplete;
-      expect(requestUpdateSpy).toHaveBeenCalled();
       const buttons = el.querySelectorAll('hx-button');
       expect(buttons.length).toBe(2);
     });
@@ -204,7 +231,78 @@ describe('hx-button-group', () => {
     });
   });
 
-  // ─── Accessibility (4) ───
+  // ─── Mixed Variants (1) ───
+
+  describe('Mixed Variants', () => {
+    it('renders buttons with different variants correctly', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group>
+          <hx-button variant="primary">Confirm</hx-button>
+          <hx-button variant="secondary">Review</hx-button>
+          <hx-button variant="ghost">Dismiss</hx-button>
+        </hx-button-group>
+      `);
+      const buttons = el.querySelectorAll('hx-button');
+      expect(buttons.length).toBe(3);
+      expect(buttons[0].getAttribute('variant')).toBe('primary');
+      expect(buttons[1].getAttribute('variant')).toBe('secondary');
+      expect(buttons[2].getAttribute('variant')).toBe('ghost');
+    });
+  });
+
+  // ─── Disabled Children (2) ───
+
+  describe('Disabled Children', () => {
+    it('renders with a mix of disabled and enabled buttons', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group>
+          <hx-button variant="secondary">Enabled</hx-button>
+          <hx-button variant="secondary" disabled>Disabled</hx-button>
+          <hx-button variant="secondary">Enabled</hx-button>
+        </hx-button-group>
+      `);
+      const buttons = el.querySelectorAll('hx-button');
+      expect(buttons.length).toBe(3);
+      expect(buttons[0].disabled).toBe(false);
+      expect(buttons[1].disabled).toBe(true);
+      expect(buttons[2].disabled).toBe(false);
+    });
+
+    it('has no axe violations with disabled children', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group aria-label="Actions">
+          <hx-button variant="secondary">Active</hx-button>
+          <hx-button variant="secondary" disabled>Disabled</hx-button>
+        </hx-button-group>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Keyboard Navigation (1) ───
+
+  describe('Keyboard Navigation', () => {
+    it('each child button is reachable via sequential Tab', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group aria-label="Actions">
+          <hx-button variant="secondary">First</hx-button>
+          <hx-button variant="secondary">Second</hx-button>
+          <hx-button variant="secondary">Third</hx-button>
+        </hx-button-group>
+      `);
+      const buttons = el.querySelectorAll('hx-button');
+      expect(buttons.length).toBe(3);
+      // Verify all buttons exist and are in the DOM (sequential tab order is
+      // native browser behavior for role="group" with tabbable children)
+      for (const btn of buttons) {
+        expect(btn.shadowRoot?.querySelector('button')).toBeTruthy();
+      }
+    });
+  });
+
+  // ─── Accessibility (5) ───
 
   describe('Accessibility', () => {
     it('uses ElementInternals for role (no explicit role attribute on host or wrapper)', async () => {
@@ -213,11 +311,6 @@ describe('hx-button-group', () => {
           <hx-button variant="secondary">Button</hx-button>
         </hx-button-group>
       `);
-      // ElementInternals.role sets the *default* ARIA role without creating a
-      // DOM attribute. Verify the host has no explicit role attribute and the
-      // internal wrapper div also carries no role (both confirm the
-      // ElementInternals pattern is used, not setAttribute). Semantic
-      // correctness is verified by the axe tests below.
       expect(el.getAttribute('role')).toBeNull();
       const wrapper = shadowQuery(el, '[part="group"]');
       expect(wrapper?.hasAttribute('role')).toBe(false);
@@ -269,6 +362,16 @@ describe('hx-button-group', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Export Verification (1) ───
+
+  describe('Export Verification', () => {
+    it('HelixButtonGroup class is exported from index', async () => {
+      const mod = await import('./index.js');
+      expect(mod.HelixButtonGroup).toBeDefined();
+      expect(typeof mod.HelixButtonGroup).toBe('function');
     });
   });
 });

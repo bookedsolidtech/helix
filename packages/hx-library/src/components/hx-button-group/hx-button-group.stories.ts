@@ -106,7 +106,9 @@ export const Vertical: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 3. SIZE STORIES
+// 3. SIZE STORIES — Child buttons do NOT set hx-size
+//    explicitly, demonstrating the cascade mechanism
+//    via --hx-button-group-size CSS custom property.
 // ─────────────────────────────────────────────────
 
 export const SmallSize: Story = {
@@ -115,9 +117,9 @@ export const SmallSize: Story = {
   },
   render: () => html`
     <hx-button-group hx-size="sm">
-      <hx-button variant="secondary" hx-size="sm">Edit</hx-button>
-      <hx-button variant="secondary" hx-size="sm">Copy</hx-button>
-      <hx-button variant="secondary" hx-size="sm">Delete</hx-button>
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary">Copy</hx-button>
+      <hx-button variant="secondary">Delete</hx-button>
     </hx-button-group>
   `,
 };
@@ -128,9 +130,9 @@ export const MediumSize: Story = {
   },
   render: () => html`
     <hx-button-group hx-size="md">
-      <hx-button variant="secondary" hx-size="md">Edit</hx-button>
-      <hx-button variant="secondary" hx-size="md">Copy</hx-button>
-      <hx-button variant="secondary" hx-size="md">Delete</hx-button>
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary">Copy</hx-button>
+      <hx-button variant="secondary">Delete</hx-button>
     </hx-button-group>
   `,
 };
@@ -141,9 +143,9 @@ export const LargeSize: Story = {
   },
   render: () => html`
     <hx-button-group hx-size="lg">
-      <hx-button variant="secondary" hx-size="lg">Edit</hx-button>
-      <hx-button variant="secondary" hx-size="lg">Copy</hx-button>
-      <hx-button variant="secondary" hx-size="lg">Delete</hx-button>
+      <hx-button variant="secondary">Edit</hx-button>
+      <hx-button variant="secondary">Copy</hx-button>
+      <hx-button variant="secondary">Delete</hx-button>
     </hx-button-group>
   `,
 };
@@ -156,7 +158,9 @@ export const MixedVariants: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6b7280;">
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
           Primary + Secondary + Ghost
         </p>
         <hx-button-group>
@@ -166,7 +170,9 @@ export const MixedVariants: Story = {
         </hx-button-group>
       </div>
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6b7280;">
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
           All Secondary (recommended for grouped actions)
         </p>
         <hx-button-group>
@@ -177,21 +183,115 @@ export const MixedVariants: Story = {
       </div>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const groups = canvasElement.querySelectorAll('hx-button-group');
+    await expect(groups.length).toBe(2);
+
+    const firstGroupButtons = groups[0].querySelectorAll('hx-button');
+    await expect(firstGroupButtons.length).toBe(3);
+    await expect(firstGroupButtons[0].getAttribute('variant')).toBe('primary');
+    await expect(firstGroupButtons[1].getAttribute('variant')).toBe('secondary');
+    await expect(firstGroupButtons[2].getAttribute('variant')).toBe('ghost');
+  },
 };
 
 // ─────────────────────────────────────────────────
-// 5. DRUPAL USAGE — Twig/CMS pattern with Save/Cancel/Reset
+// 5. DISABLED CHILDREN — Mixed disabled states
+// ─────────────────────────────────────────────────
+
+export const DisabledChildren: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
+          One disabled button in the group
+        </p>
+        <hx-button-group aria-label="Actions with disabled">
+          <hx-button variant="secondary">Edit</hx-button>
+          <hx-button variant="secondary" disabled>Copy</hx-button>
+          <hx-button variant="secondary">Delete</hx-button>
+        </hx-button-group>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
+          All disabled buttons
+        </p>
+        <hx-button-group aria-label="All disabled actions">
+          <hx-button variant="secondary" disabled>Edit</hx-button>
+          <hx-button variant="secondary" disabled>Copy</hx-button>
+          <hx-button variant="secondary" disabled>Delete</hx-button>
+        </hx-button-group>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const groups = canvasElement.querySelectorAll('hx-button-group');
+    await expect(groups.length).toBe(2);
+
+    const firstGroupButtons = groups[0].querySelectorAll('hx-button');
+    await expect(firstGroupButtons[1].hasAttribute('disabled')).toBe(true);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 6. ACCESSIBILITY — Dedicated aria-label demo
+// ─────────────────────────────────────────────────
+
+export const AccessibilityLabel: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
+          Always provide <code>aria-label</code> for screen reader context:
+        </p>
+        <hx-button-group aria-label="Text formatting">
+          <hx-button variant="secondary">Bold</hx-button>
+          <hx-button variant="secondary">Italic</hx-button>
+          <hx-button variant="secondary">Underline</hx-button>
+        </hx-button-group>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
+          Or use the <code>label</code> property (sets via ElementInternals):
+        </p>
+        <hx-button-group label="Record actions">
+          <hx-button variant="primary">Save</hx-button>
+          <hx-button variant="secondary">Cancel</hx-button>
+        </hx-button-group>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const groups = canvasElement.querySelectorAll('hx-button-group');
+    await expect(groups.length).toBe(2);
+    await expect(groups[0].getAttribute('aria-label')).toBe('Text formatting');
+    await expect(groups[1].getAttribute('label')).toBe('Record actions');
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 7. DRUPAL USAGE — Twig/CMS pattern with Save/Cancel/Reset
 // ─────────────────────────────────────────────────
 
 export const DrupalUsage: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
       <div>
-        <p style="margin: 0 0 0.75rem; font-size: 0.875rem; color: #6b7280;">
+        <p
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
           Typical Drupal form action buttons rendered via Twig:
         </p>
         <pre
-          style="margin: 0 0 1rem; padding: 1rem; background: #f3f4f6; border-radius: 0.375rem; font-size: 0.75rem; white-space: pre-wrap; overflow-x: auto;"
+          style="margin: 0 0 1rem; padding: 1rem; background: var(--hx-color-neutral-100, #f3f4f6); border-radius: var(--hx-border-radius-md, 0.375rem); font-size: 0.75rem; white-space: pre-wrap; overflow-x: auto;"
         ><code>{# button-group.html.twig #}
 &lt;hx-button-group orientation="horizontal" hx-size="md"&gt;
   &lt;hx-button variant="primary" type="submit"&gt;{{ 'Save'|t }}&lt;/hx-button&gt;
@@ -209,25 +309,29 @@ export const DrupalUsage: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 6. PATIENT RECORD — Healthcare scenario
+// 8. PATIENT RECORD — Healthcare scenario
 // ─────────────────────────────────────────────────
 
 export const PatientRecord: Story = {
   render: () => html`
     <div
-      style="max-width: 640px; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden;"
+      style="max-width: 640px; border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb); border-radius: var(--hx-border-radius-lg, 0.5rem); overflow: hidden;"
     >
-      <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
-        <h3 style="margin: 0 0 0.25rem; font-size: 1rem; font-weight: 600; color: #111827;">
+      <div
+        style="padding: 1.25rem 1.5rem; border-bottom: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb); background: var(--hx-color-neutral-50, #f9fafb);"
+      >
+        <h3
+          style="margin: 0 0 0.25rem; font-size: 1rem; font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-900, #111827);"
+        >
           Patient Record — Jane Doe (MRN: 00482917)
         </h3>
-        <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);">
           Last updated: 2026-03-03 at 09:14 AM by Dr. R. Patel
         </p>
       </div>
 
       <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-        <p style="margin: 0; font-size: 0.875rem; color: #374151;">
+        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-700, #374151);">
           Admission diagnosis: Acute exacerbation of chronic obstructive pulmonary disease (COPD).
           Oxygen saturation 92% on room air. Patient stable, scheduled for pulmonology consult.
         </p>
@@ -264,34 +368,43 @@ export const PatientRecord: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 7. ALL SIZES — Reference grid
+// 9. ALL SIZES — Reference grid
 // ─────────────────────────────────────────────────
 
 export const AllSizes: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-        <span style="font-size: 0.75rem; color: #6b7280; min-width: 3rem;">sm</span>
-        <hx-button-group>
-          <hx-button variant="secondary" hx-size="sm">Edit</hx-button>
-          <hx-button variant="secondary" hx-size="sm">Copy</hx-button>
-          <hx-button variant="secondary" hx-size="sm">Archive</hx-button>
+        <span
+          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280); min-width: 3rem;"
+          >sm</span
+        >
+        <hx-button-group hx-size="sm">
+          <hx-button variant="secondary">Edit</hx-button>
+          <hx-button variant="secondary">Copy</hx-button>
+          <hx-button variant="secondary">Archive</hx-button>
         </hx-button-group>
       </div>
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-        <span style="font-size: 0.75rem; color: #6b7280; min-width: 3rem;">md</span>
-        <hx-button-group>
-          <hx-button variant="secondary" hx-size="md">Edit</hx-button>
-          <hx-button variant="secondary" hx-size="md">Copy</hx-button>
-          <hx-button variant="secondary" hx-size="md">Archive</hx-button>
+        <span
+          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280); min-width: 3rem;"
+          >md</span
+        >
+        <hx-button-group hx-size="md">
+          <hx-button variant="secondary">Edit</hx-button>
+          <hx-button variant="secondary">Copy</hx-button>
+          <hx-button variant="secondary">Archive</hx-button>
         </hx-button-group>
       </div>
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-        <span style="font-size: 0.75rem; color: #6b7280; min-width: 3rem;">lg</span>
-        <hx-button-group>
-          <hx-button variant="secondary" hx-size="lg">Edit</hx-button>
-          <hx-button variant="secondary" hx-size="lg">Copy</hx-button>
-          <hx-button variant="secondary" hx-size="lg">Archive</hx-button>
+        <span
+          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280); min-width: 3rem;"
+          >lg</span
+        >
+        <hx-button-group hx-size="lg">
+          <hx-button variant="secondary">Edit</hx-button>
+          <hx-button variant="secondary">Copy</hx-button>
+          <hx-button variant="secondary">Archive</hx-button>
         </hx-button-group>
       </div>
     </div>
@@ -299,14 +412,18 @@ export const AllSizes: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 8. BOTH ORIENTATIONS — Side by side
+// 10. BOTH ORIENTATIONS — Side by side
 // ─────────────────────────────────────────────────
 
 export const BothOrientations: Story = {
   render: () => html`
     <div style="display: flex; gap: 3rem; align-items: flex-start; flex-wrap: wrap;">
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <p style="margin: 0; font-size: 0.875rem; font-weight: 600;">Horizontal</p>
+        <p
+          style="margin: 0; font-size: 0.875rem; font-weight: var(--hx-font-weight-semibold, 600);"
+        >
+          Horizontal
+        </p>
         <hx-button-group orientation="horizontal">
           <hx-button variant="secondary">Bold</hx-button>
           <hx-button variant="secondary">Italic</hx-button>
@@ -314,7 +431,11 @@ export const BothOrientations: Story = {
         </hx-button-group>
       </div>
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <p style="margin: 0; font-size: 0.875rem; font-weight: 600;">Vertical</p>
+        <p
+          style="margin: 0; font-size: 0.875rem; font-weight: var(--hx-font-weight-semibold, 600);"
+        >
+          Vertical
+        </p>
         <hx-button-group orientation="vertical">
           <hx-button variant="secondary">Bold</hx-button>
           <hx-button variant="secondary">Italic</hx-button>
@@ -326,7 +447,7 @@ export const BothOrientations: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 9. TWO BUTTONS — Edge case: only first/last, no middle
+// 11. TWO BUTTONS — Edge case: only first/last, no middle
 // ─────────────────────────────────────────────────
 
 export const TwoButtons: Story = {
@@ -345,7 +466,7 @@ export const TwoButtons: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 10. SINGLE BUTTON — Edge case: single child, full border-radius
+// 12. SINGLE BUTTON — Edge case: single child, full border-radius
 // ─────────────────────────────────────────────────
 
 export const SingleButton: Story = {
