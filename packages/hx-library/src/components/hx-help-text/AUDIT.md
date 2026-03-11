@@ -15,7 +15,7 @@ Branch: feature/deep-audit-hx-help-text
 | Tests         | PASS   | 31 tests, 100% coverage (lines, functions, branches, stmts) |
 | Storybook     | PASS   | 6 stories, all variants, play functions, form integration   |
 | CSS/Tokens    | PASS   | All values use `--hx-*` tokens with semantic fallbacks      |
-| CEM           | PASS   | Accurate: 1 attr, 1 slot, 3 parts, 6 CSS props, 0 events  |
+| CEM           | PASS   | Accurate: 1 attr, 1 slot, 3 parts, 6 CSS props, 0 events    |
 | Documentation | PASS   | Astro Starlight docs complete with all sections             |
 | Exports       | PASS   | Exported from index.ts and main library entry point         |
 | Performance   | PASS   | 1.46KB gzip (well within 5KB gate)                          |
@@ -26,15 +26,15 @@ Branch: feature/deep-audit-hx-help-text
 
 ## Quality Gate Results
 
-| Gate | Check             | Result | Detail                                          |
-| ---- | ----------------- | ------ | ----------------------------------------------- |
-| 1    | TypeScript strict | PASS   | `npm run verify` — zero errors                  |
-| 2    | Test suite        | PASS   | 31/31 pass, 100% coverage                       |
+| Gate | Check             | Result | Detail                                           |
+| ---- | ----------------- | ------ | ------------------------------------------------ |
+| 1    | TypeScript strict | PASS   | `npm run verify` — zero errors                   |
+| 2    | Test suite        | PASS   | 31/31 pass, 100% coverage                        |
 | 3    | Accessibility     | PASS   | axe-core zero violations, ARIA semantics correct |
-| 4    | Storybook         | PASS   | 6 stories covering all variants + integration   |
-| 5    | CEM accuracy      | PASS   | Matches public API exactly                      |
-| 6    | Bundle size       | PASS   | 1.46KB gzip                                     |
-| 7    | Code review       | PASS   | Deep audit, no issues found                     |
+| 4    | Storybook         | PASS   | 6 stories covering all variants + integration    |
+| 5    | CEM accuracy      | PASS   | Matches public API exactly                       |
+| 6    | Bundle size       | PASS   | 1.46KB gzip                                      |
+| 7    | Code review       | PASS   | Deep audit, no issues found                      |
 
 ---
 
@@ -60,6 +60,7 @@ Branch: feature/deep-audit-hx-help-text
 ### Test Coverage — PASS (31 tests, 100%)
 
 Test sections:
+
 1. **Rendering** (4 tests): Shadow DOM, CSS part, root element type, slotted content
 2. **Property: variant** (7 tests): Default value, attribute reflection, variant classes, dynamic update
 3. **ID association** (2 tests): Direct id, aria-describedby cross-reference
@@ -73,6 +74,7 @@ Test sections:
 ### Storybook Stories — PASS
 
 6 stories with full coverage:
+
 - `Default` — default variant with play function assertion
 - `Error` — error variant with play function assertion
 - `Warning` — warning variant with play function assertion
@@ -83,6 +85,7 @@ Test sections:
 ### CEM (Custom Elements Manifest) — PASS
 
 Generated CEM matches public API:
+
 - **Tag:** `hx-help-text`
 - **Attributes:** `variant`
 - **Slots:** `(default)`
@@ -93,6 +96,7 @@ Generated CEM matches public API:
 ### Design Token Compliance — PASS
 
 All CSS values use the `--hx-*` token cascade:
+
 - Component-level tokens: `--hx-help-text-color`, `--hx-help-text-font-*`, `--hx-help-text-icon-gap`
 - Semantic fallbacks: `--hx-color-neutral-500`, `--hx-font-family-sans`, etc.
 - Variant colors: `--hx-color-error-600`, `--hx-color-warning-700`, `--hx-color-success-700`
@@ -102,6 +106,7 @@ All CSS values use the `--hx-*` token cascade:
 ### Astro Starlight Documentation — PASS
 
 Comprehensive docs at `apps/docs/src/content/docs/component-library/hx-help-text.mdx`:
+
 - Overview with key behaviors
 - Live demos (variants + form field integration)
 - Installation instructions
