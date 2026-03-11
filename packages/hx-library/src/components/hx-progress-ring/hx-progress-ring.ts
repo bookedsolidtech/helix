@@ -1,4 +1,4 @@
-import { LitElement, html, svg, TemplateResult } from 'lit';
+import { LitElement, html, svg, TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
@@ -98,26 +98,20 @@ export class HelixProgressRing extends LitElement {
     return this._circumference * (1 - this._clampedValue / this.max);
   }
 
+  private _labelWarned = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute('role', 'progressbar');
     this.setAttribute('aria-valuemin', '0');
+  }
+
+  protected override willUpdate(_changed: PropertyValues): void {
+    // Sync all dynamic ARIA attributes before render
     this.setAttribute('aria-valuemax', String(this.max));
-    this._syncState();
-  }
 
-  override updated(changed: Map<string, unknown>): void {
-    if (changed.has('value') || changed.has('label') || changed.has('max')) {
-      if (changed.has('max')) {
-        this.setAttribute('aria-valuemax', String(this.max));
-      }
-      this._syncState();
-    }
-  }
-
-  private _syncState(): void {
     if (this._isIndeterminate) {
       this.setAttribute('indeterminate', '');
       this.setAttribute('aria-busy', 'true');
@@ -132,9 +126,12 @@ export class HelixProgressRing extends LitElement {
       this.setAttribute('aria-label', this.label);
     } else {
       this.removeAttribute('aria-label');
-      console.warn(
-        '[hx-progress-ring] Missing accessible label. Set the `label` attribute for WCAG 4.1.2 compliance.',
-      );
+      if (!this._labelWarned) {
+        this._labelWarned = true;
+        console.warn(
+          '[hx-progress-ring] Missing accessible label. Set the `label` attribute for WCAG 4.1.2 compliance.',
+        );
+      }
     }
   }
 
