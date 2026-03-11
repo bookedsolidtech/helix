@@ -5,6 +5,10 @@
 #   - Open a "Version Packages" PR when unreleased changesets exist
 #   - Publish to npm when that PR is merged (changesets consumed)
 #
+# Tests are NOT re-run here — CI (ci.yml + ci-matrix.yml) already validates
+# all code before it reaches main via the staging→main promotion flow.
+# This pipeline only builds and publishes.
+#
 # Required secrets:
 #   GITHUB_TOKEN  — auto-provided by Actions (needs contents:write + pull-requests:write)
 #   NPM_TOKEN     — npm automation token (must be added to repo settings by repo admin)
@@ -29,7 +33,7 @@ jobs:
   publish:
     name: Version or Publish
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,16 +48,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Type check
-        run: npx turbo run type-check --filter='!docs'
-
       - name: Build
         run: npx turbo run build --filter='!docs'
-
-      - name: Test
-        run: |
-          npx playwright install --with-deps chromium
-          npm run test:library
 
       - name: Version or Publish via Changesets
         uses: changesets/action@v1
