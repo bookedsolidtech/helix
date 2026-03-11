@@ -26,9 +26,9 @@ Load the full library bundle from a CDN:
   <hx-button variant="primary" id="my-btn">Click me</hx-button>
 
   <script type="module">
-    import '@helix/library';
+    import '@helixui/library';
     // or from a CDN URL:
-    // import 'https://cdn.jsdelivr.net/npm/@helix/library/dist/index.js';
+    // import 'https://cdn.jsdelivr.net/npm/@helixui/library/dist/index.js';
   </script>
 
 </body>
@@ -41,8 +41,8 @@ For performance, load only the components you use:
 
 ```html
 <script type="module">
-  import '@helix/library/components/hx-button';
-  import '@helix/library/components/hx-text-input';
+  import '@helixui/library/components/hx-button';
+  import '@helixui/library/components/hx-text-input';
 </script>
 ```
 
@@ -55,7 +55,7 @@ Listen for HELIX's `hx-` prefixed custom events with standard `addEventListener`
 <hx-text-input id="name-input" name="name" placeholder="Enter name"></hx-text-input>
 
 <script type="module">
-  import '@helix/library';
+  import '@helixui/library';
 
   const btn = document.getElementById('save-btn');
   const input = document.getElementById('name-input');
@@ -82,7 +82,7 @@ HELIX components expose DOM properties for dynamic values. Set them directly on 
 <hx-button id="submit-btn" variant="primary">Submit</hx-button>
 
 <script type="module">
-  import '@helix/library';
+  import '@helixui/library';
 
   const btn = document.getElementById('submit-btn');
 
@@ -140,7 +140,7 @@ HELIX form components work with native `<form>` elements and `FormData`:
 </form>
 
 <script type="module">
-  import '@helix/library';
+  import '@helixui/library';
 
   const form = document.getElementById('contact-form');
 
@@ -190,7 +190,7 @@ A complete, self-contained example:
   <div id="output"></div>
 
   <script type="module">
-    import '@helix/library';
+    import '@helixui/library';
 
     const form = document.getElementById('login-form');
     const output = document.getElementById('output');

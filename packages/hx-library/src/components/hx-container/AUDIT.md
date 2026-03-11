@@ -183,7 +183,7 @@ The `WcContainer` type alias is used in tests (`import type { WcContainer } from
 
 **Area:** Performance
 
-The performance gate requires `< 2KB` per component (min+gz). No bundle size measurement exists for `hx-container`. Given the component's simplicity (single template, no external dependencies beyond Lit and `@helix/tokens`), it is likely under budget — but this has not been measured and cannot be claimed as passing.
+The performance gate requires `< 2KB` per component (min+gz). No bundle size measurement exists for `hx-container`. Given the component's simplicity (single template, no external dependencies beyond Lit and `@helixui/tokens`), it is likely under budget — but this has not been measured and cannot be claimed as passing.
 
 ---
 

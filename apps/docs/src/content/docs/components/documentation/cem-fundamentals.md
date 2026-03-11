@@ -470,7 +470,7 @@ This file is committed to version control and published with the package.
 
 **customElements**: Standard package.json field indicating CEM location.
 
-**exports**: Named export allowing imports like `import cem from '@helix/library/custom-elements.json'`.
+**exports**: Named export allowing imports like `import cem from '@helixui/library/custom-elements.json'`.
 
 ---
 
@@ -568,7 +568,7 @@ Install "Custom Elements Manifest" extension and add to `.vscode/settings.json`:
 
 ```json
 {
-  "html.customData": ["./node_modules/@helix/library/custom-elements.json"]
+  "html.customData": ["./node_modules/@helixui/library/custom-elements.json"]
 }
 ```
 

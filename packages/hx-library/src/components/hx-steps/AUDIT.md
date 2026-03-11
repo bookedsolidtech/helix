@@ -286,7 +286,7 @@ Estimated concern areas:
 
 - Two Lit components with shadow DOM + styles
 - Inline SVG strings in template literals (not tree-shakeable)
-- `tokenStyles` import from `@helix/tokens/lit` (shared, but still bundled per component)
+- `tokenStyles` import from `@helixui/tokens/lit` (shared, but still bundled per component)
 
 ---
 

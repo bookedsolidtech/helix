@@ -12,7 +12,7 @@ HELIX components work in React 18+ with a few important patterns to follow. Reac
 ## Installation
 
 ```bash
-npm install @helix/library
+npm install @helixui/library
 ```
 
 ## Importing Components
@@ -21,10 +21,10 @@ Import components at the root of your app (or in a client-side module):
 
 ```tsx
 // app.tsx or a dedicated helix.ts loader
-import '@helix/library/components/hx-button';
-import '@helix/library/components/hx-text-input';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-text-input';
 // Or import all components
-import '@helix/library';
+import '@helixui/library';
 ```
 
 ## Basic Usage
@@ -75,7 +75,7 @@ Add JSX type declarations so TypeScript knows about HELIX elements. Create a `he
 
 ```ts
 // src/helix.d.ts
-import type { HxButton, HxTextInput } from '@helix/library';
+import type { HxButton, HxTextInput } from '@helixui/library';
 
 declare global {
   namespace JSX {
@@ -189,7 +189,7 @@ import { useEffect } from 'react';
 
 export function HelixLoader() {
   useEffect(() => {
-    import('@helix/library');
+    import('@helixui/library');
   }, []);
 
   return null;

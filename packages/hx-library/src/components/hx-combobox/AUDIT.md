@@ -215,7 +215,7 @@ The listbox positions relative to `.field` (which has `position: relative`). Any
 ### P2-15: Bundle size not verified against 5KB budget
 **File:** `hx-combobox.ts` + `hx-combobox.styles.ts`
 
-The component imports `tokenStyles` from `@helix/tokens/lit`, which may include the full token set. The component source itself (class + styles) is substantial. No bundle analysis was run to confirm compliance with the `<5KB min+gz` per-component budget enforced in CI.
+The component imports `tokenStyles` from `@helixui/tokens/lit`, which may include the full token set. The component source itself (class + styles) is substantial. No bundle analysis was run to confirm compliance with the `<5KB min+gz` per-component budget enforced in CI.
 
 ### P2-16: No Drupal progressive enhancement / Twig example
 **File:** (missing)
