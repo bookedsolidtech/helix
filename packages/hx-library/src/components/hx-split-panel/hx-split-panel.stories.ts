@@ -252,13 +252,23 @@ export const WithMinMax: Story = {
       max=${args.max}
       style="height: 300px; border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden;"
     >
-      <div slot="start" style="padding: 1rem; background: #f8fafc; height: 100%; box-sizing: border-box;">
+      <div
+        slot="start"
+        style="padding: 1rem; background: #f8fafc; height: 100%; box-sizing: border-box;"
+      >
         <strong>Navigation</strong>
-        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">Always at least 20% wide</p>
+        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">
+          Always at least 20% wide
+        </p>
       </div>
-      <div slot="end" style="padding: 1rem; background: #ffffff; height: 100%; box-sizing: border-box;">
+      <div
+        slot="end"
+        style="padding: 1rem; background: #ffffff; height: 100%; box-sizing: border-box;"
+      >
         <strong>Content</strong>
-        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">Always at least 20% wide</p>
+        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">
+          Always at least 20% wide
+        </p>
       </div>
     </hx-split-panel>
   `,
@@ -288,13 +298,23 @@ export const Collapsible: Story = {
       ?collapsible=${args.collapsible}
       style="height: 300px; border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden;"
     >
-      <div slot="start" style="padding: 1rem; background: #f8fafc; height: 100%; box-sizing: border-box;">
+      <div
+        slot="start"
+        style="padding: 1rem; background: #f8fafc; height: 100%; box-sizing: border-box;"
+      >
         <strong>Sidebar</strong>
-        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">Collapsible navigation panel</p>
+        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">
+          Collapsible navigation panel
+        </p>
       </div>
-      <div slot="end" style="padding: 1rem; background: #ffffff; height: 100%; box-sizing: border-box;">
+      <div
+        slot="end"
+        style="padding: 1rem; background: #ffffff; height: 100%; box-sizing: border-box;"
+      >
         <strong>Main Content</strong>
-        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">More space when sidebar is collapsed</p>
+        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">
+          More space when sidebar is collapsed
+        </p>
       </div>
     </hx-split-panel>
   `,
@@ -350,6 +370,49 @@ export const Disabled: Story = {
 
 // ─────────────────────────────────────────────────
 // 7. HEALTHCARE — PATIENT RECORD LAYOUT
+// ─────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────
+// 7. NESTED SPLIT PANELS
+// ─────────────────────────────────────────────────
+
+export const Nested: Story = {
+  render: () => html`
+    <hx-split-panel
+      position="30"
+      style="height: 400px; border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden; font-family: sans-serif;"
+    >
+      <div
+        slot="start"
+        style="padding: 1rem; background: #f8fafc; height: 100%; box-sizing: border-box;"
+      >
+        <strong>Sidebar</strong>
+        <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">Navigation panel</p>
+      </div>
+      <hx-split-panel slot="end" orientation="vertical" position="60" style="height: 100%;">
+        <div slot="start" style="padding: 1rem; background: #ffffff; box-sizing: border-box;">
+          <strong>Main Content</strong>
+          <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">
+            Patient details area
+          </p>
+        </div>
+        <div slot="end" style="padding: 1rem; background: #f1f5f9; box-sizing: border-box;">
+          <strong>Bottom Panel</strong>
+          <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 0.875rem;">
+            Lab results or timeline
+          </p>
+        </div>
+      </hx-split-panel>
+    </hx-split-panel>
+  `,
+  play: async ({ canvasElement }) => {
+    const panels = canvasElement.querySelectorAll('hx-split-panel');
+    await expect(panels.length).toBe(2);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 8. HEALTHCARE — PATIENT RECORD LAYOUT
 // ─────────────────────────────────────────────────
 
 export const PatientRecordLayout: Story = {
