@@ -9,8 +9,10 @@ import type { McpProbeResult, McpProbeStatus } from './mcp-probe';
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 
 // ── categorizeToolName ───────────────────────────────────────────────────
 
@@ -166,10 +168,15 @@ describe('probeMcpServer — binary check', () => {
 });
 
 // ── probeMcpServer — live server integration ─────────────────────────────
-// These tests require the wc-tools server to be built at the expected path.
+// These tests require the helixir MCP server package to be installed.
 
-const WC_TOOLS_BINARY = resolve(__dirname, '../../../../../../wc-tools/build/index.js');
-const serverAvailable = existsSync(WC_TOOLS_BINARY);
+let HELIXIR_BINARY: string;
+try {
+  HELIXIR_BINARY = require.resolve('helixir');
+} catch {
+  HELIXIR_BINARY = '';
+}
+const serverAvailable = HELIXIR_BINARY !== '' && existsSync(HELIXIR_BINARY);
 
 describe.skipIf(!serverAvailable)('probeMcpServer — live server', () => {
   let result: McpProbeResult;
