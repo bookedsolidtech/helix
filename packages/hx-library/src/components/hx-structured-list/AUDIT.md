@@ -3,6 +3,7 @@
 **Auditor:** Antagonistic QA Agent
 **Branch audited:** `feature/implement-hx-structured-list-t3` (commit `fbc6075f`)
 **Files reviewed:**
+
 - `hx-structured-list.ts`
 - `hx-structured-list.styles.ts`
 - `hx-structured-list.test.ts`
@@ -13,15 +14,15 @@
 
 ## Summary
 
-| Area         | Score | Critical Issues |
-| ------------ | ----- | --------------- |
-| TypeScript   | 7/10  | Missing `@cssprop` docs for 2 props |
-| Accessibility| 5/10  | Semantic structure broken, `role=term`/`definition` misuse |
-| Tests        | 5/10  | No coverage for visual variants, hardcoded border untested |
-| Storybook    | 7/10  | No header story; only 2 of 8 stories have `play` tests |
-| CSS          | 4/10  | Striped not implemented, hardcoded `1px`, missing `cell` part |
-| Performance  | N/A   | No bundle size verified |
-| Drupal       | 6/10  | Works as HTML but no Twig example provided |
+| Area          | Score | Critical Issues                                               |
+| ------------- | ----- | ------------------------------------------------------------- |
+| TypeScript    | 7/10  | Missing `@cssprop` docs for 2 props                           |
+| Accessibility | 5/10  | Semantic structure broken, `role=term`/`definition` misuse    |
+| Tests         | 5/10  | No coverage for visual variants, hardcoded border untested    |
+| Storybook     | 7/10  | No header story; only 2 of 8 stories have `play` tests        |
+| CSS           | 4/10  | Striped not implemented, hardcoded `1px`, missing `cell` part |
+| Performance   | N/A   | No bundle size verified                                       |
+| Drupal        | 6/10  | Works as HTML but no Twig example provided                    |
 
 **Overall: SHIPPABLE — P0 and P1 defects fixed in Deep Audit v2.**
 
@@ -42,6 +43,7 @@ The `striped` boolean property is declared on `HelixStructuredList` and reflects
 This is a functional regression, not a style preference.
 
 **Evidence:**
+
 ```css
 /* helixStructuredListStyles — stripe variable is defined but NEVER applied */
 --_bg-stripe: var(--hx-structured-list-stripe-bg, var(--hx-color-neutral-50, #f8fafc));
@@ -66,6 +68,7 @@ The `1px` value is hardcoded. Per CLAUDE.md Zero-Tolerance Policy: _"No hardcode
 The component already has `--_border-width: var(--hx-structured-list-border-width, var(--hx-border-width-thin, 1px))` defined for exactly this purpose. It is used correctly for the bordered wrapper border but forgotten for the row divider.
 
 **Fix required:**
+
 ```css
 border-bottom: var(--_border-width) solid var(--_border-color, var(--hx-color-neutral-200, #e2e8f0));
 ```
@@ -89,11 +92,13 @@ No other component in the library has this omission. All existing components are
 **File:** `hx-structured-list.ts`
 
 The component JSDoc explicitly states:
+
 > "Renders as a description list for accessible term/definition semantics."
 
 The actual implementation renders a `<div class="list">` container. The row renders `role="term"` and `role="definition"` on plain `<div>` elements.
 
 **Problems:**
+
 1. `role="term"` and `role="definition"` without a `role="definition list"` parent is semantically orphaned. Per WAI-ARIA 1.1, these roles have implicit ownership expectations. Screen readers may not associate the term with its definition correctly.
 2. The container `<div part="base" class="list">` has no role. Assistive technology announces it as a generic container with no structural meaning.
 3. The JSDoc promises description-list semantics (`<dl>/<dt>/<dd>`) but delivers roles on divs. One or the other needs to be true.
@@ -116,6 +121,7 @@ The actual implementation renders a `<div class="list">` container. The row rend
 ```
 
 The `actions` part lives inside `row__value`. The grid is 2-column: `label | value+actions`. This means:
+
 - Actions are NOT in a dedicated third column
 - With long value text, action buttons are pushed to a new line within the same cell
 - There is no consistent right-side alignment for action buttons across rows
@@ -129,6 +135,7 @@ The audit spec requires `actions` to be a composable area. The current structure
 **File:** `hx-structured-list.styles.ts`
 
 Used in styles but absent from `@cssprop` annotations on `HelixStructuredListRow`:
+
 - `--hx-structured-list-label-color` (line: `.row__label` color)
 - `--hx-structured-list-value-color` (line: `.row__value` color)
 
@@ -143,10 +150,12 @@ These are theming hooks consumers can and should use, but they are invisible in 
 The audit spec requires CSS parts: `list, row, cell, header`.
 
 Current parts:
+
 - `hx-structured-list`: `base` (the container div)
 - `hx-structured-list-row`: `base` (the row div), `label`, `value`, `actions`
 
 Missing:
+
 - No `row` part on the row element — the `base` part is doing double duty as both the component root and the row. Convention in this library is `base` = root element, but for composition purposes an explicit `row` part is expected.
 - No `cell` part — individual label/value cells are not independently targetable by name (they use `label` and `value` which is acceptable, but no generic `cell` abstraction exists).
 - No `header` concept at all — see P1-5.
@@ -203,23 +212,30 @@ The `condensed` variant defines `--_padding-block` and `--_padding-inline` on th
 
 ## Fixes Applied (Deep Audit v2)
 
-| Issue | Status | Fix |
-| ----- | ------ | --- |
-| P0-1 | FIXED | Striped CSS implemented via `::slotted(hx-structured-list-row:nth-of-type(even))` |
-| P0-2 | FIXED | Hardcoded `1px` replaced with `var(--_border-width, var(--hx-border-width-thin, 1px))` |
-| P0-3 | N/A | Library uses per-component entry points — no centralized `src/index.ts` needed |
-| P1-1 | FIXED | Added `role="list"` to container div for assistive technology |
-| P1-3 | FIXED | Added `@cssprop` docs for `--hx-structured-list-label-color` and `--hx-structured-list-value-color` |
+| Issue | Status | Fix                                                                                                 |
+| ----- | ------ | --------------------------------------------------------------------------------------------------- |
+| P0-1  | FIXED  | Striped CSS implemented via `::slotted(hx-structured-list-row:nth-of-type(even))`                   |
+| P0-2  | FIXED  | Hardcoded `1px` replaced with `var(--_border-width, var(--hx-border-width-thin, 1px))`              |
+| P0-3  | N/A    | Library uses per-component entry points — no centralized `src/index.ts` needed                      |
+| P1-1  | FIXED  | Added `role="list"` to container div for assistive technology                                       |
+| P1-3  | FIXED  | Added `@cssprop` docs for `--hx-structured-list-label-color` and `--hx-structured-list-value-color` |
+
+## Fixes Applied (Deep Audit v3)
+
+| Issue | Status | Fix                                                                                                                    |
+| ----- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| P2-1  | FIXED  | Added computed style assertions for condensed padding and striped background                                           |
+| P2-2  | FIXED  | Added row border divider test asserting `border-bottom-style: solid`                                                   |
+| P2-3  | FIXED  | Added play functions to all stories (Condensed, Striped, BorderedCondensed, UserProfile, SettingsPanel, PatientDetail) |
+| P2-4  | FIXED  | Added `IsolatedRow` story demonstrating standalone `hx-structured-list-row` with all parts and actions                 |
+
+**Test count: 30 tests (17 hx-structured-list + 13 hx-structured-list-row), all passing.**
 
 ## Remaining (P1/P2 — documented, not blocking)
 
 - **P1-2** — Actions slot nested inside value cell (structural, would be a breaking change)
 - **P1-4** — No `row` CSS part alias on row component (cosmetic)
 - **P1-5** — No header variant (design decision needed)
-- **P2-1** — Striped/condensed tests only verify attribute reflection
-- **P2-2** — Row border divider not tested
-- **P2-3** — Missing play functions in 6 stories
-- **P2-4** — No isolated row story
-- **P2-5** — No Drupal Twig example
+- **P2-5** — No Drupal Twig example (Starlight docs already include Twig example)
 - **P2-6** — Bundle size unverified
 - **P2-7** — CSS variable inheritance across shadow boundaries
