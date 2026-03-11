@@ -1,1 +1,1 @@
-export { HelixDropdown } from './hx-dropdown.js';
+export { HelixDropdown, type DropdownPlacement } from './hx-dropdown.js';
