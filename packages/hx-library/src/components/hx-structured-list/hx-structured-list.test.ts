@@ -68,6 +68,23 @@ describe('hx-structured-list', () => {
       );
       expect(el.hasAttribute('condensed')).toBe(true);
     });
+
+    it('applies reduced padding in condensed mode', async () => {
+      const el = await fixture<HelixStructuredList>(`
+        <hx-structured-list condensed>
+          <hx-structured-list-row>
+            <span slot="label">Name</span>
+            Jane Doe
+          </hx-structured-list-row>
+        </hx-structured-list>
+      `);
+      const row = el.querySelector('hx-structured-list-row') as HelixStructuredListRow;
+      await row.updateComplete;
+      const rowBase = row.shadowRoot?.querySelector('.row') as HTMLElement;
+      const padding = getComputedStyle(rowBase).paddingBlockStart;
+      // condensed padding should be smaller than default 1rem (16px)
+      expect(parseFloat(padding)).toBeLessThan(16);
+    });
   });
 
   // ─── Property: striped ───
@@ -83,6 +100,49 @@ describe('hx-structured-list', () => {
         '<hx-structured-list striped></hx-structured-list>',
       );
       expect(el.hasAttribute('striped')).toBe(true);
+    });
+
+    it('applies stripe background to even rows', async () => {
+      const el = await fixture<HelixStructuredList>(`
+        <hx-structured-list striped>
+          <hx-structured-list-row>
+            <span slot="label">Name</span>
+            Jane Doe
+          </hx-structured-list-row>
+          <hx-structured-list-row>
+            <span slot="label">MRN</span>
+            885521
+          </hx-structured-list-row>
+        </hx-structured-list>
+      `);
+      const rows = el.querySelectorAll('hx-structured-list-row');
+      const evenRowBg = getComputedStyle(rows[1]!).backgroundColor;
+      // Even row should have a non-transparent background from striping
+      expect(evenRowBg).not.toBe('rgba(0, 0, 0, 0)');
+    });
+  });
+
+  // ─── Row border dividers ───
+
+  describe('Row border dividers', () => {
+    it('renders border between rows using token variable', async () => {
+      const el = await fixture<HelixStructuredList>(`
+        <hx-structured-list>
+          <hx-structured-list-row>
+            <span slot="label">Name</span>
+            Jane Doe
+          </hx-structured-list-row>
+          <hx-structured-list-row>
+            <span slot="label">MRN</span>
+            885521
+          </hx-structured-list-row>
+        </hx-structured-list>
+      `);
+      const firstRow = el.querySelector('hx-structured-list-row') as HelixStructuredListRow;
+      await firstRow.updateComplete;
+      const rowBase = firstRow.shadowRoot?.querySelector('.row') as HTMLElement;
+      const borderBottom = getComputedStyle(rowBase).borderBottomStyle;
+      expect(borderBottom).toBe('solid');
     });
   });
 
@@ -200,6 +260,23 @@ describe('hx-structured-list-row', () => {
       );
       const def = shadowQuery(el, '[role="definition"]');
       expect(def).toBeTruthy();
+    });
+
+    it('exposes "actions" CSS part', async () => {
+      const el = await fixture<HelixStructuredListRow>(
+        '<hx-structured-list-row><span slot="label">Name</span>Value<button slot="actions">Edit</button></hx-structured-list-row>',
+      );
+      const actions = shadowQuery(el, '[part~="actions"]');
+      expect(actions).toBeTruthy();
+    });
+
+    it('renders actions container with flex display', async () => {
+      const el = await fixture<HelixStructuredListRow>(
+        '<hx-structured-list-row><span slot="label">Name</span>Value<button slot="actions">Edit</button></hx-structured-list-row>',
+      );
+      const actions = shadowQuery<HTMLElement>(el, '.row__actions');
+      const display = getComputedStyle(actions!).display;
+      expect(display).toBe('flex');
     });
   });
 

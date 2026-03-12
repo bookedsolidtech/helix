@@ -264,11 +264,6 @@ export const SelectEvent: Story = {
         Click an item to see the selected value.
       </p>
     </div>
-    <script>
-      document.getElementById('demo-menu').addEventListener('hx-select', (e) => {
-        document.getElementById('demo-output').textContent = 'Selected: ' + e.detail.value;
-      });
-    </script>
   `,
   play: async ({ canvasElement }) => {
     const menu = canvasElement.querySelector('hx-menu');

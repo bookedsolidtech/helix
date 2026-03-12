@@ -325,6 +325,54 @@ describe('hx-tag', () => {
       expect(base.classList.contains('tag--lg')).toBe(true);
       expect(base.classList.contains('tag--sm')).toBe(false);
     });
+
+    it('shows remove button when removable is set dynamically', async () => {
+      const el = await fixture<HxTag>('<hx-tag>Tag</hx-tag>');
+      expect(shadowQuery(el, '[part="remove-button"]')).toBeNull();
+      el.removable = true;
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="remove-button"]')).toBeTruthy();
+    });
+
+    it('toggles pill class when pill is set dynamically', async () => {
+      const el = await fixture<HxTag>('<hx-tag>Tag</hx-tag>');
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('tag--pill')).toBe(false);
+      el.pill = true;
+      await el.updateComplete;
+      expect(base.classList.contains('tag--pill')).toBe(true);
+    });
+
+    it('prefix wrapper becomes visible when prefix content is added', async () => {
+      const el = await fixture<HxTag>('<hx-tag>Tag</hx-tag>');
+      await el.updateComplete;
+      const prefix = shadowQuery(el, '[part="prefix"]')!;
+      expect(prefix.classList.contains('tag__prefix--hidden')).toBe(true);
+      const icon = document.createElement('span');
+      icon.slot = 'prefix';
+      icon.textContent = '★';
+      el.appendChild(icon);
+      await el.updateComplete;
+      // Wait for slotchange event to fire
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      expect(prefix.classList.contains('tag__prefix--hidden')).toBe(false);
+    });
+
+    it('suffix wrapper becomes visible when suffix content is added', async () => {
+      const el = await fixture<HxTag>('<hx-tag>Tag</hx-tag>');
+      await el.updateComplete;
+      const suffix = shadowQuery(el, '[part="suffix"]')!;
+      expect(suffix.classList.contains('tag__suffix--hidden')).toBe(true);
+      const badge = document.createElement('span');
+      badge.slot = 'suffix';
+      badge.textContent = '5';
+      el.appendChild(badge);
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      expect(suffix.classList.contains('tag__suffix--hidden')).toBe(false);
+    });
   });
 
   // ─── Accessibility (axe-core) ───

@@ -1,6 +1,7 @@
 # AUDIT: hx-spinner (T1-09) — Antagonistic Quality Review
 
 **Reviewed files** (from `feature/implement-hx-spinner-t1-26-loading` worktree):
+
 - `hx-spinner.ts`
 - `hx-spinner.styles.ts`
 - `hx-spinner.test.ts`
@@ -25,6 +26,7 @@ The `role="status"` container has both an `aria-label` attribute AND visible inn
 On dynamic mount, screen readers will announce the inner text `"Loading..."` via the live region. If a user then focuses the element, AT announces `"Loading"` again from `aria-label`. In practice (NVDA+Chrome, JAWS, VoiceOver) this produces redundant announcements. In a healthcare context this is an accessibility defect.
 
 **Root cause:** Both mechanisms serve the same purpose. Only one should be used:
+
 - Keep `role="status"` + `aria-label` for accessible name (navigation context).
 - Remove `.spinner__sr-text` entirely, OR remove `aria-label` and rely on inner text for live region.
   The `aria-label` approach is preferred (it doesn't inject text into the live region on mount).
@@ -54,6 +56,7 @@ animation: hx-spinner-rotate var(--hx-duration-spinner, 750ms) linear infinite;
 ```
 
 The component exposes `--hx-duration-spinner` as a consumer-overridable token, but:
+
 1. It is not listed in the `@cssprop` JSDoc block in `hx-spinner.ts`.
 2. It will not appear in the generated CEM.
 3. There is no corresponding token defined in the design token system.
@@ -68,7 +71,9 @@ This is an undocumented public API surface violation.
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  .spinner__svg { animation: none; }
+  .spinner__svg {
+    animation: none;
+  }
   .spinner__arc {
     animation: none;
     stroke-dashoffset: 14;
@@ -103,6 +108,7 @@ A static full ring (100% opacity track, colored arc segment at 100% opacity) or 
 **File:** `hx-spinner.test.ts`
 
 The CSS `@media (prefers-reduced-motion: reduce)` block is the critical accessibility adaptation for this component. No test verifies:
+
 - That `animation` is set to `none` on `.spinner__svg` under reduced motion.
 - That `.spinner__arc` loses its animation and retains a static `stroke-dashoffset`.
 - That the spinner is visually recognizable in the reduced-motion state.
@@ -116,6 +122,7 @@ Playwright/Vitest browser mode can emulate `prefers-reduced-motion: reduce` via 
 **File:** `hx-spinner.test.ts:30-34`
 
 The test only asserts the `.spinner__sr-text` element exists — it does not verify:
+
 - The text content is `${label}...` (with hardcoded ellipsis).
 - That `aria-label` on the base element updates reactively when `label` property changes at runtime.
 - That setting `label=""` (empty string) does not produce `aria-label=""` (which is a WCAG failure — an empty accessible name is worse than no aria-label).
@@ -133,6 +140,7 @@ size: 'sm' | 'md' | 'lg' | string = 'md';
 ```
 
 `'sm' | 'md' | 'lg' | string` resolves to `string` at the TypeScript level — the string literal members add no type safety. TypeScript will not flag `size="xxl"` as an error. Consider:
+
 - `type SpinnerSize = 'sm' | 'md' | 'lg'` for the token sizes, combined with a separate `customSize?: string` property.
 - Or keep the union but document that it intentionally degrades to `string` for custom CSS values (add a comment explaining the design choice).
 
@@ -197,6 +205,7 @@ The SVG arc uses `r=10` on a 24x24 viewBox (circumference = 2π × 10 ≈ 62.83)
 **File:** directory (`hx-spinner/`)
 
 The CLAUDE.md states Drupal compatibility is a non-negotiable. The `hx-spinner` directory has no:
+
 - `hx-spinner.twig` template demonstrating Drupal usage.
 - Documentation on how to register the component in a Drupal theme.
 - Notes on the `label` attribute behavior in a Twig context.
@@ -207,20 +216,20 @@ Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also la
 
 ## Summary Matrix
 
-| ID    | Area          | Severity | Description                                              |
-|-------|---------------|----------|----------------------------------------------------------|
-| P0-1  | Accessibility | P0       | Dual announcement: `aria-label` + live region sr-text    |
-| P0-2  | Accessibility | P0       | No decorative mode to suppress announcements             |
-| P1-1  | CEM/API       | P1       | `--hx-duration-spinner` undocumented custom property     |
-| P1-2  | Accessibility | P1       | Reduced-motion fallback is visually ambiguous            |
-| P1-3  | CSS           | P1       | `color-mix()` without fallback — broken in older browsers|
-| P1-4  | Tests         | P1       | No reduced-motion behavior test                          |
-| P1-5  | Tests         | P1       | sr-text content and reactive label update untested       |
-| P2-1  | TypeScript    | P2       | `size` union collapses to `string`                       |
-| P2-2  | Drupal/DX     | P2       | `label` not reflected — asymmetric vs `size`/`variant`  |
-| P2-3  | DX            | P2       | Hardcoded `...` appended to all sr-text labels           |
-| P2-4  | Storybook     | P2       | `size` argType `select`-only, custom sizes not explorable|
-| P2-5  | CSS           | P2       | Magic numbers in SVG dash math — no inline documentation |
-| P2-6  | Drupal        | P2       | No Twig template or Drupal integration notes             |
+| ID   | Area          | Severity | Description                                               |
+| ---- | ------------- | -------- | --------------------------------------------------------- |
+| P0-1 | Accessibility | P0       | Dual announcement: `aria-label` + live region sr-text     |
+| P0-2 | Accessibility | P0       | No decorative mode to suppress announcements              |
+| P1-1 | CEM/API       | P1       | `--hx-duration-spinner` undocumented custom property      |
+| P1-2 | Accessibility | P1       | Reduced-motion fallback is visually ambiguous             |
+| P1-3 | CSS           | P1       | `color-mix()` without fallback — broken in older browsers |
+| P1-4 | Tests         | P1       | No reduced-motion behavior test                           |
+| P1-5 | Tests         | P1       | sr-text content and reactive label update untested        |
+| P2-1 | TypeScript    | P2       | `size` union collapses to `string`                        |
+| P2-2 | Drupal/DX     | P2       | `label` not reflected — asymmetric vs `size`/`variant`    |
+| P2-3 | DX            | P2       | Hardcoded `...` appended to all sr-text labels            |
+| P2-4 | Storybook     | P2       | `size` argType `select`-only, custom sizes not explorable |
+| P2-5 | CSS           | P2       | Magic numbers in SVG dash math — no inline documentation  |
+| P2-6 | Drupal        | P2       | No Twig template or Drupal integration notes              |
 
 **P0 count: 2 — merge blocked until resolved.**

@@ -123,8 +123,8 @@ export const helixDialogStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     color: var(--hx-color-neutral-500, #6b7280);
-    font-size: 1.25rem;
-    line-height: 1;
+    font-size: var(--hx-font-size-xl, 1.25rem);
+    line-height: var(--hx-line-height-none, 1);
     transition:
       color var(--hx-duration-100, 100ms) ease,
       background-color var(--hx-duration-100, 100ms) ease;

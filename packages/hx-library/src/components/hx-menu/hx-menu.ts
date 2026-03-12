@@ -1,5 +1,5 @@
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { LitElement, html, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
@@ -29,6 +29,14 @@ import type { HelixMenuItem } from './hx-menu-item.js';
 export class HelixMenu extends LitElement {
   static override styles = [tokenStyles, helixMenuStyles];
 
+  /**
+   * Accessible label for the menu. Rendered as `aria-label` on the inner
+   * `role="menu"` element when set.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label = '';
+
   private _focusedIndex = -1;
 
   private _typeaheadBuffer = '';
@@ -41,12 +49,25 @@ export class HelixMenu extends LitElement {
     );
   }
 
+  /**
+   * Synchronize roving tabindex across all enabled items.
+   * Only the active item (or first item if none active) gets tabindex=0.
+   */
+  private _syncRovingTabIndex(): void {
+    const items = this._getItems();
+    const activeIndex = this._focusedIndex >= 0 ? this._focusedIndex : 0;
+    items.forEach((item, i) => {
+      item.setRovingTabIndex(i === activeIndex ? 0 : -1);
+    });
+  }
+
   /** Focus the first menu item. */
   focusFirst(): void {
     const items = this._getItems();
     const first = items[0];
     if (first !== undefined) {
       this._focusedIndex = 0;
+      this._syncRovingTabIndex();
       first.focus();
     }
   }
@@ -57,6 +78,7 @@ export class HelixMenu extends LitElement {
     const last = items[items.length - 1];
     if (last !== undefined) {
       this._focusedIndex = items.length - 1;
+      this._syncRovingTabIndex();
       last.focus();
     }
   }
@@ -65,6 +87,7 @@ export class HelixMenu extends LitElement {
     const items = this._getItems();
     if (items.length === 0) return;
     this._focusedIndex = Math.max(0, Math.min(index, items.length - 1));
+    this._syncRovingTabIndex();
     const target = items[this._focusedIndex];
     if (target !== undefined) target.focus();
   }
@@ -141,6 +164,8 @@ export class HelixMenu extends LitElement {
         `[hx-menu] Default slot expects <hx-menu-item> or <hx-menu-divider> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
       );
     }
+    // Initialize roving tabindex when items are slotted
+    this._syncRovingTabIndex();
   }
 
   private _handleItemSelect(e: Event): void {
@@ -163,6 +188,7 @@ export class HelixMenu extends LitElement {
         part="base"
         class="menu"
         role="menu"
+        aria-label=${this.label || nothing}
         @keydown=${this._handleKeyDown}
         @hx-item-select=${this._handleItemSelect}
       >

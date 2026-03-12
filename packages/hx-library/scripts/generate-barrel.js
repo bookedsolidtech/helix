@@ -31,13 +31,14 @@ for (const component of components) {
 
   const content = readFileSync(indexPath, 'utf-8');
 
-  // Match export { Foo } or export { Foo, Bar } patterns
-  const exportMatch = content.match(/export\s*\{([^}]+)\}\s*from\s*['"][^'"]+['"]/g);
+  // Match export { Foo } or export type { Foo } patterns
+  const exportMatch = content.match(/export\s+(?:type\s+)?\{([^}]+)\}\s*from\s*['"][^'"]+['"]/g);
   if (!exportMatch) continue;
 
   // Re-export from the component directory
   for (const line of exportMatch) {
-    const names = line.match(/export\s*\{([^}]+)\}/)?.[1];
+    const isTypeExport = /^export\s+type\s+\{/.test(line);
+    const names = line.match(/\{([^}]+)\}/)?.[1];
     if (!names) continue;
 
     const cleanNames = names
@@ -46,7 +47,8 @@ for (const component of components) {
       .filter(Boolean)
       .join(', ');
 
-    exportLines.push(`export { ${cleanNames} } from './components/${component}/index.js';`);
+    const keyword = isTypeExport ? 'export type' : 'export';
+    exportLines.push(`${keyword} { ${cleanNames} } from './components/${component}/index.js';`);
   }
 }
 

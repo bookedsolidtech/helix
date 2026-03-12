@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixVisuallyHidden } from './hx-visually-hidden.js';
 import './index.js';
@@ -37,7 +36,7 @@ describe('hx-visually-hidden', () => {
     });
   });
 
-  // ─── Visually Hidden (2) ───
+  // ─── Visually Hidden (7) ───
 
   describe('Visually hidden styles', () => {
     it('host element is positioned absolutely', async () => {
@@ -56,6 +55,47 @@ describe('hx-visually-hidden', () => {
       expect(styles.width).toBe('1px');
       expect(styles.height).toBe('1px');
     });
+
+    it('host element has overflow hidden', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      const styles = getComputedStyle(el);
+      expect(styles.overflow).toBe('hidden');
+    });
+
+    it('host element has clip-path inset(50%)', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      const styles = getComputedStyle(el);
+      expect(styles.clipPath).toBe('inset(50%)');
+    });
+
+    it('host element has negative margin for clipping', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      const styles = getComputedStyle(el);
+      expect(styles.margin).toBe('-1px');
+    });
+
+    it('host element has white-space nowrap', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      const styles = getComputedStyle(el);
+      expect(styles.whiteSpace).toBe('nowrap');
+    });
+
+    it('host element has border 0', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      const styles = getComputedStyle(el);
+      // Computed border-width should be 0px when border: 0 is set
+      expect(styles.borderWidth).toBe('0px');
+    });
   });
 
   // ─── A11y contract (2) ───
@@ -71,7 +111,7 @@ describe('hx-visually-hidden', () => {
     });
   });
 
-  // ─── Focusable property (4) ───
+  // ─── Focusable property (6) ───
 
   describe('Focusable property', () => {
     it('defaults focusable to false', async () => {
@@ -107,6 +147,32 @@ describe('hx-visually-hidden', () => {
       link?.focus();
       expect(document.activeElement).toBe(link);
     });
+
+    it('becomes visible when a focusable child receives focus', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden focusable><a href="#main">Skip to main content</a></hx-visually-hidden>',
+      );
+      const link = el.querySelector('a')!;
+      link.focus();
+      const styles = getComputedStyle(el);
+      expect(styles.position).toBe('static');
+      expect(styles.overflow).toBe('visible');
+      expect(styles.clipPath).toBe('none');
+      expect(styles.width).not.toBe('1px');
+      expect(styles.height).not.toBe('1px');
+    });
+
+    it('sets focusable programmatically and reflects to attribute', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      expect(el.focusable).toBe(false);
+      expect(el.hasAttribute('focusable')).toBe(false);
+      el.focusable = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('focusable')).toBe(true);
+      expect(el.focusable).toBe(true);
+    });
   });
 
   // ─── Nesting contexts (2) ───
@@ -133,14 +199,13 @@ describe('hx-visually-hidden', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (2) ───
+  // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations', async () => {
       const el = await fixture<HelixVisuallyHidden>(
         '<hx-visually-hidden>Hidden accessible text</hx-visually-hidden>',
       );
-      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -149,8 +214,15 @@ describe('hx-visually-hidden', () => {
       const container = await fixture<HTMLButtonElement>(
         '<button><hx-visually-hidden>Close</hx-visually-hidden></button>',
       );
-      await page.screenshot();
       const { violations } = await checkA11y(container);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations for focusable skip-link pattern', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden focusable><a href="#main">Skip to main content</a></hx-visually-hidden>',
+      );
+      const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
   });

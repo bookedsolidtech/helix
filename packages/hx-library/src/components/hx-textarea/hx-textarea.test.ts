@@ -299,7 +299,7 @@ describe('hx-textarea', () => {
     });
   });
 
-  // --- Slots (3) ---
+  // --- Slots (5) ---
 
   describe('Slots', () => {
     it('help-text slot renders', async () => {
@@ -331,6 +331,27 @@ describe('hx-textarea', () => {
       const slottedError = el.querySelector('[slot="error"]');
       expect(slottedError).toBeTruthy();
       expect(slottedError?.textContent).toBe('Slot error');
+    });
+
+    it('help-text slot renders without helpText property set', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea><span slot="help-text">Custom slot help</span></hx-textarea>',
+      );
+      await el.updateComplete;
+      const helpSlot = el.querySelector('[slot="help-text"]');
+      expect(helpSlot).toBeTruthy();
+      expect(helpSlot?.textContent).toBe('Custom slot help');
+    });
+
+    it('error slot has aria-describedby pointing to error container', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea><span slot="error">Slot error msg</span></hx-textarea>',
+      );
+      await el.updateComplete;
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      const errorDiv = shadowQuery(el, '.field__error')!;
+      const describedBy = textarea.getAttribute('aria-describedby');
+      expect(describedBy).toContain(errorDiv.id);
     });
   });
 
@@ -390,6 +411,31 @@ describe('hx-textarea', () => {
       el.formStateRestoreCallback('restored');
       await el.updateComplete;
       expect(el.value).toBe('restored');
+    });
+
+    it('form.reset() resets the textarea value', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-textarea name="notes" value="typed"></hx-textarea>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-textarea') as WcTextarea;
+      await el.updateComplete;
+      expect(el.value).toBe('typed');
+      form.reset();
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('setFormValue is called when value changes', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-textarea name="notes"></hx-textarea>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-textarea') as WcTextarea;
+      await el.updateComplete;
+      el.value = 'new value';
+      await el.updateComplete;
+      // FormData should reflect the updated value
+      const formData = new FormData(form);
+      expect(formData.get('notes')).toBe('new value');
     });
   });
 
@@ -459,7 +505,7 @@ describe('hx-textarea', () => {
     });
   });
 
-  // --- aria-describedby (2) ---
+  // --- aria-describedby (5) ---
 
   describe('aria-describedby', () => {
     it('references error ID when error set', async () => {
@@ -477,9 +523,37 @@ describe('hx-textarea', () => {
       const describedBy = textarea.getAttribute('aria-describedby');
       expect(describedBy).toContain(helpDiv.id);
     });
+
+    it('references counter ID when showCount is set', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea show-count value="hello"></hx-textarea>',
+      );
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      const counterDiv = shadowQuery(el, '[part="counter"]')!;
+      const describedBy = textarea.getAttribute('aria-describedby');
+      expect(describedBy).toContain(counterDiv.id);
+    });
+
+    it('references both error and counter IDs when both are set', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea error="Bad" show-count value="hello"></hx-textarea>',
+      );
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      const errorDiv = shadowQuery(el, '.field__error')!;
+      const counterDiv = shadowQuery(el, '[part="counter"]')!;
+      const describedBy = textarea.getAttribute('aria-describedby');
+      expect(describedBy).toContain(errorDiv.id);
+      expect(describedBy).toContain(counterDiv.id);
+    });
+
+    it('has no aria-describedby when nothing is set', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.hasAttribute('aria-describedby')).toBe(false);
+    });
   });
 
-  // --- Auto-resize (2) ---
+  // --- Auto-resize (3) ---
 
   describe('Auto-resize', () => {
     it('sets resize="auto" attribute on host', async () => {
@@ -497,9 +571,19 @@ describe('hx-textarea', () => {
       // After auto-resize, height should be set as inline style
       expect(textarea.style.height).not.toBe(initialHeight);
     });
+
+    it('programmatic value change triggers auto-resize when resize="auto"', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea resize="auto"></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      const initialHeight = textarea.style.height;
+      // Set value programmatically (not via input event) — updated() lifecycle handles resize
+      el.value = 'Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8';
+      await el.updateComplete;
+      expect(textarea.style.height).not.toBe(initialHeight);
+    });
   });
 
-  // --- Character Counter (2) ---
+  // --- Character Counter (4) ---
 
   describe('Character Counter', () => {
     it('shows count only when no maxlength', async () => {
@@ -515,6 +599,20 @@ describe('hx-textarea', () => {
       const counter = shadowQuery(el, '[part="counter"]');
       expect(counter).toBeTruthy();
       expect(counter?.textContent?.trim()).toBe('5');
+    });
+
+    it('counter has aria-live="polite"', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea show-count></hx-textarea>');
+      const counter = shadowQuery(el, '[part="counter"]')!;
+      expect(counter.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('counter updates when value changes programmatically', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea show-count></hx-textarea>');
+      el.value = 'updated text';
+      await el.updateComplete;
+      const counter = shadowQuery(el, '[part="counter"]');
+      expect(counter?.textContent?.trim()).toBe('12');
     });
   });
 
@@ -565,6 +663,137 @@ describe('hx-textarea', () => {
       const el = await fixture<WcTextarea>('<hx-textarea label="Notes" required></hx-textarea>');
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with help-text', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea label="Notes" help-text="Enter your notes here"></hx-textarea>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with character counter', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea label="Notes" show-count maxlength="200"></hx-textarea>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with aria-label (no visible label)', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea aria-label="Notes field"></hx-textarea>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with all features combined', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea label="Notes" required error="Required field" show-count maxlength="200" value="hello"></hx-textarea>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // --- Dynamic Property Changes (5) ---
+
+  describe('Dynamic Property Changes', () => {
+    it('changing required from false to true updates validity.valueMissing', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      expect(el.validity.valueMissing).toBe(false);
+      el.required = true;
+      await el.updateComplete;
+      expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('changing maxlength below current value triggers tooLong', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea value="hello world"></hx-textarea>');
+      expect(el.validity.tooLong).toBe(false);
+      el.maxlength = 5;
+      await el.updateComplete;
+      expect(el.validity.tooLong).toBe(true);
+    });
+
+    it('toggling disabled reflects on native textarea', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.disabled).toBe(false);
+      el.disabled = true;
+      await el.updateComplete;
+      expect(textarea.disabled).toBe(true);
+      el.disabled = false;
+      await el.updateComplete;
+      expect(textarea.disabled).toBe(false);
+    });
+
+    it('clearing error removes aria-invalid', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea error="Bad"></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.getAttribute('aria-invalid')).toBe('true');
+      el.error = '';
+      await el.updateComplete;
+      expect(textarea.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('setting error after help-text hides help-text', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea help-text="Some guidance"></hx-textarea>',
+      );
+      expect(shadowQuery(el, '.field__help-text')).toBeTruthy();
+      el.error = 'Something went wrong';
+      await el.updateComplete;
+      expect(shadowQuery(el, '.field__help-text')).toBeNull();
+      expect(shadowQuery(el, '.field__error')).toBeTruthy();
+    });
+  });
+
+  // --- Design Tokens (3) ---
+
+  describe('Design Tokens', () => {
+    it('host has display: block', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      const computed = getComputedStyle(el);
+      expect(computed.display).toBe('block');
+    });
+
+    it('disabled host has reduced opacity', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea disabled></hx-textarea>');
+      const computed = getComputedStyle(el);
+      const opacity = parseFloat(computed.opacity);
+      expect(opacity).toBeLessThan(1);
+    });
+
+    it('no hardcoded color values in component styles', async () => {
+      // Access the component's static styles and verify token usage
+      const ctor = customElements.get('hx-textarea') as unknown as {
+        styles: Array<{ cssText: string }>;
+      };
+      // The styles array includes tokenStyles and helixTextareaStyles
+      const componentStyles = ctor.styles.map((s) => s.cssText).join('');
+      // Verify that color declarations use CSS custom properties (var(--hx-...))
+      // Match color properties that have hex values NOT inside var() fallbacks
+      const colorProps = componentStyles.match(/(?:^|;)\s*color\s*:\s*#[0-9a-fA-F]+/g);
+      // All color values should be inside var() as fallbacks, not bare hex values
+      expect(colorProps).toBeNull();
+    });
+  });
+
+  // --- Edge Cases (2) ---
+
+  describe('Edge Cases', () => {
+    it('empty placeholder does not render placeholder attribute', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.hasAttribute('placeholder')).toBe(false);
+    });
+
+    it('empty name does not render name attribute', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.hasAttribute('name')).toBe(false);
     });
   });
 });

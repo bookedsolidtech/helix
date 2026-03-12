@@ -36,6 +36,12 @@ import { helixCardStyles } from './hx-card.styles.js';
  */
 @customElement('hx-card')
 export class HelixCard extends LitElement {
+  /** Enable delegatesFocus so :focus on the host works when the inner card div has focus. */
+  static override shadowRootOptions = {
+    ...LitElement.shadowRootOptions,
+    delegatesFocus: true,
+  };
+
   static override styles = [tokenStyles, helixCardStyles];
 
   /**

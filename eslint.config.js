@@ -118,6 +118,17 @@ export default tseslint.config(
     },
   },
 
+  // ── Node.js scripts ────────────────────────────────────────────────
+  {
+    files: ['scripts/**/*.js', 'scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+      },
+    },
+  },
+
   // ── Prettier (must be last to disable conflicting rules) ──────────
   prettierConfig,
 );

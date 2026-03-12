@@ -299,6 +299,85 @@ export const PatientDashboard: Story = {
 // 8. GAP VARIANTS
 // ─────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────
+// 8. ALIGNMENT VARIANTS
+// ─────────────────────────────────────────────────
+
+export const AlignmentVariants: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; font-family: sans-serif;">
+      ${(
+        [
+          ['start', 'start'],
+          ['center', 'center'],
+          ['end', 'end'],
+          ['stretch', 'stretch'],
+        ] as const
+      ).map(
+        ([align, justify]) => html`
+          <div>
+            <p
+              style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em;"
+            >
+              align="${align}" justify="${justify}"
+            </p>
+            <hx-grid columns="3" gap="md" align=${align} justify=${justify}>
+              ${gridItem('A')} ${gridItem('B', ITEM_COLORS[1])} ${gridItem('C', ITEM_COLORS[2])}
+            </hx-grid>
+          </div>
+        `,
+      )}
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const grids = canvasElement.querySelectorAll('hx-grid');
+    await expect(grids.length).toBe(4);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 9. ROW-GAP / COLUMN-GAP OVERRIDES
+// ─────────────────────────────────────────────────
+
+export const RowColumnGapOverrides: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; font-family: sans-serif;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          row-gap="xl" column-gap="xs"
+        </p>
+        <hx-grid columns="3" row-gap="xl" column-gap="xs">
+          ${gridItem('A')} ${gridItem('B', ITEM_COLORS[1])} ${gridItem('C', ITEM_COLORS[2])}
+          ${gridItem('D', ITEM_COLORS[3])} ${gridItem('E', ITEM_COLORS[4])}
+          ${gridItem('F', ITEM_COLORS[5])}
+        </hx-grid>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          row-gap="xs" column-gap="xl"
+        </p>
+        <hx-grid columns="3" row-gap="xs" column-gap="xl">
+          ${gridItem('A')} ${gridItem('B', ITEM_COLORS[1])} ${gridItem('C', ITEM_COLORS[2])}
+          ${gridItem('D', ITEM_COLORS[3])} ${gridItem('E', ITEM_COLORS[4])}
+          ${gridItem('F', ITEM_COLORS[5])}
+        </hx-grid>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const grids = canvasElement.querySelectorAll('hx-grid');
+    await expect(grids.length).toBe(2);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 10. GAP VARIANTS
+// ─────────────────────────────────────────────────
+
 export const GapVariants: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 2rem; font-family: sans-serif;">

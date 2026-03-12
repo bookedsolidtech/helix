@@ -14,228 +14,179 @@ Files reviewed:
 
 ## Summary
 
-| Severity | Count |
-| -------- | ----- |
-| P0       | 1     |
-| P1       | 3     |
-| P2       | 10    |
+| Severity | Found | Resolved |
+| -------- | ----- | -------- |
+| P0       | 1     | 1        |
+| P1       | 3     | 3        |
+| P2       | 10    | 10       |
+
+**All issues resolved.** Component passes all 7 quality gates.
+
+### Verification Results
+
+- **TypeScript strict:** Zero errors (`npm run verify` passes)
+- **Tests:** 46/46 pass (Vitest browser mode, Chromium)
+- **Accessibility:** 3 axe-core scenarios pass (closed, open, disabled); zero violations
+- **Storybook:** 13 stories covering all variants, states, and healthcare context
+- **CEM:** Accurate — matches public API (5 properties, 3 events, 4 CSS parts, 7 CSS custom properties, 1 slot)
+- **Bundle:** `@floating-ui/dom` externalized as peerDependency; component code well within 5KB budget
+- **Docs:** Starlight page complete with live demos, API tables, Drupal/Twig integration, standalone HTML example
 
 ---
 
 ## P0 — Critical (Blocking)
 
-### P0-01: Missing arrow-key navigation within the menu panel
+### P0-01: Missing arrow-key navigation within the menu panel — RESOLVED
 
-**File:** `hx-overflow-menu.ts:179–189`
+**File:** `hx-overflow-menu.ts:206–223`
 
-The `_handleKeydown` handler only responds to `Escape` and `Tab`. It does not implement Up/Down arrow key navigation between `[role="menuitem"]` elements.
+**Finding:** The `_handleKeydown` handler only responded to `Escape` and `Tab`, missing ArrowDown/ArrowUp/Home/End per WAI-ARIA Menu Button Pattern.
 
-The WAI-ARIA Authoring Practices for the [Menu Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/) mandates:
-
-- `ArrowDown` — move focus to the next menu item; wrap from last to first.
-- `ArrowUp` — move focus to the previous menu item; wrap from first to last.
-- `Home` — move focus to the first menu item.
-- `End` — move focus to the last menu item.
-
-Without these, keyboard-only users and screen reader users cannot navigate the open menu in the expected manner. Screen readers announce the container as `role="menu"`, leading users to expect standard menu keyboard behavior that is not present.
-
-**Impact:** WCAG 2.1 SC 2.1.1 (Keyboard) failure. Healthcare mandate violation.
+**Resolution:** Full arrow-key navigation implemented with wrapping behavior. Disabled items are automatically skipped via `_getMenuItems()` filter. Tests added: ArrowDown, ArrowDown wrap, ArrowUp, ArrowUp wrap, Home, End, skip-disabled (7 tests).
 
 ---
 
 ## P1 — High Priority
 
-### P1-01: `aria-haspopup="true"` should be `aria-haspopup="menu"`
+### P1-01: `aria-haspopup="true"` should be `aria-haspopup="menu"` — RESOLVED
 
-**File:** `hx-overflow-menu.ts:259`
+**File:** `hx-overflow-menu.ts:294`
 
-```ts
-aria-haspopup="true"
-```
-
-ARIA 1.2 specifies that `aria-haspopup` should use the role token of the popup — `"menu"`, `"listbox"`, `"tree"`, `"grid"`, or `"dialog"`. Using `"true"` is the legacy ARIA 1.0 form, which browsers treat as equivalent to `"menu"`, but:
-
-1. Automated accessibility auditors (axe, WAVE, ARC) flag `"true"` as imprecise in strict-mode configurations.
-2. The value is semantically misleading to developers reading the markup.
-3. The companion test at `hx-overflow-menu.test.ts:162` asserts `'true'`, which will pass the wrong value.
-
-**Fix:** Change to `aria-haspopup="menu"`.
+**Resolution:** Changed to `aria-haspopup="menu"` per ARIA 1.2. Test updated to assert `'menu'`.
 
 ---
 
-### P1-02: Trigger accessible label is hardcoded — no customization property
+### P1-02: Trigger accessible label is hardcoded — no customization property — RESOLVED
 
-**File:** `hx-overflow-menu.ts:257`
+**File:** `hx-overflow-menu.ts:88–92`
 
-```ts
-aria-label="More actions"
-```
-
-The feature spec states: _"trigger button has accessible label ('More options' or custom)"_. There is no `label` property on the component, making the accessible name non-overridable from the consuming template. In a healthcare application, the same overflow menu may appear in multiple contexts (patient row, appointment row, document row), each requiring a unique accessible label so screen reader users can distinguish repeated controls on the page.
-
-WCAG 2.4.6 (Headings and Labels) and 2.4.9 (Link Purpose) are at risk when identical labels are used for different controls.
-
-**Fix:** Add a `label` property (defaulting to `"More actions"`) that is reflected to `aria-label`.
+**Resolution:** Added `label` property (string, reflected, default `'More actions'`) that binds to `aria-label` on the trigger button. Tests added: default value, attribute reflection, property change reflection (3 tests).
 
 ---
 
-### P1-03: `@floating-ui/dom` is bundled, not externalized — bundle budget exceeded
+### P1-03: `@floating-ui/dom` is bundled, not externalized — bundle budget exceeded — RESOLVED
 
-**File:** `vite.config.ts` (library root), `packages/hx-library/package.json`
+**Files:** `vite.config.ts:49`, `package.json:51`
 
-The `rollupOptions.external` array externalizes `lit`, `@lit/*`, and `@helixui/tokens` but does **not** externalize `@floating-ui/dom`. The library lists it as a `dependency`, not a `peerDependency`. This means the entire `@floating-ui/dom` package (~5.4 KB min+gz as of v1.7.x) is bundled into the `hx-overflow-menu` component chunk.
-
-The project budget is **< 5 KB per component min+gz**. `@floating-ui/dom` alone reaches that limit before any component code is included. This is an automatic budget violation.
-
-Additionally, if any other future component also uses `@floating-ui/dom`, it will be duplicated in each component chunk rather than shared.
-
-**Fix:** Move `@floating-ui/dom` to `peerDependencies` and add it to `rollupOptions.external`.
+**Resolution:** `@floating-ui/dom` moved to `peerDependencies` and added to `rollupOptions.external` regex (`/^@floating-ui/`). No longer bundled into the component chunk.
 
 ---
 
 ## P2 — Medium Priority
 
-### P2-01: No tests for disabled menu items
+### P2-01: No tests for disabled menu items — RESOLVED
 
-**File:** `hx-overflow-menu.test.ts`
+**File:** `hx-overflow-menu.test.ts:285–301`
 
-The feature spec explicitly lists "disabled items" as a required test case. No test exists that:
-
-- Renders a menu item with the `disabled` attribute.
-- Verifies the item is not focusable or clickable.
-- Verifies `hx-select` is NOT dispatched when a disabled item is interacted with.
-
-The current `_handleSlotClick` handler does not check for disabled state on the clicked item — it will emit `hx-select` even for a `disabled` button.
+**Resolution:** Test added: "does not dispatch hx-select when disabled menu item is clicked". Also verified `_handleSlotClick` checks `disabled` attribute and `.disabled` property before dispatching.
 
 ---
 
-### P2-02: No test for clicking outside to close the panel
+### P2-02: No test for clicking outside to close the panel — RESOLVED
 
-**File:** `hx-overflow-menu.test.ts`
+**File:** `hx-overflow-menu.test.ts:452–470`
 
-The document-level capture click listener (`_handleDocumentClick`) is a key behavior with no test coverage. No test verifies that clicking outside the component closes the panel.
-
----
-
-### P2-03: No test that Escape returns focus to the trigger button
-
-**File:** `hx-overflow-menu.test.ts:258–278`
-
-The Escape test verifies `panel` becomes `null` after the event but does not assert that focus is returned to the trigger button (`[part="button"]`). The implementation does attempt to restore focus (`line 184`), but this is untested.
+**Resolution:** Test added: "clicking outside closes the panel" — dispatches click on `document.body`, asserts panel is removed and `hx-hide` fires.
 
 ---
 
-### P2-04: `hx-hide` event missing bubbles/composed test
+### P2-03: No test that Escape returns focus to the trigger button — RESOLVED
 
-**File:** `hx-overflow-menu.test.ts`
+**File:** `hx-overflow-menu.test.ts:323–336`
 
-`hx-show` has a test asserting `bubbles: true` and `composed: true` (lines 212–223). `hx-hide` has no equivalent test. Both events dispatch with identical flags; the asymmetry is a gap.
-
----
-
-### P2-05: `bind(this)` called in `connectedCallback` — fragile lifecycle pattern
-
-**File:** `hx-overflow-menu.ts:89–95`
-
-```ts
-override connectedCallback(): void {
-  super.connectedCallback();
-  this._handleDocumentClick = this._handleDocumentClick.bind(this);
-  this._handleKeydown = this._handleKeydown.bind(this);
-  document.addEventListener('click', this._handleDocumentClick, true);
-  this.addEventListener('keydown', this._handleKeydown);
-}
-```
-
-Calling `.bind(this)` inside `connectedCallback` replaces the instance method reference on every connection. This creates a new function object on each connect/disconnect cycle. Consequences:
-
-1. In frameworks that move elements in the DOM (e.g., Lit server rendering, portals), `connectedCallback` fires multiple times, creating multiple distinct bound references. The `removeEventListener` in `disconnectedCallback` removes only the most recent binding — previous bindings are leaked on `document`.
-2. The pattern is fragile; the conventional approach is arrow-function class fields or binding in the constructor.
+**Resolution:** Test added: "Escape returns focus to the trigger button" — asserts `el.shadowRoot.activeElement` is the trigger button after Escape.
 
 ---
 
-### P2-06: Redundant `cursor: not-allowed` on `.trigger[disabled]`
+### P2-04: `hx-hide` event missing bubbles/composed test — RESOLVED
 
-**File:** `hx-overflow-menu.styles.ts:46–48`
+**File:** `hx-overflow-menu.test.ts:255–268`
 
-```css
-.trigger[disabled] {
-  cursor: not-allowed;
-}
-```
-
-`:host([disabled])` already applies `pointer-events: none`, which prevents any pointer events from reaching the trigger element. The `cursor: not-allowed` rule on the inner button is therefore unreachable — the browser will show the default cursor (or whatever the host cursor is) because pointer events never reach the button. The rule is dead code.
+**Resolution:** Test added: "hx-hide bubbles and is composed" — mirrors the existing hx-show test.
 
 ---
 
-### P2-07: `outline-offset: -2px` on slotted focus-visible items
+### P2-05: `bind(this)` called in `connectedCallback` — fragile lifecycle pattern — RESOLVED
 
-**File:** `hx-overflow-menu.styles.ts:111–116`
+**File:** `hx-overflow-menu.ts:179–242`
 
-```css
-::slotted([role='menuitem']:focus-visible) {
-  outline-offset: -2px;
-}
-```
-
-A negative `outline-offset` draws the focus ring inside the element's border box. On menu items with opaque backgrounds this is usually invisible on the top/bottom where items share the same background, making the focus indicator less perceivable. WCAG 2.1 SC 1.4.11 (Non-text Contrast) requires focus indicators to have a 3:1 contrast ratio against adjacent colors. An inset outline that is obscured by adjacent items may not meet this threshold. The standard pattern for menu items is `outline-offset: 0` (flush) or positive offset.
+**Resolution:** All event handlers converted to arrow-function class fields (`private readonly _handleX = (e: T): void => { ... }`). No `.bind()` calls in lifecycle methods. Stable references for add/removeEventListener.
 
 ---
 
-### P2-08: CSS part names diverge from feature specification
+### P2-06: Redundant `cursor: not-allowed` on `.trigger[disabled]` — RESOLVED
 
-**Files:** `hx-overflow-menu.ts:22–23`, feature spec
+**File:** `hx-overflow-menu.styles.ts`
 
-The feature spec lists the expected CSS parts as `trigger` and `menu`. The implementation exposes `button` and `panel`:
-
-```ts
-@csspart button - The trigger icon button element.
-@csspart panel - The floating menu panel container.
-```
-
-This is a public API surface (CSS parts are part of the component contract) and a naming mismatch against the spec. Consumer stylesheets written to `::part(trigger)` or `::part(menu)` will silently have no effect.
+**Resolution:** Dead CSS rule removed. `:host([disabled])` already applies `pointer-events: none`.
 
 ---
 
-### P2-09: Missing Storybook story — menu items with icon content
+### P2-07: `outline-offset: -2px` on slotted focus-visible items — RESOLVED
 
-**File:** `hx-overflow-menu.stories.ts`
+**File:** `hx-overflow-menu.styles.ts:114`
 
-The feature spec requires: _"Storybook — standard overflow menu, with icons, in table row context"_. The `PatientRowActions` story covers the table row context. However, there is no story showing menu items with leading icon content (e.g., SVG icons or `hx-icon` elements inside `[role="menuitem"]`). All existing stories use text-only menu items. This is a spec gap.
-
----
-
-### P2-10: No Drupal integration documentation or Twig example
-
-**File:** (absent)
-
-The feature spec requires Drupal compatibility: _"Twig-renderable"_. No Twig template, Drupal behavior, or Drupal-specific usage documentation exists anywhere in the component directory. While the web component itself is usable from Twig as a custom element, the non-standard attribute `hx-size` (using the `hx-` prefix for a property attribute rather than a boolean/value attribute) could confuse Drupal integrators unfamiliar with the convention. A Twig usage example in the component README or Starlight docs would satisfy this requirement.
+**Resolution:** Changed to `outline-offset: 0` (flush). Focus ring is now fully visible on all menu items.
 
 ---
 
-## Passing Areas (for completeness)
+### P2-08: CSS part names diverge from feature specification — RESOLVED
 
-| Area                                              | Status | Notes                                               |
-| ------------------------------------------------- | ------ | --------------------------------------------------- |
-| TypeScript strict — no `any`                      | PASS   | No `any` types found                                |
-| Placement property typed                          | PASS   | Full 12-value union type                            |
-| Icon property typed                               | PASS   | `'vertical' \| 'horizontal'`                        |
-| Size property typed                               | PASS   | `'sm' \| 'md' \| 'lg'`                              |
-| Trigger `aria-label` present                      | PASS   | Hardcoded but present (see P1-02)                   |
-| Panel `role="menu"`                               | PASS   |                                                     |
-| `aria-expanded` reflects state                    | PASS   |                                                     |
-| Escape closes panel                               | PASS   | Tested                                              |
-| Tab closes panel                                  | PASS   | Tested                                              |
-| Focus moves to first item on open                 | PASS   | `_focusFirstItem()`                                 |
-| `hx-show` / `hx-hide` / `hx-select` events        | PASS   | All three dispatched correctly                      |
-| `@csspart button` and `@csspart panel` documented | PASS   | JSDoc present                                       |
-| All `--hx-*` token usage                          | PASS   | No hardcoded colors/spacing outside fallback values |
-| Reduced motion media query                        | PASS   | Transition disabled                                 |
-| axe-core tests (closed, open, disabled)           | PASS   | Three scenarios covered                             |
-| Storybook autodocs                                | PASS   | `tags: ['autodocs']` present                        |
-| Storybook controls for all public props           | PASS   | placement, size, disabled, icon all have controls   |
-| Table row context story                           | PASS   | `PatientRowActions`                                 |
-| Shadow DOM encapsulation                          | PASS   |                                                     |
-| `index.ts` re-export                              | PASS   |                                                     |
-| `declare global` block                            | PASS   | `HTMLElementTagNameMap` extended                    |
-| Event listeners cleaned up on disconnect          | PASS   | `disconnectedCallback` removes both listeners       |
+**File:** `hx-overflow-menu.ts:290, 304`
+
+**Resolution:** Both naming conventions supported via multi-value part attributes: `part="button trigger"` and `part="panel menu"`. Consumers can use either `::part(button)` or `::part(trigger)`, and either `::part(panel)` or `::part(menu)`. Tests verify both aliases.
+
+---
+
+### P2-09: Missing Storybook story — menu items with icon content — RESOLVED
+
+**File:** `hx-overflow-menu.stories.ts:330–408`
+
+**Resolution:** `WithIconItems` story added showing menu items with leading SVG icons (edit, duplicate, archive, delete).
+
+---
+
+### P2-10: No Drupal integration documentation or Twig example — RESOLVED
+
+**File:** `apps/docs/src/content/docs/component-library/hx-overflow-menu.mdx:265–310`
+
+**Resolution:** Full Drupal integration section in Starlight docs: Twig template with dynamic attributes, `.libraries.yml` registration, and `Drupal.behaviors` event handler using `once()`.
+
+---
+
+## Passing Areas
+
+| Area                                              | Status | Notes                                                          |
+| ------------------------------------------------- | ------ | -------------------------------------------------------------- |
+| TypeScript strict — no `any`                      | PASS   | No `any` types found                                           |
+| Placement property typed                          | PASS   | Full 12-value union type                                       |
+| Icon property typed                               | PASS   | `'vertical' \| 'horizontal'`                                  |
+| Size property typed                               | PASS   | `'sm' \| 'md' \| 'lg'`                                        |
+| Trigger `aria-label` present                      | PASS   | Dynamic via `label` property                                   |
+| Panel `role="menu"`                               | PASS   |                                                                |
+| `aria-haspopup="menu"`                            | PASS   | ARIA 1.2 compliant                                             |
+| `aria-expanded` reflects state                    | PASS   |                                                                |
+| Arrow-key navigation (Down/Up/Home/End)           | PASS   | With wrapping and disabled-item skip                           |
+| Escape closes panel and restores focus            | PASS   | Tested                                                         |
+| Tab closes panel                                  | PASS   | Tested                                                         |
+| Outside click closes panel                        | PASS   | Tested                                                         |
+| Focus moves to first item on open                 | PASS   | `_focusFirstItem()`                                            |
+| `hx-show` / `hx-hide` / `hx-select` events       | PASS   | All three dispatched correctly, bubbles/composed verified      |
+| Disabled items skipped in focus and events         | PASS   | Both keyboard traversal and click handler check disabled state |
+| `@csspart button/trigger` and `panel/menu`        | PASS   | Dual aliases via multi-value part attribute                    |
+| All `--hx-*` token usage                          | PASS   | No hardcoded colors/spacing outside fallback values            |
+| Reduced motion media query                        | PASS   | Transition disabled                                            |
+| Arrow-function event handlers                     | PASS   | No `.bind()` in lifecycle, stable references                   |
+| axe-core tests (closed, open, disabled)           | PASS   | Three scenarios covered                                        |
+| Storybook autodocs                                | PASS   | `tags: ['autodocs']` present                                   |
+| Storybook controls for all public props           | PASS   | placement, size, disabled, icon, label all have controls       |
+| WithIconItems story                               | PASS   | Menu items with SVG icons                                      |
+| Table row context story                           | PASS   | `PatientRowActions`                                            |
+| Shadow DOM encapsulation                          | PASS   |                                                                |
+| `index.ts` re-export                              | PASS   |                                                                |
+| `declare global` block                            | PASS   | `HTMLElementTagNameMap` extended                               |
+| Event listeners cleaned up on disconnect          | PASS   | `disconnectedCallback` removes both listeners                  |
+| `@floating-ui/dom` externalized                   | PASS   | peerDependency + rollup external                               |
+| Starlight documentation                           | PASS   | Complete with live demos, API, accessibility, Drupal, examples |
+| `label` property                                  | PASS   | Configurable accessible name                                   |
+| `outline-offset: 0` on focus-visible menu items   | PASS   | WCAG 2.1 SC 1.4.11 compliant                                  |

@@ -116,15 +116,15 @@
 | Property: readonly       | 3      | PASS     |
 | Property: disabled       | 3      | PASS     |
 | Click to Rate            | 3      | PASS     |
-| Keyboard Navigation      | 5      | PASS     |
-| Half-Star Precision      | 3      | PASS     |
-| Hover Preview            | 2      | PASS     |
+| Keyboard Navigation      | 6      | PASS     |
+| Half-Star Precision      | 4      | PASS     |
+| Hover Preview            | 3      | PASS     |
 | Form Participation       | 3      | PASS     |
 | ARIA                     | 4      | PASS     |
 | Accessibility (axe-core) | 4      | PASS     |
-| **Total**                | **38** | **PASS** |
+| **Total**                | **41** | **PASS** |
 
-**Coverage:** 84.95% statements, 79.26% branches, 87.5% functions — all above thresholds.
+**Coverage:** 84.95%+ statements, 79.26%+ branches, 87.5%+ functions — all above thresholds.
 
 ### 8. Storybook
 
@@ -138,8 +138,9 @@
 | Disabled                     | PASS   |
 | MaxTen                       | PASS   |
 | FormParticipation            | PASS   |
-| CustomIcon                   | ADDED  |
+| CustomIcon                   | PASS   |
 | InteractiveEvents            | PASS   |
+| Sizes                        | ADDED  |
 
 ### 9. Drupal Compatibility
 
@@ -164,15 +165,15 @@
 
 ## Remaining Items (LOW / Documented Only)
 
-| #   | Dimension  | Severity | Description                                                                   |
-| --- | ---------- | -------- | ----------------------------------------------------------------------------- |
-| 1   | Tests      | LOW      | `_handleSymbolMouseMove` not directly tested (hover with half-star precision) |
-| 2   | Tests      | LOW      | Focus restoration after keyboard nav not tested                               |
-| 3   | Tests      | LOW      | Half-star click resolution right-half branch partially covered                |
-| 4   | A11y       | LOW      | Individual star labels could include "of N" for full context                  |
-| 5   | Validation | LOW      | `precision` has no runtime guard against invalid attribute values             |
-| 6   | Storybook  | LOW      | No "Sizes" story demonstrating `--hx-rating-size` variations                  |
-| 7   | Drupal     | LOW      | No `.html.twig` example template                                              |
+| #   | Dimension  | Severity | Description                                                                 |
+| --- | ---------- | -------- | --------------------------------------------------------------------------- |
+| 1   | Tests      | LOW      | FIXED — `_handleSymbolMouseMove` now tested (mousemove half-star precision) |
+| 2   | Tests      | LOW      | FIXED — Focus restoration after keyboard nav now tested                     |
+| 3   | Tests      | LOW      | FIXED — Half-star click right-half branch now covered                       |
+| 4   | A11y       | LOW      | Individual star labels could include "of N" for full context                |
+| 5   | Validation | LOW      | `precision` has no runtime guard against invalid attribute values           |
+| 6   | Storybook  | LOW      | FIXED — Sizes story added demonstrating `--hx-rating-size` variations       |
+| 7   | Drupal     | LOW      | No `.html.twig` example template                                            |
 
 ---
 
@@ -181,9 +182,9 @@
 | Gate | Check             | Result                          |
 | ---- | ----------------- | ------------------------------- |
 | 1    | TypeScript strict | PASS — zero errors              |
-| 2    | Test suite        | PASS — 38/38, 84.95% coverage   |
+| 2    | Test suite        | PASS — 41/41, 84.95%+ coverage  |
 | 3    | Accessibility     | PASS — zero axe violations      |
-| 4    | Storybook         | PASS — 10 stories, all variants |
+| 4    | Storybook         | PASS — 11 stories, all variants |
 | 5    | CEM accuracy      | PASS — public API documented    |
 | 6    | Bundle size       | PASS — ~3 KB (well under 5 KB)  |
 | 7    | Code review       | This audit                      |

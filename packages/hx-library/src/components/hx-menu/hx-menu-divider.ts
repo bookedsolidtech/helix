@@ -1,19 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { css } from 'lit';
 import { tokenStyles } from '@helixui/tokens/lit';
-
-const helixMenuDividerStyles = css`
-  :host {
-    display: block;
-  }
-
-  .menu-divider {
-    height: var(--hx-border-width-thin, 1px);
-    background-color: var(--hx-menu-divider-color, var(--hx-color-neutral-200, #e2e8f0));
-    margin: var(--hx-space-1, 0.25rem) calc(-1 * var(--hx-space-1, 0.25rem));
-  }
-`;
+import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
 
 /**
  * A visual separator for grouping items within an `hx-menu`.

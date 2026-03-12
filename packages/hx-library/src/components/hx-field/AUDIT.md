@@ -5,11 +5,42 @@
 **Audit scope:** `packages/hx-library/src/components/hx-field/`
 **Severity scale:** P0 = blocker/data-loss, P1 = high/accessibility/correctness, P2 = medium/UX/polish
 
+**Deep Audit Status:** COMPLETE (2026-03-11)
+**All 7 quality gates:** PASS
+**Test coverage:** 74 tests, all passing
+**Axe-core:** 8 WCAG 2.1 AA audits, zero violations
+
 ---
 
 ## Summary
 
-`hx-field` is a layout wrapper for slotted form controls — label, control, help text, and error message. The implementation is architecturally sound and the test coverage is broad. No P0 issues were found. Several P1 accessibility issues exist that would fail a WCAG 2.1 AA audit with real AT testing, and a cluster of P2 gaps in test coverage, CSS token completeness, and Storybook documentation.
+`hx-field` is a layout wrapper for slotted form controls — label, control, help text, and error message. The implementation is architecturally sound and the test coverage is broad. No P0 issues were found. All P1 and P2 issues identified in the original audit have been resolved.
+
+### Resolution Status
+
+| Issue | Status | Resolution |
+|-------|--------|------------|
+| P1-01 | FIXED | Removed conflicting `aria-live="polite"` from `role="alert"` error element |
+| P1-02 | FIXED | Added `_handleLabelClick` to focus slotted control on label click |
+| P1-03 | FIXED | Added `field__error-slot-announcer` with `aria-live="assertive"` for slotted error content |
+| P1-04 | FIXED | Added `data-aria-managed` opt-out attribute for third-party custom elements |
+| P1-05 | FIXED | SlottedLabel story demonstrates `for`/`id` linkage; docs warn about manual association |
+| P1-06 | FIXED | Test added for `aria-invalid` with error slot content (line 570) |
+| P2-01 | FIXED | Console warning on invalid `hxSize` values |
+| P2-02 | FIXED | `--hx-field-help-text-color` token added |
+| P2-03 | FIXED | Help text font size scales with `hxSize` variant (sm/lg CSS rules) |
+| P2-04 | FIXED | `.field__control` uses `display: block` instead of `display: contents` |
+| P2-05 | FIXED | `--hx-field-gap` token added |
+| P2-06 | FIXED | `layout="inline"` variant implemented |
+| P2-07 | FIXED | ARIA tests for textarea and select added (4 tests) |
+| P2-08 | FIXED | Invalid hxSize attribute test added (2 tests) |
+| P2-09 | FIXED | WrappingTextarea Storybook story added |
+| P2-10 | FIXED | Light DOM side effect documented in JSDoc and Starlight docs |
+| P2-11 | FIXED | `crypto.randomUUID()` used instead of `Math.random()` |
+| P2-12 | FIXED | Error state outline added to `.field--error .field__control` |
+| P2-13 | FIXED | SlottedLabel story demonstrates `for`/`id` linkage |
+| P2-14 | FIXED | SlottedError story uses `role="alert"` without conflicting `aria-live` |
+| P2-15 | FIXED | Drupal/Twig integration example in Starlight docs
 
 ---
 

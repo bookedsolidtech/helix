@@ -119,16 +119,18 @@ export const helixNavStyles = css`
     position: absolute;
     top: calc(100% + var(--hx-space-1, 0.25rem));
     left: 0;
-    min-width: 12rem;
+    min-width: var(--hx-nav-submenu-min-width, 12rem);
     list-style: none;
     margin: 0;
     padding: var(--hx-space-1, 0.25rem) 0;
     background-color: var(--hx-nav-submenu-bg, var(--hx-color-neutral-800, #1f2937));
     border-radius: var(--hx-border-radius-md, 0.375rem);
-    box-shadow:
+    box-shadow: var(
+      --hx-shadow-md,
       0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1);
-    z-index: 100;
+      0 2px 4px -2px rgb(0 0 0 / 0.1)
+    );
+    z-index: var(--hx-z-index-dropdown, 100);
   }
 
   .nav__submenu[hidden] {

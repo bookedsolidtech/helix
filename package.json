@@ -41,6 +41,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
+    "bundle-size": "node scripts/bundle-size-report.js",
+    "bundle-size:ci": "node scripts/bundle-size-report.js --ci",
     "verify": "npm run lint && npm run format:check && npm run type-check",
     "pre-commit-check": "bash scripts/pre-commit-check.sh",
     "pre-push-check": "bash scripts/pre-push-check.sh",

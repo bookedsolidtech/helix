@@ -147,15 +147,16 @@ describe('hx-field-label', () => {
       const el = await fixture<HelixFieldLabel>(
         '<hx-field-label required><span slot="required-indicator">(req)</span></hx-field-label>',
       );
-      // verify light DOM content exists
-      const slotted = el.querySelector('[slot="required-indicator"]');
-      expect(slotted?.textContent).toBe('(req)');
-      // verify shadow DOM slot has assigned nodes
+      // verify shadow DOM slot exists and has assigned nodes
       const slot = el.shadowRoot!.querySelector(
         'slot[name="required-indicator"]',
       ) as HTMLSlotElement;
       expect(slot).toBeTruthy();
-      expect(slot.assignedNodes().length).toBeGreaterThan(0);
+      const assignedNodes = slot.assignedNodes();
+      expect(assignedNodes.length).toBeGreaterThan(0);
+      // verify the assigned content matches the slotted element
+      const slottedElement = assignedNodes[0] as HTMLElement;
+      expect(slottedElement.textContent).toBe('(req)');
     });
 
     it('required-indicator slot is not rendered when required is false', async () => {

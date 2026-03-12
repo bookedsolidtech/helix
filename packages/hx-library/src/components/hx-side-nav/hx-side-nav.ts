@@ -201,7 +201,6 @@ export class HelixSideNav extends LitElement {
             class="side-nav__toggle"
             aria-label=${this.collapsed ? 'Expand navigation' : 'Collapse navigation'}
             aria-expanded=${!this.collapsed}
-            aria-controls="side-nav-body"
             @click=${this._handleToggle}
           >
             ${this._renderToggleIcon()}
