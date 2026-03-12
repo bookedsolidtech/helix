@@ -59,7 +59,7 @@ else
     echo "Changeset check skipped (branch: $BRANCH)"
   else
     # Check if this branch touches component source
-    BASE_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}' || echo "dev")
+    BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||' || echo "dev")
     COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || echo "")
     if [ -n "$COMMON_ANCESTOR" ]; then
       SOURCE_CHANGED=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \

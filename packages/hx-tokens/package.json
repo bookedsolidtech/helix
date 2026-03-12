@@ -1,6 +1,6 @@
 {
   "name": "@helixui/tokens",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
   "type": "module",
   "main": "./dist/index.js",
@@ -47,7 +47,7 @@
     "directory": "packages/hx-tokens"
   },
   "license": "MIT",
-  "homepage": "https://helix.bookedsolid.com",
+  "homepage": "https://helix.bookedsolid.tech",
   "bugs": "https://github.com/bookedsolidtech/helix/issues",
   "keywords": [
     "web-components",
