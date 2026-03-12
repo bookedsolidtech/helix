@@ -1,5 +1,5 @@
 ---
-"@helixui/library": patch
+'@helixui/library': patch
 ---
 
 fix: add runtime deprecation warning to hx-action-bar sticky property
