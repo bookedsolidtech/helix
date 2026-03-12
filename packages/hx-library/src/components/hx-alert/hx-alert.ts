@@ -5,7 +5,7 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAlertStyles } from './hx-alert.styles.js';
 
 /** Alert variant determines visual styling and ARIA semantics. */
-type AlertVariant = 'info' | 'success' | 'warning' | 'error';
+export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
 /**
  * A feedback component for communicating status messages, warnings, and errors.
