@@ -1,0 +1,88 @@
+/**
+ * HELiX FOUC Prevention Stylesheet
+ *
+ * Load this stylesheet in <head> before your JS bundle to prevent
+ * Flash of Unstyled Content (FOUC) for HELiX web components.
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="@helixui/library/fouc.css" />
+ *
+ * Once each component's JS registers, the :defined pseudo-class
+ * matches and the element becomes visible automatically.
+ */
+
+hx-accordion:not(:defined),
+hx-action-bar:not(:defined),
+hx-alert:not(:defined),
+hx-avatar:not(:defined),
+hx-badge:not(:defined),
+hx-breadcrumb:not(:defined),
+hx-button:not(:defined),
+hx-button-group:not(:defined),
+hx-card:not(:defined),
+hx-carousel:not(:defined),
+hx-checkbox:not(:defined),
+hx-checkbox-group:not(:defined),
+hx-code-snippet:not(:defined),
+hx-color-picker:not(:defined),
+hx-combobox:not(:defined),
+hx-container:not(:defined),
+hx-copy-button:not(:defined),
+hx-data-table:not(:defined),
+hx-date-picker:not(:defined),
+hx-dialog:not(:defined),
+hx-divider:not(:defined),
+hx-drawer:not(:defined),
+hx-dropdown:not(:defined),
+hx-field:not(:defined),
+hx-field-label:not(:defined),
+hx-file-upload:not(:defined),
+hx-form:not(:defined),
+hx-format-date:not(:defined),
+hx-grid:not(:defined),
+hx-help-text:not(:defined),
+hx-icon:not(:defined),
+hx-icon-button:not(:defined),
+hx-image:not(:defined),
+hx-link:not(:defined),
+hx-list:not(:defined),
+hx-menu:not(:defined),
+hx-meter:not(:defined),
+hx-nav:not(:defined),
+hx-number-input:not(:defined),
+hx-overflow-menu:not(:defined),
+hx-pagination:not(:defined),
+hx-popover:not(:defined),
+hx-popup:not(:defined),
+hx-progress-bar:not(:defined),
+hx-progress-ring:not(:defined),
+hx-prose:not(:defined),
+hx-radio-group:not(:defined),
+hx-rating:not(:defined),
+hx-select:not(:defined),
+hx-side-nav:not(:defined),
+hx-skeleton:not(:defined),
+hx-slider:not(:defined),
+hx-spinner:not(:defined),
+hx-split-button:not(:defined),
+hx-split-panel:not(:defined),
+hx-stack:not(:defined),
+hx-status-indicator:not(:defined),
+hx-steps:not(:defined),
+hx-structured-list:not(:defined),
+hx-switch:not(:defined),
+hx-tabs:not(:defined),
+hx-tag:not(:defined),
+hx-text:not(:defined),
+hx-text-input:not(:defined),
+hx-textarea:not(:defined),
+hx-theme:not(:defined),
+hx-time-picker:not(:defined),
+hx-toast:not(:defined),
+hx-toggle-button:not(:defined),
+hx-tooltip:not(:defined),
+hx-top-nav:not(:defined),
+hx-tree-view:not(:defined),
+hx-visually-hidden:not(:defined) {
+  visibility: hidden;
+}
