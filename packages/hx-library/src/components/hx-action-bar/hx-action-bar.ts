@@ -74,7 +74,20 @@ export class HelixActionBar extends LitElement {
    * @attr sticky
    */
   @property({ type: Boolean, reflect: true })
-  sticky = false;
+  get sticky(): boolean {
+    return this._sticky;
+  }
+  set sticky(value: boolean) {
+    if (value) {
+      console.warn(
+        '[hx-action-bar] The `sticky` property is deprecated. Use `position="sticky"` instead.',
+      );
+    }
+    const old = this._sticky;
+    this._sticky = value;
+    this.requestUpdate('sticky', old);
+  }
+  private _sticky = false;
 
   /**
    * Accessible label for the toolbar.
