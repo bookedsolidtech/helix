@@ -45,6 +45,7 @@ let _hxSliderIdCounter = 0;
  * @cssprop [--hx-slider-fill-bg=var(--hx-color-primary-500)] - Fill/progress color.
  * @cssprop [--hx-slider-thumb-bg=var(--hx-color-neutral-0)] - Thumb background color.
  * @cssprop [--hx-slider-thumb-border-color=var(--hx-color-primary-500)] - Thumb border color.
+ * @cssprop [--hx-slider-thumb-border-width=2px] - Thumb border width.
  * @cssprop [--hx-slider-thumb-shadow=var(--hx-shadow-sm)] - Thumb box shadow.
  * @cssprop [--hx-slider-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-slider-label-color=var(--hx-color-neutral-700)] - Label text color.
@@ -209,6 +210,11 @@ export class HelixSlider extends LitElement {
   }
 
   // ─── Lifecycle ───
+
+  override firstUpdated(): void {
+    // Enable fill transition after initial render to suppress animation on mount
+    requestAnimationFrame(() => this.setAttribute('data-ready', ''));
+  }
 
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
