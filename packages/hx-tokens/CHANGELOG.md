@@ -2,7 +2,7 @@
 
 ## 0.2.0
 
-### Patch Changes
+### Minor Changes
 
 - Accessibility audit batch — WCAG 2.1 AA compliance across 20+ components, CSS design token audit, infrastructure hardening.
 

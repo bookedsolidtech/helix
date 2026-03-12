@@ -410,13 +410,14 @@ jobs:
             fi
           done
 
-          # Test and VRT are allowed to be skipped (no source changes) or
+          # Test, VRT, and changeset are allowed to be skipped (no source changes) or
           # cancelled (concurrency group replaced a running job)
-          for gate in test vrt; do
+          for gate in test vrt changeset; do
             result="${{ needs.test.result }}"
             case "$gate" in
-              test) result="${{ needs.test.result }}" ;;
-              vrt)  result="${{ needs.vrt.result }}" ;;
+              test)      result="${{ needs.test.result }}" ;;
+              vrt)       result="${{ needs.vrt.result }}" ;;
+              changeset) result="${{ needs.changeset.result }}" ;;
             esac
             if [[ "$result" != "success" && "$result" != "skipped" && "$result" != "cancelled" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
