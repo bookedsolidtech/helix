@@ -138,9 +138,6 @@ export class HelixText extends LitElement {
   }
 }
 
-/** @deprecated Use `HelixText` directly. Kept for backward compatibility. */
-export type WcText = HelixText;
-
 declare global {
   interface HTMLElementTagNameMap {
     'hx-text': HelixText;
