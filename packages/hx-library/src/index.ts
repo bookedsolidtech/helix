@@ -79,6 +79,7 @@ export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
 export { HelixStructuredList, HelixStructuredListRow } from './components/hx-structured-list/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
+export type { HxSwitch, WcSwitch } from './components/hx-switch/index.js';
 export { HelixTabs } from './components/hx-tabs/index.js';
 export { HelixTab } from './components/hx-tabs/index.js';
 export { HelixTabPanel } from './components/hx-tabs/index.js';
