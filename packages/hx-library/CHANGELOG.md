@@ -1,5 +1,20 @@
 # @helixui/library
 
+## 0.3.1
+
+### Patch Changes
+
+- 819759f: fix: correct homepage URL from helix.bookedsolid.com to helix.bookedsolid.tech
+- Updated dependencies [819759f]
+- Updated dependencies [5e4d197]
+  - @helixui/tokens@0.3.1
+
+## 0.3.0
+
+### Minor Changes
+
+- 52179bd: Add `fouc.css` for FOUC prevention. Load in `<head>` before your JS bundle to hide undefined custom elements until they register: `<link rel="stylesheet" href="@helixui/library/fouc.css" />`.
+
 ## 0.2.0
 
 ### Minor Changes
