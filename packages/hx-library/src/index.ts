@@ -45,6 +45,7 @@ export { HelixFormatDate } from './components/hx-format-date/index.js';
 export { HelixGrid, HelixGridItem } from './components/hx-grid/index.js';
 export { HelixHelpText } from './components/hx-help-text/index.js';
 export { HelixIcon } from './components/hx-icon/index.js';
+export { HelixIconButton } from './components/hx-icon-button/index.js';
 export { HelixImage } from './components/hx-image/index.js';
 export { HelixLink } from './components/hx-link/index.js';
 export type { LinkVariant } from './components/hx-link/index.js';
