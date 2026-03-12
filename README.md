@@ -18,7 +18,7 @@ A production-ready Web Component library built with Lit 3.x and TypeScript for h
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Bundle Size](https://img.shields.io/badge/bundle-%3C50KB%20gzip-success)](packages/hx-library)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](tsconfig.base.json)
-[![WCAG 2.1 AA](https://img.shields.io/badge/WCAG%202.1-AA%20compliant-success)](https://www.w3.org/TR/WCAG21/)
+[![WCAG 2.1 AA](https://img.shields.io/badge/WCAG%202.1-AA%20target-blue)](https://www.w3.org/TR/WCAG21/)
 
 [Documentation](https://helix.bookedsolid.tech) · [Storybook](https://helix.bookedsolid.tech/storybook/) · [NPM Package](https://www.npmjs.com/package/@helixui/library) · [Contributing](CONTRIBUTING.md)
 
@@ -59,13 +59,13 @@ import '@helixui/library/components/hx-card';
 
 ## Why HELiX?
 
-- **Healthcare accessibility built in** — WCAG 2.1 AA compliant out of the box, meeting the [HHS mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/). Every component is keyboard-navigable, screen reader compatible, and tested with axe-core.
+- **Healthcare accessibility built in** — Targeting WCAG 2.1 AA compliance ahead of the [HHS Section 504 mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/). Every component is keyboard-navigable, screen reader compatible, and tested with axe-core. Accessibility audits are ongoing as we work toward full AA conformance across all 73 components.
 
 - **Framework-agnostic Web Components** — Built on Lit 3.x and the Web Components standard. Works in React, Angular, Vue, Drupal, or plain HTML. No framework lock-in, no adapter libraries.
 
 - **Design token theming** — Three-tier token architecture (primitive → semantic → component) with CSS custom properties. Theme entire applications by overriding `--hx-*` tokens — light mode, dark mode, and high contrast modes included.
 
-- **Enterprise-grade quality** — TypeScript strict mode, 73 components, 3-tier code review, automated accessibility testing, and <5KB per component (gzipped). Built for organizations where software failures impact patient care.
+- **Enterprise-grade quality** — TypeScript strict mode, 73 components, 3-tier code review, automated accessibility testing, and most components <5KB gzipped (hx-theme is larger due to design token imports). Built for organizations where software failures impact patient care.
 
 ---
 
