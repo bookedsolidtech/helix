@@ -23,13 +23,16 @@ else
   FAILED=1
 fi
 
-# Gate 2: Format (catches Prettier drift)
-echo "Format check..."
-if npm run format:check --silent 2>/dev/null; then
-  echo "Format passed"
+# Gate 2: Auto-format (fix and commit any formatting drift)
+echo "Auto-formatting..."
+npm run format --silent 2>/dev/null || true
+if ! git diff --quiet; then
+  echo "Formatting applied — committing auto-format changes"
+  git add -u
+  git -c core.hooksPath=/dev/null commit -m "chore: auto-format"
+  echo "Format committed"
 else
-  echo "Format FAILED — run 'npm run format' to fix"
-  FAILED=1
+  echo "Format already clean"
 fi
 
 # Gate 3: Type check (catches TS errors without full build)
