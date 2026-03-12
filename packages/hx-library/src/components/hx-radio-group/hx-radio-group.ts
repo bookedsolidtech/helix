@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -136,7 +136,7 @@ export class HelixRadioGroup extends LitElement {
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value || null);
@@ -148,7 +148,7 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  override firstUpdated(changedProperties: Map<string, unknown>): void {
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
     this._syncRadios();
     this._updateValidity();
