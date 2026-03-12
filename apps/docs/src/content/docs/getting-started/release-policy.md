@@ -9,9 +9,11 @@ HELiX follows a predictable release cadence so that consuming teams can plan upg
 
 HELiX strictly follows [Semantic Versioning 2.0.0](https://semver.org/):
 
-- **Patch** (`0.1.0` → `0.1.1`) — Bug fixes, documentation updates, internal refactors. No public API changes. Safe to adopt immediately.
-- **Minor** (`0.1.0` → `0.2.0`) — New components, new properties, new CSS parts or slots. All changes are backward-compatible. Existing code continues to work without modification.
-- **Major** (`0.x` → `1.0`) — Breaking changes to the public API: renamed properties, removed components, changed event signatures, or altered default behavior. Requires migration effort.
+- **Patch** (`1.0.0` → `1.0.1`) — Bug fixes, documentation updates, internal refactors. No public API changes. Safe to adopt immediately.
+- **Minor** (`1.0.0` → `1.1.0`) — New components, new properties, new CSS parts or slots. All changes are backward-compatible. Existing code continues to work without modification.
+- **Major** (`1.0.0` → `2.0.0`) — Breaking changes to the public API: renamed properties, removed components, changed event signatures, or altered default behavior. Requires migration effort.
+
+> **Note:** Versions in the `0.y.z` range are considered initial development. The public API is not yet stable and breaking changes may occur in any release during this phase.
 
 ### What Counts as Public API
 
@@ -60,7 +62,7 @@ Every release includes a changelog generated via [changesets](https://github.com
 | Version | Support Level |
 |---------|--------------|
 | Current major | Full support — bug fixes, security patches, new features |
-| Previous major | Maintenance — critical bug fixes and security patches only (12 months after next major release) |
+| Previous major | Maintenance — critical bug fixes and security patches for 12 months after the next major release |
 | Older majors | Unsupported — no fixes, no patches |
 
 Security vulnerabilities in supported versions are patched as soon as possible, regardless of the regular release schedule.
