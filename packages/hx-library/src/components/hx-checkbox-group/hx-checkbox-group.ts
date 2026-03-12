@@ -30,6 +30,7 @@ let _uid = 0;
  * @cssprop [--hx-checkbox-group-gap=var(--hx-space-3, 0.75rem)] - Gap between checkbox items.
  * @cssprop [--hx-checkbox-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  * @cssprop [--hx-checkbox-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
+ * @cssprop [--hx-checkbox-group-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  *
  * @drupal
  * Form-associated; render via Twig:

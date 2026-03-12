@@ -20,6 +20,7 @@ import { helixActionBarStyles } from './hx-action-bar.styles.js';
  * @csspart start - The start (left) slot wrapper.
  * @csspart center - The center (default) slot wrapper.
  * @csspart end - The end (right) slot wrapper.
+ * @csspart overflow - The overflow slot wrapper (hidden when no overflow content).
  *
  * @cssprop [--hx-action-bar-bg=transparent] - Bar background color (default variant).
  * @cssprop [--hx-action-bar-border=none] - Bar border (default variant).
@@ -247,7 +248,7 @@ export class HelixActionBar extends LitElement {
         <div part="end" class="section section--end">
           <slot name="end" @slotchange=${this._handleSlotChange}></slot>
         </div>
-        <div class="section section--overflow" ?hidden=${!this._hasOverflow}>
+        <div part="overflow" class="section section--overflow" ?hidden=${!this._hasOverflow}>
           <slot name="overflow" @slotchange=${this._handleSlotChange}></slot>
         </div>
       </div>

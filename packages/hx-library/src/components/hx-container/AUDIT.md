@@ -54,7 +54,7 @@ The `padding` property applies identical vertical spacing at all viewport widths
 
 ---
 
-### P2-02: `padding="none"` explicitly sets `padding-top: 0; padding-bottom: 0` — unnecessary override
+### P2-02: `padding="none"` explicitly sets `padding-top: 0; padding-bottom: 0` — unnecessary override ✅ FIXED
 
 **File:** `hx-container.styles.ts:13-16`
 
