@@ -43,7 +43,7 @@ The previous antagonistic review found 11 issues (1 P0, 4 P1, 8 P2). **All have 
 
 ## P2 — Medium Priority
 
-### P2-01: Hardcoded hex fallbacks in styles are inconsistent
+### P2-01: Hardcoded hex fallbacks in styles are inconsistent ✅ FIXED
 
 **File:** `hx-checkbox-group.styles.ts:44, 64, 77`
 

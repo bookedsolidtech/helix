@@ -3,6 +3,7 @@
 **Auditor:** auto-agent (T1-13)
 **Date:** 2026-03-05
 **Files reviewed:**
+
 - `hx-slider.ts` (422 lines)
 - `hx-slider.styles.ts` (238 lines)
 - `hx-slider.test.ts` (507 lines)
@@ -68,7 +69,7 @@ formResetCallback(): void {
 }
 ```
 
-HTML spec: form reset restores a field to its *default value* — the value set at authoring time via the `value` attribute. Resetting a `<hx-slider value="5" min="0">` should return to `5`, not `0`. This deviates from native `<input type="range">` behavior and will break Drupal forms that set an initial value other than `min`.
+HTML spec: form reset restores a field to its _default value_ — the value set at authoring time via the `value` attribute. Resetting a `<hx-slider value="5" min="0">` should return to `5`, not `0`. This deviates from native `<input type="range">` behavior and will break Drupal forms that set an initial value other than `min`.
 
 ### [P2] `_thumbPercent()` is dead code
 
@@ -99,6 +100,7 @@ Minor strict-mode observation — `render()` lacks an explicit `TemplateResult` 
 **File:** `hx-slider.ts:326-335, 361-362`
 
 When the consumer uses `<slot name="label">` to provide a custom label:
+
 1. `_hasLabelSlot` becomes `true`
 2. `hasLabel = true`
 3. `aria-labelledby=${this._labelId}` is set on the native `<input>`
@@ -122,10 +124,7 @@ Because `hasLabel = !!this.label || this._hasLabelSlot`, when `hasLabel` is `fal
 **File:** `hx-slider.ts:357-360`
 
 ```html
-role="slider"
-aria-valuemin=${this.min}
-aria-valuemax=${this.max}
-aria-valuenow=${this.value}
+role="slider" aria-valuemin=${this.min} aria-valuemax=${this.max} aria-valuenow=${this.value}
 ```
 
 `<input type="range">` already has an implicit ARIA role of `slider` and derives `aria-valuemin/max/now` from `min/max/value` attributes. Adding them explicitly creates a **desync risk**: if `min` is updated but `aria-valuemin` rendering lags a Lit microtask, ATs see inconsistent state. The redundant `role="slider"` may also confuse some AT/browser combinations. These should be removed; trust the native semantics.
@@ -150,6 +149,7 @@ The `disabled` boolean attribute is reflected, and `pointer-events: none` is app
 ### [P2] Page Up / Page Down keyboard behavior is untested
 
 The ARIA Authoring Practices Guide for the slider pattern specifies:
+
 - `Page Up` — increases value by a large step (typically 10% of range)
 - `Page Down` — decreases by a large step
 
@@ -233,7 +233,7 @@ No story sets `value` outside `[min, max]` to demonstrate (or test) clamping beh
 
 ## Area 5 — CSS
 
-### [P1] `outline: none` on native input is unconditional
+### [P1] `outline: none` on native input is unconditional ✅ FIXED
 
 **File:** `hx-slider.styles.ts:130`
 
@@ -243,16 +243,17 @@ outline: none;
 
 The focus-visible state is re-applied via `.slider__input:focus-visible ~ .slider__thumb-visual`, which works when the visual thumb is present in DOM. However, `outline: none` without a compensating focus style is a WCAG 2.1 AA violation in contexts where the visual thumb is hidden (e.g., CSS load failure, forced-color mode where custom backgrounds are overridden).
 
-### [P1] Thumb visual misalignment at range extremes
+### [P1] Thumb visual misalignment at range extremes ✅ FIXED
 
 **File:** `hx-slider.styles.ts:148-160`
 
 The visual thumb uses `left: ${thumbPct}%` + `transform: translateX(-50%)`. At `0%`, `left: 0; transform: translateX(-50%)` positions the thumb's center at the track's left edge — correct — but the left half of the thumb extends outside the track. Native browser range inputs compensate for thumb radius by offsetting the travel range inward by half the thumb width. The custom thumb does not do this, so:
+
 - At `0%`: left half of thumb is clipped or overflows
 - At `100%`: right half of thumb is clipped or overflows
 - This is a visual regression on all three sizes
 
-### [P2] No `--hx-slider-range-label-color` token
+### [P2] No `--hx-slider-range-label-color` token ✅ FIXED
 
 **File:** `hx-slider.styles.ts:216`
 
@@ -264,15 +265,15 @@ The visual thumb uses `left: ${thumbPct}%` + `transform: translateX(-50%)`. At `
 
 Range label color is not exposed as a component-level token. It should be `var(--hx-slider-range-label-color, var(--hx-color-neutral-500))`. The same applies to `.slider__help-text` (line 225). These violate the project's three-tier token cascade rule.
 
-### [P2] Forced-colors (Windows High Contrast) not handled
+### [P2] Forced-colors (Windows High Contrast) not handled ✅ FIXED
 
 No `@media (forced-colors: active)` block. The custom fill and thumb visuals (`background-color` overrides) will disappear in forced-color mode, leaving only the hidden native input (which does render in forced-color mode but is `opacity: 0`). The slider becomes invisible in High Contrast mode — a healthcare accessibility regression.
 
-### [P2] `--hx-border-width-thin` used for two unrelated things at different sizes
+### [P2] `--hx-border-width-thin` used for two unrelated things at different sizes ✅ FIXED
 
 In the styles, `--hx-border-width-thin` is used for both the tick width (1px context) and the thumb border. The CSS comments suggest it's `1px` but the thumb border comment says `2px`. Semantically incorrect token reuse.
 
-### [P3] `transition: width` on fill plays on initial render
+### [P3] `transition: width` on fill plays on initial render ✅ FIXED
 
 On page load, the fill animates from `0` to its initial value. This motion is not triggered by user interaction and should be suppressed on initial render. Only the `prefers-reduced-motion` block (which sets `transition: none`) prevents this for reduced-motion users; all others see an animation on mount.
 
@@ -310,37 +311,37 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 
 ## Summary Table
 
-| # | Area | Severity | Finding |
-|---|------|----------|---------|
-| 1 | Accessibility | **P0** | `aria-labelledby` points to non-existent element when label slot is used — accessible name fails |
-| 2 | Accessibility | **P0** | `aria-label` binding is dead code — no accessible name fallback when label is omitted |
-| 3 | TypeScript | **P1** | No value clamping to `[min, max]` — out-of-range values silently accepted |
-| 4 | TypeScript/Form | **P1** | `formResetCallback` resets to `min` not original `value` default — breaks Drupal forms |
-| 5 | TypeScript | **P1** | `formStateRestoreCallback` missing `reason` param and doesn't clamp restored value |
-| 6 | Accessibility | **P1** | No `aria-valuetext` support — critical for healthcare labeling contexts |
-| 7 | Accessibility | **P1** | Redundant ARIA on `<input type="range">` creates desync risk |
-| 8 | Tests | **P1** | `formResetCallback` test asserts the wrong expected value — cements the bug |
-| 9 | Tests | **P1** | No test for value out-of-range |
-| 10 | CSS | **P1** | `outline: none` without forced-color fallback — WCAG failure in High Contrast |
-| 11 | CSS | **P1** | Thumb visual misalignment at 0% and 100% — left/right halves clip outside track |
-| 12 | Storybook | **P1** | No story that verifies label slot + accessible name (exposes P0 bug) |
-| 13 | TypeScript | **P2** | `_thumbPercent()` is dead code — identical to `_fillPercent()` |
-| 14 | TypeScript | **P2** | No step-snapping validation on `value` setter |
-| 15 | Accessibility | **P2** | `aria-disabled` not exposed on host element |
-| 16 | Accessibility | **P2** | Page Up / Page Down behavior untested |
-| 17 | Tests | **P2** | No `name` → `FormData` integration test |
-| 18 | Tests | **P2** | Keyboard navigation tests only in Storybook, not Vitest |
-| 19 | Tests | **P2** | No step-snapping test |
-| 20 | Tests | **P2** | Disabled test uses synthetic event, not keyboard event |
-| 21 | CSS | **P2** | `--hx-slider-range-label-color` and help-text color not tokenized |
-| 22 | CSS | **P2** | No `@media (forced-colors: active)` block — invisible in Windows High Contrast |
-| 23 | CSS | **P2** | `--hx-border-width-thin` reused for semantically different sizes |
-| 24 | Storybook | **P2** | Range slider (two thumbs) absent — 6/6 major libraries ship this variant |
-| 25 | Performance | **P2** | Bundle size unverifiable — no dist output |
-| 26 | Performance | **P3** | `_ticks()` re-runs on every render, not memoized |
-| 27 | CSS | **P3** | Fill transition animates on initial page load (not just user interaction) |
-| 28 | Storybook | **P3** | `aria-valuetext` not demonstrated (blocked on implementation) |
-| 29 | TypeScript | **P3** | `render()` missing explicit return type |
+| #   | Area            | Severity | Finding                                                                                          |
+| --- | --------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| 1   | Accessibility   | **P0**   | `aria-labelledby` points to non-existent element when label slot is used — accessible name fails |
+| 2   | Accessibility   | **P0**   | `aria-label` binding is dead code — no accessible name fallback when label is omitted            |
+| 3   | TypeScript      | **P1**   | No value clamping to `[min, max]` — out-of-range values silently accepted                        |
+| 4   | TypeScript/Form | **P1**   | `formResetCallback` resets to `min` not original `value` default — breaks Drupal forms           |
+| 5   | TypeScript      | **P1**   | `formStateRestoreCallback` missing `reason` param and doesn't clamp restored value               |
+| 6   | Accessibility   | **P1**   | No `aria-valuetext` support — critical for healthcare labeling contexts                          |
+| 7   | Accessibility   | **P1**   | Redundant ARIA on `<input type="range">` creates desync risk                                     |
+| 8   | Tests           | **P1**   | `formResetCallback` test asserts the wrong expected value — cements the bug                      |
+| 9   | Tests           | **P1**   | No test for value out-of-range                                                                   |
+| 10  | CSS             | **P1**   | ✅ FIXED — `outline: none` without forced-color fallback — WCAG failure in High Contrast         |
+| 11  | CSS             | **P1**   | ✅ FIXED — Thumb visual misalignment at 0% and 100% — left/right halves clip outside track       |
+| 12  | Storybook       | **P1**   | No story that verifies label slot + accessible name (exposes P0 bug)                             |
+| 13  | TypeScript      | **P2**   | `_thumbPercent()` is dead code — identical to `_fillPercent()`                                   |
+| 14  | TypeScript      | **P2**   | No step-snapping validation on `value` setter                                                    |
+| 15  | Accessibility   | **P2**   | `aria-disabled` not exposed on host element                                                      |
+| 16  | Accessibility   | **P2**   | Page Up / Page Down behavior untested                                                            |
+| 17  | Tests           | **P2**   | No `name` → `FormData` integration test                                                          |
+| 18  | Tests           | **P2**   | Keyboard navigation tests only in Storybook, not Vitest                                          |
+| 19  | Tests           | **P2**   | No step-snapping test                                                                            |
+| 20  | Tests           | **P2**   | Disabled test uses synthetic event, not keyboard event                                           |
+| 21  | CSS             | **P2**   | ✅ FIXED — `--hx-slider-range-label-color` and help-text color not tokenized                     |
+| 22  | CSS             | **P2**   | ✅ FIXED — No `@media (forced-colors: active)` block — invisible in Windows High Contrast        |
+| 23  | CSS             | **P2**   | ✅ FIXED — `--hx-border-width-thin` reused for semantically different sizes                      |
+| 24  | Storybook       | **P2**   | Range slider (two thumbs) absent — 6/6 major libraries ship this variant                         |
+| 25  | Performance     | **P2**   | Bundle size unverifiable — no dist output                                                        |
+| 26  | Performance     | **P3**   | `_ticks()` re-runs on every render, not memoized                                                 |
+| 27  | CSS             | **P3**   | ✅ FIXED — Fill transition animates on initial page load (not just user interaction)             |
+| 28  | Storybook       | **P3**   | `aria-valuetext` not demonstrated (blocked on implementation)                                    |
+| 29  | TypeScript      | **P3**   | `render()` missing explicit return type                                                          |
 
 ---
 
@@ -349,6 +350,7 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 ### BUG-01: Accessible name failure when label slot is used
 
 **Reproduction:**
+
 ```html
 <hx-slider>
   <strong slot="label">Pain Level</strong>
@@ -356,6 +358,7 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 ```
 
 With `label=""` (default) and `slot="label"` provided:
+
 - `hasLabel = true` (because `_hasLabelSlot = true`)
 - `aria-labelledby = "${this._labelId}"` is set on the `<input>`
 - The `<label id="${this._labelId}">` is NOT rendered (gated on `this.label` being truthy)
@@ -369,6 +372,7 @@ With `label=""` (default) and `slot="label"` provided:
 ### BUG-02: `aria-label` never set — no accessible name when both label prop and slot are empty
 
 **Reproduction:**
+
 ```html
 <hx-slider min="0" max="10" value="5"></hx-slider>
 ```

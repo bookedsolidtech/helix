@@ -340,11 +340,11 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 | 18  | Storybook     | P2       | `Default` and `Horizontal` stories are functionally duplicative                                  |
 | 19  | Storybook     | P2       | No size + vertical combination stories                                                           |
 | 20  | Storybook     | P2       | `WithCustomIcon` story uses inline `width`/`height` overriding token sizing                      |
-| 21  | CSS           | P1       | Connector `2px` thickness hardcoded — not tokenized                                              |
-| 22  | CSS           | P1       | `cursor: pointer` unconditionally applied — no non-interactive state                             |
-| 23  | CSS           | P2       | Hardcoded hex fallbacks violate token-only policy                                                |
-| 24  | CSS           | P2       | Missing `--hx-steps-connector-complete-color` component token                                    |
-| 25  | CSS           | P2       | No `::part()` focus-visible styles provided                                                      |
+| 21  | CSS           | P1       | ✅ FIXED — Connector thickness tokenized via `--hx-steps-connector-thickness`                    |
+| 22  | CSS           | P1       | ✅ FIXED — Disabled steps get `cursor: not-allowed` + `pointer-events: none`                     |
+| 23  | CSS           | P2       | ✅ FIXED — Hex fallbacks removed, tokens used throughout                                         |
+| 24  | CSS           | P2       | ✅ FIXED — `--hx-steps-connector-complete-color` component token added                           |
+| 25  | CSS           | P2       | ✅ FIXED — `:host(:focus-visible) .step__indicator` focus styles added                           |
 | 26  | Performance   | P2       | Bundle size unverified; inline SVGs add non-tree-shakeable bytes                                 |
 | 27  | Drupal        | P1       | No Drupal Twig template provided                                                                 |
 | 28  | Drupal        | P1       | No documentation on Drupal attribute mapping                                                     |
@@ -362,18 +362,18 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 
 ### RESOLVED — CRITICAL / HIGH
 
-| # | Finding | Resolution |
-|---|---------|------------|
-| 4 | P0: `aria-current="step"` on inner div | **FIXED** — Moved to host element via `updated()` lifecycle. Tests updated. |
-| 6 | P1: No keyboard support | **FIXED** — Added `tabindex="0"`, `keydown` handler (Enter/Space), `disconnectedCallback` cleanup. |
-| 7 | P1: No disabled mechanism | **FIXED** — Added `disabled` boolean property with `aria-disabled`, `tabindex="-1"`, click guard. |
-| 9 | P2: No focus styles | **FIXED** — Added `:host(:focus-visible) .step__indicator` outline styles. |
-| 11 | P1: No keyboard tests | **FIXED** — Added 4 keyboard navigation tests (tabindex, Enter, Space, other keys). |
-| 12 | P1: No disabled tests | **FIXED** — Added 4 disabled property tests (reflected, aria-disabled, tabindex, no event). |
-| 13 | P1: aria-current test validates wrong placement | **FIXED** — Tests now check host element, not indicator div. |
-| 3 | P2: No CEM `@internal` tags | **FIXED** — Added `@internal` JSDoc to all private methods in both components. |
-| 8 | P1: No accessible name guidance | **FIXED** — Added aria-label guidance to `hx-steps` JSDoc description. |
-| 22 | P1: cursor:pointer unconditional | **FIXED** — Disabled steps get `cursor: not-allowed` + `pointer-events: none`. |
+| #   | Finding                                         | Resolution                                                                                         |
+| --- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| 4   | P0: `aria-current="step"` on inner div          | **FIXED** — Moved to host element via `updated()` lifecycle. Tests updated.                        |
+| 6   | P1: No keyboard support                         | **FIXED** — Added `tabindex="0"`, `keydown` handler (Enter/Space), `disconnectedCallback` cleanup. |
+| 7   | P1: No disabled mechanism                       | **FIXED** — Added `disabled` boolean property with `aria-disabled`, `tabindex="-1"`, click guard.  |
+| 9   | P2: No focus styles                             | **FIXED** — Added `:host(:focus-visible) .step__indicator` outline styles.                         |
+| 11  | P1: No keyboard tests                           | **FIXED** — Added 4 keyboard navigation tests (tabindex, Enter, Space, other keys).                |
+| 12  | P1: No disabled tests                           | **FIXED** — Added 4 disabled property tests (reflected, aria-disabled, tabindex, no event).        |
+| 13  | P1: aria-current test validates wrong placement | **FIXED** — Tests now check host element, not indicator div.                                       |
+| 3   | P2: No CEM `@internal` tags                     | **FIXED** — Added `@internal` JSDoc to all private methods in both components.                     |
+| 8   | P1: No accessible name guidance                 | **FIXED** — Added aria-label guidance to `hx-steps` JSDoc description.                             |
+| 22  | P1: cursor:pointer unconditional                | **FIXED** — Disabled steps get `cursor: not-allowed` + `pointer-events: none`.                     |
 
 ### NEW — Dark mode support added
 
@@ -386,14 +386,14 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 
 ### REMAINING (P2 — documented, deferred)
 
-| # | Finding | Status |
-|---|---------|--------|
-| 1 | Status vocabulary mismatch | Documented — current vocabulary (`pending/active/complete/error`) is more expressive than spec. |
-| 2 | Internal props reflected on hx-step | Documented — requires architectural change to child sync pattern. |
-| 5 | Complete/error not announced to SR | Documented — needs visually hidden status text. |
-| 10 | Active/complete visually identical | Documented — needs distinct indicator styles. |
-| 14-16 | Test gaps (slot change, coverage) | Documented. |
-| 17-20 | Storybook gaps | Documented. |
-| 21, 23-25 | CSS token gaps | Documented. |
-| 26 | Bundle size unverified | Documented. |
-| 27-29 | Drupal integration gaps | Documented. |
+| #         | Finding                             | Status                                                                                                                                                                                                      |
+| --------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1         | Status vocabulary mismatch          | Documented — current vocabulary (`pending/active/complete/error`) is more expressive than spec.                                                                                                             |
+| 2         | Internal props reflected on hx-step | Documented — requires architectural change to child sync pattern.                                                                                                                                           |
+| 5         | Complete/error not announced to SR  | Documented — needs visually hidden status text.                                                                                                                                                             |
+| 10        | Active/complete visually identical  | Documented — needs distinct indicator styles.                                                                                                                                                               |
+| 14-16     | Test gaps (slot change, coverage)   | Documented.                                                                                                                                                                                                 |
+| 17-20     | Storybook gaps                      | Documented.                                                                                                                                                                                                 |
+| 21, 23-25 | CSS token gaps                      | ✅ FIXED — Connector thickness tokenized (`--hx-steps-connector-thickness`), connector complete color tokenized (`--hx-steps-connector-complete-color`), hex fallbacks removed, focus-visible styles added. |
+| 26        | Bundle size unverified              | Documented.                                                                                                                                                                                                 |
+| 27-29     | Drupal integration gaps             | Documented.                                                                                                                                                                                                 |
