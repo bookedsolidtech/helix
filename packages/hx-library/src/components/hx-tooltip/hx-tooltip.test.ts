@@ -280,6 +280,91 @@ describe('hx-tooltip', () => {
       // Timers should have been cleared — no errors
       vi.runAllTimers();
     });
+
+    it('keeps tooltip visible when hovering over tooltip content', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0" hide-delay="0"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const tooltipEl = shadowQuery<HTMLElement>(el, '[part="tooltip"]')!;
+
+      // Show tooltip via mouseenter on trigger
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(tooltipEl.classList.contains('visible')).toBe(true);
+
+      // Mouse leaves trigger
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      // Mouse enters tooltip content — should cancel hide timer
+      tooltipEl.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(tooltipEl.classList.contains('visible')).toBe(true);
+    });
+
+    it('hides tooltip when mouse leaves tooltip content', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0" hide-delay="0"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const tooltipEl = shadowQuery<HTMLElement>(el, '[part="tooltip"]')!;
+
+      // Show tooltip
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+
+      // Hover over tooltip, then leave
+      tooltipEl.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      tooltipEl.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(tooltipEl.classList.contains('visible')).toBe(false);
+    });
+
+    it('does not hide on mouseleave when trigger is focused', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0" hide-delay="0"><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const trigger = el.querySelector('button')!;
+
+      // Focus trigger to show tooltip
+      wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(true);
+
+      // Simulate focus on the trigger element
+      trigger.focus();
+
+      // Mouse leaves trigger — tooltip should stay because trigger is focused
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(true);
+    });
+  });
+
+  // ─── Disconnected cleanup ───
+
+  describe('Disconnected cleanup', () => {
+    it('removes light DOM description element on disconnect', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>Trigger</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+
+      // Visually-hidden description should exist in light DOM
+      const descSpan = el.querySelector('span:not([slot])');
+      expect(descSpan).toBeTruthy();
+
+      el.remove();
+
+      // The description should have been removed from the DOM
+      expect(descSpan?.parentNode).toBeFalsy();
+    });
   });
 
   // ─── Accessibility (axe-core) ───
