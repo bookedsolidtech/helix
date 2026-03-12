@@ -4,6 +4,7 @@
 **Reviewer:** Antagonistic Quality Review Agent
 **Component:** `hx-side-nav` + `hx-nav-item`
 **Files reviewed:**
+
 - `hx-side-nav.ts`
 - `hx-nav-item.ts`
 - `hx-side-nav.styles.ts`
@@ -32,7 +33,7 @@ private get _isCollapsed(): boolean {
 }
 ```
 
-`data-collapsed` is set externally by `hx-side-nav` via `setAttribute`/`removeAttribute`. Because `_isCollapsed` is a plain getter — not a `@property` or `@state` — Lit's reactive system does not schedule a re-render when `data-collapsed` changes. The tooltip (`html\`<span class="nav-item__tooltip"...>\``) is guarded by this getter in the render method:
+`data-collapsed` is set externally by `hx-side-nav` via `setAttribute`/`removeAttribute`. Because `_isCollapsed` is a plain getter — not a `@property` or `@state` — Lit's reactive system does not schedule a re-render when `data-collapsed` changes. The tooltip (`html\`<span class="nav-item\_\_tooltip"...>\``) is guarded by this getter in the render method:
 
 ```ts
 ${this._isCollapsed
@@ -51,16 +52,13 @@ The initial render fires before `hx-side-nav._propagateCollapsedToChildren()` ru
 **File:** `hx-side-nav.ts:206-208`
 
 ```html
-<button
-  aria-controls="side-nav-body"
-  ...
->
+<button aria-controls="side-nav-body" ...></button>
 ```
 
 The element with `id="side-nav-body"` lives inside `hx-side-nav`'s own Shadow DOM:
 
 ```html
-<div part="body" class="side-nav__body" id="side-nav-body" ...>
+<div part="body" class="side-nav__body" id="side-nav-body" ...></div>
 ```
 
 The `aria-controls` attribute uses an IDREF to look up an element in the document's flat tree. Shadow DOM is a separate tree; cross-shadow IDREF resolution is not supported by any current AT/browser combination. The attribute effectively points to nothing. Screen readers that honour `aria-controls` will report an invalid reference or silently ignore it.
@@ -183,40 +181,27 @@ All other components use the `Hx` prefix for exported aliases (e.g., `HxButton`)
 
 ---
 
-### P2-03: Toggle button has no CSS `part` — cannot be styled by consumers
+### P2-03: Toggle button has no CSS `part` — FIXED
 
 **File:** `hx-side-nav.ts`, `hx-side-nav.styles.ts`
 
-The toggle button is not exposed as a CSS part. Consumers who need to style it (e.g., reposition it, change color for a light theme) have no supported mechanism. All other interactive elements in the component expose parts. The JSDoc `@csspart` block does not list `toggle`.
+**Resolution:** Added `part="toggle"` to the toggle button element and `@csspart toggle` to the JSDoc documentation.
 
 ---
 
-### P2-04: `--hx-side-nav-toggle-color` and `--hx-nav-item-host-bg` are undocumented tokens
+### P2-04: `--hx-side-nav-toggle-color` and `--hx-nav-item-host-bg` are undocumented tokens — FIXED
 
-**File:** `hx-side-nav.styles.ts:93`, `hx-nav-item.styles.ts:6`
+**File:** `hx-side-nav.ts`, `hx-nav-item.ts`
 
-```css
-/* hx-side-nav.styles.ts */
-color: var(--hx-side-nav-toggle-color, var(--hx-color-neutral-400, #9ca3af));
-
-/* hx-nav-item.styles.ts */
-background-color: var(--hx-nav-item-host-bg, var(--hx-color-neutral-900, #111827));
-```
-
-Both tokens are used but not listed in the corresponding component's `@cssprop` JSDoc block. CEM generation will omit them; consumers cannot discover them.
+**Resolution:** Both tokens are now documented in their respective component's `@cssprop` JSDoc block. CEM generation will include them.
 
 ---
 
-### P2-05: Tooltip `z-index` and `box-shadow` are hardcoded, not tokenized
+### P2-05: Tooltip `z-index` and `box-shadow` are hardcoded, not tokenized — FIXED
 
-**File:** `hx-nav-item.styles.ts:167-168`
+**File:** `hx-nav-item.styles.ts`
 
-```css
-z-index: 100;
-box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
-```
-
-Both values violate the no-hardcoded-values rule. The project has `--hx-*` tokens for shadows and z-index layering should use a documented stacking system.
+**Resolution:** Replaced with tokenized values: `var(--hx-z-index-tooltip, 100)` for z-index and `var(--hx-shadow-md, 0 2px 8px rgb(0 0 0 / 0.2))` for box-shadow.
 
 ---
 
