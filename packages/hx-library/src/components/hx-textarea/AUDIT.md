@@ -111,13 +111,7 @@ override updated(changedProperties: Map<string, unknown>): void {
 **File:** `hx-textarea.ts`, lines 372–381
 
 ```html
-<div
-  part="error"
-  class="field__error"
-  id=${this._errorId}
-  role="alert"
-  aria-live="polite"
->
+<div part="error" class="field__error" id="${this._errorId}" role="alert" aria-live="polite"></div>
 ```
 
 `role="alert"` implicitly carries `aria-live="assertive"` and `aria-atomic="true"`. Adding `aria-live="polite"` creates an ambiguous override — different screen readers resolve this conflict differently. VoiceOver on macOS ignores the explicit `aria-live` and uses assertive semantics from the role. NVDA on Windows may use the explicit `aria-live="polite"`. This non-standard combination leads to inconsistent announcement timing across AT, violating WCAG 2.1 SC 4.1.3.
@@ -134,6 +128,7 @@ override updated(changedProperties: Map<string, unknown>): void {
 
 **Description:**
 The character counter `<div part="counter" class="field__counter">${display}</div>` is a visual-only element. It is not:
+
 - Referenced in the textarea's `aria-describedby`
 - Given an `aria-live` region to announce updates as the user types
 - Given a meaningful role or label for screen reader context
@@ -224,11 +219,11 @@ box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
 
 ---
 
-### P2-05: Missing `minlength` attribute support
+### P2-05: Missing `minlength` attribute support — FIXED
 
 **File:** `hx-textarea.ts`
 
-The native `<textarea>` supports `minlength` for constraint validation. The component exposes `maxlength` but not `minlength`. The `_updateValidity()` method does not check `tooShort`. This is a feature gap, not a bug, but healthcare forms commonly enforce minimum character requirements for clinical note fields.
+**Resolution:** Added `minlength` property with attribute reflection and `tooShort` constraint validation in `_updateValidity()`. The native `<textarea>` also receives the `minlength` attribute. Validation triggers on `value`, `required`, `minlength`, and `maxlength` changes.
 
 **Severity:** P2
 
@@ -254,11 +249,11 @@ The `:host([resize='vertical'])` block is never needed since the base style alre
 
 ---
 
-### P2-07: No `rows` range validation
+### P2-07: No `rows` range validation — FIXED
 
-**File:** `hx-textarea.ts`, line 118
+**File:** `hx-textarea.ts`
 
-`rows` accepts any number, including `0`, negative values, or non-integers, which the native `<textarea>` either ignores or treats as `2` (browser-dependent). No validation or warning is issued. `rows="0"` collapses the textarea visually.
+**Resolution:** Added rows range validation in `updated()` lifecycle. Invalid values (≤0, non-integers) are clamped to the nearest valid value (minimum 1, rounded to integer).
 
 **Severity:** P2
 
@@ -285,27 +280,27 @@ The following areas are well-implemented and do not require changes:
 
 The following test scenarios are missing and should be added alongside fixes:
 
-| Gap | Scenario | Priority |
-|-----|----------|----------|
-| T-01 | Error slot sets `aria-describedby` to slotted error element's ID | P0 |
-| T-02 | Help-text slot renders without `helpText` property set | P0 |
-| T-03 | Changing `required` from `false` to `true` updates `validity.valueMissing` | P1 |
-| T-04 | Changing `maxlength` to a value below current value triggers `tooLong` | P1 |
-| T-05 | Counter is present in `aria-describedby` when `showCount` is set | P1 |
-| T-06 | Programmatic `value` change triggers auto-resize when `resize="auto"` | P2 |
-| T-07 | `readonly` attribute disables user editing | P2 |
-| T-08 | `setFormValue` is called exactly once per input event (no double-call) | P1 |
+| Gap  | Scenario                                                                   | Priority |
+| ---- | -------------------------------------------------------------------------- | -------- |
+| T-01 | Error slot sets `aria-describedby` to slotted error element's ID           | P0       |
+| T-02 | Help-text slot renders without `helpText` property set                     | P0       |
+| T-03 | Changing `required` from `false` to `true` updates `validity.valueMissing` | P1       |
+| T-04 | Changing `maxlength` to a value below current value triggers `tooLong`     | P1       |
+| T-05 | Counter is present in `aria-describedby` when `showCount` is set           | P1       |
+| T-06 | Programmatic `value` change triggers auto-resize when `resize="auto"`      | P2       |
+| T-07 | `readonly` attribute disables user editing                                 | P2       |
+| T-08 | `setFormValue` is called exactly once per input event (no double-call)     | P1       |
 
 ---
 
 ## Storybook Gaps
 
-| Gap | Description | Priority |
-|-----|-------------|----------|
-| S-01 | No story demonstrating error via `error` slot (only via property) | P1 |
-| S-02 | No story demonstrating `help-text` slot without `help-text` property | P0 |
-| S-03 | No story showing character counter with `aria-describedby` association | P1 |
-| S-04 | No `readonly` story (feature doesn't exist yet — see P2-02) | P2 |
+| Gap  | Description                                                            | Priority |
+| ---- | ---------------------------------------------------------------------- | -------- |
+| S-01 | No story demonstrating error via `error` slot (only via property)      | P1       |
+| S-02 | No story demonstrating `help-text` slot without `help-text` property   | P0       |
+| S-03 | No story showing character counter with `aria-describedby` association | P1       |
+| S-04 | No `readonly` story (feature doesn't exist yet — see P2-02)            | P2       |
 
 ---
 
@@ -319,10 +314,11 @@ The component imports Lit core, 3 Lit directives, and the token styles. No third
 ## Drupal Compatibility Assessment
 
 **Status: CONDITIONAL PASS**
+
 - Form association works correctly via `ElementInternals` — Drupal Form API `name`/`id` patterns are supported.
 - The `error` slot and `label` slot are Drupal-integration-ready.
 - **P0-02 breaks Drupal `help-text` slot rendering** — Drupal Form API renders help text as markup injected into `slot="help-text"`, but this only renders if the `help-text` property is also set. This is a blocking issue for Drupal integration.
 
 ---
 
-*This document is a finding report only. No code changes were made. All P0 and P1 items must be resolved before this component is eligible for merge to `main`.*
+_This document is a finding report only. No code changes were made. All P0 and P1 items must be resolved before this component is eligible for merge to `main`._
