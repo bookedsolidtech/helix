@@ -1,5 +1,28 @@
 # @helixui/tokens
 
+## 0.2.0
+
+### Patch Changes
+
+- Accessibility audit batch — WCAG 2.1 AA compliance across 20+ components, CSS design token audit, infrastructure hardening.
+
+  **Accessibility (WCAG 2.1 AA)**
+  - hx-field, hx-progress-bar, hx-action-bar, hx-side-nav, hx-spinner: ARIA roles, keyboard navigation, focus management
+  - hx-tag, hx-textarea, hx-toggle-button, hx-button-group, hx-combobox: label associations, describedby wiring
+  - hx-pagination, hx-popover, hx-theme, hx-time-picker, hx-alert: live regions, focus traps, landmark roles
+  - hx-card, hx-drawer, hx-meter, hx-number-input, hx-split-button: interactive semantics, required indicators
+  - hx-skeleton, hx-status-indicator, hx-switch, hx-tabs, hx-avatar: role assignments, state announcements
+
+  **CSS / Design Token Audit**
+  - Eliminated hardcoded values across hx-action-bar, hx-container, hx-slider, hx-steps, hx-checkbox-group
+  - Token compliance for hx-avatar, hx-link, hx-number-input, hx-status-indicator, hx-time-picker
+  - Design system alignment for hx-combobox, hx-field, hx-side-nav, hx-structured-list, hx-textarea
+
+  **Infrastructure**
+  - Prettier enforcement: pre-push hook now auto-fixes and commits formatting before every push — formatting drift eliminated permanently
+  - VRT baselines: CI is now cache-hit aware — stale baselines auto-regenerate, VRT failures from stale screenshots eliminated
+  - Removed DCO workflow — not applicable for private enterprise repos
+
 ## 0.1.3
 
 ### Patch Changes
