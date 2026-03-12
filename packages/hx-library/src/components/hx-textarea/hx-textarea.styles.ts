@@ -59,6 +59,9 @@ export const helixTextareaStyles = css`
 
   .field__textarea-wrapper:focus-within {
     border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    /* Solid fallback for browsers without color-mix() (Chrome < 111, Safari < 16.2) — WCAG 1.4.11 */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      rgba(37, 99, 235, var(--hx-focus-ring-opacity, 0.25));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -76,6 +79,9 @@ export const helixTextareaStyles = css`
 
   .field--error .field__textarea-wrapper:focus-within {
     border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc3545));
+    /* Solid fallback for browsers without color-mix() — WCAG 1.4.11 */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      rgba(220, 53, 69, var(--hx-focus-ring-opacity, 0.25));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
@@ -115,9 +121,7 @@ export const helixTextareaStyles = css`
     resize: none;
   }
 
-  :host([resize='vertical']) .field__textarea {
-    resize: vertical;
-  }
+  /* resize: vertical is the base default — no override needed for [resize='vertical'] */
 
   :host([resize='both']) .field__textarea {
     resize: both;
