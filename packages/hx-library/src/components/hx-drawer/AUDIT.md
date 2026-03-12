@@ -307,8 +307,8 @@ Using `void` to discard promises suppresses any rejection silently. If `updateCo
 | P1-05 | P1       | Behavior               | Animation timeout race condition on rapid open/close           |
 | P1-06 | P1       | Accessibility          | Dialog has no accessible name when label slot empty            |
 | P2-01 | P2       | TypeScript             | `DrawerSize \| string` collapses to `string`                   |
-| P2-02 | P2       | CSS/API                | CSS part name `close-button` deviates from spec (`close-btn`)  |
-| P2-03 | P2       | CSS                    | Footer `hidden` attribute has no CSS override for reset safety |
+| P2-02 | P2       | CSS/API                | CSS part name `close-button` deviates from spec (`close-btn`)  | RESOLVED |
+| P2-03 | P2       | CSS                    | Footer `hidden` attribute has no CSS override for reset safety | RESOLVED |
 | P2-04 | P2       | TypeScript             | `_triggerElement` cast bypasses `HTMLElement` type guard       |
 | P2-05 | P2       | Storybook              | No story for nested interactive content                        |
 | P3-01 | P3       | Code quality           | `firstUpdated()` slot detection is redundant                   |
