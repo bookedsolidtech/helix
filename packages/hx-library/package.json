@@ -20,11 +20,13 @@
       "types": "./dist/components/*/index.d.ts",
       "import": "./dist/components/*/index.js"
     },
-    "./custom-elements.json": "./custom-elements.json"
+    "./custom-elements.json": "./custom-elements.json",
+    "./fouc.css": "./fouc.css"
   },
   "files": [
     "dist",
-    "custom-elements.json"
+    "custom-elements.json",
+    "fouc.css"
   ],
   "customElements": "custom-elements.json",
   "scripts": {
