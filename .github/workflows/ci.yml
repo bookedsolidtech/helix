@@ -275,12 +275,18 @@ jobs:
         if: steps.detect.outputs.changed != ''
         env:
           CHANGED_COMPONENTS: ${{ steps.detect.outputs.changed }}
+          VRT_CACHE_HIT: ${{ steps.vrt-cache.outputs.cache-hit }}
         run: |
           npx http-server apps/storybook/dist -p 3151 &
           sleep 5
-          # If no cached baselines exist, run in update mode to create them (first-run pass)
+          # Run update mode when: no baselines exist, OR cache was only a partial/fallback hit
+          # (cache-hit == 'true' means exact key match — source files unchanged since last baseline)
+          # (cache-hit != 'true' means fallback restore — source changed, baselines are stale)
           if [ ! -d "packages/hx-library/__screenshots__" ] || [ -z "$(ls -A packages/hx-library/__screenshots__ 2>/dev/null)" ]; then
             echo "No VRT baselines found — creating initial baselines"
+            npm run test:vrt:update
+          elif [ "$VRT_CACHE_HIT" != "true" ]; then
+            echo "Stale VRT baselines (fallback cache hit) — regenerating for current source"
             npm run test:vrt:update
           else
             npm run test:vrt
