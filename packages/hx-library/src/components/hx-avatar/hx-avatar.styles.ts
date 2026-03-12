@@ -108,4 +108,12 @@ export const helixAvatarStyles = css`
   .avatar__badge--hidden {
     display: none;
   }
+
+  /* P1-B: Windows High Contrast Mode — background colors are stripped, so the avatar
+     loses its visual boundary. Add a border so the shape remains perceivable (WCAG 1.4.11). */
+  @media (forced-colors: active) {
+    .avatar {
+      border: 2px solid ButtonText;
+    }
+  }
 `;

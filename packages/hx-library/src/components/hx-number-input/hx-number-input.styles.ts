@@ -59,6 +59,9 @@ export const helixNumberInputStyles = css`
 
   .field__input-wrapper:focus-within {
     border-color: var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color));
+    /* Fallback for Safari < 16.2 (no color-mix support) */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width)
+      var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color));
     box-shadow: 0 0 0 var(--hx-focus-ring-width)
       color-mix(
         in srgb,
@@ -76,6 +79,9 @@ export const helixNumberInputStyles = css`
 
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #dc2626));
+    /* Fallback for Safari < 16.2 (no color-mix support) */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width)
+      var(--hx-number-input-error-color, var(--hx-color-error-500, #dc2626));
     box-shadow: 0 0 0 var(--hx-focus-ring-width)
       color-mix(
         in srgb,
