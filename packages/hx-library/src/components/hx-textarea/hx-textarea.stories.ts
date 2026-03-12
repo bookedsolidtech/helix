@@ -1273,3 +1273,48 @@ ALLERGIES:
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// 12. SLOT PATTERNS
+// ─────────────────────────────────────────────────
+
+export const ErrorSlot: Story = {
+  render: () => html`
+    <hx-textarea label="Assessment Notes" value="">
+      <span slot="error">This field is required by hospital policy.</span>
+    </hx-textarea>
+  `,
+};
+
+export const HelpTextSlot: Story = {
+  render: () => html`
+    <hx-textarea label="Medication Notes" placeholder="Enter medication details...">
+      <span slot="help-text">Include dosage, route, and frequency for each medication.</span>
+    </hx-textarea>
+  `,
+};
+
+export const AllSlots: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 500px;">
+      <div>
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">Error via Slot</p>
+        <hx-textarea label="Field with Slot Error" value="">
+          <span slot="error">Slot-based error message for Drupal integration.</span>
+        </hx-textarea>
+      </div>
+      <div>
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">Help Text via Slot</p>
+        <hx-textarea label="Field with Slot Help Text" placeholder="Enter notes...">
+          <span slot="help-text">Slot-based help text for Drupal Form API.</span>
+        </hx-textarea>
+      </div>
+      <div>
+        <p style="margin: 0 0 0.5rem; font-weight: 600;">Label via Slot</p>
+        <hx-textarea placeholder="Custom label via slot...">
+          <label slot="label" style="font-weight: 600; color: #7c3aed;">Custom Slotted Label</label>
+        </hx-textarea>
+      </div>
+    </div>
+  `,
+};
