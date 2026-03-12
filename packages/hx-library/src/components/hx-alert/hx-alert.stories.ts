@@ -70,7 +70,7 @@ const meta = {
       variant=${args.variant}
       ?dismissible=${args.dismissible}
       ?open=${args.open}
-      ?icon=${args.icon}
+      ?show-icon=${args.icon}
     >
       ${args.message}
     </hx-alert>
@@ -100,8 +100,8 @@ export const Default: Story = {
 
     const alertContainer = alert?.shadowRoot?.querySelector('[part="alert"]');
     await expect(alertContainer).toBeTruthy();
-    await expect(alertContainer?.getAttribute('role')).toBe('status');
-    await expect(alertContainer?.getAttribute('aria-live')).toBe('polite');
+    // Role is applied to the host element, not the shadow DOM internal div
+    await expect(alert?.getAttribute('role')).toBe('status');
 
     // Verify icon is rendered
     const iconPart = alert?.shadowRoot?.querySelector('[part="icon"]');
@@ -119,7 +119,7 @@ export const Default: Story = {
 // 2. EVERY VARIANT
 // ─────────────────────────────────────────────────
 
-/** Informational alert for non-critical status messages. Uses `role="status"` and `aria-live="polite"`. */
+/** Informational alert for non-critical status messages. Uses `role="status"` (implies polite announcement). */
 export const Info: Story = {
   args: {
     variant: 'info',
@@ -131,13 +131,12 @@ export const Info: Story = {
     await expect(alert).toBeTruthy();
     await expect(alert?.variant).toBe('info');
 
-    const container = alert?.shadowRoot?.querySelector('[part="alert"]');
-    await expect(container?.getAttribute('role')).toBe('status');
-    await expect(container?.getAttribute('aria-live')).toBe('polite');
+    // Role is on the host element; aria-live is omitted to avoid JAWS double-announcements
+    await expect(alert?.getAttribute('role')).toBe('status');
   },
 };
 
-/** Success alert confirming a completed action. Uses `role="status"` and `aria-live="polite"`. */
+/** Success alert confirming a completed action. Uses `role="status"` (implies polite announcement). */
 export const Success: Story = {
   args: {
     variant: 'success',
@@ -149,12 +148,12 @@ export const Success: Story = {
     await expect(alert).toBeTruthy();
     await expect(alert?.variant).toBe('success');
 
-    const container = alert?.shadowRoot?.querySelector('[part="alert"]');
-    await expect(container?.getAttribute('role')).toBe('status');
+    // Role is on the host element
+    await expect(alert?.getAttribute('role')).toBe('status');
   },
 };
 
-/** Warning alert for situations requiring clinician attention. Uses `role="alert"` and `aria-live="assertive"`. */
+/** Warning alert for situations requiring clinician attention. Uses `role="alert"` (implies assertive announcement). */
 export const Warning: Story = {
   args: {
     variant: 'warning',
@@ -166,13 +165,12 @@ export const Warning: Story = {
     await expect(alert).toBeTruthy();
     await expect(alert?.variant).toBe('warning');
 
-    const container = alert?.shadowRoot?.querySelector('[part="alert"]');
-    await expect(container?.getAttribute('role')).toBe('alert');
-    await expect(container?.getAttribute('aria-live')).toBe('assertive');
+    // Role is on the host element; aria-live is omitted to avoid JAWS double-announcements
+    await expect(alert?.getAttribute('role')).toBe('alert');
   },
 };
 
-/** Error alert for critical failures. Uses `role="alert"` and `aria-live="assertive"` for immediate screen reader announcement. */
+/** Error alert for critical failures. Uses `role="alert"` (implies assertive announcement) for immediate screen reader notification. */
 export const Error: Story = {
   args: {
     variant: 'error',
@@ -184,9 +182,8 @@ export const Error: Story = {
     await expect(alert).toBeTruthy();
     await expect(alert?.variant).toBe('error');
 
-    const container = alert?.shadowRoot?.querySelector('[part="alert"]');
-    await expect(container?.getAttribute('role')).toBe('alert');
-    await expect(container?.getAttribute('aria-live')).toBe('assertive');
+    // Role is on the host element; aria-live is omitted to avoid JAWS double-announcements
+    await expect(alert?.getAttribute('role')).toBe('alert');
   },
 };
 
@@ -615,7 +612,8 @@ export const RapidToggle: Story = {
     // After toggling, ensure the alert is in a clean final state
     const alertContainer = alert.shadowRoot?.querySelector('[part="alert"]');
     await expect(alertContainer).toBeTruthy();
-    await expect(alertContainer?.getAttribute('role')).toBe('status');
+    // Role is on the host element
+    await expect(alert.getAttribute('role')).toBe('status');
   },
 };
 
@@ -778,10 +776,10 @@ export const CSSCustomProperties: Story = {
 // ─────────────────────────────────────────────────
 
 /**
- * Demonstrates all 5 CSS `::part()` targets exposed by `hx-alert`.
+ * Demonstrates all 6 CSS `::part()` targets exposed by `hx-alert`.
  * External consumers can style these parts without piercing Shadow DOM.
  *
- * Parts: `alert`, `icon`, `message`, `close-button`, `actions`
+ * Parts: `alert`, `title`, `icon`, `message`, `close-button`, `actions`
  */
 export const CSSParts: Story = {
   render: () => html`
@@ -1013,47 +1011,42 @@ export const AriaRoles: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
       <hx-alert variant="info" data-testid="alert-info">
-        Info uses role="status" with aria-live="polite".
+        Info uses role="status" (implicit polite announcement).
       </hx-alert>
       <hx-alert variant="success" data-testid="alert-success">
-        Success uses role="status" with aria-live="polite".
+        Success uses role="status" (implicit polite announcement).
       </hx-alert>
       <hx-alert variant="warning" data-testid="alert-warning">
-        Warning uses role="alert" with aria-live="assertive".
+        Warning uses role="alert" (implicit assertive announcement).
       </hx-alert>
       <hx-alert variant="error" data-testid="alert-error">
-        Error uses role="alert" with aria-live="assertive".
+        Error uses role="alert" (implicit assertive announcement).
       </hx-alert>
     </div>
   `,
   play: async ({ canvasElement }) => {
-    // Info: role="status", aria-live="polite"
-    const infoAlert = canvasElement.querySelector('[data-testid="alert-info"]') as HTMLElement;
-    const infoContainer = infoAlert.shadowRoot?.querySelector('[part="alert"]');
-    await expect(infoContainer?.getAttribute('role')).toBe('status');
-    await expect(infoContainer?.getAttribute('aria-live')).toBe('polite');
+    // Role is applied to the host element, not the shadow DOM internal div.
+    // aria-live is intentionally omitted to avoid JAWS double-announcements.
 
-    // Success: role="status", aria-live="polite"
+    // Info: role="status" (implies polite)
+    const infoAlert = canvasElement.querySelector('[data-testid="alert-info"]') as HTMLElement;
+    await expect(infoAlert.getAttribute('role')).toBe('status');
+
+    // Success: role="status" (implies polite)
     const successAlert = canvasElement.querySelector(
       '[data-testid="alert-success"]',
     ) as HTMLElement;
-    const successContainer = successAlert.shadowRoot?.querySelector('[part="alert"]');
-    await expect(successContainer?.getAttribute('role')).toBe('status');
-    await expect(successContainer?.getAttribute('aria-live')).toBe('polite');
+    await expect(successAlert.getAttribute('role')).toBe('status');
 
-    // Warning: role="alert", aria-live="assertive"
+    // Warning: role="alert" (implies assertive)
     const warningAlert = canvasElement.querySelector(
       '[data-testid="alert-warning"]',
     ) as HTMLElement;
-    const warningContainer = warningAlert.shadowRoot?.querySelector('[part="alert"]');
-    await expect(warningContainer?.getAttribute('role')).toBe('alert');
-    await expect(warningContainer?.getAttribute('aria-live')).toBe('assertive');
+    await expect(warningAlert.getAttribute('role')).toBe('alert');
 
-    // Error: role="alert", aria-live="assertive"
+    // Error: role="alert" (implies assertive)
     const errorAlert = canvasElement.querySelector('[data-testid="alert-error"]') as HTMLElement;
-    const errorContainer = errorAlert.shadowRoot?.querySelector('[part="alert"]');
-    await expect(errorContainer?.getAttribute('role')).toBe('alert');
-    await expect(errorContainer?.getAttribute('aria-live')).toBe('assertive');
+    await expect(errorAlert.getAttribute('role')).toBe('alert');
   },
 };
 
@@ -1118,9 +1111,8 @@ export const DrugAllergyWarning: Story = {
 
     // This is a critical safety alert -- must be role="alert"
     await expect(alert.variant).toBe('error');
-    const container = alert.shadowRoot?.querySelector('[part="alert"]');
-    await expect(container?.getAttribute('role')).toBe('alert');
-    await expect(container?.getAttribute('aria-live')).toBe('assertive');
+    // Role is on the host element; aria-live is omitted to avoid JAWS double-announcements
+    await expect(alert.getAttribute('role')).toBe('alert');
 
     // Must be dismissible so clinicians can acknowledge
     await expect(alert.dismissible).toBe(true);
