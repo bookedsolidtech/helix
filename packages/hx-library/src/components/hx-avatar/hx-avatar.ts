@@ -175,10 +175,14 @@ export class HelixAvatar extends LitElement {
       const hasAccessibleName = nodes.some((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
           const el = node as Element;
+          const role = el.getAttribute('role');
+          // Decorative roles explicitly remove semantics — they do not convey
+          // an accessible name (WCAG 2.1 AA).
+          const isDecorativeRole = role === 'presentation' || role === 'none';
           return (
             el.hasAttribute('aria-label') ||
             el.hasAttribute('aria-labelledby') ||
-            !!el.getAttribute('role')
+            (!!role && !isDecorativeRole)
           );
         }
         return false;
