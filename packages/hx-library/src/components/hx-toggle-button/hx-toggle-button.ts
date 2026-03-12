@@ -113,7 +113,7 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProperties: PropertyValues): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
     if (changedProperties.has('pressed') || changedProperties.has('value')) {
@@ -127,8 +127,11 @@ export class HelixToggleButton extends LitElement {
   }
 
   /** Called by the browser when restoring form state (e.g. bfcache). */
-  formStateRestoreCallback(state: string): void {
-    this.pressed = state === 'pressed';
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    this.pressed = typeof state === 'string' && state === 'pressed';
   }
 
   // ─── Private Helpers ───
