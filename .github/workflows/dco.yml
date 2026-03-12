@@ -29,6 +29,6 @@ jobs:
           fetch-depth: 0
 
       - name: Check DCO sign-off
-        uses: tim-actions/dco@master
+        uses: tim-actions/dco@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

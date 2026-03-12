@@ -79,8 +79,8 @@ Organization members are exempt from this requirement.
 
 ```bash
 # Clone the repository
-git clone https://github.com/himerus/wc-2026.git
-cd wc-2026
+git clone https://github.com/bookedsolidtech/helix.git
+cd helix
 
 # Install dependencies
 npm install
