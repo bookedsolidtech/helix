@@ -3,6 +3,7 @@ import { css } from 'lit';
 export const helixButtonGroupStyles = css`
   :host {
     display: inline-flex;
+    contain: layout style;
   }
 
   .group {
@@ -89,13 +90,5 @@ export const helixButtonGroupStyles = css`
   .group ::slotted(:focus-within) {
     z-index: 1;
     position: relative;
-  }
-
-  /* ─── Reduced Motion ─── */
-
-  @media (prefers-reduced-motion: reduce) {
-    .group ::slotted(*) {
-      transition: none;
-    }
   }
 `;

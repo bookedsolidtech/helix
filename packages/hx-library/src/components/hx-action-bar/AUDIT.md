@@ -102,7 +102,7 @@ The `ariaLabel` property name also shadows `HTMLElement.prototype.ariaLabel` (th
 
 ---
 
-### P2-02: Missing `overflow` CSS part — inconsistent part API
+### P2-02: Missing `overflow` CSS part — inconsistent part API ✅ FIXED
 
 **File:** `hx-action-bar.ts:250`
 

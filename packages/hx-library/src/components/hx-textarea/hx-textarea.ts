@@ -123,11 +123,19 @@ export class HelixTextarea extends LitElement {
   name = '';
 
   /**
-   * The number of visible text rows.
+   * The number of visible text rows. Must be a positive integer (minimum 1).
+   * Invalid values are clamped to the nearest valid value.
    * @attr rows
    */
   @property({ type: Number })
   rows = 4;
+
+  /**
+   * Minimum number of characters required.
+   * @attr minlength
+   */
+  @property({ type: Number, attribute: 'minlength' })
+  minlength: number | undefined;
 
   /**
    * Maximum number of characters allowed.
@@ -200,12 +208,19 @@ export class HelixTextarea extends LitElement {
 
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
+    if (changedProperties.has('rows')) {
+      const clamped = Math.max(1, Math.round(this.rows));
+      if (clamped !== this.rows) {
+        this.rows = clamped;
+      }
+    }
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
     }
     if (
       changedProperties.has('value') ||
       changedProperties.has('required') ||
+      changedProperties.has('minlength') ||
       changedProperties.has('maxlength')
     ) {
       this._updateValidity();
@@ -251,6 +266,16 @@ export class HelixTextarea extends LitElement {
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'This field is required.',
+        anchor,
+      );
+    } else if (
+      this.minlength !== undefined &&
+      this.value.length > 0 &&
+      this.value.length < this.minlength
+    ) {
+      this._internals.setValidity(
+        { tooShort: true },
+        this.error || `Value must be at least ${this.minlength} characters.`,
         anchor,
       );
     } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
@@ -408,6 +433,7 @@ export class HelixTextarea extends LitElement {
             ?required=${this.required}
             ?disabled=${this.disabled}
             rows=${this.rows}
+            minlength=${ifDefined(this.minlength)}
             maxlength=${ifDefined(this.maxlength)}
             name=${ifDefined(this.name || undefined)}
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}

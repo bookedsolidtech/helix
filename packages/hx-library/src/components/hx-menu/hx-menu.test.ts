@@ -135,8 +135,10 @@ describe('hx-menu', () => {
       const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
       firstInner.focus();
       await userEvent.keyboard('{ArrowUp}');
-      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item');
-      expect(lastInner).toBeTruthy();
+      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
+      expect(
+        items[2].shadowRoot?.activeElement === lastInner || document.activeElement === items[2],
+      ).toBe(true);
     });
 
     it('ArrowDown wraps to first item from last', async () => {
@@ -150,8 +152,10 @@ describe('hx-menu', () => {
       const lastInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
       lastInner.focus();
       await userEvent.keyboard('{ArrowDown}');
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item');
-      expect(firstInner).toBeTruthy();
+      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
+      expect(
+        items[0].shadowRoot?.activeElement === firstInner || document.activeElement === items[0],
+      ).toBe(true);
     });
 
     it('Escape dispatches hx-close', async () => {
@@ -222,6 +226,116 @@ describe('hx-menu', () => {
       expect(
         items[2].shadowRoot?.activeElement === cInner || document.activeElement === items[2],
       ).toBe(true);
+    });
+  });
+
+  describe('Roving tabindex', () => {
+    it('first enabled item has tabindex=0, others have tabindex=-1', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="a">A</hx-menu-item>
+          <hx-menu-item value="b">B</hx-menu-item>
+          <hx-menu-item value="c">C</hx-menu-item>
+        </hx-menu>
+      `);
+      const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      await items[0].updateComplete;
+      await items[1].updateComplete;
+      await items[2].updateComplete;
+      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
+      const secondInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
+      const thirdInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
+      expect(firstInner.getAttribute('tabindex')).toBe('0');
+      expect(secondInner.getAttribute('tabindex')).toBe('-1');
+      expect(thirdInner.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('updates tabindex after ArrowDown navigation', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="a">A</hx-menu-item>
+          <hx-menu-item value="b">B</hx-menu-item>
+        </hx-menu>
+      `);
+      const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
+      firstInner.focus();
+      await userEvent.keyboard('{ArrowDown}');
+      await items[0].updateComplete;
+      await items[1].updateComplete;
+      const firstInnerAfter = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
+      const secondInnerAfter = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
+      expect(firstInnerAfter.getAttribute('tabindex')).toBe('-1');
+      expect(secondInnerAfter.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('disabled items always have tabindex=-1', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="a" disabled>A</hx-menu-item>
+          <hx-menu-item value="b">B</hx-menu-item>
+        </hx-menu>
+      `);
+      const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      await items[0].updateComplete;
+      const disabledInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
+      expect(disabledInner.getAttribute('tabindex')).toBe('-1');
+    });
+  });
+
+  describe('Public methods', () => {
+    it('focusFirst() focuses the first enabled item', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="a">A</hx-menu-item>
+          <hx-menu-item value="b">B</hx-menu-item>
+        </hx-menu>
+      `);
+      el.focusFirst();
+      const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
+      expect(items[0].shadowRoot?.activeElement === firstInner).toBe(true);
+    });
+
+    it('focusLast() focuses the last enabled item', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="a">A</hx-menu-item>
+          <hx-menu-item value="b">B</hx-menu-item>
+          <hx-menu-item value="c">C</hx-menu-item>
+        </hx-menu>
+      `);
+      el.focusLast();
+      const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
+      expect(items[2].shadowRoot?.activeElement === lastInner).toBe(true);
+    });
+
+    it('focusFirst() skips disabled items', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="a" disabled>A</hx-menu-item>
+          <hx-menu-item value="b">B</hx-menu-item>
+        </hx-menu>
+      `);
+      el.focusFirst();
+      const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+      const bInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
+      expect(items[1].shadowRoot?.activeElement === bInner).toBe(true);
+    });
+  });
+
+  describe('Property: label', () => {
+    it('renders aria-label on the menu element', async () => {
+      const el = await fixture<HelixMenu>('<hx-menu label="Actions"></hx-menu>');
+      const base = shadowQuery(el, '[role="menu"]')!;
+      expect(base.getAttribute('aria-label')).toBe('Actions');
+    });
+
+    it('omits aria-label when label is empty', async () => {
+      const el = await fixture<HelixMenu>('<hx-menu></hx-menu>');
+      const base = shadowQuery(el, '[role="menu"]')!;
+      expect(base.hasAttribute('aria-label')).toBe(false);
     });
   });
 
@@ -550,10 +664,28 @@ describe('hx-menu-divider', () => {
     expect(sep).toBeTruthy();
   });
 
+  it('sets aria-orientation="horizontal"', async () => {
+    const el = await fixture<HelixMenuDivider>('<hx-menu-divider></hx-menu-divider>');
+    const sep = shadowQuery(el, '[role="separator"]')!;
+    expect(sep.getAttribute('aria-orientation')).toBe('horizontal');
+  });
+
   it('exposes "base" CSS part', async () => {
     const el = await fixture<HelixMenuDivider>('<hx-menu-divider></hx-menu-divider>');
     const base = shadowQuery(el, '[part~="base"]');
     expect(base).toBeTruthy();
+  });
+
+  it('renders inside hx-menu without errors', async () => {
+    const menu = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="a">A</hx-menu-item>
+        <hx-menu-divider></hx-menu-divider>
+        <hx-menu-item value="b">B</hx-menu-item>
+      </hx-menu>
+    `);
+    const dividers = menu.querySelectorAll('hx-menu-divider');
+    expect(dividers.length).toBe(1);
   });
 });
 
@@ -591,6 +723,31 @@ describe('Accessibility (axe-core)', () => {
     const el = await fixture<HelixMenu>(`
       <hx-menu>
         <hx-menu-item type="checkbox" checked>Notifications</hx-menu-item>
+      </hx-menu>
+    `);
+    await page.screenshot();
+    const { violations } = await checkA11y(el);
+    expect(violations).toEqual([]);
+  });
+
+  it('hx-menu-item type=radio has no axe violations inside hx-menu', async () => {
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item type="radio" value="a" checked>Low</hx-menu-item>
+        <hx-menu-item type="radio" value="b">Medium</hx-menu-item>
+        <hx-menu-item type="radio" value="c">High</hx-menu-item>
+      </hx-menu>
+    `);
+    await page.screenshot();
+    const { violations } = await checkA11y(el);
+    expect(violations).toEqual([]);
+  });
+
+  it('hx-menu with label has no axe violations', async () => {
+    const el = await fixture<HelixMenu>(`
+      <hx-menu label="Patient Actions">
+        <hx-menu-item value="view">View Chart</hx-menu-item>
+        <hx-menu-item value="edit">Edit Record</hx-menu-item>
       </hx-menu>
     `);
     await page.screenshot();

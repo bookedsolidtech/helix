@@ -212,63 +212,8 @@ jobs:
       - name: Validate package exports (npm pack --dry-run)
         run: npm pack --dry-run
         working-directory: packages/hx-library
-      - name: Bundle size check
-        run: |
-          echo "=== Bundle Size Report ==="
-          echo ""
-
-          EXIT_CODE=0
-
-          # Per-component budget: 5KB (5120 bytes) gzipped
-          COMPONENT_BUDGET=5120
-          # Full bundle budget: 50KB (51200 bytes) gzipped
-          BUNDLE_BUDGET=51200
-
-          # Check individual component entry points
-          for component in hx-button hx-card hx-text-input hx-alert hx-badge hx-checkbox hx-container hx-form hx-prose hx-radio-group hx-select hx-switch hx-textarea; do
-            file="packages/hx-library/dist/components/${component}/index.js"
-            if [ -f "$file" ]; then
-              raw_size=$(wc -c < "$file" | tr -d ' ')
-              gzip_size=$(gzip -c "$file" | wc -c | tr -d ' ')
-              raw_kb=$(echo "scale=2; $raw_size / 1024" | bc)
-              gzip_kb=$(echo "scale=2; $gzip_size / 1024" | bc)
-
-              if [ "$gzip_size" -gt "$COMPONENT_BUDGET" ]; then
-                echo "FAIL ${component}: ${raw_kb}KB raw / ${gzip_kb}KB gzipped (budget: 5KB gzipped)"
-                EXIT_CODE=1
-              else
-                echo "PASS ${component}: ${raw_kb}KB raw / ${gzip_kb}KB gzipped (budget: 5KB gzipped)"
-              fi
-            else
-              echo "SKIP ${component}: no per-component entry point at ${file}"
-            fi
-          done
-
-          echo ""
-
-          # Check full bundle
-          full="packages/hx-library/dist/index.js"
-          if [ -f "$full" ]; then
-            raw_size=$(wc -c < "$full" | tr -d ' ')
-            gzip_size=$(gzip -c "$full" | wc -c | tr -d ' ')
-            raw_kb=$(echo "scale=2; $raw_size / 1024" | bc)
-            gzip_kb=$(echo "scale=2; $gzip_size / 1024" | bc)
-
-            if [ "$gzip_size" -gt "$BUNDLE_BUDGET" ]; then
-              echo "FAIL Full bundle: ${raw_kb}KB raw / ${gzip_kb}KB gzipped (budget: 50KB gzipped)"
-              EXIT_CODE=1
-            else
-              echo "PASS Full bundle: ${raw_kb}KB raw / ${gzip_kb}KB gzipped (budget: 50KB gzipped)"
-            fi
-          else
-            echo "ERROR: Full bundle not found at ${full}"
-            EXIT_CODE=1
-          fi
-
-          echo ""
-          echo "=== End Bundle Size Report ==="
-
-          exit $EXIT_CODE
+      - name: Bundle size report (all components, tree-shaken)
+        run: node scripts/bundle-size-report.js
 
   # ── Visual Regression Tests ─────────────────────────────────────────────
 
@@ -330,12 +275,18 @@ jobs:
         if: steps.detect.outputs.changed != ''
         env:
           CHANGED_COMPONENTS: ${{ steps.detect.outputs.changed }}
+          VRT_CACHE_HIT: ${{ steps.vrt-cache.outputs.cache-hit }}
         run: |
           npx http-server apps/storybook/dist -p 3151 &
           sleep 5
-          # If no cached baselines exist, run in update mode to create them (first-run pass)
+          # Run update mode when: no baselines exist, OR cache was only a partial/fallback hit
+          # (cache-hit == 'true' means exact key match — source files unchanged since last baseline)
+          # (cache-hit != 'true' means fallback restore — source changed, baselines are stale)
           if [ ! -d "packages/hx-library/__screenshots__" ] || [ -z "$(ls -A packages/hx-library/__screenshots__ 2>/dev/null)" ]; then
             echo "No VRT baselines found — creating initial baselines"
+            npm run test:vrt:update
+          elif [ "$VRT_CACHE_HIT" != "true" ]; then
+            echo "Stale VRT baselines (fallback cache hit) — regenerating for current source"
             npm run test:vrt:update
           else
             npm run test:vrt

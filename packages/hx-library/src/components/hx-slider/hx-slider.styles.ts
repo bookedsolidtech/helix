@@ -107,6 +107,11 @@ export const helixSliderStyles = css`
     transition: width var(--hx-transition-fast, 150ms ease);
   }
 
+  /* Suppress fill animation on initial render — only animate on user interaction */
+  :host(:not([data-ready])) .slider__fill {
+    transition: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .slider__fill {
       transition: none;
@@ -170,7 +175,8 @@ export const helixSliderStyles = css`
     transform: translate(-50%, -50%);
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-slider-thumb-bg, var(--hx-color-neutral-0, #ffffff));
-    border: 2px solid var(--hx-slider-thumb-border-color, var(--hx-color-primary-500, #2563eb));
+    border: var(--hx-slider-thumb-border-width, 2px) solid
+      var(--hx-slider-thumb-border-color, var(--hx-color-primary-500, #2563eb));
     box-shadow: var(--hx-slider-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
     pointer-events: none;
     transition:

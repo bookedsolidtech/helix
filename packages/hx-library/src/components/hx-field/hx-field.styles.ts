@@ -117,6 +117,6 @@ export const helixFieldStyles = css`
   .field--error .field__control {
     outline: 2px solid var(--hx-field-error-color, var(--hx-color-error-500, #ef4444));
     outline-offset: 2px;
-    border-radius: 0.25rem;
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 `;

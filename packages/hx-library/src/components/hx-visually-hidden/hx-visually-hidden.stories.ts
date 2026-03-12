@@ -63,6 +63,13 @@ export const IconButtonLabel: Story = {
       <hx-visually-hidden>Close dialog</hx-visually-hidden>
     </button>
   `,
+  play: async ({ canvasElement }) => {
+    const button = canvasElement.querySelector('button');
+    await expect(button).toBeTruthy();
+    const el = canvasElement.querySelector('hx-visually-hidden');
+    await expect(el).toBeTruthy();
+    await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -91,6 +98,13 @@ export const ScreenReaderAnnouncement: Story = {
       </nav>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const nav = canvasElement.querySelector('nav');
+    await expect(nav).toBeTruthy();
+    const el = canvasElement.querySelector('hx-visually-hidden');
+    await expect(el).toBeTruthy();
+    await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -126,6 +140,13 @@ export const SkipLink: Story = {
       </main>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-visually-hidden[focusable]');
+    await expect(el).toBeTruthy();
+    const anchor = el?.querySelector('a');
+    await expect(anchor).toBeTruthy();
+    await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -156,4 +177,9 @@ export const HealthcareContext: Story = {
       </div>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-visually-hidden');
+    await expect(el).toBeTruthy();
+    await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
+  },
 };

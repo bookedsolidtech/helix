@@ -1097,4 +1097,158 @@ describe('hx-time-picker', () => {
       expect(changeEventFired).toBe(false);
     });
   });
+
+  // ─── Toggle button interaction ───
+
+  describe('Toggle button interaction', () => {
+    it('clicking the toggle button opens the dropdown', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
+      toggle.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox).toBeTruthy();
+    });
+
+    it('clicking the toggle button again closes the dropdown', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
+      toggle.click();
+      await el.updateComplete;
+      toggle.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]');
+      expect(listbox).toBeNull();
+    });
+  });
+
+  // ─── aria-controls attribute ───
+
+  describe('aria-controls attribute', () => {
+    it('input has no aria-controls when listbox is closed', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-controls')).toBeNull();
+    });
+
+    it('input has aria-controls matching listbox id when open', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]')!;
+      expect(input.getAttribute('aria-controls')).toBe(listbox.id);
+    });
+  });
+
+  // ─── aria-activedescendant attribute ───
+
+  describe('aria-activedescendant attribute', () => {
+    it('aria-activedescendant updates during keyboard navigation', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="10:00" step="30"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const firstDescendant = input.getAttribute('aria-activedescendant');
+      expect(firstDescendant).toBeTruthy();
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      const secondDescendant = input.getAttribute('aria-activedescendant');
+      expect(secondDescendant).toBeTruthy();
+      expect(secondDescendant).not.toBe(firstDescendant);
+    });
+  });
+
+  // ─── Listbox aria-label ───
+
+  describe('Listbox aria-label', () => {
+    it('listbox has aria-label matching the label prop', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Appointment Time"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]')!;
+      expect(listbox.getAttribute('aria-label')).toBe('Appointment Time');
+    });
+
+    it('listbox has fallback aria-label "Time options" when no label', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]')!;
+      expect(listbox.getAttribute('aria-label')).toBe('Time options');
+    });
+  });
+
+  // ─── help-text CSS part ───
+
+  describe('help-text CSS part', () => {
+    it('help-text part is exposed', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const helpText = shadowQuery(el, '[part="help-text"]');
+      expect(helpText).toBeTruthy();
+    });
+  });
+
+  // ─── mouseenter on options ───
+
+  describe('Option mouseenter interaction', () => {
+    it('mouseenter on an option updates the active option', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="10:00" step="30"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const options = shadowQueryAll(el, '[role="option"]');
+      // Hover over the last option
+      const lastOption = options[options.length - 1]!;
+      lastOption.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(lastOption.classList.contains('field__option--active')).toBe(true);
+    });
+  });
+
+  // ─── formStateRestoreCallback edge cases ───
+
+  describe('formStateRestoreCallback edge cases', () => {
+    it('ignores File argument and does not change value', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker value="09:00"></hx-time-picker>',
+      );
+      el.formStateRestoreCallback(new File([], 'test.txt'));
+      await el.updateComplete;
+      expect(el.value).toBe('09:00');
+    });
+
+    it('ignores FormData argument and does not change value', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker value="09:00"></hx-time-picker>',
+      );
+      el.formStateRestoreCallback(new FormData());
+      await el.updateComplete;
+      expect(el.value).toBe('09:00');
+    });
+  });
+
+  // ─── hx-change on field clear ───
+
+  describe('hx-change event on clear', () => {
+    it('dispatches hx-change with empty value when field is cleared', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" value="09:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-change');
+      input.value = '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('');
+    });
+  });
 });

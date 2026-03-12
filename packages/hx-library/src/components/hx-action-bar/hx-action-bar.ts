@@ -20,6 +20,7 @@ import { helixActionBarStyles } from './hx-action-bar.styles.js';
  * @csspart start - The start (left) slot wrapper.
  * @csspart center - The center (default) slot wrapper.
  * @csspart end - The end (right) slot wrapper.
+ * @csspart overflow - The overflow slot wrapper (hidden when no overflow content).
  *
  * @cssprop [--hx-action-bar-bg=transparent] - Bar background color (default variant).
  * @cssprop [--hx-action-bar-border=none] - Bar border (default variant).
@@ -121,6 +122,13 @@ export class HelixActionBar extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Prevent dual aria-label announcement: the host carries the consumer's
+    // aria-label attribute while the inner div[role="toolbar"] receives the
+    // same value. Setting role="none" on the host hides it from the
+    // accessibility tree so only the toolbar is announced.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'none');
+    }
     this.addEventListener('keydown', this._handleKeydown);
   }
 
@@ -188,9 +196,16 @@ export class HelixActionBar extends LitElement {
     const items = this._getFocusableItems();
     if (!items.length) return;
     const hasActive = items.some((el) => el.getAttribute('tabindex') === '0');
-    items.forEach((el, i) => {
-      el.setAttribute('tabindex', !hasActive && i === 0 ? '0' : '-1');
-    });
+    if (!hasActive) {
+      // No item is active yet — make the first item tabbable.
+      items.forEach((el, i) => el.setAttribute('tabindex', i === 0 ? '0' : '-1'));
+    } else {
+      // An item is already active — ensure new items get tabindex="-1"
+      // without disturbing the currently active item.
+      items.forEach((el) => {
+        if (el.getAttribute('tabindex') === null) el.setAttribute('tabindex', '-1');
+      });
+    }
   }
 
   private _moveFocus(direction: 'next' | 'prev'): void {
@@ -236,6 +251,7 @@ export class HelixActionBar extends LitElement {
         part="base"
         role="toolbar"
         aria-label=${this.ariaLabel}
+        aria-orientation="horizontal"
         class="base base--${this.size} base--${this.variant}${positionClass}"
       >
         <div part="start" class="section section--start">
@@ -247,7 +263,7 @@ export class HelixActionBar extends LitElement {
         <div part="end" class="section section--end">
           <slot name="end" @slotchange=${this._handleSlotChange}></slot>
         </div>
-        <div class="section section--overflow" ?hidden=${!this._hasOverflow}>
+        <div part="overflow" class="section section--overflow" ?hidden=${!this._hasOverflow}>
           <slot name="overflow" @slotchange=${this._handleSlotChange}></slot>
         </div>
       </div>

@@ -1,10 +1,11 @@
-# Contributing to WC-2026
+# Contributing to HELiX
 
-Thank you for your interest in contributing to WC-2026, an enterprise healthcare web component library! This document provides guidelines and best practices for contributing to this project.
+Thank you for your interest in contributing to HELiX, an enterprise healthcare web component library! This document provides guidelines and best practices for contributing to this project.
 
 ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
+- [Developer Certificate of Origin (DCO)](#developer-certificate-of-origin-dco)
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
 - [Quality Standards](#quality-standards)
@@ -19,6 +20,52 @@ Thank you for your interest in contributing to WC-2026, an enterprise healthcare
 
 This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
 
+## Developer Certificate of Origin (DCO)
+
+This project requires all external contributors to sign off on their commits using the [Developer Certificate of Origin (DCO)](https://developercertificate.org/). The DCO is a lightweight way to certify that you wrote or have the right to submit the code you are contributing.
+
+### How It Works
+
+Every commit in your pull request must include a `Signed-off-by` line with your real name and email address. This certifies that you agree to the [DCO terms](https://developercertificate.org/).
+
+### Signing Off on Commits
+
+Add the `-s` (or `--signoff`) flag when committing:
+
+```bash
+git commit -s -m "feat(button): add icon support"
+```
+
+This appends a line like the following to your commit message:
+
+```text
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+### Signing Off on Past Commits
+
+If you forgot to sign off, you can amend the most recent commit:
+
+```bash
+git commit --amend -s --no-edit
+git push --force-with-lease
+```
+
+To sign off on multiple commits, use an interactive rebase:
+
+```bash
+git rebase HEAD~N --signoff
+git push --force-with-lease
+```
+
+Replace `N` with the number of commits to update.
+
+### What Happens on PRs
+
+A DCO check runs automatically on all pull requests. If any commit is missing a sign-off, the check will fail and the PR cannot be merged until all commits are signed off.
+
+Organization members are exempt from this requirement.
+
 ## Getting Started
 
 ### Prerequisites
@@ -32,8 +79,8 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ```bash
 # Clone the repository
-git clone https://github.com/himerus/wc-2026.git
-cd wc-2026
+git clone https://github.com/bookedsolidtech/helix.git
+cd helix
 
 # Install dependencies
 npm install
@@ -519,8 +566,8 @@ Required for new features:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the MIT License. All contributions require DCO sign-off (see [Developer Certificate of Origin](#developer-certificate-of-origin-dco) above).
 
 ---
 
-**Thank you for contributing to WC-2026!** Your contributions help build better healthcare experiences for everyone.
+**Thank you for contributing to HELiX!** Your contributions help build better healthcare experiences for everyone.

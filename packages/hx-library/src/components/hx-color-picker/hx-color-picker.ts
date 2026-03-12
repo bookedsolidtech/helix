@@ -438,14 +438,17 @@ export class HelixColorPicker extends LitElement {
     this.value = formatted;
     this._inputValue = formatted;
     this._internals.setFormValue(formatted);
-    const eventName = source === 'drag' ? 'hx-input' : 'hx-change';
-    this.dispatchEvent(
-      new CustomEvent(eventName, {
-        bubbles: true,
-        composed: true,
-        detail: { value: formatted },
-      }),
-    );
+    const detail = { value: formatted };
+    const opts: CustomEventInit<{ value: string }> = {
+      bubbles: true,
+      composed: true,
+      detail,
+    };
+    if (source === 'drag') {
+      this.dispatchEvent(new CustomEvent('hx-input', opts));
+    } else {
+      this.dispatchEvent(new CustomEvent('hx-change', opts));
+    }
   }
 
   // ─── Panel open/close ────────────────────────────────────────────────────
