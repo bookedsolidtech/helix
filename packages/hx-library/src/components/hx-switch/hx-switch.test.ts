@@ -336,6 +336,20 @@ describe('hx-switch', () => {
       await el.updateComplete;
       expect(el.checked).toBe(true);
     });
+
+    it('formStateRestoreCallback with null state preserves current state', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch checked></hx-switch>');
+      el.formStateRestoreCallback(null, 'restore');
+      await el.updateComplete;
+      expect(el.checked).toBe(true);
+    });
+
+    it('formStateRestoreCallback handles autocomplete mode', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
+      el.formStateRestoreCallback('on', 'autocomplete');
+      await el.updateComplete;
+      expect(el.checked).toBe(true);
+    });
   });
 
   // --- Validation (6) ---
@@ -447,9 +461,27 @@ describe('hx-switch', () => {
       const describedBy = track?.getAttribute('aria-describedby');
       expect(describedBy).toContain(helpDiv?.id);
     });
+
+    it('aria-describedby is absent when no error or helpText', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Plain"></hx-switch>');
+      const track = shadowQuery(el, '[role="switch"]');
+      expect(track?.hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('aria-invalid is absent when no error', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="No error"></hx-switch>');
+      const track = shadowQuery(el, '[role="switch"]');
+      expect(track?.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('aria-required is absent when not required', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Optional"></hx-switch>');
+      const track = shadowQuery(el, '[role="switch"]');
+      expect(track?.hasAttribute('aria-required')).toBe(false);
+    });
   });
 
-  // --- Property: value (2) ---
+  // --- Property: value (3) ---
 
   describe('Property: value', () => {
     it('defaults to "on"', async () => {
@@ -460,6 +492,15 @@ describe('hx-switch', () => {
     it('accepts custom value attribute', async () => {
       const el = await fixture<HxSwitch>('<hx-switch value="yes"></hx-switch>');
       expect(el.value).toBe('yes');
+    });
+
+    it('hx-change detail.value reflects custom value', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch value="enabled"></hx-switch>');
+      const track = shadowQuery<HTMLElement>(el, '.switch__track');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      track?.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('enabled');
     });
   });
 
