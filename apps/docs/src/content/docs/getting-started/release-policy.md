@@ -31,11 +31,11 @@ Internal implementation details (private methods, internal DOM structure, undocu
 
 ## Release Cadence
 
-| Release Type | Frequency | Content |
-|-------------|-----------|---------|
-| Patch | As needed | Bug fixes, security patches |
-| Minor | Monthly | New features, new components |
-| Major | Quarterly (at most) | Breaking changes, batched |
+| Release Type | Frequency           | Content                      |
+| ------------ | ------------------- | ---------------------------- |
+| Patch        | As needed           | Bug fixes, security patches  |
+| Minor        | Monthly             | New features, new components |
+| Major        | Quarterly (at most) | Breaking changes, batched    |
 
 ### Pre-release Versions
 
@@ -59,11 +59,11 @@ Every release includes a changelog generated via [changesets](https://github.com
 
 ## Support Policy
 
-| Version | Support Level |
-|---------|--------------|
-| Current major | Full support — bug fixes, security patches, new features |
+| Version        | Support Level                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| Current major  | Full support — bug fixes, security patches, new features                                         |
 | Previous major | Maintenance — critical bug fixes and security patches for 12 months after the next major release |
-| Older majors | Unsupported — no fixes, no patches |
+| Older majors   | Unsupported — no fixes, no patches                                                               |
 
 Security vulnerabilities in supported versions are patched as soon as possible, regardless of the regular release schedule.
 
