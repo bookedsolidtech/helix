@@ -191,6 +191,7 @@ export default defineConfig({
             { label: 'Installation', slug: 'getting-started/installation' },
             { label: 'Quick Start', slug: 'getting-started/quick-start' },
             { label: 'Project Structure', slug: 'getting-started/project-structure' },
+            { label: 'Release Policy', slug: 'getting-started/release-policy' },
           ],
         },
         {
