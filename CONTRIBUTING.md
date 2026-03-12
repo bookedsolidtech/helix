@@ -38,7 +38,7 @@ git commit -s -m "feat(button): add icon support"
 
 This appends a line like the following to your commit message:
 
-```
+```text
 Signed-off-by: Your Name <your.email@example.com>
 ```
 
