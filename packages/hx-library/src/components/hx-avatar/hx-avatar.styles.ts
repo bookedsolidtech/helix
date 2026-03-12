@@ -109,8 +109,9 @@ export const helixAvatarStyles = css`
     display: none;
   }
 
-  /* P1-B: Windows High Contrast Mode — background colors are stripped, so the avatar
-     loses its visual boundary. Add a border so the shape remains perceivable (WCAG 1.4.11). */
+  /* P1-B: Windows High Contrast Mode — avatar background is stripped by the system,
+     leaving no visual boundary. Add a border so the avatar remains perceivable.
+     WCAG 1.4.11 Non-text Contrast (Level AA). */
   @media (forced-colors: active) {
     .avatar {
       border: 2px solid ButtonText;

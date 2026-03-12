@@ -92,9 +92,30 @@ export class HelixStatusIndicator extends LitElement {
     return `Status: ${statusText}`;
   }
 
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // T3-01-4: Place role="img" on the host element for robust AT traversal.
+    // Some screen reader + browser combinations skip shadow children; host-level
+    // ARIA attributes are more reliable across the flat accessibility tree.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'img');
+    }
+    this.setAttribute('aria-label', this._getLabel());
+  }
+
+  override updated(changedProperties: Map<string | symbol, unknown>): void {
+    super.updated(changedProperties);
+    // Keep host aria-label in sync when status or label properties change.
+    if (changedProperties.has('status') || changedProperties.has('label')) {
+      this.setAttribute('aria-label', this._getLabel());
+    }
+  }
+
   override render() {
     return html`
-      <div class="indicator" role="img" aria-label=${this._getLabel()}>
+      <div class="indicator">
         <div class="indicator__pulse-ring" part="pulse-ring"></div>
         <div class="indicator__dot" part="base"></div>
       </div>

@@ -97,7 +97,10 @@ export class HelixAvatar extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProperties: PropertyValues): void {
+  // P1-A / P2-B: Use willUpdate() instead of updated() for property validation
+  // and derived state. willUpdate() runs before render() and does not schedule
+  // a second update cycle when @state() properties are mutated.
+  override willUpdate(changedProperties: PropertyValues): void {
     // P0-1: Reset image error state when src changes so a new valid src renders correctly.
     if (changedProperties.has('src')) {
       this._imgError = false;
@@ -110,6 +113,18 @@ export class HelixAvatar extends LitElement {
           '[hx-avatar] Accessibility: "alt" attribute is required when "src" is provided. ' +
             'Without alt text, screen readers announce a non-descriptive label. ' +
             'Add alt="Full name or description" to your hx-avatar element.',
+        );
+      }
+    }
+
+    // P2-A: Warn when initials are used without label — screen readers announce
+    // raw initials as individual letters (e.g., "J D") instead of a name.
+    if (changedProperties.has('initials') || changedProperties.has('label')) {
+      if (this.initials && !this.label) {
+        console.warn(
+          '[hx-avatar] Accessibility: "label" attribute is recommended when "initials" is provided. ' +
+            'Without label, screen readers announce raw initials as individual letters. ' +
+            'Add label="Full Name" to your hx-avatar element.',
         );
       }
     }
@@ -153,6 +168,28 @@ export class HelixAvatar extends LitElement {
       }
       return false;
     });
+
+    // P2-C: Warn when badge slot content lacks an accessible name.
+    // A plain <span class="dot"></span> badge is invisible to screen readers.
+    if (this._hasBadgeSlot) {
+      const hasAccessibleName = nodes.some((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node as Element;
+          return (
+            el.hasAttribute('aria-label') ||
+            el.hasAttribute('aria-labelledby') ||
+            !!el.getAttribute('role')
+          );
+        }
+        return false;
+      });
+      if (!hasAccessibleName) {
+        console.warn(
+          '[hx-avatar] Accessibility: badge slot content should have an accessible name ' +
+            '(aria-label, role, etc.). Without it, the badge is invisible to screen readers.',
+        );
+      }
+    }
   }
 
   // ─── Image Error Handling ───
