@@ -628,6 +628,118 @@ describe('hx-field', () => {
     });
   });
 
+  // ─── Property: layout (3) ───
+
+  describe('Property: layout', () => {
+    it('defaults to "column"', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      expect(el.layout).toBe('column');
+    });
+
+    it('applies field--layout-inline class for layout="inline"', async () => {
+      const el = await fixture<HelixField>('<hx-field layout="inline"></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--layout-inline')).toBe(true);
+    });
+
+    it('does not apply field--layout-inline class for layout="column"', async () => {
+      const el = await fixture<HelixField>('<hx-field layout="column"></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--layout-inline')).toBe(false);
+    });
+  });
+
+  // ─── Label click-to-focus (1) ───
+
+  describe('Label click-to-focus', () => {
+    it('focuses slotted input when shadow label is clicked', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Patient Name"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      const label = shadowQuery(el, 'label');
+      expect(label).toBeTruthy();
+      label!.click();
+      expect(document.activeElement).toBe(input);
+    });
+  });
+
+  // ─── ARIA: data-aria-managed opt-out (1) ───
+
+  describe('ARIA: data-aria-managed opt-out', () => {
+    it('skips ARIA bridging for elements with data-aria-managed attribute', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Name" required error="Required"><input type="text" data-aria-managed /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input');
+      expect(input?.hasAttribute('aria-label')).toBe(false);
+      expect(input?.hasAttribute('aria-required')).toBe(false);
+      expect(input?.hasAttribute('aria-invalid')).toBe(false);
+      expect(input?.hasAttribute('aria-describedby')).toBe(false);
+    });
+  });
+
+  // ─── Attribute reflection (4) ───
+
+  describe('Attribute reflection', () => {
+    it('reflects layout="inline" attribute to host', async () => {
+      const el = await fixture<HelixField>('<hx-field layout="inline"></hx-field>');
+      expect(el.getAttribute('layout')).toBe('inline');
+    });
+
+    it('reflects layout="column" attribute to host', async () => {
+      const el = await fixture<HelixField>('<hx-field layout="column"></hx-field>');
+      expect(el.getAttribute('layout')).toBe('column');
+    });
+
+    it('reflects hx-size="sm" attribute to host', async () => {
+      const el = await fixture<HelixField>('<hx-field hx-size="sm"></hx-field>');
+      expect(el.getAttribute('hx-size')).toBe('sm');
+    });
+
+    it('reflects hx-size="lg" attribute to host', async () => {
+      const el = await fixture<HelixField>('<hx-field hx-size="lg"></hx-field>');
+      expect(el.getAttribute('hx-size')).toBe('lg');
+    });
+  });
+
+  // ─── ARIA: label slot suppresses aria-label (1) ───
+
+  describe('ARIA: label slot suppresses aria-label on control', () => {
+    it('does not set aria-label on slotted input when label slot is populated', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Fallback"><input type="text" /><span slot="label">Custom Label</span></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input');
+      // When a label slot is used, the component skips aria-label bridging
+      expect(input?.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
+  // ─── Help text visibility (2) ───
+
+  describe('Help text visibility', () => {
+    it('shows help text when helpText is set and no error is present', async () => {
+      const el = await fixture<HelixField>('<hx-field help-text="Guidance text"></hx-field>');
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv?.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('shows help-text part when help slot has content but helpText property is empty', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><em slot="help">Slot help only</em></hx-field>',
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      // The help-text container should be visible because the slot has content
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv?.hasAttribute('hidden')).toBe(false);
+    });
+  });
+
   // ─── Lifecycle (2) ───
 
   describe('Lifecycle', () => {
