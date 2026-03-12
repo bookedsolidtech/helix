@@ -128,64 +128,56 @@ describe('hx-status-indicator', () => {
   // ─── ARIA ───
 
   describe('ARIA', () => {
-    it('has role="img" on the wrapper', async () => {
+    it('has role="img" on the host element', async () => {
       const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper).toBeTruthy();
+      expect(el.getAttribute('role')).toBe('img');
     });
 
     it('has default aria-label "Status: Unknown"', async () => {
       const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Unknown');
+      expect(el.getAttribute('aria-label')).toBe('Status: Unknown');
     });
 
     it('generates correct aria-label for "online" status', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator status="online"></hx-status-indicator>',
       );
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Online');
+      expect(el.getAttribute('aria-label')).toBe('Status: Online');
     });
 
     it('uses custom label when provided', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator label="System is healthy"></hx-status-indicator>',
       );
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('System is healthy');
+      expect(el.getAttribute('aria-label')).toBe('System is healthy');
     });
 
     it('generates correct aria-label for "offline" status', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator status="offline"></hx-status-indicator>',
       );
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Offline');
+      expect(el.getAttribute('aria-label')).toBe('Status: Offline');
     });
 
     it('generates correct aria-label for "away" status', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator status="away"></hx-status-indicator>',
       );
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Away');
+      expect(el.getAttribute('aria-label')).toBe('Status: Away');
     });
 
     it('generates correct aria-label for "busy" status', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator status="busy"></hx-status-indicator>',
       );
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Busy');
+      expect(el.getAttribute('aria-label')).toBe('Status: Busy');
     });
 
     it('generates correct aria-label for "unknown" status', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator status="unknown"></hx-status-indicator>',
       );
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Unknown');
+      expect(el.getAttribute('aria-label')).toBe('Status: Unknown');
     });
 
     it('falls back to generated label when custom label is cleared', async () => {
@@ -194,8 +186,7 @@ describe('hx-status-indicator', () => {
       );
       el.label = '';
       await el.updateComplete;
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Online');
+      expect(el.getAttribute('aria-label')).toBe('Status: Online');
     });
   });
 
@@ -208,8 +199,7 @@ describe('hx-status-indicator', () => {
       );
       el.status = 'offline';
       await el.updateComplete;
-      const wrapper = shadowQuery(el, '[role="img"]');
-      expect(wrapper?.getAttribute('aria-label')).toBe('Status: Offline');
+      expect(el.getAttribute('aria-label')).toBe('Status: Offline');
     });
   });
 
