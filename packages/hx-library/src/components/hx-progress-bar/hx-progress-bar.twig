@@ -100,7 +100,7 @@
   variant="{{ _variant }}"
   min="{{ _min }}"
   max="{{ _max }}"
-  {% if value is not null and value is defined %}value="{{ value }}"{% endif %}
+  {% if value is defined and value is not null %}value="{{ value }}"{% endif %}
   {% if indeterminate %}indeterminate{% endif %}
   {% if label %}label="{{ label }}"{% endif %}
   {% if description %}description="{{ description }}"{% endif %}

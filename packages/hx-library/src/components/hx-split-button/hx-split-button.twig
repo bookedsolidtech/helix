@@ -26,7 +26,8 @@
                       - label    (string, required): Menu item display text.
                       - value    (string, optional): Value emitted in hx-select event detail.
                       - disabled (boolean, optional): Disables this menu item.
-                      - icon     (string, optional): Icon slot HTML markup.
+                      - icon     (string, optional): Icon token or text label for the prefix slot
+                                 (HTML is escaped; pass trusted text only, not raw HTML).
     - attributes    (object, optional): Additional HTML attributes for the host element.
 
   Slots:

@@ -293,4 +293,4 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 
 - Twig-renderable: **Pass** — standard HTML attribute API works
 - label attribute: **Pass** (with caveat — P2-08)
-- Behavior file: **Missing** (P2-08)
+- Behavior file: **Pass** — `hx-split-button.drupal.js` added (P2-08 ✅ FIXED)

@@ -107,18 +107,11 @@
           if (!value) {
             return;
           }
-          // Convert value to a dataset key: "save-draft" → dataset.hxMenuActionSaveDraft
-          var dataKey =
-            'hxMenuAction' +
-            value.replace(/-([a-z])/g, function (_, c) {
-              return c.toUpperCase();
-            });
-          dataKey = dataKey.charAt(0).toUpperCase() + dataKey.slice(1);
-          dataKey =
-            'hxMenuAction' +
-            value.replace(/([-_][a-z])/g, function (match) {
-              return match.toUpperCase().replace(/[-_]/, '');
-            });
+          // Convert value to dataset key: "save-draft" → "hxMenuActionSaveDraft"
+          var normalized = String(value).replace(/[-_]+([a-zA-Z0-9])/g, function (_, c) {
+            return c.toUpperCase();
+          });
+          var dataKey = 'hxMenuAction' + normalized.charAt(0).toUpperCase() + normalized.slice(1);
 
           var url = el.dataset[dataKey];
           if (url) {
