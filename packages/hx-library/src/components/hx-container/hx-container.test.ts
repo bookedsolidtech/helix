@@ -44,7 +44,9 @@ describe('hx-container', () => {
     });
 
     it('width="narrow" applies narrow class and correct max-width', async () => {
-      const el = await fixture<HelixContainer>('<hx-container width="narrow">Content</hx-container>');
+      const el = await fixture<HelixContainer>(
+        '<hx-container width="narrow">Content</hx-container>',
+      );
       const inner = shadowQuery(el, '.container__inner')!;
       expect(inner.classList.contains('container__inner--narrow')).toBe(true);
       expect(getComputedStyle(inner).maxWidth).toBe('768px');
@@ -108,7 +110,9 @@ describe('hx-container', () => {
     });
 
     it('padding="2xl" reflected as attribute', async () => {
-      const el = await fixture<HelixContainer>('<hx-container padding="2xl">Content</hx-container>');
+      const el = await fixture<HelixContainer>(
+        '<hx-container padding="2xl">Content</hx-container>',
+      );
       expect(el.getAttribute('padding')).toBe('2xl');
     });
   });
@@ -117,7 +121,9 @@ describe('hx-container', () => {
 
   describe('Attribute Reflection', () => {
     it('width attribute reflects to property', async () => {
-      const el = await fixture<HelixContainer>('<hx-container width="narrow">Content</hx-container>');
+      const el = await fixture<HelixContainer>(
+        '<hx-container width="narrow">Content</hx-container>',
+      );
       expect(el.width).toBe('narrow');
     });
 
@@ -256,7 +262,9 @@ describe('hx-container', () => {
     });
 
     it('padding="2xl" applies 128px vertical padding', async () => {
-      const el = await fixture<HelixContainer>('<hx-container padding="2xl">Content</hx-container>');
+      const el = await fixture<HelixContainer>(
+        '<hx-container padding="2xl">Content</hx-container>',
+      );
       const styles = getComputedStyle(el);
       expect(styles.paddingTop).toBe('128px');
       expect(styles.paddingBottom).toBe('128px');
