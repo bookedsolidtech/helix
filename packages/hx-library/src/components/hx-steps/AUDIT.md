@@ -396,4 +396,4 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 | 17-20 | Storybook gaps | Documented. |
 | 21, 23-25 | CSS token gaps | Documented. |
 | 26 | Bundle size unverified | Documented. |
-| 27-29 | Drupal integration gaps | Documented. |
+| 27-29 | Drupal integration gaps | **FIXED** — `hx-steps.twig` template and `README.drupal.md` created with full attribute mapping, parent-managed property guidance, and accessibility notes. |

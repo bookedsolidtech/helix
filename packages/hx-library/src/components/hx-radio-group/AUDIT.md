@@ -206,17 +206,9 @@ After `this.value = newValue`, the Lit reactive system queues an update. `update
 
 ---
 
-### P2-2: `Math.random()` IDs break SSR / Drupal hydration
+### ~~P2-2: `Math.random()` IDs break SSR / Drupal hydration~~ ✅ FIXED
 
-**File:** `hx-radio-group.ts:111–113`
-
-```ts
-private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
-```
-
-IDs generated with `Math.random()` differ between server (Drupal/Twig pre-render) and client hydration. `aria-describedby` references will point to IDs that don't exist in the server-rendered DOM.
-
-**Fix:** Use a deterministic ID strategy (e.g., `name` attribute as seed, or a monotonically incrementing counter).
+**Fix applied:** `_groupId` now uses a monotonically incrementing module-level counter (`++_groupCounter`) instead of `Math.random()`. IDs are deterministic within a page session and do not cause `aria-describedby` reference mismatches between Drupal server-rendered markup and client hydration.
 
 ---
 
@@ -312,7 +304,7 @@ it('has no axe violations in default state', async () => {
 | P0-1 | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible            |
 | P0-2 | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)        |
 | P0-3 | P0       | Form/Validation | Required validity not initialized on first render              |
-| P1-1 | P1       | Behavior        | Re-enabling disabled group leaves radios permanently off       |
+| P1-1 | P1       | Behavior        | ~~Re-enabling disabled group leaves radios permanently off~~ ✅ FIXED — `_individualDisabledStates` map restores per-radio state |
 | P1-2 | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature                |
 | P1-3 | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards              |
 | P1-4 | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby`        |
@@ -320,7 +312,7 @@ it('has no axe violations in default state', async () => {
 | P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM        |
 | P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)        |
 | P2-1 | P2       | Performance     | Double `setFormValue`/`_syncRadios`/`_updateValidity`          |
-| P2-2 | P2       | Drupal/SSR      | `Math.random()` IDs break server/client hydration              |
+| P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used |
 | P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default         |
 | P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                 |
 | P2-5 | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)              |

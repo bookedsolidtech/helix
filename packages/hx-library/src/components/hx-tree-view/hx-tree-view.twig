@@ -1,0 +1,132 @@
+{#
+  hx-tree-view — Drupal Twig Template
+  =====================================
+
+  Renders a <hx-tree-view> web component populated from a Drupal data structure
+  (e.g., taxonomy term hierarchy, menu tree, ICD-10 code browser).
+
+  The tree is server-rendered for progressive enhancement — content is accessible
+  without JavaScript. The web component hydrates client-side to add keyboard
+  navigation, expand/collapse, and selection behavior.
+
+  Parameters:
+    label      (string)  Required. Accessible name for the tree (aria-label).
+                         Screen readers announce this when focus enters the tree.
+                         Example: 'ICD-10 Diagnosis Codes', 'Department Hierarchy'.
+    items      (array)   Required. Array of tree item objects with keys:
+                           - label     (string)  Item display text.
+                           - children  (array)   Optional nested items (same structure).
+                           - expanded  (bool)    Optional. Pre-expand this node.
+                           - disabled  (bool)    Optional. Disable interaction.
+                           - selected  (bool)    Optional. Pre-select this item.
+    selection  (string)  Optional. 'none' | 'single' | 'multiple'. Defaults to 'none'.
+    attributes (object)  Optional. Additional HTML attributes spread onto <hx-tree-view>.
+
+  Usage — ICD-10 taxonomy browser:
+    {% include '@mytheme/hx-tree-view/hx-tree-view.twig' with {
+      label: 'ICD-10 Diagnosis Codes',
+      selection: 'single',
+      items: [
+        {
+          label: 'A00–A09: Intestinal infectious diseases',
+          children: [
+            {
+              label: 'A00: Cholera',
+              expanded: true,
+              children: [
+                { label: 'A00.0: Cholera due to Vibrio cholerae 01, biovar cholerae' },
+                { label: 'A00.1: Cholera due to Vibrio cholerae 01, biovar eltor' },
+              ],
+            },
+            { label: 'A01: Typhoid and paratyphoid fevers' },
+          ],
+        },
+      ],
+    } %}
+
+  Usage — department org chart:
+    {% include '@mytheme/hx-tree-view/hx-tree-view.twig' with {
+      label: 'Hospital Departments',
+      items: drupal_departments,
+    } %}
+
+  Drupal behavior for JS enhancement:
+    The tree dispatches 'hx-select' CustomEvents (bubbles, composed) when a user
+    selects an item. Wire up Drupal behaviors to respond:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixTreeView = {
+          attach: function (context) {
+            once('hx-tree-view', 'hx-tree-view', context).forEach((tree) => {
+              tree.addEventListener('hx-select', (event) => {
+                const { item, selected } = event.detail;
+                // Update a hidden form field, trigger AJAX, etc.
+                const input = document.getElementById('selected-diagnosis');
+                if (input) {
+                  input.value = item.textContent.trim();
+                }
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+
+  Registration:
+    Load the component scripts in your theme's .libraries.yml:
+      hx-tree-view:
+        js:
+          path/to/@helixui/library/dist/hx-tree-view.js: { attributes: { type: module } }
+          path/to/@helixui/library/dist/hx-tree-item.js: { attributes: { type: module } }
+        dependencies:
+          - core/drupal
+          - core/once
+
+    Attach the library in your template:
+      {{ attach_library('mytheme/hx-tree-view') }}
+#}
+
+{% macro render_tree_items(items) %}
+  {% for item in items %}
+    <hx-tree-item
+      {% if item.expanded %}expanded{% endif %}
+      {% if item.disabled %}disabled{% endif %}
+      {% if item.selected %}selected{% endif %}
+    >
+      {{- item.label -}}
+      {% if item.children %}
+        {% for child in item.children %}
+          <hx-tree-item
+            slot="children"
+            {% if child.expanded %}expanded{% endif %}
+            {% if child.disabled %}disabled{% endif %}
+            {% if child.selected %}selected{% endif %}
+          >
+            {{- child.label -}}
+            {% if child.children %}
+              {% for grandchild in child.children %}
+                <hx-tree-item
+                  slot="children"
+                  {% if grandchild.expanded %}expanded{% endif %}
+                  {% if grandchild.disabled %}disabled{% endif %}
+                  {% if grandchild.selected %}selected{% endif %}
+                >
+                  {{- grandchild.label -}}
+                </hx-tree-item>
+              {% endfor %}
+            {% endif %}
+          </hx-tree-item>
+        {% endfor %}
+      {% endif %}
+    </hx-tree-item>
+  {% endfor %}
+{% endmacro %}
+
+{% import _self as tree_macros %}
+
+<hx-tree-view
+  label="{{ label }}"
+  {% if selection is defined and selection != 'none' %}selection="{{ selection }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {{ tree_macros.render_tree_items(items) }}
+</hx-tree-view>
