@@ -3,6 +3,7 @@ import { css } from 'lit';
 export const helixTreeItemStyles = css`
   :host {
     display: block;
+    contain: layout style;
   }
 
   * {

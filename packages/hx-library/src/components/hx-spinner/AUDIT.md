@@ -131,18 +131,11 @@ The test only asserts the `.spinner__sr-text` element exists — it does not ver
 
 ## P2 — Medium (tech debt / DX gap)
 
-### P2-1: `size` TypeScript union collapses to `string` — no runtime narrowing
+### ~~P2-1: `size` TypeScript union collapses to `string` — no runtime narrowing~~ FIXED
 
-**File:** `hx-spinner.ts:31`
+**File:** `hx-spinner.ts`
 
-```typescript
-size: 'sm' | 'md' | 'lg' | string = 'md';
-```
-
-`'sm' | 'md' | 'lg' | string` resolves to `string` at the TypeScript level — the string literal members add no type safety. TypeScript will not flag `size="xxl"` as an error. Consider:
-
-- `type SpinnerSize = 'sm' | 'md' | 'lg'` for the token sizes, combined with a separate `customSize?: string` property.
-- Or keep the union but document that it intentionally degrades to `string` for custom CSS values (add a comment explaining the design choice).
+**Resolution:** Added a named `SpinnerSize = 'sm' | 'md' | 'lg'` type, exported from both `hx-spinner.ts` and `index.ts`. The `size` property is typed as `SpinnerSize | string` with clear JSDoc documentation explaining the intentional widening to `string` for custom CSS size values. Consumers can import `SpinnerSize` for type-safe usage with token values.
 
 ---
 
@@ -173,17 +166,11 @@ The ellipsis should either be removed (let the consumer control punctuation) or 
 
 ---
 
-### P2-4: Storybook `size` argType control is `select`-only — custom sizes untestable from controls
+### ~~P2-4: Storybook `size` argType control is `select`-only — custom sizes untestable from controls~~ FIXED
 
-**File:** `hx-spinner.stories.ts:15-22`
+**File:** `hx-spinner.stories.ts`
 
-```typescript
-size: {
-  control: { type: 'select' },
-  options: ['sm', 'md', 'lg'],
-```
-
-The `select` control only exposes token values. A user exploring Storybook has no way to test custom CSS sizes (e.g., `"3rem"`, `"48px"`) from the controls panel. A `text` control with a note about accepted values would better document the prop's capabilities. The `CustomSize` story exists but is static — it cannot demonstrate the input freedom.
+**Resolution:** Changed `size` argType control from `{ type: 'select' }` with fixed options to `control: 'text'` with a description noting both token values (`'sm' | 'md' | 'lg'`) and custom CSS sizes (e.g., `'3rem'`, `'48px'`). The `CustomSize` story demonstrates a `3rem` value as an example.
 
 ---
 
@@ -200,17 +187,16 @@ The SVG arc uses `r=10` on a 24x24 viewBox (circumference = 2π × 10 ≈ 62.83)
 
 ---
 
-### P2-6: No Drupal Twig template or integration notes
+### ~~P2-6: No Drupal Twig template or integration notes~~ FIXED
 
 **File:** directory (`hx-spinner/`)
 
-The CLAUDE.md states Drupal compatibility is a non-negotiable. The `hx-spinner` directory has no:
-
-- `hx-spinner.twig` template demonstrating Drupal usage.
-- Documentation on how to register the component in a Drupal theme.
-- Notes on the `label` attribute behavior in a Twig context.
-
-Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also lacks Twig templates, but given the healthcare Drupal mandate, this is a systemic gap that starts here.
+**Resolution:** `hx-spinner.twig` template added to the component directory with full
+variable documentation (size, variant, label, decorative), standalone and decorative usage
+examples, and library registration instructions for `mytheme.libraries.yml`. A
+`DrupalIntegration` story added to `hx-spinner.stories.ts` demonstrating standalone,
+decorative, and inverted CDN usage patterns with notes on the intentional `label` attribute
+asymmetry (not reflected, unlike `size`/`variant`).
 
 ---
 
@@ -225,11 +211,11 @@ Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also la
 | P1-3 | CSS           | P1       | `color-mix()` without fallback — broken in older browsers |
 | P1-4 | Tests         | P1       | No reduced-motion behavior test                           |
 | P1-5 | Tests         | P1       | sr-text content and reactive label update untested        |
-| P2-1 | TypeScript    | P2       | `size` union collapses to `string`                        |
+| P2-1 | TypeScript    | P2       | `size` union collapses to `string` — **FIXED**            |
 | P2-2 | Drupal/DX     | P2       | `label` not reflected — asymmetric vs `size`/`variant`    |
 | P2-3 | DX            | P2       | Hardcoded `...` appended to all sr-text labels            |
 | P2-4 | Storybook     | P2       | `size` argType `select`-only, custom sizes not explorable |
 | P2-5 | CSS           | P2       | Magic numbers in SVG dash math — no inline documentation  |
-| P2-6 | Drupal        | P2       | No Twig template or Drupal integration notes              |
+| P2-6 | Drupal        | P2       | No Twig template or Drupal integration notes — **FIXED**  |
 
 **P0 count: 2 — merge blocked until resolved.**

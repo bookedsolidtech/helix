@@ -190,7 +190,16 @@ export class HelixBadge extends LitElement {
   }
 }
 
+/**
+ * @deprecated Use `HelixBadge` instead. This alias will be removed in a future
+ * major version as part of the project-wide migration from `Wc` to `Hx` prefixes.
+ * @since 0.1.0
+ * @removal-target 1.0.0
+ */
 export type WcBadge = HelixBadge;
+
+/** Canonical type alias for the hx-badge component. */
+export type HxBadge = HelixBadge;
 
 declare global {
   interface HTMLElementTagNameMap {

@@ -15,7 +15,7 @@
 
 ## P0 — Critical / Blocking
 
-### P0-01: `_syncClonedOptions()` silently drops `<optgroup>` children from the native select
+### P0-01: `_syncClonedOptions()` silently drops `<optgroup>` children from the native select ✅ FIXED
 
 **File:** `hx-select.ts:300-320`
 
@@ -44,9 +44,11 @@ This filter only captures top-level `<option>` elements. `<optgroup>` children a
 
 Form submits with `country=` (empty) regardless of selection.
 
+**Resolution:** The separate `_syncClonedOptions()` and `_readOptions()` methods have been unified into a single `_handleSlotChange()` that processes `slot.assignedElements({ flatten: true })` in one pass, correctly cloning both top-level `<option>` elements and `<optgroup>` children into the native `<select>`. Drupal Twig templates using `<optgroup>` now participate in form submission correctly.
+
 ---
 
-### P0-02: Error div uses `role="alert"` (assertive) AND `aria-live="polite"` simultaneously
+### P0-02: Error div uses `role="alert"` (assertive) AND `aria-live="polite"` simultaneously ✅ FIXED
 
 **File:** `hx-select.ts:615-621`
 
@@ -57,6 +59,8 @@ Form submits with `country=` (empty) regardless of selection.
 `role="alert"` implies `aria-live="assertive"` per the ARIA spec. Explicitly overriding it with `aria-live="polite"` creates contradictory instructions. AT behavior is undefined — some screen readers honor the explicit attribute (polite), others honor the implicit role semantics (assertive), and some may double-announce.
 
 For a healthcare error message this is unacceptable: the user must always receive a clear, predictable announcement. Either use `role="alert"` alone (assertive — correct for errors) or use `aria-live="polite"` alone (no role="alert"). Do not mix them.
+
+**Resolution:** The error div now uses only `role="alert"` without the redundant `aria-live="polite"` override. The element renders as `<div part="error" class="field__error" id="${this._errorId}" role="alert">`, providing unambiguous assertive announcement semantics for healthcare error messages.
 
 ---
 
@@ -316,7 +320,7 @@ If a consumer sets `hx-size="xl"` or `hx-size="foobar"`, the CSS class `field__t
 | Storybook     | ⚠️ Issues  | —   | —   | 1   |
 | CSS           | ⚠️ Issues  | —   | 2   | 2   |
 | Performance   | ✅ OK      | —   | —   | 1   |
-| Drupal        | 🔴 Blocked | 1   | —   | —   |
+| Drupal        | ✅ Fixed   | —   | —   | —   |
 
 **Total: 2 P0, 7 P1, 11 P2**
 

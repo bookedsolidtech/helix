@@ -80,6 +80,13 @@ export class HelixCopyButton extends LitElement {
   /**
    * Visual size of the button. Maps to fixed height and padding tokens.
    * Accepts: 'sm' | 'md' | 'lg'. Invalid values are silently coerced to 'md'.
+   *
+   * **Accessibility (WCAG 2.5.8):** The `sm` variant uses `--hx-size-8` for
+   * its minimum width and height. Ensure this token resolves to at least 24×24 px
+   * (WCAG 2.5.8 AA minimum target size). For touch-primary interfaces such as
+   * mobile clinical apps, prefer `md` or `lg` to meet the 44×44 px recommended
+   * target size (WCAG 2.5.5 AAA / Apple HIG / Android guidelines).
+   *
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })

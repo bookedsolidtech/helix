@@ -130,17 +130,11 @@ The component exposes 6 parts: `alert`, `title`, `icon`, `message`, `close-butto
 
 **Fix:** The JSDoc at the top of `CSSParts` story already says "6 CSS `::part()` targets" (correct). Updated the body text in the alert's inner content from "5 CSS parts" to "6 CSS parts" and added `::part(title)` to the enumerated list.
 
-### P2-06: `AlertVariant` type not exported
+### ~~P2-06: `AlertVariant` type not exported~~ FIXED
 
 **File:** `hx-alert.ts:8`, `index.ts:1`
 
-The `AlertVariant` type (`'info' | 'success' | 'warning' | 'error'`) is defined locally but not exported from the component or the barrel file. Consumers who want to type-check variant values in their TypeScript code cannot import this type.
-
-**Fix direction:** Export `AlertVariant` from `hx-alert.ts` and re-export from `index.ts`:
-
-```ts
-export type { AlertVariant } from './hx-alert.js';
-```
+**Resolution:** `AlertVariant` is exported from `hx-alert.ts` and re-exported from `index.ts` as `export type { AlertVariant }`. Consumers can import the type for type-safe variant checks.
 
 ### P2-07: Live region re-announcement reliability on `open` toggle
 
@@ -170,19 +164,11 @@ background-color: color-mix(in srgb, currentColor 10%, transparent);
 
 `color-mix()` requires Chrome 111+, Firefox 113+, Safari 16.2+. Falls back gracefully to no hover background (transparent) in older browsers. A comment documents the browser support range (line 122-123). This is acceptable for modern healthcare applications but should be noted in the component's browser support documentation.
 
-### P3-02: Twig template `show-icon` logic is inverted/verbose
+### ~~P3-02: Twig template `show-icon` logic is inverted/verbose~~ FIXED
 
 **File:** `hx-alert.twig:41`
 
-```twig
-{% if not show_icon %}{% else %}show-icon{% endif %}
-```
-
-This works correctly but is an unnecessarily complex way to express "output `show-icon` when `show_icon` is true." Simpler:
-
-```twig
-{% if show_icon %}show-icon{% endif %}
-```
+**Fix:** Simplified the inverted `{% if not show_icon %}{% else %}show-icon{% endif %}` to the idiomatic `{% if show_icon %}show-icon{% endif %}`.
 
 ### P3-03: No `fill="currentColor"` on variant icon SVGs
 

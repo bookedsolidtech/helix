@@ -1,0 +1,60 @@
+{#
+  hx-card — Content card component
+  ==================================
+
+  A flexible card for displaying grouped content. Supports optional image,
+  heading, body, footer, and actions slots.
+
+  Properties:
+    - variant:       'default' | 'featured' | 'compact' (default: 'default')
+    - elevation:     'flat' | 'raised' | 'floating' (default: 'flat')
+    - hx-href:       Optional URL. When set, the card becomes interactive/clickable.
+                     Note: Do NOT use hx-href together with slot="actions". Interactive
+                     controls nested inside role="link" violates ARIA spec.
+    - hx-aria-label: Accessible label for interactive cards. Required when hx-href is
+                     set — provide a meaningful description of the card's purpose
+                     (e.g., "View chart for Margaret Thompson") rather than the raw URL.
+
+  Slots:
+    - image:   Optional image or media content at the top of the card.
+    - heading: The card title. Use a semantic heading element (h2, h3, etc.) for proper
+               accessibility — not a <span>.
+    - default: Card body content.
+    - footer:  Optional footer content.
+    - actions: Optional action buttons. NOT compatible with hx-href (see above).
+
+  Events (when hx-href is set):
+    - hx-click: Dispatched when the interactive card is activated (click or Enter/Space).
+                detail: { href: string, originalEvent: MouseEvent | KeyboardEvent }
+                In Drupal, listen via a Drupal behavior and handle navigation:
+                  element.addEventListener('hx-click', (e) => {
+                    window.location.href = e.detail.href;
+                  });
+#}
+
+<hx-card
+  variant="{{ variant|default('default') }}"
+  elevation="{{ elevation|default('flat') }}"
+  {% if href is defined and href %}
+    hx-href="{{ href }}"
+    hx-aria-label="{{ aria_label }}"
+  {% endif %}
+>
+  {% if image is defined and image %}
+    <img slot="image" src="{{ image.src }}" alt="{{ image.alt|default('') }}">
+  {% endif %}
+
+  {% if heading is defined and heading %}
+    <{{ heading_tag|default('h3') }} slot="heading">{{ heading }}</{{ heading_tag|default('h3') }}>
+  {% endif %}
+
+  {{ body }}
+
+  {% if footer is defined and footer %}
+    <span slot="footer">{{ footer }}</span>
+  {% endif %}
+
+  {% if actions is defined and actions and not href %}
+    <span slot="actions">{{ actions }}</span>
+  {% endif %}
+</hx-card>

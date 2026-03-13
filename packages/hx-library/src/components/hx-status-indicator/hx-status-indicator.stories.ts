@@ -247,3 +247,96 @@ export const DecorativeUsage: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// 7. DRUPAL BOOLEAN PROP PATTERN
+// ─────────────────────────────────────────────────
+
+/**
+ * Documents the correct boolean attribute pattern for Twig template authors.
+ *
+ * `pulse` is a boolean property. In HTML (and Twig), only the **presence** of the attribute
+ * activates it — `pulse="false"` does NOT work because the attribute is present regardless of
+ * the string value, so the component treats it as truthy.
+ *
+ * Correct Twig usage:
+ * ```twig
+ * {# pulse ON — attribute present #}
+ * <hx-status-indicator status="online" pulse></hx-status-indicator>
+ *
+ * {# pulse OFF — attribute absent (omit entirely) #}
+ * <hx-status-indicator status="online"></hx-status-indicator>
+ * ```
+ *
+ * Incorrect Twig usage (pulse="false" still activates the pulse):
+ * ```twig
+ * {# WRONG — this renders pulse as active because the attribute is present #}
+ * <hx-status-indicator status="online" pulse="false"></hx-status-indicator>
+ * ```
+ */
+export const DrupalBooleanProp: Story = {
+  name: 'Drupal Boolean Prop Pattern (pulse)',
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-spacing-6, 1.5rem); max-width: 480px;"
+    >
+      <div>
+        <p
+          style="margin: 0 0 var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); font-weight: 600;"
+        >
+          Correct: attribute present (pulse active)
+        </p>
+        <code
+          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
+          >&lt;hx-status-indicator status="online" pulse&gt;&lt;/hx-status-indicator&gt;</code
+        >
+        <hx-status-indicator status="online" pulse></hx-status-indicator>
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); font-weight: 600;"
+        >
+          Correct: attribute absent (pulse inactive)
+        </p>
+        <code
+          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
+          >&lt;hx-status-indicator status="online"&gt;&lt;/hx-status-indicator&gt;</code
+        >
+        <hx-status-indicator status="online"></hx-status-indicator>
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); font-weight: 600; color: var(--hx-color-error-600, #dc2626);"
+        >
+          Incorrect: pulse="false" — attribute is still present, pulse IS active
+        </p>
+        <code
+          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
+          >&lt;hx-status-indicator status="online"
+          pulse="false"&gt;&lt;/hx-status-indicator&gt;</code
+        >
+        <!-- pulse="false" does NOT disable pulse — the attribute presence is what counts -->
+        <hx-status-indicator status="online" pulse="false"></hx-status-indicator>
+      </div>
+    </div>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Documents the boolean attribute pattern for Drupal/Twig authors. The `pulse` property is activated by the **presence** of the attribute — `pulse="false"` does NOT work because the attribute itself is present. To disable pulse, omit the attribute entirely from your Twig template.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const indicators = canvasElement.querySelectorAll('hx-status-indicator');
+    // First: pulse attribute present — should be pulsing
+    await expect(indicators[0]?.hasAttribute('pulse')).toBe(true);
+    // Second: no pulse attribute — not pulsing
+    await expect(indicators[1]?.hasAttribute('pulse')).toBe(false);
+    // Third: pulse="false" — attribute IS present despite "false" string, so component treats as active
+    await expect(indicators[2]?.hasAttribute('pulse')).toBe(true);
+  },
+};

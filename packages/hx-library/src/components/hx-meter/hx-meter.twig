@@ -1,0 +1,73 @@
+{#
+  hx-meter — Drupal Twig Template
+  =================================
+  Scalar measurement gauge within a defined range. Renders a progress-bar
+  style meter with semantic color feedback (optimum/warning/danger zones).
+
+  Variables:
+    - value    (number, required): Current value of the meter. Clamped to [min, max].
+    - min      (number, optional): Minimum value. Default: 0.
+    - max      (number, optional): Maximum value. Default: 100.
+    - label    (string, optional): Visible label and accessible name for the meter.
+               Required when no label slot content is provided. Healthcare context:
+               use a meaningful description like "Disk usage" or "Patient risk score".
+    - low      (number, optional): Threshold below which value is suboptimal.
+    - high     (number, optional): Threshold above which value is suboptimal.
+    - optimum  (number, optional): The optimal value. Used to determine which
+               zone is "good" when combined with low/high thresholds.
+    - attributes (object, optional): Additional Drupal attributes object.
+
+  Semantic state (color feedback) is determined automatically:
+    - No thresholds → default state (neutral color)
+    - With thresholds, no optimum → 'optimum' (in range) or 'warning' (out of range)
+    - With thresholds and optimum → 'optimum', 'warning', or 'danger' based on zone
+
+  Usage:
+    Simple disk usage meter (no thresholds):
+      {% include 'hx-meter.twig' with {
+        value: disk_used_percent,
+        label: 'Disk usage',
+      } %}
+
+    Patient risk score with thresholds:
+      {% include 'hx-meter.twig' with {
+        value: risk_score,
+        min: 0,
+        max: 100,
+        low: 30,
+        high: 70,
+        optimum: 10,
+        label: 'Patient risk score',
+      } %}
+
+    Medication adherence (higher is better):
+      {% include 'hx-meter.twig' with {
+        value: adherence_pct,
+        min: 0,
+        max: 100,
+        low: 50,
+        high: 80,
+        optimum: 100,
+        label: 'Medication adherence',
+      } %}
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-meter:
+        js:
+          path/to/@helixui/library/dist/hx-meter.js: { attributes: { type: module } }
+#}
+
+{% set _min = min|default(0) %}
+{% set _max = max|default(100) %}
+
+<hx-meter
+  value="{{ value }}"
+  min="{{ _min }}"
+  max="{{ _max }}"
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if low is defined and low is not null %}low="{{ low }}"{% endif %}
+  {% if high is defined and high is not null %}high="{{ high }}"{% endif %}
+  {% if optimum is defined and optimum is not null %}optimum="{{ optimum }}"{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+></hx-meter>

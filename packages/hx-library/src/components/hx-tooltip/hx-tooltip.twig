@@ -1,0 +1,96 @@
+{#
+  hx-tooltip — Drupal Twig Template
+  ===================================
+
+  Server-renders the hx-tooltip custom element with correct attributes.
+  Show/hide behavior (hover, focus, keyboard) is handled automatically
+  by the component — no Drupal behavior is required for standard usage.
+
+  Note on htmx: If your project uses htmx, be aware that `hx-*` attribute names are
+  reserved by htmx. The `hx-tooltip` tag and `placement`, `show-delay`, and `hide-delay`
+  attributes do not conflict with htmx directives, but avoid adding other `hx-*`
+  attributes that htmx may interpret as directives.
+
+  Parameters:
+    trigger_label  (string)  Required. Visible label for the trigger element.
+    content        (string)  Required. Tooltip text content.
+    placement      (string)  Optional. Preferred tooltip placement relative to the trigger.
+                             Supports all Floating UI placement values:
+                             top | top-start | top-end | bottom | bottom-start | bottom-end
+                             left | left-start | left-end | right | right-start | right-end
+                             Defaults to 'top'.
+    show_delay     (int)     Optional. Milliseconds before the tooltip appears. Defaults to 300.
+    hide_delay     (int)     Optional. Milliseconds before the tooltip disappears. Defaults to 100.
+    trigger_type   (string)  Optional. Button type attribute: button | submit | reset.
+                             Defaults to 'button'.
+    aria_label     (string)  Optional. Accessible name for icon-only triggers where
+                             trigger_label is not visible (e.g. icon buttons).
+    attributes     (object)  Optional. Additional HTML attributes to spread onto the element.
+
+  Slots (Twig blocks):
+    trigger — The trigger element rendered in the default slot.
+    content — The tooltip text rendered in the content slot.
+
+  Usage examples:
+
+    Basic tooltip on a button:
+      {% include 'hx-tooltip.twig' with {
+        trigger_label: 'View Details',
+        content: 'Opens the patient record in a new panel.',
+      } %}
+
+    Custom placement:
+      {% include 'hx-tooltip.twig' with {
+        trigger_label: 'Lab Results',
+        content: 'Most recent CBC panel from 2026-03-10.',
+        placement: 'bottom-start',
+      } %}
+
+    Instant show (no delay):
+      {% include 'hx-tooltip.twig' with {
+        trigger_label: 'Help',
+        content: 'Contact your administrator for access.',
+        show_delay: 0,
+        hide_delay: 0,
+      } %}
+
+    Icon-only trigger (accessible name required):
+      {% include 'hx-tooltip.twig' with {
+        trigger_label: '',
+        aria_label: 'More information',
+        content: 'Blood pressure measured in the left arm.',
+      } %}
+
+  No Drupal behavior required:
+    The component manages tooltip visibility entirely via its shadow DOM event handlers.
+    Standard usage requires no Drupal.behaviors attachment. For custom interactions
+    (e.g. programmatic show/hide from a Drupal behavior), access the element directly:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixTooltip = {
+          attach: function (context) {
+            once('hx-tooltip-custom', 'hx-tooltip[data-custom]', context).forEach((el) => {
+              // Components expose no public show/hide methods — control via focus/hover
+              // events on the slotted trigger element if programmatic control is needed.
+            });
+          },
+        };
+      })(Drupal, once);
+#}
+
+<hx-tooltip
+  {% if placement is defined and placement %}placement="{{ placement }}"{% endif %}
+  {% if show_delay is defined %}show-delay="{{ show_delay }}"{% endif %}
+  {% if hide_delay is defined %}hide-delay="{{ hide_delay }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {%- block trigger -%}
+    <button
+      type="{{ trigger_type|default('button') }}"
+      {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    >{{ trigger_label }}</button>
+  {%- endblock -%}
+  {%- block content -%}
+    <span slot="content">{{ content }}</span>
+  {%- endblock -%}
+</hx-tooltip>

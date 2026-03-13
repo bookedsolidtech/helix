@@ -254,3 +254,127 @@ export const DeepNesting: Story = {
     </hx-tree-view>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// DRUPAL / CDN INTEGRATION REFERENCE
+// ─────────────────────────────────────────────────
+
+/**
+ * Drupal Twig integration reference for hx-tree-view.
+ *
+ * A companion `hx-tree-view.twig` template ships alongside this component.
+ * It handles server-rendered tree structures from Drupal taxonomy, menu trees,
+ * or custom data sources for progressive enhancement.
+ *
+ * **Progressive enhancement:** The tree markup is server-rendered. Content is accessible
+ * without JavaScript. The web component hydrates client-side to add keyboard navigation,
+ * expand/collapse, and ARIA tree semantics (aria-level, aria-posinset, aria-setsize).
+ *
+ * **Critical: always provide `label`** — The `label` attribute maps to `aria-label` on the
+ * `role="tree"` container. WCAG 4.1.2 requires an accessible name on the tree. Without it,
+ * screen readers announce an unnamed tree, giving users no context.
+ *
+ * **Twig template pattern** (taxonomy term hierarchy):
+ * ```twig
+ * {% include '@mytheme/hx-tree-view/hx-tree-view.twig' with {
+ *   label: 'ICD-10 Diagnosis Codes',
+ *   selection: 'single',
+ *   items: [
+ *     {
+ *       label: 'A00–A09: Intestinal infectious diseases',
+ *       children: [
+ *         { label: 'A00: Cholera', expanded: true, children: [
+ *           { label: 'A00.0: Classical cholera' },
+ *           { label: 'A00.1: El Tor cholera' },
+ *         ]},
+ *       ],
+ *     },
+ *   ],
+ * } %}
+ * ```
+ *
+ * **Drupal behavior for selection events:**
+ * ```javascript
+ * (function (Drupal, once) {
+ *   Drupal.behaviors.helixTreeView = {
+ *     attach: function (context) {
+ *       once('hx-tree-view', 'hx-tree-view', context).forEach((tree) => {
+ *         tree.addEventListener('hx-select', (event) => {
+ *           const input = document.getElementById('selected-diagnosis');
+ *           if (input) input.value = event.detail.item.textContent.trim();
+ *         });
+ *       });
+ *     },
+ *   };
+ * })(Drupal, once);
+ * ```
+ *
+ * **Library registration** (`mytheme.libraries.yml`):
+ * ```yaml
+ * hx-tree-view:
+ *   js:
+ *     path/to/@helixui/library/dist/hx-tree-view.js: { attributes: { type: module } }
+ *     path/to/@helixui/library/dist/hx-tree-item.js: { attributes: { type: module } }
+ *   dependencies:
+ *     - core/drupal
+ *     - core/once
+ * ```
+ */
+export const DrupalIntegration: Story = {
+  name: 'Drupal / CDN Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 560px;">
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Server-rendered taxonomy tree — ICD-10 diagnosis codes (single selection)
+        </p>
+        <hx-tree-view label="ICD-10 Diagnosis Codes" selection="single">
+          <hx-tree-item expanded>
+            A00–A09: Intestinal infectious diseases
+            <hx-tree-item slot="children" expanded>
+              A00: Cholera
+              <hx-tree-item slot="children">A00.0: Classical cholera</hx-tree-item>
+              <hx-tree-item slot="children">A00.1: El Tor cholera</hx-tree-item>
+            </hx-tree-item>
+            <hx-tree-item slot="children">A01: Typhoid and paratyphoid fevers</hx-tree-item>
+          </hx-tree-item>
+          <hx-tree-item>
+            A15–A19: Tuberculosis
+          </hx-tree-item>
+        </hx-tree-view>
+        <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: #9ca3af;">
+          aria-label="ICD-10 Diagnosis Codes" ensures screen readers announce tree context
+        </p>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Department org chart — navigation-only (no selection)
+        </p>
+        <hx-tree-view label="Hospital Departments">
+          <hx-tree-item expanded>
+            Clinical Services
+            <hx-tree-item slot="children">Emergency Medicine</hx-tree-item>
+            <hx-tree-item slot="children" expanded>
+              Surgery
+              <hx-tree-item slot="children">Cardiothoracic Surgery</hx-tree-item>
+              <hx-tree-item slot="children">Orthopedics</hx-tree-item>
+            </hx-tree-item>
+          </hx-tree-item>
+          <hx-tree-item>Administrative Services</hx-tree-item>
+        </hx-tree-view>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Disabled items — permission-gated from Drupal access check
+        </p>
+        <hx-tree-view label="Patient Records">
+          <hx-tree-item>Active Admissions</hx-tree-item>
+          <hx-tree-item disabled>Archived Records (access restricted)</hx-tree-item>
+          <hx-tree-item>Discharge Summaries</hx-tree-item>
+        </hx-tree-view>
+      </div>
+    </div>
+  `,
+};

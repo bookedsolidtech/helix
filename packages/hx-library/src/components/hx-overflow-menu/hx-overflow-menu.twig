@@ -1,0 +1,81 @@
+{#
+  hx-overflow-menu — Drupal Twig Template
+  =========================================
+  A "more actions" overflow menu button that reveals a dropdown menu panel.
+  Follows the WAI-ARIA Menu Button pattern with full arrow-key navigation.
+
+  Variables:
+    - label      (string, optional): Accessible label for the trigger button.
+                 Default: 'More actions'. Customize per-instance for context:
+                   'Actions for patient Margaret Thompson'
+    - placement  (string, optional): Floating panel placement. Supports all 12
+                 Floating UI placements: 'bottom', 'bottom-start', 'bottom-end',
+                 'top', 'top-start', 'top-end', 'left', 'left-start', 'left-end',
+                 'right', 'right-start', 'right-end'. Default: 'bottom-end'.
+    - hx_size    (string, optional): 'sm' | 'md' | 'lg'. Default: 'md'.
+                 Note: maps to the `hx-size` attribute (not `size`).
+    - icon       (string, optional): 'vertical' | 'horizontal'. Controls the
+                 orientation of the three-dot trigger icon. Default: 'vertical'.
+    - disabled   (bool, optional): Disables the trigger button. Default: false.
+    - actions    (array, optional): Array of action objects with keys:
+                   - label (string): Display text for the menu item.
+                   - value (string): Value dispatched in the hx-select event detail.
+                   - disabled (bool, optional): Whether this item is disabled.
+    - attributes (object, optional): Additional Drupal attributes object.
+
+  Usage:
+    Patient row actions (most common healthcare pattern):
+      {% include 'hx-overflow-menu.twig' with {
+        label: 'Actions for ' ~ patient.name,
+        placement: 'bottom-end',
+        actions: [
+          { label: 'View chart', value: 'view-chart' },
+          { label: 'Edit record', value: 'edit-record' },
+          { label: 'Schedule appointment', value: 'schedule' },
+          { label: 'Archive patient', value: 'archive', disabled: not user.can_archive },
+        ],
+      } %}
+
+  Event handling:
+    Wire up the hx-select event via Drupal behaviors — see the
+    "Event Handling with Drupal Behaviors" section in the hx-overflow-menu
+    component documentation in apps/docs.
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-overflow-menu:
+        js:
+          path/to/@helixui/library/dist/hx-overflow-menu.js: { attributes: { type: module } }
+        dependencies:
+          - core/drupal
+          - core/once
+#}
+
+{% set _placement = placement|default('bottom-end') %}
+{% set _size = hx_size|default('md') %}
+{% set _icon = icon|default('vertical') %}
+{% set _label = label|default('More actions') %}
+{% set disabled = disabled|default(false) %}
+{% set actions = actions|default([]) %}
+{% set attributes = attributes|default('') %}
+
+<hx-overflow-menu
+  label="{{ _label }}"
+  placement="{{ _placement }}"
+  hx-size="{{ _size }}"
+  icon="{{ _icon }}"
+  {% if disabled %}disabled{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% if actions %}
+    {% for action in actions %}
+      <button
+        role="menuitem"
+        data-value="{{ action.value }}"
+        {% if action.disabled %}disabled{% endif %}
+      >
+        {{ action.label }}
+      </button>
+    {% endfor %}
+  {% endif %}
+</hx-overflow-menu>

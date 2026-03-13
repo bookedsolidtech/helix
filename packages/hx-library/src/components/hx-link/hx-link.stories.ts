@@ -242,6 +242,119 @@ export const InlineContext: Story = {
   `,
 };
 
+// --- Drupal Integration ---
+
+export const DrupalIntegration: Story = {
+  name: 'Drupal Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 1: Internal navigation link
+        </p>
+        <hx-link href="/patient/123">View Patient Record</hx-link>
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 2: External reference link (opens in new tab)
+        </p>
+        <hx-link href="https://example.com/clinical-guidelines" target="_blank"
+          >Clinical Guidelines</hx-link
+        >
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 3: Document download link
+        </p>
+        <hx-link href="/reports/discharge-summary.pdf" download="discharge-summary.pdf"
+          >Download Discharge Summary</hx-link
+        >
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 4: Inline within prose content
+        </p>
+        <p style="line-height: 1.6; color: #374151;">
+          Review the patient's
+          <hx-link href="/records/lab-results">lab results</hx-link>
+          and consult the
+          <hx-link href="https://example.com/formulary" target="_blank">formulary</hx-link>
+          before updating the medication order.
+        </p>
+      </div>
+    </div>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Demonstrates \`hx-link\` usage patterns for Drupal Twig templates.
+
+**Twig template example:**
+\`\`\`twig
+{# Internal navigation link #}
+<hx-link href="{{ path('entity.node.canonical', {'node': node.id}) }}">
+  {{ node.label }}
+</hx-link>
+
+{# External reference link opening in new tab #}
+<hx-link
+  href="{{ url }}"
+  target="_blank"
+  {% if variant %}variant="{{ variant }}"{% endif %}
+>
+  {{ link_text }}
+</hx-link>
+
+{# Document download #}
+<hx-link
+  href="{{ file.url }}"
+  download="{{ file.filename }}"
+>
+  {{ 'Download'|t }} {{ file.filename }}
+</hx-link>
+
+{# Conditionally disabled based on access #}
+<hx-link
+  href="{{ path }}"
+  {% if not access %}disabled{% endif %}
+>
+  {{ label }}
+</hx-link>
+\`\`\`
+
+**Drupal Behaviors (AJAX navigation):**
+\`\`\`js
+(function (Drupal, once) {
+  Drupal.behaviors.helixLink = {
+    attach(context) {
+      once('hx-link-init', 'hx-link[href]', context).forEach((link) => {
+        link.addEventListener('hx-click', (e) => {
+          // Handle AJAX navigation or analytics tracking
+          console.log('hx-link clicked:', e.detail);
+        });
+      });
+    },
+  };
+})(Drupal, once);
+\`\`\`
+        `,
+      },
+    },
+  },
+};
+
 // --- CSS Custom Properties ---
 
 export const CSSCustomProperties: Story = {
