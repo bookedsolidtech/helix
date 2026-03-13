@@ -190,15 +190,15 @@ The axe-core accessibility test is inside `describe('hx-tree-item', ...)` but cr
 
 ---
 
-### P2-4: No Drupal / Twig Documentation or Example
+### ~~P2-4: No Drupal / Twig Documentation or Example~~ FIXED
 
-The component has no Twig template example, no Drupal behavior documentation, and no guidance for server-side-rendered tree structures. For a healthcare organization where the primary consumer is Drupal CMS, this is a significant documentation gap.
-
-Specific concerns:
-
-- How should a Drupal backend render a tree from a taxonomy term hierarchy?
-- How does `selection` mode get passed from a Drupal field formatter?
-- Is there a Drupal behavior for progressive enhancement of server-rendered trees?
+**Resolution:** `hx-tree-view.twig` template added covering: taxonomy term hierarchy rendering
+(ICD-10 browser pattern), recursive macro for up to 3 levels of nesting, `label` (aria-label),
+`selection` mode, `expanded`/`disabled`/`selected` per-item flags, `hx-select` event handling
+via Drupal behaviors, and `mytheme.libraries.yml` registration for both `hx-tree-view.js` and
+`hx-tree-item.js`. A `DrupalIntegration` story added to `hx-tree-view.stories.ts` demonstrating
+server-rendered taxonomy trees, org chart navigation-only mode, and permission-gated disabled
+items from Drupal access checks.
 
 ---
 
@@ -334,7 +334,7 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | P2-1  | TypeScript               | P2       | `TreeSelection` type not exported                                                            |
 | P2-2  | TypeScript               | P2       | `indent` property is dead/unused code                                                        |
 | P2-3  | Tests                    | P2       | axe-core test in wrong describe block                                                        |
-| P2-4  | Drupal                   | P2       | No Twig/Drupal documentation or example                                                      |
+| P2-4  | Drupal                   | P2       | No Twig/Drupal documentation or example — **FIXED**                                          |
 | P2-5  | Accessibility / ARIA     | P2       | `aria-selected="false"` in non-selectable tree                                               |
 | P2-6  | UX                       | P2       | Wrap-around arrow navigation is undocumented and potentially disorienting                    |
 | P2-7  | CSS                      | P2       | `color-mix()` requires modern browser — no fallback [FIXED: replaced with `rgba()` fallback] |
