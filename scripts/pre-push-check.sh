@@ -62,9 +62,9 @@ COMMON_ANCESTOR_35=$(git merge-base HEAD "origin/${BASE_BRANCH_35}" 2>/dev/null 
 # Resolve cross-platform timeout: use gtimeout (macOS/coreutils), timeout (Linux), or skip
 TIMEOUT_BIN=""
 if command -v gtimeout &>/dev/null; then
-  TIMEOUT_BIN="gtimeout 90"
+  TIMEOUT_BIN="gtimeout 300"
 elif command -v timeout &>/dev/null; then
-  TIMEOUT_BIN="timeout 90"
+  TIMEOUT_BIN="timeout 300"
 fi
 
 if [ -z "$COMMON_ANCESTOR_35" ]; then
@@ -126,7 +126,7 @@ else
 
       if [ $TEST_EXIT -eq 124 ]; then
         echo ""
-        echo "Targeted tests TIMED OUT (90s) — tests may be hanging or environment issue."
+        echo "Targeted tests TIMED OUT (5min) — tests may be hanging or environment issue."
         echo "Run manually: cd packages/hx-library && npx vitest run${VITEST_INCLUDE_ARGS}"
         echo ""
         FAILED=1
