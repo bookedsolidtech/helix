@@ -12,10 +12,10 @@
 All 13 findings from the T1-22 antagonistic quality review have been resolved. The component now passes all 7 quality gates: TypeScript strict, 28 Vitest browser tests, WCAG 2.1 AA (axe-core verified in both hidden and visible states), 9 Storybook stories with play functions, accurate CEM, design token compliance, and code review.
 
 | Severity | Original Count | Resolved |
-|----------|---------------|----------|
-| P0       | 2             | 2        |
-| P1       | 5             | 5        |
-| P2       | 6             | 6        |
+| -------- | -------------- | -------- |
+| P0       | 2              | 2        |
+| P1       | 5              | 5        |
+| P2       | 6              | 6        |
 
 ---
 
@@ -85,19 +85,32 @@ All 13 findings from the T1-22 antagonistic quality review have been resolved. T
 
 ---
 
+## Post-Audit Resolution
+
+### DRUPAL: RESOLVED — Twig template created
+
+**Fix:** Created `hx-tooltip.twig` — Drupal integration template for server-rendering `hx-tooltip`
+with all supported properties (`placement`, `show-delay`, `hide-delay`), default trigger block,
+content slot block, and comprehensive Drupal usage examples including basic, custom placement,
+no-delay, and icon-only patterns.
+
+**File:** `hx-tooltip.twig`
+
+---
+
 ## Test Coverage (28 tests)
 
-| Category | Count | Tests |
-|----------|-------|-------|
-| Rendering | 4 | Shadow DOM, trigger wrapper, role=tooltip, hidden default |
-| CSS Parts | 2 | tooltip, arrow |
-| Placement | 2 | Default, reflection |
-| Delays | 2 | showDelay default, hideDelay default |
-| Slots | 2 | Default slot, content slot |
-| ARIA | 3 | aria-describedby, aria-hidden true, aria-hidden false |
-| Show/Hide | 9 | mouseenter, mouseleave, focusin, Escape, focusout, delay, timer cleanup, hover-over-tooltip, mixed keyboard+mouse |
-| Accessibility | 2 | axe-core hidden, axe-core visible |
-| Disconnected | 2 | Timer cleanup, light DOM description cleanup |
+| Category      | Count | Tests                                                                                                             |
+| ------------- | ----- | ----------------------------------------------------------------------------------------------------------------- |
+| Rendering     | 4     | Shadow DOM, trigger wrapper, role=tooltip, hidden default                                                         |
+| CSS Parts     | 2     | tooltip, arrow                                                                                                    |
+| Placement     | 2     | Default, reflection                                                                                               |
+| Delays        | 2     | showDelay default, hideDelay default                                                                              |
+| Slots         | 2     | Default slot, content slot                                                                                        |
+| ARIA          | 3     | aria-describedby, aria-hidden true, aria-hidden false                                                             |
+| Show/Hide     | 9     | mouseenter, mouseleave, focusin, Escape, focusout, delay, timer cleanup, hover-over-tooltip, mixed keyboard+mouse |
+| Accessibility | 2     | axe-core hidden, axe-core visible                                                                                 |
+| Disconnected  | 2     | Timer cleanup, light DOM description cleanup                                                                      |
 
 ## Storybook Coverage (9 stories)
 
@@ -115,10 +128,11 @@ All 13 findings from the T1-22 antagonistic quality review have been resolved. T
 
 ## Files Reviewed
 
-| File | Lines | Status |
-|---|---|---|
-| `hx-tooltip.ts` | 290 | All issues resolved |
-| `hx-tooltip.styles.ts` | 55 | All issues resolved |
-| `hx-tooltip.test.ts` | 350+ | Full coverage |
-| `hx-tooltip.stories.ts` | 343 | Full coverage |
-| `index.ts` | 1 | Correct re-export |
+| File                    | Lines | Status                  |
+| ----------------------- | ----- | ----------------------- |
+| `hx-tooltip.ts`         | 290   | All issues resolved     |
+| `hx-tooltip.styles.ts`  | 55    | All issues resolved     |
+| `hx-tooltip.test.ts`    | 350+  | Full coverage           |
+| `hx-tooltip.stories.ts` | 343   | Full coverage           |
+| `index.ts`              | 1     | Correct re-export       |
+| `hx-tooltip.twig`       | 90    | Drupal template created |

@@ -271,13 +271,13 @@ The `condensed` variant defines `--_padding-block` and `--_padding-inline` on th
 
 ## Fixes Applied (Deep Audit v2)
 
-| Issue | Status | Fix                                                                                                 |
-| ----- | ------ | --------------------------------------------------------------------------------------------------- |
-| P0-1  | FIXED  | Striped CSS implemented via `::slotted(hx-structured-list-row:nth-of-type(even))`                   |
-| P0-2  | FIXED  | Hardcoded `1px` replaced with `var(--_border-width, var(--hx-border-width-thin, 1px))`              |
-| P0-3  | N/A    | Library uses per-component entry points — no centralized `src/index.ts` needed                      |
+| Issue | Status | Fix                                                                                                                                                                                                                            |
+| ----- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P0-1  | FIXED  | Striped CSS implemented via `::slotted(hx-structured-list-row:nth-of-type(even))`                                                                                                                                              |
+| P0-2  | FIXED  | Hardcoded `1px` replaced with `var(--_border-width, var(--hx-border-width-thin, 1px))`                                                                                                                                         |
+| P0-3  | N/A    | Library uses per-component entry points — no centralized `src/index.ts` needed                                                                                                                                                 |
 | P1-1  | FIXED  | Container has `role="list"`; row base uses `role="listitem"` (removed conflicting `role="term"`/`role="definition"` from shadow DOM children — these caused axe `aria-required-children` violations when inside `role="list"`) |
-| P1-3  | FIXED  | Added `@cssprop` docs for `--hx-structured-list-label-color` and `--hx-structured-list-value-color` |
+| P1-3  | FIXED  | Added `@cssprop` docs for `--hx-structured-list-label-color` and `--hx-structured-list-value-color`                                                                                                                            |
 
 ## Fixes Applied (Deep Audit v3)
 
