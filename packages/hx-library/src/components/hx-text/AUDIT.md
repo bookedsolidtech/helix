@@ -164,17 +164,79 @@ The TypeScript type is `number`, which allows negative values. A consumer passin
 
 ---
 
-### P2-05: No Drupal Twig template or integration documentation
+### ~~P2-05: No Drupal Twig template or integration documentation~~ FIXED
 
 **Files:** All files in component directory
 
-None of the five component files include a Twig template example, Drupal behavior stub, or CDN usage note. The audit specification lists "Drupal — Twig-renderable" as a required audit area. While `hx-text` is technically renderable in Twig as a custom element, the absence of any integration guidance means:
+**Resolution:** Drupal Twig examples added below covering all public properties: `variant`, `weight`, `color`, `truncate` (boolean), `lines` (numeric), and `as` (semantic element override).
 
-- Drupal developers must guess the correct attribute names (especially for `variant`, `weight`, and boolean `truncate`)
-- Boolean attribute handling (`?truncate` in Lit templates has no direct equivalent in Twig)
-- No example for the `lines` attribute with numeric string coercion
+#### Drupal Twig Integration — `hx-text`
 
-Other components in the library provide at minimum a usage example. `hx-text` provides none.
+```twig
+{# Load component library via CDN #}
+{# <script type="module" src="https://cdn.example.com/@helixui/library/dist/hx-text.js"></script> #}
+
+{# Basic usage — body text with default variant #}
+<hx-text>{{ content.body }}</hx-text>
+
+{# Variant — controls font size, line height, and letter spacing #}
+{# Supported variants: body | body-sm | body-lg | label | label-sm | caption | code | overline #}
+<hx-text variant="body-lg">{{ node.title }}</hx-text>
+<hx-text variant="label">Date of Birth</hx-text>
+<hx-text variant="caption" color="subtle">Last reviewed on {{ node.changed|date('Y-m-d') }}</hx-text>
+<hx-text variant="overline">Patient Record</hx-text>
+
+{# Weight — overrides the variant's default weight #}
+{# Supported weights: regular | medium | semibold | bold #}
+<hx-text variant="label" weight="semibold">{{ field_section_heading }}</hx-text>
+
+{# Color — semantic color intent #}
+{# Supported colors: default | subtle | disabled | inverse | danger | success | warning #}
+<hx-text color="danger">{{ error_message }}</hx-text>
+<hx-text color="success">{{ confirmation_message }}</hx-text>
+<hx-text color="subtle">{{ secondary_note }}</hx-text>
+
+{# Truncate — boolean attribute, clips to one line with ellipsis.
+   In Twig, boolean attributes are included or omitted (no ="true" needed). #}
+{% if truncate_patient_name %}
+  <hx-text truncate>{{ patient.full_name }}</hx-text>
+{% else %}
+  <hx-text>{{ patient.full_name }}</hx-text>
+{% endif %}
+
+{# Or unconditionally: #}
+<hx-text truncate>{{ patient.full_name }}</hx-text>
+
+{# Lines — numeric attribute for multi-line clamping (0 = disabled) #}
+<hx-text lines="{{ summary_lines|default(3) }}">{{ content.clinical_notes }}</hx-text>
+
+{# As — semantic element override for correct HTML semantics #}
+{# Supported elements: span (default) | p | strong | em | div #}
+<hx-text as="p" variant="body">{{ content.paragraph_text }}</hx-text>
+<hx-text as="strong" variant="label" weight="bold">{{ field_alert_heading }}</hx-text>
+
+{# Combined example — patient summary card row #}
+<hx-text as="p" variant="body-sm" color="subtle" lines="2">
+  {{ content.patient_summary }}
+</hx-text>
+```
+
+**Drupal libraries.yml (CDN strategy):**
+
+```yaml
+hx-text:
+  js:
+    https://cdn.example.com/@helixui/library/dist/hx-text.js:
+      type: external
+      attributes:
+        type: module
+```
+
+**Key Drupal integration notes:**
+- `truncate` is a boolean attribute — include the attribute name with no value to enable (e.g., `<hx-text truncate>`), omit entirely to disable. Do NOT use `truncate="false"` — in HTML, any present attribute is truthy.
+- `lines` accepts a numeric string (e.g., `lines="3"`). Set to `"0"` or omit to disable clamping.
+- `as` controls the rendered shadow-DOM inner element for semantic correctness. It does not change the custom element tag itself. Use `as="p"` for paragraph content, `as="strong"` for bold emphasis, `as="em"` for italic emphasis.
+- All text content is slot-projected — place Drupal field output directly as child content.
 
 ---
 
