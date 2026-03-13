@@ -185,7 +185,11 @@ describe('hx-progress-ring', () => {
     });
   });
 
-  // ─── Property: strokeWidth (2) ───
+  // ─── Property: strokeWidth (4) ───
+  // P2-02: indeterminate animation uses hardcoded SVG path lengths that are
+  // calibrated for the default strokeWidth. These tests verify the indicator
+  // and track circles render at the correct geometry for non-default values
+  // so regressions in the SVG geometry are caught deterministically.
 
   describe('Property: strokeWidth', () => {
     it('defaults to 4', async () => {
@@ -198,6 +202,29 @@ describe('hx-progress-ring', () => {
         '<hx-progress-ring stroke-width="8"></hx-progress-ring>',
       );
       expect(el.strokeWidth).toBe(8);
+    });
+
+    it('indicator circle renders at correct radius for non-default strokeWidth in indeterminate mode', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring stroke-width="8"></hx-progress-ring>',
+      );
+      await el.updateComplete;
+      // r = (100 - strokeWidth) / 2 = (100 - 8) / 2 = 46
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      expect(indicator).toBeTruthy();
+      expect(indicator?.getAttribute('r')).toBe('46');
+    });
+
+    it('track and indicator circles share the same radius for a given strokeWidth', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50" stroke-width="10"></hx-progress-ring>',
+      );
+      await el.updateComplete;
+      // r = (100 - 10) / 2 = 45
+      const track = shadowQuery(el, '[part="track"]');
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      expect(track?.getAttribute('r')).toBe('45');
+      expect(indicator?.getAttribute('r')).toBe('45');
     });
   });
 

@@ -60,6 +60,26 @@ export class HelixStack extends LitElement {
   @property({ type: Boolean, reflect: true })
   inline = false;
 
+  /**
+   * Sets `role="presentation"` on connect so assistive technologies treat this
+   * element as a purely visual layout wrapper with no semantic meaning. This
+   * suppresses any implicit ARIA role that a custom element might otherwise
+   * inherit, preventing screen readers from announcing "group" or "region"
+   * for what is purely a spacing/alignment container.
+   *
+   * **Consumer override:** If you need a semantic grouping role (e.g. for a
+   * form fieldset equivalent), set `role="group"` or any other ARIA role
+   * directly on the element — the guard `!this.hasAttribute('role')` ensures
+   * the component will not overwrite it.
+   *
+   * @example
+   * <!-- Layout stack — role="presentation" applied automatically -->
+   * <hx-stack gap="md">...</hx-stack>
+   *
+   * @example
+   * <!-- Semantic group — consumer role preserved -->
+   * <hx-stack role="group" aria-labelledby="form-heading" gap="md">...</hx-stack>
+   */
   override connectedCallback(): void {
     super.connectedCallback();
     if (!this.hasAttribute('role')) {

@@ -1,0 +1,82 @@
+{#
+  hx-theme — Drupal Twig Template
+  =================================
+
+  Wraps a content region in <hx-theme> to scope design tokens to that subtree.
+
+  IMPORTANT: hx-theme requires JavaScript to inject --hx-* design tokens.
+  Server-rendered content is accessible before hydration, but visual theming
+  (colors, typography, spacing via tokens) is applied client-side. Ensure
+  meaningful fallback styles exist in your base CSS for the no-JS case.
+
+  system mode (window.matchMedia) is NOT available during Drupal server-side
+  rendering. Always set theme explicitly from PHP/Twig. Use theme="auto" if you
+  want OS preference to apply after client-side hydration without a JS cookie/session.
+
+  Parameters:
+    theme      (string)  Required. One of: 'light' | 'dark' | 'high-contrast' | 'auto'.
+                         Defaults to 'light'.
+                         - 'light'         — Light token set (default).
+                         - 'dark'          — Dark token set.
+                         - 'high-contrast' — WCAG 7:1+ contrast token set. Use for
+                                             users with low vision or HC display modes.
+                         - 'auto'          — Reads OS color-scheme preference after hydration.
+                                             Renders as 'light' until JavaScript runs.
+    attributes (object)  Optional. Additional HTML attributes spread onto <hx-theme>.
+
+  Usage — Full page theming:
+    Read theme preference from Drupal config, cookie, or user profile:
+
+    {% set active_theme = user.field_preferred_theme.value|default('light') %}
+    {% include '@mytheme/hx-theme/hx-theme.twig' with {
+      theme: active_theme,
+    } %}
+      {{ page.content }}
+    {% endinclide %}
+
+  Usage — Dark sidebar inside a light page (nested scope):
+    <hx-theme theme="light">
+      {{ page.content }}
+      <hx-theme theme="dark">
+        {{ page.sidebar_first }}
+      </hx-theme>
+    </hx-theme>
+
+  Usage — Theme toggle button (Drupal behavior):
+    Add data-hx-theme-toggle="dark" to any clickable element. The behavior below
+    finds the nearest <hx-theme> ancestor and updates its theme attribute:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixTheme = {
+          attach: function (context) {
+            once('hx-theme-toggle', '[data-hx-theme-toggle]', context).forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const themeEl = btn.closest('hx-theme') || document.querySelector('hx-theme');
+                if (themeEl) {
+                  themeEl.setAttribute('theme', btn.dataset.hxThemeToggle);
+                }
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-theme:
+        js:
+          path/to/@helixui/library/dist/hx-theme.js: { attributes: { type: module } }
+        dependencies:
+          - core/drupal
+          - core/once
+
+    Attach the library in page.html.twig:
+      {{ attach_library('mytheme/hx-theme') }}
+#}
+
+<hx-theme
+  theme="{{ theme|default('light') }}"
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% block content %}{% endblock %}
+</hx-theme>

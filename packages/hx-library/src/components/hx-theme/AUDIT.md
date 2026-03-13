@@ -274,20 +274,3 @@ The component's JSDoc does not include a Drupal usage example. Enterprise Drupal
 2. **`ThemeName` missing `'auto'`** — creates unserializable split API
 3. **Three-tier token cascade not implemented** — primitives and semantics are indistinguishable in injection
 4. **Bundle size** — verify with `npm run build` + bundlesize check; `TokenEntry[]` metadata arrays will blow the 5KB budget
-
----
-
-## TypeScript Audit Fixes Applied (2026-03-13)
-
-| Finding                                                                         | Status                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0-02: `ThemeName` missing `'auto'`; `system` prop untyped workaround           | **FIXED** — `ThemeName` updated to `'light' \| 'dark' \| 'high-contrast' \| 'auto'`; `system` prop retained as `@deprecated` backward-compat shim; `theme="auto"` now reads OS preference via `effectiveTheme` getter |
-| P0-01: High-contrast is a stub (dark tokens reused)                             | **FIXED** — dedicated `_hcOverrides` constant with WCAG 7:1+ contrast values added to `hx-theme.ts`; high-contrast theme now injects distinct token set independent of dark tokens                                    |
-| P1-01: No exported token override types                                         | **FIXED** — `export type { TokenDefinition, TokenEntry } from '@helixui/tokens'` re-exported from `hx-theme.ts`; both types also re-exported from `index.ts`                                                          |
-| P1-02: `firstUpdated()` missing `super.firstUpdated()`                          | **FIXED** — `super.firstUpdated(changed)` call added as first statement of `firstUpdated()`                                                                                                                           |
-| P2-01: `WcTheme` deprecated alias lacks `@deprecated` in `index.ts`             | **FIXED** — `HxTheme` canonical alias added to `hx-theme.ts` and `index.ts`; `WcTheme` deprecated alias added with `@deprecated` JSDoc in both files                                                                  |
-| P2-06: `ThemeSwitcherDemo` uses loose `as HTMLElement & { theme: string }` cast | **FIXED** — `import type { HelixTheme }` added to `hx-theme.stories.ts`; all inline casts now use `as HelixTheme`                                                                                                     |
-| P1-03/P1-10: No `color-scheme` CSS property                                     | **FIXED** — `color-scheme: dark` injected into `:host` block for `dark` and `high-contrast` themes; `color-scheme: light` for `light`/`auto` light-mode resolution                                                    |
-| P1-11: No memoization of CSS strings                                            | **FIXED** — module-level `_cssCache: Map<ThemeName, string>` added; `_buildThemeCss(theme)` returns cached string on subsequent calls                                                                                 |
-| P1-12: `CSSStyleSheet.replaceSync()` synchronous                                | **FIXED** — switched to async `this._themeSheet.replace(...)` via `void` promise                                                                                                                                      |
-| Drupal `window` guard for SSR                                                   | **FIXED** — `typeof window === 'undefined'` guard added in `_attachMediaQuery()` and `effectiveTheme` getter                                                                                                          |

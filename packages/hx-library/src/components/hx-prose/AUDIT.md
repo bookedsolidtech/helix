@@ -4,6 +4,7 @@
 **Auditor:** Automated antagonistic review
 **Audit Date:** 2026-03-05
 **Files Reviewed:**
+
 - `hx-prose.ts`
 - `hx-prose.styles.ts`
 - `hx-prose.test.ts`
@@ -17,11 +18,11 @@
 
 ## Summary
 
-| Severity | Count |
-|---|---|
-| P0 (Blocker) | 2 |
-| P1 (High) | 8 |
-| P2 (Medium) | 8 |
+| Severity     | Count |
+| ------------ | ----- |
+| P0 (Blocker) | 2     |
+| P1 (High)    | 8     |
+| P2 (Medium)  | 8     |
 
 ---
 
@@ -62,15 +63,15 @@ The component exports `HelixProse`, not `WcProse`. This import will produce a Ty
 
 ```css
 /* inline code */
-font-size: 0.875em;          /* should be var(--hx-font-size-sm, 0.875em) */
-padding: 0.125em var(--hx-space-1, 0.25rem);  /* 0.125em is not tokenized */
+font-size: 0.875em; /* should be var(--hx-font-size-sm, 0.875em) */
+padding: 0.125em var(--hx-space-1, 0.25rem); /* 0.125em is not tokenized */
 
 /* kbd */
-font-size: 0.875em;          /* same issue */
-padding: 0.125em var(--hx-space-2, 0.5rem);   /* 0.125em is not tokenized */
+font-size: 0.875em; /* same issue */
+padding: 0.125em var(--hx-space-2, 0.5rem); /* 0.125em is not tokenized */
 
 /* samp */
-font-size: 0.875em;          /* same issue */
+font-size: 0.875em; /* same issue */
 ```
 
 The project rule is "no hardcoded values — colors, spacing, typography use tokens always." The `0.875em` font-size has a token (`--hx-font-size-sm`) but is not using it. The `0.125em` padding value has no token and is hardcoded. A consumer cannot override the `code` font-size via `--hx-font-size-sm` because the CSS bypasses it.
@@ -277,12 +278,15 @@ The accessibility test suite tests headings, tables, and lists with axe-core. Th
 
 ```html
 <hx-prose>
-  <img src="chart.png">  <!-- no alt — axe violation -->
-  <img src="chart.png" alt="">  <!-- decorative — should be valid -->
+  <img src="chart.png" />
+  <!-- no alt — axe violation -->
+  <img src="chart.png" alt="" />
+  <!-- decorative — should be valid -->
 </hx-prose>
 ```
 
 The feature description notes: "images have alt." This is partially a consumer responsibility, but the test suite should include:
+
 1. A test verifying that `img` without `alt` produces an axe violation (to confirm axe CAN detect this in Light DOM).
 2. A test verifying that `img` with `alt=""` (decorative) passes.
 3. A test verifying that `img` with descriptive `alt` text passes.
@@ -315,6 +319,7 @@ If any of these are absent, Storybook coverage is incomplete. Stories cannot be 
 ### Light DOM Design — Correct but Requires Consumer Discipline
 
 `hx-prose` intentionally uses Light DOM (no Shadow DOM) via `createRenderRoot() { return this; }`. This is the right choice for a CMS content wrapper because:
+
 - Axe-core can scan child content (Shadow DOM creates a boundary axe historically struggles with)
 - Global heading hierarchy is preserved across page sections
 - CMS-injected styles can still target content within the wrapper

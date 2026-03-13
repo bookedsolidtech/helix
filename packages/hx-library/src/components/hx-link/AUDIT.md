@@ -55,7 +55,7 @@ All 14 issues from the T1-05 audit have been addressed:
 | P2-5 | Redundant `cursor: not-allowed`              | **Fixed** (removed from `.link--disabled`, kept on `:host([disabled])`) |
 | P2-6 | `LinkVariant` type not exported              | **Fixed** (exported from `index.ts`)                                    |
 | P2-7 | Missing `outline: 0` on `.link`              | **Fixed** (present on `.link` base)                                     |
-| P2-8 | No Drupal Twig usage example                 | **Fixed** (full Twig + behaviors in docs)                               |
+| P2-8 | No Drupal Twig usage example                 | **Fixed** (full Twig + behaviors in docs and `DrupalIntegration` story) |
 
 ---
 

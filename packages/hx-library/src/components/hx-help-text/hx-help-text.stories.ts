@@ -23,10 +23,12 @@ const meta = {
       },
     },
     label: {
+      name: 'default (slot)',
       control: 'text',
-      description: 'Help text content passed via the default slot.',
+      description:
+        '**Storybook only.** Controls the default slot content. This is not a component property — pass text between `<hx-help-text>` tags to populate the default slot.',
       table: {
-        category: 'Content',
+        category: 'Slots',
         type: { summary: 'string' },
       },
     },
@@ -109,7 +111,7 @@ export const FormFieldIntegration: Story = {
           id="email"
           type="email"
           aria-describedby="email-help"
-          style="display: block; width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"
+          style="display: block; width: 100%; padding: 0.5rem; border: 1px solid var(--hx-color-neutral-300); border-radius: 0.375rem;"
           placeholder="you@example.com"
         />
         <hx-help-text id="email-help" style="margin-top: 0.25rem;">
@@ -126,7 +128,7 @@ export const FormFieldIntegration: Story = {
           type="password"
           aria-describedby="password-error"
           aria-invalid="true"
-          style="display: block; width: 100%; padding: 0.5rem; border: 1px solid #dc2626; border-radius: 0.375rem;"
+          style="display: block; width: 100%; padding: 0.5rem; border: 1px solid var(--hx-color-error-600); border-radius: 0.375rem;"
         />
         <hx-help-text id="password-error" variant="error" style="margin-top: 0.25rem;">
           Password must be at least 8 characters.
@@ -141,7 +143,7 @@ export const FormFieldIntegration: Story = {
           id="username"
           type="text"
           aria-describedby="username-success"
-          style="display: block; width: 100%; padding: 0.5rem; border: 1px solid #15803d; border-radius: 0.375rem;"
+          style="display: block; width: 100%; padding: 0.5rem; border: 1px solid var(--hx-color-success-700); border-radius: 0.375rem;"
           value="john_doe"
         />
         <hx-help-text id="username-success" variant="success" style="margin-top: 0.25rem;">
