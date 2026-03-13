@@ -116,13 +116,11 @@ This is a surprising UX bug: users hovering briefly near end-of-life toasts rest
 
 ## P2 — Medium Severity (should fix in follow-up sprint)
 
-### P2-01: `prefers-reduced-motion` suppresses animation only, not auto-dismiss timer
+### ~~P2-01: `prefers-reduced-motion` suppresses animation only, not auto-dismiss timer~~ FIXED
 
-**File:** `hx-toast.styles.ts:130–134`
+**File:** `hx-toast.ts:139–142`
 
-The `@media (prefers-reduced-motion: reduce)` block sets `transition: none` on `.toast`, which is correct. However, the auto-dismiss timer (`this.duration`) fires regardless of this preference. Users who require reduced motion often have vestibular or cognitive disabilities that also benefit from extended or persistent notification durations.
-
-**Expected improvement:** When `prefers-reduced-motion` is active, either suppress the auto-dismiss entirely or significantly extend the duration. This requires a `window.matchMedia('(prefers-reduced-motion: reduce)')` check at timer start.
+**Resolution:** `_startTimer` now checks `window.matchMedia('(prefers-reduced-motion: reduce)').matches` at the start and returns early if true, preventing the auto-dismiss timer from firing when the user has requested reduced motion.
 
 ---
 
@@ -152,13 +150,11 @@ This is the primary behavioral contract of `hx-toast-stack` and it has no test c
 
 ---
 
-### P2-05: `action` slot wrapper has no CSS part
+### ~~P2-05: `action` slot wrapper has no CSS part~~ FIXED
 
-**File:** `hx-toast.ts:218–220`, JSDoc at lines 33–36
+**File:** `hx-toast.ts`, JSDoc at lines 33–36
 
-The `<span class="toast__action">` wrapping the action slot has no `part` attribute. The JSDoc documents `base`, `icon`, `message`, and `close-button` parts — but `action` is not listed. Consumers cannot style the action slot wrapper via `::part(action)`.
-
-This is inconsistent with `icon` and `message` which both have dedicated parts. The action wrapper is meaningful for layout (e.g., changing gap, alignment, border between action and message).
+**Resolution:** `part="action"` added to `<span class="toast__action">` and documented in JSDoc `@csspart` block. Consumers can now style the action wrapper via `::part(action)`.
 
 ---
 
@@ -209,6 +205,6 @@ The story is misleading to developers evaluating the component.
 | Accessibility (ARIA/axe)       | PARTIAL | P1-01, P1-02                               |
 | Tests (coverage/completeness)  | FAIL    | P1-03, P2-02, P2-03                        |
 | Storybook (variants/demos)     | PARTIAL | P2-07                                      |
-| CSS (tokens, animation, parts) | PARTIAL | P2-04, P2-05, P2-08                        |
+| CSS (tokens, animation, parts) | PASS    | P2-01, P2-04, P2-05, P2-08 all fixed       |
 | Performance (bundle size)      | PASS    | ~14KB raw, well under 5KB gzipped estimate |
 | Drupal integration             | PASS    | P1-04 FIXED                                |

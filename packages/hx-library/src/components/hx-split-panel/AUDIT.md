@@ -260,3 +260,4 @@ The following areas pass review without significant issues:
 | P2-04 | RESOLVED | `aria-disabled` now uses Lit `nothing` directive when not disabled; attribute is absent (not `aria-disabled="false"`) |
 | P2-05 | RESOLVED | Divider has `aria-label="Resize panels"` for screen reader announcement |
 | P2-06 | RESOLVED | PageUp (+10%) and PageDown (-10%) keyboard handlers added to divider |
+| P2-07 | RESOLVED | Hardcoded hex fallbacks (`#e2e8f0`, `#3b82f6`) removed; `--_divider-color` and `--_divider-hover-color` now use token-only cascade with no hex last-resort |
