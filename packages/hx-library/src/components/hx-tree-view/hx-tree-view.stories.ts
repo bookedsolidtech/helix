@@ -115,7 +115,9 @@ export const MultipleSelection: Story = {
     <hx-tree-view label="ICD-10 categories" selection="multiple">
       <hx-tree-item expanded>
         ICD-10 Categories
-        <hx-tree-item slot="children" selected>A00-A09: Intestinal infectious diseases</hx-tree-item>
+        <hx-tree-item slot="children" selected
+          >A00-A09: Intestinal infectious diseases</hx-tree-item
+        >
         <hx-tree-item slot="children" selected>A15-A19: Tuberculosis</hx-tree-item>
         <hx-tree-item slot="children">A20-A28: Certain zoonotic bacterial diseases</hx-tree-item>
         <hx-tree-item slot="children">A30-A49: Other bacterial diseases</hx-tree-item>
@@ -243,7 +245,9 @@ export const DeepNesting: Story = {
               <hx-tree-item slot="children">A00.0.1: Classical cholera</hx-tree-item>
               <hx-tree-item slot="children">A00.0.2: El Tor cholera</hx-tree-item>
             </hx-tree-item>
-            <hx-tree-item slot="children">A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item>
+            <hx-tree-item slot="children"
+              >A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item
+            >
           </hx-tree-item>
         </hx-tree-item>
       </hx-tree-item>

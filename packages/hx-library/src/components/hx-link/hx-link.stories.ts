@@ -257,8 +257,7 @@ export const CSSCustomProperties: Story = {
         <hx-link href="/page" style="--hx-link-text-decoration: none;">No underline</hx-link>
       </div>
       <div>
-        <code style="font-size: 0.75rem; color: #6b7280;"
-          >--hx-link-focus-ring-color: #7c3aed</code
+        <code style="font-size: 0.75rem; color: #6b7280;">--hx-link-focus-ring-color: #7c3aed</code
         ><br />
         <hx-link href="/page" style="--hx-link-focus-ring-color: #7c3aed;"
           >Purple focus ring (tab to see)</hx-link
