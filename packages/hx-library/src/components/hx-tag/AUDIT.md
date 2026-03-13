@@ -328,6 +328,8 @@ This pattern creates new event listeners on every Storybook hot-reload and re-re
 | 6. Bundle size       | ✅ Pass    | Component is minimal; well under 5KB                                                      |
 | 7. Code review       | ✅ Pass    | All P0 issues resolved.                                                                   |
 
+# <<<<<<< HEAD
+
 ---
 
 ## TypeScript Audit Fixes Applied (2026-03-13)
@@ -337,3 +339,5 @@ This pattern creates new event listeners on every Storybook hot-reload and re-re
 | P1-01: Event name mismatch (`hx-remove` vs `hx-dismiss`)  | **RESOLVED** — API decision made: `hx-remove` is the canonical event name. `hx-dismiss` from the spec brief was a preliminary name; `hx-remove` more accurately describes user intent (removing a tag from a collection). Spec and JSDoc updated accordingly. |
 | P1-02: Prop name deviation (`removable` vs `dismissible`) | **RESOLVED** — API decision made: `removable` is the canonical property name. It aligns better with the component's function (enabling a remove button) and is more intuitive for healthcare consumers building filterable lists. Documented in JSDoc.        |
 | P2-03: `WcTag` type alias uses legacy `Wc` prefix         | **FIXED** — `export type HxTag = HelixTag` added as canonical alias; `WcTag` retained with `@deprecated` JSDoc warning consumers to migrate. Both now exported from `index.ts`.                                                                               |
+
+> > > > > > > origin/dev

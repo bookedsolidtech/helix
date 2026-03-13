@@ -100,6 +100,33 @@ describe('hx-status-indicator', () => {
       );
       expect(el.size).toBe('lg');
     });
+
+    // P2-08: Verify size attribute is reflected for all distinct size values.
+    // getBoundingClientRect() returns 0 in headless Chromium, so we test the
+    // reflected attribute rather than computed layout dimensions.
+    it('"sm" size is a distinct value from "md"', async () => {
+      const sm = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="sm"></hx-status-indicator>',
+      );
+      const md = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="md"></hx-status-indicator>',
+      );
+      expect(sm.getAttribute('size')).toBe('sm');
+      expect(md.getAttribute('size')).toBe('md');
+      expect(sm.getAttribute('size')).not.toBe(md.getAttribute('size'));
+    });
+
+    it('"lg" size is a distinct value from "md"', async () => {
+      const md = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="md"></hx-status-indicator>',
+      );
+      const lg = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="lg"></hx-status-indicator>',
+      );
+      expect(md.getAttribute('size')).toBe('md');
+      expect(lg.getAttribute('size')).toBe('lg');
+      expect(lg.getAttribute('size')).not.toBe(md.getAttribute('size'));
+    });
   });
 
   // ─── Property: pulse ───

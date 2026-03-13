@@ -352,6 +352,8 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | P2-7: `color-mix()` CSS Level 5 — Browser Compatibility Risk | **FIXED** — replaced `color-mix(in srgb, currentColor 10%, transparent)` with `rgba(0, 0, 0, 0.06)` fallback in `hx-tree-item.styles.ts`                                                                      |
 | Incomplete `prefers-reduced-motion` coverage                 | **FIXED** — expanded `@media (prefers-reduced-motion: reduce)` block in `hx-tree-item.styles.ts` to cover `.item-row`, `.expand-btn`, and `.expand-btn svg` transitions (previously only covered `.children`) |
 
+# <<<<<<< HEAD
+
 ## TypeScript Audit Fixes Applied (2026-03-13)
 
 | Finding                                                                | Status                                                                                                                                                                     |
@@ -366,3 +368,5 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | P2-10: `_handleFocusIn` dead code (tree div not focusable)             | **FIXED** — resolved by adding `tabindex="0"` to the tree container (P0-1 fix); `_handleFocusIn` is now functional                                                         |
 | P2-11: `aria-posinset` and `aria-setsize` missing                      | **FIXED** — `_getPosInSet()` and `_getSetSize()` methods added; `aria-posinset` and `aria-setsize` applied to all treeitems                                                |
 | `WcTreeView`/`WcTreeItem` use legacy `Wc` prefix without `@deprecated` | **FIXED** — `HxTreeView` and `HxTreeItem` canonical type aliases added; `WcTreeView` and `WcTreeItem` retained with `@deprecated` JSDoc; all four exported from `index.ts` |
+
+> > > > > > > origin/dev
