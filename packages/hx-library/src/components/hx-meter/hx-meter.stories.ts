@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 import './hx-meter.js';
 
 // ─────────────────────────────────────────────────
@@ -102,7 +102,6 @@ type Story = StoryObj;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const meter = canvasElement.querySelector('hx-meter');
     await expect(meter).toBeTruthy();
     const base = meter!.shadowRoot!.querySelector('[part="base"]');

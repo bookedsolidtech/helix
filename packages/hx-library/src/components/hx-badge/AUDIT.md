@@ -199,17 +199,13 @@ The `aria-live="polite"` attribute is tested for static presence, but no test ve
 
 ---
 
-#### P3-3: `WcBadge` type alias follows project-wide legacy pattern
+#### ~~P3-3: `WcBadge` type alias follows project-wide legacy pattern~~ FIXED
 
-**Location:** `hx-badge.ts:193`
+**Location:** `hx-badge.ts`
 
-```ts
-export type WcBadge = HelixBadge;
-```
+The `WcBadge` type alias now carries a `@deprecated` JSDoc annotation with `@since 0.1.0` and `@removal-target 1.0.0`, documenting the migration timeline. A canonical `HxBadge` alias has been added alongside the deprecated one, and both are exported from the component `index.ts` and the library root `index.ts`. Consumers can migrate from `WcBadge` to `HxBadge` or directly to `HelixBadge`.
 
-This uses the old `Wc` prefix instead of `Hx`. However, this is a **project-wide pattern** (found in hx-button, hx-text, hx-text-input, hx-switch, hx-tag, hx-checkbox, hx-radio-group, hx-divider, hx-help-text, hx-nav, etc.). Not a badge-specific issue — should be addressed as a coordinated migration across all components.
-
-**Severity:** P3 — systemic naming inconsistency, not badge-specific.
+**Severity:** P3 — systemic naming inconsistency, now tracked with deprecation metadata.
 
 ---
 
@@ -260,12 +256,12 @@ This uses the old `Wc` prefix instead of `Hx`. However, this is a **project-wide
 
 ## Severity Summary
 
-| Severity | Count | Details                                                 |
-| -------- | ----- | ------------------------------------------------------- |
-| P0       | 0     | —                                                       |
-| P1       | 0     | —                                                       |
-| P2       | 3     | Dead CSS variable, misleading story, prefix in dot mode |
-| P3       | 3     | Test gaps, legacy type alias                            |
+| Severity | Count | Details                                                                 |
+| -------- | ----- | ----------------------------------------------------------------------- |
+| P0       | 0     | —                                                                       |
+| P1       | 0     | —                                                                       |
+| P2       | 3     | Dead CSS variable (FIXED), misleading story, prefix in dot mode (FIXED) |
+| P3       | 3     | Test gaps (2), legacy type alias (FIXED with deprecation metadata)      |
 
 **Recommendation:** Component is **ready for production**. P2 items are polish — create GitHub issues for tracking. No blockers.
 

@@ -239,9 +239,7 @@ describe('hx-switch', () => {
     });
 
     it('slotted label content sets aria-labelledby on track', async () => {
-      const el = await fixture<HxSwitch>(
-        '<hx-switch><strong>Slotted Label</strong></hx-switch>',
-      );
+      const el = await fixture<HxSwitch>('<hx-switch><strong>Slotted Label</strong></hx-switch>');
       await el.updateComplete;
       const track = shadowQuery(el, '[role="switch"]');
       const label = shadowQuery(el, '[part="label"]');
@@ -423,6 +421,14 @@ describe('hx-switch', () => {
       track?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
       expect(el.checked).toBe(false);
+    });
+
+    it('disabled inner button still has tabIndex=0 (keyboard exclusion via _toggle() guard, not tabIndex)', async () => {
+      // Native <button disabled> retains tabIndex=0 — the browser does not change tabIndex on disable.
+      // Keyboard interaction is prevented by the _toggle() guard checking this.disabled (A-12).
+      const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
+      const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
+      expect(track?.tabIndex).toBe(0);
     });
   });
 
