@@ -827,4 +827,119 @@ describe('hx-split-panel', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Pointer / Drag interaction ───
+
+  describe('Pointer interaction', () => {
+    it('pointerdown on divider initiates drag state', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      // Give the component a measurable size by forcing offsetWidth via inline style
+      Object.defineProperty(el, 'offsetWidth', { configurable: true, value: 400 });
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]')!;
+
+      divider.dispatchEvent(
+        new PointerEvent('pointerdown', { clientX: 200, bubbles: true, pointerId: 1 }),
+      );
+      // After pointerdown + pointermove 40px right on a 400px host = +10%
+      divider.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 240, bubbles: true, pointerId: 1 }),
+      );
+      await el.updateComplete;
+
+      expect(el.position).toBe(60);
+    });
+
+    it('pointermove does not move divider when not dragging', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      Object.defineProperty(el, 'offsetWidth', { configurable: true, value: 400 });
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]')!;
+
+      // pointermove without a preceding pointerdown — should be a no-op
+      divider.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 300, bubbles: true, pointerId: 1 }),
+      );
+      await el.updateComplete;
+
+      expect(el.position).toBe(50);
+    });
+
+    it('pointerup ends drag state so subsequent pointermove is ignored', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      Object.defineProperty(el, 'offsetWidth', { configurable: true, value: 400 });
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]')!;
+
+      divider.dispatchEvent(
+        new PointerEvent('pointerdown', { clientX: 200, bubbles: true, pointerId: 1 }),
+      );
+      divider.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
+      // Move after release — position should remain at 50
+      divider.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 300, bubbles: true, pointerId: 1 }),
+      );
+      await el.updateComplete;
+
+      expect(el.position).toBe(50);
+    });
+
+    it('pointerdown is blocked when disabled', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="50" disabled></hx-split-panel>',
+      );
+      Object.defineProperty(el, 'offsetWidth', { configurable: true, value: 400 });
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]')!;
+
+      divider.dispatchEvent(
+        new PointerEvent('pointerdown', { clientX: 200, bubbles: true, pointerId: 1 }),
+      );
+      divider.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 280, bubbles: true, pointerId: 1 }),
+      );
+      await el.updateComplete;
+
+      expect(el.position).toBe(50);
+    });
+
+    it('drag fires hx-reposition event with updated position', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      Object.defineProperty(el, 'offsetWidth', { configurable: true, value: 400 });
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]')!;
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-reposition');
+      divider.dispatchEvent(
+        new PointerEvent('pointerdown', { clientX: 200, bubbles: true, pointerId: 1 }),
+      );
+      divider.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 240, bubbles: true, pointerId: 1 }),
+      );
+
+      const event = await eventPromise;
+      expect(event.detail.position).toBe(60);
+    });
+  });
+
+  // ─── positionInPixels ───
+
+  describe('positionInPixels', () => {
+    it('sets positionInPixels property without error', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position-in-pixels="200"></hx-split-panel>',
+      );
+      expect(el.positionInPixels).toBe(200);
+    });
+
+    it('positionInPixels attribute is parsed as number', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position-in-pixels="150"></hx-split-panel>',
+      );
+      expect(typeof el.positionInPixels).toBe('number');
+      expect(el.positionInPixels).toBe(150);
+    });
+
+    it('positionInPixels property can be set programmatically', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      el.positionInPixels = 100;
+      await el.updateComplete;
+      expect(el.positionInPixels).toBe(100);
+    });
+  });
 });
