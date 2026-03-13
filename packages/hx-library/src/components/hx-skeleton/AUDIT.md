@@ -20,8 +20,10 @@
 | Severity      | Count |
 | ------------- | ----- |
 | P0 (Blocking) | 1     |
-| P1 (High)     | 5     |
-| P2 (Medium)   | 5     |
+| P1 (High)     | 4     |
+| P2 (Medium)   | 3     |
+
+**Status:** 3 findings resolved (P1-03, P2-01, P2-03), 8 remaining.
 
 All tests pass (21/21, 100% coverage). TypeScript is clean (0 errors). Bundle is 3.2 KB unminified. These findings do NOT reflect runtime failures but rather gaps against the specification and quality bar.
 
@@ -95,7 +97,7 @@ Whether this is a spec change or implementation error is unresolved, but the mis
 
 ---
 
-### P1-03: `prefers-reduced-motion` leaves static shimmer gradient visible
+### P1-03: `prefers-reduced-motion` leaves static shimmer gradient visible — **[FIXED]**
 
 **File:** `hx-skeleton.styles.ts:68–72`
 **Area:** Accessibility / CSS
@@ -103,22 +105,14 @@ Whether this is a spec change or implementation error is unresolved, but the mis
 ```css
 @media (prefers-reduced-motion: reduce) {
   .skeleton--animated::after {
-    animation: none;
+    display: none;
   }
 }
 ```
 
-`animation: none` stops the shimmer movement but **the `::after` pseudo-element remains rendered** with its `linear-gradient` background. This creates a permanent, static light-band overlay on the skeleton placeholder that appears frozen. For users with vestibular disorders who opt into `prefers-reduced-motion`, this static visual artifact may still cause discomfort and is inconsistent with WCAG SC 2.3.3 (Animation from Interactions).
+`animation: none` (the previous fix attempt) stops the shimmer movement but **the `::after` pseudo-element remains rendered** with its `linear-gradient` background. This creates a permanent, static light-band overlay on the skeleton placeholder that appears frozen. For users with vestibular disorders who opt into `prefers-reduced-motion`, this static visual artifact may still cause discomfort and is inconsistent with WCAG SC 2.3.3 (Animation from Interactions).
 
-The correct fix is:
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .skeleton--animated::after {
-    display: none; /* or opacity: 0 */
-  }
-}
-```
+**Resolution:** Changed to `display: none` on the `::after` pseudo-element under `prefers-reduced-motion: reduce` — the shimmer overlay is fully removed rather than frozen.
 
 ---
 
@@ -167,7 +161,7 @@ The component is not verified Drupal-renderable per the CLAUDE.md requirement.
 
 ## P2 — Medium Priority
 
-### P2-01: No `--hx-skeleton-circle-radius` CSS custom property
+### P2-01: No `--hx-skeleton-circle-radius` CSS custom property — **[FIXED]**
 
 **File:** `hx-skeleton.styles.ts:26–31`
 **Area:** CSS / Design Tokens
@@ -178,13 +172,9 @@ Three of the four variants expose a border-radius token:
 - `--hx-skeleton-rect-radius`
 - `--hx-skeleton-button-radius`
 
-But `.skeleton--circle` hardcodes `border-radius: 50%` with no override token. This is inconsistent — consumers cannot theme the circle radius (e.g., for a rounded-rectangle avatar skeleton) without CSS part overrides. Should be:
+But `.skeleton--circle` hardcodes `border-radius: 50%` with no override token. This is inconsistent — consumers cannot theme the circle radius (e.g., for a rounded-rectangle avatar skeleton) without CSS part overrides.
 
-```css
-.skeleton--circle {
-  border-radius: var(--hx-skeleton-circle-radius, 50%);
-}
-```
+**Resolution:** `.skeleton--circle` now uses `border-radius: var(--hx-skeleton-circle-radius, 50%)` — consistent with other variant radius tokens.
 
 ---
 
@@ -201,7 +191,7 @@ No story demonstrates the transition from a skeleton state to real content. All 
 
 ---
 
-### P2-03: Shimmer `background-size` has no CSS variable override point
+### P2-03: Shimmer `background-size` has no CSS variable override point — **[FIXED]**
 
 **File:** `hx-skeleton.styles.ts:55`
 **Area:** CSS / Design Tokens
@@ -211,6 +201,8 @@ background-size: 200% 100%;
 ```
 
 The shimmer sweep width (`200%`) is hardcoded. There is no `--hx-skeleton-shimmer-width` or similar token to adjust shimmer intensity. This is inconsistent with the other exposed CSS custom properties and limits consumer theming flexibility.
+
+**Resolution:** Changed to `background-size: var(--hx-skeleton-shimmer-width, 200%) 100%` — consumers can now override shimmer sweep width via CSS custom property.
 
 ---
 
@@ -248,7 +240,7 @@ The following checks passed without issue:
 | Animation is CSS-only            | Confirmed — no JS timers or rAF             |
 | `--hx-*` token prefix            | Compliant on all CSS custom properties      |
 | `part="base"` exposed            | Confirmed                                   |
-| `prefers-reduced-motion` handled | Partial (see P1-03)                         |
+| `prefers-reduced-motion` handled | Confirmed (shimmer hidden via display:none) |
 | Shadow DOM encapsulation         | Confirmed                                   |
 | No `any` types                   | Confirmed                                   |
 | TypeScript strict mode           | Confirmed                                   |
@@ -259,12 +251,12 @@ The following checks passed without issue:
 
 1. **P0-01** — Add `loaded` property + `hx-loaded` event + consumer documentation for live region pattern
 2. **P1-01** — Set `aria-hidden="true"` on host element via `connectedCallback` or reflected property
-3. **P1-03** — Change `prefers-reduced-motion` rule to `display: none` on `::after`
+3. ~~**P1-03** — Change `prefers-reduced-motion` rule to `display: none` on `::after`~~ ✅ **FIXED**
 4. **P1-04** — Fix the `animated="false"` test to test attribute removal, not JS property override
 5. **P1-02** — Clarify `paragraph` vs `button` variant with design/spec — implement whichever is correct
 6. **P1-05** — Add `helix-skeleton.html.twig` Drupal integration template
-7. **P2-01** — Add `--hx-skeleton-circle-radius` token
+7. ~~**P2-01** — Add `--hx-skeleton-circle-radius` token~~ ✅ **FIXED**
 8. **P2-02** — Add loading→loaded Storybook story (after P0-01 resolved)
-9. **P2-03** — Add `--hx-skeleton-shimmer-width` token
+9. ~~**P2-03** — Add `--hx-skeleton-shimmer-width` token~~ ✅ **FIXED**
 10. **P2-04** — Add invalid variant graceful degradation test
 11. **P2-05** — Add `rect` variant class application test

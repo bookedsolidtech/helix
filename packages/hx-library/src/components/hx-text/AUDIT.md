@@ -239,6 +239,7 @@ hx-text:
 ```
 
 **Key Drupal integration notes:**
+
 - `truncate` is a boolean attribute — include the attribute name with no value to enable (e.g., `<hx-text truncate>`), omit entirely to disable. Do NOT use `truncate="false"` — in HTML, any present attribute is truthy.
 - `lines` accepts a numeric string (e.g., `lines="3"`). Set to `"0"` or omit to disable clamping.
 - `as` controls the rendered shadow-DOM inner element for semantic correctness. It does not change the custom element tag itself. Use `as="p"` for paragraph content, `as="strong"` for bold emphasis, `as="em"` for italic emphasis.
