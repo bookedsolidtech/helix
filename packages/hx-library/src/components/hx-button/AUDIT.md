@@ -4,6 +4,7 @@
 **Reviewer:** Automated antagonistic audit
 **Scope:** Full quality review of all files in `packages/hx-library/src/components/hx-button/`
 **Files reviewed:**
+
 - `hx-button.ts`
 - `hx-button.styles.ts`
 - `hx-button.test.ts`
@@ -17,12 +18,12 @@
 
 ## Severity Scale
 
-| Level | Meaning |
-|-------|---------|
-| **P0** | Blocks production. WCAG violation, data loss risk, or complete AT failure. |
+| Level  | Meaning                                                                      |
+| ------ | ---------------------------------------------------------------------------- |
+| **P0** | Blocks production. WCAG violation, data loss risk, or complete AT failure.   |
 | **P1** | Must fix before release. Functional bug, security issue, or misleading test. |
-| **P2** | Should fix in current cycle. Missing coverage, spec deviation, quality gap. |
-| **P3** | Low priority. Polish, non-idiomatic, cosmetic. |
+| **P2** | Should fix in current cycle. Missing coverage, spec deviation, quality gap.  |
+| **P3** | Low priority. Polish, non-idiomatic, cosmetic.                               |
 
 ---
 
@@ -35,6 +36,7 @@
 `aria-label` placed on the `<hx-button>` host element does NOT propagate into Shadow DOM. When the browser builds the accessibility tree, the inner native `<button>` computes its accessible name from its shadow-DOM slot content — not from the host element's attributes.
 
 The `IconOnly` story renders:
+
 ```html
 <hx-button variant="ghost" aria-label="Close dialog">
   <svg aria-hidden="true">...</svg>
@@ -60,12 +62,12 @@ Two independent rules both set `opacity: 0.5` for the disabled state:
 ```css
 /* rule 1 — on :host */
 :host([disabled]) {
-  opacity: var(--hx-opacity-disabled, 0.5);  /* line 10 */
+  opacity: var(--hx-opacity-disabled, 0.5); /* line 10 */
 }
 
 /* rule 2 — on inner .button */
 .button[disabled] {
-  opacity: var(--hx-opacity-disabled, 0.5);  /* line 135 */
+  opacity: var(--hx-opacity-disabled, 0.5); /* line 135 */
 }
 ```
 
@@ -130,7 +132,7 @@ Both keyboard tests follow this pattern:
 
 ```ts
 btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-btn.click();  // ← this is what actually fires hx-click
+btn.click(); // ← this is what actually fires hx-click
 const event = await eventPromise;
 expect(event).toBeTruthy();
 ```
@@ -190,9 +192,9 @@ Note: `aria-disabled` without native `disabled` is a valid pattern for keeping b
 Approximately 18 hardcoded hex values appear as fallbacks throughout the stylesheet. Representative examples:
 
 ```css
-background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));  /* line 22 */
-color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));             /* line 23 */
---hx-button-bg: var(--hx-color-error-500, #dc2626);                           /* line 102 */
+background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb)); /* line 22 */
+color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff)); /* line 23 */
+--hx-button-bg: var(--hx-color-error-500, #dc2626); /* line 102 */
 ```
 
 Hardcoded hex fallbacks are not tied to the design system. If a semantic token definition changes (e.g., `--hx-color-primary-500` moves from `#2563eb` to a different shade), the fallback remains at the old value. Token consumers who have not defined the CSS custom properties will render with stale colors.
@@ -218,6 +220,7 @@ Tests verify `aria-busy="true"` when `loading` is true (`hx-button.test.ts:185-1
 **Files:** `hx-button.ts:219`, `hx-button.ts:129-133`
 
 In button mode, loading prevents all interaction:
+
 ```ts
 // hx-button.ts:129-133
 if (this.disabled || this.loading) {
@@ -228,6 +231,7 @@ if (this.disabled || this.loading) {
 ```
 
 In anchor mode, `href` is only removed when `disabled`:
+
 ```ts
 // hx-button.ts:219
 href=${this.disabled ? nothing : ifDefined(this.href)}
@@ -264,7 +268,7 @@ Private members should not be in the public CEM. They create noise in Storybook 
 ```ts
 it('applies host opacity 0.5 via disabled attribute', async () => {
   const el = await fixture<WcButton>('<hx-button disabled>Click</hx-button>');
-  expect(el.hasAttribute('disabled')).toBe(true);  // ← tests attribute presence, not opacity
+  expect(el.hasAttribute('disabled')).toBe(true); // ← tests attribute presence, not opacity
 });
 ```
 
@@ -338,25 +342,25 @@ No `@since`, no removal version, no changeset associated. Deprecation notices wi
 
 ## Summary Table
 
-| ID | Area | Severity | Description |
-|----|------|----------|-------------|
-| P0-01 | Accessibility | **P0** | Icon-only buttons have no accessible name (WCAG 4.1.2) |
-| P1-01 | CSS | **FIXED** | Double opacity: verified already resolved; added regression-guard comment |
-| P1-02 | Security | **P1** | `target="_blank"` missing `rel="noopener noreferrer"` |
-| P1-03 | TypeScript | **P1** | `WcButton` not exported from `index.ts` |
-| P1-04 | Tests | **P1** | Keyboard tests don't actually test keyboard activation |
-| P2-01 | Tests | P2 | `name`/`value` form value submission untested |
-| P2-02 | Accessibility | P2 | Redundant `aria-disabled` on native disabled `<button>` |
-| P2-03 | CSS | **FIXED** | Hex fallbacks removed from variant setters; semantic tokens only |
-| P2-04 | Tests | P2 | No test for absence of `aria-busy` in default state |
-| P2-05 | Behavior | P2 | Loading anchor mode does not prevent navigation |
-| P2-06 | CEM | P2 | Private methods exposed in CEM members array |
-| P2-07 | Tests | P2 | Disabled opacity test doesn't test opacity |
-| P2-08 | Tests | P2 | No test for `loading` + `disabled` combined state |
-| P3-01 | API | P3 | `hx-size` attribute naming is non-idiomatic |
-| P3-02 | Storybook | P3 | Inconsistent icon slot pattern across stories |
-| P3-03 | Storybook | P3 | Unused `_canvas` variable in Default story |
-| P3-04 | TypeScript | P3 | Deprecated `WcButton` has no removal timeline |
+| ID    | Area          | Severity  | Description                                                               |
+| ----- | ------------- | --------- | ------------------------------------------------------------------------- |
+| P0-01 | Accessibility | **P0**    | Icon-only buttons have no accessible name (WCAG 4.1.2)                    |
+| P1-01 | CSS           | **FIXED** | Double opacity: verified already resolved; added regression-guard comment |
+| P1-02 | Security      | **P1**    | `target="_blank"` missing `rel="noopener noreferrer"`                     |
+| P1-03 | TypeScript    | **P1**    | `WcButton` not exported from `index.ts`                                   |
+| P1-04 | Tests         | **P1**    | Keyboard tests don't actually test keyboard activation                    |
+| P2-01 | Tests         | P2        | `name`/`value` form value submission untested                             |
+| P2-02 | Accessibility | P2        | Redundant `aria-disabled` on native disabled `<button>`                   |
+| P2-03 | CSS           | **FIXED** | Hex fallbacks removed from variant setters; semantic tokens only          |
+| P2-04 | Tests         | P2        | No test for absence of `aria-busy` in default state                       |
+| P2-05 | Behavior      | P2        | Loading anchor mode does not prevent navigation                           |
+| P2-06 | CEM           | P2        | Private methods exposed in CEM members array                              |
+| P2-07 | Tests         | P2        | Disabled opacity test doesn't test opacity                                |
+| P2-08 | Tests         | P2        | No test for `loading` + `disabled` combined state                         |
+| P3-01 | API           | P3        | `hx-size` attribute naming is non-idiomatic                               |
+| P3-02 | Storybook     | P3        | Inconsistent icon slot pattern across stories                             |
+| P3-03 | Storybook     | P3        | Unused `_canvas` variable in Default story                                |
+| P3-04 | TypeScript    | P3        | Deprecated `WcButton` has no removal timeline                             |
 
 ---
 
