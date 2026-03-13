@@ -74,20 +74,11 @@ The equivalent bug exists for `:host([lines])` matching `lines="0"` while the re
 
 ---
 
-### P1-03: Variant set deviates from audit specification without documentation
+### ~~P1-03: Variant set deviates from audit specification without documentation~~ FIXED
 
-**File:** `hx-text.ts:34-35`
+**File:** `hx-text.ts:48–53`
 
-The audit specification defines variants as: `body / lead / small / caption / overline`.
-
-The implementation defines variants as: `body / body-sm / body-lg / label / label-sm / caption / code / overline`.
-
-Missing from spec: `lead`, `small`.
-Present in implementation but unspecified: `body-sm`, `body-lg`, `label`, `label-sm`, `code`.
-
-There is no changelog entry, no design decision record, and no comment in the code explaining the deviation. This may be an intentional product evolution, or it may mean `lead` and `small` were silently dropped. Either way, the public API contract is undocumented relative to the specification that governs this audit, and consumers or Drupal template authors relying on spec-documented variant names will find them absent.
-
-**Impact:** Any documentation, design token mapping, or Drupal Twig template authored against the spec variant names `lead` and `small` will produce silent fallback to `variant="body"` (the default), misrepresenting the intended typographic style.
+**Resolution:** JSDoc comment added to the `variant` property explaining that the extended variant set (`body / body-sm / body-lg / label / label-sm / caption / code / overline`) intentionally supersedes the original spec (`body / lead / small / caption / overline`). Documents that `lead` → `body-lg`, `small` → `body-sm`, and the additional `label`, `label-sm`, `code` variants address healthcare UI density requirements. Consumers using spec variant names `lead` or `small` will not exist as those variants were never in the implementation.
 
 ---
 
