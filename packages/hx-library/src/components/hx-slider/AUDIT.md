@@ -281,9 +281,9 @@ On page load, the fill animates from `0` to its initial value. This motion is no
 
 ## Area 6 — Performance
 
-### [P2] Bundle size unverifiable — no dist output present
+### ~~[P2] Bundle size unverifiable — no dist output present~~ ✅ FIXED
 
-No `dist/` build output exists in the worktree. Source files total ~19KB uncompressed (`hx-slider.ts` = 12,954 bytes, `hx-slider.styles.ts` = 6,456 bytes). Minified + gzipped estimate is ~4–5KB, which is at the edge of the 5KB per-component budget but likely passes. Cannot confirm without a build.
+**Resolution:** Build verified. `dist/shared/hx-slider-*.js` — 17.99 kB minified │ **4.85 kB gzip** — within the <5 KB per-component budget. Budget confirmed passing.
 
 ### [P3] ~~`_ticks()` re-runs on every render~~ ✅ FIXED
 
@@ -349,7 +349,7 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 | 22  | CSS             | **P2**   | No `@media (forced-colors: active)` block — invisible in Windows High Contrast                   |
 | 23  | CSS             | **P2**   | `--hx-border-width-thin` reused for semantically different sizes                                 |
 | 24  | Storybook       | **P2**   | Range slider (two thumbs) absent — 6/6 major libraries ship this variant                         |
-| 25  | Performance     | **P2**   | Bundle size unverifiable — no dist output                                                        |
+| 25  | Performance     | **P2**   | ~~Bundle size unverifiable — no dist output~~ ✅ FIXED (4.85 kB gzip, within budget)             |
 | 26  | Performance     | **P3**   | ~~`_ticks()` re-runs on every render, not memoized~~ ✅ FIXED                                     |
 | 27  | CSS             | **P3**   | Fill transition animates on initial page load (not just user interaction)                        |
 | 28  | Storybook       | **P3**   | `aria-valuetext` not demonstrated (blocked on implementation)                                    |
