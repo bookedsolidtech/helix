@@ -268,3 +268,81 @@ export const CSSCustomProperties: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// DRUPAL / CDN INTEGRATION REFERENCE
+// ─────────────────────────────────────────────────
+
+/**
+ * Drupal Twig integration reference for hx-spinner.
+ *
+ * A companion `hx-spinner.twig` template ships alongside this component.
+ * Include it in your Drupal theme or module templates:
+ *
+ * ```twig
+ * {# Standalone — announces "Loading patient records" to screen readers #}
+ * {{ include('@mytheme/hx-spinner/hx-spinner.twig', {
+ *   size: 'md',
+ *   variant: 'primary',
+ *   label: 'Loading patient records',
+ * }) }}
+ *
+ * {# Decorative — adjacent visible text carries the announcement #}
+ * <div style="display: flex; align-items: center; gap: 0.75rem;">
+ *   {{ include('@mytheme/hx-spinner/hx-spinner.twig', { decorative: true, size: 'sm' }) }}
+ *   <span>Saving patient record...</span>
+ * </div>
+ * ```
+ *
+ * Register the component script in `mytheme.libraries.yml`:
+ * ```yaml
+ * hx-spinner:
+ *   js:
+ *     path/to/@helixui/library/dist/hx-spinner.js: { attributes: { type: module } }
+ * ```
+ *
+ * Then attach the library in your template:
+ * ```twig
+ * {{ attach_library('mytheme/hx-spinner') }}
+ * ```
+ *
+ * **`label` attribute note:** The `label` property is read from the HTML attribute on
+ * first render. Twig can set it statically with `label="..."`. If JavaScript later
+ * updates `el.label = '...'` programmatically, the attribute will NOT be updated
+ * (the property is not reflected). This asymmetry is intentional — `size` and
+ * `variant` ARE reflected. Document this in your Drupal theme if needed.
+ */
+export const DrupalIntegration: Story = {
+  name: 'Drupal / CDN Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 560px;">
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Standalone — announces to screen readers
+        </p>
+        <hx-spinner size="md" variant="primary" label="Loading patient records"></hx-spinner>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Decorative — adjacent text carries the announcement
+        </p>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <hx-spinner size="sm" decorative></hx-spinner>
+          <span style="font-size: 0.875rem; color: #374151;">Saving patient record...</span>
+        </div>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Inverted on dark background (CDN usage)
+        </p>
+        <div
+          style="background: #1e293b; padding: 1rem; border-radius: 0.375rem; display: inline-flex;"
+        >
+          <hx-spinner size="md" variant="inverted" label="Loading"></hx-spinner>
+        </div>
+      </div>
+    </div>
+  `,
+};

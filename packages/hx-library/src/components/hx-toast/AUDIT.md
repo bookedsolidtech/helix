@@ -81,19 +81,20 @@ None of this logic has a single test. The `hx-toast-stack` tests in `hx-toast.te
 
 ---
 
-### P1-04: No Drupal JS behaviors file
+### ~~P1-04: No Drupal JS behaviors file~~ FIXED
 
-**File:** (missing — no `hx-toast.drupal.js` or equivalent)
+**File:** `hx-toast.drupal.js`
 
-The audit spec explicitly requires "JS behaviors for programmatic toast triggering" in the Drupal integration area. No such file exists. There is no Drupal behavior that wraps the `toast()` utility for server-rendered Twig templates, no `data-hx-toast-trigger` pattern, no behavior attach/detach lifecycle.
+**Resolution:** `hx-toast.drupal.js` added providing `Drupal.behaviors.hxToast` that:
+- Attaches to elements with `data-hx-toast` attributes containing JSON-encoded options
+- Dynamically imports `toast()` from `@helixui/library` on click (tree-shaking friendly)
+- Uses a `dataset.hxToastAttached` guard to prevent double-binding on AJAX/BigPipe updates
+- Detaches cleanly on `'unload'` to prevent memory leaks on partial DOM replacement
+- Announces parse errors and load failures via `Drupal.announce()` for accessibility
 
-This is a hard blocker for the primary consumer of this component library (Drupal CMS). Twig templates cannot import ES modules directly; they require Drupal behaviors to bridge the gap.
-
-**Expected behavior:** A `hx-toast.drupal.js` file providing a `Drupal.behaviors.hxToast` implementation that:
-
-- Attaches to elements with `data-hx-toast` attributes
-- Calls `toast()` with serialized options from data attributes
-- Properly detaches to prevent memory leaks on partial DOM updates
+A `DrupalIntegration` story was also added to `hx-toast.stories.ts` documenting the full
+`data-hx-toast` trigger pattern, supported options (message, variant, duration, placement,
+closable), and `mytheme.libraries.yml` registration including the `.drupal.js` file.
 
 ---
 
@@ -210,4 +211,4 @@ The story is misleading to developers evaluating the component.
 | Storybook (variants/demos)     | PARTIAL | P2-07                                      |
 | CSS (tokens, animation, parts) | PARTIAL | P2-04, P2-05, P2-08                        |
 | Performance (bundle size)      | PASS    | ~14KB raw, well under 5KB gzipped estimate |
-| Drupal integration             | FAIL    | P1-04                                      |
+| Drupal integration             | PASS    | P1-04 FIXED                                |

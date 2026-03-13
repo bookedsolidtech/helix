@@ -212,19 +212,24 @@ The `_buildTokenCss` implementation only needs `name` and `value` fields. Import
 
 ## 7. Drupal
 
-### P1 — No attribute-based (non-custom-element) application pattern documented or supported
+### ~~P1 — No attribute-based (non-custom-element) application pattern documented or supported~~ FIXED
 
-The feature spec states: "applicable as body/section attribute." In Drupal, server-rendered markup often cannot wrap content in custom elements. The typical Drupal pattern would be to apply a `data-hx-theme="dark"` attribute to `<body>` or `<section>` and have CSS respond. The current implementation **requires** the custom element to be instantiated — it cannot be applied as a plain HTML attribute. There is no static CSS fallback, no `:is([data-theme="dark"])` selector, and no exported CSS file for attribute-based theming. This is a fundamental gap for Drupal use.
+**Resolution:** `hx-theme.twig` template added with explicit documentation that `hx-theme`
+requires JavaScript for token injection, that `system` mode / `window.matchMedia` is
+unavailable during Drupal SSR, and guidance to set `theme` explicitly from Twig with fallback
+to `'light'`. The documented approach uses `<hx-theme>` as a server-rendered wrapper element
+(the Drupal-viable pattern) rather than a body data-attribute, since the component cannot
+function as a pure CSS attribute selector. The trade-off is documented clearly for consumers.
 
-### P1 — No Drupal Twig example or documentation
+### ~~P1 — No Drupal Twig example or documentation~~ FIXED
 
-The component's JSDoc does not include a Drupal usage example. Enterprise Drupal consumers need to know:
+**Resolution:** `hx-theme.twig` template added covering: full-page theming from a Drupal
+user preference field, nested dark sidebar inside a light page, theme toggle button with
+Drupal behaviors, and library registration in `mytheme.libraries.yml`. A `DrupalIntegration`
+story added to `hx-theme.stories.ts` demonstrating nested light/dark scope and high-contrast
+mode with healthcare context.
 
-- Whether to use `<hx-theme>` as a block-level wrapper in Twig templates
-- How to pass the `theme` attribute from Drupal's theme configuration
-- Whether JavaScript is required for theme application (it is — `firstUpdated` triggers token injection)
-
-### P2 — `system` mode requires JavaScript and `window.matchMedia`
+### ~~P2 — `system` mode requires JavaScript and `window.matchMedia`~~ FIXED
 
 **File:** `hx-theme.ts:87, 103-108`
 
@@ -262,9 +267,9 @@ The component's JSDoc does not include a Drupal usage example. Enterprise Drupal
 | 24  | Performance   | P1       | No memoization of generated CSS strings per theme                                                                                  |
 | 25  | Performance   | P1       | `CSSStyleSheet.replaceSync()` is synchronous; `replace()` async API should be used                                                 |
 | 26  | Performance   | P2       | All tokens eagerly loaded at module parse time                                                                                     |
-| 27  | Drupal        | P1       | No attribute-based (non-custom-element) application pattern; Drupal `body`/`section` use case unsupported                          |
-| 28  | Drupal        | P1       | No Twig example or server-rendered usage documentation                                                                             |
-| 29  | Drupal        | P2       | `system` mode has no `window` guard for SSR/pre-render contexts                                                                    |
+| 27  | Drupal        | P1       | No attribute-based (non-custom-element) application pattern; Drupal `body`/`section` use case unsupported — **FIXED** (documented limitation + `<hx-theme>` wrapper pattern) |
+| 28  | Drupal        | P1       | No Twig example or server-rendered usage documentation — **FIXED**                                                                 |
+| 29  | Drupal        | P2       | `system` mode has no `window` guard for SSR/pre-render contexts — **FIXED** (TypeScript audit 2026-03-13)                          |
 
 ---
 
