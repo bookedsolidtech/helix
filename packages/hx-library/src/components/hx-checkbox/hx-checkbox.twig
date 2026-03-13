@@ -111,10 +111,10 @@
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% block default %}{% endblock %}
-  {% if help_text_slot is defined %}
-    <span slot="help-text">{{ help_text_slot }}</span>
-  {% endif %}
-  {% if error_slot is defined %}
-    <span slot="error">{{ error_slot }}</span>
-  {% endif %}
+  {%- set help_text_block %}{% block help_text %}{% endblock %}{% endset -%}
+  {%- if help_text_block %}<span slot="help-text">{{ help_text_block }}</span>
+  {%- elseif help_text_slot is defined %}<span slot="help-text">{{ help_text_slot }}</span>{% endif %}
+  {%- set error_block %}{% block error %}{% endblock %}{% endset -%}
+  {%- if error_block %}<span slot="error">{{ error_block }}</span>
+  {%- elseif error_slot is defined %}<span slot="error">{{ error_slot }}</span>{% endif %}
 </hx-checkbox>

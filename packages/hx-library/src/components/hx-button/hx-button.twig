@@ -110,7 +110,9 @@
   {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
-  {% block prefix %}{% endblock %}
-  {%- if label %}{{ label }}{% endif -%}
-  {% block suffix %}{% endblock %}
+  {%- set prefix_content %}{% block prefix %}{% endblock %}{% endset -%}
+  {%- if prefix_content %}<span slot="prefix">{{ prefix_content }}</span>{% endif -%}
+  {%- block default %}{%- if label %}{{ label }}{% endif -%}{% endblock -%}
+  {%- set suffix_content %}{% block suffix %}{% endblock %}{% endset -%}
+  {%- if suffix_content %}<span slot="suffix">{{ suffix_content }}</span>{% endif -%}
 </hx-button>

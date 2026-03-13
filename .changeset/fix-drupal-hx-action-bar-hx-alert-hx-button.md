@@ -1,5 +1,5 @@
 ---
-"@helixui/library": patch
+'@helixui/library': patch
 ---
 
 Fix Drupal integration findings for hx-alert, hx-button, hx-checkbox, and hx-checkbox-group
