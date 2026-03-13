@@ -330,3 +330,13 @@ The `hx-size` attribute uses a hyphen prefix, which is valid HTML but unusual. T
 5. **A11y: Document and enforce `aria-label`** (P1, A11y #5) — Add JSDoc, CEM annotation, and a dedicated Storybook story.
 6. **CSS: Fix `prefers-reduced-motion` no-op** (P2, CSS #23) — Coordinate with `hx-button` to expose a motion token.
 7. **TS: Remove `requestUpdate()` from slot handler** (P2, TS #1) — Clean up unnecessary render cycle and false comment.
+
+---
+
+## Drupal Fixes Applied
+
+| Finding | Status |
+|---------|--------|
+| P2-16: No CDN/Drupal registration pattern documented | **FIXED** — `README.drupal.md` created with CDN strategy, npm+theme build pipeline strategy, asset loading YAML, and Drupal behaviors integration example. |
+| P2-17: `hx-size` attribute name not documented as Drupal-safe | **FIXED** — `README.drupal.md` explicitly documents `hx-size` as valid HTML, shows `attributes.setAttribute('hx-size', 'sm')` in PHP, and explains the CSS custom property cascade mechanism. |
+| Missing Twig template | **FIXED** — `hx-button-group.twig` template created with orientation, size, aria-label, and button iteration pattern. |
