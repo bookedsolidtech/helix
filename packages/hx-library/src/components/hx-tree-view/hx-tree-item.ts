@@ -28,6 +28,8 @@ import { helixTreeItemStyles } from './hx-tree-item.styles.js';
  * @cssprop [--hx-tree-item-padding-x=var(--hx-space-2)] - Horizontal padding.
  * @cssprop [--hx-tree-item-padding-y=var(--hx-space-1)] - Vertical padding.
  * @cssprop [--hx-tree-indent-size=1.5rem] - Indentation size per level.
+ *
+ * @fires {CustomEvent<{item: HelixTreeItem}>} hx-tree-item-select - Dispatched when this item is clicked or activated via keyboard.
  */
 @customElement('hx-tree-item')
 export class HelixTreeItem extends LitElement {
@@ -60,48 +62,67 @@ export class HelixTreeItem extends LitElement {
 
   @state() private _hasChildren = false;
 
+  /**
+   * Cached ARIA position metadata. Computed once on connect and on slotchange
+   * of the parent container, avoiding repeated DOM traversal on every render.
+   */
+  @state() private _level = 1;
+  @state() private _posInSet = 1;
+  @state() private _setSize = 1;
+  @state() private _selectable = false;
+
   // ─── Computed ARIA ───
 
-  /** Whether this item has slotted children. */
+  /**
+   * Whether this item has slotted children.
+   * @returns True if one or more elements are assigned to the children slot.
+   */
   get hasChildItems(): boolean {
     return this._hasChildren;
   }
 
-  /** Compute nesting depth by counting ancestor hx-tree-item elements. */
-  private _getLevel(): number {
+  /**
+   * Recompute all cached ARIA metadata in a single DOM pass.
+   * Called on connect, slotchange, and whenever structural context may change.
+   */
+  private _updateAriaMetadata(): void {
+    // Compute nesting level by counting ancestor hx-tree-item elements.
     let level = 1;
     let el: Element | null = this.parentElement;
     while (el) {
       if (el.tagName.toLowerCase() === 'hx-tree-item') level++;
       el = el.parentElement;
     }
-    return level;
-  }
+    this._level = level;
 
-  /** Compute position in set among siblings. */
-  private _getPosInSet(): number {
+    // Compute position-in-set and set-size from sibling hx-tree-item elements.
     const parent = this.parentElement;
-    if (!parent) return 1;
-    const siblings = Array.from(parent.children).filter(
-      (c) => c.tagName.toLowerCase() === 'hx-tree-item',
-    );
-    return siblings.indexOf(this) + 1;
-  }
+    if (parent) {
+      const siblings = Array.from(parent.children).filter(
+        (c) => c.tagName.toLowerCase() === 'hx-tree-item',
+      );
+      this._posInSet = siblings.indexOf(this) + 1;
+      this._setSize = siblings.length;
+    } else {
+      this._posInSet = 1;
+      this._setSize = 1;
+    }
 
-  /** Compute set size among siblings. */
-  private _getSetSize(): number {
-    const parent = this.parentElement;
-    if (!parent) return 1;
-    return Array.from(parent.children).filter((c) => c.tagName.toLowerCase() === 'hx-tree-item')
-      .length;
-  }
-
-  /** Determine if selection is active on the parent tree. */
-  private _isSelectable(): boolean {
+    // Determine if the owning tree supports selection.
     const tree = this.closest('hx-tree-view');
-    if (!tree) return false;
-    const selection = tree.getAttribute('selection');
-    return selection === 'single' || selection === 'multiple';
+    if (tree) {
+      const selection = tree.getAttribute('selection');
+      this._selectable = selection === 'single' || selection === 'multiple';
+    } else {
+      this._selectable = false;
+    }
+  }
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._updateAriaMetadata();
   }
 
   // ─── Children Detection ───
@@ -109,7 +130,7 @@ export class HelixTreeItem extends LitElement {
   private _handleChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedElements().length > 0;
-    this.requestUpdate();
+    this._updateAriaMetadata();
   }
 
   // ─── Event Handlers ───
@@ -192,7 +213,7 @@ export class HelixTreeItem extends LitElement {
 
   override render() {
     const ariaExpanded = this._hasChildren ? String(this.expanded) : nothing;
-    const ariaSelected = this._isSelectable() ? String(this.selected) : nothing;
+    const ariaSelected = this._selectable ? String(this.selected) : nothing;
 
     return html`
       <div part="item" class="item">
@@ -204,9 +225,9 @@ export class HelixTreeItem extends LitElement {
           aria-expanded=${ariaExpanded}
           aria-selected=${ariaSelected}
           aria-disabled=${this.disabled ? 'true' : nothing}
-          aria-level=${this._getLevel()}
-          aria-posinset=${this._getPosInSet()}
-          aria-setsize=${this._getSetSize()}
+          aria-level=${this._level}
+          aria-posinset=${this._posInSet}
+          aria-setsize=${this._setSize}
           @click=${this._handleRowClick}
           @keydown=${this._handleKeyDown}
         >

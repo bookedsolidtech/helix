@@ -3,6 +3,7 @@ import { css } from 'lit';
 export const helixTreeViewStyles = css`
   :host {
     display: block;
+    contain: layout style;
     font-family: var(--hx-tree-font-family, var(--hx-font-family-sans, sans-serif));
   }
 

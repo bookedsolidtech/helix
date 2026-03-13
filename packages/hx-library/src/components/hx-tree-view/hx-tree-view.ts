@@ -16,6 +16,15 @@ export type TreeSelection = 'none' | 'single' | 'multiple';
  * for screen reader identification. Full keyboard navigation: Arrow keys for movement,
  * Enter/Space for selection, Home/End for first/last item.
  *
+ * ## Scale Limits
+ *
+ * This component renders all tree items simultaneously in the DOM. It is suitable for
+ * trees with up to ~500 visible items. For large taxonomies (e.g., ICD-10 with 70,000+
+ * codes), use async/lazy loading: only render top-level nodes initially and populate
+ * child nodes on `hx-select` or expand events. The component exposes the `expanded`
+ * property on `hx-tree-item` for programmatic control of subtrees, enabling consumer-level
+ * virtualization strategies without requiring changes to this component.
+ *
  * @summary Hierarchical tree view with expand/collapse and keyboard navigation.
  *
  * @tag hx-tree-view
