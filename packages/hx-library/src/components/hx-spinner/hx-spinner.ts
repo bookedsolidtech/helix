@@ -6,6 +6,13 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSpinnerStyles } from './hx-spinner.styles.js';
 
 /**
+ * Token size values for the spinner. Use these for standard sizing.
+ * The `size` property also accepts any valid CSS size string (e.g. "3rem", "48px")
+ * for custom sizes — the type widens to `string` in that usage.
+ */
+export type SpinnerSize = 'sm' | 'md' | 'lg';
+
+/**
  * A circular loading indicator for inline and overlay loading states.
  * Purely visual — no slots. Announces loading state to screen readers via
  * `role="status"` and an `aria-label` (customizable via the `label` prop).
@@ -28,16 +35,16 @@ export class HelixSpinner extends LitElement {
   static override styles = [tokenStyles, helixSpinnerStyles];
 
   /**
-   * Size of the spinner. Accepts 'sm' | 'md' | 'lg' token values, or any
-   * valid CSS size string (e.g. "3rem", "48px").
+   * Size of the spinner. Accepts `SpinnerSize` token values ('sm' | 'md' | 'lg'),
+   * or any valid CSS size string (e.g. "3rem", "48px") for custom dimensions.
    *
-   * Note: `'sm' | 'md' | 'lg' | string` intentionally degrades to `string`
-   * at the TypeScript level to allow CSS size values as a convenience override.
-   * This is a deliberate design choice — use token values for standard sizing.
+   * The type is `SpinnerSize | string` which widens to `string` at the TypeScript
+   * level — this is intentional to support CSS size overrides. Use `SpinnerSize`
+   * values for standard sizing; custom strings bypass token-based scaling.
    * @attr size
    */
   @property({ type: String, reflect: true })
-  size: 'sm' | 'md' | 'lg' | string = 'md';
+  size: SpinnerSize | string = 'md';
 
   /**
    * Visual variant of the spinner.
@@ -63,7 +70,7 @@ export class HelixSpinner extends LitElement {
   @property({ type: Boolean, reflect: true })
   decorative = false;
 
-  private _isTokenSize(): boolean {
+  private _isTokenSize(): this is { size: SpinnerSize } {
     return this.size === 'sm' || this.size === 'md' || this.size === 'lg';
   }
 
