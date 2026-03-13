@@ -20,8 +20,10 @@
 | Severity      | Count |
 | ------------- | ----- |
 | P0 (Blocking) | 1     |
-| P1 (High)     | 5     |
-| P2 (Medium)   | 5     |
+| P1 (High)     | 4     |
+| P2 (Medium)   | 3     |
+
+**Status:** 3 findings resolved (P1-03, P2-01, P2-03), 8 remaining.
 
 All tests pass (21/21, 100% coverage). TypeScript is clean (0 errors). Bundle is 3.2 KB unminified. These findings do NOT reflect runtime failures but rather gaps against the specification and quality bar.
 
@@ -238,7 +240,7 @@ The following checks passed without issue:
 | Animation is CSS-only            | Confirmed — no JS timers or rAF             |
 | `--hx-*` token prefix            | Compliant on all CSS custom properties      |
 | `part="base"` exposed            | Confirmed                                   |
-| `prefers-reduced-motion` handled | Partial (see P1-03)                         |
+| `prefers-reduced-motion` handled | Confirmed (shimmer hidden via display:none) |
 | Shadow DOM encapsulation         | Confirmed                                   |
 | No `any` types                   | Confirmed                                   |
 | TypeScript strict mode           | Confirmed                                   |
@@ -249,12 +251,12 @@ The following checks passed without issue:
 
 1. **P0-01** — Add `loaded` property + `hx-loaded` event + consumer documentation for live region pattern
 2. **P1-01** — Set `aria-hidden="true"` on host element via `connectedCallback` or reflected property
-3. **P1-03** — Change `prefers-reduced-motion` rule to `display: none` on `::after`
+3. ~~**P1-03** — Change `prefers-reduced-motion` rule to `display: none` on `::after`~~ ✅ **FIXED**
 4. **P1-04** — Fix the `animated="false"` test to test attribute removal, not JS property override
 5. **P1-02** — Clarify `paragraph` vs `button` variant with design/spec — implement whichever is correct
 6. **P1-05** — Add `helix-skeleton.html.twig` Drupal integration template
-7. **P2-01** — Add `--hx-skeleton-circle-radius` token
+7. ~~**P2-01** — Add `--hx-skeleton-circle-radius` token~~ ✅ **FIXED**
 8. **P2-02** — Add loading→loaded Storybook story (after P0-01 resolved)
-9. **P2-03** — Add `--hx-skeleton-shimmer-width` token
+9. ~~**P2-03** — Add `--hx-skeleton-shimmer-width` token~~ ✅ **FIXED**
 10. **P2-04** — Add invalid variant graceful degradation test
 11. **P2-05** — Add `rect` variant class application test
