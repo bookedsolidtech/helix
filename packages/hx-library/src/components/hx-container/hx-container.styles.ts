@@ -3,6 +3,7 @@ import { css } from 'lit';
 export const helixContainerStyles = css`
   :host {
     display: block;
+    contain: layout style;
     width: 100%;
     background-color: var(--hx-container-bg, transparent);
     box-sizing: border-box;
