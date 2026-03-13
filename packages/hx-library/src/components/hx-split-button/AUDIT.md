@@ -282,8 +282,8 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 
 - Variant coverage: **Pass** — all 6 variants present
 - Interaction tests: **Pass** — 7 play functions with event spies
-- Documentation gap: **Fail** — no standalone hx-menu-item story (P2-05)
-- Accessibility in stories: **Fail** — Danger story has unlabeled button (P1-06)
+- Documentation gap: **Resolved** — standalone hx-menu-item story added (P2-05 fixed)
+- Accessibility in stories: **Resolved** — Danger story button label added (P1-06 fixed)
 
 ### CSS
 

@@ -340,7 +340,7 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 | 13  | TypeScript      | **P2**   | `_thumbPercent()` is dead code — identical to `_fillPercent()`                                   |
 | 14  | TypeScript      | **P2**   | No step-snapping validation on `value` setter                                                    |
 | 15  | Accessibility   | **P2**   | `aria-disabled` not exposed on host element                                                      |
-| 16  | Accessibility   | **P2**   | Page Up / Page Down behavior untested                                                            |
+| 16  | Accessibility   | **P2**   | Page Up / Page Down behavior — tested in Storybook play functions (`{PageDown}` / `{PageUp}`)    |
 | 17  | Tests           | **P2**   | No `name` → `FormData` integration test                                                          |
 | 18  | Tests           | **P2**   | Keyboard navigation tests only in Storybook, not Vitest                                          |
 | 19  | Tests           | **P2**   | No step-snapping test                                                                            |
