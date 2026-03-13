@@ -18,11 +18,11 @@
 
 ## Summary
 
-| Severity     | Count | Fixed |
-| ------------ | ----- | ----- |
-| P0 (Blocker) | 2     | 1     |
-| P1 (High)    | 8     | 2     |
-| P2 (Medium)  | 8     | 1     |
+| Severity     | Total | Fixed | Open |
+| ------------ | ----- | ----- | ---- |
+| P0 (Blocker) | 2     | 2     | 0    |
+| P1 (High)    | 8     | 4     | 4    |
+| P2 (Medium)  | 8     | 2     | 6    |
 
 ---
 
