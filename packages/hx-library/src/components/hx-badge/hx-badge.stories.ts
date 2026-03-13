@@ -362,7 +362,12 @@ export const WithCount: Story = {
   },
 };
 
-/** Removable badges with numeric counts — the primary filter tag use case. */
+/**
+ * Removable badges combining a label (via the `prefix` slot) with a numeric
+ * count — the primary filter-tag use case. When `count` is set the component
+ * replaces the default slot content with the formatted number, so the label
+ * must be placed in the `prefix` slot to appear alongside the count.
+ */
 export const RemovableWithCount: Story = {
   render: () => html`
     <div
@@ -372,23 +377,24 @@ export const RemovableWithCount: Story = {
         Active Filters
       </p>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <hx-badge variant="primary" pill removable remove-label="Remove ICU filter" count="12"
-          >ICU</hx-badge
-        >
-        <hx-badge variant="success" pill removable remove-label="Remove Stable filter" count="28"
-          >Stable</hx-badge
-        >
+        <hx-badge variant="primary" pill removable remove-label="Remove ICU filter" count="12">
+          <span slot="prefix">ICU</span>
+        </hx-badge>
+        <hx-badge variant="success" pill removable remove-label="Remove Stable filter" count="28">
+          <span slot="prefix">Stable</span>
+        </hx-badge>
         <hx-badge
           variant="warning"
           pill
           removable
           remove-label="Remove Pending Review filter"
           count="5"
-          >Pending Review</hx-badge
         >
-        <hx-badge variant="error" pill removable remove-label="Remove Critical filter" count="3"
-          >Critical</hx-badge
-        >
+          <span slot="prefix">Pending Review</span>
+        </hx-badge>
+        <hx-badge variant="error" pill removable remove-label="Remove Critical filter" count="3">
+          <span slot="prefix">Critical</span>
+        </hx-badge>
         <hx-badge
           variant="neutral"
           pill
@@ -396,8 +402,9 @@ export const RemovableWithCount: Story = {
           remove-label="Remove Discharged filter"
           count="107"
           max="99"
-          >Discharged</hx-badge
         >
+          <span slot="prefix">Discharged</span>
+        </hx-badge>
       </div>
     </div>
   `,
