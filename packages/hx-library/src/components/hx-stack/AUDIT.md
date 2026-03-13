@@ -97,24 +97,24 @@
 
 ## P1 Issues Remediated
 
-| ID    | Issue                                                     | Resolution                                                                   |
-| ----- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| P1-01 | Tests only verified property reflection, not CSS behavior | Added `getComputedStyle()` assertions for all CSS properties                 |
-| P1-02 | No nested stack test                                      | Added nested stacks test verifying both outer/inner layout                   |
+| ID    | Issue                                                     | Resolution                                                                                                  |
+| ----- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| P1-01 | Tests only verified property reflection, not CSS behavior | Added `getComputedStyle()` assertions for all CSS properties                                                |
+| P1-02 | No nested stack test                                      | Added nested stacks test verifying both outer/inner layout                                                  |
 | P1-03 | No role preservation test                                 | ✅ FIXED — Tests for default `role="presentation"` and consumer `role="group"` + `aria-labelledby` override |
-| P1-04 | Missing Storybook stories                                 | Added AllGapSizes, AllAlignments, AllJustifyValues, Wrapping, Inline stories |
-| P1-05 | Missing justify="start" and justify="end" CSS tests       | Added getComputedStyle assertions for all 6 justify values                   |
-| P1-06 | No reactivity test for runtime property changes           | Added test verifying direction change updates flexDirection                  |
+| P1-04 | Missing Storybook stories                                 | Added AllGapSizes, AllAlignments, AllJustifyValues, Wrapping, Inline stories                                |
+| P1-05 | Missing justify="start" and justify="end" CSS tests       | Added getComputedStyle assertions for all 6 justify values                                                  |
+| P1-06 | No reactivity test for runtime property changes           | Added test verifying direction change updates flexDirection                                                 |
 
 ## P2 Issues — Documented (Not Blocking)
 
-| ID    | Issue                                                   | Status                                            |
-| ----- | ------------------------------------------------------- | ------------------------------------------------- |
-| P2-01 | Redundant default gap in base style                     | By design — handles pre-hydration window          |
-| P2-02 | No runtime validation for invalid attribute values      | Low risk — TypeScript catches at compile time     |
-| P2-03 | No row/column gap differentiation for wrap              | Design limitation — document if needed            |
+| ID    | Issue                                                   | Status                                                                                                       |
+| ----- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| P2-01 | Redundant default gap in base style                     | By design — handles pre-hydration window                                                                     |
+| P2-02 | No runtime validation for invalid attribute values      | Low risk — TypeScript catches at compile time                                                                |
+| P2-03 | No row/column gap differentiation for wrap              | Design limitation — document if needed                                                                       |
 | P2-05 | `role="presentation"` implications not documented       | ✅ FIXED — Comprehensive JSDoc on `connectedCallback` documents ARIA semantics and consumer override pattern |
-| P2-06 | `inline` uses `inline-block` on host, not `inline-flex` | Net effect correct; unconventional but functional |
+| P2-06 | `inline` uses `inline-block` on host, not `inline-flex` | Net effect correct; unconventional but functional                                                            |
 
 ---
 
