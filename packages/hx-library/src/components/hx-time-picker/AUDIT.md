@@ -9,11 +9,11 @@
 
 ## Severity Key
 
-| Level | Meaning |
-|-------|---------|
-| P0 | Correctness defect — broken behavior or spec violation |
-| P1 | Quality gap — regression risk, accessibility violation, or missing required coverage |
-| P2 | Improvement — inconsistency, tech debt, or missing polish |
+| Level | Meaning                                                                              |
+| ----- | ------------------------------------------------------------------------------------ |
+| P0    | Correctness defect — broken behavior or spec violation                               |
+| P1    | Quality gap — regression risk, accessibility violation, or missing required coverage |
+| P2    | Improvement — inconsistency, tech debt, or missing polish                            |
 
 ---
 
@@ -29,11 +29,11 @@
 <div
   class="field__combobox"
   role="combobox"
-  aria-expanded=${...}
+  aria-expanded="${...}"
   aria-haspopup="listbox"
-  aria-owns=${...}
+  aria-owns="${...}"
 >
-  <input ... aria-controls=${...} />
+  <input ... aria-controls="${...}" />
 </div>
 ```
 
@@ -52,13 +52,7 @@ The fix requires moving `role="combobox"`, `aria-expanded`, `aria-haspopup`, and
 **File:** `hx-time-picker.ts:397-405`
 
 ```html
-<div
-  part="error"
-  class="field__error"
-  id=${this._errorId}
-  role="alert"
-  aria-live="polite"
->
+<div part="error" class="field__error" id="${this._errorId}" role="alert" aria-live="polite"></div>
 ```
 
 `role="alert"` carries an **implicit** `aria-live="assertive"`. Adding `aria-live="polite"` on the same element overrides the implicit assertive priority to polite. This creates contradictory semantics: the element declares it is an alert (assertive) but then demands polite delivery. Screen readers treat this inconsistently — some honor `aria-live`, others honor the role implicit value.
@@ -106,10 +100,9 @@ There are no tests for this behavior and no Storybook story demonstrating it.
 **File:** `hx-time-picker.ts:349-352`
 
 ```html
-<div role="combobox"
-  aria-owns=${ifDefined(this._open ? this._listboxId : undefined)}
->
-  <input aria-controls=${ifDefined(this._open ? this._listboxId : undefined)} />
+<div role="combobox" aria-owns="${ifDefined(this._open" ? this._listboxId : undefined)}>
+  <input aria-controls="${ifDefined(this._open" ? this._listboxId : undefined)} />
+</div>
 ```
 
 Both `aria-owns` (on the wrapper) and `aria-controls` (on the input) point to the same listbox ID. In ARIA 1.2, only `aria-controls` on the combobox input is required. `aria-owns` in the combobox pattern is an ARIA 1.1 artifact and is explicitly not recommended in ARIA 1.2. Having both on different elements may cause assistive technologies to announce the listbox twice or create unexpected virtual cursor behavior.
@@ -161,6 +154,7 @@ The `mode` parameter is omitted. While TypeScript may not flag this in all confi
 The `_handleInputChange` handler processes user-typed strings through `parseUserInput`, which supports complex 12h/24h parsing patterns ("2:30 PM", "230 pm", "2 PM", bare "HH:MM"). None of these parsing paths are tested. The only value-related tests use property assignment or option clicks — not typed input.
 
 Edge cases that are untested:
+
 - "12:00 PM" → `12:00` (noon)
 - "12:00 AM" → `00:00` (midnight)
 - "13:00 PM" → null (invalid) — should revert display
@@ -192,7 +186,7 @@ The four axe-core tests run on the component in its **closed** state. The ARIA c
 **File:** `hx-time-picker.ts:358-384`
 
 ```html
-<button type="button" class="field__toggle" tabindex="-1" ...>
+<button type="button" class="field__toggle" tabindex="-1" ...></button>
 ```
 
 The toggle button (clock icon) has no `part` attribute. All other primary surfaces (label, input, listbox, option, error, help-text, field) expose CSS parts, but the toggle button cannot be styled by consumers via `::part(toggle)`. This is inconsistent and a blocker for theming integrations that need to match a custom design system's icon button appearance.
@@ -204,8 +198,9 @@ The toggle button (clock icon) has no `part` attribute. All other primary surfac
 **File:** `hx-time-picker.ts:149-171` (JSDoc), `hx-time-picker.styles.ts:141-145`
 
 The listbox CSS uses:
+
 ```css
-box-shadow: var(--hx-time-picker-listbox-shadow, 0 4px 16px ...);
+box-shadow: var(--hx-time-picker-listbox-shadow, 0 4px 16px...);
 ```
 
 This is a consumer-overridable CSS custom property, but it is **not listed** in the `@cssprop` JSDoc annotations on the component class. The CEM generator reads these annotations to populate the Custom Elements Manifest. The undocumented token is invisible to CEM consumers, Storybook autodocs, and design system integrators.
@@ -217,26 +212,23 @@ This is a consumer-overridable CSS custom property, but it is **not listed** in 
 **File:** `hx-time-picker.stories.ts:CSSCustomProperties story`, `CSSParts story`
 
 ```ts
-style="--hx-time-picker-border-color: #2563EB;"
-style="--hx-time-picker-bg: #1e293b; --hx-time-picker-color: #f1f5f9; ..."
+style = '--hx-time-picker-border-color: #2563EB;';
+style = '--hx-time-picker-bg: #1e293b; --hx-time-picker-color: #f1f5f9; ...';
 ```
 
 The CSS Custom Properties and CSS Parts demonstration stories use hardcoded hex values (`#2563EB`, `#1e293b`, `#f1f5f9`, `#334155`, `#94a3b8`, `#dc3545`) throughout the style attributes and the `<style>` block (`#0d6efd`, `rgba(13, 110, 253, 0.15)`). This directly contradicts the design token architecture — stories demonstrating override patterns should use semantic token references (e.g., `--hx-color-primary-600`) as examples, not hardcoded hex values that are meaningless to design-system consumers.
 
 ---
 
-### ~~A-14 — `Math.random()` for stable IDs is not SSR-safe~~ FIXED [P2]
+### A-14 — `Math.random()` for stable IDs is not SSR-safe [P2]
 
-**File:** `hx-time-picker.ts`
-
-**Resolution:** `Math.random()` replaced with a static class-level monotonically incrementing counter:
+**File:** `hx-time-picker.ts:242-245`
 
 ```ts
-private static _instanceCount = 0;
-private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
+private readonly _id = `hx-time-picker-${Math.random().toString(36).slice(2, 9)}`;
 ```
 
-IDs are now deterministic per page render order. `<label for>` associations, `aria-labelledby` references, and `aria-controls` listbox linkage remain stable across server-render and client-side hydration in Drupal Declarative Shadow DOM contexts. The static counter is scoped to the class, ensuring uniqueness across all instances on the page.
+Random IDs generated at construction time differ between server-rendered HTML and client-side hydration. For Drupal's Declarative Shadow DOM or any SSR rendering pipeline, this causes ID mismatches that break `<label for="...">` associations after hydration. Consider using a monotonically incrementing counter (e.g., `static _instanceCount = 0`) for deterministic IDs.
 
 ---
 
@@ -289,8 +281,8 @@ box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
 
 ```html
 <svg width="16" height="16" viewBox="0 0 16 16" ...>
-  <circle .../>
-  <path .../>
+  <circle ... />
+  <path ... />
 </svg>
 ```
 
@@ -338,30 +330,30 @@ The restored state is set directly to `this.value` without validation. If the br
 
 ## Summary
 
-| ID | Area | Severity | Title |
-|----|------|----------|-------|
-| A-01 | Accessibility | P0 | `role="combobox"` on wrapper div violates ARIA 1.2 |
-| A-02 | Accessibility | P0 | `role="alert"` + `aria-live="polite"` contradiction |
-| A-03 | Accessibility | P1 | Slotted label breaks `<label for>` association |
-| A-04 | Accessibility | P1 | Missing `Home`/`End` keyboard navigation |
-| A-05 | Accessibility | P1 | Deprecated `aria-owns` redundant with `aria-controls` |
-| A-06 | Performance | P1 | `_slots` getter regenerates on every invocation |
-| A-07 | TypeScript | P1 | `formStateRestoreCallback` signature incomplete per spec |
-| A-08 | Tests | P1 | No tests for user-typed input via `parseUserInput` |
-| A-09 | Tests | P1 | No tests for live-typing (`_handleInputInput`) |
-| A-10 | Tests | P1 | `axe-core` not tested with dropdown open |
-| A-11 | CSS Parts | P1 | Toggle button missing `part` attribute |
-| A-12 | CEM/Docs | P1 | `--hx-time-picker-listbox-shadow` token undocumented |
-| A-13 | Storybook | P1 | Hardcoded hex values in CSS demo stories |
-| ~~A-14~~ | TypeScript | P2 | ~~`Math.random()` IDs not SSR-safe~~ FIXED: static class counter |
-| A-15 | CSS | P2 | Listbox clipped by ancestor `overflow: hidden` |
-| A-16 | Performance | P2 | `_slots` not memoized; format change regenerates |
-| A-17 | CSS | P2 | `color-mix()` not supported in Safari < 16.2 |
-| A-18 | Architecture | P2 | Inline SVG should use `hx-icon` component |
-| A-19 | CSS | P2 | No RTL layout support |
-| A-20 | Tests | P2 | `step=0`/negative step guard untested |
-| A-21 | TypeScript | P2 | Restored state not validated or clamped |
-| A-22 | Tests | P2 | No test confirming `hx-change` absent on form reset |
+| ID   | Area          | Severity | Title                                                    |
+| ---- | ------------- | -------- | -------------------------------------------------------- |
+| A-01 | Accessibility | P0       | `role="combobox"` on wrapper div violates ARIA 1.2       |
+| A-02 | Accessibility | P0       | `role="alert"` + `aria-live="polite"` contradiction      |
+| A-03 | Accessibility | P1       | Slotted label breaks `<label for>` association           |
+| A-04 | Accessibility | P1       | Missing `Home`/`End` keyboard navigation                 |
+| A-05 | Accessibility | P1       | Deprecated `aria-owns` redundant with `aria-controls`    |
+| A-06 | Performance   | P1       | `_slots` getter regenerates on every invocation          |
+| A-07 | TypeScript    | P1       | `formStateRestoreCallback` signature incomplete per spec |
+| A-08 | Tests         | P1       | No tests for user-typed input via `parseUserInput`       |
+| A-09 | Tests         | P1       | No tests for live-typing (`_handleInputInput`)           |
+| A-10 | Tests         | P1       | `axe-core` not tested with dropdown open                 |
+| A-11 | CSS Parts     | P1       | Toggle button missing `part` attribute                   |
+| A-12 | CEM/Docs      | P1       | `--hx-time-picker-listbox-shadow` token undocumented     |
+| A-13 | Storybook     | P1       | Hardcoded hex values in CSS demo stories                 |
+| A-14 | TypeScript    | P2       | `Math.random()` IDs not SSR-safe                         |
+| A-15 | CSS           | P2       | Listbox clipped by ancestor `overflow: hidden`           |
+| A-16 | Performance   | P2       | `_slots` not memoized; format change regenerates         |
+| A-17 | CSS           | P2       | `color-mix()` not supported in Safari < 16.2             |
+| A-18 | Architecture  | P2       | Inline SVG should use `hx-icon` component                |
+| A-19 | CSS           | P2       | No RTL layout support                                    |
+| A-20 | Tests         | P2       | `step=0`/negative step guard untested                    |
+| A-21 | TypeScript    | P2       | Restored state not validated or clamped                  |
+| A-22 | Tests         | P2       | No test confirming `hx-change` absent on form reset      |
 
 **P0 count: 2 — BLOCKS MERGE**
 **P1 count: 11**
