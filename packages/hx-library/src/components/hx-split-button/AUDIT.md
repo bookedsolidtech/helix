@@ -237,7 +237,7 @@ This audit is based on source code from `rescue/abandoned-components` (PR #175),
 
 ---
 
-#### P2-08: No Drupal behavior file provided
+#### P2-08: No Drupal behavior file provided ✅ FIXED
 
 **File:** N/A
 **Area:** Drupal / Integration
@@ -245,6 +245,8 @@ This audit is based on source code from `rescue/abandoned-components` (PR #175),
 The component has no accompanying Drupal behavior file (`.js` or `.es6.js` in a Drupal-compatible format). For the primary consumer (Drupal CMS), consumers are expected to use the web component directly from a CDN or asset library. The component is Twig-renderable as-is (both `label` attribute and slot content work from Twig), but interactive keyboard patterns and analytics hooks typically require a Drupal behavior. This is a gap for full enterprise Drupal integration.
 
 Note: The `label` property does not use `reflect: true`, so the `label` attribute set from Twig/HTML will work (Lit observes attributes) but reading the `label` property back from JS will return the default (`undefined`) until the Lit property is set via JavaScript. This is a subtle but non-blocking Drupal integration concern.
+
+**Resolution:** Created `hx-split-button.twig` documenting all attributes (`label`, `variant`, `hx-size`, `disabled`, `trigger-label`, `menu-label`) with `menu_items` array rendering `<hx-menu-item>` children. Created `hx-split-button.drupal.js` with two Drupal behaviors: `hxSplitButtonPrimary` (wires `hx-click` to AJAX via `data-hx-split-button-action`) and `hxSplitButtonMenu` (wires `hx-select` to per-item AJAX via `data-hx-menu-action-<value>` attributes). Both use the `once()` API for AJAX-safe re-attachment.
 
 ---
 
@@ -291,4 +293,4 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 
 - Twig-renderable: **Pass** — standard HTML attribute API works
 - label attribute: **Pass** (with caveat — P2-08)
-- Behavior file: **Missing** (P2-08)
+- Behavior file: **Pass** — `hx-split-button.drupal.js` added (P2-08 ✅ FIXED)
