@@ -28,6 +28,14 @@ import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
  * @cssprop [--hx-breadcrumb-text-color=var(--hx-color-neutral-700)] - Current page text color.
  * @cssprop [--hx-breadcrumb-item-max-width] - Max-width for item text truncation (e.g. `12rem`).
  */
+/** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
+interface JsonLdListItem {
+  '@type': string;
+  position: number;
+  name: string;
+  item?: string;
+}
+
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
   static override styles = [tokenStyles, helixBreadcrumbStyles];
@@ -270,13 +278,10 @@ export class HelixBreadcrumb extends LitElement {
   /**
    * JSON-LD ListItem entry with typed fields to avoid Record<string, unknown>.
    */
-  private _buildListItem(
-    item: Element,
-    position: number,
-  ): { '@type': string; position: number; name: string; item?: string } {
+  private _buildListItem(item: Element, position: number): JsonLdListItem {
     const href = (item as HTMLElement).getAttribute('href');
     const name = (item as HTMLElement).textContent?.trim() ?? '';
-    const entry: { '@type': string; position: number; name: string; item?: string } = {
+    const entry: JsonLdListItem = {
       '@type': 'ListItem',
       position,
       name,

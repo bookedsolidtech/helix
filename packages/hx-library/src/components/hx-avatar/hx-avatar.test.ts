@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixAvatar } from './hx-avatar.js';
@@ -129,7 +129,7 @@ describe('hx-avatar', () => {
       // Update src — _imgError must reset so the new image renders.
       el.src = 'https://example.com/new-avatar.png';
       await el.updateComplete;
-      await el.updateComplete; // second await for the state change triggered in updated().
+      await el.updateComplete; // extra await ensures all reactive state settles.
 
       expect(shadowQuery(el, '[part="image"]')).toBeTruthy();
       expect(shadowQuery(el, '[part="initials"]')).toBeNull();
@@ -318,6 +318,76 @@ describe('hx-avatar', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Console warnings (P2-A, P2-C) ───
+
+  describe('Console warnings', () => {
+    it('warns when initials is set without label (P2-A)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>('<hx-avatar initials="JD"></hx-avatar>');
+        await el.updateComplete;
+        expect(warnSpy).toHaveBeenCalledWith(
+          expect.stringContaining('"label" attribute is recommended when "initials" is provided'),
+        );
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when initials is set with label (P2-A)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar initials="JD" label="Dr. John Doe"></hx-avatar>',
+        );
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('"label" attribute is recommended when "initials" is provided'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('warns when badge slot content lacks an accessible name (P2-C)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar initials="JD" label="John Doe"><span slot="badge" class="status-dot"></span></hx-avatar>',
+        );
+        await el.updateComplete;
+        await el.updateComplete;
+        expect(warnSpy).toHaveBeenCalledWith(
+          expect.stringContaining('badge slot content should have an accessible name'),
+        );
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when badge slot has aria-label (P2-C)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar initials="JD" label="John Doe"><span slot="badge" aria-label="Online"></span></hx-avatar>',
+        );
+        await el.updateComplete;
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('badge slot content should have an accessible name'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
     });
   });
 });

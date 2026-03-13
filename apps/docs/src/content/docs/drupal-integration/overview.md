@@ -778,7 +778,7 @@ Ready to integrate HELIX with your Drupal site?
 
 ## Support and Community
 
-- **GitHub Issues:** [github.com/your-org/helix/issues](https://github.com)
+- **GitHub Issues:** [github.com/bookedsolidtech/helix/issues](https://github.com/bookedsolidtech/helix/issues)
 - **Documentation:** [helix-docs.example.com](https://example.com)
 - **Drupal Slack:** #helix channel in [Drupal Slack](https://drupal.org/slack)
 - **Stack Overflow:** Tag questions with `helix-web-components` and `drupal`

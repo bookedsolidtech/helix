@@ -413,5 +413,29 @@ describe('hx-card', () => {
         el.remove();
       }
     });
+
+    // P2-05: axe-core must cover the interactive card + actions slot combination
+    it('has no axe violations — interactive card with hx-aria-label and actions slot', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="https://example.com" hx-aria-label="View patient record"><span slot="heading">Patient: Jane Doe</span><p>MRN: 885521</p><button slot="actions">View Chart</button></hx-card>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Horizontal Layout (known gap) ───
+
+  describe('Horizontal layout (known gap)', () => {
+    // P2-10: The audit spec calls out horizontal/vertical layout as an expected feature.
+    // The component does not implement a horizontal layout variant. This test documents
+    // the known gap so any future implementation will be caught by the test suite.
+    it('does not have a horizontal layout property (known gap — not yet implemented)', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      // No "orientation" or "layout" property exists on the component
+      expect((el as unknown as Record<string, unknown>)['orientation']).toBeUndefined();
+      expect((el as unknown as Record<string, unknown>)['layout']).toBeUndefined();
+    });
   });
 });

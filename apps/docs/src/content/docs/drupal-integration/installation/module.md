@@ -1264,7 +1264,7 @@ drush cr
 
 ## Support
 
-For issues, see: https://github.com/your-org/hx-library/issues
+For issues, see: https://github.com/bookedsolidtech/helix/issues
 
 ````
 

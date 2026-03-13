@@ -131,9 +131,9 @@ Comprehensive docs at `apps/docs/src/content/docs/component-library/hx-help-text
 
 The `label` arg in stories is a fabricated control for the default slot, not a real component property. This is a common Storybook pattern for web components and does not affect functionality, but may confuse autodocs consumers.
 
-### P2-03: FormFieldIntegration story uses hardcoded hex colors for input borders
+### ~~P2-03: FormFieldIntegration story uses hardcoded hex colors for input borders~~ FIXED
 
-The `<input>` elements in the FormFieldIntegration story use hardcoded hex values (`#dc2626`, `#15803d`, `#d1d5db`) for their borders. These are native HTML elements in the demo context, not the component itself. Low priority.
+**Resolution:** Hardcoded hex values replaced with design tokens: `#d1d5db` → `var(--hx-color-neutral-300)`, `#dc2626` → `var(--hx-color-error-600)`, `#15803d` → `var(--hx-color-success-700)`.
 
 ---
 

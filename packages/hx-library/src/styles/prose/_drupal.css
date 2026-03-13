@@ -95,10 +95,12 @@
   display: block;
 }
 
-/* Clearfix after floated elements */
+/* Clear floats after aligned elements so block-level content (headings,
+   paragraphs) starts below floated images rather than wrapping beside them.
+   Consumers who want wrap-around behavior can override with clear: none. */
 .align-left + *,
 .align-right + * {
-  clear: none;
+  clear: both;
 }
 
 /* ─── CKEditor Caption ─── */

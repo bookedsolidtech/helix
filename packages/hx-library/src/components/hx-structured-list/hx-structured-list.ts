@@ -54,7 +54,7 @@ export class HelixStructuredList extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="list">
+      <div part="base" class="list" role="list">
         <slot></slot>
       </div>
     `;
@@ -87,11 +87,11 @@ export class HelixStructuredListRow extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="row">
-        <div part="label" class="row__label" role="term">
+      <div part="base" class="row" role="listitem">
+        <div part="label" class="row__label">
           <slot name="label"></slot>
         </div>
-        <div part="value" class="row__value" role="definition">
+        <div part="value" class="row__value">
           <slot></slot>
           <div part="actions" class="row__actions">
             <slot name="actions"></slot>

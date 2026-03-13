@@ -41,7 +41,7 @@ The component is in **strong shape** for production use. Remaining findings are 
 
 ---
 
-#### P2-1: `--hx-badge-pulse-color` is dead CSS — set but never consumed
+#### ~~P2-1: `--hx-badge-pulse-color` is dead CSS — set but never consumed~~ FIXED
 
 **Location:** `hx-badge.styles.ts:49, 55, 61, 67, 73, 79, 85`, `hx-badge.ts:30`
 
@@ -80,39 +80,19 @@ The variable is also documented as `@cssprop` in the JSDoc (line 30), meaning th
 
 **Severity:** P2 — dead code in CSS + false API documentation.
 
----
-
-#### P2-2: `RemovableWithCount` story labels are silently dropped
-
-**Location:** `hx-badge.stories.ts:375–399`
-
-The story renders badges with both default slot content AND `count`:
-
-```html
-<hx-badge variant="primary" pill removable remove-label="Remove ICU filter" count="12"
-  >ICU</hx-badge
->
-```
-
-However, the component's render method replaces the default slot entirely when `count` is set:
-
-```ts
-${hasCount ? this._countDisplay : html`<slot @slotchange=${this._handleSlotChange}></slot>`}
-```
-
-The "ICU", "Stable", "Pending Review", "Critical", "Discharged" labels in the story are **never rendered visually**. The badges show only the numbers: "12", "28", "5", "3", "99+". This makes the "Active Filters" story misleading — it appears to show labeled filter tags but actually shows number-only badges.
-
-**Recommendation:** Either:
-
-- Use the `prefix` slot for labels: `<span slot="prefix">ICU</span>`
-- Remove the label text and update the story description to clarify count-only badges
-- Add a `label` property to support label+count display
-
-**Severity:** P2 — misleading Storybook documentation of a pattern that doesn't work as shown.
+**Fix:** Implemented `box-shadow` pulse animation in `@keyframes wc-badge-pulse` using `--hx-badge-pulse-color`. The keyframe now animates from `box-shadow: 0 0 0 0 var(--hx-badge-pulse-color, currentColor)` to `box-shadow: 0 0 0 4px transparent`, giving a colored expanding ring effect. The variable is now consumed and the API is functional.
 
 ---
 
-#### P2-3: Prefix slot rendered inside dot mode with no layout guard
+#### ~~P2-2: `RemovableWithCount` story labels are silently dropped~~ FIXED
+
+**Location:** `hx-badge.stories.ts`
+
+**Fix:** Labels moved to the `prefix` slot using `<span slot="prefix">Label</span>`. The default slot is replaced by the count display when `count` is set, so the prefix slot is the correct location for labels that must coexist with a count. The JSDoc comment on the story now documents this pattern explicitly so future consumers understand the required markup. The play function assertions remain in place to verify the remove button presence and `max`-count truncation behaviour.
+
+---
+
+#### ~~P2-3: Prefix slot rendered inside dot mode with no layout guard~~ FIXED
 
 **Location:** `hx-badge.ts:171`, `hx-badge.styles.ts:96–101`
 
@@ -145,6 +125,8 @@ The SVG will be rendered inside the 0.5rem × 0.5rem container with `overflow: v
 Or conditionally render the prefix slot only when not in dot mode.
 
 **Severity:** P2 — edge case layout breakage with no guard.
+
+**Fix:** Added `.badge--dot ::slotted(*) { display: none; }` CSS guard in `hx-badge.styles.ts` after the `.badge--dot` rule.
 
 ---
 
@@ -195,73 +177,69 @@ The `aria-live="polite"` attribute is tested for static presence, but no test ve
 
 ---
 
-#### P3-3: `WcBadge` type alias follows project-wide legacy pattern
+#### ~~P3-3: `WcBadge` type alias follows project-wide legacy pattern~~ FIXED
 
-**Location:** `hx-badge.ts:193`
+**Location:** `hx-badge.ts`
 
-```ts
-export type WcBadge = HelixBadge;
-```
+The `WcBadge` type alias now carries a `@deprecated` JSDoc annotation with `@since 0.1.0` and `@removal-target 1.0.0`, documenting the migration timeline. A canonical `HxBadge` alias has been added alongside the deprecated one, and both are exported from the component `index.ts` and the library root `index.ts`. Consumers can migrate from `WcBadge` to `HxBadge` or directly to `HelixBadge`.
 
-This uses the old `Wc` prefix instead of `Hx`. However, this is a **project-wide pattern** (found in hx-button, hx-text, hx-text-input, hx-switch, hx-tag, hx-checkbox, hx-radio-group, hx-divider, hx-help-text, hx-nav, etc.). Not a badge-specific issue — should be addressed as a coordinated migration across all components.
-
-**Severity:** P3 — systemic naming inconsistency, not badge-specific.
+**Severity:** P3 — systemic naming inconsistency, now tracked with deprecation metadata.
 
 ---
 
 ## Coverage Matrix
 
-| Area                                        | Status  | Notes                                                          |
-| ------------------------------------------- | ------- | -------------------------------------------------------------- |
-| TypeScript types — variant union            | PASS    | All 7 variants in type + stories + tests                       |
-| TypeScript types — strict compliance        | PASS    | No `any`, no `@ts-ignore`, proper typing                       |
-| TypeScript types — count/max                | PASS    | Implemented with correct types                                 |
-| Accessibility — dot indicator name          | PASS    | `dotLabel` with `role="img"` + `aria-label`                    |
-| Accessibility — remove button label         | PASS    | Contextual `removeLabel` property                              |
-| Accessibility — prefers-reduced-motion CSS  | PASS    | Media query disables animation                                 |
-| Accessibility — prefers-reduced-motion test | PASS    | Test verifies CSS rule                                         |
-| Accessibility — live region for count       | PASS    | `aria-live="polite"` when count set                            |
-| Accessibility — axe-core                    | PASS    | Tests for default + all variants                               |
-| Tests — rendering (5)                       | PASS    | Shadow DOM, CSS parts, defaults                                |
-| Tests — all variants (8)                    | PASS    | All 7 variants + reflection                                    |
-| Tests — sizes (3)                           | PASS    | sm, md, lg                                                     |
-| Tests — pill (3)                            | PASS    | Class, default, reflection                                     |
-| Tests — pulse (3)                           | PASS    | Class, default, reflection                                     |
-| Tests — removable (3)                       | PASS    | Button presence, default, reflection                           |
-| Tests — dot indicator (3)                   | PASS    | Empty+pulse, content+pulse, empty-pulse                        |
-| Tests — slots (3)                           | PASS    | Default text, HTML, prefix                                     |
-| Tests — CSS parts (2)                       | PASS    | badge, remove-button                                           |
-| Tests — events (3)                          | PASS    | Click, Enter, Space                                            |
-| Tests — count/max (6)                       | PASS    | Display, zero, truncation, equals max, custom max, count+pulse |
-| Tests — dotLabel (3)                        | PASS    | role/aria-label, without, not in dot mode                      |
-| Tests — removeLabel (2)                     | PASS    | Default, custom                                                |
-| Tests — aria-live (2)                       | PASS    | With count, without count                                      |
-| Tests — whitespace edge cases (2)           | PASS    | Whitespace-only, newline-only                                  |
-| Tests — dynamic updates (2)                 | PASS    | Variant change, size change                                    |
-| Tests — reduced motion (1)                  | PASS    | CSS rule verification                                          |
-| Storybook — all variants                    | PASS    | 7 stories with play tests                                      |
-| Storybook — all sizes                       | PASS    | 3 stories with play tests                                      |
-| Storybook — count/max                       | PASS    | WithCount story with 6 examples                                |
-| Storybook — removable + count               | PARTIAL | Story exists but labels silently dropped (P2-2)                |
-| Storybook — dot indicator                   | PASS    | 4 examples with dot-label                                      |
-| Storybook — kitchen sinks                   | PASS    | AllVariants, AllSizes, AllCombinations                         |
-| CSS — design tokens only                    | PASS    | No hardcoded values, all token-backed with fallbacks           |
-| CSS — Shadow DOM encapsulation              | PASS    | `:host` display, proper scoping                                |
-| CSS — parts API                             | PASS    | `badge`, `remove-button`                                       |
-| CSS — dead code                             | FAIL    | `--hx-badge-pulse-color` (P2-1)                                |
-| Performance — bundle size                   | PASS    | Lightweight, well within 5KB                                   |
-| Performance — render efficiency             | PASS    | Minimal DOM, conditional rendering                             |
+| Area                                        | Status | Notes                                                          |
+| ------------------------------------------- | ------ | -------------------------------------------------------------- |
+| TypeScript types — variant union            | PASS   | All 7 variants in type + stories + tests                       |
+| TypeScript types — strict compliance        | PASS   | No `any`, no `@ts-ignore`, proper typing                       |
+| TypeScript types — count/max                | PASS   | Implemented with correct types                                 |
+| Accessibility — dot indicator name          | PASS   | `dotLabel` with `role="img"` + `aria-label`                    |
+| Accessibility — remove button label         | PASS   | Contextual `removeLabel` property                              |
+| Accessibility — prefers-reduced-motion CSS  | PASS   | Media query disables animation                                 |
+| Accessibility — prefers-reduced-motion test | PASS   | Test verifies CSS rule                                         |
+| Accessibility — live region for count       | PASS   | `aria-live="polite"` when count set                            |
+| Accessibility — axe-core                    | PASS   | Tests for default + all variants                               |
+| Tests — rendering (5)                       | PASS   | Shadow DOM, CSS parts, defaults                                |
+| Tests — all variants (8)                    | PASS   | All 7 variants + reflection                                    |
+| Tests — sizes (3)                           | PASS   | sm, md, lg                                                     |
+| Tests — pill (3)                            | PASS   | Class, default, reflection                                     |
+| Tests — pulse (3)                           | PASS   | Class, default, reflection                                     |
+| Tests — removable (3)                       | PASS   | Button presence, default, reflection                           |
+| Tests — dot indicator (3)                   | PASS   | Empty+pulse, content+pulse, empty-pulse                        |
+| Tests — slots (3)                           | PASS   | Default text, HTML, prefix                                     |
+| Tests — CSS parts (2)                       | PASS   | badge, remove-button                                           |
+| Tests — events (3)                          | PASS   | Click, Enter, Space                                            |
+| Tests — count/max (6)                       | PASS   | Display, zero, truncation, equals max, custom max, count+pulse |
+| Tests — dotLabel (3)                        | PASS   | role/aria-label, without, not in dot mode                      |
+| Tests — removeLabel (2)                     | PASS   | Default, custom                                                |
+| Tests — aria-live (2)                       | PASS   | With count, without count                                      |
+| Tests — whitespace edge cases (2)           | PASS   | Whitespace-only, newline-only                                  |
+| Tests — dynamic updates (2)                 | PASS   | Variant change, size change                                    |
+| Tests — reduced motion (1)                  | PASS   | CSS rule verification                                          |
+| Storybook — all variants                    | PASS   | 7 stories with play tests                                      |
+| Storybook — all sizes                       | PASS   | 3 stories with play tests                                      |
+| Storybook — count/max                       | PASS   | WithCount story with 6 examples                                |
+| Storybook — removable + count               | PASS   | Labels placed in prefix slot alongside count (P2-2 FIXED)      |
+| Storybook — dot indicator                   | PASS   | 4 examples with dot-label                                      |
+| Storybook — kitchen sinks                   | PASS   | AllVariants, AllSizes, AllCombinations                         |
+| CSS — design tokens only                    | PASS   | No hardcoded values, all token-backed with fallbacks           |
+| CSS — Shadow DOM encapsulation              | PASS   | `:host` display, proper scoping                                |
+| CSS — parts API                             | PASS   | `badge`, `remove-button`                                       |
+| CSS — dead code                             | FIXED  | `--hx-badge-pulse-color` now consumed in box-shadow animation  |
+| Performance — bundle size                   | PASS   | Lightweight, well within 5KB                                   |
+| Performance — render efficiency             | PASS   | Minimal DOM, conditional rendering                             |
 
 ---
 
 ## Severity Summary
 
-| Severity | Count | Details                                                 |
-| -------- | ----- | ------------------------------------------------------- |
-| P0       | 0     | —                                                       |
-| P1       | 0     | —                                                       |
-| P2       | 3     | Dead CSS variable, misleading story, prefix in dot mode |
-| P3       | 3     | Test gaps, legacy type alias                            |
+| Severity | Count | Details                                                                 |
+| -------- | ----- | ----------------------------------------------------------------------- |
+| P0       | 0     | —                                                                       |
+| P1       | 0     | —                                                                       |
+| P2       | 3     | Dead CSS variable (FIXED), misleading story, prefix in dot mode (FIXED) |
+| P3       | 3     | Test gaps (2), legacy type alias (FIXED with deprecation metadata)      |
 
 **Recommendation:** Component is **ready for production**. P2 items are polish — create GitHub issues for tracking. No blockers.
 

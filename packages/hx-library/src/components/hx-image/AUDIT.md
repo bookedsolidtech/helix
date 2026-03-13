@@ -258,3 +258,13 @@ When `src` is `''`, the `src` attribute is omitted (`nothing`), which is correct
 **NOT READY FOR SHIP.**
 
 2 P0 blockers, 5 P1 defects. The component has a solid structural foundation but the accessibility default (P0-01) is a critical regression that would silently hide informative images from screen readers in production. The missing `srcset`/`sizes` support (P0-02) makes it unfit for its primary consumer (Drupal). The caption feature (P1-01) is listed in the spec but entirely absent from the implementation.
+
+---
+
+## Fixes Applied (A11y Audit — 2026-03-12)
+
+| Issue | Status | Fix |
+|-------|--------|-----|
+| P0-01 | RESOLVED | `alt` property now defaults to `undefined`; no image is silently decorative. Developer must explicitly set `alt` text or use the `decorative` prop. |
+| P1-02 | RESOLVED | Error/fallback container uses `role="alert"` and `aria-live="polite"` for AT announcement |
+| P2-01 | RESOLVED | Explicit `decorative` boolean prop added; `alt=""` is now reserved for intentional use via the `decorative` attribute |

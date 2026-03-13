@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -168,7 +168,7 @@ export class HelixNumberInput extends LitElement {
   // ─── Internal References ───
 
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  declare private _input: HTMLInputElement | null;
 
   // ─── Internal State ───
 
@@ -229,7 +229,7 @@ export class HelixNumberInput extends LitElement {
     this._clearLongPress();
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (
       changedProperties.has('value') ||

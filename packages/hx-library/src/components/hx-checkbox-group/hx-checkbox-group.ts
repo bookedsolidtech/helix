@@ -100,7 +100,17 @@ export class HelixCheckboxGroup extends LitElement {
    * @attr orientation
    */
   @property({ type: String, reflect: true })
-  orientation: 'vertical' | 'horizontal' = 'vertical';
+  get orientation(): 'vertical' | 'horizontal' {
+    return this._orientation;
+  }
+  set orientation(value: string) {
+    if (value !== 'vertical' && value !== 'horizontal') {
+      console.warn(`[hx-checkbox-group] Invalid orientation "${value}", defaulting to "vertical".`);
+      value = 'vertical';
+    }
+    this._orientation = value as 'vertical' | 'horizontal';
+  }
+  private _orientation: 'vertical' | 'horizontal' = 'vertical';
 
   @state() private _hasErrorSlot = false;
   @state() private _hasHelpSlot = false;
@@ -127,12 +137,12 @@ export class HelixCheckboxGroup extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('hx-change', this._handleCheckboxChange as EventListener);
+    this.addEventListener('hx-change', this._handleCheckboxChange);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('hx-change', this._handleCheckboxChange as EventListener);
+    this.removeEventListener('hx-change', this._handleCheckboxChange);
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
@@ -186,7 +196,7 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Event Handling ───
 
-  private _handleCheckboxChange = (e: CustomEvent<{ checked: boolean; value: string }>): void => {
+  private _handleCheckboxChange = (e: Event): void => {
     // Only intercept events from direct hx-checkbox children — do not re-intercept
     // the hx-change we dispatch ourselves from this element.
     if (e.target === this) return;

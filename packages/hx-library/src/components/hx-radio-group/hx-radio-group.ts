@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -18,7 +18,8 @@ let _groupCounter = 0;
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{value: string, checked: boolean}>} hx-change - Dispatched when the selected radio changes.
+ * @fires hx-change - Dispatched when the selected radio changes (detail: `{value: string, checked: boolean}`).
+ * @fires hx-radio-select - Internal event dispatched by `hx-radio` when selected; consumed by the group (detail: `{value: string}`).
  *
  * @csspart fieldset - The fieldset wrapper.
  * @csspart legend - The legend/label.
@@ -29,6 +30,7 @@ let _groupCounter = 0;
  * @cssprop [--hx-radio-group-gap=var(--hx-space-3, 0.75rem)] - Gap between radio items.
  * @cssprop [--hx-radio-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  * @cssprop [--hx-radio-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
+ * @cssprop [--hx-radio-group-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  */
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends LitElement {
@@ -136,7 +138,7 @@ export class HelixRadioGroup extends LitElement {
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value || null);
@@ -148,7 +150,7 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  override firstUpdated(changedProperties: Map<string, unknown>): void {
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
     this._syncRadios();
     this._updateValidity();
@@ -308,27 +310,42 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
+  /**
+   * Returns the associated form element, if any.
+   * @returns The associated `HTMLFormElement`, or `null` if not in a form.
+   */
   get form(): HTMLFormElement | null {
     return this._internals.form;
   }
 
-  /** Returns the validation message. */
+  /**
+   * Returns the validation message.
+   * @returns The current validation message string.
+   */
   get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
-  /** Returns the ValidityState object. */
+  /**
+   * Returns the ValidityState object.
+   * @returns The `ValidityState` representing the current validity of the element.
+   */
   get validity(): ValidityState {
     return this._internals.validity;
   }
 
-  /** Checks whether the group satisfies its constraints. */
+  /**
+   * Checks whether the group satisfies its constraints.
+   * @returns `true` if the group is valid, `false` otherwise.
+   */
   checkValidity(): boolean {
     return this._internals.checkValidity();
   }
 
-  /** Reports validity and shows the browser's constraint validation UI. */
+  /**
+   * Reports validity and shows the browser's constraint validation UI.
+   * @returns `true` if the group is valid, `false` otherwise.
+   */
   reportValidity(): boolean {
     return this._internals.reportValidity();
   }
@@ -352,7 +369,11 @@ export class HelixRadioGroup extends LitElement {
     this._syncRadios();
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
+  /**
+   * Called when the form restores state (e.g., back/forward navigation).
+   * @param state - The saved form state value.
+   * @param _mode - The restore mode: `'restore'` or `'autocomplete'`.
+   */
   formStateRestoreCallback(
     state: string | File | FormData,
     _mode: 'restore' | 'autocomplete',

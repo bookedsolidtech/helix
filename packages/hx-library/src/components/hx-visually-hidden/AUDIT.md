@@ -23,9 +23,9 @@
 - Added 4 tests for focusable behavior (default, reflection, removal, keyboard accessibility)
 - Added `SkipLink` story demonstrating the focusable variant
 
-### P1 — Deprecated `clip` without modern `clip-path` (F-05)
+### P1 — Deprecated `clip` without modern `clip-path` (F-05) — GH #833
 
-- Added `clip-path: inset(50%) !important` alongside existing `clip: rect(0, 0, 0, 0)`
+- Added `clip-path: inset(50%) !important` alongside existing `clip: rect(0, 0, 0, 0)` for modern browser support
 
 ### P1 — No guard against display:none / visibility:hidden (F-06)
 

@@ -1,0 +1,143 @@
+{#
+  hx-split-panel — Drupal Twig Template
+  ========================================
+  Renders the <hx-split-panel> web component for use in Drupal themes.
+
+  A resizable two-pane layout with a draggable divider. Drag interaction,
+  keyboard navigation (Arrow keys, Page Up/Down, Home, End), and ARIA
+  semantics are handled by the component.
+
+  Attribute compatibility:
+    All public properties are attribute-settable from Twig. The `snap` property
+    accepts a JSON array string (e.g. snap="[25, 50, 75]") which the component
+    parses automatically. See P1-06 in AUDIT.md — this was fixed with a custom
+    converter.
+
+  Variables:
+    - position           (number, optional): Initial divider position as a
+                         percentage of the start panel (0–100). Defaults to 50.
+    - position_in_pixels (number, optional): Alternative to `position`. Sets
+                         the initial divider position in pixels. Converted to
+                         a percentage on first render. Takes precedence over
+                         `position` until the host is measured.
+    - orientation        (string, optional): 'horizontal' (default) or 'vertical'.
+                         Horizontal split = left/right panes.
+                         Vertical split = top/bottom panes.
+    - min                (number, optional): Minimum divider position as a
+                         percentage. Defaults to 0.
+    - max                (number, optional): Maximum divider position as a
+                         percentage. Defaults to 100.
+    - snap               (string, optional): JSON array of snap-point percentages.
+                         Example: '[25, 50, 75]'
+                         The divider snaps to the nearest point within 5%.
+    - disabled           (boolean, optional): Locks the divider; prevents dragging
+                         and keyboard repositioning.
+    - start_content      (string, optional): HTML/Twig markup for the start panel.
+                         Rendered in the `start` slot.
+    - end_content        (string, optional): HTML/Twig markup for the end panel.
+                         Rendered in the `end` slot.
+    - attributes         (object, optional): Additional HTML attributes.
+
+  CSS parts (for theming):
+    - start   — The start panel container.
+    - divider — The draggable divider element.
+    - end     — The end panel container.
+
+  Events:
+    hx-reposition — Dispatched when the divider is moved.
+                    Detail: { position: number } (percentage)
+
+  Usage:
+
+    Basic horizontal split (left navigation / content area):
+      {% include 'hx-split-panel.twig' with {
+        position: 30,
+        min: 15,
+        max: 70,
+        start_content: '<nav>' ~ drupal_menu('main') ~ '</nav>',
+        end_content: node.body.value,
+      } %}
+
+    Vertical split (header / body panes):
+      {% include 'hx-split-panel.twig' with {
+        orientation: 'vertical',
+        position: 25,
+        start_content: '<header>' ~ page.header ~ '</header>',
+        end_content: '<main>' ~ page.content ~ '</main>',
+      } %}
+
+    Patient record layout with snap points:
+      {% include 'hx-split-panel.twig' with {
+        position: 50,
+        snap: '[25, 50, 75]',
+        min: 20,
+        max: 80,
+        start_content: patient_summary_html,
+        end_content: patient_detail_html,
+      } %}
+
+    Fixed pixel initial position:
+      {% include 'hx-split-panel.twig' with {
+        position_in_pixels: 300,
+        start_content: sidebar_html,
+        end_content: main_html,
+      } %}
+
+    Locked (non-resizable) layout:
+      {% include 'hx-split-panel.twig' with {
+        position: 40,
+        disabled: true,
+        start_content: sidebar_html,
+        end_content: content_html,
+      } %}
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-split-panel:
+        js:
+          path/to/@helixui/library/dist/hx-split-panel.js: { attributes: { type: module } }
+
+    Attach the library in your template:
+      {{ attach_library('mytheme/hx-split-panel') }}
+
+  Responding to resize events in Drupal:
+    Listen for hx-reposition to save panel state (e.g., persist to localStorage):
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixSplitPanel = {
+          attach: function (context) {
+            once('hx-split-panel', 'hx-split-panel[data-persist-key]', context).forEach((el) => {
+              var key = el.dataset.persistKey;
+              var saved = localStorage.getItem('hx-split-panel:' + key);
+              if (saved !== null) { el.position = parseFloat(saved); }
+              el.addEventListener('hx-reposition', function (e) {
+                localStorage.setItem('hx-split-panel:' + key, e.detail.position);
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+#}
+
+{% set _position = position|default(50) %}
+{% set _orientation = orientation|default('horizontal') %}
+{% set _min = min|default(0) %}
+{% set _max = max|default(100) %}
+
+<hx-split-panel
+  position="{{ _position }}"
+  orientation="{{ _orientation }}"
+  min="{{ _min }}"
+  max="{{ _max }}"
+  {% if position_in_pixels is defined and position_in_pixels %}position-in-pixels="{{ position_in_pixels }}"{% endif %}
+  {% if snap %}snap="{{ snap }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if attributes %}{% for key, val in attributes %}{{ key }}="{{ val }}" {% endfor %}{% endif %}
+>
+  {%- if start_content is defined -%}
+    <div slot="start">{{ start_content }}</div>
+  {%- endif -%}
+  {%- if end_content is defined -%}
+    <div slot="end">{{ end_content }}</div>
+  {%- endif -%}
+</hx-split-panel>

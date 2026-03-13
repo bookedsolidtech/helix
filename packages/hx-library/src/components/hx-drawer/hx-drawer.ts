@@ -54,7 +54,7 @@ const FOCUSABLE_SELECTORS = [
  * @csspart panel - The drawer panel itself.
  * @csspart header - The header region containing the title and actions.
  * @csspart title - The drawer title element.
- * @csspart close-button - The built-in close button.
+ * @csspart close-btn - The built-in close button.
  * @csspart body - The scrollable body region.
  * @csspart footer - The footer region.
  *
@@ -465,7 +465,7 @@ export class HelixDrawer extends LitElement {
                 style="display:none"
               ></slot>`}
           <button
-            part="close-button"
+            part="close-btn"
             class="drawer-close-button"
             aria-label="Close drawer"
             @click=${() => {
