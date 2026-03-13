@@ -107,7 +107,7 @@ export class HelixImage extends LitElement {
    *
    * @attr rounded
    */
-  @property({ reflect: true })
+  @property({ type: String, reflect: true })
   rounded: boolean | string | undefined = undefined;
 
   /**
