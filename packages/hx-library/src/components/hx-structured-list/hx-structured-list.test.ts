@@ -268,6 +268,25 @@ describe('hx-structured-list-row', () => {
       expect(actions).toBeTruthy();
     });
 
+    // P1-04: Verify all documented CSS parts are present and targetable
+    it('documents all required CSS parts: base, label, value, actions', async () => {
+      const el = await fixture<HelixStructuredListRow>(
+        '<hx-structured-list-row><span slot="label">Name</span>Value<button slot="actions">Edit</button></hx-structured-list-row>',
+      );
+      expect(shadowQuery(el, '[part~="base"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="label"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="value"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part~="actions"]')).toBeTruthy();
+    });
+
+    it('"base" part is the row root element with role="listitem"', async () => {
+      const el = await fixture<HelixStructuredListRow>(
+        '<hx-structured-list-row><span slot="label">Name</span>Value</hx-structured-list-row>',
+      );
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('role')).toBe('listitem');
+    });
+
     it('renders actions container with flex display', async () => {
       const el = await fixture<HelixStructuredListRow>(
         '<hx-structured-list-row><span slot="label">Name</span>Value<button slot="actions">Edit</button></hx-structured-list-row>',

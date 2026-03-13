@@ -100,6 +100,31 @@ describe('hx-status-indicator', () => {
       );
       expect(el.size).toBe('lg');
     });
+
+    // P2-08: Verify size attribute affects visual dimensions via computed style
+    it('"sm" size produces smaller dimensions than "md"', async () => {
+      const sm = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="sm"></hx-status-indicator>',
+      );
+      const md = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="md"></hx-status-indicator>',
+      );
+      const smWidth = sm.getBoundingClientRect().width;
+      const mdWidth = md.getBoundingClientRect().width;
+      expect(smWidth).toBeLessThan(mdWidth);
+    });
+
+    it('"lg" size produces larger dimensions than "md"', async () => {
+      const md = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="md"></hx-status-indicator>',
+      );
+      const lg = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="lg"></hx-status-indicator>',
+      );
+      const mdWidth = md.getBoundingClientRect().width;
+      const lgWidth = lg.getBoundingClientRect().width;
+      expect(lgWidth).toBeGreaterThan(mdWidth);
+    });
   });
 
   // ─── Property: pulse ───

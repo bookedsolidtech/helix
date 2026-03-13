@@ -553,6 +553,65 @@ describe('hx-checkbox-group', () => {
     });
   });
 
+  // ─── Dynamic Children (P2-03) ───
+
+  describe('Dynamic children', () => {
+    it('picks up a checkbox added after initial render', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // Add a second checkbox dynamically
+      const newCb = document.createElement('hx-checkbox') as HelixCheckbox;
+      newCb.value = 'b';
+      newCb.setAttribute('label', 'Option B');
+      el.appendChild(newCb);
+      // Allow slot change and update cycle to settle
+      await el.updateComplete;
+      await newCb.updateComplete;
+
+      const checkboxes = Array.from(el.querySelectorAll('hx-checkbox')) as HelixCheckbox[];
+      expect(checkboxes.length).toBe(2);
+    });
+
+    it('removing a checked checkbox updates form validity', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options" required>
+          <hx-checkbox value="a" label="Option A" checked></hx-checkbox>
+          <hx-checkbox value="b" label="Option B"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // Initially valid because checkbox A is checked
+      expect(el.checkValidity()).toBe(true);
+
+      // Remove the only checked checkbox
+      const checkedCb = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
+      checkedCb.remove();
+      await el.updateComplete;
+
+      // Now required group has no checked children — should be invalid
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('disabled state propagates to dynamically added checkboxes', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" disabled>
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const newCb = document.createElement('hx-checkbox') as HelixCheckbox;
+      newCb.value = 'b';
+      newCb.setAttribute('label', 'Option B');
+      el.appendChild(newCb);
+      await el.updateComplete;
+      await newCb.updateComplete;
+
+      // The new checkbox should inherit the group's disabled state via _handleSlotChange
+      expect(newCb.disabled).toBe(true);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
