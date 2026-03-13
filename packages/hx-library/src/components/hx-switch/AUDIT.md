@@ -302,3 +302,12 @@ The screenshot filename references `wc-change` but the current test and componen
 4. **A-04** — Add `@media (prefers-reduced-motion: reduce)` to `hx-switch.styles.ts`.
 5. **A-05** — Correct `formStateRestoreCallback` signature.
 6. **A-02** — Fix or remove `NoLabel` story; document the `aria-label` limitation.
+
+---
+
+## CSS Audit Fixes Applied (2026-03-12)
+
+| Finding | Status |
+|---------|--------|
+| A-04: No `prefers-reduced-motion` support | **FIXED** — `@media (prefers-reduced-motion: reduce)` block disabling `.switch__track` and `.switch__thumb` transitions added to `hx-switch.styles.ts` |
+| A-08: Missing `--hx-switch-help-text-color` CSS custom property | **FIXED** — `--hx-switch-help-text-color` token applied to `.switch__help-text` in `hx-switch.styles.ts`; `@cssprop` documentation added to `hx-switch.ts` |

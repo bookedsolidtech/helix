@@ -158,6 +158,9 @@ export const helixTreeItemStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .item-row,
+    .expand-btn,
+    .expand-btn svg,
     .children {
       transition: none;
     }

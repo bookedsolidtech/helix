@@ -181,6 +181,14 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 
 ---
 
+## CSS Audit Fixes Applied (2026-03-12)
+
+| Finding | Status |
+|---------|--------|
+| P0-1: Double opacity on disabled state (0.5 × 0.5 = 0.25) | **FIXED** — `opacity` removed from `.button[disabled]`; only `:host([disabled])` applies `opacity: var(--hx-opacity-disabled, 0.5)` |
+
+---
+
 ## What Passes
 
 - `aria-pressed` correctly uses `"true"` / `"false"` strings (not `aria-checked`)

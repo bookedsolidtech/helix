@@ -333,8 +333,17 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | P2-4 | Drupal | P2 | No Twig/Drupal documentation or example |
 | P2-5 | Accessibility / ARIA | P2 | `aria-selected="false"` in non-selectable tree |
 | P2-6 | UX | P2 | Wrap-around arrow navigation is undocumented and potentially disorienting |
-| P2-7 | CSS | P2 | `color-mix()` requires modern browser — no fallback |
+| P2-7 | CSS | P2 | `color-mix()` requires modern browser — no fallback [FIXED: replaced with `rgba()` fallback] |
 | P2-8 | Performance | P2 | Bundle size not verified against 5KB threshold |
 | P2-9 | Performance | P2 | No virtualization strategy for large trees (ICD-10 scale) |
 | P2-10 | Code Quality | P2 | `_handleFocusIn` is dead code — `.tree` div has no tabindex |
 | P2-11 | ARIA | P2 | `aria-posinset` and `aria-setsize` missing on treeitems |
+
+---
+
+## CSS Audit Fixes Applied (2026-03-12)
+
+| Finding | Fix Applied |
+|---------|-------------|
+| P2-7: `color-mix()` CSS Level 5 — Browser Compatibility Risk | **FIXED** — replaced `color-mix(in srgb, currentColor 10%, transparent)` with `rgba(0, 0, 0, 0.06)` fallback in `hx-tree-item.styles.ts` |
+| Incomplete `prefers-reduced-motion` coverage | **FIXED** — expanded `@media (prefers-reduced-motion: reduce)` block in `hx-tree-item.styles.ts` to cover `.item-row`, `.expand-btn`, and `.expand-btn svg` transitions (previously only covered `.children`) |
