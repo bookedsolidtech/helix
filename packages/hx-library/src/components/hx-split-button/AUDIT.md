@@ -193,7 +193,7 @@ The `.split-button__menu` has no `max-height`, `overflow-y: auto`, or `overflow-
 
 The menu panel toggles between `display: none` and `display: block` with no animation. The chevron icon does animate (`transition: transform`), creating a mismatch where the icon animates but the menu appears instantly. The reduced-motion media query correctly disables the chevron animation, but there is nothing to disable for the menu because it has no transition. A fade-in or slide-down transition would be expected for production quality.
 
-**Resolution:** Added `@keyframes hx-split-button-menu-open` (opacity 0→1, translateY -4px→0) applied via `animation` on `.split-button__menu--open`. `prefers-reduced-motion: reduce` sets `animation: none` on the open class.
+**Resolution:** Added `@keyframes hx-split-button-menu-open` (opacity 0→1, translateY -4px→0) applied via `animation` on `.split-button__menu--open`. The `@media (prefers-reduced-motion: reduce)` block explicitly sets `animation: none` on `.split-button__menu--open` (in addition to `transition: none` on the primary, trigger, and chevron elements), ensuring motion-sensitive users do not see the menu animate.
 
 ---
 
