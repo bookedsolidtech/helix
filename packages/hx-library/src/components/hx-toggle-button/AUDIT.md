@@ -99,11 +99,14 @@ formStateRestoreCallback(state: string): void {
 
 The form value is set via `this._internals.setFormValue(this.value)` (the string value), not the string `'pressed'`. This means if the browser restores state from the stored form value (e.g., `"on"`), `formStateRestoreCallback` would receive `"on"`, which is not equal to `'pressed'`, so `this.pressed` would be set to `false` — incorrect behavior. The restore callback should likely check `state !== null` or match against the stored value string.
 
-#### P1-4: No Drupal Twig template or integration documentation
+#### ~~P1-4: No Drupal Twig template or integration documentation~~ FIXED
 
-The component directory contains no `hx-toggle-button.twig` or any Drupal integration guidance. Per project convention, all components must be Twig-renderable for Drupal consumers. A toggle button is stateful — the Drupal pattern (server-rendered pressed attribute, Drupal behavior for JS enhancement) must be documented or implemented.
-
-**Impact:** Drupal consumers cannot use this component without guessing at integration patterns.
+**Resolution:** `hx-toggle-button.twig` template added covering: server-rendered pressed state,
+icon-only usage with `aria_label`, exclusive toggle group pattern with `data-toggle-group` and
+a full Drupal behavior, form-associated usage with `name`/`value`, and the `hx-size` attribute
+mapping (not `size`). A `DrupalIntegration` story added to `hx-toggle-button.stories.ts`
+demonstrating server-rendered pressed state, exclusive view-mode toggle group, form-associated
+toggle, and disabled state from server-side permission checks.
 
 ---
 
@@ -140,11 +143,11 @@ override updated(changedProperties: Map<string | number | symbol, unknown>): voi
 
 Lit exports `PropertyValues` as a type alias for `ReadonlyMap<PropertyKey, unknown>`. Using it directly provides better semantics and aligns with Lit conventions. Minor but violates the project's TypeScript-strict quality standard.
 
-#### P2-4: No icon-only story in Storybook
+#### ~~P2-4: No icon-only story in Storybook~~ FIXED
 
 **File:** `hx-toggle-button.stories.ts`
 
-There is no dedicated `IconOnly` story demonstrating a toggle button with only a prefix slot icon and no label text (the most challenging accessibility case). The feature audit spec explicitly calls for an "icon-only" story. The `ViewModeToggle` healthcare scenario uses icon+text buttons, not icon-only.
+**Fix:** `IconOnly` story added (story #10, "Icon Only (accessible name via label)"). Demonstrates four icon-only toggle buttons (grid view, list view, mute, disabled bookmark) each providing an accessible name via the `label` attribute, which forwards to the inner `<button>`. SVG icons carry `aria-hidden="true"`. The story includes a descriptive paragraph explaining the `label` attribute requirement for screen reader compatibility.
 
 #### P2-5: Toggle group context — no coordination mechanism or ARIA guidance documented
 
@@ -173,11 +176,11 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 | P1-1 | P1       | Tests         | Keyboard tests call `btn.click()` — keydown dispatch is not tested          |
 | P1-2 | P1       | Accessibility | Icon-only usage has no accessible name forwarding to inner `<button>`       |
 | P1-3 | P1       | Tests         | `formStateRestoreCallback` untested; implementation may use wrong state key |
-| P1-4 | P1       | Drupal        | No Twig template or Drupal integration guidance                             |
+| P1-4 | P1       | Drupal        | No Twig template or Drupal integration guidance — **FIXED**                 |
 | P2-1 | P2       | CSS / A11y    | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast     |
 | P2-2 | P2       | TypeScript    | Deprecated alias `WcToggleButton` should be `HxToggleButton`                |
 | P2-3 | P2       | TypeScript    | `updated()` should use Lit's `PropertyValues` type                          |
-| P2-4 | P2       | Storybook     | Missing icon-only story                                                     |
+| P2-4 | P2       | Storybook     | ~~Missing icon-only story~~ **FIXED**                                       |
 | P2-5 | P2       | Architecture  | No toggle group coordination mechanism or exclusive-select pattern          |
 | P2-6 | P2       | API           | `hx-size` attribute diverges from library convention; undocumented          |
 
@@ -188,14 +191,6 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 | Finding                                                   | Status                                                                                                                              |
 | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | P0-1: Double opacity on disabled state (0.5 × 0.5 = 0.25) | **FIXED** — `opacity` removed from `.button[disabled]`; only `:host([disabled])` applies `opacity: var(--hx-opacity-disabled, 0.5)` |
-
-## Test Audit Fixes Applied (2026-03-13)
-
-| Finding                                                                           | Status                                                                                                                                                                                                                                                             |
-| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| P1-1: Keyboard tests do not test keyboard activation                              | **FIXED** — keyboard tests rewritten to use `btn.focus()` + `userEvent.keyboard('{Space}')` / `userEvent.keyboard('{Enter}')` from `@vitest/browser/context`; no `btn.click()` call — the event is produced by the browser from real keyboard input                |
-| P1-3: `formStateRestoreCallback` untested; implementation may use wrong state key | **FIXED** — implementation corrected: `setFormValue(this.value, 'pressed')` passes `'pressed'` as the state key; `formStateRestoreCallback` checks `state === 'pressed'`; tests added for restore from `'pressed'` (→ true) and restore from other state (→ false) |
-| P2-3: `updated()` uses raw `Map` type instead of Lit's `PropertyValues`           | **FIXED** — `updated(changedProperties: PropertyValues<this>)` uses Lit's exported type                                                                                                                                                                            |
 
 ---
 
