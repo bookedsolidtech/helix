@@ -197,7 +197,11 @@ export class HelixSlider extends LitElement {
     return ((clamped - this.min) / range) * 100;
   }
 
-  private _ticks(): number[] {
+  // Cached tick array — recomputed only when showTicks, min, max, or step change.
+  // Avoids redundant array allocation on every render during continuous drag updates.
+  private _cachedTicks: number[] = [];
+
+  private _computeTicks(): number[] {
     if (!this.showTicks) return [];
     const ticks: number[] = [];
     const range = this.max - this.min;
@@ -210,6 +214,18 @@ export class HelixSlider extends LitElement {
   }
 
   // ─── Lifecycle ───
+
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+    if (
+      changedProperties.has('showTicks') ||
+      changedProperties.has('min') ||
+      changedProperties.has('max') ||
+      changedProperties.has('step')
+    ) {
+      this._cachedTicks = this._computeTicks();
+    }
+  }
 
   override firstUpdated(): void {
     // Enable fill transition after initial render to suppress animation on mount
@@ -365,7 +381,7 @@ export class HelixSlider extends LitElement {
 
   override render(): TemplateResult {
     const fillPct = this._fillPercent();
-    const ticks = this._ticks();
+    const ticks = this._cachedTicks;
     const hasLabel = !!this.label || this._hasLabelSlot;
     const showRangeLabels = this._hasMinLabelSlot || this._hasMaxLabelSlot;
 

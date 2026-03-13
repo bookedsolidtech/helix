@@ -75,13 +75,9 @@ When `href` is set and `disabled` is true, the component removes `href` (via `if
 ></a>
 ```
 
-### P1-04: JSDoc claims console.warn is emitted — it is not
+### P1-04: JSDoc claims console.warn is emitted — it is not ✅ FIXED
 
-**File:** `hx-icon-button.ts:39` and `hx-icon-button.ts:112-115`
-
-The `@property` JSDoc says: "A console warning is emitted when absent." The `connectedCallback` comment says: "Label validation now happens in render() which enforces it by rendering nothing." No `console.warn` call exists anywhere in the file.
-
-This is a documentation lie that will mislead consumers: they expect a developer-facing warning during authoring, but they get silent failure (component renders nothing). The missing warn also removes an essential DX signal for the healthcare teams building with this component.
+**Resolution:** `console.warn('[hx-icon-button] The \`label\` property is required for accessibility. Render suppressed.')` is now called in `render()` when `normalizedLabel` is empty, before returning `nothing`. The JSDoc accurately documents the warning behaviour. The AUDIT.md note about `connectedCallback` is no longer applicable — validation happens in `render()` as documented.
 
 ### P1-05: Missing `shape` property (circular variant not implemented)
 
@@ -159,7 +155,7 @@ The base `.button:hover` applies `filter: brightness(0.9)`. However, `secondary`
 
 | Audit Area                                | Status     | Notes                                                               |
 | ----------------------------------------- | ---------- | ------------------------------------------------------------------- |
-| TypeScript — no `any`, proper typing      | PASS       | All types are correct                                               |
+| TypeScript — no `any`, proper typing      | PASS       | All types are correct. P1-04 (console.warn) ✅ FIXED               |
 | Accessibility — aria-label                | PASS       | Correctly set from `label`                                          |
 | Accessibility — keyboard activation       | FAIL       | Tests use click(), not keyboard events (P1-01)                      |
 | Accessibility — focus visible             | PASS       | `focus-visible` ring present                                        |

@@ -18,13 +18,11 @@
 
 ## Summary
 
-_Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
-
-| Severity     | Baseline | Remaining |
-| ------------ | -------- | --------- |
-| P0 (Blocker) | 2        | 2         |
-| P1 (High)    | 8        | 7         |
-| P2 (Medium)  | 8        | 6         |
+| Severity     | Total | Fixed | Open |
+| ------------ | ----- | ----- | ---- |
+| P0 (Blocker) | 2     | 1     | 1    |
+| P1 (High)    | 8     | 2     | 6    |
+| P2 (Medium)  | 8     | 1     | 7    |
 
 ---
 
@@ -43,7 +41,7 @@ _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have b
 
 ---
 
-### P0-02: Test file imports nonexistent type `WcProse`
+### P0-02: Test file imports nonexistent type `WcProse` ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 4
@@ -53,6 +51,8 @@ import type { WcProse } from './hx-prose.js';
 ```
 
 The component exports `HelixProse`, not `WcProse`. This import will produce a TypeScript error under strict mode (`'WcProse' is not exported from './hx-prose.js'`). The tests currently pass because the type is used only as a generic parameter to `fixture<WcProse>()`, and TypeScript may not enforce the import strictly in the test runner context — but it will fail `npm run type-check`. This is a broken type reference that violates the zero-TypeScript-errors gate.
+
+**Fix applied (2026-03-13):** Import updated to `HelixProse`.
 
 ---
 
@@ -112,11 +112,18 @@ hx-prose p.lead {
 
 ---
 
-### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
+### P1-04: `caption-side: bottom` — accessibility regression for data tables
 
 **File:** `styles/prose/prose.scoped.css`
+**Line:** ~406
 
-Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
+```css
+hx-prose caption {
+  caption-side: bottom;
+}
+```
+
+WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
 
 ---
 
@@ -135,7 +142,7 @@ hx-prose th {
 
 ---
 
-### P1-06: Test line-height assertion is trivially weak — doesn't enforce the healthcare mandate
+### P1-06: Test line-height assertion is trivially weak — doesn't enforce the healthcare mandate ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 131
@@ -146,11 +153,15 @@ expect(parseFloat(computed.lineHeight)).toBeGreaterThan(0);
 
 The feature description explicitly states: "healthcare-appropriate spacing and readability (min 1.5 line-height for body copy)." This test checks `> 0` — any line-height including `1px` passes. The test should assert `toBeGreaterThanOrEqual(1.5)` to enforce the healthcare mandate. The requirement is documented but the gate is absent.
 
+**Fix applied (2026-03-13):** Assertion updated to enforce `lineHeightRatio >= 1.5` (line-height / font-size ratio).
+
 ---
 
-### P1-07: Missing test coverage for key content types
+### P1-07: Missing test coverage for key content types ✅ FIXED
 
 **File:** `hx-prose.test.ts`
+
+**Fix applied (2026-03-13):** Tests added for all cases listed below.
 
 The following test cases are absent:
 
@@ -202,9 +213,19 @@ The comment block uses `--wc-prose-*` (old namespace) while the actual CSS custo
 
 ---
 
-### ~~P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared~~ ✅ FIXED
+### P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared
 
-**Fix:** Changed `clear: none` to `clear: both` in both `styles/prose/_drupal.css` and `styles/prose/prose.scoped.css`. Block-level content (headings, paragraphs) now starts below floated images rather than wrapping beside them. Updated comment explains the behavior and notes consumers can override with `clear: none` if wrap-around is intentional for their layout.
+**File:** `styles/prose/prose.scoped.css`
+**Lines:** ~730–733
+
+```css
+hx-prose .align-left + *,
+hx-prose .align-right + * {
+  clear: none;
+}
+```
+
+This rule explicitly prevents clearing floated content. CKEditor's `.align-left` and `.align-right` classes create floated elements. Setting `clear: none` on the following sibling means subsequent content will wrap around the float — which may be the intended visual behavior. However, if two consecutive floated images appear, or if a heading follows an aligned image, the heading may render adjacent to the floated image rather than below it. This is a layout bug waiting to happen in complex WYSIWYG content. The `clearfix` utility class exists (line ~795) but is opt-in. Most Drupal authors will not add it.
 
 ---
 
@@ -255,9 +276,11 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
+### P2-07: Axe tests do not cover images without `alt` attribute ✅ FIXED
 
 **File:** `hx-prose.test.ts`
+
+**Fix applied (2026-03-13):** Three axe tests added for img missing alt (violation), decorative img with `alt=""` (pass), img with descriptive alt (pass).
 
 The accessibility test suite tests headings, tables, and lists with axe-core. There is no axe test for image content:
 
@@ -316,3 +339,14 @@ This is documented implicitly via the `prose.scoped.css` approach but should be 
 ### `AdoptedStylesheetsController` Cleanup
 
 The `stylesheet is removed on disconnect` test (line 87–110) tests that the sheet count decreases by exactly 1 on `el.remove()`. This assumes the controller deregisters exactly one sheet. The test would fail (false pass) if: (a) multiple prose instances exist, (b) the controller does not properly deregister, or (c) the test cleanup runs before the assertion. The test logic is sound for single-instance scenarios but may be fragile in parallel test runs.
+
+---
+
+## Test Audit Fixes Applied (2026-03-13)
+
+| Finding                                             | Status                                                                                                                                                                                                             |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P0-02: Test file imports nonexistent type `WcProse` | **FIXED** — test file now imports `HelixProse` (the correct export name)                                                                                                                                           |
+| P1-06: Line-height assertion trivially weak         | **FIXED** — test now asserts `lineHeightRatio >= 1.5` (line-height / font-size ratio), enforcing the healthcare mandate                                                                                            |
+| P1-07: Missing test coverage for key content types  | **FIXED** — tests added for: `size="lg"` variant, dynamic size update via `updated()`, blockquote border, pre/code monospace font, img block display, figure margin, definition list dt/dd, empty `maxWidth` reset |
+| P2-07: Axe tests do not cover images without `alt`  | **FIXED** — three axe tests added: img missing alt (expects violation), decorative img with `alt=""` (expects pass), img with descriptive alt (expects pass)                                                       |

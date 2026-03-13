@@ -27,9 +27,11 @@ The implementation is structurally sound — TypeScript is strict, CEM docs are 
 
 ## P1 — High Severity (must fix before merge)
 
-### P1-01: Closed toast is fully exposed to the accessibility tree
+### P1-01: Closed toast is fully exposed to the accessibility tree — **FIXED**
 
 **File:** `hx-toast.ts:197–246`
+
+**Fix:** Added `aria-hidden="true"` management in the `updated()` lifecycle hook. When `open` changes to `false`, `aria-hidden="true"` is set on the host element. When `open` changes to `true`, `aria-hidden` is removed. Tests added verifying `aria-hidden` is set when closed and absent when open.
 
 When `open=false`, the `.toast` div is still rendered in the shadow DOM with `role="status"` (or `role="alert"` for `danger`). It is visually hidden via `opacity: 0` and `pointer-events: none` only. Screen readers traverse the shadow DOM and will encounter the live region and its content regardless of visibility.
 
@@ -43,9 +45,11 @@ When `open=false`, the `.toast` div is still rendered in the shadow DOM with `ro
 
 ---
 
-### P1-02: `aria-atomic` is missing on the live region
+### P1-02: `aria-atomic` is missing on the live region — **FIXED**
 
 **File:** `hx-toast.ts:205–206`
+
+**Fix:** Added `aria-atomic="true"` to the `.toast` div in the render template. Test added verifying `aria-atomic="true"` is present on the live region base element.
 
 The `.toast` div has `role="alert"` / `role="status"` and `aria-live="assertive"` / `aria-live="polite"` but lacks `aria-atomic="true"`.
 
@@ -86,6 +90,7 @@ None of this logic has a single test. The `hx-toast-stack` tests in `hx-toast.te
 **File:** `hx-toast.drupal.js`
 
 **Resolution:** `hx-toast.drupal.js` added providing `Drupal.behaviors.hxToast` that:
+
 - Attaches to elements with `data-hx-toast` attributes containing JSON-encoded options
 - Dynamically imports `toast()` from `@helixui/library` on click (tree-shaking friendly)
 - Uses a `dataset.hxToastAttached` guard to prevent double-binding on AJAX/BigPipe updates
@@ -158,9 +163,11 @@ This is the primary behavioral contract of `hx-toast-stack` and it has no test c
 
 ---
 
-### P2-06: Close button `aria-label` is hardcoded English with no i18n support
+### P2-06: Close button `aria-label` is hardcoded English with no i18n support — **FIXED**
 
 **File:** `hx-toast.ts:226`
+
+**Fix:** Added `closeLabel` property (attribute `close-label`) defaulting to `'Dismiss notification'`. The close button now uses `aria-label=${this.closeLabel}`. Test added verifying custom `close-label` attribute value is applied to the button's `aria-label`.
 
 ```ts
 aria-label="Dismiss notification"
