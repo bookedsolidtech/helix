@@ -98,23 +98,9 @@ Per WCAG 2.1 AA (Success Criterion 2.4.7 — Focus Visible), focus must be visib
 
 There is no `outline`, `box-shadow`, or equivalent visible ring. This is particularly critical in a healthcare context.
 
-### P1-06: `snap` property cannot be set via HTML attribute — Drupal incompatibility
+### P1-06: `snap` property cannot be set via HTML attribute — Drupal incompatibility ✅ FIXED
 
-**File:** `hx-split-panel.ts`, line 57
-
-```typescript
-@property({ type: Array })
-snap: number[] = [];
-```
-
-The `snap` property has no `attribute` converter for serializing/deserializing an array from an HTML attribute string. In Drupal Twig templates (purely static HTML), snap points cannot be configured:
-
-```twig
-{# This does NOT work — snap is a JS property, not an HTML attribute #}
-<hx-split-panel snap="[25, 50, 75]"></hx-split-panel>
-```
-
-The Drupal integration guide requires components to be "Twig-renderable without modification." The snap feature is inaccessible from Twig.
+**Resolution:** The `snap` property now uses a custom `converter` with `fromAttribute` (parses JSON array string, e.g. `snap="[25,50,75]"`, with a comma-separated fallback) and `toAttribute` (serializes to `JSON.stringify`). Drupal Twig templates can now set snap points via the `snap` attribute as a JSON array string. The JSDoc and component-level Twig example have been updated to document this pattern.
 
 ### P1-07: No Drupal Twig template documentation
 

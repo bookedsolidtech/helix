@@ -99,19 +99,9 @@ Compare to `hx-split-button.styles.ts:52` where the primary button uses `outline
 
 ---
 
-#### P1-03: Dead code — `_primaryButton` @query is never used
+#### P1-03: Dead code — `_primaryButton` @query is never used ✅ FIXED
 
-**File:** `hx-split-button.ts:67`
-**Area:** TypeScript / Code Quality
-
-```ts
-@query('.split-button__primary')
-private _primaryButton!: HTMLButtonElement;
-```
-
-This property is declared and queried but never accessed in any method body. All primary button interaction occurs through event handlers attached in the template. This is dead code that adds noise and may mislead maintainers into thinking the reference is used somewhere.
-
-TypeScript strict mode should catch this with `noUnusedLocals`, but `@query` decorated properties avoid this because they are technically "used" at the class level.
+**Resolution:** The `@query('.split-button__primary') private _primaryButton!: HTMLButtonElement` declaration has been removed. All primary button interaction occurs through template-attached event handlers; the explicit query reference was never accessed in any method body. Removing it eliminates the non-null assertion (`!`) and removes dead code.
 
 ---
 
@@ -263,7 +253,7 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 ### TypeScript
 
 - Strict mode compliance: **Pass** — no `any`, no `@ts-ignore`
-- Dead code: **Fail** — `_primaryButton` query (P1-03), `focused` variable (P1-04)
+- Dead code: `_primaryButton` query removed (P1-03 ✅ FIXED). `focused` variable (P1-04) — **Fail** (pending P0-01 fix)
 - Type accuracy: **Pass** — event detail types are correctly typed
 
 ### Accessibility
