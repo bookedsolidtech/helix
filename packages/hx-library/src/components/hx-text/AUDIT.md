@@ -20,9 +20,11 @@
 
 ## P0 — Blockers
 
-### P0-01: Truncated text provides no accessible full-text exposure
+### P0-01: Truncated text provides no accessible full-text exposure — **FIXED**
 
 **File:** `hx-text.ts:67-86`, `hx-text.test.ts:211-217`
+
+**Fix:** Added `title` attribute via `ifDefined` that exposes the full `textContent` when `truncate=true` or `lines > 0`. Tests added verifying title is set for both truncation modes and absent when not truncated.
 
 When `truncate=true` or `lines > 0`, visible text is clipped with CSS `text-overflow: ellipsis` or `-webkit-line-clamp`. No `title` attribute and no `aria-label` is added to the host or inner span to expose the full text to screen readers. Assistive technology users receive only the truncated string with no indication that content has been hidden.
 
@@ -99,9 +101,11 @@ A future refactor could drop the `styleMap` call (or incorrectly short-circuit t
 
 ---
 
-### P1-05: `inverse` and `disabled` colors excluded from axe test loop without sufficient justification
+### P1-05: `inverse` and `disabled` colors excluded from axe test loop without sufficient justification — **FIXED**
 
 **File:** `hx-text.test.ts:199-209`
+
+**Fix:** Added separate `inverse` color test with a dark background wrapper (`background: #1e293b`) so axe-core can validate contrast correctly. `disabled` remains excluded per WCAG 1.4.3 exemption (inactive UI components), with a comment justifying this. All 5 standard colors plus `inverse` are now axe-tested.
 
 The a11y test loop covers only `['default', 'subtle', 'danger', 'success', 'warning']`. The colors `inverse` and `disabled` are silently excluded. The inline comment justifies only `disabled` (WCAG 1.4.3 exempts inactive UI components). No comment or justification covers `inverse`.
 
@@ -131,9 +135,11 @@ The correct approach is `weight=${ifDefined(args.weight)}` using Lit's `ifDefine
 
 ---
 
-### P2-02: `code` variant excluded from accessibility test loop without explanation
+### P2-02: `code` variant excluded from accessibility test loop without explanation — **FIXED**
 
 **File:** `hx-text.test.ts:189`
+
+**Fix:** Added `code` to the variant axe test loop. All 8 variants are now tested: `body`, `body-sm`, `body-lg`, `label`, `label-sm`, `caption`, `code`, `overline`.
 
 The variant a11y loop at line 189 lists `['body', 'body-sm', 'body-lg', 'label', 'label-sm', 'caption', 'overline']` — `code` is missing. No comment explains why. If this is intentional (e.g., monospace fonts are known to trigger false positives from certain axe rules), that rationale must be documented. If it is an oversight, `code` variant has never been axe-tested.
 
