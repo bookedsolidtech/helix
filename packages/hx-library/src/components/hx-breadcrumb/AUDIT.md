@@ -166,10 +166,10 @@ All 9 P1 and 8 P2 issues from the previous audit have been resolved:
 | BC-A01 | P1       | CEM        | Private members exposed in Custom Elements Manifest             |
 | BC-A02 | P2       | Tests      | Ellipsis expand button click/keyboard paths not directly tested |
 | BC-A03 | P3       | Tests      | No test for `json-ld` toggled on programmatically after render  |
-| BC-A04 | P3       | Tests      | No test for `current` property toggling at runtime              |
+| BC-A04 | P3       | Tests      | ~~No test for `current` property toggling at runtime~~ FIXED    |
 | BC-A05 | P3       | Storybook  | No story for explicit `current` attribute (Drupal pattern)      |
 | BC-A06 | P3       | Storybook  | ~~`WithCustomStyling` story uses hardcoded hex colors~~ FIXED   |
-| BC-A07 | P3       | TypeScript | `_buildListItem` return type defined inline                     |
+| BC-A07 | P3       | TypeScript | ~~`_buildListItem` return type defined inline~~ FIXED           |
 | BC-A08 | P3       | CSS        | ~~`display: contents` on `::part(item)` not documented~~ FIXED  |
 
 ---

@@ -109,18 +109,11 @@ hx-prose p.lead {
 
 ---
 
-### P1-04: `caption-side: bottom` — accessibility regression for data tables
+### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
 
 **File:** `styles/prose/prose.scoped.css`
-**Line:** ~406
 
-```css
-hx-prose caption {
-  caption-side: bottom;
-}
-```
-
-WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
+Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
 
 ---
 
@@ -269,7 +262,7 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### P2-07: Axe tests do not cover images without `alt` attribute
+### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 
