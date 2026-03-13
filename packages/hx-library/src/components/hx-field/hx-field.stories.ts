@@ -926,6 +926,145 @@ export const MedicationDosageField: Story = {
 };
 
 // ─────────────────────────────────────────────────
+// DRUPAL INTEGRATION
+// ─────────────────────────────────────────────────
+
+export const DrupalIntegration: Story = {
+  name: 'Drupal Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 520px;">
+      <div>
+        <p
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 1: Native input from Drupal Form API
+        </p>
+        <hx-field label="Patient Name" required help-text="Enter legal name as it appears on ID.">
+          <input
+            type="text"
+            name="patient_name"
+            placeholder="First Last"
+            required
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+          />
+        </hx-field>
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 2: Select field from Drupal Form API
+        </p>
+        <hx-field label="Department" required>
+          <select
+            name="department"
+            required
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
+          >
+            <option value="">Select a department...</option>
+            <option value="cardiology">Cardiology</option>
+            <option value="emergency">Emergency Medicine</option>
+            <option value="oncology">Oncology</option>
+          </select>
+        </hx-field>
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 3: Textarea for clinical notes
+        </p>
+        <hx-field
+          label="Clinical Notes"
+          help-text="Document observations for the attending physician."
+        >
+          <textarea
+            name="clinical_notes"
+            rows="4"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; resize: vertical; font-family: inherit;"
+          ></textarea>
+        </hx-field>
+      </div>
+
+      <div>
+        <p
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+        >
+          Pattern 4: Error state from Drupal validation
+        </p>
+        <hx-field
+          label="Insurance ID"
+          required
+          error="Insurance ID must be 9–12 digits. Please verify and re-enter."
+        >
+          <input
+            type="text"
+            name="insurance_id"
+            value="ABC"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #dc3545); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+          />
+        </hx-field>
+      </div>
+    </div>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Demonstrates the primary Drupal Form API integration patterns for \`hx-field\`.
+
+**Twig template example:**
+\`\`\`twig
+{# Basic labeled field from Drupal field data #}
+<hx-field
+  label="{{ field_label|t }}"
+  {% if field_required %}required{% endif %}
+  {% if field_help_text %}help-text="{{ field_help_text|t }}"{% endif %}
+  {% if field_error %}error="{{ field_error|t }}"{% endif %}
+>
+  <input
+    type="{{ field_type|default('text') }}"
+    name="{{ field_name }}"
+    id="{{ field_id }}"
+    value="{{ field_value|default('') }}"
+  />
+</hx-field>
+\`\`\`
+
+**Drupal Behaviors (AJAX validation):**
+\`\`\`js
+(function (Drupal, once) {
+  Drupal.behaviors.helixFieldValidation = {
+    attach(context) {
+      once('hx-field-validation', 'hx-field[data-drupal-field]', context).forEach((field) => {
+        field.closest('form').addEventListener('submit', (e) => {
+          const input = field.querySelector('input, textarea, select');
+          if (input && !input.value.trim()) {
+            e.preventDefault();
+            field.error = Drupal.t('This field is required.');
+          }
+        });
+      });
+    },
+  };
+})(Drupal, once);
+\`\`\`
+
+**Asset loading (mytheme.libraries.yml):**
+\`\`\`yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+\`\`\`
+        `,
+      },
+    },
+  },
+};
+
+// ─────────────────────────────────────────────────
 // INTERACTION TESTS
 // ─────────────────────────────────────────────────
 

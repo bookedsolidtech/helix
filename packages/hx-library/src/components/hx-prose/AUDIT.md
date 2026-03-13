@@ -24,7 +24,7 @@ _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have b
 | ------------ | -------- | --------- |
 | P0 (Blocker) | 2        | 2         |
 | P1 (High)    | 8        | 7         |
-| P2 (Medium)  | 8        | 7         |
+| P2 (Medium)  | 8        | 6         |
 
 ---
 
@@ -202,19 +202,9 @@ The comment block uses `--wc-prose-*` (old namespace) while the actual CSS custo
 
 ---
 
-### P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared
+### ~~P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared~~ ✅ FIXED
 
-**File:** `styles/prose/prose.scoped.css`
-**Lines:** ~730–733
-
-```css
-hx-prose .align-left + *,
-hx-prose .align-right + * {
-  clear: none;
-}
-```
-
-This rule explicitly prevents clearing floated content. CKEditor's `.align-left` and `.align-right` classes create floated elements. Setting `clear: none` on the following sibling means subsequent content will wrap around the float — which may be the intended visual behavior. However, if two consecutive floated images appear, or if a heading follows an aligned image, the heading may render adjacent to the floated image rather than below it. This is a layout bug waiting to happen in complex WYSIWYG content. The `clearfix` utility class exists (line ~795) but is opt-in. Most Drupal authors will not add it.
+**Fix:** Changed `clear: none` to `clear: both` in both `styles/prose/_drupal.css` and `styles/prose/prose.scoped.css`. Block-level content (headings, paragraphs) now starts below floated images rather than wrapping beside them. Updated comment explains the behavior and notes consumers can override with `clear: none` if wrap-around is intentional for their layout.
 
 ---
 
