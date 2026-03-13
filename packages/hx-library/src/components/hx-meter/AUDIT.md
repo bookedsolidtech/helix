@@ -47,9 +47,9 @@ The `role="meter"` element has no `tabindex`. ARIA `meter` is a range widget; pe
 
 Note: browse-mode screen readers (NVDA, JAWS document mode) can still encounter it via cursor navigation, so this is P2 not P1.
 
-### P2 — `data-state` attribute duplication
+### P2 — `data-state` attribute duplication ✅ FIXED
 
-`_resolveState()` is called twice per render cycle: once inside `render()` to set `data-state` on the inner `div[part="base"]` (line 155), and once in `updated()` to set `this.dataset['state']` on the host element (line 137). The inner `data-state` is unnecessary (CSS selectors use `:host([data-state])`) and creates attribute noise that could confuse consumers inspecting the DOM.
+**Resolution:** Removed redundant `data-state` from the inner render div. State is only set on the host element via `updated()`, which is what the `:host([data-state='optimum'])` CSS selectors consume.
 
 ---
 
@@ -130,17 +130,9 @@ If a `size` property is added (see TypeScript P2), corresponding stories are abs
 
 ## 5. CSS
 
-### P1 — Missing `track` CSS part
+### P1 — Missing `track` CSS part ✅ FIXED
 
-The audit requirements explicitly list expected CSS parts as `(track, fill, label)`. The `.meter__track` div has no `part` attribute:
-
-```html
-<div class="meter__track"></div>
-```
-
-Consumers cannot style the track via `::part(track)`. This violates the component's documented customization contract. The audit requirement calls out `track` as a required CSS part.
-
-Additionally, the filled bar is exposed as `part="indicator"` but the audit requirement calls it `fill`. While the naming divergence is not a blocker, it should be documented as a deliberate naming decision.
+**Resolution:** Added `part="track"` to the `.meter__track` div element. The track is now externally styleable via `::part(track)`. JSDoc `@csspart track` annotation added.
 
 ### P2 — No `size` CSS custom property or variant
 
@@ -206,14 +198,14 @@ There is no `hx-meter.twig` file or Drupal-specific documentation in the compone
 | --- | ------------- | -------- | ------------------------------------------------------------------------------------------------ |
 | 1   | Accessibility | P1       | No `aria-valuetext` — semantic state (optimum/warning/danger) not communicated to screen readers |
 | 2   | Accessibility | P1       | Slot-only label produces wrong accessible name (WCAG 2.5.3 violation)                            |
-| 3   | CSS           | P1       | Missing `track` CSS part — required by audit contract                                            |
+| 3   | CSS           | P1       | Missing `track` CSS part — required by audit contract ✅ FIXED                                   |
 | 4   | Storybook     | P1       | Default story controls for `low`, `high`, `optimum` are non-functional (not bound in render)     |
 | 5   | Tests         | P1       | No test for `aria-valuetext` (feature also missing)                                              |
 | 6   | Tests         | P1       | Slot-only label accessible name bug is untested                                                  |
 | 7   | TypeScript    | P2       | Final `return 'default'` in `_resolveState()` is unreachable — dead code                         |
 | 8   | TypeScript    | P2       | No `size` property if size variants are expected                                                 |
 | 9   | Accessibility | P2       | `role="meter"` element not focusable (no `tabindex="0"`)                                         |
-| 10  | Accessibility | P2       | `data-state` attribute set redundantly on both host and inner div                                |
+| 10  | Accessibility | P2       | `data-state` attribute set redundantly on both host and inner div ✅ FIXED                       |
 | 11  | Tests         | P2       | Test description at line 260 says "default" but asserts "optimum" — misleading                   |
 | 12  | Tests         | P2       | Boundary values `value === low` and `value === high` not tested                                  |
 | 13  | Tests         | P2       | `min === max` zero-division guard not tested                                                     |
@@ -225,5 +217,5 @@ There is no `hx-meter.twig` file or Drupal-specific documentation in the compone
 | 19  | Drupal        | P2       | No Twig template or Drupal usage example                                                         |
 
 **P0 findings: 0**
-**P1 findings: 6**
-**P2 findings: 13**
+**P1 findings: 6** (1 fixed: #3 track CSS part)
+**P2 findings: 13** (1 fixed: #10 data-state duplication)
