@@ -18,11 +18,11 @@
 
 ## Summary
 
-| Severity     | Count |
-| ------------ | ----- |
-| P0 (Blocker) | 2     |
-| P1 (High)    | 8     |
-| P2 (Medium)  | 8     |
+| Severity     | Count | Fixed |
+| ------------ | ----- | ----- |
+| P0 (Blocker) | 2     | 1     |
+| P1 (High)    | 8     | 2     |
+| P2 (Medium)  | 8     | 1     |
 
 ---
 
@@ -41,7 +41,7 @@
 
 ---
 
-### P0-02: Test file imports nonexistent type `WcProse`
+### P0-02: Test file imports nonexistent type `WcProse` ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 4
@@ -51,6 +51,8 @@ import type { WcProse } from './hx-prose.js';
 ```
 
 The component exports `HelixProse`, not `WcProse`. This import will produce a TypeScript error under strict mode (`'WcProse' is not exported from './hx-prose.js'`). The tests currently pass because the type is used only as a generic parameter to `fixture<WcProse>()`, and TypeScript may not enforce the import strictly in the test runner context — but it will fail `npm run type-check`. This is a broken type reference that violates the zero-TypeScript-errors gate.
+
+**Fix applied (2026-03-13):** Import updated to `HelixProse`.
 
 ---
 
@@ -140,7 +142,7 @@ hx-prose th {
 
 ---
 
-### P1-06: Test line-height assertion is trivially weak — doesn't enforce the healthcare mandate
+### P1-06: Test line-height assertion is trivially weak — doesn't enforce the healthcare mandate ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 131
@@ -151,11 +153,15 @@ expect(parseFloat(computed.lineHeight)).toBeGreaterThan(0);
 
 The feature description explicitly states: "healthcare-appropriate spacing and readability (min 1.5 line-height for body copy)." This test checks `> 0` — any line-height including `1px` passes. The test should assert `toBeGreaterThanOrEqual(1.5)` to enforce the healthcare mandate. The requirement is documented but the gate is absent.
 
+**Fix applied (2026-03-13):** Assertion updated to enforce `lineHeightRatio >= 1.5` (line-height / font-size ratio).
+
 ---
 
-### P1-07: Missing test coverage for key content types
+### P1-07: Missing test coverage for key content types ✅ FIXED
 
 **File:** `hx-prose.test.ts`
+
+**Fix applied (2026-03-13):** Tests added for all cases listed below.
 
 The following test cases are absent:
 
@@ -270,9 +276,11 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### P2-07: Axe tests do not cover images without `alt` attribute
+### P2-07: Axe tests do not cover images without `alt` attribute ✅ FIXED
 
 **File:** `hx-prose.test.ts`
+
+**Fix applied (2026-03-13):** Three axe tests added for img missing alt (violation), decorative img with `alt=""` (pass), img with descriptive alt (pass).
 
 The accessibility test suite tests headings, tables, and lists with axe-core. There is no axe test for image content:
 

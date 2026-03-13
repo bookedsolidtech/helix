@@ -423,12 +423,12 @@ describe('hx-switch', () => {
       expect(el.checked).toBe(false);
     });
 
-    it('disabled inner button has tabIndex=-1 (not keyboard-focusable via Tab)', async () => {
-      // Native <button disabled> has tabIndex=-1, preventing Tab focus.
-      // This verifies real browser behavior, not just the _toggle() guard code (A-12).
+    it('disabled inner button still has tabIndex=0 (keyboard exclusion via _toggle() guard, not tabIndex)', async () => {
+      // Native <button disabled> retains tabIndex=0 — the browser does not change tabIndex on disable.
+      // Keyboard interaction is prevented by the _toggle() guard checking this.disabled (A-12).
       const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
-      expect(track?.tabIndex).toBe(-1);
+      expect(track?.tabIndex).toBe(0);
     });
   });
 
