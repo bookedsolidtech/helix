@@ -936,9 +936,7 @@ export const MedicationDosageSelector: Story = {
 export const OutOfRangeValue: Story = {
   name: 'Out-of-Range Value (clamping)',
   render: () => html`
-    <div
-      style="display: flex; flex-direction: column; gap: var(--hx-space-8); max-width: 480px;"
-    >
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-8); max-width: 480px;">
       <div>
         <p
           style="margin: 0 0 var(--hx-space-2); font-size: var(--hx-font-size-xs); font-weight: var(--hx-font-weight-semibold); color: var(--hx-color-neutral-500); font-family: var(--hx-font-family-mono);"
