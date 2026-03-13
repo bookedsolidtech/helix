@@ -316,3 +316,14 @@ This is documented implicitly via the `prose.scoped.css` approach but should be 
 ### `AdoptedStylesheetsController` Cleanup
 
 The `stylesheet is removed on disconnect` test (line 87–110) tests that the sheet count decreases by exactly 1 on `el.remove()`. This assumes the controller deregisters exactly one sheet. The test would fail (false pass) if: (a) multiple prose instances exist, (b) the controller does not properly deregister, or (c) the test cleanup runs before the assertion. The test logic is sound for single-instance scenarios but may be fragile in parallel test runs.
+
+---
+
+## Test Audit Fixes Applied (2026-03-13)
+
+| Finding | Status |
+|---------|--------|
+| P0-02: Test file imports nonexistent type `WcProse` | **FIXED** — test file now imports `HelixProse` (the correct export name) |
+| P1-06: Line-height assertion trivially weak | **FIXED** — test now asserts `lineHeightRatio >= 1.5` (line-height / font-size ratio), enforcing the healthcare mandate |
+| P1-07: Missing test coverage for key content types | **FIXED** — tests added for: `size="lg"` variant, dynamic size update via `updated()`, blockquote border, pre/code monospace font, img block display, figure margin, definition list dt/dd, empty `maxWidth` reset |
+| P2-07: Axe tests do not cover images without `alt` | **FIXED** — three axe tests added: img missing alt (expects violation), decorative img with `alt=""` (expects pass), img with descriptive alt (expects pass) |

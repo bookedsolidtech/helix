@@ -424,6 +424,14 @@ describe('hx-switch', () => {
       await el.updateComplete;
       expect(el.checked).toBe(false);
     });
+
+    it('disabled inner button has tabIndex=-1 (not keyboard-focusable via Tab)', async () => {
+      // Native <button disabled> has tabIndex=-1, preventing Tab focus.
+      // This verifies real browser behavior, not just the _toggle() guard code (A-12).
+      const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
+      const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
+      expect(track?.tabIndex).toBe(-1);
+    });
   });
 
   // --- Accessibility (4) ---

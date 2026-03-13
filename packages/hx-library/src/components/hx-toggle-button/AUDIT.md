@@ -190,6 +190,14 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 |---------|--------|
 | P0-1: Double opacity on disabled state (0.5 × 0.5 = 0.25) | **FIXED** — `opacity` removed from `.button[disabled]`; only `:host([disabled])` applies `opacity: var(--hx-opacity-disabled, 0.5)` |
 
+## Test Audit Fixes Applied (2026-03-13)
+
+| Finding | Status |
+|---------|--------|
+| P1-1: Keyboard tests do not test keyboard activation | **FIXED** — keyboard tests rewritten to use `btn.focus()` + `userEvent.keyboard('{Space}')` / `userEvent.keyboard('{Enter}')` from `@vitest/browser/context`; no `btn.click()` call — the event is produced by the browser from real keyboard input |
+| P1-3: `formStateRestoreCallback` untested; implementation may use wrong state key | **FIXED** — implementation corrected: `setFormValue(this.value, 'pressed')` passes `'pressed'` as the state key; `formStateRestoreCallback` checks `state === 'pressed'`; tests added for restore from `'pressed'` (→ true) and restore from other state (→ false) |
+| P2-3: `updated()` uses raw `Map` type instead of Lit's `PropertyValues` | **FIXED** — `updated(changedProperties: PropertyValues<this>)` uses Lit's exported type |
+
 ---
 
 ## What Passes
