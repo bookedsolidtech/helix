@@ -31,10 +31,10 @@ export const helixRadioStyles = css`
 
   .radio__input {
     position: absolute;
-    width: var(--hx-space-px, 1px);
-    height: var(--hx-space-px, 1px);
+    width: var(--hx-space-px);
+    height: var(--hx-space-px);
     padding: 0;
-    margin: calc(var(--hx-space-px, 1px) * -1);
+    margin: calc(var(--hx-space-px) * -1);
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
