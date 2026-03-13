@@ -160,17 +160,17 @@ Every size story explicitly passes `hx-size` to each individual `hx-button` chil
 
 **Impact:** The primary value proposition of `hx-size` on the group (cascading to children automatically) is not demonstrated and cannot be visually validated.
 
-### P2 — No story for disabled children
+### ~~P2 — No story for disabled children~~ FIXED
 
-Explicitly called out in the feature description as a required scenario. No story exercises a group with one or more disabled buttons.
+`DisabledChildren` story added. Shows (1) a group with one disabled mid-position button and (2) an all-disabled group, each with a descriptive `aria-label`. A play function asserts the disabled attribute is present on the expected button element.
 
-### P2 — No dedicated `aria-label` story / accessibility documentation story
+### ~~P2 — No dedicated `aria-label` story / accessibility documentation story~~ FIXED
 
-The `PatientRecord` story uses `aria-label` correctly, but there is no simple dedicated story that documents "always use `aria-label`" as the required accessibility pattern. The `aria-label` requirement is buried inside a complex composite story.
+`AccessibilityLabel` story added. A dedicated story that documents `aria-label` as a required accessibility pattern — separate from the complex `PatientRecord` story. The play function asserts `aria-label` values on both group elements.
 
-### P2 — `MixedVariants` story has no play function / assertions
+### ~~P2 — `MixedVariants` story has no play function / assertions~~ FIXED
 
-The `MixedVariants` story renders different button variants but has no automated assertions. This is a documentation story only, not a behavior-verified story.
+`MixedVariants` story updated with a play function. Assertions verify: both groups are rendered, each group contains the correct number of buttons, and variant attribute values on the first group match expected values.
 
 ---
 
@@ -303,9 +303,9 @@ The `hx-size` attribute uses a hyphen prefix, which is valid HTML but unusual. T
 | 13  | Tests         | P2       | `requestUpdate` spy test is fragile implementation testing                       |
 | 14  | Tests         | P2       | `--hx-button-group-size` cascade not end-to-end tested                           |
 | 15  | Storybook     | P1       | Size stories override individual button sizes — cascade mechanism undemonstrated |
-| 16  | Storybook     | P2       | No disabled-children story                                                       |
-| 17  | Storybook     | P2       | No dedicated `aria-label` accessibility documentation story                      |
-| 18  | Storybook     | P2       | `MixedVariants` has no play assertions                                           |
+| 16  | Storybook     | **FIXED**| `DisabledChildren` story added                                                   |
+| 17  | Storybook     | **FIXED**| `AccessibilityLabel` dedicated story added                                       |
+| 18  | Storybook     | **FIXED**| `MixedVariants` updated with play function and assertions                        |
 | 19  | CSS           | P1       | Single-child border-radius bug (`:first-child:last-child` specificity collision) |
 | 20  | CSS           | P1       | `--hx-button-group-size` cascade likely non-functional; unverified end-to-end    |
 | 21  | CSS           | P2       | `position: relative` z-index context is undocumented dependency                  |

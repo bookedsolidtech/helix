@@ -141,11 +141,11 @@ override updated(changedProperties: Map<string | number | symbol, unknown>): voi
 
 Lit exports `PropertyValues` as a type alias for `ReadonlyMap<PropertyKey, unknown>`. Using it directly provides better semantics and aligns with Lit conventions. Minor but violates the project's TypeScript-strict quality standard.
 
-#### P2-4: No icon-only story in Storybook
+#### ~~P2-4: No icon-only story in Storybook~~ FIXED
 
 **File:** `hx-toggle-button.stories.ts`
 
-There is no dedicated `IconOnly` story demonstrating a toggle button with only a prefix slot icon and no label text (the most challenging accessibility case). The feature audit spec explicitly calls for an "icon-only" story. The `ViewModeToggle` healthcare scenario uses icon+text buttons, not icon-only.
+**Fix:** `IconOnly` story added (story #10, "Icon Only (accessible name via label)"). Demonstrates four icon-only toggle buttons (grid view, list view, mute, disabled bookmark) each providing an accessible name via the `label` attribute, which forwards to the inner `<button>`. SVG icons carry `aria-hidden="true"`. The story includes a descriptive paragraph explaining the `label` attribute requirement for screen reader compatibility.
 
 #### P2-5: Toggle group context — no coordination mechanism or ARIA guidance documented
 
@@ -178,7 +178,7 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 | P2-1 | P2 | CSS / A11y | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast |
 | P2-2 | P2 | TypeScript | Deprecated alias `WcToggleButton` should be `HxToggleButton` |
 | P2-3 | P2 | TypeScript | `updated()` should use Lit's `PropertyValues` type |
-| P2-4 | P2 | Storybook | Missing icon-only story |
+| P2-4 | P2 | Storybook | ~~Missing icon-only story~~ **FIXED** |
 | P2-5 | P2 | Architecture | No toggle group coordination mechanism or exclusive-select pattern |
 | P2-6 | P2 | API | `hx-size` attribute diverges from library convention; undocumented |
 

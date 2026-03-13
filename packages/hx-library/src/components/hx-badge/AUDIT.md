@@ -84,33 +84,11 @@ The variable is also documented as `@cssprop` in the JSDoc (line 30), meaning th
 
 ---
 
-#### P2-2: `RemovableWithCount` story labels are silently dropped
+#### ~~P2-2: `RemovableWithCount` story labels are silently dropped~~ FIXED
 
-**Location:** `hx-badge.stories.ts:375–399`
+**Location:** `hx-badge.stories.ts`
 
-The story renders badges with both default slot content AND `count`:
-
-```html
-<hx-badge variant="primary" pill removable remove-label="Remove ICU filter" count="12"
-  >ICU</hx-badge
->
-```
-
-However, the component's render method replaces the default slot entirely when `count` is set:
-
-```ts
-${hasCount ? this._countDisplay : html`<slot @slotchange=${this._handleSlotChange}></slot>`}
-```
-
-The "ICU", "Stable", "Pending Review", "Critical", "Discharged" labels in the story are **never rendered visually**. The badges show only the numbers: "12", "28", "5", "3", "99+". This makes the "Active Filters" story misleading — it appears to show labeled filter tags but actually shows number-only badges.
-
-**Recommendation:** Either:
-
-- Use the `prefix` slot for labels: `<span slot="prefix">ICU</span>`
-- Remove the label text and update the story description to clarify count-only badges
-- Add a `label` property to support label+count display
-
-**Severity:** P2 — misleading Storybook documentation of a pattern that doesn't work as shown.
+**Fix:** Labels moved to the `prefix` slot using `<span slot="prefix">Label</span>`. The default slot is replaced by the count display when `count` is set, so the prefix slot is the correct location for labels that must coexist with a count. The JSDoc comment on the story now documents this pattern explicitly so future consumers understand the required markup. The play function assertions remain in place to verify the remove button presence and `max`-count truncation behaviour.
 
 ---
 
@@ -246,7 +224,7 @@ This uses the old `Wc` prefix instead of `Hx`. However, this is a **project-wide
 | Storybook — all variants                    | PASS    | 7 stories with play tests                                      |
 | Storybook — all sizes                       | PASS    | 3 stories with play tests                                      |
 | Storybook — count/max                       | PASS    | WithCount story with 6 examples                                |
-| Storybook — removable + count               | PARTIAL | Story exists but labels silently dropped (P2-2)                |
+| Storybook — removable + count               | PASS    | Labels placed in prefix slot alongside count (P2-2 FIXED)      |
 | Storybook — dot indicator                   | PASS    | 4 examples with dot-label                                      |
 | Storybook — kitchen sinks                   | PASS    | AllVariants, AllSizes, AllCombinations                         |
 | CSS — design tokens only                    | PASS    | No hardcoded values, all token-backed with fallbacks           |
