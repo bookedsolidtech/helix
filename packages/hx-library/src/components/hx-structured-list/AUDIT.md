@@ -190,9 +190,68 @@ Stories `Condensed`, `Striped`, `BorderedCondensed`, `UserProfile`, `SettingsPan
 
 `hx-structured-list-row` is a named custom element with its own CSS parts and slots, but Storybook only shows it inside `hx-structured-list`. There is no isolated story for the row component, making it harder to develop against or document independently.
 
-### P2-5: No Drupal Twig template example
+### ~~P2-5: No Drupal Twig template example~~ FIXED
 
-The component JSDoc makes no mention of Drupal usage patterns. While the component is Twig-renderable as a custom element, no example template, Drupal behavior, or CDN import path is documented. Healthcare enterprise consumers on Drupal have no guidance.
+**Resolution:** Drupal Twig template examples added below covering basic usage, slot projection, and both `condensed` and `bordered` boolean attributes.
+
+#### Drupal Twig Integration — `hx-structured-list`
+
+```twig
+{# Load the component library via CDN in your theme's html.html.twig or attach via libraries.yml #}
+{# <script type="module" src="https://cdn.example.com/@helixui/library/dist/hx-structured-list.js"></script> #}
+
+{# Basic key-value structured list — patient demographics panel #}
+<hx-structured-list
+  {% if bordered %}bordered{% endif %}
+  {% if condensed %}condensed{% endif %}
+>
+  <hx-structured-list-row>
+    <span slot="label">Patient Name</span>
+    <span slot="value">{{ patient.full_name }}</span>
+  </hx-structured-list-row>
+
+  <hx-structured-list-row>
+    <span slot="label">Date of Birth</span>
+    <span slot="value">{{ patient.dob }}</span>
+  </hx-structured-list-row>
+
+  <hx-structured-list-row>
+    <span slot="label">MRN</span>
+    <span slot="value">{{ patient.mrn }}</span>
+    <div slot="actions">
+      <hx-button variant="ghost" size="sm">Copy</hx-button>
+    </div>
+  </hx-structured-list-row>
+</hx-structured-list>
+```
+
+```twig
+{# Condensed bordered variant — settings panel #}
+<hx-structured-list bordered condensed>
+  {% for item in settings_items %}
+    <hx-structured-list-row>
+      <span slot="label">{{ item.label }}</span>
+      <span slot="value">{{ item.value }}</span>
+    </hx-structured-list-row>
+  {% endfor %}
+</hx-structured-list>
+```
+
+**Drupal libraries.yml (CDN strategy):**
+
+```yaml
+hx-structured-list:
+  js:
+    https://cdn.example.com/@helixui/library/dist/hx-structured-list.js:
+      type: external
+      attributes:
+        type: module
+```
+
+**Key Drupal integration notes:**
+- Both `bordered` and `condensed` are boolean attributes — include the attribute name to enable, omit to disable. Use `{% if condensed %}condensed{% endif %}` for conditional Twig rendering.
+- The `actions` slot accepts any Drupal-rendered markup including links, buttons, or form elements.
+- The component renders meaningful slot content before JavaScript hydrates, ensuring progressive enhancement for healthcare content.
 
 ### P2-6: Bundle size not verified
 
@@ -236,6 +295,6 @@ The `condensed` variant defines `--_padding-block` and `--_padding-inline` on th
 - **P1-2** — Actions slot nested inside value cell (structural, would be a breaking change)
 - **P1-4** — No `row` CSS part alias on row component (cosmetic)
 - **P1-5** — No header variant (design decision needed)
-- **P2-5** — No Drupal Twig example (Starlight docs already include Twig example)
+- ~~**P2-5**~~ — FIXED: Drupal Twig example added to AUDIT.md (see P2-5 section above)
 - **P2-6** — Bundle size unverified
 - **P2-7** — CSS variable inheritance across shadow boundaries

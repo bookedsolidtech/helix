@@ -1,5 +1,5 @@
 ---
-"@helixui/library": patch
+'@helixui/library': patch
 ---
 
 fix(css): resolve css audit findings for hx-tooltip and hx-visually-hidden
