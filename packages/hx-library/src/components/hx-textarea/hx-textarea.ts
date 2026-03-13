@@ -145,6 +145,15 @@ export class HelixTextarea extends LitElement {
   maxlength: number | undefined;
 
   /**
+   * Whether the textarea is read-only. Read-only fields are visible but
+   * cannot be edited by the user. Common in healthcare for displaying
+   * non-editable patient data inline with editable fields.
+   * @attr readonly
+   */
+  @property({ type: Boolean, reflect: true })
+  readonly = false;
+
+  /**
    * Controls how the textarea can be resized. Use 'auto' for auto-grow behavior.
    * @attr resize
    */
@@ -432,6 +441,7 @@ export class HelixTextarea extends LitElement {
             placeholder=${ifDefined(this.placeholder || undefined)}
             ?required=${this.required}
             ?disabled=${this.disabled}
+            ?readonly=${this.readonly}
             rows=${this.rows}
             minlength=${ifDefined(this.minlength)}
             maxlength=${ifDefined(this.maxlength)}

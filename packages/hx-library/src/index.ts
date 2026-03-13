@@ -75,6 +75,7 @@ export { HelixNavItem } from './components/hx-side-nav/index.js';
 export { HelixSkeleton } from './components/hx-skeleton/index.js';
 export { HelixSlider } from './components/hx-slider/index.js';
 export { HelixSpinner } from './components/hx-spinner/index.js';
+export type { SpinnerSize } from './components/hx-spinner/index.js';
 export { HelixSplitButton } from './components/hx-split-button/index.js';
 export { HelixSplitPanel } from './components/hx-split-panel/index.js';
 export { HelixStack } from './components/hx-stack/index.js';

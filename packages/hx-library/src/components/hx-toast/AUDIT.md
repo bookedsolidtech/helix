@@ -143,13 +143,11 @@ This is the primary behavioral contract of `hx-toast-stack` and it has no test c
 
 ---
 
-### P2-04: Slide animation direction does not vary by placement
+### ~~P2-04: Slide animation direction does not vary by placement~~ FIXED
 
-**File:** `hx-toast.styles.ts:34–46`
+**File:** `hx-toast.styles.ts`
 
-The enter animation always slides from `translateY(0.5rem)` (upward from below). For toasts in a `bottom-*` placement stack, this means they slide up to their final position, which is semantically correct. However for `top-*` placements, toasts should ideally slide downward from above (`translateY(-0.5rem)`) to feel natural. Currently all placements use the same upward slide.
-
-**Impact:** Minor visual inconsistency for `top-start`, `top-center`, `top-end` placements.
+**Resolution:** The `hx-toast-stack` styles now set `--hx-toast-enter-translate` to `calc(var(--hx-space-2, 0.5rem) * -1)` for `top-*` placements via the `::slotted(hx-toast)` selector. Toasts in top-positioned stacks slide downward from above; toasts in bottom-positioned stacks slide upward from below. The `--hx-toast-enter-translate` CSS custom property in `hx-toast.styles.ts` uses the parent-set value as its default.
 
 ---
 
@@ -194,23 +192,11 @@ The story is misleading to developers evaluating the component.
 
 ---
 
-### P2-08: CSS `:host(:not([placement]))` maps to `bottom-start`, conflicting with JS default `bottom-end`
+### ~~P2-08: CSS `:host(:not([placement]))` maps to `bottom-start`, conflicting with JS default `bottom-end`~~ FIXED
 
-**File:** `hx-toast.styles.ts:177–183`, `hx-toast.ts:273`
+**File:** `hx-toast.styles.ts`
 
-The CSS fallback for when no `placement` attribute is present maps to the `bottom-start` position:
-
-```css
-:host([placement='bottom-start']),
-:host(:not([placement])) {
-  bottom: 0;
-  left: 0;
-  right: auto;
-  top: auto;
-}
-```
-
-But the JS property default is `'bottom-end'` (bottom-right). Because `placement` has `reflect: true`, the attribute will be set on first render, so this mismatch only manifests if the attribute is programmatically removed after render (`el.removeAttribute('placement')`). However it creates a confusing inconsistency: the "no placement" CSS state and the JS default disagree on which corner is the fallback. The CSS should either be removed (the reflect will always set the attribute) or changed to match `bottom-end`.
+**Resolution:** The `:host(:not([placement]))` fallback CSS rule has been removed. The styles only contain explicit `:host([placement='...'])` selectors. Because `placement` has `reflect: true` on `HelixToastStack`, the attribute is always present after first render. The JS default `'bottom-end'` and the CSS placement rules are now consistent.
 
 ---
 
@@ -218,7 +204,7 @@ But the JS property default is `'bottom-end'` (bottom-right). Because `placement
 
 | Area                           | Status  | Findings                                   |
 | ------------------------------ | ------- | ------------------------------------------ |
-| TypeScript (strict, types)     | PASS    | None                                       |
+| TypeScript (strict, types)     | PASS    | P2-04, P2-08 fixed                         |
 | Accessibility (ARIA/axe)       | PARTIAL | P1-01, P1-02                               |
 | Tests (coverage/completeness)  | FAIL    | P1-03, P2-02, P2-03                        |
 | Storybook (variants/demos)     | PARTIAL | P2-07                                      |

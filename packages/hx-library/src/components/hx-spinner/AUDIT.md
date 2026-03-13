@@ -131,18 +131,11 @@ The test only asserts the `.spinner__sr-text` element exists — it does not ver
 
 ## P2 — Medium (tech debt / DX gap)
 
-### P2-1: `size` TypeScript union collapses to `string` — no runtime narrowing
+### ~~P2-1: `size` TypeScript union collapses to `string` — no runtime narrowing~~ FIXED
 
-**File:** `hx-spinner.ts:31`
+**File:** `hx-spinner.ts`
 
-```typescript
-size: 'sm' | 'md' | 'lg' | string = 'md';
-```
-
-`'sm' | 'md' | 'lg' | string` resolves to `string` at the TypeScript level — the string literal members add no type safety. TypeScript will not flag `size="xxl"` as an error. Consider:
-
-- `type SpinnerSize = 'sm' | 'md' | 'lg'` for the token sizes, combined with a separate `customSize?: string` property.
-- Or keep the union but document that it intentionally degrades to `string` for custom CSS values (add a comment explaining the design choice).
+**Resolution:** Added a named `SpinnerSize = 'sm' | 'md' | 'lg'` type, exported from both `hx-spinner.ts` and `index.ts`. The `size` property is typed as `SpinnerSize | string` with clear JSDoc documentation explaining the intentional widening to `string` for custom CSS size values. Consumers can import `SpinnerSize` for type-safe usage with token values.
 
 ---
 
@@ -225,7 +218,7 @@ Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also la
 | P1-3 | CSS           | P1       | `color-mix()` without fallback — broken in older browsers |
 | P1-4 | Tests         | P1       | No reduced-motion behavior test                           |
 | P1-5 | Tests         | P1       | sr-text content and reactive label update untested        |
-| P2-1 | TypeScript    | P2       | `size` union collapses to `string`                        |
+| P2-1 | TypeScript    | P2       | `size` union collapses to `string` — **FIXED**            |
 | P2-2 | Drupal/DX     | P2       | `label` not reflected — asymmetric vs `size`/`variant`    |
 | P2-3 | DX            | P2       | Hardcoded `...` appended to all sr-text labels            |
 | P2-4 | Storybook     | P2       | `size` argType `select`-only, custom sizes not explorable |

@@ -130,17 +130,11 @@ The component exposes 6 parts: `alert`, `title`, `icon`, `message`, `close-butto
 
 **Fix:** The JSDoc at the top of `CSSParts` story already says "6 CSS `::part()` targets" (correct). Updated the body text in the alert's inner content from "5 CSS parts" to "6 CSS parts" and added `::part(title)` to the enumerated list.
 
-### P2-06: `AlertVariant` type not exported
+### ~~P2-06: `AlertVariant` type not exported~~ FIXED
 
 **File:** `hx-alert.ts:8`, `index.ts:1`
 
-The `AlertVariant` type (`'info' | 'success' | 'warning' | 'error'`) is defined locally but not exported from the component or the barrel file. Consumers who want to type-check variant values in their TypeScript code cannot import this type.
-
-**Fix direction:** Export `AlertVariant` from `hx-alert.ts` and re-export from `index.ts`:
-
-```ts
-export type { AlertVariant } from './hx-alert.js';
-```
+**Resolution:** `AlertVariant` is exported from `hx-alert.ts` and re-exported from `index.ts` as `export type { AlertVariant }`. Consumers can import the type for type-safe variant checks.
 
 ### P2-07: Live region re-announcement reliability on `open` toggle
 
