@@ -29,6 +29,12 @@ describe('hx-structured-list', () => {
       const base = shadowQuery(el, 'div.list');
       expect(base).toBeTruthy();
     });
+
+    it('container div has role="list" for assistive technology', async () => {
+      const el = await fixture<HelixStructuredList>('<hx-structured-list></hx-structured-list>');
+      const base = shadowQuery(el, '[role="list"]');
+      expect(base).toBeTruthy();
+    });
   });
 
   // ─── Property: bordered ───
@@ -246,20 +252,12 @@ describe('hx-structured-list-row', () => {
       expect(value).toBeTruthy();
     });
 
-    it('renders a role="term" element for label', async () => {
+    it('renders base element with role="listitem"', async () => {
       const el = await fixture<HelixStructuredListRow>(
         '<hx-structured-list-row><span slot="label">Name</span>Value</hx-structured-list-row>',
       );
-      const term = shadowQuery(el, '[role="term"]');
-      expect(term).toBeTruthy();
-    });
-
-    it('renders a role="definition" element for value', async () => {
-      const el = await fixture<HelixStructuredListRow>(
-        '<hx-structured-list-row><span slot="label">Name</span>Value</hx-structured-list-row>',
-      );
-      const def = shadowQuery(el, '[role="definition"]');
-      expect(def).toBeTruthy();
+      const item = shadowQuery(el, '[role="listitem"]');
+      expect(item).toBeTruthy();
     });
 
     it('exposes "actions" CSS part', async () => {

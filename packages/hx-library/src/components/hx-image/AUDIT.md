@@ -173,12 +173,17 @@ No story demonstrates responsive behavior (fluid width, container queries, or `s
 
 ---
 
-### P2-06: `:host { display: inline-block }` is wrong default for block-level usage ✅ FIXED
+### P2-06: `:host { display: inline-block }` is wrong default for block-level usage
 
 **File:** `hx-image.styles.ts:5-7`
-**Area:** CSS
+**Code:**
+```css
+:host {
+  display: inline-block;
+}
+```
 
-**Resolution:** Changed `:host` display from `inline-block` to `block`. This is the correct default for image components used in block contexts, preventing baseline alignment gaps with adjacent text nodes.
+Most production uses of `hx-image` will be block-level (hero images, content images, card thumbnails). `inline-block` causes unwanted baseline alignment gaps with adjacent text nodes (the classic "4px gap" problem). The more defensive default is `display: block`, with `display: inline-block` available as an override. This matches how `<img>` itself is typically used in CSS resets.
 
 ---
 
@@ -195,12 +200,11 @@ For a Drupal-first component, attribute reflection is important for progressive 
 
 ---
 
-### P2-08: Fallback error container missing `min-height` — collapses to zero without `ratio` or `height` ✅ FIXED
+### P2-08: Fallback error container missing `min-height` — collapses to zero without `ratio` or `height`
 
 **File:** `hx-image.styles.ts:16-22`
-**Area:** CSS
 
-**Resolution:** Added `min-height: var(--hx-image-fallback-min-height, 3rem)` to `.image__container--error`. Error state now has a visible minimum height even when neither `ratio` nor `height` is set. The token allows consumer customization.
+When `ratio` and `height` are both unset, `.image__container--error` has no intrinsic height. The fallback slot content has nothing to fill. The error state collapses to zero height, making the fallback content invisible unless the slotted element provides its own height. A sensible default `min-height` (e.g., `var(--hx-image-fallback-min-height, 3rem)`) would prevent invisible error states.
 
 ---
 
@@ -241,9 +245,9 @@ When `src` is `''`, the `src` attribute is omitted (`nothing`), which is correct
 | P2-03 | Tests | P2 | `ratio`, `fit`, `width`, `height` have zero test coverage |
 | P2-04 | Storybook | P2 | No lazy loading demo story |
 | P2-05 | Storybook | P2 | No responsive story |
-| P2-06 | CSS | P2 | `:host { display: inline-block }` wrong default for block images ✅ FIXED |
+| P2-06 | CSS | P2 | `:host { display: inline-block }` wrong default for block images |
 | P2-07 | API / Drupal | P2 | Properties not reflected to attributes |
-| P2-08 | CSS | P2 | Error container collapses to zero height without `ratio`/`height` ✅ FIXED |
+| P2-08 | CSS | P2 | Error container collapses to zero height without `ratio`/`height` |
 | P2-09 | Tests | P2 | `hx-error` dispatch after fallback-src failure not asserted |
 | P2-10 | Logic | P2 | Empty `src` skips error path — broken image renders silently |
 
@@ -255,4 +259,12 @@ When `src` is `''`, the `src` attribute is omitted (`nothing`), which is correct
 
 2 P0 blockers, 5 P1 defects. The component has a solid structural foundation but the accessibility default (P0-01) is a critical regression that would silently hide informative images from screen readers in production. The missing `srcset`/`sizes` support (P0-02) makes it unfit for its primary consumer (Drupal). The caption feature (P1-01) is listed in the spec but entirely absent from the implementation.
 
-**CSS fixes applied (P2-06, P2-08):** `:host` display corrected to `block` and error container `min-height` added. Remaining P0/P1 items require further implementation work.
+---
+
+## Fixes Applied (A11y Audit — 2026-03-12)
+
+| Issue | Status | Fix |
+|-------|--------|-----|
+| P0-01 | RESOLVED | `alt` property now defaults to `undefined`; no image is silently decorative. Developer must explicitly set `alt` text or use the `decorative` prop. |
+| P1-02 | RESOLVED | Error/fallback container uses `role="alert"` and `aria-live="polite"` for AT announcement |
+| P2-01 | RESOLVED | Explicit `decorative` boolean prop added; `alt=""` is now reserved for intentional use via the `decorative` attribute |
