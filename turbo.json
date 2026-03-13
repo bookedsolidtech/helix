@@ -21,6 +21,9 @@
       "dependsOn": ["^build"],
       "outputs": [".cache/test-results.json"]
     },
+    "test:smart": {
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^build"]
     },

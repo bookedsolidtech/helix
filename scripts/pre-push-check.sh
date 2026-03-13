@@ -44,6 +44,106 @@ else
   FAILED=1
 fi
 
+# Gate 3.5: Targeted component tests (only for changed components, feature branches only)
+# Runs *.test.ts only for components whose SOURCE files changed vs base branch.
+# Skips entirely for story-only, Twig, AUDIT.md, changeset-only pushes.
+# Skips on main/staging/dev (promotion pushes, not feature work).
+# Timeout: 90 seconds total — fail gracefully if exceeded.
+echo "Targeted component tests..."
+BRANCH_35=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [[ "$BRANCH_35" == "main" || "$BRANCH_35" == "staging" || "$BRANCH_35" == "dev" ]]; then
+  echo "Targeted tests skipped (branch: $BRANCH_35)"
+else
+BASE_BRANCH_35=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' \
+  || git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||' \
+  || echo "dev")
+COMMON_ANCESTOR_35=$(git merge-base HEAD "origin/${BASE_BRANCH_35}" 2>/dev/null || echo "")
+
+# Resolve cross-platform timeout: use gtimeout (macOS/coreutils), timeout (Linux), or skip
+TIMEOUT_BIN=""
+if command -v gtimeout &>/dev/null; then
+  TIMEOUT_BIN="gtimeout 300"
+elif command -v timeout &>/dev/null; then
+  TIMEOUT_BIN="timeout 300"
+fi
+
+if [ -z "$COMMON_ANCESTOR_35" ]; then
+  echo "Targeted tests skipped (no common ancestor found)"
+else
+  # Find changed component SOURCE files (exclude .test.ts, .stories.ts, .styles.ts, index.ts, non-.ts)
+  CHANGED_COMPONENT_SOURCES=$(git diff --name-only "$COMMON_ANCESTOR_35"...HEAD \
+    | grep -E '^packages/hx-library/src/components/hx-[^/]+/[^/]+\.ts$' \
+    | grep -v '\.test\.ts$' \
+    | grep -v '\.stories\.ts$' \
+    | grep -v '\.styles\.ts$' \
+    | grep -v '/index\.ts$' \
+    || true)
+
+  if [ -z "$CHANGED_COMPONENT_SOURCES" ]; then
+    echo "Targeted tests skipped (no component source .ts files changed)"
+  else
+    # Extract unique component names from paths
+    CHANGED_COMPONENTS=$(echo "$CHANGED_COMPONENT_SOURCES" \
+      | sed -E 's|packages/hx-library/src/components/(hx-[^/]+)/.*|\1|' \
+      | sort -u)
+
+    # Build list of test files that actually exist
+    TEST_FILES=""
+    TESTED_COMPONENTS=""
+    for COMP in $CHANGED_COMPONENTS; do
+      TEST_PATH="packages/hx-library/src/components/${COMP}/${COMP}.test.ts"
+      if [ -f "$TEST_PATH" ]; then
+        TEST_FILES="$TEST_FILES $TEST_PATH"
+        TESTED_COMPONENTS="$TESTED_COMPONENTS $COMP"
+      fi
+    done
+
+    if [ -z "$TEST_FILES" ]; then
+      echo "Targeted tests skipped (no test files found for changed components)"
+    else
+      # Trim leading spaces for display
+      TESTED_COMPONENTS_DISPLAY=$(echo "$TESTED_COMPONENTS" | xargs | tr ' ' ', ')
+      echo "Testing changed components: ${TESTED_COMPONENTS_DISPLAY}"
+
+      # Build the vitest include args (relative to packages/hx-library)
+      VITEST_INCLUDE_ARGS=""
+      for TEST_FILE in $TEST_FILES; do
+        # Strip the packages/hx-library/ prefix — vitest runs from that dir
+        RELATIVE_TEST="${TEST_FILE#packages/hx-library/}"
+        VITEST_INCLUDE_ARGS="$VITEST_INCLUDE_ARGS $RELATIVE_TEST"
+      done
+
+      # Run vitest with optional timeout (gtimeout on macOS, timeout on Linux).
+      TEST_CMD="cd packages/hx-library && npx vitest run --reporter=verbose $VITEST_INCLUDE_ARGS 2>&1"
+      set +e
+      if [ -n "$TIMEOUT_BIN" ]; then
+        $TIMEOUT_BIN bash -c "$TEST_CMD"
+      else
+        bash -c "$TEST_CMD"
+      fi
+      TEST_EXIT=$?
+      set -e
+
+      if [ $TEST_EXIT -eq 124 ]; then
+        echo ""
+        echo "Targeted tests TIMED OUT (5min) — tests may be hanging or environment issue."
+        echo "Run manually: cd packages/hx-library && npx vitest run${VITEST_INCLUDE_ARGS}"
+        echo ""
+        FAILED=1
+      elif [ $TEST_EXIT -ne 0 ]; then
+        echo ""
+        echo "Targeted tests FAILED for: ${TESTED_COMPONENTS_DISPLAY}"
+        echo "Run manually: cd packages/hx-library && npx vitest run${VITEST_INCLUDE_ARGS}"
+        echo ""
+        FAILED=1
+      else
+        echo "Targeted tests passed (${TESTED_COMPONENTS_DISPLAY})"
+      fi
+    fi
+  fi
+fi
+fi  # end branch skip for Gate 3.5
+
 # Gate 4: Changeset required for component source changes
 # Every push that touches packages/hx-library/src/ must have a .changeset/*.md file.
 # This ensures every component change is versioned — no silent API changes.

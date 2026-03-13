@@ -249,19 +249,19 @@ When a nav item has children it renders as a `<button>` (expand/collapse trigger
 
 ---
 
-### P2-09: Storybook missing `hx-nav-item` component meta and standalone stories
+### P2-09: Storybook missing `hx-nav-item` component meta and standalone stories — FIXED
 
 **File:** `hx-side-nav.stories.ts`
 
-Only `hx-side-nav` has a Storybook meta entry. `hx-nav-item` has its own public API (`active`, `disabled`, `expanded`, `href`, slots) and is registered as a custom element, but has zero standalone stories. CEM autodocs cannot generate a controls panel for `hx-nav-item` without a `Meta` entry.
+**Resolution:** Created `hx-nav-item.stories.ts` with full Meta entry and standalone stories covering Default, Active, Disabled, WithIcon, WithBadge, WithChildren, and CollapsedMode variants. CEM autodocs are now generated for `hx-nav-item`.
 
 ---
 
-### P2-10: Storybook missing grouped/sectioned navigation story
+### P2-10: Storybook missing grouped/sectioned navigation story — FIXED
 
 **File:** `hx-side-nav.stories.ts`
 
-The audit brief lists "grouped items" as a required story. There is no story demonstrating section labels or visual grouping of nav items (e.g., a "Clinical" group and an "Admin" group separated by a divider or label). `WithNestedNavigation` covers sub-items but not peer-group sectioning.
+**Resolution:** Added `WithSectionedNavigation` story demonstrating a "Clinical" group and "Administration" group separated by a divider, with section labels using uppercase typography and correct nav item grouping.
 
 ---
 

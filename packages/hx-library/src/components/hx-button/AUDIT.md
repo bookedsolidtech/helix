@@ -99,28 +99,11 @@ The `LinkNewTab` story (`hx-button.stories.ts:299-305`) actively demonstrates th
 
 ---
 
-### P1-03: `WcButton` deprecated type not exported from `index.ts`
+### ~~P1-03: `WcButton` deprecated type not exported from `index.ts`~~ FIXED
 
-**Files:** `index.ts:1`, `hx-button.ts:252-253`
+**Files:** `index.ts`, `hx-button.ts`
 
-`WcButton` is defined in `hx-button.ts` as a deprecated type alias:
-
-```ts
-// hx-button.ts:252
-/** @deprecated Use HelixButton */
-export type WcButton = HelixButton;
-```
-
-But `index.ts` only re-exports `HelixButton`:
-
-```ts
-// index.ts:1
-export { HelixButton } from './hx-button.js';
-```
-
-Any package consumer importing `WcButton` from the package entry point (`@helix/library` or the component barrel) gets nothing. The test file works around this by importing directly from `./hx-button.js` (`hx-button.test.ts:4`), which masks the issue.
-
-**Fix required:** Either add `WcButton` to the `index.ts` re-export, or remove it from `hx-button.ts` and update any references.
+The `WcButton` deprecated type alias was removed from `hx-button.ts` entirely. The test file and all internal references were updated to use `HelixButton` directly. `index.ts` correctly exports only `HelixButton`. This eliminates the mismatch and removes dead deprecated surface area.
 
 ---
 
@@ -303,6 +286,8 @@ In Drupal Twig templates: `<hx-button hx-size="sm">` vs `<hx-button size="sm">`.
 
 This would be a breaking change to fix. Flag for next major version.
 
+**Drupal integration status:** `hx-button.twig` added. The template correctly uses `hx-size` as the attribute name and includes documentation warning Drupal theme authors about the htmx namespace overlap and the planned normalization in a future major version.
+
 ---
 
 ### P3-02: Inconsistent icon pattern across Storybook stories
@@ -327,16 +312,11 @@ const _canvas = within(canvasElement);
 
 ---
 
-### P3-04: Deprecated `WcButton` alias has no migration timeline or changeset
+### ~~P3-04: Deprecated `WcButton` alias has no migration timeline or changeset~~ FIXED
 
-**Files:** `hx-button.ts:252-253`
+**Files:** `hx-button.ts`
 
-```ts
-/** @deprecated Use HelixButton */
-export type WcButton = HelixButton;
-```
-
-No `@since`, no removal version, no changeset associated. Deprecation notices without a removal plan accumulate indefinitely. Add a removal target version or create a changeset.
+Moot — the `WcButton` deprecated type alias was fully removed from `hx-button.ts` as part of the P1-03 fix. No lingering deprecation notice remains.
 
 ---
 
@@ -347,7 +327,7 @@ No `@since`, no removal version, no changeset associated. Deprecation notices wi
 | P0-01 | Accessibility | **P0**    | Icon-only buttons have no accessible name (WCAG 4.1.2)                    |
 | P1-01 | CSS           | **FIXED** | Double opacity: verified already resolved; added regression-guard comment |
 | P1-02 | Security      | **P1**    | `target="_blank"` missing `rel="noopener noreferrer"`                     |
-| P1-03 | TypeScript    | **P1**    | `WcButton` not exported from `index.ts`                                   |
+| P1-03 | TypeScript    | **FIXED** | `WcButton` removed from source; `HelixButton` is the canonical export     |
 | P1-04 | Tests         | **P1**    | Keyboard tests don't actually test keyboard activation                    |
 | P2-01 | Tests         | P2        | `name`/`value` form value submission untested                             |
 | P2-02 | Accessibility | P2        | Redundant `aria-disabled` on native disabled `<button>`                   |
@@ -360,7 +340,7 @@ No `@since`, no removal version, no changeset associated. Deprecation notices wi
 | P3-01 | API           | P3        | `hx-size` attribute naming is non-idiomatic                               |
 | P3-02 | Storybook     | P3        | Inconsistent icon slot pattern across stories                             |
 | P3-03 | Storybook     | P3        | Unused `_canvas` variable in Default story                                |
-| P3-04 | TypeScript    | P3        | Deprecated `WcButton` has no removal timeline                             |
+| P3-04 | TypeScript    | **FIXED** | `WcButton` alias removed entirely; no lingering deprecation notice        |
 
 ---
 

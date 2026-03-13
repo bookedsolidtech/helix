@@ -1116,3 +1116,125 @@ export const CSSParts: Story = {
     </div>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// DRUPAL / CDN INTEGRATION REFERENCE
+// ─────────────────────────────────────────────────
+
+/**
+ * Drupal Twig integration reference for hx-toggle-button.
+ *
+ * A companion `hx-toggle-button.twig` template ships alongside this component.
+ * It handles server-side pressed state, size, variant, and form binding.
+ *
+ * **Key Drupal integration points:**
+ *
+ * 1. **Pressed state from server** — Pass `pressed: true` from Twig to pre-render the button
+ *    in pressed state (e.g., from a saved user preference or form field value).
+ *
+ * 2. **Size attribute** — The `size` property maps to the `hx-size` attribute (not `size`).
+ *    The Twig template handles this automatically via `hx-size="{{ size|default('md') }}"`.
+ *    Do not use `size=` directly in Twig — it will not work.
+ *
+ * 3. **Form integration** — The component uses ElementInternals for native form association.
+ *    Set `name` and `value` attributes; when pressed, the value is submitted with the form.
+ *
+ * 4. **Exclusive toggle groups** — Use a Drupal behavior with `data-toggle-group` for
+ *    radio-like exclusive selection (see `hx-toggle-button.twig` for the full behavior pattern).
+ *
+ * **Basic Twig usage:**
+ * ```twig
+ * {# Simple toggle — server-rendered pressed state #}
+ * {% include 'hx-toggle-button.twig' with {
+ *   label: 'Active Patients',
+ *   name: 'filter',
+ *   value: 'active',
+ *   pressed: current_filter == 'active',
+ * } %}
+ *
+ * {# Icon-only toggle — accessible name via aria_label #}
+ * {% include 'hx-toggle-button.twig' with {
+ *   aria_label: 'Grid view',
+ *   variant: 'outline',
+ *   size: 'sm',
+ *   pressed: drupal_settings.viewMode == 'grid',
+ * } %}
+ *
+ * {# Exclusive view-mode toggle group #}
+ * <div role="group" aria-label="View mode">
+ *   {% include 'hx-toggle-button.twig' with {
+ *     label: 'List',
+ *     data_toggle_group: 'view-mode',
+ *     pressed: view_mode == 'list',
+ *   } %}
+ *   {% include 'hx-toggle-button.twig' with {
+ *     label: 'Grid',
+ *     data_toggle_group: 'view-mode',
+ *     pressed: view_mode == 'grid',
+ *   } %}
+ * </div>
+ * ```
+ *
+ * **Library registration** (`mytheme.libraries.yml`):
+ * ```yaml
+ * hx-toggle-button:
+ *   js:
+ *     path/to/@helixui/library/dist/hx-toggle-button.js: { attributes: { type: module } }
+ *   dependencies:
+ *     - core/drupal
+ *     - core/once
+ * ```
+ */
+export const DrupalIntegration: Story = {
+  name: 'Drupal / CDN Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 560px;">
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Server-rendered pressed state (from Twig variable)
+        </p>
+        <div style="display: flex; gap: 0.75rem;">
+          <hx-toggle-button pressed>Active Patients</hx-toggle-button>
+          <hx-toggle-button>Discharged</hx-toggle-button>
+        </div>
+        <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: #9ca3af;">
+          pressed attribute set server-side from Drupal filter state
+        </p>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Exclusive view-mode toggle group (Drupal behavior pattern)
+        </p>
+        <div role="group" aria-label="View mode" style="display: flex; gap: 0.5rem;">
+          <hx-toggle-button variant="outline" hx-size="sm" pressed>List</hx-toggle-button>
+          <hx-toggle-button variant="outline" hx-size="sm">Grid</hx-toggle-button>
+        </div>
+        <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: #9ca3af;">
+          data-toggle-group + Drupal behavior enforces single-active semantics
+        </p>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Form-associated toggle (name + value submitted when pressed)
+        </p>
+        <form style="display: flex; gap: 0.75rem; align-items: center;">
+          <hx-toggle-button name="notifications" value="enabled" variant="primary">
+            Email Alerts
+          </hx-toggle-button>
+          <span style="font-size: 0.75rem; color: #6b7280;">
+            Submitted as notifications=enabled when pressed
+          </span>
+        </form>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Disabled state — server-rendered (e.g., permission check in Twig)
+        </p>
+        <hx-toggle-button disabled>Feature Disabled</hx-toggle-button>
+      </div>
+    </div>
+  `,
+};
