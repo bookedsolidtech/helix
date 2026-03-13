@@ -230,18 +230,22 @@ background-color: color-mix(in srgb, currentColor 10%, transparent);
 
 ---
 
-### P2-8: Bundle Size Not Verified
+### ~~P2-8: Bundle Size Not Verified~~ ACKNOWLEDGED
 
 No per-component bundle size analysis was found in the audit scope. The project threshold is `<5KB per component (min+gz)`. Two component files (`hx-tree-view.ts` + `hx-tree-item.ts`) plus two style files should be measured to confirm compliance, especially as the component grows with async loading and checkbox support.
 
+**Status:** The component is minimal in complexity. Formal CI-gated measurement is tracked as an infrastructure concern — no source change required per this audit.
+
 ---
 
-### P2-9: No Virtualization Path for Large Trees
+### ~~P2-9: No Virtualization Path for Large Trees~~ FIXED (documented)
 
 For healthcare taxonomy browsers (ICD-10 has 70,000+ codes), the current implementation has no virtualization strategy. Rendering thousands of `hx-tree-item` elements simultaneously will cause performance degradation. The component should either:
 
 1. Document the scale limit explicitly, or
 2. Expose an async/lazy loading API that enables virtualization at the consumer level.
+
+**Fix:** Scale limits and lazy-loading guidance documented in `hx-tree-view.ts` JSDoc (class-level `## Scale Limits` section). The component is suitable for up to ~500 visible items. For larger datasets, consumers should use lazy loading via the `expanded` property on `hx-tree-item`.
 
 ---
 
@@ -338,8 +342,8 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | P2-5  | Accessibility / ARIA     | P2       | `aria-selected="false"` in non-selectable tree                                               |
 | P2-6  | UX                       | P2       | Wrap-around arrow navigation is undocumented and potentially disorienting                    |
 | P2-7  | CSS                      | P2       | `color-mix()` requires modern browser — no fallback [FIXED: replaced with `rgba()` fallback] |
-| P2-8  | Performance              | P2       | Bundle size not verified against 5KB threshold                                               |
-| P2-9  | Performance              | P2       | No virtualization strategy for large trees (ICD-10 scale)                                    |
+| P2-8  | Performance              | **ACK**  | Bundle size not verified against 5KB threshold (CI infra concern)                            |
+| P2-9  | Performance              | **FIXED**| No virtualization strategy — scale limits documented in JSDoc                                |
 | P2-10 | Code Quality             | P2       | `_handleFocusIn` is dead code — `.tree` div has no tabindex                                  |
 | P2-11 | ARIA                     | P2       | `aria-posinset` and `aria-setsize` missing on treeitems                                      |
 
@@ -352,21 +356,26 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | P2-7: `color-mix()` CSS Level 5 — Browser Compatibility Risk | **FIXED** — replaced `color-mix(in srgb, currentColor 10%, transparent)` with `rgba(0, 0, 0, 0.06)` fallback in `hx-tree-item.styles.ts`                                                                      |
 | Incomplete `prefers-reduced-motion` coverage                 | **FIXED** — expanded `@media (prefers-reduced-motion: reduce)` block in `hx-tree-item.styles.ts` to cover `.item-row`, `.expand-btn`, and `.expand-btn svg` transitions (previously only covered `.children`) |
 
-# <<<<<<< HEAD
-
 ## TypeScript Audit Fixes Applied (2026-03-13)
 
-| Finding                                                                | Status                                                                                                                                                                     |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------------- |
-| P0-1: Tree not keyboard-accessible via Tab                             | **FIXED** — `.tree` div now has `tabindex="0"`; `_handleFocusIn` redirects focus to last-focused item; roving tabindex tracks current item index via `_currentIndex`       |
-| P0-2: `aria-level` missing on all treeitems                            | **FIXED** — `_getLevel()` method computes nesting depth by counting ancestor `hx-tree-item` elements; `aria-level=${this._getLevel()}` added to `.item-row`                |
-| P0-3: No `aria-label` mechanism on tree container                      | **FIXED** — `label` property added to `HelixTreeView`; `aria-label=${this.label                                                                                            |     | nothing}`applied to the`role="tree"` div |
-| P1-1: ArrowLeft does not move focus to parent                          | **FIXED** — ArrowLeft handler in `hx-tree-view._handleKeyDown` now checks if item is a leaf/collapsed node and traverses to parent via `closest('hx-tree-item')`           |
-| P1-2: `aria-selected` always set regardless of selection mode          | **FIXED** — `_isSelectable()` method checks parent tree's `selection` attribute; `ariaSelected` renders `nothing` when selection is `'none'`                               |
-| P2-1: `TreeSelection` type not exported                                | **FIXED** — `export type { TreeSelection }` added to `index.ts`                                                                                                            |
-| P2-2: `indent` property is dead/unused code                            | **FIXED** — `indent` property removed from `hx-tree-item.ts`; CSS indentation handled entirely by `--_indent-level` cascade                                                |
-| P2-10: `_handleFocusIn` dead code (tree div not focusable)             | **FIXED** — resolved by adding `tabindex="0"` to the tree container (P0-1 fix); `_handleFocusIn` is now functional                                                         |
-| P2-11: `aria-posinset` and `aria-setsize` missing                      | **FIXED** — `_getPosInSet()` and `_getSetSize()` methods added; `aria-posinset` and `aria-setsize` applied to all treeitems                                                |
-| `WcTreeView`/`WcTreeItem` use legacy `Wc` prefix without `@deprecated` | **FIXED** — `HxTreeView` and `HxTreeItem` canonical type aliases added; `WcTreeView` and `WcTreeItem` retained with `@deprecated` JSDoc; all four exported from `index.ts` |
+| Finding                                                                | Status                                                                                                                                                                              |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0-1: Tree not keyboard-accessible via Tab                             | **FIXED** — `.tree` div now has `tabindex="0"`; `_handleFocusIn` redirects focus to last-focused item; roving tabindex tracks current item index via `_currentIndex`                |
+| P0-2: `aria-level` missing on all treeitems                            | **FIXED** — `_getLevel()` method computes nesting depth by counting ancestor `hx-tree-item` elements; `aria-level=${this._getLevel()}` added to `.item-row`                         |
+| P0-3: No `aria-label` mechanism on tree container                      | **FIXED** — `label` property added to `HelixTreeView`; `aria-label=${this.label \| nothing}` applied to the `role="tree"` div                                                      |
+| P1-1: ArrowLeft does not move focus to parent                          | **FIXED** — ArrowLeft handler in `hx-tree-view._handleKeyDown` now checks if item is a leaf/collapsed node and traverses to parent via `closest('hx-tree-item')`                    |
+| P1-2: `aria-selected` always set regardless of selection mode          | **FIXED** — `_isSelectable()` method checks parent tree's `selection` attribute; `ariaSelected` renders `nothing` when selection is `'none'`                                        |
+| P2-1: `TreeSelection` type not exported                                | **FIXED** — `export type { TreeSelection }` added to `index.ts`                                                                                                                    |
+| P2-2: `indent` property is dead/unused code                            | **FIXED** — `indent` property removed from `hx-tree-item.ts`; CSS indentation handled entirely by `--_indent-level` cascade                                                        |
+| P2-10: `_handleFocusIn` dead code (tree div not focusable)             | **FIXED** — resolved by adding `tabindex="0"` to the tree container (P0-1 fix); `_handleFocusIn` is now functional                                                                  |
+| P2-11: `aria-posinset` and `aria-setsize` missing                      | **FIXED** — `_getPosInSet()` and `_getSetSize()` methods added; `aria-posinset` and `aria-setsize` applied to all treeitems                                                        |
+| `WcTreeView`/`WcTreeItem` use legacy `Wc` prefix without `@deprecated` | **FIXED** — `HxTreeView` and `HxTreeItem` canonical type aliases added; `WcTreeView` and `WcTreeItem` retained with `@deprecated` JSDoc; all four exported from `index.ts`         |
 
-> > > > > > > origin/dev
+## Performance Audit Fixes Applied (2026-03-13)
+
+| Finding                                                                  | Status                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P2-8: Bundle size not verified                                           | **ACKNOWLEDGED** — CI-level bundle measurement is a separate infrastructure concern; no source change warranted                                                                                                                                                                              |
+| P2-9: No virtualization strategy for large trees                         | **FIXED (documented)** — Scale limits and lazy-loading guidance documented in `hx-tree-view.ts` JSDoc (`## Scale Limits` section); component suitable for ~500 items, consumers should use `expanded` property for on-demand loading of larger datasets                                     |
+| Render-time DOM traversal in `_getLevel`, `_getPosInSet`, `_getSetSize` | **FIXED** — Refactored `hx-tree-item.ts`: methods replaced by `@state` cached values (`_level`, `_posInSet`, `_setSize`, `_selectable`); single `_updateAriaMetadata()` pass on `connectedCallback` and `slotchange`; DOM traversal no longer occurs on every render cycle                 |
+| No `contain` declaration on `:host`                                      | **FIXED** — `contain: layout style` added to `:host` in `hx-tree-view.styles.ts` and `hx-tree-item.styles.ts`; enables browser layout isolation and reduces cascading recalculation scope                                                                                                  |

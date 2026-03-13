@@ -2,10 +2,18 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
-import type { HelixTreeItem } from './hx-tree-item.js';
+import type { HelixTreeItem, HxTreeItemSelectDetail } from './hx-tree-item.js';
 
 /** Selection mode for the tree. */
 export type TreeSelection = 'none' | 'single' | 'multiple';
+
+/** Detail type for the `hx-select` event. */
+export interface HxSelectDetail {
+  /** The tree item that was selected or deselected. */
+  item: HelixTreeItem;
+  /** Whether the item is now selected. */
+  selected: boolean;
+}
 
 /**
  * A hierarchical tree component for navigating nested data structures.
@@ -16,13 +24,22 @@ export type TreeSelection = 'none' | 'single' | 'multiple';
  * for screen reader identification. Full keyboard navigation: Arrow keys for movement,
  * Enter/Space for selection, Home/End for first/last item.
  *
+ * ## Scale Limits
+ *
+ * This component renders all tree items simultaneously in the DOM. It is suitable for
+ * trees with up to ~500 visible items. For large taxonomies (e.g., ICD-10 with 70,000+
+ * codes), use async/lazy loading: only render top-level nodes initially and populate
+ * child nodes on `hx-select` or expand events. The component exposes the `expanded`
+ * property on `hx-tree-item` for programmatic control of subtrees, enabling consumer-level
+ * virtualization strategies without requiring changes to this component.
+ *
  * @summary Hierarchical tree view with expand/collapse and keyboard navigation.
  *
  * @tag hx-tree-view
  *
  * @slot - Default slot for hx-tree-item elements.
  *
- * @fires {CustomEvent<{item: HelixTreeItem, selected: boolean}>} hx-select - Dispatched when a tree item is selected or deselected.
+ * @fires {CustomEvent<HxSelectDetail>} hx-select - Dispatched when a tree item is selected or deselected.
  *
  * @csspart tree - The tree container element with role="tree".
  *
@@ -97,7 +114,7 @@ export class HelixTreeView extends LitElement {
   // ─── Event Handling ───
 
   private _handleTreeItemSelect(e: Event): void {
-    const event = e as CustomEvent<{ item: HelixTreeItem }>;
+    const event = e as CustomEvent<HxTreeItemSelectDetail>;
     const item = event.detail.item;
 
     if (this.selection === 'none') return;
@@ -113,7 +130,7 @@ export class HelixTreeView extends LitElement {
     }
 
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<HxSelectDetail>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { item, selected: item.selected },

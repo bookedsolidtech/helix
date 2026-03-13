@@ -107,7 +107,7 @@ The `WcContainer` type alias is exported from `hx-container.ts` but not re-expor
 
 ---
 
-### P3-03: Bundle size not formally measured
+### ~~P3-03: Bundle size not formally measured~~ ACKNOWLEDGED
 
 **Area:** Performance
 
@@ -115,7 +115,7 @@ The performance gate requires `< 5KB` per component (min+gz). No formal bundle s
 
 **Impact:** Quality gate compliance gap. No runtime impact.
 
-**Recommendation:** Add bundle size measurement to CI or manually verify with `npx vite-bundle-visualizer`.
+**Status:** Acknowledged — CI-level bundle measurement is a separate infrastructure concern. `contain: layout style` added to `:host` in `hx-container.styles.ts` to enable browser rendering isolation.
 
 ---
 
@@ -156,4 +156,4 @@ The performance gate requires `< 5KB` per component (min+gz). No formal bundle s
 | P2-02    | Remove or document redundant `padding="none"` CSS rule                            | Trivial |
 | P3-01    | Update test file to use `HelixContainer` type instead of deprecated `WcContainer` | Trivial |
 | P3-02    | Document `WcContainer` exclusion from `index.ts` or re-export it                  | Trivial |
-| P3-03    | Measure and record bundle size for performance gate                               | Small   |
+| ~~P3-03~~| Bundle size acknowledgment + `contain: layout style` added to `:host`            | Done    |

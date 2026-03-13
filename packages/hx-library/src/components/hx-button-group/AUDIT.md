@@ -246,19 +246,23 @@ This sets `transition: none` on the slotted `hx-button` host element. But `hx-bu
 
 ## 6. Performance
 
-### P2 — Unnecessary `requestUpdate()` on every `slotchange` event (`hx-button-group.ts:67-71`)
+### ~~P2 — Unnecessary `requestUpdate()` on every `slotchange` event~~ FIXED
 
 Every time a button is added or removed from the slot, `_handleSlotChange()` triggers a full Lit render cycle. For a container with no dynamic state that changes on slot mutation, this is unnecessary work. The `::slotted()` CSS updates automatically via the browser without a Lit render.
 
-**Impact:** Extra render cycle per slot mutation; measurable on frequent DOM updates (e.g., dynamic button groups).
+**Fix:** `_handleSlotChange` method and the `@slotchange` listener removed entirely from `hx-button-group.ts`. CSS `::slotted()` selectors update via the browser without any Lit render cycle.
 
-### P2 — No `contain` declaration on `:host`
+### ~~P2 — No `contain` declaration on `:host`~~ FIXED
 
-Shadow DOM components benefit from `contain: layout style` (or `contain: content`) on `:host` to enable browser rendering optimizations. Not critical but an omission given the enterprise-quality bar.
+Shadow DOM components benefit from `contain: layout style` (or `contain: content`) on `:host` to enable browser rendering optimizations.
+
+**Fix:** `contain: layout style` added to `:host` in `hx-button-group.styles.ts`.
 
 ### P2 — Bundle size not verifiable from source review alone
 
 The component is minimal (~82 lines + styles). Based on source analysis the component itself is likely well within the 5KB (min+gz) budget. However, no automated bundle size CI gate output is present in the component directory confirming compliance.
+
+**Status:** Acknowledged — CI-level measurement is a separate infrastructure concern.
 
 ---
 
@@ -307,9 +311,9 @@ The `hx-size` attribute uses a hyphen prefix, which is valid HTML but unusual. T
 | 21  | CSS           | P2       | `position: relative` z-index context is undocumented dependency                  |
 | 22  | CSS           | P2       | No consumer-facing CSS custom properties for group container theming             |
 | 23  | CSS           | P2       | `prefers-reduced-motion` rule is no-op for Shadow DOM button transitions         |
-| 24  | Performance   | P2       | `requestUpdate()` on every slot change adds unnecessary render cycles            |
-| 25  | Performance   | P2       | No `contain` declaration on `:host`                                              |
-| 26  | Performance   | P2       | No bundle size CI gate output confirming <5KB compliance                         |
+| 24  | Performance   | **FIXED**| `requestUpdate()` removed from slot handler; `_handleSlotChange` deleted         |
+| 25  | Performance   | **FIXED**| `contain: layout style` added to `:host` in styles                               |
+| 26  | Performance   | **ACK**  | No bundle size CI gate output confirming <5KB compliance (infra concern)         |
 | 27  | Drupal        | P2       | No CDN/Drupal registration pattern documented at component level                 |
 | 28  | Drupal        | P2       | `hx-size` hyphen attribute not documented as Drupal-safe                         |
 
