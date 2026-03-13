@@ -952,9 +952,10 @@ export const AllContentTypes: Story = {
       <h2>Keyboard and Technical Text</h2>
       <p>
         Press <kbd>Ctrl</kbd> + <kbd>P</kbd> to print. Use <kbd>Alt</kbd> + <kbd>F4</kbd> to close
-        the current window. Terminal output like <samp>Connection established. Waiting for
-        data...</samp> uses the <code>samp</code> element. Mathematical variables such as
-        <var>x</var> + <var>y</var> = <var>z</var> use the <code>var</code> element.
+        the current window. Terminal output like
+        <samp>Connection established. Waiting for data...</samp> uses the <code>samp</code> element.
+        Mathematical variables such as <var>x</var> + <var>y</var> = <var>z</var> use the
+        <code>var</code> element.
       </p>
 
       <h2>Links</h2>
