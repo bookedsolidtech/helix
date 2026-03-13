@@ -298,7 +298,7 @@ export const LinkDefault: Story = {
 export const LinkNewTab: Story = {
   name: 'Link (New Tab)',
   render: () => html`
-    <hx-button variant="secondary" href="https://example.com" target="_blank">
+    <hx-button variant="secondary" href="https://example.com" target="_blank" rel="noopener noreferrer">
       View Lab Results
     </hx-button>
   `,
@@ -307,7 +307,7 @@ export const LinkNewTab: Story = {
 export const LinkOutline: Story = {
   name: 'Link (Outline variant)',
   render: () => html`
-    <hx-button variant="outline" href="https://example.com" target="_blank">
+    <hx-button variant="outline" href="https://example.com" target="_blank" rel="noopener noreferrer">
       Download Discharge Summary
     </hx-button>
   `,
