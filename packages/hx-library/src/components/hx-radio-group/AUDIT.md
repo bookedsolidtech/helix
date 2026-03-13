@@ -281,7 +281,9 @@ There is no dedicated story for a mixed state (one radio disabled within an enab
 
 ---
 
-### P2-8: `hx-radio` axe test runs standalone without parent group
+### P2-8: `hx-radio` axe test runs standalone without parent group ✅ FIXED
+
+**Resolution:** Updated the axe test in `hx-radio.test.ts` to wrap `hx-radio` elements inside a parent `hx-radio-group` with a label, providing proper context for accessibility validation.
 
 **File:** `hx-radio.test.ts:139–145`
 
@@ -316,7 +318,7 @@ it('has no axe violations in default state', async () => {
 | P2-5  | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)        |
 | P2-6  | P2       | API             | No `selected-value` alias (naming gap vs other libraries) |
 | P2-7  | P2       | Storybook       | No mixed-disabled story (partial disable state)          |
-| P2-8  | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal    |
+| P2-8  | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal ✅ FIXED |
 
 **Total findings: 3 P0, 7 P1, 8 P2**
 
