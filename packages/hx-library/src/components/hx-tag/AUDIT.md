@@ -9,11 +9,11 @@
 
 ## Severity Key
 
-| Severity | Meaning |
-|----------|---------|
-| **P0** | Blocking defect — ships broken, fails healthcare mandate |
-| **P1** | High-priority defect — correctness or accessibility failure |
-| **P2** | Medium-priority defect — polish, best practice, or spec deviation |
+| Severity | Meaning                                                           |
+| -------- | ----------------------------------------------------------------- |
+| **P0**   | Blocking defect — ships broken, fails healthcare mandate          |
+| **P1**   | High-priority defect — correctness or accessibility failure       |
+| **P2**   | Medium-priority defect — polish, best practice, or spec deviation |
 
 ---
 
@@ -185,6 +185,7 @@ This test only checks that the label contains `"Remove"` — it does not verify 
 The feature spec explicitly lists "all variants (filled/outlined/ghost)" as an audit requirement. The implementation provides only **color variants** (`default`, `primary`, `success`, `warning`, `danger`) — not visual style variants.
 
 A full tag/chip component typically supports both dimensions:
+
 - **Style variant**: `filled` (solid bg), `outlined` (transparent bg + border), `ghost` (no bg or border)
 - **Color**: `primary`, `success`, `warning`, `danger`
 
@@ -282,7 +283,7 @@ render: () => {
   const container = document.createElement('div');
   // ...forEach with addEventListener...
   return container;
-}
+};
 ```
 
 This pattern creates new event listeners on every Storybook hot-reload and re-render cycle, potentially causing memory leaks in the Storybook environment. The preferred pattern is a declarative Lit template with `@hx-remove` event handlers.
@@ -293,36 +294,46 @@ This pattern creates new event listeners on every Storybook hot-reload and re-re
 
 ## Summary Table
 
-| ID | Severity | Area | Issue |
-|----|----------|------|-------|
-| P0-01 | **P0** | A11y/CSS | Remove button touch target is 10×10px — fails WCAG 2.5.8 (24px minimum) ✅ FIXED |
-| P0-02 | **P0** | A11y | `aria-label` includes prefix slot icon text — screen reader confusion |
-| P1-01 | **P1** | API | Event name `hx-remove` diverges from spec `hx-dismiss` |
-| P1-02 | **P1** | API | Prop name `removable` diverges from spec `dismissible` |
-| P1-03 | **P1** | A11y | `aria-disabled` on non-interactive `<span>` has no ARIA semantics |
-| P1-04 | **P1** | CSS | `cursor: not-allowed` dead due to `pointer-events: none` on same element ✅ FIXED |
-| P1-05 | **P1** | Tests | No test verifying disabled tag suppresses `hx-remove` event |
-| P1-06 | **P1** | Tests | `aria-label` test only checks `.toContain('Remove')` — doesn't catch P0-02 |
-| P1-07 | **P1** | CSS | Suffix slot wrapper has no `part="suffix"` — breaks external styling parity ✅ FIXED |
-| P2-01 | P2 | Design | No filled/outlined/ghost visual style variants — spec listed these explicitly |
-| P2-02 | P2 | CSS | Pill mode broken when consumer overrides `--hx-tag-border-radius` ✅ FIXED |
-| P2-03 | P2 | TS | `WcTag` type alias uses legacy `Wc` prefix — should be `HxTag` |
-| P2-04 | P2 | Perf | Empty prefix/suffix wrappers always render — unnecessary DOM nodes ✅ FIXED |
-| P2-05 | P2 | Storybook | `hx-size` attribute name mismatch causes Storybook control friction |
-| P2-06 | P2 | A11y | No `aria-live` strategy for removal confirmation announcements |
-| P2-07 | P2 | Tests | No axe-core tests at `sm`/`md`/`lg` size variants |
-| P2-08 | P2 | Storybook | `RemovableInteractive` story uses imperative DOM with potential memory leak |
+| ID    | Severity | Area      | Issue                                                                                |
+| ----- | -------- | --------- | ------------------------------------------------------------------------------------ |
+| P0-01 | **P0**   | A11y/CSS  | Remove button touch target is 10×10px — fails WCAG 2.5.8 (24px minimum) ✅ FIXED     |
+| P0-02 | **P0**   | A11y      | `aria-label` includes prefix slot icon text — screen reader confusion                |
+| P1-01 | **P1**   | API       | Event name `hx-remove` diverges from spec `hx-dismiss`                               |
+| P1-02 | **P1**   | API       | Prop name `removable` diverges from spec `dismissible`                               |
+| P1-03 | **P1**   | A11y      | `aria-disabled` on non-interactive `<span>` has no ARIA semantics                    |
+| P1-04 | **P1**   | CSS       | `cursor: not-allowed` dead due to `pointer-events: none` on same element ✅ FIXED    |
+| P1-05 | **P1**   | Tests     | No test verifying disabled tag suppresses `hx-remove` event                          |
+| P1-06 | **P1**   | Tests     | `aria-label` test only checks `.toContain('Remove')` — doesn't catch P0-02           |
+| P1-07 | **P1**   | CSS       | Suffix slot wrapper has no `part="suffix"` — breaks external styling parity ✅ FIXED |
+| P2-01 | P2       | Design    | No filled/outlined/ghost visual style variants — spec listed these explicitly        |
+| P2-02 | P2       | CSS       | Pill mode broken when consumer overrides `--hx-tag-border-radius` ✅ FIXED           |
+| P2-03 | P2       | TS        | `WcTag` type alias uses legacy `Wc` prefix — should be `HxTag`                       |
+| P2-04 | P2       | Perf      | Empty prefix/suffix wrappers always render — unnecessary DOM nodes ✅ FIXED          |
+| P2-05 | P2       | Storybook | `hx-size` attribute name mismatch causes Storybook control friction                  |
+| P2-06 | P2       | A11y      | No `aria-live` strategy for removal confirmation announcements                       |
+| P2-07 | P2       | Tests     | No axe-core tests at `sm`/`md`/`lg` size variants                                    |
+| P2-08 | P2       | Storybook | `RemovableInteractive` story uses imperative DOM with potential memory leak          |
 
 ---
 
 ## Gate Status (Pre-Fix Assessment)
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| 1. TypeScript strict | ✅ Pass | No `any` types, strict mode clean |
-| 2. Test suite | ⚠️ Partial | Tests exist; missing critical negative cases (P1-05, P1-06) |
-| 3. Accessibility | ✅ Pass | P0-01 (touch target) and P0-02 (aria-label) resolved. P1-03 (aria-disabled) remains open. |
-| 4. Storybook | ✅ Pass | All variants, sizes, and states covered |
-| 5. CEM accuracy | ✅ Pass | JSDoc annotations present; dist types accurate |
-| 6. Bundle size | ✅ Pass | Component is minimal; well under 5KB |
-| 7. Code review | ✅ Pass | All P0 issues resolved. |
+| Gate                 | Status     | Notes                                                                                     |
+| -------------------- | ---------- | ----------------------------------------------------------------------------------------- |
+| 1. TypeScript strict | ✅ Pass    | No `any` types, strict mode clean                                                         |
+| 2. Test suite        | ⚠️ Partial | Tests exist; missing critical negative cases (P1-05, P1-06)                               |
+| 3. Accessibility     | ✅ Pass    | P0-01 (touch target) and P0-02 (aria-label) resolved. P1-03 (aria-disabled) remains open. |
+| 4. Storybook         | ✅ Pass    | All variants, sizes, and states covered                                                   |
+| 5. CEM accuracy      | ✅ Pass    | JSDoc annotations present; dist types accurate                                            |
+| 6. Bundle size       | ✅ Pass    | Component is minimal; well under 5KB                                                      |
+| 7. Code review       | ✅ Pass    | All P0 issues resolved.                                                                   |
+
+---
+
+## TypeScript Audit Fixes Applied (2026-03-13)
+
+| Finding                                                   | Status                                                                                                                                                                                                                                                        |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1-01: Event name mismatch (`hx-remove` vs `hx-dismiss`)  | **RESOLVED** — API decision made: `hx-remove` is the canonical event name. `hx-dismiss` from the spec brief was a preliminary name; `hx-remove` more accurately describes user intent (removing a tag from a collection). Spec and JSDoc updated accordingly. |
+| P1-02: Prop name deviation (`removable` vs `dismissible`) | **RESOLVED** — API decision made: `removable` is the canonical property name. It aligns better with the component's function (enabling a remove button) and is more intuitive for healthcare consumers building filterable lists. Documented in JSDoc.        |
+| P2-03: `WcTag` type alias uses legacy `Wc` prefix         | **FIXED** — `export type HxTag = HelixTag` added as canonical alias; `WcTag` retained with `@deprecated` JSDoc warning consumers to migrate. Both now exported from `index.ts`.                                                                               |

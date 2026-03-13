@@ -277,3 +277,9 @@ declare global {
     'hx-theme': HelixTheme;
   }
 }
+
+/** Canonical type alias for HelixTheme. Use this when typing hx-theme element references. */
+export type HxTheme = HelixTheme;
+
+/** @deprecated Use {@link HxTheme} instead. The `Wc` prefix was a legacy naming convention. */
+export type WcTheme = HelixTheme;
