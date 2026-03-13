@@ -2,10 +2,18 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
-import type { HelixTreeItem } from './hx-tree-item.js';
+import type { HelixTreeItem, HxTreeItemSelectDetail } from './hx-tree-item.js';
 
 /** Selection mode for the tree. */
 export type TreeSelection = 'none' | 'single' | 'multiple';
+
+/** Detail type for the `hx-select` event. */
+export interface HxSelectDetail {
+  /** The tree item that was selected or deselected. */
+  item: HelixTreeItem;
+  /** Whether the item is now selected. */
+  selected: boolean;
+}
 
 /**
  * A hierarchical tree component for navigating nested data structures.
@@ -31,7 +39,7 @@ export type TreeSelection = 'none' | 'single' | 'multiple';
  *
  * @slot - Default slot for hx-tree-item elements.
  *
- * @fires {CustomEvent<{item: HelixTreeItem, selected: boolean}>} hx-select - Dispatched when a tree item is selected or deselected.
+ * @fires {CustomEvent<HxSelectDetail>} hx-select - Dispatched when a tree item is selected or deselected.
  *
  * @csspart tree - The tree container element with role="tree".
  *
@@ -106,7 +114,7 @@ export class HelixTreeView extends LitElement {
   // ─── Event Handling ───
 
   private _handleTreeItemSelect(e: Event): void {
-    const event = e as CustomEvent<{ item: HelixTreeItem }>;
+    const event = e as CustomEvent<HxTreeItemSelectDetail>;
     const item = event.detail.item;
 
     if (this.selection === 'none') return;
@@ -122,7 +130,7 @@ export class HelixTreeView extends LitElement {
     }
 
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<HxSelectDetail>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { item, selected: item.selected },

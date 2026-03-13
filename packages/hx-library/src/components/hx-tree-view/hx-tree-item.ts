@@ -3,6 +3,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
 
+/** Detail type for the `hx-tree-item-select` event. */
+export interface HxTreeItemSelectDetail {
+  /** The tree item that was selected or activated. */
+  item: HelixTreeItem;
+}
+
 /**
  * A tree item used within an hx-tree-view component.
  * Supports expand/collapse, selection, keyboard navigation, and icon/children slots.
@@ -29,7 +35,7 @@ import { helixTreeItemStyles } from './hx-tree-item.styles.js';
  * @cssprop [--hx-tree-item-padding-y=var(--hx-space-1)] - Vertical padding.
  * @cssprop [--hx-tree-indent-size=1.5rem] - Indentation size per level.
  *
- * @fires {CustomEvent<{item: HelixTreeItem}>} hx-tree-item-select - Dispatched when this item is clicked or activated via keyboard.
+ * @fires {CustomEvent<HxTreeItemSelectDetail>} hx-tree-item-select - Dispatched when this item is clicked or activated via keyboard.
  */
 @customElement('hx-tree-item')
 export class HelixTreeItem extends LitElement {
@@ -144,7 +150,7 @@ export class HelixTreeItem extends LitElement {
   private _handleRowClick(): void {
     if (this.disabled) return;
     this.dispatchEvent(
-      new CustomEvent('hx-tree-item-select', {
+      new CustomEvent<HxTreeItemSelectDetail>('hx-tree-item-select', {
         bubbles: true,
         composed: true,
         detail: { item: this },
