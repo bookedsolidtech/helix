@@ -70,6 +70,10 @@ export class HelixStep extends LitElement {
 
   /**
    * Layout orientation. Set by the parent `<hx-steps>` container.
+   * Reflected as an attribute for CSS styling (`[orientation='vertical']` selector).
+   * Do not set this attribute directly on `<hx-step>` — use the `orientation`
+   * property on the parent `<hx-steps>` container instead. The parent will
+   * propagate the value to all child steps via `_syncChildren()`.
    * @internal
    */
   @property({ type: String, reflect: true })
@@ -77,6 +81,10 @@ export class HelixStep extends LitElement {
 
   /**
    * Size variant. Set by the parent `<hx-steps>` container.
+   * Reflected as an attribute for CSS styling. Do not set this attribute
+   * directly on `<hx-step>` — use the `size` property on the parent
+   * `<hx-steps>` container instead. The parent will propagate the value
+   * to all child steps via `_syncChildren()`.
    * @internal
    */
   @property({ type: String, reflect: true })

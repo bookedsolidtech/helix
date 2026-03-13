@@ -180,11 +180,11 @@ IDs generated via `Math.random()` differ between server render and client hydrat
 
 ---
 
-### P2-02: Missing `readonly` property
+### ~~P2-02: Missing `readonly` property~~ FIXED
 
 **File:** `hx-textarea.ts`
 
-The native `<textarea>` element supports `readonly`, a standard HTML attribute. The component does not expose it. Read-only form fields are a common healthcare pattern (displaying non-editable patient data inline with editable fields). Consumers must currently work around this with CSS or by intercepting input events.
+**Resolution:** Added `readonly` boolean property with `reflect: true` (attribute: `readonly`). The native `<textarea>` receives `?readonly=${this.readonly}` via Lit's boolean attribute binding. Common healthcare pattern for displaying non-editable patient data inline with editable fields.
 
 **Severity:** P2
 
