@@ -37,7 +37,9 @@
       } %}
 
   Event handling:
-    Wire up the hx-select event via Drupal behaviors (see README.drupal.md).
+    Wire up the hx-select event via Drupal behaviors — see the
+    "Event Handling with Drupal Behaviors" section in the hx-overflow-menu
+    component documentation in apps/docs.
 
   Registration:
     Load the component script in your theme's .libraries.yml:
@@ -53,14 +55,17 @@
 {% set _size = hx_size|default('md') %}
 {% set _icon = icon|default('vertical') %}
 {% set _label = label|default('More actions') %}
+{% set disabled = disabled|default(false) %}
+{% set actions = actions|default([]) %}
+{% set attributes = attributes|default('') %}
 
 <hx-overflow-menu
   label="{{ _label }}"
   placement="{{ _placement }}"
   hx-size="{{ _size }}"
   icon="{{ _icon }}"
-  {% if disabled|default(false) %}disabled{% endif %}
-  {% if attributes|default('') %}{{ attributes }}{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
 >
   {% if actions %}
     {% for action in actions %}

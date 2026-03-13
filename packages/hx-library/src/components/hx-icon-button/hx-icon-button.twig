@@ -76,5 +76,7 @@
   {% if value %}value="{{ value }}"{% endif %}
   {% if attributes %}{{ attributes }}{% endif %}
 >
-  {{ icon }}
+  {# SECURITY: icon must be trusted markup — only pass hx-icon tags or
+     other controlled markup from Drupal templates, never raw user input. #}
+  {{ icon|raw }}
 </hx-icon-button>
