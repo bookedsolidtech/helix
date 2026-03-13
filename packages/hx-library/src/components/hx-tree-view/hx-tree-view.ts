@@ -226,4 +226,8 @@ declare global {
   }
 }
 
-export type { HelixTreeView as WcTreeView };
+/** Canonical type alias for HelixTreeView. Use this when typing hx-tree-view element references. */
+export type HxTreeView = HelixTreeView;
+
+/** @deprecated Use {@link HxTreeView} instead. The `Wc` prefix was a legacy naming convention. */
+export type WcTreeView = HelixTreeView;

@@ -311,3 +311,15 @@ The screenshot filename references `wc-change` but the current test and componen
 |---------|--------|
 | A-04: No `prefers-reduced-motion` support | **FIXED** — `@media (prefers-reduced-motion: reduce)` block disabling `.switch__track` and `.switch__thumb` transitions added to `hx-switch.styles.ts` |
 | A-08: Missing `--hx-switch-help-text-color` CSS custom property | **FIXED** — `--hx-switch-help-text-color` token applied to `.switch__help-text` in `hx-switch.styles.ts`; `@cssprop` documentation added to `hx-switch.ts` |
+
+## TypeScript Audit Fixes Applied (2026-03-13)
+
+| Finding | Status |
+|---------|--------|
+| A-05: `formStateRestoreCallback` signature is incorrect | **FIXED** — signature updated to `formStateRestoreCallback(state: File \| string \| null, _mode: 'restore' \| 'autocomplete'): void`; `typeof state === 'string'` guard added before comparison |
+| A-06: `Enter` key double-toggles | **FIXED** — removed `Enter` from `_handleKeyDown`; Space-only activation per ARIA APG; native button click-on-Enter behavior removed by handling in keydown only with explicit `preventDefault` |
+| A-07: `_trackEl!` non-null assertion contradicted by `?? undefined` | **FIXED** — type changed to `HTMLButtonElement \| null`; `!` assertion removed; defensive `?? undefined` guard retained as correct null handling |
+| A-09: `WcSwitch` type alias uses legacy `Wc` prefix | **FIXED** — `export type HxSwitch = HelixSwitch` added; `WcSwitch` retained with `@deprecated` JSDoc; both exported from `index.ts` |
+| A-11: `Math.random()` IDs non-deterministic | **FIXED** — replaced with `private static _instanceCounter = 0` monotonic counter; ID is now `hx-switch-${++HelixSwitch._instanceCounter}` — deterministic and collision-free |
+| A-13: Duplicate `@event` JSDoc inside method body | **FIXED** — inline `@event` JSDoc inside `_toggle()` method body removed; event documented solely at class-level `@fires` annotation |
+| `updated()` uses `Map<string, unknown>` instead of `PropertyValues<this>` | **FIXED** — `PropertyValues` imported from `lit`; `updated(changedProperties: PropertyValues<this>)` now conforms to project standards |

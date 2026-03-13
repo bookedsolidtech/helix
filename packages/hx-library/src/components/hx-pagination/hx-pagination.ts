@@ -404,3 +404,6 @@ declare global {
     'hx-pagination': HelixPagination;
   }
 }
+
+/** Canonical type alias for HelixPagination. Use this when typing hx-pagination element references. */
+export type HxPagination = HelixPagination;

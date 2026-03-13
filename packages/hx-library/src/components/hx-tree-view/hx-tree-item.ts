@@ -238,4 +238,8 @@ declare global {
   }
 }
 
-export type { HelixTreeItem as WcTreeItem };
+/** Canonical type alias for HelixTreeItem. Use this when typing hx-tree-item element references. */
+export type HxTreeItem = HelixTreeItem;
+
+/** @deprecated Use {@link HxTreeItem} instead. The `Wc` prefix was a legacy naming convention. */
+export type WcTreeItem = HelixTreeItem;
