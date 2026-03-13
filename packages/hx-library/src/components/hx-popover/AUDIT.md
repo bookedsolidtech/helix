@@ -127,13 +127,9 @@ The fallback `0 4px 16px rgba(0, 0, 0, 0.12)` is a hardcoded value. The project 
 
 ---
 
-### P2-02: Arrow border clipping — wrong border side shown for each placement
+### P2-02: Arrow border clipping — wrong border side shown for each placement ✅ FIXED
 
-**File:** `hx-popover.styles.ts`, lines 39–47; `hx-popover.ts`, lines 228–243
-
-The arrow element is a rotated square (`transform: rotate(45deg)`) with a border on all four sides. When positioned against an anchor, the two border sides facing the popover body should be hidden so only the two facing outward are visible. The current implementation renders a full border on all four sides, producing a visually incorrect diamond/rhombus shape with a visible inner border line cutting through the popover body edge.
-
-The `_updatePosition` logic sets the `staticSide` correctly but does not zero out the border on the anchor-facing sides. The arrow CSS should conditionally remove specific border sides based on placement (e.g., for `bottom` placement, the arrow points upward — `border-bottom` and `border-right` on the rotated element should be transparent).
+**Resolution:** `_updatePosition()` now resets all four border sides on the arrow element and then applies `1px solid transparent` to the two inward-facing sides for each placement direction via `innerBorderMap`. The mapping (`bottom → border-bottom + border-right`, `top → border-top + border-left`, `right → border-top + border-right`, `left → border-bottom + border-left`) ensures only the two outward-facing corner edges of the rotated square are visible, eliminating the inner border artefact.
 
 ---
 
@@ -184,6 +180,6 @@ Module-level mutable state causes ID collisions when the module is imported in m
 
 - **`aria-controls` omitted**: Correctly documented in code comment. Cross-root IDREF cannot be resolved by axe-core. This is a known Shadow DOM limitation.
 - **Floating UI vs. browser Popover API**: Using Floating UI is acceptable and provides broader browser support.
-- **TypeScript types**: `PopoverPlacement` and `TriggerMode` union types are correct and complete. No `any` types found.
+- **TypeScript types**: `PopoverPlacement` and `TriggerMode` union types are correct and complete. No `any` types found. P2-02 (arrow border logic) ✅ FIXED.
 - **Token usage (general)**: CSS custom properties follow the `--hx-*` pattern consistently (except P2-01 above).
 - **`@floating-ui/dom` `arrow` function naming**: The imported `arrow` function and the `@property() arrow` boolean coexist without TypeScript conflict because `this.arrow` (class property) and `arrow` (module import) are distinct identifiers. This is not a defect, though it reduces readability.
