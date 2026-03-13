@@ -293,6 +293,32 @@ describe('hx-breadcrumb', () => {
       const link = shadowQuery(el, '[part="link"]');
       expect(link?.getAttribute('aria-current')).toBeNull();
     });
+
+    it('toggles between link and text rendering when current changes at runtime', async () => {
+      // P3-02: runtime current toggle — WAI-ARIA requires the DOM to reflect the state change
+      const item = await fixture<HelixBreadcrumbItem>(
+        '<hx-breadcrumb-item href="/dept">Department</hx-breadcrumb-item>',
+      );
+      await item.updateComplete;
+
+      // Initial state: current is false → renders as <a part="link">
+      expect(shadowQuery(item, '[part="link"]')).toBeInstanceOf(HTMLAnchorElement);
+      expect(shadowQuery(item, '[part="text"]')).toBeNull();
+
+      // Toggle current ON → must render as <span part="text" aria-current="page">
+      item.current = true;
+      await item.updateComplete;
+      const textEl = shadowQuery(item, '[part="text"]');
+      expect(shadowQuery(item, '[part="link"]')).toBeNull();
+      expect(textEl).toBeInstanceOf(HTMLSpanElement);
+      expect(textEl?.getAttribute('aria-current')).toBe('page');
+
+      // Toggle current OFF → must revert to <a part="link">
+      item.current = false;
+      await item.updateComplete;
+      expect(shadowQuery(item, '[part="link"]')).toBeInstanceOf(HTMLAnchorElement);
+      expect(shadowQuery(item, '[part="text"]')).toBeNull();
+    });
   });
 
   // ─── Collapse (max-items) (7) ───
