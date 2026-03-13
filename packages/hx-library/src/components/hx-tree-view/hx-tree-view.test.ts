@@ -621,7 +621,6 @@ describe('hx-tree-view', () => {
 
       expect(item.expanded).toBe(false);
     });
-
   });
 });
 

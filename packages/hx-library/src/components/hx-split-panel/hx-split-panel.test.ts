@@ -827,5 +827,4 @@ describe('hx-split-panel', () => {
       expect(violations).toEqual([]);
     });
   });
-
 });
