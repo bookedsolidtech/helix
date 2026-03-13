@@ -26,14 +26,24 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
-  private internals: ElementInternals;
+  private internals!: ElementInternals;
 
   /**
    * Layout orientation of the button group.
    * @attr orientation
    */
   @property({ type: String, reflect: true })
-  orientation: 'horizontal' | 'vertical' = 'horizontal';
+  get orientation(): 'horizontal' | 'vertical' {
+    return this._orientation;
+  }
+  set orientation(value: string) {
+    if (value !== 'horizontal' && value !== 'vertical') {
+      console.warn(`[hx-button-group] Invalid orientation "${value}", defaulting to "horizontal".`);
+      value = 'horizontal';
+    }
+    this._orientation = value as 'horizontal' | 'vertical';
+  }
+  private _orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
    * Size applied to the button group and cascaded to child buttons via

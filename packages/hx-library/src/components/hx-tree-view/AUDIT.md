@@ -351,3 +351,22 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | P2-7: `color-mix()` CSS Level 5 — Browser Compatibility Risk | **FIXED** — replaced `color-mix(in srgb, currentColor 10%, transparent)` with `rgba(0, 0, 0, 0.06)` fallback in `hx-tree-item.styles.ts`                                                                      |
 | Incomplete `prefers-reduced-motion` coverage                 | **FIXED** — expanded `@media (prefers-reduced-motion: reduce)` block in `hx-tree-item.styles.ts` to cover `.item-row`, `.expand-btn`, and `.expand-btn svg` transitions (previously only covered `.children`) |
+
+# <<<<<<< HEAD
+
+## TypeScript Audit Fixes Applied (2026-03-13)
+
+| Finding                                                                | Status                                                                                                                                                                     |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------------- |
+| P0-1: Tree not keyboard-accessible via Tab                             | **FIXED** — `.tree` div now has `tabindex="0"`; `_handleFocusIn` redirects focus to last-focused item; roving tabindex tracks current item index via `_currentIndex`       |
+| P0-2: `aria-level` missing on all treeitems                            | **FIXED** — `_getLevel()` method computes nesting depth by counting ancestor `hx-tree-item` elements; `aria-level=${this._getLevel()}` added to `.item-row`                |
+| P0-3: No `aria-label` mechanism on tree container                      | **FIXED** — `label` property added to `HelixTreeView`; `aria-label=${this.label                                                                                            |     | nothing}`applied to the`role="tree"` div |
+| P1-1: ArrowLeft does not move focus to parent                          | **FIXED** — ArrowLeft handler in `hx-tree-view._handleKeyDown` now checks if item is a leaf/collapsed node and traverses to parent via `closest('hx-tree-item')`           |
+| P1-2: `aria-selected` always set regardless of selection mode          | **FIXED** — `_isSelectable()` method checks parent tree's `selection` attribute; `ariaSelected` renders `nothing` when selection is `'none'`                               |
+| P2-1: `TreeSelection` type not exported                                | **FIXED** — `export type { TreeSelection }` added to `index.ts`                                                                                                            |
+| P2-2: `indent` property is dead/unused code                            | **FIXED** — `indent` property removed from `hx-tree-item.ts`; CSS indentation handled entirely by `--_indent-level` cascade                                                |
+| P2-10: `_handleFocusIn` dead code (tree div not focusable)             | **FIXED** — resolved by adding `tabindex="0"` to the tree container (P0-1 fix); `_handleFocusIn` is now functional                                                         |
+| P2-11: `aria-posinset` and `aria-setsize` missing                      | **FIXED** — `_getPosInSet()` and `_getSetSize()` methods added; `aria-posinset` and `aria-setsize` applied to all treeitems                                                |
+| `WcTreeView`/`WcTreeItem` use legacy `Wc` prefix without `@deprecated` | **FIXED** — `HxTreeView` and `HxTreeItem` canonical type aliases added; `WcTreeView` and `WcTreeItem` retained with `@deprecated` JSDoc; all four exported from `index.ts` |
+
+> > > > > > > origin/dev

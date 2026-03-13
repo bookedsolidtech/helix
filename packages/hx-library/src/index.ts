@@ -26,8 +26,13 @@ export { HelixCheckbox } from './components/hx-checkbox/index.js';
 export { HelixCheckboxGroup } from './components/hx-checkbox-group/index.js';
 export { HelixCodeSnippet } from './components/hx-code-snippet/index.js';
 export { HelixColorPicker } from './components/hx-color-picker/index.js';
-export { HelixCombobox, type ComboboxOption, type HxComboboxSize } from './components/hx-combobox/index.js';
+export {
+  HelixCombobox,
+  type ComboboxOption,
+  type HxComboboxSize,
+} from './components/hx-combobox/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
+export type { WcContainer } from './components/hx-container/index.js';
 export { HelixCopyButton } from './components/hx-copy-button/index.js';
 export { HelixDataTable } from './components/hx-data-table/index.js';
 export type { HxDataTableColumn, HxDataTableSortState } from './components/hx-data-table/index.js';
@@ -59,6 +64,7 @@ export { HelixNav, type NavItem, type WcNav } from './components/hx-nav/index.js
 export { HelixNumberInput } from './components/hx-number-input/index.js';
 export { HelixOverflowMenu } from './components/hx-overflow-menu/index.js';
 export { HelixPagination } from './components/hx-pagination/index.js';
+export type { HxPagination } from './components/hx-pagination/index.js';
 export { HelixPopover } from './components/hx-popover/index.js';
 export { HelixPopup } from './components/hx-popup/index.js';
 export { HelixProgressBar } from './components/hx-progress-bar/index.js';
@@ -76,28 +82,50 @@ export { HelixSpinner } from './components/hx-spinner/index.js';
 export { HelixSplitButton } from './components/hx-split-button/index.js';
 export { HelixSplitPanel } from './components/hx-split-panel/index.js';
 export { HelixStack } from './components/hx-stack/index.js';
-export { HelixStatusIndicator, type StatusIndicatorStatus, type StatusIndicatorSize } from './components/hx-status-indicator/index.js';
+export {
+  HelixStatusIndicator,
+  type StatusIndicatorStatus,
+  type StatusIndicatorSize,
+} from './components/hx-status-indicator/index.js';
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
-export { HelixStructuredList, HelixStructuredListRow } from './components/hx-structured-list/index.js';
+export {
+  HelixStructuredList,
+  HelixStructuredListRow,
+} from './components/hx-structured-list/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export type { HxSwitch, WcSwitch } from './components/hx-switch/index.js';
 export { HelixTabs } from './components/hx-tabs/index.js';
 export { HelixTab } from './components/hx-tabs/index.js';
 export { HelixTabPanel } from './components/hx-tabs/index.js';
 export { HelixTag } from './components/hx-tag/index.js';
+export type { HxTag } from './components/hx-tag/index.js';
+export type { WcTag } from './components/hx-tag/index.js';
 export { HelixText } from './components/hx-text/index.js';
 export { HelixTextInput } from './components/hx-text-input/index.js';
 export { HelixTextarea } from './components/hx-textarea/index.js';
 export { HelixTheme } from './components/hx-theme/index.js';
-export type { ThemeName, TokenDefinition, TokenEntry } from './components/hx-theme/index.js';
+export type {
+  ThemeName,
+  TokenDefinition,
+  TokenEntry,
+  HxTheme,
+} from './components/hx-theme/index.js';
+export type { WcTheme } from './components/hx-theme/index.js';
 export { HelixTimePicker } from './components/hx-time-picker/index.js';
 export { HelixToast, HelixToastStack, toast } from './components/hx-toast/index.js';
-export type { ToastVariant, ToastStackPlacement, ToastOptions } from './components/hx-toast/index.js';
+export type {
+  ToastVariant,
+  ToastStackPlacement,
+  ToastOptions,
+} from './components/hx-toast/index.js';
 export { HelixToggleButton } from './components/hx-toggle-button/index.js';
 export { HelixTooltip } from './components/hx-tooltip/index.js';
 export { HelixTopNav } from './components/hx-top-nav/index.js';
 export { HelixTreeView } from './components/hx-tree-view/index.js';
 export { HelixTreeItem } from './components/hx-tree-view/index.js';
-export type { TreeSelection } from './components/hx-tree-view/index.js';
+export type { TreeSelection, HxTreeView } from './components/hx-tree-view/index.js';
+export type { HxTreeItem } from './components/hx-tree-view/index.js';
+export type { WcTreeView } from './components/hx-tree-view/index.js';
+export type { WcTreeItem } from './components/hx-tree-view/index.js';
 export { HelixVisuallyHidden } from './components/hx-visually-hidden/index.js';
