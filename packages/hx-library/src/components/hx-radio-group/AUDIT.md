@@ -290,26 +290,26 @@ it('has no axe violations in default state', async () => {
 
 ## Summary Table
 
-| ID   | Severity | Area            | Description                                                    |
-| ---- | -------- | --------------- | -------------------------------------------------------------- |
-| P0-1 | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible            |
-| P0-2 | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)        |
-| P0-3 | P0       | Form/Validation | Required validity not initialized on first render              |
+| ID   | Severity | Area            | Description                                                                                                                      |
+| ---- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| P0-1 | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible                                                                              |
+| P0-2 | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)                                                                          |
+| P0-3 | P0       | Form/Validation | Required validity not initialized on first render                                                                                |
 | P1-1 | P1       | Behavior        | ~~Re-enabling disabled group leaves radios permanently off~~ ✅ FIXED — `_individualDisabledStates` map restores per-radio state |
-| P1-2 | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature                |
-| P1-3 | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards              |
-| P1-4 | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby`        |
-| P1-5 | P1       | Accessibility   | No `aria-required` on radiogroup                               |
-| P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM        |
-| P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)        |
-| P2-1 | P2       | Performance     | ~~Double `setFormValue`/`_syncRadios`/`_updateValidity`~~ ✅ FIXED — single call path via `updated()` |
-| P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used |
-| P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default         |
-| P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                 |
-| P2-5 | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)              |
-| P2-6 | P2       | API             | No `selected-value` alias (naming gap vs other libraries)      |
-| P2-7 | P2       | Storybook       | No mixed-disabled story (partial disable state)                |
-| P2-8 | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal ✅ FIXED |
+| P1-2 | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature                                                                                  |
+| P1-3 | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards                                                                                |
+| P1-4 | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby`                                                                          |
+| P1-5 | P1       | Accessibility   | No `aria-required` on radiogroup                                                                                                 |
+| P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM                                                                          |
+| P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)                                                                          |
+| P2-1 | P2       | Performance     | ~~Double `setFormValue`/`_syncRadios`/`_updateValidity`~~ ✅ FIXED — single call path via `updated()`                            |
+| P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used                                          |
+| P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default                                                                           |
+| P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                                                                                   |
+| P2-5 | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)                                                                                |
+| P2-6 | P2       | API             | No `selected-value` alias (naming gap vs other libraries)                                                                        |
+| P2-7 | P2       | Storybook       | No mixed-disabled story (partial disable state)                                                                                  |
+| P2-8 | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal ✅ FIXED                                                                   |
 
 **Total findings: 3 P0, 7 P1, 8 P2**
 
