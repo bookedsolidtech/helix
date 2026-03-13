@@ -172,7 +172,7 @@ Missing token: `--hx-select-placeholder-color`
 
 ## P2 — Medium Severity
 
-### P2-01: `formStateRestoreCallback` has incomplete signature
+### P2-01: `formStateRestoreCallback` has incomplete signature — FIXED
 
 **File:** `hx-select.ts:251-253`
 
@@ -183,6 +183,8 @@ formStateRestoreCallback(state: string): void {
 ```
 
 The `FormStateRestoreCallback` interface specifies `(state: string | File | FormData, mode: 'restore' | 'autocomplete'): void`. The method accepts only `string` and ignores the `mode` parameter. If the browser restores state as `FormData` or `File` (valid per spec), this will silently assign a non-string to `this.value` without a type error in TypeScript (due to the narrowed parameter type). A proper guard and `mode` handling are missing.
+
+**Resolution:** Signature updated to `formStateRestoreCallback(state: string | File | FormData, _mode: 'restore' | 'autocomplete'): void` with a `typeof state === 'string'` guard before assigning to `this.value`.
 
 ---
 
@@ -290,7 +292,7 @@ The axe-core tests check default, error, and disabled states — all with `open=
 
 ---
 
-### P2-11: `size` property accepts invalid values with no runtime warning
+### P2-11: `size` property accepts invalid values with no runtime warning — FIXED
 
 **File:** `hx-select.ts:143`
 
@@ -299,6 +301,8 @@ size: 'sm' | 'md' | 'lg' = 'md';
 ```
 
 If a consumer sets `hx-size="xl"` or `hx-size="foobar"`, the CSS class `field__trigger--xl` is applied (via the classMap template), which has no definition. The component renders silently at its default appearance with no developer warning. Other components in the library follow a similar pattern, but this is worth flagging as it complicates debugging.
+
+**Resolution:** Runtime guard added in `updated()`: checks `['sm', 'md', 'lg'].includes(this.size)` and emits a `console.warn` with the invalid value and expected options.
 
 ---
 

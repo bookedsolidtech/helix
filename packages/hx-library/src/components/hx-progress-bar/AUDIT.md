@@ -22,11 +22,11 @@ The feature spec calls for `min` typed as a number. The component hardcodes `ari
 
 ---
 
-### [P1] Missing `indeterminate` boolean property
+### [P1] Missing `indeterminate` boolean property — FIXED
 
 The spec calls for an explicit typed `indeterminate` prop. The implementation derives indeterminate state from `value === null`, which is a valid pattern but means consumers cannot set `indeterminate` as a boolean attribute (`<hx-progress-bar indeterminate>`). The null-value approach requires consumers to know about `value` semantics and makes Twig/HTML usage less obvious.
 
-**Location:** `hx-progress-bar.ts` — no `@property() indeterminate` declared.
+**Resolution:** `@property({ type: Boolean, reflect: true }) indeterminate = false` added. The `_isIndeterminate` getter combines both the boolean flag and `value === null` to support both API styles.
 
 ---
 
@@ -38,9 +38,11 @@ The spec mentions "label/description typed." No `description` property exists. A
 
 ---
 
-### [P2] `value` attribute is null-by-default but reflected as number type
+### [P2] `value` attribute is null-by-default but reflected as number type — FIXED
 
-`@property({ type: Number, reflect: true }) value: number | null = null` reflects correctly, but the reflected attribute will be absent (not `"null"`) when `value` is `null` — this is correct Lit behavior. No issue with the implementation itself, but the type `number | null` is undocumented in the JSDocs `@attr` tag, which says only "Current progress value (0–max). Set to null for indeterminate state." — acceptable documentation.
+`@property({ type: Number, reflect: true }) value: number | null = null` reflects correctly, but the reflected attribute will be absent (not `"null"`) when `value` is `null` — this is correct Lit behavior. No issue with the implementation itself, but the type `number | null` is undocumented in the JSDocs `@attr` tag.
+
+**Resolution:** JSDoc updated to `Current progress value (min–max). Set to null for indeterminate state.` — explicitly documents the null-for-indeterminate contract. No code change required.
 
 ---
 
