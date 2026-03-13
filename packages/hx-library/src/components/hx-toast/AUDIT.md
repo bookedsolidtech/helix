@@ -27,9 +27,11 @@ The implementation is structurally sound — TypeScript is strict, CEM docs are 
 
 ## P1 — High Severity (must fix before merge)
 
-### P1-01: Closed toast is fully exposed to the accessibility tree
+### P1-01: Closed toast is fully exposed to the accessibility tree — **FIXED**
 
 **File:** `hx-toast.ts:197–246`
+
+**Fix:** Added `aria-hidden="true"` management in the `updated()` lifecycle hook. When `open` changes to `false`, `aria-hidden="true"` is set on the host element. When `open` changes to `true`, `aria-hidden` is removed. Tests added verifying `aria-hidden` is set when closed and absent when open.
 
 When `open=false`, the `.toast` div is still rendered in the shadow DOM with `role="status"` (or `role="alert"` for `danger`). It is visually hidden via `opacity: 0` and `pointer-events: none` only. Screen readers traverse the shadow DOM and will encounter the live region and its content regardless of visibility.
 
@@ -43,9 +45,11 @@ When `open=false`, the `.toast` div is still rendered in the shadow DOM with `ro
 
 ---
 
-### P1-02: `aria-atomic` is missing on the live region
+### P1-02: `aria-atomic` is missing on the live region — **FIXED**
 
 **File:** `hx-toast.ts:205–206`
+
+**Fix:** Added `aria-atomic="true"` to the `.toast` div in the render template. Test added verifying `aria-atomic="true"` is present on the live region base element.
 
 The `.toast` div has `role="alert"` / `role="status"` and `aria-live="assertive"` / `aria-live="polite"` but lacks `aria-atomic="true"`.
 
@@ -81,19 +85,21 @@ None of this logic has a single test. The `hx-toast-stack` tests in `hx-toast.te
 
 ---
 
-### P1-04: No Drupal JS behaviors file
+### ~~P1-04: No Drupal JS behaviors file~~ FIXED
 
-**File:** (missing — no `hx-toast.drupal.js` or equivalent)
+**File:** `hx-toast.drupal.js`
 
-The audit spec explicitly requires "JS behaviors for programmatic toast triggering" in the Drupal integration area. No such file exists. There is no Drupal behavior that wraps the `toast()` utility for server-rendered Twig templates, no `data-hx-toast-trigger` pattern, no behavior attach/detach lifecycle.
+**Resolution:** `hx-toast.drupal.js` added providing `Drupal.behaviors.hxToast` that:
 
-This is a hard blocker for the primary consumer of this component library (Drupal CMS). Twig templates cannot import ES modules directly; they require Drupal behaviors to bridge the gap.
+- Attaches to elements with `data-hx-toast` attributes containing JSON-encoded options
+- Dynamically imports `toast()` from `@helixui/library` on click (tree-shaking friendly)
+- Uses a `dataset.hxToastAttached` guard to prevent double-binding on AJAX/BigPipe updates
+- Detaches cleanly on `'unload'` to prevent memory leaks on partial DOM replacement
+- Announces parse errors and load failures via `Drupal.announce()` for accessibility
 
-**Expected behavior:** A `hx-toast.drupal.js` file providing a `Drupal.behaviors.hxToast` implementation that:
-
-- Attaches to elements with `data-hx-toast` attributes
-- Calls `toast()` with serialized options from data attributes
-- Properly detaches to prevent memory leaks on partial DOM updates
+A `DrupalIntegration` story was also added to `hx-toast.stories.ts` documenting the full
+`data-hx-toast` trigger pattern, supported options (message, variant, duration, placement,
+closable), and `mytheme.libraries.yml` registration including the `.drupal.js` file.
 
 ---
 
@@ -115,13 +121,11 @@ This is a surprising UX bug: users hovering briefly near end-of-life toasts rest
 
 ## P2 — Medium Severity (should fix in follow-up sprint)
 
-### P2-01: `prefers-reduced-motion` suppresses animation only, not auto-dismiss timer
+### ~~P2-01: `prefers-reduced-motion` suppresses animation only, not auto-dismiss timer~~ FIXED
 
-**File:** `hx-toast.styles.ts:130–134`
+**File:** `hx-toast.ts:139–142`
 
-The `@media (prefers-reduced-motion: reduce)` block sets `transition: none` on `.toast`, which is correct. However, the auto-dismiss timer (`this.duration`) fires regardless of this preference. Users who require reduced motion often have vestibular or cognitive disabilities that also benefit from extended or persistent notification durations.
-
-**Expected improvement:** When `prefers-reduced-motion` is active, either suppress the auto-dismiss entirely or significantly extend the duration. This requires a `window.matchMedia('(prefers-reduced-motion: reduce)')` check at timer start.
+**Resolution:** `_startTimer` now checks `window.matchMedia('(prefers-reduced-motion: reduce)').matches` at the start and returns early if true, preventing the auto-dismiss timer from firing when the user has requested reduced motion.
 
 ---
 
@@ -143,29 +147,27 @@ This is the primary behavioral contract of `hx-toast-stack` and it has no test c
 
 ---
 
-### P2-04: Slide animation direction does not vary by placement
+### ~~P2-04: Slide animation direction does not vary by placement~~ FIXED
 
-**File:** `hx-toast.styles.ts:34–46`
+**File:** `hx-toast.styles.ts`
 
-The enter animation always slides from `translateY(0.5rem)` (upward from below). For toasts in a `bottom-*` placement stack, this means they slide up to their final position, which is semantically correct. However for `top-*` placements, toasts should ideally slide downward from above (`translateY(-0.5rem)`) to feel natural. Currently all placements use the same upward slide.
-
-**Impact:** Minor visual inconsistency for `top-start`, `top-center`, `top-end` placements.
+**Resolution:** The `hx-toast-stack` styles now set `--hx-toast-enter-translate` to `calc(var(--hx-space-2, 0.5rem) * -1)` for `top-*` placements via the `::slotted(hx-toast)` selector. Toasts in top-positioned stacks slide downward from above; toasts in bottom-positioned stacks slide upward from below. The `--hx-toast-enter-translate` CSS custom property in `hx-toast.styles.ts` uses the parent-set value as its default.
 
 ---
 
-### P2-05: `action` slot wrapper has no CSS part
+### ~~P2-05: `action` slot wrapper has no CSS part~~ FIXED
 
-**File:** `hx-toast.ts:218–220`, JSDoc at lines 33–36
+**File:** `hx-toast.ts`, JSDoc at lines 33–36
 
-The `<span class="toast__action">` wrapping the action slot has no `part` attribute. The JSDoc documents `base`, `icon`, `message`, and `close-button` parts — but `action` is not listed. Consumers cannot style the action slot wrapper via `::part(action)`.
-
-This is inconsistent with `icon` and `message` which both have dedicated parts. The action wrapper is meaningful for layout (e.g., changing gap, alignment, border between action and message).
+**Resolution:** `part="action"` added to `<span class="toast__action">` and documented in JSDoc `@csspart` block. Consumers can now style the action wrapper via `::part(action)`.
 
 ---
 
-### P2-06: Close button `aria-label` is hardcoded English with no i18n support
+### P2-06: Close button `aria-label` is hardcoded English with no i18n support — **FIXED**
 
 **File:** `hx-toast.ts:226`
+
+**Fix:** Added `closeLabel` property (attribute `close-label`) defaulting to `'Dismiss notification'`. The close button now uses `aria-label=${this.closeLabel}`. Test added verifying custom `close-label` attribute value is applied to the button's `aria-label`.
 
 ```ts
 aria-label="Dismiss notification"
@@ -194,23 +196,11 @@ The story is misleading to developers evaluating the component.
 
 ---
 
-### P2-08: CSS `:host(:not([placement]))` maps to `bottom-start`, conflicting with JS default `bottom-end`
+### ~~P2-08: CSS `:host(:not([placement]))` maps to `bottom-start`, conflicting with JS default `bottom-end`~~ FIXED
 
-**File:** `hx-toast.styles.ts:177–183`, `hx-toast.ts:273`
+**File:** `hx-toast.styles.ts`
 
-The CSS fallback for when no `placement` attribute is present maps to the `bottom-start` position:
-
-```css
-:host([placement='bottom-start']),
-:host(:not([placement])) {
-  bottom: 0;
-  left: 0;
-  right: auto;
-  top: auto;
-}
-```
-
-But the JS property default is `'bottom-end'` (bottom-right). Because `placement` has `reflect: true`, the attribute will be set on first render, so this mismatch only manifests if the attribute is programmatically removed after render (`el.removeAttribute('placement')`). However it creates a confusing inconsistency: the "no placement" CSS state and the JS default disagree on which corner is the fallback. The CSS should either be removed (the reflect will always set the attribute) or changed to match `bottom-end`.
+**Resolution:** The `:host(:not([placement]))` fallback CSS rule has been removed. The styles only contain explicit `:host([placement='...'])` selectors. Because `placement` has `reflect: true` on `HelixToastStack`, the attribute is always present after first render. The JS default `'bottom-end'` and the CSS placement rules are now consistent.
 
 ---
 
@@ -218,10 +208,10 @@ But the JS property default is `'bottom-end'` (bottom-right). Because `placement
 
 | Area                           | Status  | Findings                                   |
 | ------------------------------ | ------- | ------------------------------------------ |
-| TypeScript (strict, types)     | PASS    | None                                       |
+| TypeScript (strict, types)     | PASS    | P2-04, P2-08 fixed                         |
 | Accessibility (ARIA/axe)       | PARTIAL | P1-01, P1-02                               |
 | Tests (coverage/completeness)  | FAIL    | P1-03, P2-02, P2-03                        |
 | Storybook (variants/demos)     | PARTIAL | P2-07                                      |
-| CSS (tokens, animation, parts) | PARTIAL | P2-04, P2-05, P2-08                        |
+| CSS (tokens, animation, parts) | PASS    | P2-01, P2-04, P2-05, P2-08 all fixed       |
 | Performance (bundle size)      | PASS    | ~14KB raw, well under 5KB gzipped estimate |
-| Drupal integration             | FAIL    | P1-04                                      |
+| Drupal integration             | PASS    | P1-04 FIXED                                |

@@ -225,15 +225,18 @@ The CSS Custom Properties and CSS Parts demonstration stories use hardcoded hex 
 
 ---
 
-### A-14 — `Math.random()` for stable IDs is not SSR-safe [P2]
+### ~~A-14 — `Math.random()` for stable IDs is not SSR-safe~~ FIXED [P2]
 
-**File:** `hx-time-picker.ts:242-245`
+**File:** `hx-time-picker.ts`
+
+**Resolution:** `Math.random()` replaced with a static class-level monotonically incrementing counter:
 
 ```ts
-private readonly _id = `hx-time-picker-${Math.random().toString(36).slice(2, 9)}`;
+private static _instanceCount = 0;
+private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
 ```
 
-Random IDs generated at construction time differ between server-rendered HTML and client-side hydration. For Drupal's Declarative Shadow DOM or any SSR rendering pipeline, this causes ID mismatches that break `<label for="...">` associations after hydration. Consider using a monotonically incrementing counter (e.g., `static _instanceCount = 0`) for deterministic IDs.
+IDs are now deterministic per page render order. `<label for>` associations, `aria-labelledby` references, and `aria-controls` listbox linkage remain stable across server-render and client-side hydration in Drupal Declarative Shadow DOM contexts. The static counter is scoped to the class, ensuring uniqueness across all instances on the page.
 
 ---
 
@@ -350,7 +353,7 @@ The restored state is set directly to `this.value` without validation. If the br
 | A-11 | CSS Parts | P1 | Toggle button missing `part` attribute |
 | A-12 | CEM/Docs | P1 | `--hx-time-picker-listbox-shadow` token undocumented |
 | A-13 | Storybook | P1 | Hardcoded hex values in CSS demo stories |
-| A-14 | TypeScript | P2 | `Math.random()` IDs not SSR-safe |
+| ~~A-14~~ | TypeScript | P2 | ~~`Math.random()` IDs not SSR-safe~~ FIXED: static class counter |
 | A-15 | CSS | P2 | Listbox clipped by ancestor `overflow: hidden` |
 | A-16 | Performance | P2 | `_slots` not memoized; format change regenerates |
 | A-17 | CSS | P2 | `color-mix()` not supported in Safari < 16.2 |

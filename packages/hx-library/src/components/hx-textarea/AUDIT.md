@@ -166,25 +166,30 @@ The native `<textarea required>` already maps to `aria-required="true"` in the a
 
 ## P2 — Medium (Address Before Next Major Release)
 
-### P2-01: Random ID generation (`Math.random()`) is not SSR-safe
+### ~~P2-01: Random ID generation (`Math.random()`) is not SSR-safe~~ FIXED
 
-**File:** `hx-textarea.ts`, line 300
+**File:** `hx-textarea.ts`
+
+**Resolution:** `Math.random()` replaced with a module-level monotonically incrementing counter:
 
 ```ts
-private _textareaId = `hx-textarea-${Math.random().toString(36).slice(2, 9)}`;
+// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
+let _hxTextareaIdCounter = 0;
+// ...
+private _textareaId = `hx-textarea-${++_hxTextareaIdCounter}`;
 ```
 
-IDs generated via `Math.random()` differ between server render and client hydration. If this component is ever used in SSR contexts (Next.js, Astro, Drupal with server-side prerendering), the `for`/`id` association on label and textarea will break. The `aria-describedby` references will also mismatch. Use a stable, deterministic ID strategy (e.g., `crypto.randomUUID()` with SSR guard, or a sequential counter exported from a shared module).
+IDs are now deterministic per page render order, eliminating server/client hydration mismatches. The `<label for>` association and `aria-describedby` references remain stable across SSR and client-side hydration in Drupal Declarative Shadow DOM contexts.
 
 **Severity:** P2
 
 ---
 
-### P2-02: Missing `readonly` property
+### ~~P2-02: Missing `readonly` property~~ FIXED
 
 **File:** `hx-textarea.ts`
 
-The native `<textarea>` element supports `readonly`, a standard HTML attribute. The component does not expose it. Read-only form fields are a common healthcare pattern (displaying non-editable patient data inline with editable fields). Consumers must currently work around this with CSS or by intercepting input events.
+**Resolution:** Added `readonly` boolean property with `reflect: true` (attribute: `readonly`). The native `<textarea>` receives `?readonly=${this.readonly}` via Lit's boolean attribute binding. Common healthcare pattern for displaying non-editable patient data inline with editable fields.
 
 **Severity:** P2
 

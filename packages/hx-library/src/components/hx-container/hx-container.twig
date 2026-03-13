@@ -1,0 +1,58 @@
+{#
+  hx-container — Drupal Twig Template
+  ====================================
+  Layout primitive for constraining content width with consistent spacing.
+  A purely visual layout component — no semantic meaning, no ARIA role.
+
+  Variables:
+    - width     (string, optional): 'full' | 'content' | 'narrow' | 'sm' | 'md' | 'lg' | 'xl'.
+                Defaults to 'content'. Controls the max-width of the inner content wrapper.
+    - padding   (string, optional): 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'.
+                Defaults to 'none'. Vertical padding applied to the outer wrapper.
+    - bg_color  (string, optional): CSS color value for the container background.
+                Applied via the --hx-container-bg custom property inline style.
+    - content   (markup): The content to render inside the container. Required.
+    - attributes (object, optional): Additional Drupal attributes object.
+
+  Usage:
+    Basic wrapping a page section:
+      {% include 'hx-container.twig' with {
+        width: 'content',
+        padding: 'xl',
+        content: body_content,
+      } %}
+
+    Hero section with background color:
+      {% include 'hx-container.twig' with {
+        width: 'full',
+        padding: 'lg',
+        bg_color: 'var(--hx-color-primary-900)',
+        content: hero_content,
+      } %}
+
+    Responsive padding via CSS custom properties:
+      Consumers can override padding per-breakpoint using external stylesheets:
+        @media (max-width: 640px) {
+          hx-container {
+            --hx-container-gutter: var(--hx-space-4);
+          }
+        }
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-container:
+        js:
+          path/to/@helixui/library/dist/hx-container.js: { attributes: { type: module } }
+#}
+
+{% set _width = width|default('content') %}
+{% set _padding = padding|default('none') %}
+
+<hx-container
+  width="{{ _width }}"
+  padding="{{ _padding }}"
+  {% if bg_color %}style="--hx-container-bg: {{ bg_color|escape('css') }};"{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {{ content }}
+</hx-container>

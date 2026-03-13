@@ -151,6 +151,33 @@ describe('hx-toast', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
       expect(btn.getAttribute('aria-label')).toBeTruthy();
     });
+
+    it('has aria-atomic="true" on the live region (P1-02)', async () => {
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-atomic')).toBe('true');
+    });
+
+    it('sets aria-hidden="true" on host when closed (P1-01)', async () => {
+      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      await el.updateComplete;
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('removes aria-hidden from host when opened (P1-01)', async () => {
+      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      el.show();
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-hidden')).toBe(false);
+    });
+
+    it('supports custom closeLabel for localization (P2-06)', async () => {
+      const el = await fixture<HelixToast>(
+        '<hx-toast closable close-label="Cerrar notificación">Test</hx-toast>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
+      expect(btn.getAttribute('aria-label')).toBe('Cerrar notificación');
+    });
   });
 
   // ─── Events ───
@@ -308,9 +335,7 @@ describe('hx-toast', () => {
     });
 
     it('icon slot accepts content', async () => {
-      const el = await fixture<HelixToast>(
-        '<hx-toast><span slot="icon">★</span>Test</hx-toast>',
-      );
+      const el = await fixture<HelixToast>('<hx-toast><span slot="icon">★</span>Test</hx-toast>');
       const icon = el.querySelector('[slot="icon"]');
       expect(icon).toBeTruthy();
     });

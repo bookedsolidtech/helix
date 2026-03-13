@@ -502,10 +502,12 @@ Healthcare contexts often show placeholder hints for expected format (e.g., `pla
 | 27 | Performance | P2 | `Math.random()` IDs — non-deterministic, SSR/snapshot unfriendly |
 | 28 | Performance | P2 | 100ms `setInterval` long-press creates GC pressure at high step counts |
 | 29 | Performance | P2 | Bundle size not verified against 5KB budget |
-| 30 | Drupal | **P0** | `@slot -` documents default slot that doesn't exist — Drupal label content silently lost |
-| 31 | Drupal | P1 | `formResetCallback` doesn't restore to HTML `value` attribute default |
-| 32 | Drupal | P1 | `step="1"` omitted from native input DOM when value is 1 |
+| 30 | Drupal | **P0** | ~~`@slot -` documents default slot that doesn't exist~~ **FIXED** — `@slot -` removed; named `label` slot documented |
+| 31 | Drupal | P1 | ~~`formResetCallback` doesn't restore to HTML `value` attribute default~~ **FIXED** — `_defaultValue` captured in `firstUpdated()` |
+| 32 | Drupal | P1 | ~~`step="1"` omitted from native input DOM when value is 1~~ **FIXED** — `step=${this.step}` always rendered |
 | 33 | Drupal | P2 | No `placeholder` property (parity gap with `hx-text-input`) |
+| 34 | Storybook | P2 | ~~No `label` slot story (Drupal Form API pattern)~~ **FIXED** — `WithLabelSlot` story added |
+| 35 | Storybook | P2 | ~~No composite Drupal slot story~~ **FIXED** — `DrupalFormAPI` story added (all three slots) |
 
 ---
 
@@ -513,4 +515,4 @@ Healthcare contexts often show placeholder hints for expected format (e.g., `pla
 
 1. **Stepper `aria-hidden="true"` (Finding #6)** — Buttons are completely inaccessible to screen reader users. WCAG 2.1 AA violation. Must be fixed before merge.
 
-2. **`@slot -` documents non-existent default slot (Finding #30)** — Drupal consumers following the documentation will silently lose server-rendered label content. Either add the slot or fix the documentation before merge.
+2. ~~**`@slot -` documents non-existent default slot (Finding #30)**~~ **FIXED** — `@slot -` removed from JSDoc; the named `slot="label"` is correctly documented and a `WithLabelSlot` story demonstrates the Drupal Form API pattern.

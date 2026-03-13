@@ -571,6 +571,156 @@ export const ClinicalProtocols: Story = {
 // 12. ALL COMBINATIONS
 // ─────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────
+// 13. NESTED ACCORDIONS
+// ─────────────────────────────────────────────────
+
+export const NestedAccordions: Story = {
+  name: 'Nested Accordions',
+  render: () => html`
+    <hx-accordion mode="single" style="max-width: 600px;">
+      <hx-accordion-item>
+        <span slot="trigger">Clinical Departments</span>
+        <div style="padding-top: 0.5rem;">
+          <hx-accordion mode="single">
+            <hx-accordion-item>
+              <span slot="trigger">Cardiology</span>
+              <p>Cardiac care unit on the 4th floor. Contact extension 4-2200 for consultations.</p>
+            </hx-accordion-item>
+            <hx-accordion-item>
+              <span slot="trigger">Neurology</span>
+              <p>Neurology clinic on the 3rd floor. Accepts referrals Monday through Friday.</p>
+            </hx-accordion-item>
+            <hx-accordion-item>
+              <span slot="trigger">Oncology</span>
+              <p>Cancer care center in the south wing. Chemotherapy suite on level 2.</p>
+            </hx-accordion-item>
+          </hx-accordion>
+        </div>
+      </hx-accordion-item>
+      <hx-accordion-item>
+        <span slot="trigger">Administrative Services</span>
+        <div style="padding-top: 0.5rem;">
+          <hx-accordion mode="single">
+            <hx-accordion-item>
+              <span slot="trigger">Medical Records</span>
+              <p>Request records through the patient portal or call extension 2-1400.</p>
+            </hx-accordion-item>
+            <hx-accordion-item>
+              <span slot="trigger">Billing & Insurance</span>
+              <p>
+                Billing inquiries: Monday–Friday 8 AM to 5 PM. Accepts all major insurance plans.
+              </p>
+            </hx-accordion-item>
+          </hx-accordion>
+        </div>
+      </hx-accordion-item>
+      <hx-accordion-item>
+        <span slot="trigger">Patient Resources</span>
+        <p>Educational materials, support groups, and discharge planning are available on request.</p>
+      </hx-accordion-item>
+    </hx-accordion>
+  `,
+  play: async ({ canvasElement }) => {
+    const accordions = canvasElement.querySelectorAll('hx-accordion');
+    await expect(accordions.length).toBe(3);
+
+    const outerItems = accordions[0].querySelectorAll(':scope > hx-accordion-item');
+    await expect(outerItems.length).toBe(3);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 14. DYNAMIC ADD / REMOVE
+// ─────────────────────────────────────────────────
+
+export const DynamicAddRemove: Story = {
+  name: 'Dynamic Add / Remove',
+  render: () => {
+    let count = 3;
+
+    const addItem = () => {
+      count += 1;
+      const accordion = document.getElementById('dynamic-accordion');
+      if (!accordion) return;
+      const item = document.createElement('hx-accordion-item');
+      const trigger = document.createElement('span');
+      trigger.slot = 'trigger';
+      trigger.textContent = `Item ${count}`;
+      const content = document.createElement('p');
+      content.textContent = `Content for dynamically added item ${count}.`;
+      item.appendChild(trigger);
+      item.appendChild(content);
+      accordion.appendChild(item);
+      const counter = document.getElementById('dynamic-count');
+      if (counter) counter.textContent = String(accordion.querySelectorAll('hx-accordion-item').length);
+    };
+
+    const removeItem = () => {
+      const accordion = document.getElementById('dynamic-accordion');
+      if (!accordion) return;
+      const items = accordion.querySelectorAll('hx-accordion-item');
+      if (items.length > 0) items[items.length - 1].remove();
+      const counter = document.getElementById('dynamic-count');
+      if (counter) counter.textContent = String(accordion.querySelectorAll('hx-accordion-item').length);
+    };
+
+    return html`
+      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button
+            @click=${addItem}
+            style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          >
+            Add Item
+          </button>
+          <button
+            @click=${removeItem}
+            style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          >
+            Remove Last
+          </button>
+          <span style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280);">
+            Items: <strong id="dynamic-count">3</strong>
+          </span>
+        </div>
+        <hx-accordion id="dynamic-accordion" mode="single">
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content for item 1. Click "Add Item" to append new accordion items dynamically.</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content for item 2. Newly added items are appended and participate in single-mode.</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 3</span>
+            <p>Content for item 3. Click "Remove Last" to remove items from the end.</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      </div>
+    `;
+  },
+  play: async ({ canvasElement }) => {
+    const accordion = canvasElement.querySelector('#dynamic-accordion');
+    await expect(accordion).toBeTruthy();
+
+    const initialItems = accordion?.querySelectorAll('hx-accordion-item');
+    await expect(initialItems?.length).toBe(3);
+
+    const addBtn = canvasElement.querySelector<HTMLButtonElement>('button:first-of-type');
+    await expect(addBtn).toBeTruthy();
+    addBtn?.click();
+
+    const afterAddItems = accordion?.querySelectorAll('hx-accordion-item');
+    await expect(afterAddItems?.length).toBe(4);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 12. ALL COMBINATIONS
+// ─────────────────────────────────────────────────
+
 export const AllCombinations: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 2rem;">

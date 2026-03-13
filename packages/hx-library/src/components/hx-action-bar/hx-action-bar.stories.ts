@@ -405,3 +405,95 @@ export const KeyboardNavigation: Story = {
     await expect(document.activeElement).toBe(clear);
   },
 };
+
+// ─────────────────────────────────────────────────
+// 10. EMPTY ACTION BAR
+// ─────────────────────────────────────────────────
+
+export const EmptyActionBar: Story = {
+  name: 'Empty Action Bar',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280); margin-bottom: 0.5rem;"
+      >
+        An action bar with no slotted content. The bar renders but shows no items.
+      </p>
+      <hx-action-bar
+        aria-label="Empty toolbar"
+        variant="outlined"
+        style="min-height: 2.5rem;"
+      ></hx-action-bar>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-action-bar');
+    await expect(el).toBeTruthy();
+
+    const base = el?.shadowRoot?.querySelector('[part="base"]');
+    await expect(base?.getAttribute('role')).toBe('toolbar');
+
+    // No slotted buttons
+    const buttons = canvasElement.querySelectorAll('button');
+    await expect(buttons.length).toBe(0);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 11. WITH OVERFLOW SLOT
+// ─────────────────────────────────────────────────
+
+export const WithOverflowSlot: Story = {
+  name: 'With Overflow Slot',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280); margin-bottom: 0.5rem;"
+      >
+        The <code>overflow</code> slot renders actions that appear when the bar has constrained
+        space. Content in the overflow slot is only visible when assigned.
+      </p>
+      <hx-action-bar aria-label="Toolbar with overflow" variant="outlined">
+        <button
+          slot="start"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        >
+          Primary Action
+        </button>
+        <button
+          slot="start"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        >
+          Secondary Action
+        </button>
+        <button
+          slot="overflow"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        >
+          Overflow Action 1
+        </button>
+        <button
+          slot="overflow"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        >
+          Overflow Action 2
+        </button>
+      </hx-action-bar>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-action-bar');
+    await expect(el).toBeTruthy();
+
+    // Overflow slot wrapper should be visible (has assigned content)
+    const overflowPart = el?.shadowRoot?.querySelector('[part="overflow"]');
+    await expect(overflowPart).toBeTruthy();
+    await expect(overflowPart?.hasAttribute('hidden')).toBe(false);
+
+    // Overflow slot has 2 assigned buttons
+    const overflowSlot = el?.shadowRoot?.querySelector('slot[name="overflow"]') as HTMLSlotElement;
+    await expect(overflowSlot).toBeTruthy();
+    const assigned = overflowSlot?.assignedElements({ flatten: true });
+    await expect(assigned?.length).toBe(2);
+  },
+};
