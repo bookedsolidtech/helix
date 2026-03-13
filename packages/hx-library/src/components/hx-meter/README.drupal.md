@@ -33,27 +33,27 @@ Use the provided `hx-meter.twig` template or render the component directly:
 
 ## Template Variables
 
-| Variable     | Type    | Default | Description                                                                              |
-|--------------|---------|---------|------------------------------------------------------------------------------------------|
-| `value`      | number  | —       | **Required.** Current value. Clamped to `[min, max]`.                                   |
-| `min`        | number  | `0`     | Minimum value of the range.                                                              |
-| `max`        | number  | `100`   | Maximum value of the range.                                                              |
-| `label`      | string  |         | Visible label and accessible name. Required unless using the label slot.                 |
-| `low`        | number  |         | Threshold below which value is suboptimal.                                               |
-| `high`       | number  |         | Threshold above which value is suboptimal.                                               |
-| `optimum`    | number  |         | The optimal value. Determines which zone is "good" relative to `low`/`high`.            |
-| `attributes` | object  |         | Additional Drupal attributes object.                                                     |
+| Variable     | Type   | Default | Description                                                                  |
+| ------------ | ------ | ------- | ---------------------------------------------------------------------------- |
+| `value`      | number | —       | **Required.** Current value. Clamped to `[min, max]`.                        |
+| `min`        | number | `0`     | Minimum value of the range.                                                  |
+| `max`        | number | `100`   | Maximum value of the range.                                                  |
+| `label`      | string |         | Visible label and accessible name. Required unless using the label slot.     |
+| `low`        | number |         | Threshold below which value is suboptimal.                                   |
+| `high`       | number |         | Threshold above which value is suboptimal.                                   |
+| `optimum`    | number |         | The optimal value. Determines which zone is "good" relative to `low`/`high`. |
+| `attributes` | object |         | Additional Drupal attributes object.                                         |
 
 ## Semantic State Reference
 
 The component resolves a semantic state from the numeric values and applies color automatically via CSS custom properties:
 
-| State     | Meaning                               | CSS Custom Property             |
-|-----------|---------------------------------------|---------------------------------|
-| `default` | No threshold attributes set           | `--hx-meter-indicator-color`   |
-| `optimum` | Value is in the optimal zone          | `--hx-meter-color-optimum`     |
-| `warning` | Value is outside the optimal zone     | `--hx-meter-color-warning`     |
-| `danger`  | Value is in the least desirable zone  | `--hx-meter-color-danger`      |
+| State     | Meaning                              | CSS Custom Property          |
+| --------- | ------------------------------------ | ---------------------------- |
+| `default` | No threshold attributes set          | `--hx-meter-indicator-color` |
+| `optimum` | Value is in the optimal zone         | `--hx-meter-color-optimum`   |
+| `warning` | Value is outside the optimal zone    | `--hx-meter-color-warning`   |
+| `danger`  | Value is in the least desirable zone | `--hx-meter-color-danger`    |
 
 ## Healthcare Examples
 
@@ -140,7 +140,7 @@ For automated rendering from entity fields, consider a custom `FieldFormatter` p
 - The component exposes `role="meter"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and `aria-valuetext`.
 - `aria-valuetext` includes the semantic state: `"75 of 100 — warning"` or `"50 of 100 — optimum"`.
 - The `label` attribute provides the accessible name. Always supply a meaningful label.
-- The meter element is focusable (`tabindex="0"`) so keyboard users can receive the tooltip and value context.
+- Keyboard focusability (`tabindex="0"`) is not yet implemented. See outstanding P2 finding in AUDIT.md.
 
 ## Asset Loading
 

@@ -57,7 +57,7 @@
   {% if drawer_id %}id="{{ drawer_id }}"{% endif %}
   placement="{{ _placement }}"
   size="{{ _size }}"
-  {% if label and not label_content %}label="{{ label }}"{% endif %}
+  {% if not label_content %}label="{{ label|default('Drawer') }}"{% endif %}
   {% if open %}open{% endif %}
   {% if contained %}contained{% endif %}
   {% if no_header %}no-header{% endif %}

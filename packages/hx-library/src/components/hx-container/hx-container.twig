@@ -51,7 +51,7 @@
 <hx-container
   width="{{ _width }}"
   padding="{{ _padding }}"
-  {% if bg_color %}style="--hx-container-bg: {{ bg_color }};"{% endif %}
+  {% if bg_color %}style="--hx-container-bg: {{ bg_color|escape('css') }};"{% endif %}
   {% if attributes %}{{ attributes }}{% endif %}
 >
   {{ content }}

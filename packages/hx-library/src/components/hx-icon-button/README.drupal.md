@@ -2,7 +2,7 @@
 
 ## Overview
 
-`hx-icon-button` renders a square icon-only button (or anchor link) with full accessibility support. The `label` attribute is mandatory — it provides the accessible name via `aria-label` and a native tooltip via `title`. The component renders nothing and emits a `console.warn` when `label` is absent.
+`hx-icon-button` renders a square icon-only button (or anchor link) with full accessibility support. The `label` attribute is mandatory — it provides the accessible name via `aria-label` and a native tooltip via `title`. The component renders nothing when `label` is absent.
 
 **Note on `hx-size`:** The size attribute uses the non-standard `hx-size` name (not `size`). This must be set explicitly in Twig templates.
 
@@ -29,28 +29,28 @@ Use the provided `hx-icon-button.twig` template or render the component directly
 
 ## Template Variables
 
-| Variable     | Type                                                       | Default   | Description                                                                       |
-|--------------|---------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------|
-| `label`      | string                                                        | —         | **Required.** Accessible name (aria-label + title). Component renders nothing if absent. |
-| `variant`    | `'ghost'` \| `'primary'` \| `'secondary'` \| `'tertiary'` \| `'danger'` | `'ghost'` | Visual style variant |
-| `hx_size`    | `'sm'` \| `'md'` \| `'lg'`                                   | `'md'`    | Button size. Maps to the `hx-size` attribute (not `size`).                        |
-| `type`       | `'button'` \| `'submit'` \| `'reset'`                        | `'button'`| Button type. Ignored when `href` is set.                                          |
-| `disabled`   | boolean                                                       | `false`   | Disables the button.                                                              |
-| `href`       | string                                                        |           | When set, renders an `<a>` element. Disabled anchor sets `tabindex="-1"`.         |
-| `name`       | string                                                        |           | Form field name (button mode only).                                               |
-| `value`      | string                                                        |           | Form field value (button mode only).                                              |
-| `icon`       | markup                                                        | —         | **Required.** Icon markup for the default slot (hx-icon, SVG, or img).           |
-| `attributes` | Drupal attributes object                                      |           | Additional HTML attributes forwarded to the element.                              |
+| Variable     | Type                                                                    | Default    | Description                                                                              |
+| ------------ | ----------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------- |
+| `label`      | string                                                                  | —          | **Required.** Accessible name (aria-label + title). Component renders nothing if absent. |
+| `variant`    | `'ghost'` \| `'primary'` \| `'secondary'` \| `'tertiary'` \| `'danger'` | `'ghost'`  | Visual style variant                                                                     |
+| `hx_size`    | `'sm'` \| `'md'` \| `'lg'`                                              | `'md'`     | Button size. Maps to the `hx-size` attribute (not `size`).                               |
+| `type`       | `'button'` \| `'submit'` \| `'reset'`                                   | `'button'` | Button type. Ignored when `href` is set.                                                 |
+| `disabled`   | boolean                                                                 | `false`    | Disables the button.                                                                     |
+| `href`       | string                                                                  |            | When set, renders an `<a>` element.                                                      |
+| `name`       | string                                                                  |            | Form field name (button mode only).                                                      |
+| `value`      | string                                                                  |            | Form field value (button mode only).                                                     |
+| `icon`       | markup                                                                  | —          | **Required.** Icon markup for the default slot (hx-icon, SVG, or img).                   |
+| `attributes` | Drupal attributes object                                                |            | Additional HTML attributes forwarded to the element.                                     |
 
 ## Attribute Reference
 
-| Attribute   | Drupal-safe? | Notes                                                                                            |
-|-------------|:------------:|--------------------------------------------------------------------------------------------------|
-| `label`     | Yes          | Required for accessibility. Use a meaningful action description, not just an icon name.          |
-| `variant`   | Yes          | String enum. `ghost` is appropriate for toolbar actions.                                         |
-| `hx-size`   | Yes          | Note the `hx-` prefix — this is NOT a standard HTML attribute name.                             |
-| `disabled`  | Yes          | Boolean attribute. Set via `?disabled=${disabled}` in PHP or `{% if disabled %}disabled{% endif %}` in Twig. |
-| `href`      | Yes          | String. When present, renders `<a>` instead of `<button>`.                                       |
+| Attribute  | Drupal-safe? | Notes                                                                                                        |
+| ---------- | :----------: | ------------------------------------------------------------------------------------------------------------ |
+| `label`    |     Yes      | Required for accessibility. Use a meaningful action description, not just an icon name.                      |
+| `variant`  |     Yes      | String enum. `ghost` is appropriate for toolbar actions.                                                     |
+| `hx-size`  |     Yes      | Note the `hx-` prefix — this is NOT a standard HTML attribute name.                                          |
+| `disabled` |     Yes      | Boolean attribute. Set via `?disabled=${disabled}` in PHP or `{% if disabled %}disabled{% endif %}` in Twig. |
+| `href`     |     Yes      | String. When present, renders `<a>` instead of `<button>`.                                                   |
 
 ## Healthcare Label Guidance
 

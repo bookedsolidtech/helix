@@ -144,7 +144,7 @@ The performance gate requires `< 5KB` per component (min+gz). No formal bundle s
 | HTMLElementTagNameMap                      | PASS     | Global type augmentation present for `'hx-container': HelixContainer`.                                                                                                                                                                  |
 | classMap directive                         | PASS     | Width variant classes applied via `classMap()`. Correct conditional class generation.                                                                                                                                                   |
 | Test count                                 | 40 tests | Rendering (3), width (7), padding (6), attribute reflection (2), slots (2), CSS parts (1), CSS custom properties (3), layout behavior (3), computed padding (5), programmatic updates (2), CSS preset overrides (3), accessibility (3). |
-| Drupal compatibility                       | PASS     | Pure custom element with attribute-only API. Twig-renderable without modification. `hx-container.twig` template, `README.drupal.md` integration guide, and MDX docs Drupal section all present.                                        |
+| Drupal compatibility                       | PASS     | Pure custom element with attribute-only API. Twig-renderable without modification. `hx-container.twig` template, `README.drupal.md` integration guide, and MDX docs Drupal section all present.                                         |
 
 ---
 

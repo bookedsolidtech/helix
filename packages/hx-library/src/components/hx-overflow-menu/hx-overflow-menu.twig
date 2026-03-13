@@ -59,8 +59,8 @@
   placement="{{ _placement }}"
   hx-size="{{ _size }}"
   icon="{{ _icon }}"
-  {% if disabled %}disabled{% endif %}
-  {% if attributes %}{{ attributes }}{% endif %}
+  {% if disabled|default(false) %}disabled{% endif %}
+  {% if attributes|default('') %}{{ attributes }}{% endif %}
 >
   {% if actions %}
     {% for action in actions %}
