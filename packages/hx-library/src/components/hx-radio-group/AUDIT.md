@@ -321,3 +321,12 @@ it('has no axe violations in default state', async () => {
 **Total findings: 3 P0, 7 P1, 8 P2**
 
 The component is **not shippable** in its current state. The three P0 items (invisible keyboard focus, Space key inoperability, uninitialized required validation) are WCAG 2.1 AA violations and form correctness failures. All must be resolved before merge.
+
+---
+
+## CSS Audit Fixes Applied (2026-03-12)
+
+| Finding | Fix Applied |
+|---------|-------------|
+| Missing `prefers-reduced-motion` on `hx-radio` transitions | Added `@media (prefers-reduced-motion: reduce)` block disabling `.radio__control` and `.radio__dot` transitions in `hx-radio.styles.ts` |
+| Missing component-level help text color token | Added `--hx-radio-group-help-text-color` CSS custom property to `.fieldset__help-text` in `hx-radio-group.styles.ts` and `@cssprop` documentation in `hx-radio-group.ts` |

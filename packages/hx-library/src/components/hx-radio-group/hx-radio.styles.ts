@@ -31,10 +31,10 @@ export const helixRadioStyles = css`
 
   .radio__input {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    width: var(--hx-space-px);
+    height: var(--hx-space-px);
     padding: 0;
-    margin: -1px;
+    margin: calc(var(--hx-space-px) * -1);
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
@@ -106,5 +106,14 @@ export const helixRadioStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  /* ─── Reduced Motion ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    .radio__control,
+    .radio__dot {
+      transition: none;
+    }
   }
 `;
