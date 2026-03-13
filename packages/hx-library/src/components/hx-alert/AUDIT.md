@@ -116,7 +116,7 @@ These gaps reduce documentation coverage and make the Storybook playground incom
 
 **Fix direction:** Add dedicated stories: `AccentVariant`, `WithTitle`, `FocusReturn`.
 
-### P2-05: CSS Parts demo story references 5 parts but component exposes 6
+### ~~P2-05: CSS Parts demo story references 5 parts but component exposes 6~~ FIXED
 
 **File:** `hx-alert.stories.ts` — CSSParts story JSDoc (line ~784)
 
@@ -127,6 +127,8 @@ These gaps reduce documentation coverage and make the Storybook playground incom
 The component exposes 6 parts: `alert`, `title`, `icon`, `message`, `close-button`, `actions`. The `title` part was added after this story was written.
 
 **Fix direction:** Update JSDoc to say "6 CSS `::part()` targets" and add `::part(title)` styling to the demo.
+
+**Fix:** The JSDoc at the top of `CSSParts` story already says "6 CSS `::part()` targets" (correct). Updated the body text in the alert's inner content from "5 CSS parts" to "6 CSS parts" and added `::part(title)` to the enumerated list.
 
 ### P2-06: `AlertVariant` type not exported
 

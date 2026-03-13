@@ -100,15 +100,22 @@ export const helixBadgeStyles = css`
     border-radius: var(--hx-border-radius-full, 9999px);
   }
 
+  /* Guard: hide prefix slot and slotted content in dot mode to prevent overflow */
+  .badge--dot ::slotted(*) {
+    display: none;
+  }
+
   /* ─── Pulse Animation ─── */
 
   @keyframes wc-badge-pulse {
     0%,
     100% {
       opacity: 1;
+      box-shadow: 0 0 0 0 var(--hx-badge-pulse-color, currentColor);
     }
     50% {
-      opacity: 0.5;
+      opacity: 0.7;
+      box-shadow: 0 0 0 4px transparent;
     }
   }
 

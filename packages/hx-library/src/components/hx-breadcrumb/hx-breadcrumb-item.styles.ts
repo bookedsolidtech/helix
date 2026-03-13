@@ -6,6 +6,13 @@ export const helixBreadcrumbItemStyles = css`
     align-items: center;
   }
 
+  /*
+   * display: contents removes [part='item'] from the box model entirely.
+   * This is intentional — the wrapper exists only for slot selection purposes.
+   * Consumers using ::part(item) CANNOT apply box-model properties (padding,
+   * margin, background, border) to this part. Use ::part(link) or ::part(text)
+   * for visual styling of breadcrumb item content.
+   */
   [part='item'] {
     display: contents;
   }
