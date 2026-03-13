@@ -1511,7 +1511,7 @@ If you've worked through this guide and still have issues:
 
 ### 2. Search Existing Issues
 
-[GitHub Issues](https://github.com/your-org/helix/issues) - Search for your error message or symptom.
+[GitHub Issues](https://github.com/bookedsolidtech/helix/issues) - Search for your error message or symptom.
 
 ### 3. File a Bug Report
 
@@ -1591,4 +1591,4 @@ drush cr && \
 
 ---
 
-**Have a troubleshooting tip not covered here?** [Contribute to this guide](https://github.com/your-org/helix/edit/main/apps/docs/src/content/docs/drupal-integration/troubleshooting/common-issues.md)
+**Have a troubleshooting tip not covered here?** [Contribute to this guide](https://github.com/bookedsolidtech/helix/edit/main/apps/docs/src/content/docs/drupal-integration/troubleshooting/common-issues.md)
