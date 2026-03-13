@@ -423,11 +423,11 @@ When the card is used as a linked card (`hx-href`), the navigation is handled vi
 
 ## Drupal Fixes Applied
 
-| Finding | Status |
-|---------|--------|
-| P2-16: No documented Drupal usage example or Twig template | **FIXED** — `hx-card.twig` template created with variant, elevation, hx-href, slots, and conditional rendering. `README.drupal.md` created with full Drupal integration guide. |
+| Finding                                                           | Status                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P2-16: No documented Drupal usage example or Twig template        | **FIXED** — `hx-card.twig` template created with variant, elevation, hx-href, slots, and conditional rendering. `README.drupal.md` created with full Drupal integration guide.                                                                     |
 | P2-17: `hx-card-click` event has no Drupal behavior documentation | **FIXED** — `README.drupal.md` includes full Drupal behaviors example for `hx-click` navigation, AJAX navigation, and anti-pattern warning for `hx-href + actions` slot. Renamed event note: the component fires `hx-click` (not `hx-card-click`). |
 
 ---
 
-*Audit complete. Do not modify the component source. Fix forward in separate tickets.*
+_Audit complete. Do not modify the component source. Fix forward in separate tickets._

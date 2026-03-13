@@ -311,13 +311,13 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 
 ## Drupal Fixes Applied
 
-| Finding | Status |
-|---------|--------|
-| P1: `formResetCallback` resets to `min` not `value` default — breaks Drupal forms | **FIXED** — `formResetCallback()` now reads the `value` attribute to determine the default, with `_clamp()` applied. A `<hx-slider value="5" min="0">` resets to `5`. |
-| P1: `formStateRestoreCallback` missing `reason` param and doesn't clamp | **FIXED** — Signature updated to `(state: string \| File \| FormData \| null, _reason: string)`. Restored value is clamped via `_clamp()`. |
-| P2: No progressive-enhancement fallback | **FIXED** — `README.drupal.md` documents the `<noscript>` fallback pattern for Drupal form contexts where JS may be unavailable. |
-| Missing Twig template | **FIXED** — `hx-slider.twig` template created with all properties, slot examples, and boolean attribute patterns. |
-| Missing Drupal integration documentation | **FIXED** — `README.drupal.md` created with form integration, FormData submission, Drupal behaviors example, progressive enhancement, and attribute compatibility notes. |
+| Finding                                                                           | Status                                                                                                                                                                   |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P1: `formResetCallback` resets to `min` not `value` default — breaks Drupal forms | **FIXED** — `formResetCallback()` now reads the `value` attribute to determine the default, with `_clamp()` applied. A `<hx-slider value="5" min="0">` resets to `5`.    |
+| P1: `formStateRestoreCallback` missing `reason` param and doesn't clamp           | **FIXED** — Signature updated to `(state: string \| File \| FormData \| null, _reason: string)`. Restored value is clamped via `_clamp()`.                               |
+| P2: No progressive-enhancement fallback                                           | **FIXED** — `README.drupal.md` documents the `<noscript>` fallback pattern for Drupal form contexts where JS may be unavailable.                                         |
+| Missing Twig template                                                             | **FIXED** — `hx-slider.twig` template created with all properties, slot examples, and boolean attribute patterns.                                                        |
+| Missing Drupal integration documentation                                          | **FIXED** — `README.drupal.md` created with form integration, FormData submission, Drupal behaviors example, progressive enhancement, and attribute compatibility notes. |
 
 ---
 
