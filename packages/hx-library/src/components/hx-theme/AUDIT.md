@@ -33,6 +33,7 @@ More critically: the test at line 99-104 asserts that `high-contrast` mode injec
 **File:** `hx-theme.ts:7, 48`
 
 The feature spec requires `color-scheme (light/dark/auto)` typed. The component uses a separate boolean `system` prop instead of `ThemeName = 'light' | 'dark' | 'auto' | 'high-contrast'`. This creates a split API where:
+
 - `effectiveTheme` can only return `'light' | 'dark'` when `system=true` (line 87), never `'high-contrast'`
 - Consumers cannot serialize or deserialize the full theme state from a single attribute
 - The `theme` attribute on the element will be `"light"` even when the actual effective theme is dark via `system=true` — misleading for attribute-based consumers
@@ -70,6 +71,7 @@ The `@deprecated` JSDoc comment is only on the declaration in `hx-theme.ts:156`.
 **File:** `hx-theme.styles.ts`
 
 When `theme="dark"` or `theme="high-contrast"` is active, the browser's built-in dark-mode rendering for form controls, scrollbars, `<input>` backgrounds, and `<select>` elements will not adapt unless `color-scheme: dark` is declared on the containing element. The styles only set `display: contents`. The dynamically injected stylesheet (`_buildTokenCss`) generates `:host { ...tokens... }` but never includes `color-scheme`. This means:
+
 - Browser UI chrome stays light regardless of applied theme
 - `<input>` elements inside the themed scope will have white backgrounds in dark mode
 - This is a significant visual accessibility regression
@@ -153,6 +155,7 @@ The dark column uses `var(--hx-color-border-default, #374151)` and `var(--hx-col
 **Architecture reference:** `CLAUDE.md` — "Three-tier cascade: Primitive → Semantic → Component"
 
 The `hx-theme` component only implements two tiers: it injects both primitive tokens (`--hx-color-primary-500`) and semantic tokens (`--hx-color-text-primary`) directly onto `:host`. Component-tier tokens (e.g., `--hx-button-bg`, `--hx-card-padding`) are not in scope for `hx-theme`, but the component makes no distinction between tiers in its injection strategy. Primitives and semantics are dumped together from `tokenEntries` with no tier separation. This means:
+
 - Consumers cannot override only semantic tokens without also overriding primitives
 - The component token tier (`--wc-*` prefix per CLAUDE.md examples) is not represented
 - The documented cascade pattern is implemented differently than specified
@@ -216,6 +219,7 @@ The feature spec states: "applicable as body/section attribute." In Drupal, serv
 ### P1 — No Drupal Twig example or documentation
 
 The component's JSDoc does not include a Drupal usage example. Enterprise Drupal consumers need to know:
+
 - Whether to use `<hx-theme>` as a block-level wrapper in Twig templates
 - How to pass the `theme` attribute from Drupal's theme configuration
 - Whether JavaScript is required for theme application (it is — `firstUpdated` triggers token injection)
@@ -230,37 +234,37 @@ The component's JSDoc does not include a Drupal usage example. Enterprise Drupal
 
 ## Findings Summary Table
 
-| # | Area | Severity | Finding |
-|---|------|----------|---------|
-| 1 | TypeScript | P0 | Dark token override mechanism relies on undocumented `var()` chain semantics; `high-contrast` confirming a defect via passing test |
-| 2 | TypeScript | P0 | `ThemeName` missing `'auto'`; `system` boolean creates split unserializable API |
-| 3 | TypeScript | P1 | No exported token override types |
-| 4 | TypeScript | P1 | `firstUpdated()` missing `super.firstUpdated()` |
-| 5 | TypeScript | P2 | `WcTheme` deprecated alias not annotated in `index.ts` |
-| 6 | Accessibility | P0 | `theme="high-contrast"` is `theme="dark"` with no distinct token set; HC is a healthcare compliance requirement |
-| 7 | Accessibility | P1 | No `color-scheme` CSS property; browser form controls stay light in dark/HC mode |
-| 8 | Accessibility | P1 | Axe-core tests test structure only, not contrast ratios |
-| 9 | Accessibility | P2 | No AT announcement when theme changes via system mode |
-| 10 | Tests | P1 | No nested theme test |
-| 11 | Tests | P1 | No token override / consumer override test |
-| 12 | Tests | P1 | System mode tests verify `effectiveTheme` string only, not actual token injection |
-| 13 | Tests | P2 | `disconnectedCallback` / listener cleanup not tested |
-| 14 | Tests | P2 | Token value assertions hardcode resolved values, not derived from token source |
-| 15 | Tests | P2 | No coverage threshold enforcement |
-| 16 | Storybook | P1 | No contrast checker integration (spec requirement) |
-| 17 | Storybook | P1 | No nested theme story |
-| 18 | Storybook | P2 | `ThemeSwitcherDemo` uses loose element cast instead of `HelixTheme` type |
-| 19 | Storybook | P2 | `SideBySide` story uses hardcoded fallback hex values |
-| 20 | CSS | P0 | Three-tier token cascade not implemented (primitives and semantics injected together with no tier distinction) |
-| 21 | CSS | P1 | `color-scheme` property missing from dynamic token stylesheet |
-| 22 | CSS | P2 | Redundant `display: contents` on `.theme-base` wrapper — intent undocumented |
-| 23 | Performance | P0 | Bundle almost certainly exceeds 5KB — full `TokenEntry[]` arrays (with metadata) bundled |
-| 24 | Performance | P1 | No memoization of generated CSS strings per theme |
-| 25 | Performance | P1 | `CSSStyleSheet.replaceSync()` is synchronous; `replace()` async API should be used |
-| 26 | Performance | P2 | All tokens eagerly loaded at module parse time |
-| 27 | Drupal | P1 | No attribute-based (non-custom-element) application pattern; Drupal `body`/`section` use case unsupported |
-| 28 | Drupal | P1 | No Twig example or server-rendered usage documentation |
-| 29 | Drupal | P2 | `system` mode has no `window` guard for SSR/pre-render contexts |
+| #   | Area          | Severity | Finding                                                                                                                            |
+| --- | ------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | TypeScript    | P0       | Dark token override mechanism relies on undocumented `var()` chain semantics; `high-contrast` confirming a defect via passing test |
+| 2   | TypeScript    | P0       | `ThemeName` missing `'auto'`; `system` boolean creates split unserializable API                                                    |
+| 3   | TypeScript    | P1       | No exported token override types                                                                                                   |
+| 4   | TypeScript    | P1       | `firstUpdated()` missing `super.firstUpdated()`                                                                                    |
+| 5   | TypeScript    | P2       | `WcTheme` deprecated alias not annotated in `index.ts`                                                                             |
+| 6   | Accessibility | P0       | `theme="high-contrast"` is `theme="dark"` with no distinct token set; HC is a healthcare compliance requirement                    |
+| 7   | Accessibility | P1       | No `color-scheme` CSS property; browser form controls stay light in dark/HC mode                                                   |
+| 8   | Accessibility | P1       | Axe-core tests test structure only, not contrast ratios                                                                            |
+| 9   | Accessibility | P2       | No AT announcement when theme changes via system mode                                                                              |
+| 10  | Tests         | P1       | No nested theme test                                                                                                               |
+| 11  | Tests         | P1       | No token override / consumer override test                                                                                         |
+| 12  | Tests         | P1       | System mode tests verify `effectiveTheme` string only, not actual token injection                                                  |
+| 13  | Tests         | P2       | `disconnectedCallback` / listener cleanup not tested                                                                               |
+| 14  | Tests         | P2       | Token value assertions hardcode resolved values, not derived from token source                                                     |
+| 15  | Tests         | P2       | No coverage threshold enforcement                                                                                                  |
+| 16  | Storybook     | P1       | No contrast checker integration (spec requirement)                                                                                 |
+| 17  | Storybook     | P1       | No nested theme story                                                                                                              |
+| 18  | Storybook     | P2       | `ThemeSwitcherDemo` uses loose element cast instead of `HelixTheme` type                                                           |
+| 19  | Storybook     | P2       | `SideBySide` story uses hardcoded fallback hex values                                                                              |
+| 20  | CSS           | P0       | Three-tier token cascade not implemented (primitives and semantics injected together with no tier distinction)                     |
+| 21  | CSS           | P1       | `color-scheme` property missing from dynamic token stylesheet                                                                      |
+| 22  | CSS           | P2       | Redundant `display: contents` on `.theme-base` wrapper — intent undocumented                                                       |
+| 23  | Performance   | P0       | Bundle almost certainly exceeds 5KB — full `TokenEntry[]` arrays (with metadata) bundled                                           |
+| 24  | Performance   | P1       | No memoization of generated CSS strings per theme                                                                                  |
+| 25  | Performance   | P1       | `CSSStyleSheet.replaceSync()` is synchronous; `replace()` async API should be used                                                 |
+| 26  | Performance   | P2       | All tokens eagerly loaded at module parse time                                                                                     |
+| 27  | Drupal        | P1       | No attribute-based (non-custom-element) application pattern; Drupal `body`/`section` use case unsupported                          |
+| 28  | Drupal        | P1       | No Twig example or server-rendered usage documentation                                                                             |
+| 29  | Drupal        | P2       | `system` mode has no `window` guard for SSR/pre-render contexts                                                                    |
 
 ---
 
@@ -275,15 +279,15 @@ The component's JSDoc does not include a Drupal usage example. Enterprise Drupal
 
 ## TypeScript Audit Fixes Applied (2026-03-13)
 
-| Finding | Status |
-|---------|--------|
-| P0-02: `ThemeName` missing `'auto'`; `system` prop untyped workaround | **FIXED** — `ThemeName` updated to `'light' \| 'dark' \| 'high-contrast' \| 'auto'`; `system` prop retained as `@deprecated` backward-compat shim; `theme="auto"` now reads OS preference via `effectiveTheme` getter |
-| P0-01: High-contrast is a stub (dark tokens reused) | **FIXED** — dedicated `_hcOverrides` constant with WCAG 7:1+ contrast values added to `hx-theme.ts`; high-contrast theme now injects distinct token set independent of dark tokens |
-| P1-01: No exported token override types | **FIXED** — `export type { TokenDefinition, TokenEntry } from '@helixui/tokens'` re-exported from `hx-theme.ts`; both types also re-exported from `index.ts` |
-| P1-02: `firstUpdated()` missing `super.firstUpdated()` | **FIXED** — `super.firstUpdated(changed)` call added as first statement of `firstUpdated()` |
-| P2-01: `WcTheme` deprecated alias lacks `@deprecated` in `index.ts` | **FIXED** — `HxTheme` canonical alias added to `hx-theme.ts` and `index.ts`; `WcTheme` deprecated alias added with `@deprecated` JSDoc in both files |
-| P2-06: `ThemeSwitcherDemo` uses loose `as HTMLElement & { theme: string }` cast | **FIXED** — `import type { HelixTheme }` added to `hx-theme.stories.ts`; all inline casts now use `as HelixTheme` |
-| P1-03/P1-10: No `color-scheme` CSS property | **FIXED** — `color-scheme: dark` injected into `:host` block for `dark` and `high-contrast` themes; `color-scheme: light` for `light`/`auto` light-mode resolution |
-| P1-11: No memoization of CSS strings | **FIXED** — module-level `_cssCache: Map<ThemeName, string>` added; `_buildThemeCss(theme)` returns cached string on subsequent calls |
-| P1-12: `CSSStyleSheet.replaceSync()` synchronous | **FIXED** — switched to async `this._themeSheet.replace(...)` via `void` promise |
-| Drupal `window` guard for SSR | **FIXED** — `typeof window === 'undefined'` guard added in `_attachMediaQuery()` and `effectiveTheme` getter |
+| Finding                                                                         | Status                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0-02: `ThemeName` missing `'auto'`; `system` prop untyped workaround           | **FIXED** — `ThemeName` updated to `'light' \| 'dark' \| 'high-contrast' \| 'auto'`; `system` prop retained as `@deprecated` backward-compat shim; `theme="auto"` now reads OS preference via `effectiveTheme` getter |
+| P0-01: High-contrast is a stub (dark tokens reused)                             | **FIXED** — dedicated `_hcOverrides` constant with WCAG 7:1+ contrast values added to `hx-theme.ts`; high-contrast theme now injects distinct token set independent of dark tokens                                    |
+| P1-01: No exported token override types                                         | **FIXED** — `export type { TokenDefinition, TokenEntry } from '@helixui/tokens'` re-exported from `hx-theme.ts`; both types also re-exported from `index.ts`                                                          |
+| P1-02: `firstUpdated()` missing `super.firstUpdated()`                          | **FIXED** — `super.firstUpdated(changed)` call added as first statement of `firstUpdated()`                                                                                                                           |
+| P2-01: `WcTheme` deprecated alias lacks `@deprecated` in `index.ts`             | **FIXED** — `HxTheme` canonical alias added to `hx-theme.ts` and `index.ts`; `WcTheme` deprecated alias added with `@deprecated` JSDoc in both files                                                                  |
+| P2-06: `ThemeSwitcherDemo` uses loose `as HTMLElement & { theme: string }` cast | **FIXED** — `import type { HelixTheme }` added to `hx-theme.stories.ts`; all inline casts now use `as HelixTheme`                                                                                                     |
+| P1-03/P1-10: No `color-scheme` CSS property                                     | **FIXED** — `color-scheme: dark` injected into `:host` block for `dark` and `high-contrast` themes; `color-scheme: light` for `light`/`auto` light-mode resolution                                                    |
+| P1-11: No memoization of CSS strings                                            | **FIXED** — module-level `_cssCache: Map<ThemeName, string>` added; `_buildThemeCss(theme)` returns cached string on subsequent calls                                                                                 |
+| P1-12: `CSSStyleSheet.replaceSync()` synchronous                                | **FIXED** — switched to async `this._themeSheet.replace(...)` via `void` promise                                                                                                                                      |
+| Drupal `window` guard for SSR                                                   | **FIXED** — `typeof window === 'undefined'` guard added in `_attachMediaQuery()` and `effectiveTheme` getter                                                                                                          |

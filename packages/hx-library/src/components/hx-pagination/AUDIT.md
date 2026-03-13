@@ -336,12 +336,12 @@ The following aspects of the implementation are well-executed and should be pres
 
 ## TypeScript Audit Fixes Applied (2026-03-13)
 
-| Finding | Status |
-|---------|--------|
-| P0-01: `page-size` property/event entirely absent | **FIXED** — `pageSize` property, `showPageSize` boolean, `hx-page-size-change` event, and page-size selector UI added to `hx-pagination.ts` |
-| P1-01: `as number` cast on `endPages[0]` | **FIXED** — replaced `(endPages[0] as number)` with non-null assertion `endPages[0]!` backed by the `endPages.length > 0` guard |
-| P2-01: `reflect: true` on `currentPage` causes DOM churn | **FIXED** — removed `reflect: true` from `currentPage` property declaration; only configuration properties reflect |
-| P2-12: `_buildPageRange()` not memoized | **FIXED** — `_pageRangeCache` keyed by `totalPages-currentPage-siblingCount-boundaryCount` introduced; `_buildPageRange()` returns cached result on cache hit |
-| P1-02: `aria-live` region for page-change announcements | **FIXED** — `_liveMessage` state and `aria-live="polite"` visually-hidden `<span>` added; updated by `_navigate()` with "Page N of M" message |
-| P1-04: Accessibility: `<ul>` needs `role="list"` for Safari VoiceOver | **FIXED** — `role="list"` added to `<ul class="list">` |
-| `HxPagination` type alias missing | **FIXED** — `export type HxPagination = HelixPagination` added to `hx-pagination.ts` and re-exported from `index.ts` |
+| Finding                                                               | Status                                                                                                                                                        |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0-01: `page-size` property/event entirely absent                     | **FIXED** — `pageSize` property, `showPageSize` boolean, `hx-page-size-change` event, and page-size selector UI added to `hx-pagination.ts`                   |
+| P1-01: `as number` cast on `endPages[0]`                              | **FIXED** — replaced `(endPages[0] as number)` with non-null assertion `endPages[0]!` backed by the `endPages.length > 0` guard                               |
+| P2-01: `reflect: true` on `currentPage` causes DOM churn              | **FIXED** — removed `reflect: true` from `currentPage` property declaration; only configuration properties reflect                                            |
+| P2-12: `_buildPageRange()` not memoized                               | **FIXED** — `_pageRangeCache` keyed by `totalPages-currentPage-siblingCount-boundaryCount` introduced; `_buildPageRange()` returns cached result on cache hit |
+| P1-02: `aria-live` region for page-change announcements               | **FIXED** — `_liveMessage` state and `aria-live="polite"` visually-hidden `<span>` added; updated by `_navigate()` with "Page N of M" message                 |
+| P1-04: Accessibility: `<ul>` needs `role="list"` for Safari VoiceOver | **FIXED** — `role="list"` added to `<ul class="list">`                                                                                                        |
+| `HxPagination` type alias missing                                     | **FIXED** — `export type HxPagination = HelixPagination` added to `hx-pagination.ts` and re-exported from `index.ts`                                          |
