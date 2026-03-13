@@ -115,7 +115,7 @@ The listener should be on `document` while the popover is open (added in `_show`
 
 ## P2 — Medium (code quality / completeness)
 
-### P2-01: Hardcoded `rgba(0,0,0,0.12)` fallback in box-shadow
+### P2-01: Hardcoded `rgba(0,0,0,0.12)` fallback in box-shadow — **[FIXED]**
 
 **File:** `hx-popover.styles.ts`, line 25
 
@@ -125,11 +125,15 @@ box-shadow: var(--hx-popover-shadow, 0 4px 16px rgba(0, 0, 0, 0.12));
 
 The fallback `0 4px 16px rgba(0, 0, 0, 0.12)` is a hardcoded value. The project convention (CLAUDE.md) requires: "No hardcoded values — Colors, spacing, typography, and timing use design tokens. Always." This should use `var(--hx-shadow-md)` or an equivalent token, with the raw value as the last resort only if no token exists.
 
+**Resolution:** Updated to use `var(--hx-shadow-md, 0 4px 16px var(--hx-overlay-black-12, rgba(0, 0, 0, 0.12)))` — token cascade with `--hx-overlay-black-12` semantic token as intermediate fallback.
+
 ---
 
 ### P2-02: Arrow border clipping — wrong border side shown for each placement ✅ FIXED
 
 **Resolution:** `_updatePosition()` now resets all four border sides on the arrow element and then applies `1px solid transparent` to the two inward-facing sides for each placement direction via `innerBorderMap`. The mapping (`bottom → border-bottom + border-right`, `top → border-top + border-left`, `right → border-top + border-right`, `left → border-bottom + border-left`) ensures only the two outward-facing corner edges of the rotated square are visible, eliminating the inner border artefact.
+
+**Resolution:** `_updatePosition` now resets all four border sides then applies `1px solid transparent` to the two inward-facing sides via an `innerBorderMap` keyed by `basePlacement`. Only the outward corner border remains visible.
 
 ---
 
@@ -149,7 +153,7 @@ The `Placements` story iterates over `['top', 'bottom', 'left', 'right']` — on
 
 ---
 
-### P2-05: `display: inline-block` on `:host` may cause unexpected layout behavior
+### P2-05: `display: inline-block` on `:host` may cause unexpected layout behavior — **[FIXED]**
 
 **File:** `hx-popover.styles.ts`, line 5
 
@@ -161,6 +165,8 @@ The `Placements` story iterates over `['top', 'bottom', 'left', 'right']` — on
 ```
 
 The `position: relative` on `:host` is vestigial — the popover body uses `position: fixed` and is positioned via Floating UI, so the `:host` offset origin is irrelevant. More importantly, `display: inline-block` causes the component to collapse to zero height in flex/grid containers when the anchor slot is empty, potentially affecting page layout in ways that are hard to debug. Consider `display: contents` with inline-block applied only to `.trigger-wrapper`, or document the expected host display behavior.
+
+**Resolution:** `:host` now uses `display: contents`; `.trigger-wrapper` uses `display: inline-block`. The vestigial `position: relative` on `:host` has been removed.
 
 ---
 

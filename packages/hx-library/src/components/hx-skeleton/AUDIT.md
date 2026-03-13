@@ -95,7 +95,7 @@ Whether this is a spec change or implementation error is unresolved, but the mis
 
 ---
 
-### P1-03: `prefers-reduced-motion` leaves static shimmer gradient visible
+### P1-03: `prefers-reduced-motion` leaves static shimmer gradient visible — **[FIXED]**
 
 **File:** `hx-skeleton.styles.ts:68–72`
 **Area:** Accessibility / CSS
@@ -110,15 +110,7 @@ Whether this is a spec change or implementation error is unresolved, but the mis
 
 `animation: none` stops the shimmer movement but **the `::after` pseudo-element remains rendered** with its `linear-gradient` background. This creates a permanent, static light-band overlay on the skeleton placeholder that appears frozen. For users with vestibular disorders who opt into `prefers-reduced-motion`, this static visual artifact may still cause discomfort and is inconsistent with WCAG SC 2.3.3 (Animation from Interactions).
 
-The correct fix is:
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  .skeleton--animated::after {
-    display: none; /* or opacity: 0 */
-  }
-}
-```
+**Resolution:** Changed to `display: none` on the `::after` pseudo-element under `prefers-reduced-motion: reduce` — the shimmer overlay is fully removed rather than frozen.
 
 ---
 
@@ -167,7 +159,7 @@ The component is not verified Drupal-renderable per the CLAUDE.md requirement.
 
 ## P2 — Medium Priority
 
-### P2-01: No `--hx-skeleton-circle-radius` CSS custom property
+### P2-01: No `--hx-skeleton-circle-radius` CSS custom property — **[FIXED]**
 
 **File:** `hx-skeleton.styles.ts:26–31`
 **Area:** CSS / Design Tokens
@@ -178,13 +170,9 @@ Three of the four variants expose a border-radius token:
 - `--hx-skeleton-rect-radius`
 - `--hx-skeleton-button-radius`
 
-But `.skeleton--circle` hardcodes `border-radius: 50%` with no override token. This is inconsistent — consumers cannot theme the circle radius (e.g., for a rounded-rectangle avatar skeleton) without CSS part overrides. Should be:
+But `.skeleton--circle` hardcodes `border-radius: 50%` with no override token. This is inconsistent — consumers cannot theme the circle radius (e.g., for a rounded-rectangle avatar skeleton) without CSS part overrides.
 
-```css
-.skeleton--circle {
-  border-radius: var(--hx-skeleton-circle-radius, 50%);
-}
-```
+**Resolution:** `.skeleton--circle` now uses `border-radius: var(--hx-skeleton-circle-radius, 50%)` — consistent with other variant radius tokens.
 
 ---
 
@@ -201,7 +189,7 @@ No story demonstrates the transition from a skeleton state to real content. All 
 
 ---
 
-### P2-03: Shimmer `background-size` has no CSS variable override point
+### P2-03: Shimmer `background-size` has no CSS variable override point — **[FIXED]**
 
 **File:** `hx-skeleton.styles.ts:55`
 **Area:** CSS / Design Tokens
@@ -211,6 +199,8 @@ background-size: 200% 100%;
 ```
 
 The shimmer sweep width (`200%`) is hardcoded. There is no `--hx-skeleton-shimmer-width` or similar token to adjust shimmer intensity. This is inconsistent with the other exposed CSS custom properties and limits consumer theming flexibility.
+
+**Resolution:** Changed to `background-size: var(--hx-skeleton-shimmer-width, 200%) 100%` — consumers can now override shimmer sweep width via CSS custom property.
 
 ---
 
