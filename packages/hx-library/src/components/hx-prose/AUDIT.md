@@ -18,11 +18,11 @@
 
 ## Summary
 
-| Severity     | Total | Fixed | Open |
-| ------------ | ----- | ----- | ---- |
-| P0 (Blocker) | 2     | 1     | 1    |
-| P1 (High)    | 8     | 2     | 6    |
-| P2 (Medium)  | 8     | 1     | 7    |
+| Severity     | Count |
+| ------------ | ----- |
+| P0 (Blocker) | 2     |
+| P1 (High)    | 8     |
+| P2 (Medium)  | 8     |
 
 ---
 
@@ -41,7 +41,7 @@
 
 ---
 
-### P0-02: Test file imports nonexistent type `WcProse` ✅ FIXED
+### P0-02: Test file imports nonexistent type `WcProse`
 
 **File:** `hx-prose.test.ts`
 **Line:** 4
@@ -51,8 +51,6 @@ import type { WcProse } from './hx-prose.js';
 ```
 
 The component exports `HelixProse`, not `WcProse`. This import will produce a TypeScript error under strict mode (`'WcProse' is not exported from './hx-prose.js'`). The tests currently pass because the type is used only as a generic parameter to `fixture<WcProse>()`, and TypeScript may not enforce the import strictly in the test runner context — but it will fail `npm run type-check`. This is a broken type reference that violates the zero-TypeScript-errors gate.
-
-**Fix applied (2026-03-13):** Import updated to `HelixProse`.
 
 ---
 
@@ -142,7 +140,7 @@ hx-prose th {
 
 ---
 
-### P1-06: Test line-height assertion is trivially weak — doesn't enforce the healthcare mandate ✅ FIXED
+### P1-06: Test line-height assertion is trivially weak — doesn't enforce the healthcare mandate
 
 **File:** `hx-prose.test.ts`
 **Line:** 131
@@ -153,15 +151,11 @@ expect(parseFloat(computed.lineHeight)).toBeGreaterThan(0);
 
 The feature description explicitly states: "healthcare-appropriate spacing and readability (min 1.5 line-height for body copy)." This test checks `> 0` — any line-height including `1px` passes. The test should assert `toBeGreaterThanOrEqual(1.5)` to enforce the healthcare mandate. The requirement is documented but the gate is absent.
 
-**Fix applied (2026-03-13):** Assertion updated to enforce `lineHeightRatio >= 1.5` (line-height / font-size ratio).
-
 ---
 
-### P1-07: Missing test coverage for key content types ✅ FIXED
+### P1-07: Missing test coverage for key content types
 
 **File:** `hx-prose.test.ts`
-
-**Fix applied (2026-03-13):** Tests added for all cases listed below.
 
 The following test cases are absent:
 
@@ -276,11 +270,9 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### P2-07: Axe tests do not cover images without `alt` attribute ✅ FIXED
+### P2-07: Axe tests do not cover images without `alt` attribute
 
 **File:** `hx-prose.test.ts`
-
-**Fix applied (2026-03-13):** Three axe tests added for img missing alt (violation), decorative img with `alt=""` (pass), img with descriptive alt (pass).
 
 The accessibility test suite tests headings, tables, and lists with axe-core. There is no axe test for image content:
 
@@ -339,14 +331,3 @@ This is documented implicitly via the `prose.scoped.css` approach but should be 
 ### `AdoptedStylesheetsController` Cleanup
 
 The `stylesheet is removed on disconnect` test (line 87–110) tests that the sheet count decreases by exactly 1 on `el.remove()`. This assumes the controller deregisters exactly one sheet. The test would fail (false pass) if: (a) multiple prose instances exist, (b) the controller does not properly deregister, or (c) the test cleanup runs before the assertion. The test logic is sound for single-instance scenarios but may be fragile in parallel test runs.
-
----
-
-## Test Audit Fixes Applied (2026-03-13)
-
-| Finding                                             | Status                                                                                                                                                                                                             |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| P0-02: Test file imports nonexistent type `WcProse` | **FIXED** — test file now imports `HelixProse` (the correct export name)                                                                                                                                           |
-| P1-06: Line-height assertion trivially weak         | **FIXED** — test now asserts `lineHeightRatio >= 1.5` (line-height / font-size ratio), enforcing the healthcare mandate                                                                                            |
-| P1-07: Missing test coverage for key content types  | **FIXED** — tests added for: `size="lg"` variant, dynamic size update via `updated()`, blockquote border, pre/code monospace font, img block display, figure margin, definition list dt/dd, empty `maxWidth` reset |
-| P2-07: Axe tests do not cover images without `alt`  | **FIXED** — three axe tests added: img missing alt (expects violation), decorative img with `alt=""` (expects pass), img with descriptive alt (expects pass)                                                       |
