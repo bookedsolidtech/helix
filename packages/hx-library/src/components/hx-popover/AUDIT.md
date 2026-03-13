@@ -2,6 +2,7 @@
 
 **Reviewed:** `packages/hx-library/src/components/hx-popover/`
 **Files audited:**
+
 - `hx-popover.ts`
 - `hx-popover.styles.ts`
 - `hx-popover.test.ts`
@@ -13,7 +14,7 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 2     |
 | P1       | 7     |
 | P2       | 6     |
@@ -41,11 +42,13 @@ There is also no test coverage for click-outside behavior (because the feature i
 `role="dialog"` is unconditionally applied to the popover body for all trigger modes and all content types. The ARIA spec requires that when a `dialog` element is opened, focus must move into it (typically to the first focusable element or the dialog container itself). This implementation does **not** move focus on show.
 
 **Consequences:**
+
 - Screen readers announce the element as a dialog and expect focus to transfer in, but focus stays on the trigger.
 - VoiceOver (macOS/iOS) will not automatically read the popover content.
 - AT users on click-trigger mode will hear "button, collapsed" → click → focus stays on button → popover content is invisible to them unless they manually navigate.
 
 **Fix options (either acceptable):**
+
 1. Change `role` to `tooltip` for non-interactive / informational popovers and add a `role` property allowing callers to opt into `dialog` + focus management.
 2. Add `tabindex="-1"` to the body element and call `bodyEl.focus()` inside `_show()`, then return focus to the trigger inside `_hide()`.
 
