@@ -180,9 +180,9 @@ All configuration is via HTML attributes. No JavaScript dependencies are require
 ></hx-meter>
 ```
 
-### P2 — No Twig template or Drupal usage example documented
+### P2 — No Twig template or Drupal usage example documented ✅ FIXED
 
-There is no `hx-meter.twig` file or Drupal-specific documentation in the component directory. Other components in this library include integration examples. Consistency requires a Drupal usage example.
+**Resolution:** Added `hx-meter.twig` template covering all public properties (`value`, `min`, `max`, `label`, `low`, `high`, `optimum`). Added `README.drupal.md` with healthcare-specific examples (blood glucose lab value, medication adherence, patient risk score), a Views integration snippet, accessibility notes for `aria-valuetext`, and asset loading configuration.
 
 ---
 
@@ -208,7 +208,7 @@ There is no `hx-meter.twig` file or Drupal-specific documentation in the compone
 | 16  | Storybook     | P2       | No story for aria-label-only (no visible label) usage                                            |
 | 17  | CSS           | P2       | No `size` CSS variants or custom property                                                        |
 | 18  | Performance   | P2       | Bundle size not verified against 5KB gate for this component specifically                        |
-| 19  | Drupal        | P2       | No Twig template or Drupal usage example                                                         |
+| 19  | Drupal        | P2       | No Twig template or Drupal usage example ✅ FIXED                                                |
 
 **P0 findings: 0**
 **P1 findings: 6** (3 fixed: #3 track CSS part, #5 aria-valuetext tests, #6 slot-only label test)

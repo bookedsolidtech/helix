@@ -11,7 +11,7 @@ Antagonistic quality review of all files in `packages/hx-library/src/components/
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 0     |
 | P1       | 7     |
 | P2       | 6     |
@@ -70,9 +70,9 @@ When `href` is set and `disabled` is true, the component removes `href` (via `if
 ```html
 <!-- Current: -->
 <a part="button" aria-disabled="true" ...>
-
-<!-- Required: -->
-<a part="button" aria-disabled="true" tabindex="-1" ...>
+  <!-- Required: -->
+  <a part="button" aria-disabled="true" tabindex="-1" ...></a
+></a>
 ```
 
 ### P1-04: JSDoc claims console.warn is emitted — it is not
@@ -133,9 +133,9 @@ const _canvas = within(canvasElement);
 
 `_canvas` is never used. The underscore prefix suppresses linting but this is dead code that should be removed.
 
-### P2-04: No Drupal integration file or Twig template example
+### P2-04: No Drupal integration file or Twig template example ✅ FIXED
 
-The audit spec calls out Drupal as a required area. There is no Twig template, no `drupal-behaviors.js`, and no documentation of the Drupal consumption pattern. While Drupal integration may live in a separate package, the `hx-icon-button` folder has no reference to it. The non-standard `hx-size` attribute name should be explicitly documented for Twig authors.
+**Resolution:** Added `hx-icon-button.twig` template covering all public properties including the non-standard `hx-size` attribute (exposed as the `hx_size` Twig variable to avoid Twig parsing conflicts). Added `README.drupal.md` with attribute reference, healthcare label guidance, event handling example using Drupal behaviors with `once()`, form submit/reset usage, and asset loading configuration. The `hx-size` attribute is prominently documented for Twig authors.
 
 ### P2-05: `--hx-icon-button-bg` has no base fallback value
 
@@ -157,22 +157,22 @@ The base `.button:hover` applies `filter: brightness(0.9)`. However, `secondary`
 
 ## Gaps vs. Feature Description Audit Checklist
 
-| Audit Area | Status | Notes |
-|---|---|---|
-| TypeScript — no `any`, proper typing | PASS | All types are correct |
-| Accessibility — aria-label | PASS | Correctly set from `label` |
-| Accessibility — keyboard activation | FAIL | Tests use click(), not keyboard events (P1-01) |
-| Accessibility — focus visible | PASS | `focus-visible` ring present |
-| Accessibility — axe-core | PASS | Screenshots show zero violations |
-| Tests — all sizes | PASS | sm/md/lg covered |
-| Tests — all states (default/disabled) | PASS | Covered |
-| Tests — loading state | FAIL | Loading state does not exist (P1-06) |
-| Tests — accessible label present | PASS | aria-label and title tested |
-| Storybook — all variants with controls | PASS | All 5 variants |
-| Storybook — accessible label demonstrated | PASS | Healthcare scenarios present |
-| Storybook — loading state | FAIL | Not present (P1-06) |
-| CSS — `--hx-*` tokens only | PASS | Component styles are token-only |
-| CSS — circular/square shape variants | FAIL | No shape property (P1-05) |
-| CSS — CSS parts exposed | PASS | `button` and `icon` parts |
-| Performance — bundle < 5KB | UNVERIFIED | Requires build measurement |
-| Drupal — Twig-renderable | PARTIAL | Attributes are Twig-compatible but no template (P2-04) |
+| Audit Area                                | Status     | Notes                                                               |
+| ----------------------------------------- | ---------- | ------------------------------------------------------------------- |
+| TypeScript — no `any`, proper typing      | PASS       | All types are correct                                               |
+| Accessibility — aria-label                | PASS       | Correctly set from `label`                                          |
+| Accessibility — keyboard activation       | FAIL       | Tests use click(), not keyboard events (P1-01)                      |
+| Accessibility — focus visible             | PASS       | `focus-visible` ring present                                        |
+| Accessibility — axe-core                  | PASS       | Screenshots show zero violations                                    |
+| Tests — all sizes                         | PASS       | sm/md/lg covered                                                    |
+| Tests — all states (default/disabled)     | PASS       | Covered                                                             |
+| Tests — loading state                     | FAIL       | Loading state does not exist (P1-06)                                |
+| Tests — accessible label present          | PASS       | aria-label and title tested                                         |
+| Storybook — all variants with controls    | PASS       | All 5 variants                                                      |
+| Storybook — accessible label demonstrated | PASS       | Healthcare scenarios present                                        |
+| Storybook — loading state                 | FAIL       | Not present (P1-06)                                                 |
+| CSS — `--hx-*` tokens only                | PASS       | Component styles are token-only                                     |
+| CSS — circular/square shape variants      | FAIL       | No shape property (P1-05)                                           |
+| CSS — CSS parts exposed                   | PASS       | `button` and `icon` parts                                           |
+| Performance — bundle < 5KB                | UNVERIFIED | Requires build measurement                                          |
+| Drupal — Twig-renderable                  | PASS       | `hx-icon-button.twig` and `README.drupal.md` added (P2-04 ✅ FIXED) |
