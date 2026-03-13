@@ -3,6 +3,7 @@
 **Reviewer:** Automated antagonistic review
 **Date:** 2026-03-06
 **Files audited:**
+
 - `hx-split-panel.ts`
 - `hx-split-panel.styles.ts`
 - `hx-split-panel.test.ts`
@@ -15,11 +16,11 @@
 
 ## Severity Key
 
-| Severity | Meaning |
-|----------|---------|
-| P0 | Blocking — must fix before merge. Fails a gate. |
-| P1 | High — significant deficiency in functionality or accessibility |
-| P2 | Medium — quality issue, improvement recommended |
+| Severity | Meaning                                                         |
+| -------- | --------------------------------------------------------------- |
+| P0       | Blocking — must fix before merge. Fails a gate.                 |
+| P1       | High — significant deficiency in functionality or accessibility |
+| P2       | Medium — quality issue, improvement recommended                 |
 
 ---
 
@@ -31,6 +32,7 @@
 **Gate:** Gate 2 — "100% pass, 80%+ coverage"
 
 Measured coverage:
+
 - Statements: **68.29%** (required ≥80%)
 - Branches: **57.5%** (required ≥80%)
 - Functions: **61.53%** (required ≥80%)
@@ -54,6 +56,7 @@ The project gate is explicit: 80%+ coverage, no exceptions. This component fails
 The component's entire pointer event surface (`_onPointerDown`, `_onPointerMove`, `_onPointerUp`, `setPointerCapture`) is untested. The primary user interaction for a split panel — dragging the divider — is entirely unverified by the test suite.
 
 There are no tests for:
+
 - Drag produces correct percentage delta calculation
 - `hx-reposition` fires during drag
 - Pointer capture is acquired on pointerdown
@@ -127,6 +130,7 @@ The audit description requires Storybook stories for "horizontal/vertical, with 
 - PatientRecordLayout — present (bonus)
 
 Missing:
+
 - "With Min/Max" — not present (and not implementable until P1-02 is resolved)
 - "Collapsible" — not present (and not implementable until P1-03 is resolved)
 
@@ -171,6 +175,7 @@ This is particularly important in healthcare UIs where assistive technology user
 **File:** `hx-split-panel.ts`, lines 132–154
 
 The keyboard handler supports ArrowLeft/Right/Up/Down (+/-1%), Home (0%), and End (100%). Standard practice for slider-like controls (per ARIA APG) is to also support:
+
 - `Page Up` — move divider by a larger increment (typically +10%)
 - `Page Down` — move divider by a larger increment (-10%)
 
@@ -182,7 +187,10 @@ This allows keyboard-only users to reposition the divider more efficiently than 
 
 ```css
 --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-neutral-200, #e2e8f0));
---_divider-hover-color: var(--hx-split-panel-divider-hover-color, var(--hx-color-primary-500, #3b82f6));
+--_divider-hover-color: var(
+  --hx-split-panel-divider-hover-color,
+  var(--hx-color-primary-500, #3b82f6)
+);
 ```
 
 The hex values `#e2e8f0` and `#3b82f6` are hardcoded as last-resort fallbacks. The project non-negotiable states "Never hardcode colors, spacing, or typography values. Always use tokens." If the semantic tokens (`--hx-color-neutral-200`, `--hx-color-primary-500`) fail to resolve (e.g., token file not loaded), the component falls back to arbitrary hex values rather than a neutral/transparent default that would signal the misconfiguration. The hex fallbacks also couple the component to a specific color palette.
@@ -217,24 +225,24 @@ The following areas pass review without significant issues:
 
 ## Summary
 
-| ID | Severity | Area | Issue |
-|----|----------|------|-------|
-| P0-01 | P0 | Testing | Coverage at 68.29% — below 80% gate |
-| P1-01 | P1 | Testing | Zero tests for drag/pointer interaction |
-| P1-02 | P1 | TypeScript | No public `min`/`max` properties |
-| P1-03 | P1 | Feature | Panel collapse not implemented |
-| P1-04 | P1 | Testing/Logic | `positionInPixels` untested; conversion skips snap and event |
-| P1-05 | P1 | Accessibility | `outline: none` with color-only focus indicator |
-| P1-06 | P1 | Drupal | `snap` not settable via HTML attribute |
-| P1-07 | P1 | Drupal | No Twig template documentation ✅ FIXED |
-| P2-01 | P2 | Storybook | Missing collapsible and min/max stories |
-| P2-02 | P2 | Storybook | `snap` and `positionInPixels` absent from argTypes |
-| P2-03 | P2 | Logic | `_positionAtDragStart` race condition on rapid events |
-| P2-04 | P2 | Accessibility | `aria-disabled="false"` rendered redundantly |
-| P2-05 | P2 | Accessibility | No `aria-label` on focusable divider |
-| P2-06 | P2 | Accessibility | No Page Up/Down keyboard support |
-| P2-07 | P2 | CSS | Hardcoded hex fallbacks bypass token layer |
-| P2-08 | P2 | CSS | CSS part naming diverges from specification |
+| ID    | Severity | Area          | Issue                                                        |
+| ----- | -------- | ------------- | ------------------------------------------------------------ |
+| P0-01 | P0       | Testing       | Coverage at 68.29% — below 80% gate                          |
+| P1-01 | P1       | Testing       | Zero tests for drag/pointer interaction                      |
+| P1-02 | P1       | TypeScript    | No public `min`/`max` properties                             |
+| P1-03 | P1       | Feature       | Panel collapse not implemented                               |
+| P1-04 | P1       | Testing/Logic | `positionInPixels` untested; conversion skips snap and event |
+| P1-05 | P1       | Accessibility | `outline: none` with color-only focus indicator              |
+| P1-06 | P1       | Drupal        | `snap` not settable via HTML attribute                       |
+| P1-07 | P1       | Drupal        | No Twig template documentation ✅ FIXED                      |
+| P2-01 | P2       | Storybook     | Missing collapsible and min/max stories                      |
+| P2-02 | P2       | Storybook     | `snap` and `positionInPixels` absent from argTypes           |
+| P2-03 | P2       | Logic         | `_positionAtDragStart` race condition on rapid events        |
+| P2-04 | P2       | Accessibility | `aria-disabled="false"` rendered redundantly                 |
+| P2-05 | P2       | Accessibility | No `aria-label` on focusable divider                         |
+| P2-06 | P2       | Accessibility | No Page Up/Down keyboard support                             |
+| P2-07 | P2       | CSS           | Hardcoded hex fallbacks bypass token layer                   |
+| P2-08 | P2       | CSS           | CSS part naming diverges from specification                  |
 
 **Verdict: BLOCKED — 1 P0, 7 P1 issues must be resolved before merge.**
 
@@ -242,10 +250,10 @@ The following areas pass review without significant issues:
 
 ## Fixes Applied (A11y Audit — 2026-03-12)
 
-| Issue | Status | Fix |
-|-------|--------|-----|
-| P1-05 | RESOLVED | Added `outline: 2px solid` + `box-shadow` to `:focus-visible` state; focus indicator no longer relies solely on color change |
-| P2-04 | RESOLVED | `aria-disabled` now uses Lit `nothing` directive when not disabled; attribute is absent (not `aria-disabled="false"`) |
-| P2-05 | RESOLVED | Divider has `aria-label="Resize panels"` for screen reader announcement |
-| P2-06 | RESOLVED | PageUp (+10%) and PageDown (-10%) keyboard handlers added to divider |
+| Issue | Status   | Fix                                                                                                                                                        |
+| ----- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1-05 | RESOLVED | Added `outline: 2px solid` + `box-shadow` to `:focus-visible` state; focus indicator no longer relies solely on color change                               |
+| P2-04 | RESOLVED | `aria-disabled` now uses Lit `nothing` directive when not disabled; attribute is absent (not `aria-disabled="false"`)                                      |
+| P2-05 | RESOLVED | Divider has `aria-label="Resize panels"` for screen reader announcement                                                                                    |
+| P2-06 | RESOLVED | PageUp (+10%) and PageDown (-10%) keyboard handlers added to divider                                                                                       |
 | P2-07 | RESOLVED | Hardcoded hex fallbacks (`#e2e8f0`, `#3b82f6`) removed; `--_divider-color` and `--_divider-hover-color` now use token-only cascade with no hex last-resort |
