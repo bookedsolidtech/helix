@@ -1181,7 +1181,7 @@ Consumers import this and get full type safety.
 - [Lit TypeScript Guide](https://lit.dev/docs/components/typescript/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
 - [Custom Elements Manifest](https://custom-elements-manifest.open-wc.org/)
-- [hx-library source code](https://github.com/your-org/hx-library) (internal)
+- [hx-library source code](https://github.com/bookedsolidtech/helix) (internal)
 
 ---
 

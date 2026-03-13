@@ -1158,7 +1158,7 @@ When deprecating or removing features:
 ```typescript
 /**
  * @deprecated Use `variant="outlined"` instead. This property will be removed in v2.0.0.
- * @see https://github.com/org/repo/issues/123 for migration guide
+ * @see https://github.com/bookedsolidtech/helix/issues for migration guide
  */
 @property({ type: Boolean })
 outline = false;

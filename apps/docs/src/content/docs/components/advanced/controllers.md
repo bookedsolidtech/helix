@@ -1399,4 +1399,4 @@ With Reactive Controllers, you can build a library of reusable behaviors that co
 
 - Explore [Component Lifecycle](/components/fundamentals/lifecycle) for detailed lifecycle documentation
 - Learn about [Reactive Properties](/components/fundamentals/reactive-properties) for property system internals
-- Study the [AdoptedStylesheetsController source](https://github.com/your-repo/packages/hx-library/src/controllers/adopted-stylesheets.ts) for a production example
+- Study the [AdoptedStylesheetsController source](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/controllers/adopted-stylesheets.ts) for a production example
