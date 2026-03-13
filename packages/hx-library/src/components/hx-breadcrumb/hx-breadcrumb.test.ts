@@ -490,7 +490,9 @@ describe('hx-breadcrumb', () => {
       expect(btn).toBeTruthy();
 
       // Dispatch a real keydown Enter event on the ellipsis button
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+      btn.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+      );
       await el.updateComplete;
 
       expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
@@ -517,7 +519,9 @@ describe('hx-breadcrumb', () => {
       expect(btn).toBeTruthy();
 
       // Dispatch a real keydown Space event on the ellipsis button
-      btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+      btn.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }),
+      );
       await el.updateComplete;
 
       expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();

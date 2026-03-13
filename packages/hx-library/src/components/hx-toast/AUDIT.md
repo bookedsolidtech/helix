@@ -86,6 +86,7 @@ None of this logic has a single test. The `hx-toast-stack` tests in `hx-toast.te
 **File:** `hx-toast.drupal.js`
 
 **Resolution:** `hx-toast.drupal.js` added providing `Drupal.behaviors.hxToast` that:
+
 - Attaches to elements with `data-hx-toast` attributes containing JSON-encoded options
 - Dynamically imports `toast()` from `@helixui/library` on click (tree-shaking friendly)
 - Uses a `dataset.hxToastAttached` guard to prevent double-binding on AJAX/BigPipe updates

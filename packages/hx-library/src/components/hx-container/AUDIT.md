@@ -150,10 +150,10 @@ The performance gate requires `< 5KB` per component (min+gz). No formal bundle s
 
 ## Recommendations Summary
 
-| Priority | Issue                                                                             | Effort  |
-| -------- | --------------------------------------------------------------------------------- | ------- |
-| P2-01    | Add responsive padding guidance to MDX docs                                       | Small   |
-| P2-02    | Remove or document redundant `padding="none"` CSS rule                            | Trivial |
-| P3-01    | Update test file to use `HelixContainer` type instead of deprecated `WcContainer` | Trivial |
-| P3-02    | Document `WcContainer` exclusion from `index.ts` or re-export it                  | Trivial |
-| ~~P3-03~~| Bundle size acknowledgment + `contain: layout style` added to `:host`            | Done    |
+| Priority  | Issue                                                                             | Effort  |
+| --------- | --------------------------------------------------------------------------------- | ------- |
+| P2-01     | Add responsive padding guidance to MDX docs                                       | Small   |
+| P2-02     | Remove or document redundant `padding="none"` CSS rule                            | Trivial |
+| P3-01     | Update test file to use `HelixContainer` type instead of deprecated `WcContainer` | Trivial |
+| P3-02     | Document `WcContainer` exclusion from `index.ts` or re-export it                  | Trivial |
+| ~~P3-03~~ | Bundle size acknowledgment + `contain: layout style` added to `:host`             | Done    |

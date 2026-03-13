@@ -156,37 +156,37 @@ Files reviewed:
 
 ## Passing Areas
 
-| Area                                              | Status | Notes                                                          |
-| ------------------------------------------------- | ------ | -------------------------------------------------------------- |
-| TypeScript strict — no `any`                      | PASS   | No `any` types found                                           |
-| Placement property typed                          | PASS   | Full 12-value union type                                       |
-| Icon property typed                               | PASS   | `'vertical' \| 'horizontal'`                                  |
-| Size property typed                               | PASS   | `'sm' \| 'md' \| 'lg'`                                        |
-| Trigger `aria-label` present                      | PASS   | Dynamic via `label` property                                   |
-| Panel `role="menu"`                               | PASS   |                                                                |
-| `aria-haspopup="menu"`                            | PASS   | ARIA 1.2 compliant                                             |
-| `aria-expanded` reflects state                    | PASS   |                                                                |
-| Arrow-key navigation (Down/Up/Home/End)           | PASS   | With wrapping and disabled-item skip                           |
-| Escape closes panel and restores focus            | PASS   | Tested                                                         |
-| Tab closes panel                                  | PASS   | Tested                                                         |
-| Outside click closes panel                        | PASS   | Tested                                                         |
-| Focus moves to first item on open                 | PASS   | `_focusFirstItem()`                                            |
-| `hx-show` / `hx-hide` / `hx-select` events       | PASS   | All three dispatched correctly, bubbles/composed verified      |
-| Disabled items skipped in focus and events         | PASS   | Both keyboard traversal and click handler check disabled state |
-| `@csspart button/trigger` and `panel/menu`        | PASS   | Dual aliases via multi-value part attribute                    |
-| All `--hx-*` token usage                          | PASS   | No hardcoded colors/spacing outside fallback values            |
-| Reduced motion media query                        | PASS   | Transition disabled                                            |
-| Arrow-function event handlers                     | PASS   | No `.bind()` in lifecycle, stable references                   |
-| axe-core tests (closed, open, disabled)           | PASS   | Three scenarios covered                                        |
-| Storybook autodocs                                | PASS   | `tags: ['autodocs']` present                                   |
-| Storybook controls for all public props           | PASS   | placement, size, disabled, icon, label all have controls       |
-| WithIconItems story                               | PASS   | Menu items with SVG icons                                      |
-| Table row context story                           | PASS   | `PatientRowActions`                                            |
-| Shadow DOM encapsulation                          | PASS   |                                                                |
-| `index.ts` re-export                              | PASS   |                                                                |
-| `declare global` block                            | PASS   | `HTMLElementTagNameMap` extended                               |
-| Event listeners cleaned up on disconnect          | PASS   | `disconnectedCallback` removes both listeners                  |
-| `@floating-ui/dom` externalized                   | PASS   | peerDependency + rollup external                               |
-| Starlight documentation                           | PASS   | Complete with live demos, API, accessibility, Drupal, examples |
-| `label` property                                  | PASS   | Configurable accessible name                                   |
-| `outline-offset: 0` on focus-visible menu items   | PASS   | WCAG 2.1 SC 1.4.11 compliant                                  |
+| Area                                            | Status | Notes                                                          |
+| ----------------------------------------------- | ------ | -------------------------------------------------------------- |
+| TypeScript strict — no `any`                    | PASS   | No `any` types found                                           |
+| Placement property typed                        | PASS   | Full 12-value union type                                       |
+| Icon property typed                             | PASS   | `'vertical' \| 'horizontal'`                                   |
+| Size property typed                             | PASS   | `'sm' \| 'md' \| 'lg'`                                         |
+| Trigger `aria-label` present                    | PASS   | Dynamic via `label` property                                   |
+| Panel `role="menu"`                             | PASS   |                                                                |
+| `aria-haspopup="menu"`                          | PASS   | ARIA 1.2 compliant                                             |
+| `aria-expanded` reflects state                  | PASS   |                                                                |
+| Arrow-key navigation (Down/Up/Home/End)         | PASS   | With wrapping and disabled-item skip                           |
+| Escape closes panel and restores focus          | PASS   | Tested                                                         |
+| Tab closes panel                                | PASS   | Tested                                                         |
+| Outside click closes panel                      | PASS   | Tested                                                         |
+| Focus moves to first item on open               | PASS   | `_focusFirstItem()`                                            |
+| `hx-show` / `hx-hide` / `hx-select` events      | PASS   | All three dispatched correctly, bubbles/composed verified      |
+| Disabled items skipped in focus and events      | PASS   | Both keyboard traversal and click handler check disabled state |
+| `@csspart button/trigger` and `panel/menu`      | PASS   | Dual aliases via multi-value part attribute                    |
+| All `--hx-*` token usage                        | PASS   | No hardcoded colors/spacing outside fallback values            |
+| Reduced motion media query                      | PASS   | Transition disabled                                            |
+| Arrow-function event handlers                   | PASS   | No `.bind()` in lifecycle, stable references                   |
+| axe-core tests (closed, open, disabled)         | PASS   | Three scenarios covered                                        |
+| Storybook autodocs                              | PASS   | `tags: ['autodocs']` present                                   |
+| Storybook controls for all public props         | PASS   | placement, size, disabled, icon, label all have controls       |
+| WithIconItems story                             | PASS   | Menu items with SVG icons                                      |
+| Table row context story                         | PASS   | `PatientRowActions`                                            |
+| Shadow DOM encapsulation                        | PASS   |                                                                |
+| `index.ts` re-export                            | PASS   |                                                                |
+| `declare global` block                          | PASS   | `HTMLElementTagNameMap` extended                               |
+| Event listeners cleaned up on disconnect        | PASS   | `disconnectedCallback` removes both listeners                  |
+| `@floating-ui/dom` externalized                 | PASS   | peerDependency + rollup external                               |
+| Starlight documentation                         | PASS   | Complete with live demos, API, accessibility, Drupal, examples |
+| `label` property                                | PASS   | Configurable accessible name                                   |
+| `outline-offset: 0` on focus-visible menu items | PASS   | WCAG 2.1 SC 1.4.11 compliant                                   |

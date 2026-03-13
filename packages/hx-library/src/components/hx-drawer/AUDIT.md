@@ -298,7 +298,7 @@ Using `void` to discard promises suppresses any rejection silently. If `updateCo
 ## Summary Table
 
 | ID    | Severity | Area                   | Title                                                          |
-| ----- | -------- | ---------------------- | -------------------------------------------------------------- |
+| ----- | -------- | ---------------------- | -------------------------------------------------------------- | -------- |
 | P0-01 | P0       | Accessibility/Behavior | Body scroll lock not implemented                               |
 | P1-01 | P1       | Behavior               | Duplicate keydown listener — double handler invocation         |
 | P1-02 | P1       | Accessibility          | Focus trap broken for slotted elements                         |
