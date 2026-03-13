@@ -1,0 +1,116 @@
+{#
+  hx-button — Drupal Twig Template
+  ==================================
+
+  Server-renders the hx-button custom element with correct attributes.
+  JavaScript enhancement (hx-click events, form submission) is handled automatically
+  by the component — no Drupal behavior is required for standard usage.
+
+  Note on hx-size: The size attribute is intentionally prefixed as `hx-size` rather than
+  `size` to avoid conflicts with the native HTML `size` attribute on form elements. This
+  diverges from HTML naming conventions and will be normalized to `size` in a future major
+  version. Until then, use `hx-size` when setting size from Twig templates.
+
+  Note on htmx: If your project uses htmx, be aware that `hx-*` attribute names are
+  reserved by htmx. The `hx-size` attribute used by this component does not conflict
+  with any htmx attributes, but avoid adding other `hx-*` attributes that htmx may
+  interpret as directives.
+
+  Parameters:
+    label      (string)  Required for text buttons. Visible button label text.
+    variant    (string)  Optional. One of: primary | secondary | tertiary | danger | ghost | outline.
+                         Defaults to 'primary'.
+    size       (string)  Optional. One of: sm | md | lg. Defaults to 'md'.
+                         Rendered as the `hx-size` attribute on the element.
+    disabled   (bool)    Optional. Renders the button in a disabled, non-interactive state.
+    loading    (bool)    Optional. Renders the button with a spinner and prevents interaction.
+    type       (string)  Optional. One of: button | submit | reset. Defaults to 'button'.
+                         Ignored when href is set.
+    href       (string)  Optional. When set, renders an anchor element instead of a button.
+    target     (string)  Optional. Anchor target. Only used when href is set.
+                         Use '_blank' to open in a new tab (rel="noopener noreferrer" is
+                         automatically applied by the component for security).
+    name       (string)  Optional. Form field name for ElementInternals form submission.
+    value      (string)  Optional. Form field value submitted with name on form submission.
+    aria_label (string)  Optional. Forwarded to the inner button/anchor element. Required
+                         for icon-only buttons where no visible label text is present.
+    attributes (object)  Optional. Additional HTML attributes to spread onto the element.
+
+  Slots (Twig blocks):
+    prefix — Content rendered before the label (icons, SVG).
+    default — The button label (set via `label` parameter or override this block).
+    suffix — Content rendered after the label (icons, trailing chevrons).
+
+  Usage examples:
+
+    Primary action button:
+      {% include 'hx-button.twig' with {
+        label: 'Save Patient Record',
+        variant: 'primary',
+        type: 'submit',
+      } %}
+
+    Destructive action button:
+      {% include 'hx-button.twig' with {
+        label: 'Discharge Patient',
+        variant: 'danger',
+        size: 'sm',
+      } %}
+
+    Link button (opens in new tab):
+      {% include 'hx-button.twig' with {
+        label: 'View Lab Results',
+        variant: 'ghost',
+        href: node.field_lab_results_url.value,
+        target: '_blank',
+      } %}
+
+    Icon-only button (accessible name required):
+      {% include 'hx-button.twig' with {
+        variant: 'ghost',
+        aria_label: 'Close dialog',
+      } %}
+
+    Loading state (form submission in progress):
+      {% include 'hx-button.twig' with {
+        label: 'Submitting...',
+        loading: true,
+        disabled: true,
+      } %}
+
+  Drupal behavior for dynamic interactions:
+    The component dispatches an `hx-click` CustomEvent (bubbles, composed) on activation.
+    For standard form submission, set `type="submit"` — no Drupal behavior required.
+    For AJAX-driven patterns, attach a behavior to listen for `hx-click`:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixButton = {
+          attach: function (context) {
+            once('hx-button-ajax', 'hx-button[data-ajax-action]', context).forEach((btn) => {
+              btn.addEventListener('hx-click', (e) => {
+                const action = btn.dataset.ajaxAction;
+                Drupal.ajax({ url: action }).execute();
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+#}
+
+<hx-button
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if disabled %}disabled{% endif %}
+  {% if loading %}loading{% endif %}
+  {% if type is defined and not href %}type="{{ type }}"{% endif %}
+  {% if href %}href="{{ href }}"{% endif %}
+  {% if target %}target="{{ target }}"{% endif %}
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% block prefix %}{% endblock %}
+  {%- if label %}{{ label }}{% endif -%}
+  {% block suffix %}{% endblock %}
+</hx-button>

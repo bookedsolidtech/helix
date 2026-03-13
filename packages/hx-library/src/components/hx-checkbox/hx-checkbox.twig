@@ -1,0 +1,120 @@
+{#
+  hx-checkbox — Drupal Twig Template
+  =====================================
+
+  Server-renders the hx-checkbox custom element with correct attributes.
+  Form association is handled automatically via ElementInternals — no Drupal behavior
+  is required for standard form submission patterns.
+
+  Note on hx-size: The size attribute is prefixed as `hx-size` to avoid conflicts with the
+  native HTML `size` attribute on form elements. If your project uses htmx, note that htmx
+  reserves `hx-*` attribute names for its own directives. The `hx-size` attribute on this
+  component does not conflict with any current htmx directive, but be aware of this
+  namespace overlap when combining HELiX components with htmx on the same page. This
+  naming will be normalized in a future major version.
+
+  Parameters:
+    label      (string)  Required. Visible label text for the checkbox.
+    name       (string)  Required for form submission. The form field name.
+    value      (string)  Optional. Value submitted when checked. Defaults to 'on'.
+    checked    (bool)    Optional. Pre-renders the checkbox in the checked state.
+                         Use for server-side persistence of checkbox state.
+    disabled   (bool)    Optional. Renders the checkbox in a disabled state.
+    required   (bool)    Optional. Marks the checkbox as required for form submission.
+    error      (string)  Optional. Error message displayed below the checkbox.
+    help_text  (string)  Optional. Help text displayed below the checkbox.
+    size       (string)  Optional. One of: sm | md | lg. Defaults to 'md'.
+                         Rendered as the `hx-size` attribute on the element.
+    aria_label (string)  Optional. Accessible name when no visible label is provided
+                         (e.g., in a custom label slot pattern). Forwarded to the inner input.
+    attributes (object)  Optional. Additional HTML attributes spread onto the element.
+
+  Slots (Twig blocks):
+    default   — Custom label content. Overrides the `label` parameter. Rich HTML is
+                allowed — Drupal can include links or formatted text in consent labels.
+    help_text — Custom help text content. Overrides the `help_text` parameter.
+    error     — Custom error content. Overrides the `error` parameter.
+
+  Usage examples:
+
+    Simple checkbox:
+      {% include 'hx-checkbox.twig' with {
+        label: 'Send appointment reminders',
+        name: 'reminders',
+        value: '1',
+      } %}
+
+    Pre-checked with server state:
+      {% include 'hx-checkbox.twig' with {
+        label: 'Patient consented to treatment',
+        name: 'consent',
+        value: 'yes',
+        checked: node.field_consent.value,
+        required: true,
+      } %}
+
+    With error state (form validation failure):
+      {% include 'hx-checkbox.twig' with {
+        label: 'I agree to the terms and conditions',
+        name: 'terms',
+        required: true,
+        error: 'You must accept the terms to continue.',
+      } %}
+
+    With help text:
+      {% include 'hx-checkbox.twig' with {
+        label: 'Enable two-factor authentication',
+        name: 'two_factor',
+        help_text: 'Adds an extra layer of security to your account.',
+      } %}
+
+    Small size (compact lists):
+      {% include 'hx-checkbox.twig' with {
+        label: 'Hypertension',
+        name: 'conditions[]',
+        value: 'hypertension',
+        size: 'sm',
+      } %}
+
+  Drupal behavior for change events:
+    The component dispatches an `hx-change` CustomEvent (bubbles, composed) with
+    detail `{ checked: boolean, value: string }` when the checkbox state changes.
+    For standard form submission, no behavior is needed.
+    For AJAX-driven patterns:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixCheckbox = {
+          attach: function (context) {
+            once('hx-checkbox-change', 'hx-checkbox[data-ajax]', context).forEach((cb) => {
+              cb.addEventListener('hx-change', (e) => {
+                // e.detail.checked — new checked state
+                // e.detail.value — configured value
+                Drupal.ajax({ url: cb.dataset.ajax }).execute();
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+#}
+
+<hx-checkbox
+  label="{{ label }}"
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value is defined and value != 'on' %}value="{{ value }}"{% endif %}
+  {% if checked %}checked{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if required %}required{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  hx-size="{{ size|default('md') }}"
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% block default %}{% endblock %}
+  {% if help_text_slot is defined %}
+    <span slot="help-text">{{ help_text_slot }}</span>
+  {% endif %}
+  {% if error_slot is defined %}
+    <span slot="error">{{ error_slot }}</span>
+  {% endif %}
+</hx-checkbox>
