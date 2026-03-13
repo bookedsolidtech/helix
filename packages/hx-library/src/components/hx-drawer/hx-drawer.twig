@@ -1,0 +1,80 @@
+{#
+  hx-drawer — Drupal Twig Template
+  ==================================
+  Slide-in panel overlay from any viewport edge. Supports focus trapping,
+  overlay backdrop, keyboard navigation (Escape to close), and full ARIA
+  labelling for healthcare accessibility requirements.
+
+  Variables:
+    - drawer_id   (string, required): Unique ID for the drawer element.
+                  Used by trigger elements via data-hx-drawer-target="{{ drawer_id }}".
+    - label       (string, optional): Accessible name for the dialog when the label
+                  slot is not populated. Defaults to 'Drawer'.
+    - placement   (string, optional): 'start' | 'end' | 'top' | 'bottom'. Default: 'end'.
+    - size        (string, optional): 'sm' | 'md' | 'lg' | 'full' or a CSS length.
+                  Default: 'md'.
+    - open        (bool, optional): Whether the drawer is initially open. Default: false.
+    - contained   (bool, optional): Constrains overlay to positioned parent. Default: false.
+    - no_header   (bool, optional): Hides the header region. Default: false.
+    - no_footer   (bool, optional): Hides the footer region. Default: false.
+    - label_content (markup, optional): Content for the label slot (drawer title).
+    - header_actions (markup, optional): Content for the header-actions slot.
+    - body_content  (markup): The main drawer body content. Required.
+    - footer_content (markup, optional): Content for the footer slot.
+    - attributes  (object, optional): Additional Drupal attributes object.
+
+  Usage:
+    Trigger button (wire up with hx-drawer.drupal.js behaviors):
+      <button data-hx-drawer-trigger data-hx-drawer-target="patient-detail-drawer">
+        Open Patient Details
+      </button>
+
+    Drawer template:
+      {% include 'hx-drawer.twig' with {
+        drawer_id: 'patient-detail-drawer',
+        placement: 'end',
+        size: 'lg',
+        label_content: 'Patient Details',
+        body_content: patient_detail_content,
+        footer_content: footer_actions,
+      } %}
+
+  Registration:
+    Load the component script and behaviors in your theme's .libraries.yml:
+      hx-drawer:
+        js:
+          path/to/@helixui/library/dist/hx-drawer.js: { attributes: { type: module } }
+          path/to/hx-drawer.drupal.js: {}
+        dependencies:
+          - core/drupal
+          - core/once
+#}
+
+{% set _placement = placement|default('end') %}
+{% set _size = size|default('md') %}
+
+<hx-drawer
+  {% if drawer_id %}id="{{ drawer_id }}"{% endif %}
+  placement="{{ _placement }}"
+  size="{{ _size }}"
+  {% if label and not label_content %}label="{{ label }}"{% endif %}
+  {% if open %}open{% endif %}
+  {% if contained %}contained{% endif %}
+  {% if no_header %}no-header{% endif %}
+  {% if no_footer %}no-footer{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% if label_content %}
+    <span slot="label">{{ label_content }}</span>
+  {% endif %}
+
+  {% if header_actions %}
+    <span slot="header-actions">{{ header_actions }}</span>
+  {% endif %}
+
+  {{ body_content }}
+
+  {% if footer_content %}
+    <div slot="footer">{{ footer_content }}</div>
+  {% endif %}
+</hx-drawer>

@@ -146,11 +146,11 @@ Files reviewed:
 
 ---
 
-### P2-10: No Drupal integration documentation or Twig example — RESOLVED
+### P2-10: No Drupal integration documentation or Twig example — RESOLVED ✅ FIXED
 
-**File:** `apps/docs/src/content/docs/component-library/hx-overflow-menu.mdx:265–310`
+**Files:** `apps/docs/src/content/docs/component-library/hx-overflow-menu.mdx:265–310`, `hx-overflow-menu.twig`
 
-**Resolution:** Full Drupal integration section in Starlight docs: Twig template with dynamic attributes, `.libraries.yml` registration, and `Drupal.behaviors` event handler using `once()`.
+**Resolution:** Full Drupal integration section in Starlight docs: Twig template with dynamic attributes, `.libraries.yml` registration, and `Drupal.behaviors` event handler using `once()`. Standalone `hx-overflow-menu.twig` template added to component directory covering all public properties (`label`, `placement`, `hx-size`, `icon`, `disabled`) and action items with disabled state support.
 
 ---
 

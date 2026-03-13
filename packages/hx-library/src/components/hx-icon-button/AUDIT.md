@@ -133,9 +133,9 @@ const _canvas = within(canvasElement);
 
 `_canvas` is never used. The underscore prefix suppresses linting but this is dead code that should be removed.
 
-### P2-04: No Drupal integration file or Twig template example
+### P2-04: No Drupal integration file or Twig template example ✅ FIXED
 
-The audit spec calls out Drupal as a required area. There is no Twig template, no `drupal-behaviors.js`, and no documentation of the Drupal consumption pattern. While Drupal integration may live in a separate package, the `hx-icon-button` folder has no reference to it. The non-standard `hx-size` attribute name should be explicitly documented for Twig authors.
+**Resolution:** Added `hx-icon-button.twig` template covering all public properties including the non-standard `hx-size` attribute (exposed as the `hx_size` Twig variable to avoid Twig parsing conflicts). Added `README.drupal.md` with attribute reference, healthcare label guidance, event handling example using Drupal behaviors with `once()`, form submit/reset usage, and asset loading configuration. The `hx-size` attribute is prominently documented for Twig authors.
 
 ### P2-05: `--hx-icon-button-bg` has no base fallback value
 
@@ -175,4 +175,4 @@ The base `.button:hover` applies `filter: brightness(0.9)`. However, `secondary`
 | CSS — circular/square shape variants | FAIL | No shape property (P1-05) |
 | CSS — CSS parts exposed | PASS | `button` and `icon` parts |
 | Performance — bundle < 5KB | UNVERIFIED | Requires build measurement |
-| Drupal — Twig-renderable | PARTIAL | Attributes are Twig-compatible but no template (P2-04) |
+| Drupal — Twig-renderable | PASS    | `hx-icon-button.twig` and `README.drupal.md` added (P2-04 ✅ FIXED) |
