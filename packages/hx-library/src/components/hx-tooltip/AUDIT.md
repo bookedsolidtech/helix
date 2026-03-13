@@ -85,6 +85,19 @@ All 13 findings from the T1-22 antagonistic quality review have been resolved. T
 
 ---
 
+## Post-Audit Resolution
+
+### DRUPAL: RESOLVED — Twig template created
+
+**Fix:** Created `hx-tooltip.twig` — Drupal integration template for server-rendering `hx-tooltip`
+with all supported properties (`placement`, `show-delay`, `hide-delay`), default trigger block,
+content slot block, and comprehensive Drupal usage examples including basic, custom placement,
+no-delay, and icon-only patterns.
+
+**File:** `hx-tooltip.twig`
+
+---
+
 ## Test Coverage (28 tests)
 
 | Category | Count | Tests |
@@ -122,3 +135,4 @@ All 13 findings from the T1-22 antagonistic quality review have been resolved. T
 | `hx-tooltip.test.ts` | 350+ | Full coverage |
 | `hx-tooltip.stories.ts` | 343 | Full coverage |
 | `index.ts` | 1 | Correct re-export |
+| `hx-tooltip.twig` | 90 | Drupal template created |
