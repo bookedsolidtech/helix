@@ -116,7 +116,9 @@ export const MultipleSelection: Story = {
     <hx-tree-view label="ICD-10 categories" selection="multiple">
       <hx-tree-item expanded>
         ICD-10 Categories
-        <hx-tree-item slot="children" selected>A00-A09: Intestinal infectious diseases</hx-tree-item>
+        <hx-tree-item slot="children" selected
+          >A00-A09: Intestinal infectious diseases</hx-tree-item
+        >
         <hx-tree-item slot="children" selected>A15-A19: Tuberculosis</hx-tree-item>
         <hx-tree-item slot="children">A20-A28: Certain zoonotic bacterial diseases</hx-tree-item>
         <hx-tree-item slot="children">A30-A49: Other bacterial diseases</hx-tree-item>
@@ -244,7 +246,9 @@ export const DeepNesting: Story = {
               <hx-tree-item slot="children">A00.0.1: Classical cholera</hx-tree-item>
               <hx-tree-item slot="children">A00.0.2: El Tor cholera</hx-tree-item>
             </hx-tree-item>
-            <hx-tree-item slot="children">A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item>
+            <hx-tree-item slot="children"
+              >A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item
+            >
           </hx-tree-item>
         </hx-tree-item>
       </hx-tree-item>
@@ -289,7 +293,12 @@ export const CheckboxMultiSelect: Story = {
         </span>
         <hx-tree-item slot="children" selected>
           <span class="checkbox-tree-item">
-            <input type="checkbox" id="a00-a09" checked aria-label="A00-A09 Intestinal infections" />
+            <input
+              type="checkbox"
+              id="a00-a09"
+              checked
+              aria-label="A00-A09 Intestinal infections"
+            />
             A00-A09: Intestinal infectious diseases
           </span>
         </hx-tree-item>
@@ -319,13 +328,21 @@ export const CheckboxMultiSelect: Story = {
         </span>
         <hx-tree-item slot="children">
           <span class="checkbox-tree-item">
-            <input type="checkbox" id="c00-c14" aria-label="C00-C14 Malignant neoplasms lip oral cavity" />
+            <input
+              type="checkbox"
+              id="c00-c14"
+              aria-label="C00-C14 Malignant neoplasms lip oral cavity"
+            />
             C00-C14: Malignant neoplasms of lip, oral cavity
           </span>
         </hx-tree-item>
         <hx-tree-item slot="children">
           <span class="checkbox-tree-item">
-            <input type="checkbox" id="c15-c26" aria-label="C15-C26 Malignant neoplasms digestive organs" />
+            <input
+              type="checkbox"
+              id="c15-c26"
+              aria-label="C15-C26 Malignant neoplasms digestive organs"
+            />
             C15-C26: Malignant neoplasms of digestive organs
           </span>
         </hx-tree-item>
