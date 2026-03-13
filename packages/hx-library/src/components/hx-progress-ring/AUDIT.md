@@ -183,21 +183,9 @@ This means the control-driven indeterminate path is never interactively exercisa
 
 ---
 
-### P2-06: `render()` method missing explicit return type
+### P2-06: `render()` method missing explicit return type ✅ FIXED
 
-**File:** `hx-progress-ring.ts:125`
-
-```ts
-override render() {
-```
-
-TypeScript strict mode infers the return type correctly from the `html` tagged template literal, but per project conventions and explicit `override` usage, the method should declare its return type explicitly:
-
-```ts
-override render(): TemplateResult {
-```
-
-This is consistent with every other component in the library that follows the Lit override pattern.
+**Resolution:** `render()` now declares `override render(): TemplateResult`, consistent with all other components in the library. `TemplateResult` is imported from `lit`.
 
 ---
 
@@ -205,7 +193,7 @@ This is consistent with every other component in the library that follows the Li
 
 | Area          | Score | Notes                                                                                      |
 | ------------- | ----- | ------------------------------------------------------------------------------------------ |
-| TypeScript    | 7/10  | No `any`, correct types, but missing `max` (P2-01), missing render return type (P2-06)     |
+| TypeScript    | 8/10  | No `any`, correct types. `max` property added (P2-01 ✅ FIXED), render return type added (P2-06 ✅ FIXED) |
 | Accessibility | 6/10  | ARIA timing defect (P1-01), no label enforcement (P1-02), no `aria-busy` (P2-04)           |
 | Tests         | 7/10  | 28 tests, axe coverage, but missing 0%/100% boundary values and reverse transition (P2-03) |
 | Storybook     | 8/10  | Comprehensive stories, healthcare scenarios, but null control unreachable (P2-05)          |

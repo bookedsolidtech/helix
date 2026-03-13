@@ -212,24 +212,19 @@ The `_buildTokenCss` implementation only needs `name` and `value` fields. Import
 
 ## 7. Drupal
 
-### ~~P1 — No attribute-based (non-custom-element) application pattern documented or supported~~ FIXED
+### P1 — No attribute-based (non-custom-element) application pattern documented or supported
 
-**Resolution:** `hx-theme.twig` template added with explicit documentation that `hx-theme`
-requires JavaScript for token injection, that `system` mode / `window.matchMedia` is
-unavailable during Drupal SSR, and guidance to set `theme` explicitly from Twig with fallback
-to `'light'`. The documented approach uses `<hx-theme>` as a server-rendered wrapper element
-(the Drupal-viable pattern) rather than a body data-attribute, since the component cannot
-function as a pure CSS attribute selector. The trade-off is documented clearly for consumers.
+The feature spec states: "applicable as body/section attribute." In Drupal, server-rendered markup often cannot wrap content in custom elements. The typical Drupal pattern would be to apply a `data-hx-theme="dark"` attribute to `<body>` or `<section>` and have CSS respond. The current implementation **requires** the custom element to be instantiated — it cannot be applied as a plain HTML attribute. There is no static CSS fallback, no `:is([data-theme="dark"])` selector, and no exported CSS file for attribute-based theming. This is a fundamental gap for Drupal use.
 
-### ~~P1 — No Drupal Twig example or documentation~~ FIXED
+### P1 — No Drupal Twig example or documentation
 
-**Resolution:** `hx-theme.twig` template added covering: full-page theming from a Drupal
-user preference field, nested dark sidebar inside a light page, theme toggle button with
-Drupal behaviors, and library registration in `mytheme.libraries.yml`. A `DrupalIntegration`
-story added to `hx-theme.stories.ts` demonstrating nested light/dark scope and high-contrast
-mode with healthcare context.
+The component's JSDoc does not include a Drupal usage example. Enterprise Drupal consumers need to know:
 
-### ~~P2 — `system` mode requires JavaScript and `window.matchMedia`~~ FIXED
+- Whether to use `<hx-theme>` as a block-level wrapper in Twig templates
+- How to pass the `theme` attribute from Drupal's theme configuration
+- Whether JavaScript is required for theme application (it is — `firstUpdated` triggers token injection)
+
+### P2 — `system` mode requires JavaScript and `window.matchMedia`
 
 **File:** `hx-theme.ts:87, 103-108`
 
@@ -267,9 +262,9 @@ mode with healthcare context.
 | 24  | Performance   | P1       | No memoization of generated CSS strings per theme                                                                                  |
 | 25  | Performance   | P1       | `CSSStyleSheet.replaceSync()` is synchronous; `replace()` async API should be used                                                 |
 | 26  | Performance   | P2       | All tokens eagerly loaded at module parse time                                                                                     |
-| 27  | Drupal        | P1       | No attribute-based (non-custom-element) application pattern; Drupal `body`/`section` use case unsupported — **FIXED** (documented limitation + `<hx-theme>` wrapper pattern) |
-| 28  | Drupal        | P1       | No Twig example or server-rendered usage documentation — **FIXED**                                                                 |
-| 29  | Drupal        | P2       | `system` mode has no `window` guard for SSR/pre-render contexts — **FIXED** (TypeScript audit 2026-03-13)                          |
+| 27  | Drupal        | P1       | No attribute-based (non-custom-element) application pattern; Drupal `body`/`section` use case unsupported                          |
+| 28  | Drupal        | P1       | No Twig example or server-rendered usage documentation                                                                             |
+| 29  | Drupal        | P2       | `system` mode has no `window` guard for SSR/pre-render contexts                                                                    |
 
 ---
 
@@ -279,20 +274,3 @@ mode with healthcare context.
 2. **`ThemeName` missing `'auto'`** — creates unserializable split API
 3. **Three-tier token cascade not implemented** — primitives and semantics are indistinguishable in injection
 4. **Bundle size** — verify with `npm run build` + bundlesize check; `TokenEntry[]` metadata arrays will blow the 5KB budget
-
----
-
-## TypeScript Audit Fixes Applied (2026-03-13)
-
-| Finding                                                                         | Status                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0-02: `ThemeName` missing `'auto'`; `system` prop untyped workaround           | **FIXED** — `ThemeName` updated to `'light' \| 'dark' \| 'high-contrast' \| 'auto'`; `system` prop retained as `@deprecated` backward-compat shim; `theme="auto"` now reads OS preference via `effectiveTheme` getter |
-| P0-01: High-contrast is a stub (dark tokens reused)                             | **FIXED** — dedicated `_hcOverrides` constant with WCAG 7:1+ contrast values added to `hx-theme.ts`; high-contrast theme now injects distinct token set independent of dark tokens                                    |
-| P1-01: No exported token override types                                         | **FIXED** — `export type { TokenDefinition, TokenEntry } from '@helixui/tokens'` re-exported from `hx-theme.ts`; both types also re-exported from `index.ts`                                                          |
-| P1-02: `firstUpdated()` missing `super.firstUpdated()`                          | **FIXED** — `super.firstUpdated(changed)` call added as first statement of `firstUpdated()`                                                                                                                           |
-| P2-01: `WcTheme` deprecated alias lacks `@deprecated` in `index.ts`             | **FIXED** — `HxTheme` canonical alias added to `hx-theme.ts` and `index.ts`; `WcTheme` deprecated alias added with `@deprecated` JSDoc in both files                                                                  |
-| P2-06: `ThemeSwitcherDemo` uses loose `as HTMLElement & { theme: string }` cast | **FIXED** — `import type { HelixTheme }` added to `hx-theme.stories.ts`; all inline casts now use `as HelixTheme`                                                                                                     |
-| P1-03/P1-10: No `color-scheme` CSS property                                     | **FIXED** — `color-scheme: dark` injected into `:host` block for `dark` and `high-contrast` themes; `color-scheme: light` for `light`/`auto` light-mode resolution                                                    |
-| P1-11: No memoization of CSS strings                                            | **FIXED** — module-level `_cssCache: Map<ThemeName, string>` added; `_buildThemeCss(theme)` returns cached string on subsequent calls                                                                                 |
-| P1-12: `CSSStyleSheet.replaceSync()` synchronous                                | **FIXED** — switched to async `this._themeSheet.replace(...)` via `void` promise                                                                                                                                      |
-| Drupal `window` guard for SSR                                                   | **FIXED** — `typeof window === 'undefined'` guard added in `_attachMediaQuery()` and `effectiveTheme` getter                                                                                                          |

@@ -44,6 +44,7 @@
     "test:batch:4": "npm run test:batch:4 --workspace=packages/hx-library",
     "test:batch:5": "npm run test:batch:5 --workspace=packages/hx-library",
     "test:component": "npm run test:component --workspace=packages/hx-library --",
+    "test:smart": "bash scripts/test-smart.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
