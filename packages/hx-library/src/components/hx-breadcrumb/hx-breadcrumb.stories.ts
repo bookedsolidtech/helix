@@ -221,6 +221,52 @@ export const SingleItem: Story = {
 };
 
 /**
+ * Use the `current` attribute on any item to explicitly mark it as the current
+ * page — regardless of its position in the list. This is the recommended
+ * Drupal pattern: the CMS sets `current` server-side rather than relying on
+ * the component to auto-detect the last child.
+ *
+ * Any item with `current` renders as static text with `aria-current="page"`.
+ * Explicitly marking a non-last item is useful when the breadcrumb structure
+ * is dynamically generated or when the page is not the deepest level.
+ */
+export const ExplicitCurrent: Story = {
+  name: 'Explicit current attribute (Drupal pattern)',
+  args: {
+    separator: '/',
+    label: 'Breadcrumb',
+  },
+  render: (args) => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
+          Explicit <code>current</code> on middle item (non-last):
+        </p>
+        <hx-breadcrumb separator=${args.separator} label=${args.label}>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/department" current>Department</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/department/division">Division</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+        >
+          Server-rendered Drupal pattern — <code>current</code> on last item:
+        </p>
+        <hx-breadcrumb separator=${args.separator} label=${args.label}>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/patients">Patients</hx-breadcrumb-item>
+          <hx-breadcrumb-item current>Jane Doe (MRN: 00482917)</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      </div>
+    </div>
+  `,
+};
+
+/**
  * CSS custom properties allow full visual customization without modifying
  * component internals. Override token values at the consumer level.
  */
