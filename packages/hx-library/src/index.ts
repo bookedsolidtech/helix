@@ -28,6 +28,7 @@ export { HelixCodeSnippet } from './components/hx-code-snippet/index.js';
 export { HelixColorPicker } from './components/hx-color-picker/index.js';
 export { HelixCombobox, type ComboboxOption, type HxComboboxSize } from './components/hx-combobox/index.js';
 export { HelixContainer } from './components/hx-container/index.js';
+export type { WcContainer } from './components/hx-container/index.js';
 export { HelixCopyButton } from './components/hx-copy-button/index.js';
 export { HelixDataTable } from './components/hx-data-table/index.js';
 export type { HxDataTableColumn, HxDataTableSortState } from './components/hx-data-table/index.js';
