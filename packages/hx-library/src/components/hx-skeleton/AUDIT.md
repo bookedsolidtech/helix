@@ -180,16 +180,16 @@ But `.skeleton--circle` hardcodes `border-radius: 50%` with no override token. T
 
 ---
 
-### P2-02: No `loading → loaded` Storybook story
+### ~~P2-02: No `loading → loaded` Storybook story~~ ✅ FIXED
 
 **File:** `hx-skeleton.stories.ts`
 **Area:** Storybook
 
-The audit criteria explicitly requires:
-
-> Storybook — all variants, loading→loaded transition demo
-
-No story demonstrates the transition from a skeleton state to real content. All 8 stories show static skeleton states. Given the P0 finding that the `loaded` state doesn't exist yet, this is a documentation gap that will remain unresolvable until P0-01 is fixed.
+The `LoadingToLoaded` story (exported as `State: Loading → Loaded`) demonstrates the full transition from skeleton placeholder to real content. It includes:
+- A visually hidden `aria-live="polite"` region that announces state changes to screen readers
+- A `hx-skeleton` element that receives `loaded = true` programmatically
+- Real content hidden behind `hidden` attribute that is revealed after the skeleton dismisses
+- A button to simulate content loading for interactive demonstration in Storybook
 
 ---
 

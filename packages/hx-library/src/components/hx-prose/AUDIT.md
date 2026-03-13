@@ -24,7 +24,7 @@ _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have b
 | ------------ | -------- | --------- |
 | P0 (Blocker) | 2        | 2         |
 | P1 (High)    | 8        | 7         |
-| P2 (Medium)  | 8        | 6         |
+| P2 (Medium)  | 8        | 5         |
 
 ---
 
@@ -280,22 +280,20 @@ This is important because the audit area note says "axe may not scan slot conten
 
 ---
 
-### P2-08: Storybook does not appear to have stories for all HTML element types
+### ~~P2-08: Storybook does not appear to have stories for all HTML element types~~ ✅ FIXED
 
 **File:** `hx-prose.stories.ts`
 
-From the available preview, stories include rich text demos and component compositions. The feature description requires "full rich text demo with all HTML elements, typography scale." The following should be verified against the published Storybook:
+The `AllContentTypes` story now covers all required HTML element types:
 
-- Blockquote with `<cite>`
-- `<pre><code>` code blocks with language class
-- `<kbd>`, `<samp>`, `<var>` elements
-- Definition lists (`<dl>`, `<dt>`, `<dd>`)
-- `<figure>` with `<figcaption>`
-- `<mark>`, `<del>`, `<ins>`, `<abbr title="">`, `<sub>`, `<sup>`
-- Tables with `<caption>`, `<tfoot>`, and scope attributes
-- Drupal-specific markup classes (`.field`, `.text-formatted`, `.align-left`, `.align-right`, `.messages`)
-
-If any of these are absent, Storybook coverage is incomplete. Stories cannot be autodoc-generated for these since they are slot content (not component properties), so they must be explicitly authored.
+- Blockquote with `<cite>` — covered
+- `<pre><code>` code blocks — covered
+- `<kbd>`, `<samp>`, `<var>` elements — added `<samp>` and `<var>` to "Keyboard and Technical Text" section
+- Definition lists (`<dl>`, `<dt>`, `<dd>`) — covered
+- `<figure>` with `<figcaption>` — covered
+- `<mark>`, `<del>`, `<ins>`, `<abbr title="">`, `<sub>`, `<sup>` — covered
+- Tables with `<caption>`, `<tfoot>`, and `scope` attributes — added `<tfoot>` and `scope` on all `<th>` elements
+- Drupal-specific markup classes — covered in `DrupalCKEditor` story
 
 ---
 
