@@ -1,0 +1,119 @@
+{#
+  hx-split-button — Drupal Twig Template
+  =========================================
+  Renders the <hx-split-button> web component for use in Drupal themes.
+
+  A split button combines a primary action button with an attached dropdown
+  menu for secondary actions. Keyboard navigation (ArrowDown/ArrowUp/Enter/
+  Escape) and ARIA menu button pattern are handled by the component.
+
+  IMPORTANT: The size attribute is prefixed as `hx-size` (not `size`) to avoid
+  conflicts with the native HTML `size` attribute on form elements.
+
+  Variables:
+    - label         (string, required): Primary button label text.
+    - variant       (string, optional): Visual style variant. One of:
+                      'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'.
+                      Defaults to 'primary'.
+    - size          (string, optional): 'sm' | 'md' | 'lg'. Defaults to 'md'.
+                    Rendered as the `hx-size` attribute.
+    - disabled      (boolean, optional): Disables both the primary button and trigger.
+    - trigger_label (string, optional): Accessible label for the dropdown trigger button.
+                    Defaults to 'More actions'. Override for localization.
+    - menu_label    (string, optional): Accessible label for the dropdown menu panel.
+                    Defaults to 'Secondary actions'. Override for localization.
+    - menu_items    (array, optional): Array of menu item objects:
+                      - label    (string, required): Menu item display text.
+                      - value    (string, optional): Value emitted in hx-select event detail.
+                      - disabled (boolean, optional): Disables this menu item.
+                      - icon     (string, optional): Icon token or text label for the prefix slot
+                                 (HTML is escaped; pass trusted text only, not raw HTML).
+    - attributes    (object, optional): Additional HTML attributes for the host element.
+
+  Slots:
+    Default slot — Primary button label (set via `label` variable).
+    menu slot    — <hx-menu-item> children in the dropdown (set via `menu_items` variable).
+
+  Events:
+    hx-click  — Dispatched when the primary button is clicked (not disabled).
+                Detail: { originalEvent: MouseEvent }
+    hx-select — Dispatched when a menu item is selected.
+                Detail: { value: string, label: string }
+
+  Usage:
+
+    Standard split button with menu actions:
+      {% include 'hx-split-button.twig' with {
+        label: 'Save Record',
+        variant: 'primary',
+        menu_items: [
+          { label: 'Save as Draft', value: 'draft' },
+          { label: 'Save and Publish', value: 'publish' },
+          { label: 'Save and Archive', value: 'archive' },
+        ],
+      } %}
+
+    Danger variant for destructive actions:
+      {% include 'hx-split-button.twig' with {
+        label: 'Delete Record',
+        variant: 'danger',
+        menu_items: [
+          { label: 'Delete Record', value: 'delete' },
+          { label: 'Archive Record', value: 'archive' },
+        ],
+      } %}
+
+    Disabled state:
+      {% include 'hx-split-button.twig' with {
+        label: 'Submit Form',
+        disabled: true,
+        menu_items: [{ label: 'Save Draft', value: 'draft' }],
+      } %}
+
+    Localized accessible labels:
+      {% include 'hx-split-button.twig' with {
+        label: 'Enregistrer',
+        trigger_label: 'Autres actions',
+        menu_label: 'Actions secondaires',
+        menu_items: [{ label: 'Brouillon', value: 'draft' }],
+      } %}
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-split-button:
+        js:
+          path/to/@helixui/library/dist/hx-split-button.js: { attributes: { type: module } }
+
+    Attach the library in your template:
+      {{ attach_library('mytheme/hx-split-button') }}
+
+  Drupal behavior (analytics / AJAX):
+    Include hx-split-button.drupal.js to listen for primary and menu actions.
+    See hx-split-button.drupal.js for implementation details.
+#}
+
+{% set _variant = variant|default('primary') %}
+{% set _size = size|default('md') %}
+
+<hx-split-button
+  variant="{{ _variant }}"
+  hx-size="{{ _size }}"
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if trigger_label %}trigger-label="{{ trigger_label }}"{% endif %}
+  {% if menu_label %}menu-label="{{ menu_label }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if attributes %}{% for key, val in attributes %}{{ key }}="{{ val }}" {% endfor %}{% endif %}
+>
+  {%- if menu_items is defined and menu_items|length > 0 -%}
+    {%- for item in menu_items -%}
+      <hx-menu-item
+        slot="menu"
+        {% if item.value is defined %}value="{{ item.value }}"{% endif %}
+        {% if item.disabled is defined and item.disabled %}disabled{% endif %}
+      >
+        {%- if item.icon is defined %}<span slot="prefix">{{ item.icon }}</span>{% endif -%}
+        {{- item.label -}}
+      </hx-menu-item>
+    {%- endfor -%}
+  {%- endif -%}
+</hx-split-button>

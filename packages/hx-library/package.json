@@ -41,6 +41,12 @@
     "test:coverage": "vitest run --coverage.enabled",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "test:batch:1": "vitest run \"hx-accordion/|hx-action-bar/|hx-alert/|hx-avatar/|hx-badge/|hx-breadcrumb/|hx-button/|hx-button-group/|hx-card/|hx-carousel/|hx-checkbox/|hx-checkbox-group/|hx-code-snippet/|hx-color-picker/|hx-combobox/\" --reporter=verbose",
+    "test:batch:2": "vitest run \"hx-container/|hx-copy-button/|hx-data-table/|hx-date-picker/|hx-dialog/|hx-divider/|hx-drawer/|hx-dropdown/|hx-field/|hx-field-label/|hx-file-upload/|hx-form/|hx-format-date/|hx-grid/|hx-help-text/\" --reporter=verbose",
+    "test:batch:3": "vitest run \"hx-icon/|hx-icon-button/|hx-image/|hx-link/|hx-list/|hx-menu/|hx-meter/|hx-nav/|hx-number-input/|hx-overflow-menu/|hx-pagination/|hx-popover/|hx-popup/|hx-progress-bar/|hx-progress-ring/\" --reporter=verbose",
+    "test:batch:4": "vitest run \"hx-prose/|hx-radio-group/|hx-rating/|hx-select/|hx-side-nav/|hx-skeleton/|hx-slider/|hx-spinner/|hx-split-button/|hx-split-panel/|hx-stack/|hx-status-indicator/|hx-steps/|hx-structured-list/\" --reporter=verbose",
+    "test:batch:5": "vitest run \"hx-switch/|hx-tabs/|hx-tag/|hx-text/|hx-text-input/|hx-textarea/|hx-theme/|hx-time-picker/|hx-toast/|hx-toggle-button/|hx-tooltip/|hx-top-nav/|hx-tree-view/|hx-visually-hidden/\" --reporter=verbose",
+    "test:component": "vitest run --reporter=verbose",
     "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\"",
     "lint": "eslint src/",
     "clean": "rm -rf dist custom-elements.json"

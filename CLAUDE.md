@@ -206,6 +206,7 @@ npm run build                  # Build everything (Turborepo)
 npm run type-check             # TypeScript strict
 npm run test                   # Vitest browser mode (112 tests)
 npm run test:library           # Tests for @helixui/library only
+npm run test:smart             # Smart: only tests changed components vs origin/dev
 npm run cem                    # Generate Custom Elements Manifest
 npm run lint                   # ESLint
 npm run format                 # Auto-fix formatting

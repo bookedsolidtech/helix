@@ -166,17 +166,11 @@ The ellipsis should either be removed (let the consumer control punctuation) or 
 
 ---
 
-### P2-4: Storybook `size` argType control is `select`-only — custom sizes untestable from controls
+### ~~P2-4: Storybook `size` argType control is `select`-only — custom sizes untestable from controls~~ FIXED
 
-**File:** `hx-spinner.stories.ts:15-22`
+**File:** `hx-spinner.stories.ts`
 
-```typescript
-size: {
-  control: { type: 'select' },
-  options: ['sm', 'md', 'lg'],
-```
-
-The `select` control only exposes token values. A user exploring Storybook has no way to test custom CSS sizes (e.g., `"3rem"`, `"48px"`) from the controls panel. A `text` control with a note about accepted values would better document the prop's capabilities. The `CustomSize` story exists but is static — it cannot demonstrate the input freedom.
+**Resolution:** Changed `size` argType control from `{ type: 'select' }` with fixed options to `control: 'text'` with a description noting both token values (`'sm' | 'md' | 'lg'`) and custom CSS sizes (e.g., `'3rem'`, `'48px'`). The `CustomSize` story demonstrates a `3rem` value as an example.
 
 ---
 

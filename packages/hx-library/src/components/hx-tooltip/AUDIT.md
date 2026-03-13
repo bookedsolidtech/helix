@@ -77,6 +77,8 @@ All 13 findings from the T1-22 antagonistic quality review have been resolved. T
 
 ### P2-4: RESOLVED — `overflow-wrap: break-word` (standard property)
 
+**Fix:** Replaced `word-wrap: break-word` vendor alias with the standard `overflow-wrap: break-word` property in `hx-tooltip.styles.ts`. Tracked in GH #831.
+
 ### P2-5: RESOLVED — SSR-safe IDs via `crypto.randomUUID()`
 
 ### P2-6: RESOLVED — Twig usage example in JSDoc

@@ -25,7 +25,7 @@ The previous antagonistic review found 11 issues (1 P0, 4 P1, 8 P2). **All have 
 | P2-05 | RESOLVED                | Tests added for `formStateRestoreCallback`, `validationMessage`, `validity` getters, and pre-checked initial state                                                                                                                                                                   |
 | P2-06 | N/A                     | `_suppressNextChildChange` guard removed entirely — no longer applicable                                                                                                                                                                                                             |
 | P2-07 | OPEN (downgraded to P3) | Stories still use relative import `./hx-checkbox-group.js` instead of package entry point                                                                                                                                                                                            |
-| P2-08 | RESOLVED                | `@drupal` JSDoc tag added with Twig template example                                                                                                                                                                                                                                 |
+| P2-08 | RESOLVED                | `@drupal` JSDoc tag added with Twig template example; `hx-checkbox-group.twig` standalone template added with full Drupal Form API integration guide                                                                                                                                 |
 
 ---
 
