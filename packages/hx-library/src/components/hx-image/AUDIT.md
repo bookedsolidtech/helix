@@ -4,6 +4,7 @@
 **Date:** 2026-03-06
 **Branch:** feature/audit-hx-image-t3-11-antagonistic
 **Files reviewed:**
+
 - `hx-image.ts`
 - `hx-image.styles.ts`
 - `hx-image.stories.ts`
@@ -14,11 +15,11 @@
 
 ## Severity Legend
 
-| Code | Meaning |
-|------|---------|
-| P0 | Blocks merge. Regression or spec violation that ships broken behavior. |
-| P1 | Must fix before ship. Significant gap in functionality, coverage, or correctness. |
-| P2 | Should fix. Design debt, discoverability hazard, or missing expected feature. |
+| Code | Meaning                                                                           |
+| ---- | --------------------------------------------------------------------------------- |
+| P0   | Blocks merge. Regression or spec violation that ships broken behavior.            |
+| P1   | Must fix before ship. Significant gap in functionality, coverage, or correctness. |
+| P2   | Should fix. Design debt, discoverability hazard, or missing expected feature.     |
 
 ---
 
@@ -28,6 +29,7 @@
 
 **File:** `hx-image.ts:43`
 **Code:**
+
 ```ts
 alt = '';
 ```
@@ -57,6 +59,7 @@ The component has no support for `srcset` or `sizes` attributes on the inner `<i
 **Files:** `hx-image.ts`, `hx-image.styles.ts`, `hx-image.stories.ts`
 
 The audit spec requires:
+
 - A "with caption" story
 - A `caption` CSS part
 - Caption token support
@@ -71,6 +74,7 @@ A caption-capable image component should wrap in `<figure>`/`<figcaption>`, expo
 
 **File:** `hx-image.ts:151-157`
 **Code:**
+
 ```ts
 if (this._error) {
   return html`
@@ -92,6 +96,7 @@ When image loading fails and the fallback slot is shown, screen reader users rec
 **File:** `hx-image.test.ts`
 
 The `rounded` property has three distinct code paths in `_computeBorderRadius`:
+
 1. `rounded === true` or `rounded === ''` → theme radius token
 2. `rounded` is a non-empty string other than `'false'` → used directly as CSS
 3. All other cases → `undefined`
@@ -104,6 +109,7 @@ None of these paths are tested. The `rounded === 'false'` guard (which causes th
 
 **File:** `hx-image.stories.ts:132`
 **Code:**
+
 ```ts
 await expect(img?.getAttribute('alt')).toBe('A sample image');
 ```
@@ -134,6 +140,7 @@ The spec requires: "alt text required (no empty alt unless decorative with expli
 
 **File:** `hx-image.ts:88-89`
 **Code:**
+
 ```ts
 @property()
 rounded: boolean | string | undefined = undefined;
@@ -148,6 +155,7 @@ rounded: boolean | string | undefined = undefined;
 **File:** `hx-image.test.ts`
 
 The following properties have zero test coverage:
+
 - `ratio` — no test that `--_ratio` is set in the container's style
 - `fit` — no test that `--_fit` is set or that `object-fit` is applied
 - `width` — no test for number value (`200` → `"200px"`) or string value
@@ -187,6 +195,7 @@ No story demonstrates responsive behavior (fluid width, container queries, or `s
 **File:** `hx-image.ts`
 
 `loading`, `fit`, `ratio`, `rounded`, `src`, and `alt` are not reflected with `reflect: true`. This means:
+
 - CSS attribute selectors (`hx-image[loading="lazy"]`) don't work after programmatic changes
 - DevTools shows stale attribute values
 - Drupal server-side rendered attributes may conflict with hydrated property values
@@ -216,6 +225,7 @@ The test "shows fallback slot after fallback-src also fails" (line 160) only ver
 
 **File:** `hx-image.ts:164-165`
 **Code:**
+
 ```ts
 src=${this._currentSrc() || nothing}
 alt=${this.alt}
@@ -227,25 +237,25 @@ When `src` is `''`, the `src` attribute is omitted (`nothing`), which is correct
 
 ## Summary Table
 
-| ID | Area | Severity | Finding |
-|----|------|----------|---------|
-| P0-01 | Accessibility | P0 | `alt` defaults to `''` — all images silently decorative |
-| P0-02 | Drupal / Performance | P0 | No `srcset`/`sizes` — responsive images unsupported |
-| P1-01 | Feature completeness | P1 | Caption feature entirely absent (no slot, no part, no story) |
-| P1-02 | Accessibility | P1 | No ARIA live region for error/fallback state |
-| P1-03 | Tests | P1 | `rounded` / `_computeBorderRadius` not tested |
-| P1-04 | Tests / Storybook | P1 | Default story `play` asserts on unreflected attribute |
-| P1-05 | Tests | P1 | Duplicate CSS Parts test adds no coverage |
-| P2-01 | Accessibility / API | P2 | No explicit `decorative` prop |
-| P2-02 | TypeScript | P2 | `rounded` `@property()` type mismatch with Lit coercion |
-| P2-03 | Tests | P2 | `ratio`, `fit`, `width`, `height` have zero test coverage |
-| P2-04 | Storybook | P2 | No lazy loading demo story |
-| P2-05 | Storybook | P2 | No responsive story |
-| P2-06 | CSS | P2 | `:host { display: inline-block }` wrong default for block images ✅ FIXED |
-| P2-07 | API / Drupal | P2 | Properties not reflected to attributes |
-| P2-08 | CSS | P2 | Error container collapses to zero height without `ratio`/`height` ✅ FIXED |
-| P2-09 | Tests | P2 | `hx-error` dispatch after fallback-src failure not asserted |
-| P2-10 | Logic | P2 | Empty `src` skips error path — broken image renders silently |
+| ID    | Area                 | Severity | Finding                                                                    |
+| ----- | -------------------- | -------- | -------------------------------------------------------------------------- |
+| P0-01 | Accessibility        | P0       | `alt` defaults to `''` — all images silently decorative                    |
+| P0-02 | Drupal / Performance | P0       | No `srcset`/`sizes` — responsive images unsupported                        |
+| P1-01 | Feature completeness | P1       | Caption feature entirely absent (no slot, no part, no story)               |
+| P1-02 | Accessibility        | P1       | No ARIA live region for error/fallback state                               |
+| P1-03 | Tests                | P1       | `rounded` / `_computeBorderRadius` not tested                              |
+| P1-04 | Tests / Storybook    | P1       | Default story `play` asserts on unreflected attribute                      |
+| P1-05 | Tests                | P1       | Duplicate CSS Parts test adds no coverage                                  |
+| P2-01 | Accessibility / API  | P2       | No explicit `decorative` prop                                              |
+| P2-02 | TypeScript           | P2       | `rounded` `@property()` type mismatch with Lit coercion                    |
+| P2-03 | Tests                | P2       | `ratio`, `fit`, `width`, `height` have zero test coverage                  |
+| P2-04 | Storybook            | P2       | No lazy loading demo story                                                 |
+| P2-05 | Storybook            | P2       | No responsive story                                                        |
+| P2-06 | CSS                  | P2       | `:host { display: inline-block }` wrong default for block images ✅ FIXED  |
+| P2-07 | API / Drupal         | P2       | Properties not reflected to attributes                                     |
+| P2-08 | CSS                  | P2       | Error container collapses to zero height without `ratio`/`height` ✅ FIXED |
+| P2-09 | Tests                | P2       | `hx-error` dispatch after fallback-src failure not asserted                |
+| P2-10 | Logic                | P2       | Empty `src` skips error path — broken image renders silently               |
 
 ---
 
