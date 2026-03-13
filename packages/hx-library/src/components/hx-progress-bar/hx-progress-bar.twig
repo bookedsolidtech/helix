@@ -1,0 +1,110 @@
+{#
+  hx-progress-bar — Drupal Twig Template
+  ========================================
+  Renders the <hx-progress-bar> web component for use in Drupal themes.
+
+  IMPORTANT: The size attribute is prefixed as `hx-size` (not `size`) to avoid
+  conflicts with the native HTML `size` attribute on form elements.
+
+  Variables:
+    - value        (number|null, optional): Current progress value (min–max).
+                   Omit or set to null for indeterminate (animated) state.
+    - min          (number, optional): Minimum value. Defaults to 0.
+    - max          (number, optional): Maximum value. Defaults to 100.
+    - label        (string, optional): Accessible name for the progress bar.
+                   STRONGLY RECOMMENDED — omitting will trigger a WCAG 2.1 AA
+                   violation warning. Required for screen reader users.
+                   Example: 'Uploading patient records'
+    - description  (string, optional): Additional description linked via
+                   aria-describedby. Example: '3 of 12 files uploaded'
+    - size         (string, optional): 'sm' | 'md' | 'lg'. Defaults to 'md'.
+                   Rendered as the `hx-size` attribute.
+    - variant      (string, optional): 'default' | 'success' | 'warning' | 'danger'.
+                   Controls the indicator fill color. Defaults to 'default'.
+    - indeterminate (boolean, optional): When true, displays an animated
+                   indeterminate loading bar regardless of value.
+    - label_slot   (string, optional): HTML content for the label slot.
+                   Overrides the `label` attribute for rich label markup.
+    - attributes   (object, optional): Additional HTML attributes.
+
+  Usage:
+
+    Determinate progress (file upload):
+      {% include 'hx-progress-bar.twig' with {
+        value: upload_progress,
+        max: 100,
+        label: 'Uploading patient records',
+        description: node.upload_status.value,
+        variant: 'default',
+      } %}
+
+    Indeterminate loading:
+      {% include 'hx-progress-bar.twig' with {
+        indeterminate: true,
+        label: 'Loading patient data',
+      } %}
+
+    Success state (operation complete):
+      {% include 'hx-progress-bar.twig' with {
+        value: 100,
+        max: 100,
+        label: 'Upload complete',
+        variant: 'success',
+      } %}
+
+    Small size with warning:
+      {% include 'hx-progress-bar.twig' with {
+        value: node.field_storage_used.value,
+        max: node.field_storage_limit.value,
+        label: 'Storage usage',
+        size: 'sm',
+        variant: 'warning',
+      } %}
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-progress-bar:
+        js:
+          path/to/@helixui/library/dist/hx-progress-bar.js: { attributes: { type: module } }
+
+    Attach the library in your template:
+      {{ attach_library('mytheme/hx-progress-bar') }}
+
+  Events:
+    The component dispatches an `hx-complete` CustomEvent (bubbles, composed) when
+    value reaches max. To respond to completion in Drupal:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixProgressBar = {
+          attach: function (context) {
+            once('hx-progress-bar', 'hx-progress-bar[data-on-complete]', context).forEach((el) => {
+              el.addEventListener('hx-complete', function () {
+                var action = el.dataset.onComplete;
+                if (action) {
+                  Drupal.ajax({ url: action }).execute();
+                }
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+#}
+
+{% set _size = size|default('md') %}
+{% set _variant = variant|default('default') %}
+{% set _min = min|default(0) %}
+{% set _max = max|default(100) %}
+
+<hx-progress-bar
+  hx-size="{{ _size }}"
+  variant="{{ _variant }}"
+  min="{{ _min }}"
+  max="{{ _max }}"
+  {% if value is not null and value is defined %}value="{{ value }}"{% endif %}
+  {% if indeterminate %}indeterminate{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if description %}description="{{ description }}"{% endif %}
+  {% if attributes %}{% for key, val in attributes %}{{ key }}="{{ val }}" {% endfor %}{% endif %}
+>
+  {%- if label_slot %}<span slot="label">{{ label_slot }}</span>{% endif -%}
+</hx-progress-bar>

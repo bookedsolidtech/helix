@@ -144,7 +144,7 @@ el.removeAttribute('animated');
 
 ---
 
-### P1-05: No Drupal Twig template for `hx-skeleton`
+### P1-05: No Drupal Twig template for `hx-skeleton` ✅ FIXED
 
 **File:** `testing/drupal/templates/helix-all-components.html.twig`
 **Area:** Drupal Integration
@@ -155,6 +155,8 @@ The integration test template (`helix-all-components.html.twig`) covers 19 other
 - CDN script include pattern
 
 The component is not verified Drupal-renderable per the CLAUDE.md requirement.
+
+**Resolution:** Created `hx-skeleton.twig` documenting all properties (`variant`, `width`, `height`, `animated`), accessibility patterns (`aria-busy` wrapper, `aria-live` status region for loading state announcements), usage examples for text/circle/rect/paragraph/static variants, and a Drupal behavior workaround for the Lit boolean attribute limitation with `animated=false`. Libraries.yml registration pattern documented.
 
 ---
 

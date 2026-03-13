@@ -102,11 +102,13 @@ There is no `outline`, `box-shadow`, or equivalent visible ring. This is particu
 
 **Resolution:** The `snap` property now uses a custom `converter` with `fromAttribute` (parses JSON array string, e.g. `snap="[25,50,75]"`, with a comma-separated fallback) and `toAttribute` (serializes to `JSON.stringify`). Drupal Twig templates can now set snap points via the `snap` attribute as a JSON array string. The JSDoc and component-level Twig example have been updated to document this pattern.
 
-### P1-07: No Drupal Twig template documentation
+### P1-07: No Drupal Twig template documentation ✅ FIXED
 
 **Files:** All component files
 
 There is no Twig template example, no `@example` Twig block in the component JSDoc, and no documentation of which properties are attribute-settable vs. JS-only. The project non-negotiable states "Components work in Twig templates without modification." The `snap` issue (P1-06) is a direct violation; the documentation gap makes the full Drupal compatibility surface unclear.
+
+**Resolution:** Created `hx-split-panel.twig` documenting all attribute-settable properties (`position`, `position-in-pixels`, `orientation`, `min`, `max`, `snap`, `disabled`), `start`/`end` slot rendering, usage examples for horizontal/vertical/snap-point/pixel-position/disabled layouts, Drupal libraries.yml registration, and a Drupal behavior example for persisting panel state via `localStorage`.
 
 ---
 
@@ -224,7 +226,7 @@ The following areas pass review without significant issues:
 | P1-04 | P1 | Testing/Logic | `positionInPixels` untested; conversion skips snap and event |
 | P1-05 | P1 | Accessibility | `outline: none` with color-only focus indicator |
 | P1-06 | P1 | Drupal | `snap` not settable via HTML attribute |
-| P1-07 | P1 | Drupal | No Twig template documentation |
+| P1-07 | P1 | Drupal | No Twig template documentation ✅ FIXED |
 | P2-01 | P2 | Storybook | Missing collapsible and min/max stories |
 | P2-02 | P2 | Storybook | `snap` and `positionInPixels` absent from argTypes |
 | P2-03 | P2 | Logic | `_positionAtDragStart` race condition on rapid events |
