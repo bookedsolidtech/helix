@@ -173,7 +173,7 @@ export class HelixSlider extends LitElement {
 
   /** Reference to the native range `<input>` inside shadow DOM. */
   @query('.slider__input')
-  private _input: HTMLInputElement | null = null;
+  declare private _input: HTMLInputElement | null;
 
   // ─── Unique IDs ───
 
