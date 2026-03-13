@@ -105,12 +105,12 @@ Whether this is a spec change or implementation error is unresolved, but the mis
 ```css
 @media (prefers-reduced-motion: reduce) {
   .skeleton--animated::after {
-    animation: none;
+    display: none;
   }
 }
 ```
 
-`animation: none` stops the shimmer movement but **the `::after` pseudo-element remains rendered** with its `linear-gradient` background. This creates a permanent, static light-band overlay on the skeleton placeholder that appears frozen. For users with vestibular disorders who opt into `prefers-reduced-motion`, this static visual artifact may still cause discomfort and is inconsistent with WCAG SC 2.3.3 (Animation from Interactions).
+`animation: none` (the previous fix attempt) stops the shimmer movement but **the `::after` pseudo-element remains rendered** with its `linear-gradient` background. This creates a permanent, static light-band overlay on the skeleton placeholder that appears frozen. For users with vestibular disorders who opt into `prefers-reduced-motion`, this static visual artifact may still cause discomfort and is inconsistent with WCAG SC 2.3.3 (Animation from Interactions).
 
 **Resolution:** Changed to `display: none` on the `::after` pseudo-element under `prefers-reduced-motion: reduce` — the shimmer overlay is fully removed rather than frozen.
 
