@@ -151,23 +151,12 @@ Missing test cases:
 
 ---
 
-#### P1-06: Storybook `Danger` story leaves primary button without accessible text
+#### P1-06: Storybook `Danger` story leaves primary button without accessible text — FIXED
 
-**File:** `hx-split-button.stories.ts:121–135`
+**File:** `hx-split-button.stories.ts`
 **Area:** Storybook
 
-The `Danger` story provides a custom `render` function that does not bind `args.label` and contains no default slot content for the primary button label:
-
-```ts
-export const Danger: Story = {
-  args: { variant: 'danger', label: 'Delete Record' },
-  render: (args) => html`
-    <hx-split-button variant=${args.variant} hx-size=${args.size} ?disabled=${args.disabled}>
-      <!-- No label prop binding, no slot text -->
-      <hx-menu-item slot="menu" value="archive">Archive Record</hx-menu-item>
-```
-
-The primary button receives no accessible text — `args.label = 'Delete Record'` is defined but never applied. This is a Storybook documentation defect that also means the rendered story fails accessibility for unlabeled buttons. If axe-core runs against Storybook stories, this story will produce a violation.
+**Resolution:** Updated the `Danger` story's custom `render` function to bind `.label=${args.label}` on the `hx-split-button` element, ensuring the primary button receives accessible text (`args.label = 'Delete Record'`). The story now passes axe-core accessibility checks for labeled buttons.
 
 ---
 
@@ -216,12 +205,12 @@ Both components set native `disabled` attribute AND `aria-disabled="true"` on `<
 
 ---
 
-#### P2-05: No standalone Storybook story for `hx-menu-item`
+#### P2-05: No standalone Storybook story for `hx-menu-item` — FIXED
 
-**File:** `hx-split-button.stories.ts`
+**File:** `hx-menu-item.stories.ts` (new file)
 **Area:** Storybook / Documentation
 
-`hx-menu-item` is a documented public component (`@tag hx-menu-item`, `@customElement('hx-menu-item')`, exported in `index.ts`) with its own CSS parts (`part="item"`), CSS custom properties, events, and properties. However, it has no standalone Storybook story file. Consumers cannot browse its API in isolation. Its CEM documentation will exist but Storybook autodocs won't be generated for it.
+**Resolution:** Created `packages/hx-library/src/components/hx-menu/hx-menu-item.stories.ts` with a full Meta entry and standalone stories covering Default, Disabled, Checkbox, Radio, Loading, WithPrefixSuffix, and HealthcareActions variants. CEM autodocs are now generated for `hx-menu-item`.
 
 ---
 
