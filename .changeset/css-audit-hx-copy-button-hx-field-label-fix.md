@@ -1,5 +1,5 @@
 ---
-"@helixui/library": patch
+'@helixui/library': patch
 ---
 
 fix(css): mark CSS audit findings as resolved for hx-popover, hx-skeleton, hx-split-button
