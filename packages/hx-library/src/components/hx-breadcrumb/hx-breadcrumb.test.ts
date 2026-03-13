@@ -443,6 +443,89 @@ describe('hx-breadcrumb', () => {
       );
       expect(items.every((i) => !i.hasAttribute('data-bc-hidden'))).toBe(true);
     });
+
+    it('clicking the ellipsis button directly expands all items (BC-A02)', async () => {
+      // BC-A02: tests the actual _handleEllipsisClick event handler path via a
+      // real click event on the button element, not a programmatic maxItems=0 assignment.
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="2">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/c">C</hx-breadcrumb-item>
+          <hx-breadcrumb-item>D</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      expect(ellipsis).toBeTruthy();
+      const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
+      expect(btn).toBeTruthy();
+
+      // Dispatch a real click event on the ellipsis button
+      btn.click();
+      await el.updateComplete;
+
+      // The _handleEllipsisClick → _expandBreadcrumb → maxItems=0 path must have fired
+      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      const items = Array.from(
+        el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
+      );
+      expect(items.every((i) => !i.hasAttribute('data-bc-hidden'))).toBe(true);
+    });
+
+    it('Enter key on ellipsis button expands all items (BC-A02)', async () => {
+      // BC-A02: tests the _handleEllipsisKeydown path for Enter.
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="2">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/c">C</hx-breadcrumb-item>
+          <hx-breadcrumb-item>D</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      expect(ellipsis).toBeTruthy();
+      const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
+      expect(btn).toBeTruthy();
+
+      // Dispatch a real keydown Enter event on the ellipsis button
+      btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+
+      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      const items = Array.from(
+        el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
+      );
+      expect(items.every((i) => !i.hasAttribute('data-bc-hidden'))).toBe(true);
+    });
+
+    it('Space key on ellipsis button expands all items (BC-A02)', async () => {
+      // BC-A02: tests the _handleEllipsisKeydown path for Space.
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb max-items="2">
+          <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/b">B</hx-breadcrumb-item>
+          <hx-breadcrumb-item href="/c">C</hx-breadcrumb-item>
+          <hx-breadcrumb-item>D</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      expect(ellipsis).toBeTruthy();
+      const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
+      expect(btn).toBeTruthy();
+
+      // Dispatch a real keydown Space event on the ellipsis button
+      btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+
+      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      const items = Array.from(
+        el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
+      );
+      expect(items.every((i) => !i.hasAttribute('data-bc-hidden'))).toBe(true);
+    });
   });
 
   // ─── JSON-LD (6) ───
@@ -560,6 +643,55 @@ describe('hx-breadcrumb', () => {
 
       const data = JSON.parse(script.textContent ?? '{}') as { itemListElement: unknown[] };
       expect(data.itemListElement).toHaveLength(2);
+    });
+
+    it('injects JSON-LD script when json-ld is toggled on after initial render (BC-A03)', async () => {
+      // BC-A03: exercises the updated() handler's jsonLd branch — toggling json-ld on
+      // programmatically after the element is already connected (no json-ld attribute initially).
+      const before = document.querySelectorAll('script[data-hx-breadcrumb]').length;
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      // No script yet — json-ld was not set at render time
+      expect(document.querySelectorAll('script[data-hx-breadcrumb]').length).toBe(before);
+
+      // Toggle json-ld on after initial render
+      el.jsonLd = true;
+      await el.updateComplete;
+
+      // Script must now exist and contain valid BreadcrumbList structured data
+      const scripts = document.querySelectorAll<HTMLScriptElement>('script[data-hx-breadcrumb]');
+      expect(scripts.length).toBe(before + 1);
+      const script = scripts[scripts.length - 1]!;
+      expect(script.type).toBe('application/ld+json');
+      const data = JSON.parse(script.textContent ?? '{}') as Record<string, unknown>;
+      expect(data['@type']).toBe('BreadcrumbList');
+    });
+
+    it('removes JSON-LD script when json-ld is toggled off programmatically (BC-A03)', async () => {
+      // BC-A03: exercises the updated() handler's jsonLd branch for removal — toggling
+      // json-ld off after it was enabled.
+      const el = await fixture<HelixBreadcrumb>(`
+        <hx-breadcrumb json-ld>
+          <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+          <hx-breadcrumb-item>Current</hx-breadcrumb-item>
+        </hx-breadcrumb>
+      `);
+      await el.updateComplete;
+      const scriptsBefore = document.querySelectorAll('script[data-hx-breadcrumb]').length;
+      expect(scriptsBefore).toBeGreaterThanOrEqual(1);
+
+      // Toggle json-ld off — the updated() handler must call _removeJsonLd()
+      el.jsonLd = false;
+      await el.updateComplete;
+
+      expect(document.querySelectorAll('script[data-hx-breadcrumb]').length).toBe(
+        scriptsBefore - 1,
+      );
     });
   });
 
