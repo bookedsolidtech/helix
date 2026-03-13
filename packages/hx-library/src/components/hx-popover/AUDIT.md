@@ -2,6 +2,7 @@
 
 **Reviewed:** `packages/hx-library/src/components/hx-popover/`
 **Files audited:**
+
 - `hx-popover.ts`
 - `hx-popover.styles.ts`
 - `hx-popover.test.ts`
@@ -13,7 +14,7 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 2     |
 | P1       | 7     |
 | P2       | 6     |
@@ -41,11 +42,13 @@ There is also no test coverage for click-outside behavior (because the feature i
 `role="dialog"` is unconditionally applied to the popover body for all trigger modes and all content types. The ARIA spec requires that when a `dialog` element is opened, focus must move into it (typically to the first focusable element or the dialog container itself). This implementation does **not** move focus on show.
 
 **Consequences:**
+
 - Screen readers announce the element as a dialog and expect focus to transfer in, but focus stays on the trigger.
 - VoiceOver (macOS/iOS) will not automatically read the popover content.
 - AT users on click-trigger mode will hear "button, collapsed" → click → focus stays on button → popover content is invisible to them unless they manually navigate.
 
 **Fix options (either acceptable):**
+
 1. Change `role` to `tooltip` for non-interactive / informational popovers and add a `role` property allowing callers to opt into `dialog` + focus management.
 2. Add `tabindex="-1"` to the body element and call `bodyEl.focus()` inside `_show()`, then return focus to the trigger inside `_hide()`.
 
@@ -86,35 +89,27 @@ The listener should be on `document` while the popover is open (added in `_show`
 
 ---
 
-### P1-04: `aria-expanded` is not updated on open/close after initial setup
+### P1-04: `aria-expanded` is not updated on open/close after initial setup ✅ FIXED
 
-**File:** `hx-popover.ts`, lines 158–167
-
-`_updateAnchorAriaExpanded()` is called inside `_show()` and `_hide()`, and it does update. However, there is no test verifying `aria-expanded` changes from `"false"` → `"true"` → `"false"` across the open/close cycle. The existing test (line 192–199 in the test file) only checks the initial state. A regression could easily be introduced undetected.
+**Resolution:** Added test `aria-expanded cycles false → true → false across open/close` verifying the full open/close cycle updates `aria-expanded` correctly on the anchor element.
 
 ---
 
-### P1-05: Missing test — hover `mouseleave` hides popover
+### P1-05: Missing test — hover `mouseleave` hides popover ✅ FIXED
 
-**File:** `hx-popover.test.ts`
-
-The `Behavior: Show/Hide` suite tests `mouseenter` for `trigger="hover"` (line 229) but has no corresponding test for `mouseleave` closing the popover. The `_handleAnchorMouseLeave` handler exists in the implementation but is untested.
+**Resolution:** Added test `hides on mouseleave when trigger="hover"` verifying that `_handleAnchorMouseLeave` correctly closes the popover when the mouse leaves the anchor.
 
 ---
 
-### P1-06: Missing test — `trigger="focus"` open and close
+### P1-06: Missing test — `trigger="focus"` open and close ✅ FIXED
 
-**File:** `hx-popover.test.ts`
-
-There are zero tests for `trigger="focus"`. The `focusin` → show and `focusout` → hide handlers exist in the implementation but have no test coverage. This leaves a whole trigger mode completely untested.
+**Resolution:** Added two tests: `shows on focusin when trigger="focus"` and `hides on focusout when trigger="focus"`, covering both the open and close paths for the focus trigger mode.
 
 ---
 
-### P1-07: Missing tests for `hx-after-show` and `hx-after-hide` events
+### P1-07: Missing tests for `hx-after-show` and `hx-after-hide` events ✅ FIXED
 
-**File:** `hx-popover.test.ts`
-
-The component dispatches four events: `hx-show`, `hx-after-show`, `hx-hide`, `hx-after-hide`. Only `hx-show` and `hx-hide` are tested. The "after" variants — which signal animation/transition completion — have no coverage.
+**Resolution:** Added tests `dispatches hx-after-show after the popover is fully visible` and `dispatches hx-after-hide after the popover is fully hidden`, completing the event coverage for all four lifecycle events.
 
 ---
 

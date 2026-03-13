@@ -55,35 +55,29 @@ Note: browse-mode screen readers (NVDA, JAWS document mode) can still encounter 
 
 ## 3. Tests
 
-### P1 — No test for `aria-valuetext` (because it does not exist)
+### P1 — No test for `aria-valuetext` (because it does not exist) ✅ FIXED
 
-There are no tests asserting that the qualitative state is communicated to screen readers. Once `aria-valuetext` is implemented (see Accessibility P1), tests must cover all four state transitions: `default`, `optimum`, `warning`, `danger`.
+**Resolution:** Added tests for all four state transitions in the `ARIA` suite: default (no thresholds), optimum, warning, and danger states. Also implemented `aria-valuetext` on the `role="meter"` element in `hx-meter.ts` with format `"${value} of ${max}"` and `"${value} of ${max} — ${state}"` for non-default states.
 
-### P1 — Slot-only label accessible name not tested
+### P1 — Slot-only label accessible name not tested ✅ FIXED
 
-No test verifies the `aria-label` value when only slot content is provided (no `label` attribute). The current fallback silently produces an incorrect accessible name. This failure mode is untested.
+**Resolution:** Added test `sets aria-labelledby when slot content is provided` verifying that `aria-labelledby="__hx-meter-label"` is set on the base element when only slot content is used (no `label` attribute).
 
-### P2 — Misleading test description at line 260
+### P2 — Misleading test description at line 260 ✅ FIXED
 
-The test is named:
+**Resolution:** Updated test description to `has data-state="optimum" with only optimum set (no low/high)` to accurately reflect the assertion.
 
-```
-it('has data-state="default" with only optimum set (no low/high)', ...)
-```
+### P2 — Boundary values at `low` and `high` thresholds not tested ✅ FIXED
 
-But the assertion is `expect(el.dataset['state']).toBe('optimum')`. The description says `"default"` but expects `'optimum'`. This is a confusing mismatch. The test passes for the right reason (when only `optimum` is set, the entire range becomes "optimum"), but the description will mislead future maintainers.
+**Resolution:** Added two boundary tests: `has data-state="optimum" when value exactly equals low boundary` and `has data-state="optimum" when value exactly equals high boundary`. Both verify the strict inequality behavior (equal-to-boundary values fall in the middle zone).
 
-### P2 — Boundary values at `low` and `high` thresholds not tested
+### P2 — `min === max` zero-division edge case not tested ✅ FIXED
 
-The threshold logic uses strict inequality: `v < this.low` and `v > this.high`. This means a value exactly equal to `low` or `high` is considered "in the middle zone" (not warning). No test covers `value === low` or `value === high` as explicit boundary cases. Future refactors could accidentally change the boundary behavior.
+**Resolution:** Added test `sets indicator width to 0% when min equals max (zero-division guard)` in the `Indicator width` suite. Verifies `<hx-meter value="5" min="5" max="5">` renders indicator at 0% without throwing.
 
-### P2 — `min === max` zero-division edge case not tested
+### P2 — Duplicate CSS-part assertions ✅ FIXED
 
-The guard at `hx-meter.ts:93` handles `range === 0` by returning `0`. This is correct but untested. A test with `<hx-meter value="5" min="5" max="5">` should assert the indicator renders at 0% and does not throw.
-
-### P2 — Duplicate CSS-part assertions
-
-The Rendering suite (lines 18-34) and the CSS Parts suite (lines 300-317) both test `[part~="base"]` and `[part~="indicator"]`. Minor redundancy but increases maintenance burden without adding coverage.
+**Resolution:** Removed the CSS-part assertions from the Rendering suite. Part assertions now exist only in the dedicated `CSS Parts` suite, eliminating duplication.
 
 ---
 
@@ -200,16 +194,16 @@ There is no `hx-meter.twig` file or Drupal-specific documentation in the compone
 | 2   | Accessibility | P1       | Slot-only label produces wrong accessible name (WCAG 2.5.3 violation)                            |
 | 3   | CSS           | P1       | Missing `track` CSS part — required by audit contract ✅ FIXED                                   |
 | 4   | Storybook     | P1       | Default story controls for `low`, `high`, `optimum` are non-functional (not bound in render)     |
-| 5   | Tests         | P1       | No test for `aria-valuetext` (feature also missing)                                              |
-| 6   | Tests         | P1       | Slot-only label accessible name bug is untested                                                  |
+| 5   | Tests         | P1       | No test for `aria-valuetext` (feature also missing) ✅ FIXED                                     |
+| 6   | Tests         | P1       | Slot-only label accessible name bug is untested ✅ FIXED                                         |
 | 7   | TypeScript    | P2       | Final `return 'default'` in `_resolveState()` is unreachable — dead code                         |
 | 8   | TypeScript    | P2       | No `size` property if size variants are expected                                                 |
 | 9   | Accessibility | P2       | `role="meter"` element not focusable (no `tabindex="0"`)                                         |
 | 10  | Accessibility | P2       | `data-state` attribute set redundantly on both host and inner div ✅ FIXED                       |
-| 11  | Tests         | P2       | Test description at line 260 says "default" but asserts "optimum" — misleading                   |
-| 12  | Tests         | P2       | Boundary values `value === low` and `value === high` not tested                                  |
-| 13  | Tests         | P2       | `min === max` zero-division guard not tested                                                     |
-| 14  | Tests         | P2       | Duplicate CSS-part assertions in Rendering and CSS Parts suites                                  |
+| 11  | Tests         | P2       | Test description at line 260 says "default" but asserts "optimum" — misleading ✅ FIXED          |
+| 12  | Tests         | P2       | Boundary values `value === low` and `value === high` not tested ✅ FIXED                         |
+| 13  | Tests         | P2       | `min === max` zero-division guard not tested ✅ FIXED                                            |
+| 14  | Tests         | P2       | Duplicate CSS-part assertions in Rendering and CSS Parts suites ✅ FIXED                         |
 | 15  | Storybook     | P2       | `LabelSlot` story demonstrates an accessibility failure silently                                 |
 | 16  | Storybook     | P2       | No story for aria-label-only (no visible label) usage                                            |
 | 17  | CSS           | P2       | No `size` CSS variants or custom property                                                        |
@@ -217,5 +211,5 @@ There is no `hx-meter.twig` file or Drupal-specific documentation in the compone
 | 19  | Drupal        | P2       | No Twig template or Drupal usage example                                                         |
 
 **P0 findings: 0**
-**P1 findings: 6** (1 fixed: #3 track CSS part)
-**P2 findings: 13** (1 fixed: #10 data-state duplication)
+**P1 findings: 6** (3 fixed: #3 track CSS part, #5 aria-valuetext tests, #6 slot-only label test)
+**P2 findings: 13** (5 fixed: #10 data-state duplication, #11 misleading test description, #12 boundary tests, #13 zero-division test, #14 duplicate CSS-part assertions)
