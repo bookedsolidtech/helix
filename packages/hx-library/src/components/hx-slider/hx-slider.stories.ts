@@ -502,6 +502,18 @@ export const KeyboardNavigation: Story = {
     await userEvent.keyboard('{End}');
     await waitForUpdate(canvasElement);
     await expect(input.value).toBe('100');
+
+    // Page Down decreases value by a large step (native behaviour: ~10% of range)
+    await userEvent.keyboard('{PageDown}');
+    await waitForUpdate(canvasElement);
+    // Native range input decreases by 10 on a 0–100 range with step=1
+    await expect(Number(input.value)).toBeLessThan(100);
+
+    // Page Up increases value by a large step
+    const beforePageUp = Number(input.value);
+    await userEvent.keyboard('{PageUp}');
+    await waitForUpdate(canvasElement);
+    await expect(Number(input.value)).toBeGreaterThan(beforePageUp);
   },
 };
 
@@ -903,6 +915,66 @@ export const MedicationDosageSelector: Story = {
       </div>
     </div>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// OUT-OF-RANGE VALUE
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates what happens when `value` is set outside `[min, max]`.
+ *
+ * The native `<input type="range">` clamps out-of-range values internally, so
+ * `input.value` will always report the clamped result (e.g. setting `value="150"` on
+ * `max="100"` results in the thumb sitting at the maximum position). The play function
+ * confirms the rendered input value stays within bounds regardless of the initial prop.
+ *
+ * NOTE: The component itself does not yet implement a property-level setter that clamps
+ * the `value` property before assigning it to the internal input — this story exposes that
+ * gap (audit finding hx-slider:P1-02) and acts as a visual regression baseline.
+ */
+export const OutOfRangeValue: Story = {
+  name: 'Out-of-Range Value (clamping)',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6c757d; font-family: monospace;"
+        >
+          value="150" on max="100" — native input clamps to 100
+        </p>
+        <hx-slider label="Over-max value" value="150" min="0" max="100" show-value></hx-slider>
+      </div>
+      <div>
+        <p
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6c757d; font-family: monospace;"
+        >
+          value="-20" on min="0" — native input clamps to 0
+        </p>
+        <hx-slider label="Under-min value" value="-20" min="0" max="100" show-value></hx-slider>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    await waitForUpdate(canvasElement);
+    const sliders = canvasElement.querySelectorAll('hx-slider');
+
+    // Over-max: native input should report clamped value (≤ max)
+    const overMaxInput = sliders[0]?.shadowRoot?.querySelector<HTMLInputElement>(
+      'input[type="range"]',
+    );
+    if (overMaxInput) {
+      await expect(Number(overMaxInput.value)).toBeLessThanOrEqual(100);
+    }
+
+    // Under-min: native input should report clamped value (≥ min)
+    const underMinInput = sliders[1]?.shadowRoot?.querySelector<HTMLInputElement>(
+      'input[type="range"]',
+    );
+    if (underMinInput) {
+      await expect(Number(underMinInput.value)).toBeGreaterThanOrEqual(0);
+    }
+  },
 };
 
 /**

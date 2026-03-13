@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import './hx-tag.js';
 
 // ─────────────────────────────────────────────────
@@ -24,7 +25,8 @@ const meta = {
     size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
-      description: 'Controls the font size and padding of the tag.',
+      description:
+        'Controls the font size and padding of the tag. **Storybook controls bind to the `size` property name**, but the HTML attribute is `hx-size` (e.g. `<hx-tag hx-size="sm">`). Use `hx-size` in Twig templates and raw HTML.',
       table: {
         category: 'Visual',
         defaultValue: { summary: 'md' },
@@ -199,4 +201,26 @@ export const RemovableInteractive: Story = {
       <hx-tag removable>Neurology</hx-tag>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    // Verify all four tags rendered
+    const tags = canvasElement.querySelectorAll('hx-tag');
+    await expect(tags.length).toBe(4);
+
+    // Each tag must have a remove button inside shadow DOM
+    const firstTag = tags[0];
+    await expect(firstTag).toBeTruthy();
+    const removeButton = firstTag.shadowRoot?.querySelector<HTMLButtonElement>(
+      '[part="remove-button"]',
+    );
+    await expect(removeButton).toBeTruthy();
+
+    // Keyboard: tab to the remove button and activate via Enter
+    removeButton!.focus();
+    await expect(removeButton).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+
+    // After removal, only 3 tags should remain in the container
+    const remaining = canvasElement.querySelectorAll('hx-tag');
+    await expect(remaining.length).toBe(3);
+  },
 };
