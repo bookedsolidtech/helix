@@ -193,46 +193,46 @@ This uses the old `Wc` prefix instead of `Hx`. However, this is a **project-wide
 
 ## Coverage Matrix
 
-| Area                                        | Status  | Notes                                                          |
-| ------------------------------------------- | ------- | -------------------------------------------------------------- |
-| TypeScript types — variant union            | PASS    | All 7 variants in type + stories + tests                       |
-| TypeScript types — strict compliance        | PASS    | No `any`, no `@ts-ignore`, proper typing                       |
-| TypeScript types — count/max                | PASS    | Implemented with correct types                                 |
-| Accessibility — dot indicator name          | PASS    | `dotLabel` with `role="img"` + `aria-label`                    |
-| Accessibility — remove button label         | PASS    | Contextual `removeLabel` property                              |
-| Accessibility — prefers-reduced-motion CSS  | PASS    | Media query disables animation                                 |
-| Accessibility — prefers-reduced-motion test | PASS    | Test verifies CSS rule                                         |
-| Accessibility — live region for count       | PASS    | `aria-live="polite"` when count set                            |
-| Accessibility — axe-core                    | PASS    | Tests for default + all variants                               |
-| Tests — rendering (5)                       | PASS    | Shadow DOM, CSS parts, defaults                                |
-| Tests — all variants (8)                    | PASS    | All 7 variants + reflection                                    |
-| Tests — sizes (3)                           | PASS    | sm, md, lg                                                     |
-| Tests — pill (3)                            | PASS    | Class, default, reflection                                     |
-| Tests — pulse (3)                           | PASS    | Class, default, reflection                                     |
-| Tests — removable (3)                       | PASS    | Button presence, default, reflection                           |
-| Tests — dot indicator (3)                   | PASS    | Empty+pulse, content+pulse, empty-pulse                        |
-| Tests — slots (3)                           | PASS    | Default text, HTML, prefix                                     |
-| Tests — CSS parts (2)                       | PASS    | badge, remove-button                                           |
-| Tests — events (3)                          | PASS    | Click, Enter, Space                                            |
-| Tests — count/max (6)                       | PASS    | Display, zero, truncation, equals max, custom max, count+pulse |
-| Tests — dotLabel (3)                        | PASS    | role/aria-label, without, not in dot mode                      |
-| Tests — removeLabel (2)                     | PASS    | Default, custom                                                |
-| Tests — aria-live (2)                       | PASS    | With count, without count                                      |
-| Tests — whitespace edge cases (2)           | PASS    | Whitespace-only, newline-only                                  |
-| Tests — dynamic updates (2)                 | PASS    | Variant change, size change                                    |
-| Tests — reduced motion (1)                  | PASS    | CSS rule verification                                          |
-| Storybook — all variants                    | PASS    | 7 stories with play tests                                      |
-| Storybook — all sizes                       | PASS    | 3 stories with play tests                                      |
-| Storybook — count/max                       | PASS    | WithCount story with 6 examples                                |
-| Storybook — removable + count               | PASS    | Labels placed in prefix slot alongside count (P2-2 FIXED)      |
-| Storybook — dot indicator                   | PASS    | 4 examples with dot-label                                      |
-| Storybook — kitchen sinks                   | PASS    | AllVariants, AllSizes, AllCombinations                         |
-| CSS — design tokens only                    | PASS    | No hardcoded values, all token-backed with fallbacks           |
-| CSS — Shadow DOM encapsulation              | PASS    | `:host` display, proper scoping                                |
-| CSS — parts API                             | PASS    | `badge`, `remove-button`                                       |
-| CSS — dead code                             | FIXED   | `--hx-badge-pulse-color` now consumed in box-shadow animation  |
-| Performance — bundle size                   | PASS    | Lightweight, well within 5KB                                   |
-| Performance — render efficiency             | PASS    | Minimal DOM, conditional rendering                             |
+| Area                                        | Status | Notes                                                          |
+| ------------------------------------------- | ------ | -------------------------------------------------------------- |
+| TypeScript types — variant union            | PASS   | All 7 variants in type + stories + tests                       |
+| TypeScript types — strict compliance        | PASS   | No `any`, no `@ts-ignore`, proper typing                       |
+| TypeScript types — count/max                | PASS   | Implemented with correct types                                 |
+| Accessibility — dot indicator name          | PASS   | `dotLabel` with `role="img"` + `aria-label`                    |
+| Accessibility — remove button label         | PASS   | Contextual `removeLabel` property                              |
+| Accessibility — prefers-reduced-motion CSS  | PASS   | Media query disables animation                                 |
+| Accessibility — prefers-reduced-motion test | PASS   | Test verifies CSS rule                                         |
+| Accessibility — live region for count       | PASS   | `aria-live="polite"` when count set                            |
+| Accessibility — axe-core                    | PASS   | Tests for default + all variants                               |
+| Tests — rendering (5)                       | PASS   | Shadow DOM, CSS parts, defaults                                |
+| Tests — all variants (8)                    | PASS   | All 7 variants + reflection                                    |
+| Tests — sizes (3)                           | PASS   | sm, md, lg                                                     |
+| Tests — pill (3)                            | PASS   | Class, default, reflection                                     |
+| Tests — pulse (3)                           | PASS   | Class, default, reflection                                     |
+| Tests — removable (3)                       | PASS   | Button presence, default, reflection                           |
+| Tests — dot indicator (3)                   | PASS   | Empty+pulse, content+pulse, empty-pulse                        |
+| Tests — slots (3)                           | PASS   | Default text, HTML, prefix                                     |
+| Tests — CSS parts (2)                       | PASS   | badge, remove-button                                           |
+| Tests — events (3)                          | PASS   | Click, Enter, Space                                            |
+| Tests — count/max (6)                       | PASS   | Display, zero, truncation, equals max, custom max, count+pulse |
+| Tests — dotLabel (3)                        | PASS   | role/aria-label, without, not in dot mode                      |
+| Tests — removeLabel (2)                     | PASS   | Default, custom                                                |
+| Tests — aria-live (2)                       | PASS   | With count, without count                                      |
+| Tests — whitespace edge cases (2)           | PASS   | Whitespace-only, newline-only                                  |
+| Tests — dynamic updates (2)                 | PASS   | Variant change, size change                                    |
+| Tests — reduced motion (1)                  | PASS   | CSS rule verification                                          |
+| Storybook — all variants                    | PASS   | 7 stories with play tests                                      |
+| Storybook — all sizes                       | PASS   | 3 stories with play tests                                      |
+| Storybook — count/max                       | PASS   | WithCount story with 6 examples                                |
+| Storybook — removable + count               | PASS   | Labels placed in prefix slot alongside count (P2-2 FIXED)      |
+| Storybook — dot indicator                   | PASS   | 4 examples with dot-label                                      |
+| Storybook — kitchen sinks                   | PASS   | AllVariants, AllSizes, AllCombinations                         |
+| CSS — design tokens only                    | PASS   | No hardcoded values, all token-backed with fallbacks           |
+| CSS — Shadow DOM encapsulation              | PASS   | `:host` display, proper scoping                                |
+| CSS — parts API                             | PASS   | `badge`, `remove-button`                                       |
+| CSS — dead code                             | FIXED  | `--hx-badge-pulse-color` now consumed in box-shadow animation  |
+| Performance — bundle size                   | PASS   | Lightweight, well within 5KB                                   |
+| Performance — render efficiency             | PASS   | Minimal DOM, conditional rendering                             |
 
 ---
 

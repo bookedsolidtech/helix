@@ -230,8 +230,8 @@ This is consistent with every other component in the library that follows the Li
 
 ## Fixes Applied (A11y Audit — 2026-03-12)
 
-| Issue | Status | Fix |
-|-------|--------|-----|
+| Issue | Status   | Fix                                                                                                                                                                                                         |
+| ----- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | P1-01 | RESOLVED | `role`, `aria-valuemin` moved to `connectedCallback()`; `aria-valuemax`, `aria-valuenow`, `aria-busy`, `aria-label` synced in `willUpdate()` — no SSR/Drupal window exists where ARIA attributes are absent |
-| P1-02 | RESOLVED | When `label` is absent, a `console.warn` is emitted guiding developers to WCAG 4.1.2 compliance |
-| P2-04 | RESOLVED | `aria-busy="true"` set during indeterminate state; removed when determinate value is set |
+| P1-02 | RESOLVED | When `label` is absent, a `console.warn` is emitted guiding developers to WCAG 4.1.2 compliance                                                                                                             |
+| P2-04 | RESOLVED | `aria-busy="true"` set during indeterminate state; removed when determinate value is set                                                                                                                    |

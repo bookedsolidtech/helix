@@ -4,6 +4,7 @@
 **Date:** 2026-03-05
 **Branch under audit:** `feature/t2-29-hx-toggle-button-pressedunpressed`
 **Files reviewed:**
+
 - `hx-toggle-button.ts` (209 lines)
 - `hx-toggle-button.styles.ts` (206 lines)
 - `hx-toggle-button.test.ts` (490 lines)
@@ -30,13 +31,13 @@ The component is structurally sound: correct `aria-pressed` semantics, full Elem
 /* Host level */
 :host([disabled]) {
   pointer-events: none;
-  opacity: var(--hx-opacity-disabled, 0.5);   /* <-- 0.5 */
+  opacity: var(--hx-opacity-disabled, 0.5); /* <-- 0.5 */
 }
 
 /* Inner button level */
 .button[disabled] {
   cursor: not-allowed;
-  opacity: var(--hx-opacity-disabled, 0.5);   /* <-- 0.5 again */
+  opacity: var(--hx-opacity-disabled, 0.5); /* <-- 0.5 again */
 }
 ```
 
@@ -57,7 +58,7 @@ it('toggles on Space key press', async () => {
   const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
   const eventPromise = oneEvent(el, 'hx-toggle');
   btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-  btn.click();   // <-- this is what actually fires the event
+  btn.click(); // <-- this is what actually fires the event
   const event = await eventPromise;
   expect(event.detail.pressed).toBe(true);
 });
@@ -78,6 +79,7 @@ The component does not expose a `label` property, and has no mechanism to forwar
 Storybook workaround (`ViewModeToggle` story) applies `aria-label` directly on `<hx-toggle-button>`, which only labels the custom element host — it does **not** propagate to the inner `<button>` element inside Shadow DOM. Screen readers operating in forms mode will announce the `<button>` inside the shadow, which has no label.
 
 The correct fix is to either:
+
 1. Add a `label` string property that sets `aria-label` on the inner `<button>`, or
 2. Use `aria-labelledby` with an explicitly connected label ID.
 
@@ -168,26 +170,26 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 
 ## Summary Table
 
-| ID | Severity | Area | Description |
-|----|----------|------|-------------|
-| P0-1 | **P0** | CSS | Double opacity on disabled: 0.5 × 0.5 = 0.25 effective opacity |
-| P1-1 | P1 | Tests | Keyboard tests call `btn.click()` — keydown dispatch is not tested |
-| P1-2 | P1 | Accessibility | Icon-only usage has no accessible name forwarding to inner `<button>` |
-| P1-3 | P1 | Tests | `formStateRestoreCallback` untested; implementation may use wrong state key |
-| P1-4 | P1 | Drupal | No Twig template or Drupal integration guidance — **FIXED** |
-| P2-1 | P2 | CSS / A11y | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast |
-| P2-2 | P2 | TypeScript | Deprecated alias `WcToggleButton` should be `HxToggleButton` |
-| P2-3 | P2 | TypeScript | `updated()` should use Lit's `PropertyValues` type |
-| P2-4 | P2 | Storybook | ~~Missing icon-only story~~ **FIXED** |
-| P2-5 | P2 | Architecture | No toggle group coordination mechanism or exclusive-select pattern |
-| P2-6 | P2 | API | `hx-size` attribute diverges from library convention; undocumented |
+| ID   | Severity | Area          | Description                                                                 |
+| ---- | -------- | ------------- | --------------------------------------------------------------------------- |
+| P0-1 | **P0**   | CSS           | Double opacity on disabled: 0.5 × 0.5 = 0.25 effective opacity              |
+| P1-1 | P1       | Tests         | Keyboard tests call `btn.click()` — keydown dispatch is not tested          |
+| P1-2 | P1       | Accessibility | Icon-only usage has no accessible name forwarding to inner `<button>`       |
+| P1-3 | P1       | Tests         | `formStateRestoreCallback` untested; implementation may use wrong state key |
+| P1-4 | P1       | Drupal        | No Twig template or Drupal integration guidance — **FIXED**                 |
+| P2-1 | P2       | CSS / A11y    | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast     |
+| P2-2 | P2       | TypeScript    | Deprecated alias `WcToggleButton` should be `HxToggleButton`                |
+| P2-3 | P2       | TypeScript    | `updated()` should use Lit's `PropertyValues` type                          |
+| P2-4 | P2       | Storybook     | ~~Missing icon-only story~~ **FIXED**                                       |
+| P2-5 | P2       | Architecture  | No toggle group coordination mechanism or exclusive-select pattern          |
+| P2-6 | P2       | API           | `hx-size` attribute diverges from library convention; undocumented          |
 
 ---
 
 ## CSS Audit Fixes Applied (2026-03-12)
 
-| Finding | Status |
-|---------|--------|
+| Finding                                                   | Status                                                                                                                              |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | P0-1: Double opacity on disabled state (0.5 × 0.5 = 0.25) | **FIXED** — `opacity` removed from `.button[disabled]`; only `:host([disabled])` applies `opacity: var(--hx-opacity-disabled, 0.5)` |
 
 ---

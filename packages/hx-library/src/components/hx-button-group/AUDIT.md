@@ -286,36 +286,36 @@ The `hx-size` attribute uses a hyphen prefix, which is valid HTML but unusual. T
 
 ## Summary Table
 
-| #   | Area          | Severity | Finding                                                                          |
-| --- | ------------- | -------- | -------------------------------------------------------------------------------- |
-| 1   | TypeScript    | P2       | `requestUpdate()` in slot handler is unnecessary and comment is false            |
-| 2   | TypeScript    | P2       | No runtime guard for invalid `orientation` values                                |
-| 3   | TypeScript    | P2       | `private internals` convention inconsistency (minor)                             |
-| 4   | Accessibility | P1       | `role="group"` used instead of `role="toolbar"`; no arrow-key navigation         |
-| 5   | Accessibility | P1       | No accessible label requirement documented or enforced                           |
-| 6   | Accessibility | P1       | Focus visibility z-index via `:focus-within` on Shadow DOM not tested            |
-| 7   | Accessibility | P2       | No `aria-disabled` cascade for disabled children                                 |
-| 8   | Tests         | P1       | No keyboard navigation tests                                                     |
-| 9   | Tests         | P1       | No disabled-children tests                                                       |
-| 10  | Tests         | P1       | No mixed-variant tests                                                           |
-| 11  | Tests         | P1       | No orientation attribute reflection test                                         |
-| 12  | Tests         | P1       | No single-button border-radius test                                              |
-| 13  | Tests         | P2       | `requestUpdate` spy test is fragile implementation testing                       |
-| 14  | Tests         | P2       | `--hx-button-group-size` cascade not end-to-end tested                           |
-| 15  | Storybook     | P1       | Size stories override individual button sizes — cascade mechanism undemonstrated |
-| 16  | Storybook     | **FIXED**| `DisabledChildren` story added                                                   |
-| 17  | Storybook     | **FIXED**| `AccessibilityLabel` dedicated story added                                       |
-| 18  | Storybook     | **FIXED**| `MixedVariants` updated with play function and assertions                        |
-| 19  | CSS           | P1       | Single-child border-radius bug (`:first-child:last-child` specificity collision) |
-| 20  | CSS           | P1       | `--hx-button-group-size` cascade likely non-functional; unverified end-to-end    |
-| 21  | CSS           | P2       | `position: relative` z-index context is undocumented dependency                  |
-| 22  | CSS           | P2       | No consumer-facing CSS custom properties for group container theming             |
-| 23  | CSS           | P2       | `prefers-reduced-motion` rule is no-op for Shadow DOM button transitions         |
-| 24  | Performance   | **FIXED**| `requestUpdate()` removed from slot handler; `_handleSlotChange` deleted         |
-| 25  | Performance   | **FIXED**| `contain: layout style` added to `:host` in styles                               |
-| 26  | Performance   | **ACK**  | No bundle size CI gate output confirming <5KB compliance (infra concern)         |
-| 27  | Drupal        | P2       | No CDN/Drupal registration pattern documented at component level                 |
-| 28  | Drupal        | P2       | `hx-size` hyphen attribute not documented as Drupal-safe                         |
+| #   | Area          | Severity  | Finding                                                                          |
+| --- | ------------- | --------- | -------------------------------------------------------------------------------- |
+| 1   | TypeScript    | P2        | `requestUpdate()` in slot handler is unnecessary and comment is false            |
+| 2   | TypeScript    | P2        | No runtime guard for invalid `orientation` values                                |
+| 3   | TypeScript    | P2        | `private internals` convention inconsistency (minor)                             |
+| 4   | Accessibility | P1        | `role="group"` used instead of `role="toolbar"`; no arrow-key navigation         |
+| 5   | Accessibility | P1        | No accessible label requirement documented or enforced                           |
+| 6   | Accessibility | P1        | Focus visibility z-index via `:focus-within` on Shadow DOM not tested            |
+| 7   | Accessibility | P2        | No `aria-disabled` cascade for disabled children                                 |
+| 8   | Tests         | P1        | No keyboard navigation tests                                                     |
+| 9   | Tests         | P1        | No disabled-children tests                                                       |
+| 10  | Tests         | P1        | No mixed-variant tests                                                           |
+| 11  | Tests         | P1        | No orientation attribute reflection test                                         |
+| 12  | Tests         | P1        | No single-button border-radius test                                              |
+| 13  | Tests         | P2        | `requestUpdate` spy test is fragile implementation testing                       |
+| 14  | Tests         | P2        | `--hx-button-group-size` cascade not end-to-end tested                           |
+| 15  | Storybook     | P1        | Size stories override individual button sizes — cascade mechanism undemonstrated |
+| 16  | Storybook     | **FIXED** | `DisabledChildren` story added                                                   |
+| 17  | Storybook     | **FIXED** | `AccessibilityLabel` dedicated story added                                       |
+| 18  | Storybook     | **FIXED** | `MixedVariants` updated with play function and assertions                        |
+| 19  | CSS           | P1        | Single-child border-radius bug (`:first-child:last-child` specificity collision) |
+| 20  | CSS           | P1        | `--hx-button-group-size` cascade likely non-functional; unverified end-to-end    |
+| 21  | CSS           | P2        | `position: relative` z-index context is undocumented dependency                  |
+| 22  | CSS           | P2        | No consumer-facing CSS custom properties for group container theming             |
+| 23  | CSS           | P2        | `prefers-reduced-motion` rule is no-op for Shadow DOM button transitions         |
+| 24  | Performance   | **FIXED** | `requestUpdate()` removed from slot handler; `_handleSlotChange` deleted         |
+| 25  | Performance   | **FIXED** | `contain: layout style` added to `:host` in styles                               |
+| 26  | Performance   | **ACK**   | No bundle size CI gate output confirming <5KB compliance (infra concern)         |
+| 27  | Drupal        | P2        | No CDN/Drupal registration pattern documented at component level                 |
+| 28  | Drupal        | P2        | `hx-size` hyphen attribute not documented as Drupal-safe                         |
 
 ---
 
@@ -339,8 +339,8 @@ The `hx-size` attribute uses a hyphen prefix, which is valid HTML but unusual. T
 
 ## Drupal Fixes Applied
 
-| Finding | Status |
-|---------|--------|
-| P2-16: No CDN/Drupal registration pattern documented | **FIXED** — `README.drupal.md` created with CDN strategy, npm+theme build pipeline strategy, asset loading YAML, and Drupal behaviors integration example. |
+| Finding                                                       | Status                                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P2-16: No CDN/Drupal registration pattern documented          | **FIXED** — `README.drupal.md` created with CDN strategy, npm+theme build pipeline strategy, asset loading YAML, and Drupal behaviors integration example.                                    |
 | P2-17: `hx-size` attribute name not documented as Drupal-safe | **FIXED** — `README.drupal.md` explicitly documents `hx-size` as valid HTML, shows `attributes.setAttribute('hx-size', 'sm')` in PHP, and explains the CSS custom property cascade mechanism. |
-| Missing Twig template | **FIXED** — `hx-button-group.twig` template created with orientation, size, aria-label, and button iteration pattern. |
+| Missing Twig template                                         | **FIXED** — `hx-button-group.twig` template created with orientation, size, aria-label, and button iteration pattern.                                                                         |
