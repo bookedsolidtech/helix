@@ -74,12 +74,12 @@ The "expanding via ellipsis button removes collapse state" test (line 397) sets 
 
 The `updated()` handler (line 358-369) correctly watches `jsonLd` property changes and injects/removes the script. No test exercises `el.jsonLd = true` after initial render without `json-ld` attribute, or `el.jsonLd = false` to verify removal via property toggle.
 
-#### P3 — No test for `current` property toggling at runtime
+#### ~~P3 — No test for `current` property toggling at runtime~~ ✅ FIXED (BC-A04)
 
-**File:** `hx-breadcrumb.test.ts` (missing)
+**File:** `hx-breadcrumb.test.ts`
 **Issue ID:** BC-A04
 
-No test verifies that toggling `current` from `true` to `false` on an `hx-breadcrumb-item` switches the render output from `<span part="text" aria-current="page">` back to `<a part="link">`.
+Added runtime toggle test: verifies that setting `current = true` on an `hx-breadcrumb-item` switches from `<a part="link">` to `<span part="text" aria-current="page">`, and setting `current = false` reverts to `<a part="link">`.
 
 ---
 
@@ -105,12 +105,12 @@ The story demonstrates token overrides using literal hex values (`#7c3aed`, `#5b
 
 ### 4. TypeScript
 
-#### P3 — `_buildListItem` return type defined inline
+#### ~~P3 — `_buildListItem` return type defined inline~~ ✅ FIXED (BC-A07)
 
-**File:** `hx-breadcrumb.ts:273-286`
+**File:** `hx-breadcrumb.ts`
 **Issue ID:** BC-A07
 
-The return type `{ '@type': string; position: number; name: string; item?: string }` is written inline on both the method signature and the local `entry` variable. A named interface (e.g., `JsonLdListItem`) would reduce duplication and improve self-documentation.
+Extracted inline return type to named `JsonLdListItem` interface. The method signature and local `entry` variable now reference the named type, eliminating the duplication.
 
 ---
 
@@ -166,10 +166,10 @@ All 9 P1 and 8 P2 issues from the previous audit have been resolved:
 | BC-A01 | P1       | CEM        | Private members exposed in Custom Elements Manifest             |
 | BC-A02 | P2       | Tests      | Ellipsis expand button click/keyboard paths not directly tested |
 | BC-A03 | P3       | Tests      | No test for `json-ld` toggled on programmatically after render  |
-| BC-A04 | P3       | Tests      | No test for `current` property toggling at runtime              |
+| BC-A04 | P3       | Tests      | ~~No test for `current` property toggling at runtime~~ FIXED    |
 | BC-A05 | P3       | Storybook  | No story for explicit `current` attribute (Drupal pattern)      |
 | BC-A06 | P3       | Storybook  | ~~`WithCustomStyling` story uses hardcoded hex colors~~ FIXED   |
-| BC-A07 | P3       | TypeScript | `_buildListItem` return type defined inline                     |
+| BC-A07 | P3       | TypeScript | ~~`_buildListItem` return type defined inline~~ FIXED           |
 | BC-A08 | P3       | CSS        | ~~`display: contents` on `::part(item)` not documented~~ FIXED  |
 
 ---

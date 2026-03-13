@@ -291,7 +291,69 @@ export const PatientDetail: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 9. ISOLATED ROW
+// 9. WITH HEADER ROW (composition pattern)
+// ─────────────────────────────────────────────────
+
+/**
+ * The `hx-structured-list` component does not have a native header slot or
+ * variant. Until a dedicated header API is added, a header row can be composed
+ * by placing a styled element before the list using standard HTML. This story
+ * demonstrates the recommended composition pattern for healthcare data views
+ * that require column labels above a structured list.
+ */
+export const WithHeaderComposition: Story = {
+  name: 'With Header (Composition)',
+  render: () => html`
+    <div style="max-width: 560px; font-family: sans-serif;">
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          padding: 0.5rem 1rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--hx-color-neutral-500, #64748b);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-bottom: 1px solid var(--hx-color-neutral-200, #e2e8f0);
+        "
+        role="row"
+        aria-hidden="true"
+      >
+        <span>Field</span>
+        <span>Value</span>
+      </div>
+      <hx-structured-list bordered>
+        <hx-structured-list-row>
+          <span slot="label">Patient name</span>
+          Jane Doe
+        </hx-structured-list-row>
+        <hx-structured-list-row>
+          <span slot="label">Date of birth</span>
+          March 15, 1982
+        </hx-structured-list-row>
+        <hx-structured-list-row>
+          <span slot="label">MRN</span>
+          885521
+        </hx-structured-list-row>
+        <hx-structured-list-row>
+          <span slot="label">Primary physician</span>
+          Dr. Anil Patel
+        </hx-structured-list-row>
+      </hx-structured-list>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-structured-list');
+    await expect(el).toBeTruthy();
+    await expect(el?.hasAttribute('bordered')).toBe(true);
+    const rows = el?.querySelectorAll('hx-structured-list-row');
+    await expect(rows?.length).toBe(4);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 10. ISOLATED ROW
 // ─────────────────────────────────────────────────
 
 export const IsolatedRow: Story = {
