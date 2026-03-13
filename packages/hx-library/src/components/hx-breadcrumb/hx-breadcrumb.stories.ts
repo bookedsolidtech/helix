@@ -234,11 +234,11 @@ export const WithCustomStyling: Story = {
       separator=${args.separator}
       label=${args.label}
       style="
-        --hx-breadcrumb-link-color: #7c3aed;
-        --hx-breadcrumb-link-hover-color: #5b21b6;
-        --hx-breadcrumb-text-color: #1f2937;
-        --hx-breadcrumb-separator-color: #d1d5db;
-        --hx-breadcrumb-font-size: 1rem;
+        --hx-breadcrumb-link-color: var(--hx-color-secondary-600);
+        --hx-breadcrumb-link-hover-color: var(--hx-color-secondary-700);
+        --hx-breadcrumb-text-color: var(--hx-color-neutral-800);
+        --hx-breadcrumb-separator-color: var(--hx-color-neutral-300);
+        --hx-breadcrumb-font-size: var(--hx-font-size-md);
       "
     >
       <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>

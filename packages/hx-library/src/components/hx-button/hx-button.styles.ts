@@ -38,7 +38,7 @@ export const helixButtonStyles = css`
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -73,63 +73,65 @@ export const helixButtonStyles = css`
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-button-bg: var(--hx-color-primary-500, #2563eb);
-    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-button-bg: var(--hx-color-primary-500);
+    --hx-button-color: var(--hx-color-neutral-0);
     --hx-button-border-color: transparent;
   }
 
   .button--secondary {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-primary-500, #2563eb);
-    --hx-button-border-color: var(--hx-color-primary-500, #2563eb);
+    --hx-button-color: var(--hx-color-primary-500);
+    --hx-button-border-color: var(--hx-color-primary-500);
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-primary-50, #eff6ff);
+    --hx-button-bg: var(--hx-color-primary-50);
   }
 
   .button--tertiary {
-    --hx-button-bg: var(--hx-color-neutral-100, #f1f5f9);
-    --hx-button-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-button-bg: var(--hx-color-neutral-100);
+    --hx-button-color: var(--hx-color-neutral-900);
     --hx-button-border-color: transparent;
   }
 
   .button--tertiary:hover {
-    --hx-button-bg: var(--hx-color-neutral-200, #e2e8f0);
+    --hx-button-bg: var(--hx-color-neutral-200);
   }
 
   .button--danger {
-    --hx-button-bg: var(--hx-color-error-500, #dc2626);
-    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-button-bg: var(--hx-color-error-500);
+    --hx-button-color: var(--hx-color-neutral-0);
     --hx-button-border-color: transparent;
   }
 
   .button--danger:hover {
-    --hx-button-bg: var(--hx-color-error-600, #b91c1c);
+    --hx-button-bg: var(--hx-color-error-600);
   }
 
   .button--ghost {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-primary-500, #2563eb);
+    --hx-button-color: var(--hx-color-primary-500);
     --hx-button-border-color: transparent;
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-color-neutral-100, #f1f5f9);
+    --hx-button-bg: var(--hx-color-neutral-100);
   }
 
   .button--outline {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-neutral-900, #0f172a);
-    --hx-button-border-color: var(--hx-color-neutral-300, #cbd5e1);
+    --hx-button-color: var(--hx-color-neutral-900);
+    --hx-button-border-color: var(--hx-color-neutral-300);
   }
 
   .button--outline:hover {
-    --hx-button-bg: var(--hx-color-neutral-50, #f8fafc);
+    --hx-button-bg: var(--hx-color-neutral-50);
   }
 
   /* ─── Disabled ─── */
 
+  /* Note: opacity is applied on :host([disabled]) above — do NOT add opacity here.
+     Stacking opacity on both :host and .button[disabled] would multiply to 0.25. */
   .button[disabled] {
     cursor: not-allowed;
   }

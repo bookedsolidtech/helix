@@ -92,12 +92,14 @@ No test verifies that toggling `current` from `true` to `false` on an `hx-breadc
 
 The explicit `current` attribute on non-last items is a key feature for Drupal integration. No Storybook story demonstrates this pattern, making it invisible to consumers.
 
-#### P3 — `WithCustomStyling` story uses hardcoded hex colors
+#### ~~P3 — `WithCustomStyling` story uses hardcoded hex colors~~ FIXED
 
 **File:** `hx-breadcrumb.stories.ts:237-241`
 **Issue ID:** BC-A06
 
 The story demonstrates token overrides using literal hex values (`#7c3aed`, `#5b21b6`, etc.) in the `style` attribute. While this is technically correct for showing the mechanism, using HELiX token values from a different semantic context would better reinforce the token-first approach without introducing hardcoded values in demo code.
+
+**Fix:** Replaced all hardcoded hex values with `--hx-color-*` and `--hx-font-size-*` token references in the `style` attribute: `--hx-color-secondary-600`, `--hx-color-secondary-700`, `--hx-color-neutral-800`, `--hx-color-neutral-300`, `--hx-font-size-md`.
 
 ---
 
@@ -114,12 +116,14 @@ The return type `{ '@type': string; position: number; name: string; item?: strin
 
 ### 5. CSS / Shadow DOM
 
-#### P3 — `display: contents` on `[part='item']` prevents direct styling
+#### ~~P3 — `display: contents` on `[part='item']` prevents direct styling~~ FIXED (documented)
 
 **File:** `hx-breadcrumb-item.styles.ts:9-11`
 **Issue ID:** BC-A08
 
 The `[part='item']` wrapper uses `display: contents`, which removes it from the box model. While this is intentional (the wrapper exists only for slotting/selection purposes), it means consumers who attempt to style `::part(item)` with box-model properties (padding, margin, background) will see no effect. This behavior should be documented in the CSS parts section.
+
+**Fix:** Added an inline documentation comment in `hx-breadcrumb-item.styles.ts` above `[part='item']` explaining that `display: contents` is intentional and warning consumers to use `::part(link)` or `::part(text)` for visual styling instead.
 
 ---
 
@@ -164,9 +168,9 @@ All 9 P1 and 8 P2 issues from the previous audit have been resolved:
 | BC-A03 | P3       | Tests      | No test for `json-ld` toggled on programmatically after render  |
 | BC-A04 | P3       | Tests      | No test for `current` property toggling at runtime              |
 | BC-A05 | P3       | Storybook  | No story for explicit `current` attribute (Drupal pattern)      |
-| BC-A06 | P3       | Storybook  | `WithCustomStyling` story uses hardcoded hex colors             |
+| BC-A06 | P3       | Storybook  | ~~`WithCustomStyling` story uses hardcoded hex colors~~ FIXED   |
 | BC-A07 | P3       | TypeScript | `_buildListItem` return type defined inline                     |
-| BC-A08 | P3       | CSS        | `display: contents` on `::part(item)` not documented            |
+| BC-A08 | P3       | CSS        | ~~`display: contents` on `::part(item)` not documented~~ FIXED  |
 
 ---
 

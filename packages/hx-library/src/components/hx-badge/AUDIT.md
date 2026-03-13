@@ -41,7 +41,7 @@ The component is in **strong shape** for production use. Remaining findings are 
 
 ---
 
-#### P2-1: `--hx-badge-pulse-color` is dead CSS — set but never consumed
+#### ~~P2-1: `--hx-badge-pulse-color` is dead CSS — set but never consumed~~ FIXED
 
 **Location:** `hx-badge.styles.ts:49, 55, 61, 67, 73, 79, 85`, `hx-badge.ts:30`
 
@@ -80,6 +80,8 @@ The variable is also documented as `@cssprop` in the JSDoc (line 30), meaning th
 
 **Severity:** P2 — dead code in CSS + false API documentation.
 
+**Fix:** Implemented `box-shadow` pulse animation in `@keyframes wc-badge-pulse` using `--hx-badge-pulse-color`. The keyframe now animates from `box-shadow: 0 0 0 0 var(--hx-badge-pulse-color, currentColor)` to `box-shadow: 0 0 0 4px transparent`, giving a colored expanding ring effect. The variable is now consumed and the API is functional.
+
 ---
 
 #### P2-2: `RemovableWithCount` story labels are silently dropped
@@ -112,7 +114,7 @@ The "ICU", "Stable", "Pending Review", "Critical", "Discharged" labels in the st
 
 ---
 
-#### P2-3: Prefix slot rendered inside dot mode with no layout guard
+#### ~~P2-3: Prefix slot rendered inside dot mode with no layout guard~~ FIXED
 
 **Location:** `hx-badge.ts:171`, `hx-badge.styles.ts:96–101`
 
@@ -145,6 +147,8 @@ The SVG will be rendered inside the 0.5rem × 0.5rem container with `overflow: v
 Or conditionally render the prefix slot only when not in dot mode.
 
 **Severity:** P2 — edge case layout breakage with no guard.
+
+**Fix:** Added `.badge--dot ::slotted(*) { display: none; }` CSS guard in `hx-badge.styles.ts` after the `.badge--dot` rule.
 
 ---
 
@@ -248,7 +252,7 @@ This uses the old `Wc` prefix instead of `Hx`. However, this is a **project-wide
 | CSS — design tokens only                    | PASS    | No hardcoded values, all token-backed with fallbacks           |
 | CSS — Shadow DOM encapsulation              | PASS    | `:host` display, proper scoping                                |
 | CSS — parts API                             | PASS    | `badge`, `remove-button`                                       |
-| CSS — dead code                             | FAIL    | `--hx-badge-pulse-color` (P2-1)                                |
+| CSS — dead code                             | FIXED   | `--hx-badge-pulse-color` now consumed in box-shadow animation  |
 | Performance — bundle size                   | PASS    | Lightweight, well within 5KB                                   |
 | Performance — render efficiency             | PASS    | Minimal DOM, conditional rendering                             |
 
