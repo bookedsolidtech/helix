@@ -164,19 +164,11 @@ background-color: color-mix(in srgb, currentColor 10%, transparent);
 
 `color-mix()` requires Chrome 111+, Firefox 113+, Safari 16.2+. Falls back gracefully to no hover background (transparent) in older browsers. A comment documents the browser support range (line 122-123). This is acceptable for modern healthcare applications but should be noted in the component's browser support documentation.
 
-### P3-02: Twig template `show-icon` logic is inverted/verbose
+### ~~P3-02: Twig template `show-icon` logic is inverted/verbose~~ FIXED
 
 **File:** `hx-alert.twig:41`
 
-```twig
-{% if not show_icon %}{% else %}show-icon{% endif %}
-```
-
-This works correctly but is an unnecessarily complex way to express "output `show-icon` when `show_icon` is true." Simpler:
-
-```twig
-{% if show_icon %}show-icon{% endif %}
-```
+**Fix:** Simplified the inverted `{% if not show_icon %}{% else %}show-icon{% endif %}` to the idiomatic `{% if show_icon %}show-icon{% endif %}`.
 
 ### P3-03: No `fill="currentColor"` on variant icon SVGs
 

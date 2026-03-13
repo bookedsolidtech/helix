@@ -1,0 +1,82 @@
+{#
+  hx-icon-button — Drupal Twig Template
+  =======================================
+  Icon-only action button with full accessibility support.
+  Renders a square button (or anchor) containing a single icon.
+
+  IMPORTANT: The `label` variable is REQUIRED for accessibility. It is
+  rendered as both aria-label and title on the underlying element.
+  The component renders nothing when absent.
+
+  IMPORTANT: The `hx-size` attribute (not `size`) controls button dimensions.
+  This non-standard attribute name is required by the component API.
+
+  Variables:
+    - label     (string, required): Accessible name for the button. Required.
+                Exposed as aria-label and title. Healthcare context: use a
+                meaningful description like "Edit patient record" not "Edit".
+    - variant   (string, optional): 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'.
+                Default: 'ghost'.
+    - hx_size   (string, optional): 'sm' | 'md' | 'lg'. Default: 'md'.
+                Note: maps to the `hx-size` attribute (not `size`).
+    - type      (string, optional): 'button' | 'submit' | 'reset'. Default: 'button'.
+                Has no effect when href is set.
+    - disabled  (bool, optional): Disables the button. Default: false.
+    - href      (string, optional): When set, renders an <a> element instead of <button>.
+    - name      (string, optional): Name for form submission (button mode only).
+    - value     (string, optional): Value for form submission (button mode only).
+    - icon      (markup, required): The icon markup to render in the default slot.
+                Use hx-icon, an SVG element, or an <img>. Example:
+                  <hx-icon name="edit" aria-hidden="true"></hx-icon>
+    - attributes (object, optional): Additional Drupal attributes object.
+
+  Usage:
+    Icon button with hx-icon:
+      {% include 'hx-icon-button.twig' with {
+        label: 'Edit patient record',
+        variant: 'ghost',
+        hx_size: 'md',
+        icon: '<hx-icon name="edit" aria-hidden="true"></hx-icon>',
+      } %}
+
+    Danger icon button (e.g., delete action):
+      {% include 'hx-icon-button.twig' with {
+        label: 'Delete appointment',
+        variant: 'danger',
+        icon: '<hx-icon name="trash" aria-hidden="true"></hx-icon>',
+      } %}
+
+    Link mode (renders as <a>):
+      {% include 'hx-icon-button.twig' with {
+        label: 'Download patient report',
+        variant: 'secondary',
+        href: node.field_report.url,
+        icon: '<hx-icon name="download" aria-hidden="true"></hx-icon>',
+      } %}
+
+  Registration:
+    Load the component script in your theme's .libraries.yml:
+      hx-icon-button:
+        js:
+          path/to/@helixui/library/dist/hx-icon-button.js: { attributes: { type: module } }
+#}
+
+{% set _variant = variant|default('ghost') %}
+{% set _size = hx_size|default('md') %}
+{% set _type = type|default('button') %}
+
+<hx-icon-button
+  label="{{ label }}"
+  variant="{{ _variant }}"
+  hx-size="{{ _size }}"
+  {% if not href %}type="{{ _type }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if href %}href="{{ href }}"{% endif %}
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {# SECURITY: icon must be trusted markup — only pass hx-icon tags or
+     other controlled markup from Drupal templates, never raw user input. #}
+  {{ icon|raw }}
+</hx-icon-button>

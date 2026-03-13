@@ -351,3 +351,116 @@ export const SaveConfirmation: Story = {
     </hx-toast>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// DRUPAL / CDN INTEGRATION REFERENCE
+// ─────────────────────────────────────────────────
+
+/**
+ * Drupal integration reference for hx-toast.
+ *
+ * A companion `hx-toast.drupal.js` Drupal behaviors file ships alongside this component.
+ * It bridges server-rendered Twig markup to the imperative `toast()` JavaScript API.
+ *
+ * **How it works:**
+ * Attach a `data-hx-toast` attribute containing a JSON-encoded options object to any
+ * clickable element in Twig. When clicked, the behavior calls `toast()` with those options.
+ *
+ * **Twig template pattern:**
+ * ```twig
+ * {# Trigger a success toast on button click #}
+ * <button
+ *   type="button"
+ *   data-hx-toast='{"message":"Record saved.","variant":"success","duration":4000}'
+ * >
+ *   Save Patient Record
+ * </button>
+ *
+ * {# Trigger a warning toast — medication interaction alert #}
+ * <button
+ *   type="button"
+ *   data-hx-toast='{"message":"Medication interaction detected. Review before confirming.","variant":"warning"}'
+ * >
+ *   Check Interactions
+ *</button>
+ * ```
+ *
+ * **Library registration** (`mytheme.libraries.yml`):
+ * ```yaml
+ * hx-toast:
+ *   js:
+ *     path/to/@helixui/library/dist/hx-toast.js: { attributes: { type: module } }
+ *     path/to/hx-toast.drupal.js: {}
+ *   dependencies:
+ *     - core/drupal
+ * ```
+ *
+ * **Supported toast() options** (passed via data-hx-toast JSON):
+ * - `message`   (string) — notification text (required)
+ * - `variant`   (string) — 'default' | 'success' | 'warning' | 'danger' | 'info'
+ * - `duration`  (number) — milliseconds before auto-dismiss (default: 5000)
+ * - `placement` (string) — 'top-start' | 'top-center' | 'top-end' | 'bottom-start' | 'bottom-center' | 'bottom-end'
+ * - `closable`  (boolean) — show close button (default: true)
+ *
+ * **Attach/detach lifecycle:**
+ * The behavior uses `dataset.hxToastAttached` as a guard flag to prevent double-binding
+ * on partial DOM updates (Drupal AJAX / BigPipe). On `detach('unload')` the flag is removed,
+ * allowing re-attachment after AJAX replaces content.
+ */
+export const DrupalIntegration: Story = {
+  name: 'Drupal / CDN Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 560px;">
+      <div>
+        <p style="margin: 0 0 0.75rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Static hx-toast rendered from Twig (open attribute set server-side)
+        </p>
+        <hx-toast variant="success" open>
+          Patient chart saved successfully.
+        </hx-toast>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.75rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Warning toast — medication interaction (from Twig data-hx-toast trigger)
+        </p>
+        <hx-toast variant="warning" open>
+          Medication interaction detected. Review before confirming.
+        </hx-toast>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.75rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Danger alert — critical patient event
+        </p>
+        <hx-toast variant="danger" open>
+          Critical alert: patient vitals require immediate attention.
+        </hx-toast>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Twig trigger element pattern (data-hx-toast attribute)
+        </p>
+        <code
+          style="
+            display: block;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+          "
+        >
+{# Twig button that triggers a toast via hx-toast.drupal.js behavior #}
+&lt;button type="button"
+  data-hx-toast='{"message":"Record saved.","variant":"success","duration":4000}'&gt;
+  Save Patient Record
+&lt;/button&gt;
+        </code>
+      </div>
+    </div>
+  `,
+};

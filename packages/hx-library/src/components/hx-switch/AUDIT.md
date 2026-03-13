@@ -316,6 +316,18 @@ The screenshot filename references `wc-change` but the current test and componen
 | A-04: No `prefers-reduced-motion` support                       | **FIXED** — `@media (prefers-reduced-motion: reduce)` block disabling `.switch__track` and `.switch__thumb` transitions added to `hx-switch.styles.ts`     |
 | A-08: Missing `--hx-switch-help-text-color` CSS custom property | **FIXED** — `--hx-switch-help-text-color` token applied to `.switch__help-text` in `hx-switch.styles.ts`; `@cssprop` documentation added to `hx-switch.ts` |
 
+## Test Audit Fixes Applied (2026-03-13)
+
+| Finding                                                   | Status                                                                                                                                                                                                       |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A-01: `role="alert"` + `aria-live="polite"` contradictory | **FIXED** — `aria-live="polite"` removed from error div; test added verifying `role="alert"` present and `aria-live` absent                                                                                  |
+| A-05: `formStateRestoreCallback` signature incorrect      | **FIXED** — signature corrected to `(state: File \| string \| null, _mode: 'restore' \| 'autocomplete')` in `hx-switch.ts`; test added in `formStateRestoreCallback with null state` and `autocomplete mode` |
+| A-06: `Enter` key double-toggles                          | **FIXED** — `Enter` removed from keydown handler (Space-only per ARIA APG); test `Enter does not double-toggle` confirms correct behavior                                                                    |
+| A-09: `WcSwitch` type export wrong prefix                 | **FIXED** — `HxSwitch` alias added alongside deprecated `WcSwitch` in `hx-switch.ts`                                                                                                                         |
+| A-11: `Math.random()` IDs non-deterministic               | **FIXED** — monotonic counter `static _instanceCounter` replaces `Math.random()` in `hx-switch.ts`                                                                                                           |
+| A-12: Keyboard-disabled test vacuous                      | **FIXED** — added test verifying disabled inner button retains `tabIndex=0` (native browser behavior); keyboard exclusion is via `_toggle()` guard, not tabIndex manipulation                                |
+| A-14: Stale `wc-change` screenshot artifacts              | **RESOLVED** — no screenshot files present; stale artifacts removed                                                                                                                                          |
+
 ## TypeScript Audit Fixes Applied (2026-03-13)
 
 | Finding                                                                   | Status                                                                                                                                                                                          |
