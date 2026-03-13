@@ -23,10 +23,12 @@ const meta = {
       },
     },
     label: {
+      name: 'default (slot)',
       control: 'text',
-      description: 'Help text content passed via the default slot.',
+      description:
+        '**Storybook only.** Controls the default slot content. This is not a component property — pass text between `<hx-help-text>` tags to populate the default slot.',
       table: {
-        category: 'Content',
+        category: 'Slots',
         type: { summary: 'string' },
       },
     },
