@@ -23,7 +23,7 @@ The component has a solid architectural foundation — Shadow DOM encapsulation,
 
 ## P0 — Blockers (Ship Nothing Until Fixed)
 
-### P0-1: Tree is Not Keyboard-Accessible via Tab
+### ~~P0-1: Tree is Not Keyboard-Accessible via Tab~~ FIXED
 
 **File:** `hx-tree-view.ts:157-170`, `hx-tree-item.ts:163`
 
@@ -40,7 +40,7 @@ The entire keyboard navigation system is dead on arrival. Neither the tree conta
 
 ---
 
-### P0-2: `aria-level` Missing on All Treeitems
+### ~~P0-2: `aria-level` Missing on All Treeitems~~ FIXED
 
 **File:** `hx-tree-item.ts:155-190`
 
@@ -52,7 +52,7 @@ Without `aria-level`, screen readers announce "treeitem" with no depth cue. In a
 
 ---
 
-### P0-3: `aria-label` / `aria-labelledby` Missing on Tree Container
+### ~~P0-3: `aria-label` / `aria-labelledby` Missing on Tree Container~~ FIXED
 
 **File:** `hx-tree-view.ts:159-169`
 
@@ -64,7 +64,7 @@ The `<div role="tree">` has no accessible name. WAI-ARIA 1.2 requires that `role
 
 ## P1 — High Severity (Must Fix Before Ship)
 
-### P1-1: ArrowLeft Does Not Move Focus to Parent Item
+### ~~P1-1: ArrowLeft Does Not Move Focus to Parent Item~~ FIXED
 
 **File:** `hx-tree-item.ts:107-110`
 
@@ -80,7 +80,7 @@ No parent-traversal logic exists anywhere in `hx-tree-view._handleKeyDown` eithe
 
 ---
 
-### P1-2: `aria-selected` Always Set Regardless of Selection Mode
+### ~~P1-2: `aria-selected` Always Set Regardless of Selection Mode~~ FIXED
 
 **File:** `hx-tree-item.ts:165`
 
@@ -236,6 +236,14 @@ No per-component bundle size analysis was found in the audit scope. The project 
 
 **Status:** The component is minimal in complexity. Formal CI-gated measurement is tracked as an infrastructure concern — no source change required per this audit.
 
+**Acceptance Criteria (manual verification until CI gate is in place):**
+
+1. Run `npm run build` from the repo root to produce the dist output.
+2. Locate `dist/hx-tree-view.js` and `dist/hx-tree-item.js` in the library build output.
+3. Verify each file is **<5KB min+gz**: `gzip -c dist/hx-tree-view.js | wc -c` and `gzip -c dist/hx-tree-item.js | wc -c` must both be under `5120` bytes.
+4. Combined (both files): must remain under `8KB min+gz` as the component grows with async and checkbox features.
+5. If either threshold is exceeded, open a dedicated performance audit issue before merging.
+
 ---
 
 ### ~~P2-9: No Virtualization Path for Large Trees~~ FIXED (documented)
@@ -246,6 +254,16 @@ For healthcare taxonomy browsers (ICD-10 has 70,000+ codes), the current impleme
 2. Expose an async/lazy loading API that enables virtualization at the consumer level.
 
 **Fix:** Scale limits and lazy-loading guidance documented in `hx-tree-view.ts` JSDoc (class-level `## Scale Limits` section). The component is suitable for up to ~500 visible items. For larger datasets, consumers should use lazy loading via the `expanded` property on `hx-tree-item`.
+
+**Acceptance Criteria / Thresholds:**
+
+| Scenario | Threshold | Verification |
+| -------- | --------- | ------------ |
+| Flat list, all items visible | ≤500 `hx-tree-item` elements | Render 500-item flat list; measure FCP and interaction latency — must remain <100ms |
+| Nested tree, fully expanded | ≤200 simultaneously visible items | Render 200-item expanded tree; no jank on ArrowDown traversal |
+| Large dataset (ICD-10, 70 000+ codes) | Lazy load required | Top-level nodes only rendered on mount; children fetched on `expanded` toggle via `hx-expand` event |
+| Lazy-load batch size | ≤50 children per expand | Consumer fetches ≤50 items per `hx-expand` event to avoid blocking the main thread |
+| DOM node count | <1000 total `hx-tree-item` elements in DOM at any time | Use Chrome DevTools → Performance → DOM Size to verify |
 
 ---
 
@@ -322,28 +340,28 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 
 ## Key Findings Summary
 
-| ID    | Area                     | Severity | Finding                                                                                      |
-| ----- | ------------------------ | -------- | -------------------------------------------------------------------------------------------- |
-| P0-1  | Accessibility / Keyboard | P0       | Tree entirely inaccessible via keyboard Tab — roving tabindex not implemented                |
-| P0-2  | Accessibility / ARIA     | P0       | `aria-level` missing on all treeitems                                                        |
-| P0-3  | Accessibility / ARIA     | P0       | `aria-label` / `aria-labelledby` mechanism missing on tree container                         |
-| P1-1  | Accessibility / Keyboard | P1       | ArrowLeft does not move focus to parent item                                                 |
-| P1-2  | Accessibility / ARIA     | P1       | `aria-selected` set in `selection="none"` mode                                               |
-| P1-3  | Accessibility / AT       | P1       | `role="group"` + shadow DOM treeitems: AT cross-shadow association risk                      |
-| P1-4  | Tests                    | P1       | No tests for ArrowUp/Down/Home/End, tree-level navigation                                    |
-| P1-5  | Tests                    | P1       | No async children loading tests                                                              |
-| P1-6  | Storybook                | P1       | No async loading story                                                                       |
-| P1-7  | Storybook                | P1       | No icon story                                                                                |
-| P1-8  | Storybook                | P1       | No checkbox / multi-select visual story                                                      |
-| P2-1  | TypeScript               | P2       | `TreeSelection` type not exported                                                            |
-| P2-2  | TypeScript               | P2       | `indent` property is dead/unused code                                                        |
-| P2-3  | Tests                    | P2       | axe-core test in wrong describe block                                                        |
-| P2-4  | Drupal                   | P2       | No Twig/Drupal documentation or example — **FIXED**                                          |
-| P2-5  | Accessibility / ARIA     | P2       | `aria-selected="false"` in non-selectable tree                                               |
-| P2-6  | UX                       | P2       | Wrap-around arrow navigation is undocumented and potentially disorienting                    |
-| P2-7  | CSS                      | P2       | `color-mix()` requires modern browser — no fallback [FIXED: replaced with `rgba()` fallback] |
-| P2-8  | Performance              | **ACK**  | Bundle size not verified against 5KB threshold (CI infra concern)                            |
-| P2-9  | Performance              | **FIXED**| No virtualization strategy — scale limits documented in JSDoc                                |
+| ID    | Area                     | Severity | Status       | Finding                                                                                      |
+| ----- | ------------------------ | -------- | ------------ | -------------------------------------------------------------------------------------------- |
+| P0-1  | Accessibility / Keyboard | P0       | ✅ FIXED     | Tree entirely inaccessible via keyboard Tab — roving tabindex not implemented                |
+| P0-2  | Accessibility / ARIA     | P0       | ✅ FIXED     | `aria-level` missing on all treeitems                                                        |
+| P0-3  | Accessibility / ARIA     | P0       | ✅ FIXED     | `aria-label` / `aria-labelledby` mechanism missing on tree container                         |
+| P1-1  | Accessibility / Keyboard | P1       | ✅ FIXED     | ArrowLeft does not move focus to parent item                                                 |
+| P1-2  | Accessibility / ARIA     | P1       | ✅ FIXED     | `aria-selected` set in `selection="none"` mode                                               |
+| P1-3  | Accessibility / AT       | P1       | OPEN         | `role="group"` + shadow DOM treeitems: AT cross-shadow association risk                      |
+| P1-4  | Tests                    | P1       | OPEN         | No tests for ArrowUp/Down/Home/End, tree-level navigation                                    |
+| P1-5  | Tests                    | P1       | OPEN         | No async children loading tests                                                              |
+| P1-6  | Storybook                | P1       | OPEN         | No async loading story                                                                       |
+| P1-7  | Storybook                | P1       | OPEN         | No icon story                                                                                |
+| P1-8  | Storybook                | P1       | OPEN         | No checkbox / multi-select visual story                                                      |
+| P2-1  | TypeScript               | P2       | ✅ FIXED     | `TreeSelection` type not exported                                                            |
+| P2-2  | TypeScript               | P2       | ✅ FIXED     | `indent` property is dead/unused code                                                        |
+| P2-3  | Tests                    | P2       | OPEN         | axe-core test in wrong describe block                                                        |
+| P2-4  | Drupal                   | P2       | ✅ FIXED     | No Twig/Drupal documentation or example                                                      |
+| P2-5  | Accessibility / ARIA     | P2       | OPEN         | `aria-selected="false"` in non-selectable tree                                               |
+| P2-6  | UX                       | P2       | OPEN         | Wrap-around arrow navigation is undocumented and potentially disorienting                    |
+| P2-7  | CSS                      | P2       | ✅ FIXED     | `color-mix()` requires modern browser — replaced with `rgba()` fallback                     |
+| P2-8  | Performance              | ACK      | ACKNOWLEDGED | Bundle size not verified against 5KB threshold (CI infra concern)                            |
+| P2-9  | Performance              | P2       | ✅ FIXED     | No virtualization strategy — scale limits documented in JSDoc                                |
 | P2-10 | Code Quality             | P2       | `_handleFocusIn` is dead code — `.tree` div has no tabindex                                  |
 | P2-11 | ARIA                     | P2       | `aria-posinset` and `aria-setsize` missing on treeitems                                      |
 
