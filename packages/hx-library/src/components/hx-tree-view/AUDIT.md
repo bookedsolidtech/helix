@@ -4,6 +4,7 @@
 **Auditor:** Antagonistic Review Agent
 **Scope:** `packages/hx-library/src/components/hx-tree-view/`
 **Files Reviewed:**
+
 - `hx-tree-view.ts`
 - `hx-tree-item.ts`
 - `hx-tree-view.styles.ts`
@@ -68,6 +69,7 @@ The `<div role="tree">` has no accessible name. WAI-ARIA 1.2 requires that `role
 **File:** `hx-tree-item.ts:107-110`
 
 The WAI-ARIA tree keyboard pattern requires:
+
 > "If focus is on a closed node or a leaf node: Move focus to the node's parent node."
 
 Current implementation only handles the case where the item is expanded and has children (collapses it). If the item is already collapsed, or is a leaf node, ArrowLeft does nothing — focus does not move to the parent.
@@ -193,6 +195,7 @@ The axe-core accessibility test is inside `describe('hx-tree-item', ...)` but cr
 The component has no Twig template example, no Drupal behavior documentation, and no guidance for server-side-rendered tree structures. For a healthcare organization where the primary consumer is Drupal CMS, this is a significant documentation gap.
 
 Specific concerns:
+
 - How should a Drupal backend render a tree from a taxonomy term hierarchy?
 - How does `selection` mode get passed from a Drupal field formatter?
 - Is there a Drupal behavior for progressive enhancement of server-rendered trees?
@@ -236,6 +239,7 @@ No per-component bundle size analysis was found in the audit scope. The project 
 ### P2-9: No Virtualization Path for Large Trees
 
 For healthcare taxonomy browsers (ICD-10 has 70,000+ codes), the current implementation has no virtualization strategy. Rendering thousands of `hx-tree-item` elements simultaneously will cause performance degradation. The component should either:
+
 1. Document the scale limit explicitly, or
 2. Expose an async/lazy loading API that enables virtualization at the consumer level.
 
@@ -251,99 +255,99 @@ This handler runs when `e.target === e.currentTarget` (focus landed on the `.tre
 
 ## Accessibility Pattern Gaps (ARIA Tree Checklist)
 
-| ARIA Tree Requirement | Status | Severity |
-|---|---|---|
-| `role="tree"` on container | PASS | — |
-| `role="treeitem"` on items | PASS | — |
-| `role="group"` on child containers | PASS (shadow DOM caveat) | — |
-| `aria-expanded` on expandable items | PASS | — |
-| `aria-selected` on items | PARTIAL — always set regardless of mode | P1 |
-| `aria-level` on all treeitems | FAIL — missing entirely | P0 |
-| `aria-posinset` on treeitems | FAIL — missing | P1 |
-| `aria-setsize` on treeitems | FAIL — missing | P1 |
-| Accessible name on tree container | FAIL — no `aria-label` mechanism | P0 |
-| Roving tabindex (one item at tabindex=0) | FAIL — all items at tabindex=-1 | P0 |
-| ArrowDown moves to next visible item | FAIL — tree not focusable | P0 |
-| ArrowUp moves to previous visible item | FAIL — tree not focusable | P0 |
-| ArrowRight expands or moves into children | PARTIAL — expand works if focused | — |
-| ArrowLeft collapses or moves to parent | FAIL — parent move not implemented | P1 |
-| Home moves to first item | FAIL — tree not focusable | P0 |
-| End moves to last item | FAIL — tree not focusable | P0 |
-| Enter / Space selects | PARTIAL — works if focused | — |
+| ARIA Tree Requirement                     | Status                                  | Severity |
+| ----------------------------------------- | --------------------------------------- | -------- |
+| `role="tree"` on container                | PASS                                    | —        |
+| `role="treeitem"` on items                | PASS                                    | —        |
+| `role="group"` on child containers        | PASS (shadow DOM caveat)                | —        |
+| `aria-expanded` on expandable items       | PASS                                    | —        |
+| `aria-selected` on items                  | PARTIAL — always set regardless of mode | P1       |
+| `aria-level` on all treeitems             | FAIL — missing entirely                 | P0       |
+| `aria-posinset` on treeitems              | FAIL — missing                          | P1       |
+| `aria-setsize` on treeitems               | FAIL — missing                          | P1       |
+| Accessible name on tree container         | FAIL — no `aria-label` mechanism        | P0       |
+| Roving tabindex (one item at tabindex=0)  | FAIL — all items at tabindex=-1         | P0       |
+| ArrowDown moves to next visible item      | FAIL — tree not focusable               | P0       |
+| ArrowUp moves to previous visible item    | FAIL — tree not focusable               | P0       |
+| ArrowRight expands or moves into children | PARTIAL — expand works if focused       | —        |
+| ArrowLeft collapses or moves to parent    | FAIL — parent move not implemented      | P1       |
+| Home moves to first item                  | FAIL — tree not focusable               | P0       |
+| End moves to last item                    | FAIL — tree not focusable               | P0       |
+| Enter / Space selects                     | PARTIAL — works if focused              | —        |
 
 ---
 
 ## Test Coverage Gaps
 
-| Test Area | Status |
-|---|---|
-| Expand/collapse via click | PASS |
-| Expand/collapse via keyboard (ArrowRight/Left) | PASS |
-| ArrowDown/Up navigation in tree | MISSING |
-| Home/End navigation | MISSING |
-| ArrowLeft moves to parent | MISSING |
-| Single selection | PASS |
-| Multi-selection | PASS |
-| Deselect in single mode | PASS |
-| hx-select event composition | PASS |
-| Async children loading | MISSING |
-| Disabled item keyboard | MISSING |
-| Tab into tree | MISSING |
-| axe-core (in tree context) | PASS (but placement wrong) |
-| `indent` property behavior | MISSING (dead code, no test) |
+| Test Area                                      | Status                       |
+| ---------------------------------------------- | ---------------------------- |
+| Expand/collapse via click                      | PASS                         |
+| Expand/collapse via keyboard (ArrowRight/Left) | PASS                         |
+| ArrowDown/Up navigation in tree                | MISSING                      |
+| Home/End navigation                            | MISSING                      |
+| ArrowLeft moves to parent                      | MISSING                      |
+| Single selection                               | PASS                         |
+| Multi-selection                                | PASS                         |
+| Deselect in single mode                        | PASS                         |
+| hx-select event composition                    | PASS                         |
+| Async children loading                         | MISSING                      |
+| Disabled item keyboard                         | MISSING                      |
+| Tab into tree                                  | MISSING                      |
+| axe-core (in tree context)                     | PASS (but placement wrong)   |
+| `indent` property behavior                     | MISSING (dead code, no test) |
 
 ---
 
 ## Story Coverage Gaps
 
-| Story | Status |
-|---|---|
-| Default (flat list) | PASS |
-| Nested items | PASS |
-| Single selection | PASS |
-| Multiple selection | PASS |
-| Disabled items | PASS |
-| No selection / navigation-only | PASS |
-| Healthcare domain example | PASS |
-| With icons | MISSING |
+| Story                              | Status  |
+| ---------------------------------- | ------- |
+| Default (flat list)                | PASS    |
+| Nested items                       | PASS    |
+| Single selection                   | PASS    |
+| Multiple selection                 | PASS    |
+| Disabled items                     | PASS    |
+| No selection / navigation-only     | PASS    |
+| Healthcare domain example          | PASS    |
+| With icons                         | MISSING |
 | Checkboxes / checkbox multi-select | MISSING |
-| Async loading / lazy children | MISSING |
-| Very deep nesting (5+ levels) | MISSING |
+| Async loading / lazy children      | MISSING |
+| Very deep nesting (5+ levels)      | MISSING |
 
 ---
 
 ## Key Findings Summary
 
-| ID | Area | Severity | Finding |
-|---|---|---|---|
-| P0-1 | Accessibility / Keyboard | P0 | Tree entirely inaccessible via keyboard Tab — roving tabindex not implemented |
-| P0-2 | Accessibility / ARIA | P0 | `aria-level` missing on all treeitems |
-| P0-3 | Accessibility / ARIA | P0 | `aria-label` / `aria-labelledby` mechanism missing on tree container |
-| P1-1 | Accessibility / Keyboard | P1 | ArrowLeft does not move focus to parent item |
-| P1-2 | Accessibility / ARIA | P1 | `aria-selected` set in `selection="none"` mode |
-| P1-3 | Accessibility / AT | P1 | `role="group"` + shadow DOM treeitems: AT cross-shadow association risk |
-| P1-4 | Tests | P1 | No tests for ArrowUp/Down/Home/End, tree-level navigation |
-| P1-5 | Tests | P1 | No async children loading tests |
-| P1-6 | Storybook | P1 | No async loading story |
-| P1-7 | Storybook | P1 | No icon story |
-| P1-8 | Storybook | P1 | No checkbox / multi-select visual story |
-| P2-1 | TypeScript | P2 | `TreeSelection` type not exported |
-| P2-2 | TypeScript | P2 | `indent` property is dead/unused code |
-| P2-3 | Tests | P2 | axe-core test in wrong describe block |
-| P2-4 | Drupal | P2 | No Twig/Drupal documentation or example |
-| P2-5 | Accessibility / ARIA | P2 | `aria-selected="false"` in non-selectable tree |
-| P2-6 | UX | P2 | Wrap-around arrow navigation is undocumented and potentially disorienting |
-| P2-7 | CSS | P2 | `color-mix()` requires modern browser — no fallback [FIXED: replaced with `rgba()` fallback] |
-| P2-8 | Performance | P2 | Bundle size not verified against 5KB threshold |
-| P2-9 | Performance | P2 | No virtualization strategy for large trees (ICD-10 scale) |
-| P2-10 | Code Quality | P2 | `_handleFocusIn` is dead code — `.tree` div has no tabindex |
-| P2-11 | ARIA | P2 | `aria-posinset` and `aria-setsize` missing on treeitems |
+| ID    | Area                     | Severity | Finding                                                                                      |
+| ----- | ------------------------ | -------- | -------------------------------------------------------------------------------------------- |
+| P0-1  | Accessibility / Keyboard | P0       | Tree entirely inaccessible via keyboard Tab — roving tabindex not implemented                |
+| P0-2  | Accessibility / ARIA     | P0       | `aria-level` missing on all treeitems                                                        |
+| P0-3  | Accessibility / ARIA     | P0       | `aria-label` / `aria-labelledby` mechanism missing on tree container                         |
+| P1-1  | Accessibility / Keyboard | P1       | ArrowLeft does not move focus to parent item                                                 |
+| P1-2  | Accessibility / ARIA     | P1       | `aria-selected` set in `selection="none"` mode                                               |
+| P1-3  | Accessibility / AT       | P1       | `role="group"` + shadow DOM treeitems: AT cross-shadow association risk                      |
+| P1-4  | Tests                    | P1       | No tests for ArrowUp/Down/Home/End, tree-level navigation                                    |
+| P1-5  | Tests                    | P1       | No async children loading tests                                                              |
+| P1-6  | Storybook                | P1       | No async loading story                                                                       |
+| P1-7  | Storybook                | P1       | No icon story                                                                                |
+| P1-8  | Storybook                | P1       | No checkbox / multi-select visual story                                                      |
+| P2-1  | TypeScript               | P2       | `TreeSelection` type not exported                                                            |
+| P2-2  | TypeScript               | P2       | `indent` property is dead/unused code                                                        |
+| P2-3  | Tests                    | P2       | axe-core test in wrong describe block                                                        |
+| P2-4  | Drupal                   | P2       | No Twig/Drupal documentation or example                                                      |
+| P2-5  | Accessibility / ARIA     | P2       | `aria-selected="false"` in non-selectable tree                                               |
+| P2-6  | UX                       | P2       | Wrap-around arrow navigation is undocumented and potentially disorienting                    |
+| P2-7  | CSS                      | P2       | `color-mix()` requires modern browser — no fallback [FIXED: replaced with `rgba()` fallback] |
+| P2-8  | Performance              | P2       | Bundle size not verified against 5KB threshold                                               |
+| P2-9  | Performance              | P2       | No virtualization strategy for large trees (ICD-10 scale)                                    |
+| P2-10 | Code Quality             | P2       | `_handleFocusIn` is dead code — `.tree` div has no tabindex                                  |
+| P2-11 | ARIA                     | P2       | `aria-posinset` and `aria-setsize` missing on treeitems                                      |
 
 ---
 
 ## CSS Audit Fixes Applied (2026-03-12)
 
-| Finding | Fix Applied |
-|---------|-------------|
-| P2-7: `color-mix()` CSS Level 5 — Browser Compatibility Risk | **FIXED** — replaced `color-mix(in srgb, currentColor 10%, transparent)` with `rgba(0, 0, 0, 0.06)` fallback in `hx-tree-item.styles.ts` |
-| Incomplete `prefers-reduced-motion` coverage | **FIXED** — expanded `@media (prefers-reduced-motion: reduce)` block in `hx-tree-item.styles.ts` to cover `.item-row`, `.expand-btn`, and `.expand-btn svg` transitions (previously only covered `.children`) |
+| Finding                                                      | Fix Applied                                                                                                                                                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P2-7: `color-mix()` CSS Level 5 — Browser Compatibility Risk | **FIXED** — replaced `color-mix(in srgb, currentColor 10%, transparent)` with `rgba(0, 0, 0, 0.06)` fallback in `hx-tree-item.styles.ts`                                                                      |
+| Incomplete `prefers-reduced-motion` coverage                 | **FIXED** — expanded `@media (prefers-reduced-motion: reduce)` block in `hx-tree-item.styles.ts` to cover `.item-row`, `.expand-btn`, and `.expand-btn svg` transitions (previously only covered `.children`) |
