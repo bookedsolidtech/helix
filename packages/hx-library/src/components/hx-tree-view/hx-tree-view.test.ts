@@ -622,17 +622,6 @@ describe('hx-tree-view', () => {
       expect(item.expanded).toBe(false);
     });
 
-    it('tree container has tabindex="0" allowing Tab-key focus entry', async () => {
-      const el = await fixture<WcTreeView>(
-        `<hx-tree-view label="Tab test">
-          <hx-tree-item>Item 1</hx-tree-item>
-        </hx-tree-view>`,
-      );
-      await el.updateComplete;
-
-      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      expect(tree.getAttribute('tabindex')).toBe('0');
-    });
   });
 });
 

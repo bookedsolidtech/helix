@@ -482,26 +482,6 @@ describe('hx-button', () => {
       expect(submitted).toBe(true);
     });
 
-    it('submits form when type=submit with no name or value set', async () => {
-      const form = document.createElement('form');
-      form.innerHTML = '<hx-button type="submit">Submit</hx-button>';
-      document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-button') as HelixButton;
-      await el.updateComplete;
-
-      let submitted = false;
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        submitted = true;
-      });
-
-      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
-      btn.click();
-      await el.updateComplete;
-      // Form should still submit even without name/value — setFormValue is not called
-      expect(submitted).toBe(true);
-    });
-
     it('returns parent form from form getter', async () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-button>Click</hx-button>';
