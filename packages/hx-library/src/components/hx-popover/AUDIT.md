@@ -133,8 +133,6 @@ The fallback `0 4px 16px rgba(0, 0, 0, 0.12)` is a hardcoded value. The project 
 
 **Resolution:** `_updatePosition()` now resets all four border sides on the arrow element and then applies `1px solid transparent` to the two inward-facing sides for each placement direction via `innerBorderMap`. The mapping (`bottom → border-bottom + border-right`, `top → border-top + border-left`, `right → border-top + border-right`, `left → border-bottom + border-left`) ensures only the two outward-facing corner edges of the rotated square are visible, eliminating the inner border artefact.
 
-**Resolution:** `_updatePosition` now resets all four border sides then applies `1px solid transparent` to the two inward-facing sides via an `innerBorderMap` keyed by `basePlacement`. Only the outward corner border remains visible.
-
 ---
 
 ### P2-03: `_setupAnchorAria` and `_updateAnchorAriaExpanded` are duplicate logic
