@@ -4,6 +4,7 @@
 **Auditor:** Automated antagonistic review
 **Audit Date:** 2026-03-05
 **Files Reviewed:**
+
 - `hx-prose.ts`
 - `hx-prose.styles.ts`
 - `hx-prose.test.ts`
@@ -17,11 +18,13 @@
 
 ## Summary
 
-| Severity | Count |
-|---|---|
-| P0 (Blocker) | 2 |
-| P1 (High) | 8 |
-| P2 (Medium) | 8 |
+_Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
+
+| Severity     | Baseline | Remaining |
+| ------------ | -------- | --------- |
+| P0 (Blocker) | 2        | 2         |
+| P1 (High)    | 8        | 7         |
+| P2 (Medium)  | 8        | 7         |
 
 ---
 
@@ -62,15 +65,15 @@ The component exports `HelixProse`, not `WcProse`. This import will produce a Ty
 
 ```css
 /* inline code */
-font-size: 0.875em;          /* should be var(--hx-font-size-sm, 0.875em) */
-padding: 0.125em var(--hx-space-1, 0.25rem);  /* 0.125em is not tokenized */
+font-size: 0.875em; /* should be var(--hx-font-size-sm, 0.875em) */
+padding: 0.125em var(--hx-space-1, 0.25rem); /* 0.125em is not tokenized */
 
 /* kbd */
-font-size: 0.875em;          /* same issue */
-padding: 0.125em var(--hx-space-2, 0.5rem);   /* 0.125em is not tokenized */
+font-size: 0.875em; /* same issue */
+padding: 0.125em var(--hx-space-2, 0.5rem); /* 0.125em is not tokenized */
 
 /* samp */
-font-size: 0.875em;          /* same issue */
+font-size: 0.875em; /* same issue */
 ```
 
 The project rule is "no hardcoded values — colors, spacing, typography use tokens always." The `0.875em` font-size has a token (`--hx-font-size-sm`) but is not using it. The `0.125em` padding value has no token and is hardcoded. A consumer cannot override the `code` font-size via `--hx-font-size-sm` because the CSS bypasses it.
@@ -109,18 +112,11 @@ hx-prose p.lead {
 
 ---
 
-### P1-04: `caption-side: bottom` — accessibility regression for data tables
+### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
 
 **File:** `styles/prose/prose.scoped.css`
-**Line:** ~406
 
-```css
-hx-prose caption {
-  caption-side: bottom;
-}
-```
-
-WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
+Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
 
 ---
 
@@ -269,7 +265,7 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### P2-07: Axe tests do not cover images without `alt` attribute
+### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 
@@ -277,12 +273,15 @@ The accessibility test suite tests headings, tables, and lists with axe-core. Th
 
 ```html
 <hx-prose>
-  <img src="chart.png">  <!-- no alt — axe violation -->
-  <img src="chart.png" alt="">  <!-- decorative — should be valid -->
+  <img src="chart.png" />
+  <!-- no alt — axe violation -->
+  <img src="chart.png" alt="" />
+  <!-- decorative — should be valid -->
 </hx-prose>
 ```
 
 The feature description notes: "images have alt." This is partially a consumer responsibility, but the test suite should include:
+
 1. A test verifying that `img` without `alt` produces an axe violation (to confirm axe CAN detect this in Light DOM).
 2. A test verifying that `img` with `alt=""` (decorative) passes.
 3. A test verifying that `img` with descriptive `alt` text passes.
@@ -315,6 +314,7 @@ If any of these are absent, Storybook coverage is incomplete. Stories cannot be 
 ### Light DOM Design — Correct but Requires Consumer Discipline
 
 `hx-prose` intentionally uses Light DOM (no Shadow DOM) via `createRenderRoot() { return this; }`. This is the right choice for a CMS content wrapper because:
+
 - Axe-core can scan child content (Shadow DOM creates a boundary axe historically struggles with)
 - Global heading hierarchy is preserved across page sections
 - CMS-injected styles can still target content within the wrapper

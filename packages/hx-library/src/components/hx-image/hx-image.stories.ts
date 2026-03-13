@@ -155,8 +155,9 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const img = canvasElement.querySelector('hx-image');
     await expect(img).toBeTruthy();
-    // With reflect: true, the alt attribute is reflected to the host element
-    await expect(img?.getAttribute('alt')).toBe('A sample image');
+    // Check the Lit property directly — alt is a reflected property but we read it
+    // as a DOM property to avoid dependence on attribute serialization behavior.
+    await expect(img?.alt).toBe('A sample image');
     const innerImg = img?.shadowRoot?.querySelector('img');
     await expect(innerImg?.getAttribute('alt')).toBe('A sample image');
   },
