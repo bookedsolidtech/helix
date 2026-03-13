@@ -343,6 +343,20 @@ describe('hx-icon-button', () => {
     });
   });
 
+  // ─── Loading state (1) ───
+  // P1-06: The loading state feature is not yet implemented on hx-icon-button.
+  // This test documents the current behavior (no loading property exists) so
+  // a regression is caught if a partial/broken implementation is added without
+  // completing the feature end-to-end.
+
+  describe('Loading state', () => {
+    it('does not have a loading property (feature not yet implemented)', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      // 'loading' is not a declared property — accessing it returns undefined
+      expect((el as unknown as Record<string, unknown>)['loading']).toBeUndefined();
+    });
+  });
+
   // ─── Slots (1) ───
 
   describe('Slots', () => {
