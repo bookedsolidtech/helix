@@ -145,11 +145,11 @@ Both methods perform the same slot query and `setAttribute('aria-expanded', ...)
 
 ---
 
-### P2-04: Storybook `Placements` story shows only 4 of 12 placement variants
+### P2-04: Storybook `Placements` story shows only 4 of 12 placement variants — ✅ FIXED
 
-**File:** `hx-popover.stories.ts`, lines 154–170
+**File:** `hx-popover.stories.ts`, lines 154–185
 
-The `Placements` story iterates over `['top', 'bottom', 'left', 'right']` — only the 4 cardinal directions. The type system supports 12 variants (`top-start`, `top-end`, `right-start`, `right-end`, `bottom-start`, `bottom-end`, `left-start`, `left-end` are absent). The story should demonstrate all variants, especially the alignment variants which are the most likely to have visual regressions.
+**Resolution:** The `Placements` story now iterates over all 12 placement variants: `top`, `top-start`, `top-end`, `right`, `right-start`, `right-end`, `bottom`, `bottom-start`, `bottom-end`, `left`, `left-start`, `left-end`. All alignment variants are rendered with an arrow for visual regression coverage.
 
 ---
 

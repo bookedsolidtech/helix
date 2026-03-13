@@ -24,7 +24,7 @@ The previous antagonistic review found 11 issues (1 P0, 4 P1, 8 P2). **All have 
 | P2-04 | RESOLVED                | `setValidity()` anchor is now `firstCheckbox` (first focusable child), not a non-focusable div                                                                                                                                                                                       |
 | P2-05 | RESOLVED                | Tests added for `formStateRestoreCallback`, `validationMessage`, `validity` getters, and pre-checked initial state                                                                                                                                                                   |
 | P2-06 | N/A                     | `_suppressNextChildChange` guard removed entirely — no longer applicable                                                                                                                                                                                                             |
-| P2-07 | OPEN (downgraded to P3) | Stories still use relative import `./hx-checkbox-group.js` instead of package entry point                                                                                                                                                                                            |
+| P2-07 | RESOLVED (by design)    | Stories use relative imports (`./hx-checkbox-group.js`) consistent with all other HELiX component stories. Storybook reads directly from source files via Vite; package entry imports would require a dist build and would be inconsistent with the project pattern.                |
 | P2-08 | RESOLVED                | `@drupal` JSDoc tag added with Twig template example                                                                                                                                                                                                                                 |
 
 ---
@@ -104,7 +104,7 @@ These are common patterns in healthcare apps where form fields may be conditiona
 
 ## P3 — Low Priority
 
-### P3-01: Stories use relative imports instead of package entry point
+### P3-01: Stories use relative imports instead of package entry point — RESOLVED (by design)
 
 **File:** `hx-checkbox-group.stories.ts:4-5`
 
@@ -113,7 +113,7 @@ import './hx-checkbox-group.js';
 import '../hx-checkbox/hx-checkbox.js';
 ```
 
-Production stories should import via the package entry (`@helixui/library`) to validate the public import path. Carried forward from previous audit (P2-07).
+Resolved by design: Relative imports are consistent with all other HELiX component stories. Storybook reads directly from TypeScript source files via Vite; switching to `@helixui/library/components/*` package entry imports would require a compiled dist build and would make this story inconsistent with the rest of the codebase. This pattern is accepted for the project.
 
 ---
 

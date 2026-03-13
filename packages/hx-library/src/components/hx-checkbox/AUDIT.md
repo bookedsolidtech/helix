@@ -43,11 +43,11 @@ All 2 P0 and all 10 P1 findings are resolved. Remediation quality is high.
 | P2-08 | Tests | P2 | No test for `formStateRestoreCallback(null)` | **FIXED** — null case tested |
 | P2-09 | CSS | P2 | `clip: rect(0,0,0,0)` deprecated | **FIXED** — `clip-path: inset(50%)` |
 | P2-10 | Drupal | P2 | `hx-size` may conflict with htmx | **OPEN** — design decision, acknowledged risk |
-| P2-11 | Storybook | P2 | `NoLabel` story lacks play function | **OPEN** — no runtime axe assertion on this pattern |
+| P2-11 | Storybook | P2 | `NoLabel` story lacks play function | **FIXED** — play function added; asserts `aria-label` forwarded to native input and no visible label rendered |
 | P2-12 | Storybook | P2 | `--hx-checkbox-bg` undocumented in stories | **FIXED** — token exists, documented in JSDoc + Starlight |
 | P2-13 | TypeScript | P2 | `_hasErrorSlot` re-render edge case | **FIXED** — resolved by P0-01 wrapper pattern |
 | P2-14 | API | P2 | Missing `checkmark` CSS part | **FIXED** — `part="checkmark"` on SVG |
-| P2-15 | Storybook | P2 | Select-All stories use DOM anti-pattern | **OPEN** — story-quality issue, not component bug |
+| P2-15 | Storybook | P2 | Select-All stories use DOM anti-pattern | **FIXED** — `SelectAllPattern` story uses `querySelector('#select-all-parent')` ID-based lookup instead of fragile CSS class queries |
 
 ---
 
