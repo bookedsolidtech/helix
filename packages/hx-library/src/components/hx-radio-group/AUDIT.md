@@ -189,20 +189,11 @@ Only Arrow keys are handled. This is expected behavior that AT users and power k
 
 ## P2 — Medium (Should Fix)
 
-### P2-1: `setFormValue` called twice per selection
+### P2-1: `setFormValue` called twice per selection ✅ FIXED
 
-**File:** `hx-radio-group.ts:199–223`
+**File:** `hx-radio-group.ts`
 
-In `_handleRadioSelect`:
-
-```ts
-this.value = newValue; // triggers updated() → setFormValue()
-this._internals.setFormValue(this.value); // redundant second call
-this._syncRadios(); // also called by updated()
-this._updateValidity(); // also called by updated()
-```
-
-After `this.value = newValue`, the Lit reactive system queues an update. `updated()` runs and calls `setFormValue`, `_syncRadios`, and `_updateValidity`. Then `_handleRadioSelect` immediately calls all three again synchronously. Each selection triggers double work.
+**Resolution:** `_handleRadioSelect` now only sets `this.value = newValue` and dispatches the `hx-change` event. The redundant synchronous calls to `this._internals.setFormValue()`, `this._syncRadios()`, and `this._updateValidity()` have been removed. All three are now called exclusively from `updated()` via Lit's reactive property change cycle, eliminating the double-work pattern. Each selection triggers exactly one `setFormValue`, one `_syncRadios`, and one `_updateValidity` call.
 
 ---
 
@@ -311,7 +302,7 @@ it('has no axe violations in default state', async () => {
 | P1-5 | P1       | Accessibility   | No `aria-required` on radiogroup                               |
 | P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM        |
 | P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)        |
-| P2-1 | P2       | Performance     | Double `setFormValue`/`_syncRadios`/`_updateValidity`          |
+| P2-1 | P2       | Performance     | ~~Double `setFormValue`/`_syncRadios`/`_updateValidity`~~ ✅ FIXED — single call path via `updated()` |
 | P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used |
 | P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default         |
 | P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                 |
