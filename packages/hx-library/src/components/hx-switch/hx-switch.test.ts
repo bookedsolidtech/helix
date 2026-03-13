@@ -239,9 +239,7 @@ describe('hx-switch', () => {
     });
 
     it('slotted label content sets aria-labelledby on track', async () => {
-      const el = await fixture<HxSwitch>(
-        '<hx-switch><strong>Slotted Label</strong></hx-switch>',
-      );
+      const el = await fixture<HxSwitch>('<hx-switch><strong>Slotted Label</strong></hx-switch>');
       await el.updateComplete;
       const track = shadowQuery(el, '[role="switch"]');
       const label = shadowQuery(el, '[part="label"]');
