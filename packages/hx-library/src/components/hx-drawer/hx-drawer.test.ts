@@ -234,12 +234,12 @@ describe('hx-drawer', () => {
       expect(part?.getAttribute('part')).toBe('body');
     });
 
-    it('exposes "close-button" part on the close button', async () => {
+    it('exposes "close-btn" part on the close button', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
       await el.updateComplete;
-      const part = shadowQuery(el, '[part="close-button"]');
+      const part = shadowQuery(el, '[part="close-btn"]');
       expect(part).toBeTruthy();
-      expect(part?.getAttribute('part')).toBe('close-button');
+      expect(part?.getAttribute('part')).toBe('close-btn');
     });
 
     it('exposes "title" part on the title element', async () => {
@@ -330,7 +330,7 @@ describe('hx-drawer', () => {
     it('close button has aria-label="Close drawer"', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
       await el.updateComplete;
-      const closeBtn = shadowQuery(el, '[part="close-button"]');
+      const closeBtn = shadowQuery(el, '[part="close-btn"]');
       expect(closeBtn?.getAttribute('aria-label')).toBe('Close drawer');
     });
   });
@@ -374,7 +374,7 @@ describe('hx-drawer', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
-      const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-button"]');
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-btn"]');
       expect(closeBtn).toBeTruthy();
 
       const hidePromise = oneEvent<CustomEvent>(el, 'hx-hide');
@@ -419,7 +419,7 @@ describe('hx-drawer', () => {
       await new Promise((r) => setTimeout(r, 100));
 
       // Focus the close button (first shadow DOM focusable)
-      const closeBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="close-button"]');
+      const closeBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="close-btn"]');
       expect(closeBtn).toBeTruthy();
       closeBtn!.focus();
 

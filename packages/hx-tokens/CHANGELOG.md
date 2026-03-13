@@ -1,5 +1,18 @@
 # @helixui/tokens
 
+## 0.3.1
+
+### Patch Changes
+
+- 819759f: fix: correct homepage URL from helix.bookedsolid.com to helix.bookedsolid.tech
+- 5e4d197: Sync @helixui/tokens version to match @helixui/library@0.3.0 (linked packages).
+
+## 0.2.0
+
+### Minor Changes
+
+- Version bump to stay in sync with `@helixui/library@0.2.0` (linked packages). No token value changes in this release — all component-level changes are documented in `@helixui/library` CHANGELOG.
+
 ## 0.1.3
 
 ### Patch Changes

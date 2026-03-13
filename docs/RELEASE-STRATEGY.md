@@ -6,13 +6,13 @@ Canonical reference for publishing `@helixui/library` and `@helixui/tokens` to t
 
 ## Scope & Naming
 
-| Detail | Value |
-|--------|-------|
-| **npm scope** | `@helix` |
-| **Owner** | `himerus` (Jake Strawn) |
-| **Existing packages** | `@helixui/ini-parse` (confirms scope ownership) |
-| **Packages to publish** | `@helixui/library`, `@helixui/tokens` |
-| **Current version** | `0.1.0` (both packages, linked) |
+| Detail                  | Value                                           |
+| ----------------------- | ----------------------------------------------- |
+| **npm scope**           | `@helix`                                        |
+| **Owner**               | `himerus` (Jake Strawn)                         |
+| **Existing packages**   | `@helixui/ini-parse` (confirms scope ownership) |
+| **Packages to publish** | `@helixui/library`, `@helixui/tokens`           |
+| **Current version**     | `0.1.0` (both packages, linked)                 |
 
 The `@helix` scope is owned and available. HELiX components publish under `@helix` rather than `@bookedsolid` (used by the sister project `helixir`) for a cleaner developer experience. The `@helix` namespace is short, memorable, and accurately represents the project brand.
 
@@ -43,9 +43,10 @@ Supported via the `exports` map in `package.json`. Each component builds to its 
 **CDN / Vanilla HTML (planned -- not yet built):**
 
 ```html
-<script type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@latest/cdn/hx-button.js">
-</script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@latest/cdn/hx-button.js"
+></script>
 ```
 
 The CDN entry point is a P1 pre-publish item. It will produce self-contained, dependency-bundled ES modules for each component. This is the primary consumption path for Drupal and vanilla HTML consumers.
@@ -91,10 +92,10 @@ import tokensJson from '@helixui/tokens/tokens.json';
 
 ```json
 {
-  ".":            { "types": "./dist/index.d.ts",  "import": "./dist/index.js" },
-  "./css":        { "types": "./dist/css.d.ts",    "import": "./dist/css.js" },
-  "./lit":        { "types": "./dist/lit.d.ts",     "import": "./dist/lit.js" },
-  "./utils":      { "types": "./dist/utils.d.ts",   "import": "./dist/utils.js" },
+  ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+  "./css": { "types": "./dist/css.d.ts", "import": "./dist/css.js" },
+  "./lit": { "types": "./dist/lit.d.ts", "import": "./dist/lit.js" },
+  "./utils": { "types": "./dist/utils.d.ts", "import": "./dist/utils.js" },
   "./tokens.css": "./dist/tokens.css",
   "./tokens.json": "./src/tokens.json"
 }
@@ -123,9 +124,7 @@ That is the entire setup. `@helixui/tokens` is a dependency of `@helixui/library
 
 ```html
 <!-- Individual component via CDN (future) -->
-<script type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library/cdn/hx-button.js">
-</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library/cdn/hx-button.js"></script>
 ```
 
 ### For token-only consumers (theme providers, design tools)
@@ -144,12 +143,12 @@ Version management uses [Changesets](https://github.com/changesets/changesets). 
 
 **Key settings:**
 
-| Setting | Value | Reason |
-|---------|-------|--------|
-| `linked` | `[["@helixui/library", "@helixui/tokens"]]` | Versions stay in sync across both packages |
-| `access` | `restricted` (must change to `public`) | Currently prevents publish; P0 blocker |
-| `baseBranch` | `main` | Changesets are consumed on merge to `main` |
-| `updateInternalDependencies` | `patch` | `@helixui/library` auto-bumps when `@helixui/tokens` changes |
+| Setting                      | Value                                       | Reason                                                       |
+| ---------------------------- | ------------------------------------------- | ------------------------------------------------------------ |
+| `linked`                     | `[["@helixui/library", "@helixui/tokens"]]` | Versions stay in sync across both packages                   |
+| `access`                     | `restricted` (must change to `public`)      | Currently prevents publish; P0 blocker                       |
+| `baseBranch`                 | `main`                                      | Changesets are consumed on merge to `main`                   |
+| `updateInternalDependencies` | `patch`                                     | `@helixui/library` auto-bumps when `@helixui/tokens` changes |
 
 ### Semantic Versioning
 
@@ -190,12 +189,12 @@ feature/* --> dev --> staging --> main
 
 ### Promotion Gates
 
-| Transition | Gate | Owner |
-|------------|------|-------|
-| `feature/* --> dev` | PR review + CI quality gates + CodeRabbit | Automated / Agent |
-| `dev --> staging` | All quality gates green | Ava (autonomous) |
-| `staging --> main` | Human-in-the-loop approval | Jake (manual) |
-| `main --> npm` | CI publish workflow | GitHub Actions (automated) |
+| Transition          | Gate                                      | Owner                      |
+| ------------------- | ----------------------------------------- | -------------------------- |
+| `feature/* --> dev` | PR review + CI quality gates + CodeRabbit | Automated / Agent          |
+| `dev --> staging`   | All quality gates green                   | Ava (autonomous)           |
+| `staging --> main`  | Human-in-the-loop approval                | Jake (manual)              |
+| `main --> npm`      | CI publish workflow                       | GitHub Actions (automated) |
 
 The human gate on `staging --> main` is non-negotiable. Every npm publish traces back to an explicit human approval.
 
@@ -216,7 +215,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write  # Required for npm provenance
+      id-token: write # Required for npm provenance
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -270,7 +269,7 @@ jobs:
       "directory": "packages/hx-library"
     },
     "license": "TBD",
-    "homepage": "https://helix.bookedsolid.com",
+    "homepage": "https://helix.bookedsolid.tech",
     "bugs": "https://github.com/bookedsolidtech/helix/issues"
   }
   ```
@@ -301,27 +300,27 @@ jobs:
 
 ## Component Inventory
 
-| Metric | Count |
-|--------|-------|
-| Parent component directories | 73 |
-| Sub-components (bundled with parents) | 12 |
-| Total custom elements | 85 |
-| Build entry points | 73 (one per directory) + 1 barrel |
+| Metric                                | Count                             |
+| ------------------------------------- | --------------------------------- |
+| Parent component directories          | 73                                |
+| Sub-components (bundled with parents) | 12                                |
+| Total custom elements                 | 85                                |
+| Build entry points                    | 73 (one per directory) + 1 barrel |
 
 **Sub-components bundled with parents:**
 
-| Parent | Sub-components |
-|--------|---------------|
-| `hx-accordion` | `hx-accordion-item` |
-| `hx-breadcrumb` | `hx-breadcrumb-item` |
-| `hx-carousel` | `hx-carousel-item` |
-| `hx-list` | `hx-list-item` |
-| `hx-menu` | `hx-menu-item`, `hx-menu-divider` |
-| `hx-nav` | `hx-nav-item` |
-| `hx-radio-group` | `hx-radio` |
-| `hx-stepper` | `hx-step` |
-| `hx-tabs` | `hx-tab`, `hx-tab-panel` |
-| `hx-tree` | `hx-tree-item` |
+| Parent           | Sub-components                    |
+| ---------------- | --------------------------------- |
+| `hx-accordion`   | `hx-accordion-item`               |
+| `hx-breadcrumb`  | `hx-breadcrumb-item`              |
+| `hx-carousel`    | `hx-carousel-item`                |
+| `hx-list`        | `hx-list-item`                    |
+| `hx-menu`        | `hx-menu-item`, `hx-menu-divider` |
+| `hx-nav`         | `hx-nav-item`                     |
+| `hx-radio-group` | `hx-radio`                        |
+| `hx-stepper`     | `hx-step`                         |
+| `hx-tabs`        | `hx-tab`, `hx-tab-panel`          |
+| `hx-tree`        | `hx-tree-item`                    |
 
 **Conventions:**
 
@@ -360,13 +359,13 @@ Generated by `@custom-elements-manifest/analyzer` after each build. Published as
 
 ### Why `@helix` instead of `@bookedsolid`?
 
-| Factor | `@helix` | `@bookedsolid` |
-|--------|----------|----------------|
-| Length | 6 chars | 11 chars |
-| Brand match | Exact | Parent org |
-| Available | Yes (owned by himerus) | Yes (used by helixir) |
-| Import DX | `@helixui/library` | `@bookedsolid/helix-library` |
-| Collision risk | Low (scope is owned) | Low |
+| Factor         | `@helix`               | `@bookedsolid`               |
+| -------------- | ---------------------- | ---------------------------- |
+| Length         | 6 chars                | 11 chars                     |
+| Brand match    | Exact                  | Parent org                   |
+| Available      | Yes (owned by himerus) | Yes (used by helixir)        |
+| Import DX      | `@helixui/library`     | `@bookedsolid/helix-library` |
+| Collision risk | Low (scope is owned)   | Low                          |
 
 The `@helix` scope produces shorter, cleaner imports. The sister project `helixir` already occupies `@bookedsolid`, and sharing a scope between two distinct projects creates confusion. `@helix` is the correct namespace for HELiX components.
 

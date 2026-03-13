@@ -1,6 +1,6 @@
 {
   "name": "@helixui/library",
-  "version": "0.1.3",
+  "version": "0.3.1",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
@@ -20,11 +20,13 @@
       "types": "./dist/components/*/index.d.ts",
       "import": "./dist/components/*/index.js"
     },
-    "./custom-elements.json": "./custom-elements.json"
+    "./custom-elements.json": "./custom-elements.json",
+    "./fouc.css": "./fouc.css"
   },
   "files": [
     "dist",
-    "custom-elements.json"
+    "custom-elements.json",
+    "fouc.css"
   ],
   "customElements": "custom-elements.json",
   "scripts": {
@@ -56,7 +58,7 @@
     "directory": "packages/hx-library"
   },
   "license": "MIT",
-  "homepage": "https://helix.bookedsolid.com",
+  "homepage": "https://helix.bookedsolid.tech",
   "bugs": "https://github.com/bookedsolidtech/helix/issues",
   "keywords": [
     "web-components",

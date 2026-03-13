@@ -249,3 +249,14 @@ The following areas pass review without significant issues:
 | P2-08 | P2 | CSS | CSS part naming diverges from specification |
 
 **Verdict: BLOCKED — 1 P0, 7 P1 issues must be resolved before merge.**
+
+---
+
+## Fixes Applied (A11y Audit — 2026-03-12)
+
+| Issue | Status | Fix |
+|-------|--------|-----|
+| P1-05 | RESOLVED | Added `outline: 2px solid` + `box-shadow` to `:focus-visible` state; focus indicator no longer relies solely on color change |
+| P2-04 | RESOLVED | `aria-disabled` now uses Lit `nothing` directive when not disabled; attribute is absent (not `aria-disabled="false"`) |
+| P2-05 | RESOLVED | Divider has `aria-label="Resize panels"` for screen reader announcement |
+| P2-06 | RESOLVED | PageUp (+10%) and PageDown (-10%) keyboard handlers added to divider |
