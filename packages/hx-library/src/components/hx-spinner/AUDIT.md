@@ -187,17 +187,16 @@ The SVG arc uses `r=10` on a 24x24 viewBox (circumference = 2π × 10 ≈ 62.83)
 
 ---
 
-### P2-6: No Drupal Twig template or integration notes
+### ~~P2-6: No Drupal Twig template or integration notes~~ FIXED
 
 **File:** directory (`hx-spinner/`)
 
-The CLAUDE.md states Drupal compatibility is a non-negotiable. The `hx-spinner` directory has no:
-
-- `hx-spinner.twig` template demonstrating Drupal usage.
-- Documentation on how to register the component in a Drupal theme.
-- Notes on the `label` attribute behavior in a Twig context.
-
-Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also lacks Twig templates, but given the healthcare Drupal mandate, this is a systemic gap that starts here.
+**Resolution:** `hx-spinner.twig` template added to the component directory with full
+variable documentation (size, variant, label, decorative), standalone and decorative usage
+examples, and library registration instructions for `mytheme.libraries.yml`. A
+`DrupalIntegration` story added to `hx-spinner.stories.ts` demonstrating standalone,
+decorative, and inverted CDN usage patterns with notes on the intentional `label` attribute
+asymmetry (not reflected, unlike `size`/`variant`).
 
 ---
 
@@ -217,6 +216,6 @@ Every other T1 component audited so far (hx-tag, hx-switch, hx-textarea) also la
 | P2-3 | DX            | P2       | Hardcoded `...` appended to all sr-text labels            |
 | P2-4 | Storybook     | P2       | `size` argType `select`-only, custom sizes not explorable |
 | P2-5 | CSS           | P2       | Magic numbers in SVG dash math — no inline documentation  |
-| P2-6 | Drupal        | P2       | No Twig template or Drupal integration notes              |
+| P2-6 | Drupal        | P2       | No Twig template or Drupal integration notes — **FIXED**  |
 
 **P0 count: 2 — merge blocked until resolved.**

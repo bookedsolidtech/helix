@@ -97,11 +97,14 @@ formStateRestoreCallback(state: string): void {
 
 The form value is set via `this._internals.setFormValue(this.value)` (the string value), not the string `'pressed'`. This means if the browser restores state from the stored form value (e.g., `"on"`), `formStateRestoreCallback` would receive `"on"`, which is not equal to `'pressed'`, so `this.pressed` would be set to `false` — incorrect behavior. The restore callback should likely check `state !== null` or match against the stored value string.
 
-#### P1-4: No Drupal Twig template or integration documentation
+#### ~~P1-4: No Drupal Twig template or integration documentation~~ FIXED
 
-The component directory contains no `hx-toggle-button.twig` or any Drupal integration guidance. Per project convention, all components must be Twig-renderable for Drupal consumers. A toggle button is stateful — the Drupal pattern (server-rendered pressed attribute, Drupal behavior for JS enhancement) must be documented or implemented.
-
-**Impact:** Drupal consumers cannot use this component without guessing at integration patterns.
+**Resolution:** `hx-toggle-button.twig` template added covering: server-rendered pressed state,
+icon-only usage with `aria_label`, exclusive toggle group pattern with `data-toggle-group` and
+a full Drupal behavior, form-associated usage with `name`/`value`, and the `hx-size` attribute
+mapping (not `size`). A `DrupalIntegration` story added to `hx-toggle-button.stories.ts`
+demonstrating server-rendered pressed state, exclusive view-mode toggle group, form-associated
+toggle, and disabled state from server-side permission checks.
 
 ---
 
@@ -171,7 +174,7 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 | P1-1 | P1 | Tests | Keyboard tests call `btn.click()` — keydown dispatch is not tested |
 | P1-2 | P1 | Accessibility | Icon-only usage has no accessible name forwarding to inner `<button>` |
 | P1-3 | P1 | Tests | `formStateRestoreCallback` untested; implementation may use wrong state key |
-| P1-4 | P1 | Drupal | No Twig template or Drupal integration guidance |
+| P1-4 | P1 | Drupal | No Twig template or Drupal integration guidance — **FIXED** |
 | P2-1 | P2 | CSS / A11y | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast |
 | P2-2 | P2 | TypeScript | Deprecated alias `WcToggleButton` should be `HxToggleButton` |
 | P2-3 | P2 | TypeScript | `updated()` should use Lit's `PropertyValues` type |
