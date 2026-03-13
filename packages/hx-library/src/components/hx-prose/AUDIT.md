@@ -18,13 +18,11 @@
 
 ## Summary
 
-_Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
-
-| Severity     | Baseline | Remaining |
-| ------------ | -------- | --------- |
-| P0 (Blocker) | 2        | 2         |
-| P1 (High)    | 8        | 7         |
-| P2 (Medium)  | 8        | 6         |
+| Severity     | Count |
+| ------------ | ----- |
+| P0 (Blocker) | 2     |
+| P1 (High)    | 8     |
+| P2 (Medium)  | 8     |
 
 ---
 
@@ -112,11 +110,18 @@ hx-prose p.lead {
 
 ---
 
-### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
+### P1-04: `caption-side: bottom` — accessibility regression for data tables
 
 **File:** `styles/prose/prose.scoped.css`
+**Line:** ~406
 
-Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
+```css
+hx-prose caption {
+  caption-side: bottom;
+}
+```
+
+WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
 
 ---
 
@@ -202,9 +207,19 @@ The comment block uses `--wc-prose-*` (old namespace) while the actual CSS custo
 
 ---
 
-### ~~P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared~~ ✅ FIXED
+### P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared
 
-**Fix:** Changed `clear: none` to `clear: both` in both `styles/prose/_drupal.css` and `styles/prose/prose.scoped.css`. Block-level content (headings, paragraphs) now starts below floated images rather than wrapping beside them. Updated comment explains the behavior and notes consumers can override with `clear: none` if wrap-around is intentional for their layout.
+**File:** `styles/prose/prose.scoped.css`
+**Lines:** ~730–733
+
+```css
+hx-prose .align-left + *,
+hx-prose .align-right + * {
+  clear: none;
+}
+```
+
+This rule explicitly prevents clearing floated content. CKEditor's `.align-left` and `.align-right` classes create floated elements. Setting `clear: none` on the following sibling means subsequent content will wrap around the float — which may be the intended visual behavior. However, if two consecutive floated images appear, or if a heading follows an aligned image, the heading may render adjacent to the floated image rather than below it. This is a layout bug waiting to happen in complex WYSIWYG content. The `clearfix` utility class exists (line ~795) but is opt-in. Most Drupal authors will not add it.
 
 ---
 
@@ -255,7 +270,7 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
+### P2-07: Axe tests do not cover images without `alt` attribute
 
 **File:** `hx-prose.test.ts`
 

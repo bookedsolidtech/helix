@@ -62,11 +62,70 @@ The parent sets `aria-controls` on the `<hx-tab>` host element, but `role="tab"`
 
 Native `disabled` removes the button from the tab sequence. ARIA APG recommends disabled tabs remain focusable with `aria-disabled="true"` so screen reader users know they exist.
 
-### P1 — No public API to get/set active tab
+### ~~P1 — No public API to get/set active tab~~ FIXED
 
 **File:** `hx-tabs.ts`
 
-No `selectedIndex` or `value` property. Active tab tracked internally via private `_activePanel`. Consumers cannot pre-select a tab from Drupal Twig.
+**Resolution:** `selectedIndex` getter/setter added to `HelixTabs`. The getter returns the zero-based index of the currently active tab. The setter activates the tab at the given index (disabled-tab guard and out-of-range guard included). 5 tests cover the API.
+
+#### Drupal Twig Integration — `hx-tabs` with `selected-index`
+
+```twig
+{# Load component library via CDN #}
+{# <script type="module" src="https://cdn.example.com/@helixui/library/dist/hx-tabs.js"></script> #}
+
+{# Pre-select a tab from Drupal server-side context.
+   selected-index is a 0-based integer attribute. The default (0) selects the first tab.
+   Pass a Drupal variable (e.g., from a route parameter or user preference) to pre-open a tab. #}
+<hx-tabs
+  selected-index="{{ active_tab_index|default(0) }}"
+  orientation="{{ orientation|default('horizontal') }}"
+  label="{{ tablist_label|default('Record sections') }}"
+>
+  <hx-tab slot="tab" panel="demographics">Demographics</hx-tab>
+  <hx-tab slot="tab" panel="vitals">Vitals</hx-tab>
+  <hx-tab slot="tab" panel="medications">Medications</hx-tab>
+
+  <hx-tab-panel name="demographics">
+    {{ content.demographics }}
+  </hx-tab-panel>
+  <hx-tab-panel name="vitals">
+    {{ content.vitals }}
+  </hx-tab-panel>
+  <hx-tab-panel name="medications">
+    {{ content.medications }}
+  </hx-tab-panel>
+</hx-tabs>
+```
+
+**Drupal Behaviors integration (for programmatic control):**
+
+```javascript
+(function (Drupal, once) {
+  Drupal.behaviors.hxTabsSelection = {
+    attach(context) {
+      once('hx-tabs-init', 'hx-tabs', context).forEach((tabs) => {
+        // Respond to tab changes and persist selection
+        tabs.addEventListener('hx-tab-change', (e) => {
+          const { index } = e.detail;
+          sessionStorage.setItem('activeTabIndex', String(index));
+        });
+
+        // Restore persisted selection on page load
+        const saved = sessionStorage.getItem('activeTabIndex');
+        if (saved !== null) {
+          tabs.selectedIndex = parseInt(saved, 10);
+        }
+      });
+    },
+  };
+})(Drupal, once);
+```
+
+**Key Drupal integration notes:**
+- `selected-index` is a reflected attribute — set it in Twig as an integer string (e.g., `"1"` to open the second tab on load).
+- The `hx-tab-change` CustomEvent fires with `detail: { tabId: string, index: number }` — use in Drupal Behaviors for analytics or AJAX panel loading.
+- Disabled tabs are skipped by the setter; setting `selected-index` to a disabled tab's index is a no-op.
 
 ### P1 — `activation` property not reflected
 

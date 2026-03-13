@@ -314,7 +314,8 @@ export const DrupalBooleanProp: Story = {
         </p>
         <code
           style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
-          >&lt;hx-status-indicator status="online" pulse="false"&gt;&lt;/hx-status-indicator&gt;</code
+          >&lt;hx-status-indicator status="online"
+          pulse="false"&gt;&lt;/hx-status-indicator&gt;</code
         >
         <!-- pulse="false" does NOT disable pulse — the attribute presence is what counts -->
         <hx-status-indicator status="online" pulse="false"></hx-status-indicator>
