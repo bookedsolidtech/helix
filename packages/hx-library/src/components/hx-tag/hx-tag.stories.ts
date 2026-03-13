@@ -214,7 +214,7 @@ export const RemovableInteractive: Story = {
     await expect(removeButton).toBeTruthy();
 
     // Keyboard: tab to the remove button and activate via Enter
-    await userEvent.keyboard('{Tab}');
+    await userEvent.tab();
     await expect(removeButton).toHaveFocus();
     await userEvent.keyboard('{Enter}');
 

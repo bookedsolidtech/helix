@@ -937,11 +937,11 @@ export const OutOfRangeValue: Story = {
   name: 'Out-of-Range Value (clamping)',
   render: () => html`
     <div
-      style="display: flex; flex-direction: column; gap: var(--hx-space-8, 2rem); max-width: 480px;"
+      style="display: flex; flex-direction: column; gap: var(--hx-space-8); max-width: 480px;"
     >
       <div>
         <p
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-500, #6c757d); font-family: var(--hx-font-family-mono, monospace);"
+          style="margin: 0 0 var(--hx-space-2); font-size: var(--hx-font-size-xs); font-weight: var(--hx-font-weight-semibold); color: var(--hx-color-neutral-500); font-family: var(--hx-font-family-mono);"
         >
           value="150" on max="100" — native input clamps to 100
         </p>
@@ -949,7 +949,7 @@ export const OutOfRangeValue: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-500, #6c757d); font-family: var(--hx-font-family-mono, monospace);"
+          style="margin: 0 0 var(--hx-space-2); font-size: var(--hx-font-size-xs); font-weight: var(--hx-font-weight-semibold); color: var(--hx-color-neutral-500); font-family: var(--hx-font-family-mono);"
         >
           value="-20" on min="0" — native input clamps to 0
         </p>
