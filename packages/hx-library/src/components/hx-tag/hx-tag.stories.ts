@@ -209,9 +209,8 @@ export const RemovableInteractive: Story = {
     // Each tag must have a remove button inside shadow DOM
     const firstTag = tags[0];
     await expect(firstTag).toBeTruthy();
-    const removeButton = firstTag.shadowRoot?.querySelector<HTMLButtonElement>(
-      '[part="remove-button"]',
-    );
+    const removeButton =
+      firstTag.shadowRoot?.querySelector<HTMLButtonElement>('[part="remove-button"]');
     await expect(removeButton).toBeTruthy();
 
     // Keyboard: tab to the remove button and activate via Enter

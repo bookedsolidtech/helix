@@ -960,17 +960,15 @@ export const OutOfRangeValue: Story = {
     const sliders = canvasElement.querySelectorAll('hx-slider');
 
     // Over-max: native input should report clamped value (≤ max)
-    const overMaxInput = sliders[0]?.shadowRoot?.querySelector<HTMLInputElement>(
-      'input[type="range"]',
-    );
+    const overMaxInput =
+      sliders[0]?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
     if (overMaxInput) {
       await expect(Number(overMaxInput.value)).toBeLessThanOrEqual(100);
     }
 
     // Under-min: native input should report clamped value (≥ min)
-    const underMinInput = sliders[1]?.shadowRoot?.querySelector<HTMLInputElement>(
-      'input[type="range"]',
-    );
+    const underMinInput =
+      sliders[1]?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
     if (underMinInput) {
       await expect(Number(underMinInput.value)).toBeGreaterThanOrEqual(0);
     }

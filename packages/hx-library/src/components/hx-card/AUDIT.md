@@ -9,11 +9,11 @@
 
 ## Severity Key
 
-| Level | Meaning |
-|-------|---------|
-| **P0** | Blocking — breaks functionality, WCAG violation, or data loss |
+| Level  | Meaning                                                                                  |
+| ------ | ---------------------------------------------------------------------------------------- |
+| **P0** | Blocking — breaks functionality, WCAG violation, or data loss                            |
 | **P1** | High — significant quality/usability/correctness issue that must be fixed before release |
-| **P2** | Medium/Low — quality improvement, inconsistency, or missing polish |
+| **P2** | Medium/Low — quality improvement, inconsistency, or missing polish                       |
 
 ---
 
@@ -24,6 +24,7 @@
 **File:** `hx-card.ts:20`
 
 The `@fires` JSDoc annotation declares:
+
 ```ts
 @fires {CustomEvent<{href: string, originalEvent: MouseEvent}>} hx-card-click
 ```
@@ -88,6 +89,7 @@ The correct pattern is to derive the accessible name from slotted heading conten
 When `hx-href` is set, the `<div part="card">` receives `role="link"`. If the consumer also populates the `actions` slot with `<hx-button>` elements, interactive controls are nested inside a link role. This violates ARIA: [spec prohibits interactive descendants of role=link](https://www.w3.org/TR/wai-aria-1.2/#link).
 
 **Concrete example — `PatientSummaryCard` story (lines 964–1006):**
+
 ```html
 <hx-card variant="featured" elevation="raised" hx-href="...">
   <!-- ... content ... -->
@@ -142,6 +144,7 @@ This also means `this.focus()` on the component instance focuses the host elemen
 **File:** `hx-card.ts:148–150`, `hx-card.styles.ts:92–100`
 
 The `heading` slot wrapper (`<div class="card__heading">`) applies visual heading styles (font-size, font-weight) but provides no semantic heading role. If consumers pass `<span slot="heading">Title</span>` (as all stories do), the heading has no semantic meaning for screen readers. The component should either:
+
 - Document that consumers MUST use a heading element (`<h2>`, `<h3>`, etc.)
 - Provide an internal heading with appropriate ARIA level
 - Apply `role="heading"` to the slot wrapper with a configurable `aria-level` prop
@@ -155,8 +158,9 @@ Currently all Storybook stories use `<span slot="heading">` — none use semanti
 **File:** `hx-card.test.ts:326–333`
 
 The axe-core test for interactive state does not include actions slot content:
+
 ```ts
-'<hx-card hx-href="https://example.com"><span slot="heading">Title</span><p>Content</p></hx-card>'
+'<hx-card hx-href="https://example.com"><span slot="heading">Title</span><p>Content</p></hx-card>';
 ```
 
 The combination `hx-href + slot="actions"` — the pattern explicitly documented in stories — is never axe-tested.
@@ -186,6 +190,7 @@ The most dangerous usage scenario (interactive card with actions) has no test. T
 **File:** `__screenshots__/hx-card.test.ts/`
 
 Screenshots include:
+
 - `hx-card-Events-dispatches-wc-card-click-when-hx-href---click-1.png`
 - `hx-card-Events-dispatches-wc-card-click-when-wc-href---click-1.png`
 - `hx-card-Property--wc-href-has-aria-label--Navigate-to--wc-href---when-wc-href-set-1.png`
@@ -247,6 +252,7 @@ The feature audit description explicitly lists "horizontal/vertical layout" as a
 **File:** `hx-card.ts:34`, `hx-card.styles.ts`, `hx-card.stories.ts:736–739`
 
 The `@cssprop` JSDoc documents:
+
 ```ts
 @cssprop [--hx-card-gap=var(--hx-space-4)] - Gap between card sections.
 ```
@@ -266,6 +272,7 @@ The CSS Custom Properties story shows consumers how to override `--hx-card-gap`.
 ```
 
 The compact variant reduces only `card__body` padding. The `card__heading`, `card__footer`, and `card__actions` sections retain their full `var(--hx-card-padding)` spacing. A compact card with heading and actions will have:
+
 - Heading: full 1.5rem padding
 - Body: reduced 0.75rem padding
 - Actions: full 1.5rem padding
@@ -307,6 +314,7 @@ All other tokens follow `--hx-{category}-{scale}` naming: `--hx-shadow-lg`, `--h
 **File:** `hx-card.styles.ts` (multiple lines)
 
 Examples:
+
 - Line 11: `var(--hx-color-neutral-0, #ffffff)`
 - Line 12: `var(--hx-color-neutral-800, #212529)`
 - Line 14: `var(--hx-color-neutral-200, #dee2e6)`
@@ -350,6 +358,7 @@ The render always creates `card__image`, `card__heading`, `card__footer`, `card_
 There is no `*.twig`, `*.drupal.md`, or Drupal-specific documentation for `hx-card`. All other documented components should ship with a usage example for the primary consumer. Given that `hx-card` is described as a "content container" and would be used widely in Drupal templates, the absence of a reference Twig template is a gap.
 
 Example of what should exist:
+
 ```twig
 <hx-card variant="{{ variant|default('default') }}" elevation="{{ elevation|default('flat') }}"
   {% if href %}hx-href="{{ href }}"{% endif %}>
@@ -378,33 +387,33 @@ When the card is used as a linked card (`hx-href`), the navigation is handled vi
 
 ## Summary Table
 
-| # | Area | Severity | Issue |
-|---|------|----------|-------|
-| 1 | TypeScript | P1 | `@fires` JSDoc types `originalEvent` as `MouseEvent` only — misses `KeyboardEvent` |
-| 2 | TypeScript | P2 | `CustomEvent` not generically typed at dispatch site |
-| 3 | TypeScript | P2 | `hxHref` defaults to `''` not `string \| undefined` |
-| 4 | Accessibility | P1 | `aria-label="Navigate to <URL>"` — non-descriptive, exposes raw URL to screen readers |
-| 5 | Accessibility | P1 | Interactive card + actions slot anti-pattern unguarded; demonstrated in 7 stories |
-| 6 | Accessibility | P1 | No `prefers-reduced-motion` guard on transitions/transforms |
-| 7 | Accessibility | P2 | `tabindex` on inner shadow div, not host element |
-| 8 | Accessibility | P2 | Heading slot provides no semantic heading role or guidance |
-| 9 | Accessibility | P2 | axe-core test does not cover interactive + actions combination |
-| 10 | Tests | P2 | No test for `hxHref` property change after initial render |
-| 11 | Tests | P2 | No test for interactive + actions slot combination |
-| 12 | Tests | P2 | Stale screenshot names with `wc-` prefix |
-| 13 | Storybook | P1 | `InteractiveClickTest` play function checks `detail.url` — property is `detail.href`; assertion silently no-ops |
-| 14 | Storybook | P1 | `wcHref` arg name is stale `wc-` prefix; conflicts with CEM-generated `hxHref` autodoc control |
-| 15 | Storybook | P2 | External `placehold.co` image URLs break in offline/CI environments |
-| 16 | Storybook | P2 | Horizontal card layout absent — called out in audit spec as expected feature |
-| 17 | CSS | P1 | `--hx-card-gap` documented and advertised but never referenced in stylesheet |
-| 18 | CSS | P1 | `.card--compact` only reduces body padding — heading/footer/actions retain full padding |
-| 19 | CSS | P2 | No image aspect ratio enforcement — cards with different images have inconsistent heights |
-| 20 | CSS | P2 | `--hx-transform-lift-md` token name does not follow project naming conventions |
-| 21 | CSS | P2 | Hardcoded hex fallback values throughout stylesheet (violates zero-tolerance policy) |
-| 22 | Performance | P2 | `tokenStyles` injected per shadow-root instance — systemic concern |
-| 23 | Performance | P2 | Five hidden DOM nodes always present per card for empty slots |
-| 24 | Drupal | P2 | No Twig template or Drupal usage documentation |
-| 25 | Drupal | P2 | `hx-card-click` navigation pattern undocumented for Drupal behaviors |
+| #   | Area          | Severity | Issue                                                                                                           |
+| --- | ------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| 1   | TypeScript    | P1       | `@fires` JSDoc types `originalEvent` as `MouseEvent` only — misses `KeyboardEvent`                              |
+| 2   | TypeScript    | P2       | `CustomEvent` not generically typed at dispatch site                                                            |
+| 3   | TypeScript    | P2       | `hxHref` defaults to `''` not `string \| undefined`                                                             |
+| 4   | Accessibility | P1       | `aria-label="Navigate to <URL>"` — non-descriptive, exposes raw URL to screen readers                           |
+| 5   | Accessibility | P1       | Interactive card + actions slot anti-pattern unguarded; demonstrated in 7 stories                               |
+| 6   | Accessibility | P1       | No `prefers-reduced-motion` guard on transitions/transforms                                                     |
+| 7   | Accessibility | P2       | `tabindex` on inner shadow div, not host element                                                                |
+| 8   | Accessibility | P2       | Heading slot provides no semantic heading role or guidance                                                      |
+| 9   | Accessibility | P2       | axe-core test does not cover interactive + actions combination                                                  |
+| 10  | Tests         | P2       | No test for `hxHref` property change after initial render                                                       |
+| 11  | Tests         | P2       | No test for interactive + actions slot combination                                                              |
+| 12  | Tests         | P2       | Stale screenshot names with `wc-` prefix                                                                        |
+| 13  | Storybook     | P1       | `InteractiveClickTest` play function checks `detail.url` — property is `detail.href`; assertion silently no-ops |
+| 14  | Storybook     | P1       | `wcHref` arg name is stale `wc-` prefix; conflicts with CEM-generated `hxHref` autodoc control                  |
+| 15  | Storybook     | P2       | External `placehold.co` image URLs break in offline/CI environments                                             |
+| 16  | Storybook     | P2       | Horizontal card layout absent — called out in audit spec as expected feature                                    |
+| 17  | CSS           | P1       | `--hx-card-gap` documented and advertised but never referenced in stylesheet                                    |
+| 18  | CSS           | P1       | `.card--compact` only reduces body padding — heading/footer/actions retain full padding                         |
+| 19  | CSS           | P2       | No image aspect ratio enforcement — cards with different images have inconsistent heights                       |
+| 20  | CSS           | P2       | `--hx-transform-lift-md` token name does not follow project naming conventions                                  |
+| 21  | CSS           | P2       | Hardcoded hex fallback values throughout stylesheet (violates zero-tolerance policy)                            |
+| 22  | Performance   | P2       | `tokenStyles` injected per shadow-root instance — systemic concern                                              |
+| 23  | Performance   | P2       | Five hidden DOM nodes always present per card for empty slots                                                   |
+| 24  | Drupal        | P2       | No Twig template or Drupal usage documentation                                                                  |
+| 25  | Drupal        | P2       | `hx-card-click` navigation pattern undocumented for Drupal behaviors                                            |
 
 **P0 count:** 0
 **P1 count:** 7
@@ -412,4 +421,4 @@ When the card is used as a linked card (`hx-href`), the navigation is handled vi
 
 ---
 
-*Audit complete. Do not modify the component source. Fix forward in separate tickets.*
+_Audit complete. Do not modify the component source. Fix forward in separate tickets._

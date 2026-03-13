@@ -11,7 +11,7 @@
 ## Summary
 
 | Severity | Count |
-|----------|-------|
+| -------- | ----- |
 | P0       | 1     |
 | P1       | 6     |
 | P2       | 8     |
@@ -48,12 +48,13 @@ const currentIndex = items.findIndex((item) => item === lightActive);
 Because `document.activeElement` returns the shadow host (`hx-menu-item`), not the inner `<button>` inside its shadow root, `currentIndex` is always `-1`.
 
 Consequence:
+
 - `ArrowDown`: `currentIndex (-1) < items.length - 1` → always true → always focuses `items[0]`
 - `ArrowUp`: `currentIndex (-1) > 0` → false → always focuses `items[items.length - 1]`
 
 You **cannot advance past the first item** with ArrowDown. Every ArrowDown press refocuses item 0. The menu is non-navigable. This violates WCAG 2.1 SC 2.1.1 (Keyboard).
 
-**Fix direction:** Use `Element.shadowRoot.activeElement` chained through each item, or track focus with a separate state variable, or compare against the `hx-menu-item` *hosts* and resolve to their inner buttons accordingly.
+**Fix direction:** Use `Element.shadowRoot.activeElement` chained through each item, or track focus with a separate state variable, or compare against the `hx-menu-item` _hosts_ and resolve to their inner buttons accordingly.
 
 ---
 
@@ -68,9 +69,10 @@ You **cannot advance past the first item** with ArrowDown. Every ArrowDown press
 
 The `<div role="menu">` lives in `hx-split-button`'s shadow DOM. Slotted `<hx-menu-item>` elements each have their own shadow DOM containing `<button role="menuitem">`. This means the `role="menuitem"` is two shadow boundaries deep from the `role="menu"` container.
 
-The ARIA spec requires that `menuitem` elements be owned by a `menu`. The ARIA in HTML spec and Accessibility Object Model define that slotted content is flattened into the host shadow tree for accessibility purposes — however, the button element with `role="menuitem"` is inside a *nested* shadow root (hx-menu-item's own shadow root), not a direct slot assignment. Some AT/browser combinations may not expose the button as a child of the menu in the accessibility tree.
+The ARIA spec requires that `menuitem` elements be owned by a `menu`. The ARIA in HTML spec and Accessibility Object Model define that slotted content is flattened into the host shadow tree for accessibility purposes — however, the button element with `role="menuitem"` is inside a _nested_ shadow root (hx-menu-item's own shadow root), not a direct slot assignment. Some AT/browser combinations may not expose the button as a child of the menu in the accessibility tree.
 
 This pattern passes axe-core (which is DOM-based) but may fail in real AT testing (NVDA + Firefox in particular). Requires manual AT verification with:
+
 - NVDA + Firefox
 - VoiceOver + Safari
 - JAWS + Chrome
@@ -89,7 +91,7 @@ This pattern passes axe-core (which is DOM-based) but may fail in real AT testin
   outline-offset: var(--hx-focus-ring-offset, -2px);
 ```
 
-A negative offset draws the focus ring *inside* the element boundary. On elements with `border-radius`, this clips the focus ring at the corners, making it partially invisible. WCAG 2.1 SC 1.4.11 (Non-text Contrast) requires that focus indicators be clearly distinguishable.
+A negative offset draws the focus ring _inside_ the element boundary. On elements with `border-radius`, this clips the focus ring at the corners, making it partially invisible. WCAG 2.1 SC 1.4.11 (Non-text Contrast) requires that focus indicators be clearly distinguishable.
 
 The `hx-menu-item` has `border-radius: var(--hx-menu-item-border-radius, ...)`. With negative offset and rounded corners, the focus ring will be clipped.
 
@@ -140,6 +142,7 @@ Both `focused` and the shadow-root approach should be removed once the P0 fix is
 The keyboard test suite verifies that `ArrowDown` opens the menu (line ~263) but never verifies that `ArrowDown` moves focus from item 1 to item 2 in a multi-item menu. This is exactly the scenario where P0-01 manifests. The P0 keyboard navigation bug would pass all current tests.
 
 Missing test cases:
+
 - ArrowDown moves focus from first item to second item
 - ArrowDown wraps from last item to first item
 - ArrowUp moves focus from second item to first item
@@ -170,8 +173,10 @@ Missing test cases:
 **Area:** Accessibility / i18n
 
 ```html
-aria-label="More actions"    <!-- trigger button -->
-aria-label="Secondary actions"  <!-- menu panel -->
+aria-label="More actions"
+<!-- trigger button -->
+aria-label="Secondary actions"
+<!-- menu panel -->
 ```
 
 These are hardcoded English strings with no mechanism for localization. Healthcare enterprise consumers serving non-English markets cannot override these without patching the component. Should be exposed as properties (e.g., `triggerLabel`, `menuLabel`) with English defaults.
@@ -220,10 +225,7 @@ Both components set native `disabled` attribute AND `aria-disabled="true"` on `<
 **Area:** Accessibility / JavaScript
 
 ```html
-<div
-  role="menu"
-  @keydown=${this._handleMenuKeydown}
->
+<div role="menu" @keydown="${this._handleMenuKeydown}">
   <slot name="menu"></slot>
 </div>
 ```
@@ -259,27 +261,32 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 ## Area-by-Area Summary
 
 ### TypeScript
+
 - Strict mode compliance: **Pass** — no `any`, no `@ts-ignore`
 - Dead code: **Fail** — `_primaryButton` query (P1-03), `focused` variable (P1-04)
 - Type accuracy: **Pass** — event detail types are correctly typed
 
 ### Accessibility
+
 - ARIA pattern intent: **Correct** — properly targets ARIA menu button pattern
 - Implementation: **Fail** — P0 keyboard navigation bug, P1 cross-shadow ARIA relationship
 - axe-core: **Pass** (DOM-based static analysis insufficient for shadow DOM role relationships)
 - Manual AT: **Untested** — required for P1-01
 
 ### Tests
+
 - Coverage: **Partial** — 40+ tests but critical keyboard navigation path untested (P1-05)
 - Quality: **Fail** — P0 bug undetected by test suite
 
 ### Storybook
+
 - Variant coverage: **Pass** — all 6 variants present
 - Interaction tests: **Pass** — 7 play functions with event spies
 - Documentation gap: **Fail** — no standalone hx-menu-item story (P2-05)
 - Accessibility in stories: **Fail** — Danger story has unlabeled button (P1-06)
 
 ### CSS
+
 - Token usage: **Pass** — comprehensive `--hx-*` token coverage with fallbacks
 - Parts: **Pass** — `button`, `trigger`, `menu` CSS parts correctly exposed
 - Focus visibility: **Fail** — negative outline-offset on hx-menu-item (P1-02)
@@ -287,9 +294,11 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 - Reduced motion: **Pass** — media query present
 
 ### Performance
+
 - Bundle size: **Unverified** — blocked by PR #175 (P2-07)
 
 ### Drupal
+
 - Twig-renderable: **Pass** — standard HTML attribute API works
 - label attribute: **Pass** (with caveat — P2-08)
 - Behavior file: **Missing** (P2-08)
