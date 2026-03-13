@@ -1,0 +1,64 @@
+{#
+  hx-slider — Range slider
+  ========================
+
+  A form-associated range slider for selecting a numeric value.
+
+  Properties:
+    - min:        Minimum allowed value (default: 0)
+    - max:        Maximum allowed value (default: 100)
+    - value:      Initial/default value (default: 0)
+    - step:       Stepping interval (default: 1)
+    - name:       Form field name (required for form submission)
+    - label:      Visible label text
+    - help-text:  Help/hint text shown below the slider
+    - hx-size:    'sm' | 'md' | 'lg' (default: 'md')
+    - disabled:   Boolean — prevents interaction
+    - show-value: Boolean — shows the current numeric value next to the label
+    - show-ticks: Boolean — renders tick marks at each step interval
+    - aria-valuetext: Human-readable value label (e.g., "7 — Moderate-Severe")
+
+  Slots:
+    - label:     Custom label content (overrides the label property)
+    - help-text: Custom help text content
+    - min-label: Label at the minimum end of the track
+    - max-label: Label at the maximum end of the track
+
+  Form integration:
+    - The slider participates in native HTML forms via ElementInternals.
+    - The `name` attribute maps the value into FormData on submit.
+    - Form reset restores to the declared `value` attribute, not `min`.
+    - Use within a Drupal Form API render element or a plain <form>.
+
+  Accessibility:
+    - Always provide a label (either the `label` attribute or `slot="label"` content).
+    - Use `aria-valuetext` for contextual value labeling (e.g., pain scales).
+    - The slider is keyboard-navigable via arrow keys, Home, End, Page Up, Page Down.
+#}
+
+<hx-slider
+  name="{{ name }}"
+  min="{{ min|default(0) }}"
+  max="{{ max|default(100) }}"
+  value="{{ value|default(0) }}"
+  step="{{ step|default(1) }}"
+  label="{{ label }}"
+  {% if help_text is defined and help_text %}
+    help-text="{{ help_text }}"
+  {% endif %}
+  {% if size is defined and size %}
+    hx-size="{{ size }}"
+  {% endif %}
+  {% if show_value is defined and show_value %}
+    show-value
+  {% endif %}
+  {% if show_ticks is defined and show_ticks %}
+    show-ticks
+  {% endif %}
+  {% if aria_valuetext is defined and aria_valuetext %}
+    aria-valuetext="{{ aria_valuetext }}"
+  {% endif %}
+  {% if disabled is defined and disabled %}
+    disabled
+  {% endif %}
+></hx-slider>

@@ -1,0 +1,50 @@
+{#
+  hx-pagination — Pagination navigation
+  ======================================
+
+  A pagination component for navigating content listings. Integrates with
+  Drupal's standard URL-based pager pattern (?page=N, 0-based).
+
+  IMPORTANT: Drupal's pager uses 0-based page index in the URL (?page=N).
+  This component is 1-based, so add 1 to the Drupal page value when rendering
+  and subtract 1 when updating the URL.
+
+  Properties:
+    - total-pages:    Total number of pages (required)
+    - current-page:   The active page, 1-based (required)
+    - label:          Accessible label for the <nav> element (default: 'Pagination')
+    - sibling-count:  Number of pages shown on each side of current (default: 1)
+    - boundary-count: Number of pages shown at start and end (default: 1)
+    - show-first-last: Boolean — show First/Last page buttons
+    - show-page-size: Boolean — show the page-size selector UI
+    - page-size:      Current page size value (default: 25)
+
+  Events:
+    - hx-page-change:      { page: number } — fired on page navigation (1-based)
+    - hx-page-size-change: { pageSize: number } — fired when page size changes
+
+  Drupal GET parameter wiring:
+    - Drupal core pager uses ?page=N where N is 0-based.
+    - Pass `pager.current_page + 1` as current-page.
+    - On hx-page-change, set ?page to e.detail.page - 1.
+    - See README.drupal.md for a full Drupal behaviors example.
+#}
+
+<hx-pagination
+  total-pages="{{ total_pages }}"
+  current-page="{{ current_page|default(pager.current_page + 1)|default(1) }}"
+  label="{{ label|default('Pagination')|t }}"
+  {% if sibling_count is defined %}
+    sibling-count="{{ sibling_count }}"
+  {% endif %}
+  {% if boundary_count is defined %}
+    boundary-count="{{ boundary_count }}"
+  {% endif %}
+  {% if show_first_last is defined and show_first_last %}
+    show-first-last
+  {% endif %}
+  {% if show_page_size is defined and show_page_size %}
+    show-page-size
+    page-size="{{ page_size|default(25) }}"
+  {% endif %}
+></hx-pagination>

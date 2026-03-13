@@ -1,0 +1,60 @@
+{#
+  hx-button-group — Button group container
+  =========================================
+
+  Groups related hx-button elements into a cohesive horizontal or vertical
+  action set. Eliminates double borders between adjacent buttons and squares
+  off inner border-radius for a unified visual appearance.
+
+  Asset loading (add to mytheme.libraries.yml):
+  ---------------------------------------------
+  hx-button-group:
+    js:
+      https://cdn.example.com/@helixui/library/dist/hx-button-group.js:
+        type: external
+        attributes:
+          type: module
+
+  Properties:
+    - orientation: 'horizontal' | 'vertical' (default: 'horizontal')
+    - hx-size:     'sm' | 'md' | 'lg' (default: 'md')
+                   Cascades to child hx-button elements automatically.
+    - aria-label:  Accessible name for the group (strongly recommended for WCAG).
+                   Alternatively, use aria-labelledby pointing to an existing element.
+
+  Accessibility requirement:
+    Always provide aria-label or aria-labelledby. Without it, screen readers
+    announce an unnamed "group" with no context about the button set purpose.
+
+  Slot:
+    - Default slot accepts hx-button children.
+
+  Note on hx-size cascade:
+    Setting hx-size on the container sets a CSS custom property
+    (--hx-button-group-size) that child hx-button elements read.
+    You do NOT need to set hx-size on each individual hx-button.
+#}
+
+<hx-button-group
+  {% if orientation is defined and orientation %}
+    orientation="{{ orientation }}"
+  {% endif %}
+  {% if size is defined and size %}
+    hx-size="{{ size }}"
+  {% endif %}
+  aria-label="{{ aria_label }}"
+>
+  {% for button in buttons %}
+    <hx-button
+      {% if button.variant is defined and button.variant %}
+        variant="{{ button.variant }}"
+      {% endif %}
+      {% if button.disabled is defined and button.disabled %}
+        disabled
+      {% endif %}
+      {% if button.type is defined and button.type %}
+        type="{{ button.type }}"
+      {% endif %}
+    >{{ button.label }}</hx-button>
+  {% endfor %}
+</hx-button-group>

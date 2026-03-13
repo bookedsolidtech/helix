@@ -936,10 +936,12 @@ export const MedicationDosageSelector: Story = {
 export const OutOfRangeValue: Story = {
   name: 'Out-of-Range Value (clamping)',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-8, 2rem); max-width: 480px;"
+    >
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6c757d; font-family: monospace;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-500, #6c757d); font-family: var(--hx-font-family-mono, monospace);"
         >
           value="150" on max="100" — native input clamps to 100
         </p>
@@ -947,7 +949,7 @@ export const OutOfRangeValue: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6c757d; font-family: monospace;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-500, #6c757d); font-family: var(--hx-font-family-mono, monospace);"
         >
           value="-20" on min="0" — native input clamps to 0
         </p>
@@ -956,22 +958,20 @@ export const OutOfRangeValue: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
-    await waitForUpdate(canvasElement);
     const sliders = canvasElement.querySelectorAll('hx-slider');
+    await expect(sliders.length).toBe(2);
 
-    // Over-max: native input should report clamped value (≤ max)
+    // Over-max: native input must report clamped value of exactly 100
     const overMaxInput =
       sliders[0]?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
-    if (overMaxInput) {
-      await expect(Number(overMaxInput.value)).toBeLessThanOrEqual(100);
-    }
+    await expect(overMaxInput).toBeTruthy();
+    await expect(overMaxInput!.value).toBe('100');
 
-    // Under-min: native input should report clamped value (≥ min)
+    // Under-min: native input must report clamped value of exactly 0
     const underMinInput =
       sliders[1]?.shadowRoot?.querySelector<HTMLInputElement>('input[type="range"]');
-    if (underMinInput) {
-      await expect(Number(underMinInput.value)).toBeGreaterThanOrEqual(0);
-    }
+    await expect(underMinInput).toBeTruthy();
+    await expect(underMinInput!.value).toBe('0');
   },
 };
 
