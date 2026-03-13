@@ -303,6 +303,8 @@ In Drupal Twig templates: `<hx-button hx-size="sm">` vs `<hx-button size="sm">`.
 
 This would be a breaking change to fix. Flag for next major version.
 
+**Drupal integration status:** `hx-button.twig` added. The template correctly uses `hx-size` as the attribute name and includes documentation warning Drupal theme authors about the htmx namespace overlap and the planned normalization in a future major version.
+
 ---
 
 ### P3-02: Inconsistent icon pattern across Storybook stories

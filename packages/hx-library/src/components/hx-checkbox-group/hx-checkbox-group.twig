@@ -1,0 +1,138 @@
+{#
+  hx-checkbox-group — Drupal Twig Template
+  ==========================================
+
+  Server-renders the hx-checkbox-group custom element with its hx-checkbox children.
+  The group is form-associated via ElementInternals and manages multi-value form
+  submission automatically. The `name` attribute set on the group propagates to all
+  child checkboxes — no Drupal behavior or PHP form alter is required.
+
+  Parameters:
+    name        (string)  Required for form submission. Form field name shared by all
+                          child checkboxes. Drupal Form API field names use bracket notation
+                          for array values (e.g., 'allergies[]').
+    label       (string)  Required. Legend text displayed above the checkbox group.
+    options     (array)   Required. Array of checkbox options. Each item must have:
+                            - value (string): submitted form value
+                            - label (string): visible checkbox label
+                          Optional per-item keys:
+                            - checked (bool): pre-checked state from server
+                            - disabled (bool): disable individual option
+                            - help_text (string): per-option guidance text
+    required    (bool)    Optional. At least one checkbox must be checked.
+    disabled    (bool)    Optional. Disables all checkboxes in the group.
+    error       (string)  Optional. Error message displayed below the group.
+    help_text   (string)  Optional. Help text displayed below the group label.
+    orientation (string)  Optional. One of: vertical | horizontal. Defaults to 'vertical'.
+    attributes  (object)  Optional. Additional HTML attributes spread onto the group element.
+
+  Usage examples:
+
+    Basic checkbox group (Drupal form field):
+      {% include 'hx-checkbox-group.twig' with {
+        name: 'notifications',
+        label: 'Notification Preferences',
+        options: [
+          { value: 'email', label: 'Email notifications' },
+          { value: 'sms', label: 'SMS notifications' },
+          { value: 'push', label: 'Push notifications' },
+        ],
+      } %}
+
+    Pre-selected options (server-side state):
+      {% include 'hx-checkbox-group.twig' with {
+        name: 'symptoms',
+        label: 'Current Symptoms',
+        options: [
+          { value: 'fever', label: 'Fever', checked: 'fever' in patient_symptoms },
+          { value: 'cough', label: 'Cough', checked: 'cough' in patient_symptoms },
+          { value: 'fatigue', label: 'Fatigue', checked: 'fatigue' in patient_symptoms },
+        ],
+      } %}
+
+    Required group with error state (form validation failure):
+      {% include 'hx-checkbox-group.twig' with {
+        name: 'consent',
+        label: 'Patient Consent',
+        required: true,
+        error: element['#errors'] ? element['#errors']|render,
+        options: [
+          { value: 'treatment', label: 'I consent to the proposed treatment plan' },
+          { value: 'records', label: 'I consent to sharing medical records' },
+        ],
+      } %}
+
+    Horizontal layout (compact option sets):
+      {% include 'hx-checkbox-group.twig' with {
+        name: 'days',
+        label: 'Available Days',
+        orientation: 'horizontal',
+        options: [
+          { value: 'mon', label: 'Mon' },
+          { value: 'tue', label: 'Tue' },
+          { value: 'wed', label: 'Wed' },
+          { value: 'thu', label: 'Thu' },
+          { value: 'fri', label: 'Fri' },
+        ],
+      } %}
+
+    Drupal Form API integration (via preprocess hook):
+      In your preprocess_form_element hook, map Drupal's `#options` to the `options`
+      array and pass `element['#value']` as the checked items list. Example:
+        function mytheme_preprocess_checkboxes(&$variables) {
+          $element = $variables['element'];
+          $variables['options'] = [];
+          foreach ($element['#options'] as $value => $label) {
+            $variables['options'][] = [
+              'value' => $value,
+              'label' => $label,
+              'checked' => in_array($value, (array) $element['#value']),
+            ];
+          }
+          $variables['name'] = $element['#name'];
+          $variables['label'] = $element['#title'];
+        }
+
+  Drupal behavior for change events:
+    The component dispatches an `hx-change` CustomEvent (bubbles, composed) with
+    detail `{ values: string[] }` — the current array of all checked values.
+    For standard form submission, no behavior is needed.
+    For AJAX-driven patterns:
+
+      (function (Drupal, once) {
+        Drupal.behaviors.helixCheckboxGroup = {
+          attach: function (context) {
+            once('hx-checkbox-group', 'hx-checkbox-group[data-ajax]', context).forEach((grp) => {
+              grp.addEventListener('hx-change', (e) => {
+                // e.detail.values — array of currently checked values
+                Drupal.ajax({ url: grp.dataset.ajax }).execute();
+              });
+            });
+          },
+        };
+      })(Drupal, once);
+#}
+
+<hx-checkbox-group
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if orientation %}orientation="{{ orientation }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% if help_text %}
+    <span slot="help">{{ help_text }}</span>
+  {% endif %}
+
+  {% for option in options %}
+    <hx-checkbox
+      value="{{ option.value }}"
+      label="{{ option.label }}"
+      {% if option.checked %}checked{% endif %}
+      {% if option.disabled %}disabled{% endif %}
+      {% if option.help_text %}help-text="{{ option.help_text }}"{% endif %}
+    ></hx-checkbox>
+  {% endfor %}
+</hx-checkbox-group>
