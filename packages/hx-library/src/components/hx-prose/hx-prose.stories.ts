@@ -898,32 +898,38 @@ export const AllContentTypes: Story = {
         </caption>
         <thead>
           <tr>
-            <th>Test</th>
-            <th>Result</th>
-            <th>Reference</th>
-            <th>Status</th>
+            <th scope="col">Test</th>
+            <th scope="col">Result</th>
+            <th scope="col">Reference</th>
+            <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Hemoglobin</td>
+            <th scope="row">Hemoglobin</th>
             <td>14.2 g/dL</td>
             <td>12.0 - 16.0</td>
             <td>Normal</td>
           </tr>
           <tr>
-            <td>WBC</td>
+            <th scope="row">WBC</th>
             <td>8.5 K/uL</td>
             <td>4.5 - 11.0</td>
             <td>Normal</td>
           </tr>
           <tr>
-            <td>Glucose</td>
+            <th scope="row">Glucose</th>
             <td>142 mg/dL</td>
             <td>70 - 100</td>
             <td>High</td>
           </tr>
         </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colspan="3">3 results — 1 abnormal</th>
+            <td>Review required</td>
+          </tr>
+        </tfoot>
       </table>
 
       <h2>Code Block</h2>
@@ -943,10 +949,13 @@ export const AllContentTypes: Story = {
   }
 }</code></pre>
 
-      <h2>Keyboard Input</h2>
+      <h2>Keyboard and Technical Text</h2>
       <p>
         Press <kbd>Ctrl</kbd> + <kbd>P</kbd> to print. Use <kbd>Alt</kbd> + <kbd>F4</kbd> to close
-        the current window.
+        the current window. Terminal output like
+        <samp>Connection established. Waiting for data...</samp> uses the <code>samp</code> element.
+        Mathematical variables such as <var>x</var> + <var>y</var> = <var>z</var> use the
+        <code>var</code> element.
       </p>
 
       <h2>Links</h2>
