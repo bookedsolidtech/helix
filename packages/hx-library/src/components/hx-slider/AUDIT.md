@@ -281,15 +281,15 @@ On page load, the fill animates from `0` to its initial value. This motion is no
 
 ## Area 6 — Performance
 
-### ~~[P2] Bundle size unverifiable — no dist output present~~ ✅ FIXED
+### [P2] Bundle size unverifiable — no dist output present
 
-**Resolution:** Build verified. `dist/shared/hx-slider-*.js` — 17.99 kB minified │ **4.85 kB gzip** — within the <5 KB per-component budget. Budget confirmed passing.
+No `dist/` build output exists in the worktree. Source files total ~19KB uncompressed (`hx-slider.ts` = 12,954 bytes, `hx-slider.styles.ts` = 6,456 bytes). Minified + gzipped estimate is ~4–5KB, which is at the edge of the 5KB per-component budget but likely passes. Cannot confirm without a build.
 
-### [P3] ~~`_ticks()` re-runs on every render~~ ✅ FIXED
+### [P3] `_ticks()` re-runs on every render
 
 **File:** `hx-slider.ts:169-179`
 
-**Resolution:** Renamed `_ticks()` to `_computeTicks()` and added a `_cachedTicks: number[]` field that is populated in `willUpdate()` only when `showTicks`, `min`, `max`, or `step` change. `render()` now reads from `this._cachedTicks` directly, eliminating redundant array allocation on every drag update.
+`_ticks()` computes the tick array fresh on every `render()` call. When `showTicks=true` and the slider updates on drag (continuous `hx-input`), this recomputes an array every frame even though `min`, `max`, `step` have not changed. Should be memoized or computed only when relevant properties change.
 
 ---
 
@@ -340,7 +340,7 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 | 13  | TypeScript      | **P2**   | `_thumbPercent()` is dead code — identical to `_fillPercent()`                                   |
 | 14  | TypeScript      | **P2**   | No step-snapping validation on `value` setter                                                    |
 | 15  | Accessibility   | **P2**   | `aria-disabled` not exposed on host element                                                      |
-| 16  | Accessibility   | **P2**   | Page Up / Page Down behavior — tested in Storybook play functions (`{PageDown}` / `{PageUp}`)    |
+| 16  | Accessibility   | **P2**   | Page Up / Page Down behavior untested                                                            |
 | 17  | Tests           | **P2**   | No `name` → `FormData` integration test                                                          |
 | 18  | Tests           | **P2**   | Keyboard navigation tests only in Storybook, not Vitest                                          |
 | 19  | Tests           | **P2**   | No step-snapping test                                                                            |
@@ -349,8 +349,8 @@ Slot-based content (`min-label`, `max-label`, `help`, `label`) works with Twig-i
 | 22  | CSS             | **P2**   | No `@media (forced-colors: active)` block — invisible in Windows High Contrast                   |
 | 23  | CSS             | **P2**   | `--hx-border-width-thin` reused for semantically different sizes                                 |
 | 24  | Storybook       | **P2**   | Range slider (two thumbs) absent — 6/6 major libraries ship this variant                         |
-| 25  | Performance     | **P2**   | ~~Bundle size unverifiable — no dist output~~ ✅ FIXED (4.85 kB gzip, within budget)             |
-| 26  | Performance     | **P3**   | ~~`_ticks()` re-runs on every render, not memoized~~ ✅ FIXED                                     |
+| 25  | Performance     | **P2**   | Bundle size unverifiable — no dist output                                                        |
+| 26  | Performance     | **P3**   | `_ticks()` re-runs on every render, not memoized                                                 |
 | 27  | CSS             | **P3**   | Fill transition animates on initial page load (not just user interaction)                        |
 | 28  | Storybook       | **P3**   | `aria-valuetext` not demonstrated (blocked on implementation)                                    |
 | 29  | TypeScript      | **P3**   | `render()` missing explicit return type                                                          |
