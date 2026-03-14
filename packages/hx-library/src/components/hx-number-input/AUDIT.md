@@ -4,6 +4,7 @@
 **Date:** 2026-03-05
 **Source:** `rescue/abandoned-components` branch (PR #175 — not yet merged to dev)
 **Files audited:**
+
 - `hx-number-input.ts`
 - `hx-number-input.styles.ts`
 - `hx-number-input.test.ts`
@@ -15,11 +16,11 @@
 
 ## Severity Key
 
-| Severity | Meaning |
-|---|---|
-| **P0** | Blocking — ships broken behavior, data loss, or hard accessibility violation |
-| **P1** | High — incorrect contract, AT inaccessibility, missing test coverage for critical path |
-| **P2** | Medium — code quality, minor spec deviation, documentation gap |
+| Severity | Meaning                                                                                |
+| -------- | -------------------------------------------------------------------------------------- |
+| **P0**   | Blocking — ships broken behavior, data loss, or hard accessibility violation           |
+| **P1**   | High — incorrect contract, AT inaccessibility, missing test coverage for critical path |
+| **P2**   | Medium — code quality, minor spec deviation, documentation gap                         |
 
 ---
 
@@ -50,6 +51,7 @@ this.value = isNaN(parsed) ? null : parsed;
 **File:** `hx-number-input.ts`, `_applyStep` method
 
 The documentation establishes two distinct events:
+
 - `hx-input` — "Dispatched on every keystroke as the user types"
 - `hx-change` — "Dispatched when the input loses focus after its value changed"
 
@@ -123,8 +125,13 @@ A sighted screen reader user (e.g., low-vision user who mouses to the buttons) c
 **File:** `hx-number-input.ts`, error div in render
 
 ```html
-<div part="error-message" class="field__error" id=${this._errorId}
-     role="alert" aria-live="polite">
+<div
+  part="error-message"
+  class="field__error"
+  id="${this._errorId}"
+  role="alert"
+  aria-live="polite"
+>
   ${this.error}
 </div>
 ```
@@ -132,6 +139,7 @@ A sighted screen reader user (e.g., low-vision user who mouses to the buttons) c
 `role="alert"` has an implicit `aria-live="assertive"` and `aria-atomic="true"`. Adding `aria-live="polite"` attempts to downgrade it to polite announcement, but `role="alert"` wins — the content will still be announced assertively by most screen readers. In a healthcare UI where error announcements compete with ongoing task narration, an unintended assertive interrupt could disorient users.
 
 **Fix needed:** Choose one semantic:
+
 - `role="alert"` alone (assertive — appropriate for validation errors that require immediate attention)
 - `role="status"` + `aria-live="polite"` (polite — appropriate if errors are informational, non-blocking)
 
@@ -178,6 +186,7 @@ The native `required` attribute already communicates requiredness to all assisti
 **File:** `hx-number-input.test.ts`
 
 The component implements a long-press acceleration pattern (`_startLongPress`, `_repeatInterval`, 400ms initial delay, 100ms repeat interval). This is one of the most complex and behavior-rich features of the component, but it has no tests:
+
 - No test for repeated firing during hold
 - No test for stopping on `pointerup`
 - No test for stopping on `pointerleave`
@@ -322,10 +331,10 @@ Consumers who inspect the JSDoc or autodocs cannot discover these customization 
 
 ```css
 .field__stepper-btn {
-  outline: none;  /* removes default focus ring */
+  outline: none; /* removes default focus ring */
 }
 .field__stepper-btn:focus-visible {
-  outline: ...;   /* restores via :focus-visible */
+  outline: ...; /* restores via :focus-visible */
 }
 ```
 
@@ -341,7 +350,7 @@ This is secondary to the P0 `aria-hidden` finding. Once `aria-hidden` is removed
 
 ```css
 .field__input[type='number'] {
-  -moz-appearance: textfield;  /* deprecated */
+  -moz-appearance: textfield; /* deprecated */
   appearance: textfield;
 }
 ```
@@ -356,7 +365,11 @@ This is secondary to the P0 `aria-hidden` finding. Once `aria-hidden` is removed
 
 ```css
 box-shadow: 0 0 0 var(--hx-focus-ring-width)
-  color-mix(in srgb, var(--hx-focus-ring-color) calc(var(--hx-focus-ring-opacity) * 100%), transparent);
+  color-mix(
+    in srgb,
+    var(--hx-focus-ring-color) calc(var(--hx-focus-ring-opacity) * 100%),
+    transparent
+  );
 ```
 
 `color-mix()` is Baseline 2023 (broadly available as of late 2023). For healthcare enterprise deployments on older managed browsers or Windows 7/8 era systems, this could silently drop the focus ring box-shadow. No fallback is provided.
@@ -374,6 +387,7 @@ box-shadow: 0 0 0 var(--hx-focus-ring-width)
   pointer-events: none;
 }
 ```
+
 ```ts
 ?disabled=${this.disabled || this.readonly || this._atMax}
 ```
@@ -421,6 +435,7 @@ The feature requirement specifies `< 5KB (min+gz)`. Given the implementation siz
 **File:** `hx-number-input.ts`
 
 The JSDoc documents:
+
 ```
  * @slot - Default slot — label override for Drupal Form API rendered labels.
 ```
@@ -471,43 +486,41 @@ Healthcare contexts often show placeholder hints for expected format (e.g., `pla
 
 ## Summary Table
 
-| # | Area | Severity | Finding |
-|---|------|----------|---------|
-| 1 | TypeScript | P1 | `formStateRestoreCallback` uses `parseFloat` vs converter's `Number()` — inconsistency |
-| 2 | TypeScript | P1 | `_applyStep` dispatches both `hx-input` AND `hx-change` — violates event contract |
-| 3 | TypeScript | P1 | `step` typed inconsistently vs `min`/`max` |
-| 4 | TypeScript | P2 | `select()` is misleading API on `type="number"` |
-| 5 | TypeScript | P2 | No runtime validation of `hxSize` attribute |
-| 6 | Accessibility | **P0** | Stepper `aria-hidden="true"` hides buttons from AT — WCAG SC 4.1.2 violation |
-| 7 | Accessibility | P1 | `role="alert"` + `aria-live="polite"` semantic conflict |
-| 8 | Accessibility | P1 | Stepper `aria-label` attributes are dead code (hidden by `aria-hidden`) |
-| 9 | Accessibility | P1 | `aria-required` redundant alongside native `required` |
-| 10 | Accessibility | P2 | `type="number"` accepts scientific notation silently |
-| 11 | Tests | P1 | Long-press behavior has zero test coverage |
-| 12 | Tests | P1 | `formResetCallback` test validates incorrect behavior |
-| 13 | Tests | P1 | Test uses `getElementById('test-fixture-container')` — fragile DOM assumption |
-| 14 | Tests | P1 | No test for `_applyStep` dual-event dispatch |
-| 15 | Tests | P2 | `pointerleave`/`pointercancel` handlers untested |
-| 16 | Tests | P2 | `select()` test validates no-op |
-| 17 | Tests | P2 | `formStateRestoreCallback("77abc")` edge case not tested |
-| 18 | Storybook | P1 | `argTypes` keys use camelCase, not HTML attribute names |
-| 19 | Storybook | P1 | `InAForm` story uses hardcoded hex colors |
-| 20 | Storybook | P2 | No `label` slot story (Drupal Form API pattern) |
-| 21 | Storybook | P2 | No composite Drupal slot story |
-| 22 | CSS | P1 | `--hx-number-input-label-color` and `--hx-number-input-font-family` undocumented |
-| 23 | CSS | P1 | `outline: none` on stepper buttons without reliable replacement for programmatic focus |
-| 24 | CSS | P2 | `-moz-appearance: textfield` is deprecated |
-| 25 | CSS | P2 | `color-mix()` has no fallback for older managed browsers |
-| 26 | CSS | P2 | Double-disable (`pointer-events: none` + `disabled`) undocumented |
-| 27 | Performance | P2 | `Math.random()` IDs — non-deterministic, SSR/snapshot unfriendly |
-| 28 | Performance | P2 | 100ms `setInterval` long-press creates GC pressure at high step counts |
-| 29 | Performance | P2 | Bundle size not verified against 5KB budget |
-| 30 | Drupal | **P0** | ~~`@slot -` documents default slot that doesn't exist~~ **FIXED** — `@slot -` removed; named `label` slot documented |
-| 31 | Drupal | P1 | ~~`formResetCallback` doesn't restore to HTML `value` attribute default~~ **FIXED** — `_defaultValue` captured in `firstUpdated()` |
-| 32 | Drupal | P1 | ~~`step="1"` omitted from native input DOM when value is 1~~ **FIXED** — `step=${this.step}` always rendered |
-| 33 | Drupal | P2 | No `placeholder` property (parity gap with `hx-text-input`) |
-| 34 | Storybook | P2 | ~~No `label` slot story (Drupal Form API pattern)~~ **FIXED** — `WithLabelSlot` story added |
-| 35 | Storybook | P2 | ~~No composite Drupal slot story~~ **FIXED** — `DrupalFormAPI` story added (all three slots) |
+| #   | Area          | Severity | Finding                                                                                  |
+| --- | ------------- | -------- | ---------------------------------------------------------------------------------------- |
+| 1   | TypeScript    | P1       | `formStateRestoreCallback` uses `parseFloat` vs converter's `Number()` — inconsistency   |
+| 2   | TypeScript    | P1       | `_applyStep` dispatches both `hx-input` AND `hx-change` — violates event contract        |
+| 3   | TypeScript    | P1       | `step` typed inconsistently vs `min`/`max`                                               |
+| 4   | TypeScript    | P2       | `select()` is misleading API on `type="number"`                                          |
+| 5   | TypeScript    | P2       | No runtime validation of `hxSize` attribute                                              |
+| 6   | Accessibility | **P0**   | Stepper `aria-hidden="true"` hides buttons from AT — WCAG SC 4.1.2 violation             |
+| 7   | Accessibility | P1       | `role="alert"` + `aria-live="polite"` semantic conflict                                  |
+| 8   | Accessibility | P1       | Stepper `aria-label` attributes are dead code (hidden by `aria-hidden`)                  |
+| 9   | Accessibility | P1       | `aria-required` redundant alongside native `required`                                    |
+| 10  | Accessibility | P2       | `type="number"` accepts scientific notation silently                                     |
+| 11  | Tests         | P1       | Long-press behavior has zero test coverage                                               |
+| 12  | Tests         | P1       | `formResetCallback` test validates incorrect behavior                                    |
+| 13  | Tests         | P1       | Test uses `getElementById('test-fixture-container')` — fragile DOM assumption            |
+| 14  | Tests         | P1       | No test for `_applyStep` dual-event dispatch                                             |
+| 15  | Tests         | P2       | `pointerleave`/`pointercancel` handlers untested                                         |
+| 16  | Tests         | P2       | `select()` test validates no-op                                                          |
+| 17  | Tests         | P2       | `formStateRestoreCallback("77abc")` edge case not tested                                 |
+| 18  | Storybook     | P1       | `argTypes` keys use camelCase, not HTML attribute names                                  |
+| 19  | Storybook     | P1       | `InAForm` story uses hardcoded hex colors                                                |
+| 20  | Storybook     | P2       | No `label` slot story (Drupal Form API pattern)                                          |
+| 21  | Storybook     | P2       | No composite Drupal slot story                                                           |
+| 22  | CSS           | P1       | `--hx-number-input-label-color` and `--hx-number-input-font-family` undocumented         |
+| 23  | CSS           | P1       | `outline: none` on stepper buttons without reliable replacement for programmatic focus   |
+| 24  | CSS           | P2       | `-moz-appearance: textfield` is deprecated                                               |
+| 25  | CSS           | P2       | `color-mix()` has no fallback for older managed browsers                                 |
+| 26  | CSS           | P2       | Double-disable (`pointer-events: none` + `disabled`) undocumented                        |
+| 27  | Performance   | P2       | `Math.random()` IDs — non-deterministic, SSR/snapshot unfriendly                         |
+| 28  | Performance   | P2       | 100ms `setInterval` long-press creates GC pressure at high step counts                   |
+| 29  | Performance   | P2       | Bundle size not verified against 5KB budget                                              |
+| 30  | Drupal        | **P0**   | `@slot -` documents default slot that doesn't exist — Drupal label content silently lost |
+| 31  | Drupal        | P1       | `formResetCallback` doesn't restore to HTML `value` attribute default                    |
+| 32  | Drupal        | P1       | `step="1"` omitted from native input DOM when value is 1                                 |
+| 33  | Drupal        | P2       | No `placeholder` property (parity gap with `hx-text-input`)                              |
 
 ---
 
@@ -515,4 +528,4 @@ Healthcare contexts often show placeholder hints for expected format (e.g., `pla
 
 1. **Stepper `aria-hidden="true"` (Finding #6)** — Buttons are completely inaccessible to screen reader users. WCAG 2.1 AA violation. Must be fixed before merge.
 
-2. ~~**`@slot -` documents non-existent default slot (Finding #30)**~~ **FIXED** — `@slot -` removed from JSDoc; the named `slot="label"` is correctly documented and a `WithLabelSlot` story demonstrates the Drupal Form API pattern.
+2. **`@slot -` documents non-existent default slot (Finding #30)** — Drupal consumers following the documentation will silently lose server-rendered label content. Either add the slot or fix the documentation before merge.

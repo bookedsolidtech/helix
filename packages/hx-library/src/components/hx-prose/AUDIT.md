@@ -51,7 +51,7 @@ _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have b
 
 ---
 
-### P0-02: Test file imports nonexistent type `WcProse`
+### P0-02: Test file imports nonexistent type `WcProse` — FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 4
@@ -61,6 +61,8 @@ import type { WcProse } from './hx-prose.js';
 ```
 
 The component exports `HelixProse`, not `WcProse`. This import will produce a TypeScript error under strict mode (`'WcProse' is not exported from './hx-prose.js'`). The tests currently pass because the type is used only as a generic parameter to `fixture<WcProse>()`, and TypeScript may not enforce the import strictly in the test runner context — but it will fail `npm run type-check`. This is a broken type reference that violates the zero-TypeScript-errors gate.
+
+**Resolution:** Import corrected to `import type { HelixProse } from './hx-prose.js'` and all `fixture<WcProse>` generic usages updated to `fixture<HelixProse>`.
 
 ---
 
@@ -120,11 +122,18 @@ hx-prose p.lead {
 
 ---
 
-### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
+### P1-04: `caption-side: bottom` — accessibility regression for data tables
 
 **File:** `styles/prose/prose.scoped.css`
+**Line:** ~406
 
-Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
+```css
+hx-prose caption {
+  caption-side: bottom;
+}
+```
+
+WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
 
 ---
 
@@ -226,7 +235,7 @@ This rule explicitly prevents clearing floated content. CKEditor's `.align-left`
 
 ---
 
-### P2-04: `_styles` private member — redundant underscore prefix convention
+### P2-04: `_styles` private member — redundant underscore prefix convention — FIXED
 
 **File:** `hx-prose.ts`
 **Line:** 38
@@ -236,6 +245,8 @@ private _styles = new AdoptedStylesheetsController(this, helixProseScopedCss, do
 ```
 
 TypeScript's `private` keyword already enforces access restriction. The underscore prefix (`_styles`) is a JavaScript convention for "pseudo-private" that predates `private`. Using both simultaneously is redundant and inconsistent — other components in the library should be checked for consistency. If the codebase convention is `private` (TypeScript), the underscore prefix should be dropped.
+
+**Resolution:** Renamed to `private adoptedStyles = new AdoptedStylesheetsController(...)` — underscore prefix removed, consistent with TypeScript `private` access modifier usage across the library.
 
 ---
 
@@ -273,7 +284,7 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
+### P2-07: Axe tests do not cover images without `alt` attribute
 
 **File:** `hx-prose.test.ts`
 
