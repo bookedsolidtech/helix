@@ -1330,6 +1330,7 @@ export const FocusReturn: Story = {
     const canvas = within(canvasElement);
     const alert = canvasElement.querySelector('#focus-return-alert') as HTMLElement & {
       open: boolean;
+      updateComplete: Promise<void>;
     };
     await expect(alert).toBeTruthy();
 

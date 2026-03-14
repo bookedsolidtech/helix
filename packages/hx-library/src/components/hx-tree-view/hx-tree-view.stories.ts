@@ -293,7 +293,6 @@ export const CheckboxMultiSelect: Story = {
             id="cat-a"
             aria-hidden="true"
             tabindex="-1"
-            aria-label="Infectious diseases category"
           />
           Infectious &amp; Parasitic Diseases (A00-B99)
         </span>
@@ -305,7 +304,6 @@ export const CheckboxMultiSelect: Story = {
               checked
               aria-hidden="true"
               tabindex="-1"
-              aria-label="A00-A09 Intestinal infections"
             />
             A00-A09: Intestinal infectious diseases
           </span>
@@ -318,7 +316,6 @@ export const CheckboxMultiSelect: Story = {
               checked
               aria-hidden="true"
               tabindex="-1"
-              aria-label="A15-A19 Tuberculosis"
             />
             A15-A19: Tuberculosis
           </span>
@@ -330,7 +327,6 @@ export const CheckboxMultiSelect: Story = {
               id="a20-a28"
               aria-hidden="true"
               tabindex="-1"
-              aria-label="A20-A28 Zoonotic bacterial diseases"
             />
             A20-A28: Certain zoonotic bacterial diseases
           </span>
@@ -342,7 +338,6 @@ export const CheckboxMultiSelect: Story = {
               id="a30-a49"
               aria-hidden="true"
               tabindex="-1"
-              aria-label="A30-A49 Other bacterial diseases"
             />
             A30-A49: Other bacterial diseases
           </span>
@@ -355,7 +350,6 @@ export const CheckboxMultiSelect: Story = {
             id="cat-c"
             aria-hidden="true"
             tabindex="-1"
-            aria-label="Neoplasms category"
           />
           Neoplasms (C00-D49)
         </span>
@@ -366,7 +360,6 @@ export const CheckboxMultiSelect: Story = {
               id="c00-c14"
               aria-hidden="true"
               tabindex="-1"
-              aria-label="C00-C14 Malignant neoplasms lip oral cavity"
             />
             C00-C14: Malignant neoplasms of lip, oral cavity
           </span>
@@ -378,7 +371,6 @@ export const CheckboxMultiSelect: Story = {
               id="c15-c26"
               aria-hidden="true"
               tabindex="-1"
-              aria-label="C15-C26 Malignant neoplasms digestive organs"
             />
             C15-C26: Malignant neoplasms of digestive organs
           </span>
