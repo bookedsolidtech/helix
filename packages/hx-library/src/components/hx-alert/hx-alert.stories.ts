@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import './hx-alert.js';
 
 // ─────────────────────────────────────────────────
@@ -55,6 +55,26 @@ const meta = {
       table: {
         category: 'Content',
         type: { summary: 'string (slot)' },
+      },
+    },
+    accent: {
+      control: 'boolean',
+      description:
+        'When true, applies a left border accent stripe instead of a full border. Common in enterprise healthcare dashboards for visual distinction.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    'return-focus-to': {
+      control: 'text',
+      description:
+        'CSS selector for the element to return focus to after the alert is dismissed. Critical accessibility pattern to prevent focus loss after dismissal.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'null' },
+        type: { summary: 'string | null' },
       },
     },
   },
@@ -1136,7 +1156,9 @@ export const DrugAllergyWarning: Story = {
 export const AccentVariant: Story = {
   name: 'Accent (Left Border Stripe)',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 640px;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
+    >
       <hx-alert variant="info" accent>
         <strong>Session activity:</strong> Your patient chart session will expire in 10 minutes.
         Save any unsaved progress before the session ends.
@@ -1181,7 +1203,9 @@ export const AccentVariant: Story = {
 export const WithTitle: Story = {
   name: 'With Title Slot',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 640px;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
+    >
       <hx-alert variant="error" dismissible>
         <strong slot="title">Drug Interaction — High Risk</strong>
         Concurrent use of Warfarin and Amoxicillin may potentiate the anticoagulant effect. Monitor
@@ -1241,23 +1265,27 @@ export const WithTitle: Story = {
 export const FocusReturn: Story = {
   name: 'Focus Return After Dismiss',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 640px;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
+    >
+      <p
+        style="font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary); margin: 0;"
+      >
         Click "Submit Order" to show a dismissible confirmation alert. When dismissed, focus returns
         to the submit button via <code>return-focus-to="#submit-order-btn"</code>.
       </p>
 
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <div style="display: flex; gap: var(--hx-space-3, 0.75rem); align-items: center;">
         <button
           id="submit-order-btn"
           style="
-            padding: 0.5rem 1rem;
-            background: #2563eb;
-            color: white;
+            padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+            background: var(--hx-color-primary-500, #2563eb);
+            color: var(--hx-color-text-on-primary, white);
             border: none;
-            border-radius: 0.375rem;
+            border-radius: var(--hx-border-radius-md, 0.375rem);
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: var(--hx-font-size-sm, 0.875rem);
           "
           onclick="document.getElementById('focus-return-alert').open = true;"
         >
@@ -1265,13 +1293,13 @@ export const FocusReturn: Story = {
         </button>
         <button
           style="
-            padding: 0.5rem 1rem;
-            background: white;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
+            padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+            background: var(--hx-color-surface-default, white);
+            color: var(--hx-color-text-primary);
+            border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default);
+            border-radius: var(--hx-border-radius-md, 0.375rem);
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: var(--hx-font-size-sm, 0.875rem);
           "
         >
           Cancel
@@ -1283,29 +1311,42 @@ export const FocusReturn: Story = {
         variant="success"
         dismissible
         return-focus-to="#submit-order-btn"
-        open="false"
+        ?open=${false}
       >
         <strong slot="title">Order Submitted</strong>
         Medication order #RX-2026-04928 has been submitted to the pharmacy. Expected processing time
         is 30 minutes. Dismiss to return focus to the order form.
       </hx-alert>
 
-      <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">
+      <p
+        style="font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-text-muted); margin: 0;"
+      >
         After dismissing the alert, verify focus returns to the "Submit Order" button. This pattern
         ensures keyboard and AT users are never stranded after a dynamic UI change.
       </p>
     </div>
   `,
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
     const alert = canvasElement.querySelector('#focus-return-alert') as HTMLElement & {
-      returnFocusTo: string | null;
       open: boolean;
     };
     await expect(alert).toBeTruthy();
-    await expect(alert.returnFocusTo).toBe('#submit-order-btn');
 
-    const submitBtn = canvasElement.querySelector('#submit-order-btn');
-    await expect(submitBtn).toBeTruthy();
+    // Open the alert programmatically to make the dismiss button accessible
+    alert.open = true;
+    await alert.updateComplete;
+
+    // Locate the dismiss button inside the shadow DOM
+    const closeButton = alert.shadowRoot?.querySelector('[part="close-button"]') as HTMLElement;
+    await expect(closeButton).toBeTruthy();
+
+    // Click the dismiss button and await the transition
+    await userEvent.click(closeButton);
+
+    // After dismissal, focus must return to the submit button
+    const submitBtn = canvas.getByText('Submit Order') as HTMLElement;
+    await expect(document.activeElement).toBe(submitBtn);
   },
 };
 
