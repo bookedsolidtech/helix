@@ -100,8 +100,8 @@ There are no tests for this behavior and no Storybook story demonstrating it.
 **File:** `hx-time-picker.ts:349-352`
 
 ```html
-<div role="combobox" aria-owns="${ifDefined(this._open" ? this._listboxId : undefined)}>
-  <input aria-controls="${ifDefined(this._open" ? this._listboxId : undefined)} />
+<div role="combobox" aria-owns="${ifDefined(this._open ? this._listboxId : undefined)}">
+  <input aria-controls="${ifDefined(this._open ? this._listboxId : undefined)}" />
 </div>
 ```
 
