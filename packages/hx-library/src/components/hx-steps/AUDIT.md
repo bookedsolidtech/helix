@@ -362,18 +362,18 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 
 ### RESOLVED — CRITICAL / HIGH
 
-| #   | Finding                                         | Resolution                                                                                         |
-| --- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 4   | P0: `aria-current="step"` on inner div          | **FIXED** — Moved to host element via `updated()` lifecycle. Tests updated.                        |
-| 6   | P1: No keyboard support                         | **FIXED** — Added `tabindex="0"`, `keydown` handler (Enter/Space), `disconnectedCallback` cleanup. |
-| 7   | P1: No disabled mechanism                       | **FIXED** — Added `disabled` boolean property with `aria-disabled`, `tabindex="-1"`, click guard.  |
-| 9   | P2: No focus styles                             | **FIXED** — Added `:host(:focus-visible) .step__indicator` outline styles.                         |
-| 11  | P1: No keyboard tests                           | **FIXED** — Added 4 keyboard navigation tests (tabindex, Enter, Space, other keys).                |
-| 12  | P1: No disabled tests                           | **FIXED** — Added 4 disabled property tests (reflected, aria-disabled, tabindex, no event).        |
-| 13  | P1: aria-current test validates wrong placement | **FIXED** — Tests now check host element, not indicator div.                                       |
-| 3   | P2: No CEM `@internal` tags                     | **FIXED** — Added `@internal` JSDoc to all private methods in both components.                     |
-| 8   | P1: No accessible name guidance                 | **FIXED** — Added aria-label guidance to `hx-steps` JSDoc description.                             |
-| 22  | P1: cursor:pointer unconditional                | **FIXED** — Disabled steps get `cursor: not-allowed` + `pointer-events: none`.                     |
+| # | Finding | Resolution |
+|---|---------|------------|
+| 4 | P0: `aria-current="step"` on inner div | **FIXED** — Moved to host element via `updated()` lifecycle. Tests updated. |
+| 6 | P1: No keyboard support | **FIXED** — Added `tabindex="0"`, `keydown` handler (Enter/Space), `disconnectedCallback` cleanup. |
+| 7 | P1: No disabled mechanism | **FIXED** — Added `disabled` boolean property with `aria-disabled`, `tabindex="-1"`, click guard. |
+| 9 | P2: No focus styles | **FIXED** — Added `:host(:focus-visible) .step__indicator` outline styles. |
+| 11 | P1: No keyboard tests | **FIXED** — Added 4 keyboard navigation tests (tabindex, Enter, Space, other keys). |
+| 12 | P1: No disabled tests | **FIXED** — Added 4 disabled property tests (reflected, aria-disabled, tabindex, no event). |
+| 13 | P1: aria-current test validates wrong placement | **FIXED** — Tests now check host element, not indicator div. |
+| 3 | P2: No CEM `@internal` tags | **FIXED** — Added `@internal` JSDoc to all private methods in both components. |
+| 8 | P1: No accessible name guidance | **FIXED** — Added aria-label guidance to `hx-steps` JSDoc description. |
+| 22 | P1: cursor:pointer unconditional | **FIXED** — Disabled steps get `cursor: not-allowed` + `pointer-events: none`. |
 
 ### NEW — Dark mode support added
 
@@ -386,14 +386,14 @@ The `label`, `description`, `status` attributes map to Drupal field values. With
 
 ### REMAINING (P2 — documented, deferred)
 
-| #         | Finding                             | Status                                                                                                                                                                                                                                                                                                                                                                  |
-| --------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1         | Status vocabulary mismatch          | Documented — current vocabulary (`pending/active/complete/error`) is more expressive than spec.                                                                                                                                                                                                                                                                         |
-| 2         | Internal props reflected on hx-step | **IMPROVED** — JSDoc updated to explicitly document that `orientation` and `size` are CSS-styling-required reflected attributes, should not be set externally on `<hx-step>`, and are managed exclusively by the parent `<hx-steps>` container via `_syncChildren()`. Full removal of `reflect: true` blocked by CSS dependency on `[orientation='vertical']` selector. |
-| 5         | Complete/error not announced to SR  | Documented — needs visually hidden status text.                                                                                                                                                                                                                                                                                                                         |
-| 10        | Active/complete visually identical  | Documented — needs distinct indicator styles.                                                                                                                                                                                                                                                                                                                           |
-| 14-16     | Test gaps (slot change, coverage)   | Documented.                                                                                                                                                                                                                                                                                                                                                             |
-| 17-20     | Storybook gaps                      | Documented.                                                                                                                                                                                                                                                                                                                                                             |
-| 21, 23-25 | CSS token gaps                      | Documented.                                                                                                                                                                                                                                                                                                                                                             |
-| 26        | Bundle size unverified              | Documented.                                                                                                                                                                                                                                                                                                                                                             |
-| 27-29     | Drupal integration gaps             | **FIXED** — `hx-steps.twig` template and `README.drupal.md` created with full attribute mapping, parent-managed property guidance, and accessibility notes.                                                                                                                                                                                                             |
+| # | Finding | Status |
+|---|---------|--------|
+| 1 | Status vocabulary mismatch | Documented — current vocabulary (`pending/active/complete/error`) is more expressive than spec. |
+| 2 | Internal props reflected on hx-step | **IMPROVED** — JSDoc updated to explicitly document that `orientation` and `size` are CSS-styling-required reflected attributes, should not be set externally on `<hx-step>`, and are managed exclusively by the parent `<hx-steps>` container via `_syncChildren()`. Full removal of `reflect: true` blocked by CSS dependency on `[orientation='vertical']` selector. |
+| 5 | Complete/error not announced to SR | Documented — needs visually hidden status text. |
+| 10 | Active/complete visually identical | Documented — needs distinct indicator styles. |
+| 14-16 | Test gaps (slot change, coverage) | Documented. |
+| 17-20 | Storybook gaps | Documented. |
+| 21, 23-25 | CSS token gaps | Documented. |
+| 26 | Bundle size unverified | Documented. |
+| 27-29 | Drupal integration gaps | **FIXED** — `hx-steps.twig` template and `README.drupal.md` created with full attribute mapping, parent-managed property guidance, and accessibility notes. |
