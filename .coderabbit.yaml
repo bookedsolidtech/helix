@@ -3,6 +3,8 @@
 
 reviews:
   profile: 'assertive'
+  path_filters:
+    - '!**/AUDIT.md'
   request_changes_workflow: true
   high_level_summary: true
   poem: false
@@ -10,11 +12,10 @@ reviews:
   collapse_walkthrough: false
   auto_review:
     enabled: true
+    auto_incremental_review: true
     drafts: false
     base_branches:
-      - main
       - dev
-      - staging
     ignore_title_keywords:
       - 'AUDIT'
       - 'audit'

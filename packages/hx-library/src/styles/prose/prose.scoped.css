@@ -747,10 +747,13 @@ hx-prose .align-right img {
   display: block;
 }
 
-/* Float siblings — allow content to wrap around aligned images (intentional).
-   Removed explicit clear:none; the default is already no-clear and setting it
-   explicitly prevented consumers from overriding it when clearfix is needed.
-   Use the .clearfix utility class on the parent container when floats must be cleared. */
+/* Clear floats after aligned elements so block-level content (headings,
+   paragraphs) starts below floated images rather than wrapping beside them.
+   Consumers who want wrap-around behavior can override with clear: none. */
+hx-prose .align-left + *,
+hx-prose .align-right + * {
+  clear: both;
+}
 
 /* CKEditor Caption */
 hx-prose .caption {

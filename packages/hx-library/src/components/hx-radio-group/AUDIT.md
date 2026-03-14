@@ -4,6 +4,7 @@
 **Auditor:** Antagonistic Quality Review Agent
 **Scope:** `packages/hx-library/src/components/hx-radio-group/`
 **Files reviewed:**
+
 - `hx-radio-group.ts`
 - `hx-radio.ts`
 - `hx-radio-group.styles.ts`
@@ -57,11 +58,13 @@ Custom elements with `tabIndex` do **not** receive synthetic click events from S
 A `required` radio group with no initial selection passes `checkValidity()` as `true` until any interaction triggers an update.
 
 **Reproduction:**
+
 ```html
 <hx-radio-group required name="x">
   <hx-radio value="a" label="A"></hx-radio>
 </hx-radio-group>
 ```
+
 ```js
 el.checkValidity(); // true — incorrect, should be false
 ```
@@ -103,11 +106,13 @@ formStateRestoreCallback(state: string): void {
 ```
 
 The HTML spec for `ElementInternals` defines the signature as:
+
 ```ts
 formStateRestoreCallback(state: string | File | FormData, mode: 'restore' | 'autocomplete'): void
 ```
 
 The current implementation:
+
 1. Is missing the `mode` parameter entirely.
 2. Types `state` as `string` only — if the browser passes a `File` or `FormData`, `this.value = state` will assign a non-string to a string property.
 
@@ -174,6 +179,7 @@ The `_groupId` is generated but never applied to the legend element. There is no
 **File:** `hx-radio-group.ts:231–260`
 
 The ARIA Authoring Practices Guide (APG) for radio groups specifies:
+
 - `Home` → move focus to and select first radio
 - `End` → move focus to and select last radio
 
@@ -183,33 +189,17 @@ Only Arrow keys are handled. This is expected behavior that AT users and power k
 
 ## P2 — Medium (Should Fix)
 
-### P2-1: `setFormValue` called twice per selection
+### P2-1: `setFormValue` called twice per selection ✅ FIXED
 
-**File:** `hx-radio-group.ts:199–223`
+**File:** `hx-radio-group.ts`
 
-In `_handleRadioSelect`:
-```ts
-this.value = newValue;                       // triggers updated() → setFormValue()
-this._internals.setFormValue(this.value);    // redundant second call
-this._syncRadios();                          // also called by updated()
-this._updateValidity();                      // also called by updated()
-```
-
-After `this.value = newValue`, the Lit reactive system queues an update. `updated()` runs and calls `setFormValue`, `_syncRadios`, and `_updateValidity`. Then `_handleRadioSelect` immediately calls all three again synchronously. Each selection triggers double work.
+**Resolution:** `_handleRadioSelect` now only sets `this.value = newValue` and dispatches the `hx-change` event. The redundant synchronous calls to `this._internals.setFormValue()`, `this._syncRadios()`, and `this._updateValidity()` have been removed. All three are now called exclusively from `updated()` via Lit's reactive property change cycle, eliminating the double-work pattern. Each selection triggers exactly one `setFormValue`, one `_syncRadios`, and one `_updateValidity` call.
 
 ---
 
-### P2-2: `Math.random()` IDs break SSR / Drupal hydration
+### ~~P2-2: `Math.random()` IDs break SSR / Drupal hydration~~ ✅ FIXED
 
-**File:** `hx-radio-group.ts:111–113`
-
-```ts
-private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
-```
-
-IDs generated with `Math.random()` differ between server (Drupal/Twig pre-render) and client hydration. `aria-describedby` references will point to IDs that don't exist in the server-rendered DOM.
-
-**Fix:** Use a deterministic ID strategy (e.g., `name` attribute as seed, or a monotonically incrementing counter).
+**Fix applied:** `_groupId` now uses a monotonically incrementing module-level counter (`++_groupCounter`) instead of `Math.random()`. IDs are deterministic within a page session and do not cause `aria-describedby` reference mismatches between Drupal server-rendered markup and client hydration.
 
 ---
 
@@ -237,7 +227,7 @@ Setting `role` in `connectedCallback` rather than as a static attribute means th
 **File:** `hx-radio-group.ts:357–363`
 
 ```html
-<div role="alert" aria-live="polite">
+<div role="alert" aria-live="polite"></div>
 ```
 
 `role="alert"` implicitly sets `aria-live="assertive"` and `aria-atomic="true"`. Explicitly adding `aria-live="polite"` contradicts the implicit value. Browser behavior when both are present varies by AT. Choose one: use `role="alert"` alone (assertive, immediate announcement) or use `role="status"` with `aria-live="polite"` for less urgent messages. For form validation errors, `role="alert"` (assertive) is typically correct.
@@ -272,6 +262,7 @@ The feature spec mentions "selected-value typing." Common radio group APIs (Shoe
 **File:** `hx-radio-group.stories.ts`
 
 Stories cover:
+
 - Group-level `disabled`
 - Required state
 - Error state
@@ -281,7 +272,9 @@ There is no dedicated story for a mixed state (one radio disabled within an enab
 
 ---
 
-### P2-8: `hx-radio` axe test runs standalone without parent group
+### P2-8: `hx-radio` axe test runs standalone without parent group ✅ FIXED
+
+**Resolution:** Updated the axe test in `hx-radio.test.ts` to wrap `hx-radio` elements inside a parent `hx-radio-group` with a label, providing proper context for accessibility validation.
 
 **File:** `hx-radio.test.ts:139–145`
 
@@ -297,27 +290,36 @@ it('has no axe violations in default state', async () => {
 
 ## Summary Table
 
-| ID    | Severity | Area            | Description                                              |
-|-------|----------|-----------------|----------------------------------------------------------|
-| P0-1  | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible      |
-| P0-2  | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)  |
-| P0-3  | P0       | Form/Validation | Required validity not initialized on first render        |
-| P1-1  | P1       | Behavior        | Re-enabling disabled group leaves radios permanently off |
-| P1-2  | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature          |
-| P1-3  | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards        |
-| P1-4  | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby` |
-| P1-5  | P1       | Accessibility   | No `aria-required` on radiogroup                         |
-| P1-6  | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM  |
-| P1-7  | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)  |
-| P2-1  | P2       | Performance     | Double `setFormValue`/`_syncRadios`/`_updateValidity`    |
-| P2-2  | P2       | Drupal/SSR      | `Math.random()` IDs break server/client hydration        |
-| P2-3  | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default   |
-| P2-4  | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict           |
-| P2-5  | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)        |
-| P2-6  | P2       | API             | No `selected-value` alias (naming gap vs other libraries) |
-| P2-7  | P2       | Storybook       | No mixed-disabled story (partial disable state)          |
-| P2-8  | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal    |
+| ID   | Severity | Area            | Description                                                    |
+| ---- | -------- | --------------- | -------------------------------------------------------------- |
+| P0-1 | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible            |
+| P0-2 | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)        |
+| P0-3 | P0       | Form/Validation | Required validity not initialized on first render              |
+| P1-1 | P1       | Behavior        | ~~Re-enabling disabled group leaves radios permanently off~~ ✅ FIXED — `_individualDisabledStates` map restores per-radio state |
+| P1-2 | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature                |
+| P1-3 | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards              |
+| P1-4 | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby`        |
+| P1-5 | P1       | Accessibility   | No `aria-required` on radiogroup                               |
+| P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM        |
+| P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)        |
+| P2-1 | P2       | Performance     | ~~Double `setFormValue`/`_syncRadios`/`_updateValidity`~~ ✅ FIXED — single call path via `updated()` |
+| P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used |
+| P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default         |
+| P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                 |
+| P2-5 | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)              |
+| P2-6 | P2       | API             | No `selected-value` alias (naming gap vs other libraries)      |
+| P2-7 | P2       | Storybook       | No mixed-disabled story (partial disable state)                |
+| P2-8 | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal ✅ FIXED |
 
 **Total findings: 3 P0, 7 P1, 8 P2**
 
 The component is **not shippable** in its current state. The three P0 items (invisible keyboard focus, Space key inoperability, uninitialized required validation) are WCAG 2.1 AA violations and form correctness failures. All must be resolved before merge.
+
+---
+
+## CSS Audit Fixes Applied (2026-03-12)
+
+| Finding                                                    | Fix Applied                                                                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Missing `prefers-reduced-motion` on `hx-radio` transitions | Added `@media (prefers-reduced-motion: reduce)` block disabling `.radio__control` and `.radio__dot` transitions in `hx-radio.styles.ts`                                  |
+| Missing component-level help text color token              | Added `--hx-radio-group-help-text-color` CSS custom property to `.fieldset__help-text` in `hx-radio-group.styles.ts` and `@cssprop` documentation in `hx-radio-group.ts` |

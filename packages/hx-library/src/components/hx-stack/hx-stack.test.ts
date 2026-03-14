@@ -29,6 +29,18 @@ describe('hx-stack', () => {
       const el = await fixture<HelixStack>('<hx-stack role="group"></hx-stack>');
       expect(el.getAttribute('role')).toBe('group');
     });
+
+    it('preserves role="group" and aria-labelledby after connectedCallback', async () => {
+      // P1-03: connectedCallback must not overwrite consumer-supplied ARIA attributes.
+      // Healthcare components are frequently labelled by an adjacent heading via aria-labelledby.
+      const el = await fixture<HelixStack>(
+        '<hx-stack role="group" aria-labelledby="my-heading"></hx-stack>',
+      );
+      // role must remain "group" — NOT overwritten to "presentation"
+      expect(el.getAttribute('role')).toBe('group');
+      // aria-labelledby must be preserved exactly as supplied
+      expect(el.getAttribute('aria-labelledby')).toBe('my-heading');
+    });
   });
 
   // ─── Property: direction ───

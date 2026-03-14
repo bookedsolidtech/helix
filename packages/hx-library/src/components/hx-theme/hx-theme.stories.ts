@@ -339,3 +339,136 @@ export const NestedThemes: Story = {
     </hx-theme>
   `,
 };
+
+// ─────────────────────────────────────────────────
+// 8. DRUPAL / CDN INTEGRATION REFERENCE
+// ─────────────────────────────────────────────────
+
+/**
+ * Drupal Twig integration reference for hx-theme.
+ *
+ * `hx-theme` requires JavaScript to inject design tokens — it is NOT a pure CSS solution.
+ * In Drupal, wrap your page regions or blocks with `<hx-theme>` to scope the token set.
+ *
+ * **Important:** `system` mode (`window.matchMedia`) is unavailable during Drupal server-side
+ * rendering. Always set `theme` explicitly on the server side. Use `theme="auto"` if you want
+ * the OS preference to be applied after client-side hydration.
+ *
+ * **Twig template pattern** (`page.html.twig` or a block template):
+ * ```twig
+ * {# Read theme from Drupal config or user preference cookie #}
+ * {% set active_theme = drupal_settings.helixTheme|default('light') %}
+ *
+ * <hx-theme theme="{{ active_theme }}">
+ *   <main>
+ *     {{ page.content }}
+ *   </main>
+ * </hx-theme>
+ * ```
+ *
+ * **Nested dark sidebar pattern** (dark panel inside a light page):
+ * ```twig
+ * <hx-theme theme="light">
+ *   {{ page.content }}
+ *   <hx-theme theme="dark">
+ *     {{ page.sidebar_first }}
+ *   </hx-theme>
+ * </hx-theme>
+ * ```
+ *
+ * **Library registration** (`mytheme.libraries.yml`):
+ * ```yaml
+ * hx-theme:
+ *   js:
+ *     path/to/@helixui/library/dist/hx-theme.js: { attributes: { type: module } }
+ * ```
+ *
+ * **Drupal behavior for dynamic theme switching**:
+ * ```javascript
+ * (function (Drupal, once) {
+ *   Drupal.behaviors.helixTheme = {
+ *     attach: function (context) {
+ *       once('hx-theme-toggle', '[data-hx-theme-toggle]', context).forEach((btn) => {
+ *         btn.addEventListener('click', () => {
+ *           const themeEl = document.querySelector('hx-theme');
+ *           if (themeEl) {
+ *             themeEl.setAttribute('theme', btn.dataset.hxThemeToggle);
+ *           }
+ *         });
+ *       });
+ *     },
+ *   };
+ * })(Drupal, once);
+ * ```
+ */
+export const DrupalIntegration: Story = {
+  name: 'Drupal / CDN Integration',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          Light page with dark sidebar — nested hx-theme scoping
+        </p>
+        <hx-theme theme="light">
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 200px;
+              gap: 1rem;
+              padding: 1rem;
+              background: var(--hx-color-surface-default);
+              border: 1px solid var(--hx-color-border-default);
+              border-radius: 0.5rem;
+              font-family: var(--hx-font-family-sans, sans-serif);
+            "
+          >
+            <main style="color: var(--hx-color-text-primary); padding: 0.5rem;">
+              <p style="margin: 0; font-weight: 600;">Main content (light tokens)</p>
+              <p style="margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--hx-color-text-secondary);">
+                Patient dashboard content area
+              </p>
+            </main>
+            <hx-theme theme="dark">
+              <aside
+                style="
+                  padding: 0.75rem;
+                  background: var(--hx-color-surface-default);
+                  color: var(--hx-color-text-primary);
+                  border-radius: 0.375rem;
+                "
+              >
+                <p style="margin: 0; font-size: 0.8125rem; font-weight: 600;">Navigation</p>
+                <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--hx-color-text-secondary);">
+                  Dark tokens scoped here
+                </p>
+              </aside>
+            </hx-theme>
+          </div>
+        </hx-theme>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+          High-contrast mode — WCAG 7:1+ contrast tokens (healthcare accessibility)
+        </p>
+        <hx-theme theme="high-contrast">
+          <div
+            style="
+              padding: 1rem;
+              background: var(--hx-color-surface-default);
+              color: var(--hx-color-text-primary);
+              border: 1px solid var(--hx-color-border-default);
+              border-radius: 0.375rem;
+              font-family: var(--hx-font-family-sans, sans-serif);
+            "
+          >
+            <p style="margin: 0; font-weight: 600;">High-contrast patient view</p>
+            <p style="margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--hx-color-text-secondary);">
+              Distinct token set — not a clone of dark mode
+            </p>
+          </div>
+        </hx-theme>
+      </div>
+    </div>
+  `,
+};

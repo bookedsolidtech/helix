@@ -526,9 +526,9 @@ describe('hx-step', () => {
       expect(violations).toEqual([]);
     });
 
-    it('hx-step standalone has no axe violations', async () => {
-      const el = await fixture<HelixStep>(
-        '<ul><hx-step label="A step" status="pending" description="With description"></hx-step></ul>',
+    it('hx-step within hx-steps has no axe violations', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps aria-label="Test steps"><hx-step label="A step" status="pending" description="With description"></hx-step></hx-steps>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);

@@ -81,9 +81,9 @@
 - Success state uses border change in addition to color (WCAG 1.4.1).
 - axe-core verified: zero violations across default, disabled, sm, md, lg variants.
 
-#### P3 — Touch target size for `sm` variant depends on token values
+#### ~~P3 — Touch target size for `sm` variant depends on token values~~ ✅ FIXED (documented)
 
-The `sm` variant uses `--hx-size-8` for min-width and height. If this token resolves below 24x24px (WCAG 2.5.8 AA), the target size may be insufficient for touchscreen use. Token values should be verified at the design system level. This is not a component code issue.
+The `sm` variant uses `--hx-size-8` for min-width and height. WCAG 2.5.8 touch target requirements are now documented in the `size` property JSDoc, advising consumers to prefer `md`/`lg` for touch-primary interfaces.
 
 ---
 

@@ -426,11 +426,11 @@ export const SelectAllPattern: Story = {
             checked: boolean;
             indeterminate: boolean;
           };
-          const container = parent.closest('div');
-          const children = container?.querySelectorAll('.child-checkbox') as NodeListOf<
-            HTMLElement & { checked: boolean; indeterminate: boolean }
-          >;
-          children?.forEach((child) => {
+          const childGroup = parent.nextElementSibling;
+          const children = Array.from(
+            childGroup?.querySelectorAll('hx-checkbox') ?? [],
+          ) as (HTMLElement & { checked: boolean })[];
+          children.forEach((child) => {
             child.checked = parent.checked;
           });
         }}
@@ -443,25 +443,25 @@ export const SelectAllPattern: Story = {
         ${['Cardiology', 'Radiology', 'Oncology', 'Neurology'].map(
           (dept) => html`
             <hx-checkbox
-              class="child-checkbox"
               label=${dept}
               name="departments"
               value=${dept.toLowerCase()}
               @hx-change=${(e: CustomEvent) => {
                 const target = e.target as HTMLElement;
-                const container = target.closest('div')?.parentElement;
-                const parent = container?.querySelector('#select-all-parent') as
+                const childGroup = target.parentElement;
+                const wrapper = childGroup?.parentElement;
+                const parent = wrapper?.querySelector('#select-all-parent') as
                   | (HTMLElement & {
                       checked: boolean;
                       indeterminate: boolean;
                     })
                   | null;
-                const children = container?.querySelectorAll('.child-checkbox') as NodeListOf<
-                  HTMLElement & { checked: boolean; indeterminate: boolean }
-                >;
-                if (!parent || !children) return;
-                const allChecked = Array.from(children).every((c) => c.checked);
-                const noneChecked = Array.from(children).every((c) => !c.checked);
+                const children = Array.from(
+                  childGroup?.querySelectorAll('hx-checkbox') ?? [],
+                ) as (HTMLElement & { checked: boolean })[];
+                if (!parent || !children.length) return;
+                const allChecked = children.every((c) => c.checked);
+                const noneChecked = children.every((c) => !c.checked);
                 parent.indeterminate = !allChecked && !noneChecked;
                 parent.checked = allChecked;
               }}
@@ -478,9 +478,11 @@ export const SelectAllPattern: Story = {
       checked: boolean;
       indeterminate: boolean;
     };
-    const children = canvasElement.querySelectorAll('.child-checkbox') as NodeListOf<
-      HTMLElement & { checked: boolean; indeterminate: boolean }
-    >;
+    const childGroup = parent.nextElementSibling;
+    const children = Array.from(childGroup?.querySelectorAll('hx-checkbox') ?? []) as (HTMLElement & {
+      checked: boolean;
+      indeterminate: boolean;
+    })[];
 
     // Click parent: all children should become checked
     const parentControl = parent.shadowRoot?.querySelector('.checkbox__control');
@@ -488,7 +490,7 @@ export const SelectAllPattern: Story = {
     await nextFrame();
 
     await expect(parent.checked).toBe(true);
-    for (const child of Array.from(children)) {
+    for (const child of children) {
       await expect(child.checked).toBe(true);
     }
 
@@ -642,6 +644,19 @@ export const NoLabel: Story = {
   render: () => html`
     <hx-checkbox aria-label="Accept terms and conditions" name="accept" value="true"></hx-checkbox>
   `,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-checkbox');
+    if (!host) throw new Error('hx-checkbox not found');
+
+    // Verify aria-label is forwarded to the inner native input so AT can announce it
+    const input = host.shadowRoot?.querySelector('input[type="checkbox"]');
+    if (!input) throw new Error('native input not found in shadow root');
+    await expect(input.getAttribute('aria-label')).toBe('Accept terms and conditions');
+
+    // Verify no visible label element is rendered (NoLabel pattern)
+    const labelEl = host.shadowRoot?.querySelector('.checkbox__label');
+    await expect(labelEl?.textContent?.trim() ?? '').toBe('');
+  },
 };
 
 export const ManyCheckboxes: Story = {
@@ -1093,10 +1108,10 @@ export const PatientConsentChecklist: Story = {
             indeterminate: boolean;
           };
           const container = parent.closest('div');
-          const children = container?.querySelectorAll('.consent-item') as NodeListOf<
-            HTMLElement & { checked: boolean; indeterminate: boolean }
-          >;
-          children?.forEach((child) => {
+          const children = Array.from(
+            container?.querySelectorAll('hx-checkbox:not(#consent-select-all)') ?? [],
+          ) as (HTMLElement & { checked: boolean })[];
+          children.forEach((child) => {
             child.checked = parent.checked;
           });
         }}
@@ -1126,7 +1141,6 @@ export const PatientConsentChecklist: Story = {
       ].map(
         (item) => html`
           <hx-checkbox
-            class="consent-item"
             label=${item.label}
             name="consent"
             value=${item.value}
@@ -1140,12 +1154,12 @@ export const PatientConsentChecklist: Story = {
                     indeterminate: boolean;
                   })
                 | null;
-              const children = container?.querySelectorAll('.consent-item') as NodeListOf<
-                HTMLElement & { checked: boolean; indeterminate: boolean }
-              >;
-              if (!parent || !children) return;
-              const allChecked = Array.from(children).every((c) => c.checked);
-              const noneChecked = Array.from(children).every((c) => !c.checked);
+              const children = Array.from(
+                container?.querySelectorAll('hx-checkbox:not(#consent-select-all)') ?? [],
+              ) as (HTMLElement & { checked: boolean })[];
+              if (!parent || !children.length) return;
+              const allChecked = children.every((c) => c.checked);
+              const noneChecked = children.every((c) => !c.checked);
               parent.indeterminate = !allChecked && !noneChecked;
               parent.checked = allChecked;
             }}
@@ -1161,9 +1175,10 @@ export const PatientConsentChecklist: Story = {
       checked: boolean;
       indeterminate: boolean;
     };
-    const items = canvasElement.querySelectorAll('.consent-item') as NodeListOf<
-      HTMLElement & { checked: boolean; indeterminate: boolean }
-    >;
+    const container = selectAll.closest('div');
+    const items = Array.from(
+      container?.querySelectorAll('hx-checkbox:not(#consent-select-all)') ?? [],
+    ) as (HTMLElement & { checked: boolean; indeterminate: boolean })[];
 
     // Verify 5 consent items
     await expect(items.length).toBe(5);
@@ -1174,7 +1189,7 @@ export const PatientConsentChecklist: Story = {
     await nextFrame();
 
     await expect(selectAll.checked).toBe(true);
-    for (const item of Array.from(items)) {
+    for (const item of items) {
       await expect(item.checked).toBe(true);
     }
 

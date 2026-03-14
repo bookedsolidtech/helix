@@ -331,3 +331,20 @@ The following aspects of the implementation are well-executed and should be pres
 - **Healthcare scenario story** (`PatientList`) — good contextual demonstration.
 - **10 stories** covering all major states.
 - **`_buildPageRange()` boundary clamping** — edge cases (negative currentPage, currentPage > totalPages, totalPages=0) handled gracefully.
+
+---
+
+## TypeScript Audit Fixes Applied (2026-03-13)
+
+| Finding                                                               | Status                                                                                                                                                        |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0-01: `page-size` property/event entirely absent                     | **FIXED** — `pageSize` property, `showPageSize` boolean, `hx-page-size-change` event, and page-size selector UI added to `hx-pagination.ts`                   |
+| P1-01: `as number` cast on `endPages[0]`                              | **FIXED** — replaced `(endPages[0] as number)` with non-null assertion `endPages[0]!` backed by the `endPages.length > 0` guard                               |
+| P2-01: `reflect: true` on `currentPage` causes DOM churn              | **FIXED** — removed `reflect: true` from `currentPage` property declaration; only configuration properties reflect                                            |
+| P2-12: `_buildPageRange()` not memoized                               | **FIXED** — `_pageRangeCache` keyed by `totalPages-currentPage-siblingCount-boundaryCount` introduced; `_buildPageRange()` returns cached result on cache hit |
+| P1-02: `aria-live` region for page-change announcements               | **FIXED** — `_liveMessage` state and `aria-live="polite"` visually-hidden `<span>` added; updated by `_navigate()` with "Page N of M" message                 |
+| P1-04: Accessibility: `<ul>` needs `role="list"` for Safari VoiceOver | **FIXED** — `role="list"` added to `<ul class="list">`                                                                                                        |
+| `HxPagination` type alias missing                                     | **FIXED** — `export type HxPagination = HelixPagination` added to `hx-pagination.ts` and re-exported from `index.ts`                                          |
+| P1-10: No Twig template example                                       | **FIXED** — `hx-pagination.twig` template created with full Drupal pager variable mapping and 0-to-1-based index conversion.                                   |
+| P1-11: No GET parameter wiring documentation                          | **FIXED** — `README.drupal.md` created with full GET parameter wiring guide, index offset explanation, AJAX and full-page navigation examples.                 |
+| P2-14: Boolean attribute Twig documentation missing                   | **FIXED** — `README.drupal.md` documents the `{{ attr ? 'attr' : '' }}` Twig pattern and Drupal `Attribute` class approach for `show-first-last` and `show-page-size`. |

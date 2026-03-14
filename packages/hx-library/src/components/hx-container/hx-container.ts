@@ -12,6 +12,18 @@ import { helixContainerStyles } from './hx-container.styles.js';
  * vertical padding), while the inner wrapper constrains max-width,
  * centers content, and applies horizontal gutters.
  *
+ * ## Accessibility
+ *
+ * `hx-container` is a purely visual layout primitive with no semantic meaning.
+ * It carries no ARIA role and is intentionally transparent to assistive
+ * technologies. Screen readers announce the container's children directly,
+ * not the container itself.
+ *
+ * The inner wrapper always centers content horizontally (via `margin: auto`).
+ * This is by design for page-layout use cases. If you need non-centered
+ * alignment at a specific breakpoint, override `margin-left` and
+ * `margin-right` on `::part(inner)` from your stylesheet.
+ *
  * @summary Layout primitive for constraining content width with consistent spacing.
  *
  * @tag hx-container

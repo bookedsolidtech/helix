@@ -74,52 +74,56 @@ The "expanding via ellipsis button removes collapse state" test (line 397) sets 
 
 The `updated()` handler (line 358-369) correctly watches `jsonLd` property changes and injects/removes the script. No test exercises `el.jsonLd = true` after initial render without `json-ld` attribute, or `el.jsonLd = false` to verify removal via property toggle.
 
-#### P3 — No test for `current` property toggling at runtime
+#### ~~P3 — No test for `current` property toggling at runtime~~ ✅ FIXED (BC-A04)
 
-**File:** `hx-breadcrumb.test.ts` (missing)
+**File:** `hx-breadcrumb.test.ts`
 **Issue ID:** BC-A04
 
-No test verifies that toggling `current` from `true` to `false` on an `hx-breadcrumb-item` switches the render output from `<span part="text" aria-current="page">` back to `<a part="link">`.
+Added runtime toggle test: verifies that setting `current = true` on an `hx-breadcrumb-item` switches from `<a part="link">` to `<span part="text" aria-current="page">`, and setting `current = false` reverts to `<a part="link">`.
 
 ---
 
 ### 3. Storybook
 
-#### P3 — No story demonstrating explicit `current` attribute (Drupal pattern)
+#### ~~P3 — No story demonstrating explicit `current` attribute (Drupal pattern)~~ FIXED
 
-**File:** `hx-breadcrumb.stories.ts` (missing)
+**File:** `hx-breadcrumb.stories.ts`
 **Issue ID:** BC-A05
 
-The explicit `current` attribute on non-last items is a key feature for Drupal integration. No Storybook story demonstrates this pattern, making it invisible to consumers.
+**Fix:** `ExplicitCurrent` story added. It demonstrates (1) the `current` attribute on a non-last item and (2) the recommended Drupal server-rendered pattern with `current` on the last item. The story includes a descriptive JSDoc comment explaining why the `prefix` slot is the correct location for labels in combination with `count`-bearing badges.
 
-#### P3 — `WithCustomStyling` story uses hardcoded hex colors
+#### ~~P3 — `WithCustomStyling` story uses hardcoded hex colors~~ FIXED
 
 **File:** `hx-breadcrumb.stories.ts:237-241`
 **Issue ID:** BC-A06
 
 The story demonstrates token overrides using literal hex values (`#7c3aed`, `#5b21b6`, etc.) in the `style` attribute. While this is technically correct for showing the mechanism, using HELiX token values from a different semantic context would better reinforce the token-first approach without introducing hardcoded values in demo code.
 
+**Fix:** Replaced all hardcoded hex values with `--hx-color-*` and `--hx-font-size-*` token references in the `style` attribute: `--hx-color-secondary-600`, `--hx-color-secondary-700`, `--hx-color-neutral-800`, `--hx-color-neutral-300`, `--hx-font-size-md`.
+
 ---
 
 ### 4. TypeScript
 
-#### P3 — `_buildListItem` return type defined inline
+#### ~~P3 — `_buildListItem` return type defined inline~~ ✅ FIXED (BC-A07)
 
-**File:** `hx-breadcrumb.ts:273-286`
+**File:** `hx-breadcrumb.ts`
 **Issue ID:** BC-A07
 
-The return type `{ '@type': string; position: number; name: string; item?: string }` is written inline on both the method signature and the local `entry` variable. A named interface (e.g., `JsonLdListItem`) would reduce duplication and improve self-documentation.
+Extracted inline return type to named `JsonLdListItem` interface. The method signature and local `entry` variable now reference the named type, eliminating the duplication.
 
 ---
 
 ### 5. CSS / Shadow DOM
 
-#### P3 — `display: contents` on `[part='item']` prevents direct styling
+#### ~~P3 — `display: contents` on `[part='item']` prevents direct styling~~ FIXED (documented)
 
 **File:** `hx-breadcrumb-item.styles.ts:9-11`
 **Issue ID:** BC-A08
 
 The `[part='item']` wrapper uses `display: contents`, which removes it from the box model. While this is intentional (the wrapper exists only for slotting/selection purposes), it means consumers who attempt to style `::part(item)` with box-model properties (padding, margin, background) will see no effect. This behavior should be documented in the CSS parts section.
+
+**Fix:** Added an inline documentation comment in `hx-breadcrumb-item.styles.ts` above `[part='item']` explaining that `display: contents` is intentional and warning consumers to use `::part(link)` or `::part(text)` for visual styling instead.
 
 ---
 
@@ -157,16 +161,16 @@ All 9 P1 and 8 P2 issues from the previous audit have been resolved:
 
 ## Current Issue Register
 
-| ID     | Severity | Area       | Title                                                           |
-| ------ | -------- | ---------- | --------------------------------------------------------------- |
-| BC-A01 | P1       | CEM        | Private members exposed in Custom Elements Manifest             |
-| BC-A02 | P2       | Tests      | Ellipsis expand button click/keyboard paths not directly tested |
-| BC-A03 | P3       | Tests      | No test for `json-ld` toggled on programmatically after render  |
-| BC-A04 | P3       | Tests      | No test for `current` property toggling at runtime              |
-| BC-A05 | P3       | Storybook  | No story for explicit `current` attribute (Drupal pattern)      |
-| BC-A06 | P3       | Storybook  | `WithCustomStyling` story uses hardcoded hex colors             |
-| BC-A07 | P3       | TypeScript | `_buildListItem` return type defined inline                     |
-| BC-A08 | P3       | CSS        | `display: contents` on `::part(item)` not documented            |
+| ID     | Severity | Area       | Title                                                                |
+| ------ | -------- | ---------- | -------------------------------------------------------------------- |
+| BC-A01 | P1       | CEM        | Private members exposed in Custom Elements Manifest                  |
+| BC-A02 | P2       | Tests      | Ellipsis expand button click/keyboard paths not directly tested      |
+| BC-A03 | P3       | Tests      | No test for `json-ld` toggled on programmatically after render       |
+| BC-A04 | P3       | Tests      | ~~No test for `current` property toggling at runtime~~ FIXED         |
+| BC-A05 | P3       | Storybook  | ~~No story for explicit `current` attribute (Drupal pattern)~~ FIXED |
+| BC-A06 | P3       | Storybook  | ~~`WithCustomStyling` story uses hardcoded hex colors~~ FIXED        |
+| BC-A07 | P3       | TypeScript | ~~`_buildListItem` return type defined inline~~ FIXED                |
+| BC-A08 | P3       | CSS        | ~~`display: contents` on `::part(item)` not documented~~ FIXED       |
 
 ---
 

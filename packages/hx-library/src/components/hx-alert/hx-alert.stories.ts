@@ -821,9 +821,10 @@ export const CSSParts: Story = {
           All parts styled externally via ::part()
         </p>
         <hx-alert variant="info" dismissible>
-          This alert has all 5 CSS parts styled externally:
-          <code>::part(alert)</code>, <code>::part(icon)</code>, <code>::part(message)</code>,
-          <code>::part(close-button)</code>, and <code>::part(actions)</code>.
+          This alert has all 6 CSS parts styled externally:
+          <code>::part(alert)</code>, <code>::part(title)</code>, <code>::part(icon)</code>,
+          <code>::part(message)</code>, <code>::part(close-button)</code>, and
+          <code>::part(actions)</code>.
           <button
             slot="actions"
             style="

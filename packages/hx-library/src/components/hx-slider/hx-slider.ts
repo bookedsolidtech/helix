@@ -1,4 +1,4 @@
-import { LitElement, TemplateResult, html, nothing } from 'lit';
+import { LitElement, TemplateResult, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -173,7 +173,7 @@ export class HelixSlider extends LitElement {
 
   /** Reference to the native range `<input>` inside shadow DOM. */
   @query('.slider__input')
-  private _input!: HTMLInputElement;
+  declare private _input: HTMLInputElement | null;
 
   // ─── Unique IDs ───
 
@@ -197,7 +197,11 @@ export class HelixSlider extends LitElement {
     return ((clamped - this.min) / range) * 100;
   }
 
-  private _ticks(): number[] {
+  // Cached tick array — recomputed only when showTicks, min, max, or step change.
+  // Avoids redundant array allocation on every render during continuous drag updates.
+  private _cachedTicks: number[] = [];
+
+  private _computeTicks(): number[] {
     if (!this.showTicks) return [];
     const ticks: number[] = [];
     const range = this.max - this.min;
@@ -211,12 +215,24 @@ export class HelixSlider extends LitElement {
 
   // ─── Lifecycle ───
 
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+    if (
+      changedProperties.has('showTicks') ||
+      changedProperties.has('min') ||
+      changedProperties.has('max') ||
+      changedProperties.has('step')
+    ) {
+      this._cachedTicks = this._computeTicks();
+    }
+  }
+
   override firstUpdated(): void {
     // Enable fill transition after initial render to suppress animation on mount
     requestAnimationFrame(() => this.setAttribute('data-ready', ''));
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     // Clamp value to [min, max] after any relevant property change
     if (
@@ -284,7 +300,8 @@ export class HelixSlider extends LitElement {
    * @param state - The serialized value to restore.
    * @param _reason - Either "restore" (back/forward) or "autocomplete".
    */
-  formStateRestoreCallback(state: string, _reason: string): void {
+  formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
+    if (typeof state !== 'string' || state === null) return;
     const parsed = parseFloat(state);
     if (!isNaN(parsed)) {
       this.value = this._clamp(parsed);
@@ -364,7 +381,7 @@ export class HelixSlider extends LitElement {
 
   override render(): TemplateResult {
     const fillPct = this._fillPercent();
-    const ticks = this._ticks();
+    const ticks = this._cachedTicks;
     const hasLabel = !!this.label || this._hasLabelSlot;
     const showRangeLabels = this._hasMinLabelSlot || this._hasMaxLabelSlot;
 

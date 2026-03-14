@@ -4,6 +4,7 @@
 **Date:** 2026-03-05
 **Branch under audit:** `feature/t2-29-hx-toggle-button-pressedunpressed`
 **Files reviewed:**
+
 - `hx-toggle-button.ts` (209 lines)
 - `hx-toggle-button.styles.ts` (206 lines)
 - `hx-toggle-button.test.ts` (490 lines)
@@ -30,13 +31,13 @@ The component is structurally sound: correct `aria-pressed` semantics, full Elem
 /* Host level */
 :host([disabled]) {
   pointer-events: none;
-  opacity: var(--hx-opacity-disabled, 0.5);   /* <-- 0.5 */
+  opacity: var(--hx-opacity-disabled, 0.5); /* <-- 0.5 */
 }
 
 /* Inner button level */
 .button[disabled] {
   cursor: not-allowed;
-  opacity: var(--hx-opacity-disabled, 0.5);   /* <-- 0.5 again */
+  opacity: var(--hx-opacity-disabled, 0.5); /* <-- 0.5 again */
 }
 ```
 
@@ -57,7 +58,7 @@ it('toggles on Space key press', async () => {
   const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
   const eventPromise = oneEvent(el, 'hx-toggle');
   btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-  btn.click();   // <-- this is what actually fires the event
+  btn.click(); // <-- this is what actually fires the event
   const event = await eventPromise;
   expect(event.detail.pressed).toBe(true);
 });
@@ -78,6 +79,7 @@ The component does not expose a `label` property, and has no mechanism to forwar
 Storybook workaround (`ViewModeToggle` story) applies `aria-label` directly on `<hx-toggle-button>`, which only labels the custom element host — it does **not** propagate to the inner `<button>` element inside Shadow DOM. Screen readers operating in forms mode will announce the `<button>` inside the shadow, which has no label.
 
 The correct fix is to either:
+
 1. Add a `label` string property that sets `aria-label` on the inner `<button>`, or
 2. Use `aria-labelledby` with an explicitly connected label ID.
 
@@ -97,11 +99,14 @@ formStateRestoreCallback(state: string): void {
 
 The form value is set via `this._internals.setFormValue(this.value)` (the string value), not the string `'pressed'`. This means if the browser restores state from the stored form value (e.g., `"on"`), `formStateRestoreCallback` would receive `"on"`, which is not equal to `'pressed'`, so `this.pressed` would be set to `false` — incorrect behavior. The restore callback should likely check `state !== null` or match against the stored value string.
 
-#### P1-4: No Drupal Twig template or integration documentation
+#### ~~P1-4: No Drupal Twig template or integration documentation~~ FIXED
 
-The component directory contains no `hx-toggle-button.twig` or any Drupal integration guidance. Per project convention, all components must be Twig-renderable for Drupal consumers. A toggle button is stateful — the Drupal pattern (server-rendered pressed attribute, Drupal behavior for JS enhancement) must be documented or implemented.
-
-**Impact:** Drupal consumers cannot use this component without guessing at integration patterns.
+**Resolution:** `hx-toggle-button.twig` template added covering: server-rendered pressed state,
+icon-only usage with `aria_label`, exclusive toggle group pattern with `data-toggle-group` and
+a full Drupal behavior, form-associated usage with `name`/`value`, and the `hx-size` attribute
+mapping (not `size`). A `DrupalIntegration` story added to `hx-toggle-button.stories.ts`
+demonstrating server-rendered pressed state, exclusive view-mode toggle group, form-associated
+toggle, and disabled state from server-side permission checks.
 
 ---
 
@@ -138,11 +143,11 @@ override updated(changedProperties: Map<string | number | symbol, unknown>): voi
 
 Lit exports `PropertyValues` as a type alias for `ReadonlyMap<PropertyKey, unknown>`. Using it directly provides better semantics and aligns with Lit conventions. Minor but violates the project's TypeScript-strict quality standard.
 
-#### P2-4: No icon-only story in Storybook
+#### ~~P2-4: No icon-only story in Storybook~~ FIXED
 
 **File:** `hx-toggle-button.stories.ts`
 
-There is no dedicated `IconOnly` story demonstrating a toggle button with only a prefix slot icon and no label text (the most challenging accessibility case). The feature audit spec explicitly calls for an "icon-only" story. The `ViewModeToggle` healthcare scenario uses icon+text buttons, not icon-only.
+**Fix:** `IconOnly` story added (story #10, "Icon Only (accessible name via label)"). Demonstrates four icon-only toggle buttons (grid view, list view, mute, disabled bookmark) each providing an accessible name via the `label` attribute, which forwards to the inner `<button>`. SVG icons carry `aria-hidden="true"`. The story includes a descriptive paragraph explaining the `label` attribute requirement for screen reader compatibility.
 
 #### P2-5: Toggle group context — no coordination mechanism or ARIA guidance documented
 
@@ -165,19 +170,27 @@ The `hx-size` attribute name is inconsistent with how other components in the li
 
 ## Summary Table
 
-| ID | Severity | Area | Description |
-|----|----------|------|-------------|
-| P0-1 | **P0** | CSS | Double opacity on disabled: 0.5 × 0.5 = 0.25 effective opacity |
-| P1-1 | P1 | Tests | Keyboard tests call `btn.click()` — keydown dispatch is not tested |
-| P1-2 | P1 | Accessibility | Icon-only usage has no accessible name forwarding to inner `<button>` |
-| P1-3 | P1 | Tests | `formStateRestoreCallback` untested; implementation may use wrong state key |
-| P1-4 | P1 | Drupal | No Twig template or Drupal integration guidance |
-| P2-1 | P2 | CSS / A11y | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast |
-| P2-2 | P2 | TypeScript | Deprecated alias `WcToggleButton` should be `HxToggleButton` |
-| P2-3 | P2 | TypeScript | `updated()` should use Lit's `PropertyValues` type |
-| P2-4 | P2 | Storybook | Missing icon-only story |
-| P2-5 | P2 | Architecture | No toggle group coordination mechanism or exclusive-select pattern |
-| P2-6 | P2 | API | `hx-size` attribute diverges from library convention; undocumented |
+| ID   | Severity | Area          | Description                                                                 |
+| ---- | -------- | ------------- | --------------------------------------------------------------------------- |
+| P0-1 | **P0**   | CSS           | Double opacity on disabled: 0.5 × 0.5 = 0.25 effective opacity              |
+| P1-1 | P1       | Tests         | Keyboard tests call `btn.click()` — keydown dispatch is not tested          |
+| P1-2 | P1       | Accessibility | Icon-only usage has no accessible name forwarding to inner `<button>`       |
+| P1-3 | P1       | Tests         | `formStateRestoreCallback` untested; implementation may use wrong state key |
+| P1-4 | P1       | Drupal        | No Twig template or Drupal integration guidance — **FIXED**                 |
+| P2-1 | P2       | CSS / A11y    | Tertiary/outline pressed states may not meet WCAG 3:1 non-text contrast     |
+| P2-2 | P2       | TypeScript    | Deprecated alias `WcToggleButton` should be `HxToggleButton`                |
+| P2-3 | P2       | TypeScript    | `updated()` should use Lit's `PropertyValues` type                          |
+| P2-4 | P2       | Storybook     | ~~Missing icon-only story~~ **FIXED**                                       |
+| P2-5 | P2       | Architecture  | No toggle group coordination mechanism or exclusive-select pattern          |
+| P2-6 | P2       | API           | `hx-size` attribute diverges from library convention; undocumented          |
+
+---
+
+## CSS Audit Fixes Applied (2026-03-12)
+
+| Finding                                                   | Status                                                                                                                              |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| P0-1: Double opacity on disabled state (0.5 × 0.5 = 0.25) | **FIXED** — `opacity` removed from `.button[disabled]`; only `:host([disabled])` applies `opacity: var(--hx-opacity-disabled, 0.5)` |
 
 ---
 
