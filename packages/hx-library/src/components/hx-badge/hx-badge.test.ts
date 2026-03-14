@@ -500,4 +500,51 @@ describe('hx-badge', () => {
       expect(cssText).toContain('prefers-reduced-motion');
     });
   });
+
+  // ─── Slots: count + prefix combination (1) ─── [P3-01]
+
+  describe('Slots: count + prefix combination', () => {
+    it('renders prefix slot content alongside count display', async () => {
+      // P3-01: icon + count is a valid API combination. The prefix slot must be
+      // rendered even when count replaces the default slot content.
+      const el = await fixture<WcBadge>(
+        '<hx-badge count="5"><span slot="prefix" class="star">★</span></hx-badge>',
+      );
+      await el.updateComplete;
+      // The prefix slot content must be present in the light DOM
+      const icon = el.querySelector('span.star');
+      expect(icon).toBeTruthy();
+      expect(icon?.textContent).toBe('★');
+      // The prefix slot element must be present in shadow DOM (slot[name="prefix"] always rendered)
+      const prefixSlot = shadowQuery(el, 'slot[name="prefix"]');
+      expect(prefixSlot).toBeTruthy();
+      // The count must be reflected in the component's count property
+      expect(el.count).toBe(5);
+    });
+  });
+
+  // ─── Dynamic count updates (1) ─── [P3-02]
+
+  describe('Dynamic count updates', () => {
+    it('DOM reflects updated count value when count property changes dynamically', async () => {
+      // P3-02: verifying the DOM contract for the aria-live="polite" region.
+      // When count changes, the badge span (which carries aria-live="polite") must
+      // update its text content so screen readers can announce the new value.
+      const el = await fixture<WcBadge>('<hx-badge count="3"></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+
+      // Initial state
+      expect(badge.textContent?.trim()).toBe('3');
+      expect(badge.getAttribute('aria-live')).toBe('polite');
+
+      // Dynamically update the count
+      el.count = 7;
+      await el.updateComplete;
+
+      // The aria-live region must reflect the new count so AT can announce it
+      expect(badge.textContent?.trim()).toBe('7');
+      expect(badge.getAttribute('aria-live')).toBe('polite');
+    });
+  });
 });

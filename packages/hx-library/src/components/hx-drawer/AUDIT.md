@@ -95,6 +95,21 @@ Without this, screen readers with poor `aria-modal` support will allow users to 
 
 ---
 
+### P1-04: No Drupal behaviors file
+
+**Area:** Drupal Integration
+**File:** (missing)
+
+The feature description requires: _"Twig-renderable, JS behaviors for open/close."_ There is no `hx-drawer.behaviors.js` (or `.es6.js`) file and no Twig example template. The Drupal consumer cannot wire up open/close triggers using Drupal behaviors without this file.
+
+**Required fix:** Create `hx-drawer.behaviors.js` implementing a Drupal behavior that:
+
+- Finds `[data-hx-drawer-trigger]` elements
+- Calls `drawerEl.show()` / `drawerEl.hide()` on click
+- Handles attach/detach cleanup
+
+---
+
 ### P1-05: Animation timeout race condition on rapid open/close
 
 **Area:** Behavior
@@ -136,32 +151,20 @@ When the `label` slot is empty (no `[slot="label"]` child provided), `aria-label
 
 ---
 
-## Resolved P1 Findings
-
-### P1-04: No Drupal behaviors file ✅ FIXED
-
-**Area:** Drupal Integration
-**File:** `hx-drawer.drupal.js`, `hx-drawer.twig`
-
-**Resolution:** Added `hx-drawer.drupal.js` implementing two Drupal behaviors:
-
-- `hxDrawerTrigger` — finds `[data-hx-drawer-trigger][data-hx-drawer-target]` elements and calls `drawer.show()` on click, using `once()` for AJAX-safe attachment.
-- `hxDrawerClose` — finds `[data-hx-drawer-close][data-hx-drawer-target]` elements and calls `drawer.hide()` on click, using `once()` for AJAX-safe attachment.
-
-Both behaviors implement `detach` with `once.remove()` for proper cleanup on content unload.
-
-Also added `hx-drawer.twig` Twig template covering all public properties: `placement`, `size`, `label`, `open`, `contained`, `no-header`, `no-footer`, and all four slots (`label`, `header-actions`, default body, `footer`).
-
----
-
 ## P2 — Minor
 
-### ~~P2-01: `DrawerSize | string` type collapses to `string`~~ FIXED
+### P2-01: `DrawerSize | string` type collapses to `string`
 
 **Area:** TypeScript
 **File:** `hx-drawer.ts`
 
-Fixed by splitting the type into a narrowed union using the TypeScript pattern `DrawerSizePreset | (string & Record<never, never>)`. This preserves IDE autocompletion suggestions for the preset values (`'sm' | 'md' | 'lg' | 'full'`) while still accepting arbitrary CSS length strings. The `DrawerSizePreset` type is used in the `DRAWER_SIZE_MAP` record type, ensuring type-safe map access.
+```ts
+size: DrawerSize | string = 'md';
+```
+
+`DrawerSize` is a string union `'sm' | 'md' | 'lg' | 'full'`. The union with `string` renders the `DrawerSize` members irrelevant because `string` encompasses all of them. TypeScript cannot narrow `size` to `DrawerSize` without a type guard. IDE completions will not suggest the valid enum values.
+
+**Required fix:** Keep `size` typed as `DrawerSize` for the property. If arbitrary CSS lengths need to be supported, document that in JSDoc and accept a separate `--hx-drawer-size` CSS custom property override, or create a distinct CSS property path. The public API should guide users toward valid values.
 
 ---
 
@@ -199,19 +202,23 @@ The `hidden` attribute relies on the browser's default `[hidden] { display: none
 
 ---
 
-### ~~P2-04: `_triggerElement` cast from `document.activeElement` may not be `HTMLElement`~~ FIXED
+### P2-04: `_triggerElement` cast from `document.activeElement` may not be `HTMLElement`
 
 **Area:** TypeScript
 **File:** `hx-drawer.ts`, `_openDrawer()`
 
-Fixed by replacing the unsafe `as HTMLElement | null` cast with a proper `instanceof HTMLElement` type guard:
+```ts
+this._triggerElement = document.activeElement as HTMLElement | null;
+```
+
+`document.activeElement` returns `Element | null`. Casting it `as HTMLElement | null` bypasses the type system. If the active element is an `SVGElement` or `MathMLElement`, calling `.focus()` on it later (in `_closeDrawer`) may fail at runtime because SVGElement has a different `focus()` signature and behavior.
+
+**Required fix:** Guard with `instanceof HTMLElement`:
 
 ```ts
 const active = document.activeElement;
 this._triggerElement = active instanceof HTMLElement ? active : null;
 ```
-
-This safely narrows the type without bypassing the type system. SVGElement and other non-HTMLElement active elements are correctly handled by setting `_triggerElement` to `null`.
 
 ---
 
@@ -290,22 +297,22 @@ Using `void` to discard promises suppresses any rejection silently. If `updateCo
 
 ## Summary Table
 
-| ID    | Severity  | Area                   | Title                                                                           |
-| ----- | --------- | ---------------------- | ------------------------------------------------------------------------------- | -------- |
-| P0-01 | P0        | Accessibility/Behavior | Body scroll lock not implemented                                                |
-| P1-01 | P1        | Behavior               | Duplicate keydown listener — double handler invocation                          |
-| P1-02 | P1        | Accessibility          | Focus trap broken for slotted elements                                          |
-| P1-03 | P1        | Accessibility          | Background content not `aria-hidden` when open                                  |
-| P1-04 | P1        | Drupal                 | No Drupal behaviors file ✅ FIXED                                               |
-| P1-05 | P1        | Behavior               | Animation timeout race condition on rapid open/close                            |
-| P1-06 | P1        | Accessibility          | Dialog has no accessible name when label slot empty                             |
-| P2-01 | **FIXED** | TypeScript             | `DrawerSizePreset \| (string & Record<never, never>)` preserves IDE completions |
-| P2-02 | P2        | CSS/API                | CSS part name `close-button` deviates from spec (`close-btn`)                   | RESOLVED |
-| P2-03 | P2        | CSS                    | Footer `hidden` attribute has no CSS override for reset safety                  | RESOLVED |
-| P2-04 | **FIXED** | TypeScript             | `instanceof HTMLElement` guard replaces unsafe `as` cast                        |
-| P2-05 | P2        | Storybook              | No story for nested interactive content                                         |
-| P3-01 | P3        | Code quality           | `firstUpdated()` slot detection is redundant                                    |
-| P3-02 | P3        | Code quality           | `void` promise discards suppress rejections silently                            |
-| P3-03 | P3        | Code quality           | Overlay `addEventListener` is effectively unreachable                           |
+| ID    | Severity | Area                   | Title                                                          |
+| ----- | -------- | ---------------------- | -------------------------------------------------------------- | -------- |
+| P0-01 | P0       | Accessibility/Behavior | Body scroll lock not implemented                               |
+| P1-01 | P1       | Behavior               | Duplicate keydown listener — double handler invocation         |
+| P1-02 | P1       | Accessibility          | Focus trap broken for slotted elements                         |
+| P1-03 | P1       | Accessibility          | Background content not `aria-hidden` when open                 |
+| P1-04 | P1       | Drupal                 | No Drupal behaviors file                                       |
+| P1-05 | P1       | Behavior               | Animation timeout race condition on rapid open/close           |
+| P1-06 | P1       | Accessibility          | Dialog has no accessible name when label slot empty            |
+| P2-01 | P2       | TypeScript             | `DrawerSize \| string` collapses to `string`                   |
+| P2-02 | P2       | CSS/API                | CSS part name `close-button` deviates from spec (`close-btn`)  | RESOLVED |
+| P2-03 | P2       | CSS                    | Footer `hidden` attribute has no CSS override for reset safety | RESOLVED |
+| P2-04 | P2       | TypeScript             | `_triggerElement` cast bypasses `HTMLElement` type guard       |
+| P2-05 | P2       | Storybook              | No story for nested interactive content                        |
+| P3-01 | P3       | Code quality           | `firstUpdated()` slot detection is redundant                   |
+| P3-02 | P3       | Code quality           | `void` promise discards suppress rejections silently           |
+| P3-03 | P3       | Code quality           | Overlay `addEventListener` is effectively unreachable          |
 
 **Total: 1 P0, 6 P1, 5 P2, 3 P3 — Merge BLOCKED pending P0 and P1 resolution.**
