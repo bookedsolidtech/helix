@@ -71,7 +71,7 @@ The `aria-hidden="true"` attribute is set on the inner shadow `<span>`, not on t
 
 ---
 
-### P1-02: `paragraph` variant absent — implementation uses `button` instead
+### P1-02: `paragraph` variant absent — implementation uses `button` instead — FIXED
 
 **File:** `hx-skeleton.ts:34`
 **Area:** TypeScript / Feature Spec
@@ -92,6 +92,8 @@ The `paragraph` variant is entirely absent. The `button` variant exists in its p
 - `button` = interactive action placeholder
 
 Whether this is a spec change or implementation error is unresolved, but the mismatch means either the audit criteria is wrong or the implementation diverged from requirements. The absence of `paragraph` forces consumers to manually compose multiple `text` variants for a paragraph skeleton, which is undocumented.
+
+**Resolution:** `paragraph` variant added to the type union: `variant: 'text' | 'circle' | 'rect' | 'button' | 'paragraph' = 'rect'`. CSS styles added for `.skeleton--paragraph`. Both variants are now supported.
 
 ---
 
@@ -186,16 +188,17 @@ But `.skeleton--circle` hardcodes `border-radius: 50%` with no override token. T
 
 ---
 
-### P2-02: No `loading → loaded` Storybook story
+### ~~P2-02: No `loading → loaded` Storybook story~~ ✅ FIXED
 
 **File:** `hx-skeleton.stories.ts`
 **Area:** Storybook
 
-The audit criteria explicitly requires:
+The `LoadingToLoaded` story (exported as `State: Loading → Loaded`) demonstrates the full transition from skeleton placeholder to real content. It includes:
 
-> Storybook — all variants, loading→loaded transition demo
-
-No story demonstrates the transition from a skeleton state to real content. All 8 stories show static skeleton states. Given the P0 finding that the `loaded` state doesn't exist yet, this is a documentation gap that will remain unresolvable until P0-01 is fixed.
+- A visually hidden `aria-live="polite"` region that announces state changes to screen readers
+- A `hx-skeleton` element that receives `loaded = true` programmatically
+- Real content hidden behind `hidden` attribute that is revealed after the skeleton dismisses
+- A button to simulate content loading for interactive demonstration in Storybook
 
 ---
 
@@ -212,12 +215,14 @@ The shimmer sweep width (`200%`) is hardcoded. There is no `--hx-skeleton-shimme
 
 ---
 
-### P2-04: No test for invalid/unknown variant values
+### P2-04: No test for invalid/unknown variant values — FIXED
 
 **File:** `hx-skeleton.test.ts`
 **Area:** Tests
 
 The variant property is typed as `'text' | 'circle' | 'rect' | 'button'` but TypeScript types are erased at runtime. If a consumer passes an unknown variant via HTML attribute (e.g., `variant="image"`), the CSS class `skeleton--image` is applied but has no styles, resulting in a zero-height invisible element. There is no test verifying graceful degradation, and no fallback in the CSS. This is particularly risky in Drupal where variant values come from CMS data.
+
+**Resolution:** Test added: `'gracefully degrades with unknown variant — renders without error'` — verifies the component renders without throwing when given an unknown variant string, applying the CSS class without crashing.
 
 ---
 

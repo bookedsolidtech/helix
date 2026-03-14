@@ -176,7 +176,7 @@ Missing token: `--hx-select-placeholder-color`
 
 ## P2 — Medium Severity
 
-### P2-01: `formStateRestoreCallback` has incomplete signature
+### P2-01: `formStateRestoreCallback` has incomplete signature — FIXED
 
 **File:** `hx-select.ts:251-253`
 
@@ -188,15 +188,18 @@ formStateRestoreCallback(state: string): void {
 
 The `FormStateRestoreCallback` interface specifies `(state: string | File | FormData, mode: 'restore' | 'autocomplete'): void`. The method accepts only `string` and ignores the `mode` parameter. If the browser restores state as `FormData` or `File` (valid per spec), this will silently assign a non-string to `this.value` without a type error in TypeScript (due to the narrowed parameter type). A proper guard and `mode` handling are missing.
 
+**Resolution:** Signature updated to `formStateRestoreCallback(state: string | File | FormData, _mode: 'restore' | 'autocomplete'): void` with a `typeof state === 'string'` guard before assigning to `this.value`.
+
 ---
 
-### P2-02: No multi-select support — limitation not documented in JSDoc or Storybook
+### ~~P2-02: No multi-select support — limitation not documented in JSDoc or Storybook~~ ✅ FIXED
 
-**File:** `hx-select.ts:1-648`
+**File:** `hx-select.ts`, `hx-select.stories.ts`
 
-The component does not implement a `multiple` attribute or multi-value selection. This is a legitimate design scope decision, but the absence is not documented anywhere in the JSDoc, CEM attributes, or Storybook stories. Consumers building healthcare forms that require multi-select (e.g., selecting multiple conditions, multiple providers) have no guidance about whether to expect this feature or use an alternative component.
+The multi-select limitation is now documented in two places:
 
-Recommendation: Add a `@remarks` JSDoc note explicitly stating that multi-select is not supported and will not be added (if intentional), or create a tracked issue.
+1. **JSDoc `@remarks`** on the component class — explicitly states multi-select is intentionally not supported and directs consumers to use a separate component.
+2. **Storybook `SingleValueOnly` story** — dedicated story with a prominent warning panel, code guidance, and a side-by-side example showing `hx-checkbox-group` as the correct alternative for multi-value selection.
 
 ---
 
@@ -228,11 +231,11 @@ private _instanceId = this._selectId;
 
 ---
 
-### P2-05: No Storybook story for the open/interactive listbox state
+### ~~P2-05: No Storybook story for the open/interactive listbox state~~ ✅ FIXED
 
 **File:** `hx-select.stories.ts`
 
-The stories include default, sizes, error, disabled, required, grouped, and form composition variants. There is no story that opens the dropdown and visually demonstrates the listbox — the interactive combobox state. Storybook's primary value for this component is demonstrating the dropdown UX, option hover/focus states, and keyboard behavior. A missing interactive story means visual regression testing for the open state is not automated.
+The `OpenInteractive` story (exported as `Open / Interactive Listbox`) demonstrates the dropdown in its open state with a pre-selected value, showing option focus states, disabled options, and keyboard navigation guidance. Visual regression testing for the open state is now automated via this story.
 
 ---
 
@@ -294,7 +297,7 @@ The axe-core tests check default, error, and disabled states — all with `open=
 
 ---
 
-### P2-11: `size` property accepts invalid values with no runtime warning
+### P2-11: `size` property accepts invalid values with no runtime warning — FIXED
 
 **File:** `hx-select.ts:143`
 
@@ -303,6 +306,8 @@ size: 'sm' | 'md' | 'lg' = 'md';
 ```
 
 If a consumer sets `hx-size="xl"` or `hx-size="foobar"`, the CSS class `field__trigger--xl` is applied (via the classMap template), which has no definition. The component renders silently at its default appearance with no developer warning. Other components in the library follow a similar pattern, but this is worth flagging as it complicates debugging.
+
+**Resolution:** Runtime guard added in `updated()`: checks `['sm', 'md', 'lg'].includes(this.size)` and emits a `console.warn` with the invalid value and expected options.
 
 ---
 
@@ -313,7 +318,7 @@ If a consumer sets `hx-size="xl"` or `hx-size="foobar"`, the CSS class `field__t
 | TypeScript    | ⚠️ Issues  | —   | —   | 2   |
 | Accessibility | 🔴 Blocked | 1   | 5   | 1   |
 | Tests         | ⚠️ Issues  | —   | 1   | 3   |
-| Storybook     | ⚠️ Issues  | —   | —   | 1   |
+| Storybook     | ✅ Fixed   | —   | —   | 0   |
 | CSS           | ⚠️ Issues  | —   | 2   | 2   |
 | Performance   | ✅ OK      | —   | —   | 1   |
 | Drupal        | ✅ Fixed   | —   | —   | —   |

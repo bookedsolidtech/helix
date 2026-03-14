@@ -197,9 +197,17 @@ Only Arrow keys are handled. This is expected behavior that AT users and power k
 
 ---
 
-### ~~P2-2: `Math.random()` IDs break SSR / Drupal hydration~~ ✅ FIXED
+### P2-2: `Math.random()` IDs break SSR / Drupal hydration
 
-**Fix applied:** `_groupId` now uses a monotonically incrementing module-level counter (`++_groupCounter`) instead of `Math.random()`. IDs are deterministic within a page session and do not cause `aria-describedby` reference mismatches between Drupal server-rendered markup and client hydration.
+**File:** `hx-radio-group.ts:111–113`
+
+```ts
+private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
+```
+
+IDs generated with `Math.random()` differ between server (Drupal/Twig pre-render) and client hydration. `aria-describedby` references will point to IDs that don't exist in the server-rendered DOM.
+
+**Fix:** Use a deterministic ID strategy (e.g., `name` attribute as seed, or a monotonically incrementing counter).
 
 ---
 
@@ -257,18 +265,11 @@ The feature spec mentions "selected-value typing." Common radio group APIs (Shoe
 
 ---
 
-### P2-7: Storybook missing individual-radio-disabled story
+### P2-7: Storybook missing individual-radio-disabled story — ✅ FIXED
 
 **File:** `hx-radio-group.stories.ts`
 
-Stories cover:
-
-- Group-level `disabled`
-- Required state
-- Error state
-- Horizontal/vertical orientation
-
-There is no dedicated story for a mixed state (one radio disabled within an enabled group), which is a valid and distinct state that Drupal consumers will use.
+**Resolution:** The `SingleDisabledOption` story demonstrates a mixed state: one `hx-radio` with `disabled` attribute inside an enabled group. The story includes a play function verifying that the disabled radio has the `disabled` attribute while enabled radios remain interactive and update the group value on click.
 
 ---
 
