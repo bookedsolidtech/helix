@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixStatusIndicatorStyles } from './hx-status-indicator.styles.js';
@@ -105,7 +105,7 @@ export class HelixStatusIndicator extends LitElement {
     this.setAttribute('aria-label', this._getLabel());
   }
 
-  override updated(changedProperties: Map<string | symbol, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     // Keep host aria-label in sync when status or label properties change.
     if (changedProperties.has('status') || changedProperties.has('label')) {

@@ -479,7 +479,9 @@ export const SelectAllPattern: Story = {
       indeterminate: boolean;
     };
     const childGroup = parent.nextElementSibling;
-    const children = Array.from(childGroup?.querySelectorAll('hx-checkbox') ?? []) as (HTMLElement & {
+    const children = Array.from(
+      childGroup?.querySelectorAll('hx-checkbox') ?? [],
+    ) as (HTMLElement & {
       checked: boolean;
       indeterminate: boolean;
     })[];
