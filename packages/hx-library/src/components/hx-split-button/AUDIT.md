@@ -81,7 +81,7 @@ This pattern passes axe-core (which is DOM-based) but may fail in real AT testin
 
 ---
 
-#### P1-02: Negative `outline-offset` on menu item focus ring can clip — **[FIXED]**
+#### P1-02: Negative `outline-offset` on menu item focus ring can clip
 
 **File:** `hx-menu-item.styles.ts:40`
 **Area:** CSS / Accessibility
@@ -97,13 +97,21 @@ The `hx-menu-item` has `border-radius: var(--hx-menu-item-border-radius, ...)`. 
 
 Compare to `hx-split-button.styles.ts:52` where the primary button uses `outline-offset: var(--hx-focus-ring-offset, 2px)` (positive) — inconsistency confirms this is a defect.
 
-**Resolution:** `outline-offset` changed to `0px` — focus ring sits flush at the element boundary, fully visible at rounded corners. Consistent with WCAG 1.4.11 compliance.
-
 ---
 
-#### P1-03: Dead code — `_primaryButton` @query is never used ✅ FIXED
+#### P1-03: Dead code — `_primaryButton` @query is never used
 
-**Resolution:** The `@query('.split-button__primary') private _primaryButton!: HTMLButtonElement` declaration has been removed. All primary button interaction occurs through template-attached event handlers; the explicit query reference was never accessed in any method body. Removing it eliminates the non-null assertion (`!`) and removes dead code.
+**File:** `hx-split-button.ts:67`
+**Area:** TypeScript / Code Quality
+
+```ts
+@query('.split-button__primary')
+private _primaryButton!: HTMLButtonElement;
+```
+
+This property is declared and queried but never accessed in any method body. All primary button interaction occurs through event handlers attached in the template. This is dead code that adds noise and may mislead maintainers into thinking the reference is used somewhere.
+
+TypeScript strict mode should catch this with `noUnusedLocals`, but `@query` decorated properties avoid this because they are technically "used" at the class level.
 
 ---
 
@@ -146,12 +154,23 @@ Missing test cases:
 
 ---
 
-#### P1-06: Storybook `Danger` story leaves primary button without accessible text — FIXED
+#### P1-06: Storybook `Danger` story leaves primary button without accessible text
 
-**File:** `hx-split-button.stories.ts`
+**File:** `hx-split-button.stories.ts:121–135`
 **Area:** Storybook
 
-**Resolution:** Updated the `Danger` story's custom `render` function to bind `.label=${args.label}` on the `hx-split-button` element, ensuring the primary button receives accessible text (`args.label = 'Delete Record'`). The story now passes axe-core accessibility checks for labeled buttons.
+The `Danger` story provides a custom `render` function that does not bind `args.label` and contains no default slot content for the primary button label:
+
+```ts
+export const Danger: Story = {
+  args: { variant: 'danger', label: 'Delete Record' },
+  render: (args) => html`
+    <hx-split-button variant=${args.variant} hx-size=${args.size} ?disabled=${args.disabled}>
+      <!-- No label prop binding, no slot text -->
+      <hx-menu-item slot="menu" value="archive">Archive Record</hx-menu-item>
+```
+
+The primary button receives no accessible text — `args.label = 'Delete Record'` is defined but never applied. This is a Storybook documentation defect that also means the rendered story fails accessibility for unlabeled buttons. If axe-core runs against Storybook stories, this story will produce a violation.
 
 ---
 
@@ -175,25 +194,21 @@ These are hardcoded English strings with no mechanism for localization. Healthca
 
 ---
 
-#### P2-02: Menu panel has no `max-height` or scroll — can overflow viewport — **[FIXED]**
+#### P2-02: Menu panel has no `max-height` or scroll — can overflow viewport
 
 **File:** `hx-split-button.styles.ts:190–210`
 **Area:** CSS / UX
 
 The `.split-button__menu` has no `max-height`, `overflow-y: auto`, or `overflow-y: scroll`. In healthcare scenarios with many items (e.g., patient status codes, export formats) the menu could extend beyond the viewport with no scroll affordance. Overflow would be clipped by any `overflow: hidden` ancestor.
 
-**Resolution:** Added `max-height: var(--hx-split-button-menu-max-height, 18rem)` and `overflow-y: auto` to `.split-button__menu` — viewport overflow prevented with consumer-overridable height token.
-
 ---
 
-#### P2-03: Menu open/close has no CSS transition — instant appearance — **[FIXED]**
+#### P2-03: Menu open/close has no CSS transition — instant appearance
 
 **File:** `hx-split-button.styles.ts:193`
 **Area:** CSS / UX
 
 The menu panel toggles between `display: none` and `display: block` with no animation. The chevron icon does animate (`transition: transform`), creating a mismatch where the icon animates but the menu appears instantly. The reduced-motion media query correctly disables the chevron animation, but there is nothing to disable for the menu because it has no transition. A fade-in or slide-down transition would be expected for production quality.
-
-**Resolution:** Added `@keyframes hx-split-button-menu-open` (opacity 0→1, translateY -4px→0) applied via `animation` on `.split-button__menu--open`. The `@media (prefers-reduced-motion: reduce)` block explicitly sets `animation: none` on `.split-button__menu--open` (in addition to `transition: none` on the primary, trigger, and chevron elements), ensuring motion-sensitive users do not see the menu animate.
 
 ---
 
@@ -206,12 +221,12 @@ Both components set native `disabled` attribute AND `aria-disabled="true"` on `<
 
 ---
 
-#### P2-05: No standalone Storybook story for `hx-menu-item` — FIXED
+#### P2-05: No standalone Storybook story for `hx-menu-item`
 
-**File:** `hx-menu-item.stories.ts` (new file)
+**File:** `hx-split-button.stories.ts`
 **Area:** Storybook / Documentation
 
-**Resolution:** Created `packages/hx-library/src/components/hx-menu/hx-menu-item.stories.ts` with a full Meta entry and standalone stories covering Default, Disabled, Checkbox, Radio, Loading, WithPrefixSuffix, and HealthcareActions variants. CEM autodocs are now generated for `hx-menu-item`.
+`hx-menu-item` is a documented public component (`@tag hx-menu-item`, `@customElement('hx-menu-item')`, exported in `index.ts`) with its own CSS parts (`part="item"`), CSS custom properties, events, and properties. However, it has no standalone Storybook story file. Consumers cannot browse its API in isolation. Its CEM documentation will exist but Storybook autodocs won't be generated for it.
 
 ---
 
@@ -232,18 +247,18 @@ However, this means `Escape`/`ArrowDown`/`ArrowUp`/`Home`/`End` keys pressed whi
 
 ---
 
-#### P2-07: ~~Bundle size cannot be verified — blocked by PR #175 not merged~~ ✅ FIXED
+#### P2-07: Bundle size cannot be verified — blocked by PR #175 not merged
 
 **File:** N/A
 **Area:** Performance
 
-**Resolution:** The component has been merged into the main branch and is now part of the buildable codebase. Source totals: `hx-split-button.ts` (~389 lines) + `hx-split-button.styles.ts` (~250 lines) + `hx-menu-item.ts` + `hx-menu-item.styles.ts`, combined estimated minified+gzipped size of ~4–5KB, within the <5KB per-component budget. Bundle size can now be formally verified via `npm run build` in the library package.
+This audit is based on source code from `rescue/abandoned-components` (PR #175), which has not been merged into any buildable branch. Bundle size cannot be measured against the <5KB per-component threshold. The source code volume (~300 lines TS + ~250 lines styles across both components) suggests it will likely satisfy the budget, but formal verification is blocked.
 
-**Gate:** Performance Gate is now verifiable. Run `npm run build` from `packages/hx-library` to confirm.
+**Gate:** Performance Gate (bundle < 5KB per component) is **unverified** until PR #175 is merged and a build can be run.
 
 ---
 
-#### P2-08: No Drupal behavior file provided ✅ FIXED
+#### P2-08: No Drupal behavior file provided
 
 **File:** N/A
 **Area:** Drupal / Integration
@@ -252,8 +267,6 @@ The component has no accompanying Drupal behavior file (`.js` or `.es6.js` in a 
 
 Note: The `label` property does not use `reflect: true`, so the `label` attribute set from Twig/HTML will work (Lit observes attributes) but reading the `label` property back from JS will return the default (`undefined`) until the Lit property is set via JavaScript. This is a subtle but non-blocking Drupal integration concern.
 
-**Resolution:** Created `hx-split-button.twig` documenting all attributes (`label`, `variant`, `hx-size`, `disabled`, `trigger-label`, `menu-label`) with `menu_items` array rendering `<hx-menu-item>` children. Created `hx-split-button.drupal.js` with two Drupal behaviors: `hxSplitButtonPrimary` (wires `hx-click` to AJAX via `data-hx-split-button-action`) and `hxSplitButtonMenu` (wires `hx-select` to per-item AJAX via `data-hx-menu-action-<value>` attributes). Both use the `once()` API for AJAX-safe re-attachment.
-
 ---
 
 ## Area-by-Area Summary
@@ -261,7 +274,7 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 ### TypeScript
 
 - Strict mode compliance: **Pass** — no `any`, no `@ts-ignore`
-- Dead code: `_primaryButton` query removed (P1-03 ✅ FIXED). `focused` variable (P1-04) — **Fail** (pending P0-01 fix)
+- Dead code: **Fail** — `_primaryButton` query (P1-03), `focused` variable (P1-04)
 - Type accuracy: **Pass** — event detail types are correctly typed
 
 ### Accessibility
@@ -280,8 +293,8 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 
 - Variant coverage: **Pass** — all 6 variants present
 - Interaction tests: **Pass** — 7 play functions with event spies
-- Documentation gap: **Resolved** — standalone hx-menu-item story added (P2-05 fixed)
-- Accessibility in stories: **Resolved** — Danger story button label added (P1-06 fixed)
+- Documentation gap: **Fail** — no standalone hx-menu-item story (P2-05)
+- Accessibility in stories: **Fail** — Danger story has unlabeled button (P1-06)
 
 ### CSS
 
@@ -293,10 +306,10 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 
 ### Performance
 
-- Bundle size: **Verifiable** — PR #175 merged; estimated ~4–5KB within budget (P2-07 ✅ FIXED)
+- Bundle size: **Unverified** — blocked by PR #175 (P2-07)
 
 ### Drupal
 
 - Twig-renderable: **Pass** — standard HTML attribute API works
 - label attribute: **Pass** (with caveat — P2-08)
-- Behavior file: **Pass** — `hx-split-button.drupal.js` added (P2-08 ✅ FIXED)
+- Behavior file: **Missing** (P2-08)

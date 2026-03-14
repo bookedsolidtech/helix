@@ -285,6 +285,7 @@ npm run verify   # runs: lint + format:check + type-check
 Do NOT push if `npm run verify` fails. Fix the issue first, then re-run.
 
 Auto-fix helpers:
+
 ```bash
 npx eslint --fix .    # auto-fix lint errors
 npm run format        # auto-fix formatting
