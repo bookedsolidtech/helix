@@ -288,11 +288,13 @@ describe('hx-copy-button', () => {
         );
         const btn = shadowQuery<HTMLButtonElement>(el, 'button');
         expect(btn).toBeTruthy();
+        // Use oneEvent to await the hx-copy event before advancing fake timers.
+        // This is more robust than double Promise.resolve() microtask flushing
+        // because it ties synchronization to the observable event, not to
+        // internal async implementation details (P2-01 fix).
+        const eventPromise = oneEvent(el, 'hx-copy');
         btn!.click();
-        // Flush microtask queue so the async clipboard promise resolves and
-        // _copied is set to true before we advance the macro-task timer.
-        await Promise.resolve();
-        await Promise.resolve();
+        await eventPromise;
         await el.updateComplete;
         expect(btn!.classList.contains('button--copied')).toBe(true);
         vi.advanceTimersByTime(600);
@@ -476,9 +478,10 @@ describe('hx-copy-button', () => {
         expect(btn).toBeTruthy();
 
         // First click — enters copied state.
+        // Use oneEvent for robust synchronization with the async clipboard chain (P2-01 fix).
+        const firstEventPromise = oneEvent(el, 'hx-copy');
         btn!.click();
-        await Promise.resolve();
-        await Promise.resolve();
+        await firstEventPromise;
         await el.updateComplete;
         expect(btn?.classList.contains('button--copied')).toBe(true);
 
@@ -488,9 +491,9 @@ describe('hx-copy-button', () => {
         expect(btn?.classList.contains('button--copied')).toBe(true);
 
         // Second click — timer must reset. This clears the first timer.
+        const secondEventPromise = oneEvent(el, 'hx-copy');
         btn!.click();
-        await Promise.resolve();
-        await Promise.resolve();
+        await secondEventPromise;
         await el.updateComplete;
         expect(btn?.classList.contains('button--copied')).toBe(true);
 
@@ -519,9 +522,10 @@ describe('hx-copy-button', () => {
         expect(btn).toBeTruthy();
 
         // Click to start feedback and set the internal timer.
+        // Use oneEvent for robust synchronization with the async clipboard chain (P2-01 fix).
+        const eventPromise = oneEvent(el, 'hx-copy');
         btn!.click();
-        await Promise.resolve();
-        await Promise.resolve();
+        await eventPromise;
         await el.updateComplete;
         expect(btn?.classList.contains('button--copied')).toBe(true);
 

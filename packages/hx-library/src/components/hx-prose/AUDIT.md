@@ -18,11 +18,13 @@
 
 ## Summary
 
-| Severity     | Count |
-| ------------ | ----- |
-| P0 (Blocker) | 2     |
-| P1 (High)    | 8     |
-| P2 (Medium)  | 8     |
+_Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
+
+| Severity     | Baseline | Remaining |
+| ------------ | -------- | --------- |
+| P0 (Blocker) | 2        | 2         |
+| P1 (High)    | 8        | 7         |
+| P2 (Medium)  | 8        | 5         |
 
 ---
 
@@ -110,18 +112,11 @@ hx-prose p.lead {
 
 ---
 
-### P1-04: `caption-side: bottom` — accessibility regression for data tables
+### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
 
 **File:** `styles/prose/prose.scoped.css`
-**Line:** ~406
 
-```css
-hx-prose caption {
-  caption-side: bottom;
-}
-```
-
-WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
+Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
 
 ---
 
@@ -207,19 +202,9 @@ The comment block uses `--wc-prose-*` (old namespace) while the actual CSS custo
 
 ---
 
-### P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared
+### ~~P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared~~ ✅ FIXED
 
-**File:** `styles/prose/prose.scoped.css`
-**Lines:** ~730–733
-
-```css
-hx-prose .align-left + *,
-hx-prose .align-right + * {
-  clear: none;
-}
-```
-
-This rule explicitly prevents clearing floated content. CKEditor's `.align-left` and `.align-right` classes create floated elements. Setting `clear: none` on the following sibling means subsequent content will wrap around the float — which may be the intended visual behavior. However, if two consecutive floated images appear, or if a heading follows an aligned image, the heading may render adjacent to the floated image rather than below it. This is a layout bug waiting to happen in complex WYSIWYG content. The `clearfix` utility class exists (line ~795) but is opt-in. Most Drupal authors will not add it.
+**Fix:** Changed `clear: none` to `clear: both` in both `styles/prose/_drupal.css` and `styles/prose/prose.scoped.css`. Block-level content (headings, paragraphs) now starts below floated images rather than wrapping beside them. Updated comment explains the behavior and notes consumers can override with `clear: none` if wrap-around is intentional for their layout.
 
 ---
 
@@ -270,7 +255,7 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### P2-07: Axe tests do not cover images without `alt` attribute
+### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
 
 **File:** `hx-prose.test.ts`
 
@@ -295,22 +280,20 @@ This is important because the audit area note says "axe may not scan slot conten
 
 ---
 
-### P2-08: Storybook does not appear to have stories for all HTML element types
+### ~~P2-08: Storybook does not appear to have stories for all HTML element types~~ ✅ FIXED
 
 **File:** `hx-prose.stories.ts`
 
-From the available preview, stories include rich text demos and component compositions. The feature description requires "full rich text demo with all HTML elements, typography scale." The following should be verified against the published Storybook:
+The `AllContentTypes` story now covers all required HTML element types:
 
-- Blockquote with `<cite>`
-- `<pre><code>` code blocks with language class
-- `<kbd>`, `<samp>`, `<var>` elements
-- Definition lists (`<dl>`, `<dt>`, `<dd>`)
-- `<figure>` with `<figcaption>`
-- `<mark>`, `<del>`, `<ins>`, `<abbr title="">`, `<sub>`, `<sup>`
-- Tables with `<caption>`, `<tfoot>`, and scope attributes
-- Drupal-specific markup classes (`.field`, `.text-formatted`, `.align-left`, `.align-right`, `.messages`)
-
-If any of these are absent, Storybook coverage is incomplete. Stories cannot be autodoc-generated for these since they are slot content (not component properties), so they must be explicitly authored.
+- Blockquote with `<cite>` — covered
+- `<pre><code>` code blocks — covered
+- `<kbd>`, `<samp>`, `<var>` elements — added `<samp>` and `<var>` to "Keyboard and Technical Text" section
+- Definition lists (`<dl>`, `<dt>`, `<dd>`) — covered
+- `<figure>` with `<figcaption>` — covered
+- `<mark>`, `<del>`, `<ins>`, `<abbr title="">`, `<sub>`, `<sup>` — covered
+- Tables with `<caption>`, `<tfoot>`, and `scope` attributes — added `<tfoot>` and `scope` on all `<th>` elements
+- Drupal-specific markup classes — covered in `DrupalCKEditor` story
 
 ---
 

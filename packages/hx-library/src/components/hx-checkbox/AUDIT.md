@@ -20,35 +20,35 @@
 
 All 2 P0 and all 10 P1 findings are resolved. Remediation quality is high.
 
-| ID    | Area          | Severity | Description                                          | Status                                                                                                                                          |
-| ----- | ------------- | -------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0-01 | Accessibility | P0       | `aria-describedby` broken for `error` slot           | **FIXED** — wrapper div always owns the ID                                                                                                      |
-| P0-02 | Accessibility | P0       | `NoLabel` pattern fails — `aria-label` not forwarded | **FIXED** — host aria-label forwarded to inner input                                                                                            |
-| P1-01 | TypeScript    | P1       | `formStateRestoreCallback` wrong signature           | **FIXED** — accepts `string \| File \| FormData \| null`                                                                                        |
-| P1-02 | Accessibility | P1       | `role="alert"` + `aria-live="polite"` contradiction  | **FIXED** — `role="status"` used, no explicit aria-live                                                                                         |
-| P1-03 | CSS           | P1       | Hover border-color ignores component token           | **FIXED** — cascades through `--hx-checkbox-hover-border-color`                                                                                 |
-| P1-04 | Storybook     | P1       | `hx-size` missing from `argTypes`                    | **FIXED** — select control with sm/md/lg                                                                                                        |
-| P1-05 | Tests         | P1       | No axe-core test for indeterminate state             | **FIXED** — axe test added                                                                                                                      |
-| P1-06 | Tests         | P1       | No test for `input.indeterminate`                    | **FIXED** — asserts `input.indeterminate === true`                                                                                              |
-| P1-07 | Tests         | P1       | Error slot has no test coverage                      | **FIXED** — slot + aria-describedby tested                                                                                                      |
-| P1-08 | Storybook     | P1       | Empty-string attributes passed unconditionally       | **FIXED** — `ifDefined` used for error/helpText/name                                                                                            |
-| P1-09 | TypeScript    | P1       | `indeterminate` missing `reflect: true`              | **FIXED** — reflects to host attribute                                                                                                          |
-| P1-10 | Tests         | P1       | No test clicking label text                          | **FIXED** — label click test added                                                                                                              |
-| P2-01 | Tests         | P2       | Tests use deprecated `WcCheckbox` type               | **FIXED** — uses `HelixCheckbox`                                                                                                                |
-| P2-02 | CSS/Tokens    | P2       | Missing `--hx-checkbox-bg` component token           | **FIXED** — token added with fallback                                                                                                           |
-| P2-03 | CSS/Tokens    | P2       | Help text color missing component token              | **FIXED** — `--hx-checkbox-help-text-color` used                                                                                                |
-| P2-04 | HTML          | P2       | `tabindex="0"` redundant on native input             | **FIXED** — removed                                                                                                                             |
-| P2-05 | TypeScript    | P2       | `Math.random()` for ID — collision risk              | **FIXED** — monotonic counter                                                                                                                   |
-| P2-06 | TypeScript    | P2       | Redundant condition in `describedBy`                 | **FIXED** — simplified                                                                                                                          |
-| P2-07 | Tests         | P2       | No tests for `hx-size` variants                      | **FIXED** — sm, lg, reflection tested                                                                                                           |
-| P2-08 | Tests         | P2       | No test for `formStateRestoreCallback(null)`         | **FIXED** — null case tested                                                                                                                    |
-| P2-09 | CSS           | P2       | `clip: rect(0,0,0,0)` deprecated                     | **FIXED** — `clip-path: inset(50%)`                                                                                                             |
-| P2-10 | Drupal        | P2       | `hx-size` may conflict with htmx                     | **ADDRESSED** — `hx-checkbox.twig` added with documentation of the htmx namespace consideration and planned normalization in next major version |
-| P2-11 | Storybook     | P2       | `NoLabel` story lacks play function                  | **OPEN** — no runtime axe assertion on this pattern                                                                                             |
-| P2-12 | Storybook     | P2       | `--hx-checkbox-bg` undocumented in stories           | **FIXED** — token exists, documented in JSDoc + Starlight                                                                                       |
-| P2-13 | TypeScript    | P2       | `_hasErrorSlot` re-render edge case                  | **FIXED** — resolved by P0-01 wrapper pattern                                                                                                   |
-| P2-14 | API           | P2       | Missing `checkmark` CSS part                         | **FIXED** — `part="checkmark"` on SVG                                                                                                           |
-| P2-15 | Storybook     | P2       | Select-All stories use DOM anti-pattern              | **OPEN** — story-quality issue, not component bug                                                                                               |
+| ID    | Area          | Severity | Description                                          | Status                                                          |
+| ----- | ------------- | -------- | ---------------------------------------------------- | --------------------------------------------------------------- |
+| P0-01 | Accessibility | P0       | `aria-describedby` broken for `error` slot           | **FIXED** — wrapper div always owns the ID                      |
+| P0-02 | Accessibility | P0       | `NoLabel` pattern fails — `aria-label` not forwarded | **FIXED** — host aria-label forwarded to inner input            |
+| P1-01 | TypeScript    | P1       | `formStateRestoreCallback` wrong signature           | **FIXED** — accepts `string \| File \| FormData \| null`        |
+| P1-02 | Accessibility | P1       | `role="alert"` + `aria-live="polite"` contradiction  | **FIXED** — `role="status"` used, no explicit aria-live         |
+| P1-03 | CSS           | P1       | Hover border-color ignores component token           | **FIXED** — cascades through `--hx-checkbox-hover-border-color` |
+| P1-04 | Storybook     | P1       | `hx-size` missing from `argTypes`                    | **FIXED** — select control with sm/md/lg                        |
+| P1-05 | Tests         | P1       | No axe-core test for indeterminate state             | **FIXED** — axe test added                                      |
+| P1-06 | Tests         | P1       | No test for `input.indeterminate`                    | **FIXED** — asserts `input.indeterminate === true`              |
+| P1-07 | Tests         | P1       | Error slot has no test coverage                      | **FIXED** — slot + aria-describedby tested                      |
+| P1-08 | Storybook     | P1       | Empty-string attributes passed unconditionally       | **FIXED** — `ifDefined` used for error/helpText/name            |
+| P1-09 | TypeScript    | P1       | `indeterminate` missing `reflect: true`              | **FIXED** — reflects to host attribute                          |
+| P1-10 | Tests         | P1       | No test clicking label text                          | **FIXED** — label click test added                              |
+| P2-01 | Tests         | P2       | Tests use deprecated `WcCheckbox` type               | **FIXED** — uses `HelixCheckbox`                                |
+| P2-02 | CSS/Tokens    | P2       | Missing `--hx-checkbox-bg` component token           | **FIXED** — token added with fallback                           |
+| P2-03 | CSS/Tokens    | P2       | Help text color missing component token              | **FIXED** — `--hx-checkbox-help-text-color` used                |
+| P2-04 | HTML          | P2       | `tabindex="0"` redundant on native input             | **FIXED** — removed                                             |
+| P2-05 | TypeScript    | P2       | `Math.random()` for ID — collision risk              | **FIXED** — monotonic counter                                   |
+| P2-06 | TypeScript    | P2       | Redundant condition in `describedBy`                 | **FIXED** — simplified                                          |
+| P2-07 | Tests         | P2       | No tests for `hx-size` variants                      | **FIXED** — sm, lg, reflection tested                           |
+| P2-08 | Tests         | P2       | No test for `formStateRestoreCallback(null)`         | **FIXED** — null case tested                                    |
+| P2-09 | CSS           | P2       | `clip: rect(0,0,0,0)` deprecated                     | **FIXED** — `clip-path: inset(50%)`                             |
+| P2-10 | Drupal        | P2       | `hx-size` may conflict with htmx                     | **OPEN** — design decision, acknowledged risk                   |
+| P2-11 | Storybook     | P2       | `NoLabel` story lacks play function                  | **OPEN** — no runtime axe assertion on this pattern             |
+| P2-12 | Storybook     | P2       | `--hx-checkbox-bg` undocumented in stories           | **FIXED** — token exists, documented in JSDoc + Starlight       |
+| P2-13 | TypeScript    | P2       | `_hasErrorSlot` re-render edge case                  | **FIXED** — resolved by P0-01 wrapper pattern                   |
+| P2-14 | API           | P2       | Missing `checkmark` CSS part                         | **FIXED** — `part="checkmark"` on SVG                           |
+| P2-15 | Storybook     | P2       | Select-All stories use DOM anti-pattern              | **OPEN** — story-quality issue, not component bug               |
 
 ---
 
