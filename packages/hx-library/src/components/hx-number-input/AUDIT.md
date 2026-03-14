@@ -530,4 +530,4 @@ Healthcare contexts often show placeholder hints for expected format (e.g., `pla
 
 1. **Stepper `aria-hidden="true"` (Finding #6)** — Buttons are completely inaccessible to screen reader users. WCAG 2.1 AA violation. Must be fixed before merge.
 
-2. ~~**`@slot -` documents non-existent default slot (Finding #30)**~~ **FIXED** — `@slot -` removed from JSDoc; the named `slot="label"` is correctly documented and a `WithLabelSlot` story demonstrates the Drupal Form API pattern.
+2. **`@slot -` documents non-existent default slot (Finding #30)** — Drupal consumers following the documentation will silently lose server-rendered label content. Either add the slot or fix the documentation before merge.

@@ -18,13 +18,11 @@
 
 ## Summary
 
-_Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
-
-| Severity     | Baseline | Remaining |
-| ------------ | -------- | --------- |
-| P0 (Blocker) | 2        | 2         |
-| P1 (High)    | 8        | 7         |
-| P2 (Medium)  | 8        | 5         |
+| Severity     | Count | Fixed | Remaining |
+| ------------ | ----- | ----- | --------- |
+| P0 (Blocker) | 2     | 1     | 1         |
+| P1 (High)    | 8     | 0     | 8         |
+| P2 (Medium)  | 8     | 1     | 7         |
 
 ---
 
@@ -43,7 +41,7 @@ _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have b
 
 ---
 
-### P0-02: Test file imports nonexistent type `WcProse`
+### P0-02: Test file imports nonexistent type `WcProse` — FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 4
@@ -53,6 +51,8 @@ import type { WcProse } from './hx-prose.js';
 ```
 
 The component exports `HelixProse`, not `WcProse`. This import will produce a TypeScript error under strict mode (`'WcProse' is not exported from './hx-prose.js'`). The tests currently pass because the type is used only as a generic parameter to `fixture<WcProse>()`, and TypeScript may not enforce the import strictly in the test runner context — but it will fail `npm run type-check`. This is a broken type reference that violates the zero-TypeScript-errors gate.
+
+**Resolution:** Import corrected to `import type { HelixProse } from './hx-prose.js'` and all `fixture<WcProse>` generic usages updated to `fixture<HelixProse>`.
 
 ---
 
@@ -112,11 +112,18 @@ hx-prose p.lead {
 
 ---
 
-### ~~P1-04: `caption-side: bottom` — accessibility regression for data tables~~ ✅ FIXED
+### P1-04: `caption-side: bottom` — accessibility regression for data tables
 
 **File:** `styles/prose/prose.scoped.css`
+**Line:** ~406
 
-Changed `caption-side: bottom` to `caption-side: top` (with explanatory comment) so caption DOM order matches visual order — resolves WCAG H39 AT/visual mismatch for sighted screen-reader users.
+```css
+hx-prose caption {
+  caption-side: bottom;
+}
+```
+
+WCAG 2.1 Technique H39 and AT behavior: screen readers announce the table caption before the table data. When `caption-side: bottom`, some screen readers (especially NVDA + Chrome combinations) still read caption first (before the table) because `caption-side` is a visual-only property and does not affect the DOM order. However, the visual caption appearing below the table while AT reads it above creates a mismatch that is confusing for sighted users with screen readers. The WAI-ARIA authoring practices recommend caption at top (default) for data tables. In healthcare, data tables (lab results, medication schedules) must be immediately understandable. `caption-side: bottom` is an active accessibility risk.
 
 ---
 
@@ -202,13 +209,23 @@ The comment block uses `--wc-prose-*` (old namespace) while the actual CSS custo
 
 ---
 
-### ~~P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared~~ ✅ FIXED
+### P2-03: `align-left + *` / `align-right + *` sets `clear: none` — float not cleared
 
-**Fix:** Changed `clear: none` to `clear: both` in both `styles/prose/_drupal.css` and `styles/prose/prose.scoped.css`. Block-level content (headings, paragraphs) now starts below floated images rather than wrapping beside them. Updated comment explains the behavior and notes consumers can override with `clear: none` if wrap-around is intentional for their layout.
+**File:** `styles/prose/prose.scoped.css`
+**Lines:** ~730–733
+
+```css
+hx-prose .align-left + *,
+hx-prose .align-right + * {
+  clear: none;
+}
+```
+
+This rule explicitly prevents clearing floated content. CKEditor's `.align-left` and `.align-right` classes create floated elements. Setting `clear: none` on the following sibling means subsequent content will wrap around the float — which may be the intended visual behavior. However, if two consecutive floated images appear, or if a heading follows an aligned image, the heading may render adjacent to the floated image rather than below it. This is a layout bug waiting to happen in complex WYSIWYG content. The `clearfix` utility class exists (line ~795) but is opt-in. Most Drupal authors will not add it.
 
 ---
 
-### P2-04: `_styles` private member — redundant underscore prefix convention
+### P2-04: `_styles` private member — redundant underscore prefix convention — FIXED
 
 **File:** `hx-prose.ts`
 **Line:** 38
@@ -218,6 +235,8 @@ private _styles = new AdoptedStylesheetsController(this, helixProseScopedCss, do
 ```
 
 TypeScript's `private` keyword already enforces access restriction. The underscore prefix (`_styles`) is a JavaScript convention for "pseudo-private" that predates `private`. Using both simultaneously is redundant and inconsistent — other components in the library should be checked for consistency. If the codebase convention is `private` (TypeScript), the underscore prefix should be dropped.
+
+**Resolution:** Renamed to `private adoptedStyles = new AdoptedStylesheetsController(...)` — underscore prefix removed, consistent with TypeScript `private` access modifier usage across the library.
 
 ---
 
@@ -255,7 +274,7 @@ A CSS rule like `hx-prose { display: block; font-family: var(--hx-font-family-sa
 
 ---
 
-### ~~P2-07: Axe tests do not cover images without `alt` attribute~~ ✅ FIXED
+### P2-07: Axe tests do not cover images without `alt` attribute
 
 **File:** `hx-prose.test.ts`
 
@@ -280,20 +299,22 @@ This is important because the audit area note says "axe may not scan slot conten
 
 ---
 
-### ~~P2-08: Storybook does not appear to have stories for all HTML element types~~ ✅ FIXED
+### P2-08: Storybook does not appear to have stories for all HTML element types
 
 **File:** `hx-prose.stories.ts`
 
-The `AllContentTypes` story now covers all required HTML element types:
+From the available preview, stories include rich text demos and component compositions. The feature description requires "full rich text demo with all HTML elements, typography scale." The following should be verified against the published Storybook:
 
-- Blockquote with `<cite>` — covered
-- `<pre><code>` code blocks — covered
-- `<kbd>`, `<samp>`, `<var>` elements — added `<samp>` and `<var>` to "Keyboard and Technical Text" section
-- Definition lists (`<dl>`, `<dt>`, `<dd>`) — covered
-- `<figure>` with `<figcaption>` — covered
-- `<mark>`, `<del>`, `<ins>`, `<abbr title="">`, `<sub>`, `<sup>` — covered
-- Tables with `<caption>`, `<tfoot>`, and `scope` attributes — added `<tfoot>` and `scope` on all `<th>` elements
-- Drupal-specific markup classes — covered in `DrupalCKEditor` story
+- Blockquote with `<cite>`
+- `<pre><code>` code blocks with language class
+- `<kbd>`, `<samp>`, `<var>` elements
+- Definition lists (`<dl>`, `<dt>`, `<dd>`)
+- `<figure>` with `<figcaption>`
+- `<mark>`, `<del>`, `<ins>`, `<abbr title="">`, `<sub>`, `<sup>`
+- Tables with `<caption>`, `<tfoot>`, and scope attributes
+- Drupal-specific markup classes (`.field`, `.text-formatted`, `.align-left`, `.align-right`, `.messages`)
+
+If any of these are absent, Storybook coverage is incomplete. Stories cannot be autodoc-generated for these since they are slot content (not component properties), so they must be explicitly authored.
 
 ---
 

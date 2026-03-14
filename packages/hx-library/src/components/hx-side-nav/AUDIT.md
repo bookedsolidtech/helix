@@ -155,7 +155,7 @@ The assertion proves the element exists in the DOM, not that focus was moved to 
 
 ## P2 — Should Fix
 
-### P2-01: `_bodyEl` is declared but never used — dead code
+### P2-01: `_bodyEl` is declared but never used — dead code — FIXED
 
 **File:** `hx-side-nav.ts:56-57`
 
@@ -166,9 +166,11 @@ private _bodyEl!: HTMLDivElement;
 
 This `@query` decorator is declared but not referenced anywhere in the class. It adds a getter with a DOM query that runs on every access for no benefit.
 
+**Resolution:** Removed unused `@query('.side-nav__body') private _bodyEl` declaration.
+
 ---
 
-### P2-02: Exported type alias uses `Wc` prefix instead of project `Hx` prefix
+### P2-02: Exported type alias uses `Wc` prefix instead of project `Hx` prefix — FIXED
 
 **File:** `hx-side-nav.ts:231`, `hx-nav-item.ts:164`
 
@@ -178,6 +180,8 @@ export type { HelixNavItem as WcNavItem };
 ```
 
 All other components use the `Hx` prefix for exported aliases (e.g., `HxButton`). These use `WcSideNav`/`WcNavItem`, which is inconsistent and leaks the old `wc-2026` naming into the public API surface.
+
+**Resolution:** Updated to `export type { HelixSideNav as HxSideNav }` and `export type { HelixNavItem as HxNavItem }` to match the project's `Hx` prefix convention.
 
 ---
 
