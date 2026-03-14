@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, userEvent, within } from 'storybook/test';
 import './hx-alert.js';
 
@@ -94,7 +95,7 @@ const meta = {
       ?open=${args.open}
       ?show-icon=${args.icon}
       ?accent=${args.accent}
-      return-focus-to=${args['return-focus-to'] || ''}
+      return-focus-to=${ifDefined(args['return-focus-to'] || undefined)}
     >
       ${args.message}
     </hx-alert>
