@@ -18,11 +18,21 @@
 
 ## Summary
 
+<<<<<<< HEAD
 | Severity     | Count |
 | ------------ | ----- |
 | P0 (Blocker) | 2     |
 | P1 (High)    | 8     |
 | P2 (Medium)  | 8     |
+=======
+_Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
+
+| Severity     | Baseline | Remaining |
+| ------------ | -------- | --------- |
+| P0 (Blocker) | 2        | 2         |
+| P1 (High)    | 8        | 7         |
+| P2 (Medium)  | 8        | 7         |
+>>>>>>> origin/dev
 
 ---
 
@@ -41,7 +51,7 @@
 
 ---
 
-### P0-02: Test file imports nonexistent type `WcProse`
+### P0-02: Test file imports nonexistent type `WcProse` — FIXED
 
 **File:** `hx-prose.test.ts`
 **Line:** 4
@@ -51,6 +61,8 @@ import type { WcProse } from './hx-prose.js';
 ```
 
 The component exports `HelixProse`, not `WcProse`. This import will produce a TypeScript error under strict mode (`'WcProse' is not exported from './hx-prose.js'`). The tests currently pass because the type is used only as a generic parameter to `fixture<WcProse>()`, and TypeScript may not enforce the import strictly in the test runner context — but it will fail `npm run type-check`. This is a broken type reference that violates the zero-TypeScript-errors gate.
+
+**Resolution:** Import corrected to `import type { HelixProse } from './hx-prose.js'` and all `fixture<WcProse>` generic usages updated to `fixture<HelixProse>`.
 
 ---
 
@@ -223,7 +235,7 @@ This rule explicitly prevents clearing floated content. CKEditor's `.align-left`
 
 ---
 
-### P2-04: `_styles` private member — redundant underscore prefix convention
+### P2-04: `_styles` private member — redundant underscore prefix convention — FIXED
 
 **File:** `hx-prose.ts`
 **Line:** 38
@@ -233,6 +245,8 @@ private _styles = new AdoptedStylesheetsController(this, helixProseScopedCss, do
 ```
 
 TypeScript's `private` keyword already enforces access restriction. The underscore prefix (`_styles`) is a JavaScript convention for "pseudo-private" that predates `private`. Using both simultaneously is redundant and inconsistent — other components in the library should be checked for consistency. If the codebase convention is `private` (TypeScript), the underscore prefix should be dropped.
+
+**Resolution:** Renamed to `private adoptedStyles = new AdoptedStylesheetsController(...)` — underscore prefix removed, consistent with TypeScript `private` access modifier usage across the library.
 
 ---
 

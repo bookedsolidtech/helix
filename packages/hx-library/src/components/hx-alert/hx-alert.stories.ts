@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within } from 'storybook/test';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { expect, userEvent, within } from 'storybook/test';
 import './hx-alert.js';
 
 // ─────────────────────────────────────────────────
@@ -57,12 +58,34 @@ const meta = {
         type: { summary: 'string (slot)' },
       },
     },
+    accent: {
+      control: 'boolean',
+      description:
+        'When true, applies a left border accent stripe instead of a full border. Common in enterprise healthcare dashboards for visual distinction.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    'return-focus-to': {
+      control: 'text',
+      description:
+        'CSS selector for the element to return focus to after the alert is dismissed. Critical accessibility pattern to prevent focus loss after dismissal.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'null' },
+        type: { summary: 'string | null' },
+      },
+    },
   },
   args: {
     variant: 'info',
     dismissible: false,
     open: true,
     icon: true,
+    accent: false,
+    'return-focus-to': '',
     message: 'Your session will expire in 15 minutes. Please save your work.',
   },
   render: (args) => html`
@@ -71,6 +94,8 @@ const meta = {
       ?dismissible=${args.dismissible}
       ?open=${args.open}
       ?show-icon=${args.icon}
+      ?accent=${args.accent}
+      return-focus-to=${ifDefined(args['return-focus-to'] || undefined)}
     >
       ${args.message}
     </hx-alert>
@@ -92,7 +117,6 @@ export const Default: Story = {
     message: 'Your session will expire in 15 minutes. Please save your work.',
   },
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const alert = canvasElement.querySelector('hx-alert');
 
     await expect(alert).toBeTruthy();
@@ -288,7 +312,7 @@ export const WithActions: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
           "
         >
           View Results
@@ -302,7 +326,7 @@ export const WithActions: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
             text-decoration: underline;
           "
         >
@@ -328,7 +352,7 @@ export const WithActions: Story = {
 /** All four alert variants displayed together for visual comparison. */
 export const AllVariants: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
       <hx-alert variant="info">
         <strong>Information:</strong> Your session will expire in 15 minutes. Save all open patient
         records.
@@ -361,7 +385,7 @@ export const AllVariants: Story = {
 /** All state combinations: dismissible, non-dismissible, with actions, with custom icon. */
 export const AllStates: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
       <hx-alert variant="info">
         <strong>Default:</strong> Non-dismissible, no actions, default icon.
       </hx-alert>
@@ -382,7 +406,7 @@ export const AllStates: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
           "
         >
           View Lab Report
@@ -429,7 +453,7 @@ export const AllStates: Story = {
 /** Multiple stacked alerts simulating a healthcare drug interaction warning panel. */
 export const StackedAlerts: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 0.5rem; max-width: 600px;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-2, 0.5rem); max-width: 600px;">
       <hx-alert variant="error" dismissible>
         <strong>Drug-Drug Interaction (Severity: Major):</strong> Warfarin + Aspirin. Increased risk
         of bleeding. Consider alternative antiplatelet therapy.
@@ -478,7 +502,7 @@ export const InAContainer: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
           "
         >
           View Details
@@ -525,7 +549,7 @@ export const LongContent: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
           "
         >
           Acknowledge
@@ -539,7 +563,7 @@ export const LongContent: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
             text-decoration: underline;
           "
         >
@@ -638,16 +662,16 @@ export const RapidToggle: Story = {
  */
 export const CSSCustomProperties: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem); max-width: 600px;">
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           Default (no overrides)
         </p>
         <hx-alert variant="info"> Standard alert using default design token values. </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           Custom: --hx-alert-bg, --hx-alert-color, --hx-alert-border-color
         </p>
         <hx-alert
@@ -663,7 +687,7 @@ export const CSSCustomProperties: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           Custom: --hx-alert-border-radius, --hx-alert-border-width
         </p>
         <hx-alert
@@ -678,7 +702,7 @@ export const CSSCustomProperties: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           Custom: --hx-alert-padding, --hx-alert-gap
         </p>
         <hx-alert
@@ -693,7 +717,7 @@ export const CSSCustomProperties: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           Custom: --hx-alert-icon-color
         </p>
         <hx-alert variant="info" style="--hx-alert-icon-color: #7c3aed;">
@@ -702,7 +726,7 @@ export const CSSCustomProperties: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           Custom: --hx-alert-font-family
         </p>
         <hx-alert variant="info" style="--hx-alert-font-family: 'Georgia', serif;">
@@ -711,7 +735,7 @@ export const CSSCustomProperties: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           All properties combined
         </p>
         <hx-alert
@@ -734,16 +758,16 @@ export const CSSCustomProperties: Story = {
         </hx-alert>
       </div>
 
-      <details style="font-size: 0.8125rem; margin-top: 0.5rem;">
+      <details style="font-size: var(--hx-font-size-xs, 0.8125rem); margin-top: var(--hx-space-2, 0.5rem);">
         <summary style="cursor: pointer; font-weight: 600;">View CSS code</summary>
         <pre
           style="
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            border: 1px solid #e2e8f0;
+            background: var(--hx-color-surface-subtle, #f8fafc);
+            padding: var(--hx-space-4, 1rem);
+            border-radius: var(--hx-border-radius-md, 0.375rem);
+            border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #e2e8f0);
             overflow-x: auto;
-            font-size: 0.75rem;
+            font-size: var(--hx-font-size-xs, 0.75rem);
             line-height: 1.6;
           "
         ><code>hx-alert {
@@ -816,8 +840,8 @@ export const CSSParts: Story = {
     </style>
 
     <div class="parts-demo" style="max-width: 600px;">
-      <div style="margin-bottom: 1.5rem;">
-        <p style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem;">
+      <div style="margin-bottom: var(--hx-space-6, 1.5rem);">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
           All parts styled externally via ::part()
         </p>
         <hx-alert variant="info" dismissible>
@@ -828,13 +852,13 @@ export const CSSParts: Story = {
           <button
             slot="actions"
             style="
-              padding: 0.25rem 0.75rem;
-              border: 1px solid #3b82f6;
-              border-radius: 0.25rem;
-              background: #3b82f6;
-              color: white;
+              padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
+              border: var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-500, #3b82f6);
+              border-radius: var(--hx-border-radius-sm, 0.25rem);
+              background: var(--hx-color-primary-500, #3b82f6);
+              color: var(--hx-color-text-on-primary, #fff);
               cursor: pointer;
-              font-size: 0.8125rem;
+              font-size: var(--hx-font-size-xs, 0.8125rem);
             "
           >
             Accept
@@ -842,13 +866,13 @@ export const CSSParts: Story = {
           <button
             slot="actions"
             style="
-              padding: 0.25rem 0.75rem;
-              border: 1px solid #93c5fd;
-              border-radius: 0.25rem;
+              padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
+              border: var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-300, #93c5fd);
+              border-radius: var(--hx-border-radius-sm, 0.25rem);
               background: transparent;
-              color: #1e40af;
+              color: var(--hx-color-primary-800, #1e40af);
               cursor: pointer;
-              font-size: 0.8125rem;
+              font-size: var(--hx-font-size-xs, 0.8125rem);
             "
           >
             Decline
@@ -856,16 +880,16 @@ export const CSSParts: Story = {
         </hx-alert>
       </div>
 
-      <details style="font-size: 0.8125rem;">
+      <details style="font-size: var(--hx-font-size-xs, 0.8125rem);">
         <summary style="cursor: pointer; font-weight: 600;">View CSS code</summary>
         <pre
           style="
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            border: 1px solid #e2e8f0;
+            background: var(--hx-color-surface-subtle, #f8fafc);
+            padding: var(--hx-space-4, 1rem);
+            border-radius: var(--hx-border-radius-md, 0.375rem);
+            border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #e2e8f0);
             overflow-x: auto;
-            font-size: 0.75rem;
+            font-size: var(--hx-font-size-xs, 0.75rem);
             line-height: 1.6;
           "
         ><code>hx-alert::part(alert) {
@@ -1010,7 +1034,7 @@ export const KeyboardDismiss: Story = {
  */
 export const AriaRoles: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
       <hx-alert variant="info" data-testid="alert-info">
         Info uses role="status" (implicit polite announcement).
       </hx-alert>
@@ -1062,14 +1086,14 @@ export const DrugAllergyWarning: Story = {
       <hx-alert variant="error" dismissible>
         <strong>ALLERGY ALERT - Penicillin (Anaphylaxis)</strong>
         <br />
-        <span style="display: block; margin-top: 0.25rem;">
+        <span style="display: block; margin-top: var(--hx-space-1, 0.25rem);">
           Patient: Johnson, Maria (MRN: 00482195)
           <br />
           Documented reaction: Anaphylaxis (severity: Life-Threatening)
           <br />
           Recorded: 2024-03-14 by Dr. Sarah Chen, MD
           <br />
-          <em style="display: block; margin-top: 0.25rem;">
+          <em style="display: block; margin-top: var(--hx-space-1, 0.25rem);">
             The ordered medication Amoxicillin belongs to the Penicillin class. Cross-reactivity
             risk is approximately 1-2%. Physician override required to proceed.
           </em>
@@ -1083,7 +1107,7 @@ export const DrugAllergyWarning: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
             font-weight: 600;
           "
         >
@@ -1098,7 +1122,7 @@ export const DrugAllergyWarning: Story = {
             background: transparent;
             color: inherit;
             cursor: pointer;
-            font-size: 0.8125rem;
+            font-size: var(--hx-font-size-xs, 0.8125rem);
             text-decoration: underline;
           "
         >
@@ -1124,24 +1148,233 @@ export const DrugAllergyWarning: Story = {
   },
 };
 
+// ─────────────────────────────────────────────────
+// ACCENT VARIANT (P2-04)
+// ─────────────────────────────────────────────────
+
+/**
+ * The `accent` property applies a left border stripe instead of a full border.
+ * Common in enterprise healthcare dashboards where inline alerts must visually
+ * differentiate from bordered card containers. Use when a softer visual weight
+ * is needed without losing the semantic color coding of the alert.
+ */
+export const AccentVariant: Story = {
+  name: 'Accent (Left Border Stripe)',
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
+    >
+      <hx-alert variant="info" accent>
+        <strong>Session activity:</strong> Your patient chart session will expire in 10 minutes.
+        Save any unsaved progress before the session ends.
+      </hx-alert>
+      <hx-alert variant="success" accent>
+        <strong>Prior authorization approved:</strong> PA #2026-04891 for Adalimumab 40mg/0.4ml has
+        been approved by the patient's insurer. Valid through 2026-09-30.
+      </hx-alert>
+      <hx-alert variant="warning" accent>
+        <strong>Allergy on file:</strong> Patient has a documented allergy to Penicillin
+        (anaphylaxis). Review all antibiotic orders before administration.
+      </hx-alert>
+      <hx-alert variant="error" accent>
+        <strong>Critical lab value:</strong> Potassium 6.4 mEq/L (reference: 3.5–5.0). Immediate
+        physician review required.
+      </hx-alert>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const alerts = canvasElement.querySelectorAll('hx-alert');
+    await expect(alerts.length).toBe(4);
+
+    for (const alert of Array.from(alerts)) {
+      await expect(alert.accent).toBe(true);
+      // Accent variant still carries semantic role on the host
+      const role = alert.getAttribute('role');
+      await expect(['status', 'alert']).toContain(role);
+    }
+  },
+};
+
+// ─────────────────────────────────────────────────
+// WITH TITLE SLOT (P2-04)
+// ─────────────────────────────────────────────────
+
+/**
+ * The `title` slot adds a structured headline above the alert message body.
+ * Use for alerts that require a distinct heading to orient the user before
+ * presenting action details — common in clinical workflow notifications where
+ * the title conveys urgency and the body provides instructional content.
+ */
+export const WithTitle: Story = {
+  name: 'With Title Slot',
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
+    >
+      <hx-alert variant="error" dismissible>
+        <strong slot="title">Drug Interaction — High Risk</strong>
+        Concurrent use of Warfarin and Amoxicillin may potentiate the anticoagulant effect. Monitor
+        INR closely and consider dose adjustment. Consult pharmacy before prescribing.
+      </hx-alert>
+
+      <hx-alert variant="warning" dismissible>
+        <strong slot="title">Isolation Precautions Required</strong>
+        Patient is in Contact Isolation (MRSA). Gown and gloves required for all direct contact.
+        Dedicated equipment must remain in room.
+      </hx-alert>
+
+      <hx-alert variant="success">
+        <strong slot="title">Authorization Approved</strong>
+        Prior authorization #PA-2026-09281 for Adalimumab 40mg injection has been approved. Valid
+        for 12 months from today's date.
+      </hx-alert>
+
+      <hx-alert variant="info">
+        <strong slot="title">Scheduled Downtime Notice</strong>
+        The EHR system will be unavailable on Saturday March 15 from 02:00–04:00 AM for routine
+        maintenance. Plan patient documentation accordingly.
+      </hx-alert>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const alerts = canvasElement.querySelectorAll('hx-alert');
+    await expect(alerts.length).toBe(4);
+
+    // Verify all alerts have slotted title content
+    for (const alert of Array.from(alerts)) {
+      const titleSlot = alert.querySelector('[slot="title"]');
+      await expect(titleSlot).toBeTruthy();
+    }
+
+    // Error alert with title must still use role="alert"
+    await expect(alerts[0].getAttribute('role')).toBe('alert');
+    // Info alert with title must use role="status"
+    await expect(alerts[3].getAttribute('role')).toBe('status');
+  },
+};
+
+// ─────────────────────────────────────────────────
+// FOCUS RETURN PATTERN (P2-04)
+// ─────────────────────────────────────────────────
+
+/**
+ * The `return-focus-to` property accepts a CSS selector. After the alert is
+ * dismissed, focus is programmatically returned to the matching element.
+ * This is a critical accessibility pattern — without it, focus is lost to the
+ * `<body>` when a dismissible alert is removed from the tab order.
+ *
+ * Use this for dismissible alerts that appear in response to user actions
+ * so focus returns to the triggering element (e.g., the button that opened
+ * the notification, or the form field that caused a validation error).
+ */
+export const FocusReturn: Story = {
+  name: 'Focus Return After Dismiss',
+  render: () => html`
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
+    >
+      <p
+        style="font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary); margin: 0;"
+      >
+        Click "Submit Order" to show a dismissible confirmation alert. When dismissed, focus returns
+        to the submit button via <code>return-focus-to="#submit-order-btn"</code>.
+      </p>
+
+      <div style="display: flex; gap: var(--hx-space-3, 0.75rem); align-items: center;">
+        <button
+          id="submit-order-btn"
+          style="
+            padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+            background: var(--hx-color-primary-500, #2563eb);
+            color: var(--hx-color-text-on-primary, white);
+            border: none;
+            border-radius: var(--hx-border-radius-md, 0.375rem);
+            cursor: pointer;
+            font-size: var(--hx-font-size-sm, 0.875rem);
+          "
+          onclick="document.getElementById('focus-return-alert').open = true;"
+        >
+          Submit Order
+        </button>
+        <button
+          style="
+            padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+            background: var(--hx-color-surface-default, white);
+            color: var(--hx-color-text-primary);
+            border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default);
+            border-radius: var(--hx-border-radius-md, 0.375rem);
+            cursor: pointer;
+            font-size: var(--hx-font-size-sm, 0.875rem);
+          "
+        >
+          Cancel
+        </button>
+      </div>
+
+      <hx-alert
+        id="focus-return-alert"
+        variant="success"
+        dismissible
+        return-focus-to="#submit-order-btn"
+        ?open=${false}
+      >
+        <strong slot="title">Order Submitted</strong>
+        Medication order #RX-2026-04928 has been submitted to the pharmacy. Expected processing time
+        is 30 minutes. Dismiss to return focus to the order form.
+      </hx-alert>
+
+      <p
+        style="font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-text-muted); margin: 0;"
+      >
+        After dismissing the alert, verify focus returns to the "Submit Order" button. This pattern
+        ensures keyboard and AT users are never stranded after a dynamic UI change.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const alert = canvasElement.querySelector('#focus-return-alert') as HTMLElement & {
+      open: boolean;
+      updateComplete: Promise<void>;
+    };
+    await expect(alert).toBeTruthy();
+
+    // Open the alert programmatically to make the dismiss button accessible
+    alert.open = true;
+    await alert.updateComplete;
+
+    // Locate the dismiss button inside the shadow DOM
+    const closeButton = alert.shadowRoot?.querySelector('[part="close-button"]') as HTMLElement;
+    await expect(closeButton).toBeTruthy();
+
+    // Click the dismiss button and await the transition
+    await userEvent.click(closeButton);
+    await alert.updateComplete;
+
+    // After dismissal, focus must return to the submit button
+    const submitBtn = canvas.getByText('Submit Order') as HTMLElement;
+    await expect(document.activeElement).toBe(submitBtn);
+  },
+};
+
 /** Multiple severity alerts stacked in a patient chart context, ordered by clinical priority. */
 export const PatientSafetyStack: Story = {
   render: () => html`
     <div
       style="
         max-width: 640px;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
+        border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #e2e8f0);
+        border-radius: var(--hx-border-radius-md, 0.5rem);
         overflow: hidden;
       "
     >
       <div
         style="
-          padding: 0.75rem 1rem;
-          background: #f8fafc;
-          border-bottom: 1px solid #e2e8f0;
+          padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
+          background: var(--hx-color-surface-subtle, #f8fafc);
+          border-bottom: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #e2e8f0);
           font-weight: 600;
-          font-size: 0.875rem;
+          font-size: var(--hx-font-size-sm, 0.875rem);
           font-family: system-ui, sans-serif;
         "
       >
@@ -1151,8 +1384,8 @@ export const PatientSafetyStack: Story = {
         style="
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
-          padding: 1rem;
+          gap: var(--hx-space-2, 0.5rem);
+          padding: var(--hx-space-4, 1rem);
         "
       >
         <hx-alert variant="error" dismissible>
@@ -1171,13 +1404,13 @@ export const PatientSafetyStack: Story = {
           <button
             slot="actions"
             style="
-              padding: 0.25rem 0.75rem;
-              border: 1px solid currentColor;
-              border-radius: 0.25rem;
+              padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
+              border: var(--hx-border-width-thin, 1px) solid currentColor;
+              border-radius: var(--hx-border-radius-sm, 0.25rem);
               background: transparent;
               color: inherit;
               cursor: pointer;
-              font-size: 0.8125rem;
+              font-size: var(--hx-font-size-xs, 0.8125rem);
             "
           >
             View Precaution Details
@@ -1220,9 +1453,9 @@ export const PatientSafetyStack: Story = {
     await expect(closeBtn).toBeNull();
 
     // Error alerts must use role="alert" for immediate announcement
+    // Role is on the host element, not the shadow DOM internal div
     for (let i = 0; i < 2; i++) {
-      const container = alerts[i].shadowRoot?.querySelector('[part="alert"]');
-      await expect(container?.getAttribute('role')).toBe('alert');
+      await expect(alerts[i].getAttribute('role')).toBe('alert');
     }
   },
 };

@@ -197,9 +197,17 @@ Only Arrow keys are handled. This is expected behavior that AT users and power k
 
 ---
 
-### ~~P2-2: `Math.random()` IDs break SSR / Drupal hydration~~ ✅ FIXED
+### P2-2: `Math.random()` IDs break SSR / Drupal hydration
 
-**Fix applied:** `_groupId` now uses a monotonically incrementing module-level counter (`++_groupCounter`) instead of `Math.random()`. IDs are deterministic within a page session and do not cause `aria-describedby` reference mismatches between Drupal server-rendered markup and client hydration.
+**File:** `hx-radio-group.ts:111–113`
+
+```ts
+private _groupId = `hx-radio-group-${Math.random().toString(36).slice(2, 9)}`;
+```
+
+IDs generated with `Math.random()` differ between server (Drupal/Twig pre-render) and client hydration. `aria-describedby` references will point to IDs that don't exist in the server-rendered DOM.
+
+**Fix:** Use a deterministic ID strategy (e.g., `name` attribute as seed, or a monotonically incrementing counter).
 
 ---
 
@@ -257,18 +265,11 @@ The feature spec mentions "selected-value typing." Common radio group APIs (Shoe
 
 ---
 
-### P2-7: Storybook missing individual-radio-disabled story
+### P2-7: Storybook missing individual-radio-disabled story — ✅ FIXED
 
 **File:** `hx-radio-group.stories.ts`
 
-Stories cover:
-
-- Group-level `disabled`
-- Required state
-- Error state
-- Horizontal/vertical orientation
-
-There is no dedicated story for a mixed state (one radio disabled within an enabled group), which is a valid and distinct state that Drupal consumers will use.
+**Resolution:** The `SingleDisabledOption` story demonstrates a mixed state: one `hx-radio` with `disabled` attribute inside an enabled group. The story includes a play function verifying that the disabled radio has the `disabled` attribute while enabled radios remain interactive and update the group value on click.
 
 ---
 
@@ -290,26 +291,26 @@ it('has no axe violations in default state', async () => {
 
 ## Summary Table
 
-| ID   | Severity | Area            | Description                                                    |
-| ---- | -------- | --------------- | -------------------------------------------------------------- |
-| P0-1 | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible            |
-| P0-2 | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)        |
-| P0-3 | P0       | Form/Validation | Required validity not initialized on first render              |
+| ID   | Severity | Area            | Description                                                                                                                      |
+| ---- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| P0-1 | P0       | Accessibility   | Focus ring CSS targets hidden input — never visible                                                                              |
+| P0-2 | P0       | Accessibility   | Space key does not select radio (`role="radio"` breach)                                                                          |
+| P0-3 | P0       | Form/Validation | Required validity not initialized on first render                                                                                |
 | P1-1 | P1       | Behavior        | ~~Re-enabling disabled group leaves radios permanently off~~ ✅ FIXED — `_individualDisabledStates` map restores per-radio state |
-| P1-2 | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature                |
-| P1-3 | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards              |
-| P1-4 | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby`        |
-| P1-5 | P1       | Accessibility   | No `aria-required` on radiogroup                               |
-| P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM        |
-| P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)        |
-| P2-1 | P2       | Performance     | ~~Double `setFormValue`/`_syncRadios`/`_updateValidity`~~ ✅ FIXED — single call path via `updated()` |
-| P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used |
-| P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default         |
-| P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                 |
-| P2-5 | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)              |
-| P2-6 | P2       | API             | No `selected-value` alias (naming gap vs other libraries)      |
-| P2-7 | P2       | Storybook       | No mixed-disabled story (partial disable state)                |
-| P2-8 | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal ✅ FIXED |
+| P1-2 | P1       | TypeScript      | `formStateRestoreCallback` wrong spec signature                                                                                  |
+| P1-3 | P1       | TypeScript      | `_groupEl!` non-null assertion violates standards                                                                                |
+| P1-4 | P1       | Accessibility   | `_hasErrorSlot` dead code + dangling `aria-describedby`                                                                          |
+| P1-5 | P1       | Accessibility   | No `aria-required` on radiogroup                                                                                                 |
+| P1-6 | P1       | Accessibility   | No `aria-labelledby` — legend naming unreliable in SDOM                                                                          |
+| P1-7 | P1       | Accessibility   | Missing `Home`/`End` keyboard support (APG requirement)                                                                          |
+| P2-1 | P2       | Performance     | ~~Double `setFormValue`/`_syncRadios`/`_updateValidity`~~ ✅ FIXED — single call path via `updated()`                            |
+| P2-2 | P2       | Drupal/SSR      | ~~`Math.random()` IDs break server/client hydration~~ ✅ FIXED — monotonic counter used                                          |
+| P2-3 | P2       | TypeScript/A11y | `role` set imperatively, not in CEM, no static default                                                                           |
+| P2-4 | P2       | Accessibility   | `role="alert"` + `aria-live="polite"` conflict                                                                                   |
+| P2-5 | P2       | Accessibility   | Disabled focus ring state gap (follow-on to P0-1)                                                                                |
+| P2-6 | P2       | API             | No `selected-value` alias (naming gap vs other libraries)                                                                        |
+| P2-7 | P2       | Storybook       | No mixed-disabled story (partial disable state)                                                                                  |
+| P2-8 | P2       | Testing         | `hx-radio` axe test runs orphaned — misleading signal ✅ FIXED                                                                   |
 
 **Total findings: 3 P0, 7 P1, 8 P2**
 

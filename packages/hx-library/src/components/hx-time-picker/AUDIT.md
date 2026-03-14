@@ -100,8 +100,8 @@ There are no tests for this behavior and no Storybook story demonstrating it.
 **File:** `hx-time-picker.ts:349-352`
 
 ```html
-<div role="combobox" aria-owns="${ifDefined(this._open" ? this._listboxId : undefined)}>
-  <input aria-controls="${ifDefined(this._open" ? this._listboxId : undefined)} />
+<div role="combobox" aria-owns="${ifDefined(this._open ? this._listboxId : undefined)}">
+  <input aria-controls="${ifDefined(this._open ? this._listboxId : undefined)}" />
 </div>
 ```
 
@@ -220,18 +220,15 @@ The CSS Custom Properties and CSS Parts demonstration stories use hardcoded hex 
 
 ---
 
-### ~~A-14 — `Math.random()` for stable IDs is not SSR-safe~~ FIXED [P2]
+### A-14 — `Math.random()` for stable IDs is not SSR-safe [P2]
 
-**File:** `hx-time-picker.ts`
-
-**Resolution:** `Math.random()` replaced with a static class-level monotonically incrementing counter:
+**File:** `hx-time-picker.ts:242-245`
 
 ```ts
-private static _instanceCount = 0;
-private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
+private readonly _id = `hx-time-picker-${Math.random().toString(36).slice(2, 9)}`;
 ```
 
-IDs are now deterministic per page render order. `<label for>` associations, `aria-labelledby` references, and `aria-controls` listbox linkage remain stable across server-render and client-side hydration in Drupal Declarative Shadow DOM contexts. The static counter is scoped to the class, ensuring uniqueness across all instances on the page.
+Random IDs generated at construction time differ between server-rendered HTML and client-side hydration. For Drupal's Declarative Shadow DOM or any SSR rendering pipeline, this causes ID mismatches that break `<label for="...">` associations after hydration. Consider using a monotonically incrementing counter (e.g., `static _instanceCount = 0`) for deterministic IDs.
 
 ---
 
@@ -333,30 +330,30 @@ The restored state is set directly to `this.value` without validation. If the br
 
 ## Summary
 
-| ID       | Area          | Severity | Title                                                            |
-| -------- | ------------- | -------- | ---------------------------------------------------------------- |
-| A-01     | Accessibility | P0       | `role="combobox"` on wrapper div violates ARIA 1.2               |
-| A-02     | Accessibility | P0       | `role="alert"` + `aria-live="polite"` contradiction              |
-| A-03     | Accessibility | P1       | Slotted label breaks `<label for>` association                   |
-| A-04     | Accessibility | P1       | Missing `Home`/`End` keyboard navigation                         |
-| A-05     | Accessibility | P1       | Deprecated `aria-owns` redundant with `aria-controls`            |
-| A-06     | Performance   | P1       | `_slots` getter regenerates on every invocation                  |
-| A-07     | TypeScript    | P1       | `formStateRestoreCallback` signature incomplete per spec         |
-| A-08     | Tests         | P1       | No tests for user-typed input via `parseUserInput`               |
-| A-09     | Tests         | P1       | No tests for live-typing (`_handleInputInput`)                   |
-| A-10     | Tests         | P1       | `axe-core` not tested with dropdown open                         |
-| A-11     | CSS Parts     | P1       | Toggle button missing `part` attribute                           |
-| A-12     | CEM/Docs      | P1       | `--hx-time-picker-listbox-shadow` token undocumented             |
-| A-13     | Storybook     | P1       | Hardcoded hex values in CSS demo stories                         |
-| ~~A-14~~ | TypeScript    | P2       | ~~`Math.random()` IDs not SSR-safe~~ FIXED: static class counter |
-| A-15     | CSS           | P2       | Listbox clipped by ancestor `overflow: hidden`                   |
-| A-16     | Performance   | P2       | `_slots` not memoized; format change regenerates                 |
-| A-17     | CSS           | P2       | `color-mix()` not supported in Safari < 16.2                     |
-| A-18     | Architecture  | P2       | Inline SVG should use `hx-icon` component                        |
-| A-19     | CSS           | P2       | No RTL layout support                                            |
-| A-20     | Tests         | P2       | `step=0`/negative step guard untested                            |
-| A-21     | TypeScript    | P2       | Restored state not validated or clamped                          |
-| A-22     | Tests         | P2       | No test confirming `hx-change` absent on form reset              |
+| ID   | Area          | Severity | Title                                                    |
+| ---- | ------------- | -------- | -------------------------------------------------------- |
+| A-01 | Accessibility | P0       | `role="combobox"` on wrapper div violates ARIA 1.2       |
+| A-02 | Accessibility | P0       | `role="alert"` + `aria-live="polite"` contradiction      |
+| A-03 | Accessibility | P1       | Slotted label breaks `<label for>` association           |
+| A-04 | Accessibility | P1       | Missing `Home`/`End` keyboard navigation                 |
+| A-05 | Accessibility | P1       | Deprecated `aria-owns` redundant with `aria-controls`    |
+| A-06 | Performance   | P1       | `_slots` getter regenerates on every invocation          |
+| A-07 | TypeScript    | P1       | `formStateRestoreCallback` signature incomplete per spec |
+| A-08 | Tests         | P1       | No tests for user-typed input via `parseUserInput`       |
+| A-09 | Tests         | P1       | No tests for live-typing (`_handleInputInput`)           |
+| A-10 | Tests         | P1       | `axe-core` not tested with dropdown open                 |
+| A-11 | CSS Parts     | P1       | Toggle button missing `part` attribute                   |
+| A-12 | CEM/Docs      | P1       | `--hx-time-picker-listbox-shadow` token undocumented     |
+| A-13 | Storybook     | P1       | Hardcoded hex values in CSS demo stories                 |
+| A-14 | TypeScript    | P2       | `Math.random()` IDs not SSR-safe                         |
+| A-15 | CSS           | P2       | Listbox clipped by ancestor `overflow: hidden`           |
+| A-16 | Performance   | P2       | `_slots` not memoized; format change regenerates         |
+| A-17 | CSS           | P2       | `color-mix()` not supported in Safari < 16.2             |
+| A-18 | Architecture  | P2       | Inline SVG should use `hx-icon` component                |
+| A-19 | CSS           | P2       | No RTL layout support                                    |
+| A-20 | Tests         | P2       | `step=0`/negative step guard untested                    |
+| A-21 | TypeScript    | P2       | Restored state not validated or clamped                  |
+| A-22 | Tests         | P2       | No test confirming `hx-change` absent on form reset      |
 
 **P0 count: 2 — BLOCKS MERGE**
 **P1 count: 11**

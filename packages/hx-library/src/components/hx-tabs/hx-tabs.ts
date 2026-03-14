@@ -167,7 +167,7 @@ export class HelixTabs extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: Map<PropertyKey, unknown>): void {
     super.updated(changedProperties);
     if (changedProperties.has('_activePanel')) {
       this._updateTabsAndPanels();

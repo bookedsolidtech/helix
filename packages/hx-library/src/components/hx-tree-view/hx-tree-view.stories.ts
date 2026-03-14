@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent, within } from 'storybook/test';
 import './hx-tree-view.js';
 import './hx-tree-item.js';
 
@@ -115,7 +116,9 @@ export const MultipleSelection: Story = {
     <hx-tree-view label="ICD-10 categories" selection="multiple">
       <hx-tree-item expanded>
         ICD-10 Categories
-        <hx-tree-item slot="children" selected>A00-A09: Intestinal infectious diseases</hx-tree-item>
+        <hx-tree-item slot="children" selected
+          >A00-A09: Intestinal infectious diseases</hx-tree-item
+        >
         <hx-tree-item slot="children" selected>A15-A19: Tuberculosis</hx-tree-item>
         <hx-tree-item slot="children">A20-A28: Certain zoonotic bacterial diseases</hx-tree-item>
         <hx-tree-item slot="children">A30-A49: Other bacterial diseases</hx-tree-item>
@@ -197,26 +200,26 @@ export const WithIcons: Story = {
   render: () => html`
     <hx-tree-view label="Patient records" selection="single">
       <hx-tree-item expanded>
-        <span slot="icon" style="font-size: 1rem;">&#128193;</span>
+        <span slot="icon" style="font-size: var(--hx-font-size-base, 1rem);">&#128193;</span>
         Patient Records
         <hx-tree-item slot="children">
-          <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+          <span slot="icon" style="font-size: var(--hx-font-size-base, 1rem);">&#128196;</span>
           Admission Notes
         </hx-tree-item>
         <hx-tree-item slot="children" expanded>
-          <span slot="icon" style="font-size: 1rem;">&#128193;</span>
+          <span slot="icon" style="font-size: var(--hx-font-size-base, 1rem);">&#128193;</span>
           Lab Results
           <hx-tree-item slot="children">
-            <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+            <span slot="icon" style="font-size: var(--hx-font-size-base, 1rem);">&#128196;</span>
             CBC Panel
           </hx-tree-item>
           <hx-tree-item slot="children">
-            <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+            <span slot="icon" style="font-size: var(--hx-font-size-base, 1rem);">&#128196;</span>
             Metabolic Panel
           </hx-tree-item>
         </hx-tree-item>
         <hx-tree-item slot="children">
-          <span slot="icon" style="font-size: 1rem;">&#128196;</span>
+          <span slot="icon" style="font-size: var(--hx-font-size-base, 1rem);">&#128196;</span>
           Discharge Summary
         </hx-tree-item>
       </hx-tree-item>
@@ -243,12 +246,330 @@ export const DeepNesting: Story = {
               <hx-tree-item slot="children">A00.0.1: Classical cholera</hx-tree-item>
               <hx-tree-item slot="children">A00.0.2: El Tor cholera</hx-tree-item>
             </hx-tree-item>
-            <hx-tree-item slot="children">A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item>
+            <hx-tree-item slot="children"
+              >A00.1: Cholera due to Vibrio cholerae 01, biovar eltor</hx-tree-item
+            >
           </hx-tree-item>
         </hx-tree-item>
       </hx-tree-item>
     </hx-tree-view>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// MULTI-SELECT WITH CHECKBOXES (P1-8)
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates a visual checkbox multi-select pattern. The hx-tree-view
+ * supports selection="multiple" for programmatic multi-selection. Consumer
+ * teams can augment items with slotted checkbox inputs to provide an explicit
+ * visual affordance for multi-select state, as shown in this healthcare
+ * diagnosis code selection example.
+ */
+export const CheckboxMultiSelect: Story = {
+  name: 'Multi-Select with Checkboxes',
+  args: {
+    label: 'Select diagnosis codes',
+    selection: 'multiple',
+  },
+  render: (args) => html`
+    <style>
+      .checkbox-tree-item {
+        display: flex;
+        align-items: center;
+        gap: var(--hx-space-2, 0.5rem);
+      }
+      .checkbox-tree-item input[type='checkbox'] {
+        margin: 0;
+        width: var(--hx-space-4, 1rem);
+        height: var(--hx-space-4, 1rem);
+        accent-color: var(--hx-color-primary-500);
+        pointer-events: none;
+        flex-shrink: 0;
+      }
+    </style>
+    <hx-tree-view label=${args['label']} selection=${args['selection']}>
+      <hx-tree-item expanded>
+        <span class="checkbox-tree-item">
+          <input
+            type="checkbox"
+            id="cat-a"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+          Infectious &amp; Parasitic Diseases (A00-B99)
+        </span>
+        <hx-tree-item slot="children" selected>
+          <span class="checkbox-tree-item">
+            <input
+              type="checkbox"
+              id="a00-a09"
+              checked
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            A00-A09: Intestinal infectious diseases
+          </span>
+        </hx-tree-item>
+        <hx-tree-item slot="children" selected>
+          <span class="checkbox-tree-item">
+            <input
+              type="checkbox"
+              id="a15-a19"
+              checked
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            A15-A19: Tuberculosis
+          </span>
+        </hx-tree-item>
+        <hx-tree-item slot="children">
+          <span class="checkbox-tree-item">
+            <input
+              type="checkbox"
+              id="a20-a28"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            A20-A28: Certain zoonotic bacterial diseases
+          </span>
+        </hx-tree-item>
+        <hx-tree-item slot="children">
+          <span class="checkbox-tree-item">
+            <input
+              type="checkbox"
+              id="a30-a49"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            A30-A49: Other bacterial diseases
+          </span>
+        </hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item>
+        <span class="checkbox-tree-item">
+          <input
+            type="checkbox"
+            id="cat-c"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+          Neoplasms (C00-D49)
+        </span>
+        <hx-tree-item slot="children">
+          <span class="checkbox-tree-item">
+            <input
+              type="checkbox"
+              id="c00-c14"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            C00-C14: Malignant neoplasms of lip, oral cavity
+          </span>
+        </hx-tree-item>
+        <hx-tree-item slot="children">
+          <span class="checkbox-tree-item">
+            <input
+              type="checkbox"
+              id="c15-c26"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            C15-C26: Malignant neoplasms of digestive organs
+          </span>
+        </hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+    <p
+      style="margin-top: var(--hx-space-4, 1rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary);"
+    >
+      2 diagnosis codes selected. Use <code>selection="multiple"</code> with slotted checkboxes for
+      explicit visual affordance. The <code>selected</code> attribute reflects programmatic
+      selection state.
+    </p>
+    <script>
+      (function () {
+        // Sync visual checkboxes with hx-tree-item selection state.
+        // The hx-tree-view emits 'hx-select' when an item is selected/deselected.
+        // This listener updates the decorative checkbox inputs to match.
+        const tree = document.querySelector('hx-tree-view[selection="multiple"]');
+        if (tree) {
+          tree.addEventListener('hx-select', function (e) {
+            const detail = /** @type {CustomEvent} */ (e).detail;
+            if (detail && detail.item) {
+              const checkbox = detail.item.querySelector('input[type="checkbox"]');
+              if (checkbox) {
+                checkbox.checked = !!detail.selected;
+              }
+            }
+          });
+        }
+      })();
+    </script>
+  `,
+  play: async ({ canvasElement }) => {
+    const tree = canvasElement.querySelector('hx-tree-view');
+    await expect(tree).toBeTruthy();
+
+    const selectedItems = canvasElement.querySelectorAll('hx-tree-item[selected]');
+    await expect(selectedItems.length).toBe(2);
+
+    const checkedBoxes = canvasElement.querySelectorAll('input[type="checkbox"]:checked');
+    await expect(checkedBoxes.length).toBe(2);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// ASYNC LOADING (P1-6)
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates a simulated async-loaded subtree pattern. In healthcare taxonomy
+ * browsers (ICD-10 has 70,000+ codes), subtrees are typically fetched on demand
+ * when a parent node is expanded. This story shows the recommended pattern:
+ * show a loading placeholder, fetch data, then populate the children slot.
+ */
+export const AsyncLoading: Story = {
+  name: 'Async Loading (Simulated)',
+  args: {
+    label: 'Drug classification',
+    selection: 'single',
+  },
+  render: (args) => html`
+    <style>
+      .loading-placeholder {
+        display: flex;
+        align-items: center;
+        gap: var(--hx-space-2, 0.5rem);
+        color: var(--hx-color-text-muted);
+        font-size: var(--hx-font-size-sm, 0.875rem);
+        padding: var(--hx-space-1, 0.25rem) 0;
+        font-style: italic;
+      }
+      .loading-placeholder::before {
+        content: '';
+        display: inline-block;
+        width: var(--hx-font-size-sm, 0.875rem);
+        height: var(--hx-font-size-sm, 0.875rem);
+        border: var(--hx-border-width-medium, 2px) solid var(--hx-color-border-default);
+        border-top-color: var(--hx-color-primary-500);
+        border-radius: var(--hx-border-radius-full, 50%);
+        animation: spin 0.75s linear infinite;
+        flex-shrink: 0;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .loading-placeholder::before {
+          animation: none;
+          border-top-color: var(--hx-color-text-muted);
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <hx-tree-view id="async-tree" label=${args['label']} selection=${args['selection']}>
+      <hx-tree-item id="cardiovascular-node">
+        Cardiovascular Drugs
+        <hx-tree-item slot="children" id="cardiovascular-loading">
+          <span class="loading-placeholder">Loading subcategories...</span>
+        </hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item expanded>
+        Antibiotics
+        <hx-tree-item slot="children">Penicillins</hx-tree-item>
+        <hx-tree-item slot="children">Cephalosporins</hx-tree-item>
+        <hx-tree-item slot="children">Fluoroquinolones</hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item id="analgesics-node">
+        Analgesics
+        <hx-tree-item slot="children" id="analgesics-loading">
+          <span class="loading-placeholder">Loading subcategories...</span>
+        </hx-tree-item>
+      </hx-tree-item>
+    </hx-tree-view>
+    <p
+      style="margin-top: var(--hx-space-4, 1rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary);"
+    >
+      Expand "Cardiovascular Drugs" or "Analgesics" to see simulated async loading. Children replace
+      the loading placeholder after a short delay.
+    </p>
+    <script>
+      (function () {
+        function loadChildren(parentItem, loadingItemId, children) {
+          parentItem.addEventListener(
+            'hx-tree-item-select',
+            function onSelect() {
+              const loadingItem = document.getElementById(loadingItemId);
+              if (!loadingItem) return;
+              setTimeout(function () {
+                const parent = loadingItem.parentElement;
+                if (!parent) return;
+                loadingItem.remove();
+                children.forEach(function (label) {
+                  const item = document.createElement('hx-tree-item');
+                  item.setAttribute('slot', 'children');
+                  item.textContent = label;
+                  parent.appendChild(item);
+                });
+              }, 400);
+            },
+            { once: true },
+          );
+        }
+        const cvNode = document.getElementById('cardiovascular-node');
+        const analNode = document.getElementById('analgesics-node');
+        if (cvNode)
+          loadChildren(cvNode, 'cardiovascular-loading', [
+            'ACE Inhibitors',
+            'Beta Blockers',
+            'Calcium Channel Blockers',
+          ]);
+        if (analNode)
+          loadChildren(analNode, 'analgesics-loading', [
+            'NSAIDs',
+            'Opioid Analgesics',
+            'Non-opioid Analgesics',
+          ]);
+      })();
+    </script>
+  `,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tree = canvasElement.querySelector('hx-tree-view');
+    await expect(tree).toBeTruthy();
+
+    // Verify the loading placeholders are present before expansion
+    const loadingPlaceholders = canvasElement.querySelectorAll('.loading-placeholder');
+    await expect(loadingPlaceholders.length).toBeGreaterThan(0);
+
+    // Expand the cardiovascular node by clicking the visible row text.
+    // This uses the public interaction surface rather than reaching into
+    // the shadow DOM for internal parts like [part="expand-icon"].
+    const cvLabel = canvas.getByText('Cardiovascular Drugs');
+    await expect(cvLabel).toBeTruthy();
+    await userEvent.click(cvLabel);
+
+    // Wait for simulated async load: the story uses a 400ms setTimeout to mimic
+    // an async data fetch, so we need a 600ms delay (400ms + 200ms buffer) here.
+    // There is no element.updateComplete to await because the loading is driven
+    // by the story's own setTimeout, not by a Lit reactive update cycle.
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    // After async load, the loading placeholder should be replaced with actual items
+    const loadingAfter = canvasElement.querySelector('#cardiovascular-loading');
+    await expect(loadingAfter).toBeNull();
+
+    // Verify dynamically loaded children appear in the DOM
+    await expect(canvas.getByText('ACE Inhibitors')).toBeTruthy();
+    await expect(canvas.getByText('Beta Blockers')).toBeTruthy();
+
+    // Verify the tree renders synchronously loaded items (Antibiotics subtree)
+    await expect(canvas.getByText('Antibiotics')).toBeTruthy();
+    await expect(canvas.getByText('Penicillins')).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -319,9 +640,9 @@ export const DeepNesting: Story = {
 export const DrupalIntegration: Story = {
   name: 'Drupal / CDN Integration',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 560px;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-8, 2rem); max-width: 560px;">
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-text-muted); font-weight: 600;">
           Server-rendered taxonomy tree — ICD-10 diagnosis codes (single selection)
         </p>
         <hx-tree-view label="ICD-10 Diagnosis Codes" selection="single">
@@ -338,13 +659,13 @@ export const DrupalIntegration: Story = {
             A15–A19: Tuberculosis
           </hx-tree-item>
         </hx-tree-view>
-        <p style="margin: 0.5rem 0 0; font-size: 0.75rem; color: #9ca3af;">
+        <p style="margin: var(--hx-space-2, 0.5rem) 0 0; font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-text-disabled);">
           aria-label="ICD-10 Diagnosis Codes" ensures screen readers announce tree context
         </p>
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-text-muted); font-weight: 600;">
           Department org chart — navigation-only (no selection)
         </p>
         <hx-tree-view label="Hospital Departments">
@@ -362,7 +683,7 @@ export const DrupalIntegration: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: #6b7280; font-weight: 600;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-text-muted); font-weight: 600;">
           Disabled items — permission-gated from Drupal access check
         </p>
         <hx-tree-view label="Patient Records">

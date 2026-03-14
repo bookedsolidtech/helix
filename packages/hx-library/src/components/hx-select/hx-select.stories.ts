@@ -6,6 +6,7 @@ import '../hx-button/hx-button.js';
 import '../hx-text-input/hx-text-input.js';
 import '../hx-card/hx-card.js';
 import '../hx-checkbox/hx-checkbox.js';
+import '../hx-checkbox-group/hx-checkbox-group.js';
 
 // ─────────────────────────────────────────────────
 // Meta
@@ -1324,6 +1325,74 @@ export const PriorityLevel: Story = {
 // ─────────────────────────────────────────────────
 // OPEN / INTERACTIVE LISTBOX STATE
 // ─────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────
+// MULTI-SELECT LIMITATION DOCUMENTATION
+// ─────────────────────────────────────────────────
+
+/**
+ * hx-select is a single-value select (combobox) only. Multi-value selection
+ * is intentionally not supported. For healthcare forms that require selecting
+ * multiple values (e.g., multiple conditions, multiple providers), use a
+ * separate multi-select component or a checkbox group (hx-checkbox-group).
+ *
+ * This story exists to document this limitation explicitly in Storybook
+ * so consumers encounter the guidance before implementing workarounds.
+ */
+export const SingleValueOnly: Story = {
+  name: 'Limitation: Single Value Only',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '**hx-select supports single-value selection only.** Multi-select (`multiple` attribute) ' +
+          'is intentionally not implemented in this component. ' +
+          'For multi-value selection use `hx-checkbox-group` or a dedicated multi-select pattern. ' +
+          'This is a design-scoped decision — see the component JSDoc `@remarks` for rationale.',
+      },
+    },
+  },
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-6); max-width: 480px;">
+      <p style="margin: 0; font-size: var(--hx-font-size-sm); color: var(--hx-color-text-secondary);">
+        <strong>Design limitation:</strong> hx-select is a single-value combobox. The
+        <code>multiple</code> attribute is not supported. For selecting multiple values use
+        <code>hx-checkbox-group</code>.
+      </p>
+
+      <div>
+        <p style="margin: 0 0 var(--hx-space-2); font-size: var(--hx-font-size-sm); color: var(--hx-color-text-secondary); font-weight: 600;">
+          Correct: single-value select
+        </p>
+        <hx-select
+          label="Primary Diagnosis"
+          placeholder="Select one diagnosis..."
+          help-text="Select a single primary diagnosis code for this encounter."
+        >
+          <option value="i10">I10 — Essential hypertension</option>
+          <option value="e11">E11 — Type 2 diabetes mellitus</option>
+          <option value="j44">J44 — COPD</option>
+          <option value="i50">I50 — Heart failure</option>
+        </hx-select>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 var(--hx-space-2); font-size: var(--hx-font-size-sm); color: var(--hx-color-text-secondary); font-weight: 600;">
+          Alternative for multi-value: hx-checkbox-group
+        </p>
+        <hx-checkbox-group
+          label="Comorbidities"
+          help-text="Select all applicable comorbidities for this patient."
+        >
+          <hx-checkbox value="hypertension" label="Hypertension"></hx-checkbox>
+          <hx-checkbox value="diabetes" label="Type 2 Diabetes"></hx-checkbox>
+          <hx-checkbox value="copd" label="COPD"></hx-checkbox>
+          <hx-checkbox value="heart-failure" label="Heart Failure"></hx-checkbox>
+        </hx-checkbox-group>
+      </div>
+    </div>
+  `,
+};
 
 export const OpenInteractive: Story = {
   name: 'Open / Interactive Listbox',
