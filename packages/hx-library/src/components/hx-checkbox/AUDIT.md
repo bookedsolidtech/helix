@@ -117,4 +117,4 @@ All 2 P0 and all 10 P1 findings are resolved. Remediation quality is high.
 
 The hx-checkbox component is production-ready. All critical and high-priority findings from the previous audit are resolved. The component demonstrates solid form-association patterns (ElementInternals, formResetCallback, formStateRestoreCallback, formDisabledCallback), comprehensive accessibility (ARIA labeling, describedby, indeterminate, keyboard, axe-core), proper design token cascade (three-tier with fallbacks), and thorough test coverage.
 
-The remaining open items are low-risk: two story-quality concerns (P2-11, P2-15), one design naming decision (P2-10), and one code-quality improvement (NEW-04). These do not block production use.
+The remaining open items are low-risk: one design naming decision (P2-10) and one code-quality improvement (NEW-04). These do not block production use.
