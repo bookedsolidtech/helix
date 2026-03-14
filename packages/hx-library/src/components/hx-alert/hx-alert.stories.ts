@@ -1344,6 +1344,7 @@ export const FocusReturn: Story = {
 
     // Click the dismiss button and await the transition
     await userEvent.click(closeButton);
+    await alert.updateComplete;
 
     // After dismissal, focus must return to the submit button
     const submitBtn = canvas.getByText('Submit Order') as HTMLElement;

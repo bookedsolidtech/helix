@@ -529,7 +529,10 @@ export const AsyncLoading: Story = {
     await expect(expandBtn).toBeTruthy();
     await userEvent.click(expandBtn);
 
-    // Wait for simulated async load (400ms timeout + buffer)
+    // Wait for simulated async load: the story uses a 400ms setTimeout to mimic
+    // an async data fetch, so we need a 600ms delay (400ms + 200ms buffer) here.
+    // There is no element.updateComplete to await because the loading is driven
+    // by the story's own setTimeout, not by a Lit reactive update cycle.
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     // After async load, the loading placeholder should be replaced with actual items
