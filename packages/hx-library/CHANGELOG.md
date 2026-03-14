@@ -1,5 +1,38 @@
 # @helixui/library
 
+## 0.3.3
+
+### Patch Changes
+
+- 6693f2b: fix(drupal): address Drupal integration findings for hx-field, hx-link, hx-number-input, hx-prose, and hx-radio-group
+
+  Closes #795, #800, #802, #808, #809
+  - hx-field: add DrupalIntegration Storybook story with Twig template, Behaviors, and asset loading examples (P2-15)
+  - hx-link: add DrupalIntegration Storybook story with Twig template and Behaviors patterns (P2-8)
+  - hx-number-input: WithLabelSlot and DrupalFormAPI stories verified as already present; confirmed @slot JSDoc fixed, formResetCallback restores \_defaultValue, step attribute always rendered (P0-02, P1-15, P1-16, P2-08, P2-09)
+  - hx-prose: fix clear: none → clear: both in \_drupal.css and prose.scoped.css so block-level content starts below floated images rather than wrapping beside them (P2-03); deprecated align attribute selectors documented as Drupal CKEditor compatibility shims (P2-05)
+  - hx-radio-group: confirmed monotonic counter replaces Math.random() for IDs (P2-2); confirmed \_individualDisabledStates map restores per-radio disabled state on group re-enable (P1-1)
+
+- 82cfb84: fix(typescript): use `PropertyValues` from lit in `updated()` overrides for `hx-status-indicator` and `hx-tabs`, replacing raw `Map<string | symbol, unknown>` per strict mode constraint
+- 0a5c758: fix(storybook): fix story findings for hx-tree-view, hx-alert, and hx-button
+- 8982675: perf: resolve performance audit findings for hx-meter, hx-overflow-menu, and hx-radio-group
+  - hx-meter: confirmed bundle within 5KB budget — all runtime deps externalized (lit, @helixui/tokens); CI shared gate covers per-component size
+  - hx-overflow-menu: @floating-ui/dom correctly externalized as peerDependency and excluded from rollup output — no longer bundled into component chunk
+  - hx-radio-group: eliminated redundant double invocation of setFormValue/syncRadios/updateValidity per radio selection — \_handleRadioSelect now delegates exclusively to updated() lifecycle hook, halving work per interaction
+
+- f6173ec: fix(storybook): resolve audit findings for hx-progress-bar, hx-prose, hx-select, hx-skeleton, and hx-stack stories
+- 73544d2: fix(storybook): fix Storybook story findings for hx-checkbox, hx-checkbox-group, hx-field, hx-popover, and hx-radio-group (fixes #789, #790, #795, #805, #809)
+  - hx-checkbox (P2-11): NoLabel story play function asserts aria-label forwarded to native input at runtime
+  - hx-checkbox (P2-15): SelectAllPattern story uses ID-based DOM query instead of fragile CSS class query
+  - hx-checkbox-group (P3-01): Relative imports accepted by design — consistent with all other HELiX stories in source-mode Storybook
+  - hx-field (P2-09): WrappingTextarea story added demonstrating textarea as slotted control
+  - hx-field (P2-13): SlottedLabel story demonstrates for/id linkage between slotted label and slotted input
+  - hx-popover (P2-04): Placements story now renders all 12 placement variants (was 4 cardinal only)
+  - hx-radio-group (P2-07): SingleDisabledOption story demonstrates mixed-disabled state (one radio disabled in an enabled group)
+
+- 772810b: test(hx-library): fix test coverage gaps for hx-badge, hx-breadcrumb, hx-copy-button
+- edce136: Fix TypeScript type safety findings for hx-progress-bar, hx-prose, hx-select, hx-side-nav, and hx-skeleton. Adds indeterminate boolean property to hx-progress-bar, corrects WcProse type import in hx-prose tests, adds full formStateRestoreCallback signature and size runtime guard to hx-select, removes dead \_bodyEl query and renames WcSideNav/WcNavItem type aliases to HxSideNav/HxNavItem in hx-side-nav, and adds paragraph variant plus unknown variant test to hx-skeleton.
+
 ## 0.3.2
 
 ### Patch Changes
