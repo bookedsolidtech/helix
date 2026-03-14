@@ -1353,17 +1353,15 @@ export const SingleValueOnly: Story = {
     },
   },
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
-      <div
-        style="padding: 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 0.375rem; font-size: 0.875rem;"
-      >
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem); max-width: 480px;">
+      <p style="margin: 0; font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary);">
         <strong>Design limitation:</strong> hx-select is a single-value combobox. The
         <code>multiple</code> attribute is not supported. For selecting multiple values use
         <code>hx-checkbox-group</code>.
-      </div>
+      </p>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d; font-weight: 600;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary); font-weight: 600;">
           Correct: single-value select
         </p>
         <hx-select
@@ -1379,7 +1377,7 @@ export const SingleValueOnly: Story = {
       </div>
 
       <div>
-        <p style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d; font-weight: 600;">
+        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-text-secondary); font-weight: 600;">
           Alternative for multi-value: hx-checkbox-group
         </p>
         <hx-checkbox-group
