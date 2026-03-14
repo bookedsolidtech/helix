@@ -124,27 +124,21 @@ The accessibility tests always supply `label="..."`. There is no test that asser
 
 ## 4. Storybook
 
-### [P2] Duplicate label in `Default` story (attribute + slot)
+### ~~[P2] Duplicate label in `Default` story (attribute + slot)~~ ✅ FIXED
 
-The `Default` story renders `label=${args.label}` (setting `aria-label`) AND `<span slot="label">${args.label}</span>` simultaneously. This means the aria-label and the visible slot label always have the same value, but via two separate mechanisms. This pattern should be documented — it is not self-evidently correct, and consumers may cargo-cult it and supply only one, introducing unlabeled progressbars.
-
-**Location:** `hx-progress-bar.stories.ts:80–90`.
+The `Default` story now uses only the slot-based label (`<span slot="label">`) without a duplicate `label` attribute for `aria-label`. The component wires `aria-labelledby` automatically from the slot.
 
 ---
 
-### [P2] `argTypes.size` key is `size` but attribute is `hx-size`
+### ~~[P2] `argTypes.size` key is `size` but attribute is `hx-size`~~ ✅ FIXED
 
-The `argTypes` object uses key `size` and the story binds via `hx-size=${args.size}`. While this works, the Storybook controls table will show the control as `size`, not matching the actual HTML attribute `hx-size`. CEM-driven autodocs may also misalign. The property is `size` but the attribute is `hx-size` (set via `attribute: 'hx-size'`); the argTypes key should reflect the attribute name for Storybook autodocs to work correctly.
-
-**Location:** `hx-progress-bar.stories.ts:42–51`.
+The `argTypes` object now uses `'hx-size'` as the key (matching the HTML attribute name), and stories bind via `hx-size=${args['hx-size']}`. Storybook controls table and CEM autodocs are correctly aligned.
 
 ---
 
-### [P2] No story demonstrating indeterminate + `aria-labelledby` pattern
+### ~~[P2] No story demonstrating indeterminate + `aria-labelledby` pattern~~ ✅ FIXED
 
-The `Indeterminate` story uses `label` attribute (aria-label). There is no story demonstrating how a consumer would use the visible label slot as the accessible name via `aria-labelledby`. Given the accessible name gap (P1 above), this story would be the canonical demonstration of correct usage.
-
-**Location:** `hx-progress-bar.stories.ts:93–108`.
+The `WithAriaLabelledBy` story demonstrates the canonical `aria-labelledby` usage pattern using the visible label slot — no redundant `label` attribute needed.
 
 ---
 
@@ -208,28 +202,28 @@ Twig usage works but requires Drupal developers to know the attribute names (`hx
 
 ## Summary Table
 
-| #   | Area       | Finding                                               | Severity |
-| --- | ---------- | ----------------------------------------------------- | -------- |
-| 1   | TypeScript | Missing `min` property                                | P1       |
-| 2   | TypeScript | Missing `indeterminate` boolean prop                  | P1       |
-| 3   | TypeScript | Missing `description` property                        | P2       |
-| 4   | A11y       | No `aria-labelledby` for visible label slot           | P1       |
-| 5   | A11y       | No live region on completion                          | P1       |
-| 6   | A11y       | Unlabeled progressbar is unguarded (silent violation) | P2       |
-| 7   | A11y       | `aria-valuemin` hardcoded, not bound to `min` prop    | P2       |
-| 8   | Tests      | No test for 0% (empty state)                          | P0       |
-| 9   | Tests      | No test for completion event                          | P1       |
-| 10  | Tests      | No test for negative value clamping                   | P1       |
-| 11  | Tests      | No test for dynamic label update                      | P2       |
-| 12  | Tests      | No test for no-label accessibility violation          | P2       |
-| 13  | Storybook  | Duplicate label in Default story (attribute + slot)   | P2       |
-| 14  | Storybook  | `argTypes.size` key mismatches attribute `hx-size`    | P2       |
-| 15  | Storybook  | No story for `aria-labelledby` usage pattern          | P2       |
-| 16  | CSS        | Parts named `base`/`indicator` vs spec `track`/`fill` | P1       |
-| 17  | CSS        | Indeterminate animation `translateX(250%)` technique  | P2       |
-| 18  | CSS        | Hardcoded hex fallbacks in CSS custom properties      | P2       |
-| 19  | CSS        | No `forced-colors` high-contrast support              | P2       |
-| 20  | Drupal     | No Twig template or integration file                  | P2       |
+| #   | Area       | Finding                                                 | Severity |
+| --- | ---------- | ------------------------------------------------------- | -------- |
+| 1   | TypeScript | Missing `min` property                                  | P1       |
+| 2   | TypeScript | Missing `indeterminate` boolean prop                    | P1       |
+| 3   | TypeScript | Missing `description` property                          | P2       |
+| 4   | A11y       | No `aria-labelledby` for visible label slot             | P1       |
+| 5   | A11y       | No live region on completion                            | P1       |
+| 6   | A11y       | Unlabeled progressbar is unguarded (silent violation)   | P2       |
+| 7   | A11y       | `aria-valuemin` hardcoded, not bound to `min` prop      | P2       |
+| 8   | Tests      | No test for 0% (empty state)                            | P0       |
+| 9   | Tests      | No test for completion event                            | P1       |
+| 10  | Tests      | No test for negative value clamping                     | P1       |
+| 11  | Tests      | No test for dynamic label update                        | P2       |
+| 12  | Tests      | No test for no-label accessibility violation            | P2       |
+| 13  | Storybook  | ~~Duplicate label in Default story (attribute + slot)~~ | ✅ FIXED |
+| 14  | Storybook  | ~~`argTypes.size` key mismatches attribute `hx-size`~~  | ✅ FIXED |
+| 15  | Storybook  | ~~No story for `aria-labelledby` usage pattern~~        | ✅ FIXED |
+| 16  | CSS        | Parts named `base`/`indicator` vs spec `track`/`fill`   | P1       |
+| 17  | CSS        | Indeterminate animation `translateX(250%)` technique    | P2       |
+| 18  | CSS        | Hardcoded hex fallbacks in CSS custom properties        | P2       |
+| 19  | CSS        | No `forced-colors` high-contrast support                | P2       |
+| 20  | Drupal     | No Twig template or integration file                    | P2       |
 
 **Totals:** 1 P0, 6 P1, 13 P2
 
