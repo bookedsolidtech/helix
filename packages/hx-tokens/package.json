@@ -1,6 +1,6 @@
 {
   "name": "@helixui/tokens",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
   "type": "module",
   "main": "./dist/index.js",
