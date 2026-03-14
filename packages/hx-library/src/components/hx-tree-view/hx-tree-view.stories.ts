@@ -393,7 +393,7 @@ export const CheckboxMultiSelect: Story = {
         // Sync visual checkboxes with hx-tree-item selection state.
         // The hx-tree-view emits 'hx-select' when an item is selected/deselected.
         // This listener updates the decorative checkbox inputs to match.
-        const tree = document.querySelector('hx-tree-view[label="Select diagnosis codes"]');
+        const tree = document.querySelector('hx-tree-view[selection="multiple"]');
         if (tree) {
           tree.addEventListener('hx-select', function (e) {
             const detail = /** @type {CustomEvent} */ (e).detail;

@@ -28,6 +28,21 @@ reviews:
     docstrings:
       enabled: false
 
+  path_instructions:
+    - path: 'packages/hx-library/src/**/*.styles.ts'
+      instructions: |
+        CSS fallbacks in `var()` expressions (e.g. `var(--hx-space-4, 1rem)`) are ALLOWED and
+        intentional. This is a defensive pattern for enterprise consumers (Drupal CMS) where the
+        token stylesheet may not always load. The "no hardcoded values" rule applies to raw literals
+        like `padding: 1rem` or `color: #ff0000`, NOT to fallback values inside `var()` token
+        references. Do NOT flag `var(--hx-*, <fallback>)` as a hardcoded value violation.
+    - path: 'packages/hx-library/src/**/*.stories.ts'
+      instructions: |
+        CSS fallbacks in `var()` expressions (e.g. `var(--hx-space-4, 1rem)`) are ALLOWED and
+        intentional. This is a defensive pattern for enterprise consumers (Drupal CMS) where the
+        token stylesheet may not always load. Do NOT flag `var(--hx-*, <fallback>)` as a hardcoded
+        value violation.
+
 chat:
   auto_reply: true
 
