@@ -1,6 +1,6 @@
 {
   "name": "@helixui/library",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [

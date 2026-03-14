@@ -1,5 +1,11 @@
 # @helixui/tokens
 
+## 0.3.2
+
+### Patch Changes
+
+- d46e1e7: fix: correct homepage URL to helix.bookedsolid.tech (no .com domain exists)
+
 ## 0.3.1
 
 ### Patch Changes
