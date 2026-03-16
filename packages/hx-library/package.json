@@ -52,7 +52,7 @@
     "clean": "rm -rf dist custom-elements.json"
   },
   "dependencies": {
-    "@helixui/tokens": "*",
+    "@helixui/tokens": "workspace:*",
     "lit": "^3.3.2"
   },
   "peerDependencies": {

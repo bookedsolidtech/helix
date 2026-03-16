@@ -4,7 +4,6 @@ node_modules/
 .pnp.js
 
 # Auth tokens (never commit)
-.npmrc
 .env
 .env*.local
 

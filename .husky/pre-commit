@@ -1,5 +1,5 @@
 # Run lint-staged for formatting and linting
-npx lint-staged
+pnpm exec lint-staged
 
 # Run comprehensive pre-commit quality checks
 bash "$(dirname "$0")/../scripts/pre-commit-check.sh"

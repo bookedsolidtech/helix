@@ -128,20 +128,20 @@ See the [Drupal Integration Guide](https://helix.bookedsolid.tech/guides/drupal/
 ```bash
 git clone https://github.com/bookedsolidtech/helix.git
 cd helix
-npm install
-npm run dev        # Start library + Storybook + docs
+pnpm install
+pnpm run dev        # Start library + Storybook + docs
 ```
 
 ### Commands
 
 ```bash
-npm run dev            # All apps + library (Turborepo)
-npm run dev:storybook  # Storybook on port 3151
-npm run dev:docs       # Documentation site on port 3150
-npm run build          # Build everything
-npm run test           # Run all tests (Vitest browser mode)
-npm run type-check     # TypeScript strict check
-npm run verify         # Lint + format + type-check (required before push)
+pnpm run dev            # All apps + library (Turborepo)
+pnpm run dev:storybook  # Storybook on port 3151
+pnpm run dev:docs       # Documentation site on port 3150
+pnpm run build          # Build everything
+pnpm run test           # Run all tests (Vitest browser mode)
+pnpm run type-check     # TypeScript strict check
+pnpm run verify         # Lint + format + type-check (required before push)
 ```
 
 ---
@@ -157,7 +157,7 @@ npm run verify         # Lint + format + type-check (required before push)
 | API Docs   | Custom Elements Manifest (CEM)                                      |
 | Stories    | [Storybook 10.x](https://storybook.js.org)                          |
 | Docs       | [Astro Starlight](https://starlight.astro.build)                    |
-| Monorepo   | [Turborepo](https://turbo.build) + npm workspaces                   |
+| Monorepo   | [Turborepo](https://turbo.build) + pnpm workspaces                  |
 
 ---
 
@@ -165,7 +165,7 @@ npm run verify         # Lint + format + type-check (required before push)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. All contributions must:
 
-- Pass TypeScript strict mode (`npm run type-check`)
+- Pass TypeScript strict mode (`pnpm run type-check`)
 - Include tests with 80%+ coverage
 - Meet WCAG 2.1 AA accessibility standards
 - Include Storybook stories for all variants

@@ -63,7 +63,7 @@ jobs:
               - 'packages/hx-library/vite.config.ts'
               - 'packages/hx-library/tsconfig*.json'
               - 'package.json'
-              - 'package-lock.json'
+              - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
               - '.github/workflows/**'
 
@@ -77,12 +77,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
 
   format:
     name: Format
@@ -92,12 +93,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run format:check
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run format:check
 
   type-check:
     name: Type Check
@@ -107,12 +109,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - run: npx turbo run type-check --filter='!docs'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run type-check --filter='!docs'
 
   # ── Tests (need Playwright browsers) ────────────────────────────────────
   # Changed-file mode: only runs tests for components touched in this PR/push.
@@ -129,13 +132,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - run: npx turbo run build --filter='!docs'
-      - run: npx playwright install --with-deps chromium
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - run: pnpm exec playwright install --with-deps chromium
       - name: Run tests (PR — path-filtered by changed components)
         if: github.event_name == 'pull_request'
         run: |
@@ -152,7 +156,7 @@ jobs:
           if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
             COMPONENT="${BASH_REMATCH[1]}"
             echo "Audit-fix branch — running tests for: $COMPONENT"
-            npx vitest run "src/components/$COMPONENT/"
+            pnpm exec vitest run "src/components/$COMPONENT/"
           else
             # General PR: extract changed component dirs from git diff
             CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
@@ -165,7 +169,7 @@ jobs:
             fi
             PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
             echo "Running tests for: $PATHS"
-            npx vitest run $PATHS
+            pnpm exec vitest run $PATHS
           fi
         working-directory: packages/hx-library
       - name: Run tests (push — path-filtered by merged changes)
@@ -202,15 +206,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - run: npx turbo run build --filter='!docs'
-      - run: npm run cem
-      - name: Validate package exports (npm pack --dry-run)
-        run: npm pack --dry-run
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - run: pnpm run cem
+      - name: Validate package exports (pnpm pack --dry-run)
+        run: pnpm pack --dry-run
         working-directory: packages/hx-library
       - name: Bundle size report (all components, tree-shaken)
         run: node scripts/bundle-size-report.js
@@ -230,10 +235,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'pnpm'
       - name: Detect changed components
         id: detect
         run: |
@@ -256,9 +262,9 @@ jobs:
           else
             echo "VRT scoped to: $CHANGED"
           fi
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
         if: steps.detect.outputs.changed != ''
-      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
         if: steps.detect.outputs.changed != ''
       - name: Restore VRT baselines
         if: steps.detect.outputs.changed != ''
@@ -269,7 +275,7 @@ jobs:
           key: vrt-screenshots-${{ hashFiles('packages/hx-library/src/**/*.ts') }}
           restore-keys: |
             vrt-screenshots-
-      - run: npm run build:storybook
+      - run: pnpm run build:storybook
         if: steps.detect.outputs.changed != ''
       - name: Serve Storybook and run VRT
         if: steps.detect.outputs.changed != ''
@@ -277,19 +283,19 @@ jobs:
           CHANGED_COMPONENTS: ${{ steps.detect.outputs.changed }}
           VRT_CACHE_HIT: ${{ steps.vrt-cache.outputs.cache-hit }}
         run: |
-          npx http-server apps/storybook/dist -p 3151 &
+          pnpm exec http-server apps/storybook/dist -p 3151 &
           sleep 5
           # Run update mode when: no baselines exist, OR cache was only a partial/fallback hit
           # (cache-hit == 'true' means exact key match — source files unchanged since last baseline)
           # (cache-hit != 'true' means fallback restore — source changed, baselines are stale)
           if [ ! -d "packages/hx-library/__screenshots__" ] || [ -z "$(ls -A packages/hx-library/__screenshots__ 2>/dev/null)" ]; then
             echo "No VRT baselines found — creating initial baselines"
-            npm run test:vrt:update
+            pnpm run test:vrt:update
           elif [ "$VRT_CACHE_HIT" != "true" ]; then
             echo "Stale VRT baselines (fallback cache hit) — regenerating for current source"
-            npm run test:vrt:update
+            pnpm run test:vrt:update
           else
-            npm run test:vrt
+            pnpm run test:vrt
           fi
       - name: Upload VRT diff images
         if: failure()
@@ -354,13 +360,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-      - run: npm ci
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
       - name: Security audit
-        run: npm audit --audit-level=critical
+        run: pnpm audit --audit-level=critical
 
   # ── Aggregate gate (for branch protection) ──────────────────────────────
   # This job depends on all checks and is the single required status check
