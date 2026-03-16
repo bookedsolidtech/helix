@@ -296,6 +296,21 @@ npm run verify        # confirm clean — must be zero failures before push
 
 ---
 
+## Promotion Pipeline (dev → staging → main)
+
+Code flows through three branches: `feature/* → dev → staging → main`.
+
+**Branch protection:**
+- `dev`: Required status checks: `Quality Gates` + `CodeRabbit`. All feature PRs get CodeRabbit review.
+- `staging`: Required status checks: `Quality Gates` only. CodeRabbit does not auto-review staging-targeted PRs (`.coderabbit.yaml` scopes auto-review to `base_branches: [dev]`).
+- `main`: Required status checks: `Quality Gates` + `CodeRabbit`. Receives from staging only.
+
+**Promotion flow:**
+1. `dev → staging`: Autonomous. Create PR, enable auto-merge, CI must pass `Quality Gates`.
+2. `staging → main`: Create PR, enable auto-merge, CI must pass. Internal code review (3-tier agent review) required since CodeRabbit does not auto-review dev-targeted PRs that have already been promoted.
+
+---
+
 ## Git Rules
 
 - `npm run verify` must pass before every `git push` (runs lint + format:check + type-check)
