@@ -296,6 +296,30 @@ npm run verify        # confirm clean — must be zero failures before push
 
 ---
 
+## Promotion Pipeline (dev → staging → main)
+
+### CodeRabbit Gate on Staging Promotion
+
+Dev→staging promotion PRs **must wait for CodeRabbit review** before merging. This is enforced via branch protection on `staging` (required status checks: `Quality Gates` + `CodeRabbit`).
+
+**Why:** Feature PRs have narrow diffs — CR reviews each in isolation. Promotion PRs aggregate 50+ commits of changes. Without CR review at this stage, cross-file issues (hardcoded tokens, unwired controls, shadow DOM patterns) slip through to main.
+
+**How it works:**
+
+1. Promotion PR is created from `dev` → `staging`
+2. Auto-merge is **not** enabled until CodeRabbit posts its review
+3. If CodeRabbit approves → auto-merge proceeds
+4. If CodeRabbit posts `CHANGES_REQUESTED` → auto-merge stays blocked; Ava delegates a fix agent to address issues on `dev`, then re-promotes
+
+**Impact:** Adds ~5 minutes per promotion cycle. This is acceptable — catching defects at staging is far cheaper than catching them at main.
+
+**Branch protection on `staging`:**
+- Required status checks: `Quality Gates`, `CodeRabbit`
+- `strict: true` — branch must be up to date before merging
+- Same pattern as `dev` branch protection
+
+---
+
 ## Git Rules
 
 - `npm run verify` must pass before every `git push` (runs lint + format:check + type-check)

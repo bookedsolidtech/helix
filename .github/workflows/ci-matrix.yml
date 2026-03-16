@@ -9,7 +9,7 @@ name: CI Matrix
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'changeset-release/**']
   pull_request:
     branches: [main]
 
