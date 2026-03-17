@@ -214,8 +214,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
       - run: pnpm run cem
-      - name: Validate package exports (pnpm pack --dry-run)
-        run: pnpm pack --dry-run
+      - name: Validate package exports (pnpm publish --dry-run)
+        run: pnpm publish --dry-run --no-git-checks
         working-directory: packages/hx-library
       - name: Bundle size report (all components, tree-shaken)
         run: node scripts/bundle-size-report.js
