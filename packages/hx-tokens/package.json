@@ -1,7 +1,7 @@
 {
   "name": "@helixui/tokens",
   "version": "0.3.2",
-  "description": "Design tokens for the WC-2026 enterprise healthcare web component library",
+  "description": "Design tokens for the HELiX enterprise healthcare web component library",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -55,7 +55,13 @@
     "lit",
     "healthcare",
     "design-system",
-    "custom-elements"
+    "custom-elements",
+    "design-tokens",
+    "css-custom-properties",
+    "wcag",
+    "accessibility",
+    "enterprise",
+    "typescript"
   ],
   "devDependencies": {
     "tsx": "^4.19.0",
