@@ -522,11 +522,11 @@ pnpm run test
 # Run library tests only
 pnpm run test:library
 
-# Watch mode
-pnpm run test:watch
+# Watch mode (library workspace only)
+pnpm --filter=@helixui/library run test:watch
 
-# With UI
-pnpm run test:ui
+# With UI (library workspace only)
+pnpm --filter=@helixui/library run test:ui
 ```
 
 ## Documentation Requirements
