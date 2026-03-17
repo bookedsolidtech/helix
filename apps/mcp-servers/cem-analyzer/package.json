@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@helixui/mcp-shared": "*",
+    "@helixui/mcp-shared": "workspace:*",
     "zod": "^3.22.0"
   },
   "devDependencies": {

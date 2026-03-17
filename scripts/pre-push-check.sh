@@ -16,16 +16,16 @@ FAILED=0
 
 # Gate 1: Lint (catches no-explicit-any, unused vars, etc.)
 echo "Lint check..."
-if npm run lint --silent 2>/dev/null; then
+if pnpm --silent run lint 2>/dev/null; then
   echo "Lint passed"
 else
-  echo "Lint FAILED — run 'npm run lint' to see errors"
+  echo "Lint FAILED — run 'pnpm run lint' to see errors"
   FAILED=1
 fi
 
 # Gate 2: Auto-format (fix and commit any formatting drift)
 echo "Auto-formatting..."
-npm run format --silent 2>/dev/null || true
+pnpm --silent run format 2>/dev/null || true
 if ! git diff --quiet; then
   echo "Formatting applied — committing auto-format changes"
   git add -u
@@ -37,10 +37,10 @@ fi
 
 # Gate 3: Type check (catches TS errors without full build)
 echo "Type check..."
-if npm run type-check --silent 2>/dev/null; then
+if pnpm --silent run type-check 2>/dev/null; then
   echo "Type check passed"
 else
-  echo "Type check FAILED — run 'npm run type-check' to see errors"
+  echo "Type check FAILED — run 'pnpm run type-check' to see errors"
   FAILED=1
 fi
 
@@ -114,7 +114,7 @@ else
       done
 
       # Run vitest with optional timeout (gtimeout on macOS, timeout on Linux).
-      TEST_CMD="cd packages/hx-library && npx vitest run --reporter=verbose $VITEST_INCLUDE_ARGS 2>&1"
+      TEST_CMD="cd packages/hx-library && pnpm exec vitest run --reporter=verbose $VITEST_INCLUDE_ARGS 2>&1"
       set +e
       if [ -n "$TIMEOUT_BIN" ]; then
         $TIMEOUT_BIN bash -c "$TEST_CMD"
@@ -127,13 +127,13 @@ else
       if [ $TEST_EXIT -eq 124 ]; then
         echo ""
         echo "Targeted tests TIMED OUT (5min) — tests may be hanging or environment issue."
-        echo "Run manually: cd packages/hx-library && npx vitest run${VITEST_INCLUDE_ARGS}"
+        echo "Run manually: cd packages/hx-library && pnpm exec vitest run${VITEST_INCLUDE_ARGS}"
         echo ""
         FAILED=1
       elif [ $TEST_EXIT -ne 0 ]; then
         echo ""
         echo "Targeted tests FAILED for: ${TESTED_COMPONENTS_DISPLAY}"
-        echo "Run manually: cd packages/hx-library && npx vitest run${VITEST_INCLUDE_ARGS}"
+        echo "Run manually: cd packages/hx-library && pnpm exec vitest run${VITEST_INCLUDE_ARGS}"
         echo ""
         FAILED=1
       else
@@ -171,7 +171,7 @@ else
         echo ""
         echo "CHANGESET REQUIRED — component source was modified but no changeset found."
         echo ""
-        echo "Run: npx changeset"
+        echo "Run: pnpm exec changeset"
         echo "Then select the packages and bump type (patch/minor/major)."
         echo "Commit the generated .changeset/*.md file with your changes."
         echo ""

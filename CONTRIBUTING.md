@@ -71,7 +71,7 @@ Organization members are exempt from this requirement.
 ### Prerequisites
 
 - **Node.js**: >= 20.0.0
-- **npm**: 10.8.2 (ships with Node.js)
+- **pnpm**: 9.15.9 (install via `corepack enable && corepack prepare pnpm@9.15.9 --activate`)
 - **Git**: Latest stable version
 - **IDE**: VSCode recommended (with recommended extensions)
 
@@ -83,10 +83,10 @@ git clone https://github.com/bookedsolidtech/helix.git
 cd helix
 
 # Install dependencies
-npm install
+pnpm install
 
 # Start development servers
-npm run dev
+pnpm run dev
 ```
 
 This will start:
@@ -114,16 +114,16 @@ Follow the coding standards and conventions outlined in [CLAUDE.md](./CLAUDE.md)
 
 ```bash
 # Type check
-npm run type-check
+pnpm run type-check
 
 # Lint
-npm run lint
+pnpm run lint
 
 # Run tests
-npm run test
+pnpm run test
 
 # Build
-npm run build
+pnpm run build
 ```
 
 ### 4. Commit Your Changes
@@ -272,8 +272,8 @@ git commit -m "fix(input): prevent focus loss on validation #123"
 1. Ensure all quality gates pass locally
 2. Update documentation (if applicable)
 3. Add/update tests for new functionality
-4. Run full test suite: `npm run test`
-5. Verify build succeeds: `npm run build`
+4. Run full test suite: `pnpm run test`
+5. Verify build succeeds: `pnpm run build`
 
 ### Creating a PR
 
@@ -315,7 +315,7 @@ PRs are merged by maintainers using **merge commits** strategy (squash merging i
 Use the generator to scaffold a new component's 5-file structure with correct boilerplate:
 
 ```bash
-npm run create:component hx-my-component
+pnpm run create:component hx-my-component
 ```
 
 This creates all 5 required files in `packages/hx-library/src/components/hx-my-component/`:
@@ -329,14 +329,14 @@ hx-my-component/
 └── hx-my-component.test.ts     # Vitest browser tests (stub)
 ```
 
-Generated files are pre-formatted and pass `npm run verify` immediately. After scaffolding:
+Generated files are pre-formatted and pass `pnpm run verify` immediately. After scaffolding:
 
 1. Implement logic in `hx-my-component.ts`
 2. Add styles in `hx-my-component.styles.ts`
 3. Export from `packages/hx-library/src/index.ts`
 4. Add Storybook stories in `hx-my-component.stories.ts`
 5. Write tests in `hx-my-component.test.ts`
-6. Run `npm run cem` to update the Custom Elements Manifest
+6. Run `pnpm run cem` to update the Custom Elements Manifest
 
 ### File Structure
 
@@ -517,16 +517,16 @@ test('renders with default variant', async () => {
 
 ```bash
 # Run all tests
-npm run test
+pnpm run test
 
 # Run library tests only
-npm run test:library
+pnpm run test:library
 
 # Watch mode
-npm run test:watch
+pnpm run test:watch
 
 # With UI
-npm run test:ui
+pnpm run test:ui
 ```
 
 ## Documentation Requirements
