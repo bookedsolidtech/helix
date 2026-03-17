@@ -34,7 +34,7 @@
     "generate:barrel": "node scripts/generate-barrel.js",
     "prepare": "node scripts/generate-barrel.js",
     "prebuild": "node scripts/generate-barrel.js",
-    "build": "vite build && npm run cem",
+    "build": "vite build && pnpm run cem",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
