@@ -16,7 +16,7 @@ FAILED=0
 
 # Gate 1: Lint (catches no-explicit-any, unused vars, etc.)
 echo "Lint check..."
-if pnpm run lint --silent 2>/dev/null; then
+if pnpm --silent run lint 2>/dev/null; then
   echo "Lint passed"
 else
   echo "Lint FAILED — run 'pnpm run lint' to see errors"
@@ -25,7 +25,7 @@ fi
 
 # Gate 2: Auto-format (fix and commit any formatting drift)
 echo "Auto-formatting..."
-pnpm run format --silent 2>/dev/null || true
+pnpm --silent run format 2>/dev/null || true
 if ! git diff --quiet; then
   echo "Formatting applied — committing auto-format changes"
   git add -u
@@ -37,7 +37,7 @@ fi
 
 # Gate 3: Type check (catches TS errors without full build)
 echo "Type check..."
-if pnpm run type-check --silent 2>/dev/null; then
+if pnpm --silent run type-check 2>/dev/null; then
   echo "Type check passed"
 else
   echo "Type check FAILED — run 'pnpm run type-check' to see errors"
