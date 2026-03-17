@@ -11,8 +11,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@helixui/library": "*",
-    "@helixui/tokens": "*"
+    "@helixui/library": "workspace:*",
+    "@helixui/tokens": "workspace:*"
   },
   "devDependencies": {
     "@mdx-js/react": "^3.0.0",

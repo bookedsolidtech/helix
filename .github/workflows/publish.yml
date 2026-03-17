@@ -37,23 +37,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npx turbo run build --filter='!docs'
+        run: pnpm turbo run build --filter='!docs'
 
       - name: Version and Publish
         uses: changesets/action@v1
         with:
-          publish: npm run changeset:publish
-          version: npm run changeset:version
+          publish: pnpm run changeset:publish
+          version: pnpm run changeset:version
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
