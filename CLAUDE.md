@@ -48,11 +48,11 @@ A feature is done when:
 
 | Gate | Check             | Command                  | Threshold                |
 | ---- | ----------------- | ------------------------ | ------------------------ |
-| 1    | TypeScript strict | `npm run type-check`     | Zero errors              |
-| 2    | Test suite        | `npm run test`           | 100% pass, 80%+ coverage |
+| 1    | TypeScript strict | `pnpm run type-check`    | Zero errors              |
+| 2    | Test suite        | `pnpm run test`          | 100% pass, 80%+ coverage |
 | 3    | Accessibility     | WCAG 2.1 AA audit        | Zero violations          |
 | 4    | Storybook         | Stories for all variants | Complete coverage        |
-| 5    | CEM accuracy      | `npm run cem`            | Matches public API       |
+| 5    | CEM accuracy      | `pnpm run cem`           | Matches public API       |
 | 6    | Bundle size       | Per-component analysis   | <5KB each, <50KB total   |
 | 7    | Code review       | 3-tier gate              | All tiers approved       |
 
@@ -91,10 +91,10 @@ If any gate fails, the release is blocked. Fix forward, never skip.
 
 ### Dev Server Management (PRIORITY)
 
-**If `npm run dev` is running in the background and you make changes that affect it (new files, config changes, dependency installs), YOU restart it. Do not tell the user to restart.**
+**If `pnpm run dev` is running in the background and you make changes that affect it (new files, config changes, dependency installs), YOU restart it. Do not tell the user to restart.**
 
-1. Run `npm run kill-ports` to kill all dev server processes
-2. Run `npm run dev` in the background
+1. Run `pnpm run kill-ports` to kill all dev server processes
+2. Run `pnpm run dev` in the background
 3. Verify the servers come up
 
 This applies to ANY change that would require a restart: new story files, config edits, package installs, build output changes. When in doubt, restart.
@@ -104,7 +104,7 @@ This applies to ANY change that would require a restart: new story files, config
 - File reads, basic exploration, git operations
 - Agent coordination and routing
 - Simple config edits (1-3 lines)
-- Running scripts (`npm run build`, `npm run test`, etc.)
+- Running scripts (`pnpm run build`, `pnpm run test`, etc.)
 - **Dev server restarts** (see above)
 
 ### What You ALWAYS Delegate
@@ -151,7 +151,7 @@ helix/
 | Stories          | Storybook 10.x with CEM-driven autodocs          |
 | Docs Site        | Astro Starlight                                  |
 | Admin            | Next.js 15 (Admin Dashboard dashboard)           |
-| Monorepo         | Turborepo + npm workspaces                       |
+| Monorepo         | Turborepo + pnpm workspaces                      |
 | Primary Consumer | Drupal CMS (Twig templates, Drupal behaviors)    |
 
 ### Conventions
@@ -176,11 +176,11 @@ helix/
 
 Every component must pass ALL gates before merge:
 
-1. `npm run type-check` — zero errors (TypeScript strict, no `any`)
-2. `npm run test` — all Vitest browser tests pass, 80%+ coverage
+1. `pnpm run type-check` — zero errors (TypeScript strict, no `any`)
+2. `pnpm run test` — all Vitest browser tests pass, 80%+ coverage
 3. Accessibility — WCAG 2.1 AA verified (healthcare mandate, zero regressions)
 4. Storybook — stories for all variants, controls for all public properties
-5. CEM — `npm run cem` generates accurate Custom Elements Manifest
+5. CEM — `pnpm run cem` generates accurate Custom Elements Manifest
 6. Performance — no bundle size regression (<5KB per component min+gz, <50KB full bundle)
 7. Code review — 3-tier review gate (`code-reviewer` → `senior-code-reviewer` → `chief-code-reviewer`)
 
@@ -191,25 +191,25 @@ Every component must pass ALL gates before merge:
 ### Dev Servers
 
 ```bash
-npm run dev                    # All apps + library (Turborepo)
-npm run dev:library            # Library watch mode only
-npm run dev:docs               # Astro Starlight docs
-npm run dev:storybook          # Storybook 10.x on port 3151
-npm run dev:admin              # Admin Dashboard on port 3159
+pnpm run dev                    # All apps + library (Turborepo)
+pnpm run dev:library            # Library watch mode only
+pnpm run dev:docs               # Astro Starlight docs
+pnpm run dev:storybook          # Storybook 10.x on port 3151
+pnpm run dev:admin              # Admin Dashboard on port 3159
 ```
 
 ### Build & Quality
 
 ```bash
-npm run verify                 # MANDATORY before push: lint + format:check + type-check
-npm run build                  # Build everything (Turborepo)
-npm run type-check             # TypeScript strict
-npm run test                   # Vitest browser mode (112 tests)
-npm run test:library           # Tests for @helixui/library only
-npm run test:smart             # Smart: only tests changed components vs origin/dev
-npm run cem                    # Generate Custom Elements Manifest
-npm run lint                   # ESLint
-npm run format                 # Auto-fix formatting
+pnpm run verify                 # MANDATORY before push: lint + format:check + type-check
+pnpm run build                  # Build everything (Turborepo)
+pnpm run type-check             # TypeScript strict
+pnpm run test                   # Vitest browser mode (112 tests)
+pnpm run test:library           # Tests for @helixui/library only
+pnpm run test:smart             # Smart: only tests changed components vs origin/dev
+pnpm run cem                    # Generate Custom Elements Manifest
+pnpm run lint                   # ESLint
+pnpm run format                 # Auto-fix formatting
 ```
 
 ### Component Development Workflow
@@ -276,23 +276,23 @@ All agents: `.claude/agents/engineering/`
 
 ## Pre-Push Quality Gate — MANDATORY, NO EXCEPTIONS
 
-**Run `npm run verify` before every `git push`. Zero failures required.**
+**Run `pnpm run verify` before every `git push`. Zero failures required.**
 
 ```bash
-npm run verify   # runs: lint + format:check + type-check
+pnpm run verify   # runs: lint + format:check + type-check
 ```
 
-Do NOT push if `npm run verify` fails. Fix the issue first, then re-run.
+Do NOT push if `pnpm run verify` fails. Fix the issue first, then re-run.
 
 Auto-fix helpers:
 
 ```bash
-npx eslint --fix .    # auto-fix lint errors
-npm run format        # auto-fix formatting
-npm run verify        # confirm clean — must be zero failures before push
+pnpm exec eslint --fix .    # auto-fix lint errors
+pnpm run format        # auto-fix formatting
+pnpm run verify        # confirm clean — must be zero failures before push
 ```
 
-**Why this matters:** Git hooks are bypassed in the automated workflow (`HUSKY=0`, `--no-verify`). The only guarantee of code quality before CI is running `npm run verify` manually before every push. A PR that fails CI wastes agent cycles and blocks other work. This is not optional.
+**Why this matters:** Git hooks are bypassed in the automated workflow (`HUSKY=0`, `--no-verify`). The only guarantee of code quality before CI is running `pnpm run verify` manually before every push. A PR that fails CI wastes agent cycles and blocks other work. This is not optional.
 
 ---
 
@@ -301,11 +301,13 @@ npm run verify        # confirm clean — must be zero failures before push
 Code flows through three branches: `feature/* → dev → staging → main`.
 
 **Branch protection:**
+
 - `dev`: Required status checks: `Quality Gates` + `CodeRabbit`. All feature PRs get CodeRabbit review.
 - `staging`: Required status checks: `Quality Gates` only. CodeRabbit does not auto-review staging-targeted PRs (`.coderabbit.yaml` scopes auto-review to `base_branches: [dev]`).
 - `main`: Required status checks: `Quality Gates` + `CodeRabbit`. Receives from staging only.
 
 **Promotion flow:**
+
 1. `dev → staging`: Autonomous. Create PR, enable auto-merge, CI must pass `Quality Gates`.
 2. `staging → main`: Create PR, enable auto-merge, CI must pass. Internal code review (3-tier agent review) required since CodeRabbit does not auto-review dev-targeted PRs that have already been promoted.
 
@@ -313,7 +315,7 @@ Code flows through three branches: `feature/* → dev → staging → main`.
 
 ## Git Rules
 
-- `npm run verify` must pass before every `git push` (runs lint + format:check + type-check)
+- `pnpm run verify` must pass before every `git push` (runs lint + format:check + type-check)
 - Never use `--no-verify`
 - Never use `git reset --hard` or `git push --force` without explicit permission
 - Commit messages: concise, imperative ("Add hx-select component", not "Added")
