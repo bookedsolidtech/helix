@@ -235,11 +235,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
       - name: Detect changed components
         id: detect
         run: |
@@ -262,6 +257,13 @@ jobs:
           else
             echo "VRT scoped to: $CHANGED"
           fi
+      - uses: pnpm/action-setup@v4
+        if: steps.detect.outputs.changed != ''
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.changed != ''
+        with:
+          node-version: 20
+          cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
         if: steps.detect.outputs.changed != ''
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
