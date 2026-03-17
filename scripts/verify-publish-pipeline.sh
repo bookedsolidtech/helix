@@ -122,18 +122,18 @@ TOKENS_PKG="$REPO_ROOT/packages/hx-tokens/package.json"
 # hx-library build should not use bare `npm run` (as opposed to `pnpm run`)
 # Check by looking for ' npm ' or '&& npm ' — `pnpm run` would NOT match these.
 LIB_BUILD=$(python3 -c "import json; d=json.load(open('$LIBRARY_PKG')); print(d.get('scripts',{}).get('build',''))")
-if echo "$LIB_BUILD" | grep -qE '(^| )npm (run|exec|install)'; then
+if echo "$LIB_BUILD" | grep -qE '(^| )(npm|npx) '; then
   check "hx-library build script uses pnpm (not bare npm/npx)" "fail"
 else
   check "hx-library build script uses pnpm (not bare npm/npx)" "pass"
 fi
 
-# hx-tokens build should not use npx
+# hx-tokens build should not use npm or npx
 TOK_BUILD=$(python3 -c "import json; d=json.load(open('$TOKENS_PKG')); print(d.get('scripts',{}).get('build',''))")
-if echo "$TOK_BUILD" | grep -qE '(^| )npx '; then
-  check "hx-tokens build script uses pnpm exec (not npx)" "fail"
+if echo "$TOK_BUILD" | grep -qE '(^| )(npm|npx) '; then
+  check "hx-tokens build script uses pnpm exec (not npm/npx)" "fail"
 else
-  check "hx-tokens build script uses pnpm exec (not npx)" "pass"
+  check "hx-tokens build script uses pnpm exec (not npm/npx)" "pass"
 fi
 
 echo ""
@@ -152,7 +152,7 @@ if [[ ! -d "$REPO_ROOT/packages/hx-library/dist" ]]; then
   FAIL=$((FAIL + 1))
 else
   (cd "$REPO_ROOT/packages/hx-library" && pnpm pack --pack-destination "$TMPDIR_LIB" 2>/dev/null)
-  LIB_TGZ=$(ls "$TMPDIR_LIB"/*.tgz 2>/dev/null | head -1)
+  LIB_TGZ=$(find "$TMPDIR_LIB" -maxdepth 1 -type f -name '*.tgz' -print -quit)
   if [[ -z "$LIB_TGZ" ]]; then
     check "hx-library pack produced a tarball" "fail"
   else
@@ -180,7 +180,7 @@ if [[ ! -d "$REPO_ROOT/packages/hx-tokens/dist" ]]; then
   FAIL=$((FAIL + 1))
 else
   (cd "$REPO_ROOT/packages/hx-tokens" && pnpm pack --pack-destination "$TMPDIR_TOK" 2>/dev/null)
-  TOK_TGZ=$(ls "$TMPDIR_TOK"/*.tgz 2>/dev/null | head -1)
+  TOK_TGZ=$(find "$TMPDIR_TOK" -maxdepth 1 -type f -name '*.tgz' -print -quit)
   if [[ -z "$TOK_TGZ" ]]; then
     check "hx-tokens pack produced a tarball" "fail"
   else
