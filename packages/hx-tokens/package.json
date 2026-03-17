@@ -35,7 +35,7 @@
     "src/tokens.json"
   ],
   "scripts": {
-    "build": "tsc && npx tsx scripts/generate-css.ts",
+    "build": "tsc && pnpm exec tsx scripts/generate-css.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
