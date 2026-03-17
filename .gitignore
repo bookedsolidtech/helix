@@ -64,8 +64,35 @@ apps/mcp-servers/*/coverage/
 # Library registry (per-install, not shared)
 apps/admin/src/data/library-registry.json
 
-# protoLabs Studio (entire directory — runtime state, settings, features, archives)
-.automaker/
+# protoLabs Studio — operational state (never committed)
+# context/, memory/, skills/, spec.md are TRACKED (project knowledge)
+.automaker/archive/
+.automaker/authority/
+.automaker/checkpoints/
+.automaker/events/
+.automaker/features/
+.automaker/images/
+.automaker/ledger/
+.automaker/notes/
+.automaker/projects/
+.automaker/quarantine/
+.automaker/recovery/
+.automaker/todos/
+.automaker/trajectory/
+.automaker/worktrees/
+.automaker/.backups/
+.automaker/agents/
+.automaker/self-review/
+.automaker/active-branches.json
+.automaker/actionable-items.json
+.automaker/calendar.json
+.automaker/categories.json
+.automaker/execution-state.json
+.automaker/notifications.json
+.automaker/settings.json
+.automaker/settings.json.bak*
+.automaker/context/context-metadata.json
+.automaker/knowledge*
 .automaker-lock
 
 # MCP health scorer output (regenerated on demand)
