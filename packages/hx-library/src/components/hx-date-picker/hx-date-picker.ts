@@ -528,6 +528,15 @@ export class HelixDatePicker extends LitElement {
       return;
     }
 
+    // Explicit Escape handler on the calendar container provides a reliable
+    // exit path even when the document-level handler does not fire (e.g. when
+    // the event is stopped by a descendant or the shadow boundary interferes).
+    if (key === 'Escape') {
+      e.stopPropagation();
+      this._closeCalendar();
+      return;
+    }
+
     if (
       key !== 'ArrowLeft' &&
       key !== 'ArrowRight' &&
@@ -663,13 +672,18 @@ export class HelixDatePicker extends LitElement {
     const first = focusableEls[0];
     const last = focusableEls[focusableEls.length - 1];
 
+    // In shadow DOM, document.activeElement returns the host element, not the
+    // focused inner element. Use shadowRoot.activeElement exclusively so the
+    // comparison is accurate and the trap cannot malfunction and strand users.
+    const shadowActive = this.shadowRoot?.activeElement;
+
     if (e.shiftKey) {
-      if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
+      if (shadowActive === first) {
         e.preventDefault();
         last?.focus();
       }
     } else {
-      if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
+      if (shadowActive === last) {
         e.preventDefault();
         first?.focus();
       }
@@ -698,7 +712,7 @@ export class HelixDatePicker extends LitElement {
     for (let rowStart = 0; rowStart < cells.length; rowStart += 7) {
       const rowCells = cells.slice(rowStart, rowStart + 7).map((date) => {
         if (date === null) {
-          return html`<div class="calendar__day-cell" role="gridcell"></div>`;
+          return html`<div class="calendar__day-cell" role="gridcell" aria-hidden="true"></div>`;
         }
 
         const isSelected = selectedDate ? this._isSameDay(date, selectedDate) : false;
@@ -721,17 +735,15 @@ export class HelixDatePicker extends LitElement {
           'calendar__day--disabled': isDisabled,
         };
 
-        return html`<div
-          class="calendar__day-cell"
-          role="gridcell"
-          aria-selected=${isSelected ? 'true' : 'false'}
-        >
+        return html`<div class="calendar__day-cell">
           <button
             part="day"
             class=${classMap(dayClasses)}
             type="button"
+            role="gridcell"
             data-day=${dayNumber}
             aria-label=${ariaLabel}
+            aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${isDisabled ? 'true' : nothing}
             aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
