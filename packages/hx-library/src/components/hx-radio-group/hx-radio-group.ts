@@ -395,6 +395,11 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Render ───
 
   override render() {

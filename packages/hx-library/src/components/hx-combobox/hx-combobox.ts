@@ -303,6 +303,11 @@ export class HelixCombobox extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Option Syncing from Slot ───
 
   private _handleSlotChange(): void {
