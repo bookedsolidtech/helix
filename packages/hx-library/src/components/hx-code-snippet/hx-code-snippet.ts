@@ -62,16 +62,11 @@ export class HelixCodeSnippet extends LitElement {
   wrap: boolean = false;
 
   /**
-   * When true, shows a copy-to-clipboard button.
+   * When true, shows a copy-to-clipboard button. Add the `copyable` attribute to enable it.
    * @attr copyable
-   *
-   * IMPORTANT: This is a standard boolean attribute. Setting `copyable="false"` in HTML
-   * will NOT disable the copy button — the attribute presence alone signals `true`.
-   * To disable programmatically, set `el.copyable = false` via JavaScript.
-   * In Lit/HTML templates, use `?copyable=${false}` (Lit boolean binding) to remove the attribute.
    */
   @property({ type: Boolean, reflect: true })
-  copyable: boolean = true;
+  copyable: boolean = false;
 
   /**
    * Maximum number of lines to display before showing a "Show more" button.
