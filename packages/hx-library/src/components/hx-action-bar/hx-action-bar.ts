@@ -144,8 +144,9 @@ export class HelixActionBar extends LitElement {
     if (!this.hasAttribute('role')) {
       this.setAttribute('role', 'none');
     } else if (this.getAttribute('role') !== 'none') {
-      console.warn(
-        `[hx-action-bar] Setting role="${this.getAttribute('role')}" on the host creates a duplicate toolbar announcement. ` +
+      devWarn(
+        'hx-action-bar',
+        `Setting role="${this.getAttribute('role')}" on the host creates a duplicate toolbar announcement. ` +
           'The shadow DOM already contains role="toolbar". Set role="none" on the host to suppress it.',
       );
     }
