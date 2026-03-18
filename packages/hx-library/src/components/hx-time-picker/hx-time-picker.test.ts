@@ -702,9 +702,9 @@ describe('hx-time-picker', () => {
 
     it('help slot renders help content', async () => {
       const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker><span slot="help">Call for help</span></hx-time-picker>',
+        '<hx-time-picker><span slot="help-text">Call for help</span></hx-time-picker>',
       );
-      const helpContent = el.querySelector('[slot="help"]');
+      const helpContent = el.querySelector('[slot="help-text"]');
       expect(helpContent).toBeTruthy();
       expect(helpContent?.textContent).toBe('Call for help');
     });
@@ -1218,18 +1218,14 @@ describe('hx-time-picker', () => {
 
   describe('formStateRestoreCallback edge cases', () => {
     it('ignores File argument and does not change value', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker value="09:00"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker value="09:00"></hx-time-picker>');
       el.formStateRestoreCallback(new File([], 'test.txt'));
       await el.updateComplete;
       expect(el.value).toBe('09:00');
     });
 
     it('ignores FormData argument and does not change value', async () => {
-      const el = await fixture<HelixTimePicker>(
-        '<hx-time-picker value="09:00"></hx-time-picker>',
-      );
+      const el = await fixture<HelixTimePicker>('<hx-time-picker value="09:00"></hx-time-picker>');
       el.formStateRestoreCallback(new FormData());
       await el.updateComplete;
       expect(el.value).toBe('09:00');

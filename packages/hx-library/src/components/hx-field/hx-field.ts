@@ -33,7 +33,7 @@ function isFormControl(el: Element): el is HTMLElement {
  *
  * @slot - The form control element (native or custom).
  * @slot label - Custom label content (overrides the label property).
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property).
  * @slot description - Additional descriptive content above the control.
  *
@@ -359,7 +359,7 @@ export class HelixField extends LitElement {
           id=${this._helpTextId}
           ?hidden=${!hasHelp || hasError}
         >
-          <slot name="help" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </div>
     `;

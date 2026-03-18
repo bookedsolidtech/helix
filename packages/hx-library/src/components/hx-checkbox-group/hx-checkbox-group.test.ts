@@ -217,10 +217,10 @@ describe('hx-checkbox-group', () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
-          <span slot="help">Select all that apply</span>
+          <span slot="help-text">Select all that apply</span>
         </hx-checkbox-group>
       `);
-      const helpSlotted = el.querySelector('[slot="help"]');
+      const helpSlotted = el.querySelector('[slot="help-text"]');
       expect(helpSlotted).toBeTruthy();
       expect(helpSlotted?.textContent).toBe('Select all that apply');
     });

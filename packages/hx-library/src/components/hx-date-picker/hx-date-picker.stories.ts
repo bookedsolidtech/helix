@@ -388,7 +388,7 @@ export const WithHelpSlot: Story = {
   render: () => html`
     <hx-date-picker label="Consent Form Date" name="consentDate" format="MM/DD/YYYY">
       <span
-        slot="help"
+        slot="help-text"
         style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); display: flex; align-items: center; gap: 0.25rem;"
       >
         <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
