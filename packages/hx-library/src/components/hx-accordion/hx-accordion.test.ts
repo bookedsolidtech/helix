@@ -602,7 +602,7 @@ describe('hx-accordion-item', () => {
       `);
       const content = shadowQuery(el, '[role="region"]')!;
       const triggerId = content.getAttribute('aria-labelledby');
-      expect(triggerId).toBe('trigger');
+      expect(triggerId).toMatch(/^hx-accordion-item-\d+-trigger$/);
 
       // Verify the referenced element exists
       const trigger = shadowQuery(el, `#${triggerId}`);
@@ -640,7 +640,7 @@ describe('hx-accordion-item', () => {
       `);
       const summary = shadowQuery<HTMLElement>(el, 'summary')!;
       const controlsId = summary.getAttribute('aria-controls');
-      expect(controlsId).toBe('content');
+      expect(controlsId).toMatch(/^hx-accordion-item-\d+-content$/);
 
       const panel = shadowQuery(el, `#${controlsId}`);
       expect(panel).toBeTruthy();
