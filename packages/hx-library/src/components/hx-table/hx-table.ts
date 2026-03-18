@@ -70,7 +70,7 @@ export class HelixTable extends LitElement {
   // ─── Lifecycle ───
 
   override willUpdate(changed: Map<string, unknown>): void {
-    if (changed.has('label') && !this.label) {
+    if (changed.has('label') && !this.label && changed.get('label') !== undefined) {
       console.warn(
         '[hx-table] No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
       );
@@ -84,6 +84,7 @@ export class HelixTable extends LitElement {
 
     return html`
       <div class="table-wrapper">
+        <!-- role="table" is required: sub-components use display:contents which can confuse assistive technology in Shadow DOM -->
         <table part="table" role="table" aria-label=${this.label || nothing}>
           ${hasCaption
             ? html`<caption part="caption">

@@ -52,22 +52,24 @@ export const helixTableStyles = css`
     --_hx-table-cell-bg: var(--hx-table-header-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  /* Striped variant: signal tbody to activate alternating row color */
+  /* Striped variant: set stripe signal on hx-tbody (direct slotted child) so hx-tbody can apply to even rows */
   :host([variant='striped']) ::slotted(hx-tbody) {
     --_hx-table-row-stripe-bg: var(--hx-table-stripe-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  /* Hover variant: set hover bg variable on direct section slot children */
+  /* Hover variant: set hover bg variable on direct slotted section elements */
   :host([variant='hover']) ::slotted(hx-tbody),
   :host([variant='hover']) ::slotted(hx-thead),
   :host([variant='striped']) ::slotted(hx-tbody),
-  :host([variant='default']) ::slotted(hx-tbody) {
+  :host([variant='striped']) ::slotted(hx-thead),
+  :host([variant='default']) ::slotted(hx-tbody),
+  :host([variant='default']) ::slotted(hx-thead) {
     --_hx-table-row-hover-bg: var(--hx-table-row-hover-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  /* Compact variant: reduced padding signal via direct section slot children */
-  :host([variant='compact']) ::slotted(hx-tbody),
+  /* Compact variant: reduced padding signal set on section elements that cascade to cells */
   :host([variant='compact']) ::slotted(hx-thead),
+  :host([variant='compact']) ::slotted(hx-tbody),
   :host([variant='compact']) ::slotted(hx-tfoot) {
     --_hx-table-cell-padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
   }

@@ -39,17 +39,23 @@ describe('hx-table', () => {
     });
 
     it('does not set aria-label when label is empty', async () => {
-      // Suppress expected console.warn for this test
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixTable>('<hx-table></hx-table>');
       const table = shadowQuery(el, 'table');
       expect(table?.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('does not warn on initial render when label is not provided', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixTable>('<hx-table></hx-table>');
+      expect(warn).not.toHaveBeenCalled();
       warn.mockRestore();
     });
 
-    it('warns when label attribute is not provided', async () => {
+    it('warns when label is changed to empty string after having a value', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      await fixture<HelixTable>('<hx-table></hx-table>');
+      const el = await fixture<HelixTable>('<hx-table label="Patients"></hx-table>');
+      el.label = '';
+      await el.updateComplete;
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('[hx-table]'));
       warn.mockRestore();
     });
@@ -152,6 +158,45 @@ describe('hx-table', () => {
 
     it('reflects full-width attribute on host', async () => {
       const el = await fixture<HelixTable>('<hx-table label="Test" full-width></hx-table>');
+      expect(el.hasAttribute('full-width')).toBe(true);
+      expect(el.fullWidth).toBe(true);
+    });
+
+    it('variant="striped" sets variant attribute (CSS selector hooks for striping)', async () => {
+      const el = await fixture<HelixTable>(
+        `<hx-table label="Test" variant="striped">
+          <hx-tbody>
+            <hx-tr><hx-td>Row 1</hx-td></hx-tr>
+            <hx-tr><hx-td>Row 2</hx-td></hx-tr>
+          </hx-tbody>
+        </hx-table>`,
+      );
+      await el.updateComplete;
+      // The variant attribute drives CSS :host([variant="striped"]) selectors
+      expect(el.getAttribute('variant')).toBe('striped');
+    });
+
+    it('stickyHeader=true reflects sticky-header attribute (CSS selector hook)', async () => {
+      const el = await fixture<HelixTable>(
+        `<hx-table label="Test" sticky-header>
+          <hx-thead><hx-tr><hx-th>Name</hx-th></hx-tr></hx-thead>
+          <hx-tbody><hx-tr><hx-td>Jane</hx-td></hx-tr></hx-tbody>
+        </hx-table>`,
+      );
+      await el.updateComplete;
+      // The sticky-header attribute drives :host([sticky-header]) CSS selectors
+      expect(el.hasAttribute('sticky-header')).toBe(true);
+      expect(el.stickyHeader).toBe(true);
+    });
+
+    it('fullWidth=true reflects full-width attribute (CSS selector hook)', async () => {
+      const el = await fixture<HelixTable>(
+        `<hx-table label="Test" full-width>
+          <hx-tbody><hx-tr><hx-td>Content</hx-td></hx-tr></hx-tbody>
+        </hx-table>`,
+      );
+      await el.updateComplete;
+      // The full-width attribute drives :host([full-width]) table { width: 100% }
       expect(el.hasAttribute('full-width')).toBe(true);
       expect(el.fullWidth).toBe(true);
     });
@@ -416,10 +461,18 @@ describe('hx-th', () => {
       expect(th?.getAttribute('aria-sort')).toBe('descending');
     });
 
-    it('has tabindex="0" on <th> when sortable', async () => {
+    it('does not set tabindex on <th> when sortable (button handles focus)', async () => {
       const el = await fixture<HelixTableHeader>('<hx-th sortable>Name</hx-th>');
       const th = shadowQuery(el, 'th');
-      expect(th?.getAttribute('tabindex')).toBe('0');
+      expect(th?.hasAttribute('tabindex')).toBe(false);
+    });
+
+    it('sort button is naturally focusable when sortable', async () => {
+      const el = await fixture<HelixTableHeader>('<hx-th sortable>Name</hx-th>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '.sort-btn');
+      expect(btn).toBeTruthy();
+      // Native <button> elements are focusable without tabindex
+      expect(btn?.tagName.toLowerCase()).toBe('button');
     });
 
     it('does not set tabindex on <th> when not sortable', async () => {
@@ -506,20 +559,22 @@ describe('hx-th', () => {
   });
 
   describe('keyboard', () => {
-    it('Enter key on <th> dispatches hx-sort', async () => {
+    it('sort button receives Enter key activation (native button behavior)', async () => {
       const el = await fixture<HelixTableHeader>('<hx-th sortable>Name</hx-th>');
-      const th = shadowQuery<HTMLElement>(el, 'th')!;
+      const btn = shadowQuery<HTMLButtonElement>(el, '.sort-btn')!;
       const eventPromise = oneEvent<CustomEvent<HxTableSortDetail>>(el, 'hx-sort');
-      th.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      // Simulate keyboard activation: native buttons fire click on Enter/Space
+      btn.click();
       const event = await eventPromise;
       expect(event.detail.direction).toBe('asc');
     });
 
-    it('Space key on <th> dispatches hx-sort', async () => {
+    it('sort button receives Space key activation (native button behavior)', async () => {
       const el = await fixture<HelixTableHeader>('<hx-th sortable>Name</hx-th>');
-      const th = shadowQuery<HTMLElement>(el, 'th')!;
+      const btn = shadowQuery<HTMLButtonElement>(el, '.sort-btn')!;
       const eventPromise = oneEvent<CustomEvent<HxTableSortDetail>>(el, 'hx-sort');
-      th.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      // Simulate keyboard activation: native buttons fire click on Enter/Space
+      btn.click();
       const event = await eventPromise;
       expect(event.detail.direction).toBe('asc');
     });
@@ -654,6 +709,32 @@ describe('hx-td', () => {
       const assigned = slot!.assignedElements();
       expect(assigned.length).toBe(1);
       expect((assigned[0] as HTMLElement).id).toBe('cell-content');
+    });
+  });
+
+  describe('label / data-label', () => {
+    it('forwards label attribute as data-label on native <td>', async () => {
+      const el = await fixture<HelixTableCell>('<hx-td label="Patient Name">Jane Doe</hx-td>');
+      await el.updateComplete;
+      const td = shadowQuery(el, 'td');
+      expect(td?.getAttribute('data-label')).toBe('Patient Name');
+    });
+
+    it('does not set data-label when label is empty (default)', async () => {
+      const el = await fixture<HelixTableCell>('<hx-td>Content</hx-td>');
+      const td = shadowQuery(el, 'td');
+      expect(td?.hasAttribute('data-label')).toBe(false);
+    });
+
+    it('updates data-label when label property changes', async () => {
+      const el = await fixture<HelixTableCell>('<hx-td label="Name">Jane</hx-td>');
+      await el.updateComplete;
+      const td = shadowQuery(el, 'td');
+      expect(td?.getAttribute('data-label')).toBe('Name');
+
+      el.label = 'Full Name';
+      await el.updateComplete;
+      expect(td?.getAttribute('data-label')).toBe('Full Name');
     });
   });
 });

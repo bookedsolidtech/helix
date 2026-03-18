@@ -292,7 +292,6 @@ export const Sortable: Story = {
     const sortBtn = drugHeader.shadowRoot?.querySelector('.sort-btn') as HTMLElement | null;
     await expect(sortBtn).toBeTruthy();
     await userEvent.click(sortBtn!);
-    await new Promise((r) => setTimeout(r, 50));
 
     // hx-sort event must have fired
     await expect(sortHandler).toHaveBeenCalledTimes(1);
