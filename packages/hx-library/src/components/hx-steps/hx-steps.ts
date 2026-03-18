@@ -58,9 +58,6 @@ export class HelixSteps extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    if (!this.hasAttribute('role')) {
-      this.setAttribute('role', 'list');
-    }
     this.addEventListener('hx-step-click-internal', this._handleStepClickInternal);
   }
 
