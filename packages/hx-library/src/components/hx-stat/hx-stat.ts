@@ -146,6 +146,7 @@ export class HelixStat extends LitElement {
                 <span
                   part="trend"
                   class="stat__trend stat__trend--${this.trend}"
+                  role="img"
                   aria-label="Trend: ${this.trend}"
                 >
                   ${this._renderTrendArrow(this.trend as 'up' | 'down')}
