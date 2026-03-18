@@ -1,6 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
 
 // D21 — deterministic monotonic counter instead of Math.random()
@@ -193,7 +194,7 @@ export class HelixDialog extends LitElement {
     this._removeGlobalListeners();
     // Restore body scroll if disconnected while open
     if (this.modal && this.open) {
-      document.body.style.overflow = '';
+      unlockBodyScroll();
     }
   }
 
@@ -246,8 +247,10 @@ export class HelixDialog extends LitElement {
       if (!dialog.open) {
         dialog.showModal();
       }
-      // D4 — lock body scroll when modal dialog is open
-      document.body.style.overflow = 'hidden';
+      // D4 — lock body scroll when modal dialog is open. Uses a shared reference-counted
+      // lock so that simultaneous hx-dialog / hx-drawer instances don't clobber each other
+      // when one closes before the other (see utils/body-scroll-lock.ts).
+      lockBodyScroll();
     } else {
       if (!dialog.open) {
         dialog.show();
@@ -287,8 +290,9 @@ export class HelixDialog extends LitElement {
       }
     }
 
-    // D4 — restore body scroll when dialog closes
-    document.body.style.overflow = '';
+    // D4 — release body scroll lock. Uses shared counter so scroll is only restored
+    // after every open overlay (hx-dialog + hx-drawer) has closed.
+    unlockBodyScroll();
 
     this._removeGlobalListeners();
     this._cachedFocusableElements = [];

@@ -34,6 +34,14 @@ export function toast(options: ToastOptions): HelixToast {
   if (!stack) {
     stack = document.createElement('hx-toast-stack') as HelixToastStack;
     stack.placement = placement;
+    // Intentional design decision: the toast stack is appended to document.body rather
+    // than inserted near the caller. This is required so that the fixed-position overlay
+    // is not clipped by an ancestor with `overflow: hidden`, `transform`, or `filter`
+    // (all of which create a new stacking context and break fixed positioning).
+    // Drupal compatibility note: Drupal's BigPipe / AJAX behaviors can re-attach the
+    // document body without removing these stacks. The selector check above
+    // (`document.querySelector`) ensures only one stack per placement is ever created,
+    // preventing duplicates on re-attach cycles.
     document.body.appendChild(stack);
   }
 
