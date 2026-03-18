@@ -79,44 +79,77 @@ export class HelixDrawer extends LitElement {
 
   // ─── Queries ───
 
-  /** @internal */
+  /**
+   * Reference to the overlay element that wraps the backdrop and panel.
+   * @internal
+   */
   @query('.drawer-overlay')
   private _overlayEl: HTMLElement | null | undefined;
 
-  /** @internal */
+  /**
+   * Reference to the drawer panel element used for focus management.
+   * @internal
+   */
   @query('.drawer-panel')
   private _panelEl: HTMLElement | null | undefined;
 
   // ─── Internal state ───
 
-  /** @internal */
+  /**
+   * Whether the drawer is in the open state and visible to the user.
+   * @internal
+   */
   @state()
   private _isOpen = false;
 
-  /** @internal */
+  /**
+   * Whether the header-actions slot has any assigned content.
+   * @internal
+   */
   @state()
   private _hasHeaderActionsSlot = false;
 
-  /** @internal */
+  /**
+   * Whether the footer slot has any assigned content.
+   * @internal
+   */
   @state()
   private _hasFooterSlot = false;
 
-  /** @internal */
+  /**
+   * Whether the label slot has any assigned content.
+   * @internal
+   */
   @state()
   private _hasLabelSlot = false;
 
-  /** @internal */
+  /**
+   * Cached list of focusable elements within the drawer, used for focus trapping.
+   * @internal
+   */
   private _cachedFocusableElements: HTMLElement[] = [];
-  /** @internal */
+  /**
+   * The element that triggered the drawer to open, restored focus when the drawer closes.
+   * @internal
+   */
   private _triggerElement: HTMLElement | null = null;
-  /** @internal */
+  /**
+   * Handle for the pending animation end timeout, cleared when the drawer opens or closes again.
+   * @internal
+   */
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
   /** Whether this drawer instance currently holds a body-scroll lock. */
   private _hasScrollLock = false;
-  /** @internal */
+  /**
+   * Elements outside the drawer that were given aria-hidden during open, restored on close.
+   * @internal
+   */
   private _siblingAriaHiddenElements: Element[] = [];
 
-  /** @internal */
+  /**
+   * Unique ID for the title element, used by aria-labelledby to link the dialog to its label.
+   * @internal
+   */
   private readonly _titleId = `hx-drawer-title-${++_hxDrawerIdCounter}`;
 
   // ─── Public Properties ───
@@ -339,7 +372,10 @@ export class HelixDrawer extends LitElement {
 
   // ─── Keyboard Handler ───
 
-  /** @internal */
+  /**
+   * Handles keyboard events on the document to trap focus and close the drawer on Escape.
+   * @internal
+   */
   private _handleKeyDown = (e: KeyboardEvent): void => {
     if (!this._isOpen) return;
 
@@ -435,7 +471,10 @@ export class HelixDrawer extends LitElement {
 
   // ─── Overlay Click ───
 
-  /** @internal */
+  /**
+   * Handles clicks on the overlay backdrop to close the drawer when the user clicks outside the panel.
+   * @internal
+   */
   private _handleOverlayClick = (e: MouseEvent): void => {
     // Only close when clicking the overlay itself (backdrop), not the panel
     const target = e.target as HTMLElement;

@@ -78,7 +78,10 @@ export class HelixAccordion extends LitElement {
     });
   }
 
-  /** @internal */
+  /**
+   * Handles expand events from child accordion items to enforce single-expand mode.
+   * @internal
+   */
   private _handleChildExpand = (e: Event): void => {
     if (this.mode !== 'single') return;
 
@@ -95,7 +98,10 @@ export class HelixAccordion extends LitElement {
 
   // ─── Arrow key navigation (ARIA APG Accordion pattern) ───
 
-  /** @internal */
+  /**
+   * Handles keyboard navigation between accordion triggers using arrow, Home, and End keys.
+   * @internal
+   */
   private _handleKeyDown = (e: KeyboardEvent): void => {
     const triggers = this._getTriggers();
     if (triggers.length === 0) return;
