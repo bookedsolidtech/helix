@@ -126,6 +126,7 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Slot Handlers ───
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
     this._hasErrorSlot = e.target.assignedNodes({ flatten: true }).length > 0;
@@ -170,6 +171,7 @@ export class HelixRadioGroup extends LitElement {
   /** @internal */
   private _individualDisabledStates = new WeakMap<HelixRadio, boolean>();
 
+  /** @internal */
   private _getRadios(): HelixRadio[] {
     if (!this._cachedRadios) {
       this._cachedRadios = Array.from(this.querySelectorAll('hx-radio')) as HelixRadio[];
@@ -177,10 +179,12 @@ export class HelixRadioGroup extends LitElement {
     return this._cachedRadios;
   }
 
+  /** @internal */
   private _getEnabledRadios(): HelixRadio[] {
     return this._getRadios().filter((radio) => !radio.disabled && !this.disabled);
   }
 
+  /** @internal */
   private _syncRadios(): void {
     const radios = this._getRadios();
     const enabledRadios = this._getEnabledRadios();
@@ -315,6 +319,7 @@ export class HelixRadioGroup extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleSlotChange(): void {
     this._cachedRadios = null;
     this._syncRadios();
@@ -362,6 +367,7 @@ export class HelixRadioGroup extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
