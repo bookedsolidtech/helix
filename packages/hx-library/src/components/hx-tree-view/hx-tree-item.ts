@@ -66,7 +66,10 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /**
+   * Tracks whether any elements are assigned to the children slot, controlling expand icon visibility.
+   * @internal
+   */
   @state() private _hasChildren = false;
 
   /**
@@ -81,11 +84,20 @@ export class HelixTreeItem extends LitElement {
    * @internal
    */
   @state() private _level = 1;
-  /** @internal */
+  /**
+   * One-based position of this item within its sibling set, set as aria-posinset.
+   * @internal
+   */
   @state() private _posInSet = 1;
-  /** @internal */
+  /**
+   * Total count of sibling hx-tree-item elements at the same level, set as aria-setsize.
+   * @internal
+   */
   @state() private _setSize = 1;
-  /** @internal */
+  /**
+   * Whether the owning hx-tree-view supports item selection (single or multiple mode).
+   * @internal
+   */
   @state() private _selectable = false;
 
   // ─── Computed ARIA ───
@@ -145,7 +157,10 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Children Detection ───
 
-  /** @internal */
+  /**
+   * Updates _hasChildren and recomputes ARIA metadata when the children slot assignment changes.
+   * @internal
+   */
   private _handleChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedElements().length > 0;
@@ -154,14 +169,20 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Event Handlers ───
 
-  /** @internal */
+  /**
+   * Toggles the expanded state when the expand/collapse button is clicked, stopping event propagation.
+   * @internal
+   */
   private _handleExpandClick(e: Event): void {
     e.stopPropagation();
     if (this.disabled) return;
     this.expanded = !this.expanded;
   }
 
-  /** @internal */
+  /**
+   * Dispatches the hx-tree-item-select event when the item row is clicked.
+   * @internal
+   */
   private _handleRowClick(): void {
     if (this.disabled) return;
     this.dispatchEvent(
@@ -173,7 +194,10 @@ export class HelixTreeItem extends LitElement {
     );
   }
 
-  /** @internal */
+  /**
+   * Handles keyboard navigation within the tree item, delegating ArrowDown/Up/Home/End to the parent tree.
+   * @internal
+   */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (this.disabled) return;
 
@@ -224,7 +248,10 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Render ───
 
-  /** @internal */
+  /**
+   * Renders the expand/collapse chevron button, or a placeholder span when the item has no children.
+   * @internal
+   */
   private _renderExpandIcon() {
     if (!this._hasChildren) {
       return html`<span class="expand-placeholder" aria-hidden="true"></span>`;
