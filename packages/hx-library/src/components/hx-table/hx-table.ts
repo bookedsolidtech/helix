@@ -2,6 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTableStyles } from './hx-table.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A semantic table container with variant styling and accessibility support.
@@ -71,8 +72,9 @@ export class HelixTable extends LitElement {
 
   override willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('label') && !this.label && changed.get('label') !== undefined) {
-      console.warn(
-        '[hx-table] No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
+      devWarn(
+        'hx-table',
+        'No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
       );
     }
   }

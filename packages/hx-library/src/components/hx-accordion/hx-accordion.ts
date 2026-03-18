@@ -4,6 +4,7 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
 import './hx-accordion-item.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * An accordion container that manages collapsible content sections.
@@ -161,8 +162,9 @@ export class HelixAccordion extends LitElement {
       .assignedElements()
       .filter((el) => el.tagName.toLowerCase() !== 'hx-accordion-item');
     if (invalid.length > 0) {
-      console.warn(
-        `[hx-accordion] Default slot expects <hx-accordion-item> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+      devWarn(
+        'hx-accordion',
+        `Default slot expects <hx-accordion-item> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
       );
     }
   }

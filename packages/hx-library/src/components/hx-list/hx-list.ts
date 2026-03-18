@@ -4,6 +4,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixListStyles } from './hx-list.styles.js';
 import { HelixListItem } from './hx-list-item.js'; // real import for instanceof check and property access
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A styled list container supporting plain, bulleted, numbered, description, and interactive variants.
@@ -63,8 +64,9 @@ export class HelixList extends LitElement {
       this._updateItemStates();
     }
     if (this.variant === 'interactive' && !this.label) {
-      console.warn(
-        '[hx-list] The "label" attribute is required when variant is "interactive". ' +
+      devWarn(
+        'hx-list',
+        'The "label" attribute is required when variant is "interactive". ' +
           'Add a label to provide an accessible name for the listbox (WCAG 2.1 SC 4.1.2).',
       );
     }

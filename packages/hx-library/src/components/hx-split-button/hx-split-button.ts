@@ -49,14 +49,17 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Internal References ───
 
+  /** @internal */
   @query('.split-button__menu')
   private _menuPanel: HTMLElement | undefined;
 
+  /** @internal */
   @query('.split-button__trigger')
   private _triggerButton: HTMLButtonElement | undefined;
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _open = false;
 
   // ─── Public Properties ───
@@ -106,6 +109,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Unique IDs ───
 
+  /** @internal */
   private readonly _menuId = `hx-split-button-menu-${++_hxSplitButtonIdCounter}`;
 
   // ─── Lifecycle ───

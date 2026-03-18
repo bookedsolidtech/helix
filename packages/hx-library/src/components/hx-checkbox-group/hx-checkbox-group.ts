@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /** Monotonic counter for stable, SSR-safe IDs. */
 let _uid = 0;
@@ -49,8 +50,10 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -105,14 +108,16 @@ export class HelixCheckboxGroup extends LitElement {
   }
   set orientation(value: string) {
     if (value !== 'vertical' && value !== 'horizontal') {
-      console.warn(`[hx-checkbox-group] Invalid orientation "${value}", defaulting to "vertical".`);
+      devWarn('hx-checkbox-group', `Invalid orientation "${value}", defaulting to "vertical".`);
       value = 'vertical';
     }
     this._orientation = value as 'vertical' | 'horizontal';
   }
   private _orientation: 'vertical' | 'horizontal' = 'vertical';
 
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
   @state() private _hasHelpSlot = false;
 
   // ─── Internal IDs ───

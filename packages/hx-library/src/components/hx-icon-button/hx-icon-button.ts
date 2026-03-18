@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * An icon-only button component for compact, accessible actions.
@@ -162,8 +163,9 @@ export class HelixIconButton extends LitElement {
   override render() {
     const normalizedLabel = this._normalizedLabel();
     if (!normalizedLabel) {
-      console.warn(
-        '[hx-icon-button] The `label` property is required for accessibility. Render suppressed.',
+      devWarn(
+        'hx-icon-button',
+        'The `label` property is required for accessibility. Render suppressed.',
       );
       return nothing;
     }
