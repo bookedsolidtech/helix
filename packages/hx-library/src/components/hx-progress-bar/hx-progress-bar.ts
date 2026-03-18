@@ -28,6 +28,8 @@ import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
  * @cssprop [--hx-progress-bar-label-font-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-progress-bar-label-font-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-progress-bar-label-color=var(--hx-color-neutral-700)] - Label text color.
+ *
+ * @fires {CustomEvent} hx-complete - Emitted when progress reaches 100%.
  */
 @customElement('hx-progress-bar')
 export class HelixProgressBar extends LitElement {
@@ -89,16 +91,19 @@ export class HelixProgressBar extends LitElement {
   @property({ type: String, reflect: true })
   variant: 'default' | 'success' | 'warning' | 'danger' = 'default';
 
+  /** @internal */
   @state() private _liveMessage = '';
   @state() private _hasLabelSlotContent = false;
 
   private static _counter = 0;
   private _uid = `hx-pb-${++HelixProgressBar._counter}`;
 
+  /** @internal */
   private get _isIndeterminate(): boolean {
     return this.indeterminate || this.value === null;
   }
 
+  /** @internal */
   private get _percentage(): number {
     if (this._isIndeterminate) return 0;
     const range = this.max - this.min;
@@ -107,6 +112,7 @@ export class HelixProgressBar extends LitElement {
     return ((clamped - this.min) / range) * 100;
   }
 
+  /** @internal */
   private get _isComplete(): boolean {
     return !this._isIndeterminate && this.value !== null && this.value >= this.max;
   }

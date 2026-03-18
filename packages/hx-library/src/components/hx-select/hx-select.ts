@@ -279,6 +279,11 @@ export class HelixSelect extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Native Select Sync ───
 
   private _syncNativeSelect(): void {

@@ -97,12 +97,12 @@ export class HelixTooltip extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('keydown', this._handleKeydown as EventListener);
+    this.addEventListener('keydown', this._handleKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('keydown', this._handleKeydown as EventListener);
+    this.removeEventListener('keydown', this._handleKeydown);
     this._clearTimers();
     this._lightDomDescription?.remove();
     this._lightDomDescription = null;
@@ -225,7 +225,8 @@ export class HelixTooltip extends LitElement {
   // ─── Events ───
 
   /** @internal */
-  private _handleKeydown = (e: KeyboardEvent): void => {
+  private _handleKeydown = (e: Event): void => {
+    if (!(e instanceof KeyboardEvent)) return;
     if (e.key === 'Escape' && this._visible) {
       this._clearTimers();
       this._hide();

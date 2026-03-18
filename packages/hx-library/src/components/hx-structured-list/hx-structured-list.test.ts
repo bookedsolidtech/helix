@@ -30,10 +30,9 @@ describe('hx-structured-list', () => {
       expect(base).toBeTruthy();
     });
 
-    it('container div has role="list" for assistive technology', async () => {
+    it('host element has role="list" for assistive technology', async () => {
       const el = await fixture<HelixStructuredList>('<hx-structured-list></hx-structured-list>');
-      const base = shadowQuery(el, '[role="list"]');
-      expect(base).toBeTruthy();
+      expect(el.getAttribute('role')).toBe('list');
     });
   });
 
@@ -255,12 +254,11 @@ describe('hx-structured-list-row', () => {
       expect(value).toBeTruthy();
     });
 
-    it('renders base element with role="listitem"', async () => {
+    it('host element has role="listitem"', async () => {
       const el = await fixture<HelixStructuredListRow>(
         '<hx-structured-list-row><span slot="label">Name</span>Value</hx-structured-list-row>',
       );
-      const item = shadowQuery(el, '[role="listitem"]');
-      expect(item).toBeTruthy();
+      expect(el.getAttribute('role')).toBe('listitem');
     });
 
     it('exposes "actions" CSS part', async () => {
@@ -282,12 +280,13 @@ describe('hx-structured-list-row', () => {
       expect(shadowQuery(el, '[part~="actions"]')).toBeTruthy();
     });
 
-    it('"base" part is the row root element with role="listitem"', async () => {
+    it('"base" part is the row root element and host carries role="listitem"', async () => {
       const el = await fixture<HelixStructuredListRow>(
         '<hx-structured-list-row><span slot="label">Name</span>Value</hx-structured-list-row>',
       );
       const base = shadowQuery(el, '[part~="base"]');
-      expect(base?.getAttribute('role')).toBe('listitem');
+      expect(base).toBeTruthy();
+      expect(el.getAttribute('role')).toBe('listitem');
     });
 
     it('renders actions container with flex display', async () => {
@@ -331,7 +330,7 @@ describe('hx-structured-list-row', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations — row inside list', async () => {
-      // hx-structured-list-row has role="listitem" in its shadow DOM, which requires
+      // hx-structured-list-row has role="listitem" on its host element, which requires
       // a parent with role="list". Wrap in hx-structured-list for a valid axe context.
       const container = await fixture<HelixStructuredList>(`
         <hx-structured-list>
@@ -347,7 +346,7 @@ describe('hx-structured-list-row', () => {
     });
 
     it('has no axe violations — row with actions inside list', async () => {
-      // hx-structured-list-row has role="listitem" in its shadow DOM, which requires
+      // hx-structured-list-row has role="listitem" on its host element, which requires
       // a parent with role="list". Wrap in hx-structured-list for a valid axe context.
       const container = await fixture<HelixStructuredList>(`
         <hx-structured-list>

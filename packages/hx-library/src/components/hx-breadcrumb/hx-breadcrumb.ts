@@ -36,6 +36,7 @@ interface JsonLdListItem {
   item?: string;
 }
 
+/** Breadcrumb navigation component with automatic truncation and JSON-LD structured data. @tag hx-breadcrumb */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
   static override styles = [tokenStyles, helixBreadcrumbStyles];
@@ -87,10 +88,14 @@ export class HelixBreadcrumb extends LitElement {
   @property({ type: Boolean, attribute: 'json-ld' })
   jsonLd = false;
 
+  /** @internal */
   private _ellipsisItem: Element | null = null;
+  /** @internal */
   private _jsonLdScript: HTMLScriptElement | null = null;
+  /** @internal */
   private _boundEllipsisClick: (e: Event) => void = () => undefined;
-  private _boundEllipsisKeydown: (e: KeyboardEvent) => void = () => undefined;
+  /** @internal */
+  private _boundEllipsisKeydown: (e: Event) => void = () => undefined;
 
   /**
    * Tracks which items had their `current` attribute set by this component
@@ -176,8 +181,8 @@ export class HelixBreadcrumb extends LitElement {
   // ─── Slot Handling ───
 
   private _handleSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    const items = this._getBreadcrumbItems(slot);
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    const items = this._getBreadcrumbItems(e.target);
 
     // Handle collapse behaviour
     if (this.maxItems > 0 && items.length > this.maxItems) {
@@ -194,8 +199,8 @@ export class HelixBreadcrumb extends LitElement {
   }
 
   private _handleSeparatorSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    const assigned = slot.assignedElements({ flatten: true });
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    const assigned = e.target.assignedElements({ flatten: true });
     if (assigned.length > 0) {
       const text = (assigned[0] as HTMLElement).textContent?.trim() ?? '';
       this.style.setProperty('--hx-breadcrumb-separator-content', JSON.stringify(text));
@@ -255,7 +260,8 @@ export class HelixBreadcrumb extends LitElement {
     }
   }
 
-  private _handleEllipsisKeydown(e: KeyboardEvent): void {
+  private _handleEllipsisKeydown(e: Event): void {
+    if (!(e instanceof KeyboardEvent)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if ((e.target as Element)?.closest?.('.hx-bc-ellipsis')) {
         e.preventDefault();
@@ -326,13 +332,13 @@ export class HelixBreadcrumb extends LitElement {
     this._boundEllipsisClick = this._handleEllipsisClick.bind(this);
     this._boundEllipsisKeydown = this._handleEllipsisKeydown.bind(this);
     this.addEventListener('click', this._boundEllipsisClick);
-    this.addEventListener('keydown', this._boundEllipsisKeydown as EventListener);
+    this.addEventListener('keydown', this._boundEllipsisKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('click', this._boundEllipsisClick);
-    this.removeEventListener('keydown', this._boundEllipsisKeydown as EventListener);
+    this.removeEventListener('keydown', this._boundEllipsisKeydown);
     this._removeJsonLd();
   }
 

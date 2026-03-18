@@ -63,21 +63,18 @@ export class HelixAlert extends LitElement {
   dismissible = false;
 
   /**
-   * Whether the alert is visible. Set to false to hide the alert.
+   * Whether the alert is visible. Add the `open` attribute to show the alert.
    * @attr open
    */
   @property({ type: Boolean, reflect: true })
-  open = true;
+  open = false;
 
   /**
-   * Whether to show the default variant icon. Set to false to hide the icon container entirely.
-   * Note: Boolean attribute semantics apply — the attribute must be absent (not set to "false")
-   * to hide the icon. `<hx-alert show-icon="false">` still shows the icon because the attribute
-   * is present; use `<hx-alert>` (attribute absent) or `el.showIcon = false` to hide it.
+   * Whether to show the default variant icon. Add `show-icon` attribute to display the icon.
    * @attr show-icon
    */
   @property({ type: Boolean, reflect: true, attribute: 'show-icon' })
-  showIcon = true;
+  showIcon = false;
 
   /**
    * When true, applies a left border accent stripe instead of a full border.

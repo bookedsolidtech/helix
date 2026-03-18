@@ -309,6 +309,11 @@ export class HelixTextarea extends LitElement {
     this.value = state;
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Event Handling ───
 
   /** @internal */

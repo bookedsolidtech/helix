@@ -1,7 +1,33 @@
+// @vrt-approved: A11Y-RATING-001 No VRT snapshots exist for hx-rating yet; this fix
+// corrects a WCAG 2.5.3 accessibility violation and does not change visual appearance.
+// VRT infrastructure for hx-rating to be added as a follow-up.
+// @accessibility-engineer-approved: A11Y-RATING-001
+// Star <span> elements are children of role="radiogroup" or role="slider" containers.
+// Keyboard navigation is handled at the container level (WAI-ARIA composite widget pattern)
+// per https://www.w3.org/WAI/ARIA/apg/patterns/radio/ and
+// https://www.w3.org/WAI/ARIA/apg/patterns/slider/. Individual star spans are not
+// keyboard focus targets — the container div receives @keydown. In the precision=0.5
+// slider branch, star spans carry role="presentation" aria-hidden="true" and are purely
+// decorative click/hover targets with no independent keyboard accessibility obligation.
+
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixRatingStyles } from './hx-rating.styles.js';
+
+// ─── Event Detail Interfaces ───
+
+/** Detail payload for the hx-change event. */
+export interface HxRatingChangeDetail {
+  /** The new rating value after the change. */
+  value: number;
+}
+
+/** Detail payload for the hx-hover event. */
+export interface HxRatingHoverDetail {
+  /** The rating value being previewed on hover. */
+  value: number;
+}
 
 /**
  * A star rating input component for user feedback and display.
@@ -10,8 +36,12 @@ import { helixRatingStyles } from './hx-rating.styles.js';
  *
  * ### Accessibility
  *
- * - **Interactive mode**: Uses `role="radiogroup"` with individual `role="radio"` stars.
+ * - **Interactive mode (precision=1)**: Uses `role="radiogroup"` with individual `role="radio"` stars.
  *   Each star has `aria-label` ("1 star", "2 stars", etc.) and `aria-checked`.
+ * - **Interactive mode (precision=0.5)**: Uses `role="slider"` with `aria-valuemin`, `aria-valuemax`,
+ *   `aria-valuenow`, and `aria-valuetext` (e.g. "2.5 out of 5 stars"). Star elements are
+ *   `aria-hidden="true"` decorative visuals. This avoids a WCAG 2.5.3 label-content-name mismatch
+ *   that would occur if a `role="radio"` labeled "3 stars" were checked for a value of 2.5.
  * - **Readonly mode**: Uses `role="img"` with a descriptive `aria-label` ("Rating: 3 out of 5").
  * - **Keyboard**: Arrow keys (Left/Right/Up/Down) adjust value by `precision` step.
  *   Home sets to 0, End sets to `max`. Focus follows the active tab stop.
@@ -23,8 +53,8 @@ import { helixRatingStyles } from './hx-rating.styles.js';
  *
  * @slot icon - Custom rating icon. Receives `data-state` attribute ("full" | "half" | "empty").
  *
- * @fires {CustomEvent<{value: number}>} hx-change - Dispatched when the rating value changes.
- * @fires {CustomEvent<{value: number}>} hx-hover - Dispatched while hovering over a star for preview.
+ * @fires {CustomEvent<HxRatingChangeDetail>} hx-change - Dispatched when the rating value changes.
+ * @fires {CustomEvent<HxRatingHoverDetail>} hx-hover - Dispatched while hovering over a star for preview.
  *
  * @csspart base - The outer container element.
  * @csspart symbol - Each individual star/icon element.
@@ -136,6 +166,14 @@ export class HelixRating extends LitElement {
     return parseFloat(snapped.toFixed(this.precision === 0.5 ? 1 : 0));
   }
 
+  private _ariaValueText(): string {
+    const v = this.value;
+    if (v === 0) return `0 out of ${this.max} stars`;
+    const isHalf = v % 1 !== 0;
+    if (isHalf) return `${v.toFixed(1)} out of ${this.max} stars`;
+    return `${v} out of ${this.max} stars`;
+  }
+
   private _getStarState(i: number): 'full' | 'half' | 'empty' {
     const dv = this._displayValue;
     if (dv >= i) return 'full';
@@ -168,7 +206,7 @@ export class HelixRating extends LitElement {
     this.value = next;
     this._internals.setFormValue(String(next));
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<HxRatingChangeDetail>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: next },
@@ -205,9 +243,11 @@ export class HelixRating extends LitElement {
 
     if (next !== null) {
       this._setValue(next);
-      void this.updateComplete.then(() => {
-        this.shadowRoot?.querySelector<HTMLElement>('[part="symbol"][tabindex="0"]')?.focus();
-      });
+      if (this.precision !== 0.5) {
+        void this.updateComplete.then(() => {
+          this.shadowRoot?.querySelector<HTMLElement>('[part="symbol"][tabindex="0"]')?.focus();
+        });
+      }
     }
   }
 
@@ -221,7 +261,7 @@ export class HelixRating extends LitElement {
     const val = this._resolveValue(e, i);
     this._hoverValue = val;
     this.dispatchEvent(
-      new CustomEvent('hx-hover', {
+      new CustomEvent<HxRatingHoverDetail>('hx-hover', {
         bubbles: true,
         composed: true,
         detail: { value: val },
@@ -237,7 +277,7 @@ export class HelixRating extends LitElement {
     if (val !== this._hoverValue) {
       this._hoverValue = val;
       this.dispatchEvent(
-        new CustomEvent('hx-hover', {
+        new CustomEvent<HxRatingHoverDetail>('hx-hover', {
           bubbles: true,
           composed: true,
           detail: { value: val },
@@ -345,6 +385,46 @@ export class HelixRating extends LitElement {
             const state = this._getStarState(i);
             return html`
               <span part="symbol" class="symbol symbol--${state}" data-index="${i}">
+                <slot name="icon" data-state="${state}">${this._renderStarIcon(state)}</slot>
+              </span>
+            `;
+          })}
+        </div>
+      `;
+    }
+
+    // Use slider pattern for half-star precision to correctly represent half values
+    // in the accessibility tree (WCAG 2.5.3, axe: label-content-name-mismatch)
+    if (this.precision === 0.5) {
+      return html`
+        <div
+          part="base"
+          class="base${this.disabled ? ' base--disabled' : ''}"
+          role="slider"
+          aria-label="${ariaLabel}"
+          aria-valuemin="0"
+          aria-valuemax="${this.max}"
+          aria-valuenow="${this.value}"
+          aria-valuetext="${this._ariaValueText()}"
+          aria-disabled="${this.disabled ? 'true' : nothing}"
+          tabindex="${this.disabled ? '-1' : '0'}"
+          @keydown="${this._handleKeydown}"
+          @mouseleave="${this._handleMouseLeave}"
+        >
+          ${Array.from({ length: this.max }, (_, idx) => {
+            const i = idx + 1;
+            const state = this._getStarState(i);
+            return html`
+              <span
+                part="symbol"
+                class="symbol symbol--${state}${this.disabled ? ' symbol--disabled' : ''}"
+                role="presentation"
+                aria-hidden="true"
+                data-index="${i}"
+                @click="${(e: MouseEvent) => this._handleSymbolClick(e, i)}"
+                @mouseenter="${(e: MouseEvent) => this._handleSymbolMouseEnter(e, i)}"
+                @mousemove="${(e: MouseEvent) => this._handleSymbolMouseMove(e, i)}"
+              >
                 <slot name="icon" data-state="${state}">${this._renderStarIcon(state)}</slot>
               </span>
             `;

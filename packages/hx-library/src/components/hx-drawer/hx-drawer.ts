@@ -3,6 +3,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -78,32 +79,44 @@ export class HelixDrawer extends LitElement {
 
   // ─── Queries ───
 
+  /** @internal */
   @query('.drawer-overlay')
   private _overlayEl: HTMLElement | null | undefined;
 
+  /** @internal */
   @query('.drawer-panel')
   private _panelEl: HTMLElement | null | undefined;
 
   // ─── Internal state ───
 
+  /** @internal */
   @state()
   private _isOpen = false;
 
+  /** @internal */
   @state()
   private _hasHeaderActionsSlot = false;
 
+  /** @internal */
   @state()
   private _hasFooterSlot = false;
 
+  /** @internal */
   @state()
   private _hasLabelSlot = false;
 
+  /** @internal */
   private _cachedFocusableElements: HTMLElement[] = [];
+  /** @internal */
   private _triggerElement: HTMLElement | null = null;
+  /** @internal */
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
-  private _previousBodyOverflow: string | null = null;
+  /** Whether this drawer instance currently holds a body-scroll lock. */
+  private _hasScrollLock = false;
+  /** @internal */
   private _siblingAriaHiddenElements: Element[] = [];
 
+  /** @internal */
   private readonly _titleId = `hx-drawer-title-${++_hxDrawerIdCounter}`;
 
   // ─── Public Properties ───
@@ -208,15 +221,18 @@ export class HelixDrawer extends LitElement {
   // ─── Private: Open / Close ───
 
   private _lockBodyScroll(): void {
-    if (this.contained) return;
-    this._previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    if (this.contained || this._hasScrollLock) return;
+    // Uses a shared reference-counted lock so that simultaneous hx-dialog / hx-drawer
+    // instances don't clobber each other when one closes before the other
+    // (see utils/body-scroll-lock.ts).
+    lockBodyScroll();
+    this._hasScrollLock = true;
   }
 
   private _restoreBodyScroll(): void {
-    if (this._previousBodyOverflow === null) return;
-    document.body.style.overflow = this._previousBodyOverflow;
-    this._previousBodyOverflow = null;
+    if (!this._hasScrollLock) return;
+    unlockBodyScroll();
+    this._hasScrollLock = false;
   }
 
   private _openDrawer(): void {
@@ -323,6 +339,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Keyboard Handler ───
 
+  /** @internal */
   private _handleKeyDown = (e: KeyboardEvent): void => {
     if (!this._isOpen) return;
 
@@ -418,6 +435,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Overlay Click ───
 
+  /** @internal */
   private _handleOverlayClick = (e: MouseEvent): void => {
     // Only close when clicking the overlay itself (backdrop), not the panel
     const target = e.target as HTMLElement;

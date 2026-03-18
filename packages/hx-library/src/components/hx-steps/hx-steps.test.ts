@@ -37,9 +37,12 @@ describe('hx-steps', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('has role="list" on host', async () => {
+    it('has role="list" on inner base element (not host, to fix shadow DOM ARIA semantics)', async () => {
       const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
-      expect(el.getAttribute('role')).toBe('list');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('role')).toBe('list');
+      // Host must NOT carry role="list" — that would break list semantics across shadow boundaries
+      expect(el.getAttribute('role')).toBeNull();
     });
 
     it('exposes "base" CSS part', async () => {
