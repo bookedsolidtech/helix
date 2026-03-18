@@ -141,6 +141,11 @@ export class HelixActionBar extends LitElement {
     // accessibility tree so only the toolbar is announced.
     if (!this.hasAttribute('role')) {
       this.setAttribute('role', 'none');
+    } else if (this.getAttribute('role') !== 'none') {
+      console.warn(
+        `[hx-action-bar] Setting role="${this.getAttribute('role')}" on the host creates a duplicate toolbar announcement. ` +
+          'The shadow DOM already contains role="toolbar". Set role="none" on the host to suppress it.',
+      );
     }
     this.addEventListener('keydown', this._handleKeydown);
   }

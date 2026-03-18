@@ -535,7 +535,7 @@ export class HelixFileUpload extends LitElement {
           id=${this._dropzoneId}
           role="button"
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-label=${dropzoneLabel}
+          aria-label=${ifDefined(!this.label ? dropzoneLabel : undefined)}
           aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-describedby=${ifDefined(hasError ? this._errorId : undefined)}
