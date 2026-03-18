@@ -89,7 +89,7 @@ export class HelixCodeSnippet extends LitElement {
    * @attr label-copy
    */
   @property({ type: String, attribute: 'label-copy' })
-  labelCopy = 'Copy';
+  labelCopy = 'Copy code';
 
   /**
    * Label for the copy button after successful copy.
