@@ -18,8 +18,8 @@ let _groupCounter = 0;
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires hx-change - Dispatched when the selected radio changes (detail: `{value: string, checked: boolean}`).
- * @fires hx-radio-select - Internal event dispatched by `hx-radio` when selected; consumed by the group (detail: `{value: string}`).
+ * @fires {CustomEvent<{value: string, checked: boolean}>} hx-change - Dispatched when the selected radio changes.
+ * @fires {CustomEvent<{value: string}>} hx-radio-select - Internal event dispatched by `hx-radio` when selected; consumed by the group.
  *
  * @csspart fieldset - The fieldset wrapper.
  * @csspart legend - The legend/label.
@@ -38,8 +38,10 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -105,16 +107,21 @@ export class HelixRadioGroup extends LitElement {
   @property({ type: String, reflect: true })
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
+  /** @internal */
   private get _groupEl(): HTMLElement | null {
     return this.renderRoot?.querySelector('.fieldset__group') ?? null;
   }
 
+  /** @internal */
   @state() private _hasErrorSlot = false;
 
   // ─── Internal IDs ───
 
+  /** @internal */
   private _groupId = `hx-radio-group-${++_groupCounter}`;
+  /** @internal */
   private _helpTextId = `${this._groupId}-help`;
+  /** @internal */
   private _errorId = `${this._groupId}-error`;
 
   // ─── Slot Handlers ───
@@ -158,7 +165,9 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Radio Management ───
 
+  /** @internal */
   private _cachedRadios: HelixRadio[] | null = null;
+  /** @internal */
   private _individualDisabledStates = new WeakMap<HelixRadio, boolean>();
 
   private _getRadios(): HelixRadio[] {
@@ -214,6 +223,7 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleRadioSelect = (e: CustomEvent<{ value: string }>): void => {
     e.stopPropagation();
 
@@ -238,6 +248,7 @@ export class HelixRadioGroup extends LitElement {
     );
   };
 
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     const enabledRadios = this._getEnabledRadios();
     if (enabledRadios.length === 0) {
