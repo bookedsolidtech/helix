@@ -5,9 +5,10 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
+let _instanceCounter = 0;
+
 /**
- * A date picker component with a calendar popup, keyboard navigation,
- * and full form association for healthcare-grade data entry.
+ * Date picker component for selecting dates with keyboard-accessible calendar popup.
  *
  * @summary Form-associated date picker with calendar popup and WCAG 2.1 AA accessibility.
  *
@@ -17,7 +18,7 @@ import { helixDatePickerStyles } from './hx-date-picker.styles.js';
  * @slot help - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property).
  *
- * @fires {CustomEvent<{value: string, date: Date | null}>} hx-change - Dispatched when a date is selected.
+ * @fires {CustomEvent<{value: string, date: Date | null}>} hx-change - Emitted when the selected date changes.
  *
  * @csspart field - The outer field container.
  * @csspart label - The label element.
@@ -47,17 +48,16 @@ import { helixDatePickerStyles } from './hx-date-picker.styles.js';
  * @cssprop [--hx-date-picker-today-color=var(--hx-color-primary-600)] - Today indicator color.
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
-
-let _instanceCounter = 0;
-
 @customElement('hx-date-picker')
 export class HelixDatePicker extends LitElement {
   static override styles = [tokenStyles, helixDatePickerStyles];
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -146,35 +146,51 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _isOpen = false;
+  /** @internal */
   @state() private _viewYear: number = new Date().getFullYear();
+  /** @internal */
   @state() private _viewMonth: number = new Date().getMonth();
+  /** @internal */
   @state() private _focusedDay: number | null = null;
+  /** @internal */
   @state() private _liveMessage = '';
 
   // ─── Internal References ───
 
+  /** @internal */
   @query('.field__input')
   private _input!: HTMLInputElement;
 
+  /** @internal */
   @query('.field__trigger')
   private _trigger!: HTMLButtonElement;
 
+  /** @internal */
   @query('.calendar')
   private _calendar!: HTMLElement;
 
   // ─── Unique IDs ───
 
+  /** @internal */
   private _id = `hx-date-picker-${++_instanceCounter}`;
+  /** @internal */
   private _inputId = `${this._id}-input`;
+  /** @internal */
   private _helpTextId = `${this._id}-help`;
+  /** @internal */
   private _errorId = `${this._id}-error`;
+  /** @internal */
   private _calendarId = `${this._id}-calendar`;
+  /** @internal */
   private _liveRegionId = `${this._id}-live`;
 
   // ─── Slot Tracking ───
 
+  /** @internal */
   private _hasLabelSlot = false;
+  /** @internal */
   private _hasErrorSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -197,7 +213,9 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Bound Handler References ───
 
+  /** @internal */
   private _boundHandleOutsideClick: (e: MouseEvent) => void = () => undefined;
+  /** @internal */
   private _boundHandleDocumentKeydown: (e: KeyboardEvent) => void = () => undefined;
 
   // ─── Lifecycle ───
@@ -269,14 +287,17 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Form Integration ───
 
+  /** The form element associated with this component, or null if not in a form. */
   get form(): HTMLFormElement | null {
     return this._internals.form;
   }
 
+  /** The current validation message, or an empty string if the field is valid. */
   get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
+  /** The current validity state of the field. */
   get validity(): ValidityState {
     return this._internals.validity;
   }
