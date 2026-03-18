@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, userEvent, fn } from 'storybook/test';
 import './hx-table.js';
-import '../hx-thead/hx-thead.js';
-import '../hx-tbody/hx-tbody.js';
-import '../hx-tfoot/hx-tfoot.js';
-import '../hx-tr/hx-tr.js';
-import '../hx-th/hx-th.js';
-import '../hx-td/hx-td.js';
+import './hx-thead.js';
+import './hx-tbody.js';
+import './hx-tfoot.js';
+import './hx-tr.js';
+import './hx-th.js';
+import './hx-td.js';
 
 // ─────────────────────────────────────────────────
 // Sample Data
