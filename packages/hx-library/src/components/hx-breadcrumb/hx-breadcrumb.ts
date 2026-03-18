@@ -36,6 +36,7 @@ interface JsonLdListItem {
   item?: string;
 }
 
+/** Breadcrumb navigation component with automatic truncation and JSON-LD structured data. @tag hx-breadcrumb */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
   static override styles = [tokenStyles, helixBreadcrumbStyles];
@@ -87,9 +88,13 @@ export class HelixBreadcrumb extends LitElement {
   @property({ type: Boolean, attribute: 'json-ld' })
   jsonLd = false;
 
+  /** @internal */
   private _ellipsisItem: Element | null = null;
+  /** @internal */
   private _jsonLdScript: HTMLScriptElement | null = null;
+  /** @internal */
   private _boundEllipsisClick: (e: Event) => void = () => undefined;
+  /** @internal */
   private _boundEllipsisKeydown: (e: KeyboardEvent) => void = () => undefined;
 
   /**
