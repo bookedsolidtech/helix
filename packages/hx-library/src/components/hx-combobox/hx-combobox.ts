@@ -67,10 +67,10 @@ export class HelixCombobox extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
-  /** @internal */
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -204,22 +204,22 @@ export class HelixCombobox extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /** Parsed option models derived from slotted `<option>` and `<optgroup>` elements. @internal */
   @state() private _options: ComboboxOption[] = [];
-  /** @internal */
+  /** Current text typed in the input, used to filter the option list. @internal */
   @state() private _filterText = '';
-  /** @internal */
+  /** Whether the listbox dropdown is currently visible. @internal */
   @state() private _open = false;
-  /** @internal */
+  /** Zero-based index of the keyboard-focused option within the filtered list; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
-  /** @internal */
+  /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
-  /** @internal */
+  /** Live-region announcement text describing the current number of filtered options. @internal */
   @state() private _filterAnnouncement = '';
 
   // ─── Queries ───
 
-  /** @internal */
+  /** Reference to the native text input element inside the shadow DOM. @internal */
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
 
