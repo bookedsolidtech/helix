@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, shadowQueryAll, cleanup, checkA11y } from '../../test-utils.js';
+import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixStat } from './hx-stat.js';
 import './index.js';
 
