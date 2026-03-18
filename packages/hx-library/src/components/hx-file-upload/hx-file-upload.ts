@@ -117,6 +117,14 @@ export class HelixFileUpload extends LitElement {
   @property({ type: String })
   error = '';
 
+  /**
+   * Instructional text shown in the dropzone when no custom slot content is provided.
+   * Also used as the accessible label for the dropzone.
+   * @attr label-dropzone
+   */
+  @property({ type: String, attribute: 'label-dropzone' })
+  labelDropzone = 'Drag files here or click to browse';
+
   // ─── Internal State ───
 
   @state() private _files: FileEntry[] = [];
@@ -515,9 +523,7 @@ export class HelixFileUpload extends LitElement {
       'dropzone--error': hasError,
     };
 
-    const dropzoneLabel = this.label
-      ? `${this.label} — Drag files here or click to browse`
-      : 'Drag files here or click to browse';
+    const dropzoneLabel = this.label ? `${this.label} — ${this.labelDropzone}` : this.labelDropzone;
 
     return html`
       <div class="field">
@@ -545,7 +551,7 @@ export class HelixFileUpload extends LitElement {
           @dragleave=${this._handleDragLeave}
           @drop=${this._handleDrop}
         >
-          <slot>Drag files here or click to browse</slot>
+          <slot>${this.labelDropzone}</slot>
         </div>
 
         <input
