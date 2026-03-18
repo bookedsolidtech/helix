@@ -77,6 +77,7 @@ export class HelixAccordion extends LitElement {
     });
   }
 
+  /** @internal */
   private _handleChildExpand = (e: Event): void => {
     if (this.mode !== 'single') return;
 
@@ -93,6 +94,7 @@ export class HelixAccordion extends LitElement {
 
   // ─── Arrow key navigation (ARIA APG Accordion pattern) ───
 
+  /** @internal */
   private _handleKeyDown = (e: KeyboardEvent): void => {
     const triggers = this._getTriggers();
     if (triggers.length === 0) return;

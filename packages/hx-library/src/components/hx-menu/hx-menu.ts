@@ -37,10 +37,13 @@ export class HelixMenu extends LitElement {
   @property({ type: String, reflect: true })
   label = '';
 
+  /** @internal */
   private _focusedIndex = -1;
 
+  /** @internal */
   private _typeaheadBuffer = '';
 
+  /** @internal */
   private _typeaheadTimeout: ReturnType<typeof setTimeout> | undefined;
 
   private _getItems(): HelixMenuItem[] {
