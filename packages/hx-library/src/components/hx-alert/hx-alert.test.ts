@@ -26,10 +26,10 @@ describe('hx-alert', () => {
       expect(el.textContent?.trim()).toContain('Hello world');
     });
 
-    it('is visible by default (open=true)', async () => {
+    it('is hidden by default (open=false)', async () => {
       const el = await fixture<HxAlert>('<hx-alert>Visible</hx-alert>');
-      expect(el.open).toBe(true);
-      expect(el.hasAttribute('open')).toBe(true);
+      expect(el.open).toBe(false);
+      expect(el.hasAttribute('open')).toBe(false);
     });
   });
 
@@ -86,9 +86,9 @@ describe('hx-alert', () => {
   // ─── Property: open (3) ───
 
   describe('Property: open', () => {
-    it('defaults to true', async () => {
+    it('defaults to false', async () => {
       const el = await fixture<HxAlert>('<hx-alert>Open</hx-alert>');
-      expect(el.open).toBe(true);
+      expect(el.open).toBe(false);
     });
 
     it('hides alert when open is false', async () => {
@@ -100,7 +100,7 @@ describe('hx-alert', () => {
     });
 
     it('reflects open attribute', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Open</hx-alert>');
+      const el = await fixture<HxAlert>('<hx-alert open>Open</hx-alert>');
       expect(el.hasAttribute('open')).toBe(true);
       el.open = false;
       await el.updateComplete;
@@ -111,15 +111,15 @@ describe('hx-alert', () => {
   // ─── Property: showIcon (4) ───
 
   describe('Property: showIcon', () => {
-    it('defaults to true', async () => {
+    it('defaults to false', async () => {
       const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
-      expect(el.showIcon).toBe(true);
+      expect(el.showIcon).toBe(false);
     });
 
-    it('renders icon container by default', async () => {
+    it('does not render icon container by default (show-icon is opt-in)', async () => {
       const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
       const iconPart = shadowQuery(el, '[part="icon"]');
-      expect(iconPart).toBeTruthy();
+      expect(iconPart).toBeNull();
     });
 
     it('hides icon container when showIcon is false', async () => {
@@ -211,7 +211,7 @@ describe('hx-alert', () => {
     });
 
     it('removes open attribute when closed', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<HxAlert>('<hx-alert dismissible open>Dismissible</hx-alert>');
       expect(el.hasAttribute('open')).toBe(true);
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.click();
@@ -239,7 +239,7 @@ describe('hx-alert', () => {
     });
 
     it('does not dismiss alert when Escape is pressed on close button', async () => {
-      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
+      const el = await fixture<HxAlert>('<hx-alert dismissible open>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
       closeBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
@@ -354,8 +354,8 @@ describe('hx-alert', () => {
       expect(part).toBeTruthy();
     });
 
-    it('exposes "icon" part', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+    it('exposes "icon" part when show-icon is set', async () => {
+      const el = await fixture<HxAlert>('<hx-alert show-icon>Test</hx-alert>');
       const part = shadowQuery(el, '[part="icon"]');
       expect(part).toBeTruthy();
     });
@@ -450,7 +450,7 @@ describe('hx-alert', () => {
     it('renders a default SVG icon per variant', async () => {
       const variants = ['info', 'success', 'warning', 'error'] as const;
       for (const variant of variants) {
-        const el = await fixture<HxAlert>(`<hx-alert variant="${variant}">Test</hx-alert>`);
+        const el = await fixture<HxAlert>(`<hx-alert variant="${variant}" show-icon>Test</hx-alert>`);
         const iconContainer = shadowQuery(el, '[part="icon"]')!;
         const svg = iconContainer.querySelector('svg');
         expect(svg).toBeTruthy();
