@@ -52,6 +52,9 @@ const chevronIcon = svg`
 export class HelixAccordionItem extends LitElement {
   static override styles = [tokenStyles, helixAccordionItemStyles];
 
+  private static _counter = 0;
+  private _uid = `hx-accordion-item-${++HelixAccordionItem._counter}`;
+
   /**
    * Whether this item is expanded.
    * @attr expanded
@@ -114,13 +117,13 @@ export class HelixAccordionItem extends LitElement {
     return html`
       <details part="item" class=${classMap(itemClasses)} ?open=${this.expanded}>
         <summary
-          id="trigger"
+          id=${`${this._uid}-trigger`}
           part="trigger"
           class="trigger"
           tabindex=${this.disabled ? '-1' : '0'}
           aria-expanded=${this.expanded ? 'true' : 'false'}
           aria-disabled=${this.disabled ? 'true' : 'false'}
-          aria-controls="content"
+          aria-controls=${`${this._uid}-content`}
           @click=${this._handleSummaryClick}
           @keydown=${this._handleKeyDown}
         >
@@ -130,11 +133,11 @@ export class HelixAccordionItem extends LitElement {
         <div class="content-wrapper">
           <div class="content-inner">
             <div
-              id="content"
+              id=${`${this._uid}-content`}
               part="content"
               class="content"
               role="region"
-              aria-labelledby="trigger"
+              aria-labelledby=${`${this._uid}-trigger`}
               aria-hidden=${this.expanded ? nothing : 'true'}
             >
               <slot></slot>

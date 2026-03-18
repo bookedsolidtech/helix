@@ -96,8 +96,10 @@ describe('hx-meter', () => {
       const el = await fixture<HelixMeter>('<hx-meter label="Battery" value="80"></hx-meter>');
       await el.updateComplete;
       const base = shadowQuery(el, '[part="base"]');
-      expect(base?.getAttribute('aria-labelledby')).toBe('__hx-meter-label');
-      const labelSpan = shadowQuery(el, '#__hx-meter-label');
+      const labelledById = base?.getAttribute('aria-labelledby');
+      expect(labelledById).toBeTruthy();
+      expect(labelledById).toMatch(/^hx-meter-\d+-label$/);
+      const labelSpan = shadowQuery(el, `#${labelledById}`);
       expect(labelSpan?.textContent?.trim()).toBe('Battery');
     });
 
@@ -123,7 +125,9 @@ describe('hx-meter', () => {
       await el.updateComplete;
       await el.updateComplete;
       const base = shadowQuery(el, '[part="base"]');
-      expect(base?.getAttribute('aria-labelledby')).toBe('__hx-meter-label');
+      const labelledById = base?.getAttribute('aria-labelledby');
+      expect(labelledById).toBeTruthy();
+      expect(labelledById).toMatch(/^hx-meter-\d+-label$/);
     });
   });
 

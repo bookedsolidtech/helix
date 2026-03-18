@@ -26,7 +26,7 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
-  private internals!: ElementInternals;
+  private internals: ElementInternals;
 
   /**
    * Layout orientation of the button group.

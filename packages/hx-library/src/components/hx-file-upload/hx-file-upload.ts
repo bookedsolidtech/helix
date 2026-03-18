@@ -126,7 +126,7 @@ export class HelixFileUpload extends LitElement {
   // ─── Internal References ───
 
   @query('.file-input')
-  private _fileInput!: HTMLInputElement | null;
+  private _fileInput: HTMLInputElement | null | undefined;
 
   // ─── Stable IDs ───
 

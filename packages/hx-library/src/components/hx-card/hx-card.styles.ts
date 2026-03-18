@@ -3,6 +3,8 @@ import { css } from 'lit';
 export const helixCardStyles = css`
   :host {
     display: block;
+    color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
+    background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
   }
 
   .card {

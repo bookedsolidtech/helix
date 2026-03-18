@@ -10,6 +10,16 @@ export const helixButtonStyles = css`
     opacity: var(--hx-opacity-disabled, 0.5);
   }
 
+  :host([full]) {
+    display: block;
+    width: 100%;
+  }
+
+  :host([full]) .button {
+    width: 100%;
+    justify-content: center;
+  }
+
   /* ─── Base Button ─── */
 
   .button {
@@ -85,7 +95,7 @@ export const helixButtonStyles = css`
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-primary-50);
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-50));
   }
 
   .button--tertiary {
@@ -95,7 +105,7 @@ export const helixButtonStyles = css`
   }
 
   .button--tertiary:hover {
-    --hx-button-bg: var(--hx-color-neutral-200);
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-200));
   }
 
   .button--danger {
@@ -105,7 +115,7 @@ export const helixButtonStyles = css`
   }
 
   .button--danger:hover {
-    --hx-button-bg: var(--hx-color-error-600);
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-error-600));
   }
 
   .button--ghost {
@@ -115,7 +125,7 @@ export const helixButtonStyles = css`
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-color-neutral-100);
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-100));
   }
 
   .button--outline {
@@ -125,7 +135,11 @@ export const helixButtonStyles = css`
   }
 
   .button--outline:hover {
-    --hx-button-bg: var(--hx-color-neutral-50);
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-50));
+  }
+
+  .button--primary:hover {
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-500));
   }
 
   /* ─── Disabled ─── */

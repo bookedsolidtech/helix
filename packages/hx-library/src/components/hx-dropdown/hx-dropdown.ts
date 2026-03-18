@@ -98,8 +98,8 @@ export class HelixDropdown extends LitElement {
   private static _instanceCounter = 0;
   private _panelId = `hx-dropdown-panel-${++HelixDropdown._instanceCounter}`;
 
-  @query('[part="panel"]') private _panel!: HTMLElement;
-  @query('[part="trigger"]') private _triggerWrapper!: HTMLElement;
+  @query('[part="panel"]') private _panel: HTMLElement | undefined;
+  @query('[part="trigger"]') private _triggerWrapper: HTMLElement | undefined;
 
   // ─── Lifecycle ───
 

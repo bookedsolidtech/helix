@@ -175,6 +175,7 @@ export class HelixCarousel extends LitElement {
   @state() private _slides: HelixCarouselItem[] = [];
   @state() private _isPlaying = false;
   @state() private _liveText = '';
+  @state() private _livePolite = true;
 
   private _autoplayTimer: ReturnType<typeof setInterval> | null = null;
   private _reducedMotion = false;
@@ -287,6 +288,7 @@ export class HelixCarousel extends LitElement {
     if (!this.loop && nextIndex > this._maxIndex) {
       return;
     }
+    this._livePolite = true;
     this.goTo(nextIndex);
   }
 
@@ -295,12 +297,14 @@ export class HelixCarousel extends LitElement {
     if (!this.loop && prevIndex < 0) {
       return;
     }
+    this._livePolite = true;
     this.goTo(prevIndex);
   }
 
   // ─── Autoplay ───
 
   private _autoplayTick = (): void => {
+    this._livePolite = false;
     if (this.loop) {
       this.goTo(this._currentIndex + this.slidesPerMove);
     } else if (this._currentIndex < this._maxIndex) {
@@ -484,6 +488,11 @@ export class HelixCarousel extends LitElement {
     this._touchMoved = false;
   }
 
+  private _goToManual(index: number): void {
+    this._livePolite = true;
+    this.goTo(index);
+  }
+
   // ─── Computed ───
 
   private get _trackTransform(): string {
@@ -565,8 +574,8 @@ export class HelixCarousel extends LitElement {
                 part="pagination-item"
                 type="button"
                 aria-label="Slide ${i + 1} of ${count}"
-                aria-current=${i === this._currentIndex ? 'true' : 'false'}
-                @click=${() => this.goTo(i)}
+                aria-current=${i === this._currentIndex ? 'true' : nothing}
+                @click=${() => this._goToManual(i)}
               >
                 <span class="pagination-dot"></span>
               </button>
@@ -603,9 +612,13 @@ export class HelixCarousel extends LitElement {
         role="region"
         aria-label=${this.label}
         aria-roledescription="carousel"
-        tabindex="0"
       >
-        <div class="live-region" role="status" aria-live="polite" aria-atomic="true">
+        <div
+          class="live-region"
+          role="status"
+          aria-live=${this._livePolite ? 'polite' : 'off'}
+          aria-atomic="true"
+        >
           ${this._liveText}
         </div>
         ${this._renderNavigation()}

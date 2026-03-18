@@ -28,6 +28,7 @@ import { helixButtonStyles } from './hx-button.styles.js';
  * @csspart spinner - The loading spinner SVG element.
  *
  * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
+ * @cssprop [--hx-button-hover-bg] - Hover background color override. When set, overrides the variant default hover background from outside the shadow DOM.
  * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
  * @cssprop [--hx-button-border-color=transparent] - Button border color.
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
@@ -115,6 +116,14 @@ export class HelixButton extends LitElement {
    */
   @property({ type: String })
   value: string | undefined = undefined;
+
+  /**
+   * When true, the button stretches to fill its container width.
+   * Sets the host to `display: block` and the inner element to `width: 100%`.
+   * @attr full
+   */
+  @property({ type: Boolean, reflect: true })
+  full = false;
 
   /**
    * Accessible label forwarded to the inner button/anchor. Required for icon-only usage.

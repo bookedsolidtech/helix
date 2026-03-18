@@ -73,6 +73,9 @@ export class HelixTreeView extends LitElement {
 
   @state() private _currentIndex = 0;
 
+  /** Tracks whether the tree has any visible items, to decide the container tabindex. */
+  @state() private _hasVisibleItems = false;
+
   // ─── Internal Helpers ───
 
   /**
@@ -103,11 +106,23 @@ export class HelixTreeView extends LitElement {
     return Array.from(this.querySelectorAll<HelixTreeItem>('hx-tree-item[selected]'));
   }
 
+  /**
+   * Updates the roving tabindex across all visible items so that only the
+   * item at `activeIndex` has `tabindex="0"`. All others receive `tabindex="-1"`.
+   * This is called whenever the active item changes (navigation, initial render).
+   */
+  private _updateRovingTabindex(items: HelixTreeItem[], activeIndex: number): void {
+    items.forEach((item, i) => {
+      item.setRovingActive(i === activeIndex);
+    });
+  }
+
   private _focusItem(index: number): void {
     const items = this._getVisibleItems();
     if (items.length === 0) return;
     const clamped = Math.max(0, Math.min(index, items.length - 1));
     this._currentIndex = clamped;
+    this._updateRovingTabindex(items, clamped);
     items[clamped]?.focus();
   }
 
@@ -211,27 +226,55 @@ export class HelixTreeView extends LitElement {
   }
 
   private _handleFocusIn(e: FocusEvent): void {
+    // With roving tabindex, the tree container (tabindex="-1") should only receive
+    // focus when the tree is empty. If focus does land on the container (e.g. the
+    // tree is empty or programmatic focus), redirect to the active item if present.
     if (e.target === e.currentTarget) {
-      this._focusItem(this._currentIndex);
+      const items = this._getVisibleItems();
+      if (items.length > 0) {
+        this._focusItem(this._currentIndex);
+      }
     }
+  }
+
+  /**
+   * Initializes the roving tabindex after items are first slotted in.
+   * Ensures the active item (index 0 by default) has tabindex="0" from the start,
+   * so a Tab into the tree lands directly on the first item without a redirect.
+   * Also updates `_hasVisibleItems` so the container tabindex re-renders correctly.
+   */
+  private _handleSlotChange(): void {
+    const items = this._getVisibleItems();
+    this._hasVisibleItems = items.length > 0;
+    if (items.length === 0) return;
+    // Clamp _currentIndex in case items were removed.
+    const clamped = Math.min(this._currentIndex, items.length - 1);
+    this._currentIndex = clamped;
+    this._updateRovingTabindex(items, clamped);
   }
 
   // ─── Render ───
 
   override render() {
+    // Roving tabindex pattern (WCAG 2.4.3 Fix):
+    // The tree container is NOT a Tab stop (tabindex="-1"). Tab focus goes
+    // directly to the active item, which carries tabindex="0". The container
+    // is only a landing target (tabindex="0") when the tree is empty.
+    const containerTabindex = this._hasVisibleItems ? '-1' : '0';
+
     return html`
       <div
         part="tree"
         class="tree"
         role="tree"
-        tabindex="0"
+        tabindex=${containerTabindex}
         aria-label=${this.label || nothing}
         aria-multiselectable=${this.selection === 'multiple' ? 'true' : 'false'}
         @hx-tree-item-select=${this._handleTreeItemSelect}
         @keydown=${this._handleKeyDown}
         @focusin=${this._handleFocusIn}
       >
-        <slot></slot>
+        <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;
   }
