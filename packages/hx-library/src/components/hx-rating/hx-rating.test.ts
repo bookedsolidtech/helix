@@ -229,12 +229,16 @@ describe('hx-rating', () => {
       expect(el.value).toBe(2.5);
     });
 
-    it('marks star 3 as checked for value=2.5 with precision=0.5', async () => {
+    it('renders role="slider" with correct aria attributes for value=2.5 with precision=0.5', async () => {
       const el = await fixture<HelixRating>(
         '<hx-rating value="2.5" max="5" precision="0.5"></hx-rating>',
       );
-      const symbols = shadowQueryAll(el, '[role="radio"]');
-      expect(symbols[2]?.getAttribute('aria-checked')).toBe('true');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('role')).toBe('slider');
+      expect(base?.getAttribute('aria-valuenow')).toBe('2.5');
+      expect(base?.getAttribute('aria-valuemin')).toBe('0');
+      expect(base?.getAttribute('aria-valuemax')).toBe('5');
+      expect(base?.getAttribute('aria-valuetext')).toBe('2.5 out of 5 stars');
     });
 
     it('ArrowRight increases by 0.5 with precision=0.5', async () => {
