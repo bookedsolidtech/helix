@@ -58,6 +58,8 @@ type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
  * </hx-popover>
  * ```
  */
+let _popoverCounter = 0;
+
 @customElement('hx-popover')
 export class HelixPopover extends LitElement {
   static override styles = [tokenStyles, helixPopoverStyles];
@@ -115,8 +117,7 @@ export class HelixPopover extends LitElement {
 
   private _previousFocus: HTMLElement | null = null;
 
-  // P2-06: use crypto.randomUUID() instead of module-level mutable counter
-  private readonly _popoverId = `hx-popover-${crypto.randomUUID()}`;
+  private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
 
   // ─── Lifecycle ───
 

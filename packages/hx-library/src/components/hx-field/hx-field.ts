@@ -7,6 +7,8 @@ import { helixFieldStyles } from './hx-field.styles.js';
 /** Native form control tag names that can receive ARIA attributes. */
 const FORM_CONTROL_TAGS = new Set(['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON']);
 
+let _fieldCounter = 0;
+
 /** Returns true if the element is a native form control or a custom element. */
 function isFormControl(el: Element): el is HTMLElement {
   return FORM_CONTROL_TAGS.has(el.tagName) || el.tagName.includes('-');
@@ -127,7 +129,7 @@ export class HelixField extends LitElement {
 
   // ─── Unique IDs for Accessibility ───
 
-  private _fieldId = `hx-field-${crypto.randomUUID().slice(0, 8)}`;
+  private _fieldId = `hx-field-${++_fieldCounter}`;
   private _helpTextId = `${this._fieldId}-help`;
   private _errorId = `${this._fieldId}-error`;
   private _a11yDescId = `${this._fieldId}-desc`;
