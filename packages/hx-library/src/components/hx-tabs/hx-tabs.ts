@@ -112,16 +112,18 @@ export class HelixTabs extends LitElement {
 
   private _getTabs(): HelixTab[] {
     if (!this._cachedTabs) {
-      this._cachedTabs = Array.from(this.querySelectorAll(':scope > hx-tab')) as HelixTab[];
+      this._cachedTabs = Array.from(this.querySelectorAll(':scope > hx-tab')).filter(
+        (el): el is HelixTab => el.tagName.toLowerCase() === 'hx-tab',
+      );
     }
     return this._cachedTabs;
   }
 
   private _getPanels(): HelixTabPanel[] {
     if (!this._cachedPanels) {
-      this._cachedPanels = Array.from(
-        this.querySelectorAll(':scope > hx-tab-panel'),
-      ) as HelixTabPanel[];
+      this._cachedPanels = Array.from(this.querySelectorAll(':scope > hx-tab-panel')).filter(
+        (el): el is HelixTabPanel => el.tagName.toLowerCase() === 'hx-tab-panel',
+      );
     }
     return this._cachedPanels;
   }
@@ -134,7 +136,7 @@ export class HelixTabs extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('hx-tab-select', this._handleTabSelect as EventListener);
+    this.addEventListener('hx-tab-select', this._handleTabSelect);
     this.addEventListener('keydown', this._handleKeydown);
     // Watch for panel/name attribute changes on child tabs and panels
     this._observer = new MutationObserver(() => {
@@ -150,7 +152,7 @@ export class HelixTabs extends LitElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('hx-tab-select', this._handleTabSelect as EventListener);
+    this.removeEventListener('hx-tab-select', this._handleTabSelect);
     this.removeEventListener('keydown', this._handleKeydown);
     this._observer?.disconnect();
     this._observer = null;
@@ -254,7 +256,8 @@ export class HelixTabs extends LitElement {
   // ─── Event Handling ───
 
   /** @internal */
-  private _handleTabSelect = (e: CustomEvent<{ panel: string }>): void => {
+  private _handleTabSelect = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
     e.stopPropagation();
     const tab = e
       .composedPath()
