@@ -75,10 +75,10 @@ export class HelixSelect extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
-  /** @internal */
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -175,20 +175,20 @@ export class HelixSelect extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /** Parsed option models derived from slotted `<option>` and `<optgroup>` elements. @internal */
   @state() private _options: SelectOption[] = [];
-  /** @internal */
+  /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
-  /** @internal */
+  /** Zero-based index of the keyboard-focused option in the listbox; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
 
   // ─── Queries ───
 
-  /** @internal */
+  /** Reference to the hidden native select element used for form participation. @internal */
   @query('.field__select')
   private _select: HTMLSelectElement | undefined;
 
-  /** @internal */
+  /** Reference to the visible combobox trigger element that receives keyboard focus. @internal */
   @query('.field__trigger')
   private _trigger: HTMLElement | undefined;
 

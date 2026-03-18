@@ -49,10 +49,10 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
-  /** @internal */
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -129,16 +129,16 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /** The list of currently selected file entries, each with a file reference and upload progress. @internal */
   @state() private _files: FileEntry[] = [];
-  /** @internal */
+  /** Whether a file is currently being dragged over the dropzone. @internal */
   @state() private _dragOver = false;
-  /** @internal */
+  /** Whether the named file-list slot contains projected content. @internal */
   @state() private _hasFileListSlot = false;
 
   // ─── Internal References ───
 
-  /** @internal */
+  /** Reference to the hidden native file input element used to open the OS file picker. @internal */
   @query('.file-input')
   private _fileInput: HTMLInputElement | null | undefined;
 
