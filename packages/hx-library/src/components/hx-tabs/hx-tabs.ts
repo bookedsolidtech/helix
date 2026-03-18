@@ -208,9 +208,11 @@ export class HelixTabs extends LitElement {
     tabs.forEach((tab) => {
       const isSelected = tab.panel === this._activePanel;
       tab.selected = isSelected;
-      // Tabindex is managed by the inner button in hx-tab via the `selected` property.
-      // We also set it on the host for the roving tabindex pattern so document.activeElement
-      // comparisons work correctly when the inner button is focused.
+      // Dual tabindex is intentional: the inner button in hx-tab manages its own tabindex
+      // via the `selected` property. We also set it on the host element for the roving
+      // tabindex pattern so document.activeElement comparisons work correctly when the
+      // inner button is focused. This is safe because the inner button is the only
+      // focusable element in hx-tab's shadow DOM (WCAG 2.4.3).
       tab.tabIndex = isSelected ? 0 : -1;
     });
 

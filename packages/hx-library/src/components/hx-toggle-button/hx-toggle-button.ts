@@ -113,6 +113,22 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Lifecycle ───
 
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+
+    if (!this.label) {
+      const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+      const hasSlotText = slot
+        ? slot.assignedNodes({ flatten: true }).some((n) => n.textContent?.trim())
+        : false;
+      if (!hasSlotText) {
+        console.warn(
+          '[hx-toggle-button] No accessible label found. Set the `label` attribute or provide slot text content for WCAG 4.1.2 compliance.',
+        );
+      }
+    }
+  }
+
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
