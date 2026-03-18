@@ -136,7 +136,7 @@ function parseUserInput(raw: string): string | null {
  * @tag hx-time-picker
  *
  * @slot label - Custom label content; overrides the rendered label element when used.
- * @slot help - Help text displayed below the field.
+ * @slot help-text - Help text displayed below the field.
  * @slot error - Custom error content; overrides the `error` property.
  *
  * @fires {CustomEvent<{value: string}>} hx-change - Dispatched when the selected time changes. Detail value is HH:MM (24h).
@@ -772,7 +772,7 @@ export class HelixTimePicker extends LitElement {
 
         <!-- Help slot -->
         <div part="help-text" class="field__help-text" id=${this._helpId}>
-          <slot name="help" @slotchange=${this._handleHelpSlotChange}></slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </div>
     `;

@@ -425,7 +425,10 @@ export class HelixNav extends LitElement {
   }
 }
 
-/** Convenience alias matching library naming convention. */
+/** Canonical type alias for the hx-nav component. */
+export type HxNav = HelixNav;
+
+/** @deprecated Use {@link HxNav} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcNav = HelixNav;
 
 declare global {

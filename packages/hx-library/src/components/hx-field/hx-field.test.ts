@@ -270,21 +270,21 @@ describe('hx-field', () => {
 
     it('help slot renders content inside help text container', async () => {
       const el = await fixture<HelixField>(
-        '<hx-field help-text="fallback"><em slot="help">Custom help</em></hx-field>',
+        '<hx-field help-text="fallback"><em slot="help-text">Custom help</em></hx-field>',
       );
-      const slottedHelp = el.querySelector('[slot="help"]');
+      const slottedHelp = el.querySelector('[slot="help-text"]');
       expect(slottedHelp).toBeTruthy();
       expect(slottedHelp?.textContent).toBe('Custom help');
     });
 
     it('help slot renders even when helpText property is empty', async () => {
       const el = await fixture<HelixField>(
-        '<hx-field><em slot="help">Slot-only help</em></hx-field>',
+        '<hx-field><em slot="help-text">Slot-only help</em></hx-field>',
       );
       await el.updateComplete;
       const helpDiv = shadowQuery(el, '[part="help-text"]');
       expect(helpDiv).toBeTruthy();
-      const slottedHelp = el.querySelector('[slot="help"]');
+      const slottedHelp = el.querySelector('[slot="help-text"]');
       expect(slottedHelp?.textContent).toBe('Slot-only help');
     });
 
@@ -730,7 +730,7 @@ describe('hx-field', () => {
 
     it('shows help-text part when help slot has content but helpText property is empty', async () => {
       const el = await fixture<HelixField>(
-        '<hx-field><em slot="help">Slot help only</em></hx-field>',
+        '<hx-field><em slot="help-text">Slot help only</em></hx-field>',
       );
       await el.updateComplete;
       const helpDiv = shadowQuery(el, '[part="help-text"]');

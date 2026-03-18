@@ -431,7 +431,10 @@ export const WithHelpSlot: Story = {
   name: 'With Help Slot',
   render: () => html`
     <hx-time-picker label="Procedure Start Time" step="15" format="12h" min="07:00" max="19:00">
-      <div slot="help" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);">
+      <div
+        slot="help-text"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+      >
         Select the scheduled start time for this procedure. Times are shown in 15-minute intervals.
       </div>
     </hx-time-picker>
