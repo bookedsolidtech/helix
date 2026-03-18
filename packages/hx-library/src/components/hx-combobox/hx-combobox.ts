@@ -84,6 +84,7 @@ export class HelixCombobox extends LitElement {
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
   private _labelId = `${this._id}-label`;
+  private _liveRegionId = `${this._id}-live`;
 
   // ─── Public Properties ───
 
@@ -192,6 +193,7 @@ export class HelixCombobox extends LitElement {
   @state() private _open = false;
   @state() private _focusedOptionIndex = -1;
   @state() private _hasErrorSlot = false;
+  @state() private _filterAnnouncement = '';
 
   // ─── Queries ───
 
@@ -371,10 +373,20 @@ export class HelixCombobox extends LitElement {
       }
       this._debounceTimer = setTimeout(() => {
         this._emitInput();
+        this._announceFilterResults();
       }, this.filterDebounce);
     } else {
       this._emitInput();
+      this._announceFilterResults();
     }
+  }
+
+  private _announceFilterResults(): void {
+    const count = this._filteredOptions.length;
+    this._filterAnnouncement =
+      count === 0
+        ? 'No matching options'
+        : `${count} ${count === 1 ? 'option' : 'options'} available`;
   }
 
   private _emitInput(): void {
@@ -635,7 +647,7 @@ export class HelixCombobox extends LitElement {
         <!-- Label -->
         <slot name="label">
           ${this.label
-            ? html`<label id=${this._labelId} part="label" class="field__label">
+            ? html`<label id=${this._labelId} for=${this._id} part="label" class="field__label">
                 ${this.label}
                 ${this.required
                   ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
@@ -791,6 +803,11 @@ export class HelixCombobox extends LitElement {
               </div>
             `
           : nothing}
+
+        <!-- Filter results live region -->
+        <div id=${this._liveRegionId} aria-live="polite" aria-atomic="true" class="field__sr-only">
+          ${this._filterAnnouncement}
+        </div>
       </div>
     `;
   }
