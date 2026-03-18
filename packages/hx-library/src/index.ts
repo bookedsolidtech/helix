@@ -33,6 +33,8 @@ export { HelixCombobox, type ComboboxOption, type HxComboboxSize } from './compo
 export { HelixContainer } from './components/hx-container/index.js';
 export type { WcContainer } from './components/hx-container/index.js';
 export { HelixCopyButton } from './components/hx-copy-button/index.js';
+export { HelixCounter } from './components/hx-counter/index.js';
+export type { CounterSize, CounterEasing, CounterFormat } from './components/hx-counter/index.js';
 export { HelixDataTable } from './components/hx-data-table/index.js';
 export type { HxDataTableColumn, HxDataTableSortState } from './components/hx-data-table/index.js';
 export { HelixDatePicker } from './components/hx-date-picker/index.js';
@@ -82,6 +84,8 @@ export type { SpinnerSize } from './components/hx-spinner/index.js';
 export { HelixSplitButton } from './components/hx-split-button/index.js';
 export { HelixSplitPanel } from './components/hx-split-panel/index.js';
 export { HelixStack } from './components/hx-stack/index.js';
+export { HelixStat } from './components/hx-stat/index.js';
+export type { StatSize, StatTrend } from './components/hx-stat/index.js';
 export { HelixStatusIndicator, type StatusIndicatorStatus, type StatusIndicatorSize } from './components/hx-status-indicator/index.js';
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
