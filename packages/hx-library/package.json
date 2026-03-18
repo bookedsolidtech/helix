@@ -48,6 +48,7 @@
     "test:batch:5": "vitest run \"hx-switch/|hx-tabs/|hx-tag/|hx-text/|hx-text-input/|hx-textarea/|hx-theme/|hx-time-picker/|hx-toast/|hx-toggle-button/|hx-tooltip/|hx-top-nav/|hx-tree-view/|hx-visually-hidden/\" --reporter=verbose",
     "test:component": "vitest run --reporter=verbose",
     "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\"",
+    "cem:watch": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" --watch",
     "lint": "eslint src/",
     "clean": "rm -rf dist custom-elements.json"
   },
