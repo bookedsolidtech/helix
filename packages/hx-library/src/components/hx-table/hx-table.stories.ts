@@ -115,7 +115,8 @@ const meta = {
   argTypes: {
     label: {
       control: 'text',
-      description: 'Accessible aria-label for the table. Required for screen reader identification.',
+      description:
+        'Accessible aria-label for the table. Required for screen reader identification.',
       table: {
         category: 'Accessibility',
         type: { summary: 'string' },
@@ -299,7 +300,8 @@ export const Sortable: Story = {
     await expect(['asc', 'desc']).toContain(event.detail.direction);
 
     // aria-sort attribute must be present after the sort interaction
-    const ariaSort = drugHeader.getAttribute('aria-sort') ?? drugHeader.getAttribute('sort-direction');
+    const ariaSort =
+      drugHeader.getAttribute('aria-sort') ?? drugHeader.getAttribute('sort-direction');
     await expect(ariaSort).not.toBeNull();
   },
 };
@@ -348,14 +350,8 @@ export const StickyHeader: Story = {
   name: 'Sticky Header',
   args: { stickyHeader: true },
   render: (args) => html`
-    <div
-      style="height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 0.5rem;"
-    >
-      <hx-table
-        label="Full patient census"
-        variant="striped"
-        ?sticky-header=${args.stickyHeader}
-      >
+    <div style="height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+      <hx-table label="Full patient census" variant="striped" ?sticky-header=${args.stickyHeader}>
         <hx-thead>
           <hx-tr>
             <hx-th scope="col">Patient ID</hx-th>

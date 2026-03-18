@@ -50,9 +50,7 @@ describe('hx-table', () => {
     it('warns when label attribute is not provided', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       await fixture<HelixTable>('<hx-table></hx-table>');
-      expect(warn).toHaveBeenCalledWith(
-        expect.stringContaining('[hx-table]'),
-      );
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('[hx-table]'));
       warn.mockRestore();
     });
 
@@ -104,7 +102,9 @@ describe('hx-table', () => {
     });
 
     it('renders default slot for child components', async () => {
-      const el = await fixture<HelixTable>('<hx-table label="Test"><hx-tbody></hx-tbody></hx-table>');
+      const el = await fixture<HelixTable>(
+        '<hx-table label="Test"><hx-tbody></hx-tbody></hx-table>',
+      );
       const slot = shadowQuery<HTMLSlotElement>(el, 'slot:not([name])');
       expect(slot).toBeTruthy();
     });
@@ -646,7 +646,9 @@ describe('hx-td', () => {
 
   describe('slots', () => {
     it('renders default slot content', async () => {
-      const el = await fixture<HelixTableCell>('<hx-td><span id="cell-content">Jane Doe</span></hx-td>');
+      const el = await fixture<HelixTableCell>(
+        '<hx-td><span id="cell-content">Jane Doe</span></hx-td>',
+      );
       const slot = shadowQuery<HTMLSlotElement>(el, 'slot');
       expect(slot).toBeTruthy();
       const assigned = slot!.assignedElements();
