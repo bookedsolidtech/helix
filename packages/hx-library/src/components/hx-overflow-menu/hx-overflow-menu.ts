@@ -98,8 +98,10 @@ export class HelixOverflowMenu extends LitElement {
   @property({ type: String, reflect: true, attribute: 'menu-label' })
   menuLabel = 'Actions';
 
+  /** @internal */
   @state() private _open = false;
 
+  /** @internal */
   private readonly _panelId = `hx-overflow-menu-panel-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Lifecycle ───
