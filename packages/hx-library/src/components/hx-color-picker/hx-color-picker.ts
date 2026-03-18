@@ -433,6 +433,11 @@ export class HelixColorPicker extends LitElement {
     this._internals.setFormValue(this.value);
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   private _commit(source: 'drag' | 'change'): void {
     const formatted = formatColor(this._hsv, this.format, this.opacity);
     this.value = formatted;

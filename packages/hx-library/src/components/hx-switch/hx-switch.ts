@@ -190,6 +190,11 @@ export class HelixSwitch extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   /** Reference to the native button element acting as the switch track. */
   @query('.switch__track')
   private _trackEl: HTMLButtonElement | null | undefined;
