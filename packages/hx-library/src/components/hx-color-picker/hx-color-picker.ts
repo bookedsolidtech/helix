@@ -307,8 +307,10 @@ function formatColor(hsv: HSV, format: ColorFormat, includeAlpha: boolean): stri
 export class HelixColorPicker extends LitElement {
   static override styles = [tokenStyles, helixColorPickerStyles];
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -382,18 +384,26 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Internal State ──────────────────────────────────────────────────────
 
+  /** @internal */
   @state() private _hsv: HSV = { h: 0, s: 0, v: 0, a: 1 };
+  /** @internal */
   @state() private _open = false;
+  /** @internal */
   @state() private _inputValue = '#000000';
 
   // ─── Dragging state (not reactive, managed manually) ─────────────────────
 
+  /** @internal */
   private _draggingGrid = false;
+  /** @internal */
   private _draggingHue = false;
+  /** @internal */
   private _draggingOpacity = false;
 
   // P1-1: Stored bound references to prevent memory leaks
+  /** @internal */
   private _boundPointerMove: (e: PointerEvent) => void;
+  /** @internal */
   private _boundPointerUp: () => void;
 
   // ─── Lifecycle ───────────────────────────────────────────────────────────
