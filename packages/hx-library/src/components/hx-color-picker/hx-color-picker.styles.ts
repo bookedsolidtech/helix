@@ -119,11 +119,14 @@ export const helixColorPickerStyles = css`
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    /* P1-6: was hardcoded #fff */
-    border: 2px solid var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff));
-    /* P1-6: was hardcoded rgba(0,0,0,0.3) */
-    box-shadow: 0 0 0 1px
-      var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
+    /* A11y fix (WCAG 1.4.11): double-ring ensures thumb visibility on light hue backgrounds
+       (yellow, cyan) where a white-only border falls below 3:1 non-text contrast.
+       Inner dark ring at 1px provides contrast against light backgrounds;
+       outer white ring at 2px provides contrast against dark backgrounds. */
+    border: none;
+    box-shadow:
+      0 0 0 2px var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff)),
+      0 0 0 3px var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
     transform: translate(-50%, -50%);
     pointer-events: none;
     top: var(--_thumb-y, 0%);
@@ -178,11 +181,14 @@ export const helixColorPickerStyles = css`
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    /* P1-6: was hardcoded #fff */
-    border: 2px solid var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff));
-    /* P1-6: was hardcoded rgba(0,0,0,0.3) */
-    box-shadow: 0 0 0 1px
-      var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
+    /* A11y fix (WCAG 1.4.11): double-ring ensures thumb visibility on light hue backgrounds
+       (yellow, cyan) where a white-only border falls below 3:1 non-text contrast.
+       Inner dark ring at 1px provides contrast against light backgrounds;
+       outer white ring at 2px provides contrast against dark backgrounds. */
+    border: none;
+    box-shadow:
+      0 0 0 2px var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff)),
+      0 0 0 3px var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
     transform: translate(-50%, -50%);
     pointer-events: none;
     left: var(--_slider-pct, 0%);
