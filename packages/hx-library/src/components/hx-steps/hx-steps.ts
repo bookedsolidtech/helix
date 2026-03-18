@@ -54,15 +54,12 @@ export class HelixSteps extends LitElement {
     if (!this.hasAttribute('role')) {
       this.setAttribute('role', 'list');
     }
-    this.addEventListener('hx-step-click-internal', this._handleStepClickInternal as EventListener);
+    this.addEventListener('hx-step-click-internal', this._handleStepClickInternal);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener(
-      'hx-step-click-internal',
-      this._handleStepClickInternal as EventListener,
-    );
+    this.removeEventListener('hx-step-click-internal', this._handleStepClickInternal);
   }
 
   override firstUpdated(): void {

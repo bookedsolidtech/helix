@@ -127,21 +127,21 @@ export class HelixRadioGroup extends LitElement {
   // ─── Slot Handlers ───
 
   private _handleErrorSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasErrorSlot = e.target.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('hx-radio-select', this._handleRadioSelect as EventListener);
+    this.addEventListener('hx-radio-select', this._handleRadioSelect);
     this.addEventListener('keydown', this._handleKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('hx-radio-select', this._handleRadioSelect as EventListener);
+    this.removeEventListener('hx-radio-select', this._handleRadioSelect);
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
@@ -224,10 +224,11 @@ export class HelixRadioGroup extends LitElement {
   // ─── Event Handling ───
 
   /** @internal */
-  private _handleRadioSelect = (e: CustomEvent<{ value: string }>): void => {
+  private _handleRadioSelect = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
     e.stopPropagation();
 
-    const newValue = e.detail.value;
+    const newValue = (e.detail as { value: string }).value;
     if (newValue === this.value) {
       return;
     }
