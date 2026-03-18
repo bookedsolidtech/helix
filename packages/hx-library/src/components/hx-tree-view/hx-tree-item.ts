@@ -68,6 +68,9 @@ export class HelixTreeItem extends LitElement {
 
   @state() private _hasChildren = false;
 
+  /** Whether this item is the roving-tabindex active item in the tree. */
+  @state() private _rovingActive = false;
+
   /**
    * Cached ARIA position metadata. Computed once on connect and on slotchange
    * of the parent container, avoiding repeated DOM traversal on every render.
@@ -190,6 +193,16 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Public API ───
 
+  /**
+   * Sets the roving tabindex state for this item.
+   * When `active` is true, the item row gets `tabindex="0"` making it the
+   * Tab-reachable item in the tree. All other items should be set to false.
+   * Called by the parent hx-tree-view to manage the roving tabindex pattern.
+   */
+  setRovingActive(active: boolean): void {
+    this._rovingActive = active;
+  }
+
   /** Focus this item's interactive row element. */
   override focus(): void {
     const row = this.shadowRoot?.querySelector<HTMLElement>('.item-row');
@@ -227,7 +240,7 @@ export class HelixTreeItem extends LitElement {
           part="row"
           class="item-row"
           role="treeitem"
-          tabindex="-1"
+          tabindex=${this._rovingActive ? '0' : '-1'}
           aria-expanded=${ariaExpanded}
           aria-selected=${ariaSelected}
           aria-disabled=${this.disabled ? 'true' : nothing}
