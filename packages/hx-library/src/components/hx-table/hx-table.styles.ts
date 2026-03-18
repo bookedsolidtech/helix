@@ -39,32 +39,42 @@ export const helixTableStyles = css`
 
   /* ─── Slotted sub-component styling ─── */
 
+  /*
+   * ::slotted() only matches DIRECT slot assignees. hx-table's direct
+   * slot children are hx-thead, hx-tbody, and hx-tfoot — never hx-tr,
+   * hx-th, or hx-td. CSS custom properties inherit through shadow DOM
+   * boundaries, so variables set on section elements cascade to their
+   * slotted row and cell descendants automatically.
+   */
+
   /* Header background via CSS vars that cascade through display:contents */
   ::slotted(hx-thead) {
     --_hx-table-cell-bg: var(--hx-table-header-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  /* Striped variant: target even rows in slotted hx-tbody children */
-  :host([variant='striped']) ::slotted(hx-tr) {
+  /* Striped variant: signal tbody to activate alternating row color */
+  :host([variant='striped']) ::slotted(hx-tbody) {
     --_hx-table-row-stripe-bg: var(--hx-table-stripe-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  /* Hover variant: set hover bg variable */
-  :host([variant='hover']) ::slotted(hx-tr),
-  :host([variant='striped']) ::slotted(hx-tr),
-  :host([variant='default']) ::slotted(hx-tr) {
+  /* Hover variant: set hover bg variable on direct section slot children */
+  :host([variant='hover']) ::slotted(hx-tbody),
+  :host([variant='hover']) ::slotted(hx-thead),
+  :host([variant='striped']) ::slotted(hx-tbody),
+  :host([variant='default']) ::slotted(hx-tbody) {
     --_hx-table-row-hover-bg: var(--hx-table-row-hover-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
-  /* Compact variant: reduced padding signal */
-  :host([variant='compact']) ::slotted(hx-th),
-  :host([variant='compact']) ::slotted(hx-td) {
+  /* Compact variant: reduced padding signal via direct section slot children */
+  :host([variant='compact']) ::slotted(hx-tbody),
+  :host([variant='compact']) ::slotted(hx-thead),
+  :host([variant='compact']) ::slotted(hx-tfoot) {
     --_hx-table-cell-padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
   }
 
   /* ─── Sticky Header ─── */
 
-  :host([sticky-header]) ::slotted(hx-th) {
+  :host([sticky-header]) ::slotted(hx-thead) {
     --_hx-table-th-position: sticky;
     --_hx-table-th-top: 0;
     --_hx-table-th-z-index: 1;

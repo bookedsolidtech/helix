@@ -21,9 +21,13 @@ export class HelixTableBody extends LitElement {
         display: contents;
       }
 
-      /* Striped: target even hx-tr children directly slotted in this tbody */
+      /*
+       * Striped rows: only applies when the parent hx-table sets
+       * --_hx-table-row-stripe-bg (via variant="striped"). Falls back
+       * to transparent so non-striped variants are unaffected.
+       */
       ::slotted(hx-tr:nth-child(even)) {
-        --_hx-table-row-bg: var(--hx-table-stripe-bg, var(--hx-color-neutral-50, #f8fafc));
+        --_hx-table-row-bg: var(--_hx-table-row-stripe-bg, transparent);
       }
     `,
   ];

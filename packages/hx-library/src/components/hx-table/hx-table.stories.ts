@@ -288,8 +288,10 @@ export const Sortable: Story = {
     const drugHeader = sortableHeaders[0] as HTMLElement;
     await expect(drugHeader).toBeTruthy();
 
-    // Click the sort header to trigger sort cycle (asc -> desc)
-    await userEvent.click(drugHeader);
+    // Click the sort button inside the header to trigger sort cycle (asc -> desc)
+    const sortBtn = drugHeader.shadowRoot?.querySelector('.sort-btn') as HTMLElement | null;
+    await expect(sortBtn).toBeTruthy();
+    await userEvent.click(sortBtn!);
     await new Promise((r) => setTimeout(r, 50));
 
     // hx-sort event must have fired
@@ -299,10 +301,11 @@ export const Sortable: Story = {
     await expect(event.type).toBe('hx-sort');
     await expect(['asc', 'desc']).toContain(event.detail.direction);
 
-    // aria-sort attribute must be present after the sort interaction
-    const ariaSort =
-      drugHeader.getAttribute('aria-sort') ?? drugHeader.getAttribute('sort-direction');
-    await expect(ariaSort).not.toBeNull();
+    // aria-sort is set on the inner <th> in shadow DOM — not on the host hx-th element
+    const thElement = drugHeader.shadowRoot?.querySelector('th');
+    await expect(thElement).toBeTruthy();
+    const ariaSort = thElement?.getAttribute('aria-sort');
+    await expect(ariaSort).toBe('descending');
   },
 };
 

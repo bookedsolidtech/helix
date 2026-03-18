@@ -101,13 +101,6 @@ export class HelixTableHeader extends LitElement {
         transform: rotate(180deg);
       }
 
-      th:focus-visible {
-        outline: var(--hx-focus-ring-width, 2px) solid
-          var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
-        outline-offset: var(--hx-focus-ring-offset, -2px);
-        border-radius: var(--hx-border-radius-sm, 2px);
-      }
-
       @media (prefers-reduced-motion: reduce) {
         .sort-icon {
           transition: none;
@@ -117,8 +110,23 @@ export class HelixTableHeader extends LitElement {
       /* ─── Mobile card layout ─── */
 
       @media (max-width: 768px) {
-        :host {
-          display: none;
+        /*
+         * Visually hide the header cell on mobile while keeping it in the
+         * accessibility tree. Screen readers can then associate column
+         * headers with data cells via the semantic table structure
+         * (scope="col", role="columnheader"), satisfying WCAG 2.1 AA.
+         * Using display:none would remove headers from the a11y tree entirely.
+         */
+        th {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
         }
       }
     `,
@@ -173,14 +181,6 @@ export class HelixTableHeader extends LitElement {
     );
   }
 
-  private _handleKeydown(e: KeyboardEvent): void {
-    if (!this.sortable) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      this._handleSort();
-    }
-  }
-
   // ─── Render Helpers ───
 
   private _renderSortIcon() {
@@ -230,8 +230,6 @@ export class HelixTableHeader extends LitElement {
         colspan=${ifDefined(this.colspan > 0 ? this.colspan : undefined)}
         rowspan=${ifDefined(this.rowspan > 0 ? this.rowspan : undefined)}
         aria-sort=${this._ariaSort()}
-        tabindex=${this.sortable ? '0' : nothing}
-        @keydown=${this._handleKeydown}
       >
         ${this.sortable
           ? html`

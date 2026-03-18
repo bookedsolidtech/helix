@@ -80,6 +80,14 @@ export class HelixTableCell extends LitElement {
   align: 'left' | 'center' | 'right' = 'left';
 
   /**
+   * Column label for mobile card layout. Forwarded as `data-label` to the
+   * inner `<td>` so the CSS `attr(data-label)` pseudo-element resolves.
+   * @attr data-label
+   */
+  @property({ type: String, attribute: 'data-label' })
+  dataLabel: string | undefined;
+
+  /**
    * Number of columns this cell spans.
    * @attr colspan
    */
@@ -98,6 +106,7 @@ export class HelixTableCell extends LitElement {
       <td
         part="cell"
         role="cell"
+        data-label=${ifDefined(this.dataLabel)}
         colspan=${ifDefined(this.colspan > 0 ? this.colspan : undefined)}
         rowspan=${ifDefined(this.rowspan > 0 ? this.rowspan : undefined)}
       >
