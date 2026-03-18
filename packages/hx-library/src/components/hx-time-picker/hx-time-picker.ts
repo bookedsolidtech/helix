@@ -171,8 +171,10 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private readonly _internals: ElementInternals;
 
   constructor() {
@@ -254,36 +256,52 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _open = false;
+  /** @internal */
   @state() private _activeIndex = -1;
+  /** @internal */
   @state() private _inputDisplayValue = '';
+  /** @internal */
   @state() private _hasLabelSlot = false;
+  /** @internal */
   @state() private _hasErrorSlot = false;
   @state() private _hasHelpSlot = false;
+  /** @internal */
   @state() private _slottedLabelId = '';
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
+  /** @internal */
   private static _instanceCount = 0;
 
+  /** @internal */
   private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
+  /** @internal */
   private readonly _listboxId = `${this._id}-listbox`;
+  /** @internal */
   private readonly _errorId = `${this._id}-error`;
+  /** @internal */
   private readonly _helpId = `${this._id}-help`;
 
   // ─── Query References ───
 
+  /** @internal */
   @query('.field__input')
   private _inputEl: HTMLInputElement | undefined;
 
+  /** @internal */
   @query('.field__listbox')
   private _listboxEl: HTMLUListElement | undefined;
 
   // ─── Memoized slot generation (avoids regenerating on every render call) ───
 
+  /** @internal */
   private _cachedSlots: TimeSlot[] | null = null;
+  /** @internal */
   private _slotsKey = '';
 
+  /** @internal */
   private get _slots(): TimeSlot[] {
     const key = `${this.min}|${this.max}|${this.step}|${this.format}`;
     if (this._cachedSlots === null || key !== this._slotsKey) {
@@ -295,6 +313,7 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Outside-click handler (bound reference for add/removeEventListener) ───
 
+  /** @internal */
   private readonly _handleOutsideClick = (e: MouseEvent): void => {
     if (!this.contains(e.target as Node) && !this.shadowRoot?.contains(e.target as Node)) {
       this._closeListbox();

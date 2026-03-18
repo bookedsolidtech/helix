@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixStepsStyles } from './hx-steps.styles.js';
@@ -47,13 +47,17 @@ export class HelixSteps extends LitElement {
   @property({ type: String, reflect: true })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Accessible label for the list. Forwarded to the inner list element.
+   * @attr aria-label
+   */
+  @property({ type: String, attribute: 'aria-label' })
+  ariaLabel: string | null = null;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    if (!this.hasAttribute('role')) {
-      this.setAttribute('role', 'list');
-    }
     this.addEventListener('hx-step-click-internal', this._handleStepClickInternal);
   }
 
@@ -126,7 +130,7 @@ export class HelixSteps extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="steps">
+      <div part="base" class="steps" role="list" aria-label=${this.ariaLabel ?? nothing}>
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;

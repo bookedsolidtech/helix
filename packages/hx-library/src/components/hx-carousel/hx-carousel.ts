@@ -171,6 +171,34 @@ export class HelixCarousel extends LitElement {
   @property({ type: Boolean, attribute: 'mouse-dragging', reflect: true })
   mouseDragging = false;
 
+  /**
+   * Accessible label for the previous slide button.
+   * @attr label-prev-slide
+   */
+  @property({ type: String, attribute: 'label-prev-slide' })
+  labelPrevSlide = 'Previous slide';
+
+  /**
+   * Accessible label for the next slide button.
+   * @attr label-next-slide
+   */
+  @property({ type: String, attribute: 'label-next-slide' })
+  labelNextSlide = 'Next slide';
+
+  /**
+   * Accessible label for the autoplay pause button.
+   * @attr label-pause-autoplay
+   */
+  @property({ type: String, attribute: 'label-pause-autoplay' })
+  labelPauseAutoplay = 'Pause autoplay';
+
+  /**
+   * Accessible label for the autoplay play button.
+   * @attr label-play-autoplay
+   */
+  @property({ type: String, attribute: 'label-play-autoplay' })
+  labelPlayAutoplay = 'Play autoplay';
+
   /** @internal */
   @state() private _currentIndex = 0;
   /** @internal */
@@ -546,7 +574,7 @@ export class HelixCarousel extends LitElement {
             class="nav-btn"
             part="prev-btn"
             type="button"
-            aria-label="Previous slide"
+            aria-label=${this.labelPrevSlide}
             ?disabled=${!this._canGoPrev}
             @click=${() => this.previous()}
           >
@@ -559,7 +587,7 @@ export class HelixCarousel extends LitElement {
                 class="play-pause-btn"
                 part="play-pause-btn"
                 type="button"
-                aria-label=${this._isPlaying ? 'Pause autoplay' : 'Play autoplay'}
+                aria-label=${this._isPlaying ? this.labelPauseAutoplay : this.labelPlayAutoplay}
                 @click=${() => this._toggleAutoplay()}
               >
                 ${this._isPlaying ? this._renderPauseIcon() : this._renderPlayIcon()}
@@ -571,7 +599,7 @@ export class HelixCarousel extends LitElement {
             class="nav-btn"
             part="next-btn"
             type="button"
-            aria-label="Next slide"
+            aria-label=${this.labelNextSlide}
             ?disabled=${!this._canGoNext}
             @click=${() => this.next()}
           >

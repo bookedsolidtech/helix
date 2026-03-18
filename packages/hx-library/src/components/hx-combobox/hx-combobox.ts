@@ -186,6 +186,20 @@ export class HelixCombobox extends LitElement {
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;
 
+  /**
+   * Text shown when no options match the current filter.
+   * @attr label-no-options
+   */
+  @property({ type: String, attribute: 'label-no-options' })
+  labelNoOptions = 'No options found';
+
+  /**
+   * Validation message shown when the field is required but empty.
+   * @attr label-required
+   */
+  @property({ type: String, attribute: 'label-required' })
+  labelRequired = 'Please select an option.';
+
   // ─── Internal State ───
 
   @state() private _options: ComboboxOption[] = [];
@@ -277,7 +291,7 @@ export class HelixCombobox extends LitElement {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'Please select an option.',
+        this.error || this.labelRequired,
         this._input,
       );
     } else {
@@ -582,7 +596,7 @@ export class HelixCombobox extends LitElement {
     if (filtered.length === 0) {
       return html`
         <slot name="empty-label">
-          <div class="field__no-options">No options found</div>
+          <div class="field__no-options">${this.labelNoOptions}</div>
         </slot>
       `;
     }

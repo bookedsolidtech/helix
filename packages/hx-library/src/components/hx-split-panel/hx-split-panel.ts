@@ -131,9 +131,13 @@ export class HelixSplitPanel extends LitElement {
   @property({ type: String, reflect: true })
   collapsed: 'start' | 'end' | null = null;
 
+  /** @internal */
   private _dragging = false;
+  /** @internal */
   private _dragStart = 0;
+  /** @internal */
   private _positionAtDragStart = 0;
+  /** @internal */
   private _positionBeforeCollapse = 50;
 
   private _clamp(value: number): number {
@@ -169,6 +173,7 @@ export class HelixSplitPanel extends LitElement {
     return this.offsetHeight;
   }
 
+  /** @internal */
   private _onPointerDown = (e: PointerEvent): void => {
     if (this.disabled) return;
     const divider = e.currentTarget as HTMLElement;
@@ -179,6 +184,7 @@ export class HelixSplitPanel extends LitElement {
     e.preventDefault();
   };
 
+  /** @internal */
   private _onPointerMove = (e: PointerEvent): void => {
     if (!this._dragging) return;
     const current = this.orientation === 'horizontal' ? e.clientX : e.clientY;
@@ -189,10 +195,12 @@ export class HelixSplitPanel extends LitElement {
     this._setPosition(this._positionAtDragStart + deltaPercent);
   };
 
+  /** @internal */
   private _onPointerUp = (): void => {
     this._dragging = false;
   };
 
+  /** @internal */
   private _onKeyDown = (e: KeyboardEvent): void => {
     if (this.disabled) return;
     switch (e.key) {
@@ -225,14 +233,17 @@ export class HelixSplitPanel extends LitElement {
     }
   };
 
+  /** @internal */
   private _collapseStart = (): void => {
     this.collapsed = 'start';
   };
 
+  /** @internal */
   private _collapseEnd = (): void => {
     this.collapsed = 'end';
   };
 
+  /** @internal */
   private _expand = (): void => {
     this.collapsed = null;
   };

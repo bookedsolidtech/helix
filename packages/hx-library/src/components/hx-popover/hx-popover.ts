@@ -113,10 +113,13 @@ export class HelixPopover extends LitElement {
   @property({ type: String, reflect: true })
   label = 'Popover';
 
+  /** @internal */
   @state() private _visible = false;
 
+  /** @internal */
   private _previousFocus: HTMLElement | null = null;
 
+  /** @internal */
   private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
 
   // ─── Lifecycle ───
@@ -279,6 +282,7 @@ export class HelixPopover extends LitElement {
   // ─── Event Handlers ───
 
   // P1-03 / P0-01: document-level handlers active only while popover is open
+  /** @internal */
   private _handleDocumentKeydown = (e: Event): void => {
     if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
       void this._hide();
@@ -286,6 +290,7 @@ export class HelixPopover extends LitElement {
   };
 
   // P0-01: close when click target is outside this component
+  /** @internal */
   private _handleDocumentClick = (e: Event): void => {
     // Shadow DOM retargets events from within to the host at document level,
     // so a click on the trigger wrapper appears as e.target === this.
@@ -294,6 +299,7 @@ export class HelixPopover extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleAnchorClick = (): void => {
     if (this.trigger !== 'click') return;
     if (this._visible) {
@@ -303,21 +309,25 @@ export class HelixPopover extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleAnchorMouseEnter = (): void => {
     if (this.trigger !== 'hover') return;
     void this._show();
   };
 
+  /** @internal */
   private _handleAnchorMouseLeave = (): void => {
     if (this.trigger !== 'hover') return;
     void this._hide();
   };
 
+  /** @internal */
   private _handleAnchorFocusIn = (): void => {
     if (this.trigger !== 'focus') return;
     void this._show();
   };
 
+  /** @internal */
   private _handleAnchorFocusOut = (): void => {
     if (this.trigger !== 'focus') return;
     void this._hide();

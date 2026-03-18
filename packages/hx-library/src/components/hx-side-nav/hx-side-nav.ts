@@ -104,7 +104,7 @@ export class HelixSideNav extends LitElement {
    * of each item (anchor or button with part="link").
    */
   private _handleKeydown(e: KeyboardEvent): void {
-    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') return;
 
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
@@ -139,8 +139,12 @@ export class HelixSideNav extends LitElement {
     let nextIndex: number;
     if (e.key === 'ArrowDown') {
       nextIndex = currentIndex < navItems.length - 1 ? currentIndex + 1 : 0;
-    } else {
+    } else if (e.key === 'ArrowUp') {
       nextIndex = currentIndex > 0 ? currentIndex - 1 : navItems.length - 1;
+    } else if (e.key === 'Home') {
+      nextIndex = 0;
+    } else {
+      nextIndex = navItems.length - 1;
     }
 
     const targetItem = navItems[nextIndex];
