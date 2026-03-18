@@ -259,6 +259,7 @@ export class HelixTimePicker extends LitElement {
   @state() private _inputDisplayValue = '';
   @state() private _hasLabelSlot = false;
   @state() private _hasErrorSlot = false;
+  @state() private _hasHelpSlot = false;
   @state() private _slottedLabelId = '';
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
@@ -449,6 +450,11 @@ export class HelixTimePicker extends LitElement {
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  private _handleHelpSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   // ─── Event Dispatch ───
 
   private _dispatchChange(value: string): void {
@@ -610,7 +616,9 @@ export class HelixTimePicker extends LitElement {
     const placeholder = this.format === '12h' ? 'hh:mm AM' : 'hh:mm';
 
     const describedBy =
-      [hasError ? this._errorId : null, this._helpId].filter(Boolean).join(' ') || undefined;
+      [hasError ? this._errorId : null, this._hasHelpSlot ? this._helpId : null]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -745,7 +753,7 @@ export class HelixTimePicker extends LitElement {
 
         <!-- Help slot -->
         <div part="help-text" class="field__help-text" id=${this._helpId}>
-          <slot name="help"></slot>
+          <slot name="help" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </div>
     `;

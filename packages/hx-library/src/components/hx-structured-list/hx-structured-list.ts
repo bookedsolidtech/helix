@@ -31,6 +31,15 @@ import {
 export class HelixStructuredList extends LitElement {
   static override styles = [tokenStyles, helixStructuredListStyles];
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Set role on the host element so the list/listitem relationship is
+    // preserved in the light DOM tree, crossing shadow boundaries correctly.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'list');
+    }
+  }
+
   /**
    * Renders a border around the entire list.
    * @attr bordered
@@ -54,7 +63,7 @@ export class HelixStructuredList extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="list" role="list">
+      <div part="base" class="list">
         <slot></slot>
       </div>
     `;
@@ -85,9 +94,19 @@ export class HelixStructuredList extends LitElement {
 export class HelixStructuredListRow extends LitElement {
   static override styles = [tokenStyles, helixStructuredListRowStyles];
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Set role on the host element so screen readers see listitem as a direct
+    // child of the hx-structured-list host (which carries role="list"),
+    // preserving the list/listitem relationship across shadow boundaries.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'listitem');
+    }
+  }
+
   override render() {
     return html`
-      <div part="base" class="row" role="listitem">
+      <div part="base" class="row">
         <div part="label" class="row__label">
           <slot name="label"></slot>
         </div>
