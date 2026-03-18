@@ -44,6 +44,8 @@ import { helixTooltipStyles } from './hx-tooltip.styles.js';
  * </hx-tooltip>
  * ```
  */
+let _tooltipCounter = 0;
+
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
   static override styles = [tokenStyles, helixTooltipStyles];
@@ -79,12 +81,8 @@ export class HelixTooltip extends LitElement {
   /** @internal */
   private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-  /**
-   * Unique ID for this tooltip instance.
-   * Uses crypto.randomUUID() to prevent SSR hydration ID collisions.
-   * @internal
-   */
-  private readonly _tooltipId = `hx-tooltip-${crypto.randomUUID()}`;
+  /** @internal */
+  private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
   /**
    * Visually-hidden description element in light DOM.
