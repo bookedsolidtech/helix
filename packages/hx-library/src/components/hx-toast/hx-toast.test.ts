@@ -1,8 +1,9 @@
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixToast, HelixToastStack } from './hx-toast.js';
-import { toast } from './hx-toast.js';
+import type { HelixToast } from './hx-toast.js';
+import type { HelixToastStack } from './hx-toast-stack.js';
+import { toast } from './toast-factory.js';
 import './index.js';
 
 afterEach(cleanup);
