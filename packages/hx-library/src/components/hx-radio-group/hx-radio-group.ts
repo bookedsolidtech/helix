@@ -38,10 +38,16 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /**
+   * Enables ElementInternals form association for this component.
+   * @internal
+   */
   static formAssociated = true;
 
-  /** @internal */
+  /**
+   * Reference to the ElementInternals instance for form participation.
+   * @internal
+   */
   private _internals: ElementInternals;
 
   constructor() {
@@ -107,26 +113,44 @@ export class HelixRadioGroup extends LitElement {
   @property({ type: String, reflect: true })
   orientation: 'vertical' | 'horizontal' = 'vertical';
 
-  /** @internal */
+  /**
+   * Queries the rendered group container element within the shadow root.
+   * @internal
+   */
   private get _groupEl(): HTMLElement | null {
     return this.renderRoot?.querySelector('.fieldset__group') ?? null;
   }
 
-  /** @internal */
+  /**
+   * Tracks whether the error slot has assigned content.
+   * @internal
+   */
   @state() private _hasErrorSlot = false;
 
   // ─── Internal IDs ───
 
-  /** @internal */
+  /**
+   * Unique identifier for this radio group instance used in ARIA attributes.
+   * @internal
+   */
   private _groupId = `hx-radio-group-${++_groupCounter}`;
-  /** @internal */
+  /**
+   * Unique identifier for the help text element, used in aria-describedby.
+   * @internal
+   */
   private _helpTextId = `${this._groupId}-help`;
-  /** @internal */
+  /**
+   * Unique identifier for the error element, used in aria-describedby.
+   * @internal
+   */
   private _errorId = `${this._groupId}-error`;
 
   // ─── Slot Handlers ───
 
-  /** @internal */
+  /**
+   * Handles slotchange events on the error slot to detect assigned content.
+   * @internal
+   */
   private _handleErrorSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
     this._hasErrorSlot = e.target.assignedNodes({ flatten: true }).length > 0;
@@ -166,12 +190,21 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Radio Management ───
 
-  /** @internal */
+  /**
+   * Cached list of child hx-radio elements; invalidated on slot change.
+   * @internal
+   */
   private _cachedRadios: HelixRadio[] | null = null;
-  /** @internal */
+  /**
+   * Stores each radio's individual disabled state before group-level disabling overrides it.
+   * @internal
+   */
   private _individualDisabledStates = new WeakMap<HelixRadio, boolean>();
 
-  /** @internal */
+  /**
+   * Returns all child hx-radio elements, using the cache when available.
+   * @internal
+   */
   private _getRadios(): HelixRadio[] {
     if (!this._cachedRadios) {
       this._cachedRadios = Array.from(this.querySelectorAll('hx-radio')) as HelixRadio[];
@@ -179,12 +212,18 @@ export class HelixRadioGroup extends LitElement {
     return this._cachedRadios;
   }
 
-  /** @internal */
+  /**
+   * Returns only the child hx-radio elements that are not disabled.
+   * @internal
+   */
   private _getEnabledRadios(): HelixRadio[] {
     return this._getRadios().filter((radio) => !radio.disabled && !this.disabled);
   }
 
-  /** @internal */
+  /**
+   * Synchronizes checked state, disabled state, and roving tabindex across all child radios.
+   * @internal
+   */
   private _syncRadios(): void {
     const radios = this._getRadios();
     const enabledRadios = this._getEnabledRadios();
@@ -227,7 +266,10 @@ export class HelixRadioGroup extends LitElement {
 
   // ─── Event Handling ───
 
-  /** @internal */
+  /**
+   * Handles the internal hx-radio-select event to update the group's selected value.
+   * @internal
+   */
   private _handleRadioSelect = (e: Event): void => {
     if (!(e instanceof CustomEvent)) return;
     e.stopPropagation();
@@ -253,7 +295,10 @@ export class HelixRadioGroup extends LitElement {
     );
   };
 
-  /** @internal */
+  /**
+   * Handles keyboard navigation (arrow keys, Home, End, Space) within the radio group.
+   * @internal
+   */
   private _handleKeydown = (e: KeyboardEvent): void => {
     const enabledRadios = this._getEnabledRadios();
     if (enabledRadios.length === 0) {
@@ -319,7 +364,10 @@ export class HelixRadioGroup extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Handles slotchange events on the default slot to refresh the radio cache.
+   * @internal
+   */
   private _handleSlotChange(): void {
     this._cachedRadios = null;
     this._syncRadios();
@@ -367,7 +415,10 @@ export class HelixRadioGroup extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** @internal */
+  /**
+   * Updates the ElementInternals validity state based on the required constraint and current value.
+   * @internal
+   */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(

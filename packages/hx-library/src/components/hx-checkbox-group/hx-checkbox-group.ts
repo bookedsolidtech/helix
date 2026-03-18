@@ -50,10 +50,10 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
-  /** @internal */
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -115,9 +115,9 @@ export class HelixCheckboxGroup extends LitElement {
   }
   private _orientation: 'vertical' | 'horizontal' = 'vertical';
 
-  /** @internal */
+  /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
-  /** @internal */
+  /** Whether the named help-text slot contains projected content. @internal */
   @state() private _hasHelpSlot = false;
 
   // ─── Internal IDs ───
