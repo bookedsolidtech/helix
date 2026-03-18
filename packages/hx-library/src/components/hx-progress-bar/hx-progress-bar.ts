@@ -90,6 +90,10 @@ export class HelixProgressBar extends LitElement {
   variant: 'default' | 'success' | 'warning' | 'danger' = 'default';
 
   @state() private _liveMessage = '';
+  @state() private _hasLabelSlotContent = false;
+
+  private static _counter = 0;
+  private _uid = `hx-pb-${++HelixProgressBar._counter}`;
 
   private get _isIndeterminate(): boolean {
     return this.indeterminate || this.value === null;
@@ -122,9 +126,15 @@ export class HelixProgressBar extends LitElement {
     }
   }
 
+  private _onLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasLabelSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   override render() {
-    const labelId = `${this.id || 'hx-pb'}-label`;
-    const descId = this.description ? `${this.id || 'hx-pb'}-desc` : undefined;
+    const labelId = `${this._uid}-label`;
+    const descId = this.description ? `${this._uid}-desc` : undefined;
+    const hasVisibleLabel = this._hasLabelSlotContent;
 
     const classes = {
       'progress-bar': true,
@@ -139,7 +149,7 @@ export class HelixProgressBar extends LitElement {
     return html`
       <div class=${classMap(classes)}>
         <span id=${labelId} part="label" class="progress-bar__label">
-          <slot name="label"></slot>
+          <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
         </span>
         ${this.description
           ? html`<span id=${descId} class="sr-only">${this.description}</span>`
@@ -151,8 +161,8 @@ export class HelixProgressBar extends LitElement {
           aria-valuenow=${ifDefined(ariaValueNow)}
           aria-valuemin=${this.min}
           aria-valuemax=${this.max}
-          aria-label=${this.label || nothing}
-          aria-labelledby=${labelId}
+          aria-label=${ifDefined(!hasVisibleLabel && this.label ? this.label : undefined)}
+          aria-labelledby=${ifDefined(hasVisibleLabel ? labelId : undefined)}
           aria-describedby=${ifDefined(descId)}
         >
           <div part="fill" class="progress-bar__fill" style=${indicatorStyle || nothing}></div>

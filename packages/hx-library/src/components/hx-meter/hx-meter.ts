@@ -40,6 +40,9 @@ type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
 export class HelixMeter extends LitElement {
   static override styles = [tokenStyles, helixMeterStyles];
 
+  private static _counter = 0;
+  private _uid = `hx-meter-${++HelixMeter._counter}`;
+
   /**
    * Current value of the meter.
    * @attr value
@@ -170,9 +173,14 @@ export class HelixMeter extends LitElement {
         aria-valuemax=${this.max}
         aria-valuetext=${ariaValuetext}
         aria-label=${ifDefined(!hasVisibleLabel ? `${clampedValue} of ${this.max}` : undefined)}
-        aria-labelledby=${ifDefined(hasVisibleLabel ? '__hx-meter-label' : undefined)}
+        aria-labelledby=${ifDefined(hasVisibleLabel ? `${this._uid}-label` : undefined)}
       >
-        <span id="__hx-meter-label" part="label" class="meter__label" ?hidden=${!hasVisibleLabel}>
+        <span
+          id=${`${this._uid}-label`}
+          part="label"
+          class="meter__label"
+          ?hidden=${!hasVisibleLabel}
+        >
           <slot name="label" @slotchange=${this._onLabelSlotChange}>${this.label ?? ''}</slot>
         </span>
         <div class="meter__track" part="track">
