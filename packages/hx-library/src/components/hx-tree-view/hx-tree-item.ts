@@ -180,7 +180,7 @@ export class HelixTreeItem extends LitElement {
   }
 
   /**
-   * Dispatches the hx-tree-item-select event when the item row is clicked.
+   * Dispatches the hx-tree-item-select event when the item is activated via click or keyboard.
    * @internal
    */
   private _handleRowClick(): void {
@@ -195,7 +195,7 @@ export class HelixTreeItem extends LitElement {
   }
 
   /**
-   * Handles keyboard navigation within the tree item, delegating ArrowDown/Up/Home/End to the parent tree.
+   * Handles keyboard interaction for the tree item, including expand/collapse, activation, and delegation of list-navigation keys to the parent tree.
    * @internal
    */
   private _handleKeyDown(e: KeyboardEvent): void {
