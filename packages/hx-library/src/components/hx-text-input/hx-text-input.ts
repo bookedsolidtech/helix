@@ -181,7 +181,7 @@ export class HelixTextInput extends LitElement {
 
   /** @internal */
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Slot Tracking ───
 

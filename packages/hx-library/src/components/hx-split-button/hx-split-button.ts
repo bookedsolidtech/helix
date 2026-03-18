@@ -50,10 +50,10 @@ export class HelixSplitButton extends LitElement {
   // ─── Internal References ───
 
   @query('.split-button__menu')
-  private _menuPanel!: HTMLElement;
+  private _menuPanel: HTMLElement | undefined;
 
   @query('.split-button__trigger')
-  private _triggerButton!: HTMLButtonElement;
+  private _triggerButton: HTMLButtonElement | undefined;
 
   // ─── Internal State ───
 

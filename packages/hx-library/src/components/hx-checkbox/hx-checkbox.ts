@@ -140,7 +140,7 @@ export class HelixCheckbox extends LitElement {
   size: 'sm' | 'md' | 'lg' = 'md';
 
   @query('.checkbox__input')
-  private _inputEl!: HTMLInputElement;
+  private _inputEl: HTMLInputElement | undefined;
 
   @state() private _hasErrorSlot = false;
 

@@ -79,10 +79,10 @@ export class HelixDrawer extends LitElement {
   // ─── Queries ───
 
   @query('.drawer-overlay')
-  private _overlayEl!: HTMLElement | null;
+  private _overlayEl: HTMLElement | null | undefined;
 
   @query('.drawer-panel')
-  private _panelEl!: HTMLElement | null;
+  private _panelEl: HTMLElement | null | undefined;
 
   // ─── Internal state ───
 
