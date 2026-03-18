@@ -94,14 +94,23 @@ export class HelixNav extends LitElement {
 
   // ─── State ───
 
-  /** @internal */
+  /**
+   * Tracks whether the mobile navigation menu is currently expanded.
+   * @internal
+   */
   @state() private _mobileOpen = false;
-  /** @internal */
+  /**
+   * Index of the currently expanded top-level nav item with a submenu, or null if none is expanded.
+   * @internal
+   */
   @state() private _expandedIndex: number | null = null;
 
   // ─── Private: bound event handler reference ───
 
-  /** @internal */
+  /**
+   * Stable bound reference to the outside-click handler, stored for addEventListener/removeEventListener symmetry.
+   * @internal
+   */
   private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
 
   /**

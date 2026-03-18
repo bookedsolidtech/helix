@@ -49,17 +49,26 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Internal References ───
 
-  /** @internal */
+  /**
+   * Reference to the dropdown menu panel element, used for positioning and focus management.
+   * @internal
+   */
   @query('.split-button__menu')
   private _menuPanel: HTMLElement | undefined;
 
-  /** @internal */
+  /**
+   * Reference to the dropdown trigger button element, used to return focus after menu closes.
+   * @internal
+   */
   @query('.split-button__trigger')
   private _triggerButton: HTMLButtonElement | undefined;
 
   // ─── Internal State ───
 
-  /** @internal */
+  /**
+   * Tracks whether the dropdown menu is currently open.
+   * @internal
+   */
   @state() private _open = false;
 
   // ─── Public Properties ───
@@ -109,7 +118,10 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Unique IDs ───
 
-  /** @internal */
+  /**
+   * Stable unique ID for the dropdown menu panel element, used to wire aria-controls on the trigger button.
+   * @internal
+   */
   private readonly _menuId = `hx-split-button-menu-${++_hxSplitButtonIdCounter}`;
 
   // ─── Lifecycle ───
