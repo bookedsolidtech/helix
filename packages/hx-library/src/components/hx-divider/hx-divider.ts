@@ -110,4 +110,8 @@ declare global {
   }
 }
 
+/** Canonical type alias for the hx-divider component. */
+export type HxDivider = HelixDivider;
+
+/** @deprecated Use {@link HxDivider} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcDivider = HelixDivider;

@@ -142,5 +142,8 @@ declare global {
   }
 }
 
-/** @public Type alias for use in test files and consumers. */
+/** Canonical type alias for the hx-radio component. */
+export type HxRadio = HelixRadio;
+
+/** @deprecated Use {@link HxRadio} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcRadio = HelixRadio;

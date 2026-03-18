@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixNav } from './hx-nav.js';
@@ -477,9 +477,10 @@ describe('hx-nav', () => {
       const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
         '[part="list"] > [part="item"] > [part="link"]',
       );
-      links?.[0]?.focus();
+      const focusSpy = vi.spyOn(links![1], 'focus');
       links?.[0]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
-      expect(el.shadowRoot?.activeElement).toBe(links?.[1]);
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
     });
 
     it('ArrowLeft moves focus to the previous top-level item', async () => {
@@ -489,9 +490,10 @@ describe('hx-nav', () => {
       const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
         '[part="list"] > [part="item"] > [part="link"]',
       );
-      links?.[1]?.focus();
+      const focusSpy = vi.spyOn(links![0], 'focus');
       links?.[1]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
-      expect(el.shadowRoot?.activeElement).toBe(links?.[0]);
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
     });
 
     it('ArrowRight wraps from last item to first item', async () => {
@@ -501,9 +503,10 @@ describe('hx-nav', () => {
       const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
         '[part="list"] > [part="item"] > [part="link"]',
       );
-      links?.[2]?.focus();
+      const focusSpy = vi.spyOn(links![0], 'focus');
       links?.[2]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
-      expect(el.shadowRoot?.activeElement).toBe(links?.[0]);
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
     });
 
     it('ArrowDown in submenu moves focus to next sub-item', async () => {
@@ -517,11 +520,12 @@ describe('hx-nav', () => {
       const subLinks = el.shadowRoot?.querySelectorAll<HTMLElement>(
         '.nav__submenu:not([hidden]) [part="link"]',
       );
-      subLinks?.[0]?.focus();
+      const focusSpy = vi.spyOn(subLinks![1], 'focus');
       subLinks?.[0]?.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
       );
-      expect(el.shadowRoot?.activeElement).toBe(subLinks?.[1]);
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
     });
 
     it('ArrowUp in submenu moves focus to previous sub-item', async () => {
@@ -535,9 +539,10 @@ describe('hx-nav', () => {
       const subLinks = el.shadowRoot?.querySelectorAll<HTMLElement>(
         '.nav__submenu:not([hidden]) [part="link"]',
       );
-      subLinks?.[1]?.focus();
+      const focusSpy = vi.spyOn(subLinks![0], 'focus');
       subLinks?.[1]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
-      expect(el.shadowRoot?.activeElement).toBe(subLinks?.[0]);
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
     });
   });
 

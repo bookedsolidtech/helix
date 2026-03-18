@@ -18,7 +18,7 @@ let _uid = 0;
  * @slot - `<hx-checkbox>` elements.
  * @slot label - Rich HTML group label (overrides the label property when used).
  * @slot error - Custom error content (overrides the error property).
- * @slot help - Group-level help text.
+ * @slot help-text - Group-level help text.
  *
  * @fires {CustomEvent<{values: string[]}>} hx-change - Dispatched when any child checkbox changes.
  *
@@ -342,7 +342,7 @@ export class HelixCheckboxGroup extends LitElement {
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
 
         <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-          <slot name="help" @slotchange=${this._handleHelpSlotChange}></slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </fieldset>
     `;
