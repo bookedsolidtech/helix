@@ -124,6 +124,13 @@ export class HelixPagination extends LitElement {
   @property({ type: Boolean, attribute: 'show-page-size', reflect: true })
   showPageSize = false;
 
+  /**
+   * Label text for the rows-per-page selector.
+   * @attr label-rows-per-page
+   */
+  @property({ type: String, attribute: 'label-rows-per-page' })
+  labelRowsPerPage = 'Rows per page:';
+
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   @state() private _rovingKey: number | string | null = null;
 
@@ -271,7 +278,7 @@ export class HelixPagination extends LitElement {
           ? html`
               <div part="page-size-wrapper" class="page-size-wrapper">
                 <label part="page-size-label" class="page-size-label">
-                  Rows per page:
+                  ${this.labelRowsPerPage}
                   <select
                     part="page-size-select"
                     class="page-size-select"
