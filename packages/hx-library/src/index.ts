@@ -99,6 +99,14 @@ export {
 } from './components/hx-structured-list/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export type { HxSwitch, WcSwitch } from './components/hx-switch/index.js';
+export { HelixTable } from './components/hx-table/index.js';
+export { HelixTableHead } from './components/hx-table/index.js';
+export { HelixTableBody } from './components/hx-table/index.js';
+export { HelixTableFoot } from './components/hx-table/index.js';
+export { HelixTableRow } from './components/hx-table/index.js';
+export { HelixTableHeader } from './components/hx-table/index.js';
+export { HelixTableCell } from './components/hx-table/index.js';
+export type { HxTableSortDetail } from './components/hx-table/index.js';
 export { HelixTabs } from './components/hx-tabs/index.js';
 export { HelixTab } from './components/hx-tabs/index.js';
 export { HelixTabPanel } from './components/hx-tabs/index.js';
