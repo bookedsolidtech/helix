@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A linear progress indicator for determinate and indeterminate states.
@@ -126,8 +127,9 @@ export class HelixProgressBar extends LitElement {
     }
 
     if (!this.label) {
-      console.warn(
-        '[hx-progress-bar] No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled progressbar violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      devWarn(
+        'hx-progress-bar',
+        'No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled progressbar violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
       );
     }
   }

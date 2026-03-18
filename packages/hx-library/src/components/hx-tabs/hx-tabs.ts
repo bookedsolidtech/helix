@@ -4,6 +4,7 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxTabsIdCounter = 0;
@@ -208,9 +209,11 @@ export class HelixTabs extends LitElement {
     tabs.forEach((tab) => {
       const isSelected = tab.panel === this._activePanel;
       tab.selected = isSelected;
-      // Tabindex is managed by the inner button in hx-tab via the `selected` property.
-      // We also set it on the host for the roving tabindex pattern so document.activeElement
-      // comparisons work correctly when the inner button is focused.
+      // Dual tabindex is intentional: the inner button in hx-tab manages its own tabindex
+      // via the `selected` property. We also set it on the host element for the roving
+      // tabindex pattern so document.activeElement comparisons work correctly when the
+      // inner button is focused. This is safe because the inner button is the only
+      // focusable element in hx-tab's shadow DOM (WCAG 2.4.3).
       tab.tabIndex = isSelected ? 0 : -1;
     });
 
@@ -276,8 +279,9 @@ export class HelixTabs extends LitElement {
         .assignedElements()
         .filter((el) => el.tagName.toLowerCase() !== 'hx-tab');
       if (invalid.length > 0) {
-        console.warn(
-          `[hx-tabs] Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        devWarn(
+          'hx-tabs',
+          `Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
         );
       }
     }
@@ -286,8 +290,9 @@ export class HelixTabs extends LitElement {
         .assignedElements()
         .filter((el) => el.tagName.toLowerCase() !== 'hx-tab-panel');
       if (invalid.length > 0) {
-        console.warn(
-          `[hx-tabs] Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        devWarn(
+          'hx-tabs',
+          `Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
         );
       }
     }

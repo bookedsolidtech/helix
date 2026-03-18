@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSelectStyles } from './hx-select.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxSelectIdCounter = 0;
@@ -74,8 +75,10 @@ export class HelixSelect extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -172,15 +175,20 @@ export class HelixSelect extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _options: SelectOption[] = [];
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
   @state() private _focusedOptionIndex = -1;
 
   // ─── Queries ───
 
+  /** @internal */
   @query('.field__select')
   private _select: HTMLSelectElement | undefined;
 
+  /** @internal */
   @query('.field__trigger')
   private _trigger: HTMLElement | undefined;
 
@@ -213,8 +221,9 @@ export class HelixSelect extends LitElement {
     if (changedProperties.has('size')) {
       const validSizes: string[] = ['sm', 'md', 'lg'];
       if (!validSizes.includes(this.size)) {
-        console.warn(
-          `[hx-select] Invalid size "${this.size}". Expected one of: ${validSizes.join(', ')}.`,
+        devWarn(
+          'hx-select',
+          `Invalid size "${this.size}". Expected one of: ${validSizes.join(', ')}.`,
         );
       }
     }

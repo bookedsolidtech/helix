@@ -149,7 +149,9 @@ function parseColor(value: string): HSV | null {
     return rgb ? rgbToHsv(rgb) : null;
   }
 
-  const rgbMatch = value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/);
+  const rgbMatch = value.match(
+    /rgba?\(\s*(\d+)(?:\s*,\s*|\s+)(\d+)(?:\s*,\s*|\s+)(\d+)(?:\s*(?:\/|,)\s*([\d.]+))?\s*\)/,
+  );
   if (rgbMatch) {
     const [, rm1, rm2, rm3, rm4] = rgbMatch;
     return rgbToHsv({
@@ -161,7 +163,7 @@ function parseColor(value: string): HSV | null {
   }
 
   const hslMatch = value.match(
-    /hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)/,
+    /hsla?\(\s*([\d.]+)(?:\s*,\s*|\s+)([\d.]+)%(?:\s*,\s*|\s+)([\d.]+)%(?:\s*(?:\/|,)\s*([\d.]+))?\s*\)/,
   );
   if (hslMatch) {
     const [, hm1, hm2, hm3, hm4] = hslMatch;
@@ -226,16 +228,16 @@ function formatColor(hsv: HSV, format: ColorFormat, includeAlpha: boolean): stri
       return rgbToHex(rgb, includeAlpha);
     case 'rgb': {
       if (includeAlpha && hsv.a < 1) {
-        return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${Math.round(hsv.a * 100) / 100})`;
+        return `rgb(${rgb.r} ${rgb.g} ${rgb.b} / ${Math.round(hsv.a * 100) / 100})`;
       }
-      return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+      return `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
     }
     case 'hsl': {
       const hsl = rgbToHsl(rgb);
       if (includeAlpha && hsv.a < 1) {
-        return `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${Math.round(hsv.a * 100) / 100})`;
+        return `hsl(${Math.round(hsl.h)} ${Math.round(hsl.s)}% ${Math.round(hsl.l)}% / ${Math.round(hsv.a * 100) / 100})`;
       }
-      return `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`;
+      return `hsl(${Math.round(hsl.h)} ${Math.round(hsl.s)}% ${Math.round(hsl.l)}%)`;
     }
     case 'hsv': {
       if (includeAlpha && hsv.a < 1) {
@@ -307,8 +309,10 @@ function formatColor(hsv: HSV, format: ColorFormat, includeAlpha: boolean): stri
 export class HelixColorPicker extends LitElement {
   static override styles = [tokenStyles, helixColorPickerStyles];
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -317,6 +321,7 @@ export class HelixColorPicker extends LitElement {
     // P1-1: Store bound references so connectedCallback/disconnectedCallback use the same object
     this._boundPointerMove = this._handlePointerMove.bind(this);
     this._boundPointerUp = this._handlePointerUp.bind(this);
+    this._boundDocumentClick = this._handleDocumentClick.bind(this);
   }
 
   // ─── Public Properties ───────────────────────────────────────────────────
@@ -382,36 +387,44 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Internal State ──────────────────────────────────────────────────────
 
+  /** @internal */
   @state() private _hsv: HSV = { h: 0, s: 0, v: 0, a: 1 };
+  /** @internal */
   @state() private _open = false;
+  /** @internal */
   @state() private _inputValue = '#000000';
 
   // ─── Dragging state (not reactive, managed manually) ─────────────────────
 
+  /** @internal */
   private _draggingGrid = false;
+  /** @internal */
   private _draggingHue = false;
+  /** @internal */
   private _draggingOpacity = false;
 
   // P1-1: Stored bound references to prevent memory leaks
+  /** @internal */
   private _boundPointerMove: (e: PointerEvent) => void;
+  /** @internal */
   private _boundPointerUp: () => void;
+  private _boundDocumentClick: (e: MouseEvent) => void;
 
   // ─── Lifecycle ───────────────────────────────────────────────────────────
 
   override connectedCallback(): void {
     super.connectedCallback();
     this._syncFromValue();
-    this._handleDocumentClick = this._handleDocumentClick.bind(this);
-    document.addEventListener('click', this._handleDocumentClick, true);
     // P1-1: Use stored bound references (not inline .bind() which creates new objects)
+    document.addEventListener('click', this._boundDocumentClick, true);
     document.addEventListener('pointermove', this._boundPointerMove);
     document.addEventListener('pointerup', this._boundPointerUp);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._handleDocumentClick, true);
     // P1-1: Remove using the same stored references added in connectedCallback
+    document.removeEventListener('click', this._boundDocumentClick, true);
     document.removeEventListener('pointermove', this._boundPointerMove);
     document.removeEventListener('pointerup', this._boundPointerUp);
   }
@@ -698,9 +711,9 @@ export class HelixColorPicker extends LitElement {
   private _previewColor(): string {
     const rgb = hsvToRgb(this._hsv);
     if (this.opacity && this._hsv.a < 1) {
-      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${this._hsv.a})`;
+      return `rgb(${rgb.r} ${rgb.g} ${rgb.b} / ${Math.round(this._hsv.a * 100) / 100})`;
     }
-    return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    return `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
   }
 
   // ─── Render helpers ───────────────────────────────────────────────────────
@@ -775,7 +788,7 @@ export class HelixColorPicker extends LitElement {
     if (!this.opacity) return nothing;
     const pct = `${this._hsv.a * 100}%`;
     const rgb = hsvToRgb(this._hsv);
-    const thumbColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${this._hsv.a})`;
+    const thumbColor = `rgb(${rgb.r} ${rgb.g} ${rgb.b} / ${Math.round(this._hsv.a * 100) / 100})`;
     const hueColor = this._hueColor();
 
     // P1-8: part="slider opacity-slider" — exposes the documented shared "slider" CSS part

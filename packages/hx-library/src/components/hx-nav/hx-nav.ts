@@ -94,11 +94,14 @@ export class HelixNav extends LitElement {
 
   // ─── State ───
 
+  /** @internal */
   @state() private _mobileOpen = false;
+  /** @internal */
   @state() private _expandedIndex: number | null = null;
 
   // ─── Private: bound event handler reference ───
 
+  /** @internal */
   private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
 
   /**
@@ -168,7 +171,7 @@ export class HelixNav extends LitElement {
 
   private _handleKeydown(e: KeyboardEvent, index: number, item: NavItem): void {
     const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
-      ':scope > [part="nav"] > [part="list"] > [part="item"] > [part="link"]',
+      '[part="list"] > [part="item"] > [part="link"]',
     );
     if (!items) return;
     const itemsArr = Array.from(items);
@@ -231,7 +234,7 @@ export class HelixNav extends LitElement {
     );
     if (!subItems) return;
     const arr = Array.from(subItems);
-    const focused = this.shadowRoot?.activeElement as HTMLElement;
+    const focused = (e.currentTarget ?? e.target) as HTMLElement;
     const currentIdx = arr.indexOf(focused);
 
     switch (e.key) {
@@ -251,7 +254,7 @@ export class HelixNav extends LitElement {
         e.preventDefault();
         this._expandedIndex = null;
         const parentLinks = this.shadowRoot?.querySelectorAll<HTMLElement>(
-          ':scope > [part="nav"] > [part="list"] > [part="item"] > [part="link"]',
+          '[part="list"] > [part="item"] > [part="link"]',
         );
         parentLinks?.[parentIndex]?.focus();
         break;
@@ -425,7 +428,10 @@ export class HelixNav extends LitElement {
   }
 }
 
-/** Convenience alias matching library naming convention. */
+/** Canonical type alias for the hx-nav component. */
+export type HxNav = HelixNav;
+
+/** @deprecated Use {@link HxNav} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcNav = HelixNav;
 
 declare global {

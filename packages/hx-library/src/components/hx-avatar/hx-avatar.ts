@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAvatarStyles } from './hx-avatar.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A user avatar component that displays an image, initials, or a fallback icon.
@@ -109,8 +110,9 @@ export class HelixAvatar extends LitElement {
     // P1-2: Warn when src is provided without alt — silent accessibility failure in healthcare UIs.
     if (changedProperties.has('src') || changedProperties.has('alt')) {
       if (this.src && !this.alt) {
-        console.warn(
-          '[hx-avatar] Accessibility: "alt" attribute is required when "src" is provided. ' +
+        devWarn(
+          'hx-avatar',
+          'Accessibility: "alt" attribute is required when "src" is provided. ' +
             'Without alt text, screen readers announce a non-descriptive label. ' +
             'Add alt="Full name or description" to your hx-avatar element.',
         );
@@ -121,8 +123,9 @@ export class HelixAvatar extends LitElement {
     // raw initials as individual letters (e.g., "J D") instead of a name.
     if (changedProperties.has('initials') || changedProperties.has('label')) {
       if (this.initials && !this.label) {
-        console.warn(
-          '[hx-avatar] Accessibility: "label" attribute is recommended when "initials" is provided. ' +
+        devWarn(
+          'hx-avatar',
+          'Accessibility: "label" attribute is recommended when "initials" is provided. ' +
             'Without label, screen readers announce raw initials as individual letters. ' +
             'Add label="Full Name" to your hx-avatar element.',
         );
@@ -132,14 +135,16 @@ export class HelixAvatar extends LitElement {
     // P2-1: Warn when invalid size or shape attribute values are used (e.g., from Twig templates).
     const validSizes: ReadonlyArray<string> = ['xs', 'sm', 'md', 'lg', 'xl'];
     if (changedProperties.has('size') && !validSizes.includes(this.size)) {
-      console.warn(
-        `[hx-avatar] Invalid hx-size="${String(this.size)}". Valid values: xs, sm, md, lg, xl. Rendering with "md".`,
+      devWarn(
+        'hx-avatar',
+        `Invalid hx-size="${String(this.size)}". Valid values: xs, sm, md, lg, xl. Rendering with "md".`,
       );
     }
     const validShapes: ReadonlyArray<string> = ['circle', 'square'];
     if (changedProperties.has('shape') && !validShapes.includes(this.shape)) {
-      console.warn(
-        `[hx-avatar] Invalid shape="${String(this.shape)}". Valid values: circle, square. Rendering with "circle".`,
+      devWarn(
+        'hx-avatar',
+        `Invalid shape="${String(this.shape)}". Valid values: circle, square. Rendering with "circle".`,
       );
     }
   }
@@ -184,8 +189,9 @@ export class HelixAvatar extends LitElement {
         return false;
       });
       if (!hasAccessibleName) {
-        console.warn(
-          '[hx-avatar] Accessibility: badge slot content should have an accessible name ' +
+        devWarn(
+          'hx-avatar',
+          'Accessibility: badge slot content should have an accessible name ' +
             '(aria-label, role, etc.). Without it, the badge is invisible to screen readers.',
         );
       }

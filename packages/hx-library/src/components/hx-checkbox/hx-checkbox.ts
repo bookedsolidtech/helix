@@ -371,7 +371,10 @@ export class HelixCheckbox extends LitElement {
   }
 }
 
-/** @deprecated Use HelixCheckbox instead. */
+/** Canonical type alias for the hx-checkbox component. */
+export type HxCheckbox = HelixCheckbox;
+
+/** @deprecated Use {@link HxCheckbox} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcCheckbox = HelixCheckbox;
 
 declare global {

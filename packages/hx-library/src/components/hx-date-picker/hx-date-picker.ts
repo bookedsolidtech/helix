@@ -15,7 +15,7 @@ let _instanceCounter = 0;
  * @tag hx-date-picker
  *
  * @slot label - Custom label content (overrides the label property).
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property).
  *
  * @fires {CustomEvent<{value: string, date: Date | null}>} hx-change - Emitted when the selected date changes.
@@ -57,7 +57,10 @@ export class HelixDatePicker extends LitElement {
   /** @internal */
   static formAssociated = true;
 
-  /** @internal */
+  /**
+   * ElementInternals instance for form association.
+   * @internal
+   */
   private _internals: ElementInternals;
 
   constructor() {
@@ -943,7 +946,7 @@ export class HelixDatePicker extends LitElement {
         ${this.helpText && !hasError
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help">${this.helpText}</slot>
+                <slot name="help-text">${this.helpText}</slot>
               </div>
             `
           : nothing}
