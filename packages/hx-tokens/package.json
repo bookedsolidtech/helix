@@ -1,6 +1,6 @@
 {
   "name": "@helixui/tokens",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "description": "Design tokens for the HELiX enterprise healthcare web component library",
   "type": "module",
   "main": "./dist/index.js",

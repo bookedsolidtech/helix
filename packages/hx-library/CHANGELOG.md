@@ -1,5 +1,14 @@
 # @helixui/library
 
+## 0.3.4
+
+### Patch Changes
+
+- ac9458e: Update package metadata: fix tokens description (remove WC-2026 codename, use HELiX) and add npm discovery keywords (shadow-dom, wcag, accessibility, enterprise, typescript, design-tokens, css-custom-properties) to both packages.
+- Updated dependencies [d55bd39]
+- Updated dependencies [ac9458e]
+  - @helixui/tokens@0.3.4
+
 ## 0.3.3
 
 ### Patch Changes
