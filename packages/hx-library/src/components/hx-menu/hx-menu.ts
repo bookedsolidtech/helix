@@ -38,13 +38,22 @@ export class HelixMenu extends LitElement {
   @property({ type: String, reflect: true })
   label = '';
 
-  /** @internal */
+  /**
+   * Index of the currently focused menu item within the list of enabled items.
+   * @internal
+   */
   private _focusedIndex = -1;
 
-  /** @internal */
+  /**
+   * Accumulated character buffer for typeahead search within menu items.
+   * @internal
+   */
   private _typeaheadBuffer = '';
 
-  /** @internal */
+  /**
+   * Timer handle that clears the typeahead buffer after a period of inactivity.
+   * @internal
+   */
   private _typeaheadTimeout: ReturnType<typeof setTimeout> | undefined;
 
   private _getItems(): HelixMenuItem[] {
