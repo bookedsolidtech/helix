@@ -2,6 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * Column definition for `hx-data-table`.
@@ -176,8 +177,9 @@ export class HelixDataTable extends LitElement {
     }
     // Only warn when rows actually changes to avoid noise on every property update.
     if (changed.has('rows') && this.rows.length > 500) {
-      console.warn(
-        '[hx-data-table] Rendering more than 500 rows may impact performance. Consider server-side pagination.',
+      devWarn(
+        'hx-data-table',
+        'Rendering more than 500 rows may impact performance. Consider server-side pagination.',
       );
     }
     // WCAG 4.1.2: data tables must have an accessible name so screen readers can identify them.
@@ -186,8 +188,9 @@ export class HelixDataTable extends LitElement {
       this.columns.length > 0 &&
       !this.label
     ) {
-      console.warn(
-        '[hx-data-table] No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
+      devWarn(
+        'hx-data-table',
+        'No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
       );
     }
   }

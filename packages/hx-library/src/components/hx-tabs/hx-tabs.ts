@@ -4,6 +4,7 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxTabsIdCounter = 0;
@@ -278,8 +279,9 @@ export class HelixTabs extends LitElement {
         .assignedElements()
         .filter((el) => el.tagName.toLowerCase() !== 'hx-tab');
       if (invalid.length > 0) {
-        console.warn(
-          `[hx-tabs] Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        devWarn(
+          'hx-tabs',
+          `Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
         );
       }
     }
@@ -288,8 +290,9 @@ export class HelixTabs extends LitElement {
         .assignedElements()
         .filter((el) => el.tagName.toLowerCase() !== 'hx-tab-panel');
       if (invalid.length > 0) {
-        console.warn(
-          `[hx-tabs] Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        devWarn(
+          'hx-tabs',
+          `Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
         );
       }
     }

@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCardStyles } from './hx-card.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A flexible card component for displaying grouped content.
@@ -102,8 +103,9 @@ export class HelixCard extends LitElement {
     const slot = e.target as HTMLSlotElement;
     this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
     if (this._hasActions && this.hxHref) {
-      console.warn(
-        '[hx-card] Using hx-href (interactive card) together with the actions slot is an ARIA anti-pattern: ' +
+      devWarn(
+        'hx-card',
+        'Using hx-href (interactive card) together with the actions slot is an ARIA anti-pattern: ' +
           'interactive controls cannot be nested inside role="link". ' +
           'Use either hx-href or the actions slot, not both.',
       );

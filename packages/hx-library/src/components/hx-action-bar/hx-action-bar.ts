@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A horizontal toolbar container for grouping related action buttons and controls.
@@ -79,8 +80,9 @@ export class HelixActionBar extends LitElement {
   }
   set sticky(value: boolean) {
     if (value) {
-      console.warn(
-        '[hx-action-bar] The `sticky` property is deprecated. Use `position="sticky"` instead.',
+      devWarn(
+        'hx-action-bar',
+        'The `sticky` property is deprecated. Use `position="sticky"` instead.',
       );
     }
     const old = this._sticky;
