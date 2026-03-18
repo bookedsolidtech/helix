@@ -39,10 +39,12 @@ export class HelixForm extends LitElement {
 
   // ─── Adopted Stylesheets ───
 
+  /** @internal */
   private _styles = new AdoptedStylesheetsController(this, helixFormScopedCss, document);
 
   // ─── Internal State ───
 
+  /** @internal */
   @state()
   private _validationErrors: Array<{ name: string; message: string }> = [];
 
@@ -236,6 +238,7 @@ export class HelixForm extends LitElement {
   /**
    * Returns all elements that support constraint validation, including
    * both native form elements and hx-* components with `checkValidity`.
+   * @internal
    */
   private _getAllValidatableElements(): HTMLElement[] {
     const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
@@ -249,6 +252,7 @@ export class HelixForm extends LitElement {
 
   /**
    * Sets `aria-invalid="true"` on fields with errors, removes it from valid fields.
+   * @internal
    */
   private _applyAriaInvalidFromErrors(errors: Array<{ name: string; message: string }>): void {
     const errorNames = new Set(errors.map((e) => e.name));
@@ -266,6 +270,7 @@ export class HelixForm extends LitElement {
 
   /**
    * Sets `aria-invalid` based on native constraint validation state.
+   * @internal
    */
   private _applyAriaInvalidFromValidity(): void {
     const allElements = this._getAllValidatableElements();
@@ -283,6 +288,7 @@ export class HelixForm extends LitElement {
 
   /**
    * Removes `aria-invalid` from all validatable elements.
+   * @internal
    */
   private _clearAriaInvalid(): void {
     const allElements = this._getAllValidatableElements();
@@ -293,6 +299,7 @@ export class HelixForm extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleSubmit = (e: Event): void => {
     // If there is an action, let native form submission happen
     if (this.action) {
@@ -349,6 +356,7 @@ export class HelixForm extends LitElement {
     );
   };
 
+  /** @internal */
   private _handleReset = (): void => {
     this._validationErrors = [];
     this._clearAriaInvalid();
@@ -365,6 +373,7 @@ export class HelixForm extends LitElement {
     );
   };
 
+  /** @internal */
   private _collectValidationErrors(): Array<{ name: string; message: string }> {
     const errors: Array<{ name: string; message: string }> = [];
     const elements = this._getAllValidatableElements();

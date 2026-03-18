@@ -66,18 +66,26 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _hasChildren = false;
 
-  /** Whether this item is the roving-tabindex active item in the tree. */
+  /**
+   * Whether this item is the roving-tabindex active item in the tree.
+   * @internal
+   */
   @state() private _rovingActive = false;
 
   /**
    * Cached ARIA position metadata. Computed once on connect and on slotchange
    * of the parent container, avoiding repeated DOM traversal on every render.
+   * @internal
    */
   @state() private _level = 1;
+  /** @internal */
   @state() private _posInSet = 1;
+  /** @internal */
   @state() private _setSize = 1;
+  /** @internal */
   @state() private _selectable = false;
 
   // ─── Computed ARIA ───
@@ -93,6 +101,7 @@ export class HelixTreeItem extends LitElement {
   /**
    * Recompute all cached ARIA metadata in a single DOM pass.
    * Called on connect, slotchange, and whenever structural context may change.
+   * @internal
    */
   private _updateAriaMetadata(): void {
     // Compute nesting level by counting ancestor hx-tree-item elements.
@@ -136,6 +145,7 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Children Detection ───
 
+  /** @internal */
   private _handleChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedElements().length > 0;
@@ -144,12 +154,14 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleExpandClick(e: Event): void {
     e.stopPropagation();
     if (this.disabled) return;
     this.expanded = !this.expanded;
   }
 
+  /** @internal */
   private _handleRowClick(): void {
     if (this.disabled) return;
     this.dispatchEvent(
@@ -161,6 +173,7 @@ export class HelixTreeItem extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (this.disabled) return;
 
@@ -211,6 +224,7 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Render ───
 
+  /** @internal */
   private _renderExpandIcon() {
     if (!this._hasChildren) {
       return html`<span class="expand-placeholder" aria-hidden="true"></span>`;
