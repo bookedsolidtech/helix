@@ -94,11 +94,14 @@ export class HelixNav extends LitElement {
 
   // ─── State ───
 
+  /** @internal */
   @state() private _mobileOpen = false;
+  /** @internal */
   @state() private _expandedIndex: number | null = null;
 
   // ─── Private: bound event handler reference ───
 
+  /** @internal */
   private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
 
   /**

@@ -74,8 +74,10 @@ export class HelixSelect extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -172,15 +174,20 @@ export class HelixSelect extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _options: SelectOption[] = [];
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
   @state() private _focusedOptionIndex = -1;
 
   // ─── Queries ───
 
+  /** @internal */
   @query('.field__select')
   private _select: HTMLSelectElement | undefined;
 
+  /** @internal */
   @query('.field__trigger')
   private _trigger: HTMLElement | undefined;
 

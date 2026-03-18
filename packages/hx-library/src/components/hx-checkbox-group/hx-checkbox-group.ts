@@ -49,8 +49,10 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -112,7 +114,9 @@ export class HelixCheckboxGroup extends LitElement {
   }
   private _orientation: 'vertical' | 'horizontal' = 'vertical';
 
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
   @state() private _hasHelpSlot = false;
 
   // ─── Internal IDs ───

@@ -67,8 +67,10 @@ export class HelixCombobox extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -202,15 +204,22 @@ export class HelixCombobox extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _options: ComboboxOption[] = [];
+  /** @internal */
   @state() private _filterText = '';
+  /** @internal */
   @state() private _open = false;
+  /** @internal */
   @state() private _focusedOptionIndex = -1;
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
   @state() private _filterAnnouncement = '';
 
   // ─── Queries ───
 
+  /** @internal */
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
 
