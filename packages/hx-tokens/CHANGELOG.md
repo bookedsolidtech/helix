@@ -1,5 +1,12 @@
 # @helixui/tokens
 
+## 0.3.4
+
+### Patch Changes
+
+- d55bd39: add ./dist/tokens.css export alias so both import paths resolve correctly
+- ac9458e: Update package metadata: fix tokens description (remove WC-2026 codename, use HELiX) and add npm discovery keywords (shadow-dom, wcag, accessibility, enterprise, typescript, design-tokens, css-custom-properties) to both packages.
+
 ## 0.3.2
 
 ### Patch Changes
