@@ -198,7 +198,7 @@ export class HelixCombobox extends LitElement {
   // ─── Queries ───
 
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Debounce timer ───
 

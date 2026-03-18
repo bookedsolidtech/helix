@@ -161,15 +161,15 @@ export class HelixDatePicker extends LitElement {
 
   /** @internal */
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | undefined;
 
   /** @internal */
   @query('.field__trigger')
-  private _trigger!: HTMLButtonElement;
+  private _trigger: HTMLButtonElement | undefined;
 
   /** @internal */
   @query('.calendar')
-  private _calendar!: HTMLElement;
+  private _calendar: HTMLElement | undefined;
 
   // ─── Unique IDs ───
 

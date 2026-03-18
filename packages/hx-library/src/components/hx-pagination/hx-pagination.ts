@@ -153,7 +153,7 @@ export class HelixPagination extends LitElement {
     );
     const siblingEnd = Math.min(
       Math.max(current + sibling, boundary + sibling * 2 + 2),
-      endPages.length > 0 ? endPages[0]! - 2 : total - 1,
+      endPages.length > 0 ? (endPages[0] ?? total) - 2 : total - 1,
     );
 
     const items: Array<number | 'ellipsis'> = [];

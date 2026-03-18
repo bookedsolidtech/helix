@@ -179,10 +179,10 @@ export class HelixSelect extends LitElement {
   // ─── Queries ───
 
   @query('.field__select')
-  private _select!: HTMLSelectElement;
+  private _select: HTMLSelectElement | undefined;
 
   @query('.field__trigger')
-  private _trigger!: HTMLElement;
+  private _trigger: HTMLElement | undefined;
 
   // ─── Computed helpers ───
 

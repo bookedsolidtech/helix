@@ -115,8 +115,12 @@ export class HelixMeter extends LitElement {
 
     if (!hasLow && !hasHigh && !hasOptimum) return 'default';
 
-    const inLowZone = hasLow && v < this.low!;
-    const inHighZone = hasHigh && v > this.high!;
+    // When hasLow/hasHigh/hasOptimum are true, the corresponding property is defined.
+    // Use nullish coalescing to satisfy the type checker while preserving the runtime logic.
+    const lowVal = this.low ?? 0;
+    const highVal = this.high ?? this.max;
+    const inLowZone = hasLow && v < lowVal;
+    const inHighZone = hasHigh && v > highVal;
     const inMiddleZone = !inLowZone && !inHighZone;
 
     if (!hasOptimum) {
@@ -124,9 +128,9 @@ export class HelixMeter extends LitElement {
       return 'optimum';
     }
 
-    const opt = this.optimum!;
-    const optimumInLow = hasLow && opt < this.low!;
-    const optimumInHigh = hasHigh && opt > this.high!;
+    const opt = this.optimum ?? this.min;
+    const optimumInLow = hasLow && opt < lowVal;
+    const optimumInHigh = hasHigh && opt > highVal;
     const optimumInMiddle = !optimumInLow && !optimumInHigh;
 
     if (optimumInMiddle) {
