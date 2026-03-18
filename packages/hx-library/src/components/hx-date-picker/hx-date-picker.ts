@@ -54,7 +54,10 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /**
+   * Marks this component as form-associated for native form participation.
+   * @internal
+   */
   static formAssociated = true;
 
   /**
@@ -149,51 +152,99 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /**
+   * Tracks whether the calendar popup is currently visible.
+   * @internal
+   */
   @state() private _isOpen = false;
-  /** @internal */
+  /**
+   * The year currently displayed in the calendar view.
+   * @internal
+   */
   @state() private _viewYear: number = new Date().getFullYear();
-  /** @internal */
+  /**
+   * The month (0-indexed) currently displayed in the calendar view.
+   * @internal
+   */
   @state() private _viewMonth: number = new Date().getMonth();
-  /** @internal */
+  /**
+   * The day number currently focused within the calendar grid, or null when the calendar is closed.
+   * @internal
+   */
   @state() private _focusedDay: number | null = null;
-  /** @internal */
+  /**
+   * The message announced to screen readers when the calendar month changes.
+   * @internal
+   */
   @state() private _liveMessage = '';
 
   // ─── Internal References ───
 
-  /** @internal */
+  /**
+   * Reference to the readonly text input element displaying the formatted date.
+   * @internal
+   */
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
 
-  /** @internal */
+  /**
+   * Reference to the calendar icon button that opens and closes the popup.
+   * @internal
+   */
   @query('.field__trigger')
   private _trigger: HTMLButtonElement | undefined;
 
-  /** @internal */
+  /**
+   * Reference to the calendar popup dialog element.
+   * @internal
+   */
   @query('.calendar')
   private _calendar: HTMLElement | undefined;
 
   // ─── Unique IDs ───
 
-  /** @internal */
+  /**
+   * Unique base ID for this component instance, used to generate all child element IDs.
+   * @internal
+   */
   private _id = `hx-date-picker-${++_instanceCounter}`;
-  /** @internal */
+  /**
+   * Unique ID for the text input element, used for label association.
+   * @internal
+   */
   private _inputId = `${this._id}-input`;
-  /** @internal */
+  /**
+   * Unique ID for the help text element, used for aria-describedby association.
+   * @internal
+   */
   private _helpTextId = `${this._id}-help`;
-  /** @internal */
+  /**
+   * Unique ID for the error message element, used for aria-describedby association.
+   * @internal
+   */
   private _errorId = `${this._id}-error`;
-  /** @internal */
+  /**
+   * Unique ID for the calendar popup dialog element, used for aria-controls association.
+   * @internal
+   */
   private _calendarId = `${this._id}-calendar`;
-  /** @internal */
+  /**
+   * Unique ID for the ARIA live region element that announces month navigation changes.
+   * @internal
+   */
   private _liveRegionId = `${this._id}-live`;
 
   // ─── Slot Tracking ───
 
-  /** @internal */
+  /**
+   * Whether the label slot has any assigned elements, used to switch between slotted and property-based label rendering.
+   * @internal
+   */
   private _hasLabelSlot = false;
-  /** @internal */
+  /**
+   * Whether the error slot has any assigned elements, used to switch between slotted and property-based error rendering.
+   * @internal
+   */
   private _hasErrorSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -216,9 +267,15 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Bound Handler References ───
 
-  /** @internal */
+  /**
+   * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
+   * @internal
+   */
   private _boundHandleOutsideClick: (e: MouseEvent) => void = () => undefined;
-  /** @internal */
+  /**
+   * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
+   * @internal
+   */
   private _boundHandleDocumentKeydown: (e: KeyboardEvent) => void = () => undefined;
 
   // ─── Lifecycle ───
