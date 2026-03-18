@@ -707,6 +707,12 @@ export class HelixColorPicker extends LitElement {
 
     // P0-1: Grid is now keyboard-operable — WCAG 2.1 SC 2.1.1 compliance
     // Arrow keys adjust saturation (left/right) and value (up/down)
+    //
+    // A11y note (WCAG 4.1.2 — 2D slider aria-valuenow limitation): The ARIA slider role
+    // requires a single numeric aria-valuenow. This 2D control has two axes (saturation and
+    // value), so aria-valuenow reports only saturation (the primary/horizontal axis) per
+    // the ARIA 1.2 "slider" pattern. aria-valuetext compensates by announcing both axes
+    // ("Saturation X%, Value Y%") for all assistive technologies that support it.
     return html`
       <div
         part="grid"
@@ -845,12 +851,16 @@ export class HelixColorPicker extends LitElement {
   }
 
   private _renderPanel() {
+    // A11y fix (WCAG 4.1.2): use role="group" instead of role="dialog" + aria-modal="true".
+    // aria-modal="true" requires a programmatic focus trap so screen readers restrict virtual
+    // cursor navigation to the dialog. Without Tab-key trapping, aria-modal causes JAWS/NVDA
+    // to hide all content outside the panel, stranding keyboard users who Tab out. role="group"
+    // with aria-label provides the same grouping semantics without the false modal contract.
     return html`
       <div
         class="panel"
-        role="dialog"
+        role="group"
         aria-label="Color picker"
-        aria-modal="true"
         tabindex="-1"
         @keydown=${this._handlePanelKeydown}
       >
@@ -880,7 +890,6 @@ export class HelixColorPicker extends LitElement {
         type="button"
         class="trigger"
         aria-label="Choose color: ${this._inputValue}"
-        aria-haspopup="dialog"
         aria-expanded=${this._open ? 'true' : 'false'}
         ?disabled=${this.disabled}
         style=${styleMap({ '--_preview-color': previewColor })}
