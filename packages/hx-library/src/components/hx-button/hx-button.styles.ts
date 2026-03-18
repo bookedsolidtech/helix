@@ -177,6 +177,69 @@ export const helixButtonStyles = css`
     }
   }
 
+  /* ─── Inverted Mode ─── */
+
+  /* Override text color and filter-based hover/active for all variants */
+  :host([inverted]) .button {
+    color: var(--hx-button-inverted-color, #ffffff);
+    filter: none;
+  }
+
+  :host([inverted]) .button:hover {
+    filter: none;
+  }
+
+  :host([inverted]) .button:active {
+    filter: none;
+  }
+
+  :host([inverted]) .button:focus-visible {
+    outline-color: var(--hx-button-inverted-focus-ring-color, rgba(255, 255, 255, 0.5));
+  }
+
+  /* Primary inverted — slight transparent white overlay on hover */
+  :host([inverted]) .button--primary:hover {
+    --hx-button-bg: var(--hx-color-primary-400, #3b82f6);
+  }
+
+  /* Secondary inverted — white border and text */
+  :host([inverted]) .button--secondary {
+    --hx-button-border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  :host([inverted]) .button--secondary:hover {
+    --hx-button-bg: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Tertiary inverted */
+  :host([inverted]) .button--tertiary {
+    --hx-button-bg: rgba(255, 255, 255, 0.15);
+    --hx-button-border-color: transparent;
+  }
+
+  :host([inverted]) .button--tertiary:hover {
+    --hx-button-bg: rgba(255, 255, 255, 0.25);
+  }
+
+  /* Ghost inverted — transparent base, white hover bg */
+  :host([inverted]) .button--ghost {
+    --hx-button-bg: transparent;
+    --hx-button-border-color: transparent;
+  }
+
+  :host([inverted]) .button--ghost:hover {
+    --hx-button-bg: var(--hx-button-inverted-ghost-hover-bg, rgba(255, 255, 255, 0.15));
+  }
+
+  /* Outline inverted — white border */
+  :host([inverted]) .button--outline {
+    --hx-button-border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  :host([inverted]) .button--outline:hover {
+    --hx-button-bg: rgba(255, 255, 255, 0.15);
+  }
+
   /* ─── Prefix / Suffix / Label ─── */
 
   .button__prefix,
