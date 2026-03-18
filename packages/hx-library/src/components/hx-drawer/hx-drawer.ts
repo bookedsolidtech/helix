@@ -79,33 +79,44 @@ export class HelixDrawer extends LitElement {
 
   // ─── Queries ───
 
+  /** @internal */
   @query('.drawer-overlay')
   private _overlayEl: HTMLElement | null | undefined;
 
+  /** @internal */
   @query('.drawer-panel')
   private _panelEl: HTMLElement | null | undefined;
 
   // ─── Internal state ───
 
+  /** @internal */
   @state()
   private _isOpen = false;
 
+  /** @internal */
   @state()
   private _hasHeaderActionsSlot = false;
 
+  /** @internal */
   @state()
   private _hasFooterSlot = false;
 
+  /** @internal */
   @state()
   private _hasLabelSlot = false;
 
+  /** @internal */
   private _cachedFocusableElements: HTMLElement[] = [];
+  /** @internal */
   private _triggerElement: HTMLElement | null = null;
+  /** @internal */
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
   /** Whether this drawer instance currently holds a body-scroll lock. */
   private _hasScrollLock = false;
+  /** @internal */
   private _siblingAriaHiddenElements: Element[] = [];
 
+  /** @internal */
   private readonly _titleId = `hx-drawer-title-${++_hxDrawerIdCounter}`;
 
   // ─── Public Properties ───
@@ -328,6 +339,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Keyboard Handler ───
 
+  /** @internal */
   private _handleKeyDown = (e: KeyboardEvent): void => {
     if (!this._isOpen) return;
 
@@ -423,6 +435,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Overlay Click ───
 
+  /** @internal */
   private _handleOverlayClick = (e: MouseEvent): void => {
     // Only close when clicking the overlay itself (backdrop), not the panel
     const target = e.target as HTMLElement;
