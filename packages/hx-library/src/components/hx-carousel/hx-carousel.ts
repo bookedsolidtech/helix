@@ -199,23 +199,37 @@ export class HelixCarousel extends LitElement {
   @property({ type: String, attribute: 'label-play-autoplay' })
   labelPlayAutoplay = 'Play autoplay';
 
+  /** @internal */
   @state() private _currentIndex = 0;
+  /** @internal */
   @state() private _slides: HelixCarouselItem[] = [];
+  /** @internal */
   @state() private _isPlaying = false;
+  /** @internal */
   @state() private _liveText = '';
   @state() private _livePolite = true;
 
+  /** @internal */
   private _autoplayTimer: ReturnType<typeof setInterval> | null = null;
+  /** @internal */
   private _reducedMotion = false;
+  /** @internal */
   private _mql: MediaQueryList | null = null;
+  /** @internal */
   private _isHovered = false;
+  /** @internal */
   private _isFocused = false;
 
   // ─── Drag state ───
+  /** @internal */
   private _dragStartCoord = 0;
+  /** @internal */
   private _isDragging = false;
+  /** @internal */
   private _dragMoved = false;
+  /** @internal */
   private _touchStartCoord = 0;
+  /** @internal */
   private _touchMoved = false;
 
   // ─── Lifecycle ───
@@ -284,6 +298,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Navigation ───
 
+  /** @internal */
   private get _maxIndex(): number {
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
@@ -331,6 +346,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Autoplay ───
 
+  /** @internal */
   private _autoplayTick = (): void => {
     this._livePolite = false;
     if (this.loop) {
@@ -378,6 +394,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleMotionChange = (e: MediaQueryListEvent): void => {
     this._reducedMotion = e.matches;
     if (this._reducedMotion) {
@@ -387,11 +404,13 @@ export class HelixCarousel extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleMouseEnter = (): void => {
     this._isHovered = true;
     this._pauseAutoplay();
   };
 
+  /** @internal */
   private _handleMouseLeave = (): void => {
     this._isHovered = false;
     if (!this._isFocused) {
@@ -399,11 +418,13 @@ export class HelixCarousel extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleFocusIn = (): void => {
     this._isFocused = true;
     this._pauseAutoplay();
   };
 
+  /** @internal */
   private _handleFocusOut = (): void => {
     this._isFocused = false;
     if (!this._isHovered) {
@@ -411,6 +432,7 @@ export class HelixCarousel extends LitElement {
     }
   };
 
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     if (this.orientation === 'horizontal') {
       if (e.key === 'ArrowLeft') {
@@ -523,6 +545,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Computed ───
 
+  /** @internal */
   private get _trackTransform(): string {
     const slideSize = 100 / this.slidesPerPage;
     const offset = this._currentIndex * slideSize;
@@ -531,10 +554,12 @@ export class HelixCarousel extends LitElement {
       : `translateY(-${offset}%)`;
   }
 
+  /** @internal */
   private get _canGoPrev(): boolean {
     return this.loop || this._currentIndex > 0;
   }
 
+  /** @internal */
   private get _canGoNext(): boolean {
     return this.loop || this._currentIndex < this._maxIndex;
   }
