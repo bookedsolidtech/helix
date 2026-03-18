@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -326,6 +326,7 @@ export class HelixSplitButton extends LitElement {
           class="split-button__primary"
           ?disabled=${this.disabled}
           type="button"
+          aria-label=${this.ariaLabel ?? this.label ?? nothing}
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
         >
