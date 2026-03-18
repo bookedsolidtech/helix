@@ -49,8 +49,10 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -127,12 +129,16 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _files: FileEntry[] = [];
+  /** @internal */
   @state() private _dragOver = false;
+  /** @internal */
   @state() private _hasFileListSlot = false;
 
   // ─── Internal References ───
 
+  /** @internal */
   @query('.file-input')
   private _fileInput: HTMLInputElement | null | undefined;
 
