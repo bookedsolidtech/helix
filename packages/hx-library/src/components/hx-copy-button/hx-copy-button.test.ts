@@ -430,22 +430,15 @@ describe('hx-copy-button', () => {
     });
   });
 
-  // ─── Clipboard Fallback (1) ───
+  // ─── Clipboard API (1) ───
 
-  describe('Clipboard fallback', () => {
-    it('does not crash when navigator.clipboard is unavailable (execCommand path)', async () => {
-      Object.defineProperty(navigator, 'clipboard', {
-        value: undefined,
-        writable: true,
-        configurable: true,
-      });
-
-      // Mock execCommand to return true (success) so we can verify the full
-      // happy path through the fallback branch.
-      const execCommandSpy = vi.spyOn(document, 'execCommand').mockReturnValue(true);
-
+  describe('Clipboard API', () => {
+    it('delegates exclusively to navigator.clipboard.writeText (no execCommand fallback)', async () => {
+      // The deprecated execCommand('copy') fallback has been removed. The component
+      // now requires the Clipboard API (supported in all target browsers). This test
+      // verifies that navigator.clipboard.writeText is the sole write path.
       const el = await fixture<HelixCopyButton>(
-        '<hx-copy-button value="fallback-test"></hx-copy-button>',
+        '<hx-copy-button value="clipboard-api-test"></hx-copy-button>',
       );
       const btn = shadowQuery<HTMLButtonElement>(el, 'button');
       expect(btn).toBeTruthy();
@@ -454,14 +447,11 @@ describe('hx-copy-button', () => {
       btn!.click();
       const event = await eventPromise;
 
-      // execCommand fallback must call document.execCommand('copy').
-      expect(execCommandSpy).toHaveBeenCalledWith('copy');
-      // Must enter copied state on successful fallback.
-      expect(event.detail.value).toBe('fallback-test');
+      expect(writeTextSpy).toHaveBeenCalledWith('clipboard-api-test');
+      expect(writeTextSpy).toHaveBeenCalledTimes(1);
+      expect(event.detail.value).toBe('clipboard-api-test');
       await el.updateComplete;
       expect(btn?.classList.contains('button--copied')).toBe(true);
-
-      execCommandSpy.mockRestore();
     });
   });
 

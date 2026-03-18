@@ -2,6 +2,7 @@ import { LitElement, html, svg, TemplateResult, type PropertyValues } from 'lit'
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * SVG-based circular progress indicator. Supports determinate and indeterminate modes,
@@ -128,8 +129,9 @@ export class HelixProgressRing extends LitElement {
       this.removeAttribute('aria-label');
       if (!this._labelWarned) {
         this._labelWarned = true;
-        console.warn(
-          '[hx-progress-ring] Missing accessible label. Set the `label` attribute for WCAG 4.1.2 compliance.',
+        devWarn(
+          'hx-progress-ring',
+          'Missing accessible label. Set the `label` attribute for WCAG 4.1.2 compliance.',
         );
       }
     }

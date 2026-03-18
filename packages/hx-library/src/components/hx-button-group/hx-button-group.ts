@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixButtonGroupStyles } from './hx-button-group.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A container component that groups related hx-button elements into a cohesive
@@ -39,7 +40,7 @@ export class HelixButtonGroup extends LitElement {
   }
   set orientation(value: string) {
     if (value !== 'horizontal' && value !== 'vertical') {
-      console.warn(`[hx-button-group] Invalid orientation "${value}", defaulting to "horizontal".`);
+      devWarn('hx-button-group', `Invalid orientation "${value}", defaulting to "horizontal".`);
       value = 'horizontal';
     }
     this._orientation = value as 'horizontal' | 'vertical';

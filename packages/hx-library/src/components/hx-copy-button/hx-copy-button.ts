@@ -154,22 +154,7 @@ export class HelixCopyButton extends LitElement {
   }
 
   private async _copyToClipboard(): Promise<void> {
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(this.value);
-    } else {
-      // Legacy execCommand fallback for environments without Clipboard API.
-      const textarea = document.createElement('textarea');
-      textarea.value = this.value;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      const success = document.execCommand('copy');
-      document.body.removeChild(textarea);
-      if (!success) {
-        throw new Error('execCommand("copy") returned false');
-      }
-    }
+    await navigator.clipboard.writeText(this.value);
   }
 
   // ─── Event Handling ───

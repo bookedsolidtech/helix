@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixFieldStyles } from './hx-field.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /** Native form control tag names that can receive ARIA attributes. */
 const FORM_CONTROL_TAGS = new Set(['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON']);
@@ -196,8 +197,9 @@ export class HelixField extends LitElement {
     if (changedProps.has('hxSize')) {
       const validSizes = ['sm', 'md', 'lg'];
       if (!validSizes.includes(this.hxSize)) {
-        console.warn(
-          `[hx-field] Invalid hx-size value: "${this.hxSize}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
+        devWarn(
+          'hx-field',
+          `Invalid hx-size value: "${this.hxSize}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
         );
       }
     }

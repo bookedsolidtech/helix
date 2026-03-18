@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A horizontal toolbar container for grouping related action buttons and controls.
@@ -79,8 +80,9 @@ export class HelixActionBar extends LitElement {
   }
   set sticky(value: boolean) {
     if (value) {
-      console.warn(
-        '[hx-action-bar] The `sticky` property is deprecated. Use `position="sticky"` instead.',
+      devWarn(
+        'hx-action-bar',
+        'The `sticky` property is deprecated. Use `position="sticky"` instead.',
       );
     }
     const old = this._sticky;
@@ -142,8 +144,9 @@ export class HelixActionBar extends LitElement {
     if (!this.hasAttribute('role')) {
       this.setAttribute('role', 'none');
     } else if (this.getAttribute('role') !== 'none') {
-      console.warn(
-        `[hx-action-bar] Setting role="${this.getAttribute('role')}" on the host creates a duplicate toolbar announcement. ` +
+      devWarn(
+        'hx-action-bar',
+        `Setting role="${this.getAttribute('role')}" on the host creates a duplicate toolbar announcement. ` +
           'The shadow DOM already contains role="toolbar". Set role="none" on the host to suppress it.',
       );
     }
