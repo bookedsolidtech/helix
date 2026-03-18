@@ -16,7 +16,7 @@
  * @param message   - Human-readable warning message for the developer.
  */
 export function devWarn(component: string, message: string): void {
-  if (import.meta.env?.DEV !== false) {
+  if (import.meta.env.DEV === true) {
     console.warn(`[${component}] ${message}`);
   }
 }

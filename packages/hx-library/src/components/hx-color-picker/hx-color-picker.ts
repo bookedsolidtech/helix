@@ -149,7 +149,7 @@ function parseColor(value: string): HSV | null {
     return rgb ? rgbToHsv(rgb) : null;
   }
 
-  const rgbMatch = value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/);
+  const rgbMatch = value.match(/rgba?\(\s*(\d+)(?:\s*,\s*|\s+)(\d+)(?:\s*,\s*|\s+)(\d+)(?:\s*(?:\/|,)\s*([\d.]+))?\s*\)/);
   if (rgbMatch) {
     const [, rm1, rm2, rm3, rm4] = rgbMatch;
     return rgbToHsv({
@@ -161,7 +161,7 @@ function parseColor(value: string): HSV | null {
   }
 
   const hslMatch = value.match(
-    /hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)/,
+    /hsla?\(\s*([\d.]+)(?:\s*,\s*|\s+)([\d.]+)%(?:\s*,\s*|\s+)([\d.]+)%(?:\s*(?:\/|,)\s*([\d.]+))?\s*\)/,
   );
   if (hslMatch) {
     const [, hm1, hm2, hm3, hm4] = hslMatch;
