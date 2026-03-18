@@ -117,6 +117,14 @@ export class HelixButton extends LitElement {
   value: string | undefined = undefined;
 
   /**
+   * When true, the button stretches to fill its container width.
+   * Sets the host to `display: block` and the inner element to `width: 100%`.
+   * @attr full
+   */
+  @property({ type: Boolean, reflect: true })
+  full = false;
+
+  /**
    * Accessible label forwarded to the inner button/anchor. Required for icon-only usage.
    * @attr aria-label
    */

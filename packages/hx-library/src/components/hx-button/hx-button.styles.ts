@@ -10,6 +10,16 @@ export const helixButtonStyles = css`
     opacity: var(--hx-opacity-disabled, 0.5);
   }
 
+  :host([full]) {
+    display: block;
+    width: 100%;
+  }
+
+  :host([full]) .button {
+    width: 100%;
+    justify-content: center;
+  }
+
   /* ─── Base Button ─── */
 
   .button {
