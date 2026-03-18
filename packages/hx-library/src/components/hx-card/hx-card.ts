@@ -78,9 +78,16 @@ export class HelixCard extends LitElement {
 
   // ─── Slot Detection ───
 
+  /** @internal */
   @state() private _hasImage = false;
+
+  /** @internal */
   @state() private _hasHeading = false;
+
+  /** @internal */
   @state() private _hasFooter = false;
+
+  /** @internal */
   @state() private _hasActions = false;
 
   private _onImageSlotChange(e: Event): void {

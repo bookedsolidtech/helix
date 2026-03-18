@@ -108,8 +108,13 @@ export class HelixField extends LitElement {
 
   // ─── Slot Tracking ───
 
+  /** @internal */
   @state() private _hasLabelSlot = false;
+
+  /** @internal */
   @state() private _hasErrorSlot = false;
+
+  /** @internal */
   @state() private _hasHelpSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -129,9 +134,16 @@ export class HelixField extends LitElement {
 
   // ─── Unique IDs for Accessibility ───
 
+  /** @internal */
   private _fieldId = `hx-field-${++_fieldCounter}`;
+
+  /** @internal */
   private _helpTextId = `${this._fieldId}-help`;
+
+  /** @internal */
   private _errorId = `${this._fieldId}-error`;
+
+  /** @internal */
   private _a11yDescId = `${this._fieldId}-desc`;
 
   // ─── A11y: Slotted control tracking + light-DOM description element ───
@@ -139,6 +151,7 @@ export class HelixField extends LitElement {
   /**
    * The first form control in the default slot. We set aria attributes on this
    * element to bridge the shadow DOM accessibility boundary.
+   * @internal
    */
   private _slottedControl: HTMLElement | null = null;
 
@@ -153,6 +166,7 @@ export class HelixField extends LitElement {
    * accessibility tree. It is removed in `disconnectedCallback`. Consumers
    * should not remove or modify this span (identifiable by its `id` ending in
    * `-desc`).
+   * @internal
    */
   private _a11yDescEl: HTMLElement | null = null;
 

@@ -26,6 +26,7 @@ import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
+  /** @internal */
   private internals: ElementInternals;
 
   /**
@@ -43,6 +44,7 @@ export class HelixButtonGroup extends LitElement {
     }
     this._orientation = value as 'horizontal' | 'vertical';
   }
+  /** @internal */
   private _orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
