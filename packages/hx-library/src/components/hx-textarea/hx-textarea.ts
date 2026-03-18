@@ -420,10 +420,16 @@ export class HelixTextarea extends LitElement {
     const count = this.value.length;
     const display = this.maxlength !== undefined ? `${count} / ${this.maxlength}` : `${count}`;
 
-    // aria-live removed: per-keystroke live region causes screen reader noise (WCAG 4.1.3).
-    // Announcements are debounced via the hidden _liveAnnouncement live region instead.
+    // aria-live="polite" announces counter changes without interrupting the user.
+    // The debounced _liveAnnouncement region provides additional context when nearing the limit.
     return html`
-      <div part="counter" class="field__counter" id=${this._counterId} aria-hidden="true">
+      <div
+        part="counter"
+        class="field__counter"
+        id=${this._counterId}
+        aria-live="polite"
+        aria-atomic="true"
+      >
         ${display}
       </div>
     `;
@@ -442,10 +448,14 @@ export class HelixTextarea extends LitElement {
     // P0-02 fix: help text container renders when slot is used OR property is set
     const hasHelpText = (!!this.helpText || this._hasHelpTextSlot) && !hasError;
 
-    // _counterId is intentionally excluded: the counter is aria-hidden and announced via the
-    // debounced _liveAnnouncement region instead (WCAG 4.1.3 — Status Messages).
+    // Include counter in aria-describedby so screen readers associate it with the textarea.
+    // The counter also has aria-live="polite" for dynamic updates (WCAG 4.1.3).
     const describedBy =
-      [hasError ? this._errorId : null, hasHelpText ? this._helpTextId : null]
+      [
+        hasError ? this._errorId : null,
+        hasHelpText ? this._helpTextId : null,
+        this.showCount ? this._counterId : null,
+      ]
         .filter(Boolean)
         .join(' ') || undefined;
 
