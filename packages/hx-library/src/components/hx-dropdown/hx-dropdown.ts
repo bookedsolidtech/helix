@@ -93,7 +93,7 @@ export class HelixDropdown extends LitElement {
   // ─── Internal State ───
 
   /**
-   * Whether the dropdown panel is currently rendered and visible in the DOM.
+   * Whether the dropdown panel is currently visible.
    * @internal
    */
   @state() private _panelVisible = false;

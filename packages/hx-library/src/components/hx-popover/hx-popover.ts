@@ -126,7 +126,7 @@ export class HelixPopover extends LitElement {
   private _previousFocus: HTMLElement | null = null;
 
   /**
-   * Unique ID assigned to the popover body element for ARIA references.
+   * Unique ID assigned to the popover body element.
    * @internal
    */
   private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
