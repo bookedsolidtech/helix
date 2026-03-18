@@ -109,13 +109,22 @@ export class HelixField extends LitElement {
 
   // ─── Slot Tracking ───
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the label slot, used to conditionally render the label property.
+   * @internal
+   */
   @state() private _hasLabelSlot = false;
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the error slot, used to toggle error state rendering.
+   * @internal
+   */
   @state() private _hasErrorSlot = false;
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the help-text slot, used to toggle help text rendering.
+   * @internal
+   */
   @state() private _hasHelpSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -135,16 +144,28 @@ export class HelixField extends LitElement {
 
   // ─── Unique IDs for Accessibility ───
 
-  /** @internal */
+  /**
+   * Unique ID for this field instance, used as a base for all derived accessibility IDs.
+   * @internal
+   */
   private _fieldId = `hx-field-${++_fieldCounter}`;
 
-  /** @internal */
+  /**
+   * ID for the help text element, allowing aria-describedby to reference it.
+   * @internal
+   */
   private _helpTextId = `${this._fieldId}-help`;
 
-  /** @internal */
+  /**
+   * ID for the error message element, allowing aria-describedby to reference it.
+   * @internal
+   */
   private _errorId = `${this._fieldId}-error`;
 
-  /** @internal */
+  /**
+   * ID for the light-DOM description span injected for cross-shadow-root aria-describedby linkage.
+   * @internal
+   */
   private _a11yDescId = `${this._fieldId}-desc`;
 
   // ─── A11y: Slotted control tracking + light-DOM description element ───

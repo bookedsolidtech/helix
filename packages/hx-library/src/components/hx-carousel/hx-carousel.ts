@@ -199,37 +199,79 @@ export class HelixCarousel extends LitElement {
   @property({ type: String, attribute: 'label-play-autoplay' })
   labelPlayAutoplay = 'Play autoplay';
 
-  /** @internal */
+  /**
+   * Index of the currently visible slide.
+   * @internal
+   */
   @state() private _currentIndex = 0;
-  /** @internal */
+  /**
+   * Array of carousel item elements assigned to the default slot.
+   * @internal
+   */
   @state() private _slides: HelixCarouselItem[] = [];
-  /** @internal */
+  /**
+   * Whether the autoplay is currently active and advancing slides.
+   * @internal
+   */
   @state() private _isPlaying = false;
-  /** @internal */
+  /**
+   * Text content for the ARIA live region announcing slide changes.
+   * @internal
+   */
   @state() private _liveText = '';
   @state() private _livePolite = true;
 
-  /** @internal */
+  /**
+   * Reference to the active autoplay interval timer, or null when stopped.
+   * @internal
+   */
   private _autoplayTimer: ReturnType<typeof setInterval> | null = null;
-  /** @internal */
+  /**
+   * Whether the user has requested reduced motion via the OS media preference.
+   * @internal
+   */
   private _reducedMotion = false;
-  /** @internal */
+  /**
+   * MediaQueryList instance for monitoring the prefers-reduced-motion media feature.
+   * @internal
+   */
   private _mql: MediaQueryList | null = null;
-  /** @internal */
+  /**
+   * Whether the carousel is currently being hovered, used to pause autoplay on hover.
+   * @internal
+   */
   private _isHovered = false;
-  /** @internal */
+  /**
+   * Whether a descendant of the carousel currently has focus, used to pause autoplay on focus.
+   * @internal
+   */
   private _isFocused = false;
 
   // ─── Drag state ───
-  /** @internal */
+  /**
+   * Pointer coordinate at the start of a mouse drag gesture.
+   * @internal
+   */
   private _dragStartCoord = 0;
-  /** @internal */
+  /**
+   * Whether a mouse drag gesture is currently in progress.
+   * @internal
+   */
   private _isDragging = false;
-  /** @internal */
+  /**
+   * Whether the pointer has moved beyond the drag threshold during the current drag gesture.
+   * @internal
+   */
   private _dragMoved = false;
-  /** @internal */
+  /**
+   * Touch coordinate at the start of a touch swipe gesture.
+   * @internal
+   */
   private _touchStartCoord = 0;
-  /** @internal */
+  /**
+   * Whether the touch has moved beyond the swipe threshold during the current touch gesture.
+   * @internal
+   */
   private _touchMoved = false;
 
   // ─── Lifecycle ───
@@ -298,7 +340,10 @@ export class HelixCarousel extends LitElement {
 
   // ─── Navigation ───
 
-  /** @internal */
+  /**
+   * Maximum valid slide index accounting for the number of slides visible per page.
+   * @internal
+   */
   private get _maxIndex(): number {
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
@@ -346,7 +391,10 @@ export class HelixCarousel extends LitElement {
 
   // ─── Autoplay ───
 
-  /** @internal */
+  /**
+   * Callback invoked on each autoplay interval tick to advance to the next slide.
+   * @internal
+   */
   private _autoplayTick = (): void => {
     this._livePolite = false;
     if (this.loop) {
@@ -394,7 +442,10 @@ export class HelixCarousel extends LitElement {
 
   // ─── Event Handlers ───
 
-  /** @internal */
+  /**
+   * Handles changes to the prefers-reduced-motion media query, stopping or resuming autoplay accordingly.
+   * @internal
+   */
   private _handleMotionChange = (e: MediaQueryListEvent): void => {
     this._reducedMotion = e.matches;
     if (this._reducedMotion) {
@@ -404,13 +455,19 @@ export class HelixCarousel extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Handles the mouseenter event to pause autoplay while the user hovers over the carousel.
+   * @internal
+   */
   private _handleMouseEnter = (): void => {
     this._isHovered = true;
     this._pauseAutoplay();
   };
 
-  /** @internal */
+  /**
+   * Handles the mouseleave event to resume autoplay when the user stops hovering.
+   * @internal
+   */
   private _handleMouseLeave = (): void => {
     this._isHovered = false;
     if (!this._isFocused) {
@@ -418,13 +475,19 @@ export class HelixCarousel extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Handles the focusin event to pause autoplay while a descendant has focus.
+   * @internal
+   */
   private _handleFocusIn = (): void => {
     this._isFocused = true;
     this._pauseAutoplay();
   };
 
-  /** @internal */
+  /**
+   * Handles the focusout event to resume autoplay when focus leaves the carousel.
+   * @internal
+   */
   private _handleFocusOut = (): void => {
     this._isFocused = false;
     if (!this._isHovered) {
@@ -432,7 +495,10 @@ export class HelixCarousel extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Handles keyboard navigation to move between slides using arrow, Home, and End keys.
+   * @internal
+   */
   private _handleKeydown = (e: KeyboardEvent): void => {
     if (this.orientation === 'horizontal') {
       if (e.key === 'ArrowLeft') {
@@ -545,7 +611,10 @@ export class HelixCarousel extends LitElement {
 
   // ─── Computed ───
 
-  /** @internal */
+  /**
+   * CSS transform value applied to the slide track to scroll to the current index.
+   * @internal
+   */
   private get _trackTransform(): string {
     const slideSize = 100 / this.slidesPerPage;
     const offset = this._currentIndex * slideSize;
@@ -554,12 +623,18 @@ export class HelixCarousel extends LitElement {
       : `translateY(-${offset}%)`;
   }
 
-  /** @internal */
+  /**
+   * Whether the previous navigation button should be enabled.
+   * @internal
+   */
   private get _canGoPrev(): boolean {
     return this.loop || this._currentIndex > 0;
   }
 
-  /** @internal */
+  /**
+   * Whether the next navigation button should be enabled.
+   * @internal
+   */
   private get _canGoNext(): boolean {
     return this.loop || this._currentIndex < this._maxIndex;
   }
