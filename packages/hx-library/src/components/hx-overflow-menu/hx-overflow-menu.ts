@@ -98,10 +98,16 @@ export class HelixOverflowMenu extends LitElement {
   @property({ type: String, reflect: true, attribute: 'menu-label' })
   menuLabel = 'Actions';
 
-  /** @internal */
+  /**
+   * Tracks whether the overflow menu panel is currently open and visible.
+   * @internal
+   */
   @state() private _open = false;
 
-  /** @internal */
+  /**
+   * Unique ID for the floating panel element, used to wire aria-controls on the trigger button.
+   * @internal
+   */
   private readonly _panelId = `hx-overflow-menu-panel-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Lifecycle ───
