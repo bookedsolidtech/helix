@@ -57,7 +57,10 @@ export class HelixDatePicker extends LitElement {
   /** @internal */
   static formAssociated = true;
 
-  /** @internal */
+  /**
+   * ElementInternals instance for form association.
+   * @internal
+   */
   private _internals: ElementInternals;
 
   constructor() {
