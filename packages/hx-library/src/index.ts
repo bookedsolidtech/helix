@@ -16,6 +16,8 @@ export type { AlertVariant } from './components/hx-alert/index.js';
 export { HelixAvatar } from './components/hx-avatar/index.js';
 export { HelixBadge } from './components/hx-badge/index.js';
 export type { HxBadge, WcBadge } from './components/hx-badge/index.js';
+export { HelixBanner } from './components/hx-banner/index.js';
+export type { BannerVariant, BannerPosition } from './components/hx-banner/index.js';
 export { HelixBreadcrumb } from './components/hx-breadcrumb/index.js';
 export { HelixBreadcrumbItem } from './components/hx-breadcrumb/index.js';
 export { HelixButton } from './components/hx-button/index.js';
