@@ -189,6 +189,18 @@ export class HelixTextarea extends LitElement {
   /** @internal */
   @state() private _hasHelpTextSlot = false;
 
+  // ─── Live Announcement ───
+
+  /**
+   * Debounced announcement text for the hidden polite live region.
+   * Only populated when the user is approaching the character limit.
+   * @internal
+   */
+  @state() private _liveAnnouncement = '';
+
+  /** Timer handle for the debounced character-count announcement. @internal */
+  private _announceTimer: ReturnType<typeof setTimeout> | null = null;
+
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
@@ -214,6 +226,14 @@ export class HelixTextarea extends LitElement {
   }
 
   // ─── Lifecycle ───
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this._announceTimer !== null) {
+      clearTimeout(this._announceTimer);
+      this._announceTimer = null;
+    }
+  }
 
   override updated(changedProperties: Map<string, unknown>): void {
     super.updated(changedProperties);
@@ -309,6 +329,11 @@ export class HelixTextarea extends LitElement {
     this.value = state;
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Event Handling ───
 
   /** @internal */
@@ -322,6 +347,20 @@ export class HelixTextarea extends LitElement {
       target.style.height = 'auto';
       target.style.height = `${target.scrollHeight}px`;
     }
+
+    // Debounced character-count announcement (WCAG 4.1.3):
+    // Only announce when near/at the maxlength limit; suppress every-keystroke noise.
+    if (this._announceTimer !== null) {
+      clearTimeout(this._announceTimer);
+    }
+    this._announceTimer = setTimeout(() => {
+      this._announceTimer = null;
+      if (this.maxlength !== undefined && this.value.length >= this.maxlength * 0.8) {
+        this._liveAnnouncement = `${this.value.length} of ${this.maxlength} characters`;
+      } else {
+        this._liveAnnouncement = '';
+      }
+    }, 1000);
 
     /**
      * Dispatched on every keystroke as the user types.
@@ -386,8 +425,16 @@ export class HelixTextarea extends LitElement {
     const count = this.value.length;
     const display = this.maxlength !== undefined ? `${count} / ${this.maxlength}` : `${count}`;
 
+    // aria-live="polite" announces counter changes without interrupting the user.
+    // The debounced _liveAnnouncement region provides additional context when nearing the limit.
     return html`
-      <div part="counter" class="field__counter" id=${this._counterId} aria-live="polite">
+      <div
+        part="counter"
+        class="field__counter"
+        id=${this._counterId}
+        aria-live="polite"
+        aria-atomic="true"
+      >
         ${display}
       </div>
     `;
@@ -406,6 +453,8 @@ export class HelixTextarea extends LitElement {
     // P0-02 fix: help text container renders when slot is used OR property is set
     const hasHelpText = (!!this.helpText || this._hasHelpTextSlot) && !hasError;
 
+    // Include counter in aria-describedby so screen readers associate it with the textarea.
+    // The counter also has aria-live="polite" for dynamic updates (WCAG 4.1.3).
     const describedBy =
       [
         hasError ? this._errorId : null,
@@ -458,6 +507,7 @@ export class HelixTextarea extends LitElement {
         </div>
 
         ${this._renderCounter()}
+        <div aria-live="polite" aria-atomic="true" class="sr-only">${this._liveAnnouncement}</div>
         ${hasError
           ? html`
               <div part="error" class="field__error" id=${this._errorId} role="alert">
@@ -485,4 +535,8 @@ declare global {
   }
 }
 
+/** Canonical type alias for the hx-textarea component. */
+export type HxTextarea = HelixTextarea;
+
+/** @deprecated Use {@link HxTextarea} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcTextarea = HelixTextarea;

@@ -67,8 +67,10 @@ export class HelixCombobox extends LitElement {
 
   // ─── Form Association ───
 
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -84,6 +86,7 @@ export class HelixCombobox extends LitElement {
   private _helpTextId = `${this._id}-help`;
   private _errorId = `${this._id}-error`;
   private _labelId = `${this._id}-label`;
+  private _liveRegionId = `${this._id}-live`;
 
   // ─── Public Properties ───
 
@@ -185,18 +188,40 @@ export class HelixCombobox extends LitElement {
   @property({ type: String, attribute: 'aria-label' })
   override ariaLabel: string | null = null;
 
+  /**
+   * Text shown when no options match the current filter.
+   * @attr label-no-options
+   */
+  @property({ type: String, attribute: 'label-no-options' })
+  labelNoOptions = 'No options found';
+
+  /**
+   * Validation message shown when the field is required but empty.
+   * @attr label-required
+   */
+  @property({ type: String, attribute: 'label-required' })
+  labelRequired = 'Please select an option.';
+
   // ─── Internal State ───
 
+  /** Parsed option models derived from slotted `<option>` and `<optgroup>` elements. @internal */
   @state() private _options: ComboboxOption[] = [];
+  /** Current text typed in the input, used to filter the option list. @internal */
   @state() private _filterText = '';
+  /** Whether the listbox dropdown is currently visible. @internal */
   @state() private _open = false;
+  /** Zero-based index of the keyboard-focused option within the filtered list; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
+  /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
+  /** Live-region announcement text describing the current number of filtered options. @internal */
+  @state() private _filterAnnouncement = '';
 
   // ─── Queries ───
 
+  /** Reference to the native text input element inside the shadow DOM. @internal */
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Debounce timer ───
 
@@ -275,7 +300,7 @@ export class HelixCombobox extends LitElement {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'Please select an option.',
+        this.error || this.labelRequired,
         this._input,
       );
     } else {
@@ -299,6 +324,11 @@ export class HelixCombobox extends LitElement {
     if (typeof state === 'string') {
       this.value = state;
     }
+  }
+
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
   }
 
   // ─── Option Syncing from Slot ───
@@ -371,10 +401,20 @@ export class HelixCombobox extends LitElement {
       }
       this._debounceTimer = setTimeout(() => {
         this._emitInput();
+        this._announceFilterResults();
       }, this.filterDebounce);
     } else {
       this._emitInput();
+      this._announceFilterResults();
     }
+  }
+
+  private _announceFilterResults(): void {
+    const count = this._filteredOptions.length;
+    this._filterAnnouncement =
+      count === 0
+        ? 'No matching options'
+        : `${count} ${count === 1 ? 'option' : 'options'} available`;
   }
 
   private _emitInput(): void {
@@ -565,7 +605,7 @@ export class HelixCombobox extends LitElement {
     if (filtered.length === 0) {
       return html`
         <slot name="empty-label">
-          <div class="field__no-options">No options found</div>
+          <div class="field__no-options">${this.labelNoOptions}</div>
         </slot>
       `;
     }
@@ -635,7 +675,7 @@ export class HelixCombobox extends LitElement {
         <!-- Label -->
         <slot name="label">
           ${this.label
-            ? html`<label id=${this._labelId} part="label" class="field__label">
+            ? html`<label id=${this._labelId} for=${this._id} part="label" class="field__label">
                 ${this.label}
                 ${this.required
                   ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
@@ -791,6 +831,11 @@ export class HelixCombobox extends LitElement {
               </div>
             `
           : nothing}
+
+        <!-- Filter results live region -->
+        <div id=${this._liveRegionId} aria-live="polite" aria-atomic="true" class="field__sr-only">
+          ${this._filterAnnouncement}
+        </div>
       </div>
     `;
   }

@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A linear progress indicator for determinate and indeterminate states.
@@ -28,6 +29,8 @@ import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
  * @cssprop [--hx-progress-bar-label-font-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-progress-bar-label-font-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-progress-bar-label-color=var(--hx-color-neutral-700)] - Label text color.
+ *
+ * @fires {CustomEvent} hx-complete - Emitted when progress reaches 100%.
  */
 @customElement('hx-progress-bar')
 export class HelixProgressBar extends LitElement {
@@ -89,12 +92,19 @@ export class HelixProgressBar extends LitElement {
   @property({ type: String, reflect: true })
   variant: 'default' | 'success' | 'warning' | 'danger' = 'default';
 
+  /** @internal */
   @state() private _liveMessage = '';
+  @state() private _hasLabelSlotContent = false;
 
+  private static _counter = 0;
+  private _uid = `hx-pb-${++HelixProgressBar._counter}`;
+
+  /** @internal */
   private get _isIndeterminate(): boolean {
     return this.indeterminate || this.value === null;
   }
 
+  /** @internal */
   private get _percentage(): number {
     if (this._isIndeterminate) return 0;
     const range = this.max - this.min;
@@ -103,6 +113,7 @@ export class HelixProgressBar extends LitElement {
     return ((clamped - this.min) / range) * 100;
   }
 
+  /** @internal */
   private get _isComplete(): boolean {
     return !this._isIndeterminate && this.value !== null && this.value >= this.max;
   }
@@ -116,15 +127,22 @@ export class HelixProgressBar extends LitElement {
     }
 
     if (!this.label) {
-      console.warn(
-        '[hx-progress-bar] No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled progressbar violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      devWarn(
+        'hx-progress-bar',
+        'No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled progressbar violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
       );
     }
   }
 
+  private _onLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasLabelSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   override render() {
-    const labelId = `${this.id || 'hx-pb'}-label`;
-    const descId = this.description ? `${this.id || 'hx-pb'}-desc` : undefined;
+    const labelId = `${this._uid}-label`;
+    const descId = this.description ? `${this._uid}-desc` : undefined;
+    const hasVisibleLabel = this._hasLabelSlotContent;
 
     const classes = {
       'progress-bar': true,
@@ -139,7 +157,7 @@ export class HelixProgressBar extends LitElement {
     return html`
       <div class=${classMap(classes)}>
         <span id=${labelId} part="label" class="progress-bar__label">
-          <slot name="label"></slot>
+          <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
         </span>
         ${this.description
           ? html`<span id=${descId} class="sr-only">${this.description}</span>`
@@ -151,8 +169,8 @@ export class HelixProgressBar extends LitElement {
           aria-valuenow=${ifDefined(ariaValueNow)}
           aria-valuemin=${this.min}
           aria-valuemax=${this.max}
-          aria-label=${this.label || nothing}
-          aria-labelledby=${labelId}
+          aria-label=${ifDefined(!hasVisibleLabel && this.label ? this.label : undefined)}
+          aria-labelledby=${ifDefined(hasVisibleLabel ? labelId : undefined)}
           aria-describedby=${ifDefined(descId)}
         >
           <div part="fill" class="progress-bar__fill" style=${indicatorStyle || nothing}></div>

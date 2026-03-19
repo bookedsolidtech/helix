@@ -100,6 +100,14 @@ export class HelixCopyButton extends LitElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  /**
+   * Text announced to screen readers and appended to aria-label after a
+   * successful copy. Also used as the content of the aria-live announcement.
+   * @attr label-copied
+   */
+  @property({ type: String, attribute: 'label-copied' })
+  labelCopied = 'Copied';
+
   // ─── Private State ───
 
   /** True while the success feedback window is active. */
@@ -146,22 +154,7 @@ export class HelixCopyButton extends LitElement {
   }
 
   private async _copyToClipboard(): Promise<void> {
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(this.value);
-    } else {
-      // Legacy execCommand fallback for environments without Clipboard API.
-      const textarea = document.createElement('textarea');
-      textarea.value = this.value;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      const success = document.execCommand('copy');
-      document.body.removeChild(textarea);
-      if (!success) {
-        throw new Error('execCommand("copy") returned false');
-      }
-    }
+    await navigator.clipboard.writeText(this.value);
   }
 
   // ─── Event Handling ───
@@ -198,7 +191,7 @@ export class HelixCopyButton extends LitElement {
 
     this._clearFeedbackTimer();
     this._copied = true;
-    this._announcement = 'Copied';
+    this._announcement = this.labelCopied;
 
     /**
      * Dispatched after the value has been successfully written to the
@@ -248,7 +241,7 @@ export class HelixCopyButton extends LitElement {
     // Reflect copied state in aria-label so re-focused button has an accurate
     // accessible name (WCAG 1.3.1). The live region handles the initial
     // announcement; this covers re-focus scenarios.
-    const ariaLabel = this._copied ? `${this.label} — Copied` : this.label;
+    const ariaLabel = this._copied ? `${this.label} — ${this.labelCopied}` : this.label;
 
     return html`
       <button

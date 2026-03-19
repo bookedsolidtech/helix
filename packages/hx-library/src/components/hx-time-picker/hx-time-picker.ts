@@ -136,7 +136,7 @@ function parseUserInput(raw: string): string | null {
  * @tag hx-time-picker
  *
  * @slot label - Custom label content; overrides the rendered label element when used.
- * @slot help - Help text displayed below the field.
+ * @slot help-text - Help text displayed below the field.
  * @slot error - Custom error content; overrides the `error` property.
  *
  * @fires {CustomEvent<{value: string}>} hx-change - Dispatched when the selected time changes. Detail value is HH:MM (24h).
@@ -171,8 +171,10 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
+  /** @internal */
   private readonly _internals: ElementInternals;
 
   constructor() {
@@ -254,35 +256,52 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _open = false;
+  /** @internal */
   @state() private _activeIndex = -1;
+  /** @internal */
   @state() private _inputDisplayValue = '';
+  /** @internal */
   @state() private _hasLabelSlot = false;
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  @state() private _hasHelpSlot = false;
+  /** @internal */
   @state() private _slottedLabelId = '';
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
+  /** @internal */
   private static _instanceCount = 0;
 
+  /** @internal */
   private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
+  /** @internal */
   private readonly _listboxId = `${this._id}-listbox`;
+  /** @internal */
   private readonly _errorId = `${this._id}-error`;
+  /** @internal */
   private readonly _helpId = `${this._id}-help`;
 
   // ─── Query References ───
 
+  /** @internal */
   @query('.field__input')
-  private _inputEl!: HTMLInputElement;
+  private _inputEl: HTMLInputElement | undefined;
 
+  /** @internal */
   @query('.field__listbox')
-  private _listboxEl!: HTMLUListElement;
+  private _listboxEl: HTMLUListElement | undefined;
 
   // ─── Memoized slot generation (avoids regenerating on every render call) ───
 
+  /** @internal */
   private _cachedSlots: TimeSlot[] | null = null;
+  /** @internal */
   private _slotsKey = '';
 
+  /** @internal */
   private get _slots(): TimeSlot[] {
     const key = `${this.min}|${this.max}|${this.step}|${this.format}`;
     if (this._cachedSlots === null || key !== this._slotsKey) {
@@ -294,6 +313,7 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Outside-click handler (bound reference for add/removeEventListener) ───
 
+  /** @internal */
   private readonly _handleOutsideClick = (e: MouseEvent): void => {
     if (!this.contains(e.target as Node) && !this.shadowRoot?.contains(e.target as Node)) {
       this._closeListbox();
@@ -447,6 +467,11 @@ export class HelixTimePicker extends LitElement {
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  private _handleHelpSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Event Dispatch ───
@@ -610,7 +635,9 @@ export class HelixTimePicker extends LitElement {
     const placeholder = this.format === '12h' ? 'hh:mm AM' : 'hh:mm';
 
     const describedBy =
-      [hasError ? this._errorId : null, this._helpId].filter(Boolean).join(' ') || undefined;
+      [hasError ? this._errorId : null, this._hasHelpSlot ? this._helpId : null]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -745,7 +772,7 @@ export class HelixTimePicker extends LitElement {
 
         <!-- Help slot -->
         <div part="help-text" class="field__help-text" id=${this._helpId}>
-          <slot name="help"></slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </div>
     `;

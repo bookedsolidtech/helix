@@ -91,7 +91,24 @@ export class HelixOverflowMenu extends LitElement {
   @property({ type: String, reflect: true })
   label = 'More actions';
 
+  /**
+   * Accessible label for the menu panel. Reflected as `menu-label`.
+   * @attr menu-label
+   */
+  @property({ type: String, reflect: true, attribute: 'menu-label' })
+  menuLabel = 'Actions';
+
+  /**
+   * Tracks whether the overflow menu panel is currently open and visible.
+   * @internal
+   */
   @state() private _open = false;
+
+  /**
+   * Unique ID for the floating panel element, used to wire aria-controls on the trigger button.
+   * @internal
+   */
+  private readonly _panelId = `hx-overflow-menu-panel-${Math.random().toString(36).slice(2, 9)}`;
 
   // ─── Lifecycle ───
 
@@ -293,6 +310,7 @@ export class HelixOverflowMenu extends LitElement {
         aria-label=${this.label}
         aria-haspopup="menu"
         aria-expanded=${this._open ? 'true' : 'false'}
+        aria-controls=${this._open ? this._panelId : nothing}
         ?disabled=${this.disabled}
         @click=${this._handleTriggerClick}
       >
@@ -301,9 +319,10 @@ export class HelixOverflowMenu extends LitElement {
       ${this._open
         ? html`
             <div
+              id=${this._panelId}
               part="panel menu"
               role="menu"
-              aria-label="Actions"
+              aria-label=${this.menuLabel}
               class="panel"
               @click=${this._handleSlotClick}
             >

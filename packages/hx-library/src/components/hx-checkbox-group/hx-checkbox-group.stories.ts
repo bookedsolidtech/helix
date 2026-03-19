@@ -388,7 +388,7 @@ export const WithHelpText: Story = {
       <hx-checkbox value="dental" label="Dental"></hx-checkbox>
       <hx-checkbox value="vision" label="Vision"></hx-checkbox>
       <hx-checkbox value="mental-health" label="Mental Health"></hx-checkbox>
-      <span slot="help">
+      <span slot="help-text">
         Select all insurance plans that apply to this patient. Contact billing if unsure.
       </span>
     </hx-checkbox-group>
@@ -466,7 +466,7 @@ export const AllStates: Story = {
           <hx-checkbox value="penicillin" label="Penicillin"></hx-checkbox>
           <hx-checkbox value="latex" label="Latex"></hx-checkbox>
           <hx-checkbox value="none" label="None of the above"></hx-checkbox>
-          <span slot="help">At least one selection is required.</span>
+          <span slot="help-text">At least one selection is required.</span>
         </hx-checkbox-group>
       </div>
 
@@ -543,7 +543,7 @@ export const DrupalExample: Story = {
               ></hx-checkbox>
             `,
           )}
-          <span slot="help">
+          <span slot="help-text">
             Select all conditions that apply. This information is used for care coordination.
           </span>
         </hx-checkbox-group>
@@ -588,7 +588,7 @@ export const InAForm: Story = {
           <hx-checkbox value="heart-disease" label="Heart Disease"></hx-checkbox>
           <hx-checkbox value="asthma" label="Asthma"></hx-checkbox>
           <hx-checkbox value="none" label="None of the above"></hx-checkbox>
-          <span slot="help">
+          <span slot="help-text">
             Select all conditions that apply. Required for accurate care planning.
           </span>
         </hx-checkbox-group>
@@ -737,7 +737,7 @@ export const HealthcarePreExistingConditions: Story = {
         ></hx-checkbox>
         <hx-checkbox value="ckd" label="Chronic Kidney Disease"></hx-checkbox>
         <hx-checkbox value="none" label="None of the above"></hx-checkbox>
-        <span slot="help">
+        <span slot="help-text">
           Select all conditions that have been diagnosed by a physician. Required for accurate care
           coordination and medication safety review.
         </span>
@@ -782,7 +782,7 @@ export const HealthcareSymptomsChecklist: Story = {
         <hx-checkbox value="chest-pain" label="Chest Pain or Tightness"></hx-checkbox>
         <hx-checkbox value="loss-taste-smell" label="Loss of Taste or Smell"></hx-checkbox>
         <hx-checkbox value="none" label="I am not experiencing any symptoms"></hx-checkbox>
-        <span slot="help">
+        <span slot="help-text">
           Select all symptoms you are currently experiencing. This information helps triage your
           visit.
         </span>
@@ -1065,7 +1065,7 @@ export const CSSParts: Story = {
           <hx-checkbox-group label="With Styled Help Text" name="parts-demo-help">
             <hx-checkbox value="fever" label="Fever"></hx-checkbox>
             <hx-checkbox value="cough" label="Cough"></hx-checkbox>
-            <span slot="help">This help text is bold and blue via ::part(help-text).</span>
+            <span slot="help-text">This help text is bold and blue via ::part(help-text).</span>
           </hx-checkbox-group>
         </div>
       </div>

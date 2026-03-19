@@ -2,6 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * Column definition for `hx-data-table`.
@@ -112,6 +113,14 @@ export class HelixDataTable extends LitElement {
   emptyLabel = 'No data';
 
   /**
+   * Accessible name for the table. Exposed via `aria-label` on the `<table>` element.
+   * Required when the table has columns — a missing label is a WCAG 4.1.2 violation.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
+
+  /**
    * When true, the header row is sticky (position: sticky; top: 0).
    * @attr sticky-header
    */
@@ -168,8 +177,20 @@ export class HelixDataTable extends LitElement {
     }
     // Only warn when rows actually changes to avoid noise on every property update.
     if (changed.has('rows') && this.rows.length > 500) {
-      console.warn(
-        '[hx-data-table] Rendering more than 500 rows may impact performance. Consider server-side pagination.',
+      devWarn(
+        'hx-data-table',
+        'Rendering more than 500 rows may impact performance. Consider server-side pagination.',
+      );
+    }
+    // WCAG 4.1.2: data tables must have an accessible name so screen readers can identify them.
+    if (
+      (changed.has('label') || changed.has('columns')) &&
+      this.columns.length > 0 &&
+      !this.label
+    ) {
+      devWarn(
+        'hx-data-table',
+        'No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
       );
     }
   }
@@ -429,7 +450,7 @@ export class HelixDataTable extends LitElement {
         >
           ${this.selectable
             ? html`
-                <td part="td" class="col-checkbox">
+                <td part="td" class="col-checkbox" tabindex="-1" data-row-index=${globalIndex}>
                   <input
                     type="checkbox"
                     part="checkbox"
@@ -463,6 +484,7 @@ export class HelixDataTable extends LitElement {
         <table
           part="table"
           role="grid"
+          aria-label=${this.label || nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           @keydown=${this._handleKeydown}
         >

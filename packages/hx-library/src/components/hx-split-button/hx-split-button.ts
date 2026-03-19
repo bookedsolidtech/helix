@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -49,14 +49,26 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Internal References ───
 
+  /**
+   * Reference to the dropdown menu panel element, used for positioning and focus management.
+   * @internal
+   */
   @query('.split-button__menu')
-  private _menuPanel!: HTMLElement;
+  private _menuPanel: HTMLElement | undefined;
 
+  /**
+   * Reference to the dropdown trigger button element, used to return focus after menu closes.
+   * @internal
+   */
   @query('.split-button__trigger')
-  private _triggerButton!: HTMLButtonElement;
+  private _triggerButton: HTMLButtonElement | undefined;
 
   // ─── Internal State ───
 
+  /**
+   * Tracks whether the dropdown menu is currently open.
+   * @internal
+   */
   @state() private _open = false;
 
   // ─── Public Properties ───
@@ -106,6 +118,10 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Unique IDs ───
 
+  /**
+   * Stable unique ID for the dropdown menu panel element, used to wire aria-controls on the trigger button.
+   * @internal
+   */
   private readonly _menuId = `hx-split-button-menu-${++_hxSplitButtonIdCounter}`;
 
   // ─── Lifecycle ───
@@ -326,6 +342,7 @@ export class HelixSplitButton extends LitElement {
           class="split-button__primary"
           ?disabled=${this.disabled}
           type="button"
+          aria-label=${this.ariaLabel ?? this.label ?? nothing}
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
         >

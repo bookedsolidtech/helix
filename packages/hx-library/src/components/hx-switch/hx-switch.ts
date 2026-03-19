@@ -190,9 +190,14 @@ export class HelixSwitch extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   /** Reference to the native button element acting as the switch track. */
   @query('.switch__track')
-  private _trackEl!: HTMLButtonElement | null;
+  private _trackEl: HTMLButtonElement | null | undefined;
 
   /** Whether the error slot has assigned content. */
   @state() private _hasErrorSlot = false;
@@ -288,6 +293,7 @@ export class HelixSwitch extends LitElement {
           <button
             part="track"
             class="switch__track"
+            id=${this._switchId}
             type="button"
             role="switch"
             aria-checked=${this.checked ? 'true' : 'false'}
@@ -302,11 +308,11 @@ export class HelixSwitch extends LitElement {
             <span part="thumb" class="switch__thumb"></span>
           </button>
 
-          <span part="label" class="switch__label" id=${this._labelId} @click=${this._handleClick}>
+          <label part="label" class="switch__label" id=${this._labelId} for=${this._switchId}>
             <slot @slotchange=${this._handleDefaultSlotChange}>${this.label}</slot>${this.required
               ? html`<span class="switch__required-marker" aria-hidden="true">*</span>`
               : nothing}
-          </span>
+          </label>
         </div>
 
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>

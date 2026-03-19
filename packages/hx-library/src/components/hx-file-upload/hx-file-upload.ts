@@ -49,8 +49,10 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Form Association ───
 
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -117,16 +119,28 @@ export class HelixFileUpload extends LitElement {
   @property({ type: String })
   error = '';
 
+  /**
+   * Instructional text shown in the dropzone when no custom slot content is provided.
+   * Also used as the accessible label for the dropzone.
+   * @attr label-dropzone
+   */
+  @property({ type: String, attribute: 'label-dropzone' })
+  labelDropzone = 'Drag files here or click to browse';
+
   // ─── Internal State ───
 
+  /** The list of currently selected file entries, each with a file reference and upload progress. @internal */
   @state() private _files: FileEntry[] = [];
+  /** Whether a file is currently being dragged over the dropzone. @internal */
   @state() private _dragOver = false;
+  /** Whether the named file-list slot contains projected content. @internal */
   @state() private _hasFileListSlot = false;
 
   // ─── Internal References ───
 
+  /** Reference to the hidden native file input element used to open the OS file picker. @internal */
   @query('.file-input')
-  private _fileInput!: HTMLInputElement | null;
+  private _fileInput: HTMLInputElement | null | undefined;
 
   // ─── Stable IDs ───
 
@@ -515,9 +529,7 @@ export class HelixFileUpload extends LitElement {
       'dropzone--error': hasError,
     };
 
-    const dropzoneLabel = this.label
-      ? `${this.label} — Drag files here or click to browse`
-      : 'Drag files here or click to browse';
+    const dropzoneLabel = this.label ? `${this.label} — ${this.labelDropzone}` : this.labelDropzone;
 
     return html`
       <div class="field">
@@ -535,7 +547,7 @@ export class HelixFileUpload extends LitElement {
           id=${this._dropzoneId}
           role="button"
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-label=${dropzoneLabel}
+          aria-label=${ifDefined(!this.label ? dropzoneLabel : undefined)}
           aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-describedby=${ifDefined(hasError ? this._errorId : undefined)}
@@ -545,7 +557,7 @@ export class HelixFileUpload extends LitElement {
           @dragleave=${this._handleDragLeave}
           @drop=${this._handleDrop}
         >
-          <slot>Drag files here or click to browse</slot>
+          <slot>${this.labelDropzone}</slot>
         </div>
 
         <input

@@ -3,9 +3,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixFieldStyles } from './hx-field.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /** Native form control tag names that can receive ARIA attributes. */
 const FORM_CONTROL_TAGS = new Set(['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON']);
+
+let _fieldCounter = 0;
 
 /** Returns true if the element is a native form control or a custom element. */
 function isFormControl(el: Element): el is HTMLElement {
@@ -31,7 +34,7 @@ function isFormControl(el: Element): el is HTMLElement {
  *
  * @slot - The form control element (native or custom).
  * @slot label - Custom label content (overrides the label property).
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property).
  * @slot description - Additional descriptive content above the control.
  *
@@ -106,8 +109,22 @@ export class HelixField extends LitElement {
 
   // ─── Slot Tracking ───
 
+  /**
+   * Tracks whether any content is assigned to the label slot, used to conditionally render the label property.
+   * @internal
+   */
   @state() private _hasLabelSlot = false;
+
+  /**
+   * Tracks whether any content is assigned to the error slot, used to toggle error state rendering.
+   * @internal
+   */
   @state() private _hasErrorSlot = false;
+
+  /**
+   * Tracks whether any content is assigned to the help-text slot, used to toggle help text rendering.
+   * @internal
+   */
   @state() private _hasHelpSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -127,9 +144,28 @@ export class HelixField extends LitElement {
 
   // ─── Unique IDs for Accessibility ───
 
-  private _fieldId = `hx-field-${crypto.randomUUID().slice(0, 8)}`;
+  /**
+   * Unique ID for this field instance, used as a base for all derived accessibility IDs.
+   * @internal
+   */
+  private _fieldId = `hx-field-${++_fieldCounter}`;
+
+  /**
+   * ID for the help text element, allowing aria-describedby to reference it.
+   * @internal
+   */
   private _helpTextId = `${this._fieldId}-help`;
+
+  /**
+   * ID for the error message element, allowing aria-describedby to reference it.
+   * @internal
+   */
   private _errorId = `${this._fieldId}-error`;
+
+  /**
+   * ID for the light-DOM description span injected for cross-shadow-root aria-describedby linkage.
+   * @internal
+   */
   private _a11yDescId = `${this._fieldId}-desc`;
 
   // ─── A11y: Slotted control tracking + light-DOM description element ───
@@ -137,6 +173,7 @@ export class HelixField extends LitElement {
   /**
    * The first form control in the default slot. We set aria attributes on this
    * element to bridge the shadow DOM accessibility boundary.
+   * @internal
    */
   private _slottedControl: HTMLElement | null = null;
 
@@ -151,6 +188,7 @@ export class HelixField extends LitElement {
    * accessibility tree. It is removed in `disconnectedCallback`. Consumers
    * should not remove or modify this span (identifiable by its `id` ending in
    * `-desc`).
+   * @internal
    */
   private _a11yDescEl: HTMLElement | null = null;
 
@@ -180,8 +218,9 @@ export class HelixField extends LitElement {
     if (changedProps.has('hxSize')) {
       const validSizes = ['sm', 'md', 'lg'];
       if (!validSizes.includes(this.hxSize)) {
-        console.warn(
-          `[hx-field] Invalid hx-size value: "${this.hxSize}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
+        devWarn(
+          'hx-field',
+          `Invalid hx-size value: "${this.hxSize}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
         );
       }
     }
@@ -357,7 +396,7 @@ export class HelixField extends LitElement {
           id=${this._helpTextId}
           ?hidden=${!hasHelp || hasError}
         >
-          <slot name="help" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </div>
     `;

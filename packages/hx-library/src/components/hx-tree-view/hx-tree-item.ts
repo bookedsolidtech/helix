@@ -66,15 +66,38 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Internal State ───
 
+  /**
+   * Tracks whether any elements are assigned to the children slot, controlling expand icon visibility.
+   * @internal
+   */
   @state() private _hasChildren = false;
+
+  /**
+   * Whether this item is the roving-tabindex active item in the tree.
+   * @internal
+   */
+  @state() private _rovingActive = false;
 
   /**
    * Cached ARIA position metadata. Computed once on connect and on slotchange
    * of the parent container, avoiding repeated DOM traversal on every render.
+   * @internal
    */
   @state() private _level = 1;
+  /**
+   * One-based position of this item within its sibling set, set as aria-posinset.
+   * @internal
+   */
   @state() private _posInSet = 1;
+  /**
+   * Total count of sibling hx-tree-item elements at the same level, set as aria-setsize.
+   * @internal
+   */
   @state() private _setSize = 1;
+  /**
+   * Whether the owning hx-tree-view supports item selection (single or multiple mode).
+   * @internal
+   */
   @state() private _selectable = false;
 
   // ─── Computed ARIA ───
@@ -90,6 +113,7 @@ export class HelixTreeItem extends LitElement {
   /**
    * Recompute all cached ARIA metadata in a single DOM pass.
    * Called on connect, slotchange, and whenever structural context may change.
+   * @internal
    */
   private _updateAriaMetadata(): void {
     // Compute nesting level by counting ancestor hx-tree-item elements.
@@ -133,6 +157,10 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Children Detection ───
 
+  /**
+   * Updates _hasChildren and recomputes ARIA metadata when the children slot assignment changes.
+   * @internal
+   */
   private _handleChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedElements().length > 0;
@@ -141,12 +169,20 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Event Handlers ───
 
+  /**
+   * Toggles the expanded state when the expand/collapse button is clicked, stopping event propagation.
+   * @internal
+   */
   private _handleExpandClick(e: Event): void {
     e.stopPropagation();
     if (this.disabled) return;
     this.expanded = !this.expanded;
   }
 
+  /**
+   * Dispatches the hx-tree-item-select event when the item is activated via click or keyboard.
+   * @internal
+   */
   private _handleRowClick(): void {
     if (this.disabled) return;
     this.dispatchEvent(
@@ -158,6 +194,10 @@ export class HelixTreeItem extends LitElement {
     );
   }
 
+  /**
+   * Handles keyboard interaction for the tree item, including expand/collapse, activation, and delegation of list-navigation keys to the parent tree.
+   * @internal
+   */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (this.disabled) return;
 
@@ -190,6 +230,16 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Public API ───
 
+  /**
+   * Sets the roving tabindex state for this item.
+   * When `active` is true, the item row gets `tabindex="0"` making it the
+   * Tab-reachable item in the tree. All other items should be set to false.
+   * Called by the parent hx-tree-view to manage the roving tabindex pattern.
+   */
+  setRovingActive(active: boolean): void {
+    this._rovingActive = active;
+  }
+
   /** Focus this item's interactive row element. */
   override focus(): void {
     const row = this.shadowRoot?.querySelector<HTMLElement>('.item-row');
@@ -198,6 +248,10 @@ export class HelixTreeItem extends LitElement {
 
   // ─── Render ───
 
+  /**
+   * Renders the expand/collapse chevron button, or a placeholder span when the item has no children.
+   * @internal
+   */
   private _renderExpandIcon() {
     if (!this._hasChildren) {
       return html`<span class="expand-placeholder" aria-hidden="true"></span>`;
@@ -227,7 +281,7 @@ export class HelixTreeItem extends LitElement {
           part="row"
           class="item-row"
           role="treeitem"
-          tabindex="-1"
+          tabindex=${this._rovingActive ? '0' : '-1'}
           aria-expanded=${ariaExpanded}
           aria-selected=${ariaSelected}
           aria-disabled=${this.disabled ? 'true' : nothing}

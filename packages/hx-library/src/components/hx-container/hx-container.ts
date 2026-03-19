@@ -85,7 +85,10 @@ export class HelixContainer extends LitElement {
   }
 }
 
-/** @deprecated Use `HelixContainer` directly. Alias kept for backward compatibility. */
+/** Canonical type alias for the hx-container component. */
+export type HxContainer = HelixContainer;
+
+/** @deprecated Use {@link HxContainer} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcContainer = HelixContainer;
 
 declare global {

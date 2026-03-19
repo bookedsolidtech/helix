@@ -2,16 +2,9 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
-import { helixToastStyles, helixToastStackStyles } from './hx-toast.styles.js';
+import { helixToastStyles } from './hx-toast.styles.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
-export type ToastStackPlacement =
-  | 'top-start'
-  | 'top-center'
-  | 'top-end'
-  | 'bottom-start'
-  | 'bottom-center'
-  | 'bottom-end';
 
 /**
  * A transient notification message that auto-dismisses after a configurable duration.
@@ -137,9 +130,6 @@ export class HelixToast extends LitElement {
 
   /** @internal */
   private _startTimer(remaining?: number): void {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
     this._clearTimerHandle();
     const delay = remaining ?? this.duration;
     this._timerStartedAt = Date.now();
@@ -299,120 +289,10 @@ export class HelixToast extends LitElement {
   }
 }
 
-/**
- * A fixed-position container that stacks `hx-toast` elements at the specified
- * corner of the viewport. Enforces a maximum visible toast count via `stack-limit`.
- *
- * @summary Toast stack container managing position and count limits.
- *
- * @tag hx-toast-stack
- *
- * @slot - Accepts `hx-toast` elements.
- *
- * @csspart base - The inner stack container div.
- *
- * @cssprop [--hx-z-index-toast=9000] - Z-index for the fixed stack.
- */
-@customElement('hx-toast-stack')
-export class HelixToastStack extends LitElement {
-  static override styles = [tokenStyles, helixToastStackStyles];
-
-  /**
-   * Corner of the viewport where toasts appear.
-   * @attr placement
-   */
-  @property({ type: String, reflect: true })
-  placement: ToastStackPlacement = 'bottom-end';
-
-  /**
-   * Maximum number of simultaneously visible toasts. 0 = unlimited.
-   * @attr stack-limit
-   */
-  @property({ type: Number, attribute: 'stack-limit' })
-  stackLimit = 3;
-
-  override render() {
-    return html`
-      <div
-        part="base"
-        class=${classMap({
-          'toast-stack': true,
-          [`toast-stack--${this.placement}`]: true,
-        })}
-      >
-        <slot></slot>
-      </div>
-    `;
-  }
-}
-
 // ─── Declarative Global Types ───
 
 declare global {
   interface HTMLElementTagNameMap {
     'hx-toast': HelixToast;
-    'hx-toast-stack': HelixToastStack;
   }
-}
-
-// ─── Imperative toast() Utility ───
-
-export interface ToastOptions {
-  /** The notification message text. */
-  message: string;
-  /** Visual variant. Defaults to 'default'. */
-  variant?: ToastVariant;
-  /** Auto-dismiss duration in ms. 0 = persistent. Defaults to 3000. */
-  duration?: number;
-  /** Placement of the shared stack. Defaults to 'bottom-end'. */
-  placement?: ToastStackPlacement;
-}
-
-/**
- * Imperatively create and display a toast notification.
- *
- * Creates a shared `hx-toast-stack` on `document.body` if one does not exist,
- * then appends a new `hx-toast` with the given options. Respects the stack's
- * `stackLimit` by hiding the oldest visible toast when the limit is exceeded.
- *
- * @example
- * import { toast } from '@helixui/library/components/hx-toast/index.js';
- * toast({ message: 'Patient record saved.', variant: 'success' });
- */
-export function toast(options: ToastOptions): HelixToast {
-  const placement = options.placement ?? 'bottom-end';
-
-  // Find or create a dedicated stack for this placement
-  const stackSelector = `hx-toast-stack[placement="${placement}"]`;
-  let stack = document.querySelector<HelixToastStack>(stackSelector);
-  if (!stack) {
-    stack = document.createElement('hx-toast-stack') as HelixToastStack;
-    stack.placement = placement;
-    document.body.appendChild(stack);
-  }
-
-  // Enforce stack limit: hide oldest open toast if at capacity
-  if (stack.stackLimit > 0) {
-    const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
-    if (openToasts.length >= stack.stackLimit) {
-      openToasts[0]?.hide();
-    }
-  }
-
-  // Create toast element
-  const toastEl = document.createElement('hx-toast') as HelixToast;
-  toastEl.variant = options.variant ?? 'default';
-  toastEl.duration = options.duration ?? 3000;
-  toastEl.closable = true;
-  toastEl.textContent = options.message;
-
-  // Remove from DOM after hiding
-  toastEl.addEventListener('hx-after-hide', () => {
-    toastEl.remove();
-  });
-
-  stack.appendChild(toastEl);
-  toastEl.show();
-
-  return toastEl;
 }

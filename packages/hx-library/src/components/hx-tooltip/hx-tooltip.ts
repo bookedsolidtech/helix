@@ -44,6 +44,8 @@ import { helixTooltipStyles } from './hx-tooltip.styles.js';
  * </hx-tooltip>
  * ```
  */
+let _tooltipCounter = 0;
+
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
   static override styles = [tokenStyles, helixTooltipStyles];
@@ -79,12 +81,8 @@ export class HelixTooltip extends LitElement {
   /** @internal */
   private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-  /**
-   * Unique ID for this tooltip instance.
-   * Uses crypto.randomUUID() to prevent SSR hydration ID collisions.
-   * @internal
-   */
-  private readonly _tooltipId = `hx-tooltip-${crypto.randomUUID()}`;
+  /** @internal */
+  private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
   /**
    * Visually-hidden description element in light DOM.
@@ -99,12 +97,12 @@ export class HelixTooltip extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('keydown', this._handleKeydown as EventListener);
+    this.addEventListener('keydown', this._handleKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('keydown', this._handleKeydown as EventListener);
+    this.removeEventListener('keydown', this._handleKeydown);
     this._clearTimers();
     this._lightDomDescription?.remove();
     this._lightDomDescription = null;
@@ -227,7 +225,8 @@ export class HelixTooltip extends LitElement {
   // ─── Events ───
 
   /** @internal */
-  private _handleKeydown = (e: KeyboardEvent): void => {
+  private _handleKeydown = (e: Event): void => {
+    if (!(e instanceof KeyboardEvent)) return;
     if (e.key === 'Escape' && this._visible) {
       this._clearTimers();
       this._hide();

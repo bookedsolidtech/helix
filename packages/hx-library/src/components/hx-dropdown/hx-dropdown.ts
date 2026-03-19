@@ -92,14 +92,19 @@ export class HelixDropdown extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _panelVisible = false;
 
   // P1-02: Unique panel ID for aria-controls.
+  /** @internal */
   private static _instanceCounter = 0;
+  /** @internal */
   private _panelId = `hx-dropdown-panel-${++HelixDropdown._instanceCounter}`;
 
-  @query('[part="panel"]') private _panel!: HTMLElement;
-  @query('[part="trigger"]') private _triggerWrapper!: HTMLElement;
+  /** @internal */
+  @query('[part="panel"]') private _panel: HTMLElement | undefined;
+  /** @internal */
+  @query('[part="trigger"]') private _triggerWrapper: HTMLElement | undefined;
 
   // ─── Lifecycle ───
 

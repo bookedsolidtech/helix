@@ -28,12 +28,17 @@ import { helixButtonStyles } from './hx-button.styles.js';
  * @csspart spinner - The loading spinner SVG element.
  *
  * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
+ * @cssprop [--hx-button-hover-bg] - Hover background color override. When set, overrides the variant default hover background from outside the shadow DOM.
  * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
  * @cssprop [--hx-button-border-color=transparent] - Button border color.
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
  * @cssprop [--hx-button-font-family=var(--hx-font-family-sans)] - Button font family.
  * @cssprop [--hx-button-font-weight=var(--hx-font-weight-semibold)] - Button font weight.
  * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ *
+ * @cssprop [--hx-button-inverted-color=#ffffff] - Text color when inverted.
+ * @cssprop [--hx-button-inverted-ghost-hover-bg=rgba(255,255,255,0.15)] - Ghost hover bg when inverted.
+ * @cssprop [--hx-button-inverted-focus-ring-color=rgba(255,255,255,0.5)] - Focus ring color when inverted.
  */
 @customElement('hx-button')
 export class HelixButton extends LitElement {
@@ -115,6 +120,22 @@ export class HelixButton extends LitElement {
    */
   @property({ type: String })
   value: string | undefined = undefined;
+
+  /**
+   * When true, the button stretches to fill its container width.
+   * Sets the host to `display: block` and the inner element to `width: 100%`.
+   * @attr full
+   */
+  @property({ type: Boolean, reflect: true })
+  full = false;
+
+  /**
+   * When true, flips button colors for placement on dark or gradient backgrounds.
+   * Forces text to white and adjusts hover/focus ring colors across all variants.
+   * @attr inverted
+   */
+  @property({ type: Boolean, reflect: true })
+  inverted = false;
 
   /**
    * Accessible label forwarded to the inner button/anchor. Required for icon-only usage.

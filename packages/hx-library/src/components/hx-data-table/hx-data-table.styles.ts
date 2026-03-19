@@ -178,7 +178,10 @@ export const helixDataTableStyles = css`
 
   /* ─── Cell Focus ─── */
 
-  td:focus-visible {
+  td:focus-visible,
+  th:focus-visible,
+  [part~='td']:focus-visible,
+  [part~='th']:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, -2px);

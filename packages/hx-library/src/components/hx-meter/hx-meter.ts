@@ -40,6 +40,9 @@ type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
 export class HelixMeter extends LitElement {
   static override styles = [tokenStyles, helixMeterStyles];
 
+  private static _counter = 0;
+  private _uid = `hx-meter-${++HelixMeter._counter}`;
+
   /**
    * Current value of the meter.
    * @attr value
@@ -112,8 +115,12 @@ export class HelixMeter extends LitElement {
 
     if (!hasLow && !hasHigh && !hasOptimum) return 'default';
 
-    const inLowZone = hasLow && v < this.low!;
-    const inHighZone = hasHigh && v > this.high!;
+    // When hasLow/hasHigh/hasOptimum are true, the corresponding property is defined.
+    // Use nullish coalescing to satisfy the type checker while preserving the runtime logic.
+    const lowVal = this.low ?? 0;
+    const highVal = this.high ?? this.max;
+    const inLowZone = hasLow && v < lowVal;
+    const inHighZone = hasHigh && v > highVal;
     const inMiddleZone = !inLowZone && !inHighZone;
 
     if (!hasOptimum) {
@@ -121,9 +128,9 @@ export class HelixMeter extends LitElement {
       return 'optimum';
     }
 
-    const opt = this.optimum!;
-    const optimumInLow = hasLow && opt < this.low!;
-    const optimumInHigh = hasHigh && opt > this.high!;
+    const opt = this.optimum ?? this.min;
+    const optimumInLow = hasLow && opt < lowVal;
+    const optimumInHigh = hasHigh && opt > highVal;
     const optimumInMiddle = !optimumInLow && !optimumInHigh;
 
     if (optimumInMiddle) {
@@ -170,9 +177,14 @@ export class HelixMeter extends LitElement {
         aria-valuemax=${this.max}
         aria-valuetext=${ariaValuetext}
         aria-label=${ifDefined(!hasVisibleLabel ? `${clampedValue} of ${this.max}` : undefined)}
-        aria-labelledby=${ifDefined(hasVisibleLabel ? '__hx-meter-label' : undefined)}
+        aria-labelledby=${ifDefined(hasVisibleLabel ? `${this._uid}-label` : undefined)}
       >
-        <span id="__hx-meter-label" part="label" class="meter__label" ?hidden=${!hasVisibleLabel}>
+        <span
+          id=${`${this._uid}-label`}
+          part="label"
+          class="meter__label"
+          ?hidden=${!hasVisibleLabel}
+        >
           <slot name="label" @slotchange=${this._onLabelSlotChange}>${this.label ?? ''}</slot>
         </span>
         <div class="meter__track" part="track">

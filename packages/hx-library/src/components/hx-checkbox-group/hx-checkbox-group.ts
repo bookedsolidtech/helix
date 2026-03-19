@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /** Monotonic counter for stable, SSR-safe IDs. */
 let _uid = 0;
@@ -18,7 +19,7 @@ let _uid = 0;
  * @slot - `<hx-checkbox>` elements.
  * @slot label - Rich HTML group label (overrides the label property when used).
  * @slot error - Custom error content (overrides the error property).
- * @slot help - Group-level help text.
+ * @slot help-text - Group-level help text.
  *
  * @fires {CustomEvent<{values: string[]}>} hx-change - Dispatched when any child checkbox changes.
  *
@@ -49,8 +50,10 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Form Association ───
 
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -105,14 +108,16 @@ export class HelixCheckboxGroup extends LitElement {
   }
   set orientation(value: string) {
     if (value !== 'vertical' && value !== 'horizontal') {
-      console.warn(`[hx-checkbox-group] Invalid orientation "${value}", defaulting to "vertical".`);
+      devWarn('hx-checkbox-group', `Invalid orientation "${value}", defaulting to "vertical".`);
       value = 'vertical';
     }
     this._orientation = value as 'vertical' | 'horizontal';
   }
   private _orientation: 'vertical' | 'horizontal' = 'vertical';
 
+  /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
+  /** Whether the named help-text slot contains projected content. @internal */
   @state() private _hasHelpSlot = false;
 
   // ─── Internal IDs ───
@@ -342,7 +347,7 @@ export class HelixCheckboxGroup extends LitElement {
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
 
         <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-          <slot name="help" @slotchange=${this._handleHelpSlotChange}></slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
       </fieldset>
     `;

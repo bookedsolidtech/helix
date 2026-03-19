@@ -4,6 +4,7 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxTabsIdCounter = 0;
@@ -112,16 +113,18 @@ export class HelixTabs extends LitElement {
 
   private _getTabs(): HelixTab[] {
     if (!this._cachedTabs) {
-      this._cachedTabs = Array.from(this.querySelectorAll(':scope > hx-tab')) as HelixTab[];
+      this._cachedTabs = Array.from(this.querySelectorAll(':scope > hx-tab')).filter(
+        (el): el is HelixTab => el.tagName.toLowerCase() === 'hx-tab',
+      );
     }
     return this._cachedTabs;
   }
 
   private _getPanels(): HelixTabPanel[] {
     if (!this._cachedPanels) {
-      this._cachedPanels = Array.from(
-        this.querySelectorAll(':scope > hx-tab-panel'),
-      ) as HelixTabPanel[];
+      this._cachedPanels = Array.from(this.querySelectorAll(':scope > hx-tab-panel')).filter(
+        (el): el is HelixTabPanel => el.tagName.toLowerCase() === 'hx-tab-panel',
+      );
     }
     return this._cachedPanels;
   }
@@ -134,7 +137,7 @@ export class HelixTabs extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('hx-tab-select', this._handleTabSelect as EventListener);
+    this.addEventListener('hx-tab-select', this._handleTabSelect);
     this.addEventListener('keydown', this._handleKeydown);
     // Watch for panel/name attribute changes on child tabs and panels
     this._observer = new MutationObserver(() => {
@@ -150,7 +153,7 @@ export class HelixTabs extends LitElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('hx-tab-select', this._handleTabSelect as EventListener);
+    this.removeEventListener('hx-tab-select', this._handleTabSelect);
     this.removeEventListener('keydown', this._handleKeydown);
     this._observer?.disconnect();
     this._observer = null;
@@ -206,9 +209,11 @@ export class HelixTabs extends LitElement {
     tabs.forEach((tab) => {
       const isSelected = tab.panel === this._activePanel;
       tab.selected = isSelected;
-      // Tabindex is managed by the inner button in hx-tab via the `selected` property.
-      // We also set it on the host for the roving tabindex pattern so document.activeElement
-      // comparisons work correctly when the inner button is focused.
+      // Dual tabindex is intentional: the inner button in hx-tab manages its own tabindex
+      // via the `selected` property. We also set it on the host element for the roving
+      // tabindex pattern so document.activeElement comparisons work correctly when the
+      // inner button is focused. This is safe because the inner button is the only
+      // focusable element in hx-tab's shadow DOM (WCAG 2.4.3).
       tab.tabIndex = isSelected ? 0 : -1;
     });
 
@@ -254,7 +259,8 @@ export class HelixTabs extends LitElement {
   // ─── Event Handling ───
 
   /** @internal */
-  private _handleTabSelect = (e: CustomEvent<{ panel: string }>): void => {
+  private _handleTabSelect = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
     e.stopPropagation();
     const tab = e
       .composedPath()
@@ -273,8 +279,9 @@ export class HelixTabs extends LitElement {
         .assignedElements()
         .filter((el) => el.tagName.toLowerCase() !== 'hx-tab');
       if (invalid.length > 0) {
-        console.warn(
-          `[hx-tabs] Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        devWarn(
+          'hx-tabs',
+          `Slot "tab" expects <hx-tab> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
         );
       }
     }
@@ -283,8 +290,9 @@ export class HelixTabs extends LitElement {
         .assignedElements()
         .filter((el) => el.tagName.toLowerCase() !== 'hx-tab-panel');
       if (invalid.length > 0) {
-        console.warn(
-          `[hx-tabs] Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+        devWarn(
+          'hx-tabs',
+          `Default slot expects <hx-tab-panel> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
         );
       }
     }

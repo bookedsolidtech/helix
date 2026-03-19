@@ -122,6 +122,10 @@ export class HelixHelpText extends LitElement {
   }
 }
 
+/** Canonical type alias for the hx-help-text component. */
+export type HxHelpText = HelixHelpText;
+
+/** @deprecated Use {@link HxHelpText} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcHelpText = HelixHelpText;
 
 declare global {

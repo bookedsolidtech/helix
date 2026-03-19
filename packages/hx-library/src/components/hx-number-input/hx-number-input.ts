@@ -332,6 +332,11 @@ export class HelixNumberInput extends LitElement {
     this.value = isNaN(parsed) ? null : parsed;
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Value Parsing ───
 
   private _finite(value: number | undefined): number | undefined {

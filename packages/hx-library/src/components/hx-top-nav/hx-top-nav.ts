@@ -92,11 +92,26 @@ export class HelixTopNav extends LitElement {
     );
 
     if (this._mobileOpen) {
-      // Move focus to first interactive element in the default slot
+      // Move focus to first truly interactive element in the default slot (WCAG 2.4.3).
+      // A plain HTMLElement (e.g. <div>) is not keyboard-reachable; we must find a
+      // focusable descendant to avoid trapping focus on a non-interactive node.
       this.updateComplete.then(() => {
+        const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), [tabindex="0"]';
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
         const assigned = slot?.assignedElements({ flatten: true }) ?? [];
-        const firstFocusable = assigned.find((el): el is HTMLElement => el instanceof HTMLElement);
+        let firstFocusable: HTMLElement | null = null;
+        for (const el of assigned) {
+          if (!(el instanceof HTMLElement)) continue;
+          if (el.matches(FOCUSABLE_SELECTOR)) {
+            firstFocusable = el;
+            break;
+          }
+          const found = el.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+          if (found) {
+            firstFocusable = found;
+            break;
+          }
+        }
         firstFocusable?.focus();
       });
     }

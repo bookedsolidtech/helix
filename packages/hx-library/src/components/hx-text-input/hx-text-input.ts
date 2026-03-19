@@ -181,7 +181,7 @@ export class HelixTextInput extends LitElement {
 
   /** @internal */
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Slot Tracking ───
 
@@ -319,6 +319,11 @@ export class HelixTextInput extends LitElement {
   // Called when the form restores state (e.g., back/forward navigation)
   formStateRestoreCallback(state: string): void {
     this.value = state;
+  }
+
+  // Called when a parent fieldset is disabled/enabled
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
   }
 
   // ─── Event Handling ───

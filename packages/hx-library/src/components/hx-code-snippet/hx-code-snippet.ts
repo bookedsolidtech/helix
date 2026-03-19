@@ -62,16 +62,11 @@ export class HelixCodeSnippet extends LitElement {
   wrap: boolean = false;
 
   /**
-   * When true, shows a copy-to-clipboard button.
+   * When true, shows a copy-to-clipboard button. Add the `copyable` attribute to enable it.
    * @attr copyable
-   *
-   * IMPORTANT: This is a standard boolean attribute. Setting `copyable="false"` in HTML
-   * will NOT disable the copy button — the attribute presence alone signals `true`.
-   * To disable programmatically, set `el.copyable = false` via JavaScript.
-   * In Lit/HTML templates, use `?copyable=${false}` (Lit boolean binding) to remove the attribute.
    */
   @property({ type: Boolean, reflect: true })
-  copyable: boolean = true;
+  copyable: boolean = false;
 
   /**
    * Maximum number of lines to display before showing a "Show more" button.
@@ -88,6 +83,34 @@ export class HelixCodeSnippet extends LitElement {
    */
   @property({ type: Boolean, attribute: 'line-numbers', reflect: true })
   lineNumbers: boolean = false;
+
+  /**
+   * Label for the copy button in idle state.
+   * @attr label-copy
+   */
+  @property({ type: String, attribute: 'label-copy' })
+  labelCopy = 'Copy code';
+
+  /**
+   * Label for the copy button after successful copy.
+   * @attr label-copied
+   */
+  @property({ type: String, attribute: 'label-copied' })
+  labelCopied = 'Copied!';
+
+  /**
+   * Label for the expand button when content is collapsed.
+   * @attr label-show-more
+   */
+  @property({ type: String, attribute: 'label-show-more' })
+  labelShowMore = 'Show more';
+
+  /**
+   * Label for the expand button when content is expanded.
+   * @attr label-show-less
+   */
+  @property({ type: String, attribute: 'label-show-less' })
+  labelShowLess = 'Show less';
 
   // ─── Internal State ───
 
@@ -213,10 +236,10 @@ export class HelixCodeSnippet extends LitElement {
                   part="copy-button"
                   class="code-snippet__copy-button"
                   type="button"
-                  aria-label=${this._copied ? 'Copied!' : 'Copy code'}
+                  aria-label=${this._copied ? this.labelCopied : this.labelCopy}
                   @click=${this._handleCopy}
                 >
-                  ${this._copied ? 'Copied!' : 'Copy'}
+                  ${this._copied ? this.labelCopied : this.labelCopy}
                 </button>
               `
             : nothing}
@@ -226,7 +249,7 @@ export class HelixCodeSnippet extends LitElement {
         <span
           aria-live="polite"
           style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;"
-          >${this._copied ? 'Copied!' : ''}</span
+          >${this._copied ? this.labelCopied : ''}</span
         >
 
         <pre
@@ -250,7 +273,7 @@ export class HelixCodeSnippet extends LitElement {
                 aria-expanded=${this._expanded ? 'true' : 'false'}
                 @click=${this._handleExpand}
               >
-                ${this._expanded ? 'Show less' : 'Show more'}
+                ${this._expanded ? this.labelShowLess : this.labelShowMore}
               </button>
             `
           : nothing}

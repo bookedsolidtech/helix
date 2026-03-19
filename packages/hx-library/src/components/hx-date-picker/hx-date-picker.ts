@@ -5,19 +5,20 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
+let _instanceCounter = 0;
+
 /**
- * A date picker component with a calendar popup, keyboard navigation,
- * and full form association for healthcare-grade data entry.
+ * Date picker component for selecting dates with keyboard-accessible calendar popup.
  *
  * @summary Form-associated date picker with calendar popup and WCAG 2.1 AA accessibility.
  *
  * @tag hx-date-picker
  *
  * @slot label - Custom label content (overrides the label property).
- * @slot help - Custom help text content (overrides the helpText property).
+ * @slot help-text - Custom help text content (overrides the helpText property).
  * @slot error - Custom error content (overrides the error property).
  *
- * @fires {CustomEvent<{value: string, date: Date | null}>} hx-change - Dispatched when a date is selected.
+ * @fires {CustomEvent<{value: string, date: Date | null}>} hx-change - Emitted when the selected date changes.
  *
  * @csspart field - The outer field container.
  * @csspart label - The label element.
@@ -47,17 +48,22 @@ import { helixDatePickerStyles } from './hx-date-picker.styles.js';
  * @cssprop [--hx-date-picker-today-color=var(--hx-color-primary-600)] - Today indicator color.
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
-
-let _instanceCounter = 0;
-
 @customElement('hx-date-picker')
 export class HelixDatePicker extends LitElement {
   static override styles = [tokenStyles, helixDatePickerStyles];
 
   // ─── Form Association ───
 
+  /**
+   * Marks this component as form-associated for native form participation.
+   * @internal
+   */
   static formAssociated = true;
 
+  /**
+   * ElementInternals instance for form association.
+   * @internal
+   */
   private _internals: ElementInternals;
 
   constructor() {
@@ -146,35 +152,99 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Internal State ───
 
+  /**
+   * Tracks whether the calendar popup is currently visible.
+   * @internal
+   */
   @state() private _isOpen = false;
+  /**
+   * The year currently displayed in the calendar view.
+   * @internal
+   */
   @state() private _viewYear: number = new Date().getFullYear();
+  /**
+   * The month (0-indexed) currently displayed in the calendar view.
+   * @internal
+   */
   @state() private _viewMonth: number = new Date().getMonth();
+  /**
+   * The day number currently focused within the calendar grid, or null when the calendar is closed.
+   * @internal
+   */
   @state() private _focusedDay: number | null = null;
+  /**
+   * The message announced to screen readers when the calendar month changes.
+   * @internal
+   */
   @state() private _liveMessage = '';
 
   // ─── Internal References ───
 
+  /**
+   * Reference to the readonly text input element displaying the formatted date.
+   * @internal
+   */
   @query('.field__input')
-  private _input!: HTMLInputElement;
+  private _input: HTMLInputElement | undefined;
 
+  /**
+   * Reference to the calendar icon button that opens and closes the popup.
+   * @internal
+   */
   @query('.field__trigger')
-  private _trigger!: HTMLButtonElement;
+  private _trigger: HTMLButtonElement | undefined;
 
+  /**
+   * Reference to the calendar popup dialog element.
+   * @internal
+   */
   @query('.calendar')
-  private _calendar!: HTMLElement;
+  private _calendar: HTMLElement | undefined;
 
   // ─── Unique IDs ───
 
+  /**
+   * Unique base ID for this component instance, used to generate all child element IDs.
+   * @internal
+   */
   private _id = `hx-date-picker-${++_instanceCounter}`;
+  /**
+   * Unique ID for the text input element, used for label association.
+   * @internal
+   */
   private _inputId = `${this._id}-input`;
+  /**
+   * Unique ID for the help text element, used for aria-describedby association.
+   * @internal
+   */
   private _helpTextId = `${this._id}-help`;
+  /**
+   * Unique ID for the error message element, used for aria-describedby association.
+   * @internal
+   */
   private _errorId = `${this._id}-error`;
+  /**
+   * Unique ID for the calendar popup dialog element, used for aria-controls association.
+   * @internal
+   */
   private _calendarId = `${this._id}-calendar`;
+  /**
+   * Unique ID for the ARIA live region element that announces month navigation changes.
+   * @internal
+   */
   private _liveRegionId = `${this._id}-live`;
 
   // ─── Slot Tracking ───
 
+  /**
+   * Whether the label slot has any assigned elements, used to switch between slotted and property-based label rendering.
+   * @internal
+   */
   private _hasLabelSlot = false;
+  /**
+   * Whether the error slot has any assigned elements, used to switch between slotted and property-based error rendering.
+   * @internal
+   */
   private _hasErrorSlot = false;
 
   private _handleLabelSlotChange(e: Event): void {
@@ -197,7 +267,15 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Bound Handler References ───
 
+  /**
+   * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
+   * @internal
+   */
   private _boundHandleOutsideClick: (e: MouseEvent) => void = () => undefined;
+  /**
+   * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
+   * @internal
+   */
   private _boundHandleDocumentKeydown: (e: KeyboardEvent) => void = () => undefined;
 
   // ─── Lifecycle ───
@@ -269,14 +347,17 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Form Integration ───
 
+  /** The form element associated with this component, or null if not in a form. */
   get form(): HTMLFormElement | null {
     return this._internals.form;
   }
 
+  /** The current validation message, or an empty string if the field is valid. */
   get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
+  /** The current validity state of the field. */
   get validity(): ValidityState {
     return this._internals.validity;
   }
@@ -528,6 +609,15 @@ export class HelixDatePicker extends LitElement {
       return;
     }
 
+    // Explicit Escape handler on the calendar container provides a reliable
+    // exit path even when the document-level handler does not fire (e.g. when
+    // the event is stopped by a descendant or the shadow boundary interferes).
+    if (key === 'Escape') {
+      e.stopPropagation();
+      this._closeCalendar();
+      return;
+    }
+
     if (
       key !== 'ArrowLeft' &&
       key !== 'ArrowRight' &&
@@ -663,13 +753,18 @@ export class HelixDatePicker extends LitElement {
     const first = focusableEls[0];
     const last = focusableEls[focusableEls.length - 1];
 
+    // In shadow DOM, document.activeElement returns the host element, not the
+    // focused inner element. Use shadowRoot.activeElement exclusively so the
+    // comparison is accurate and the trap cannot malfunction and strand users.
+    const shadowActive = this.shadowRoot?.activeElement;
+
     if (e.shiftKey) {
-      if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
+      if (shadowActive === first) {
         e.preventDefault();
         last?.focus();
       }
     } else {
-      if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
+      if (shadowActive === last) {
         e.preventDefault();
         first?.focus();
       }
@@ -698,7 +793,7 @@ export class HelixDatePicker extends LitElement {
     for (let rowStart = 0; rowStart < cells.length; rowStart += 7) {
       const rowCells = cells.slice(rowStart, rowStart + 7).map((date) => {
         if (date === null) {
-          return html`<div class="calendar__day-cell" role="gridcell"></div>`;
+          return html`<div class="calendar__day-cell" role="gridcell" aria-hidden="true"></div>`;
         }
 
         const isSelected = selectedDate ? this._isSameDay(date, selectedDate) : false;
@@ -721,17 +816,15 @@ export class HelixDatePicker extends LitElement {
           'calendar__day--disabled': isDisabled,
         };
 
-        return html`<div
-          class="calendar__day-cell"
-          role="gridcell"
-          aria-selected=${isSelected ? 'true' : 'false'}
-        >
+        return html`<div class="calendar__day-cell">
           <button
             part="day"
             class=${classMap(dayClasses)}
             type="button"
+            role="gridcell"
             data-day=${dayNumber}
             aria-label=${ariaLabel}
+            aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${isDisabled ? 'true' : nothing}
             aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
@@ -910,7 +1003,7 @@ export class HelixDatePicker extends LitElement {
         ${this.helpText && !hasError
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help">${this.helpText}</slot>
+                <slot name="help-text">${this.helpText}</slot>
               </div>
             `
           : nothing}

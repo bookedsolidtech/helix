@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSelectStyles } from './hx-select.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxSelectIdCounter = 0;
@@ -74,8 +75,10 @@ export class HelixSelect extends LitElement {
 
   // ─── Form Association ───
 
+  /** Marks this element as form-associated for ElementInternals support. @internal */
   static formAssociated = true;
 
+  /** Holds the ElementInternals instance used for form value and validity management. @internal */
   private _internals: ElementInternals;
 
   constructor() {
@@ -172,17 +175,22 @@ export class HelixSelect extends LitElement {
 
   // ─── Internal State ───
 
+  /** Parsed option models derived from slotted `<option>` and `<optgroup>` elements. @internal */
   @state() private _options: SelectOption[] = [];
+  /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
+  /** Zero-based index of the keyboard-focused option in the listbox; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
 
   // ─── Queries ───
 
+  /** Reference to the hidden native select element used for form participation. @internal */
   @query('.field__select')
-  private _select!: HTMLSelectElement;
+  private _select: HTMLSelectElement | undefined;
 
+  /** Reference to the visible combobox trigger element that receives keyboard focus. @internal */
   @query('.field__trigger')
-  private _trigger!: HTMLElement;
+  private _trigger: HTMLElement | undefined;
 
   // ─── Computed helpers ───
 
@@ -213,8 +221,9 @@ export class HelixSelect extends LitElement {
     if (changedProperties.has('size')) {
       const validSizes: string[] = ['sm', 'md', 'lg'];
       if (!validSizes.includes(this.size)) {
-        console.warn(
-          `[hx-select] Invalid size "${this.size}". Expected one of: ${validSizes.join(', ')}.`,
+        devWarn(
+          'hx-select',
+          `Invalid size "${this.size}". Expected one of: ${validSizes.join(', ')}.`,
         );
       }
     }
@@ -277,6 +286,11 @@ export class HelixSelect extends LitElement {
     if (typeof state === 'string') {
       this.value = state;
     }
+  }
+
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
   }
 
   // ─── Native Select Sync ───

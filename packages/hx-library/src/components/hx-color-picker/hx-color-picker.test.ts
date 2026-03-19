@@ -509,10 +509,12 @@ describe('hx-color-picker', () => {
       expect(label).toContain('#3b82f6');
     });
 
-    it('trigger has aria-haspopup="dialog"', async () => {
+    // A11y fix (WCAG 4.1.2): aria-haspopup="dialog" removed because the panel now uses
+    // role="group" (not role="dialog"). aria-expanded conveys open/closed state instead.
+    it('trigger does not have aria-haspopup (panel is a group, not a dialog)', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
       const trigger = shadowQuery(el, '[part="trigger"]');
-      expect(trigger?.getAttribute('aria-haspopup')).toBe('dialog');
+      expect(trigger?.hasAttribute('aria-haspopup')).toBe(false);
     });
 
     it('trigger aria-expanded is false when closed', async () => {
@@ -539,10 +541,14 @@ describe('hx-color-picker', () => {
       expect(hueSlider?.getAttribute('aria-valuetext')).toMatch(/^\d+°$/);
     });
 
-    it('panel has role="dialog"', async () => {
+    // A11y fix (WCAG 4.1.2): panel changed from role="dialog" aria-modal="true" to role="group"
+    // because there is no programmatic focus trap. aria-modal without a focus trap causes
+    // JAWS/NVDA to hide all out-of-panel content, stranding keyboard users who Tab out.
+    it('panel has role="group" (not dialog — no focus trap present)', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
       const panel = shadowQuery(el, '.panel');
-      expect(panel?.getAttribute('role')).toBe('dialog');
+      expect(panel?.getAttribute('role')).toBe('group');
+      expect(panel?.hasAttribute('aria-modal')).toBe(false);
     });
 
     // P0-1: gradient grid must be keyboard operable

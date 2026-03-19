@@ -140,7 +140,7 @@ export class HelixCheckbox extends LitElement {
   size: 'sm' | 'md' | 'lg' = 'md';
 
   @query('.checkbox__input')
-  private _inputEl!: HTMLInputElement;
+  private _inputEl: HTMLInputElement | undefined;
 
   @state() private _hasErrorSlot = false;
 
@@ -371,7 +371,10 @@ export class HelixCheckbox extends LitElement {
   }
 }
 
-/** @deprecated Use HelixCheckbox instead. */
+/** Canonical type alias for the hx-checkbox component. */
+export type HxCheckbox = HelixCheckbox;
+
+/** @deprecated Use {@link HxCheckbox} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcCheckbox = HelixCheckbox;
 
 declare global {

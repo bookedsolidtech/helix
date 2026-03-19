@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A menu container that manages keyboard navigation over a list of menu items.
@@ -37,10 +38,22 @@ export class HelixMenu extends LitElement {
   @property({ type: String, reflect: true })
   label = '';
 
+  /**
+   * Index of the currently focused menu item within the list of enabled items.
+   * @internal
+   */
   private _focusedIndex = -1;
 
+  /**
+   * Accumulated character buffer for typeahead search within menu items.
+   * @internal
+   */
   private _typeaheadBuffer = '';
 
+  /**
+   * Timer handle that clears the typeahead buffer after a period of inactivity.
+   * @internal
+   */
   private _typeaheadTimeout: ReturnType<typeof setTimeout> | undefined;
 
   private _getItems(): HelixMenuItem[] {
@@ -160,8 +173,9 @@ export class HelixMenu extends LitElement {
       .assignedElements()
       .filter((el) => !validTags.has(el.tagName.toLowerCase()));
     if (invalid.length > 0) {
-      console.warn(
-        `[hx-menu] Default slot expects <hx-menu-item> or <hx-menu-divider> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
+      devWarn(
+        'hx-menu',
+        `Default slot expects <hx-menu-item> or <hx-menu-divider> elements. Found unexpected: ${invalid.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}`,
       );
     }
     // Initialize roving tabindex when items are slotted

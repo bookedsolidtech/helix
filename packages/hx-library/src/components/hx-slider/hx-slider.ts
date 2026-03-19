@@ -308,6 +308,11 @@ export class HelixSlider extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Public Methods ───
 
   /** Moves focus to the native range input. */
