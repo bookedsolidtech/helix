@@ -110,7 +110,7 @@ export class HelixAlert extends LitElement {
 
   /** Returns true when the variant requires assertive announcement. */
   private get _isAssertive(): boolean {
-    return this.variant === 'error' || this.variant === 'warning';
+    return this.variant === 'error';
   }
 
   /**
