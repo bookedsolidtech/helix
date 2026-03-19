@@ -76,8 +76,11 @@ export const helixCarouselStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-size-8, 2rem);
-    height: var(--hx-size-8, 2rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    width: var(--hx-touch-target-min, 2.75rem);
+    height: var(--hx-touch-target-min, 2.75rem);
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
@@ -135,6 +138,11 @@ export const helixCarouselStyles = css`
 
   .pagination-item {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
     border: none;
     cursor: pointer;

@@ -199,8 +199,11 @@ export const helixDatePickerStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-size-8, 2rem);
-    height: var(--hx-size-8, 2rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    width: var(--hx-touch-target-min, 2.75rem);
+    height: var(--hx-touch-target-min, 2.75rem);
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
@@ -270,8 +273,11 @@ export const helixDatePickerStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-size-8, 2rem);
-    height: var(--hx-size-8, 2rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    width: var(--hx-touch-target-min, 2.75rem);
+    height: var(--hx-touch-target-min, 2.75rem);
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;

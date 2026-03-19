@@ -62,8 +62,9 @@ export const helixDataTableStyles = css`
 
   th.col-checkbox,
   td.col-checkbox {
-    width: 40px;
-    min-width: 40px;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    width: var(--hx-touch-target-min-px, 44px);
+    min-width: var(--hx-touch-target-min-px, 44px);
     padding-right: var(--hx-space-2, 0.5rem);
   }
 
@@ -140,6 +141,9 @@ export const helixDataTableStyles = css`
   input[type='checkbox'] {
     width: var(--hx-size-4, 1rem);
     height: var(--hx-size-4, 1rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     cursor: pointer;
     accent-color: var(--hx-color-primary-500, #2563eb);
   }
