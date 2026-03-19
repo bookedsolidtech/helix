@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -149,7 +149,7 @@ export class HelixDataTable extends LitElement {
 
   // ─── Lifecycle ───
 
-  override willUpdate(changed: Map<string, unknown>): void {
+  override willUpdate(changed: PropertyValues<this>): void {
     // Coerce JSON strings to arrays — this is the Drupal/Twig integration path.
     // Lit does not JSON-parse array attributes automatically, so we do it here.
     // Note: Lit's defaultConverter returns null (not a string) when JSON.parse fails for

@@ -186,6 +186,7 @@ export class HelixMenu extends LitElement {
   }
 
   private _handleItemSelect(e: Event): void {
+    if (!(e instanceof CustomEvent)) return;
     const detail = (e as CustomEvent<{ item: HelixMenuItem; value: string }>).detail;
     const items = this._getItems();
     this._focusedIndex = items.indexOf(detail.item);

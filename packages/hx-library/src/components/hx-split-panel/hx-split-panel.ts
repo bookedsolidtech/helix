@@ -297,7 +297,7 @@ export class HelixSplitPanel extends LitElement {
     this.collapsed = null;
   };
 
-  protected override willUpdate(changedProperties: PropertyValues): void {
+  protected override willUpdate(changedProperties: PropertyValues<this>): void {
     super.willUpdate(changedProperties);
     if (!changedProperties.has('collapsed')) return;
 

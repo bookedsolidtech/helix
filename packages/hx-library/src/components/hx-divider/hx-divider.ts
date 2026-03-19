@@ -73,7 +73,7 @@ export class HelixDivider extends LitElement {
     this._checkSlot(e.target as HTMLSlotElement);
   };
 
-  override firstUpdated(_changedProperties: PropertyValues): void {
+  override firstUpdated(_changedProperties: PropertyValues<this>): void {
     super.firstUpdated(_changedProperties);
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (slot) this._checkSlot(slot);

@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -463,7 +463,7 @@ export class HelixColorPicker extends LitElement {
     document.removeEventListener('pointerup', this._boundPointerUp);
   }
 
-  override willUpdate(changedProperties: Map<string, unknown>): void {
+  override willUpdate(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('value')) {
       this._syncFromValue();
     }

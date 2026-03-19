@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
@@ -198,7 +198,7 @@ export class HelixDialog extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
     if (changedProperties.has('open')) {

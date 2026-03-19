@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -161,7 +161,7 @@ export class HelixPopover extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('open')) {
       if (this.open) {
         void this._show();
@@ -215,9 +215,8 @@ export class HelixPopover extends LitElement {
   }
 
   /** Trap Tab/Shift+Tab focus within the popover body when it contains interactive elements. */
-  private _handleFocusTrap = (e: Event): void => {
-    const ke = e as KeyboardEvent;
-    if (ke.key !== 'Tab' || !this._visible) return;
+  private _handleFocusTrap = (e: KeyboardEvent): void => {
+    if (e.key !== 'Tab' || !this._visible) return;
 
     const focusable = this._getFocusableElements();
     // If no interactive children, keep focus on the body itself — no cycling needed.
@@ -230,14 +229,14 @@ export class HelixPopover extends LitElement {
     const first = allFocusable[0] as HTMLElement;
     const last = allFocusable[allFocusable.length - 1] as HTMLElement;
 
-    if (ke.shiftKey) {
+    if (e.shiftKey) {
       if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
-        ke.preventDefault();
+        e.preventDefault();
         last.focus();
       }
     } else {
       if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
-        ke.preventDefault();
+        e.preventDefault();
         first.focus();
       }
     }
@@ -376,8 +375,8 @@ export class HelixPopover extends LitElement {
    * Closes the popover when the Escape key is pressed while it is open.
    * @internal
    */
-  private _handleDocumentKeydown = (e: Event): void => {
-    if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
+  private _handleDocumentKeydown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this._visible) {
       // HIGH-03: Escape always restores focus to the prior element
       void this._hide(true);
     }
