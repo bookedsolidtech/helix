@@ -44,7 +44,8 @@ export const helixTreeItemStyles = css`
   }
 
   .item-row:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-tree-item-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, -2px);
   }
 
@@ -99,6 +100,12 @@ export const helixTreeItemStyles = css`
       --hx-tree-item-expand-hover-bg,
       var(--hx-overlay-black-6, rgba(0, 0, 0, 0.06))
     );
+  }
+
+  .expand-btn:focus-visible {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-tree-item-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .expand-btn svg {

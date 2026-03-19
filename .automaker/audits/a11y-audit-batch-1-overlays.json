@@ -1,0 +1,316 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "sonnet",
+  "summary": {
+    "componentsAudited": 9,
+    "totalFindings": 28,
+    "critical": 4,
+    "high": 9,
+    "medium": 10,
+    "low": 5
+  },
+  "findings": [
+    {
+      "component": "hx-popover",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Popover body uses role=\"region\" but aria-controls omitted from anchor",
+      "description": "The anchor element receives aria-expanded but aria-controls is deliberately omitted (comment on line 163 states it was skipped to avoid axe-core cross-root IDREF violations). Without aria-controls, screen readers cannot programmatically associate the trigger with the panel it controls, degrading discoverability for JAWS and NVDA users who rely on this relationship for navigation.",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.ts",
+      "line": 162,
+      "fix": "Use ElementInternals or a light-DOM proxy element as the aria-controls target, or document the popover ID on the host element so consumers can wire aria-controls from outside shadow DOM. Alternatively, expose the popover body via a CSS part so consumers can read its ID."
+    },
+    {
+      "component": "hx-popover",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-hidden set to string 'false' rather than omitted when visible",
+      "description": "Line 359 renders aria-hidden=\"false\" on the body element when the popover is visible. The value 'false' is equivalent to omitting the attribute — aria-hidden should be completely absent when content is meant to be accessible, not set to 'false'. Some screen reader and browser combinations do not reliably treat aria-hidden=\"false\" identically to no attribute, which can cause content to be double-announced or ignored.",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.ts",
+      "line": 359,
+      "fix": "Change the aria-hidden binding to use Lit's `nothing` sentinel when visible: `aria-hidden=${!this._visible ? 'true' : nothing}`. This ensures the attribute is omitted entirely when the popover is open."
+    },
+    {
+      "component": "hx-popover",
+      "severity": "medium",
+      "wcagCriteria": "2.1.1",
+      "title": "Hover-triggered popover has no keyboard equivalent for hover mode",
+      "description": "When trigger='hover', the popover opens on mouseenter and closes on mouseleave. A keyboard user can never open the popover unless they happen to move focus into the anchor (which only works if the trigger element itself is focusable). The focus trigger mode is separate — a user of the default hover mode with a non-interactive anchor element (e.g. a span) has no keyboard path. WCAG 2.1 SC 1.4.13 (Content on Hover or Focus) also requires that the content triggered by hover be dismissable, persistent, and hoverable.",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.ts",
+      "line": 313,
+      "fix": "Ensure that when trigger='hover', the popover also responds to focus events on the anchor element (focusin/focusout). The component already has _handleAnchorFocusIn/_handleAnchorFocusOut handlers but they are gated to trigger==='focus' only. Allow hover mode to also open on focus."
+    },
+    {
+      "component": "hx-popover",
+      "severity": "low",
+      "wcagCriteria": "1.4.13",
+      "title": "Popover body tabindex=\"-1\" but focus moves into it without delegatesFocus",
+      "description": "The body div is given tabindex=\"-1\" and focus is moved to it programmatically on open (line 187). This is functional but the component does not use delegatesFocus: true on the shadow root, meaning Tab from inside the popover body may escape to the host element rather than cycling logically. The inert attribute is correctly used when hidden, which is good.",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.ts",
+      "line": 187,
+      "fix": "Add `static shadowRootOptions = { ...LitElement.shadowRootOptions, delegatesFocus: true }` to the class, or implement a focus trap on the popover body that intercepts Tab/Shift+Tab and cycles within the popover content."
+    },
+    {
+      "component": "hx-dialog",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Dialog heading not rendered when heading property is empty — no fallback accessible name",
+      "description": "When neither a heading prop nor an aria-label is provided, the native <dialog> element receives no aria-labelledby or aria-label (lines 536-537). An unlabelled dialog is announced as 'dialog' with no context by screen readers, violating the requirement that dialogs have an accessible name. In clinical settings where multiple dialogs might be open or previously visited, this makes context identification impossible.",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.ts",
+      "line": 536,
+      "fix": "Require at minimum one labelling strategy. Add a dev-time warning when neither heading, aria-label, nor a slotted header element with an id is present. Consider a fallback aria-label of 'Dialog' to prevent the completely unlabelled state, documenting that consumers should always provide a meaningful label."
+    },
+    {
+      "component": "hx-dialog",
+      "severity": "medium",
+      "wcagCriteria": "2.4.3",
+      "title": "Focus trap only covers slotted light DOM — shadow DOM close button may be excluded",
+      "description": "The _getFocusableElements method (line 364) deliberately collects only slotted light DOM elements and excludes shadow DOM elements, relying on the native <dialog> tab order for the close button. The comment on line 361 explains this is intentional to avoid document.activeElement resolving to the host. However, this means the close button (a shadow DOM element) participates in a different focus cycle than the trap logic. When all slotted focusable elements are exhausted, Shift+Tab from the first slotted element wraps to the last slotted element, potentially bypassing the close button in the tab order for keyboard users.",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.ts",
+      "line": 364,
+      "fix": "Include shadow DOM focusable elements (specifically the close button) in _getFocusableElements and use shadowRoot.activeElement in _trapFocus to compare against shadow DOM elements. The close button should be part of the managed focus order, either first or last in the cycle."
+    },
+    {
+      "component": "hx-dialog",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "role attribute on <dialog> element is unnecessary and may conflict",
+      "description": "Line 535 conditionally sets role={this.variant} on the <dialog> element. The native <dialog> element already has an implicit ARIA role of 'dialog'. Explicitly setting role=\"dialog\" is redundant. When variant is 'alertdialog', the explicit role override is intentional and correct. However, when variant is 'dialog', the code uses `nothing` correctly. The concern is that consumers or future variants could inadvertently set conflicting roles on a native element that already carries semantic meaning.",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.ts",
+      "line": 535,
+      "fix": "This pattern is acceptable for alertdialog but document clearly that the native <dialog> implicit role is 'dialog' and only alertdialog requires an explicit override. Consider a TypeScript type guard or dev warning if an unsupported variant value is supplied."
+    },
+    {
+      "component": "hx-drawer",
+      "severity": "critical",
+      "wcagCriteria": "1.3.1",
+      "title": "Dialog role placed on overlay div, not on the panel — panel has role=\"document\" which is incorrect",
+      "description": "The ARIA dialog role is applied to the outer .drawer-overlay div (line 580), not to the visual panel. The panel itself receives role=\"document\" (line 588). The role=\"document\" on the panel is semantically incorrect — document is for embedding document content within an application and is not appropriate for a panel inside a modal dialog. Screen readers will announce the outer overlay as the dialog boundary, meaning content before the panel (e.g., the backdrop) is inside the announced dialog region, and the panel's role=\"document\" will confuse users. JAWS in particular treats role=\"document\" as a cue to switch reading modes.",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.ts",
+      "line": 580,
+      "fix": "Move role=\"dialog\" aria-modal=\"true\" aria-labelledby/aria-label to the .drawer-panel div, not the overlay. Remove role=\"document\" from the panel. The backdrop div with aria-hidden=\"true\" is correct. The overlay itself should not carry a dialog role — it is a layout container."
+    },
+    {
+      "component": "hx-drawer",
+      "severity": "high",
+      "wcagCriteria": "2.4.3",
+      "title": "Focus restoration is delayed by animation timeout — focus may be lost if drawer reopens quickly",
+      "description": "In _closeDrawer() (line 328), focus restoration to the trigger element is deferred inside a setTimeout with a 300ms animation duration. If the drawer is closed and immediately reopened (or if another drawer opens), the timeout fires after the new state is established, potentially restoring focus to the wrong element or to a trigger that has been removed from the DOM.",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.ts",
+      "line": 328,
+      "fix": "Store the trigger element reference before clearing it, and check that the element is still in the DOM and focus-capable before calling focus(). Consider using the animationend/transitionend event instead of a fixed timeout to restore focus precisely when the animation completes."
+    },
+    {
+      "component": "hx-drawer",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-labelledby references an ID inside shadow DOM — cross-shadow IDREF is broken",
+      "description": "When the label slot is populated, aria-labelledby is set to this._titleId (line 582), which references a <p> element with id=_titleId inside the shadow DOM. The role=\"dialog\" is on the overlay div which is also in shadow DOM, so the reference is within the same root and resolves correctly in this case. However, the label slot renders user content inside a <p> tag with the ID — if the slot content changes after initial render without triggering _handleLabelSlotChange, the labelledby target may become stale.",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.ts",
+      "line": 582,
+      "fix": "This is architecturally acceptable since both the dialog role element and the title element are in the same shadow root. However, ensure slotchange events reliably reflect the current state. Additionally, expose the title ID via a CSS part or custom attribute so consumers can also reference it externally if needed."
+    },
+    {
+      "component": "hx-dropdown",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "Panel div has no ARIA role — content type not communicated to screen readers",
+      "description": "The floating panel div (line 312) receives no role attribute. It contains slotted menu items, but the container itself does not declare role=\"menu\" or role=\"listbox\". Without a container role, screen readers cannot establish the context for the contained items. Users of NVDA and JAWS will not understand they have entered a menu or list structure when the panel opens, even if individual items have role=\"menuitem\".",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.ts",
+      "line": 312,
+      "fix": "Add role=\"menu\" to the panel div when the dropdown is used as a menu (the common case, given aria-haspopup=\"menu\" on the trigger). This must match the aria-haspopup value. Alternatively, document that consumers must provide a container element with the correct role in the slot, and add a dev warning when no role is detected on the first assigned element."
+    },
+    {
+      "component": "hx-dropdown",
+      "severity": "high",
+      "wcagCriteria": "2.1.1",
+      "title": "Panel is visually hidden via opacity/visibility but not inert — keyboard accessible when closed",
+      "description": "When closed, the panel uses CSS visibility:hidden and opacity:0 (hx-dropdown.styles.ts lines 29-31) and pointer-events:none, but no inert attribute is set. aria-hidden is set to 'true' on the panel (line 314), which removes it from the AT tree, but the actual DOM elements remain focusable via Tab navigation because visibility:hidden without inert does not prevent programmatic focus in all browsers. A keyboard user may be able to Tab into the hidden panel contents.",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.ts",
+      "line": 314,
+      "fix": "Add `?inert=${!this._panelVisible}` to the panel div alongside the existing aria-hidden binding. The inert attribute prevents all interaction (focus, click, AT) with the subtree, which is the correct mechanism for completely hiding content."
+    },
+    {
+      "component": "hx-dropdown",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-expanded not updated on the trigger after close via Tab key",
+      "description": "When the dropdown is closed via Tab (line 207, _hide(false)), the open property is set to false and hx-hide is dispatched. The updated() lifecycle updates aria-expanded on the trigger element. However, there is a race: the Tab key closes the dropdown but the browser's default Tab behavior simultaneously moves focus, potentially before the updated() cycle has run and updated aria-expanded. The trigger may briefly show aria-expanded='true' while focus moves away.",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.ts",
+      "line": 206,
+      "fix": "In _handleKeydown, when handling Tab, synchronously update aria-expanded on the trigger element before calling _hide(false), rather than relying on the async updated() lifecycle callback."
+    },
+    {
+      "component": "hx-tooltip",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Tooltip role element is in shadow DOM but its ID is also used in light DOM description — dual ID conflict",
+      "description": "The component creates a light-DOM span with id=this._tooltipId (lines 138, 141) for aria-describedby support, correctly solving the shadow DOM cross-boundary IDREF problem. However, the shadow DOM tooltip div also receives id=this._tooltipId (line 271 of render). This means the same ID exists in two different DOM trees. While IDs in shadow DOM do not conflict with light DOM IDs per the spec, the light DOM description span and the shadow DOM tooltip element share the same string ID, which could cause confusion for AT that traverses composed trees, and will fail any external accessibility audits that scan the composed document.",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts",
+      "line": 271,
+      "fix": "Give the shadow DOM tooltip div a distinct ID (e.g., `${this._tooltipId}-shadow`) or no ID at all, since it does not need to be referenced by IDREF — only the light DOM span used for aria-describedby needs the ID."
+    },
+    {
+      "component": "hx-tooltip",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-hidden set to string 'false' rather than omitted when visible",
+      "description": "Line 272 renders `aria-hidden=${String(!this._visible)}` which produces aria-hidden=\"false\" when the tooltip is visible. Like the popover finding, aria-hidden=\"false\" is semantically equivalent to omitting the attribute, but some ATs treat it differently. The tooltip also has role=\"tooltip\" which means it should be programmatically discoverable through aria-describedby; the aria-hidden should be omitted when visible to ensure this.",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts",
+      "line": 272,
+      "fix": "Change to: `aria-hidden=${!this._visible ? 'true' : nothing}` using Lit's `nothing` import to omit the attribute entirely when visible."
+    },
+    {
+      "component": "hx-tooltip",
+      "severity": "medium",
+      "wcagCriteria": "1.4.13",
+      "title": "Light DOM description span not updated when slot content changes dynamically",
+      "description": "The _lightDomDescription content is set from the content slot in _setupTriggerAria() called from firstUpdated() and slotchange events (lines 111-113, 266-277 in render). If the content slot's text content changes after the initial slotchange (e.g., via innerHTML mutation rather than slot reassignment), the light DOM description will become stale and screen readers will announce old tooltip content.",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts",
+      "line": 111,
+      "fix": "Consider using a MutationObserver on the content slot's assigned elements, or re-call _setupTriggerAria() in updated() when relevant properties change. Alternatively, document that dynamic content updates must be done by reassigning slot content rather than mutating existing slot elements."
+    },
+    {
+      "component": "hx-combobox",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-controls references listbox ID but listbox is in shadow DOM — IDREF crosses shadow boundary for ARIA 1.1 consumers",
+      "description": "The input element sets aria-controls=${this._listboxId} (line 739) to reference the listbox div, but both elements are in the same shadow root so this is technically correct within the shadow root scope. However, AT implementations that do not support shadow-scoped IDREF (older JAWS, NVDA with older Firefox) will fail to resolve this reference and the combobox-to-listbox association will be broken, meaning users cannot navigate from the input to the listbox programmatically.",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "line": 739,
+      "fix": "This is a known shadow DOM ARIA limitation. Document the AT compatibility matrix. For maximum compatibility, consider exposing the listbox via a CSS part and documenting that external aria-controls wiring may be needed for legacy AT support. Track browser/AT support improvements."
+    },
+    {
+      "component": "hx-combobox",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Listbox aria-label duplicates the visible label — creates redundant announcement",
+      "description": "The listbox div at line 807 receives `aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}`. This means the listbox is labelled identically to the combobox input. When a user navigates into the listbox (via AT virtual cursor), the AT will announce 'listbox [same label as the input]', which is redundant and verbose. The listbox does not need an independent aria-label since it is associated with the input via aria-controls.",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "line": 807,
+      "fix": "Remove aria-label from the listbox, or provide a more descriptive label like 'Options for [combobox label]'. The APG Combobox pattern does not require the listbox to have its own accessible name when it is associated with the input via aria-controls."
+    },
+    {
+      "component": "hx-combobox",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Live region for filter announcements is visually hidden but always present — announces empty string on mount",
+      "description": "The filter results live region (line 836) is always rendered and initially contains an empty _filterAnnouncement string. Some screen readers (particularly NVDA with Firefox) will announce empty live regions or their initial state on page load. The `aria-atomic=\"true\"` attribute means any change triggers a full re-announcement, which is correct for filter results.",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "line": 836,
+      "fix": "Initialize _filterAnnouncement to an empty string (already done) but ensure the live region content is only populated after the first user interaction. This is already the behavior since _announceFilterResults is only called from _handleInput, so this is a low-risk issue. No immediate code change required but confirm with screen reader testing."
+    },
+    {
+      "component": "hx-combobox",
+      "severity": "low",
+      "wcagCriteria": "2.5.3",
+      "title": "Clear button aria-label is generic 'Clear' with no reference to the field it clears",
+      "description": "The clear button at line 772 has aria-label=\"Clear\". Without context, a screen reader user who navigates to this button in isolation (e.g., via JAWS forms mode or VoiceOver rotor) cannot determine which field it clears. In a form with multiple comboboxes, multiple 'Clear' buttons become indistinguishable.",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "line": 772,
+      "fix": "Change the aria-label to reference the field: `aria-label=\"Clear ${this.label || this.ariaLabel || 'selection'}\"`."
+    },
+    {
+      "component": "hx-select",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Native hidden select element receives aria-hidden=\"true\" but also receives aria-label, aria-invalid, aria-describedby, aria-required",
+      "description": "The hidden native select (lines 661-678) is correctly hidden from AT via aria-hidden=\"true\", but it also receives aria-label, aria-invalid, aria-describedby, and aria-required attributes (lines 669-672). ARIA attributes on an aria-hidden element are ignored by AT. These attributes are redundant and create a maintenance burden — any ARIA state change must be kept in sync on both the custom trigger and the hidden select, when only the trigger needs these attributes.",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.ts",
+      "line": 661,
+      "fix": "Remove aria-label, aria-invalid, aria-describedby, aria-required, and aria-labelledby from the hidden native select element since it is aria-hidden. Keep only the functional attributes required for form participation: name, required (native), disabled (native), tabindex=\"-1\"."
+    },
+    {
+      "component": "hx-select",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Listbox aria-label duplicates the visible label — redundant announcement",
+      "description": "Same pattern as hx-combobox: the listbox div at line 654 receives `aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}`, creating a redundant accessible name identical to the trigger's labelling. This causes verbose announcements when AT users navigate to the listbox.",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.ts",
+      "line": 654,
+      "fix": "Remove the aria-label from the listbox or provide a distinct supplementary label. The ARIA combobox pattern does not require a separate accessible name on the listbox when properly associated via aria-controls."
+    },
+    {
+      "component": "hx-date-picker",
+      "severity": "critical",
+      "wcagCriteria": "2.1.1",
+      "title": "Calendar input (readonly text field) responds to click to open calendar but not to keyboard activation",
+      "description": "The readonly text input at line 902 has @click=${this._openCalendar} but no @keydown handler. A keyboard user focused on the input cannot open the calendar — Enter and Space have no effect. The separate trigger button handles keyboard activation, but if a user's focus lands on the input (which is the primary labelled form element), they are stuck. The input also has aria-haspopup=\"dialog\" (line 901) which promises keyboard openability.",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.ts",
+      "line": 902,
+      "fix": "Add a @keydown handler on the input that opens the calendar when Enter or Space is pressed: `@keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._openCalendar(); } }}`."
+    },
+    {
+      "component": "hx-date-picker",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Calendar day buttons use role=\"gridcell\" but are rendered as <button> elements — role conflict",
+      "description": "Day buttons (lines 821-836) are native <button> elements that also declare role=\"gridcell\". The role attribute overrides the implicit button role, meaning screen readers will announce these as gridcells, not buttons. Users who rely on button navigation (e.g., VoiceOver B key, JAWS button list) will not find the day buttons. The gridcell role is appropriate for the containing div wrapper, not the button itself.",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.ts",
+      "line": 821,
+      "fix": "Move role=\"gridcell\" from the <button> to the wrapping .calendar__day-cell div. The <button> element should retain its implicit button role. This matches the ARIA Grid pattern where gridcells contain interactive elements (buttons) rather than being interactive themselves."
+    },
+    {
+      "component": "hx-date-picker",
+      "severity": "medium",
+      "wcagCriteria": "2.4.7",
+      "title": "Calendar trigger button lacks visible focus ring via focus-visible",
+      "description": "The .field__trigger button in hx-date-picker.styles.ts uses :focus-visible (line 133) with only color and background-color changes, not a clear outline or box-shadow ring. The style changes color to the focus ring color and adds a slight background tint, but this color-only change may not meet the 3:1 contrast ratio required for non-text focus indicators (WCAG 2.4.11, which is AA in WCAG 2.2). The navigation buttons inside the calendar (.calendar__nav-btn) correctly use box-shadow for focus-visible.",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": 133,
+      "fix": "Add `outline: 2px solid var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, #2563eb)); outline-offset: 2px;` to .field__trigger:focus-visible to match the focus ring pattern used elsewhere in the component and library."
+    },
+    {
+      "component": "hx-date-picker",
+      "severity": "low",
+      "wcagCriteria": "1.3.1",
+      "title": "Weekday column headers use role=\"columnheader\" inside a div-based grid — missing grid context",
+      "description": "The weekday headers use role=\"columnheader\" and are placed in a div with role=\"row\" (lines 780-784). The parent grid div has role=\"grid\" (line 984). This is the correct ARIA grid pattern. However, the aria-label on the weekday headers uses the full day name (e.g. 'Monday') while displaying only the 2-character abbreviation. This is good for screen readers but the abbreviation rendering approach (slice(0, 2)) may produce incorrect results for locales where weekday names don't abbreviate predictably to 2 characters.",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.ts",
+      "line": 780,
+      "fix": "Use Intl.DateTimeFormat with weekday: 'narrow' for the displayed text and weekday: 'long' for the aria-label, rather than slicing the short name. This produces locale-appropriate single characters for display while maintaining full accessible names."
+    },
+    {
+      "component": "hx-time-picker",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "Toggle button has tabindex=\"-1\" — removed from keyboard tab order entirely",
+      "description": "The clock icon toggle button at line 693 has tabindex=\"-1\". While the comment on line 658 explains the combobox pattern has role=\"combobox\" on the input, the toggle button is a separate interactive element that performs a distinct action (opening/closing the listbox). Removing it from the tab order means keyboard users cannot directly activate the toggle — they must use the input's keyboard handlers instead. This is acceptable per APG combobox pattern only if the input fully controls the listbox and the toggle provides no additional functionality. However, the toggle closes the listbox when it is already open (line 498-500), which the input's Escape key also does. If a user's focus is not on the input, they cannot close via the toggle.",
+      "file": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "line": 693,
+      "fix": "If the toggle button's functionality is fully duplicated by the input's keyboard handling (Escape closes, Enter/ArrowDown opens), tabindex=\"-1\" is acceptable per ARIA combobox pattern (only the input needs to be in the tab stop). Verify this is the case and document it explicitly. If the toggle provides any unique interaction not available from the input, it must be keyboard accessible."
+    },
+    {
+      "component": "hx-time-picker",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-controls on combobox input is conditionally bound — omitted when listbox is closed",
+      "description": "Line 677 binds aria-controls only when the listbox is open: `aria-controls=${ifDefined(this._open ? this._listboxId : undefined)}`. The ARIA 1.1 combobox pattern requires aria-controls to always reference the listbox (owned element), even when it is collapsed. Removing aria-controls when closed means AT users cannot identify the associated listbox or navigate to it using AT-specific commands (e.g., JAWS Ctrl+Alt+Down).",
+      "file": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "line": 677,
+      "fix": "Change to `aria-controls=${this._listboxId}` (always set, unconditionally). The listbox element may not be in the DOM when closed (it is conditionally rendered via `this._open ? html... : nothing` on line 722), so also consider keeping the listbox in the DOM but using ?hidden or inert to hide it, so the aria-controls reference always resolves."
+    },
+    {
+      "component": "hx-time-picker",
+      "severity": "low",
+      "wcagCriteria": "2.5.3",
+      "title": "Help text container always rendered with id — id present in DOM even when help slot is empty",
+      "description": "The help text container div (line 774) is always rendered with id=${this._helpId} regardless of whether the help-text slot has content. This creates an element with an ID in the DOM that aria-describedby on the input references only conditionally (line 638 checks _hasHelpSlot). If _hasHelpSlot is false, the ID is not included in describedBy, so AT will not reference the empty div. However, the empty div itself is always present and visible (it lacks a ?hidden binding), potentially creating whitespace in the visual layout.",
+      "file": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "line": 774,
+      "fix": "Add `?hidden=${!this._hasHelpSlot}` to the help text container div to prevent it from taking up layout space when empty, consistent with how the error slot and other conditional content is handled."
+    },
+    {
+      "component": "hx-time-picker",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Listbox label falls back to hardcoded English string 'Time options'",
+      "description": "The listbox at line 729 uses `aria-label=${this.label || 'Time options'}`. The fallback 'Time options' is an English-only string that is not internationalizable. In healthcare deployments serving multilingual patient populations or staff, this hardcoded English string will be announced in English regardless of the user's language.",
+      "file": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "line": 729,
+      "fix": "Add an `i18n-label-listbox` or `label-listbox` property (similar to how hx-combobox exposes `label-no-options` and `label-required`) that defaults to 'Time options' but allows consumers to provide localized text."
+    }
+  ]
+}
