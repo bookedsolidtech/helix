@@ -95,7 +95,7 @@ export class HelixTopNav extends LitElement {
       // Move focus to first truly interactive element in the default slot (WCAG 2.4.3).
       // A plain HTMLElement (e.g. <div>) is not keyboard-reachable; we must find a
       // focusable descendant to avoid trapping focus on a non-interactive node.
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), [tabindex="0"]';
         const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
         const assigned = slot?.assignedElements({ flatten: true }) ?? [];
