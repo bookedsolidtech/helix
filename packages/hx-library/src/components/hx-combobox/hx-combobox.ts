@@ -1,4 +1,4 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -259,7 +259,8 @@ export class HelixCombobox extends LitElement {
     }
   }
 
-  override updated(changedProperties: PropertyValues<this>): void {
+  override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._updateFormValue();
       this._updateValidity();
