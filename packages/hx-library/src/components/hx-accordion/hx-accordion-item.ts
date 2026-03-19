@@ -34,8 +34,9 @@ const chevronIcon = svg`
  * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-expand - Dispatched when the item is expanded.
  * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-collapse - Dispatched when the item is collapsed.
  *
- * @csspart item - The outer details element container.
- * @csspart trigger - The summary/trigger element.
+ * @csspart item - The outer container wrapping the heading and panel.
+ * @csspart heading - The heading element wrapping the trigger button.
+ * @csspart trigger - The button trigger element.
  * @csspart content - The collapsible content area.
  * @csspart icon - The expand/collapse icon.
  *
@@ -50,6 +51,12 @@ const chevronIcon = svg`
  */
 @customElement('hx-accordion-item')
 export class HelixAccordionItem extends LitElement {
+  // Delegate focus so that focusing hx-accordion-item routes into the inner button.
+  static override shadowRootOptions = {
+    ...LitElement.shadowRootOptions,
+    delegatesFocus: true,
+  };
+
   static override styles = [tokenStyles, helixAccordionItemStyles];
 
   private static _counter = 0;
@@ -68,6 +75,14 @@ export class HelixAccordionItem extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
+
+  /**
+   * Heading level for the trigger (1–6). Controls the `<h*>` element wrapping
+   * the button, which is required by the ARIA APG Accordion pattern.
+   * @attr heading-level
+   */
+  @property({ type: Number, attribute: 'heading-level' })
+  headingLevel: 1 | 2 | 3 | 4 | 5 | 6 = 3;
 
   // ─── Toggle Logic ───
 
@@ -93,19 +108,41 @@ export class HelixAccordionItem extends LitElement {
 
   // ─── Event Handlers ───
 
-  private _handleSummaryClick(e: MouseEvent): void {
-    e.preventDefault();
+  private _handleButtonClick(): void {
     this._toggle();
   }
 
   private _handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === 'Enter' || e.key === ' ') {
+    // Enter and Space are native button activations and fire click automatically.
+    // Intercept only to prevent default scroll on Space, then delegate to toggle.
+    if (e.key === ' ') {
       e.preventDefault();
       this._toggle();
     }
+    // Arrow / Home / End keys bubble up to hx-accordion for inter-item navigation.
   }
 
   // ─── Render ───
+
+  private _renderHeading(content: unknown) {
+    // Dynamic heading level per ARIA APG — heading level must be configurable
+    // so consumers can place the accordion in the correct document outline.
+    const level = Math.max(1, Math.min(6, this.headingLevel)) as 1 | 2 | 3 | 4 | 5 | 6;
+    switch (level) {
+      case 1:
+        return html`<h1 part="heading" class="heading">${content}</h1>`;
+      case 2:
+        return html`<h2 part="heading" class="heading">${content}</h2>`;
+      case 3:
+        return html`<h3 part="heading" class="heading">${content}</h3>`;
+      case 4:
+        return html`<h4 part="heading" class="heading">${content}</h4>`;
+      case 5:
+        return html`<h5 part="heading" class="heading">${content}</h5>`;
+      case 6:
+        return html`<h6 part="heading" class="heading">${content}</h6>`;
+    }
+  }
 
   override render() {
     const itemClasses = {
@@ -114,22 +151,27 @@ export class HelixAccordionItem extends LitElement {
       'item--disabled': this.disabled,
     };
 
+    const trigger = html`
+      <button
+        id=${`${this._uid}-trigger`}
+        part="trigger"
+        class="trigger"
+        type="button"
+        tabindex=${this.disabled ? '-1' : '0'}
+        aria-expanded=${this.expanded ? 'true' : 'false'}
+        aria-disabled=${this.disabled ? 'true' : nothing}
+        aria-controls=${`${this._uid}-content`}
+        @click=${this._handleButtonClick}
+        @keydown=${this._handleKeyDown}
+      >
+        <slot name="trigger"></slot>
+        <span part="icon" class="icon" aria-hidden="true">${chevronIcon}</span>
+      </button>
+    `;
+
     return html`
-      <details part="item" class=${classMap(itemClasses)} ?open=${this.expanded}>
-        <summary
-          id=${`${this._uid}-trigger`}
-          part="trigger"
-          class="trigger"
-          tabindex=${this.disabled ? '-1' : '0'}
-          aria-expanded=${this.expanded ? 'true' : 'false'}
-          aria-disabled=${this.disabled ? 'true' : 'false'}
-          aria-controls=${`${this._uid}-content`}
-          @click=${this._handleSummaryClick}
-          @keydown=${this._handleKeyDown}
-        >
-          <slot name="trigger"></slot>
-          <span part="icon" class="icon">${chevronIcon}</span>
-        </summary>
+      <div part="item" class=${classMap(itemClasses)}>
+        ${this._renderHeading(trigger)}
         <div class="content-wrapper">
           <div class="content-inner">
             <div
@@ -138,13 +180,13 @@ export class HelixAccordionItem extends LitElement {
               class="content"
               role="region"
               aria-labelledby=${`${this._uid}-trigger`}
-              aria-hidden=${this.expanded ? nothing : 'true'}
+              ?hidden=${!this.expanded}
             >
               <slot></slot>
             </div>
           </div>
         </div>
-      </details>
+      </div>
     `;
   }
 }

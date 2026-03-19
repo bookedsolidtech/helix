@@ -100,23 +100,19 @@ export class HelixAccordion extends LitElement {
 
   /**
    * Handles keyboard navigation between accordion triggers using arrow, Home, and End keys.
+   * Because hx-accordion-item uses delegatesFocus, document.activeElement points to the
+   * hx-accordion-item host when focus is inside its shadow root. We use that to find the
+   * currently focused item.
    * @internal
    */
   private _handleKeyDown = (e: KeyboardEvent): void => {
-    const triggers = this._getTriggers();
-    if (triggers.length === 0) return;
-
-    const activeEl = this.shadowRoot?.activeElement ?? document.activeElement;
-    let currentItem: HelixAccordionItem | null = null;
-
     const items = Array.from(this.querySelectorAll<HelixAccordionItem>('hx-accordion-item'));
-    for (const item of items) {
-      const summary = item.shadowRoot?.querySelector('summary');
-      if (summary === activeEl || item.shadowRoot?.activeElement === summary) {
-        currentItem = item;
-        break;
-      }
-    }
+    if (items.length === 0) return;
+
+    // With delegatesFocus, document.activeElement is the hx-accordion-item host when
+    // its inner button has focus. We match against the item host elements directly.
+    const activeEl = document.activeElement;
+    const currentItem = items.find((item) => item === activeEl) ?? null;
 
     if (!currentItem) return;
 
@@ -145,16 +141,16 @@ export class HelixAccordion extends LitElement {
 
     e.preventDefault();
     const targetItem = enabledItems[targetIndex];
-    const targetSummary = targetItem?.shadowRoot?.querySelector('summary');
-    targetSummary?.focus();
+    // With delegatesFocus, focusing the host element routes focus to the inner button.
+    targetItem?.focus();
   };
 
   private _getTriggers(): HTMLElement[] {
     const items = this.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
     const triggers: HTMLElement[] = [];
     items.forEach((item) => {
-      const summary = item.shadowRoot?.querySelector<HTMLElement>('summary');
-      if (summary) triggers.push(summary);
+      const button = item.shadowRoot?.querySelector<HTMLElement>('button');
+      if (button) triggers.push(button);
     });
     return triggers;
   }
