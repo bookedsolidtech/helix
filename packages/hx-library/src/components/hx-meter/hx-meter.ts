@@ -1,7 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMeterStyles } from './hx-meter.styles.js';
 
@@ -156,6 +155,9 @@ export class HelixMeter extends LitElement {
   override updated() {
     // Set data-state on host so :host([data-state]) CSS selectors work
     this.dataset['state'] = this._resolveState();
+    // Set --_value-ratio for GPU-compositable scaleX() transform on indicator
+    const ratio = this._percentage() / 100;
+    this.style.setProperty('--_value-ratio', String(Math.max(0, Math.min(1, ratio))));
   }
 
   // ─── WCAG 1.4.1: State label map ───
@@ -171,7 +173,6 @@ export class HelixMeter extends LitElement {
   };
 
   override render() {
-    const pct = this._percentage();
     const state = this._resolveState();
     const clampedValue = this._clampedValue();
     const stateLabel = state !== 'default' ? ` — ${state}` : '';
@@ -201,11 +202,7 @@ export class HelixMeter extends LitElement {
           <slot name="label" @slotchange=${this._onLabelSlotChange}>${this.label ?? ''}</slot>
         </span>
         <div class="meter__track" part="track">
-          <div
-            part="indicator"
-            class="meter__indicator"
-            style=${styleMap({ width: `${pct}%` })}
-          ></div>
+          <div part="indicator" class="meter__indicator"></div>
         </div>
         ${visibleStateLabel
           ? html`<span class="meter__state-label" data-state=${state} aria-hidden="true"

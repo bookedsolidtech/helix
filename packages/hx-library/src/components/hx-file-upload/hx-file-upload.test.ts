@@ -368,7 +368,7 @@ describe('hx-file-upload', () => {
   // ─── Progress (3) ───
 
   describe('Progress', () => {
-    it('setProgress updates the progress bar width', async () => {
+    it('setProgress updates the progress bar ratio', async () => {
       const el = await fixture<HelixFileUpload>('<hx-file-upload multiple></hx-file-upload>');
       simulateFileInput(el, [makeFile('upload.zip', 4096, 'application/zip')]);
       await el.updateComplete;
@@ -377,7 +377,7 @@ describe('hx-file-upload', () => {
       await el.updateComplete;
 
       const progressBar = shadowQuery<HTMLElement>(el, '.progress-bar');
-      expect(progressBar?.style.width).toBe('60%');
+      expect(progressBar?.style.getPropertyValue('--_progress-ratio')).toBe('0.6');
     });
 
     it('setProgress clamps values below 0 to 0', async () => {
@@ -389,7 +389,7 @@ describe('hx-file-upload', () => {
       await el.updateComplete;
 
       const progressBar = shadowQuery<HTMLElement>(el, '.progress-bar');
-      expect(progressBar?.style.width).toBe('0%');
+      expect(progressBar?.style.getPropertyValue('--_progress-ratio')).toBe('0');
     });
 
     it('setProgress clamps values above 100 to 100', async () => {
@@ -401,7 +401,7 @@ describe('hx-file-upload', () => {
       await el.updateComplete;
 
       const progressBar = shadowQuery<HTMLElement>(el, '.progress-bar');
-      expect(progressBar?.style.width).toBe('100%');
+      expect(progressBar?.style.getPropertyValue('--_progress-ratio')).toBe('1');
     });
 
     it('setProgress with an out-of-range index is a no-op', async () => {
@@ -415,7 +415,7 @@ describe('hx-file-upload', () => {
 
       const progressBar = shadowQuery<HTMLElement>(el, '.progress-bar');
       // Progress for index 0 should remain at its initial value of 0
-      expect(progressBar?.style.width).toBe('0%');
+      expect(progressBar?.style.getPropertyValue('--_progress-ratio')).toBe('0');
     });
   });
 

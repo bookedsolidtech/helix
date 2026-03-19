@@ -101,10 +101,13 @@ export const helixSliderStyles = css`
     top: 0;
     left: 0;
     height: 100%;
+    width: 100%;
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-slider-fill-bg, var(--hx-color-primary-500, #2563eb));
     pointer-events: none;
-    transition: width var(--hx-transition-fast, 150ms ease);
+    transform-origin: left center;
+    transform: scaleX(var(--_fill-ratio, 0));
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
   /* Suppress fill animation on initial render — only animate on user interaction */
