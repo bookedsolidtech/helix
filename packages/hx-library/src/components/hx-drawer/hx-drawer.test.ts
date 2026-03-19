@@ -557,6 +557,36 @@ describe('hx-drawer', () => {
       expect(overlay?.hasAttribute('aria-label')).toBe(false);
     });
 
+    it('aria-labelledby references an element that exists in the shadow DOM', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
+
+      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
+      const labelledById = overlay?.getAttribute('aria-labelledby');
+      expect(labelledById).toBeTruthy();
+      // The referenced ID must resolve to an element inside the same shadow root
+      const referencedEl = el.shadowRoot?.getElementById(labelledById!);
+      expect(referencedEl).toBeTruthy();
+    });
+
+    it('does not set aria-labelledby when noHeader=true — title element not rendered', async () => {
+      // When noHeader=true the title element (which holds _titleId) is not rendered.
+      // The component must fall back to aria-label so the dialog always has an accessible name.
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open no-header label="Patient Record"></hx-drawer>',
+      );
+      await el.updateComplete;
+
+      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
+      // Must NOT have aria-labelledby (title element absent — reference would be broken)
+      expect(overlay?.hasAttribute('aria-labelledby')).toBe(false);
+      // Must fall back to aria-label for an accessible name
+      expect(overlay?.getAttribute('aria-label')).toBe('Patient Record');
+    });
+
     it('uses aria-label from label property when no label slot', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open label="Settings Panel"></hx-drawer>');
       await el.updateComplete;
