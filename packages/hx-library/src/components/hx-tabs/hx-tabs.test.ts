@@ -531,11 +531,11 @@ describe('hx-tabs', () => {
       expect(btn?.getAttribute('aria-selected')).toBe('true');
     });
 
-    it('tab button has no aria-selected when not selected', async () => {
+    it('tab button has aria-selected="false" when not selected', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btn = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      expect(btn?.hasAttribute('aria-selected')).toBe(false);
+      expect(btn?.getAttribute('aria-selected')).toBe('false');
     });
 
     it('tab button has aria-controls referencing its panel id', async () => {

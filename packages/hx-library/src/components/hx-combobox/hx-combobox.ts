@@ -734,7 +734,7 @@ export class HelixCombobox extends LitElement {
             id=${this._id}
             class=${classMap(inputClasses)}
             role="combobox"
-            aria-expanded=${this._open ? 'true' : nothing}
+            aria-expanded=${this._open ? 'true' : 'false'}
             aria-autocomplete="list"
             aria-controls=${this._listboxId}
             aria-activedescendant=${ifDefined(activedescendant)}

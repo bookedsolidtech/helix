@@ -600,7 +600,7 @@ describe('hx-time-picker', () => {
       expect(selectedOption).toBeTruthy();
     });
 
-    it('unselected options have no aria-selected', async () => {
+    it('unselected options have aria-selected="false"', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker format="24h" min="09:00" max="10:00" step="60"></hx-time-picker>',
       );
