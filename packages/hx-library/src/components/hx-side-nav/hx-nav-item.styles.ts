@@ -110,9 +110,7 @@ export const helixNavItemStyles = css`
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition:
-      opacity var(--hx-transition-fast, 150ms) ease,
-      width var(--hx-transition-fast, 150ms) ease;
+    transition: opacity var(--hx-transition-fast, 150ms) ease;
   }
 
   /* ─── Badge ─── */
@@ -148,16 +146,22 @@ export const helixNavItemStyles = css`
   /* ─── Children (sub-nav) ─── */
 
   .nav-item__children {
-    display: flex;
-    flex-direction: column;
-    padding-left: var(--hx-space-6, 1.5rem);
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--hx-transition-normal, 300ms ease);
     overflow: hidden;
-    transition: max-height var(--hx-transition-normal, 300ms) ease;
   }
 
   :host([expanded]) .nav-item__children {
-    max-height: 62.5rem; /* large enough for any submenu depth */
+    grid-template-rows: 1fr;
+  }
+
+  .nav-item__children-inner {
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-left: var(--hx-space-6, 1.5rem);
   }
 
   /* ─── Tooltip (collapsed mode) ─── */
@@ -221,6 +225,10 @@ export const helixNavItemStyles = css`
     .nav-item__children,
     .nav-item__tooltip {
       transition: none;
+    }
+
+    :host([expanded]) .nav-item__children {
+      grid-template-rows: 1fr;
     }
   }
 `;

@@ -512,7 +512,10 @@ export class HelixFileUpload extends LitElement {
                 aria-valuemax="100"
                 aria-label=${`Upload progress for ${entry.file.name}: ${entry.progress}%`}
               >
-                <div class="progress-bar" style="width: ${entry.progress}%"></div>
+                <div
+                  class="progress-bar"
+                  style="--_progress-ratio: ${String(entry.progress / 100)}"
+                ></div>
               </div>
             </li>
           `,

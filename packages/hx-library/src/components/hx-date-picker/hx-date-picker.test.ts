@@ -499,6 +499,21 @@ describe('hx-date-picker', () => {
 
   // ─── Form (5) ─────────────────────────────────────────────────────────
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits date value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-date-picker name="appt-date" value="2026-03-15"></hx-date-picker>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-date-picker') as HelixDatePicker;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('appt-date')).toBe('2026-03-15');
+      form.remove();
+    });
+  });
+
   describe('Form', () => {
     it('has formAssociated=true on the class', () => {
       const ctor = customElements.get('hx-date-picker') as unknown as {

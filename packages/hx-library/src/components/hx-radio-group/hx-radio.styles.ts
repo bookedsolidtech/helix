@@ -65,13 +65,12 @@ export const helixRadioStyles = css`
   /* ─── Inner Dot ─── */
 
   .radio__dot {
-    width: 0;
-    height: 0;
+    width: calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.4);
+    height: calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.4);
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-radio-dot-color, var(--hx-color-neutral-0, #ffffff));
-    transition:
-      width var(--hx-transition-fast, 150ms ease),
-      height var(--hx-transition-fast, 150ms ease);
+    transform: scale(0);
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
   /* ─── Checked State ─── */
@@ -82,8 +81,7 @@ export const helixRadioStyles = css`
   }
 
   .radio--checked .radio__dot {
-    width: calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.4);
-    height: calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.4);
+    transform: scale(1);
   }
 
   /* ─── Focus State ─── */
