@@ -126,6 +126,16 @@ export class HelixProgressBar extends LitElement {
       this._liveMessage = '';
     }
 
+    if (
+      changedProps.has('value') ||
+      changedProps.has('min') ||
+      changedProps.has('max') ||
+      changedProps.has('indeterminate')
+    ) {
+      const ratio = this._isIndeterminate ? 0 : this._percentage / 100;
+      this.style.setProperty('--_value-ratio', String(Math.max(0, Math.min(1, ratio))));
+    }
+
     if (!this.label) {
       devWarn(
         'hx-progress-bar',
@@ -166,7 +176,6 @@ export class HelixProgressBar extends LitElement {
       'progress-bar--indeterminate': this._isIndeterminate,
     };
 
-    const indicatorStyle = this._isIndeterminate ? '' : `width: ${this._percentage}%`;
     const ariaValueNow = this._isIndeterminate ? undefined : (this.value ?? this.min);
     const variantLabel = this._variantLabel;
 
@@ -199,7 +208,7 @@ export class HelixProgressBar extends LitElement {
           aria-labelledby=${ifDefined(hasVisibleLabel ? labelId : undefined)}
           aria-describedby=${ifDefined(descId)}
         >
-          <div part="fill" class="progress-bar__fill" style=${indicatorStyle || nothing}></div>
+          <div part="fill" class="progress-bar__fill"></div>
         </div>
         ${variantLabel
           ? html`<span class="sr-only progress-bar__variant-label">${variantLabel}</span>`

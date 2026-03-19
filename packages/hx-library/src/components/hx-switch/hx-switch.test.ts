@@ -301,6 +301,32 @@ describe('hx-switch', () => {
 
   // --- Form (5) ---
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits value in FormData when checked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-switch name="notifications" value="enabled" checked></hx-switch>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-switch') as HxSwitch;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('notifications')).toBe('enabled');
+      form.remove();
+    });
+
+    it('does not submit value in FormData when unchecked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-switch name="notifications" value="enabled"></hx-switch>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-switch') as HxSwitch;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('notifications')).toBeNull();
+      form.remove();
+    });
+  });
+
   describe('Form', () => {
     it('has formAssociated=true', () => {
       const ctor = customElements.get('hx-switch') as unknown as { formAssociated: boolean };

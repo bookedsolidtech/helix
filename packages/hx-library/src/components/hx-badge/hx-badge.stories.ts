@@ -1537,3 +1537,11 @@ export const WithPrefixAllVariants: StoryObj<typeof meta> = {
     await expect(badges.length).toBe(6);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    variant: 'primary',
+    label: 'New',
+  },
+};

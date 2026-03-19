@@ -487,24 +487,27 @@ describe('hx-slider', () => {
   // ─── Fill width (3) ───
 
   describe('Fill width', () => {
-    it('fill width is 0% when value equals min', async () => {
+    it('fill ratio is 0 when value equals min', async () => {
       const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="0"></hx-slider>');
+      await el.updateComplete;
       const fill = shadowQuery<HTMLElement>(el, '[part="fill"]');
-      expect(fill?.style.width).toBe('0%');
+      expect(fill?.style.getPropertyValue('--_fill-ratio')).toBe('0');
     });
 
-    it('fill width is 100% when value equals max', async () => {
+    it('fill ratio is 1 when value equals max', async () => {
       const el = await fixture<HelixSlider>(
         '<hx-slider min="0" max="100" value="100"></hx-slider>',
       );
+      await el.updateComplete;
       const fill = shadowQuery<HTMLElement>(el, '[part="fill"]');
-      expect(fill?.style.width).toBe('100%');
+      expect(fill?.style.getPropertyValue('--_fill-ratio')).toBe('1');
     });
 
-    it('fill width is 50% when value is mid-range', async () => {
+    it('fill ratio is 0.5 when value is mid-range', async () => {
       const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
+      await el.updateComplete;
       const fill = shadowQuery<HTMLElement>(el, '[part="fill"]');
-      expect(fill?.style.width).toBe('50%');
+      expect(fill?.style.getPropertyValue('--_fill-ratio')).toBe('0.5');
     });
   });
 
@@ -514,8 +517,7 @@ describe('hx-slider', () => {
     it('focus() moves focus to the native range input', async () => {
       const el = await fixture<HelixSlider>('<hx-slider label="Level"></hx-slider>');
       el.focus();
-      // Allow brief settle time for focus to propagate into the shadow DOM input
-      await new Promise<void>((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
       expect(el.shadowRoot?.activeElement).toBe(input);
     });

@@ -686,3 +686,33 @@ export const AllVariants: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: { variant: 'striped' },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-table label="Active inpatient list">
+      <span slot="caption">
+        <strong>Active Inpatients</strong> — Ward 4B as of
+        <time datetime="2026-03-17">March 17, 2026</time>
+      </span>
+      <hx-thead>
+        <hx-tr>
+          <hx-th scope="col">Patient ID</hx-th>
+          <hx-th scope="col">Name</hx-th>
+          <hx-th scope="col">Status</hx-th>
+        </hx-tr>
+      </hx-thead>
+      <hx-tbody>
+        <hx-tr>
+          <hx-td>P-10042</hx-td>
+          <hx-td>Jane Smith</hx-td>
+          <hx-td>Stable</hx-td>
+        </hx-tr>
+      </hx-tbody>
+    </hx-table>
+  `,
+};

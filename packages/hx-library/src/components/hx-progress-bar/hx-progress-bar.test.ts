@@ -122,28 +122,28 @@ describe('hx-progress-bar', () => {
 
     it('renders indicator at 0% width for value=0', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="0"></hx-progress-bar>');
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('0%');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0');
     });
 
     it('sets fill width based on value', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="50"></hx-progress-bar>');
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('50%');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0.5');
     });
 
     it('clamps value above max to 100%', async () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="150" max="100"></hx-progress-bar>',
       );
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('100%');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('1');
     });
 
     it('clamps negative value to 0%', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="-10"></hx-progress-bar>');
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('0%');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0');
     });
   });
 
@@ -158,12 +158,12 @@ describe('hx-progress-bar', () => {
     });
 
     it('calculates percentage relative to min offset', async () => {
-      // value=60, min=20, max=100 → (60-20)/(100-20) = 40/80 = 50%
+      // value=60, min=20, max=100 → (60-20)/(100-20) = 40/80 = 0.5
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="60" min="20" max="100"></hx-progress-bar>',
       );
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('50%');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0.5');
     });
   });
 
@@ -181,8 +181,8 @@ describe('hx-progress-bar', () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="50" max="200"></hx-progress-bar>',
       );
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('25%');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0.25');
     });
   });
 
@@ -262,12 +262,11 @@ describe('hx-progress-bar', () => {
   // ─── Dynamic Updates (3) ───
 
   describe('Dynamic Updates', () => {
-    it('updates fill width when value changes', async () => {
+    it('updates fill ratio when value changes', async () => {
       const el = await fixture<HelixProgressBar>('<hx-progress-bar value="30"></hx-progress-bar>');
       el.value = 70;
       await el.updateComplete;
-      const fill = shadowQuery(el, '[part="fill"]') as HTMLElement;
-      expect(fill.style.width).toBe('70%');
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0.7');
     });
 
     it('switches to indeterminate when value set to null', async () => {

@@ -34,11 +34,20 @@ export const helixMeterStyles = css`
     inset-block: 0;
     inset-inline-start: 0;
     height: 100%;
+    width: 100%;
     border-radius: inherit;
     background-color: var(--_indicator-color);
+    transform-origin: left center;
+    transform: scaleX(var(--_value-ratio, 0));
     transition:
-      width var(--hx-duration-fast, 150ms) ease,
-      background-color var(--hx-duration-fast, 150ms) ease;
+      transform var(--hx-transition-fast, 150ms ease),
+      background-color var(--hx-transition-fast, 150ms ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .meter__indicator {
+      transition: none;
+    }
   }
 
   /* ─── Default (no thresholds configured) ─── */

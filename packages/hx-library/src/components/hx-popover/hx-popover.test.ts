@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixPopover } from './hx-popover.js';
@@ -327,8 +327,11 @@ describe('hx-popover', () => {
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.classList.contains('visible')).toBe(true);
 
-      // Allow brief settle time for the deferred document click listener to be attached after open
-      await new Promise((r) => setTimeout(r, 10));
+      // The document click listener is registered via setTimeout(0) in _show(),
+      // so we must advance fake timers to let that macrotask fire before dispatching outside click.
+      vi.useFakeTimers();
+      await vi.advanceTimersByTimeAsync(0);
+      vi.useRealTimers();
 
       // Simulate click on an unrelated element outside the component
       document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -488,8 +491,7 @@ describe('hx-popover', () => {
       wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await el.updateComplete;
 
-      // Allow the deferred document click listener to register
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       // Place focus somewhere outside the popover before clicking outside
       const outsideBtn = document.createElement('button');

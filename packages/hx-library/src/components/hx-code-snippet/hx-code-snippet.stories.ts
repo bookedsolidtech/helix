@@ -391,3 +391,10 @@ export const CopyEventDemo: Story = {
     await expect(typeof (eventDetail as { text: string }).text).toBe('string');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+};

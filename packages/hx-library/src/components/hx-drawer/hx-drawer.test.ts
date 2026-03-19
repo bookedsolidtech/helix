@@ -96,8 +96,6 @@ describe('hx-drawer', () => {
     it('dispatches hx-hide when open is set to false', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
-      // Allow open animation to complete before toggling open to false
-      await new Promise((r) => setTimeout(r, 50));
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-hide');
       el.open = false;
       const event = await eventPromise;
@@ -121,9 +119,9 @@ describe('hx-drawer', () => {
       el.addEventListener('hx-show', () => events.push('hx-show'));
       el.addEventListener('hx-after-show', () => events.push('hx-after-show'));
 
+      const afterShowPromise = oneEvent(el, 'hx-after-show');
       el.open = true;
-      // Allow CSS transition/animation to complete so hx-after-show fires after hx-show
-      await new Promise((r) => setTimeout(r, 400));
+      await afterShowPromise;
 
       expect(events).toContain('hx-show');
       expect(events).toContain('hx-after-show');
@@ -133,16 +131,14 @@ describe('hx-drawer', () => {
     it('dispatches hx-hide and then hx-after-hide', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
-      // Allow open animation to complete before triggering close
-      await new Promise((r) => setTimeout(r, 100));
 
       const events: string[] = [];
       el.addEventListener('hx-hide', () => events.push('hx-hide'));
       el.addEventListener('hx-after-hide', () => events.push('hx-after-hide'));
 
+      const afterHidePromise = oneEvent(el, 'hx-after-hide');
       el.open = false;
-      // Allow CSS transition/animation to complete so hx-after-hide fires after hx-hide
-      await new Promise((r) => setTimeout(r, 400));
+      await afterHidePromise;
 
       expect(events).toContain('hx-hide');
       expect(events).toContain('hx-after-hide');
@@ -198,8 +194,6 @@ describe('hx-drawer', () => {
       const el = await fixture<HelixDrawer>(
         '<hx-drawer open><button slot="footer" class="confirm-btn">Confirm</button></hx-drawer>',
       );
-      // Wait for slotchange event to propagate and component to re-render with footer slot content
-      await new Promise((r) => setTimeout(r, 50));
       await el.updateComplete;
       const slottedFooter = el.querySelector('button.confirm-btn');
       expect(slottedFooter).toBeTruthy();
@@ -257,8 +251,6 @@ describe('hx-drawer', () => {
     it('Escape key closes the drawer when open', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
-      // Allow open animation to complete before testing Escape-key close
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -289,8 +281,6 @@ describe('hx-drawer', () => {
     it('clicking the overlay backdrop closes the drawer', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
-      // Allow open animation to complete before testing overlay-click close
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
       const overlay = shadowQuery<HTMLElement>(el, '[part="overlay"]');
@@ -370,8 +360,6 @@ describe('hx-drawer', () => {
     it('clicking close button closes the drawer', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
-      // Allow open animation to complete before testing close-button click
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-btn"]');
@@ -392,7 +380,6 @@ describe('hx-drawer', () => {
         '<hx-drawer open><span slot="label">Title</span><button class="first-btn">First</button><button class="last-btn">Last</button></hx-drawer>',
       );
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 100));
 
       // Focus the last slotted button
       const lastBtn = el.querySelector<HTMLButtonElement>('.last-btn');
@@ -416,7 +403,6 @@ describe('hx-drawer', () => {
         '<hx-drawer open><span slot="label">Title</span><button class="only-btn">Only</button></hx-drawer>',
       );
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 100));
 
       // Focus the close button (first shadow DOM focusable)
       const closeBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('[part="close-btn"]');
@@ -441,7 +427,6 @@ describe('hx-drawer', () => {
         '<hx-drawer open no-header><span>Non-focusable content</span></hx-drawer>',
       );
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 100));
 
       // Dispatch Tab — should not throw
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
@@ -458,8 +443,6 @@ describe('hx-drawer', () => {
     it('Escape key closes drawer in no-header mode', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open no-header></hx-drawer>');
       await el.updateComplete;
-      // Allow open animation to settle before testing keyboard dismiss
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(el.open).toBe(true);
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -497,13 +480,12 @@ describe('hx-drawer', () => {
       // Open drawer (trigger is still focused)
       el.open = true;
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 100));
 
       // Close drawer
+      const afterHidePromise = oneEvent(el, 'hx-after-hide');
       el.open = false;
       await el.updateComplete;
-      // Wait for close animation + focus restore timeout
-      await new Promise((r) => setTimeout(r, 400));
+      await afterHidePromise;
 
       expect(document.activeElement).toBe(trigger);
       trigger.remove();
@@ -519,14 +501,14 @@ describe('hx-drawer', () => {
 
       el.open = true;
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(document.body.style.overflow).toBe('hidden');
 
       // Close and restore
+      const afterHidePromise = oneEvent(el, 'hx-after-hide');
       el.open = false;
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 400));
+      await afterHidePromise;
       expect(document.body.style.overflow).toBe(previousOverflow);
     });
 
@@ -536,7 +518,6 @@ describe('hx-drawer', () => {
 
       el.open = true;
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
 
       expect(document.body.style.overflow).toBe(previousOverflow);
     });
@@ -550,7 +531,6 @@ describe('hx-drawer', () => {
         '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
       );
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
 
       const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
       expect(overlay?.hasAttribute('aria-labelledby')).toBe(true);
@@ -562,7 +542,6 @@ describe('hx-drawer', () => {
         '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
       );
       await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 50));
 
       const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
       const labelledById = overlay?.getAttribute('aria-labelledby');

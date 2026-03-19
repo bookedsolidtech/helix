@@ -34,7 +34,7 @@ export const helixSpinnerStyles = css`
        Adjust both proportionally if r or viewBox dimensions change. */
     stroke-dasharray: 56;
     stroke-dashoffset: 14;
-    animation: hx-spinner-dash 1.5s ease-in-out infinite;
+    animation: hx-spinner-dash var(--hx-duration-spinner, 750ms) ease-in-out infinite;
     transform-origin: center;
   }
 

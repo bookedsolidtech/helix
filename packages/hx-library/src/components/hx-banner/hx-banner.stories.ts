@@ -321,3 +321,22 @@ export const PositionFixed: Story = {
     await expect(banner?.getAttribute('position')).toBe('fixed');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    variant: 'info',
+    message: 'System maintenance is scheduled for tonight at 10 PM. Save your work before then.',
+  },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-banner variant="info" open>
+      Scheduled maintenance window begins at 10 PM tonight.
+      <span slot="action">
+        <a href="/status">View status page</a>
+      </span>
+    </hx-banner>
+  `,
+};

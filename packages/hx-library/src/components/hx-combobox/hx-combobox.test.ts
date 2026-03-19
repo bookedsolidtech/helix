@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HxCombobox } from './hx-combobox.js';
 import './index.js';
@@ -493,6 +493,26 @@ describe('hx-combobox', () => {
 
   // ─── Form Integration (5) ───
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits value in FormData when value is set', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-combobox name="fruit" value="banana">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+        </hx-combobox>
+      `;
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-combobox') as HxCombobox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('fruit')).toBe('banana');
+      form.remove();
+    });
+  });
+
   describe('Form', () => {
     it('has ElementInternals attached', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
@@ -780,19 +800,24 @@ describe('hx-combobox', () => {
 
   describe('Filter debounce', () => {
     it('delays hx-input event when filterDebounce > 0', async () => {
-      const el = await fixture<HxCombobox>(withOptions('filter-debounce="200"'));
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      let eventFired = false;
-      el.addEventListener('hx-input', () => {
-        eventFired = true;
-      });
-      input.value = 'app';
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      // Event should NOT have fired immediately
-      expect(eventFired).toBe(false);
-      // Wait for debounce to complete
-      await new Promise((resolve) => setTimeout(resolve, 250));
-      expect(eventFired).toBe(true);
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HxCombobox>(withOptions('filter-debounce="200"'));
+        const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+        let eventFired = false;
+        el.addEventListener('hx-input', () => {
+          eventFired = true;
+        });
+        input.value = 'app';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        // Event should NOT have fired immediately
+        expect(eventFired).toBe(false);
+        // Advance past the 200ms debounce
+        await vi.advanceTimersByTimeAsync(250);
+        expect(eventFired).toBe(true);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -810,6 +835,57 @@ describe('hx-combobox', () => {
       input.dispatchEvent(new Event('focus'));
       await el.updateComplete;
       await checkA11y(el, { rules: { 'color-contrast': { enabled: false } } });
+    });
+  });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects option elements into the option slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+        </hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="option"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(2);
+      expect((assigned[0] as HTMLElement).textContent).toContain('Apple');
+    });
+
+    it('projects content into the label slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox><span slot="label">Choose fruit</span></hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="label"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Choose fruit');
+    });
+
+    it('projects content into the error slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit"><span slot="error">Required</span></hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="error"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Required');
+    });
+
+    it('projects content into the help-text slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit" help-text=" "><span slot="help-text">Type to search</span></hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Type to search');
     });
   });
 });

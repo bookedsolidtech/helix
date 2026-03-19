@@ -353,3 +353,7 @@ export const EscapeDismiss: Story = {
     await expect(tooltipEl?.classList.contains('visible')).toBe(false);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
