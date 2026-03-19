@@ -195,7 +195,19 @@ export class HelixTabs extends LitElement {
         panel.id = panelId;
         // Set controls on the tab so aria-controls lands on the inner button (role="tab")
         tab.controls = panelId;
-        panel.setAttribute('aria-labelledby', tabId);
+        // Use aria-label instead of aria-labelledby to avoid shadow boundary failures.
+        // aria-labelledby pointing to hx-tab host IDs fails because the host element's
+        // accessible text is inside its shadow DOM (the inner <button>), which AT cannot
+        // traverse via aria-labelledby references across shadow roots.
+        const tabLabel = tab.textContent?.trim() ?? '';
+        if (tabLabel) {
+          panel.setAttribute('aria-label', tabLabel);
+          panel.removeAttribute('aria-labelledby');
+        } else {
+          // Fall back to aria-labelledby if no text content is yet available;
+          // this will be corrected on slotchange once content is assigned.
+          panel.setAttribute('aria-labelledby', tabId);
+        }
       }
     });
 
@@ -384,6 +396,13 @@ export class HelixTabs extends LitElement {
   // ─── Render ───
 
   override render() {
+    if (this.label === '') {
+      devWarn(
+        'hx-tabs',
+        'No accessible label provided. Set the `label` attribute on hx-tabs to describe what the tabs represent (e.g., "Patient record sections"). An unlabeled tablist violates WCAG 4.1.2.',
+      );
+    }
+
     return html`
       <div class="tabs">
         <div

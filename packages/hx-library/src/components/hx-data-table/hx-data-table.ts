@@ -484,7 +484,7 @@ export class HelixDataTable extends LitElement {
         <table
           part="table"
           role="grid"
-          aria-label=${this.label || nothing}
+          aria-label=${this.label || 'Table'}
           aria-busy=${this.loading ? 'true' : nothing}
           @keydown=${this._handleKeydown}
         >

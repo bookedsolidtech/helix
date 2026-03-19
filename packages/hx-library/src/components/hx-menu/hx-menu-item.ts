@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A single interactive item for use inside `hx-menu`. Supports normal, checkbox,
@@ -89,6 +90,20 @@ export class HelixMenuItem extends LitElement {
   /** Focus the inner interactive element. */
   override focus(options?: FocusOptions): void {
     this.shadowRoot?.querySelector<HTMLElement>('.menu-item')?.focus(options);
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // WCAG 4.1.2: menuitem role is only valid inside a role="menu" or role="menubar" container.
+    // Check the closest ancestor with a menu role.
+    const menuHost = this.closest('hx-menu, hx-split-button, [role="menu"], [role="menubar"]');
+    if (!menuHost) {
+      devWarn(
+        'hx-menu-item',
+        'hx-menu-item must be used inside an hx-menu or an element with role="menu". ' +
+          'An orphaned menuitem violates WCAG 1.3.1 (Info and Relationships).',
+      );
+    }
   }
 
   private _handleSubmenuSlotChange(e: Event): void {

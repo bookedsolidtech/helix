@@ -487,7 +487,7 @@ export class HelixDialog extends LitElement {
           part="close-button"
           class="dialog__close-btn"
           type="button"
-          aria-label="Close dialog"
+          aria-label=${`Close ${this.heading.trim() || 'dialog'}`}
           @click=${() => this.close()}
         ></button>
       </div>
@@ -534,7 +534,7 @@ export class HelixDialog extends LitElement {
       <dialog
         role=${this.variant !== 'dialog' ? this.variant : nothing}
         aria-labelledby=${hasHeading ? this._headingId : nothing}
-        aria-label=${!hasHeading && ariaLabel ? ariaLabel : nothing}
+        aria-label=${!hasHeading ? (ariaLabel ?? 'Dialog') : nothing}
         aria-describedby=${this.description ? this._descriptionId : nothing}
         aria-modal=${this.modal ? 'true' : nothing}
       >

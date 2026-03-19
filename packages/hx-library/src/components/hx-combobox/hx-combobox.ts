@@ -771,7 +771,7 @@ export class HelixCombobox extends LitElement {
                   part="clear-button"
                   type="button"
                   class="field__clear-button"
-                  aria-label="Clear"
+                  aria-label=${`Clear ${this.label || this.ariaLabel || 'selection'}`}
                   tabindex="0"
                   @click=${this._handleClear}
                 >

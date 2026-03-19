@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuStyles } from './hx-menu.styles.js';
@@ -197,12 +197,19 @@ export class HelixMenu extends LitElement {
   }
 
   override render() {
+    if (!this.label) {
+      devWarn(
+        'hx-menu',
+        'No accessible label provided. Set the `label` attribute on hx-menu so screen readers can identify this menu (WCAG 4.1.2).',
+      );
+    }
+
     return html`
       <div
         part="base"
         class="menu"
         role="menu"
-        aria-label=${this.label || nothing}
+        aria-label=${this.label || 'Menu'}
         @keydown=${this._handleKeyDown}
         @hx-item-select=${this._handleItemSelect}
       >

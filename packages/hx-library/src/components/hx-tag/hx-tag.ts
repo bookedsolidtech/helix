@@ -169,7 +169,7 @@ export class HelixTag extends LitElement {
           ? html`<button
               part="remove-button"
               class="tag__remove-button"
-              aria-label=${`Remove ${this._defaultSlotText}`}
+              aria-label=${`Remove ${this._defaultSlotText || 'tag'}`}
               ?disabled=${this.disabled}
               @click=${this._handleRemove}
             >
