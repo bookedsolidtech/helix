@@ -666,7 +666,7 @@ export class HelixTimePicker extends LitElement {
             autocomplete="off"
             spellcheck="false"
             role="combobox"
-            aria-expanded=${this._open ? 'true' : 'false'}
+            aria-expanded=${this._open ? 'true' : nothing}
             aria-haspopup="listbox"
             .value=${live(this._inputDisplayValue)}
             placeholder=${placeholder}
@@ -744,7 +744,7 @@ export class HelixTimePicker extends LitElement {
                           })}
                           id="${this._listboxId}-option-${index}"
                           role="option"
-                          aria-selected=${isSelected ? 'true' : 'false'}
+                          aria-selected=${isSelected ? 'true' : nothing}
                           @pointerdown=${this._handleOptionPointerDown}
                           @click=${() => this._handleOptionClick(slot)}
                           @mouseenter=${() => this._handleOptionMouseEnter(index)}

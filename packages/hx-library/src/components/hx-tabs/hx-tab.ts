@@ -113,8 +113,8 @@ export class HelixTab extends LitElement {
         part="tab"
         class="tab"
         role="tab"
-        aria-selected=${this.selected ? 'true' : 'false'}
-        aria-disabled=${this.disabled ? 'true' : 'false'}
+        aria-selected=${this.selected ? 'true' : nothing}
+        aria-disabled=${this.disabled ? 'true' : nothing}
         aria-controls=${this.controls || nothing}
         tabindex=${this.selected ? '0' : '-1'}
         @click=${this._handleClick}

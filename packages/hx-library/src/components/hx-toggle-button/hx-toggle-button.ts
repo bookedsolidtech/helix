@@ -218,7 +218,7 @@ export class HelixToggleButton extends LitElement {
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type="button"
-        aria-pressed=${this.pressed ? 'true' : 'false'}
+        aria-pressed=${this.pressed ? 'true' : nothing}
         aria-label=${this.label ?? nothing}
         @click=${this._handleClick}
       >

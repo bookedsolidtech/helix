@@ -908,7 +908,7 @@ export class HelixColorPicker extends LitElement {
         type="button"
         class="trigger"
         aria-label="Choose color: ${this._inputValue}"
-        aria-expanded=${this._open ? 'true' : 'false'}
+        aria-expanded=${this._open ? 'true' : nothing}
         ?disabled=${this.disabled}
         style=${styleMap({ '--_preview-color': previewColor })}
         @click=${this._handleTriggerClick}

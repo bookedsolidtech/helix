@@ -296,7 +296,7 @@ export class HelixSwitch extends LitElement {
             id=${this._switchId}
             type="button"
             role="switch"
-            aria-checked=${this.checked ? 'true' : 'false'}
+            aria-checked=${this.checked ? 'true' : nothing}
             aria-labelledby=${ifDefined(hasLabel ? this._labelId : undefined)}
             aria-describedby=${ifDefined(describedBy)}
             aria-invalid=${hasError ? 'true' : nothing}
