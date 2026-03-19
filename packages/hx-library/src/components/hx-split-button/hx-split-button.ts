@@ -278,7 +278,7 @@ export class HelixSplitButton extends LitElement {
     if (this._open) return;
     this._open = true;
     // Focus the first enabled menu item after the panel renders
-    this.updateComplete
+    void this.updateComplete
       .then(() => {
         const items = this._getMenuItems();
         items[0]?.focus();

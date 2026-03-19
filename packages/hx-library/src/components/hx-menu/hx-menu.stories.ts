@@ -13,6 +13,21 @@ const meta = {
   title: 'Components/Menu',
   component: 'hx-menu',
   tags: ['autodocs'],
+  argTypes: {
+    label: {
+      control: 'text',
+      description:
+        'Accessible label for the menu. Rendered as `aria-label` on the inner `role="menu"` element. Required for screen reader identification (WCAG 4.1.2).',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: "'Menu'" },
+        type: { summary: 'string' },
+      },
+    },
+  },
+  args: {
+    label: 'Patient actions',
+  },
   parameters: {
     docs: {
       description: {
@@ -25,7 +40,7 @@ const meta = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 // ─────────────────────────────────────────────────
 // 1. DEFAULT — Basic menu with items
@@ -393,4 +408,8 @@ export const HealthcareContextMenu: Story = {
       <hx-menu-item value="discharge" disabled>Discharge (Pending Review)</hx-menu-item>
     </hx-menu>
   `,
+};
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
 };

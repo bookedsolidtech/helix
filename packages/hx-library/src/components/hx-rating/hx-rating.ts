@@ -160,9 +160,24 @@ export class HelixRating extends LitElement {
     }
   }
 
+  /** Called by the browser when the form is reset. */
   formResetCallback(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(String(this._defaultValue));
+  }
+
+  /** Called by the browser to restore form state on navigation. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      const parsed = parseFloat(state);
+      if (!isNaN(parsed)) {
+        this.value = parsed;
+        this._internals.setFormValue(state);
+      }
+    }
   }
 
   // ─── Helpers ───

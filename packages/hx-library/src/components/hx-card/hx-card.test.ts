@@ -189,8 +189,7 @@ describe('hx-card', () => {
         fired = true;
       });
       card.click();
-      // Allow brief settle time to confirm hx-click is not dispatched on a non-interactive card
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });
@@ -224,8 +223,7 @@ describe('hx-card', () => {
         fired = true;
       });
       card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      // Allow brief settle time to confirm hx-click is not dispatched on a non-interactive card
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });

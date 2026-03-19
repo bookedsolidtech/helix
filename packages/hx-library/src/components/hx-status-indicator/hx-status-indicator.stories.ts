@@ -340,3 +340,8 @@ export const DrupalBooleanProp: Story = {
     await expect(indicators[2]?.hasAttribute('pulse')).toBe(true);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: { status: 'online' },
+};

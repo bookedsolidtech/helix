@@ -55,9 +55,18 @@ export const helixProgressBarStyles = css`
 
   .progress-bar__fill {
     height: 100%;
+    width: 100%;
     border-radius: inherit;
     background-color: var(--hx-progress-bar-indicator-bg, var(--hx-color-primary-500));
-    transition: width 0.2s ease;
+    transform-origin: left center;
+    transform: scaleX(var(--_value-ratio, 0));
+    transition: transform var(--hx-transition-fast, 150ms ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progress-bar__fill {
+      transition: none;
+    }
   }
 
   /* ─── Variant Colors ─── */
@@ -82,20 +91,19 @@ export const helixProgressBarStyles = css`
 
   @keyframes hx-progress-indeterminate {
     0% {
-      transform: translateX(-100%);
-      width: 40%;
+      transform: translateX(-100%) scaleX(0.4);
     }
     50% {
-      width: 60%;
+      transform: translateX(50%) scaleX(0.6);
     }
     100% {
-      transform: translateX(250%);
-      width: 40%;
+      transform: translateX(250%) scaleX(0.4);
     }
   }
 
   .progress-bar--indeterminate .progress-bar__fill {
-    width: 40%;
+    transform: translateX(-100%) scaleX(0.4);
+    transform-origin: left center;
     animation: hx-progress-indeterminate 1.5s ease-in-out infinite;
   }
 
@@ -106,7 +114,7 @@ export const helixProgressBarStyles = css`
 
     .progress-bar--indeterminate .progress-bar__fill {
       animation: none;
-      width: 100%;
+      transform: scaleX(1);
       opacity: 0.4;
     }
   }

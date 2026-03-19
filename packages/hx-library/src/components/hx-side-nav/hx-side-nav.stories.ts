@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import './hx-side-nav.js';
 import './hx-nav-item.js';
 
@@ -306,6 +307,102 @@ export const WithBadge: Story = {
   `,
 };
 
+// ─────────────────────────────────────────────────
+// EVENTS DEMO — hx-collapse, hx-expand
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates the `hx-collapse` and `hx-expand` events dispatched by hx-side-nav.
+ * Both events include `{ collapsed: boolean }` in their detail payload.
+ * Use these events to persist collapsed state, adjust adjacent layout, or
+ * trigger tooltip visibility on nav items in icon-only mode.
+ */
+export const CollapseExpandEventDemo: Story = {
+  name: 'Events: hx-collapse, hx-expand',
+  render: (args) => html`
+    <div style="height: 400px; display: flex;">
+      <hx-side-nav
+        id="event-side-nav"
+        ?collapsed=${args.collapsed}
+        label=${args.label}
+        style="height: 100%;"
+      >
+        <div slot="header" style="font-weight: bold; font-size: 1.125rem; color: white;">
+          HelixUI
+        </div>
+        <hx-nav-item href="/dashboard">
+          <svg
+            slot="icon"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            width="20"
+            height="20"
+            aria-hidden="true"
+          >
+            <path
+              d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm8-3a1 1 0 100 2 1 1 0 000-2zm-1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+            />
+          </svg>
+          Dashboard
+        </hx-nav-item>
+        <hx-nav-item href="/patients" active>
+          <svg
+            slot="icon"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            width="20"
+            height="20"
+            aria-hidden="true"
+          >
+            <path
+              d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"
+            />
+          </svg>
+          Patients
+        </hx-nav-item>
+      </hx-side-nav>
+      <div style="flex: 1; padding: 2rem; background: #f9fafb;">
+        <p id="collapse-event-output" style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+          Click the toggle button on the nav to fire hx-collapse or hx-expand.
+        </p>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const nav = canvasElement.querySelector('hx-side-nav');
+    await expect(nav).toBeTruthy();
+
+    const collapseEvents: { collapsed: boolean }[] = [];
+    const expandEvents: { collapsed: boolean }[] = [];
+
+    nav!.addEventListener('hx-collapse', (e: Event) => {
+      collapseEvents.push((e as CustomEvent<{ collapsed: boolean }>).detail);
+    });
+
+    nav!.addEventListener('hx-expand', (e: Event) => {
+      expandEvents.push((e as CustomEvent<{ collapsed: boolean }>).detail);
+    });
+
+    // Click the toggle button to collapse
+    const toggleBtn = nav!.shadowRoot!.querySelector<HTMLButtonElement>('[part="toggle"]');
+    await expect(toggleBtn).toBeTruthy();
+
+    await userEvent.click(toggleBtn!);
+    await nav!.updateComplete;
+
+    // After first click, nav should be collapsed and hx-collapse should have fired
+    await expect(collapseEvents.length).toBeGreaterThan(0);
+    await expect(collapseEvents[0]!.collapsed).toBe(true);
+
+    // Click again to expand
+    await userEvent.click(toggleBtn!);
+    await nav!.updateComplete;
+
+    await expect(expandEvents.length).toBeGreaterThan(0);
+    await expect(expandEvents[0]!.collapsed).toBe(false);
+  },
+};
+
 export const WithSectionedNavigation: Story = {
   render: (args) => html`
     <div style="height: 600px; display: flex;">
@@ -434,4 +531,11 @@ export const WithSectionedNavigation: Story = {
       </div>
     </div>
   `,
+};
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    collapsed: true,
+  },
 };

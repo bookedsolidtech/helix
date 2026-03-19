@@ -431,7 +431,11 @@ export class HelixSlider extends LitElement {
         <!-- Track -->
         <div class="slider__track-container">
           <div part="track" class="slider__track">
-            <div part="fill" class="slider__fill" style=${styleMap({ width: `${fillPct}%` })}></div>
+            <div
+              part="fill"
+              class="slider__fill"
+              style=${styleMap({ '--_fill-ratio': String(fillPct / 100) })}
+            ></div>
 
             <input
               class="slider__input"

@@ -652,10 +652,6 @@ describe('hx-tabs', () => {
       newPanel.textContent = 'Panel Three';
       el.appendChild(newTab);
       el.appendChild(newPanel);
-      // Wait for slot change to propagate
-      await el.updateComplete;
-      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab insertion
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       expect(tabs).toHaveLength(3);
@@ -673,9 +669,6 @@ describe('hx-tabs', () => {
       el.appendChild(newTab);
       el.appendChild(newPanel);
       await el.updateComplete;
-      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab insertion
-      await new Promise((r) => setTimeout(r, 0));
-      await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const btn = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
       assertEl(btn, 'button').click();
@@ -688,9 +681,6 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       el.removeChild(tabs[2]);
-      await el.updateComplete;
-      // Yield to event loop to allow slotchange/DOM mutation callbacks to run after tab removal
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       const remainingTabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       expect(remainingTabs).toHaveLength(2);

@@ -182,8 +182,7 @@ describe('hx-split-button', () => {
         fired = true;
       });
       primary?.click();
-      // Allow brief settle time to confirm hx-click is not dispatched on a disabled split button
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });
@@ -291,8 +290,7 @@ describe('hx-split-button', () => {
         fired = true;
       });
       primary?.click();
-      // Allow brief settle time to confirm hx-click is not dispatched on a disabled split button
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
 
@@ -307,8 +305,6 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete before asserting final state after menu open
-      await new Promise((r) => setTimeout(r, 50));
 
       // Click the inner element of the menu item
       const menuItem = el.querySelector('hx-menu-item') as HelixMenuItem;
@@ -331,8 +327,6 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete before asserting final state after menu open
-      await new Promise((r) => setTimeout(r, 50));
 
       const menuItem = el.querySelector('hx-menu-item') as HelixMenuItem;
       const itemEl = menuItem.shadowRoot?.querySelector('.menu-item') as HTMLElement;
@@ -389,8 +383,6 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open before Escape is dispatched
-      await new Promise((r) => setTimeout(r, 50));
 
       // Dispatch Escape on the menu panel
       const menu = shadowQuery(el, '.split-button__menu');
@@ -426,20 +418,16 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open and items are focusable
-      await new Promise((r) => setTimeout(r, 50));
 
       const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
       // Focus first item
       items[0].focus();
-      // Allow brief settle time for focus to propagate before dispatching ArrowDown
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       // ArrowDown from first item should move to second
       const menu = shadowQuery(el, '.split-button__menu');
       menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-      // Allow brief settle time for focus movement to take effect
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(document.activeElement).toBe(items[1]);
     });
@@ -455,19 +443,15 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open and items are focusable
-      await new Promise((r) => setTimeout(r, 50));
 
       const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
       // Focus last item
       items[1].focus();
-      // Allow brief settle time for focus to propagate before dispatching ArrowDown
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       const menu = shadowQuery(el, '.split-button__menu');
       menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-      // Allow brief settle time for focus wrap-around to take effect
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(document.activeElement).toBe(items[0]);
     });
@@ -483,19 +467,15 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open and items are focusable
-      await new Promise((r) => setTimeout(r, 50));
 
       const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
       // Focus second item
       items[1].focus();
-      // Allow brief settle time for focus to propagate before dispatching ArrowUp
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       const menu = shadowQuery(el, '.split-button__menu');
       menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
-      // Allow brief settle time for focus movement to take effect
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(document.activeElement).toBe(items[0]);
     });
@@ -512,19 +492,15 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open and items are focusable
-      await new Promise((r) => setTimeout(r, 50));
 
       const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
       // Focus first item
       items[0].focus();
-      // Allow brief settle time for focus to propagate before dispatching ArrowUp
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       const menu = shadowQuery(el, '.split-button__menu');
       menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
-      // Allow brief settle time for focus wrap-around to take effect
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(document.activeElement).toBe(items[2]);
     });
@@ -541,18 +517,14 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open and items are focusable
-      await new Promise((r) => setTimeout(r, 50));
 
       const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
       items[2].focus();
-      // Allow brief settle time for focus to propagate before dispatching Home
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       const menu = shadowQuery(el, '.split-button__menu');
       menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
-      // Allow brief settle time for focus movement to take effect
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(document.activeElement).toBe(items[0]);
     });
@@ -569,18 +541,14 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open and items are focusable
-      await new Promise((r) => setTimeout(r, 50));
 
       const items = el.querySelectorAll<HelixMenuItem>('hx-menu-item');
       items[0].focus();
-      // Allow brief settle time for focus to propagate before dispatching End
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       const menu = shadowQuery(el, '.split-button__menu');
       menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
-      // Allow brief settle time for focus movement to take effect
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(document.activeElement).toBe(items[2]);
     });
@@ -639,8 +607,7 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       trigger?.click();
       await el.updateComplete;
-      // Allow CSS transition to complete so the menu is fully open before clicking a menu item
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
 
       const menuItem = el.querySelector('hx-menu-item') as HelixMenuItem;
       const itemEl = menuItem.shadowRoot?.querySelector('.menu-item') as HTMLElement;
@@ -803,8 +770,7 @@ describe('hx-menu-item', () => {
         fired = true;
       });
       item?.click();
-      // Allow brief settle time to confirm hx-item-select is not dispatched on a disabled menu item
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });

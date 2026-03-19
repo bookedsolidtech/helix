@@ -15,18 +15,12 @@ export default defineConfig({
     baseURL: 'http://localhost:3151',
     trace: 'on-first-retry',
   },
+  // VRT only needs one browser — Chromium catches visual regressions.
+  // Cross-browser rendering is tested separately.
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
   ],
 });

@@ -389,6 +389,11 @@ describe('hx-carousel', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
+    it('exposes "slide" CSS part', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      expect(el.shadowRoot?.querySelector('[part="slide"]')).toBeTruthy();
+    });
+
     it('slide group has role="group"', async () => {
       const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
       const group = el.shadowRoot?.querySelector('[role="group"]');
@@ -813,6 +818,52 @@ describe('hx-carousel', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects carousel items into the default slot', async () => {
+      const el = await fixture<HelixCarousel>(
+        `<hx-carousel label="Images">
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot:not([name])')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(3);
+    });
+
+    it('projects custom content into the previous-button slot', async () => {
+      const el = await fixture<HelixCarousel>(
+        `<hx-carousel label="Images">
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <button slot="previous-button" aria-label="Go back">Back</button>
+        </hx-carousel>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="previous-button"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect(assigned[0].tagName.toLowerCase()).toBe('button');
+    });
+
+    it('projects custom content into the next-button slot', async () => {
+      const el = await fixture<HelixCarousel>(
+        `<hx-carousel label="Images">
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <button slot="next-button" aria-label="Go forward">Next</button>
+        </hx-carousel>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="next-button"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect(assigned[0].tagName.toLowerCase()).toBe('button');
     });
   });
 });

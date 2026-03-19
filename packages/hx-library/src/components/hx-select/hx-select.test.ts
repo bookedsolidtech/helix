@@ -402,6 +402,26 @@ describe('hx-select', () => {
 
   // ─── Form (5) ───
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits selected option value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-select name="country" value="us">
+          <option value="us">United States</option>
+          <option value="ca">Canada</option>
+        </hx-select>
+      `;
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-select') as WcSelect;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('country')).toBe('us');
+      form.remove();
+    });
+  });
+
   describe('Form', () => {
     it('has formAssociated=true', () => {
       const ctor = customElements.get('hx-select') as unknown as { formAssociated: boolean };
@@ -807,6 +827,57 @@ describe('hx-select', () => {
       await el.updateComplete;
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects option elements into the default slot', async () => {
+      const el = await fixture<HxSelect>(
+        `<hx-select label="Country">
+          <option value="us">United States</option>
+          <option value="ca">Canada</option>
+        </hx-select>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot:not([name])')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(2);
+      expect((assigned[0] as HTMLElement).textContent).toBe('United States');
+    });
+
+    it('projects content into the label slot', async () => {
+      const el = await fixture<HxSelect>(
+        `<hx-select><span slot="label">Choose country</span></hx-select>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="label"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Choose country');
+    });
+
+    it('projects content into the error slot', async () => {
+      const el = await fixture<HxSelect>(
+        `<hx-select label="Country"><span slot="error">Required</span></hx-select>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="error"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Required');
+    });
+
+    it('projects content into the help-text slot', async () => {
+      const el = await fixture<HxSelect>(
+        `<hx-select label="Country" help-text=" "><span slot="help-text">Select your country</span></hx-select>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Select your country');
     });
   });
 });

@@ -849,3 +849,10 @@ export const WithLabel: Story = {
     await expect(tablist?.getAttribute('aria-label')).toBe('Patient record sections');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    orientation: 'vertical',
+  },
+};

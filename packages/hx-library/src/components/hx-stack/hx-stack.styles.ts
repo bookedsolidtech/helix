@@ -12,7 +12,7 @@ export const helixStackStyles = css`
   [part='base'] {
     display: flex;
     flex-direction: column;
-    gap: var(--hx-spacing-md, 1rem);
+    gap: var(--hx-space-4, 1rem);
   }
 
   /* ─── Direction ─── */
@@ -86,22 +86,22 @@ export const helixStackStyles = css`
   }
 
   :host([gap='xs']) [part='base'] {
-    gap: var(--hx-spacing-xs, 0.25rem);
+    gap: var(--hx-space-1, 0.25rem);
   }
 
   :host([gap='sm']) [part='base'] {
-    gap: var(--hx-spacing-sm, 0.5rem);
+    gap: var(--hx-space-2, 0.5rem);
   }
 
   :host([gap='md']) [part='base'] {
-    gap: var(--hx-spacing-md, 1rem);
+    gap: var(--hx-space-4, 1rem);
   }
 
   :host([gap='lg']) [part='base'] {
-    gap: var(--hx-spacing-lg, 1.5rem);
+    gap: var(--hx-space-6, 1.5rem);
   }
 
   :host([gap='xl']) [part='base'] {
-    gap: var(--hx-spacing-xl, 2rem);
+    gap: var(--hx-space-8, 2rem);
   }
 `;

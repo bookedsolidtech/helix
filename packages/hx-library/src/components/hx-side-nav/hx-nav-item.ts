@@ -169,7 +169,9 @@ export class HelixNavItem extends LitElement {
       <div class="nav-item">
         ${linkEl}
         <div part="children" class="nav-item__children" role="group">
-          <slot name="children" @slotchange=${this._onChildrenSlotChange}></slot>
+          <div class="nav-item__children-inner">
+            <slot name="children" @slotchange=${this._onChildrenSlotChange}></slot>
+          </div>
         </div>
       </div>
     `;

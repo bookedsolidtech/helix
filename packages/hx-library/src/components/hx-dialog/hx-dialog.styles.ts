@@ -31,14 +31,14 @@ export const helixDialogStyles = css`
     border-radius: var(--hx-dialog-border-radius, var(--hx-border-radius-lg));
     box-shadow: var(--hx-dialog-shadow, var(--hx-shadow-xl));
     width: var(--hx-dialog-width, var(--hx-size-128, 32rem));
-    max-width: calc(100vw - var(--hx-spacing-8, 2rem));
-    max-height: calc(100vh - var(--hx-spacing-8, 2rem));
+    max-width: calc(100vw - var(--hx-space-8, 2rem));
+    max-height: calc(100vh - var(--hx-space-8, 2rem));
     overflow: hidden;
     outline: none;
 
     /* Open/close animation */
     opacity: 0;
-    transform: translateY(var(--hx-spacing-4, 1rem)) scale(0.97);
+    transform: translateY(var(--hx-space-4, 1rem)) scale(0.97);
     transition:
       opacity var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out),
       transform var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out);
@@ -94,10 +94,10 @@ export const helixDialogStyles = css`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--hx-dialog-header-padding, var(--hx-spacing-5) var(--hx-spacing-6));
+    padding: var(--hx-dialog-header-padding, var(--hx-space-5) var(--hx-space-6));
     border-bottom: var(--hx-border-width-1) solid
       var(--hx-dialog-header-border-color, var(--hx-color-neutral-200));
-    gap: var(--hx-spacing-4);
+    gap: var(--hx-space-4);
     flex-shrink: 0;
   }
 
@@ -159,7 +159,7 @@ export const helixDialogStyles = css`
 
   .dialog__body {
     flex: 1 1 auto;
-    padding: var(--hx-dialog-body-padding, var(--hx-spacing-6));
+    padding: var(--hx-dialog-body-padding, var(--hx-space-6));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -170,8 +170,8 @@ export const helixDialogStyles = css`
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--hx-spacing-3);
-    padding: var(--hx-dialog-footer-padding, var(--hx-spacing-4) var(--hx-spacing-6));
+    gap: var(--hx-space-3);
+    padding: var(--hx-dialog-footer-padding, var(--hx-space-4) var(--hx-space-6));
     border-top: var(--hx-border-width-1) solid
       var(--hx-dialog-footer-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
