@@ -54,7 +54,7 @@ export class HelixMenu extends LitElement {
    * Timer handle that clears the typeahead buffer after a period of inactivity.
    * @internal
    */
-  private _typeaheadTimeout: ReturnType<typeof setTimeout> | undefined;
+  private _typeaheadTimer: ReturnType<typeof setTimeout> | null = null;
 
   private _getItems(): HelixMenuItem[] {
     return Array.from(this.querySelectorAll<HelixMenuItem>('hx-menu-item')).filter(
@@ -148,10 +148,13 @@ export class HelixMenu extends LitElement {
   }
 
   private _handleTypeahead(char: string, items: HelixMenuItem[]): void {
-    clearTimeout(this._typeaheadTimeout);
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+    }
     this._typeaheadBuffer += char.toLowerCase();
-    this._typeaheadTimeout = setTimeout(() => {
+    this._typeaheadTimer = setTimeout(() => {
       this._typeaheadBuffer = '';
+      this._typeaheadTimer = null;
     }, 500);
 
     const match = items.findIndex((item) => {
@@ -183,6 +186,7 @@ export class HelixMenu extends LitElement {
   }
 
   private _handleItemSelect(e: Event): void {
+    if (!(e instanceof CustomEvent)) return;
     const detail = (e as CustomEvent<{ item: HelixMenuItem; value: string }>).detail;
     const items = this._getItems();
     this._focusedIndex = items.indexOf(detail.item);
@@ -194,6 +198,14 @@ export class HelixMenu extends LitElement {
         detail: { item: detail.item, value: detail.value },
       }),
     );
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+      this._typeaheadTimer = null;
+    }
   }
 
   override firstUpdated(): void {

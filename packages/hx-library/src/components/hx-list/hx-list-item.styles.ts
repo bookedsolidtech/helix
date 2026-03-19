@@ -102,4 +102,10 @@ export const helixListItemStyles = css`
     color: var(--hx-list-item-description-color, var(--hx-color-neutral-500, #64748b));
     margin-top: var(--hx-space-1, 0.25rem);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    :host([interactive]) .list-item {
+      transition: none;
+    }
+  }
 `;

@@ -147,6 +147,10 @@ export const helixToastStyles = css`
     .toast {
       transition: none;
     }
+
+    .toast__close {
+      transition: none;
+    }
   }
 `;
 

@@ -53,6 +53,10 @@ export const helixDialogStyles = css`
     .dialog {
       transition: none;
     }
+
+    .dialog__close-btn {
+      transition: none;
+    }
   }
 
   /* ─── Native backdrop (modal mode) ─── */

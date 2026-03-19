@@ -326,7 +326,9 @@ export const helixComboboxStyles = css`
 
   @media (prefers-reduced-motion: reduce) {
     .field__input-wrapper,
-    .field__option {
+    .field__option,
+    .field__clear-button,
+    .field__chip-remove {
       transition: none;
     }
   }

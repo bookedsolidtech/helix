@@ -370,6 +370,24 @@ export const helixDatePickerStyles = css`
     pointer-events: none;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .field__input-wrapper {
+      transition: none;
+    }
+
+    .field__trigger {
+      transition: none;
+    }
+
+    .calendar__nav-btn {
+      transition: none;
+    }
+
+    .calendar__day {
+      transition: none;
+    }
+  }
+
   /* ─── Forced Colors (High Contrast Mode) ─── */
 
   @media (forced-colors: active) {

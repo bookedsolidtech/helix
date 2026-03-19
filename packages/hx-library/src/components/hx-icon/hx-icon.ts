@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -108,7 +108,7 @@ export class HelixIcon extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changed: Map<string, unknown>): void {
+  override updated(changed: PropertyValues<this>): void {
     if (changed.has('src') && this.src !== this._fetchedSrc) {
       void this._fetchInlineSvg(this.src);
     }

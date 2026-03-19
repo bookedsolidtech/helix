@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixProseScopedCss } from './hx-prose.styles.js';
@@ -63,7 +63,7 @@ export class HelixProse extends LitElement {
     this._applySize();
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('maxWidth')) {
       this._applyMaxWidth();
     }
@@ -76,9 +76,9 @@ export class HelixProse extends LitElement {
 
   private _applyMaxWidth(): void {
     if (this.maxWidth) {
-      this.style.maxWidth = this.maxWidth;
+      this.style.setProperty('--hx-prose-max-width', this.maxWidth);
     } else {
-      this.style.maxWidth = '';
+      this.style.removeProperty('--hx-prose-max-width');
     }
   }
 

@@ -171,6 +171,10 @@ export const helixButtonStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .button {
+      transition: none;
+    }
+
     .button__spinner {
       animation: none;
       opacity: var(--hx-opacity-muted, 0.6);

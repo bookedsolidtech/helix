@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixStepStyles } from './hx-step.styles.js';
@@ -111,7 +111,7 @@ export class HelixStep extends LitElement {
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('status')) {
       if (this.status === 'active') {

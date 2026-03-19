@@ -177,7 +177,7 @@ export class HelixTheme extends LitElement {
   /** @internal */
   private _themeSheet: CSSStyleSheet | null = null;
 
-  override firstUpdated(changed: PropertyValues): void {
+  override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
     this._initThemeSheet();
     if (this.system || this.theme === 'auto') {
@@ -185,7 +185,7 @@ export class HelixTheme extends LitElement {
     }
   }
 
-  override updated(changed: PropertyValues): void {
+  override updated(changed: PropertyValues<this>): void {
     super.updated(changed);
     const autoMode = this.system || this.theme === 'auto';
     if (changed.has('system') || changed.has('theme')) {
