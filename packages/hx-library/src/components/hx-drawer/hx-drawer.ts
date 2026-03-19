@@ -284,7 +284,7 @@ export class HelixDrawer extends LitElement {
     this._hideBackgroundFromScreenReaders();
 
     // Dispatch hx-show before visual update
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
 
     // Transition to open state
     void this.updateComplete
@@ -302,7 +302,9 @@ export class HelixDrawer extends LitElement {
         // Dispatch hx-after-show after animation duration
         const duration = this._getAnimationDuration();
         this._animationTimeout = setTimeout(() => {
-          this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
+          this.dispatchEvent(
+            new CustomEvent<void>('hx-after-show', { bubbles: true, composed: true }),
+          );
         }, duration);
       })
       .catch(console.error);
@@ -321,7 +323,7 @@ export class HelixDrawer extends LitElement {
     this._restoreBodyScroll();
     this._restoreBackgroundForScreenReaders();
 
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
 
     // Restore focus to the trigger immediately — before any animation timeout.
     // WCAG 2.4.3: focus must never remain on invisible or inert content.
@@ -333,7 +335,7 @@ export class HelixDrawer extends LitElement {
     // Animation cleanup only — no focus management inside this timeout.
     const duration = this._getAnimationDuration();
     this._animationTimeout = setTimeout(() => {
-      this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
+      this.dispatchEvent(new CustomEvent<void>('hx-after-hide', { bubbles: true, composed: true }));
     }, duration);
   }
 
@@ -396,7 +398,7 @@ export class HelixDrawer extends LitElement {
   // ─── Focus ───
 
   private _setInitialFocus(): void {
-    const event = new CustomEvent('hx-initial-focus', {
+    const event = new CustomEvent<void>('hx-initial-focus', {
       bubbles: true,
       composed: true,
       cancelable: true,

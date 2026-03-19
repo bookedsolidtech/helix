@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-code-snippet.js';
 
 // ─────────────────────────────────────────────────
@@ -343,4 +343,51 @@ export const InlineInDocs: Story = {
       </p>
     </div>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// 14. EVENT DEMO — hx-copy
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates the `hx-copy` event dispatched when the copy button is clicked.
+ * The event detail contains the copied text. Useful for logging, analytics, or
+ * displaying a custom confirmation toast in the consuming application.
+ */
+export const CopyEventDemo: Story = {
+  name: 'Events: hx-copy',
+  render: () => html`
+    <div>
+      <hx-code-snippet id="event-demo" language="javascript" copyable>
+        const patient = { id: 'pt-001', name: 'Jane Doe' };
+      </hx-code-snippet>
+      <p
+        id="copy-event-output"
+        style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; font-family: sans-serif;"
+      >
+        Click the copy button to see the hx-copy event fire.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const snippet = canvasElement.querySelector('hx-code-snippet');
+    await expect(snippet).toBeTruthy();
+
+    let eventFired = false;
+    let eventDetail: { text: string } | null = null;
+
+    snippet!.addEventListener('hx-copy', (e: Event) => {
+      eventFired = true;
+      eventDetail = (e as CustomEvent<{ text: string }>).detail;
+    });
+
+    const copyBtn = snippet!.shadowRoot!.querySelector<HTMLButtonElement>('[part="copy-button"]');
+    await expect(copyBtn).toBeTruthy();
+
+    await userEvent.click(copyBtn!);
+
+    await expect(eventFired).toBe(true);
+    await expect(eventDetail).toBeTruthy();
+    await expect(typeof (eventDetail as { text: string }).text).toBe('string');
+  },
 };

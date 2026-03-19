@@ -363,7 +363,7 @@ export class HelixSlider extends LitElement {
      * @event hx-input
      */
     this.dispatchEvent(
-      new CustomEvent('hx-input', {
+      new CustomEvent<{ value: number }>('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -382,7 +382,7 @@ export class HelixSlider extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: number }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },

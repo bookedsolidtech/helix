@@ -597,7 +597,7 @@ export class HelixDatePicker extends LitElement {
     this._updateValidity();
 
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string; date: Date }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: iso, date },

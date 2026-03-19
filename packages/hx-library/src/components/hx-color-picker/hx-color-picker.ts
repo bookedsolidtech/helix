@@ -509,9 +509,9 @@ export class HelixColorPicker extends LitElement {
       detail,
     };
     if (source === 'drag') {
-      this.dispatchEvent(new CustomEvent('hx-input', opts));
+      this.dispatchEvent(new CustomEvent<{ value: string }>('hx-input', opts));
     } else {
-      this.dispatchEvent(new CustomEvent('hx-change', opts));
+      this.dispatchEvent(new CustomEvent<{ value: string }>('hx-change', opts));
     }
   }
 

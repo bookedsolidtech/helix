@@ -96,7 +96,7 @@ export class HelixSkeleton extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has('loaded') && this.loaded) {
       this.dispatchEvent(
-        new CustomEvent('hx-loaded', {
+        new CustomEvent<void>('hx-loaded', {
           bubbles: true,
           composed: true,
         }),

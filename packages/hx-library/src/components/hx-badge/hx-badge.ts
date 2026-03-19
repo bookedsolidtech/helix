@@ -131,7 +131,7 @@ export class HelixBadge extends LitElement {
 
   private _handleRemove(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-remove', {
+      new CustomEvent<void>('hx-remove', {
         bubbles: true,
         composed: true,
       }),

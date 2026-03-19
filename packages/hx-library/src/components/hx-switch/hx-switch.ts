@@ -227,7 +227,7 @@ export class HelixSwitch extends LitElement {
     this.checked = !this.checked;
 
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ checked: boolean; value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { checked: this.checked, value: this.value },

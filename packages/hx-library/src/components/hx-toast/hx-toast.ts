@@ -176,18 +176,18 @@ export class HelixToast extends LitElement {
 
   /** @internal */
   private _emitShow(): void {
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
   /** @internal */
   private _emitHide(): void {
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
 
     let fired = false;
     const fireAfterHide = () => {
       if (fired) return;
       fired = true;
-      this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
+      this.dispatchEvent(new CustomEvent<void>('hx-after-hide', { bubbles: true, composed: true }));
     };
 
     // Fire on transitionend if available; fallback ensures it fires in test environments

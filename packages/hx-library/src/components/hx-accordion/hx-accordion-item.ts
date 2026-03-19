@@ -112,9 +112,13 @@ export class HelixAccordionItem extends LitElement {
     const options = { bubbles: true, composed: true, detail };
 
     if (expanded) {
-      this.dispatchEvent(new CustomEvent('hx-expand', options));
+      this.dispatchEvent(
+        new CustomEvent<{ expanded: boolean; itemId: string }>('hx-expand', options),
+      );
     } else {
-      this.dispatchEvent(new CustomEvent('hx-collapse', options));
+      this.dispatchEvent(
+        new CustomEvent<{ expanded: boolean; itemId: string }>('hx-collapse', options),
+      );
     }
   }
 
