@@ -323,14 +323,17 @@ export class HelixDrawer extends LitElement {
 
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
 
-    // Restore focus to the trigger
+    // Restore focus to the trigger immediately — before any animation timeout.
+    // WCAG 2.4.3: focus must never remain on invisible or inert content.
+    if (this._triggerElement && typeof this._triggerElement.focus === 'function') {
+      this._triggerElement.focus();
+    }
+    this._triggerElement = null;
+
+    // Animation cleanup only — no focus management inside this timeout.
     const duration = this._getAnimationDuration();
     this._animationTimeout = setTimeout(() => {
       this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
-      if (this._triggerElement && typeof this._triggerElement.focus === 'function') {
-        this._triggerElement.focus();
-      }
-      this._triggerElement = null;
     }, duration);
   }
 
