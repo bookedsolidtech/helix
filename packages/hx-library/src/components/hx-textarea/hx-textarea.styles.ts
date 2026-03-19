@@ -115,6 +115,12 @@ export const helixTextareaStyles = css`
     cursor: not-allowed;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .field__textarea-wrapper {
+      transition: none;
+    }
+  }
+
   /* --- Resize Variants --- */
 
   :host([resize='none']) .field__textarea {

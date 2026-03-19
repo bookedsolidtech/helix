@@ -100,6 +100,10 @@ export const helixProgressBarStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .progress-bar__fill {
+      transition: none;
+    }
+
     .progress-bar--indeterminate .progress-bar__fill {
       animation: none;
       width: 100%;

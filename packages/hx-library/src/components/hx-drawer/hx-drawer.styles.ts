@@ -78,6 +78,10 @@ export const helixDrawerStyles = css`
     .drawer-panel {
       transition: none;
     }
+
+    .drawer-close-button {
+      transition: none;
+    }
   }
 
   /* ─── Placement: end (default — right) ─── */
