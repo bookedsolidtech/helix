@@ -158,11 +158,8 @@ export const helixDrawerStyles = css`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--hx-spacing-4, 1rem);
-    padding: var(
-      --hx-drawer-header-padding,
-      var(--hx-spacing-5, 1.25rem) var(--hx-spacing-6, 1.5rem)
-    );
+    gap: var(--hx-space-4, 1rem);
+    padding: var(--hx-drawer-header-padding, var(--hx-space-5, 1.25rem) var(--hx-space-6, 1.5rem));
     border-bottom: var(--hx-border-width-1, 1px) solid
       var(--hx-drawer-header-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
@@ -181,7 +178,7 @@ export const helixDrawerStyles = css`
   .drawer-header-actions {
     display: flex;
     align-items: center;
-    gap: var(--hx-spacing-2, 0.5rem);
+    gap: var(--hx-space-2, 0.5rem);
     flex-shrink: 0;
   }
 
@@ -222,7 +219,7 @@ export const helixDrawerStyles = css`
 
   .drawer-body {
     flex: 1 1 auto;
-    padding: var(--hx-drawer-body-padding, var(--hx-spacing-6, 1.5rem));
+    padding: var(--hx-drawer-body-padding, var(--hx-space-6, 1.5rem));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -233,8 +230,8 @@ export const helixDrawerStyles = css`
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--hx-spacing-3, 0.75rem);
-    padding: var(--hx-drawer-footer-padding, var(--hx-spacing-4, 1rem) var(--hx-spacing-6, 1.5rem));
+    gap: var(--hx-space-3, 0.75rem);
+    padding: var(--hx-drawer-footer-padding, var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-1, 1px) solid
       var(--hx-drawer-footer-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;

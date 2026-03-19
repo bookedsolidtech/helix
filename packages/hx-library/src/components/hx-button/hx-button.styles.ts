@@ -185,7 +185,7 @@ export const helixButtonStyles = css`
 
   /* Override text color and filter-based hover/active for all variants */
   :host([inverted]) .button {
-    color: var(--hx-button-inverted-color, #ffffff);
+    color: var(--hx-button-inverted-color, var(--hx-color-neutral-0));
     filter: none;
   }
 
@@ -198,7 +198,10 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button:focus-visible {
-    outline-color: var(--hx-button-inverted-focus-ring-color, rgba(255, 255, 255, 0.5));
+    outline-color: var(
+      --hx-button-inverted-focus-ring-color,
+      var(--hx-overlay-white-50, rgba(255, 255, 255, 0.5))
+    );
   }
 
   /* Primary inverted — slight transparent white overlay on hover */
@@ -208,21 +211,21 @@ export const helixButtonStyles = css`
 
   /* Secondary inverted — white border and text */
   :host([inverted]) .button--secondary {
-    --hx-button-border-color: rgba(255, 255, 255, 0.7);
+    --hx-button-border-color: var(--hx-overlay-white-70, rgba(255, 255, 255, 0.7));
   }
 
   :host([inverted]) .button--secondary:hover {
-    --hx-button-bg: rgba(255, 255, 255, 0.15);
+    --hx-button-bg: var(--hx-overlay-white-15, rgba(255, 255, 255, 0.15));
   }
 
   /* Tertiary inverted */
   :host([inverted]) .button--tertiary {
-    --hx-button-bg: rgba(255, 255, 255, 0.15);
+    --hx-button-bg: var(--hx-overlay-white-15, rgba(255, 255, 255, 0.15));
     --hx-button-border-color: transparent;
   }
 
   :host([inverted]) .button--tertiary:hover {
-    --hx-button-bg: rgba(255, 255, 255, 0.25);
+    --hx-button-bg: var(--hx-overlay-white-25, rgba(255, 255, 255, 0.25));
   }
 
   /* Ghost inverted — transparent base, white hover bg */
@@ -237,11 +240,11 @@ export const helixButtonStyles = css`
 
   /* Outline inverted — white border */
   :host([inverted]) .button--outline {
-    --hx-button-border-color: rgba(255, 255, 255, 0.7);
+    --hx-button-border-color: var(--hx-overlay-white-70, rgba(255, 255, 255, 0.7));
   }
 
   :host([inverted]) .button--outline:hover {
-    --hx-button-bg: rgba(255, 255, 255, 0.15);
+    --hx-button-bg: var(--hx-overlay-white-15, rgba(255, 255, 255, 0.15));
   }
 
   /* ─── Prefix / Suffix / Label ─── */
