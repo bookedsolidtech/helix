@@ -628,7 +628,7 @@ export class HelixCombobox extends LitElement {
             'field__option--focused': isFocused,
             'field__option--disabled': opt.disabled,
           })}
-          aria-selected=${isSelected ? 'true' : 'false'}
+          aria-selected=${isSelected ? 'true' : nothing}
           aria-disabled=${opt.disabled ? 'true' : nothing}
           @click=${() => this._selectOption(opt)}
         >

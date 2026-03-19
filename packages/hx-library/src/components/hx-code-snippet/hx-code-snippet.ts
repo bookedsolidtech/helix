@@ -270,7 +270,7 @@ export class HelixCodeSnippet extends LitElement {
                 part="expand-button"
                 class="code-snippet__expand-button"
                 type="button"
-                aria-expanded=${this._expanded ? 'true' : 'false'}
+                aria-expanded=${this._expanded ? 'true' : nothing}
                 @click=${this._handleExpand}
               >
                 ${this._expanded ? this.labelShowLess : this.labelShowMore}

@@ -59,7 +59,7 @@ describe('hx-combobox', () => {
       expect(input?.getAttribute('aria-autocomplete')).toBe('list');
     });
 
-    it('aria-expanded is false when closed', async () => {
+    it('aria-expanded is "false" when closed', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
       const input = shadowQuery(el, 'input');
       expect(input?.getAttribute('aria-expanded')).toBe('false');
