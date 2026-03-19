@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup } from '../../test-utils.js';
+import { page } from '@vitest/browser/context';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTable } from './hx-table.js';
 import type { HelixTableHead } from './hx-thead.js';
 import type { HelixTableBody } from './hx-tbody.js';
@@ -199,6 +200,63 @@ describe('hx-table', () => {
       // The full-width attribute drives :host([full-width]) table { width: 100% }
       expect(el.hasAttribute('full-width')).toBe(true);
       expect(el.fullWidth).toBe(true);
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in minimal table with label', async () => {
+      const el = await fixture<HelixTable>('<hx-table label="Patient roster"></hx-table>');
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in full table composition', async () => {
+      const el = await fixture<HelixTable>(`
+        <hx-table label="Patient roster">
+          <hx-thead>
+            <hx-tr>
+              <hx-th>Name</hx-th>
+              <hx-th>Status</hx-th>
+            </hx-tr>
+          </hx-thead>
+          <hx-tbody>
+            <hx-tr>
+              <hx-td>Jane Doe</hx-td>
+              <hx-td>Active</hx-td>
+            </hx-tr>
+          </hx-tbody>
+        </hx-table>
+      `);
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with sortable columns', async () => {
+      const el = await fixture<HelixTable>(`
+        <hx-table label="Patient roster">
+          <hx-thead>
+            <hx-tr>
+              <hx-th sortable>Name</hx-th>
+              <hx-th sortable sort-direction="asc">Status</hx-th>
+            </hx-tr>
+          </hx-thead>
+          <hx-tbody>
+            <hx-tr>
+              <hx-td>Jane Doe</hx-td>
+              <hx-td>Active</hx-td>
+            </hx-tr>
+          </hx-tbody>
+        </hx-table>
+      `);
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
     });
   });
 });
