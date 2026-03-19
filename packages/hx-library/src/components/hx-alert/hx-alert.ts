@@ -110,7 +110,7 @@ export class HelixAlert extends LitElement {
 
   /** Returns true when the variant requires assertive announcement. */
   private get _isAssertive(): boolean {
-    return this.variant === 'error' || this.variant === 'warning';
+    return this.variant === 'error';
   }
 
   /**
@@ -179,8 +179,39 @@ export class HelixAlert extends LitElement {
       // that the live region content should be announced.
       if (this.open) {
         this.removeAttribute('aria-hidden');
+        // Trigger announcement via the sr-only polite live region for ATs (JAWS+Chrome,
+        // NVDA) that do not re-announce existing content when aria-hidden is merely removed.
+        // We inject text after a microtask so the DOM has settled and the live region
+        // is registered by the AT before content arrives.
+        const previousOpen = changedProperties.get('open');
+        if (previousOpen === false) {
+          Promise.resolve().then(() => {
+            const announcer = this.renderRoot.querySelector<HTMLElement>('.sr-only');
+            if (announcer) {
+              announcer.textContent = '';
+              // Second microtask ensures the clear is processed before re-injection,
+              // guaranteeing the AT sees a content change rather than no-op.
+              Promise.resolve().then(() => {
+                const severityLabels: Record<string, string> = {
+                  info: 'Info:',
+                  success: 'Success:',
+                  warning: 'Warning:',
+                  error: 'Error:',
+                };
+                const prefix = severityLabels[this.variant] ?? '';
+                const message = this.textContent?.trim() ?? '';
+                announcer.textContent = prefix ? `${prefix} ${message}` : message;
+              });
+            }
+          });
+        }
       } else {
         this.setAttribute('aria-hidden', 'true');
+        // Clear the announcer when hidden so stale text is not re-read on next open.
+        const announcer = this.renderRoot.querySelector<HTMLElement>('.sr-only');
+        if (announcer) {
+          announcer.textContent = '';
+        }
       }
     }
   }
@@ -287,8 +318,24 @@ export class HelixAlert extends LitElement {
       'alert--accent': this.accent,
     };
 
+    // WCAG 1.4.1: Always render a visually-hidden severity label so the variant
+    // is never conveyed by color alone, regardless of whether showIcon is set.
+    const SEVERITY_LABELS: Record<string, string> = {
+      info: 'Info:',
+      success: 'Success:',
+      warning: 'Warning:',
+      error: 'Error:',
+    };
+    const severityLabel = SEVERITY_LABELS[this.variant] ?? '';
+
     return html`
+      <div
+        class="sr-only"
+        aria-live=${this._isAssertive ? 'assertive' : 'polite'}
+        aria-atomic="true"
+      ></div>
       <div part="alert" class=${classMap(classes)}>
+        <span class="alert__severity-label">${severityLabel}</span>
         ${this.showIcon
           ? html`
               <div part="icon" class="alert__icon">

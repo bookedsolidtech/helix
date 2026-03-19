@@ -113,13 +113,22 @@ export class HelixPopover extends LitElement {
   @property({ type: String, reflect: true })
   label = 'Popover';
 
-  /** @internal */
+  /**
+   * Tracks whether the popover body is currently visible.
+   * @internal
+   */
   @state() private _visible = false;
 
-  /** @internal */
+  /**
+   * The element that held focus before the popover opened, used to restore focus on close.
+   * @internal
+   */
   private _previousFocus: HTMLElement | null = null;
 
-  /** @internal */
+  /**
+   * Unique ID assigned to the popover body element.
+   * @internal
+   */
   private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
 
   // ─── Lifecycle ───
@@ -180,7 +189,7 @@ export class HelixPopover extends LitElement {
 
     const assigned = defaultSlot.assignedElements({ flatten: true });
     const focusableSelector =
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      'a[href], area[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), details > summary';
 
     const result: HTMLElement[] = [];
     for (const el of assigned) {
@@ -347,7 +356,10 @@ export class HelixPopover extends LitElement {
   // ─── Event Handlers ───
 
   // P1-03 / P0-01: document-level handlers active only while popover is open
-  /** @internal */
+  /**
+   * Closes the popover when the Escape key is pressed while it is open.
+   * @internal
+   */
   private _handleDocumentKeydown = (e: Event): void => {
     if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
       // HIGH-03: Escape always restores focus to the prior element
@@ -356,7 +368,10 @@ export class HelixPopover extends LitElement {
   };
 
   // P0-01: close when click target is outside this component
-  /** @internal */
+  /**
+   * Closes the popover when a click occurs outside the component boundary.
+   * @internal
+   */
   private _handleDocumentClick = (e: Event): void => {
     // Shadow DOM retargets events from within to the host at document level,
     // so a click on the trigger wrapper appears as e.target === this.
@@ -366,7 +381,10 @@ export class HelixPopover extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Toggles the popover open/closed when the anchor is clicked in click trigger mode.
+   * @internal
+   */
   private _handleAnchorClick = (): void => {
     if (this.trigger !== 'click') return;
     if (this._visible) {
@@ -376,13 +394,19 @@ export class HelixPopover extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Opens the popover when the anchor receives a mouseenter event in hover trigger mode.
+   * @internal
+   */
   private _handleAnchorMouseEnter = (): void => {
     if (this.trigger !== 'hover') return;
     void this._show();
   };
 
-  /** @internal */
+  /**
+   * Closes the popover when the anchor receives a mouseleave event in hover trigger mode.
+   * @internal
+   */
   private _handleAnchorMouseLeave = (): void => {
     if (this.trigger !== 'hover') return;
     void this._hide(false);

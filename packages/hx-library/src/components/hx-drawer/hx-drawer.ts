@@ -588,7 +588,7 @@ export class HelixDrawer extends LitElement {
         @click=${this._handleOverlayClick}
       >
         <div class="drawer-backdrop" aria-hidden="true"></div>
-        <div part="panel" class="drawer-panel" tabindex="-1" role="document">
+        <div part="panel" class="drawer-panel" tabindex="-1">
           ${this._renderHeader()}
           <div part="body" class="drawer-body">
             <slot></slot>

@@ -143,8 +143,12 @@ export const helixDialogStyles = css`
   }
 
   .dialog__close-btn:focus-visible {
-    outline: 2px solid var(--hx-color-primary-500, #3b82f6);
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(
+        --hx-dialog-close-btn-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+      );
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Body ─── */

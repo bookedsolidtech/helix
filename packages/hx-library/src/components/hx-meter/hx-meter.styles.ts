@@ -61,6 +61,30 @@ export const helixMeterStyles = css`
     --_indicator-color: var(--hx-meter-color-danger, var(--hx-color-danger-500, #ef4444));
   }
 
+  /* ─── State Label (WCAG 1.4.1) ─── */
+  /* Visible text label rendered below the track when a semantic state is active. */
+  /* Ensures the meter state is not conveyed by fill color alone.                 */
+  /* aria-hidden="true" because aria-valuetext already includes the state for AT. */
+
+  .meter__state-label {
+    font-size: var(--hx-font-size-xs, 0.75rem);
+    font-weight: var(--hx-font-weight-medium, 500);
+    line-height: var(--hx-line-height-tight, 1.25);
+    font-family: var(--hx-font-family-sans, sans-serif);
+  }
+
+  .meter__state-label[data-state='optimum'] {
+    color: var(--hx-meter-color-optimum, var(--hx-color-success-700, #15803d));
+  }
+
+  .meter__state-label[data-state='warning'] {
+    color: var(--hx-meter-color-warning, var(--hx-color-warning-700, #b45309));
+  }
+
+  .meter__state-label[data-state='danger'] {
+    color: var(--hx-meter-color-danger, var(--hx-color-danger-700, #b91c1c));
+  }
+
   /* ─── Native meter hidden (we use custom rendering) ─── */
 
   .meter__native {
