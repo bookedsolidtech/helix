@@ -1,0 +1,386 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "claude-sonnet-4-6",
+  "summary": {
+    "componentsAudited": 8,
+    "totalFindings": 32,
+    "critical": 5,
+    "high": 10,
+    "medium": 11,
+    "low": 6
+  },
+  "findings": [
+    {
+      "component": "hx-tab",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-disabled=\"false\" set on non-disabled tabs is semantically incorrect",
+      "description": "The inner button renders aria-disabled=\"false\" on all non-disabled tabs (line 117: aria-disabled=${this.disabled ? 'true' : 'false'}). The WAI-ARIA spec states aria-disabled should be omitted (not set to 'false') when the element is not disabled. Sending 'false' is redundant noise to screen readers and deviates from the Lit `nothing` convention used everywhere else in this codebase. JAWS and NVDA may announce 'not disabled' unnecessarily.",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tab.ts",
+      "line": 117,
+      "fix": "Change aria-disabled=${this.disabled ? 'true' : 'false'} to aria-disabled=${this.disabled ? 'true' : nothing}. Import `nothing` from 'lit' (already imported on line 1). This matches the pattern used in hx-button and is consistent with ARIA best practices."
+    },
+    {
+      "component": "hx-tab",
+      "severity": "medium",
+      "wcagCriteria": "2.4.3",
+      "title": "Dual tabindex management between hx-tab host and inner button may cause double focus stop in some AT",
+      "description": "hx-tabs sets tabindex on the hx-tab host element (line 217 of hx-tabs.ts) AND the inner shadow button also manages its own tabindex (line 119 of hx-tab.ts). Without delegatesFocus, the host element and the inner button are both focusable. The comment in hx-tabs.ts acknowledges this is intentional for roving tabindex but the host element receiving tabindex=0 without delegatesFocus means Tab can land on the host, and a second Tab lands on the inner button — creating two stops per tab. This is a focus order violation for users navigating sequentially.",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.ts",
+      "line": 217,
+      "fix": "Add `static shadowRootOptions = { ...LitElement.shadowRootOptions, delegatesFocus: true }` to HelixTab. This automatically delegates focus to the inner button when the host receives focus, eliminating the double stop. Then remove the manual tabindex setting on the host (tab.tabIndex = isSelected ? 0 : -1 in _updateTabsAndPanels) and rely solely on the button's tabindex management."
+    },
+    {
+      "component": "hx-tab-panel",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-tab-panel missing aria-labelledby resolution across shadow boundary",
+      "description": "The panel sets aria-labelledby pointing to the hx-tab host element ID (set externally by hx-tabs._syncTabsAndPanels at line 198 of hx-tabs.ts). However the actual element carrying role=\"tab\" is the inner shadow button, not the host. aria-labelledby on the tabpanel host references the hx-tab host ID, but screen readers may resolve the accessible name from the hx-tab host's text content (which is the slot content — generally correct) rather than the button. In strict shadow DOM environments (Firefox + NVDA) this cross-boundary reference may not resolve the computed name correctly.",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tab-panel.ts",
+      "line": null,
+      "fix": "Keep the current pattern but verify in NVDA + Firefox that the panel name is announced correctly when Tab moves to the panel. If broken, the mitigation is to add a visible or visually-hidden aria-label to the panel that mirrors the tab label, or restructure so label and panel are in the same shadow root."
+    },
+    {
+      "component": "hx-tabs",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "No aria-label warning when label property is empty string",
+      "description": "The tablist renders with no aria-label when the label property is empty (the default). WCAG 4.1.2 and the ARIA tablist pattern require the tablist to have an accessible name so screen readers can announce its purpose. The component provides the label property for this but makes no effort to warn consumers when it is absent. In practice, many consumers will omit the label, leaving the tablist unnamed.",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.ts",
+      "line": 81,
+      "fix": "Add a devWarn() call in connectedCallback or firstUpdated if this.label is empty, similar to the existing _warnInvalidSlotContent() pattern. Example: devWarn('hx-tabs', 'No label provided. Set the `label` attribute to describe the tablist for screen reader users (e.g. label=\"Patient record sections\").')."
+    },
+    {
+      "component": "hx-breadcrumb-item",
+      "severity": "high",
+      "wcagCriteria": "2.5.5",
+      "title": "No minimum touch target enforcement on breadcrumb links",
+      "description": "The hx-breadcrumb-item anchor element has no minimum height or padding enforced in its styles. Breadcrumb links typically render as inline text with minimal click area. WCAG 2.5.5 (AA in 2.2, advisory in 2.1) requires 44x44px touch targets. On mobile/tablet clinical portal views, small breadcrumb link targets will fail for users with motor impairments. The hx-breadcrumb-item.styles.ts has no min-height, min-width, or padding on the anchor.",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb-item.styles.ts",
+      "line": null,
+      "fix": "Add `min-height: 44px; display: inline-flex; align-items: center;` to the `a[part='link']` selector in hx-breadcrumb-item.styles.ts. Alternatively add `padding-block: 0.5rem;` to give the link sufficient tap area without visually changing the breadcrumb layout."
+    },
+    {
+      "component": "hx-breadcrumb",
+      "severity": "medium",
+      "wcagCriteria": "2.4.8",
+      "title": "Collapsed breadcrumb ellipsis button does not announce expansion result to screen readers",
+      "description": "When the ellipsis expand button is activated, it resets maxItems to 0 and the full breadcrumb is revealed. However there is no aria-live announcement and no focus management after expansion. Screen reader users who activate the ellipsis will not know the list has expanded; focus remains on the now-removed ellipsis element which disappears from the DOM. This causes focus loss.",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.ts",
+      "line": 277,
+      "fix": "After calling _removeCollapse in _expandBreadcrumb(), move focus to the first revealed breadcrumb item (the item after the original first item). Also add a visually-hidden aria-live region that announces 'All breadcrumb items are now visible' on expansion. Example: this._liveRegion.textContent = 'All breadcrumb items visible';"
+    },
+    {
+      "component": "hx-breadcrumb",
+      "severity": "low",
+      "wcagCriteria": "1.3.1",
+      "title": "Collapsed items use data-bc-hidden attribute but not aria-hidden or display:none — items remain in accessibility tree",
+      "description": "When collapse is applied, middle items get data-bc-hidden attribute (line 219 of hx-breadcrumb.ts). The CSS presumably hides them visually. However if the CSS only applies display:none via attribute selector, items that are visually hidden but not aria-hidden may still be traversed by some screen readers. The audit cannot verify the exact CSS rule applied to data-bc-hidden without seeing the breadcrumb styles file, but this pattern warrants verification.",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.ts",
+      "line": 219,
+      "fix": "Verify that the CSS for [data-bc-hidden] applies display:none (which removes from accessibility tree) rather than visibility:hidden or opacity:0 (which do not). If not display:none, also set aria-hidden='true' on hidden items programmatically in _applyCollapse."
+    },
+    {
+      "component": "hx-nav",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "Submenu has role=\"list\" but no ARIA relationship to its triggering button",
+      "description": "The submenu in hx-nav is rendered as a <ul role=\"list\"> (line 342) with aria-label=\"${parentLabel} submenu\". The parent button has aria-expanded but no aria-controls pointing to the submenu element. Screen readers cannot programmatically navigate from the button to its controlled submenu. Additionally, using role=\"list\" instead of role=\"menu\" is incorrect for a triggered dropdown — this should follow the disclosure navigation pattern, not a listbox/menu pattern.",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.ts",
+      "line": 340,
+      "fix": "Add a stable id to the submenu element (e.g. id=\"nav-submenu-${index}\") and add aria-controls=\"nav-submenu-${index}\" to the parent button. Alternatively follow the disclosure navigation pattern (no role=\"menu\") and rely on aria-expanded alone with the list visible in DOM order. Remove role=\"list\" from the submenu and let the <ul> element's implicit list role serve screen readers."
+    },
+    {
+      "component": "hx-nav",
+      "severity": "critical",
+      "wcagCriteria": "2.1.1",
+      "title": "Keyboard navigation for hx-nav does not handle Tab key to close submenu — focus escapes without closing",
+      "description": "When a submenu is open and the user presses Tab (forward or shift-Tab), focus moves to the next element outside the submenu without closing _expandedIndex. This leaves the submenu open visually while focus has moved away, which is a keyboard trap variant and violates the expected disclosure widget behavior. The Escape key correctly closes submenus (_handleSubKeydown line 264), but Tab is not handled.",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.ts",
+      "line": 240,
+      "fix": "Add a focusout event listener on the nav element. When focus leaves the component entirely (relatedTarget is null or not inside the nav), set _expandedIndex = null to close any open submenu. Example: this.addEventListener('focusout', (e) => { if (!this.contains(e.relatedTarget as Node)) { this._expandedIndex = null; } });"
+    },
+    {
+      "component": "hx-nav",
+      "severity": "high",
+      "wcagCriteria": "2.5.5",
+      "title": "Mobile hamburger toggle button may not meet 44x44px minimum touch target at all viewport widths",
+      "description": "The hx-nav toggle button has padding: var(--hx-space-2, 0.5rem) which gives it approximately 8px padding around the 24px SVG icon, yielding ~40x40px. This falls short of the 44x44px WCAG 2.5.5 minimum touch target. Only hx-top-nav explicitly comments that its 0.75rem (12px) padding + 24px icon = 48px. The hx-nav toggle uses 0.5rem (8px), which yields 40px.",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.styles.ts",
+      "line": 29,
+      "fix": "Change the toggle button padding from var(--hx-space-2, 0.5rem) to var(--hx-space-3, 0.75rem) to ensure the touch target reaches the 44x44px minimum. Add a comment documenting the calculation as done in hx-top-nav.styles.ts."
+    },
+    {
+      "component": "hx-nav",
+      "severity": "medium",
+      "wcagCriteria": "2.4.3",
+      "title": "Mobile nav list shown/hidden via CSS class only — hidden items may remain in tab order",
+      "description": "On mobile, the nav list is hidden via display:none only when the class nav__list--open is absent (line 207 of hx-nav.styles.ts: [part='list'].nav__list--open { display: flex }). When closed, the list uses display:none via the absence of the open class — however this depends on the base style having display:none. Looking at the styles, [part='list'] has display:flex normally, and is only overridden in the media query to display:none when closed. This means on non-mobile viewports the list is always visible, which is correct. But on mobile, closed state links ARE in the tab order since only display:none properly removes them. The implementation correctly uses display:none to hide the list, so this needs verification that all list items receive display:none when the hamburger is closed.",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.styles.ts",
+      "line": 197,
+      "fix": "Verify the mobile CSS chain is correct: at max-width 768px, [part='list'] should have display:none by default and display:flex only when .nav__list--open is present. Additionally add aria-hidden=${!this._mobileOpen || nothing} to the list element when on mobile to remove closed items from the accessibility tree, mirroring what hx-top-nav does with its aria-expanded on the toggle."
+    },
+    {
+      "component": "hx-nav",
+      "severity": "low",
+      "wcagCriteria": "1.4.3",
+      "title": "Submenu link text color in vertical orientation may have insufficient contrast",
+      "description": "Vertical orientation submenu links use color var(--hx-nav-link-color, var(--hx-color-neutral-300, #d1d5db)) on a transparent background that inherits from the parent nav background var(--hx-color-neutral-900, #111827). #d1d5db on #111827 gives approximately 10.7:1, which passes. However the submenu uses a lighter color in xs font-size (0.75rem), and if the consumer overrides the token without adjusting contrast, the small text may fail. This is a risk finding, not a confirmed violation.",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.styles.ts",
+      "line": 181,
+      "fix": "Document the expected minimum contrast ratios in the component's @cssprop JSDoc entries. Add a design token audit gate that verifies --hx-nav-link-color against --hx-nav-bg maintains at least 4.5:1 for normal text and 3:1 for large text."
+    },
+    {
+      "component": "hx-side-nav",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-expanded on the collapse toggle button uses boolean (not string) which may not serialize correctly",
+      "description": "The side-nav toggle button at line 207 renders aria-expanded=${!this.collapsed}. In Lit, when a non-string reactive property is interpolated into a template attribute, it is coerced to a string. Boolean false becomes the string 'false' and true becomes 'true', which is correct. However the value is the boolean `!this.collapsed` not a string literal 'true'/'false'. While Lit handles this correctly in most cases, using String(!this.collapsed) or the ternary pattern used elsewhere ('true' : 'false') is safer and explicit for ARIA attributes which must be strings.",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.ts",
+      "line": 207,
+      "fix": "Change aria-expanded=${!this.collapsed} to aria-expanded=${this.collapsed ? 'false' : 'true'} to be explicit and consistent with the pattern used for aria-expanded throughout the rest of the library. This eliminates any risk of boolean serialization issues with ARIA attributes."
+    },
+    {
+      "component": "hx-nav-item",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-nav-item children group container has role=\"group\" but no accessible name",
+      "description": "The children container div at line 171 has role=\"group\" but no aria-label or aria-labelledby. A group role without an accessible name means screen readers announce 'group' with no context — users cannot determine what the group contains before entering it. This is especially problematic for nested navigation in healthcare portals where users may have several levels of sub-navigation.",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-nav-item.ts",
+      "line": 171,
+      "fix": "Add aria-label to the group element. The label text should match the parent item's label. Since the label is already computed in _getDirectText(), use it: <div part=\"children\" class=\"nav-item__children\" role=\"group\" aria-label=${this._isCollapsed ? nothing : `${label} submenu`}>. When collapsed the group is not visible so the label can be omitted."
+    },
+    {
+      "component": "hx-nav-item",
+      "severity": "medium",
+      "wcagCriteria": "1.4.13",
+      "title": "Tooltip in collapsed mode appears only on hover/focus but is not keyboard-dismissible via Escape",
+      "description": "The nav-item tooltip (line 138-139) appears when the nav is collapsed and the user hovers or focuses the item. WCAG 1.4.13 requires that tooltip-like content appearing on hover/focus be: dismissible without moving focus, hoverable (pointer can move to it), and persistent. The tooltip has pointer-events:none (line 181 of styles) so it cannot be hovered. The component does not implement Escape key to dismiss the tooltip. While the tooltip is purely presentational (the label is the same as the visible link text), it is still a WCAG 1.4.13 concern.",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-nav-item.ts",
+      "line": 138,
+      "fix": "Either: (1) Add an Escape keydown handler on the nav-item that temporarily hides the tooltip by toggling a state variable, or (2) Remove pointer-events:none from the tooltip to make it hoverable as required by WCAG 1.4.13. Option 2 is the simpler fix and better experience. The tooltip can be re-implemented as a Popover API tooltip or a positioned element with pointer-events:auto."
+    },
+    {
+      "component": "hx-nav-item",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-describedby references 'nav-item-tooltip' ID which is not unique across multiple hx-nav-items",
+      "description": "The tooltip element is given id=\"nav-item-tooltip\" (line 138) and the link/button uses aria-describedby=\"nav-item-tooltip\" (lines 151, 161). Since each hx-nav-item creates its own shadow DOM, these IDs are scoped within each shadow root — so they are not globally duplicated in the light DOM. However, aria-describedby does NOT cross shadow boundaries. The aria-describedby on the link element references 'nav-item-tooltip' but the tooltip lives in the SAME shadow root, so it should resolve correctly. This needs verification — if the link and tooltip are in the same shadow root, the reference is valid. This is marked medium pending confirmation.",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-nav-item.ts",
+      "line": 151,
+      "fix": "Verify that the aria-describedby resolution works within the shadow root in all target browsers. Test by focusing the collapsed nav item in NVDA+Chrome and JAWS+Chrome to confirm the tooltip text is announced as the accessible description. If not announced, use aria-label on the link instead of aria-describedby for the collapsed tooltip text."
+    },
+    {
+      "component": "hx-top-nav",
+      "severity": "high",
+      "wcagCriteria": "2.4.3",
+      "title": "Mobile menu content is hidden via display:none when closed but mobile toggle aria-controls references a div, not a semantic nav/list element",
+      "description": "The toggle button has aria-controls=\"nav-menu\" pointing to the div#nav-menu collapsible container. This is technically valid but the div has no role — it is not a list, navigation, or dialog. When the mobile menu opens, screen readers hear aria-expanded='true' and could navigate to the controlled region, but the region itself has no announced role. Users of JAWS or NVDA using aria-controls navigation may be confused about what they are entering.",
+      "file": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.ts",
+      "line": 184,
+      "fix": "Add role=\"navigation\" or aria-label to the div#nav-menu element to give the controlled region an identifiable role. Alternatively, move aria-controls to point to the inner div[part='menu'] which contains the actual navigation links. Also consider whether the mobile menu warrants aria-hidden='true' when closed (currently it is removed from display via CSS, so it is already removed from the accessibility tree by display:none)."
+    },
+    {
+      "component": "hx-top-nav",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-top-nav mobile toggle label is generic ('Toggle navigation') — does not communicate open/closed state in aria-label",
+      "description": "The mobile toggle button has a static aria-label=\"Toggle navigation\" (line 185). Unlike hx-nav which updates its label ('Open navigation menu'/'Close navigation menu' based on state), and unlike hx-side-nav which uses 'Expand navigation'/'Collapse navigation', hx-top-nav uses a static label that does not communicate state changes. Screen readers relying on aria-label alone will not know if the menu is currently open or closed.",
+      "file": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.ts",
+      "line": 185,
+      "fix": "Change aria-label to be dynamic: aria-label=${this._mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}. This ensures screen readers announce the correct action when the button is focused, consistent with the pattern in hx-nav."
+    },
+    {
+      "component": "hx-top-nav",
+      "severity": "low",
+      "wcagCriteria": "2.1.1",
+      "title": "No keyboard navigation pattern documented or implemented for slotted nav items inside hx-top-nav",
+      "description": "hx-top-nav is a slot-driven component — it places nav items in the default slot and actions in the actions slot. It handles Escape to close the mobile menu but does not implement any keyboard navigation pattern for the slotted content. Consumer-provided navigation links (e.g. <a> elements) rely entirely on native browser Tab navigation. This is acceptable for link-based navigation, but if consumers slot buttons or dropdowns, there is no arrow key navigation support documented or enforced.",
+      "file": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.ts",
+      "line": 69,
+      "fix": "Document in the JSDoc/Storybook that slotted content is responsible for its own keyboard navigation, and that the hx-top-nav only provides Escape-to-close for the mobile menu. If the design system supports a companion hx-nav-link or hx-dropdown component, those should implement their own keyboard patterns."
+    },
+    {
+      "component": "hx-pagination",
+      "severity": "critical",
+      "wcagCriteria": "2.5.5",
+      "title": "Pagination buttons are 36px (2.25rem) height — below the 44x44px WCAG minimum touch target",
+      "description": "The pagination button height is set to var(--hx-pagination-button-size, 2.25rem) = 36px (line 39 of styles). The minimum touch target per WCAG 2.5.5 is 44x44px. At 36px height, all pagination buttons (prev, next, page numbers, first, last) fail the minimum touch target requirement. This is a healthcare application where many users may have motor impairments, making this especially critical.",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.styles.ts",
+      "line": 39,
+      "fix": "Change the default value of --hx-pagination-button-size from 2.25rem to 2.75rem (44px). Update the CSS variable documentation comment. Alternatively, keep the visual size at 2.25rem but add a ::before pseudo-element that expands the click/touch area to 44px using position:absolute and a negative inset, which is a common pattern for maintaining visual design while meeting touch target requirements."
+    },
+    {
+      "component": "hx-pagination",
+      "severity": "high",
+      "wcagCriteria": "2.4.6",
+      "title": "Ellipsis in pagination is aria-hidden but provides no screen reader alternative to communicate skipped pages",
+      "description": "The ellipsis element is rendered with aria-hidden=\"true\" (line 347) which correctly hides it from screen readers. However there is no accessible announcement of what the ellipsis represents (e.g. 'Pages 4 through 7 not shown'). Users navigating by keyboard who encounter the invisible ellipsis gap between page buttons have no way of knowing that pages were skipped. This affects users who cannot see the visual ellipsis characters.",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.ts",
+      "line": 347,
+      "fix": "Add a visually-hidden span adjacent to each ellipsis that provides screen-reader-only context. Example: <span class=\"visually-hidden\">more pages</span><span part=\"ellipsis\" class=\"ellipsis\" aria-hidden=\"true\">…</span>. This ensures screen reader users understand the pagination is not consecutive."
+    },
+    {
+      "component": "hx-pagination",
+      "severity": "medium",
+      "wcagCriteria": "1.4.3",
+      "title": "Focus ring uses non-token property --hx-color-focus which may not be defined in all token sets",
+      "description": "The focus ring for pagination buttons uses outline: 2px solid var(--hx-color-focus, var(--hx-color-primary, #2563eb)) (line 63-64 of styles). This uses the --hx-focus-ring-color / --hx-focus-ring-width token pattern from the system-level context, but with a slightly different token name (--hx-color-focus vs --hx-focus-ring-color). If --hx-color-focus is not defined in the token set, the fallback is --hx-color-primary (#2563eb), which has a 3:1 contrast ratio against white (#ffffff) — insufficient for focus indicator contrast per WCAG 1.4.11.",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.styles.ts",
+      "line": 63,
+      "fix": "Standardize the focus ring tokens to use var(--hx-focus-ring-width, 2px) and var(--hx-focus-ring-color, #2563eb) consistently with the rest of the library (as done in hx-nav, hx-tab, etc.). Remove --hx-color-focus references and use the --hx-focus-ring-* token set throughout pagination."
+    },
+    {
+      "component": "hx-pagination",
+      "severity": "low",
+      "wcagCriteria": "3.3.1",
+      "title": "Page size selector label uses implicit label association only — may fail in some AT implementations",
+      "description": "The page size selector uses a wrapping <label> element with the <select> inside (line 280-293). This implicit label association is valid HTML but some older screen readers and some ARIA-specific AT may prefer explicit for/id association. The select element has no id and the label has no for attribute. The implicit association should work in modern screen readers but is a risk in older AT.",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.ts",
+      "line": 280,
+      "fix": "Add an explicit for/id association: generate a stable id for the select element (e.g. using the component's instance counter or a fixed id within the shadow root) and add the matching for attribute to the label. Example: <label for=\"page-size-select\" ...> and <select id=\"page-size-select\" ...>."
+    },
+    {
+      "component": "hx-steps",
+      "severity": "critical",
+      "wcagCriteria": "2.4.3",
+      "title": "hx-step uses role=\"listitem\" and tabindex=\"0\" on the host element — creates a non-interactive element as a tab stop with no keyboard activation affordance",
+      "description": "hx-step sets role=\"listitem\" on the host (line 105) and tabindex=\"0\" (line 107). A listitem is not an interactive role and has no keyboard interaction model in ARIA. Setting tabindex on a non-interactive element means Tab reaches the step but users have no AT indication of what keyboard action will activate it. Only Enter and Space are handled (via _handleKeydown), but screen readers will not announce the element as a button or link — they will announce it as 'list item, step N label'. This creates an unclear keyboard interface for users with visual impairments.",
+      "file": "packages/hx-library/src/components/hx-step/hx-step.ts",
+      "line": 105,
+      "fix": "Replace role=\"listitem\" + tabindex=\"0\" on the host with an inner button element in the shadow DOM for interactive steps. If steps are clickable, the indicator should be a <button> with aria-label=\"Step N: {label}, {status}\" rather than a div with a click handler. Non-clickable steps should not be in the tab order. The current pattern where the entire step host is a tab stop with role=listitem violates the interactive element pattern requirement."
+    },
+    {
+      "component": "hx-steps",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Step status ('pending', 'active', 'complete', 'error') not announced to screen readers — only visual distinction",
+      "description": "Step status is communicated entirely through visual styling (colors and icons). The aria-current=\"step\" attribute is set for active steps, and the sr-only 'Complete'/'Error' text exists inside the indicator for complete/error status. However 'pending' status has no screen reader announcement — the step number is shown but not the status. Also, the step label is in a separate div, not associated with the ARIA state via aria-label or aria-describedby. Screen readers may announce only 'list item, 1' without the step label or status.",
+      "file": "packages/hx-library/src/components/hx-steps/hx-step.ts",
+      "line": 214,
+      "fix": "Add an aria-label to the hx-step host element that combines the step number, label, and status. Example in updated(): this.setAttribute('aria-label', `Step ${this.index + 1}: ${this.label}, ${this.status}`). Or add a visually-hidden status span to the shadow DOM that announces the status for pending steps: <span class=\"sr-only\">${this.status === 'pending' ? 'Not started' : ''}</span>."
+    },
+    {
+      "component": "hx-steps",
+      "severity": "medium",
+      "wcagCriteria": "2.1.1",
+      "title": "No arrow key navigation between steps — keyboard users must Tab through each step individually",
+      "description": "The hx-steps component provides only Tab navigation between steps. The ARIA list pattern suggests that for interactive list items (steps that can be clicked), arrow key navigation should be implemented to allow users to move between steps without adding each to the tab ring. Currently all enabled steps are in the tab order via tabindex=\"0\" on each host, creating a large number of tab stops for long step sequences.",
+      "file": "packages/hx-library/src/components/hx-steps/hx-steps.ts",
+      "line": 131,
+      "fix": "Implement roving tabindex at the hx-steps level: only the active/current step should have tabindex=\"0\", all others should have tabindex=\"-1\". Add keydown handling in hx-steps for ArrowLeft/ArrowRight (horizontal) and ArrowUp/ArrowDown (vertical) to move focus between steps. This is consistent with the pattern used in hx-tabs."
+    },
+    {
+      "component": "hx-steps",
+      "severity": "low",
+      "wcagCriteria": "1.4.11",
+      "title": "Focus ring on hx-step applies to the .step__indicator circle only, not the full step area",
+      "description": "The focus-visible style in hx-step.styles.ts (line 37) targets :host(:focus-visible) .step__indicator — this applies the focus ring only around the small circular indicator, not the full clickable step area. Since the full .step div is clickable (line 216: @click=${this._handleClick}), the focus indicator does not encompass the actual interactive hit area, potentially confusing users about what is focused.",
+      "file": "packages/hx-library/src/components/hx-steps/hx-step.styles.ts",
+      "line": 37,
+      "fix": "Change the focus ring target to apply to the entire :host element or the .step div rather than just the indicator. Use :host(:focus-visible) { outline: 2px solid var(--hx-color-primary-500); outline-offset: 4px; border-radius: var(--hx-border-radius-md); } to give the focus ring proper context around the full interactive area."
+    },
+    {
+      "component": "hx-steps",
+      "severity": "medium",
+      "wcagCriteria": "1.4.3",
+      "title": "hx-steps component has no prefers-reduced-motion support",
+      "description": "The hx-step styles include transitions on the indicator's background-color, border-color, and color (lines 67-71 in hx-step.styles.ts) and on the connector background-color (line 87). There is no @media (prefers-reduced-motion: reduce) block in hx-step.styles.ts to disable these transitions. The hx-steps.styles.ts container also has no reduced motion handling.",
+      "file": "packages/hx-library/src/components/hx-steps/hx-step.styles.ts",
+      "line": 67,
+      "fix": "Add a @media (prefers-reduced-motion: reduce) block to hx-step.styles.ts that sets transition: none on .step__indicator and .step__connector. Example: @media (prefers-reduced-motion: reduce) { .step__indicator, .step__connector { transition: none; } }"
+    },
+    {
+      "component": "hx-tree-view",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-tree-view missing aria-label fallback when label property is empty — tree has no accessible name",
+      "description": "The tree container renders aria-label=${this.label || nothing} (line 271). When label is empty (the default), the tree has no accessible name. A tree widget with role=\"tree\" requires an accessible name per WCAG 4.1.2 and the ARIA tree pattern. Without a label, screen readers announce only 'tree' with no context about its purpose.",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-view.ts",
+      "line": 271,
+      "fix": "Add a devWarn() in connectedCallback when label is empty: devWarn('hx-tree-view', 'No label provided. Set the `label` attribute to describe the tree for screen reader users (e.g. label=\"File browser\").'). Also consider adding aria-labelledby support as an alternative to aria-label for consumers who want to reference an external heading element."
+    },
+    {
+      "component": "hx-tree-view",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-multiselectable is always rendered (set to 'false' when selection is 'none' or 'single') — should be omitted for non-multiple trees",
+      "description": "The tree container always renders aria-multiselectable='false' when selection is 'none' or 'single' (line 272). aria-multiselectable=\"false\" on a tree with selection='none' is misleading — it implies items could be selected but only one at a time, when in fact no selection is intended. For selection='none' trees, aria-multiselectable should be omitted entirely. For selection='single', aria-multiselectable=\"false\" is acceptable.",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-view.ts",
+      "line": 272,
+      "fix": "Change the aria-multiselectable attribute to: aria-multiselectable=${this.selection === 'multiple' ? 'true' : this.selection === 'single' ? 'false' : nothing}. This omits the attribute entirely when selection='none', which is the most semantically accurate representation."
+    },
+    {
+      "component": "hx-tree-item",
+      "severity": "high",
+      "wcagCriteria": "2.5.5",
+      "title": "hx-tree-item row has insufficient touch target height — padding-y is 0.25rem (4px) giving ~22px total height",
+      "description": "The .item-row has padding: var(--hx-tree-item-padding-y, var(--hx-space-1, 0.25rem)) (lines 25-26 in hx-tree-item.styles.ts). With default font-size of 0.875rem (14px) and line-height of 1.5, the line box is ~21px. Adding 4px top + 4px bottom padding gives ~29px total height — well below the 44px minimum. Tree items in healthcare applications may be used for ICD-10 code selection, medication lists, or clinical taxonomy navigation where precise tap targeting is essential.",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.styles.ts",
+      "line": 25,
+      "fix": "Increase the minimum touch target height: add min-height: 2.75rem (44px) to the .item-row selector. Alternatively, change the default padding-y token from var(--hx-space-1, 0.25rem) to var(--hx-space-2-5, 0.625rem) which gives approximately 10px top+bottom padding, yielding ~41px — closer to but still potentially below 44px. The most reliable fix is min-height: 44px."
+    },
+    {
+      "component": "hx-tree-item",
+      "severity": "medium",
+      "wcagCriteria": "2.5.5",
+      "title": "Expand/collapse button in hx-tree-item is 16x16px — critically below the 44x44px minimum touch target",
+      "description": "The expand button (.expand-btn) has width and height of var(--hx-space-4, 1rem) = 16px (lines 85-86 in hx-tree-item.styles.ts). This is only 16x16px, far below the 44px minimum. While the button has tabindex=-1 (not in the Tab flow — line 263 of hx-tree-item.ts), it is a visible clickable element and must still meet touch target requirements for pointer users.",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.styles.ts",
+      "line": 85,
+      "fix": "Add a minimum touch target to the expand button using the pseudo-element approach: .expand-btn::before { content: ''; position: absolute; inset: -12px; } with position: relative on .expand-btn. Alternatively increase the expand button size to min 44px and use negative margin to keep visual layout unchanged. At minimum add padding: 14px to bring the effective click area to 44px."
+    },
+    {
+      "component": "hx-tree-item",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-tree-item children group container (role=\"group\") has no accessible name",
+      "description": "The children container at line 305-309 has role=\"group\" but no aria-label or aria-labelledby. The WAI-ARIA tree pattern requires that group elements have an accessible name (typically matching the parent treeitem label) so screen readers can announce 'group, {parent label}' when entering nested items. Without a name, screen readers announce only 'group' which provides no context about what items are grouped.",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.ts",
+      "line": 305,
+      "fix": "Add aria-label to the group container using the item's slot text content. Since the label is the slot content, use a data attribute set from the slotchange event, or add aria-label via a computed property. Example: cache the slot text in _handleChildrenSlotChange and use it as the group label. A simpler approach: <div part=\"children\" ... role=\"group\" aria-label=${this.textContent?.trim() + ' items' || nothing}>."
+    },
+    {
+      "component": "hx-tree-item",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Expand button aria-label uses bare 'Collapse'/'Expand' without naming the item being expanded",
+      "description": "The expand button renders aria-label=\"${this.expanded ? 'Collapse' : 'Expand'}\" (line 264). This provides no context about WHAT is being collapsed or expanded. Screen reader users navigating tree items will hear only 'Collapse, button' with no indication of which node is being acted upon. This is especially problematic in large trees with many expandable nodes.",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.ts",
+      "line": 264,
+      "fix": "Include the item label in the expand button's aria-label. Cache the visible text content in a property (updated from the default slot's slotchange event) and use it: aria-label=${`${this.expanded ? 'Collapse' : 'Expand'} ${this._labelText}`}. If label text is unavailable, fall back to aria-label=${this.expanded ? 'Collapse' : 'Expand'}."
+    },
+    {
+      "component": "hx-nav",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-nav test file has no axe-core accessibility tests",
+      "description": "The hx-nav component has no automated accessibility tests using checkA11y/axe-core in its test file (hx-nav.test.ts). All other navigation components in this audit have axe-core coverage (hx-tabs, hx-breadcrumb, hx-steps, hx-side-nav, hx-tree-view). Given that hx-nav is one of the more complex navigation components with submenu, mobile toggle, and multiple ARIA attributes, the absence of automated a11y tests is a gap that allows regressions.",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.test.ts",
+      "line": null,
+      "fix": "Add an 'Accessibility (axe-core)' describe block to hx-nav.test.ts with checkA11y tests covering: (1) default horizontal nav, (2) vertical orientation, (3) nav with active item (aria-current), (4) nav with expanded submenu, (5) mobile state (mobileOpen=true). Import checkA11y from test-utils.js and follow the pattern established in hx-tabs.test.ts."
+    },
+    {
+      "component": "hx-top-nav",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-top-nav test file has no axe-core accessibility tests",
+      "description": "The hx-top-nav component test file lacks automated accessibility (axe-core) tests. Given the complexity of the component (sticky nav, mobile toggle, hamburger menu, Escape handling, focus management), automated a11y test coverage is essential to catch regressions.",
+      "file": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.test.ts",
+      "line": null,
+      "fix": "Add axe-core accessibility tests to hx-top-nav.test.ts covering: (1) default state, (2) sticky mode, (3) mobile menu open state, (4) with slotted logo and nav items. Import checkA11y from test-utils.js."
+    },
+    {
+      "component": "hx-pagination",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Disabled prev/next buttons use native disabled attribute — screen readers announce them differently than aria-disabled page buttons",
+      "description": "The pagination component uses inconsistent disabled state patterns: prev/next buttons use the native ?disabled=${isFirst}/?disabled=${isLast} boolean attribute (lines 328-329, 375-376), while the current page button uses aria-disabled='true' (line 357). The native disabled attribute removes the element from the accessibility tree entirely in some screen readers and prevents focus. aria-disabled keeps the element focusable and reachable. This inconsistency means prev/next buttons disappear from AT when disabled while page buttons remain discoverable.",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.ts",
+      "line": 328,
+      "fix": "Standardize the disabled state: use aria-disabled='true' consistently for all pagination buttons (prev, next, first, last) and remove the native ?disabled attribute. Update the CSS to style [aria-disabled='true'] buttons (already done at line 95 of styles for aria-disabled). Also update the keyboard handler to skip aria-disabled buttons. This makes all pagination controls discoverable and consistently announced."
+    }
+  ]
+}
