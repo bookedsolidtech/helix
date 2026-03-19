@@ -554,7 +554,7 @@ export class HelixSelect extends LitElement {
             'field__option--focused': isFocused,
             'field__option--disabled': opt.disabled,
           })}
-          aria-selected=${isSelected ? 'true' : nothing}
+          aria-selected=${isSelected ? 'true' : 'false'}
           aria-disabled=${opt.disabled ? 'true' : nothing}
           @click=${() => this._selectOption(opt)}
         >
@@ -624,7 +624,7 @@ export class HelixSelect extends LitElement {
             class=${classMap(triggerClasses)}
             role="combobox"
             tabindex=${this.disabled ? '-1' : '0'}
-            aria-expanded=${this.open ? 'true' : nothing}
+            aria-expanded=${this.open ? 'true' : 'false'}
             aria-haspopup="listbox"
             aria-controls=${this._listboxId}
             aria-activedescendant=${this.open && this._focusedOptionIndex >= 0
