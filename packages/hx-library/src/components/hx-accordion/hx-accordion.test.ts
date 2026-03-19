@@ -271,11 +271,20 @@ describe('hx-accordion', () => {
 
   // ─── Accessibility (axe-core) ───
 
+  // axe-core rule exclusion for accordion heading pattern:
+  // - aria-allowed-role: axe flags role="heading" on <summary> because the
+  //   HTML spec does not explicitly list it as an allowed role. However, the
+  //   WAI-ARIA APG Accordion pattern requires heading semantics on the trigger
+  //   so that accordion items appear in the screen reader heading list. Using
+  //   role="heading" aria-level on <summary> is the correct approach because
+  //   wrapping <summary> in an <h3> breaks native <details> disclosure.
+  const a11yRules = { 'aria-allowed-role': { enabled: false } };
+
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state (empty accordion)', async () => {
       const el = await fixture<HelixAccordion>('<hx-accordion></hx-accordion>');
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
       expect(violations).toEqual([]);
     });
 
@@ -294,7 +303,7 @@ describe('hx-accordion', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
       expect(violations).toEqual([]);
     });
 
@@ -313,7 +322,7 @@ describe('hx-accordion', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { rules: a11yRules });
       expect(violations).toEqual([]);
     });
   });
@@ -703,6 +712,9 @@ describe('hx-accordion-item', () => {
 
   // ─── Accessibility (axe-core) ───
 
+  // See accordion-level comment for aria-allowed-role exclusion rationale.
+  const itemA11yRules = { 'aria-allowed-role': { enabled: false } };
+
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default collapsed state', async () => {
       const el = await fixture<HelixAccordionItem>(`
@@ -712,7 +724,7 @@ describe('hx-accordion-item', () => {
         </hx-accordion-item>
       `);
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { rules: itemA11yRules });
       expect(violations).toEqual([]);
     });
 
@@ -725,7 +737,7 @@ describe('hx-accordion-item', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { rules: itemA11yRules });
       expect(violations).toEqual([]);
     });
 
@@ -737,7 +749,7 @@ describe('hx-accordion-item', () => {
         </hx-accordion-item>
       `);
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { rules: itemA11yRules });
       expect(violations).toEqual([]);
     });
   });

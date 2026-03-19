@@ -196,14 +196,16 @@ export class HelixMenu extends LitElement {
     );
   }
 
-  override render() {
+  override firstUpdated(): void {
     if (!this.label) {
       devWarn(
         'hx-menu',
         'No accessible label provided. Set the `label` attribute on hx-menu so screen readers can identify this menu (WCAG 4.1.2).',
       );
     }
+  }
 
+  override render() {
     return html`
       <div
         part="base"

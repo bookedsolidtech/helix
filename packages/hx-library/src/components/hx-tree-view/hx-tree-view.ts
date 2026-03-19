@@ -254,16 +254,20 @@ export class HelixTreeView extends LitElement {
     this._updateRovingTabindex(items, clamped);
   }
 
-  // ─── Render ───
+  // ─── Lifecycle ───
 
-  override render() {
+  override firstUpdated(): void {
     if (!this.label) {
       devWarn(
         'hx-tree-view',
         'No accessible label provided. Set the `label` attribute on hx-tree-view so screen readers can identify this tree (WCAG 4.1.2).',
       );
     }
+  }
 
+  // ─── Render ───
+
+  override render() {
     // Roving tabindex pattern (WCAG 2.4.3 Fix):
     // The tree container is NOT a Tab stop (tabindex="-1"). Tab focus goes
     // directly to the active item, which carries tabindex="0". The container

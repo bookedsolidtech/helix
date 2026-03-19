@@ -160,6 +160,13 @@ export class HelixTabs extends LitElement {
   }
 
   override firstUpdated(): void {
+    if (this.label === '') {
+      devWarn(
+        'hx-tabs',
+        'No accessible label provided. Set the `label` attribute on hx-tabs to describe what the tabs represent (e.g., "Patient record sections"). An unlabeled tablist violates WCAG 4.1.2.',
+      );
+    }
+
     this._syncTabsAndPanels();
     // Activate the first enabled tab if none is selected
     if (!this._activePanel) {
@@ -396,13 +403,6 @@ export class HelixTabs extends LitElement {
   // ─── Render ───
 
   override render() {
-    if (this.label === '') {
-      devWarn(
-        'hx-tabs',
-        'No accessible label provided. Set the `label` attribute on hx-tabs to describe what the tabs represent (e.g., "Patient record sections"). An unlabeled tablist violates WCAG 4.1.2.',
-      );
-    }
-
     return html`
       <div class="tabs">
         <div

@@ -181,7 +181,6 @@ export class HelixTreeItem extends LitElement {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
     this._labelText = nodes
-      .filter((n): n is Text => n.nodeType === Node.TEXT_NODE)
       .map((n) => n.textContent ?? '')
       .join('')
       .trim();
