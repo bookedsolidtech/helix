@@ -1,5 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
 
@@ -331,16 +332,16 @@ export class HelixSplitPanel extends LitElement {
     }
   }
 
-  private _startPanelStyle(): string {
+  private _startPanelStyleMap(): Record<string, string> {
     if (this.orientation === 'horizontal') {
-      return `width: ${this.position}%;`;
+      return { width: `${this.position}%` };
     }
-    return `height: ${this.position}%;`;
+    return { height: `${this.position}%` };
   }
 
   override render() {
     return html`
-      <div part="start" class="panel panel--start" style=${this._startPanelStyle()}>
+      <div part="start" class="panel panel--start" style=${styleMap(this._startPanelStyleMap())}>
         <slot name="start"></slot>
       </div>
       <div class="divider-track">
