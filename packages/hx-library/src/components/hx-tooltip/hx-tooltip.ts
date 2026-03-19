@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset, arrow, type Placement } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
@@ -84,6 +84,12 @@ export class HelixTooltip extends LitElement {
   /** @internal */
   private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
+  @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;
+  @query('slot[name="content"]') private _contentSlot!: HTMLSlotElement | null;
+  @query('.trigger-wrapper') private _triggerWrapper!: HTMLElement | null;
+  @query('[part="tooltip"]') private _tooltipEl!: HTMLElement | null;
+  @query('[part="arrow"]') private _arrowEl!: HTMLElement | null;
+
   /**
    * Visually-hidden description element in light DOM.
    * Necessary because aria-describedby cannot cross Shadow DOM boundaries —
@@ -115,16 +121,14 @@ export class HelixTooltip extends LitElement {
   // ─── ARIA setup ───
 
   private _setupTriggerAria(): void {
-    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
+    const slot = this._defaultSlot;
     if (!slot) return;
     const trigger = slot.assignedElements()[0] as HTMLElement | undefined;
 
     // Sync content from the content slot into a visually-hidden light DOM element.
     // aria-describedby cannot cross Shadow DOM boundaries, so the referenced element
     // must live in the document scope (light DOM), not inside the shadow root.
-    const contentSlot = this.shadowRoot?.querySelector(
-      'slot[name="content"]',
-    ) as HTMLSlotElement | null;
+    const contentSlot = this._contentSlot;
     const contentText =
       contentSlot
         ?.assignedElements()
@@ -187,9 +191,9 @@ export class HelixTooltip extends LitElement {
   // ─── Positioning ───
 
   private async _updatePosition(): Promise<void> {
-    const reference = this.shadowRoot?.querySelector('.trigger-wrapper') as HTMLElement | null;
-    const tooltipEl = this.shadowRoot?.querySelector('[part="tooltip"]') as HTMLElement | null;
-    const arrowEl = this.shadowRoot?.querySelector('[part="arrow"]') as HTMLElement | null;
+    const reference = this._triggerWrapper;
+    const tooltipEl = this._tooltipEl;
+    const arrowEl = this._arrowEl;
 
     if (!reference || !tooltipEl || !arrowEl) return;
 
@@ -241,7 +245,7 @@ export class HelixTooltip extends LitElement {
    * @internal
    */
   private _handleTriggerMouseleave(): void {
-    const slot = this.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement | null;
+    const slot = this._defaultSlot;
     const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
     if (
       trigger &&
