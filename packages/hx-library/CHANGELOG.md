@@ -1,5 +1,46 @@
 # @helixui/library
 
+## 1.0.1
+
+### Patch Changes
+
+- 701880f: fix: add non-color indicators for state/severity variants (wcag 1.4.1)
+
+  hx-alert, hx-badge, hx-tag, hx-toast, hx-progress-bar, hx-meter no longer rely on color alone to convey severity or status. visually-hidden text labels are now always rendered alongside color for screen reader and color-blind users.
+
+- 43d9a47: fix(a11y): remove cross-shadow-boundary aria-controls from hx-dropdown trigger; add aria relationship ID resolution tests for hx-drawer, hx-combobox, and hx-dropdown
+- 0ab4ddd: fix: replace hardcoded focus-visible colors with design tokens across 14 components
+
+  All interactive element focus rings now use the `--hx-focus-ring-width`,
+  `--hx-focus-ring-color`, and `--hx-focus-ring-offset` token chain with
+  component-level override points. Fixes hx-drawer, hx-dialog, hx-breadcrumb,
+  hx-pagination, hx-card, hx-carousel, hx-combobox, hx-file-upload, hx-menu-item,
+  hx-nav, hx-overflow-menu, hx-select, hx-split-panel, and hx-tree-item.
+
+- 4894125: fix incorrect aria state attribute patterns — boolean aria attributes now omitted when false using lit nothing directive
+- a5453aa: fix missing accessible names on interactive elements and widget containers — closes #1023
+- bc44305: test(a11y): add axe-core accessibility tests to hx-accordion and hx-table
+- 66dc812: fix focus restoration timing in hx-drawer, hx-dialog, and hx-popover — focus now returns to trigger immediately on close, not after animation delay
+- 47b8b1d: fix(hx-popover): resolve wcag 2.1 aa violations — role="dialog", focus trap, hover keyboard access, aria-haspopup, focus restoration, and focus-visible outline
+- f21ab8d: Fix WCAG 2.2.1: hx-toast auto-dismiss timer now respects prefers-reduced-motion — toast will not auto-dismiss when the user has reduced motion enabled
+- 628f883: fix: ensure all interactive touch targets meet 44x44px wcag 2.5.5 healthcare minimum
+
+  Fixes insufficient touch target violations across hx-drawer, hx-dialog, hx-carousel,
+  hx-date-picker, hx-icon-button, hx-tag, hx-checkbox, hx-radio, and hx-data-table.
+  All interactive elements now enforce min-width/min-height of 2.75rem (44px) via the
+  --hx-touch-target-min design token (WCAG 2.5.5, healthcare mandate).
+
+  Closes #1027
+
+- ed70876: Fix aria-live region violations in hx-toast, hx-alert, and hx-text-input so dynamic content changes are reliably announced by screen readers (JAWS, NVDA, VoiceOver).
+- bbf93cf: fix(a11y): expose aria-required on all form control components
+
+  Added aria-required attribute to shadow DOM inputs in hx-text-input, hx-textarea, hx-checkbox, hx-checkbox-group, and hx-number-input so screen readers correctly announce required state for form fields.
+
+- 8843003: fix: correct incorrect aria role assignments across hx-drawer, hx-alert per wcag 2.1 aa audit
+- d453b0e: fix: add keyboard accessibility tests for wcag 1.4.13 hover behavior in hx-popover and no-header keyboard dismiss in hx-drawer
+- eb772ca: add jsdoc descriptions to all @internal properties and methods in hx-popover, hx-time-picker, hx-color-picker, hx-dropdown, and hx-split-panel to improve cem accuracy scores
+
 ## 1.0.0
 
 ### Major Changes
