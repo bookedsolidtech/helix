@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStyles } from './hx-toast.styles.js';
@@ -78,6 +78,8 @@ export class HelixToast extends LitElement {
 
   // ─── Private State ───
 
+  @query('.toast') private _toastEl!: HTMLElement | null;
+
   /** @internal */
   private _timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -97,6 +99,7 @@ export class HelixToast extends LitElement {
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('open')) {
       if (this.open) {
         this.removeAttribute('aria-hidden');
@@ -189,7 +192,7 @@ export class HelixToast extends LitElement {
 
     // Fire on transitionend if available; fallback ensures it fires in test environments
     // and when transitions are disabled (prefers-reduced-motion, no CSS transitions).
-    const base = this.shadowRoot?.querySelector('.toast');
+    const base = this._toastEl;
     if (base) {
       base.addEventListener('transitionend', fireAfterHide, { once: true });
     }

@@ -109,6 +109,19 @@ export class HelixIconButton extends LitElement {
     return this._internals.form;
   }
 
+  /** Called by the browser when the form is reset. No value to reset. */
+  formResetCallback(): void {
+    // hx-icon-button does not submit a value; no state to reset.
+  }
+
+  /** Called by the browser to restore form state. No value to restore. */
+  formStateRestoreCallback(
+    _state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    // hx-icon-button does not submit a value; no state to restore.
+  }
+
   // ─── Event Handling ───
 
   private _handleClick(e: MouseEvent): void {

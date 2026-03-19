@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
@@ -87,9 +87,11 @@ export class HelixMenuItem extends LitElement {
   @state()
   private _hasSubmenu = false;
 
+  @query('.menu-item') private _menuItemEl!: HTMLElement | null;
+
   /** Focus the inner interactive element. */
   override focus(options?: FocusOptions): void {
-    this.shadowRoot?.querySelector<HTMLElement>('.menu-item')?.focus(options);
+    this._menuItemEl?.focus(options);
   }
 
   override connectedCallback(): void {

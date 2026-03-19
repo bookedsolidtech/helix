@@ -325,8 +325,13 @@ export class HelixTextarea extends LitElement {
   }
 
   /** Called by the browser to restore form state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   /** Called when a parent fieldset is disabled/enabled. */

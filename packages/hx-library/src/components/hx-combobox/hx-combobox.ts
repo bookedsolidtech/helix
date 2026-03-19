@@ -259,6 +259,7 @@ export class HelixCombobox extends LitElement {
   }
 
   override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._updateFormValue();
       this._updateValidity();
