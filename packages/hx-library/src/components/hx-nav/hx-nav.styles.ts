@@ -41,7 +41,8 @@ export const helixNavStyles = css`
   }
 
   [part='toggle']:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-nav-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -93,7 +94,8 @@ export const helixNavStyles = css`
   }
 
   .nav__link:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-nav-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

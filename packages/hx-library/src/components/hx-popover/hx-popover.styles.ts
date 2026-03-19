@@ -42,7 +42,7 @@ export const helixPopoverStyles = css`
 
   [part='body']:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500));
+      var(--hx-popover-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
