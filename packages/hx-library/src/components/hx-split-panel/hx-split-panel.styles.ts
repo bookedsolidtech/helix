@@ -69,7 +69,7 @@ export const helixSplitPanelStyles = css`
     flex: 1;
     background-color: var(--_divider-color);
     cursor: col-resize;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--hx-transition-fast, 150ms ease);
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;

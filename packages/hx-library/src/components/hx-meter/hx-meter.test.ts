@@ -134,39 +134,34 @@ describe('hx-meter', () => {
   // ─── Indicator width ───
 
   describe('Indicator width', () => {
-    it('sets indicator width to 0% when value equals min', async () => {
+    it('sets indicator ratio to 0 when value equals min', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="0" min="0" max="100"></hx-meter>');
       await el.updateComplete;
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator?.style.width).toBe('0%');
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0');
     });
 
-    it('sets indicator width to 100% when value equals max', async () => {
+    it('sets indicator ratio to 1 when value equals max', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="100" min="0" max="100"></hx-meter>');
       await el.updateComplete;
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator?.style.width).toBe('100%');
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('1');
     });
 
-    it('sets indicator width to 50% at mid-range', async () => {
+    it('sets indicator ratio to 0.5 at mid-range', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="50" min="0" max="100"></hx-meter>');
       await el.updateComplete;
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator?.style.width).toBe('50%');
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0.5');
     });
 
     it('handles custom ranges correctly', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="15" min="10" max="20"></hx-meter>');
       await el.updateComplete;
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator?.style.width).toBe('50%');
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0.5');
     });
 
-    it('sets indicator width to 0% when min equals max (zero-division guard)', async () => {
+    it('sets indicator ratio to 0 when min equals max (zero-division guard)', async () => {
       const el = await fixture<HelixMeter>('<hx-meter value="5" min="5" max="5"></hx-meter>');
       await el.updateComplete;
-      const indicator = shadowQuery(el, '[part="indicator"]') as HTMLElement;
-      expect(indicator?.style.width).toBe('0%');
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0');
     });
   });
 
