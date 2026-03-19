@@ -325,6 +325,32 @@ describe('hx-toast', () => {
       await el.updateComplete;
       expect(el.open).toBe(false);
     });
+
+    it('does NOT auto-dismiss when prefers-reduced-motion is reduce (WCAG 2.2.1)', async () => {
+      // Mock matchMedia to report reduced-motion preference
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }));
+
+      const el = await fixture<HelixToast>('<hx-toast duration="1000">Test</hx-toast>');
+      el.show();
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+
+      // Advance well past the duration — toast must remain open
+      vi.advanceTimersByTime(5000);
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+
+      vi.restoreAllMocks();
+    });
   });
 
   // ─── Slots ───

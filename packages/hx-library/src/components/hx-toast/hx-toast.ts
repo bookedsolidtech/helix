@@ -81,6 +81,13 @@ export class HelixToast extends LitElement {
   /** @internal */
   private _timer: ReturnType<typeof setTimeout> | null = null;
 
+  // ─── Reduced Motion ───
+
+  /** @internal Returns true when the user has opted into reduced motion. */
+  private get _reducedMotion(): boolean {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   /** @internal */
   private _timerStartedAt: number | null = null;
 
@@ -94,7 +101,7 @@ export class HelixToast extends LitElement {
       if (this.open) {
         this.removeAttribute('aria-hidden');
         this._emitShow();
-        if (this.duration > 0) {
+        if (this.duration > 0 && !this._reducedMotion) {
           this._startTimer();
         }
       } else {
