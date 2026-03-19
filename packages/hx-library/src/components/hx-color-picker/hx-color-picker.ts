@@ -481,6 +481,22 @@ export class HelixColorPicker extends LitElement {
     this.disabled = disabled;
   }
 
+  /** Called by the browser when the form is reset. */
+  formResetCallback(): void {
+    this.value = '#000000';
+    this._internals.setFormValue(null);
+  }
+
+  /** Called by the browser to restore form state on navigation. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
+  }
+
   private _commit(source: 'drag' | 'change'): void {
     const formatted = formatColor(this._hsv, this.format, this.opacity);
     this.value = formatted;

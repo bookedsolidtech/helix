@@ -389,6 +389,11 @@ describe('hx-carousel', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
+    it('exposes "slide" CSS part', async () => {
+      const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
+      expect(el.shadowRoot?.querySelector('[part="slide"]')).toBeTruthy();
+    });
+
     it('slide group has role="group"', async () => {
       const el = await fixture<HelixCarouselItem>('<hx-carousel-item>Content</hx-carousel-item>');
       const group = el.shadowRoot?.querySelector('[role="group"]');
