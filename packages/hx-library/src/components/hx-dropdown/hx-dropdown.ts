@@ -125,8 +125,6 @@ export class HelixDropdown extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._handleOutsideClick = this._handleOutsideClick.bind(this);
-    this._handleKeydown = this._handleKeydown.bind(this);
     this.addEventListener('keydown', this._handleKeydown);
   }
 
@@ -214,7 +212,7 @@ export class HelixDropdown extends LitElement {
     }
   }
 
-  private _handleKeydown(e: KeyboardEvent): void {
+  private _handleKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.open) {
       e.stopPropagation();
       this._hide(true); // return focus to trigger on Escape
@@ -229,7 +227,7 @@ export class HelixDropdown extends LitElement {
       e.preventDefault();
       this._handleMenuNavigation(e.key);
     }
-  }
+  };
 
   // P2-01: Move focus among menuitem elements using arrow keys.
   private _handleMenuNavigation(key: string): void {
@@ -284,12 +282,12 @@ export class HelixDropdown extends LitElement {
     return null;
   }
 
-  private _handleOutsideClick(e: MouseEvent): void {
+  private _handleOutsideClick = (e: MouseEvent): void => {
     const path = e.composedPath();
     if (!path.includes(this)) {
       this._hide();
     }
-  }
+  };
 
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
