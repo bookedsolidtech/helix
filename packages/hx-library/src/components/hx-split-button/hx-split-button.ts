@@ -251,6 +251,7 @@ export class HelixSplitButton extends LitElement {
   // ─── Menu Item Selection ───
 
   private _handleMenuItemSelect(e: Event): void {
+    if (!(e instanceof CustomEvent)) return;
     const custom = e as CustomEvent<{ item: HelixMenuItem; value: string }>;
     this._closeMenu();
     this._triggerButton?.focus();

@@ -55,7 +55,7 @@ export class HelixSideNav extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProperties: PropertyValues): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('collapsed')) {
       this._propagateCollapsedToChildren();

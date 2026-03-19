@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTableStyles } from './hx-table.styles.js';
@@ -70,7 +70,7 @@ export class HelixTable extends LitElement {
 
   // ─── Lifecycle ───
 
-  override willUpdate(changed: Map<string, unknown>): void {
+  override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('label') && !this.label && changed.get('label') !== undefined) {
       devWarn(
         'hx-table',

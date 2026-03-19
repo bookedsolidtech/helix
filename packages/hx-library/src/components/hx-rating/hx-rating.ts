@@ -10,7 +10,7 @@
 // slider branch, star spans carry role="presentation" aria-hidden="true" and are purely
 // decorative click/hover targets with no independent keyboard accessibility obligation.
 
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixRatingStyles } from './hx-rating.styles.js';
@@ -147,7 +147,7 @@ export class HelixRating extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProps: Map<string, unknown>): void {
+  override updated(changedProps: PropertyValues<this>): void {
     if (changedProps.has('value') || changedProps.has('name')) {
       this._internals.setFormValue(String(this.value));
     }
