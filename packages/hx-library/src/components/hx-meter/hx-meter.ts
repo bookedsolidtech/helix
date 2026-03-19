@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -158,6 +158,18 @@ export class HelixMeter extends LitElement {
     this.dataset['state'] = this._resolveState();
   }
 
+  // ─── WCAG 1.4.1: State label map ───
+  // The indicator bar color alone is insufficient for color-blind users.
+  // A visible state label is rendered below the track when a semantic state
+  // (optimum/warning/danger) is active, providing a non-color visual cue.
+  // aria-valuetext already embeds the state for AT users.
+
+  private static readonly _STATE_LABELS: Partial<Record<MeterState, string>> = {
+    optimum: 'Optimum',
+    warning: 'Warning',
+    danger: 'Danger',
+  };
+
   override render() {
     const pct = this._percentage();
     const state = this._resolveState();
@@ -165,6 +177,7 @@ export class HelixMeter extends LitElement {
     const stateLabel = state !== 'default' ? ` — ${state}` : '';
     const ariaValuetext = `${clampedValue} of ${this.max}${stateLabel}`;
     const hasVisibleLabel = this.label !== undefined || this._hasSlotContent;
+    const visibleStateLabel = HelixMeter._STATE_LABELS[state];
 
     return html`
       <div
@@ -194,6 +207,11 @@ export class HelixMeter extends LitElement {
             style=${styleMap({ width: `${pct}%` })}
           ></div>
         </div>
+        ${visibleStateLabel
+          ? html`<span class="meter__state-label" data-state=${state} aria-hidden="true"
+              >${visibleStateLabel}</span
+            >`
+          : nothing}
         <meter
           class="meter__native"
           value=${clampedValue}

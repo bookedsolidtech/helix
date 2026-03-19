@@ -90,8 +90,12 @@ export const helixSplitPanelStyles = css`
   }
 
   .divider:focus-visible {
-    outline: 2px solid var(--_divider-hover-color);
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(
+        --hx-split-panel-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+      );
+    outline-offset: var(--hx-focus-ring-offset, 2px);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--_divider-hover-color) 30%, transparent);
   }
 
@@ -148,7 +152,11 @@ export const helixSplitPanelStyles = css`
   }
 
   .collapse-btn:focus-visible {
-    outline: 2px solid var(--hx-color-neutral-0);
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(
+        --hx-split-panel-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+      );
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 `;

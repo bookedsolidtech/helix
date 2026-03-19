@@ -1,0 +1,196 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "sonnet",
+  "summary": {
+    "componentsAudited": 12,
+    "totalFindings": 18,
+    "critical": 2,
+    "high": 5,
+    "medium": 7,
+    "low": 4
+  },
+  "findings": [
+    {
+      "component": "hx-card",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Interactive card missing accessible name when hx-aria-label is absent",
+      "description": "When hx-href is set but hx-aria-label is not provided, the div[role='link'] has no accessible name. The aria-label binding uses 'nothing' when hxAriaLabel is undefined, leaving screen readers to announce only the card's text content as a flat string with no semantic grouping. While this avoids empty aria-label, it means the link has no explicit label and relies entirely on descendant text — which for cards with image-only headings or icon-only content produces no accessible name at all.",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.ts",
+      "line": 184,
+      "fix": "Add a devWarn when hxHref is set and hxAriaLabel is absent and the heading slot is empty or image-only. Document clearly in JSDoc and Storybook that hx-aria-label is required for image-only or icon-only interactive cards. Consider making hx-aria-label required (TypeScript) when hx-href is set."
+    },
+    {
+      "component": "hx-card",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "Card role='link' does not use a native anchor element",
+      "description": "The interactive card pattern uses div[role='link'] with tabindex and synthetic keyboard/click handlers rather than a native <a> element. While the ARIA role is correct, native anchor elements provide additional affordances: browser history integration, right-click context menus ('Open in new tab'), and more robust AT support. The current div[role='link'] pattern also does not support href-based navigation — it relies on the consuming application's hx-click event handler — making the link non-functional in environments where JavaScript fails.",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.ts",
+      "line": 179,
+      "fix": "Replace the interactive card pattern with a native <a> element rendered inside the shadow DOM. Use delegatesFocus (already set) and keep the hx-click event for consumer interop. If a native anchor cannot be used (e.g., framework routing), document the JavaScript dependency explicitly."
+    },
+    {
+      "component": "hx-badge",
+      "severity": "critical",
+      "wcagCriteria": "1.3.1",
+      "title": "Dot indicator mode conveys status via color alone with no accessible label when dotLabel is absent",
+      "description": "When pulse=true and the default slot is empty (dot indicator mode), the badge renders as a colored dot. If the consumer does not provide dot-label, the element receives role='img' only when dotLabel is set (line 167: role=${isDot && this.dotLabel ? 'img' : nothing}). When dotLabel is absent, the colored dot is placed in the accessibility tree as a plain span with no role and no text — the status information is conveyed entirely by color. For healthcare UIs where these dots commonly indicate patient alert severity or system health, this is a critical violation of SC 1.3.1 and 1.4.1.",
+      "file": "packages/hx-library/src/components/hx-badge/hx-badge.ts",
+      "line": 167,
+      "fix": "Always apply role='img' when isDot is true. Provide a default dotLabel value (e.g., 'Status indicator') and emit a devWarn when isDot is true and dotLabel is empty. Update documentation to make dot-label required for dot indicator usage."
+    },
+    {
+      "component": "hx-badge",
+      "severity": "medium",
+      "wcagCriteria": "2.5.8",
+      "title": "Remove button touch target below 44x44px minimum",
+      "description": "The badge remove button (.badge__remove-button) has no explicit minimum width or height set in hx-badge.styles.ts. The SVG icon is 10x10px and padding is 0. The button inherits badge padding only through inline layout, resulting in a touch target that is far below the WCAG 2.1 AA 44x44px minimum (SC 2.5.5) and also below the WCAG 2.2 AA 24x24px minimum (SC 2.5.8). hx-tag's remove button correctly sets min-width/min-height: 24px — hx-badge lacks this.",
+      "file": "packages/hx-library/src/components/hx-badge/hx-badge.styles.ts",
+      "line": 135,
+      "fix": "Add min-width: 24px; min-height: 24px to .badge__remove-button (matching hx-tag's pattern as a minimum). Increase to 44px for full WCAG 2.5.5 compliance, or use a transparent hit-area technique."
+    },
+    {
+      "component": "hx-badge",
+      "severity": "medium",
+      "wcagCriteria": "1.4.1",
+      "title": "Status conveyed by color alone for text badge variants without additional indicator",
+      "description": "Variant badges (success, warning, error, info) communicate status information using only background color. A consumer displaying a row of patient alert badges — 'Critical' in red, 'Warning' in yellow — provides no non-color indicator. While the text label is present in text-content badges, when badges are used in dense data tables where color scanning is the primary affordance, the absence of an icon or shape variant means users who cannot distinguish colors receive identical information regardless of severity.",
+      "file": "packages/hx-library/src/components/hx-badge/hx-badge.ts",
+      "line": 44,
+      "fix": "Add an optional icon prefix slot (already exists as 'prefix') to badge documentation to encourage icon+color patterns for status variants. Provide Storybook stories showing the accessible pattern with prefix icons. Consider adding a forced-colors media query to add a border or text indicator in high-contrast mode."
+    },
+    {
+      "component": "hx-tag",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Remove button aria-label is empty string when tag has no text content",
+      "description": "The remove button aria-label is computed as `Remove ${this._defaultSlotText}`. When _defaultSlotText is empty (tag contains only prefix/suffix icon slots with no default slot text), the aria-label becomes 'Remove ' — effectively just 'Remove' with a trailing space. Screen readers will announce 'Remove' with no context about what is being removed, which is insufficient in clinical filtering UIs where multiple tags may be removable simultaneously.",
+      "file": "packages/hx-library/src/components/hx-tag/hx-tag.ts",
+      "line": 172,
+      "fix": "Fall back to a generic descriptive label when _defaultSlotText is empty: aria-label=${`Remove ${this._defaultSlotText || 'tag'}`}. Better still, expose a remove-label property analogous to hx-badge's removeLabel property, allowing consumers to provide a fully context-specific label."
+    },
+    {
+      "component": "hx-status-indicator",
+      "severity": "medium",
+      "wcagCriteria": "1.4.1",
+      "title": "Status information conveyed by color alone — no shape or pattern differentiation between statuses",
+      "description": "All status variants (online/offline/away/busy/unknown) render as identically-shaped colored circles. The aria-label on the host provides text differentiation for screen readers, but in high-contrast mode or for users with color vision deficiencies, all five statuses are visually identical dots. In healthcare dashboards where provider availability or equipment status is critical, this constitutes a color-only information violation (SC 1.4.1).",
+      "file": "packages/hx-library/src/components/hx-status-indicator/hx-status-indicator.styles.ts",
+      "line": 80,
+      "fix": "Add a forced-colors media query with distinct borders or fill patterns per status. Add an optional icon/shape variant. At minimum, document that hx-status-indicator must always be accompanied by adjacent visible text conveying the same information, and that aria-hidden='true' should be used when such text is present."
+    },
+    {
+      "component": "hx-counter",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-live='polite' on animated counter causes excessive screen reader announcements during animation",
+      "description": "The counter span has aria-live='polite' and aria-atomic='true'. During animation, the displayed value updates on every requestAnimationFrame tick (up to 60 times per second). Each update triggers a polite live region announcement. Screen readers queue these announcements, causing them to read out dozens of intermediate values after the animation completes. This is not just annoying — it can interfere with clinical workflow when the counter is used in a patient dashboard context. The WCAG 4.1.2 requirement for accurate name/role/value is violated because the AT-facing value does not match the user-visible final value during the animation period.",
+      "file": "packages/hx-library/src/components/hx-counter/hx-counter.ts",
+      "line": 190,
+      "fix": "Remove aria-live from the animated span. Use a separate visually-hidden span with aria-live='polite' that is only updated once when the animation completes (at rawProgress === 1). This way, screen readers announce only the final value, not every intermediate frame. When prefers-reduced-motion is active the final value is set immediately, so the single announcement pattern applies by default in that path."
+    },
+    {
+      "component": "hx-stat",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Trend aria-label uses raw 'up'/'down' string rather than human-readable label",
+      "description": "The trend indicator uses aria-label='Trend: up' and aria-label='Trend: down'. Screen readers will announce these literally. In healthcare contexts where trend direction is clinically significant (e.g., patient vital trending up/down), the labels should use more descriptive language. Additionally, the trend label does not include the metric context — a clinician hearing 'Trend: up' for a vitals dashboard stat cannot tell which metric is trending without the surrounding text being read first.",
+      "file": "packages/hx-library/src/components/hx-stat/hx-stat.ts",
+      "line": 150,
+      "fix": "Change the aria-label to use more descriptive language: 'Trending upward' / 'Trending downward'. Expose a trend-label property so consumers can provide context-specific labels such as 'Heart rate trending upward'. Consider appending the metric label: aria-label='${this.label}: trending ${this.trend}'."
+    },
+    {
+      "component": "hx-code-snippet",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Copy button accessible state announces 'Copied!' via both aria-label change and aria-live region — duplicate announcement",
+      "description": "The copy button uses two simultaneous mechanisms to announce copy completion: (1) the button's aria-label changes from 'Copy code' to 'Copied!', which causes some screen readers to re-announce the button label; (2) a separate visually-hidden aria-live='polite' span also announces 'Copied!' when _copied is true. This dual mechanism causes duplicate announcements on NVDA/Chrome and potentially JAWS. WCAG 4.1.2 requires name/role/value to be programmatically determinable, but the double announcement may cause confusion.",
+      "file": "packages/hx-library/src/components/hx-code-snippet/hx-code-snippet.ts",
+      "line": 239,
+      "fix": "Choose one announcement mechanism. The preferred pattern is: keep the button aria-label static ('Copy code to clipboard'), and use only the aria-live region for the confirmation message. This avoids button re-announcement and provides a clean, single confirmation. Alternatively, use aria-label change only, without the live region."
+    },
+    {
+      "component": "hx-code-snippet",
+      "severity": "low",
+      "wcagCriteria": "2.4.6",
+      "title": "Expand button label does not describe the expanded/collapsed state meaningfully",
+      "description": "The expand button uses aria-expanded='true'/'false' correctly, and the button text toggles between labelShowMore and labelShowLess. However, there is no aria-controls attribute linking the button to the region it controls. Screen readers cannot programmatically determine which content the button expands without this relationship.",
+      "file": "packages/hx-library/src/components/hx-code-snippet/hx-code-snippet.ts",
+      "line": 270,
+      "fix": "Add an id to the <pre> element (e.g., id='${codeBlockId}') and add aria-controls='${codeBlockId}' to the expand button. This creates a programmatic relationship between the control and the content it controls."
+    },
+    {
+      "component": "hx-action-bar",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Roving tabindex does not account for shadow DOM focus traversal — slotted custom elements may not be discoverable",
+      "description": "The _getFocusableItems() method iterates over slot.assignedElements() and checks tabIndex >= 0 to identify focusable items. Custom elements that set their tabIndex via ElementInternals (the spec-compliant approach used by hx-button) may report tabIndex correctly in most browsers. However, elements whose inner focusable target is inside their own shadow root (delegatesFocus=true) are included by outer tabIndex, but _moveFocus() calls items[nextIndex]?.focus() on the outer host. In delegatesFocus components, this works. But elements where tabIndex is set only on an inner shadow child (not the host) will have tabIndex=-1 on the host and will be skipped by _isFocusable(), breaking the roving pattern. This is a cross-cutting shadow DOM interaction issue that can produce silent keyboard trap failures.",
+      "file": "packages/hx-library/src/components/hx-action-bar/hx-action-bar.ts",
+      "line": 169,
+      "fix": "Document explicitly that slotted components must expose tabIndex >= 0 on the host element (either natively or via ElementInternals.tabIndex) to participate in roving tabindex. Add a devWarn if getFocusableItems() returns 0 items when slots are populated. Consider also checking for the 'button', 'a[href]', 'input', 'select', 'textarea' native element tags regardless of tabIndex."
+    },
+    {
+      "component": "hx-action-bar",
+      "severity": "low",
+      "wcagCriteria": "2.1.1",
+      "title": "No keyboard support to exit toolbar focus back to page navigation",
+      "description": "The ARIA toolbar pattern (APG) recommends that pressing Escape or Tab exits the toolbar and returns focus to the broader page navigation. The current implementation handles only ArrowLeft/ArrowRight/Home/End. There is no mechanism for a keyboard user to escape the toolbar's roving tabindex without pressing Tab (which moves focus to the next tabbable element in document order, potentially skipping toolbar content). This is expected Tab behavior, but Escape-to-exit is a recommended enhancement for healthcare power-user contexts.",
+      "file": "packages/hx-library/src/components/hx-action-bar/hx-action-bar.ts",
+      "line": 112,
+      "fix": "Per APG toolbar pattern, Tab should move focus out of the toolbar entirely (this is already the native browser behavior since only one item has tabindex=0). Ensure documentation reflects that Tab exits the toolbar. Optionally add Escape key handling to move focus to the toolbar host element if a non-standard escape-to-toolbar-exit pattern is needed."
+    },
+    {
+      "component": "hx-field",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Label element in shadow DOM cannot be programmatically associated with slotted form control via for/id",
+      "description": "The hx-field component renders a <label> in its shadow DOM but the slotted form control lives in the light DOM. The shadow DOM label uses a programmatic click handler (_handleLabelClick) to focus the control, and injects aria-label onto the slotted control. However, the visual <label> element's 'for' attribute cannot reference a light DOM input ID due to shadow DOM boundary restrictions. This means: (1) clicking the label text does invoke focus via JS, but the click handler target area is limited to the shadow label element and may miss some edge cases; (2) the AT association is via aria-label (not the native label association), which does not provide the 'required field' and 'invalid' context that a native label relationship provides. The workaround is documented as intentional, but it means AT users see aria-label rather than the native label announcement on the input.",
+      "file": "packages/hx-library/src/components/hx-field/hx-field.ts",
+      "line": 302,
+      "fix": "This is a known shadow DOM limitation. The current workaround (aria-label injection + visually-hidden light DOM span for aria-describedby) is the best available approach. However, the component should also set aria-labelledby on the slotted control pointing to the injected light DOM span rather than using aria-label, so that native label click behavior is preserved and AT reads the actual label text without overriding any existing aria-labelledby. Consider a second light DOM span for the label text, separate from the description span."
+    },
+    {
+      "component": "hx-field",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "Error message uses role='alert' inside shadow DOM — may not be announced across shadow boundary on all ATs",
+      "description": "The error message div has role='alert' in the shadow DOM (line 382). ARIA live regions inside shadow DOM are not consistently supported across all browser/AT combinations. Specifically, NVDA+Firefox and some JAWS configurations do not reliably announce live regions that are inside a shadow root. The component partially mitigates this by also having a field__error-slot-announcer div with aria-live='assertive' in the shadow DOM. However, both live regions are in shadow DOM, which does not resolve the cross-shadow boundary announcement problem.",
+      "file": "packages/hx-library/src/components/hx-field/hx-field.ts",
+      "line": 382,
+      "fix": "Move the error announcement to the light DOM by updating the _a11yDescEl (already light DOM) to also serve as the live region, setting aria-live='assertive' and aria-atomic='true' on it when an error is set. This ensures the live region fires from the light DOM where AT support is consistent."
+    },
+    {
+      "component": "hx-form",
+      "severity": "high",
+      "wcagCriteria": "3.3.1",
+      "title": "Error summary does not focus on render or provide navigation links to errored fields",
+      "description": "When form validation fails, the error summary div (role='alert', aria-live='assertive') is injected into the light DOM. The live region will announce the errors, but focus remains on the submit button. WCAG 3.3.1 requires that error identification be programmatically determinable, but also requires (per best practice and SC 3.3.3) that users can navigate to the field in error. The error summary lists field names and messages as text but contains no links or focus management to guide users to the errored fields. In complex healthcare forms, this forces screen reader users to manually search for the field in error.",
+      "file": "packages/hx-library/src/components/hx-form/hx-form.ts",
+      "line": 414,
+      "fix": "Add anchor links in the error summary list items that, when activated, focus the corresponding errored field. Use the field's name attribute to build IDs for anchor targets, or use querySelector to find and focus the field directly. After setting errors, optionally move focus to the error summary heading using a timeout (to allow DOM update) so screen reader users are immediately aware of the errors."
+    },
+    {
+      "component": "hx-split-panel",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Collapse buttons use Unicode arrow characters as visual labels — may not render consistently across screen readers",
+      "description": "The collapse buttons use Unicode triangle characters ('◀' and '▶') as their visible text labels. These characters have accessible names provided via aria-label ('Collapse start panel', 'Expand start panel', etc.), so screen readers will use the aria-label. However, the visible button content for sighted users consists solely of Unicode symbols that may not render consistently across all fonts and operating systems. High-contrast mode may strip color, making the symbol harder to distinguish from the background.",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.ts",
+      "line": 322,
+      "fix": "Replace Unicode arrow characters with SVG icons (aria-hidden='true') inside the buttons. This ensures consistent rendering across operating systems and high-contrast environments. The aria-label already provides the accessible name; the SVG only needs to be visually meaningful."
+    },
+    {
+      "component": "hx-split-panel",
+      "severity": "medium",
+      "wcagCriteria": "2.5.8",
+      "title": "Collapse control buttons are 20x20px — below 24x24px minimum touch target",
+      "description": "The .collapse-btn elements have width: 20px and height: 20px (defined in hx-split-panel.styles.ts line 133-134). WCAG 2.2 SC 2.5.8 (Level AA) requires a minimum target size of 24x24 CSS pixels. The buttons are 4px short of the minimum on both dimensions. For a component frequently used in clinical data viewers and EHR interfaces where touch input is common, this is a significant usability barrier.",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 133,
+      "fix": "Increase .collapse-btn width and height from 20px to 24px minimum. For full WCAG 2.5.5 (Level AA, WCAG 2.1) compliance of 44x44px, use a transparent clickable area via padding or a pseudo-element while keeping the visual button at 20px or 24px if design requires it."
+    }
+  ]
+}

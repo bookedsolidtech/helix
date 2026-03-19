@@ -78,6 +78,22 @@ export const helixTagStyles = css`
     --hx-tag-border-color: var(--hx-color-error-200, #fecaca);
   }
 
+  /* ─── Semantic Variant Label (WCAG 1.4.1) ─── */
+  /* Visually hidden text prefix for semantic variants (success/warning/danger). */
+  /* Ensures the variant state is not conveyed by color alone.                   */
+
+  .tag__variant-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Pill Mode ─── */
 
   /* Uses --hx-tag-border-radius-pill (separate from --hx-tag-border-radius) so consumer

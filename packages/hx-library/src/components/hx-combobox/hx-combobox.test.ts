@@ -72,6 +72,18 @@ describe('hx-combobox', () => {
       expect(input?.getAttribute('aria-controls')).toBe(listbox?.id);
     });
 
+    it('aria-controls references an element that exists in the shadow DOM', async () => {
+      // Verify the aria-controls IDREF resolves to an actual element in the same shadow root.
+      // Input and listbox must be in the same shadow root for the relationship to be valid.
+      const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
+      const input = shadowQuery(el, 'input');
+      const controlsId = input?.getAttribute('aria-controls');
+      expect(controlsId).toBeTruthy();
+      const referencedEl = el.shadowRoot?.getElementById(controlsId!);
+      expect(referencedEl).toBeTruthy();
+      expect(referencedEl?.getAttribute('role')).toBe('listbox');
+    });
+
     it('listbox has role="listbox"', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
       const listbox = shadowQuery(el, '[role="listbox"]');
