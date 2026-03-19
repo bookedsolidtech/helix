@@ -124,8 +124,12 @@ export class HelixListItem extends LitElement {
       return;
     }
 
+    this._emitListItemClick();
+  }
+
+  private _emitListItemClick(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-list-item-click', {
+      new CustomEvent<{ item: HelixListItem; value: string | undefined }>('hx-list-item-click', {
         bubbles: true,
         composed: true,
         detail: { item: this, value: this.value },
@@ -239,7 +243,7 @@ export class HelixListItem extends LitElement {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       if (!this.disabled) {
-        this._handleClick(e as unknown as MouseEvent);
+        this._emitListItemClick();
       }
     }
   }

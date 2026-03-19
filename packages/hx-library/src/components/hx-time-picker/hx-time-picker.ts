@@ -539,7 +539,7 @@ export class HelixTimePicker extends LitElement {
 
   private _dispatchChange(value: string): void {
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value },

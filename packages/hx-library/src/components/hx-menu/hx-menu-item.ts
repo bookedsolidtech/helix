@@ -130,7 +130,7 @@ export class HelixMenuItem extends LitElement {
     }
 
     this.dispatchEvent(
-      new CustomEvent('hx-item-select', {
+      new CustomEvent<{ item: HelixMenuItem; value: string }>('hx-item-select', {
         bubbles: true,
         composed: true,
         detail: { item: this, value: this.value },
@@ -157,7 +157,7 @@ export class HelixMenuItem extends LitElement {
     if (e.key === 'ArrowRight' && this._hasSubmenu) {
       e.preventDefault();
       this.dispatchEvent(
-        new CustomEvent('hx-item-submenu-open', {
+        new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-open', {
           bubbles: true,
           composed: true,
           detail: { item: this },

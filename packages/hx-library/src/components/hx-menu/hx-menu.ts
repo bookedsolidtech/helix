@@ -137,7 +137,7 @@ export class HelixMenu extends LitElement {
         break;
       case 'Escape':
         e.preventDefault();
-        this.dispatchEvent(new CustomEvent('hx-close', { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent<void>('hx-close', { bubbles: true, composed: true }));
         break;
       default:
         if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -188,7 +188,7 @@ export class HelixMenu extends LitElement {
     this._focusedIndex = items.indexOf(detail.item);
 
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<{ item: HelixMenuItem; value: string }>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { item: detail.item, value: detail.value },

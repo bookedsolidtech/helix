@@ -221,7 +221,7 @@ export class HelixBanner extends LitElement {
      * @event hx-dismiss
      */
     this.dispatchEvent(
-      new CustomEvent('hx-dismiss', {
+      new CustomEvent<{ reason: string }>('hx-dismiss', {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },

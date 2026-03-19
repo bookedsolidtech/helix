@@ -160,7 +160,7 @@ export class HelixCodeSnippet extends LitElement {
     });
 
     this.dispatchEvent(
-      new CustomEvent('hx-copy', {
+      new CustomEvent<{ text: string }>('hx-copy', {
         bubbles: true,
         composed: true,
         detail: { text },

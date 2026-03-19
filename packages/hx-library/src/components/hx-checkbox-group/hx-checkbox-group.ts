@@ -217,7 +217,7 @@ export class HelixCheckboxGroup extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ values: string[] }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { values },

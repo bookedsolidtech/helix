@@ -154,9 +154,10 @@ export class HelixDataTable extends LitElement {
     // Note: Lit's defaultConverter returns null (not a string) when JSON.parse fails for
     // type: Array — so we guard against both string and any non-array value.
     if (changed.has('columns')) {
-      if (typeof (this.columns as unknown) === 'string') {
+      const rawColumns: unknown = this.columns;
+      if (typeof rawColumns === 'string') {
         try {
-          this.columns = JSON.parse(this.columns as unknown as string) as HxDataTableColumn[];
+          this.columns = JSON.parse(rawColumns) as HxDataTableColumn[];
         } catch {
           this.columns = [];
         }
@@ -165,9 +166,10 @@ export class HelixDataTable extends LitElement {
       }
     }
     if (changed.has('rows')) {
-      if (typeof (this.rows as unknown) === 'string') {
+      const rawRows: unknown = this.rows;
+      if (typeof rawRows === 'string') {
         try {
-          this.rows = JSON.parse(this.rows as unknown as string) as Record<string, unknown>[];
+          this.rows = JSON.parse(rawRows) as Record<string, unknown>[];
         } catch {
           this.rows = [];
         }
@@ -213,7 +215,7 @@ export class HelixDataTable extends LitElement {
 
   private _handleRowClick(row: Record<string, unknown>, index: number): void {
     this.dispatchEvent(
-      new CustomEvent('hx-row-click', {
+      new CustomEvent<{ row: Record<string, unknown>; index: number }>('hx-row-click', {
         bubbles: true,
         composed: true,
         detail: { row, index },
@@ -239,11 +241,14 @@ export class HelixDataTable extends LitElement {
 
   private _dispatchSelect(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<{ selectedRows: Record<string, unknown>[] }>('hx-select', {
         bubbles: true,
         composed: true,
         detail: {
-          selectedRows: [...this._selectedRows].map((i) => this.rows[i]),
+          selectedRows: [...this._selectedRows].flatMap((i) => {
+            const row = this.rows[i];
+            return row !== undefined ? [row] : [];
+          }),
         },
       }),
     );

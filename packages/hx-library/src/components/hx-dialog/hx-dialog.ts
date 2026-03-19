@@ -268,7 +268,7 @@ export class HelixDialog extends LitElement {
     });
 
     this.dispatchEvent(
-      new CustomEvent('hx-open', {
+      new CustomEvent<void>('hx-open', {
         bubbles: true,
         composed: true,
       }),
@@ -303,7 +303,7 @@ export class HelixDialog extends LitElement {
 
     if (wasOpen) {
       this.dispatchEvent(
-        new CustomEvent('hx-close', {
+        new CustomEvent<void>('hx-close', {
           bubbles: true,
           composed: true,
         }),
@@ -449,7 +449,7 @@ export class HelixDialog extends LitElement {
 
   private _cancel(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-cancel', {
+      new CustomEvent<void>('hx-cancel', {
         bubbles: true,
         composed: true,
       }),

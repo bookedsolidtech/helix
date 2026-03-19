@@ -373,14 +373,14 @@ export class HelixCombobox extends LitElement {
     if (this.disabled || this._open) return;
     this._open = true;
     this._focusedOptionIndex = -1;
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
   private _closeDropdown(): void {
     if (!this._open) return;
     this._open = false;
     this._focusedOptionIndex = -1;
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
   }
 
   // ─── Input Handling ───
@@ -419,7 +419,7 @@ export class HelixCombobox extends LitElement {
 
   private _emitInput(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-input', {
+      new CustomEvent<{ value: string }>('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this._filterText },
@@ -555,14 +555,14 @@ export class HelixCombobox extends LitElement {
     }
     this._internals.setFormValue(null);
     this._updateValidity();
-    this.dispatchEvent(new CustomEvent('hx-clear', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-clear', { bubbles: true, composed: true }));
   }
 
   // ─── Event Dispatchers ───
 
   private _dispatchChange(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
