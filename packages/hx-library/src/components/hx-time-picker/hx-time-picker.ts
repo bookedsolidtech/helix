@@ -171,10 +171,16 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
+  /**
+   * Declares this element as form-associated so it participates in native form submission.
+   * @internal
+   */
   static formAssociated = true;
 
-  /** @internal */
+  /**
+   * ElementInternals instance used for form participation and constraint validation.
+   * @internal
+   */
   private readonly _internals: ElementInternals;
 
   constructor() {
@@ -256,52 +262,104 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /**
+   * Whether the dropdown listbox is currently open.
+   * @internal
+   */
   @state() private _open = false;
-  /** @internal */
+  /**
+   * Index of the currently keyboard-active option in the listbox; -1 when none is active.
+   * @internal
+   */
   @state() private _activeIndex = -1;
-  /** @internal */
+  /**
+   * The display string shown in the text input, formatted according to the current `format` property.
+   * @internal
+   */
   @state() private _inputDisplayValue = '';
-  /** @internal */
+  /**
+   * Whether the label slot has slotted content assigned to it.
+   * @internal
+   */
   @state() private _hasLabelSlot = false;
-  /** @internal */
+  /**
+   * Whether the error slot has slotted content assigned to it.
+   * @internal
+   */
   @state() private _hasErrorSlot = false;
+  /**
+   * Whether the help-text slot has slotted content assigned to it.
+   * @internal
+   */
   @state() private _hasHelpSlot = false;
-  /** @internal */
+  /**
+   * The ID of the slotted label element, used for aria-labelledby cross-root linking.
+   * @internal
+   */
   @state() private _slottedLabelId = '';
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
-  /** @internal */
+  /**
+   * Monotonically incrementing counter used to generate unique element IDs across instances.
+   * @internal
+   */
   private static _instanceCount = 0;
 
-  /** @internal */
+  /**
+   * Unique ID for this component instance, used as the input element's `id` attribute.
+   * @internal
+   */
   private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
-  /** @internal */
+  /**
+   * Unique ID for the listbox element, referenced by `aria-controls` on the combobox input.
+   * @internal
+   */
   private readonly _listboxId = `${this._id}-listbox`;
-  /** @internal */
+  /**
+   * Unique ID for the error message element, referenced by `aria-describedby` on the input.
+   * @internal
+   */
   private readonly _errorId = `${this._id}-error`;
-  /** @internal */
+  /**
+   * Unique ID for the help text element, referenced by `aria-describedby` on the input.
+   * @internal
+   */
   private readonly _helpId = `${this._id}-help`;
 
   // ─── Query References ───
 
-  /** @internal */
+  /**
+   * Reference to the text input element inside the shadow DOM.
+   * @internal
+   */
   @query('.field__input')
   private _inputEl: HTMLInputElement | undefined;
 
-  /** @internal */
+  /**
+   * Reference to the listbox `<ul>` element inside the shadow DOM.
+   * @internal
+   */
   @query('.field__listbox')
   private _listboxEl: HTMLUListElement | undefined;
 
   // ─── Memoized slot generation (avoids regenerating on every render call) ───
 
-  /** @internal */
+  /**
+   * Memoized array of generated time slots; null until first access.
+   * @internal
+   */
   private _cachedSlots: TimeSlot[] | null = null;
-  /** @internal */
+  /**
+   * Cache key composed of min, max, step, and format; used to detect when slots must be regenerated.
+   * @internal
+   */
   private _slotsKey = '';
 
-  /** @internal */
+  /**
+   * Lazily generates and caches the list of time slots based on current min, max, step, and format.
+   * @internal
+   */
   private get _slots(): TimeSlot[] {
     const key = `${this.min}|${this.max}|${this.step}|${this.format}`;
     if (this._cachedSlots === null || key !== this._slotsKey) {
@@ -313,7 +371,10 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Outside-click handler (bound reference for add/removeEventListener) ───
 
-  /** @internal */
+  /**
+   * Closes the listbox when a click is detected outside the component; bound for stable add/removeEventListener calls.
+   * @internal
+   */
   private readonly _handleOutsideClick = (e: MouseEvent): void => {
     if (!this.contains(e.target as Node) && !this.shadowRoot?.contains(e.target as Node)) {
       this._closeListbox();
