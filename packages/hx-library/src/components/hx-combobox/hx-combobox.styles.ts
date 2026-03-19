@@ -265,7 +265,7 @@ export const helixComboboxStyles = css`
     background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
-    outline-offset: -2px;
+    outline-offset: var(--hx-combobox-option-focus-ring-offset, -2px);
   }
 
   .field__option--focused.field__option--selected {
