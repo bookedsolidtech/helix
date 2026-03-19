@@ -151,6 +151,16 @@ export class HelixSplitPanel extends LitElement {
    * @internal
    */
   private _positionBeforeCollapse = 50;
+  /**
+   * Cached container width measured once at drag start to avoid layout thrash on every pointermove.
+   * @internal
+   */
+  private _cachedContainerWidth = 0;
+  /**
+   * Cached container height measured once at drag start to avoid layout thrash on every pointermove.
+   * @internal
+   */
+  private _cachedContainerHeight = 0;
 
   private _clamp(value: number): number {
     return Math.min(this.max, Math.max(this.min, value));
@@ -196,6 +206,9 @@ export class HelixSplitPanel extends LitElement {
     this._dragging = true;
     this._dragStart = this.orientation === 'horizontal' ? e.clientX : e.clientY;
     this._positionAtDragStart = this.position;
+    // Cache container dimensions once at drag start to avoid forced layout on every pointermove
+    this._cachedContainerWidth = this.offsetWidth;
+    this._cachedContainerHeight = this.offsetHeight;
     e.preventDefault();
   };
 
@@ -207,7 +220,8 @@ export class HelixSplitPanel extends LitElement {
     if (!this._dragging) return;
     const current = this.orientation === 'horizontal' ? e.clientX : e.clientY;
     const delta = current - this._dragStart;
-    const hostSize = this._getHostSize();
+    const hostSize =
+      this.orientation === 'horizontal' ? this._cachedContainerWidth : this._cachedContainerHeight;
     if (hostSize === 0) return;
     const deltaPercent = (delta / hostSize) * 100;
     this._setPosition(this._positionAtDragStart + deltaPercent);
@@ -219,6 +233,8 @@ export class HelixSplitPanel extends LitElement {
    */
   private _onPointerUp = (): void => {
     this._dragging = false;
+    this._cachedContainerWidth = 0;
+    this._cachedContainerHeight = 0;
   };
 
   /**

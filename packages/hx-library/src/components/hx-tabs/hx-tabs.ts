@@ -146,7 +146,7 @@ export class HelixTabs extends LitElement {
       this._syncTabsAndPanels();
     });
     this._observer.observe(this, {
-      subtree: true,
+      subtree: false,
       attributeFilter: ['panel', 'name'],
     });
   }
