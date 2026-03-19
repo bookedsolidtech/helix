@@ -59,10 +59,10 @@ describe('hx-combobox', () => {
       expect(input?.getAttribute('aria-autocomplete')).toBe('list');
     });
 
-    it('aria-expanded is absent when closed', async () => {
+    it('aria-expanded is "false" when closed', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
       const input = shadowQuery(el, 'input');
-      expect(input?.hasAttribute('aria-expanded')).toBe(false);
+      expect(input?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('aria-controls points to listbox id', async () => {
