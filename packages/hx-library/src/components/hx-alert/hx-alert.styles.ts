@@ -170,6 +170,12 @@ export const helixAlertStyles = css`
     fill: currentColor;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .alert__close-button {
+      transition: none;
+    }
+  }
+
   /* ─── Variant: info ─── */
 
   :host([variant='info']) .alert,

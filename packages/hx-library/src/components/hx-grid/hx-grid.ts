@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixGridStyles, helixGridItemStyles } from './hx-grid.styles.js';
@@ -160,7 +160,7 @@ export class HelixGridItem extends LitElement {
   @property({ type: Number, reflect: true })
   span: number | undefined;
 
-  override updated(changed: Map<string, unknown>): void {
+  override updated(changed: PropertyValues<this>): void {
     if (changed.has('column') || changed.has('row') || changed.has('span')) {
       this._applyHostGridStyles();
     }

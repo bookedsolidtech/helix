@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -292,7 +292,7 @@ export class HelixDatePicker extends LitElement {
     document.removeEventListener('keydown', this._boundHandleDocumentKeydown);
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
     if (changedProperties.has('value')) {
@@ -300,7 +300,7 @@ export class HelixDatePicker extends LitElement {
       this._updateValidity();
     }
 
-    if (changedProperties.has('_isOpen')) {
+    if ((changedProperties as Map<PropertyKey, unknown>).has('_isOpen')) {
       if (this._isOpen) {
         // Sync view to the currently selected date when opening.
         const selected = this._parseISODate(this.value);
@@ -321,7 +321,10 @@ export class HelixDatePicker extends LitElement {
       }
     }
 
-    if (changedProperties.has('_viewMonth') || changedProperties.has('_viewYear')) {
+    if (
+      (changedProperties as Map<PropertyKey, unknown>).has('_viewMonth') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_viewYear')
+    ) {
       if (this._isOpen) {
         const monthName = this._getMonthName(this._viewMonth);
         this._liveMessage = `${monthName} ${this._viewYear}`;

@@ -1,5 +1,6 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixListItemStyles } from './hx-list-item.styles.js';
@@ -79,7 +80,7 @@ export class HelixListItem extends LitElement {
   @property({ type: String, reflect: true })
   type: 'default' | 'term' | 'definition' = 'default';
 
-  override updated(changedProps: Map<string, unknown>): void {
+  override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
     if (
       changedProps.has('interactive') ||
@@ -116,13 +117,7 @@ export class HelixListItem extends LitElement {
     }
   }
 
-  private _handleClick(e: MouseEvent): void {
-    if (this.disabled) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
+  private _dispatchListItemClick(): void {
     this.dispatchEvent(
       new CustomEvent('hx-list-item-click', {
         bubbles: true,
@@ -130,6 +125,16 @@ export class HelixListItem extends LitElement {
         detail: { item: this, value: this.value },
       }),
     );
+  }
+
+  private _handleClick(e: MouseEvent): void {
+    if (this.disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    this._dispatchListItemClick();
   }
 
   private _renderContent() {
@@ -157,7 +162,7 @@ export class HelixListItem extends LitElement {
       return html`
         <dt
           part="base"
-          class="list-item ${this.disabled ? 'list-item--disabled' : ''}"
+          class=${classMap({ 'list-item': true, 'list-item--disabled': this.disabled })}
           aria-disabled=${this.disabled ? 'true' : nothing}
         >
           ${this._renderContent()}
@@ -169,7 +174,7 @@ export class HelixListItem extends LitElement {
       return html`
         <dd
           part="base"
-          class="list-item ${this.disabled ? 'list-item--disabled' : ''}"
+          class=${classMap({ 'list-item': true, 'list-item--disabled': this.disabled })}
           aria-disabled=${this.disabled ? 'true' : nothing}
         >
           ${this._renderContent()}
@@ -186,9 +191,11 @@ export class HelixListItem extends LitElement {
         <li
           part="base"
           role="presentation"
-          class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
-            ? 'list-item--disabled'
-            : ''}"
+          class=${classMap({
+            'list-item': true,
+            'list-item--selected': this.selected,
+            'list-item--disabled': this.disabled,
+          })}
           @click=${this._handleClick}
           @keydown=${this._handleKeydown}
         >
@@ -217,9 +224,11 @@ export class HelixListItem extends LitElement {
     return html`
       <li
         part="base"
-        class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
-          ? 'list-item--disabled'
-          : ''}"
+        class=${classMap({
+          'list-item': true,
+          'list-item--selected': this.selected,
+          'list-item--disabled': this.disabled,
+        })}
         role="listitem"
         aria-disabled=${this.disabled ? 'true' : nothing}
         @click=${this._handleClick}
@@ -234,7 +243,7 @@ export class HelixListItem extends LitElement {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       if (!this.disabled) {
-        this._handleClick(e as unknown as MouseEvent);
+        this._dispatchListItemClick();
       }
     }
   }

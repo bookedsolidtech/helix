@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -150,7 +150,7 @@ export class HelixCheckboxGroup extends LitElement {
     this.removeEventListener('hx-change', this._handleCheckboxChange);
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('disabled')) {
       this._syncCheckboxes();
@@ -163,7 +163,7 @@ export class HelixCheckboxGroup extends LitElement {
     }
   }
 
-  override firstUpdated(changedProperties: Map<string, unknown>): void {
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
     this._syncCheckboxes();
     this._syncCheckboxNames();

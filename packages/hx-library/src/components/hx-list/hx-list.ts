@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -58,7 +58,7 @@ export class HelixList extends LitElement {
     this.removeEventListener('keydown', this._handleKeydown);
   }
 
-  override updated(changedProps: Map<string, unknown>): void {
+  override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
     if (changedProps.has('variant')) {
       this._updateItemStates();

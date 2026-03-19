@@ -208,6 +208,16 @@ export const helixTimePickerStyles = css`
     background-color: var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100));
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .field__combobox {
+      transition: none;
+    }
+
+    .field__option {
+      transition: none;
+    }
+  }
+
   /* ─── Help Text & Error Messages ─── */
 
   .field__help-text {

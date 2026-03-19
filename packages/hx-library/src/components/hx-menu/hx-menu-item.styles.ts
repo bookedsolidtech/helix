@@ -86,6 +86,14 @@ export const helixMenuItemStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .menu-item {
+      transition: none;
+    }
+
+    .menu-item__checked-icon {
+      transition: none;
+    }
+
     .menu-item__spinner {
       animation: none;
       opacity: var(--hx-opacity-muted, 0.6);

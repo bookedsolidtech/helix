@@ -83,6 +83,12 @@ export const helixLinkStyles = css`
     flex-shrink: 0;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .link {
+      transition: none;
+    }
+  }
+
   /* --- Visually hidden (sr-only) --- */
 
   .sr-only {

@@ -101,7 +101,7 @@ export class HelixAvatar extends LitElement {
   // P1-A / P2-B: Use willUpdate() instead of updated() for property validation
   // and derived state. willUpdate() runs before render() and does not schedule
   // a second update cycle when @state() properties are mutated.
-  override willUpdate(changedProperties: PropertyValues): void {
+  override willUpdate(changedProperties: PropertyValues<this>): void {
     // P0-1: Reset image error state when src changes so a new valid src renders correctly.
     if (changedProperties.has('src')) {
       this._imgError = false;

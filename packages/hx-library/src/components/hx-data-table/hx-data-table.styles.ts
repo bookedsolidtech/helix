@@ -175,6 +175,14 @@ export const helixDataTableStyles = css`
       animation: none;
       opacity: 0.6;
     }
+
+    .sort-icon {
+      transition: none;
+    }
+
+    tbody tr {
+      transition: none;
+    }
   }
 
   /* ─── Cell Focus ─── */

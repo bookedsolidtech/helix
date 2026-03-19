@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -118,7 +118,7 @@ export class HelixProgressBar extends LitElement {
     return !this._isIndeterminate && this.value !== null && this.value >= this.max;
   }
 
-  override updated(changedProps: Map<string, unknown>): void {
+  override updated(changedProps: PropertyValues<this>): void {
     if ((changedProps.has('value') || changedProps.has('max')) && this._isComplete) {
       this._liveMessage = 'Complete';
       this.dispatchEvent(new CustomEvent('hx-complete', { bubbles: true, composed: true }));

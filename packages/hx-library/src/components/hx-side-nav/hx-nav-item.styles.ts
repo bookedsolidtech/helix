@@ -215,6 +215,7 @@ export const helixNavItemStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .nav-item__link,
     .nav-item__label,
     .nav-item__arrow,
     .nav-item__children,
