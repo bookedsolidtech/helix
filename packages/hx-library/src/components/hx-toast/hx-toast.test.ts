@@ -174,7 +174,7 @@ describe('hx-toast', () => {
 
     it('supports custom closeLabel for localization (P2-06)', async () => {
       const el = await fixture<HelixToast>(
-        '<hx-toast closable close-label="Cerrar notificación">Test</hx-toast>',
+        '<hx-toast open closable close-label="Cerrar notificación">Test</hx-toast>',
       );
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
       expect(btn.getAttribute('aria-label')).toBe('Cerrar notificación');

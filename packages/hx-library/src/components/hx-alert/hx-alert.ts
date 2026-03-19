@@ -192,7 +192,15 @@ export class HelixAlert extends LitElement {
               // Second microtask ensures the clear is processed before re-injection,
               // guaranteeing the AT sees a content change rather than no-op.
               Promise.resolve().then(() => {
-                announcer.textContent = this.textContent?.trim() ?? '';
+                const severityLabels: Record<string, string> = {
+                  info: 'Info:',
+                  success: 'Success:',
+                  warning: 'Warning:',
+                  error: 'Error:',
+                };
+                const prefix = severityLabels[this.variant] ?? '';
+                const message = this.textContent?.trim() ?? '';
+                announcer.textContent = prefix ? `${prefix} ${message}` : message;
               });
             }
           });
@@ -321,7 +329,11 @@ export class HelixAlert extends LitElement {
     const severityLabel = SEVERITY_LABELS[this.variant] ?? '';
 
     return html`
-      <div class="sr-only" aria-live="polite" aria-atomic="true"></div>
+      <div
+        class="sr-only"
+        aria-live=${this._isAssertive ? 'assertive' : 'polite'}
+        aria-atomic="true"
+      ></div>
       <div part="alert" class=${classMap(classes)}>
         <span class="alert__severity-label">${severityLabel}</span>
         ${this.showIcon
