@@ -1,4 +1,4 @@
-import { LitElement, html, svg, nothing, type TemplateResult } from 'lit';
+import { LitElement, html, svg, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -31,9 +31,9 @@ const chevronIcon = svg`
  * @slot trigger - The heading/trigger content for this item.
  * @slot - Default slot for the collapsible body content.
  *
- * @attr {number} level - Heading level (1–6) for the trigger heading wrapper. Defaults to 3.
- *   Set this to match the document outline — e.g., use `level="2"` when the accordion
- *   appears under an `<h1>` landmark.
+ * @attr {number} level - Heading level (1–6) for the trigger via `role="heading" aria-level`.
+ *   Defaults to 3. Set this to match the document outline — e.g., use `level="2"` when the
+ *   accordion appears under an `<h1>` landmark.
  *
  * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-expand - Dispatched when the item is expanded.
  * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-collapse - Dispatched when the item is collapsed.
@@ -74,37 +74,26 @@ export class HelixAccordionItem extends LitElement {
   disabled = false;
 
   /**
-   * Heading level (1–6) for the heading element that wraps the trigger button.
-   * Defaults to 3. Set to match the document outline around the accordion.
-   * Per the WAI-ARIA Authoring Practices Guide, accordion triggers should be
-   * wrapped in a heading element so the accordion structure is surfaced in the
-   * screen reader heading list.
+   * Heading level (1–6) applied via `role="heading" aria-level` on the summary
+   * trigger. Defaults to 3. Set to match the document outline around the
+   * accordion so screen readers surface accordion items in the heading list.
    * @attr level
    */
   @property({ type: Number })
   level: 1 | 2 | 3 | 4 | 5 | 6 = 3;
 
-  // ─── Heading Render Helper ───
+  // ─── Heading Level Helper ───
 
-  private _renderTriggerHeading(summary: TemplateResult): TemplateResult {
-    // Clamp level to valid heading range
-    const level = Math.max(1, Math.min(6, this.level)) as 1 | 2 | 3 | 4 | 5 | 6;
-    // Use unsafeHTML-free approach: map level to a static template
-    switch (level) {
-      case 1:
-        return html`<h1 class="trigger__heading">${summary}</h1>`;
-      case 2:
-        return html`<h2 class="trigger__heading">${summary}</h2>`;
-      case 4:
-        return html`<h4 class="trigger__heading">${summary}</h4>`;
-      case 5:
-        return html`<h5 class="trigger__heading">${summary}</h5>`;
-      case 6:
-        return html`<h6 class="trigger__heading">${summary}</h6>`;
-      case 3:
-      default:
-        return html`<h3 class="trigger__heading">${summary}</h3>`;
-    }
+  /**
+   * Returns a clamped heading level (1–6) for use as `aria-level` on the
+   * `<summary>` element. Per the WAI-ARIA APG Accordion pattern, the
+   * `<summary>` must be a **direct child** of `<details>` for native
+   * disclosure behaviour to work. Instead of wrapping `<summary>` inside
+   * an `<h3>` (which breaks the native toggle), we apply
+   * `role="heading" aria-level="N"` directly on `<summary>`.
+   */
+  private get _headingLevel(): number {
+    return Math.max(1, Math.min(6, this.level));
   }
 
   // ─── Toggle Logic ───
@@ -152,26 +141,24 @@ export class HelixAccordionItem extends LitElement {
       'item--disabled': this.disabled,
     };
 
-    const summaryEl = html`
-      <summary
-        id=${`${this._uid}-trigger`}
-        part="trigger"
-        class="trigger"
-        tabindex=${this.disabled ? '-1' : '0'}
-        aria-expanded=${this.expanded ? 'true' : 'false'}
-        aria-disabled=${this.disabled ? 'true' : 'false'}
-        aria-controls=${`${this._uid}-content`}
-        @click=${this._handleSummaryClick}
-        @keydown=${this._handleKeyDown}
-      >
-        <slot name="trigger"></slot>
-        <span part="icon" class="icon">${chevronIcon}</span>
-      </summary>
-    `;
-
     return html`
       <details part="item" class=${classMap(itemClasses)} ?open=${this.expanded}>
-        ${this._renderTriggerHeading(summaryEl)}
+        <summary
+          id=${`${this._uid}-trigger`}
+          part="trigger"
+          class="trigger"
+          role="heading"
+          aria-level=${this._headingLevel}
+          tabindex=${this.disabled ? '-1' : '0'}
+          aria-expanded=${this.expanded ? 'true' : 'false'}
+          aria-disabled=${this.disabled ? 'true' : 'false'}
+          aria-controls=${`${this._uid}-content`}
+          @click=${this._handleSummaryClick}
+          @keydown=${this._handleKeyDown}
+        >
+          <slot name="trigger"></slot>
+          <span part="icon" class="icon">${chevronIcon}</span>
+        </summary>
         <div class="content-wrapper">
           <div class="content-inner">
             <div

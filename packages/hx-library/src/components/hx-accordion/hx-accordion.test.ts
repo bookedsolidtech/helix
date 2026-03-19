@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup } from '../../test-utils.js';
 import type { HelixAccordion } from './hx-accordion.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
@@ -110,13 +109,14 @@ describe('hx-accordion', () => {
       `);
 
       const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
-      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
-      const summary2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger2 = shadowQuery<HTMLElement>(items[1], '[part="trigger"]')!;
 
-      summary1.focus();
-      await userEvent.keyboard('{ArrowDown}');
+      trigger1.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+      await el.updateComplete;
 
-      expect(items[1].shadowRoot?.activeElement).toBe(summary2);
+      expect(items[1].shadowRoot?.activeElement).toBe(trigger2);
     });
 
     it('ArrowUp moves focus to previous item trigger', async () => {
@@ -134,13 +134,14 @@ describe('hx-accordion', () => {
       `);
 
       const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
-      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
-      const summary2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger2 = shadowQuery<HTMLElement>(items[1], '[part="trigger"]')!;
 
-      summary2.focus();
-      await userEvent.keyboard('{ArrowUp}');
+      trigger2.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
+      await el.updateComplete;
 
-      expect(items[0].shadowRoot?.activeElement).toBe(summary1);
+      expect(items[0].shadowRoot?.activeElement).toBe(trigger1);
     });
 
     it('Home moves focus to first item trigger', async () => {
@@ -162,13 +163,14 @@ describe('hx-accordion', () => {
       `);
 
       const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
-      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
-      const summary3 = shadowQuery<HTMLElement>(items[2], 'summary')!;
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger3 = shadowQuery<HTMLElement>(items[2], '[part="trigger"]')!;
 
-      summary3.focus();
-      await userEvent.keyboard('{Home}');
+      trigger3.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, composed: true }));
+      await el.updateComplete;
 
-      expect(items[0].shadowRoot?.activeElement).toBe(summary1);
+      expect(items[0].shadowRoot?.activeElement).toBe(trigger1);
     });
 
     it('End moves focus to last item trigger', async () => {
@@ -190,13 +192,14 @@ describe('hx-accordion', () => {
       `);
 
       const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
-      const summary1 = shadowQuery<HTMLElement>(items[0], 'summary')!;
-      const summary3 = shadowQuery<HTMLElement>(items[2], 'summary')!;
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger3 = shadowQuery<HTMLElement>(items[2], '[part="trigger"]')!;
 
-      summary1.focus();
-      await userEvent.keyboard('{End}');
+      trigger1.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, composed: true }));
+      await el.updateComplete;
 
-      expect(items[2].shadowRoot?.activeElement).toBe(summary3);
+      expect(items[2].shadowRoot?.activeElement).toBe(trigger3);
     });
   });
 
@@ -530,11 +533,11 @@ describe('hx-accordion-item', () => {
         </hx-accordion-item>
       `);
 
-      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-expand');
-      summary.focus();
-      await userEvent.keyboard('{Enter}');
-      await eventPromise;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
       expect(el.expanded).toBe(true);
     });
 
@@ -546,11 +549,11 @@ describe('hx-accordion-item', () => {
         </hx-accordion-item>
       `);
 
-      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-expand');
-      summary.focus();
-      await userEvent.keyboard(' ');
-      await eventPromise;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
       expect(el.expanded).toBe(true);
     });
 

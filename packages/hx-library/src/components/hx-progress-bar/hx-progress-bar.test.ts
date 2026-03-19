@@ -28,7 +28,9 @@ describe('hx-progress-bar', () => {
     });
 
     it('exposes "label" CSS part', async () => {
-      const el = await fixture<HelixProgressBar>('<hx-progress-bar></hx-progress-bar>');
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Upload progress"></hx-progress-bar>',
+      );
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
