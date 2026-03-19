@@ -327,9 +327,14 @@ export class HelixNumberInput extends LitElement {
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    const parsed = Number(state);
-    this.value = isNaN(parsed) ? null : parsed;
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      const parsed = Number(state);
+      this.value = isNaN(parsed) ? null : parsed;
+    }
   }
 
   /** Called when a parent fieldset is disabled/enabled. */
