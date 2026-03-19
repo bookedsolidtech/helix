@@ -97,6 +97,7 @@ export class HelixToast extends LitElement {
   // ─── Lifecycle ───
 
   override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('open')) {
       if (this.open) {
         this.removeAttribute('aria-hidden');
