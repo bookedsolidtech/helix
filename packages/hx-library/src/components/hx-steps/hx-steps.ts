@@ -118,7 +118,7 @@ export class HelixSteps extends LitElement {
      * @event hx-step-click
      */
     this.dispatchEvent(
-      new CustomEvent('hx-step-click', {
+      new CustomEvent<{ step: HelixStep; index: number }>('hx-step-click', {
         bubbles: true,
         composed: true,
         detail: { step, index },

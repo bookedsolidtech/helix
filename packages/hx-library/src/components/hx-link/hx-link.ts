@@ -106,7 +106,7 @@ export class HelixLink extends LitElement {
     }
 
     this.dispatchEvent(
-      new CustomEvent('hx-click', {
+      new CustomEvent<{ originalEvent: MouseEvent }>('hx-click', {
         bubbles: true,
         composed: true,
         detail: { originalEvent: e },

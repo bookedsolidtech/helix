@@ -87,7 +87,7 @@ export class HelixTab extends LitElement {
      * @internal
      */
     this.dispatchEvent(
-      new CustomEvent('hx-tab-select', {
+      new CustomEvent<{ panel: string }>('hx-tab-select', {
         bubbles: true,
         composed: true,
         detail: { panel: this.panel },

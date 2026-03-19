@@ -180,7 +180,7 @@ export class HelixToggleButton extends LitElement {
      * @event hx-toggle
      */
     this.dispatchEvent(
-      new CustomEvent('hx-toggle', {
+      new CustomEvent<{ pressed: boolean }>('hx-toggle', {
         bubbles: true,
         composed: true,
         detail: { pressed: this.pressed },

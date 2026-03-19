@@ -266,7 +266,7 @@ export class HelixTabs extends LitElement {
        * @event hx-tab-change
        */
       this.dispatchEvent(
-        new CustomEvent('hx-tab-change', {
+        new CustomEvent<{ tabId: string; index: number }>('hx-tab-change', {
           bubbles: true,
           composed: true,
           detail: { tabId: tab.id, index },

@@ -287,7 +287,7 @@ export class HelixRadioGroup extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string; checked: boolean }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value, checked: true },
@@ -325,7 +325,7 @@ export class HelixRadioGroup extends LitElement {
       const targetRadio = (e.target as Element)?.closest?.('hx-radio') as HelixRadio | null;
       if (targetRadio && !targetRadio.disabled) {
         targetRadio.dispatchEvent(
-          new CustomEvent('hx-radio-select', {
+          new CustomEvent<{ value: string }>('hx-radio-select', {
             bubbles: true,
             composed: true,
             detail: { value: targetRadio.value },

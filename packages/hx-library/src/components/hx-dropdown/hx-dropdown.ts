@@ -153,7 +153,7 @@ export class HelixDropdown extends LitElement {
       firstFocusable?.focus();
     }
     await this._updatePosition();
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
   // P2-02: returnFocus=true only on Escape; Tab should let focus advance naturally.
@@ -162,7 +162,7 @@ export class HelixDropdown extends LitElement {
     this.open = false;
     this._panelVisible = false;
     document.removeEventListener('click', this._handleOutsideClick);
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
     if (returnFocus) {
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
       const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
@@ -299,7 +299,7 @@ export class HelixDropdown extends LitElement {
     const label = item.textContent?.trim() ?? '';
 
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<{ value: string | null; label: string }>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { value, label },

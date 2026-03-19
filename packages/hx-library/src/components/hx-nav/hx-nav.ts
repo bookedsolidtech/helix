@@ -156,7 +156,7 @@ export class HelixNav extends LitElement {
       this._mobileOpen = false;
       this._expandedIndex = null;
       this.dispatchEvent(
-        new CustomEvent('hx-nav-select', {
+        new CustomEvent<{ item: NavItem }>('hx-nav-select', {
           bubbles: true,
           composed: true,
           detail: { item },

@@ -430,7 +430,7 @@ export class HelixPopup extends LitElement {
       this._positionArrow(arrowEl, placement, arrowData);
     }
 
-    this.dispatchEvent(new CustomEvent('hx-reposition', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-reposition', { bubbles: true, composed: true }));
   }
 
   private _positionArrow(
