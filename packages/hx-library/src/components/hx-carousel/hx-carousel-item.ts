@@ -1,6 +1,7 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { helixCarouselItemStyles } from './hx-carousel-item.styles.js';
 
 /**
  * A wrapper for individual carousel slides.
@@ -13,34 +14,7 @@ import { tokenStyles } from '@helixui/tokens/lit';
  */
 @customElement('hx-carousel-item')
 export class HelixCarouselItem extends LitElement {
-  static override styles = [
-    tokenStyles,
-    css`
-      :host {
-        display: block;
-        flex-shrink: 0;
-        width: var(--_hx-carousel-slide-width, 100%);
-        box-sizing: border-box;
-      }
-
-      .slide-group {
-        height: 100%;
-        outline: none;
-      }
-
-      /*
-       * Show focus ring for both keyboard-initiated focus (:focus-visible) and
-       * programmatic focus (.focus() calls from JS). tabindex="-1" elements only
-       * receive focus programmatically, so :focus-visible may not trigger in all
-       * browsers — :focus-within on the host ensures the ring is always visible.
-       */
-      .slide-group:focus-visible,
-      .slide-group:focus {
-        outline: var(--hx-focus-ring-width) solid var(--hx-focus-ring-color);
-        outline-offset: var(--hx-focus-ring-offset);
-      }
-    `,
-  ];
+  static override styles = [tokenStyles, helixCarouselItemStyles];
 
   /**
    * The 0-based index of this slide within the carousel. Set by hx-carousel.
