@@ -131,6 +131,21 @@ export class HelixCard extends LitElement {
     }
   }
 
+  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
+    // WCAG 4.1.2: interactive cards (with hx-href) must have an accessible name
+    if (
+      (changedProperties.has('hxHref') || changedProperties.has('hxAriaLabel')) &&
+      this.hxHref &&
+      !this.hxAriaLabel
+    ) {
+      devWarn(
+        'hx-card',
+        "Interactive card (hx-href is set) is missing an accessible name. Set `hx-aria-label` to describe the card's destination or purpose (WCAG 4.1.2).",
+      );
+    }
+  }
+
   // ─── Event Handling ───
 
   private _dispatchCardClick(originalEvent: MouseEvent | KeyboardEvent): void {

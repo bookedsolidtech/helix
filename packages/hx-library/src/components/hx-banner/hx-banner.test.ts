@@ -365,10 +365,10 @@ describe('hx-banner', () => {
   // ─── Close Button Accessibility (2) ───
 
   describe('Close button accessibility', () => {
-    it('close button has aria-label="Dismiss"', async () => {
+    it('close button has aria-label="Dismiss banner" (default when no heading set)', async () => {
       const el = await fixture<HxBanner>('<hx-banner dismissible>Dismissible</hx-banner>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.banner__close-button')!;
-      expect(closeBtn.getAttribute('aria-label')).toBe('Dismiss');
+      expect(closeBtn.getAttribute('aria-label')).toBe('Dismiss banner');
     });
 
     it('close button is a <button> element', async () => {

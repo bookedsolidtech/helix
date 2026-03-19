@@ -185,8 +185,11 @@ export const helixDrawerStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    width: var(--hx-touch-target-min, 2.75rem);
+    height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
     border: none;
     border-radius: var(--hx-border-radius-md, 0.375rem);
@@ -203,8 +206,12 @@ export const helixDrawerStyles = css`
   }
 
   .drawer-close-button:focus-visible {
-    outline: 2px solid var(--hx-color-primary-600);
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(
+        --hx-drawer-close-btn-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+      );
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Body ─── */

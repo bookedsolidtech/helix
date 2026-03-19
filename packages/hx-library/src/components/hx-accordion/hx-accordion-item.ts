@@ -31,6 +31,10 @@ const chevronIcon = svg`
  * @slot trigger - The heading/trigger content for this item.
  * @slot - Default slot for the collapsible body content.
  *
+ * @attr {number} level - Heading level (1–6) for the trigger via `role="heading" aria-level`.
+ *   Defaults to 3. Set this to match the document outline — e.g., use `level="2"` when the
+ *   accordion appears under an `<h1>` landmark.
+ *
  * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-expand - Dispatched when the item is expanded.
  * @fires {CustomEvent<{expanded: boolean, itemId: string}>} hx-collapse - Dispatched when the item is collapsed.
  *
@@ -68,6 +72,29 @@ export class HelixAccordionItem extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   disabled = false;
+
+  /**
+   * Heading level (1–6) applied via `role="heading" aria-level` on the summary
+   * trigger. Defaults to 3. Set to match the document outline around the
+   * accordion so screen readers surface accordion items in the heading list.
+   * @attr level
+   */
+  @property({ type: Number })
+  level: 1 | 2 | 3 | 4 | 5 | 6 = 3;
+
+  // ─── Heading Level Helper ───
+
+  /**
+   * Returns a clamped heading level (1–6) for use as `aria-level` on the
+   * `<summary>` element. Per the WAI-ARIA APG Accordion pattern, the
+   * `<summary>` must be a **direct child** of `<details>` for native
+   * disclosure behaviour to work. Instead of wrapping `<summary>` inside
+   * an `<h3>` (which breaks the native toggle), we apply
+   * `role="heading" aria-level="N"` directly on `<summary>`.
+   */
+  private get _headingLevel(): number {
+    return Math.max(1, Math.min(6, this.level));
+  }
 
   // ─── Toggle Logic ───
 
@@ -120,9 +147,11 @@ export class HelixAccordionItem extends LitElement {
           id=${`${this._uid}-trigger`}
           part="trigger"
           class="trigger"
+          role="heading"
+          aria-level=${this._headingLevel}
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-expanded=${this.expanded ? 'true' : 'false'}
-          aria-disabled=${this.disabled ? 'true' : 'false'}
+          aria-expanded=${this.expanded ? 'true' : nothing}
+          aria-disabled=${this.disabled ? 'true' : nothing}
           aria-controls=${`${this._uid}-content`}
           @click=${this._handleSummaryClick}
           @keydown=${this._handleKeyDown}

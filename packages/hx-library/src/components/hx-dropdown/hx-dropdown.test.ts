@@ -357,15 +357,14 @@ describe('hx-dropdown', () => {
       expect(trigger?.getAttribute('aria-haspopup')).toBe('menu');
     });
 
-    it('sets aria-controls on trigger element pointing to the panel', async () => {
+    it('does not set aria-controls on trigger — cross-shadow IDREF is unresolvable', async () => {
+      // aria-controls on a light DOM trigger referencing a shadow DOM panel ID cannot be
+      // resolved by assistive technology across shadow boundaries. The attribute is intentionally
+      // omitted to avoid a broken ARIA relationship (same pattern as hx-popover).
       const el = await fixture<HelixDropdown>(triggerHtml);
       await el.updateComplete;
       const trigger = el.querySelector('[slot="trigger"]');
-      const panelId = trigger?.getAttribute('aria-controls');
-      expect(panelId).toBeTruthy();
-      // P1-02: aria-controls must reference the panel element.
-      const panel = shadowQuery(el, '[part="panel"]');
-      expect(panel?.id).toBe(panelId);
+      expect(trigger?.hasAttribute('aria-controls')).toBe(false);
     });
 
     it('trigger aria-expanded is false by default', async () => {

@@ -37,6 +37,9 @@ export const helixCarouselStyles = css`
     justify-content: center;
     width: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
     height: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
     border-radius: var(--hx-border-radius-full, 9999px);
     background: var(--hx-color-neutral-0, #fff);
@@ -56,7 +59,8 @@ export const helixCarouselStyles = css`
   }
 
   .nav-btn:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -76,8 +80,11 @@ export const helixCarouselStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-size-8, 2rem);
-    height: var(--hx-size-8, 2rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    width: var(--hx-touch-target-min, 2.75rem);
+    height: var(--hx-touch-target-min, 2.75rem);
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
@@ -94,7 +101,8 @@ export const helixCarouselStyles = css`
   }
 
   .play-pause-btn:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -135,6 +143,11 @@ export const helixCarouselStyles = css`
 
   .pagination-item {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
     border: none;
     cursor: pointer;
@@ -160,7 +173,8 @@ export const helixCarouselStyles = css`
   }
 
   .pagination-item:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-full, 9999px);
   }

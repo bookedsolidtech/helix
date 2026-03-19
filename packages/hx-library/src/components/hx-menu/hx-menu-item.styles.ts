@@ -37,8 +37,8 @@ export const helixMenuItemStyles = css`
 
   .menu-item:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #3b82f6));
-    outline-offset: 0px;
+      var(--hx-menu-item-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+    outline-offset: var(--hx-menu-item-focus-ring-offset, 0px);
   }
 
   .menu-item__prefix,

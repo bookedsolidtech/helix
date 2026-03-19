@@ -17,7 +17,7 @@ export interface HxTreeItemSelectDetail {
  *
  * @tag hx-tree-item
  *
- * @slot - Default slot for the item label content.
+ * @slot - Default slot for the item label content. This text is also used to label the children group.
  * @slot icon - Custom icon shown before the label.
  * @slot children - Nested hx-tree-item elements for sub-tree.
  *
@@ -77,6 +77,12 @@ export class HelixTreeItem extends LitElement {
    * @internal
    */
   @state() private _rovingActive = false;
+
+  /**
+   * Text content from the default slot, used to label the children group for screen readers.
+   * @internal
+   */
+  @state() private _labelText = '';
 
   /**
    * Cached ARIA position metadata. Computed once on connect and on slotchange
@@ -165,6 +171,19 @@ export class HelixTreeItem extends LitElement {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedElements().length > 0;
     this._updateAriaMetadata();
+  }
+
+  /**
+   * Captures the text content from the default (label) slot for use on the children group label.
+   * @internal
+   */
+  private _handleLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const nodes = slot.assignedNodes({ flatten: true });
+    this._labelText = nodes
+      .map((n) => n.textContent ?? '')
+      .join('')
+      .trim();
   }
 
   // ─── Event Handlers ───
@@ -296,13 +315,14 @@ export class HelixTreeItem extends LitElement {
             <slot name="icon"></slot>
           </span>
           <span part="label" class="item-label">
-            <slot></slot>
+            <slot @slotchange=${this._handleLabelSlotChange}></slot>
           </span>
         </div>
         <div
           part="children"
           class="children ${this.expanded ? 'children--expanded' : ''}"
           role="group"
+          aria-label=${this._labelText ? `${this._labelText} children` : 'children'}
         >
           <div class="children-inner">
             <slot name="children" @slotchange=${this._handleChildrenSlotChange}></slot>

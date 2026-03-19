@@ -92,18 +92,33 @@ export class HelixDropdown extends LitElement {
 
   // ─── Internal State ───
 
-  /** @internal */
+  /**
+   * Whether the dropdown panel is currently visible.
+   * @internal
+   */
   @state() private _panelVisible = false;
 
   // P1-02: Unique panel ID for aria-controls.
-  /** @internal */
+  /**
+   * Monotonically incrementing counter used to generate unique panel IDs across instances.
+   * @internal
+   */
   private static _instanceCounter = 0;
-  /** @internal */
+  /**
+   * Unique ID assigned to the floating panel element, referenced by `aria-controls` on the trigger.
+   * @internal
+   */
   private _panelId = `hx-dropdown-panel-${++HelixDropdown._instanceCounter}`;
 
-  /** @internal */
+  /**
+   * Reference to the floating panel element inside the shadow DOM.
+   * @internal
+   */
   @query('[part="panel"]') private _panel: HTMLElement | undefined;
-  /** @internal */
+  /**
+   * Reference to the trigger wrapper element inside the shadow DOM.
+   * @internal
+   */
   @query('[part="trigger"]') private _triggerWrapper: HTMLElement | undefined;
 
   // ─── Lifecycle ───
@@ -338,8 +353,8 @@ export class HelixDropdown extends LitElement {
       // P1-01: Use aria-haspopup="menu" per ARIA 1.1+ / APG Menu Button pattern.
       trigger.setAttribute('aria-haspopup', 'menu');
       trigger.setAttribute('aria-expanded', String(this.open));
-      // P1-02: Link trigger to panel for screen reader navigation.
-      trigger.setAttribute('aria-controls', this._panelId);
+      // aria-controls is intentionally omitted: the panel lives in Shadow DOM and
+      // IDREF values cannot be resolved across shadow boundaries by assistive technology.
       // P2-06: Remove host fallback when a trigger element is present.
       this.removeAttribute('aria-expanded');
     } else {

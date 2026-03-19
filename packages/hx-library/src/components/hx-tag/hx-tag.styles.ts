@@ -78,6 +78,22 @@ export const helixTagStyles = css`
     --hx-tag-border-color: var(--hx-color-error-200, #fecaca);
   }
 
+  /* ─── Semantic Variant Label (WCAG 1.4.1) ─── */
+  /* Visually hidden text prefix for semantic variants (success/warning/danger). */
+  /* Ensures the variant state is not conveyed by color alone.                   */
+
+  .tag__variant-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Pill Mode ─── */
 
   /* Uses --hx-tag-border-radius-pill (separate from --hx-tag-border-radius) so consumer
@@ -109,9 +125,9 @@ export const helixTagStyles = css`
     justify-content: center;
     background: none;
     border: none;
-    /* WCAG 2.5.8 (Level AA): minimum 24×24 CSS pixel touch target */
-    min-width: 24px;
-    min-height: 24px;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
     margin-inline-start: var(--hx-space-1, 0.25rem);
     cursor: pointer;

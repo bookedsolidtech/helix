@@ -549,13 +549,13 @@ describe('hx-tabs', () => {
       expect(controlsAttr).toBe(panels[0].id);
     });
 
-    it('panel has aria-labelledby referencing its tab id', async () => {
+    it('panel has aria-label matching its tab text content', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      const labelledBy = panels[0].getAttribute('aria-labelledby');
-      expect(labelledBy).toBeTruthy();
-      expect(labelledBy).toBe(tabs[0].id);
+      const ariaLabel = panels[0].getAttribute('aria-label');
+      expect(ariaLabel).toBeTruthy();
+      expect(ariaLabel).toBe(tabs[0].textContent?.trim());
     });
 
     it('panel has tabindex="0" for keyboard accessibility', async () => {

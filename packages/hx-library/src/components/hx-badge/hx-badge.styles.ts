@@ -85,6 +85,22 @@ export const helixBadgeStyles = css`
     --hx-badge-pulse-color: var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1));
   }
 
+  /* ─── Semantic Variant Label (WCAG 1.4.1) ─── */
+  /* Visually hidden text prefix for semantic variants (success/warning/error/info). */
+  /* Ensures the variant is not conveyed by color alone.                             */
+
+  .badge__variant-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Pill Mode ─── */
 
   .badge--pill {
