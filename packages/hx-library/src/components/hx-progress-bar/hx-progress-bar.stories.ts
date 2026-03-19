@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect } from 'storybook/test';
 import './index.js';
 
 // ─────────────────────────────────────────────────
@@ -218,11 +219,53 @@ export const Complete: Story = {
   `,
 };
 
+/**
+ * Demonstrates the `hx-complete` event dispatched when the progress value reaches 100%.
+ * Use this event to trigger downstream actions such as showing a confirmation toast,
+ * enabling a submit button, or navigating to the next step in a workflow.
+ */
+export const CompleteEventDemo: Story = {
+  name: 'Events: hx-complete',
+  render: () => html`
+    <div style="width: 400px;">
+      <hx-progress-bar id="complete-demo" value="75" label="File upload progress">
+        <span slot="label">File upload progress</span>
+      </hx-progress-bar>
+      <p
+        id="complete-event-output"
+        style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; font-family: sans-serif;"
+      >
+        The hx-complete event fires when value reaches 100%.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const bar = canvasElement.querySelector('hx-progress-bar');
+    await expect(bar).toBeTruthy();
+
+    let completeFired = false;
+    bar!.addEventListener('hx-complete', () => {
+      completeFired = true;
+    });
+
+    // Set value to 100 to trigger the hx-complete event
+    (bar as { value: number }).value = 100;
+
+    // Allow Lit's updated lifecycle to run
+    await bar!.updateComplete;
+
+    await expect(completeFired).toBe(true);
+  },
+};
+
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     value: null,
     indeterminate: false,
-    label: 'Loading…',
+    label: 'Loading...',
   },
 };

@@ -11,12 +11,27 @@ const meta = {
   title: 'Components/VisuallyHidden',
   component: 'hx-visually-hidden',
   tags: ['autodocs'],
+  argTypes: {
+    focusable: {
+      control: 'boolean',
+      description:
+        'When true, the component becomes visible when a focusable child (such as a skip link) receives focus. Enables the standard "skip to content" accessibility pattern.',
+      table: {
+        category: 'Behavior',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+  },
+  args: {
+    focusable: false,
+  },
   render: () => html` <hx-visually-hidden>Screen reader only text</hx-visually-hidden> `,
 } satisfies Meta;
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 // ─────────────────────────────────────────────────
 // 1. DEFAULT — basic screen reader text

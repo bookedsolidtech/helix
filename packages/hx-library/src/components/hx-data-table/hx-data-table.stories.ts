@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import './hx-data-table.js';
 
 // ─────────────────────────────────────────────────
@@ -329,7 +330,80 @@ export const JsonAttributes: Story = {
   },
 };
 
+// ─────────────────────────────────────────────────
+// 13. EVENTS DEMO — hx-sort, hx-select, hx-row-click
+// ─────────────────────────────────────────────────
+
+/**
+ * Demonstrates the three events dispatched by hx-data-table:
+ * - `hx-sort` — fired when a sortable column header is clicked, detail: `{ key, direction }`
+ * - `hx-select` — fired when row checkboxes change, detail: `{ selectedRows }`
+ * - `hx-row-click` — fired when a data row is clicked, detail: `{ row, index }`
+ *
+ * The output panel below the table updates in response to each event.
+ */
+export const EventsDemo: Story = {
+  name: 'Events: hx-sort, hx-select, hx-row-click',
+  render: () => html`
+    <div>
+      <hx-data-table
+        id="events-table"
+        .columns=${COLUMNS}
+        .rows=${ROWS}
+        selectable
+        label="Patient events demo"
+      ></hx-data-table>
+      <p
+        id="events-output"
+        style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; font-family: sans-serif;"
+      >
+        Interact with the table (sort, select, or click a row) to see events fire.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const table = canvasElement.querySelector('hx-data-table');
+    await expect(table).toBeTruthy();
+
+    const sortEvents: unknown[] = [];
+    const rowClickEvents: unknown[] = [];
+
+    table!.addEventListener('hx-sort', (e: Event) => {
+      sortEvents.push((e as CustomEvent).detail);
+    });
+
+    table!.addEventListener('hx-row-click', (e: Event) => {
+      rowClickEvents.push((e as CustomEvent).detail);
+    });
+
+    // Click the first sortable column header button to trigger hx-sort
+    const sortBtn = table!.shadowRoot!.querySelector<HTMLButtonElement>('.sort-btn');
+    await expect(sortBtn).toBeTruthy();
+    await userEvent.click(sortBtn!);
+
+    await expect(sortEvents.length).toBeGreaterThan(0);
+    const sortDetail = sortEvents[0] as { key: string; direction: string };
+    await expect(sortDetail.key).toBeTruthy();
+    await expect(['asc', 'desc'].includes(sortDetail.direction)).toBe(true);
+
+    // Click the first data row to trigger hx-row-click
+    const rows = table!.shadowRoot!.querySelectorAll<HTMLTableRowElement>('[part="tr"]');
+    // rows[0] is the header row; rows[1] is the first data row
+    const firstDataRow = rows[1];
+    await expect(firstDataRow).toBeTruthy();
+    await userEvent.click(firstDataRow!);
+
+    await expect(rowClickEvents.length).toBeGreaterThan(0);
+    const clickDetail = rowClickEvents[0] as { row: unknown; index: number };
+    await expect(clickDetail.row).toBeTruthy();
+    await expect(typeof clickDetail.index).toBe('number');
+  },
+};
+
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: { selectable: true },
 };
