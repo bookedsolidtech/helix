@@ -1,0 +1,196 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "claude-sonnet-4-6",
+  "summary": {
+    "componentsAudited": 11,
+    "totalFindings": 18,
+    "critical": 4,
+    "high": 6,
+    "medium": 5,
+    "low": 3
+  },
+  "findings": [
+    {
+      "component": "hx-toast-stack",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-toast-stack component does not exist as a standalone file",
+      "description": "The hx-toast-stack component was expected at packages/hx-library/src/components/hx-toast-stack/ but no such directory exists. The toast-stack CSS styles are co-located inside hx-toast/hx-toast.styles.ts (exported as helixToastStackStyles). There is no corresponding hx-toast-stack.ts component class implementing the container element. Without a proper component implementation, the toast stack cannot declare ARIA regions, placement semantics, or accessibility metadata. Any consumer using hx-toast-stack as a custom element will receive an HTMLUnknownElement with no ARIA role, no label, and no screen reader context for the notification region.",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.styles.ts",
+      "line": 137,
+      "fix": "Create hx-toast-stack as a proper Lit component with role=\"region\" aria-label=\"Notifications\" (or aria-live region management) implemented in its own hx-toast-stack.ts file."
+    },
+    {
+      "component": "hx-alert",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "Live region role applied to host before content renders — timing gap may suppress announcements",
+      "description": "In connectedCallback() (line 132), hx-alert sets role=\"alert\" or role=\"status\" on the host element and simultaneously checks this.open to set aria-hidden. The ARIA live region is established at connection time, before Lit's first render completes. Screen readers (particularly JAWS and NVDA) may not register a live region until after the DOM is fully settled. If the component is connected with open=true, the role is set on the host but the slot content is not yet rendered in the shadow DOM at that instant. Because the role is on the host and the content is in slotted children (in light DOM), this pattern actually works — however, the aria-hidden=\"true\" set at line 134 when open=false permanently suppresses the element from the accessibility tree. When open later becomes true, aria-hidden is removed (line 181) but the live region role was already established with no content present. Many screen readers do not re-announce content when aria-hidden is toggled off a region that was never previously announced. The recommended pattern is to keep the live region in the DOM at all times with role already present, and simply add/remove content.",
+      "file": "packages/hx-library/src/components/hx-alert/hx-alert.ts",
+      "line": 132,
+      "fix": "Consider keeping the alert always in the accessibility tree with role set, and use visibility:hidden or a visually-hidden technique to prevent visual display when closed, rather than aria-hidden toggling. Alternatively, test the aria-hidden toggle pattern explicitly with JAWS 2024 and NVDA 2024 in Chrome and Firefox to confirm announcements fire reliably on open transitions."
+    },
+    {
+      "component": "hx-alert",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Close button aria-label is generic 'Close' — does not identify what is being closed",
+      "description": "The dismiss button at line 318 uses aria-label=\"Close\" which is not sufficiently descriptive. Screen reader users interacting with multiple alerts on a page (a common healthcare dashboard pattern) will hear identical 'Close' button labels for every alert, with no way to distinguish which alert each button dismisses. WCAG 2.4.6 (Headings and Labels, AA) and best-practice guidance from the APG require that interactive controls have labels that describe their purpose in context.",
+      "file": "packages/hx-library/src/components/hx-alert/hx-alert.ts",
+      "line": 318,
+      "fix": "Expose a close-label property (similar to hx-toast's closeLabel) that defaults to 'Dismiss alert' and allows consumers to provide contextual labels such as 'Dismiss medication error alert'."
+    },
+    {
+      "component": "hx-banner",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "Live region role applied to host before content renders — same timing gap as hx-alert",
+      "description": "hx-banner applies the same connectedCallback pattern (line 117) as hx-alert: role is set on the host and aria-hidden=\"true\" is conditionally set at connection time. Because hx-banner defaults to open=true (line 92), the aria-hidden path at line 118-120 only fires when open=false. However, on initial render with open=true no aria-hidden is set, which is correct. The concern is when a banner starts hidden (open=false) and later becomes visible — the same live-region announcement reliability issue documented in hx-alert applies here. Additionally, the banner is positioned sticky/fixed (lines 7-11 of styles), which means it may already be in the DOM when the page loads. Live regions should be present but empty at page load, then content added to trigger announcement. If the banner contains content on initial render when it transitions from hidden to visible, some screen readers will not re-announce the region.",
+      "file": "packages/hx-library/src/components/hx-banner/hx-banner.ts",
+      "line": 117,
+      "fix": "Apply the same fix as hx-alert: keep the live region in the accessibility tree at all times. Test the aria-hidden toggle flow explicitly with all target screen readers."
+    },
+    {
+      "component": "hx-banner",
+      "severity": "medium",
+      "wcagCriteria": "2.4.6",
+      "title": "Action link lacks context — 'action-label' text is the only accessible name with no surrounding context",
+      "description": "The action link rendered at line 243-251 uses the actionLabel property directly as its visible text and accessible name. When multiple banners are on a page, or when the action label is generic (e.g., 'Learn more', 'View details'), screen reader users navigating by links will encounter identical or context-free link names. There is no mechanism to append context to the link name, and the banner message content (in the default slot) is not associated with the link via aria-describedby.",
+      "file": "packages/hx-library/src/components/hx-banner/hx-banner.ts",
+      "line": 243,
+      "fix": "Add an optional aria-describedby mechanism that links the action element to the banner message container, or document that action-label must be self-describing (e.g., 'View system maintenance details' rather than 'Learn more')."
+    },
+    {
+      "component": "hx-toast",
+      "severity": "critical",
+      "wcagCriteria": "2.1.1",
+      "title": "Auto-dismiss timer does not respect prefers-reduced-motion",
+      "description": "hx-toast implements a focus/hover pause mechanism (lines 196-216) that pauses the auto-dismiss timer when the user hovers or focuses the toast. However, there is no check for prefers-reduced-motion to disable or extend the auto-dismiss timer. Users who have enabled reduced motion frequently do so because they have vestibular disorders, cognitive disabilities, or other conditions that make time-limited interactions difficult. The WCAG 2.2 criterion 2.2.1 (Timing Adjustable, A) requires that time limits can be turned off, adjusted, or extended. While the focus-pause partially addresses this, keyboard-only users must Tab to the toast before it disappears, and users of switch access or other slow AT cannot reliably reach the toast in time. The 3000ms default (line 56) is particularly short for users with motor impairments.",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.ts",
+      "line": 97,
+      "fix": "Detect prefers-reduced-motion via window.matchMedia('(prefers-reduced-motion: reduce)') in the _startTimer method. When reduced motion is active, either disable auto-dismiss entirely (set duration effectively to 0) or extend it substantially (e.g., multiply by 3-5x). Expose a reduced-motion-duration property for consumer control."
+    },
+    {
+      "component": "hx-toast",
+      "severity": "critical",
+      "wcagCriteria": "4.1.3",
+      "title": "aria-live and role set on inner shadow element — unreliable for dynamically inserted toasts",
+      "description": "hx-toast sets role and aria-live on the .toast div inside the shadow root (lines 246-248). When a new hx-toast element is dynamically added to the DOM (the primary usage via hx-toast-stack), the live region is created at the same moment content is inserted. WCAG technique ARIA19 and screen reader heuristics require that live regions be pre-established in the DOM before content is injected — otherwise JAWS, NVDA, and VoiceOver may not register the region and will miss the announcement. This is a well-documented shadow DOM accessibility problem: the live region and its content arrive simultaneously, which many AT implementations interpret as a static element, not a live announcement. The role should be on the host element (set via setAttribute in connectedCallback, as hx-alert and hx-banner correctly do) so it is established before shadow DOM renders.",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.ts",
+      "line": 246,
+      "fix": "Move the role and aria-live attributes to the host element using connectedCallback() with this.setAttribute('role', this._role) and this.setAttribute('aria-live', this._ariaLive) — matching the pattern used in hx-alert and hx-banner. The live region on the host element is registered with AT before the shadow DOM renders, ensuring dynamic content insertions are announced."
+    },
+    {
+      "component": "hx-toast",
+      "severity": "medium",
+      "wcagCriteria": "2.2.1",
+      "title": "No mechanism to disable auto-dismiss for users with cognitive or motor disabilities",
+      "description": "Beyond the reduced-motion concern, users with cognitive disabilities or slow processing speed benefit from being able to disable auto-dismissing notifications entirely. The WCAG 2.2 Success Criterion 2.2.1 (Timing Adjustable, A — required for AA) requires the ability to turn off, adjust, or extend time limits. hx-toast exposes a duration=0 option to make toasts persistent, but there is no automatic mechanism to apply this based on user preference signals. The component has no built-in support for a prefers-reduced-motion or user-set preference to disable auto-dismiss globally.",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.ts",
+      "line": 56,
+      "fix": "Document that consumers must set duration=0 for persistent toasts when accessibility is a concern. Consider providing a global preference hook, or default the reduced-motion check to extend duration to at least 60 seconds when prefers-reduced-motion is active, per WCAG 2.2.1 guidance."
+    },
+    {
+      "component": "hx-progress-bar",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Label slot wrapper (span#labelId) rendered even when empty — may confuse aria-labelledby",
+      "description": "The label slot wrapper at line 159 is always rendered with an id (labelId) and is passed to aria-labelledby when hasVisibleLabel is true (line 173). The _hasLabelSlotContent state is set via slotchange, which fires after first render. On first render, _hasLabelSlotContent is false even if slot content was provided before firstUpdated. This creates a one-render window where aria-label (the fallback) is used instead of aria-labelledby, which is the correct approach — however the labelId span is always in the DOM. If aria-labelledby references a span containing only whitespace (e.g., slot not yet resolved), some AT may read an empty label. This is a timing edge case but relevant for server-side rendering contexts like Drupal.",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.ts",
+      "line": 159,
+      "fix": "Ensure slotchange fires before or immediately after firstUpdated. Consider using requestAnimationFrame or requestUpdate to force a re-render after slotchange to minimize the window where the wrong labeling strategy is active."
+    },
+    {
+      "component": "hx-progress-bar",
+      "severity": "low",
+      "wcagCriteria": "1.4.3",
+      "title": "Label color uses neutral-700 token with no hardcoded fallback verification",
+      "description": "The label color in hx-progress-bar.styles.ts (line 30) uses var(--hx-color-neutral-700) with no hardcoded fallback value. If token styles fail to load (CDN failure, Drupal block, etc.), the label color inherits from the parent with no guaranteed contrast ratio. The inline styles show the fallback is omitted for this specific token. The hx-color-neutral-700 design token should resolve to approximately #374151 which provides adequate contrast on white, but the absence of a fallback in the CSS means degraded environments get undefined color.",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.styles.ts",
+      "line": 30,
+      "fix": "Add the hardcoded fallback: var(--hx-progress-bar-label-color, var(--hx-color-neutral-700, #374151)). Several other color tokens in this file already omit hardcoded fallbacks (lines 38, 59)."
+    },
+    {
+      "component": "hx-progress-ring",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "role=\"progressbar\" and ARIA state attributes set on host via willUpdate — missing aria-valuemin on dynamic changes",
+      "description": "hx-progress-ring correctly sets role=\"progressbar\" and aria-valuemin=\"0\" in connectedCallback (lines 107-110). In willUpdate (lines 112-138), aria-valuemax, aria-valuenow/aria-busy, and aria-label are all synced. However, aria-valuemin is only set once in connectedCallback and never updated if the minimum changes. More critically: aria-label is removed (line 129) when this.label is empty, which leaves the progressbar with no accessible name. The devWarn at line 132 is a development-only warning and does not enforce the accessible name requirement at runtime. A progressbar without an accessible name fails WCAG 4.1.2.",
+      "file": "packages/hx-library/src/components/hx-progress-ring/hx-progress-ring.ts",
+      "line": 126,
+      "fix": "In willUpdate, ensure that when label is absent, aria-label falls back to a minimum meaningful string such as 'Loading' or 'Progress'. Additionally consider supporting aria-labelledby by accepting an external element ID via a labelledby attribute, allowing label text to be sourced from a visible element outside the shadow root."
+    },
+    {
+      "component": "hx-spinner",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "role=\"status\" is applied to inner shadow div, not the host — may not be recognized across shadow boundaries by all AT",
+      "description": "hx-spinner renders role=\"status\" on the .spinner div inside the shadow root (line 89-94). Unlike hx-alert and hx-banner which correctly place roles on the host element (ensuring the role is exposed to AT before shadow DOM renders), hx-spinner sets the role on an internal shadow element. Screen readers navigate the flattened accessibility tree and in most modern browsers/AT combinations this works — but JAWS with Chrome has documented issues recognizing role=\"status\" on shadow-internal elements that were never pre-registered as live regions. Since hx-spinner is commonly inserted dynamically (e.g., during async operations), the live region is created and populated simultaneously, which is the exact failure scenario for ARIA live regions. The aria-label on the same div (line 93) also fails to be exposed at the host level, so external aria-labelledby references (e.g., <hx-spinner aria-labelledby=\"someId\">) will not work.",
+      "file": "packages/hx-library/src/components/hx-spinner/hx-spinner.ts",
+      "line": 84,
+      "fix": "Apply role=\"status\" and aria-label to the host element via connectedCallback: this.setAttribute('role', this.decorative ? 'presentation' : 'status') and this.setAttribute('aria-label', ...). Keep the inner SVG aria-hidden. Also expose delegatesFocus via static shadowRootOptions if needed. This matches the pattern used by hx-alert/hx-banner."
+    },
+    {
+      "component": "hx-skeleton",
+      "severity": "medium",
+      "wcagCriteria": "4.1.3",
+      "title": "Loading completion announcement relies entirely on consumer-implemented aria-live region",
+      "description": "hx-skeleton dispatches an hx-loaded event (line 98-104) when loaded becomes true, but provides no built-in mechanism for announcing loading completion to screen readers. The JSDoc comment at lines 68-80 shows the recommended pattern requires the consumer to wire up an external aria-live region. In practice, many consumers — particularly Drupal integrations using Twig templates — will not implement this, leaving screen reader users with no announcement when content loads. The component documentation says 'Consumers should use this event to update an external aria-live region' but WCAG 4.1.3 (Status Messages, AA) requires that status messages can be programmatically determined without focus movement. The component should provide this capability internally rather than delegating it entirely to consumers.",
+      "file": "packages/hx-library/src/components/hx-skeleton/hx-skeleton.ts",
+      "line": 97,
+      "fix": "Add an optional loaded-message property (default: 'Content loaded') and an internal sr-only aria-live=\"polite\" region that announces the message when loaded transitions to true. This provides a safe default while allowing consumers to override or suppress the message. The hx-loaded event should still fire for consumers who want custom behavior."
+    },
+    {
+      "component": "hx-meter",
+      "severity": "critical",
+      "wcagCriteria": "2.1.1",
+      "title": "tabindex=\"0\" on meter div makes a non-interactive element focusable without keyboard interaction semantics",
+      "description": "The meter container at line 174 has tabindex=\"0\" making it keyboard-focusable. The meter role (line 173) is a read-only measurement widget — it has no interactive function and per the ARIA spec, role=\"meter\" is not an interactive widget role. Adding tabindex=\"0\" to it gives it keyboard focus without any corresponding keyboard interaction, which confuses keyboard-only users who Tab to it expecting to interact with it. WCAG 2.1.1 requires that all functionality is operable via keyboard — but the converse also applies: non-interactive elements should not receive Tab focus unnecessarily (creating a keyboard trap or confusion point). There is no :focus-visible style for the meter div in hx-meter.styles.ts, meaning a focused meter shows no visible focus indicator, which fails WCAG 2.4.7 (Focus Visible, AA).",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.ts",
+      "line": 174,
+      "fix": "Remove tabindex=\"0\" from the meter div. role=\"meter\" is a non-interactive semantic role; it should not be in the Tab order. If the designer specifically wants the meter to be explorable by keyboard for AT purposes, add tabindex=\"0\" along with a :focus-visible style that shows a visible focus ring. Screen readers can read meter values via virtual cursor navigation without requiring Tab stop focus."
+    },
+    {
+      "component": "hx-meter",
+      "severity": "low",
+      "wcagCriteria": "2.4.7",
+      "title": "No :focus-visible style on the focusable meter div",
+      "description": "The meter div receives tabindex=\"0\" (line 174 of hx-meter.ts) making it a Tab stop, but hx-meter.styles.ts contains no :focus-visible rule for .meter or [role='meter']. When keyboard users Tab to the meter, no visible focus indicator is displayed, which is a direct violation of WCAG 2.4.7 (Focus Visible, AA).",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.styles.ts",
+      "line": 9,
+      "fix": "Either remove tabindex=\"0\" (preferred — see related finding), or add a :focus-visible rule: .meter:focus-visible { outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb); outline-offset: var(--hx-focus-ring-offset, 2px); }"
+    },
+    {
+      "component": "hx-rating",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "radiogroup container has tabindex=\"-1\" — keyboard focus cannot reach the group via Tab",
+      "description": "In the radiogroup render branch (line 443), the container div has tabindex=\"-1\". The roving tabindex pattern for radiogroups requires that the radiogroup container itself is not a Tab stop (which is correct), but that individual radio elements within it are reachable via Tab. The individual star spans at line 461 have tabindex set conditionally based on isActiveTabStop. This is the correct roving tabindex pattern. However, the initial Tab-key navigation to reach the radiogroup depends on the first star (i=1, isActiveTabStop=true when value=0) having tabindex=\"0\". This is correctly implemented at line 452. The concern is when all stars have tabindex=\"-1\" — e.g., if _isChecked logic fails or value is fractional in precision=1 mode. In that state, keyboard users cannot Tab into the rating widget at all. Verify that at least one star always has tabindex=\"0\" when the widget is not disabled.",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.ts",
+      "line": 443,
+      "fix": "Add an invariant assertion or fallback: if no star has tabindex=\"0\" and the widget is not disabled, force the first star (i=1) to have tabindex=\"0\". This prevents the keyboard accessibility hole when value edge cases occur."
+    },
+    {
+      "component": "hx-rating",
+      "severity": "high",
+      "wcagCriteria": "2.1.1",
+      "title": "Star click handlers on span elements have no keyboard activation — Enter/Space do not activate stars in radiogroup mode",
+      "description": "In the radiogroup branch (lines 454-469), each star span has @click but no @keydown handler for Enter or Space key activation. The container div handles ArrowLeft/Right/Up/Down and Home/End via _handleKeydown (line 411), which calls _setValue and updates tabindex focus. However, there is no mechanism for the user to confirm/activate a star with Enter or Space once it has roving tabindex focus. In the WAI-ARIA radiogroup pattern, pressing Space should select (check) the currently focused radio option. Currently, keyboard users can navigate between stars with Arrow keys, but cannot activate them with keyboard — they must click with a mouse. This is a WCAG 2.1.1 (Keyboard, A) failure.",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.ts",
+      "line": 454,
+      "fix": "Add a @keydown handler on each star span (or handle Enter/Space in the container's _handleKeydown) that calls _setValue(i) when the focused star is the target. Example: if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._setValue(i); }"
+    },
+    {
+      "component": "hx-color-picker",
+      "severity": "medium",
+      "wcagCriteria": "1.4.1",
+      "title": "Color is the only means of identifying the currently selected swatch",
+      "description": "Swatch buttons (lines 824-836) are identified solely by their background color (aria-label set to the color string, e.g., '#3b82f6'). While the aria-label provides a programmatic name, there is no visual indicator of the currently selected/active swatch other than color. Keyboard users and users with low vision who have configured high-contrast modes cannot distinguish the selected swatch from unselected ones without color differentiation. WCAG 1.4.1 (Use of Color, A) requires that color is not the only visual means of conveying information. Additionally, the swatch color string (e.g., 'rgb(59 130 246)') is not human-meaningful as an accessible name for most users.",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.ts",
+      "line": 826,
+      "fix": "Add aria-pressed=\"true/false\" or aria-current=\"true/false\" to swatch buttons to indicate selection state. Add a visual selected indicator (e.g., a checkmark or border ring) that is visible in high-contrast mode. Consider showing a human-readable label alongside or instead of the raw color string for the aria-label."
+    }
+  ]
+}

@@ -353,8 +353,8 @@ export class HelixDropdown extends LitElement {
       // P1-01: Use aria-haspopup="menu" per ARIA 1.1+ / APG Menu Button pattern.
       trigger.setAttribute('aria-haspopup', 'menu');
       trigger.setAttribute('aria-expanded', String(this.open));
-      // P1-02: Link trigger to panel for screen reader navigation.
-      trigger.setAttribute('aria-controls', this._panelId);
+      // aria-controls is intentionally omitted: the panel lives in Shadow DOM and
+      // IDREF values cannot be resolved across shadow boundaries by assistive technology.
       // P2-06: Remove host fallback when a trigger element is present.
       this.removeAttribute('aria-expanded');
     } else {

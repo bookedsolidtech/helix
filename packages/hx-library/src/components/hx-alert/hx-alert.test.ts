@@ -393,9 +393,11 @@ describe('hx-alert', () => {
       expect(el.getAttribute('role')).toBe('status');
     });
 
-    it('uses role="alert" for warning variant on host element', async () => {
+    it('uses role="status" for warning variant on host element', async () => {
+      // WCAG 2.1 AA: warning is non-urgent and uses a polite live region (role="status").
+      // Only critical/error variants warrant the assertive interruption of role="alert".
       const el = await fixture<HxAlert>('<hx-alert variant="warning">Warning</hx-alert>');
-      expect(el.getAttribute('role')).toBe('alert');
+      expect(el.getAttribute('role')).toBe('status');
     });
 
     it('uses role="alert" for error variant on host element', async () => {
@@ -450,7 +452,9 @@ describe('hx-alert', () => {
     it('renders a default SVG icon per variant', async () => {
       const variants = ['info', 'success', 'warning', 'error'] as const;
       for (const variant of variants) {
-        const el = await fixture<HxAlert>(`<hx-alert variant="${variant}" show-icon>Test</hx-alert>`);
+        const el = await fixture<HxAlert>(
+          `<hx-alert variant="${variant}" show-icon>Test</hx-alert>`,
+        );
         const iconContainer = shadowQuery(el, '[part="icon"]')!;
         const svg = iconContainer.querySelector('svg');
         expect(svg).toBeTruthy();
