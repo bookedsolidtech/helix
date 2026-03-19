@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup } from '../../test-utils.js';
+import { page } from '@vitest/browser/context';
+import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixAccordion } from './hx-accordion.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
 import './index.js';
@@ -265,6 +266,55 @@ describe('hx-accordion', () => {
 
       expect(items[0].expanded).toBe(false);
       expect(collapseCount).toBe(1);
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in default state (empty accordion)', async () => {
+      const el = await fixture<HelixAccordion>('<hx-accordion></hx-accordion>');
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with items (all collapsed)', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with an item expanded', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item expanded>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span>
+            <p>Content 2</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
     });
   });
 });
@@ -648,6 +698,47 @@ describe('hx-accordion-item', () => {
       const panel = shadowQuery(el, `#${controlsId}`);
       expect(panel).toBeTruthy();
       expect(panel?.getAttribute('role')).toBe('region');
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in default collapsed state', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in expanded state', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item expanded>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in disabled state', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item disabled>
+          <span slot="trigger">Title</span>
+          <p>Content</p>
+        </hx-accordion-item>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
     });
   });
 });
