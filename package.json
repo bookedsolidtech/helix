@@ -116,5 +116,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@9.15.9",
+  "customElements": ".worktrees/feature-healthba-hx-carousel-document-25/packages/hx-library/custom-elements.json"
 }
