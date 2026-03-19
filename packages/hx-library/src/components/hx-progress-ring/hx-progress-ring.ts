@@ -109,7 +109,7 @@ export class HelixProgressRing extends LitElement {
     this.setAttribute('aria-valuemin', '0');
   }
 
-  protected override willUpdate(_changed: PropertyValues): void {
+  protected override willUpdate(_changed: PropertyValues<this>): void {
     // Sync all dynamic ARIA attributes before render
     this.setAttribute('aria-valuemax', String(this.max));
 

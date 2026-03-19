@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -108,7 +108,7 @@ export class HelixCounter extends LitElement {
     this._cancelAnimation();
   }
 
-  override updated(changedProps: Map<string, unknown>): void {
+  override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
     if (changedProps.has('value') && changedProps.get('value') !== undefined) {
       if (this._prefersReducedMotion) {
