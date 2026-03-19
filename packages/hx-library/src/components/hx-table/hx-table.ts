@@ -80,7 +80,6 @@ export class HelixTable extends LitElement {
   }
 
   override willUpdate(changed: PropertyValues<this>): void {
-  override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('label') && !this.label && changed.get('label') !== undefined) {
       devWarn(
         'hx-table',

@@ -110,7 +110,6 @@ export class HelixCounter extends LitElement {
 
   override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
-  override updated(changedProps: PropertyValues<this>): void {
     if (changedProps.has('value') && changedProps.get('value') !== undefined) {
       if (this._prefersReducedMotion) {
         this._displayValue = this.value;
