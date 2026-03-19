@@ -145,12 +145,24 @@ export class HelixRating extends LitElement {
   /** @internal */
   @state() private _hoverValue: number | null = null;
 
+  /** @internal */
+  private _defaultValue = 0;
+
   // ─── Lifecycle ───
+
+  override firstUpdated(): void {
+    this._defaultValue = this.value;
+  }
 
   override updated(changedProps: PropertyValues<this>): void {
     if (changedProps.has('value') || changedProps.has('name')) {
       this._internals.setFormValue(String(this.value));
     }
+  }
+
+  formResetCallback(): void {
+    this.value = this._defaultValue;
+    this._internals.setFormValue(String(this._defaultValue));
   }
 
   // ─── Helpers ───

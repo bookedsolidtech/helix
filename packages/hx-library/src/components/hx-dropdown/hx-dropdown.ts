@@ -133,7 +133,7 @@ export class HelixDropdown extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown);
-    document.removeEventListener('click', this._handleOutsideClick);
+    document.removeEventListener('click', this._handleOutsideClick, { capture: true });
   }
 
   // ─── Open/Close ───
@@ -163,7 +163,7 @@ export class HelixDropdown extends LitElement {
     if (!this.open) return;
     this.open = false;
     this._panelVisible = false;
-    document.removeEventListener('click', this._handleOutsideClick);
+    document.removeEventListener('click', this._handleOutsideClick, { capture: true });
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
     if (returnFocus) {
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
