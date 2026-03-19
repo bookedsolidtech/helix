@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -70,7 +70,7 @@ export class HelixRadio extends LitElement {
     this.setAttribute('aria-disabled', String(this.disabled));
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('checked')) {
       this.setAttribute('aria-checked', String(this.checked));

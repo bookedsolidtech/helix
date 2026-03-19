@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
 
@@ -258,7 +259,7 @@ export class HelixCombobox extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._updateFormValue();
@@ -611,32 +612,36 @@ export class HelixCombobox extends LitElement {
       `;
     }
 
-    return filtered.map((opt, index) => {
-      // P0-1: Use Set membership for multiple mode, direct equality for single mode
-      const isSelected = this.multiple
-        ? this._selectedValuesSet.has(opt.value)
-        : opt.value === this.value;
-      const isFocused = index === this._focusedOptionIndex;
+    return repeat(
+      filtered,
+      (opt) => opt.value,
+      (opt, index) => {
+        // P0-1: Use Set membership for multiple mode, direct equality for single mode
+        const isSelected = this.multiple
+          ? this._selectedValuesSet.has(opt.value)
+          : opt.value === this.value;
+        const isFocused = index === this._focusedOptionIndex;
 
-      return html`
-        <div
-          id=${this._optionId(index)}
-          part="option"
-          role="option"
-          class=${classMap({
-            field__option: true,
-            'field__option--selected': isSelected,
-            'field__option--focused': isFocused,
-            'field__option--disabled': opt.disabled,
-          })}
-          aria-selected=${isSelected ? 'true' : nothing}
-          aria-disabled=${opt.disabled ? 'true' : nothing}
-          @click=${() => this._selectOption(opt)}
-        >
-          <span class="field__option-label">${opt.label}</span>
-        </div>
-      `;
-    });
+        return html`
+          <div
+            id=${this._optionId(index)}
+            part="option"
+            role="option"
+            class=${classMap({
+              field__option: true,
+              'field__option--selected': isSelected,
+              'field__option--focused': isFocused,
+              'field__option--disabled': opt.disabled,
+            })}
+            aria-selected=${isSelected ? 'true' : nothing}
+            aria-disabled=${opt.disabled ? 'true' : nothing}
+            @click=${() => this._selectOption(opt)}
+          >
+            <span class="field__option-label">${opt.label}</span>
+          </div>
+        `;
+      },
+    );
   }
 
   // ─── Main Render ───

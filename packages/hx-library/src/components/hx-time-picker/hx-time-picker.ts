@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -393,7 +393,7 @@ export class HelixTimePicker extends LitElement {
     document.removeEventListener('click', this._handleOutsideClick);
   }
 
-  override willUpdate(changed: Map<string, unknown>): void {
+  override willUpdate(changed: PropertyValues<this>): void {
     // Keep display value in sync whenever the canonical value or format changes
     if (changed.has('value') || changed.has('format')) {
       this._inputDisplayValue = this.value
@@ -404,14 +404,14 @@ export class HelixTimePicker extends LitElement {
     }
   }
 
-  override updated(changed: Map<string, unknown>): void {
+  override updated(changed: PropertyValues<this>): void {
     super.updated(changed);
     if (changed.has('value')) {
       this._internals.setFormValue(this.value || null);
       this._updateValidity();
     }
     // When the listbox opens, scroll the selected (or active) option into view
-    if (changed.has('_open') && this._open) {
+    if ((changed as Map<PropertyKey, unknown>).has('_open') && this._open) {
       this._scrollActiveOptionIntoView();
     }
   }
