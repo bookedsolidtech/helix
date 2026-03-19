@@ -671,8 +671,6 @@ describe('hx-date-picker', () => {
 
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
-      // Allow microtask queue to flush so the updateComplete.then() focus-restoration callback runs
-      await new Promise((r) => setTimeout(r, 0));
 
       const trigger = getTriggerButton(el);
       expect(el.shadowRoot!.activeElement).toBe(trigger);
@@ -870,6 +868,43 @@ describe('hx-date-picker', () => {
       await openCalendar(el);
       const nextBtn = shadowQuery<HTMLButtonElement>(el, '[aria-label="Next month"]')!;
       expect(nextBtn.disabled).toBe(true);
+    });
+  });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects content into the label slot', async () => {
+      const el = await fixture<HelixDatePicker>(
+        `<hx-date-picker><span slot="label">Appointment date</span></hx-date-picker>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="label"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Appointment date');
+    });
+
+    it('projects content into the error slot', async () => {
+      const el = await fixture<HelixDatePicker>(
+        `<hx-date-picker label="Date"><span slot="error">Invalid date</span></hx-date-picker>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="error"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Invalid date');
+    });
+
+    it('projects content into the help-text slot', async () => {
+      const el = await fixture<HelixDatePicker>(
+        `<hx-date-picker label="Date"><span slot="help-text">MM/DD/YYYY</span></hx-date-picker>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('MM/DD/YYYY');
     });
   });
 });

@@ -812,4 +812,55 @@ describe('hx-combobox', () => {
       await checkA11y(el, { rules: { 'color-contrast': { enabled: false } } });
     });
   });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects option elements into the option slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+        </hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="option"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(2);
+      expect((assigned[0] as HTMLElement).textContent).toContain('Apple');
+    });
+
+    it('projects content into the label slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox><span slot="label">Choose fruit</span></hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="label"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Choose fruit');
+    });
+
+    it('projects content into the error slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit"><span slot="error">Required</span></hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="error"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Required');
+    });
+
+    it('projects content into the help-text slot', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit"><span slot="help-text">Type to search</span></hx-combobox>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Type to search');
+    });
+  });
 });

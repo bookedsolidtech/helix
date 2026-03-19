@@ -353,9 +353,6 @@ describe('hx-tag', () => {
       icon.textContent = '★';
       el.appendChild(icon);
       await el.updateComplete;
-      // Wait for slotchange event to fire
-      await new Promise((r) => setTimeout(r, 0));
-      await el.updateComplete;
       expect(prefix.classList.contains('tag__prefix--hidden')).toBe(false);
     });
 
@@ -368,8 +365,6 @@ describe('hx-tag', () => {
       badge.slot = 'suffix';
       badge.textContent = '5';
       el.appendChild(badge);
-      await el.updateComplete;
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
       expect(suffix.classList.contains('tag__suffix--hidden')).toBe(false);
     });

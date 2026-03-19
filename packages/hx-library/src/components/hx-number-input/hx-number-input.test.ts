@@ -930,8 +930,7 @@ describe('hx-number-input', () => {
     it('focus() moves focus to the native input', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
       el.focus();
-      // Allow brief settle time for focus to propagate into the shadow DOM input
-      await new Promise<void>((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);
     });
@@ -944,6 +943,65 @@ describe('hx-number-input', () => {
       el.focus();
       // Should not throw
       expect(() => el.select()).not.toThrow();
+    });
+  });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects content into the label slot', async () => {
+      const el = await fixture<HelixNumberInput>(
+        `<hx-number-input><span slot="label">Quantity</span></hx-number-input>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="label"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Quantity');
+    });
+
+    it('projects content into the prefix slot', async () => {
+      const el = await fixture<HelixNumberInput>(
+        `<hx-number-input label="Price"><span slot="prefix">$</span></hx-number-input>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="prefix"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('$');
+    });
+
+    it('projects content into the suffix slot', async () => {
+      const el = await fixture<HelixNumberInput>(
+        `<hx-number-input label="Weight"><span slot="suffix">kg</span></hx-number-input>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="suffix"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('kg');
+    });
+
+    it('projects content into the error slot', async () => {
+      const el = await fixture<HelixNumberInput>(
+        `<hx-number-input label="Qty"><span slot="error">Must be positive</span></hx-number-input>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="error"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Must be positive');
+    });
+
+    it('projects content into the help-text slot', async () => {
+      const el = await fixture<HelixNumberInput>(
+        `<hx-number-input label="Qty"><span slot="help-text">Enter a whole number</span></hx-number-input>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Enter a whole number');
     });
   });
 });
