@@ -1,0 +1,306 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "sonnet",
+  "summary": {
+    "componentsAudited": 9,
+    "totalFindings": 28,
+    "critical": 5,
+    "high": 9,
+    "medium": 9,
+    "low": 5
+  },
+  "findings": [
+    {
+      "component": "hx-text-input",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "Missing aria-required on native input",
+      "description": "The native <input> uses the boolean ?required attribute for constraint validation but does not set aria-required='true'. Some screen reader / browser combinations (notably JAWS with Firefox) do not expose the native required attribute via the accessibility tree when it lives inside a shadow root. aria-required is the reliable cross-SR mechanism.",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "line": 444,
+      "fix": "Add aria-required=${this.required ? 'true' : nothing} alongside the existing ?required=${this.required} on the native <input>."
+    },
+    {
+      "component": "hx-text-input",
+      "severity": "medium",
+      "wcagCriteria": "4.1.3",
+      "title": "Error container always rendered but hidden via slot swap — alert may not re-fire",
+      "description": "When error transitions from empty to populated, the component removes the non-error slot element and inserts a new <div role='alert'> node. Because the alert div is newly inserted into the DOM (not a pre-existing live region that receives new text), some screen readers (VoiceOver on macOS) may not announce it if the insertion happens in the same tick as the Lit re-render. The safer pattern is to keep a persistent aria-live='assertive' container always in the DOM and populate its text, so that dynamic text injection triggers the announcement.",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "line": 472,
+      "fix": "Replace the conditional role='alert' div with a persistent <div id=${this._errorId} role='alert' aria-live='assertive'> always present in DOM. Populate it conditionally with error text; leave it empty (not removed) when no error exists."
+    },
+    {
+      "component": "hx-text-input",
+      "severity": "low",
+      "wcagCriteria": "1.3.1",
+      "title": "No aria-required announced for screen readers when label-only mode is used",
+      "description": "When a visible label is provided, the required asterisk is rendered with aria-hidden='true' and no programmatic mechanism informs screen readers that the field is required beyond the native required attribute. While aria-required is the fix (see previous finding), the combination means the accessible name computation for the field does not include 'required'.",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "line": 418,
+      "fix": "Add aria-required=${this.required ? 'true' : nothing} to the native input. The required asterisk aria-hidden approach is correct; it must be paired with aria-required on the control."
+    },
+    {
+      "component": "hx-textarea",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "Missing aria-required on native textarea",
+      "description": "Same issue as hx-text-input: the native <textarea> has ?required but no aria-required='true'. Screen readers depend on the ARIA attribute for reliable required field announcements inside shadow DOM.",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.ts",
+      "line": 491,
+      "fix": "Add aria-required=${this.required ? 'true' : nothing} to the native <textarea> element."
+    },
+    {
+      "component": "hx-textarea",
+      "severity": "medium",
+      "wcagCriteria": "4.1.3",
+      "title": "Character counter aria-live fires on every keystroke — may be too noisy",
+      "description": "The visible counter <div> has aria-live='polite' and aria-atomic='true', so every character change announces the updated count to screen readers. This is extremely verbose for users typing long passages and contradicts the debounced _liveAnnouncement strategy already implemented for the sr-only region. WCAG 4.1.3 requires that status messages are programmatically determinable; it does not mandate live-region on the visible counter. The sr-only debounced region already satisfies 4.1.3.",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.ts",
+      "line": 430,
+      "fix": "Remove aria-live='polite' and aria-atomic='true' from the visible counter div. The existing debounced sr-only live region handles the announcement. Keep the counter in aria-describedby so AT users can query it on demand via virtual cursor."
+    },
+    {
+      "component": "hx-textarea",
+      "severity": "medium",
+      "wcagCriteria": "4.1.3",
+      "title": "Error container role='alert' insertion pattern may not fire in VoiceOver",
+      "description": "Identical to hx-text-input: the error <div role='alert'> is conditionally inserted/removed rather than kept as a persistent live region. VoiceOver on macOS requires the live region container to pre-exist in the DOM.",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.ts",
+      "line": 512,
+      "fix": "Use a persistent <div role='alert' aria-live='assertive'> always in the DOM, populated conditionally with error text rather than inserted/removed."
+    },
+    {
+      "component": "hx-number-input",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Stepper buttons removed from tab order (tabindex=-1) with no keyboard alternative disclosed",
+      "description": "The increment and decrement buttons have tabindex='-1', meaning keyboard-only users cannot directly focus them. The component handles ArrowUp/ArrowDown on the text input as an alternative, but this is not disclosed to assistive technology. A keyboard-only user unaware of this convention cannot discover how to step the value. WCAG 4.1.2 requires that all functionality is available from a keyboard. While the native arrow key behavior on type='number' provides some coverage, it is suppressed/overridden here and not announced.",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "line": 589,
+      "fix": "Either: (a) remove tabindex='-1' from stepper buttons so keyboard users can tab to them, with appropriate aria-label already present; or (b) keep tabindex='-1' but add aria-keyshortcuts='ArrowUp ArrowDown' to the input and document the keyboard pattern in aria-describedby."
+    },
+    {
+      "component": "hx-number-input",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-valuenow, aria-valuemin, aria-valuemax applied to native type='number' input — redundant and potentially conflicting",
+      "description": "The component adds aria-valuenow, aria-valuemin, and aria-valuemax to a native <input type='number'>. These are ARIA slider attributes (role='slider'). A native number input already exposes its value, min, and max via the accessibility tree without ARIA attributes. Adding these attributes does not provide role='slider', creating an attribute/role mismatch. Screen readers may announce conflicting value information or ignore the ARIA attributes.",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "line": 568,
+      "fix": "Remove aria-valuenow, aria-valuemin, and aria-valuemax from the native <input type='number'>. These attributes are appropriate only on elements with role='slider' or role='spinbutton' without a native equivalent. The native input already exposes this information correctly."
+    },
+    {
+      "component": "hx-number-input",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "Missing aria-required on native number input",
+      "description": "The native <input type='number'> has ?required but no aria-required='true'. Same shadow DOM reliability issue as hx-text-input and hx-textarea.",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "line": 559,
+      "fix": "Add aria-required=${this.required ? 'true' : nothing} to the native <input> element."
+    },
+    {
+      "component": "hx-number-input",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "Error message rendered inside a slot wrapper — role='alert' may not trigger",
+      "description": "The error div (role='alert') is nested as fallback content inside a <slot name='error'>. When the error property is set and the slot has no slotted content, the fallback renders. However, the role='alert' div is a child of a slot element, which is non-standard. More critically, the entire slot+error block is conditionally swapped (slot renders when no error, div renders when there is error), so the alert node is inserted rather than populated, which may fail VoiceOver announcement.",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "line": 616,
+      "fix": "Move the error container outside the slot: always render <div id=${this._errorId} role='alert' aria-live='assertive'> in the DOM, populate with error text conditionally, and keep the <slot name='error'> separate for slotted overrides."
+    },
+    {
+      "component": "hx-checkbox",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Error container uses role='status' instead of role='alert' — insufficient for error announcements",
+      "description": "The error container is assigned role='status' (an implicit polite live region). For validation errors, WCAG 4.1.3 and the ARIA APG recommend role='alert' (assertive) so the error is announced immediately when it appears. role='status' uses aria-live='polite', which can be delayed or preempted by other announcements, potentially causing the error to be missed entirely in busy contexts like healthcare forms.",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts",
+      "line": 353,
+      "fix": "Change role='status' to role='alert' on the error container div. For non-critical status messages role='status' is appropriate, but validation errors require assertive announcement."
+    },
+    {
+      "component": "hx-checkbox",
+      "severity": "medium",
+      "wcagCriteria": "2.5.5",
+      "title": "Touch target size below 44x44px for sm size variant",
+      "description": "The sm size variant sets --hx-checkbox-size to 1rem (16px). The visual checkbox box is 16x16px. The surrounding label element wraps the box and label text, providing a larger clickable area, but the visual target does not meet the WCAG 2.5.5 (AA) recommendation of 44x44px for touch targets. In healthcare contexts (e.g., consent forms on tablets), this is a material barrier for users with motor impairments.",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.styles.ts",
+      "line": 182,
+      "fix": "Apply min-height and min-width of 2.75rem (44px) to .checkbox__control for the sm variant, or add padding to the label element to expand the touch target area without affecting the visual size of the checkbox box."
+    },
+    {
+      "component": "hx-checkbox",
+      "severity": "low",
+      "wcagCriteria": "1.3.1",
+      "title": "Missing aria-required on native checkbox input",
+      "description": "The native <input type='checkbox'> uses ?required but lacks aria-required='true'. Same shadow DOM AT reliability issue as text inputs.",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts",
+      "line": 303,
+      "fix": "Add aria-required=${this.required ? 'true' : nothing} to the native <input type='checkbox'>."
+    },
+    {
+      "component": "hx-checkbox-group",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "helpText property not included in aria-describedby when set via property (not slot)",
+      "description": "The describedBy computation includes this._helpTextId only when this._hasHelpSlot is true (line 322). However, the helpText property is not exposed as a public property in the component (there is no @property for helpText), and the help-text slot rendering only occurs when _hasHelpSlot is true. The help-text slot div is always rendered in the DOM with id=${this._helpTextId} but is empty when no slot content is assigned. This means if a consumer tries to use a helpText attribute (which does not exist on this component), there is no mechanism to display or associate help text via a property — forcing consumers to always use the slot. This is an API gap compared to the other form components in this library which all have a helpText property.",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.ts",
+      "line": 321,
+      "fix": "Add a @property({ type: String, attribute: 'help-text' }) helpText = '' property and include it in the describedBy computation: include this._helpTextId when this._hasHelpSlot || !!this.helpText. Render help text fallback content in the slot similarly to hx-checkbox."
+    },
+    {
+      "component": "hx-checkbox-group",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "aria-describedby on fieldset references IDs that may not exist when slot is empty",
+      "description": "The fieldset sets aria-describedby referencing this._helpTextId even when _hasHelpSlot is false. The help-text slot div is always rendered in the DOM (even empty), so the ID exists — but an empty element as the describedby target provides no useful information and may cause screen readers to announce whitespace. The error ID reference is conditional, which is correct.",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.ts",
+      "line": 321,
+      "fix": "Make the helpText ID conditional in describedBy: only include this._helpTextId when _hasHelpSlot is true (or when helpText property has content once that is added)."
+    },
+    {
+      "component": "hx-radio-group",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-radio does not have a focusable element — keyboard focus lands on the custom element host with role='radio' but no inner input is keyboard reachable",
+      "description": "hx-radio sets role='radio' and aria-checked on its host element via connectedCallback/updated. The roving tabindex is managed by hx-radio-group by setting this.tabIndex on the hx-radio host. However, the inner native <input type='radio'> has tabindex='-1' and aria-hidden='true', and the visual .radio div has a @click handler but no keyboard handler on the host. Keyboard focus lands on the hx-radio host (role='radio'), which is correct for the roving tabindex pattern. The SPACE key is handled by hx-radio-group's keydown handler via event delegation — but this handler targets e.target.closest('hx-radio'), which works only when the target IS the hx-radio host. This will fail when focus is on a child element inside the shadow DOM. More critically, hx-radio has no @keydown handler on its host, so Enter key is not handled. The ARIA APG radio pattern requires Space to select; Enter is optional but the absence of any host-level key handling is a gap. The click handler is on the inner .radio div, not the host — a click on the host element (which is what AT may synthesize) may not propagate to the inner div handler.",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio.ts",
+      "line": 110,
+      "fix": "Add a @keydown handler directly on the hx-radio host for Space key to dispatch hx-radio-select. Move the @click handler to :host or add a separate host-level click handler. Verify that synthesized click events from AT land on the host and correctly propagate to the inner click handler."
+    },
+    {
+      "component": "hx-radio-group",
+      "severity": "critical",
+      "wcagCriteria": "1.3.1",
+      "title": "hx-radio label is not programmatically associated with the radio control",
+      "description": "The hx-radio component renders a .radio__label <span> containing the label text. The host has role='radio' and aria-checked, but no aria-labelledby pointing to the label span, and no aria-label. The accessible name of the radio is computed from the host's subtree content — but because the label text is inside shadow DOM, it may or may not be included in the accessible name depending on the browser's shadow DOM name computation. Firefox and some JAWS versions do not compute accessible names from shadow DOM subtrees for custom elements with explicitly set ARIA roles. This means radios may be announced with no accessible name.",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio.ts",
+      "line": 66,
+      "fix": "Add aria-labelledby on the host pointing to the label span ID, or use aria-label reflecting the label property. Since aria-labelledby cannot cross shadow DOM boundaries to reference the inner span, the correct approach is: set this.setAttribute('aria-label', this.label) on the host in connectedCallback and updated() when label or slot content changes. For slotted label content, observe the slot and update aria-label accordingly."
+    },
+    {
+      "component": "hx-radio-group",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "redundant role='radiogroup' on a native <fieldset> element",
+      "description": "The render output applies role='radiogroup' to the native <fieldset> element. A native fieldset already has an implicit ARIA role of 'group'. Adding role='radiogroup' overrides this. While radiogroup is semantically correct for a group of radio buttons, applying it to a <fieldset> causes the element to lose its native fieldset semantics (including the legend association). The correct pattern is to either use a <fieldset> with its native role='group' (and ensure screen readers understand it as a radio group via the child radios) or use a <div role='radiogroup'> with an explicit aria-labelledby pointing to a visible label.",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.ts",
+      "line": 480,
+      "fix": "Remove role='radiogroup' from the <fieldset>. The native fieldset with a <legend> and child radio elements provides the correct group semantics. Alternatively, if role='radiogroup' is required, use a <div role='radiogroup'> and replicate the legend/label via aria-labelledby."
+    },
+    {
+      "component": "hx-radio-group",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "Error message announced only when error property is set — slot error content not in aria-describedby",
+      "description": "The describedBy computation (line 474-476) uses errorDescribedBy only when !this._hasErrorSlot && hasError. When a consumer provides slotted error content via <slot name='error'>, _hasErrorSlot is true and no ID is referenced in aria-describedby. The slotted error element is outside the shadow root and cannot be directly referenced by the fieldset's aria-describedby. This means slotted error content provides no programmatic association to the fieldset for AT users.",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.ts",
+      "line": 474,
+      "fix": "When _hasErrorSlot is true, assign an ID to the slotted error element (via the slot change handler) and include that ID in aria-describedby. Alternatively, ensure that when slotted error content is present, the wrapper div always has the stable _errorId so aria-describedby continues to reference it."
+    },
+    {
+      "component": "hx-switch",
+      "severity": "high",
+      "wcagCriteria": "2.5.5",
+      "title": "Switch track (sm size) does not meet 44x44px touch target minimum",
+      "description": "The sm size switch track is 2rem wide (32px) and 1.125rem tall (18px). This is well below the WCAG 2.5.5 minimum of 44x44px for touch targets. In healthcare mobile contexts (tablet-based patient intake forms), users with motor impairments will have difficulty accurately activating the sm switch.",
+      "file": "packages/hx-library/src/components/hx-switch/hx-switch.styles.ts",
+      "line": 72,
+      "fix": "Add a minimum touch target to the sm size track button using padding or a pseudo-element: min-width: 2.75rem; min-height: 2.75rem with the track visuals centered inside via padding. Alternatively, apply a transparent padding to expand the clickable area without changing visual dimensions."
+    },
+    {
+      "component": "hx-switch",
+      "severity": "medium",
+      "wcagCriteria": "4.1.3",
+      "title": "Error container rendered with role='alert' only when hasError is true — VoiceOver insertion issue",
+      "description": "The error div with role='alert' is conditionally inserted (rendered only when hasError). VoiceOver on macOS announces live regions only when text is dynamically inserted into a pre-existing container. An newly inserted role='alert' node may not be announced.",
+      "file": "packages/hx-library/src/components/hx-switch/hx-switch.ts",
+      "line": 318,
+      "fix": "Keep the error container in the DOM at all times as a persistent live region: <div part='error' class='switch__error' id=${this._errorId} role='alert' aria-live='assertive'>${hasError ? this.error : ''}</div>. This ensures VoiceOver fires the announcement when error text is populated."
+    },
+    {
+      "component": "hx-switch",
+      "severity": "low",
+      "wcagCriteria": "1.3.1",
+      "title": "label element uses for=${this._switchId} pointing to a button — invalid HTML",
+      "description": "The <label> element has for=${this._switchId} where this._switchId is the id of the <button> acting as the switch track. The HTML spec states that <label> may only be associated with labelable elements, and <button> is a labelable element — so this is technically valid. However, clicking the label in most browsers will focus and activate the button (which is correct). The issue is that aria-labelledby on the button already references this._labelId, and the native label-for association is redundant. More importantly, the label's for attribute points to the button ID in shadow DOM — this association does not work across shadow boundaries when the label is in light DOM. Since both label and button are in shadow DOM here, it does work, but the pattern is fragile if the component is restructured.",
+      "file": "packages/hx-library/src/components/hx-switch/hx-switch.ts",
+      "line": 311,
+      "fix": "This is a low-priority structural concern. The current implementation works correctly since both elements are in the same shadow root. Document that the label's for association is intentional and test that clicking the label activates the switch in all target browsers."
+    },
+    {
+      "component": "hx-slider",
+      "severity": "critical",
+      "wcagCriteria": "1.3.1",
+      "title": "Slider has no accessible name when neither label property nor label slot is provided",
+      "description": "When no label or label slot is used, the input has aria-labelledby referencing undefined (line 438: ifDefined(hasLabel ? this._labelId : undefined)). The input has no aria-label fallback. A native <input type='range'> with no accessible name is announced by screen readers with only its current value and role ('slider 50'). Users cannot determine what the slider controls without a name. In healthcare contexts (e.g., a pain scale, medication dosage slider), an unnamed slider is a critical barrier.",
+      "file": "packages/hx-library/src/components/hx-slider/hx-slider.ts",
+      "line": 438,
+      "fix": "Add a fallback: when hasLabel is false, check for a host-level aria-label attribute and forward it to the input. Add @property({ type: String, attribute: 'aria-label' }) ariaLabel: string | null = null and apply aria-label=${ifDefined(this.ariaLabel || undefined)} to the native input when hasLabel is false. Document that either label or aria-label is required."
+    },
+    {
+      "component": "hx-slider",
+      "severity": "critical",
+      "wcagCriteria": "1.3.1",
+      "title": "No error state or aria-invalid support",
+      "description": "hx-slider has no error property, no aria-invalid, and no error announcement mechanism. In healthcare scenarios, sliders are used for numeric data entry (dosage, weight, pain scale). If a value is out of a clinically acceptable range and the form wants to communicate this, there is no accessible way to do so. The component does implement form validity via ElementInternals but provides no UI or AT mechanism to communicate the invalid state.",
+      "file": "packages/hx-library/src/components/hx-slider/hx-slider.ts",
+      "line": 387,
+      "fix": "Add an error property and an error message container with role='alert'. Apply aria-invalid='true' to the native input when error is set. Include the error container ID in aria-describedby."
+    },
+    {
+      "component": "hx-slider",
+      "severity": "low",
+      "wcagCriteria": "2.4.7",
+      "title": "Focus ring applied via sibling combinator on hidden native input — may fail in high contrast mode",
+      "description": "The focus ring is applied via .slider__input:focus-visible ~ .slider__thumb-visual using box-shadow. The native input is opacity: 0. In Windows High Contrast mode, box-shadow is suppressed. The styles file has a @media (forced-colors: active) block that restores the native outline on the input itself (opacity: 1, outline: revert), which is good. However, the thumb-visual focus indicator is not visible in forced colors when the input is hidden.",
+      "file": "packages/hx-library/src/components/hx-slider/hx-slider.styles.ts",
+      "line": 143,
+      "fix": "The existing forced-colors media query (line 143-151) correctly shows the native input in HC mode. Verify that the native outline renders on top of or adjacent to the visual thumb in HC mode so the user understands which element is focused. Consider adding forced-colors styling to .slider__thumb-visual within the same media query."
+    },
+    {
+      "component": "hx-file-upload",
+      "severity": "critical",
+      "wcagCriteria": "4.1.2",
+      "title": "Dropzone role='button' does not announce file type or size constraints to assistive technology",
+      "description": "The dropzone div has role='button' with aria-label set to the labelDropzone text ('Drag files here or click to browse'). When accept or maxSize constraints are configured, these constraints are not included in the accessible name or description. A screen reader user cannot discover what file types are accepted or what the size limit is before attempting to upload. This is a significant barrier — a user may spend time selecting a file only to receive an error that could have been prevented.",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.ts",
+      "line": 532,
+      "fix": "Add constraint information to the accessible description via aria-describedby pointing to a visually-present (or sr-only) element listing accepted file types and size limits. For example: 'Accepted types: PDF, DOCX. Maximum size: 10 MB.' This could be a computed string based on the accept and maxSize properties."
+    },
+    {
+      "component": "hx-file-upload",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "hx-error event dispatched but no persistent AT announcement of validation errors",
+      "description": "When file validation fails (wrong type or oversized), an hx-error event is dispatched and the error property can be set externally. However, the component does not automatically surface the validation error to assistive technology. The built-in error div (role='alert') is only rendered when the consumer sets the error property. The hx-error event provides the error message in its detail, but there is no internal live region that auto-announces file validation errors from _processFiles. A screen reader user who drops a file and gets an error has no AT notification unless the consuming application manually reads hx-error and sets the error property.",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.ts",
+      "line": 291,
+      "fix": "Add an internal aria-live='assertive' region that is populated with the validation error message immediately when _processFiles detects an invalid file. This provides immediate AT notification regardless of whether the consumer handles the hx-error event."
+    },
+    {
+      "component": "hx-file-upload",
+      "severity": "high",
+      "wcagCriteria": "2.5.5",
+      "title": "File remove button touch target is below 44x44px",
+      "description": "The remove button (.file-item__remove) has padding: var(--hx-space-1, 0.25rem) — adding 4px on each side to a 14x14px SVG icon yields an approximate target of 22x22px. This is less than half the required 44x44px minimum for WCAG 2.5.5 compliance, making it very difficult for users with motor impairments to accurately target and activate the remove button.",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.styles.ts",
+      "line": 158,
+      "fix": "Increase padding on .file-item__remove to at least 0.75rem on all sides, or set min-width: 2.75rem and min-height: 2.75rem to ensure the touch target meets the 44x44px minimum."
+    },
+    {
+      "component": "hx-file-upload",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "Dropzone aria-labelledby and aria-label logic has gap when label is set",
+      "description": "When this.label is set, the dropzone uses aria-labelledby=${this._labelId} and does NOT set aria-label. The <label> element references the dropzone via for=${this._dropzoneId}. However, the dropzone has role='button', not an input role. The <label for> association with a div[role='button'] is not valid HTML. The accessible name comes from aria-labelledby pointing to the label element, which works for AT. The issue is that clicking the visible label text does not natively activate the button (labels only activate labelable elements). Clicking the label may confuse sighted users who expect it to open the file picker.",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.ts",
+      "line": 538,
+      "fix": "Remove the for attribute from the <label> element since the dropzone is not a labelable element. The aria-labelledby association on the dropzone correctly provides the accessible name. Optionally add a click handler to the label element that calls this._handleDropzoneClick()."
+    }
+  ]
+}
