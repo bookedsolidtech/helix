@@ -183,3 +183,7 @@ export const HealthcareContext: Story = {
     await expect(el?.shadowRoot?.querySelector('[part="base"]')).toBeTruthy();
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};

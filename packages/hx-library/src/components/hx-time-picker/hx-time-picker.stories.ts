@@ -909,3 +909,12 @@ export const ShiftHandoff: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Select Time',
+    step: 30,
+    format: '12h',
+  },
+};

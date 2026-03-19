@@ -169,3 +169,11 @@ export const AllVariants: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    variant: 'default',
+    label: 'Enter your full name as it appears on your ID.',
+  },
+};

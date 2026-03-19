@@ -217,3 +217,12 @@ export const Complete: Story = {
     </hx-progress-bar>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    value: null,
+    indeterminate: false,
+    label: 'Loading…',
+  },
+};

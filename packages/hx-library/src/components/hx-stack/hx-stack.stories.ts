@@ -479,3 +479,12 @@ export const PatientFormLayout: Story = {
     await expect(stacks.length).toBeGreaterThanOrEqual(4);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    direction: 'horizontal',
+    gap: 'md',
+    align: 'center',
+  },
+};

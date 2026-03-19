@@ -382,3 +382,21 @@ export const Compact: Story = {
     await expect(grid).toBeTruthy();
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    value: '#3b82f6',
+    format: 'hex',
+  },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-color-picker value="#3b82f6" name="theme-color">
+      <button slot="trigger" style="padding: 0.5rem 1rem; cursor: pointer;">
+        Choose Color
+      </button>
+    </hx-color-picker>
+  `,
+};

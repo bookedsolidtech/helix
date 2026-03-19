@@ -354,3 +354,8 @@ export const NoThresholds: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: { value: 0, label: 'Empty (0%)' },
+};

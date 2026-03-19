@@ -1265,3 +1265,11 @@ export const SSNMasked: Story = {
     await expect(input.type).toBe('password');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Patient Name',
+    placeholder: 'Enter patient full name',
+  },
+};

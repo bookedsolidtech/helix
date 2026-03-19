@@ -1111,3 +1111,11 @@ export const DisabledNoInteraction: Story = {
     await expect(calendar).toBeFalsy();
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Date of Birth',
+    name: 'dob',
+  },
+};
