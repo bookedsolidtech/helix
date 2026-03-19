@@ -4,7 +4,7 @@ export const helixColorPickerStyles = css`
   :host {
     display: inline-block;
     position: relative;
-    font-family: var(--hx-font-family-base, sans-serif);
+    font-family: var(--hx-font-family-sans, sans-serif);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
@@ -32,7 +32,8 @@ export const helixColorPickerStyles = css`
   }
 
   .trigger:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-500));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -101,7 +102,8 @@ export const helixColorPickerStyles = css`
 
   /* P0-1: focus ring for keyboard-operable gradient grid */
   .gradient-grid:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-500));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -146,7 +148,8 @@ export const helixColorPickerStyles = css`
   }
 
   .slider-track:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-500));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -226,7 +229,8 @@ export const helixColorPickerStyles = css`
   }
 
   .swatch-btn:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-500));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -253,7 +257,8 @@ export const helixColorPickerStyles = css`
   }
 
   .format-btn:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-500));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -271,9 +276,10 @@ export const helixColorPickerStyles = css`
   }
 
   .color-input:focus {
-    border-color: var(--hx-focus-ring-color, #2563eb);
+    border-color: var(--hx-focus-ring-color, var(--hx-color-primary-500));
     /* P1-5: was invalid "box-shadow: ... / 0.2" syntax; replaced with valid box-shadow */
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--hx-focus-ring-color, #2563eb) 20%, transparent);
+    box-shadow: 0 0 0 2px
+      color-mix(in srgb, var(--hx-focus-ring-color, var(--hx-color-primary-500)) 20%, transparent);
   }
 
   /* ─── Color preview strip in input area ─── */
