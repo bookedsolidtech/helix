@@ -564,6 +564,7 @@ export class HelixNumberInput extends LitElement {
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}
             aria-invalid=${hasError ? 'true' : nothing}
+            aria-required=${this.required ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-valuenow=${ifDefined(this.value !== null ? this.value : undefined)}
             aria-valuemin=${ifDefined(this.min)}

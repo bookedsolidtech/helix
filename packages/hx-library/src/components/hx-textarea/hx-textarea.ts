@@ -500,6 +500,7 @@ export class HelixTextarea extends LitElement {
               this._hasLabelSlot ? `${this._textareaId}-slotted-label` : undefined,
             )}
             aria-invalid=${hasError ? 'true' : nothing}
+            aria-required=${this.required ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             @input=${this._handleInput}
             @change=${this._handleChange}

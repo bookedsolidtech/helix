@@ -454,6 +454,7 @@ export class HelixTextInput extends LitElement {
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}
             aria-invalid=${hasError ? 'true' : nothing}
+            aria-required=${this.required ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             @input=${this._handleInput}
             @change=${this._handleChange}

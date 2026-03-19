@@ -306,6 +306,7 @@ export class HelixCheckbox extends LitElement {
             .value=${this.value}
             aria-checked=${this.indeterminate ? 'mixed' : nothing}
             aria-invalid=${hasError ? 'true' : nothing}
+            aria-required=${this.required ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-label=${ifDefined(hostAriaLabel)}
             aria-labelledby=${ifDefined(!hostAriaLabel ? this._labelId : undefined)}
