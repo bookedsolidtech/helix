@@ -58,6 +58,23 @@ export const helixAlertStyles = css`
     border-radius: 0;
   }
 
+  /* ─── Severity Label (WCAG 1.4.1) ─── */
+  /* Visually hidden — provides a non-color cue for screen readers and users    */
+  /* who cannot distinguish variants by color alone (e.g. color-blind users).  */
+  /* Always present regardless of showIcon so severity is never color-only.    */
+
+  .alert__severity-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Icon ─── */
 
   .alert__icon {

@@ -139,6 +139,21 @@ export class HelixProgressBar extends LitElement {
     this._hasLabelSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  // ─── WCAG 1.4.1: Variant label map ───
+  // Semantic variants (success/warning/danger) must not rely on color alone.
+  // The variant label is included in aria-valuetext for AT users and rendered
+  // as visually-hidden text for users in high contrast or color-blind contexts.
+
+  private static readonly _VARIANT_LABELS: Partial<Record<HelixProgressBar['variant'], string>> = {
+    success: 'Success',
+    warning: 'Warning',
+    danger: 'Danger',
+  };
+
+  private get _variantLabel(): string {
+    return HelixProgressBar._VARIANT_LABELS[this.variant] ?? '';
+  }
+
   override render() {
     const labelId = `${this._uid}-label`;
     const descId = this.description ? `${this._uid}-desc` : undefined;
@@ -153,6 +168,14 @@ export class HelixProgressBar extends LitElement {
 
     const indicatorStyle = this._isIndeterminate ? '' : `width: ${this._percentage}%`;
     const ariaValueNow = this._isIndeterminate ? undefined : (this.value ?? this.min);
+    const variantLabel = this._variantLabel;
+
+    // WCAG 1.4.1: Include variant label in aria-valuetext so AT users receive
+    // the semantic state (success/warning/danger) without relying on fill color.
+    const percentageText = this._isIndeterminate
+      ? 'In progress'
+      : `${Math.round(this._percentage)}%`;
+    const ariaValuetext = variantLabel ? `${percentageText} — ${variantLabel}` : percentageText;
 
     return html`
       <div class=${classMap(classes)}>
@@ -169,12 +192,16 @@ export class HelixProgressBar extends LitElement {
           aria-valuenow=${ifDefined(ariaValueNow)}
           aria-valuemin=${this.min}
           aria-valuemax=${this.max}
+          aria-valuetext=${ariaValuetext}
           aria-label=${ifDefined(!hasVisibleLabel && this.label ? this.label : undefined)}
           aria-labelledby=${ifDefined(hasVisibleLabel ? labelId : undefined)}
           aria-describedby=${ifDefined(descId)}
         >
           <div part="fill" class="progress-bar__fill" style=${indicatorStyle || nothing}></div>
         </div>
+        ${variantLabel
+          ? html`<span class="sr-only progress-bar__variant-label">${variantLabel}</span>`
+          : nothing}
         <div aria-live="polite" aria-atomic="true" class="sr-only">${this._liveMessage}</div>
       </div>
     `;
