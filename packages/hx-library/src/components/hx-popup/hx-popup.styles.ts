@@ -25,4 +25,10 @@ export const helixPopupStyles = css`
     transform: rotate(45deg);
     pointer-events: none;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    [part='popup'] {
+      transition: none;
+    }
+  }
 `;

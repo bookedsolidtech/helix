@@ -130,6 +130,7 @@ export class HelixTreeView extends LitElement {
   // ─── Event Handling ───
 
   private _handleTreeItemSelect(e: Event): void {
+    if (!(e instanceof CustomEvent)) return;
     const event = e as CustomEvent<HxTreeItemSelectDetail>;
     const item = event.detail.item;
 

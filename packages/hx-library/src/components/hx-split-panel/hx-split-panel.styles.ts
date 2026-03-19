@@ -159,4 +159,10 @@ export const helixSplitPanelStyles = css`
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .divider {
+      transition: none;
+    }
+  }
 `;

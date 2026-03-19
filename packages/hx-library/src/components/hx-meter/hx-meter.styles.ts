@@ -85,6 +85,12 @@ export const helixMeterStyles = css`
     color: var(--hx-meter-color-danger, var(--hx-color-danger-700, #b91c1c));
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .meter__indicator {
+      transition: none;
+    }
+  }
+
   /* ─── Native meter hidden (we use custom rendering) ─── */
 
   .meter__native {
