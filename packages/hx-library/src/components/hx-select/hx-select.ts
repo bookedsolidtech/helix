@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -212,7 +213,7 @@ export class HelixSelect extends LitElement {
     document.removeEventListener('click', this._handleOutsideClick);
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('value')) {
       this._syncNativeSelect();
       this._updateFormValue();
@@ -539,29 +540,33 @@ export class HelixSelect extends LitElement {
       return html`<div class="field__no-options">No options found</div>`;
     }
 
-    return this._options.map((opt, index) => {
-      const isSelected = opt.value === this.value;
-      const isFocused = index === this._focusedOptionIndex;
+    return repeat(
+      this._options,
+      (opt) => opt.value,
+      (opt, index) => {
+        const isSelected = opt.value === this.value;
+        const isFocused = index === this._focusedOptionIndex;
 
-      return html`
-        <div
-          id=${this._optionId(index)}
-          part="option"
-          role="option"
-          class=${classMap({
-            field__option: true,
-            'field__option--selected': isSelected,
-            'field__option--focused': isFocused,
-            'field__option--disabled': opt.disabled,
-          })}
-          aria-selected=${isSelected ? 'true' : 'false'}
-          aria-disabled=${opt.disabled ? 'true' : nothing}
-          @click=${() => this._selectOption(opt)}
-        >
-          <span class="field__option-label">${opt.label}</span>
-        </div>
-      `;
-    });
+        return html`
+          <div
+            id=${this._optionId(index)}
+            part="option"
+            role="option"
+            class=${classMap({
+              field__option: true,
+              'field__option--selected': isSelected,
+              'field__option--focused': isFocused,
+              'field__option--disabled': opt.disabled,
+            })}
+            aria-selected=${isSelected ? 'true' : 'false'}
+            aria-disabled=${opt.disabled ? 'true' : nothing}
+            @click=${() => this._selectOption(opt)}
+          >
+            <span class="field__option-label">${opt.label}</span>
+          </div>
+        `;
+      },
+    );
   }
 
   // ─── Main Render ───

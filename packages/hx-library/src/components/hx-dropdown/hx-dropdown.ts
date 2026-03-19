@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import {
@@ -361,7 +361,7 @@ export class HelixDropdown extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<string, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('open')) {
       // Keep aria-expanded in sync
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
