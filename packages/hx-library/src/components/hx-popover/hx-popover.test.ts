@@ -351,6 +351,73 @@ describe('hx-popover', () => {
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
     });
 
+    // WCAG 1.4.13: pointer moving from anchor into body must keep popover open
+    it('stays open when pointer moves from anchor into body when trigger="hover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+
+      // Show via mouseenter on trigger wrapper
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+
+      // Simulate pointer leaving anchor wrapper (without entering body yet)
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      // Immediately enter the body — pointer moved directly from anchor into body
+      body.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+
+      // Popover must remain visible; dismissing it while pointer is inside the body
+      // would violate WCAG 1.4.13 (Content on Hover or Focus)
+      expect(body.classList.contains('visible')).toBe(true);
+    });
+
+    // WCAG 1.4.13: popover closes only when pointer leaves the body itself
+    it('closes when pointer leaves the body when trigger="hover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+
+      // Open via mouseenter on wrapper
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+
+      // Move pointer into body (keeps open)
+      body.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+
+      // Now leave the body — popover should close
+      body.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(false);
+    });
+
+    // WCAG 1.4.13 / keyboard: Escape dismisses a hover-triggered popover from document level
+    it('Escape key dismisses hover-triggered popover from document level', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+
+      // Open via hover
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+
+      // Fire Escape on document (not on the element) — matches real-world usage where
+      // focus may be anywhere on the page when the user presses Escape
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
+    });
+
     // P1-06: focus trigger — focusin shows, focusout hides
     it('shows on focusin when trigger="focus"', async () => {
       const el = await fixture<HelixPopover>(
