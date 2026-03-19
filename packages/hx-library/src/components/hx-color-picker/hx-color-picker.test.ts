@@ -607,6 +607,44 @@ describe('hx-color-picker', () => {
     });
   });
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits color value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-color-picker name="brand-color" value="#3b82f6"></hx-color-picker>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-color-picker') as HelixColorPicker;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('brand-color')).toBe('#3b82f6');
+      form.remove();
+    });
+
+    it('formDisabledCallback sets disabled state', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
+
+    it('updates FormData value when value property changes', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-color-picker name="theme-color" value="#000000"></hx-color-picker>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-color-picker') as HelixColorPicker;
+      await el.updateComplete;
+      el.value = '#ff0000';
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('theme-color')).toBe('#ff0000');
+      form.remove();
+    });
+  });
+
   // ─── Accessibility (axe-core) (2) ───
 
   describe('Accessibility (axe-core)', () => {

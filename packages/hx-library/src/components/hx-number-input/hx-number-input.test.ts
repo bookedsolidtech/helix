@@ -650,6 +650,21 @@ describe('hx-number-input', () => {
 
   // ─── Form integration (7) ───
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits numeric value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-number-input name="dosage" value="42"></hx-number-input>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-number-input') as HelixNumberInput;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('dosage')).toBe('42');
+      form.remove();
+    });
+  });
+
   describe('Form integration', () => {
     it('has formAssociated=true on constructor', () => {
       const ctor = customElements.get('hx-number-input') as unknown as {
