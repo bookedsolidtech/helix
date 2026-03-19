@@ -400,8 +400,8 @@ export class HelixDataTable extends LitElement {
   private _renderSkeletonRows() {
     return Array.from(
       { length: 3 },
-      (_, i) => html`
-        <tr part="tr" aria-hidden="true" key=${i}>
+      (_) => html`
+        <tr part="tr" aria-hidden="true">
           ${this.selectable
             ? html`<td part="td" class="col-checkbox">
                 <span class="skeleton-cell" style="width:1rem;margin:auto"></span>
