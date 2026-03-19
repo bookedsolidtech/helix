@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixListItemStyles } from './hx-list-item.styles.js';
@@ -157,7 +158,7 @@ export class HelixListItem extends LitElement {
       return html`
         <dt
           part="base"
-          class="list-item ${this.disabled ? 'list-item--disabled' : ''}"
+          class=${classMap({ 'list-item': true, 'list-item--disabled': this.disabled })}
           aria-disabled=${this.disabled ? 'true' : nothing}
         >
           ${this._renderContent()}
@@ -169,7 +170,7 @@ export class HelixListItem extends LitElement {
       return html`
         <dd
           part="base"
-          class="list-item ${this.disabled ? 'list-item--disabled' : ''}"
+          class=${classMap({ 'list-item': true, 'list-item--disabled': this.disabled })}
           aria-disabled=${this.disabled ? 'true' : nothing}
         >
           ${this._renderContent()}
@@ -186,9 +187,11 @@ export class HelixListItem extends LitElement {
         <li
           part="base"
           role="presentation"
-          class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
-            ? 'list-item--disabled'
-            : ''}"
+          class=${classMap({
+            'list-item': true,
+            'list-item--selected': this.selected,
+            'list-item--disabled': this.disabled,
+          })}
           @click=${this._handleClick}
           @keydown=${this._handleKeydown}
         >
@@ -217,9 +220,11 @@ export class HelixListItem extends LitElement {
     return html`
       <li
         part="base"
-        class="list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled
-          ? 'list-item--disabled'
-          : ''}"
+        class=${classMap({
+          'list-item': true,
+          'list-item--selected': this.selected,
+          'list-item--disabled': this.disabled,
+        })}
         role="listitem"
         aria-disabled=${this.disabled ? 'true' : nothing}
         @click=${this._handleClick}
