@@ -9,6 +9,23 @@ export const helixAlertStyles = css`
     display: none;
   }
 
+  /* ─── Screen-reader-only announcement region ─── */
+  /* Always present in DOM so AT registers it before content is injected.     */
+  /* Visually hidden via clip-path technique (superior to display:none which  */
+  /* removes the element from the AT tree entirely).                          */
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   * {
     box-sizing: border-box;
   }

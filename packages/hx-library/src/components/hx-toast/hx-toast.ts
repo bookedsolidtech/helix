@@ -251,37 +251,41 @@ export class HelixToast extends LitElement {
         @focusin=${this._handleFocusIn}
         @focusout=${this._handleFocusOut}
       >
-        <span part="icon" class="toast__icon">
-          <slot name="icon"></slot>
-        </span>
-        <span part="message" class="toast__message">
-          <slot></slot>
-        </span>
-        <span part="action" class="toast__action">
-          <slot name="action"></slot>
-        </span>
-        ${this.closable
+        ${this.open
           ? html`
-              <button
-                part="close-button"
-                class="toast__close"
-                aria-label=${this.closeLabel}
-                @click=${this._handleClose}
-              >
-                <svg
-                  aria-hidden="true"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
+              <span part="icon" class="toast__icon">
+                <slot name="icon"></slot>
+              </span>
+              <span part="message" class="toast__message">
+                <slot></slot>
+              </span>
+              <span part="action" class="toast__action">
+                <slot name="action"></slot>
+              </span>
+              ${this.closable
+                ? html`
+                    <button
+                      part="close-button"
+                      class="toast__close"
+                      aria-label=${this.closeLabel}
+                      @click=${this._handleClose}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    </button>
+                  `
+                : nothing}
             `
           : nothing}
       </div>
