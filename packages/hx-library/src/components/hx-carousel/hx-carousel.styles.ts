@@ -37,6 +37,9 @@ export const helixCarouselStyles = css`
     justify-content: center;
     width: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
     height: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
     border-radius: var(--hx-border-radius-full, 9999px);
     background: var(--hx-color-neutral-0, #fff);
