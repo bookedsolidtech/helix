@@ -122,7 +122,7 @@ export class HelixAlert extends LitElement {
 
   /** Returns true when the variant requires assertive announcement. */
   private get _isAssertive(): boolean {
-    return this.variant === 'error' || this.variant === 'warning';
+    return this.variant === 'error';
   }
 
   /**
@@ -299,8 +299,19 @@ export class HelixAlert extends LitElement {
       'alert--accent': this.accent,
     };
 
+    // WCAG 1.4.1: Always render a visually-hidden severity label so the variant
+    // is never conveyed by color alone, regardless of whether showIcon is set.
+    const SEVERITY_LABELS: Record<string, string> = {
+      info: 'Info:',
+      success: 'Success:',
+      warning: 'Warning:',
+      error: 'Error:',
+    };
+    const severityLabel = SEVERITY_LABELS[this.variant] ?? '';
+
     return html`
       <div part="alert" class=${classMap(classes)}>
+        <span class="alert__severity-label">${severityLabel}</span>
         ${this.showIcon
           ? html`
               <div part="icon" class="alert__icon">

@@ -60,8 +60,9 @@ export const helixPaginationStyles = css`
   }
 
   .button:focus-visible {
-    outline: 2px solid var(--hx-color-focus, var(--hx-color-primary, #2563eb));
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-pagination-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .button[aria-current='page'] {
@@ -125,8 +126,9 @@ export const helixPaginationStyles = css`
   }
 
   .page-size-select:focus-visible {
-    outline: 2px solid var(--hx-color-focus, var(--hx-color-primary, #2563eb));
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-pagination-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* Visually hidden — used for aria-live status messages */

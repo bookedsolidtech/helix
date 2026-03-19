@@ -145,6 +145,23 @@ export class HelixBadge extends LitElement {
     return this.count > this.max ? `${this.max}+` : String(this.count);
   }
 
+  // ─── WCAG 1.4.1: Semantic variant label map ───
+  // Variants that carry semantic meaning beyond decoration need a non-color cue.
+  // Visually-hidden text is prepended so screen reader users and color-blind
+  // users get the variant context even when no icon is slotted.
+
+  private static readonly _SEMANTIC_VARIANT_LABELS: Partial<Record<HelixBadge['variant'], string>> =
+    {
+      success: 'Success',
+      warning: 'Warning',
+      error: 'Error',
+      info: 'Info',
+    };
+
+  private get _semanticVariantLabel(): string {
+    return HelixBadge._SEMANTIC_VARIANT_LABELS[this.variant] ?? '';
+  }
+
   // ─── Render ───
 
   override render() {
@@ -160,6 +177,8 @@ export class HelixBadge extends LitElement {
       'badge--dot': isDot,
     };
 
+    const variantLabel = this._semanticVariantLabel;
+
     return html`
       <span
         part="badge"
@@ -168,6 +187,9 @@ export class HelixBadge extends LitElement {
         aria-label=${isDot && this.dotLabel ? this.dotLabel : nothing}
         aria-live=${hasCount ? 'polite' : nothing}
       >
+        ${variantLabel
+          ? html`<span class="badge__variant-label">${variantLabel}: </span>`
+          : nothing}
         <slot name="prefix"></slot>
         ${hasCount ? this._countDisplay : html`<slot @slotchange=${this._handleSlotChange}></slot>`}
         ${this.removable

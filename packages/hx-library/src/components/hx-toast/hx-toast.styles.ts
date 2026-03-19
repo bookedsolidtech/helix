@@ -67,6 +67,22 @@ export const helixToastStyles = css`
     --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 
+  /* ─── Severity Label (WCAG 1.4.1) ─── */
+  /* Visually hidden — non-color cue for severity variants (success/warning/danger/info). */
+  /* Ensures variant is not conveyed by color alone for color-blind users.                */
+
+  .toast__severity-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Icon ─── */
 
   .toast__icon {
