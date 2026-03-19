@@ -210,44 +210,4 @@ export const helixStepStyles = css`
   :host([orientation='vertical']:last-child) .step__label-area {
     padding-bottom: 0;
   }
-
-  /* ─── Dark Mode ─── */
-
-  @media (prefers-color-scheme: dark) {
-    .step__indicator {
-      background-color: var(--hx-color-neutral-800);
-      border-color: var(--hx-color-neutral-600);
-      color: var(--hx-color-neutral-300);
-    }
-
-    .step__connector {
-      background-color: var(--hx-color-neutral-700);
-    }
-
-    .step__label {
-      color: var(--hx-color-neutral-300);
-    }
-
-    .step__description {
-      color: var(--hx-color-neutral-400);
-    }
-
-    :host([status='active']) .step__label {
-      color: var(--hx-color-primary-300);
-    }
-
-    :host([status='complete']) .step__label {
-      color: var(--hx-color-neutral-200);
-    }
-
-    :host([status='error']) .step__label {
-      color: var(--hx-color-error-300);
-    }
-
-    :host([disabled]) .step__indicator {
-      background-color: var(--hx-color-neutral-900);
-      border-color: var(--hx-color-neutral-700);
-      color: var(--hx-color-neutral-600);
-    }
-  }
 `;
