@@ -76,9 +76,9 @@ export class HelixProse extends LitElement {
 
   private _applyMaxWidth(): void {
     if (this.maxWidth) {
-      this.style.maxWidth = this.maxWidth;
+      this.style.setProperty('--hx-prose-max-width', this.maxWidth);
     } else {
-      this.style.maxWidth = '';
+      this.style.removeProperty('--hx-prose-max-width');
     }
   }
 

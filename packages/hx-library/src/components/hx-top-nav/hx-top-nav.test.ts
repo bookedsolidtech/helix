@@ -263,8 +263,7 @@ describe('hx-top-nav', () => {
       const btn = shadowQuery(el, '[part="mobile-toggle"]')! as HTMLButtonElement;
       btn.click();
       await el.updateComplete;
-      // Allow CSS transition/animation to complete so the mobile menu is fully visible for axe contrast checks
-      await new Promise((r) => setTimeout(r, 200));
+      await el.updateComplete;
 
       await page.screenshot();
       const { violations } = await checkA11y(el);

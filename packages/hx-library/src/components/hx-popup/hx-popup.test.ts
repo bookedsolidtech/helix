@@ -484,8 +484,7 @@ describe('hx-popup', () => {
         { once: true },
       );
       await el.reposition();
-      // Allow brief settle time for the async hx-reposition event to propagate after reposition()
-      await new Promise((r) => setTimeout(r, 10));
+      await el.updateComplete;
 
       expect(caught).toBe(true);
     });

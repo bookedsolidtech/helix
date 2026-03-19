@@ -411,4 +411,29 @@ describe('hx-rating', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects custom svg into the icon slot', async () => {
+      const el = await fixture<HelixRating>(
+        `<hx-rating value="3" label="Rating">
+          <svg slot="icon" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>
+        </hx-rating>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="icon"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect(assigned[0].tagName.toLowerCase()).toBe('svg');
+    });
+
+    it('icon slot is empty when no icon content is provided', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="3" label="Rating"></hx-rating>');
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="icon"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(0);
+    });
+  });
 });

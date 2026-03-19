@@ -589,8 +589,6 @@ describe('hx-checkbox-group', () => {
       // Wait for both the slotchange microtask and the resulting Lit update cycle.
       const checkedCb = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
       checkedCb.remove();
-      // Allow the slotchange event to fire and propagate, then wait for Lit update
-      await new Promise((r) => setTimeout(r, 0));
       await el.updateComplete;
 
       // Now required group has no checked children — should be invalid

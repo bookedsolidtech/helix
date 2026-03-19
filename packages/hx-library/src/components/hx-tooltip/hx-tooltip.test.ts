@@ -385,8 +385,6 @@ describe('hx-tooltip', () => {
       );
       const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
       wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-      // Allow microtask queue to flush so the show-delay=0 timer fires and Lit reactive updates complete
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
       await el.updateComplete;
       await page.screenshot();
       // Disable color-contrast: axe cannot compute the visual background for slotted

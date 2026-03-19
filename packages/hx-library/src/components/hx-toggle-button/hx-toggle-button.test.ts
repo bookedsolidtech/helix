@@ -265,8 +265,7 @@ describe('hx-toggle-button', () => {
         fired = true;
       });
       btn.click();
-      // Allow brief settle time to confirm no hx-toggle event fires on a disabled button
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       expect(fired).toBe(false);
     });
   });

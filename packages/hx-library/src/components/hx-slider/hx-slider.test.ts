@@ -517,8 +517,7 @@ describe('hx-slider', () => {
     it('focus() moves focus to the native range input', async () => {
       const el = await fixture<HelixSlider>('<hx-slider label="Level"></hx-slider>');
       el.focus();
-      // Allow brief settle time for focus to propagate into the shadow DOM input
-      await new Promise<void>((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]');
       expect(el.shadowRoot?.activeElement).toBe(input);
     });

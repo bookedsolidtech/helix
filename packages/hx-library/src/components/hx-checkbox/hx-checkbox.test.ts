@@ -544,8 +544,7 @@ describe('hx-checkbox', () => {
     it('focus() moves focus to input element', async () => {
       const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
       el.focus();
-      // Allow brief settle time for focus to propagate into the shadow DOM input
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);
     });
