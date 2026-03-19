@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTableStyles } from './hx-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -68,7 +68,16 @@ export class HelixTable extends LitElement {
   @property({ type: Boolean, reflect: true, attribute: 'full-width' })
   fullWidth = true;
 
+  // ─── Internal State ───
+
+  @state() private _hasCaptionSlot = false;
+
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._hasCaptionSlot = this.querySelector('[slot="caption"]') !== null;
+  }
 
   override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('label') && !this.label && changed.get('label') !== undefined) {
@@ -79,10 +88,15 @@ export class HelixTable extends LitElement {
     }
   }
 
+  private _onCaptionSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasCaptionSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   // ─── Render ───
 
   override render() {
-    const hasCaption = this.caption || this.querySelector('[slot="caption"]') !== null;
+    const hasCaption = this.caption || this._hasCaptionSlot;
 
     return html`
       <div class="table-wrapper">
@@ -90,7 +104,7 @@ export class HelixTable extends LitElement {
         <table part="table" role="table" aria-label=${this.label || nothing}>
           ${hasCaption
             ? html`<caption part="caption">
-                <slot name="caption">${this.caption}</slot>
+                <slot name="caption" @slotchange=${this._onCaptionSlotChange}>${this.caption}</slot>
               </caption>`
             : nothing}
           <slot></slot>

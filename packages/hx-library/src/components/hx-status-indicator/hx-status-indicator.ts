@@ -37,17 +37,17 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * @csspart base - The dot element.
  * @csspart pulse-ring - The animated pulse ring element.
  *
- * @cssproperty [--hx-status-indicator-color-online] - Override color for the "online" status dot.
- * @cssproperty [--hx-status-indicator-color-offline] - Override color for the "offline" status dot.
- * @cssproperty [--hx-status-indicator-color-away] - Override color for the "away" status dot.
- * @cssproperty [--hx-status-indicator-color-busy] - Override color for the "busy" status dot.
- * @cssproperty [--hx-status-indicator-color-unknown] - Override color for the "unknown" status dot.
- * @cssproperty [--hx-status-indicator-size-sm] - Override size for the "sm" variant.
- * @cssproperty [--hx-status-indicator-size-md] - Override size for the "md" variant.
- * @cssproperty [--hx-status-indicator-size-lg] - Override size for the "lg" variant.
- * @cssproperty [--hx-status-indicator-pulse-duration] - Override pulse animation duration.
- * @cssproperty [--hx-status-indicator-pulse-scale] - Override pulse animation max scale.
- * @cssproperty [--hx-status-indicator-pulse-color] - Override pulse ring color independently from dot color.
+ * @cssprop [--hx-status-indicator-color-online] - Override color for the "online" status dot.
+ * @cssprop [--hx-status-indicator-color-offline] - Override color for the "offline" status dot.
+ * @cssprop [--hx-status-indicator-color-away] - Override color for the "away" status dot.
+ * @cssprop [--hx-status-indicator-color-busy] - Override color for the "busy" status dot.
+ * @cssprop [--hx-status-indicator-color-unknown] - Override color for the "unknown" status dot.
+ * @cssprop [--hx-status-indicator-size-sm] - Override size for the "sm" variant.
+ * @cssprop [--hx-status-indicator-size-md] - Override size for the "md" variant.
+ * @cssprop [--hx-status-indicator-size-lg] - Override size for the "lg" variant.
+ * @cssprop [--hx-status-indicator-pulse-duration] - Override pulse animation duration.
+ * @cssprop [--hx-status-indicator-pulse-scale] - Override pulse animation max scale.
+ * @cssprop [--hx-status-indicator-pulse-color] - Override pulse ring color independently from dot color.
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends LitElement {
