@@ -10,13 +10,6 @@
 
   **New:** All components now export a canonical `HxFoo` type alias alongside the deprecated `WcFoo` alias. Migrate from `WcFoo` to `HxFoo` — the `Wc` prefix aliases remain available but are marked `@deprecated` and will be removed in the next major version.
 
-### Minor Changes
-
-- 208b754: add `--hx-button-hover-bg` css custom property to hx-button so consumers can override the hover background from outside the shadow DOM for all variants
-- 0a05fc1: add hx-stat and hx-counter components for stat display and animated number counting
-- 0c319c4: add hx-table semantic table component with sub-components (hx-thead, hx-tbody, hx-tfoot, hx-tr, hx-th, hx-td), sortable columns, striped/hover/compact variants, responsive mobile card layout, dark mode support, and full wcag 2.1 aa accessibility
-- d2ca3f4: feat: add CEM accessibility analyzer for extracting a11y metadata from component source
-- c53f347: expose hardcoded english strings as i18n-overridable properties on hx-pagination, hx-code-snippet, hx-carousel, hx-combobox, hx-file-upload, and hx-copy-button
 - 4240250: fix: correct boolean property defaults for hx-alert and hx-code-snippet
 
   HTML boolean attributes follow presence=true, absence=false semantics. Properties that defaulted to `true` were impossible to set to `false` via HTML attributes — `open="false"` still evaluates to truthy because the attribute is present.
@@ -26,6 +19,13 @@
   - `hx-alert`: `showIcon` now defaults to `false`. Use `<hx-alert show-icon>` to display the icon.
   - `hx-code-snippet`: `copyable` now defaults to `false`. Use `<hx-code-snippet copyable>` to enable the copy button.
 
+### Minor Changes
+
+- 208b754: add `--hx-button-hover-bg` css custom property to hx-button so consumers can override the hover background from outside the shadow DOM for all variants
+- 0a05fc1: add hx-stat and hx-counter components for stat display and animated number counting
+- 0c319c4: add hx-table semantic table component with sub-components (hx-thead, hx-tbody, hx-tfoot, hx-tr, hx-th, hx-td), sortable columns, striped/hover/compact variants, responsive mobile card layout, dark mode support, and full wcag 2.1 aa accessibility
+- d2ca3f4: feat: add CEM accessibility analyzer for extracting a11y metadata from component source
+- c53f347: expose hardcoded english strings as i18n-overridable properties on hx-pagination, hx-code-snippet, hx-carousel, hx-combobox, hx-file-upload, and hx-copy-button
 - e67e50e: add `full` boolean attribute to hx-button that stretches the button to fill its container width
 - b557bff: add hx-banner component for full-width page-level notifications with sticky/fixed positioning, variants, dismiss behavior, and action button support
 - 1c3025f: add `inverted` boolean attribute to `hx-button` for dark/gradient background support. forces text to white and adjusts hover/focus ring colors across all variants.
