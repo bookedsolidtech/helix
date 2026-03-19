@@ -1,0 +1,246 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "sonnet",
+  "summary": {
+    "componentsAudited": 9,
+    "totalFindings": 22,
+    "critical": 1,
+    "high": 7,
+    "medium": 9,
+    "low": 5
+  },
+  "findings": [
+    {
+      "component": "hx-button",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Missing aria-disabled on disabled anchor (href mode)",
+      "description": "When hx-button renders as an <a> element (href mode) and disabled=true, it correctly sets aria-disabled='true'. However, the native <button> branch intentionally omits aria-disabled in favor of the native disabled attribute. This is correct behavior for the button branch, but the anchor branch does correctly include aria-disabled. The issue is that the loading state on the anchor branch does NOT set aria-disabled even though the link is functionally non-interactive (href is removed). Screen readers will still announce the anchor as a link without indicating the loading/interactive-prevention state.",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.ts",
+      "line": 246,
+      "fix": "Add aria-disabled='true' to the anchor element when this.loading is true, in addition to when this.disabled is true: aria-disabled=${this.disabled || this.loading ? 'true' : nothing}"
+    },
+    {
+      "component": "hx-button",
+      "severity": "low",
+      "wcagCriteria": "1.4.3",
+      "title": "sm size variant has min-height of 2rem (32px) — below 44px touch target",
+      "description": "The button--sm variant sets min-height to var(--hx-size-8, 2rem) which resolves to 32px. WCAG 2.5.5 (AAA) recommends 44x44px, and WCAG 2.5.8 (AA, WCAG 2.2) requires a 24x24px minimum target size. At 32px the height passes the 24px floor but falls short of the recommended 44px. In a healthcare context where motor precision may be impaired, the sm variant presents a usability risk on touch interfaces.",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.styles.ts",
+      "line": 68,
+      "fix": "Document the touch-target limitation in the component's JSDoc and Storybook story. For touch-primary clinical workflows, encourage consumers to use md or lg size. Alternatively add a minimum touch-target wrapper or consider raising hx-size-8 to at least 2.75rem (44px)."
+    },
+    {
+      "component": "hx-button",
+      "severity": "medium",
+      "wcagCriteria": "1.4.3",
+      "title": "Inverted ghost variant focus ring uses semi-transparent white — potential contrast failure",
+      "description": "The inverted focus ring color is rgba(255,255,255,0.5), a 50% opacity white. Against a dark gradient background this may achieve sufficient contrast, but against a mid-tone background the effective contrast of a semi-transparent ring can fall below the 3:1 non-text contrast ratio required by WCAG 1.4.11. The value is hardcoded in the stylesheet rather than relying on a tested token.",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.styles.ts",
+      "line": 197,
+      "fix": "Replace rgba(255,255,255,0.5) with a fully-opaque token such as var(--hx-color-neutral-0, #ffffff) or a design-system-vetted semi-transparent value that guarantees 3:1 contrast against expected background colors. Document the supported background range in the component JSDoc."
+    },
+    {
+      "component": "hx-button-group",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "label property is not required but unlabelled group is an ARIA violation",
+      "description": "hx-button-group uses role='group' (set via ElementInternals). The ARIA spec requires that every group have an accessible name. The label property is listed as 'strongly recommended' in the JSDoc but is not enforced at runtime — the component renders a nameless group when label is omitted and no aria-label or aria-labelledby is present on the host. Axe-core will flag this as a violation of rule 'group-name' in most configurations.",
+      "file": "packages/hx-library/src/components/hx-button-group/hx-button-group.ts",
+      "line": 72,
+      "fix": "Upgrade the console warning to fire when neither label, aria-label, nor aria-labelledby is present on the host element. Consider making label required in TypeScript (label!: string) and adding a runtime devWarn call matching the pattern used in hx-icon-button."
+    },
+    {
+      "component": "hx-button-group",
+      "severity": "low",
+      "wcagCriteria": "2.4.7",
+      "title": "Focus ring on slotted buttons may be clipped by negative margin border-collapse technique",
+      "description": "The group uses negative margins (margin-left: -1px, margin-top: -1px) to collapse adjacent button borders. The z-index elevation on :focus-within partially mitigates this for the focused button, but the focus ring on adjacent buttons may still appear visually clipped depending on outline-offset and browser rendering. The z-index: 1 on ::slotted(:focus-within) elevates the shadow host but the outline renders on the inner button element inside the shadow root, which may not be elevated correctly in all browsers.",
+      "file": "packages/hx-library/src/components/hx-button-group/hx-button-group.styles.ts",
+      "line": 90,
+      "fix": "Test with VoiceOver + Safari and NVDA + Chrome. If outline clipping is observed, consider using outline-offset: 0 on grouped buttons, or switch to a box-shadow-based focus ring which respects stacking context more reliably across shadow boundaries."
+    },
+    {
+      "component": "hx-icon-button",
+      "severity": "low",
+      "wcagCriteria": "1.4.11",
+      "title": "sm size variant is 32px — below 44px recommended touch target",
+      "description": "button--sm sets width and height to var(--hx-size-8) which defaults to 2rem (32px). For an icon-only button this is a meaningful usability concern, especially in clinical settings. The component JSDoc does not document this limitation.",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.styles.ts",
+      "line": 47,
+      "fix": "Add a @note to the component JSDoc advising consumers that hx-size='sm' produces a 32px target. Encourage use of md (40px) or lg (48px) on touch-primary surfaces. Alternatively raise the hx-size-8 token to 2.75rem."
+    },
+    {
+      "component": "hx-split-button",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Primary button aria-label falls back to nothing when label prop and ariaLabel are both unset — accessible name may be empty",
+      "description": "The primary button renders aria-label=${this.ariaLabel ?? this.label ?? nothing}. When the consumer uses only slot content (no label prop, no aria-label attribute), the aria-label is omitted entirely. This is correct — slot text provides the accessible name from inside shadow DOM. However, ariaLabel is inherited from LitElement as override ariaLabel: string | null = null, and accessing this.ariaLabel will return the value reflected from the aria-label attribute on the host. If a consumer sets aria-label on the host, it is forwarded to the inner button. If they do not, the inner button relies on its slot content for its accessible name, which is the correct fallback. This is working as designed. The actual risk is when label is set but to an empty string — then aria-label='' is rendered, which overrides the slot-derived name with an empty string, creating an unlabelled button.",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.ts",
+      "line": 345,
+      "fix": "Guard against empty-string label: aria-label=${(this.ariaLabel || this.label) ? (this.ariaLabel ?? this.label) : nothing}. This ensures an empty string label does not produce aria-label='' which would erase the accessible name."
+    },
+    {
+      "component": "hx-split-button",
+      "severity": "high",
+      "wcagCriteria": "2.1.1",
+      "title": "Menu panel is always present in the DOM but hidden via display:none — inert content is not removed from tab order",
+      "description": "The split button menu panel is rendered with display:none when closed (via the split-button__menu class without split-button__menu--open). Content with display:none is excluded from tab order in browsers, so slotted hx-menu-item elements inside the closed menu panel cannot be directly focused. However, the menu panel itself is always in the DOM and always has role='menu'. Assistive technologies that traverse the DOM independently of display state (some modes of JAWS virtual cursor, some configurations of VoiceOver reading mode) may encounter the hidden role='menu' element and announce it incorrectly.",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.ts",
+      "line": 384,
+      "fix": "Add hidden attribute to the menu panel when closed: ?hidden=${!this._open}. The hidden attribute combined with display:none provides a belt-and-suspenders approach that removes the element from the accessibility tree when closed. Alternatively add inert attribute to the panel when _open is false."
+    },
+    {
+      "component": "hx-split-button",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "Chevron rotation animation not suppressed for prefers-reduced-motion in all cases",
+      "description": "The prefers-reduced-motion block in the styles disables transitions on split-button__primary, split-button__trigger, and split-button__chevron. The chevron rotation (transform: rotate(180deg) on split-button__chevron--open) is a CSS class-toggle, not a transition, so it would be instantaneous regardless. The transition: none on the chevron correctly removes the transition animation. This is implemented correctly. However, the menu open animation (hx-split-button-menu-open keyframe) is suppressed with animation: none on split-button__menu--open. This is correct. No finding here — documented as a verification pass.",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.styles.ts",
+      "line": 295,
+      "fix": "No change required. The reduced-motion implementation is complete and correct."
+    },
+    {
+      "component": "hx-toggle-button",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-pressed always rendered as string 'true' or 'false' — never omitted — even when button has no clear toggle semantics",
+      "description": "aria-pressed=${this.pressed ? 'true' : 'false'} is always rendered on the button. This is correct ARIA for a toggle button. However, the component does not enforce that a visible label or aria-label exists when aria-pressed is present. A button with aria-pressed but no accessible name violates WCAG 4.1.2. The firstUpdated warning is a development hint only and does not block rendering. In production builds where console.warn is suppressed, a nameless toggle button will silently ship.",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.ts",
+      "line": 221,
+      "fix": "The devWarn approach is appropriate for development. To harden this for production, consider setting this._internals.ariaLabel to a default value or emitting a more prominent warning. Document in Storybook that aria-label is required when no slot text is present."
+    },
+    {
+      "component": "hx-toggle-button",
+      "severity": "low",
+      "wcagCriteria": "1.4.11",
+      "title": "Tertiary pressed state uses box-shadow for non-text contrast signal — may be insufficient in Windows High Contrast Mode",
+      "description": "The tertiary pressed state adds box-shadow: inset 0 0 0 1px var(--hx-color-primary-400) as an additional visual indicator. In Windows High Contrast Mode, box-shadow is suppressed, leaving only the color change as the pressed state indicator. If the background color change is also suppressed (as forced colors may alter both the background and the border colors), the pressed state may become visually indistinct.",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.styles.ts",
+      "line": 157,
+      "fix": "Add a @media (forced-colors: active) block that sets border: 2px solid ButtonText on .button--pressed to ensure the pressed state is visible in High Contrast Mode independent of color or box-shadow."
+    },
+    {
+      "component": "hx-copy-button",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-live announcement region is always present in DOM but conditionally populated — potential double-announcement",
+      "description": "The aria-live region renders ${this._announcement || nothing} inside a <span aria-live='polite' aria-atomic='true'>. When _announcement is empty the span exists in the DOM but is empty. When _announcement is set, the text is inserted. This is the correct pattern. However, when the copy fails, _announcement is set to 'Copy failed' and the hx-copy-error event is dispatched, but there is no timeout to clear the 'Copy failed' announcement. The announcement persists in the live region indefinitely until a successful copy occurs. Screen reader users who re-focus the button and trigger another copy will hear 'Copy failed' announced again even if the state has not changed.",
+      "file": "packages/hx-library/src/components/hx-copy-button/hx-copy-button.ts",
+      "line": 175,
+      "fix": "Add a timeout to clear the error announcement: setTimeout(() => { this._announcement = ''; }, this._effectiveDuration()). This mirrors the success-state clearing behavior and prevents stale 'Copy failed' announcements."
+    },
+    {
+      "component": "hx-copy-button",
+      "severity": "medium",
+      "wcagCriteria": "1.4.1",
+      "title": "Success state uses color alone as primary state change indicator before icon slot is populated",
+      "description": "The .button--copied class changes color to --hx-color-success-text and adds a border-color change. If the consumer does not provide a success-icon slot, only the color change and border distinguish the copied state from the idle state. The comment in the CSS correctly identifies the need for a non-color indicator (border-color change on .button--copied). However, if the default copy-icon slot is also empty (no icon provided), the button has no visible content change at all — only a color-and-border shift. In this degenerate case, the state change fails WCAG 1.4.1.",
+      "file": "packages/hx-library/src/components/hx-copy-button/hx-copy-button.styles.ts",
+      "line": 76,
+      "fix": "The component should render a default copy icon and success icon (SVG inline fallbacks) when the slots are empty, similar to how hx-icon-button embeds icons. This ensures the state change is always conveyed by more than color alone."
+    },
+    {
+      "component": "hx-link",
+      "severity": "critical",
+      "wcagCriteria": "2.1.1",
+      "title": "Disabled link rendered as span with role='link' responds to click events but does not respond to Enter key",
+      "description": "When disabled=true, hx-link renders a <span role='link' tabindex='0' aria-disabled='true'>. A span with role='link' must be keyboard-operable: it must respond to the Enter key to activate (per ARIA authoring practices). The _handleClick handler is bound to @click, which browsers do NOT synthesize for Space or Enter on a span — only on native interactive elements. A keyboard user navigating to this disabled link with Tab and pressing Enter will receive no response (not even the event-blocked no-op that a click would produce). This is a full keyboard accessibility failure for the disabled link state.",
+      "file": "packages/hx-library/src/components/hx-link/hx-link.ts",
+      "line": 157,
+      "fix": "Add a @keydown handler to the disabled span that intercepts Enter (and optionally Space) and calls e.preventDefault(). Since the link is disabled, the handler should not activate anything — but the preventDefault prevents the browser's default Space scroll behavior. Example: @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') e.preventDefault(); }}. Alternatively, consider rendering the disabled state as a native <a> without an href (which browsers already handle for focus and Enter suppression) plus aria-disabled='true'."
+    },
+    {
+      "component": "hx-link",
+      "severity": "medium",
+      "wcagCriteria": "1.4.3",
+      "title": "Subtle variant uses neutral-600 color — contrast ratio may fail against light backgrounds",
+      "description": "The subtle variant sets color to var(--hx-link-color-subtle, var(--hx-color-neutral-600, #475569)). The hex value #475569 against a white (#ffffff) background has a contrast ratio of approximately 5.74:1, which passes WCAG 1.4.3 (4.5:1 minimum). However, the subtle variant has no underline in its resting state (text-decoration: none), removing the secondary non-color indicator required when text links blend with surrounding text. Without underline, WCAG 1.4.1 (Use of Color) requires that links be distinguishable from non-link text by more than color. The hover state adds underline, but the resting state does not.",
+      "file": "packages/hx-library/src/components/hx-link/hx-link.styles.ts",
+      "line": 50,
+      "fix": "Either add text-decoration: underline to .link--subtle in its resting state, or ensure that surrounding non-link text uses a color with sufficient contrast differential from #475569 so that links are distinguishable by color alone. The safest fix is to add underline by default."
+    },
+    {
+      "component": "hx-link",
+      "severity": "high",
+      "wcagCriteria": "2.4.7",
+      "title": "Base link styles set outline: 0 which must be overridden by focus-visible — risk of outline suppression in browsers that do not support :focus-visible",
+      "description": "The .link rule sets outline: 0 unconditionally, then .link:focus-visible restores the outline. In browsers without :focus-visible support (legacy browsers still used in some healthcare enterprise environments), the focus ring will be completely suppressed for keyboard users. The :focus-visible selector has broad modern browser support, but in healthcare contexts with older browser requirements this creates a regression risk.",
+      "file": "packages/hx-library/src/components/hx-link/hx-link.styles.ts",
+      "line": 25,
+      "fix": "Replace outline: 0 with outline: none and add a :focus (not :focus-visible) fallback that provides a visible outline, then use :focus-visible to apply the styled ring. Or add a :focus-visible polyfill if IE11/legacy support is required. At minimum document the minimum browser requirement."
+    },
+    {
+      "component": "hx-overflow-menu",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Panel ID uses Math.random() — not SSR-safe and may cause aria-controls mismatch on hydration",
+      "description": "The panel ID is generated as `hx-overflow-menu-panel-${Math.random().toString(36).slice(2, 9)}`. Math.random() produces different values on server and client, causing the aria-controls attribute on the trigger to reference a non-existent ID after client-side hydration. This breaks the programmatic relationship between the trigger button and the menu panel for screen readers that use aria-controls traversal. Note: hx-split-button correctly uses a module-level counter for stable IDs.",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.ts",
+      "line": 111,
+      "fix": "Replace Math.random() with a module-level counter identical to the pattern in hx-split-button: let _counter = 0; ... private readonly _panelId = `hx-overflow-menu-panel-${++_counter}`;. This produces stable, sequential IDs that match between SSR and client hydration."
+    },
+    {
+      "component": "hx-overflow-menu",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-controls on trigger is removed when panel is closed — AT loses programmatic relationship",
+      "description": "The trigger renders aria-controls=${this._open ? this._panelId : nothing}. When the panel is closed, aria-controls is omitted. The ARIA spec for button with aria-haspopup='menu' does not require aria-controls to be present at all times, but it is a best practice to keep aria-controls pointing to the panel's ID regardless of open state. Removing aria-controls when closed means screen readers cannot use the attribute to find the controlled element when it is closed, which prevents AT from announcing 'has popup, controls [menu name]'.",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.ts",
+      "line": 313,
+      "fix": "Render aria-controls unconditionally when the panel is open or the panel ID is known. Since the panel is conditionally rendered with ${this._open ? html`...` : nothing}, the panel element does not exist in the DOM when closed. A persistent aria-controls pointing to a non-existent element would cause an aria-controls validation error. The root fix is to always render the panel in the DOM (using hidden or inert) so aria-controls can always be set. Alternatively, document this as a known limitation of the conditional-render approach."
+    },
+    {
+      "component": "hx-overflow-menu",
+      "severity": "high",
+      "wcagCriteria": "2.1.1",
+      "title": "hx-overflow-menu does not include type-ahead keyboard navigation for slotted menu items",
+      "description": "The hx-menu component implements full type-ahead search (single and multi-character buffered matching against item text content). The hx-overflow-menu component's _handleKeydown handles ArrowDown, ArrowUp, Home, End, Escape, and Tab but has no type-ahead implementation. Users of hx-overflow-menu who prefer keyboard navigation via character matching cannot use this pattern — it is only available via hx-menu. This creates an inconsistency across the menu family and fails WCAG 2.1.1 relative to the expected menu keyboard contract (APG Menu Pattern specifies type-ahead as a MUST for menuitem navigation).",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.ts",
+      "line": 211,
+      "fix": "Add type-ahead support to _handleKeydown in hx-overflow-menu, matching the implementation in hx-menu._handleTypeahead(). The implementation should buffer characters, match against the textContent of slotted menu items, and focus the first matching item."
+    },
+    {
+      "component": "hx-menu",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-menu without a label renders role='menu' with no accessible name — axe rule 'aria-menu-name'",
+      "description": "When the label property is empty (the default), the menu renders role='menu' with no aria-label and no aria-labelledby. The ARIA spec does not strictly require an accessible name for role='menu', but axe-core's aria-menu-name rule (enabled in some configurations) flags unlabelled menus as a best-practice violation. More critically, screen readers reading out the menu structure will simply say 'menu' without context, which is uninformative in healthcare apps where multiple menus may be present on the same page.",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu.ts",
+      "line": 205,
+      "fix": "Encourage consumers to always supply a label. Add a devWarn call when label is empty (similar to the slot-change warning for invalid children). In Storybook, mark the label control as required and provide a default value in all example stories."
+    },
+    {
+      "component": "hx-menu-item",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-haspopup='true' used for submenu indicator — should be 'menu' for specificity",
+      "description": "When _hasSubmenu is true, the menu item renders aria-haspopup='true'. The ARIA spec allows the boolean 'true' as an alias for 'menu' in the context of aria-haspopup. However, best practice and the APG recommend using the specific token 'menu' rather than the generic 'true' so that AT can announce 'has submenu' with the correct semantic. JAWS and NVDA handle 'true' correctly, but some mobile screen readers (TalkBack) may not distinguish 'true' from the specific role tokens.",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu-item.ts",
+      "line": 233,
+      "fix": "Change aria-haspopup=${this._hasSubmenu ? 'true' : nothing} to aria-haspopup=${this._hasSubmenu ? 'menu' : nothing}. This is a one-character change that improves AT compatibility without any behavioral impact."
+    },
+    {
+      "component": "hx-menu-item",
+      "severity": "low",
+      "wcagCriteria": "1.4.11",
+      "title": "Menu item focus ring has outline-offset: 0px — focus ring may not be visually distinct from item background",
+      "description": "The .menu-item:focus-visible rule sets outline-offset: 0px so the focus ring sits flush against the item boundary. At 2px width this is adequate for contrast purposes, but the flush offset means the ring is rendered inside the item's border-radius, which may make it visually merge with the item background at the corner curves. Items with hover/focus background color var(--hx-color-neutral-100) will show the ring against a slightly off-white surface, which may have insufficient contrast if the ring color is close to the surface color.",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu-item.styles.ts",
+      "line": 39,
+      "fix": "Consider setting outline-offset: 2px to give the focus ring breathing room and ensure it is visually distinct from the item surface. Test in high-contrast mode to verify the ring is visible in all color schemes."
+    },
+    {
+      "component": "hx-menu-item",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-menu-item outside of hx-menu has no accessible name for the menu context — orphaned menuitem",
+      "description": "hx-menu-item renders role='menuitem' (or menuitemcheckbox/menuitemradio) regardless of whether it is inside a role='menu' or role='menubar' container. ARIA requires that menuitem roles exist within a menu or menubar owner. When hx-menu-item is placed directly in an hx-split-button's menu slot without being wrapped in hx-menu, the slot content is rendered inside a div[role='menu'] within the split button shadow root, so this is handled. However, the component itself offers no guard or warning against standalone use (e.g., an hx-menu-item placed directly in a form or div), which would create an invalid ARIA tree.",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu-item.ts",
+      "line": 217,
+      "fix": "In connectedCallback, check that the nearest ancestor with role='menu', role='menubar', or tag 'hx-menu' or 'hx-split-button' exists. If not, emit a devWarn indicating that hx-menu-item must be used inside a menu context. This mirrors the pattern used by hx-menu's slot-change validator."
+    }
+  ]
+}
