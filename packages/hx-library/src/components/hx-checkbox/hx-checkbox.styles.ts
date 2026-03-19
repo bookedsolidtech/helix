@@ -27,6 +27,8 @@ export const helixCheckboxStyles = css`
     display: inline-flex;
     align-items: flex-start;
     gap: var(--hx-space-2, 0.5rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44px touch target height */
+    min-height: var(--hx-touch-target-min, 2.75rem);
     cursor: pointer;
   }
 

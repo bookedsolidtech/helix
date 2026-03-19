@@ -125,9 +125,9 @@ export const helixTagStyles = css`
     justify-content: center;
     background: none;
     border: none;
-    /* WCAG 2.5.8 (Level AA): minimum 24×24 CSS pixel touch target */
-    min-width: 24px;
-    min-height: 24px;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
     margin-inline-start: var(--hx-space-1, 0.25rem);
     cursor: pointer;

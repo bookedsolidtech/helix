@@ -42,10 +42,16 @@ export const helixIconButtonStyles = css`
 
   /* ─── Size Variants ─── */
 
+  /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target for all sizes.
+     min-width/min-height override the explicit size tokens when they fall below
+     the 2.75rem (44px) threshold, preserving the visual icon size via font-size. */
+
   .button--sm {
     padding: var(--hx-space-1);
     width: var(--hx-icon-button-size, var(--hx-size-8));
     height: var(--hx-icon-button-size, var(--hx-size-8));
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-sm);
   }
 
@@ -53,6 +59,8 @@ export const helixIconButtonStyles = css`
     padding: var(--hx-space-2);
     width: var(--hx-icon-button-size, var(--hx-size-10));
     height: var(--hx-icon-button-size, var(--hx-size-10));
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-md);
   }
 
@@ -60,6 +68,8 @@ export const helixIconButtonStyles = css`
     padding: var(--hx-space-3);
     width: var(--hx-icon-button-size, var(--hx-size-12));
     height: var(--hx-icon-button-size, var(--hx-size-12));
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-lg);
   }
 
