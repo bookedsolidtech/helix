@@ -327,7 +327,9 @@ describe('hx-popover', () => {
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.classList.contains('visible')).toBe(true);
 
-      await el.updateComplete;
+      // The document click listener is registered via setTimeout(0) in _show(),
+      // so we must wait for the macrotask to fire before dispatching outside click.
+      await new Promise((r) => setTimeout(r, 0));
 
       // Simulate click on an unrelated element outside the component
       document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));

@@ -206,10 +206,12 @@ export const helixFileUploadStyles = css`
 
   .progress-bar {
     height: 100%;
+    width: 100%;
     background-color: var(--hx-file-upload-progress-color, var(--hx-color-primary-500, #2563eb));
     border-radius: inherit;
-    transition: width var(--hx-transition-fast, 150ms ease);
-    width: 0%;
+    transform-origin: left center;
+    transform: scaleX(var(--_progress-ratio, 0));
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
   @media (prefers-reduced-motion: reduce) {

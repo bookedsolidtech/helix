@@ -469,6 +469,9 @@ describe('hx-dialog', () => {
 
       el.showModal();
       await el.updateComplete;
+      // Focus is set via void this.updateComplete.then(...) inside _openDialog,
+      // so we need a second await to let that microtask resolve.
+      await el.updateComplete;
 
       const firstFocusable = el.querySelector('#first-focusable') as HTMLElement;
       expect(document.activeElement).toBe(firstFocusable);

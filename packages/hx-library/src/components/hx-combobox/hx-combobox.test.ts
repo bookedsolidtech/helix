@@ -493,6 +493,26 @@ describe('hx-combobox', () => {
 
   // ─── Form Integration (5) ───
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits value in FormData when value is set', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-combobox name="fruit" value="banana">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+        </hx-combobox>
+      `;
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-combobox') as HxCombobox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('fruit')).toBe('banana');
+      form.remove();
+    });
+  });
+
   describe('Form', () => {
     it('has ElementInternals attached', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox></hx-combobox>');
@@ -854,7 +874,7 @@ describe('hx-combobox', () => {
 
     it('projects content into the help-text slot', async () => {
       const el = await fixture<HxCombobox>(
-        `<hx-combobox label="Fruit"><span slot="help-text">Type to search</span></hx-combobox>`,
+        `<hx-combobox label="Fruit" help-text=" "><span slot="help-text">Type to search</span></hx-combobox>`,
       );
       await el.updateComplete;
       const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;

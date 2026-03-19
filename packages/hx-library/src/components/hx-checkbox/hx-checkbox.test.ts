@@ -377,6 +377,32 @@ describe('hx-checkbox', () => {
     });
   });
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits value in FormData when checked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-checkbox name="terms" value="accepted" checked></hx-checkbox>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('terms')).toBe('accepted');
+      form.remove();
+    });
+
+    it('does not submit value in FormData when unchecked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-checkbox name="terms" value="accepted"></hx-checkbox>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('terms')).toBeNull();
+      form.remove();
+    });
+  });
+
   // ─── Form (5) ───
 
   describe('Form', () => {

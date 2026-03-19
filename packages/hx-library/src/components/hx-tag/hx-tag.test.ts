@@ -352,6 +352,9 @@ describe('hx-tag', () => {
       icon.slot = 'prefix';
       icon.textContent = '★';
       el.appendChild(icon);
+      // slotchange fires asynchronously after DOM mutation; wait for it
+      // to set _hasPrefix state, then wait for the re-render.
+      await el.updateComplete;
       await el.updateComplete;
       expect(prefix.classList.contains('tag__prefix--hidden')).toBe(false);
     });
@@ -365,6 +368,9 @@ describe('hx-tag', () => {
       badge.slot = 'suffix';
       badge.textContent = '5';
       el.appendChild(badge);
+      // slotchange fires asynchronously after DOM mutation; wait for it
+      // to set _hasSuffix state, then wait for the re-render.
+      await el.updateComplete;
       await el.updateComplete;
       expect(suffix.classList.contains('tag__suffix--hidden')).toBe(false);
     });

@@ -374,4 +374,24 @@ describe('hx-button-group', () => {
       expect(typeof mod.HelixButtonGroup).toBe('function');
     });
   });
+
+  // ─── Form Association ───
+  // hx-button-group is a layout container (role="group") that groups hx-button
+  // children. It uses ElementInternals for ARIA management only (role + ariaLabel).
+  // It does NOT set formAssociated = true and does not submit form values.
+  // Therefore FormData submission, formResetCallback, and formStateRestoreCallback
+  // are not applicable and are intentionally not tested here.
+  //
+  // Individual hx-button children inside the group handle their own form
+  // association (type="submit", type="reset", name, value).
+
+  describe('Form Association', () => {
+    it('does not have formAssociated set to true (container only)', () => {
+      const ctor = customElements.get('hx-button-group') as unknown as {
+        formAssociated?: boolean;
+      };
+      // hx-button-group uses ElementInternals for ARIA only, not form submission
+      expect(ctor.formAssociated).toBeFalsy();
+    });
+  });
 });

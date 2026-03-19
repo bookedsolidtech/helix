@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import type { NavItem } from './hx-nav.js';
 import './hx-nav.js';
 
@@ -102,6 +103,20 @@ export const Default: Story = {
   render: (args) => html`
     <hx-nav orientation=${args.orientation} label=${args.label} .items=${args.items}></hx-nav>
   `,
+  play: async ({ canvasElement }) => {
+    const nav = canvasElement.querySelector('hx-nav');
+    await expect(nav).toBeTruthy();
+    await expect(nav!.shadowRoot).toBeTruthy();
+
+    // Verify the nav landmark renders with the correct accessible label
+    const navEl = nav!.shadowRoot!.querySelector('[part="nav"]');
+    await expect(navEl).toBeTruthy();
+    await expect(navEl!.getAttribute('aria-label')).toBe('Main navigation');
+
+    // Verify nav items are rendered
+    const items = nav!.shadowRoot!.querySelectorAll('[part="item"]');
+    await expect(items.length).toBe(sampleItems.length);
+  },
 };
 
 /**
@@ -219,4 +234,58 @@ export const CustomTheme: Story = {
       "
     ></hx-nav>
   `,
+};
+
+/**
+ * Demonstrates the `hx-nav-select` event dispatched when a navigation item is activated.
+ * The event detail contains the selected `NavItem` object.
+ * Consuming applications use this to handle client-side routing without full page reloads.
+ */
+export const NavSelectEventDemo: Story = {
+  name: 'Events: hx-nav-select',
+  args: {
+    orientation: 'horizontal',
+    label: 'Main navigation',
+    items: sampleItems,
+  },
+  render: (args) => html`
+    <div>
+      <hx-nav
+        id="event-nav"
+        orientation=${args.orientation}
+        label=${args.label}
+        .items=${args.items}
+      ></hx-nav>
+      <p
+        id="nav-event-output"
+        style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; font-family: sans-serif;"
+      >
+        Click a navigation item to see the hx-nav-select event fire.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const nav = canvasElement.querySelector('hx-nav');
+    await expect(nav).toBeTruthy();
+
+    let eventFired = false;
+    let selectedItem: NavItem | null = null;
+
+    nav!.addEventListener('hx-nav-select', (e: Event) => {
+      eventFired = true;
+      selectedItem = (e as CustomEvent<{ item: NavItem }>).detail.item;
+    });
+
+    // Click the first nav link (Patients — no children, so fires hx-nav-select)
+    const links = nav!.shadowRoot!.querySelectorAll<HTMLElement>('[part="link"]');
+    // sampleItems[1] is "Patients" — a simple link with no children
+    const patientsLink = links[1];
+    await expect(patientsLink).toBeTruthy();
+
+    await userEvent.click(patientsLink!);
+
+    await expect(eventFired).toBe(true);
+    await expect(selectedItem).toBeTruthy();
+    await expect((selectedItem as NavItem).label).toBe('Patients');
+  },
 };

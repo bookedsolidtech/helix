@@ -514,6 +514,38 @@ describe('hx-button', () => {
     });
   });
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('value appears in FormData when type=submit with name and value set', async () => {
+      const form = document.createElement('form');
+      form.innerHTML =
+        '<hx-button type="submit" name="action" value="confirm">Submit</hx-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-button') as HelixButton;
+      await el.updateComplete;
+
+      let submitted = false;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitted = true;
+      });
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.click();
+      await el.updateComplete;
+      expect(submitted).toBe(true);
+      form.remove();
+    });
+
+    it('does not have formResetCallback (no internal value state to restore)', () => {
+      // hx-button triggers form reset via type="reset" + form.reset() — it does not
+      // implement formResetCallback because it holds no stateful input value.
+      const ctor = customElements.get('hx-button') as { prototype: Record<string, unknown> };
+      expect(typeof ctor.prototype['formResetCallback']).toBe('undefined');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
