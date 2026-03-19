@@ -39,12 +39,18 @@ export class HelixForm extends LitElement {
 
   // ─── Adopted Stylesheets ───
 
-  /** @internal */
+  /**
+   * Controller that injects scoped CSS into the document via adopted stylesheets for Light DOM styling.
+   * @internal
+   */
   private _styles = new AdoptedStylesheetsController(this, helixFormScopedCss, document);
 
   // ─── Internal State ───
 
-  /** @internal */
+  /**
+   * Current list of validation errors rendered in the error summary and used to set aria-invalid on fields.
+   * @internal
+   */
   @state()
   private _validationErrors: Array<{ name: string; message: string }> = [];
 
@@ -299,7 +305,10 @@ export class HelixForm extends LitElement {
 
   // ─── Event Handling ───
 
-  /** @internal */
+  /**
+   * Handles native form submit events, intercepting for client-side validation and hx-submit dispatch.
+   * @internal
+   */
   private _handleSubmit = (e: Event): void => {
     // If there is an action, let native form submission happen
     if (this.action) {
@@ -356,7 +365,10 @@ export class HelixForm extends LitElement {
     );
   };
 
-  /** @internal */
+  /**
+   * Handles native form reset events, clearing validation errors and dispatching hx-reset.
+   * @internal
+   */
   private _handleReset = (): void => {
     this._validationErrors = [];
     this._clearAriaInvalid();
@@ -373,7 +385,10 @@ export class HelixForm extends LitElement {
     );
   };
 
-  /** @internal */
+  /**
+   * Collects constraint validation errors from all validatable elements after a failed submit attempt.
+   * @internal
+   */
   private _collectValidationErrors(): Array<{ name: string; message: string }> {
     const errors: Array<{ name: string; message: string }> = [];
     const elements = this._getAllValidatableElements();

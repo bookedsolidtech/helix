@@ -27,7 +27,10 @@ import { devWarn } from '../../utils/dev-warn.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
-  /** @internal */
+  /**
+   * ElementInternals instance for ARIA role and label management via the Accessibility Object Model.
+   * @internal
+   */
   private internals: ElementInternals;
 
   /**
@@ -45,7 +48,10 @@ export class HelixButtonGroup extends LitElement {
     }
     this._orientation = value as 'horizontal' | 'vertical';
   }
-  /** @internal */
+  /**
+   * Backing store for the orientation property, holding the validated orientation value.
+   * @internal
+   */
   private _orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**

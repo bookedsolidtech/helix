@@ -1,5 +1,93 @@
 # @helixui/library
 
+## 1.0.0
+
+### Major Changes
+
+- 8d6a3a9: Unify `help-text` slot naming and standardize `HxFoo` type alias exports.
+
+  **BREAKING:** The `help` slot in `hx-checkbox-group`, `hx-field`, `hx-time-picker`, and `hx-date-picker` has been renamed to `help-text` to match all other components. Update usages from `slot="help"` to `slot="help-text"`.
+
+  **New:** All components now export a canonical `HxFoo` type alias alongside the deprecated `WcFoo` alias. Migrate from `WcFoo` to `HxFoo` — the `Wc` prefix aliases remain available but are marked `@deprecated` and will be removed in the next major version.
+
+### Minor Changes
+
+- 208b754: add `--hx-button-hover-bg` css custom property to hx-button so consumers can override the hover background from outside the shadow DOM for all variants
+- 0a05fc1: add hx-stat and hx-counter components for stat display and animated number counting
+- 0c319c4: add hx-table semantic table component with sub-components (hx-thead, hx-tbody, hx-tfoot, hx-tr, hx-th, hx-td), sortable columns, striped/hover/compact variants, responsive mobile card layout, dark mode support, and full wcag 2.1 aa accessibility
+- d2ca3f4: feat: add CEM accessibility analyzer for extracting a11y metadata from component source
+- c53f347: expose hardcoded english strings as i18n-overridable properties on hx-pagination, hx-code-snippet, hx-carousel, hx-combobox, hx-file-upload, and hx-copy-button
+- 4240250: fix: correct boolean property defaults for hx-alert and hx-code-snippet
+
+  HTML boolean attributes follow presence=true, absence=false semantics. Properties that defaulted to `true` were impossible to set to `false` via HTML attributes — `open="false"` still evaluates to truthy because the attribute is present.
+
+  **Breaking changes:**
+  - `hx-alert`: `open` now defaults to `false`. Use `<hx-alert open>` to show the alert.
+  - `hx-alert`: `showIcon` now defaults to `false`. Use `<hx-alert show-icon>` to display the icon.
+  - `hx-code-snippet`: `copyable` now defaults to `false`. Use `<hx-code-snippet copyable>` to enable the copy button.
+
+- e67e50e: add `full` boolean attribute to hx-button that stretches the button to fill its container width
+- b557bff: add hx-banner component for full-width page-level notifications with sticky/fixed positioning, variants, dismiss behavior, and action button support
+- 1c3025f: add `inverted` boolean attribute to `hx-button` for dark/gradient background support. forces text to white and adjusts hover/focus ring colors across all variants.
+
+### Patch Changes
+
+- 8da3c5f: fix(a11y): resolve high wcag findings in hx-time-picker, hx-structured-list, and hx-split-button
+  - hx-time-picker: only include \_helpId in aria-describedby when help slot has content (WCAG 4.1.2)
+  - hx-structured-list: move role="list"/role="listitem" to host elements to fix cross-shadow-DOM relationship (WCAG 1.3.1)
+  - hx-split-button: forward aria-label from host to inner button for accessible name support (WCAG 4.1.2)
+
+- dfd02a2: fix accessibility: improve hx-color-picker thumb contrast and remove aria-modal from non-trapped dialog panel
+- 4200f2f: fix(a11y): hx-switch label element, hx-tabs tabindex comment, hx-toggle-button missing label warning
+  - hx-switch: change label from span to native label element with for attribute for proper HTML association
+  - hx-tabs: document dual tabindex pattern with explicit WCAG 2.4.3 reference
+  - hx-toggle-button: add dev console.warn when no accessible label or slot text is present
+
+- d3de4d3: fix(a11y): resolve medium-severity wcag violations in hx-textarea, hx-file-upload, hx-top-nav, and hx-action-bar
+  - hx-textarea: remove aria-live from counter element; add debounced hidden live region that announces only at 80%+ of maxlength (wcag 4.1.3)
+  - hx-file-upload: fix conflicting aria-label + aria-labelledby on dropzone — now mutually exclusive (wcag 4.1.2)
+  - hx-top-nav: fix mobile menu focus — now targets first interactive element using focusable selector instead of any htmlelement (wcag 2.4.3)
+  - hx-action-bar: add dev warning when consumer sets role other than "none" on host, preventing duplicate toolbar announcement (wcag 4.1.2)
+
+- c5375c6: fix(hx-carousel): suppress live region announcements during autoplay, remove tabindex from wrapper, fix aria-current on pagination dots
+- 951faed: fix(type-safety): eliminate `as EventListener` casts in hx-radio-group, hx-tabs, hx-tooltip, hx-steps, and hx-breadcrumb by typing handlers to accept `Event` and narrowing with proper type guards; replace `as HelixTab[]`/`as HelixTabPanel[]` casts with type guard filters; guard `e.target` slot handler casts with `instanceof HTMLSlotElement` checks
+- 033a6f0: fix accessibility: list semantics in hx-steps, Home/End keyboard nav in hx-side-nav, aria-controls and menu-label in hx-overflow-menu
+- dae9d74: fix: use shared counter to prevent body overflow race condition between hx-dialog and hx-drawer
+- 4c08359: fix(a11y): replace hardcoded ids in hx-accordion-item, hx-meter, and hx-progress-bar with instance-scoped monotonic counter ids to prevent wcag 1.3.1 id collision failures when multiple instances appear on the same page; also fix conflicting aria-label + aria-labelledby on hx-progress-bar
+- 4f86222: fix(hx-card): set color and background-color on :host so css custom properties cascade into slotted content
+- ebfc529: fix accessible name, keyboard row selection, and focus indicators in hx-data-table
+- 0e139de: feat(a11y): add accessible labels and roles to hx-progress-bar and hx-spinner
+
+  hx-progress-bar now exposes `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, and `aria-valuemax` on the track element, plus a `label` attribute that maps to `aria-label` when no visible label slot content is provided.
+
+  hx-spinner now exposes `role="status"` with `aria-label` (defaulting to `"Loading"`), a `label` attribute for custom accessible names, and a `decorative` boolean that switches to `role="presentation"` to suppress duplicate announcements when spinner appears alongside visible loading text.
+
+  Axe-core passes on both components in all states.
+
+- a5544e4: fix(hx-rating): use role="slider" for half-star precision to fix wcag 2.5.3 label-content-name mismatch — when precision="0.5", half values (1.5, 2.5, etc.) are now correctly represented in the accessibility tree via aria-valuenow/aria-valuetext instead of a radiogroup with mismatched whole-integer labels
+- 0633b84: fix(hx-toast): auto-dismiss now fires for prefers-reduced-motion users; split component into separate files per convention
+- 96ed976: fix(hx-tree-view): implement roving tabindex pattern to resolve WCAG 2.4.3 focus order violation; tree container is no longer a Tab stop when items are present, Tab focus lands directly on the active tree item
+- 12dac0e: fix ssr breakage: replace crypto.randomuuid() with monotonic counters in hx-tooltip, hx-popover, and hx-field to prevent hydration id mismatches
+- 345b9f9: add @internal jsdoc tags to private fields in hx-combobox, hx-nav, hx-select, hx-file-upload, and hx-checkbox-group to improve helixir health scores to 90+
+- 282f29b: mark internal fields with @internal in hx-menu, hx-accordion, and hx-dropdown to improve helixir health scores to 90+
+- 9ca7c37: add @internal jsdoc to private properties and class-level jsdoc to hx-breadcrumb and hx-progress-bar to improve health scores
+- 104c57e: mark internal fields and methods with @internal jsdoc in hx-form and hx-tree-item to improve cem health scores to 90+
+- 80a9fde: fix(hx-combobox): add for attribute to label and aria-live region for filter results
+- ca02828: add jsdoc descriptions to internal properties in hx-combobox, hx-select, hx-checkbox-group, and hx-file-upload to improve cem documentation scores
+- 5361511: fix hx-date-picker focus trap to use shadowRoot.activeElement for correct shadow dom keyboard trap behavior
+- 56a652d: docs(hx-date-picker): add component description, document all properties and events
+- 8973c3f: mark internal fields with @internal jsdoc in hx-drawer and hx-time-picker to improve cem health scores
+- 5a29170: add @internal jsdoc tags to private properties and typed @fires annotations to hx-radio-group
+- e47c575: add jsdoc description text to all @internal members in hx-radio-group
+- b2f0313: implement formDisabledCallback for all form-associated components to support fieldset disabled propagation
+- 270289b: chore: add @internal jsdoc tags to private component members
+- 54f0cf5: chore: add @internal jsdoc tags to private component members
+- 5feb10c: add @internal jsdoc tags to private properties in hx-overflow-menu, hx-split-button, hx-button-group, hx-card, hx-field
+- 2526131: add jsdoc descriptions to all @internal properties and methods in hx-date-picker to improve cem accuracy scores
+- 2fc2572: add jsdoc descriptions to @internal-tagged private members in hx-button-group, hx-nav, hx-overflow-menu, hx-split-button, hx-card, hx-field, hx-form, and hx-tree-item to improve helixir scores from 88-89 to 90+
+- 2910a03: remove non-null assertions from @query decorated properties, replace with proper undefined handling
+- 1510375: Replace console.warn calls with dev-only warning utility and remove deprecated execCommand usage
+
 ## 0.3.4
 
 ### Patch Changes

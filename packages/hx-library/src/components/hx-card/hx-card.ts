@@ -79,16 +79,28 @@ export class HelixCard extends LitElement {
 
   // ─── Slot Detection ───
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the image slot, controlling slot container visibility.
+   * @internal
+   */
   @state() private _hasImage = false;
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the heading slot, controlling slot container visibility.
+   * @internal
+   */
   @state() private _hasHeading = false;
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the footer slot, controlling slot container visibility.
+   * @internal
+   */
   @state() private _hasFooter = false;
 
-  /** @internal */
+  /**
+   * Tracks whether any content is assigned to the actions slot, controlling slot container visibility.
+   * @internal
+   */
   @state() private _hasActions = false;
 
   private _onImageSlotChange(e: Event): void {
