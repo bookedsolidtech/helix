@@ -309,10 +309,16 @@ function formatColor(hsv: HSV, format: ColorFormat, includeAlpha: boolean): stri
 export class HelixColorPicker extends LitElement {
   static override styles = [tokenStyles, helixColorPickerStyles];
 
-  /** @internal */
+  /**
+   * Declares this element as form-associated so it participates in native form submission.
+   * @internal
+   */
   static formAssociated = true;
 
-  /** @internal */
+  /**
+   * ElementInternals instance used for form participation and constraint validation.
+   * @internal
+   */
   private _internals: ElementInternals;
 
   constructor() {
@@ -387,27 +393,55 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Internal State ──────────────────────────────────────────────────────
 
-  /** @internal */
+  /**
+   * Internal HSV representation of the current color, used to drive all picker UI elements.
+   * @internal
+   */
   @state() private _hsv: HSV = { h: 0, s: 0, v: 0, a: 1 };
-  /** @internal */
+  /**
+   * Whether the color picker popover panel is currently open.
+   * @internal
+   */
   @state() private _open = false;
-  /** @internal */
+  /**
+   * The formatted color string displayed in the text input, kept in sync with `_hsv` and `format`.
+   * @internal
+   */
   @state() private _inputValue = '#000000';
 
   // ─── Dragging state (not reactive, managed manually) ─────────────────────
 
-  /** @internal */
+  /**
+   * Whether the user is actively dragging within the gradient grid.
+   * @internal
+   */
   private _draggingGrid = false;
-  /** @internal */
+  /**
+   * Whether the user is actively dragging the hue slider thumb.
+   * @internal
+   */
   private _draggingHue = false;
-  /** @internal */
+  /**
+   * Whether the user is actively dragging the opacity slider thumb.
+   * @internal
+   */
   private _draggingOpacity = false;
 
   // P1-1: Stored bound references to prevent memory leaks
-  /** @internal */
+  /**
+   * Stable bound reference to the pointermove handler, stored to allow correct listener removal.
+   * @internal
+   */
   private _boundPointerMove: (e: PointerEvent) => void;
-  /** @internal */
+  /**
+   * Stable bound reference to the pointerup handler, stored to allow correct listener removal.
+   * @internal
+   */
   private _boundPointerUp: () => void;
+  /**
+   * Stable bound reference to the document click handler, stored to allow correct listener removal.
+   * @internal
+   */
   private _boundDocumentClick: (e: MouseEvent) => void;
 
   // ─── Lifecycle ───────────────────────────────────────────────────────────
