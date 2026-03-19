@@ -332,10 +332,10 @@ describe('hx-menu', () => {
       expect(base.getAttribute('aria-label')).toBe('Actions');
     });
 
-    it('omits aria-label when label is empty', async () => {
+    it('falls back to aria-label="Menu" when label is empty', async () => {
       const el = await fixture<HelixMenu>('<hx-menu></hx-menu>');
       const base = shadowQuery(el, '[role="menu"]')!;
-      expect(base.hasAttribute('aria-label')).toBe(false);
+      expect(base.getAttribute('aria-label')).toBe('Menu');
     });
   });
 
