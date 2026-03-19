@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -438,41 +439,49 @@ export class HelixDataTable extends LitElement {
       displayRows = this.rows.slice(start, start + this.pageSize);
     }
 
-    return displayRows.map((row, pageIndex) => {
-      // The global row index for selection and events
-      const globalIndex =
-        this.pageSize > 0 ? (this.page - 1) * this.pageSize + pageIndex : pageIndex;
-      return html`
-        <tr
-          part="tr"
-          aria-selected=${this.selectable ? String(this._selectedRows.has(globalIndex)) : nothing}
-          @click=${() => this._handleRowClick(row, globalIndex)}
-        >
-          ${this.selectable
-            ? html`
-                <td part="td" class="col-checkbox" tabindex="-1" data-row-index=${globalIndex}>
-                  <input
-                    type="checkbox"
-                    part="checkbox"
-                    aria-label=${`Select row ${globalIndex + 1}`}
-                    .checked=${this._selectedRows.has(globalIndex)}
-                    @click=${(e: Event) => e.stopPropagation()}
-                    @change=${(e: Event) =>
-                      this._handleSelect(globalIndex, (e.target as HTMLInputElement).checked)}
-                  />
+    return repeat(
+      displayRows,
+      (_row, pageIndex) => {
+        const globalIndex =
+          this.pageSize > 0 ? (this.page - 1) * this.pageSize + pageIndex : pageIndex;
+        return globalIndex;
+      },
+      (row, pageIndex) => {
+        // The global row index for selection and events
+        const globalIndex =
+          this.pageSize > 0 ? (this.page - 1) * this.pageSize + pageIndex : pageIndex;
+        return html`
+          <tr
+            part="tr"
+            aria-selected=${this.selectable ? String(this._selectedRows.has(globalIndex)) : nothing}
+            @click=${() => this._handleRowClick(row, globalIndex)}
+          >
+            ${this.selectable
+              ? html`
+                  <td part="td" class="col-checkbox" tabindex="-1" data-row-index=${globalIndex}>
+                    <input
+                      type="checkbox"
+                      part="checkbox"
+                      aria-label=${`Select row ${globalIndex + 1}`}
+                      .checked=${this._selectedRows.has(globalIndex)}
+                      @click=${(e: Event) => e.stopPropagation()}
+                      @change=${(e: Event) =>
+                        this._handleSelect(globalIndex, (e.target as HTMLInputElement).checked)}
+                    />
+                  </td>
+                `
+              : nothing}
+            ${this.columns.map(
+              (col) => html`
+                <td part="td" tabindex="-1" data-row-index=${globalIndex}>
+                  ${row[col.key] != null ? String(row[col.key]) : ''}
                 </td>
-              `
-            : nothing}
-          ${this.columns.map(
-            (col) => html`
-              <td part="td" tabindex="-1" data-row-index=${globalIndex}>
-                ${row[col.key] != null ? String(row[col.key]) : ''}
-              </td>
-            `,
-          )}
-        </tr>
-      `;
-    });
+              `,
+            )}
+          </tr>
+        `;
+      },
+    );
   }
 
   // ─── Render ───
