@@ -387,12 +387,17 @@ export class HelixDatePicker extends LitElement {
 
   formResetCallback(): void {
     this.value = '';
-    this._internals.setFormValue('');
+    this._internals.setFormValue(null);
     this._isOpen = false;
   }
 
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   // ─── Public Methods ───
@@ -592,7 +597,7 @@ export class HelixDatePicker extends LitElement {
     this._updateValidity();
 
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string; date: Date }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: iso, date },

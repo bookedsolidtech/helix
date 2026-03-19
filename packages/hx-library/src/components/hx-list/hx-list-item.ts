@@ -119,7 +119,7 @@ export class HelixListItem extends LitElement {
 
   private _dispatchListItemClick(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-list-item-click', {
+      new CustomEvent<{ item: HelixListItem; value: string | undefined }>('hx-list-item-click', {
         bubbles: true,
         composed: true,
         detail: { item: this, value: this.value },

@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
@@ -186,15 +186,15 @@ export class HelixTextInput extends LitElement {
   // ─── Slot Tracking ───
 
   /** @internal */
-  private _hasLabelSlot = false;
+  @state() private _hasLabelSlot = false;
   /** @internal */
-  private _hasErrorSlot = false;
+  @state() private _hasErrorSlot = false;
   /** @internal */
-  private _hasPrefixSlot = false;
+  @state() private _hasPrefixSlot = false;
   /** @internal */
-  private _hasSuffixSlot = false;
+  @state() private _hasSuffixSlot = false;
   /** @internal */
-  private _hasHelpTextSlot = false;
+  @state() private _hasHelpTextSlot = false;
 
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
@@ -206,35 +206,30 @@ export class HelixTextInput extends LitElement {
         slottedLabel.id = `${this._inputId}-slotted-label`;
       }
     }
-    this.requestUpdate();
   }
 
   /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   /** @internal */
   private _handlePrefixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasPrefixSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   /** @internal */
   private _handleSuffixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasSuffixSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   /** @internal */
   private _handleHelpTextSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpTextSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   // ─── Lifecycle ───
@@ -317,8 +312,13 @@ export class HelixTextInput extends LitElement {
   }
 
   // Called when the form restores state (e.g., back/forward navigation)
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   // Called when a parent fieldset is disabled/enabled
@@ -339,7 +339,7 @@ export class HelixTextInput extends LitElement {
      * @event hx-input
      */
     this.dispatchEvent(
-      new CustomEvent('hx-input', {
+      new CustomEvent<{ value: string }>('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -359,7 +359,7 @@ export class HelixTextInput extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },

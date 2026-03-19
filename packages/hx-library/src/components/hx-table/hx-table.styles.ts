@@ -91,19 +91,6 @@ export const helixTableStyles = css`
     outline-offset: var(--hx-focus-ring-offset, -2px);
   }
 
-  /* ─── Dark Mode ─── */
-
-  @media (prefers-color-scheme: dark) {
-    :host {
-      --hx-table-border-color: var(--hx-color-neutral-700, #334155);
-      --hx-table-header-bg: var(--hx-color-neutral-800, #1e293b);
-      --hx-table-header-color: var(--hx-color-neutral-200, #e2e8f0);
-      --hx-table-cell-color: var(--hx-color-neutral-100, #f1f5f9);
-      --hx-table-row-hover-bg: var(--hx-color-neutral-700, #334155);
-      --hx-table-stripe-bg: var(--hx-color-neutral-800, #1e293b);
-    }
-  }
-
   /* ─── Responsive Mobile Card Layout ─── */
 
   @media (max-width: 768px) {

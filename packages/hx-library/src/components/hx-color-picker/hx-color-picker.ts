@@ -449,10 +449,6 @@ export class HelixColorPicker extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this._syncFromValue();
-    // P1-1: Use stored bound references (not inline .bind() which creates new objects)
-    document.addEventListener('click', this._boundDocumentClick, true);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
   }
 
   override disconnectedCallback(): void {
@@ -485,6 +481,22 @@ export class HelixColorPicker extends LitElement {
     this.disabled = disabled;
   }
 
+  /** Called by the browser when the form is reset. */
+  formResetCallback(): void {
+    this.value = '#000000';
+    this._internals.setFormValue(null);
+  }
+
+  /** Called by the browser to restore form state on navigation. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
+  }
+
   private _commit(source: 'drag' | 'change'): void {
     const formatted = formatColor(this._hsv, this.format, this.opacity);
     this.value = formatted;
@@ -497,9 +509,9 @@ export class HelixColorPicker extends LitElement {
       detail,
     };
     if (source === 'drag') {
-      this.dispatchEvent(new CustomEvent('hx-input', opts));
+      this.dispatchEvent(new CustomEvent<{ value: string }>('hx-input', opts));
     } else {
-      this.dispatchEvent(new CustomEvent('hx-change', opts));
+      this.dispatchEvent(new CustomEvent<{ value: string }>('hx-change', opts));
     }
   }
 
@@ -508,11 +520,13 @@ export class HelixColorPicker extends LitElement {
   private _show(): void {
     if (this._open || this.inline) return;
     this._open = true;
+    document.addEventListener('click', this._boundDocumentClick, true);
   }
 
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
+    document.removeEventListener('click', this._boundDocumentClick, true);
   }
 
   private _handleDocumentClick(e: MouseEvent): void {
@@ -546,6 +560,8 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingGrid = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    document.addEventListener('pointermove', this._boundPointerMove);
+    document.addEventListener('pointerup', this._boundPointerUp);
     this._updateGridFromPointer(e);
   }
 
@@ -597,6 +613,8 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingHue = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    document.addEventListener('pointermove', this._boundPointerMove);
+    document.addEventListener('pointerup', this._boundPointerUp);
     this._updateHueFromPointer(e);
   }
 
@@ -617,6 +635,8 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingOpacity = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    document.addEventListener('pointermove', this._boundPointerMove);
+    document.addEventListener('pointerup', this._boundPointerUp);
     this._updateOpacityFromPointer(e);
   }
 
@@ -643,6 +663,8 @@ export class HelixColorPicker extends LitElement {
       this._draggingGrid = false;
       this._draggingHue = false;
       this._draggingOpacity = false;
+      document.removeEventListener('pointermove', this._boundPointerMove);
+      document.removeEventListener('pointerup', this._boundPointerUp);
       this._commit('change');
     }
   }

@@ -125,8 +125,6 @@ export class HelixDropdown extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._handleOutsideClick = this._handleOutsideClick.bind(this);
-    this._handleKeydown = this._handleKeydown.bind(this);
     this.addEventListener('keydown', this._handleKeydown);
   }
 
@@ -155,7 +153,7 @@ export class HelixDropdown extends LitElement {
       firstFocusable?.focus();
     }
     await this._updatePosition();
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
   // P2-02: returnFocus=true only on Escape; Tab should let focus advance naturally.
@@ -164,7 +162,7 @@ export class HelixDropdown extends LitElement {
     this.open = false;
     this._panelVisible = false;
     document.removeEventListener('click', this._handleOutsideClick);
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
     if (returnFocus) {
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
       const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
@@ -214,7 +212,7 @@ export class HelixDropdown extends LitElement {
     }
   }
 
-  private _handleKeydown(e: KeyboardEvent): void {
+  private _handleKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.open) {
       e.stopPropagation();
       this._hide(true); // return focus to trigger on Escape
@@ -229,7 +227,7 @@ export class HelixDropdown extends LitElement {
       e.preventDefault();
       this._handleMenuNavigation(e.key);
     }
-  }
+  };
 
   // P2-01: Move focus among menuitem elements using arrow keys.
   private _handleMenuNavigation(key: string): void {
@@ -284,12 +282,12 @@ export class HelixDropdown extends LitElement {
     return null;
   }
 
-  private _handleOutsideClick(e: MouseEvent): void {
+  private _handleOutsideClick = (e: MouseEvent): void => {
     const path = e.composedPath();
     if (!path.includes(this)) {
       this._hide();
     }
-  }
+  };
 
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
@@ -301,7 +299,7 @@ export class HelixDropdown extends LitElement {
     const label = item.textContent?.trim() ?? '';
 
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<{ value: string | null; label: string }>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { value, label },

@@ -217,7 +217,7 @@ export class HelixCheckboxGroup extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ values: string[] }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { values },
@@ -295,7 +295,10 @@ export class HelixCheckboxGroup extends LitElement {
   }
 
   /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string | File | FormData): void {
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
     if (!(state instanceof FormData)) return;
     const restoredValues = state.getAll(this.name).map((v) => String(v));
     const checkboxes = this._getCheckboxes();

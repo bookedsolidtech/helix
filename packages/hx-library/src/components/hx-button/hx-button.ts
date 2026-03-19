@@ -166,7 +166,7 @@ export class HelixButton extends LitElement {
      * @event hx-click
      */
     this.dispatchEvent(
-      new CustomEvent('hx-click', {
+      new CustomEvent<{ originalEvent: MouseEvent }>('hx-click', {
         bubbles: true,
         composed: true,
         detail: { originalEvent: e },

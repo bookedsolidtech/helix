@@ -156,7 +156,7 @@ export class HelixNav extends LitElement {
       this._mobileOpen = false;
       this._expandedIndex = null;
       this.dispatchEvent(
-        new CustomEvent('hx-nav-select', {
+        new CustomEvent<{ item: NavItem }>('hx-nav-select', {
           bubbles: true,
           composed: true,
           detail: { item },
@@ -193,7 +193,7 @@ export class HelixNav extends LitElement {
         if (item.children?.length && e.key === 'ArrowDown' && this.orientation === 'horizontal') {
           // open submenu and focus first item
           this._expandedIndex = index;
-          this.updateComplete.then(() => {
+          void this.updateComplete.then(() => {
             const firstSub = this.shadowRoot?.querySelector<HTMLElement>(
               `.nav__submenu [part="link"]`,
             );
@@ -224,7 +224,7 @@ export class HelixNav extends LitElement {
           const wasExpanded = this._expandedIndex === index;
           this._expandedIndex = wasExpanded ? null : index;
           if (!wasExpanded) {
-            this.updateComplete.then(() => {
+            void this.updateComplete.then(() => {
               const firstSub = this.shadowRoot?.querySelector<HTMLElement>(
                 `.nav__submenu:not([hidden]) [part="link"]`,
               );

@@ -363,7 +363,7 @@ export class HelixCarousel extends LitElement {
     this._currentIndex = next;
     this._liveText = `Slide ${next + 1} of ${this._slides.length}`;
     this.dispatchEvent(
-      new CustomEvent('hx-slide-change', {
+      new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
         bubbles: true,
         composed: true,
         detail: { index: next, slide: this._slides[next] },

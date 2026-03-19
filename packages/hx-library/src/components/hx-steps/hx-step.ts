@@ -69,25 +69,23 @@ export class HelixStep extends LitElement {
   // ─── Internal Properties (set by parent hx-steps) ───
 
   /**
-   * Layout orientation. Set by the parent `<hx-steps>` container.
-   * Reflected as an attribute for CSS styling (`[orientation='vertical']` selector).
+   * Layout orientation. Set by the parent `<hx-steps>` container via JS property.
    * Do not set this attribute directly on `<hx-step>` — use the `orientation`
    * property on the parent `<hx-steps>` container instead. The parent will
    * propagate the value to all child steps via `_syncChildren()`.
    * @internal
    */
-  @property({ type: String, reflect: true })
+  @property({ attribute: false })
   orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
-   * Size variant. Set by the parent `<hx-steps>` container.
-   * Reflected as an attribute for CSS styling. Do not set this attribute
-   * directly on `<hx-step>` — use the `size` property on the parent
-   * `<hx-steps>` container instead. The parent will propagate the value
-   * to all child steps via `_syncChildren()`.
+   * Size variant. Set by the parent `<hx-steps>` container via JS property.
+   * Do not set this attribute directly on `<hx-step>` — use the `size` property
+   * on the parent `<hx-steps>` container instead. The parent will propagate the
+   * value to all child steps via `_syncChildren()`.
    * @internal
    */
-  @property({ type: String, reflect: true })
+  @property({ attribute: false })
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
@@ -131,6 +129,12 @@ export class HelixStep extends LitElement {
         this.removeAttribute('aria-disabled');
       }
     }
+    if (changedProperties.has('orientation')) {
+      this.setAttribute('orientation', this.orientation);
+    }
+    if (changedProperties.has('size')) {
+      this.setAttribute('size', this.size);
+    }
   }
 
   // ─── Event Handling ───
@@ -154,7 +158,7 @@ export class HelixStep extends LitElement {
      * @internal
      */
     this.dispatchEvent(
-      new CustomEvent('hx-step-click-internal', {
+      new CustomEvent<void>('hx-step-click-internal', {
         bubbles: true,
         composed: true,
       }),

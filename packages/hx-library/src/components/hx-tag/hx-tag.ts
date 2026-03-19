@@ -104,7 +104,7 @@ export class HelixTag extends LitElement {
   private _handleRemove(): void {
     if (this.disabled) return;
     this.dispatchEvent(
-      new CustomEvent('hx-remove', {
+      new CustomEvent<void>('hx-remove', {
         bubbles: true,
         composed: true,
       }),

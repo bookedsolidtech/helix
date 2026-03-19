@@ -325,8 +325,13 @@ export class HelixTextarea extends LitElement {
   }
 
   /** Called by the browser to restore form state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string): void {
-    this.value = state;
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 
   /** Called when a parent fieldset is disabled/enabled. */
@@ -367,7 +372,7 @@ export class HelixTextarea extends LitElement {
      * @event hx-input
      */
     this.dispatchEvent(
-      new CustomEvent('hx-input', {
+      new CustomEvent<{ value: string }>('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -387,7 +392,7 @@ export class HelixTextarea extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },

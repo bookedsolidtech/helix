@@ -501,7 +501,7 @@ export class HelixSelect extends LitElement {
 
   private _dispatchChange(): void {
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },

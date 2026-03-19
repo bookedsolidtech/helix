@@ -328,7 +328,7 @@ export class HelixForm extends LitElement {
        * @event hx-invalid
        */
       this.dispatchEvent(
-        new CustomEvent('hx-invalid', {
+        new CustomEvent<{ errors: Array<{ name: string; message: string }> }>('hx-invalid', {
           bubbles: true,
           composed: true,
           detail: { errors },
@@ -357,7 +357,11 @@ export class HelixForm extends LitElement {
      * @event hx-submit
      */
     this.dispatchEvent(
-      new CustomEvent('hx-submit', {
+      new CustomEvent<{
+        valid: boolean;
+        values: Record<string, FormDataEntryValue | FormDataEntryValue[]>;
+        formData: FormData;
+      }>('hx-submit', {
         bubbles: true,
         composed: true,
         detail: { valid: true, values, formData },
@@ -378,7 +382,7 @@ export class HelixForm extends LitElement {
      * @event hx-reset
      */
     this.dispatchEvent(
-      new CustomEvent('hx-reset', {
+      new CustomEvent<void>('hx-reset', {
         bubbles: true,
         composed: true,
       }),

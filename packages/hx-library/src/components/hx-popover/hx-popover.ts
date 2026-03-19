@@ -248,7 +248,7 @@ export class HelixPopover extends LitElement {
     if (this._visible) return;
     // P0-02: save focus target before moving focus into dialog
     this._previousFocus = document.activeElement as HTMLElement | null;
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
     this._visible = true;
     this.open = true;
     this._setAnchorAriaAttributes(true);
@@ -261,7 +261,7 @@ export class HelixPopover extends LitElement {
     // hx-after-show fires after Lit has rendered the visible state. Dispatching here
     // (before _updatePosition) ensures it fires in the same microtask as the test's
     // await-continuation, so tests can rely on a single await el.updateComplete.
-    this.dispatchEvent(new CustomEvent('hx-after-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-after-show', { bubbles: true, composed: true }));
     // P0-02: move focus into dialog body
     const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
     if (bodyEl) bodyEl.focus();
@@ -283,7 +283,7 @@ export class HelixPopover extends LitElement {
     document.removeEventListener('click', this._handleDocumentClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
     document.removeEventListener('keydown', this._handleFocusTrap);
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
     this._visible = false;
     this.open = false;
     this._setAnchorAriaAttributes(false);
@@ -293,7 +293,7 @@ export class HelixPopover extends LitElement {
     }
     this._previousFocus = null;
     await this.updateComplete;
-    this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-after-hide', { bubbles: true, composed: true }));
   }
 
   // ─── Positioning ───

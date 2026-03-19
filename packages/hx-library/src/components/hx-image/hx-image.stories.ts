@@ -460,3 +460,103 @@ export const Responsive: Story = {
     await expect(innerImg?.getAttribute('sizes')).toContain('max-width');
   },
 };
+
+// ════════════════════════════════════════════════════════════════════════════
+// 10. EVENTS DEMO — hx-load, hx-error
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates the `hx-load` event dispatched when an image loads successfully,
+ * and the `hx-error` event dispatched when an image fails to load.
+ * Use these events to track loading state, trigger analytics, or show custom feedback.
+ */
+export const LoadEventDemo: Story = {
+  name: 'Events: hx-load',
+  render: () => html`
+    <div>
+      <hx-image
+        id="load-demo"
+        src="https://picsum.photos/seed/event-load/400/300"
+        alt="Image that fires hx-load on success"
+        ratio="4/3"
+        style="width: 300px;"
+      ></hx-image>
+      <p
+        id="load-event-output"
+        style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; font-family: sans-serif;"
+      >
+        The hx-load event fires when the image loads successfully.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const img = canvasElement.querySelector('hx-image');
+    await expect(img).toBeTruthy();
+
+    let loadFired = false;
+    img!.addEventListener('hx-load', () => {
+      loadFired = true;
+    });
+
+    // Trigger load by setting src on the inner img (the image may already be cached)
+    const innerImg = img!.shadowRoot!.querySelector('img');
+    await expect(innerImg).toBeTruthy();
+
+    // Dispatch a synthetic load event on the inner img to verify the component
+    // re-emits it as hx-load — this tests the event wiring without network dependency.
+    innerImg!.dispatchEvent(new Event('load'));
+
+    await expect(loadFired).toBe(true);
+  },
+};
+
+/**
+ * Demonstrates the `hx-error` event dispatched when an image fails to load.
+ * The component shows the fallback slot content and fires `hx-error`.
+ * Use this to show custom error UI or log load failures.
+ */
+export const ErrorEventDemo: Story = {
+  name: 'Events: hx-error',
+  render: () => html`
+    <div>
+      <hx-image
+        id="error-demo"
+        src="https://broken.url/nonexistent-image.jpg"
+        alt="Image that fires hx-error on failure"
+        ratio="4/3"
+        style="width: 300px;"
+      >
+        <div
+          slot="fallback"
+          style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #fef2f2; color: #991b1b; font-size: 0.875rem; font-family: sans-serif;"
+        >
+          Image failed to load
+        </div>
+      </hx-image>
+      <p
+        id="error-event-output"
+        style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; font-family: sans-serif;"
+      >
+        The hx-error event fires when the image URL cannot be resolved.
+      </p>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const img = canvasElement.querySelector('hx-image');
+    await expect(img).toBeTruthy();
+
+    let errorFired = false;
+    img!.addEventListener('hx-error', () => {
+      errorFired = true;
+    });
+
+    // Dispatch a synthetic error event on the inner img to verify event wiring
+    // without depending on a real network failure timing.
+    const innerImg = img!.shadowRoot?.querySelector('img');
+    if (innerImg) {
+      innerImg.dispatchEvent(new Event('error'));
+    }
+
+    await expect(errorFired).toBe(true);
+  },
+};

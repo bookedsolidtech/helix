@@ -123,7 +123,7 @@ export const helixBadgeStyles = css`
 
   /* ─── Pulse Animation ─── */
 
-  @keyframes wc-badge-pulse {
+  @keyframes hx-badge-pulse {
     0%,
     100% {
       opacity: 1;
@@ -136,7 +136,7 @@ export const helixBadgeStyles = css`
   }
 
   .badge--pulse {
-    animation: wc-badge-pulse var(--hx-badge-pulse-duration, var(--hx-duration-slow, 2s))
+    animation: hx-badge-pulse var(--hx-badge-pulse-duration, var(--hx-duration-slow, 2s))
       var(--hx-badge-pulse-easing, var(--hx-ease-in-out, ease-in-out)) infinite;
   }
 

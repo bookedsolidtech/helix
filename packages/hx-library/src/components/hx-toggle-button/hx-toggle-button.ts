@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
@@ -45,6 +45,8 @@ export class HelixToggleButton extends LitElement {
   static formAssociated = true;
 
   private _internals: ElementInternals;
+
+  @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;
 
   constructor() {
     super();
@@ -117,7 +119,7 @@ export class HelixToggleButton extends LitElement {
     super.firstUpdated(changedProperties);
 
     if (!this.label) {
-      const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+      const slot = this._defaultSlot;
       const hasSlotText = slot
         ? slot.assignedNodes({ flatten: true }).some((n) => n.textContent?.trim())
         : false;
@@ -178,7 +180,7 @@ export class HelixToggleButton extends LitElement {
      * @event hx-toggle
      */
     this.dispatchEvent(
-      new CustomEvent('hx-toggle', {
+      new CustomEvent<{ pressed: boolean }>('hx-toggle', {
         bubbles: true,
         composed: true,
         detail: { pressed: this.pressed },

@@ -4,10 +4,7 @@
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
-    "**/*.css",
-    "src/components/**/*.ts",
-    "dist/components/**/*.js",
-    "dist/shared/**/*.js"
+    "**/*.css"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

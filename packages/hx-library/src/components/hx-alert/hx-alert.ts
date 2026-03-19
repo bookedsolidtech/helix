@@ -294,7 +294,7 @@ export class HelixAlert extends LitElement {
      * @event hx-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-close', {
+      new CustomEvent<{ reason: string }>('hx-close', {
         bubbles: true,
         composed: true,
         detail: { reason: 'user' },
@@ -306,7 +306,7 @@ export class HelixAlert extends LitElement {
      * @event hx-after-close
      */
     this.dispatchEvent(
-      new CustomEvent('hx-after-close', {
+      new CustomEvent<void>('hx-after-close', {
         bubbles: true,
         composed: true,
       }),
