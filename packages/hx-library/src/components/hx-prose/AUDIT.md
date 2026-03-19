@@ -18,13 +18,6 @@
 
 ## Summary
 
-<<<<<<< HEAD
-| Severity     | Count |
-| ------------ | ----- |
-| P0 (Blocker) | 2     |
-| P1 (High)    | 8     |
-| P2 (Medium)  | 8     |
-=======
 _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have been resolved._
 
 | Severity     | Baseline | Remaining |
@@ -32,7 +25,6 @@ _Baseline counts as of audit date (2026-03-05). Findings marked ✅ FIXED have b
 | P0 (Blocker) | 2        | 2         |
 | P1 (High)    | 8        | 7         |
 | P2 (Medium)  | 8        | 7         |
->>>>>>> origin/dev
 
 ---
 

@@ -563,3 +563,12 @@ export const DisabledNoEvent: Story = {
     hxIconButton!.removeEventListener('hx-click', eventSpy);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Settings',
+    variant: 'ghost',
+    size: 'md',
+  },
+};

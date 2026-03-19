@@ -289,3 +289,15 @@ export const NavSelectEventDemo: Story = {
     await expect((selectedItem as NavItem).label).toBe('Patients');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  args: {
+    orientation: 'horizontal',
+    label: 'Main navigation',
+    items: sampleItems,
+  },
+};

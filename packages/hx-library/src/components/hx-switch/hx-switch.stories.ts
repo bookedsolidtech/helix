@@ -1015,3 +1015,20 @@ export const ClinicalAlerts: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Enable patient portal access',
+  },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-switch name="portal-access" value="enabled">
+      Enable patient portal access
+      <span slot="help-text">Patients will receive an email invitation to create their account.</span>
+      <span slot="error">Portal access requires a verified email address.</span>
+    </hx-switch>
+  `,
+};

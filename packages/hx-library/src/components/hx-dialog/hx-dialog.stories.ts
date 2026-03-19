@@ -882,3 +882,13 @@ export const FormInsideDialog: Story = {
     await expect(submitBtn).toBeTruthy();
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    open: false,
+    modal: true,
+    closeOnBackdrop: true,
+    heading: 'Patient Record',
+  },
+};

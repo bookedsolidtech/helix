@@ -1230,3 +1230,11 @@ export const InAForm: Story = {
     await expect(dosageInput.value).toBe('500');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Quantity',
+    value: 10,
+  },
+};

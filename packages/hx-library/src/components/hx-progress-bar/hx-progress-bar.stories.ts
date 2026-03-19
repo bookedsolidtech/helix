@@ -257,3 +257,15 @@ export const CompleteEventDemo: Story = {
     await expect(completeFired).toBe(true);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  args: {
+    value: null,
+    indeterminate: false,
+    label: 'Loading...',
+  },
+};

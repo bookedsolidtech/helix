@@ -476,3 +476,11 @@ export const SingleButton: Story = {
     </hx-button-group>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    orientation: 'horizontal',
+    size: 'md',
+  },
+};
