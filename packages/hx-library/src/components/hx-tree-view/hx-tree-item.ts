@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
 
@@ -321,7 +322,7 @@ export class HelixTreeItem extends LitElement {
         </div>
         <div
           part="children"
-          class="children ${this.expanded ? 'children--expanded' : ''}"
+          class=${classMap({ children: true, 'children--expanded': this.expanded })}
           role="group"
           aria-label=${this._labelText ? `${this._labelText} children` : 'children'}
         >
