@@ -402,6 +402,26 @@ describe('hx-select', () => {
 
   // ─── Form (5) ───
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits selected option value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-select name="country" value="us">
+          <option value="us">United States</option>
+          <option value="ca">Canada</option>
+        </hx-select>
+      `;
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-select') as WcSelect;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('country')).toBe('us');
+      form.remove();
+    });
+  });
+
   describe('Form', () => {
     it('has formAssociated=true', () => {
       const ctor = customElements.get('hx-select') as unknown as { formAssociated: boolean };
