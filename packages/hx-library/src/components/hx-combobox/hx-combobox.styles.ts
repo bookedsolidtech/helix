@@ -162,8 +162,9 @@ export const helixComboboxStyles = css`
   }
 
   .field__clear-button:focus-visible {
-    outline: 2px solid var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-    outline-offset: 1px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Loading Indicator ─── */
@@ -262,7 +263,8 @@ export const helixComboboxStyles = css`
 
   .field__option--focused {
     background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
-    outline: 2px solid var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: -2px;
   }
 
@@ -389,8 +391,9 @@ export const helixComboboxStyles = css`
   }
 
   .field__chip-remove:focus-visible {
-    outline: 2px solid var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-    outline-offset: 1px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
 `;
