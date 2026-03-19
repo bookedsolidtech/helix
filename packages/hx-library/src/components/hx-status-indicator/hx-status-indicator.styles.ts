@@ -7,7 +7,7 @@ export const helixStatusIndicatorStyles = css`
     justify-content: center;
     position: relative;
     flex-shrink: 0;
-    --_dot-color: var(--hx-color-neutral-300);
+    --_dot-color: var(--hx-status-indicator-color-default, var(--hx-color-neutral-300, #d1d5db));
   }
 
   .indicator {
