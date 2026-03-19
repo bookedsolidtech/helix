@@ -12,7 +12,7 @@ let _hxTextInputIdCounter = 0;
 /**
  * A text input component with label, validation, and form association.
  * Supports accessible labeling via `label` property, `aria-label` attribute, or the `label` slot.
- * Uses `aria-invalid`, `aria-describedby`, and `aria-required` on the native input for screen reader support.
+ * Uses `aria-invalid` and `aria-describedby` on the native input for screen reader support. Native `required` provides implicit aria-required mapping per HTML-AAM.
  * Error messages are announced via `role="alert"`. Keyboard navigation follows native input behavior.
  *
  * @summary Form-associated text input with built-in label, error, and help text.
