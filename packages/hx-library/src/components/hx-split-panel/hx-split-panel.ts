@@ -131,13 +131,25 @@ export class HelixSplitPanel extends LitElement {
   @property({ type: String, reflect: true })
   collapsed: 'start' | 'end' | null = null;
 
-  /** @internal */
+  /**
+   * Whether the user is currently dragging the divider.
+   * @internal
+   */
   private _dragging = false;
-  /** @internal */
+  /**
+   * The pointer coordinate (clientX or clientY) at the start of a drag gesture.
+   * @internal
+   */
   private _dragStart = 0;
-  /** @internal */
+  /**
+   * The divider position percentage at the moment a drag gesture begins, used to compute deltas.
+   * @internal
+   */
   private _positionAtDragStart = 0;
-  /** @internal */
+  /**
+   * The position saved before a collapse occurs, restored when the panel is expanded.
+   * @internal
+   */
   private _positionBeforeCollapse = 50;
 
   private _clamp(value: number): number {
@@ -173,7 +185,10 @@ export class HelixSplitPanel extends LitElement {
     return this.offsetHeight;
   }
 
-  /** @internal */
+  /**
+   * Initiates a drag gesture when the divider receives a pointerdown event.
+   * @internal
+   */
   private _onPointerDown = (e: PointerEvent): void => {
     if (this.disabled) return;
     const divider = e.currentTarget as HTMLElement;
@@ -184,7 +199,10 @@ export class HelixSplitPanel extends LitElement {
     e.preventDefault();
   };
 
-  /** @internal */
+  /**
+   * Updates the divider position during an active drag gesture.
+   * @internal
+   */
   private _onPointerMove = (e: PointerEvent): void => {
     if (!this._dragging) return;
     const current = this.orientation === 'horizontal' ? e.clientX : e.clientY;
@@ -195,12 +213,18 @@ export class HelixSplitPanel extends LitElement {
     this._setPosition(this._positionAtDragStart + deltaPercent);
   };
 
-  /** @internal */
+  /**
+   * Ends the drag gesture when the pointer is released.
+   * @internal
+   */
   private _onPointerUp = (): void => {
     this._dragging = false;
   };
 
-  /** @internal */
+  /**
+   * Handles keyboard navigation on the divider — arrow keys adjust position, Home/End jump to min/max.
+   * @internal
+   */
   private _onKeyDown = (e: KeyboardEvent): void => {
     if (this.disabled) return;
     switch (e.key) {
@@ -233,17 +257,26 @@ export class HelixSplitPanel extends LitElement {
     }
   };
 
-  /** @internal */
+  /**
+   * Collapses the start panel by setting `collapsed` to `'start'`.
+   * @internal
+   */
   private _collapseStart = (): void => {
     this.collapsed = 'start';
   };
 
-  /** @internal */
+  /**
+   * Collapses the end panel by setting `collapsed` to `'end'`.
+   * @internal
+   */
   private _collapseEnd = (): void => {
     this.collapsed = 'end';
   };
 
-  /** @internal */
+  /**
+   * Expands a collapsed panel by resetting `collapsed` to null.
+   * @internal
+   */
   private _expand = (): void => {
     this.collapsed = null;
   };
