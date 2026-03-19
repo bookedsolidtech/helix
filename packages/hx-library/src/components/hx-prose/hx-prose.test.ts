@@ -42,9 +42,9 @@ describe('hx-prose', () => {
       expect(el.size).toBe('sm');
     });
 
-    it('max-width sets inline style', async () => {
+    it('max-width sets --hx-prose-max-width custom property', async () => {
       const el = await fixture<HelixProse>('<hx-prose max-width="600px"><p>Text</p></hx-prose>');
-      expect(el.style.maxWidth).toBe('600px');
+      expect(el.style.getPropertyValue('--hx-prose-max-width')).toBe('600px');
     });
   });
 
@@ -184,12 +184,12 @@ describe('hx-prose', () => {
   // ─── Max Width ───
 
   describe('Max Width', () => {
-    it('setting maxWidth to empty string clears the inline style', async () => {
+    it('setting maxWidth to empty string clears the --hx-prose-max-width custom property', async () => {
       const el = await fixture<HelixProse>('<hx-prose max-width="800px"><p>Text</p></hx-prose>');
-      expect(el.style.maxWidth).toBe('800px');
+      expect(el.style.getPropertyValue('--hx-prose-max-width')).toBe('800px');
       el.maxWidth = '';
       await el.updateComplete;
-      expect(el.style.maxWidth).toBe('');
+      expect(el.style.getPropertyValue('--hx-prose-max-width')).toBe('');
     });
   });
 
