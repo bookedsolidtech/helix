@@ -131,7 +131,9 @@ export class HelixPopover extends LitElement {
   }
 
   override firstUpdated(): void {
-    this._setAnchorAriaExpanded(false);
+    // HIGH-02: set aria-haspopup="dialog" once on the anchor so assistive technology
+    // announces the control's popup type before it is ever opened.
+    this._setAnchorAriaAttributes(false);
     // Sync initial open state
     if (this.open) {
       void this._show();
@@ -150,19 +152,75 @@ export class HelixPopover extends LitElement {
 
   // ─── ARIA setup ───
 
-  // P2-03: collapsed _setupAnchorAria + _updateAnchorAriaExpanded into one method
-  private _setAnchorAriaExpanded(value: boolean): void {
+  // HIGH-02: set aria-haspopup="dialog" on firstUpdated and keep aria-expanded in sync
+  private _setAnchorAriaAttributes(expanded: boolean): void {
     const anchorSlot = this.shadowRoot?.querySelector(
       'slot[name="anchor"]',
     ) as HTMLSlotElement | null;
     if (!anchorSlot) return;
     const anchorEl = anchorSlot.assignedElements()[0] as HTMLElement | undefined;
     if (anchorEl) {
-      anchorEl.setAttribute('aria-expanded', String(value));
+      anchorEl.setAttribute('aria-expanded', String(expanded));
+      anchorEl.setAttribute('aria-haspopup', 'dialog');
       // aria-controls is omitted: the body lives in Shadow DOM and axe-core
       // cannot resolve cross-root IDREF values, which causes a critical violation.
     }
   }
+
+  // ─── Focus helpers ───
+
+  /** Return all keyboard-focusable elements inside the popover body's slotted content. */
+  private _getFocusableElements(): HTMLElement[] {
+    const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
+    if (!bodyEl) return [];
+
+    // Gather focusable elements from the default slot's assigned nodes
+    const defaultSlot = bodyEl.querySelector('slot:not([name])') as HTMLSlotElement | null;
+    if (!defaultSlot) return [];
+
+    const assigned = defaultSlot.assignedElements({ flatten: true });
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const result: HTMLElement[] = [];
+    for (const el of assigned) {
+      if (el.matches(focusableSelector)) {
+        result.push(el as HTMLElement);
+      }
+      const nested = el.querySelectorAll<HTMLElement>(focusableSelector);
+      result.push(...nested);
+    }
+    return result;
+  }
+
+  /** Trap Tab/Shift+Tab focus within the popover body when it contains interactive elements. */
+  private _handleFocusTrap = (e: Event): void => {
+    const ke = e as KeyboardEvent;
+    if (ke.key !== 'Tab' || !this._visible) return;
+
+    const focusable = this._getFocusableElements();
+    // If no interactive children, keep focus on the body itself — no cycling needed.
+    if (focusable.length === 0) return;
+
+    const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
+    const allFocusable = bodyEl ? [bodyEl, ...focusable] : focusable;
+    if (allFocusable.length === 0) return;
+
+    const first = allFocusable[0] as HTMLElement;
+    const last = allFocusable[allFocusable.length - 1] as HTMLElement;
+
+    if (ke.shiftKey) {
+      if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
+        ke.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
+        ke.preventDefault();
+        first.focus();
+      }
+    }
+  };
 
   // ─── Show/Hide ───
 
@@ -173,10 +231,12 @@ export class HelixPopover extends LitElement {
     this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
     this._visible = true;
     this.open = true;
-    this._setAnchorAriaExpanded(true);
+    this._setAnchorAriaAttributes(true);
     // P1-03: add Escape listener synchronously before any await so it is registered
     // by the time the test fires an Escape keydown after a single await el.updateComplete.
     document.addEventListener('keydown', this._handleDocumentKeydown);
+    // HIGH-01: focus trap listener active while popover is open
+    document.addEventListener('keydown', this._handleFocusTrap);
     await this.updateComplete;
     // hx-after-show fires after Lit has rendered the visible state. Dispatching here
     // (before _updatePosition) ensures it fires in the same microtask as the test's
@@ -192,16 +252,21 @@ export class HelixPopover extends LitElement {
     await this._updatePosition();
   }
 
-  private async _hide(): Promise<void> {
+  // HIGH-03: _hideWithFocusRestore controls whether _previousFocus is restored.
+  // Escape and programmatic close restore focus; click-outside does not.
+  private async _hide(restoreFocus = true): Promise<void> {
     if (!this._visible) return;
     document.removeEventListener('click', this._handleDocumentClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
+    document.removeEventListener('keydown', this._handleFocusTrap);
     this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
     this._visible = false;
     this.open = false;
-    this._setAnchorAriaExpanded(false);
-    // P0-02: return focus to the element that was focused before the popover opened
-    this._previousFocus?.focus();
+    this._setAnchorAriaAttributes(false);
+    // HIGH-03: only restore focus on Escape / programmatic close
+    if (restoreFocus) {
+      this._previousFocus?.focus();
+    }
     this._previousFocus = null;
     await this.updateComplete;
     this.dispatchEvent(new CustomEvent('hx-after-hide', { bubbles: true, composed: true }));
@@ -285,7 +350,8 @@ export class HelixPopover extends LitElement {
   /** @internal */
   private _handleDocumentKeydown = (e: Event): void => {
     if ((e as KeyboardEvent).key === 'Escape' && this._visible) {
-      void this._hide();
+      // HIGH-03: Escape always restores focus to the prior element
+      void this._hide(true);
     }
   };
 
@@ -295,7 +361,8 @@ export class HelixPopover extends LitElement {
     // Shadow DOM retargets events from within to the host at document level,
     // so a click on the trigger wrapper appears as e.target === this.
     if (e.target !== this && !this.contains(e.target as Node)) {
-      void this._hide();
+      // HIGH-03: click-outside does NOT restore focus — let browser handle naturally
+      void this._hide(false);
     }
   };
 
@@ -303,7 +370,7 @@ export class HelixPopover extends LitElement {
   private _handleAnchorClick = (): void => {
     if (this.trigger !== 'click') return;
     if (this._visible) {
-      void this._hide();
+      void this._hide(true);
     } else {
       void this._show();
     }
@@ -318,23 +385,45 @@ export class HelixPopover extends LitElement {
   /** @internal */
   private _handleAnchorMouseLeave = (): void => {
     if (this.trigger !== 'hover') return;
-    void this._hide();
+    void this._hide(false);
   };
 
+  // CRITICAL-02: body hover handlers so moving the pointer from anchor into
+  // the popover content does not trigger a hide.
   /** @internal */
-  private _handleAnchorFocusIn = (): void => {
-    if (this.trigger !== 'focus') return;
+  private _handleBodyMouseEnter = (): void => {
+    // Cancel a pending hide that would have fired from the anchor's mouseleave
+    // by re-showing (no-op if already visible).
+    if (this.trigger !== 'hover') return;
     void this._show();
   };
 
   /** @internal */
-  private _handleAnchorFocusOut = (): void => {
-    if (this.trigger !== 'focus') return;
-    void this._hide();
+  private _handleBodyMouseLeave = (): void => {
+    if (this.trigger !== 'hover') return;
+    void this._hide(false);
+  };
+
+  /** @internal */
+  private _handleAnchorFocusIn = (): void => {
+    // CRITICAL-02: keyboard users trigger hover-mode popovers via focusin
+    if (this.trigger !== 'focus' && this.trigger !== 'hover') return;
+    void this._show();
+  };
+
+  /** @internal */
+  private _handleAnchorFocusOut = (e: FocusEvent): void => {
+    // CRITICAL-02: for hover mode, only hide when focus leaves both the anchor
+    // and the popover body (i.e. relatedTarget is outside the component).
+    if (this.trigger !== 'focus' && this.trigger !== 'hover') return;
+    const related = e.relatedTarget as Node | null;
+    // If focus is moving into the shadow root (body element), keep popover open
+    if (related && (this.contains(related) || this.shadowRoot?.contains(related))) return;
+    void this._hide(true);
   };
 
   private _handleAnchorSlotChange(): void {
-    this._setAnchorAriaExpanded(this._visible);
+    this._setAnchorAriaAttributes(this._visible);
   }
 
   // ─── Render ───
@@ -354,12 +443,14 @@ export class HelixPopover extends LitElement {
       <div
         part="body"
         id=${this._popoverId}
-        role="region"
+        role="dialog"
         aria-label=${this.label}
         aria-hidden="${!this._visible ? 'true' : 'false'}"
         tabindex="-1"
         ?inert=${!this._visible}
         class=${this._visible ? 'visible' : ''}
+        @mouseenter=${this._handleBodyMouseEnter}
+        @mouseleave=${this._handleBodyMouseLeave}
       >
         <slot></slot>
         ${this.arrow ? html`<div part="arrow"></div>` : ''}

@@ -450,6 +450,34 @@ describe('hx-drawer', () => {
     });
   });
 
+  // ─── No-Header Mode (Keyboard Accessibility) (2) ───
+
+  describe('No-Header Mode (Keyboard Accessibility)', () => {
+    // When no-header is set the close button is absent; Escape must be the sole dismiss
+    // mechanism and must still function correctly (keyboard-accessible per WCAG 2.1 AA).
+    it('Escape key closes drawer in no-header mode', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open no-header></hx-drawer>');
+      await el.updateComplete;
+      // Allow open animation to settle before testing keyboard dismiss
+      await new Promise((r) => setTimeout(r, 50));
+
+      expect(el.open).toBe(true);
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+
+    it('has no axe violations in no-header open state', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open no-header label="Patient Notes"><p>Content</p></hx-drawer>',
+      );
+      await el.updateComplete;
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
   // ─── Focus Restoration (1) ───
 
   describe('Focus Restoration', () => {
