@@ -10,6 +10,8 @@ import { tokenStyles } from '@helixui/tokens/lit';
  * @tag hx-carousel-item
  *
  * @slot - Slide content.
+ *
+ * @csspart slide - The slide wrapper element.
  */
 @customElement('hx-carousel-item')
 export class HelixCarouselItem extends LitElement {
@@ -59,7 +61,7 @@ export class HelixCarouselItem extends LitElement {
   override render() {
     const label = `Slide ${this.slideIndex + 1} of ${this.totalSlides}`;
     return html`
-      <div class="slide-group" role="group" aria-label=${label} tabindex="-1">
+      <div class="slide-group" part="slide" role="group" aria-label=${label} tabindex="-1">
         <slot></slot>
       </div>
     `;

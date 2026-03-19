@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
@@ -106,6 +106,8 @@ export class HelixTreeItem extends LitElement {
    * @internal
    */
   @state() private _selectable = false;
+
+  @query('.item-row') private _itemRowEl!: HTMLElement | null;
 
   // ─── Computed ARIA ───
 
@@ -262,8 +264,7 @@ export class HelixTreeItem extends LitElement {
 
   /** Focus this item's interactive row element. */
   override focus(): void {
-    const row = this.shadowRoot?.querySelector<HTMLElement>('.item-row');
-    row?.focus();
+    this._itemRowEl?.focus();
   }
 
   // ─── Render ───
