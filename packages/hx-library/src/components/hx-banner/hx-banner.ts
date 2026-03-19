@@ -71,6 +71,14 @@ export class HelixBanner extends LitElement {
   dismissible = false;
 
   /**
+   * Heading text for the banner, used to provide context in the action link's and
+   * close button's accessible labels.
+   * @attr heading
+   */
+  @property({ type: String })
+  heading = '';
+
+  /**
    * Label text for the optional action link. Requires action-href to render.
    * @attr action-label
    */
@@ -245,6 +253,9 @@ export class HelixBanner extends LitElement {
                 part="action"
                 class="banner__action"
                 href=${ifDefined(this.actionHref || undefined)}
+                aria-label=${this.heading
+                  ? `${this.actionLabel}: ${this.heading}`
+                  : this.actionLabel}
               >
                 <slot name="action">${this.actionLabel}</slot>
               </a>
@@ -255,7 +266,7 @@ export class HelixBanner extends LitElement {
               <button
                 part="close-button"
                 class="banner__close-button"
-                aria-label="Dismiss"
+                aria-label=${`Dismiss ${this.heading ? `${this.heading} ` : ''}banner`}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}

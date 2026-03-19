@@ -114,8 +114,11 @@ export const helixDialogStyles = css`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: var(--hx-spacing-8, 2rem);
-    height: var(--hx-spacing-8, 2rem);
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    width: var(--hx-touch-target-min, 2.75rem);
+    height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
     margin-left: auto;
     background: transparent;
@@ -140,8 +143,12 @@ export const helixDialogStyles = css`
   }
 
   .dialog__close-btn:focus-visible {
-    outline: 2px solid var(--hx-color-primary-500, #3b82f6);
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(
+        --hx-dialog-close-btn-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+      );
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Body ─── */

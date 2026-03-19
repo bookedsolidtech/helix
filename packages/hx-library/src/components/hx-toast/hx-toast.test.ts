@@ -24,31 +24,31 @@ describe('hx-toast', () => {
     });
 
     it('exposes "icon" CSS part', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const icon = shadowQuery(el, '[part~="icon"]');
       expect(icon).toBeTruthy();
     });
 
     it('exposes "message" CSS part', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const msg = shadowQuery(el, '[part~="message"]');
       expect(msg).toBeTruthy();
     });
 
     it('exposes "action" CSS part', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const action = shadowQuery(el, '[part~="action"]');
       expect(action).toBeTruthy();
     });
 
     it('renders no close button when closable is false', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const btn = shadowQuery(el, '[part~="close-button"]');
       expect(btn).toBeNull();
     });
 
     it('renders close button when closable is true', async () => {
-      const el = await fixture<HelixToast>('<hx-toast closable>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open closable>Test</hx-toast>');
       const btn = shadowQuery(el, '[part~="close-button"]');
       expect(btn).toBeTruthy();
     });
@@ -148,7 +148,7 @@ describe('hx-toast', () => {
     });
 
     it('close button has aria-label', async () => {
-      const el = await fixture<HelixToast>('<hx-toast closable>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open closable>Test</hx-toast>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
       expect(btn.getAttribute('aria-label')).toBeTruthy();
     });
@@ -174,7 +174,7 @@ describe('hx-toast', () => {
 
     it('supports custom closeLabel for localization (P2-06)', async () => {
       const el = await fixture<HelixToast>(
-        '<hx-toast closable close-label="Cerrar notificación">Test</hx-toast>',
+        '<hx-toast open closable close-label="Cerrar notificación">Test</hx-toast>',
       );
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
       expect(btn.getAttribute('aria-label')).toBe('Cerrar notificación');
@@ -324,6 +324,32 @@ describe('hx-toast', () => {
       vi.advanceTimersByTime(1000);
       await el.updateComplete;
       expect(el.open).toBe(false);
+    });
+
+    it('does NOT auto-dismiss when prefers-reduced-motion is reduce (WCAG 2.2.1)', async () => {
+      // Mock matchMedia to report reduced-motion preference
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }));
+
+      const el = await fixture<HelixToast>('<hx-toast duration="1000">Test</hx-toast>');
+      el.show();
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+
+      // Advance well past the duration — toast must remain open
+      vi.advanceTimersByTime(5000);
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+
+      vi.restoreAllMocks();
     });
   });
 

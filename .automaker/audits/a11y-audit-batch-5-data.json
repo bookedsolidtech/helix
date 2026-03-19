@@ -1,0 +1,206 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "claude-sonnet-4-6",
+  "summary": {
+    "componentsAudited": 6,
+    "totalFindings": 18,
+    "critical": 1,
+    "high": 7,
+    "medium": 7,
+    "low": 3
+  },
+  "findings": [
+    {
+      "component": "hx-accordion-item",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "aria-labelledby on role=region does not cross shadow DOM boundary",
+      "description": "The content region uses aria-labelledby pointing to an ID inside the same shadow root (the summary element ID). While aria-labelledby works within a single shadow root, this relies on the browser correctly resolving the reference within the shadow DOM context. More critically, aria-labelledby cannot cross shadow DOM boundaries — if the trigger content were in a different shadow root this would silently fail. The current implementation keeps both IDs in the same shadow root which is correct, but the reliance on generated IDs (hx-accordion-item-N-trigger) that include a module-level counter means SSR or cloning could produce ID collisions. Additionally, the summary already carries aria-expanded and aria-controls, so the region label computation depends entirely on the slotted trigger content being accessible from the summary ID, which may not be computed correctly by all screen readers when the label text is inside a named slot within the shadow root.",
+      "file": "packages/hx-library/src/components/hx-accordion/hx-accordion-item.ts",
+      "line": 140,
+      "fix": "Verify that all target screen readers (NVDA, JAWS, VoiceOver, TalkBack) correctly resolve aria-labelledby to a shadow-DOM-scoped element. As a belt-and-suspenders measure, add aria-label as a computed fallback on the region element derived from the trigger slot text content, which does not require ID resolution."
+    },
+    {
+      "component": "hx-accordion-item",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-expanded on summary is redundant — details/summary has native open state",
+      "description": "The summary element is inside a details element. The native HTML details/summary already communicates expanded/collapsed state to assistive technology via the open attribute on details. Adding aria-expanded on summary is redundant and can cause double announcements in some screen readers (e.g., NVDA+Firefox may announce 'expanded' twice: once from the native details semantics and once from aria-expanded). The ARIA spec notes that aria-expanded should not be used on elements that have equivalent native HTML semantics. While this is a minor double-announcement risk rather than a failure to communicate state, it deviates from the native-first principle.",
+      "file": "packages/hx-library/src/components/hx-accordion/hx-accordion-item.ts",
+      "line": 124,
+      "fix": "Remove aria-expanded from the summary element and rely on the native details/summary semantics. If custom behavior requires overriding native semantics entirely (e.g., role='button' on summary), then aria-expanded is appropriate, but the current implementation uses the native details element and should leverage its built-in accessibility semantics."
+    },
+    {
+      "component": "hx-accordion-item",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "No heading role on accordion trigger — APG pattern recommends heading wrapper",
+      "description": "The WAI-ARIA Authoring Practices Guide Accordion pattern (https://www.w3.org/WAI/ARIA/apg/patterns/accordion/) requires that each accordion trigger button be contained in or associated with a heading element. The current implementation uses a raw summary element with a trigger slot — there is no heading role or element wrapping the trigger. This means screen reader users cannot navigate between accordion headers using heading navigation (H key in NVDA/JAWS, Rotor in VoiceOver). In a healthcare application where accordions may contain patient information sections, the inability to use heading navigation is a significant degradation. The AUDIT.md acknowledges this as P3-1 but the severity is higher in healthcare contexts.",
+      "file": "packages/hx-library/src/components/hx-accordion/hx-accordion-item.ts",
+      "line": 119,
+      "fix": "Wrap the summary element content in a heading element with the appropriate level (default h3, configurable via a heading-level property). The ARIA APG pattern shows: <h3><button aria-expanded>...</button></h3>. With a details/summary approach, add role='heading' and aria-level to the summary or a wrapper element inside summary."
+    },
+    {
+      "component": "hx-accordion",
+      "severity": "medium",
+      "wcagCriteria": "2.1.1",
+      "title": "Arrow key navigation fails when focus is in composed path but not directly on summary",
+      "description": "The _handleKeyDown method in hx-accordion.ts checks for focus using this.shadowRoot?.activeElement ?? document.activeElement. However, accordion items are in the light DOM (children of hx-accordion), not the shadow DOM. The shadow root active element will be null because the focused element is in a child shadow root (hx-accordion-item's shadow root). The code compensates by iterating over items and checking item.shadowRoot?.activeElement === summary. This cross-shadow-root focus detection is fragile: if the user tabs into content inside the expanded panel (which is in hx-accordion-item's shadow root), ArrowDown/Up may unexpectedly fire because currentItem detection could incorrectly include or exclude items. The condition on line 115 checks both summary === activeEl and item.shadowRoot?.activeElement === summary — the first branch (summary === activeEl) will never be true since activeEl is document.activeElement, not the shadow-scoped element.",
+      "file": "packages/hx-library/src/components/hx-accordion/hx-accordion.ts",
+      "line": 109,
+      "fix": "Use document.activeElement to get the top-level focused element, then traverse composedPath() to find the matching summary element across shadow boundaries. Alternatively, listen to focusin events on each item (which bubble and include composedPath) to track which item has focus, storing a _focusedItem reference that the keydown handler can use reliably."
+    },
+    {
+      "component": "hx-data-table",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Table header cells missing scope attribute — column/row relationships undefined",
+      "description": "The th elements rendered in _renderHeaderRow() do not have a scope attribute. Per WCAG 1.3.1 and HTML spec, header cells in a data table must have scope='col' or scope='row' to programmatically associate them with their data cells. Without scope, screen readers must infer the header-to-cell relationship algorithmically, which fails for complex or irregular tables. The hx-table sub-component's hx-th element does support a scope property (default 'col'), but hx-data-table renders its own native th elements directly and omits scope entirely. The ARIA grid role partially mitigates this (grid uses aria-labelledby at the cell level), but the table also has role='grid' which requires proper columnheader/rowheader semantics, and the th elements lack role='columnheader' as well.",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "line": 366,
+      "fix": "Add scope='col' to all th elements in _renderHeaderRow(). For the select-all checkbox th, add scope='col' as well. Consider also adding role='columnheader' explicitly since role='grid' requires its header cells to carry columnheader role for AT to announce them correctly."
+    },
+    {
+      "component": "hx-data-table",
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Selectable rows use aria-selected on tr without role='row' making the attribute invalid",
+      "description": "Data rows in _renderDataRows() set aria-selected on tr elements. The table has role='grid', which is a composite widget. In a grid, rows must have role='row' for aria-selected to be valid on them. The native tr element does carry implicit role='row', however within a role='grid' the explicit ARIA ownership may require explicit role annotations. More critically: aria-selected is set as a string 'true'/'false' when selectable, but when not selectable it uses nothing (omitted). This is correct. However, the tr elements are not focusable and cannot receive focus directly — focus is managed at the cell (td/th) level via the _handleKeydown method. A screen reader user navigating a selectable grid row will hear aria-selected on the row, but selection is toggled via Space on the td cell — the disconnect between where selection is announced (tr) and where it is toggled (td via Space key on data-row-index) may confuse AT users.",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "line": 448,
+      "fix": "Move aria-selected to the focused td cell rather than the tr, consistent with the ARIA grid pattern where aria-selected is on the gridcell. Alternatively, keep it on the tr but ensure screen readers announce the selected state when navigating into any cell of a selected row, which may require aria-selected on individual td cells or using aria-owns/aria-labelledby to associate row state with cell announcements."
+    },
+    {
+      "component": "hx-data-table",
+      "severity": "high",
+      "wcagCriteria": "2.4.7",
+      "title": "Sortable column header button focus indicator only visible within button, not th cell",
+      "description": "Sort buttons within th elements have :focus-visible styling on .sort-btn. However, the th cell itself also has tabindex='0' and a focus-visible style (from the CSS rule matching [part~='th']:focus-visible). When focus is on the sort button (inside the th), the th cell outline may overlap or conflict with the button outline, or neither may render correctly depending on browser. The th itself should not be independently focusable when it contains a sort button — having both the th (tabindex='0') and the button (naturally focusable) in the tab order creates two tab stops for the same logical control. A keyboard user tabs to the th, then must tab again to reach the sort button, which is the actual interactive element.",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "line": 369,
+      "fix": "Remove tabindex='0' from th elements that contain a sort button. The sort button itself is the interactive element and should be the only tab stop. For non-sortable th elements that still need to be part of grid navigation, tabindex='-1' managed programmatically by the grid keyboard handler is the correct approach. The current implementation adds tabindex='0' unconditionally to all th elements regardless of whether they contain a button."
+    },
+    {
+      "component": "hx-data-table",
+      "severity": "medium",
+      "wcagCriteria": "4.1.3",
+      "title": "No live region announcement when sort state changes",
+      "description": "When a sortable column header is clicked and the sort order changes, there is no live region announcement informing screen reader users of the new sort state. The aria-sort attribute on th is updated, but screen readers do not consistently announce aria-sort changes — JAWS 2023 and NVDA do not reliably announce aria-sort attribute changes dynamically. Users who sort a column have no immediate confirmation of which column is now sorted and in which direction, unless they navigate back to the header. In a healthcare data table, this could cause a user to misread patient data believing it is sorted one way when it is another.",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "line": 200,
+      "fix": "Add an aria-live='polite' region (visually hidden) that announces the new sort state after sorting. The announcement should say something like 'Table sorted by [column name] [ascending/descending]'. Update this region's text content in _handleSort() after dispatching the sort event."
+    },
+    {
+      "component": "hx-data-table",
+      "severity": "medium",
+      "wcagCriteria": "1.3.1",
+      "title": "label attribute not required — missing label is only a dev warning, not an enforcement",
+      "description": "The label property on hx-data-table is documented as 'Required when the table has columns — a missing label is a WCAG 4.1.2 violation' in the JSDoc. However, the implementation only emits a devWarn() console warning. In production builds where devWarn is likely suppressed, or when consumed via Drupal without a developer noticing the warning, the table will render with no accessible name at all (aria-label is omitted via nothing). A table with role='grid' and no accessible name is a WCAG 4.1.2 failure. The enforcement exists only at development time.",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "line": 186,
+      "fix": "In addition to the devWarn, render a visually-hidden caption or apply a fallback aria-label derived from column names when no label is provided. This ensures AT users always have some accessible name even when the developer omits the label attribute. At minimum, document in the Storybook story that this is required."
+    },
+    {
+      "component": "hx-table",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Mobile responsive layout hides thead visually but does not provide data-label on td cells",
+      "description": "The hx-th mobile CSS visually hides header cells at max-width 768px using the clip/position pattern (which is correct — it keeps them in the accessibility tree). However, the hx-td component uses td::before { content: attr(data-label) } to visually display column labels on mobile. The data-label attribute is only set when the consumer passes a label attribute to hx-td. If label is not provided on each hx-td, the mobile layout shows data cells with no column context at all — neither visible headers (hidden by CSS) nor data-label pseudo-content. Screen reader users on mobile still have the header-to-cell association via table semantics, but sighted mobile users lose all column context. This is a SC 1.3.1 failure for visual presentation.",
+      "file": "packages/hx-library/src/components/hx-table/hx-td.ts",
+      "line": 65,
+      "fix": "Either (1) require the label attribute on hx-td and emit a devWarn when absent in a table context, or (2) implement a mechanism where hx-table automatically propagates column header text to each hx-td as data-label during slot assignment. Option 2 is preferred for ease of use but requires cross-component communication. Option 1 is simpler but requires consumers to duplicate header labels."
+    },
+    {
+      "component": "hx-table",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "hx-table sets role=table redundantly on a native table element",
+      "description": "The hx-table render method sets role='table' on a native HTML table element. The comment in the source correctly explains this is because sub-components use display:contents which can confuse AT in Shadow DOM. However, setting role='table' on a native table element is redundant at best and can override the richer native table semantics that browsers compute for AT (such as the implicit rowcount/colcount computed from actual rows and columns). The ARIA spec says role='table' is intended for non-table elements being used as tables. Using it on a native table element may cause some AT to use ARIA table semantics rather than native HTML table semantics, which have less browser-computed metadata. This should be verified against actual AT behavior before considering it resolved.",
+      "file": "packages/hx-library/src/components/hx-table/hx-table.ts",
+      "line": 90,
+      "fix": "Test whether removing role='table' from the native table element causes AT to lose the table semantics in Shadow DOM due to the display:contents on sub-components. If removal breaks AT recognition, document exactly which AT and browser combinations require the explicit role. Alternatively, consider using aria-rowcount and aria-colcount to supplement native semantics rather than overriding with role='table'."
+    },
+    {
+      "component": "hx-structured-list",
+      "severity": "critical",
+      "wcagCriteria": "1.3.1",
+      "title": "Structured list uses role=list/listitem but component is documented as description list semantics",
+      "description": "The hx-structured-list renders a div with role='list' set on the host (via connectedCallback) and hx-structured-list-row sets role='listitem' on the host. The rows render a two-column grid of label and value divs with no ARIA roles. The JSDoc states the component 'Renders as a description list for accessible term/definition semantics' and uses 'label/value pair' language, but the actual semantics are generic list/listitem. Screen readers announce this as 'list' not as a definition list. Consumers expecting description list semantics (proper term/definition associations, correct reading order) are not getting them. In a healthcare context where this is used for patient demographics (Name: Jane Doe, DOB: 01/01/1980), the lack of term/definition association means AT users cannot distinguish which values belong to which labels beyond linear reading order. The label div has no semantic connection to the value div.",
+      "file": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.ts",
+      "line": 38,
+      "fix": "The component should use actual description list semantics. Two approaches: (1) Render a native dl element in shadow DOM with the list in it, and use dt/dd within hx-structured-list-row's shadow DOM — but dl/dt/dd relationship cannot cross shadow boundaries. (2) Set role='definition list' (which maps to 'list' in AT anyway — there is no ARIA role for dl). The best approach for healthcare use is to use the dl/dt/dd elements with role='term' and role='definition' on the label and value divs respectively within hx-structured-list-row. The prior audit (v2) noted this was fixed by removing role='term'/'definition' to avoid axe violations, but the correct fix is to add role='term' to .row__label and role='definition' to .row__value, with the row container carrying no role (or role='presentation'). This passes axe because the parent carries role='list' which allows term/definition as implicit children in some ARIA versions — but specifically, use the ARIA 1.2 definition list pattern."
+    },
+    {
+      "component": "hx-structured-list",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Label and value cells have no programmatic association within the shadow DOM",
+      "description": "Within hx-structured-list-row's shadow DOM, the .row__label div and .row__value div are siblings in a CSS grid. There is no ARIA relationship (aria-labelledby, aria-describedby, role='term'/'definition') linking the label cell to the value cell. In the shadow DOM context, a screen reader encountering the row will read the label div content and then the value div content sequentially, but there is no semantic indication that these are paired. With role='listitem' on the host, AT reads this as a generic list item with two text nodes. This is particularly problematic for AT users who use browse mode and navigate by element type, as label-value pairing is completely invisible.",
+      "file": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.ts",
+      "line": 109,
+      "fix": "Add role='term' to .row__label and role='definition' to .row__value within the shadow DOM. Per WAI-ARIA spec, term and definition roles are valid within a generic container when the list context is provided by a parent. Alternatively, render the label with a visually-hidden colon separator to establish the pairing in linear reading order, and add aria-label to the value div referencing the label text."
+    },
+    {
+      "component": "hx-structured-list",
+      "severity": "low",
+      "wcagCriteria": "2.4.7",
+      "title": "Action buttons in the actions slot have no focus indicator styles provided by the component",
+      "description": "The hx-structured-list-row has an actions slot inside .row__value. Action buttons placed in this slot are in the light DOM and will use their own or the page's focus styles. The component provides no :slotted() focus ring styles and the .row__actions container provides no focus context. While action buttons should provide their own focus rings, the component's layout could obscure them (e.g., overflow:hidden on a parent). This is a low-severity concern since the responsibility primarily falls on the slotted content.",
+      "file": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.ts",
+      "line": 115,
+      "fix": "Add ::slotted([slot='actions'] *:focus-visible) styles that ensure a focus ring is visible. This is a belt-and-suspenders approach since slotted content should manage its own focus rings."
+    },
+    {
+      "component": "hx-list",
+      "severity": "high",
+      "wcagCriteria": "1.3.1",
+      "title": "Numbered list variant uses div with role=list instead of native ol element",
+      "description": "When variant='numbered', hx-list renders a div with role='list' and list-style:decimal CSS. It does not render an ol element. Screen readers using native list semantics (which provide item count announcements like '3 items') will correctly recognize role='list', but they will NOT announce sequential numbering. The visual decimal numbers shown by CSS list-style are purely presentational and invisible to AT. A screen reader user navigating a numbered list (e.g., a list of clinical procedure steps) will hear 'list, bullet' or 'list, item' without knowing the step number. For medical procedures where step ordering is critical for patient safety, this is a high-severity issue.",
+      "file": "packages/hx-library/src/components/hx-list/hx-list.ts",
+      "line": 162,
+      "fix": "Render an ol element (with role='list' to preserve semantics in Shadow DOM) for the numbered variant. Native ol provides implicit numbering that screen readers announce. Alternatively, use aria-posinset and aria-setsize on each hx-list-item to provide position information to AT, but the native ol approach is simpler and more reliable."
+    },
+    {
+      "component": "hx-list",
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Interactive listbox missing aria-activedescendant — keyboard focus management incomplete",
+      "description": "When variant='interactive', hx-list renders a div with role='listbox'. The WAI-ARIA Listbox pattern supports two keyboard focus models: (1) DOM focus moves to each option, or (2) DOM focus stays on the listbox and aria-activedescendant points to the focused option. The current implementation uses model 1 (DOM focus moves), which requires hx-list-item elements to receive focus. The hx-list-item correctly sets tabindex='0' on the host in interactive mode. However, the listbox container itself has no tabindex and is not focusable. When focus moves INTO the listbox (e.g., via Tab), the first option should receive focus per the ARIA APG Listbox pattern. Currently, focus behavior on initial Tab into the listbox is undefined — no item starts with focus, and the listbox itself is not in the tab order. A user tabbing into the listbox may see no visible focus indicator.",
+      "file": "packages/hx-library/src/components/hx-list/hx-list.ts",
+      "line": 176,
+      "fix": "Implement roving tabindex on the listbox: only the currently active option should have tabindex='0', all others should have tabindex='-1'. When the listbox first receives focus (or when no item is selected), the first non-disabled item should receive tabindex='0'. Arrow key navigation should update which item has tabindex='0'. This is the standard roving tabindex pattern for listboxes."
+    },
+    {
+      "component": "hx-list",
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Bulleted list variant renders div with role=list instead of native ul element",
+      "description": "When variant='bulleted', hx-list renders the generic div container with role='list' and CSS list-style:disc. While role='list' correctly communicates list semantics to AT, some screen readers have historically suppressed list announcements on elements styled with list-style:none — this suppression was originally introduced for ul elements but some heuristics may apply to role='list' elements too depending on browser/AT combinations. More importantly, rendering a native ul element would be more semantically accurate and future-proof.",
+      "file": "packages/hx-library/src/components/hx-list/hx-list.ts",
+      "line": 176,
+      "fix": "Use a native ul element for bulleted variant (similar to how description uses dl). Add role='list' explicitly on the ul to prevent screen reader list suppression heuristics. This also better matches the semantic intent of the component."
+    },
+    {
+      "component": "hx-carousel",
+      "severity": "high",
+      "wcagCriteria": "4.1.3",
+      "title": "Autoplay live region uses aria-live=off during autoplay ticks — announcements suppressed",
+      "description": "During autoplay, _autoplayTick() sets this._livePolite = false before calling goTo(). The live region's aria-live attribute is bound to this._livePolite: 'polite' when true, 'off' when false. This means during autoplay, the live region is aria-live='off' and slide change announcements are completely suppressed. While suppressing announcements during autoplay is intentional to avoid interrupting the user, WCAG 4.1.3 requires that status messages (including slide position changes) be programmatically determinable without requiring focus. When autoplay is running, a screen reader user has no way to know which slide is currently active unless they navigate to check. The distinction between manual navigation (polite announcement) and autoplay (no announcement) is not communicated.",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.ts",
+      "line": 398,
+      "fix": "Consider using aria-live='off' during autoplay (current approach) but ensure the current slide position is always determinable via another mechanism — for example, the pagination dots already have aria-current='true' on the active dot, so AT users can navigate to pagination to determine position. Document this design decision. Alternatively, use aria-live='polite' but with a significant debounce (>500ms after autoplay tick) so rapid auto-advances do not create a flood of announcements. Also add an aria-label update on the carousel region itself reflecting current slide (e.g., 'Featured content carousel, slide 2 of 5')."
+    },
+    {
+      "component": "hx-carousel",
+      "severity": "medium",
+      "wcagCriteria": "2.1.1",
+      "title": "Keyboard navigation intercepts arrow keys globally on carousel — may conflict with interactive slide content",
+      "description": "The _handleKeydown handler on hx-carousel intercepts ArrowLeft/Right (horizontal) and ArrowUp/Down (vertical) key events globally via this.addEventListener('keydown'). If a slide contains interactive content that itself uses arrow keys (e.g., a select dropdown, a radio group, a date picker inside a slide), those arrow keys will be intercepted by the carousel handler and cause the slide to advance. The carousel does not check whether the key event originated from within interactive content inside a slide. e.preventDefault() is called on all matched keys.",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.ts",
+      "line": 502,
+      "fix": "Check whether the event target is inside an interactive element before intercepting arrow keys. For example: if (e.target instanceof HTMLSelectElement || e.target instanceof HTMLInputElement || (e.target as HTMLElement).closest('[role=listbox],[role=combobox],[role=radiogroup]')) return; This allows widgets inside slides to use arrow keys normally while still enabling carousel arrow key navigation when focus is on the carousel's own navigation controls or slide group."
+    }
+  ]
+}

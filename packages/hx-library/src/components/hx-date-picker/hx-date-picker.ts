@@ -824,7 +824,7 @@ export class HelixDatePicker extends LitElement {
             role="gridcell"
             data-day=${dayNumber}
             aria-label=${ariaLabel}
-            aria-selected=${isSelected ? 'true' : 'false'}
+            aria-selected=${isSelected ? 'true' : nothing}
             aria-disabled=${isDisabled ? 'true' : nothing}
             aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
@@ -907,7 +907,7 @@ export class HelixDatePicker extends LitElement {
             type="button"
             aria-label=${this._isOpen ? 'Close calendar' : 'Open calendar'}
             aria-haspopup="dialog"
-            aria-expanded=${this._isOpen ? 'true' : 'false'}
+            aria-expanded=${this._isOpen ? 'true' : nothing}
             aria-controls=${this._calendarId}
             ?disabled=${this.disabled}
             @click=${this._toggleCalendar}

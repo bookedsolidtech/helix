@@ -62,8 +62,9 @@ export const helixDataTableStyles = css`
 
   th.col-checkbox,
   td.col-checkbox {
-    width: 40px;
-    min-width: 40px;
+    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    width: var(--hx-touch-target-min, 2.75rem);
+    min-width: var(--hx-touch-target-min, 2.75rem);
     padding-right: var(--hx-space-2, 0.5rem);
   }
 

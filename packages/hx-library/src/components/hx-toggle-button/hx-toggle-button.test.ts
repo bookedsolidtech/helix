@@ -46,7 +46,7 @@ describe('hx-toggle-button', () => {
   // ─── ARIA (3) ───
 
   describe('ARIA', () => {
-    it('sets aria-pressed="false" when not pressed', async () => {
+    it('has aria-pressed="false" when not pressed', async () => {
       const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('aria-pressed')).toBe('false');

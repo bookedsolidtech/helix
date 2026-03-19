@@ -1,8 +1,9 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
 import type { HelixTreeItem, HxTreeItemSelectDetail } from './hx-tree-item.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /** Selection mode for the tree. */
 export type TreeSelection = 'none' | 'single' | 'multiple';
@@ -253,6 +254,17 @@ export class HelixTreeView extends LitElement {
     this._updateRovingTabindex(items, clamped);
   }
 
+  // ─── Lifecycle ───
+
+  override firstUpdated(): void {
+    if (!this.label) {
+      devWarn(
+        'hx-tree-view',
+        'No accessible label provided. Set the `label` attribute on hx-tree-view so screen readers can identify this tree (WCAG 4.1.2).',
+      );
+    }
+  }
+
   // ─── Render ───
 
   override render() {
@@ -268,7 +280,7 @@ export class HelixTreeView extends LitElement {
         class="tree"
         role="tree"
         tabindex=${containerTabindex}
-        aria-label=${this.label || nothing}
+        aria-label=${this.label || 'Tree'}
         aria-multiselectable=${this.selection === 'multiple' ? 'true' : 'false'}
         @hx-tree-item-select=${this._handleTreeItemSelect}
         @keydown=${this._handleKeyDown}

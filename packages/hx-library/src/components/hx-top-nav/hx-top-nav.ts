@@ -182,7 +182,7 @@ export class HelixTopNav extends LitElement {
               type="button"
               aria-expanded=${String(this._mobileOpen)}
               aria-controls="nav-menu"
-              aria-label="Toggle navigation"
+              aria-label=${this._mobileOpen ? 'Close navigation' : 'Open navigation'}
               @click=${this._handleMobileToggle}
             >
               ${this._renderHamburgerIcon()}

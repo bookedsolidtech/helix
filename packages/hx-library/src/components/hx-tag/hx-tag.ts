@@ -134,6 +134,21 @@ export class HelixTag extends LitElement {
     this._hasSuffix = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  // ─── WCAG 1.4.1: Semantic variant label map ───
+  // Variants with semantic meaning require a non-color cue so users who cannot
+  // distinguish variants by color alone (e.g. color-blind or high-contrast mode)
+  // still receive the status context from assistive technology.
+
+  private static readonly _SEMANTIC_VARIANT_LABELS: Partial<Record<HelixTag['variant'], string>> = {
+    success: 'Success',
+    warning: 'Warning',
+    danger: 'Danger',
+  };
+
+  private get _semanticVariantLabel(): string {
+    return HelixTag._SEMANTIC_VARIANT_LABELS[this.variant] ?? '';
+  }
+
   // ─── Render ───
 
   override render() {
@@ -154,8 +169,11 @@ export class HelixTag extends LitElement {
       'tag__suffix--hidden': !this._hasSuffix,
     };
 
+    const variantLabel = this._semanticVariantLabel;
+
     return html`
       <span part="base" class=${classMap(classes)}>
+        ${variantLabel ? html`<span class="tag__variant-label">${variantLabel}: </span>` : nothing}
         <span part="prefix" class=${classMap(prefixClasses)}>
           <slot name="prefix" @slotchange=${this._onPrefixSlotChange}></slot>
         </span>
@@ -169,7 +187,7 @@ export class HelixTag extends LitElement {
           ? html`<button
               part="remove-button"
               class="tag__remove-button"
-              aria-label=${`Remove ${this._defaultSlotText}`}
+              aria-label=${`Remove ${this._defaultSlotText || 'tag'}`}
               ?disabled=${this.disabled}
               @click=${this._handleRemove}
             >
