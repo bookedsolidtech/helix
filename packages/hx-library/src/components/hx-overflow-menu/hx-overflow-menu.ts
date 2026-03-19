@@ -1,9 +1,11 @@
 import { LitElement, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset } from '@floating-ui/dom';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
+
+let _counter = 0;
 
 /**
  * An overflow menu (kebab/meatball menu) that reveals hidden actions via a
@@ -108,7 +110,10 @@ export class HelixOverflowMenu extends LitElement {
    * Unique ID for the floating panel element, used to wire aria-controls on the trigger button.
    * @internal
    */
-  private readonly _panelId = `hx-overflow-menu-panel-${Math.random().toString(36).slice(2, 9)}`;
+  private readonly _panelId = `hx-overflow-menu-panel-${++_counter}`;
+
+  @query('[part~="button"]') private _buttonEl!: HTMLButtonElement | null;
+  @query('[part~="panel"]') private _panelEl!: HTMLElement | null;
 
   // ─── Lifecycle ───
 
@@ -152,8 +157,8 @@ export class HelixOverflowMenu extends LitElement {
   // ─── Positioning (Floating UI) ───
 
   private async _updatePosition(): Promise<void> {
-    const trigger = this.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
-    const panel = this.shadowRoot?.querySelector('[part~="panel"]') as HTMLElement | null;
+    const trigger = this._buttonEl as HTMLElement | null;
+    const panel = this._panelEl;
     if (!trigger || !panel) return;
 
     const { x, y } = await computePosition(trigger, panel, {
@@ -213,7 +218,7 @@ export class HelixOverflowMenu extends LitElement {
     if (e.key === 'Escape') {
       e.stopPropagation();
       this._hide();
-      (this.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null)?.focus();
+      this._buttonEl?.focus();
       return;
     }
     if (e.key === 'Tab') {
