@@ -24,31 +24,31 @@ describe('hx-toast', () => {
     });
 
     it('exposes "icon" CSS part', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const icon = shadowQuery(el, '[part~="icon"]');
       expect(icon).toBeTruthy();
     });
 
     it('exposes "message" CSS part', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const msg = shadowQuery(el, '[part~="message"]');
       expect(msg).toBeTruthy();
     });
 
     it('exposes "action" CSS part', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const action = shadowQuery(el, '[part~="action"]');
       expect(action).toBeTruthy();
     });
 
     it('renders no close button when closable is false', async () => {
-      const el = await fixture<HelixToast>('<hx-toast>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
       const btn = shadowQuery(el, '[part~="close-button"]');
       expect(btn).toBeNull();
     });
 
     it('renders close button when closable is true', async () => {
-      const el = await fixture<HelixToast>('<hx-toast closable>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open closable>Test</hx-toast>');
       const btn = shadowQuery(el, '[part~="close-button"]');
       expect(btn).toBeTruthy();
     });
@@ -148,7 +148,7 @@ describe('hx-toast', () => {
     });
 
     it('close button has aria-label', async () => {
-      const el = await fixture<HelixToast>('<hx-toast closable>Test</hx-toast>');
+      const el = await fixture<HelixToast>('<hx-toast open closable>Test</hx-toast>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
       expect(btn.getAttribute('aria-label')).toBeTruthy();
     });

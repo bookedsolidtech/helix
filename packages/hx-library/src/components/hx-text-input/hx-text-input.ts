@@ -476,7 +476,7 @@ export class HelixTextInput extends LitElement {
               >`
             : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
         </div>
-        ${this.helpText || this._hasHelpTextSlot
+        ${(this.helpText || this._hasHelpTextSlot) && !hasError
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
                 <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
