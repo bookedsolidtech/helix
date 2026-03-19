@@ -133,6 +133,10 @@ export const helixSideNavStyles = css`
       transition: none;
     }
 
+    .side-nav__toggle {
+      transition: none;
+    }
+
     .side-nav__toggle svg {
       transition: none;
     }

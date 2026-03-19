@@ -148,6 +148,16 @@ export const helixCodeSnippetStyles = css`
     text-align: right;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .code-snippet__copy-button {
+      transition: none;
+    }
+
+    .code-snippet__expand-button {
+      transition: none;
+    }
+  }
+
   /* ─── Screen-reader only ─── */
 
   .sr-only {

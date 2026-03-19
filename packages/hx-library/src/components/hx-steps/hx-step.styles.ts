@@ -211,6 +211,16 @@ export const helixStepStyles = css`
     padding-bottom: 0;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .step__indicator {
+      transition: none;
+    }
+
+    .step__connector {
+      transition: none;
+    }
+  }
+
   /* ─── Dark Mode ─── */
 
   @media (prefers-color-scheme: dark) {
