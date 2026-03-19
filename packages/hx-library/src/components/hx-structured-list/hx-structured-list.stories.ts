@@ -377,3 +377,10 @@ export const IsolatedRow: Story = {
     await expect(actionBtn?.textContent).toBe('Edit');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    bordered: true,
+  },
+};

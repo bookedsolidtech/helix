@@ -488,3 +488,32 @@ export const PatientEducation: Story = {
     await expect(slideChangeFired).toBe(true);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Demo carousel',
+    loop: false,
+    autoplay: false,
+    autoplayInterval: 3000,
+    slidesPerPage: 1,
+    slidesPerMove: 1,
+    orientation: 'horizontal',
+    mouseDragging: false,
+  },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-carousel label="Patient Education Carousel" style="max-width: 600px;">
+      <hx-carousel-item>
+        <div style="padding: 2rem; text-align: center; background: #f0f4f8;">Slide 1: Hand Hygiene</div>
+      </hx-carousel-item>
+      <hx-carousel-item>
+        <div style="padding: 2rem; text-align: center; background: #e8f5e9;">Slide 2: Medication Safety</div>
+      </hx-carousel-item>
+      <button slot="previous-button" aria-label="Previous slide" style="padding: 0.5rem 1rem;">Prev</button>
+      <button slot="next-button" aria-label="Next slide" style="padding: 0.5rem 1rem;">Next</button>
+    </hx-carousel>
+  `,
+};

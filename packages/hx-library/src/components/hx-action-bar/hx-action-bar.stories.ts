@@ -497,3 +497,8 @@ export const WithOverflowSlot: Story = {
     await expect(assigned?.length).toBe(2);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: { variant: 'outlined' },
+};

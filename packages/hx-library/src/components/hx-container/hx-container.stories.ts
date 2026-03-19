@@ -1568,3 +1568,8 @@ export const DashboardLayout: Story = {
     expect(contentContainer.getAttribute('width')).toBe('xl');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: { width: 'full' },
+};

@@ -1286,3 +1286,20 @@ export const MedicationAcknowledgement: Story = {
     await expect(checkbox.checkValidity()).toBe(true);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'I agree to the patient data handling terms',
+  },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-checkbox value="consent">
+      I agree to the <a href="/terms">terms and conditions</a> for patient data access
+      <span slot="help-text">Required for portal access. Review the full policy before agreeing.</span>
+      <span slot="error">You must accept the terms to continue.</span>
+    </hx-checkbox>
+  `,
+};

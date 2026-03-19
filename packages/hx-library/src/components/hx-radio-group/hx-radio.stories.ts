@@ -390,3 +390,11 @@ export const InARadioGroup: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    value: 'consent',
+    label: 'I consent to treatment',
+  },
+};

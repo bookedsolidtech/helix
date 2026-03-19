@@ -560,3 +560,13 @@ export const ErrorEventDemo: Story = {
     await expect(errorFired).toBe(true);
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  args: {
+    src: 'https://picsum.photos/seed/decorative/800/400',
+  },
+};
