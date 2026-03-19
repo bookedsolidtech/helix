@@ -20,6 +20,9 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @slot icon - Custom icon to override the default variant icon.
  * @slot actions - Action buttons rendered within the alert.
  *
+ * @attr {string} heading - Text used to build the close button's contextual aria-label
+ *   (e.g., "Close Low blood pressure alert"). When absent the label falls back to "Close alert".
+ *
  * @fires {CustomEvent<{reason: string}>} hx-close - Dispatched when the user dismisses the alert.
  * @fires {CustomEvent} hx-after-close - Dispatched after the alert is dismissed.
  *
@@ -61,6 +64,15 @@ export class HelixAlert extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   dismissible = false;
+
+  /**
+   * Optional heading text that provides context for the close button's accessible label.
+   * When provided, the close button is announced as "Close [heading] alert".
+   * When absent, the close button falls back to "Close alert".
+   * @attr heading
+   */
+  @property({ type: String })
+  heading = '';
 
   /**
    * Whether the alert is visible. Add the `open` attribute to show the alert.
@@ -362,7 +374,7 @@ export class HelixAlert extends LitElement {
               <button
                 part="close-button"
                 class="alert__close-button"
-                aria-label="Close"
+                aria-label=${`Close ${this.heading ? `${this.heading} ` : ''}alert`}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}

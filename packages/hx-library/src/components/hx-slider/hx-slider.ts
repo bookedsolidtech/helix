@@ -6,6 +6,7 @@ import { live } from 'lit/directives/live.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSliderStyles } from './hx-slider.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxSliderIdCounter = 0;
@@ -230,6 +231,13 @@ export class HelixSlider extends LitElement {
   override firstUpdated(): void {
     // Enable fill transition after initial render to suppress animation on mount
     requestAnimationFrame(() => this.setAttribute('data-ready', ''));
+    // WCAG 4.1.2: warn when no accessible name is available for the range input
+    if (!this.label && !this._hasLabelSlot) {
+      devWarn(
+        'hx-slider',
+        'No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled slider violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      );
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -436,6 +444,7 @@ export class HelixSlider extends LitElement {
               ?disabled=${this.disabled}
               name=${ifDefined(this.name || undefined)}
               aria-labelledby=${ifDefined(hasLabel ? this._labelId : undefined)}
+              aria-label=${ifDefined(!hasLabel ? 'Slider' : undefined)}
               aria-valuetext=${ifDefined(this.valueText || undefined)}
               aria-describedby=${ifDefined(describedBy)}
               @input=${this._handleInput}

@@ -111,7 +111,7 @@ export class HelixAccordion extends LitElement {
 
     const items = Array.from(this.querySelectorAll<HelixAccordionItem>('hx-accordion-item'));
     for (const item of items) {
-      const summary = item.shadowRoot?.querySelector('summary');
+      const summary = item.shadowRoot?.querySelector('[part="trigger"]');
       if (summary === activeEl || item.shadowRoot?.activeElement === summary) {
         currentItem = item;
         break;
@@ -145,7 +145,7 @@ export class HelixAccordion extends LitElement {
 
     e.preventDefault();
     const targetItem = enabledItems[targetIndex];
-    const targetSummary = targetItem?.shadowRoot?.querySelector('summary');
+    const targetSummary = targetItem?.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]');
     targetSummary?.focus();
   };
 
@@ -153,7 +153,7 @@ export class HelixAccordion extends LitElement {
     const items = this.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
     const triggers: HTMLElement[] = [];
     items.forEach((item) => {
-      const summary = item.shadowRoot?.querySelector<HTMLElement>('summary');
+      const summary = item.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]');
       if (summary) triggers.push(summary);
     });
     return triggers;

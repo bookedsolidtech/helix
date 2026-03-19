@@ -433,10 +433,10 @@ describe('hx-alert', () => {
   // ─── Close Button Accessibility (2) ───
 
   describe('Close button accessibility', () => {
-    it('close button has aria-label="Close"', async () => {
+    it('close button has aria-label="Close alert" (default when no heading set)', async () => {
       const el = await fixture<HxAlert>('<hx-alert dismissible>Dismissible</hx-alert>');
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
-      expect(closeBtn.getAttribute('aria-label')).toBe('Close');
+      expect(closeBtn.getAttribute('aria-label')).toBe('Close alert');
     });
 
     it('close button is a <button> element', async () => {

@@ -288,10 +288,10 @@ describe('hx-tree-view', () => {
       expect(tree?.getAttribute('aria-label')).toBe('File browser');
     });
 
-    it('does not set aria-label when label is empty', async () => {
+    it('falls back to "Tree" aria-label when label is empty', async () => {
       const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
-      expect(tree?.getAttribute('aria-label')).toBeNull();
+      expect(tree?.getAttribute('aria-label')).toBe('Tree');
     });
   });
 

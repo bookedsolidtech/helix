@@ -179,9 +179,11 @@ export class HelixProgressBar extends LitElement {
 
     return html`
       <div class=${classMap(classes)}>
-        <span id=${labelId} part="label" class="progress-bar__label">
-          <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
-        </span>
+        ${hasVisibleLabel || this.label
+          ? html`<span id=${labelId} part="label" class="progress-bar__label">
+              <slot name="label" @slotchange=${this._onLabelSlotChange}></slot>
+            </span>`
+          : html`<slot name="label" @slotchange=${this._onLabelSlotChange} hidden></slot>`}
         ${this.description
           ? html`<span id=${descId} class="sr-only">${this.description}</span>`
           : nothing}
