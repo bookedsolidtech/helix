@@ -25,13 +25,13 @@ describe('hx-popover', () => {
       expect(wrapper).toBeTruthy();
     });
 
-    it('renders body with role=region', async () => {
+    it('renders body with role=dialog', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
-      const body = shadowQuery(el, '[role="region"]');
+      const body = shadowQuery(el, '[role="dialog"]');
       expect(body).toBeTruthy();
-      expect(body?.getAttribute('role')).toBe('region');
+      expect(body?.getAttribute('role')).toBe('dialog');
     });
 
     it('body is hidden by default', async () => {
@@ -250,6 +250,16 @@ describe('hx-popover', () => {
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.getAttribute('aria-label')).toBe('Patient details');
     });
+
+    // HIGH-02: anchor must advertise the popup type to assistive technology
+    it('anchor has aria-haspopup="dialog" set on firstUpdated', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor" id="trig">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const trigger = el.querySelector('#trig');
+      expect(trigger?.getAttribute('aria-haspopup')).toBe('dialog');
+    });
   });
 
   // ─── Behavior: Show/Hide (4) ───
@@ -341,6 +351,73 @@ describe('hx-popover', () => {
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
     });
 
+    // WCAG 1.4.13: pointer moving from anchor into body must keep popover open
+    it('stays open when pointer moves from anchor into body when trigger="hover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+
+      // Show via mouseenter on trigger wrapper
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+
+      // Simulate pointer leaving anchor wrapper (without entering body yet)
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      // Immediately enter the body — pointer moved directly from anchor into body
+      body.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+
+      // Popover must remain visible; dismissing it while pointer is inside the body
+      // would violate WCAG 1.4.13 (Content on Hover or Focus)
+      expect(body.classList.contains('visible')).toBe(true);
+    });
+
+    // WCAG 1.4.13: popover closes only when pointer leaves the body itself
+    it('closes when pointer leaves the body when trigger="hover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+
+      // Open via mouseenter on wrapper
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+
+      // Move pointer into body (keeps open)
+      body.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+
+      // Now leave the body — popover should close
+      body.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(false);
+    });
+
+    // WCAG 1.4.13 / keyboard: Escape dismisses a hover-triggered popover from document level
+    it('Escape key dismisses hover-triggered popover from document level', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+
+      // Open via hover
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+
+      // Fire Escape on document (not on the element) — matches real-world usage where
+      // focus may be anywhere on the page when the user presses Escape
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
+    });
+
     // P1-06: focus trigger — focusin shows, focusout hides
     it('shows on focusin when trigger="focus"', async () => {
       const el = await fixture<HelixPopover>(
@@ -364,6 +441,70 @@ describe('hx-popover', () => {
       wrapper.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
       await el.updateComplete;
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
+    });
+  });
+
+  // ─── Focus Management (MEDIUM-03) ───
+
+  describe('Focus Management', () => {
+    // MEDIUM-03: focus moves to body on show
+    it('moves focus to the popover body when shown via click', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor" id="trig">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body).toBeTruthy();
+      // The body element should be the active element inside the shadow root
+      expect(el.shadowRoot?.activeElement).toBe(body);
+    });
+
+    // MEDIUM-03: focus returns to trigger on Escape dismissal
+    it('returns focus to the anchor trigger when dismissed via Escape', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor" id="trig">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const trigger = el.querySelector<HTMLElement>('#trig')!;
+      trigger.focus();
+
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    // MEDIUM-03: click-outside does not force focus back to trigger
+    it('does not restore focus to trigger when dismissed via click-outside', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor" id="trig">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+
+      // Allow the deferred document click listener to register
+      await new Promise((r) => setTimeout(r, 10));
+
+      // Place focus somewhere outside the popover before clicking outside
+      const outsideBtn = document.createElement('button');
+      outsideBtn.id = 'outside';
+      document.body.appendChild(outsideBtn);
+      outsideBtn.focus();
+
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+
+      // Focus should remain on the outside element, not be stolen back to the trigger
+      const trigger = el.querySelector<HTMLElement>('#trig')!;
+      expect(document.activeElement).not.toBe(trigger);
+
+      outsideBtn.remove();
     });
   });
 
