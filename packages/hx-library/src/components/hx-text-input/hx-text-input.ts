@@ -469,13 +469,13 @@ export class HelixTextInput extends LitElement {
           </span>
         </div>
 
-        ${hasError
-          ? html`
-              <div part="error" class="field__error" id=${this._errorId} role="alert">
-                <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
-              </div>
-            `
-          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        <div part="error" class="field__error" id=${this._errorId} role="alert" aria-atomic="true">
+          ${hasError
+            ? html`<slot name="error" @slotchange=${this._handleErrorSlotChange}
+                >${this.error}</slot
+              >`
+            : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        </div>
         ${(this.helpText || this._hasHelpTextSlot) && !hasError
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
