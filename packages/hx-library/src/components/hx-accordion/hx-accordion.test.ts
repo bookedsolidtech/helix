@@ -366,7 +366,7 @@ describe('hx-accordion-item', () => {
       `);
 
       const summary = shadowQuery<HTMLElement>(el, 'summary')!;
-      expect(summary.getAttribute('aria-expanded')).toBe('false');
+      expect(summary.hasAttribute('aria-expanded')).toBe(false);
 
       summary.click();
       await el.updateComplete;

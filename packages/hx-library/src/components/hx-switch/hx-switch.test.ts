@@ -54,10 +54,10 @@ describe('hx-switch', () => {
       expect(track?.getAttribute('aria-checked')).toBe('true');
     });
 
-    it('sets aria-checked="false" when unchecked', async () => {
+    it('has no aria-checked when unchecked', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
-      expect(track?.getAttribute('aria-checked')).toBe('false');
+      expect(track?.hasAttribute('aria-checked')).toBe(false);
     });
   });
 
@@ -446,7 +446,7 @@ describe('hx-switch', () => {
     it('aria-checked toggles with checked state', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
-      expect(track?.getAttribute('aria-checked')).toBe('false');
+      expect(track?.hasAttribute('aria-checked')).toBe(false);
       el.checked = true;
       await el.updateComplete;
       expect(track?.getAttribute('aria-checked')).toBe('true');

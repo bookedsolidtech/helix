@@ -184,10 +184,10 @@ describe('hx-overflow-menu', () => {
       expect(btn?.getAttribute('aria-haspopup')).toBe('menu');
     });
 
-    it('trigger aria-expanded is false when closed', async () => {
+    it('trigger aria-expanded is absent when closed', async () => {
       const el = await fixture<HelixOverflowMenu>('<hx-overflow-menu></hx-overflow-menu>');
       const btn = shadowQuery(el, '[part~="button"]');
-      expect(btn?.getAttribute('aria-expanded')).toBe('false');
+      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
     });
 
     it('trigger aria-expanded is true when open', async () => {

@@ -542,10 +542,10 @@ describe('hx-time-picker', () => {
       expect(combobox).toBeTruthy();
     });
 
-    it('combobox wrapper has aria-expanded="false" when closed', async () => {
+    it('combobox wrapper has no aria-expanded when closed', async () => {
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       const combobox = shadowQuery(el, '[role="combobox"]');
-      expect(combobox?.getAttribute('aria-expanded')).toBe('false');
+      expect(combobox?.hasAttribute('aria-expanded')).toBe(false);
     });
 
     it('combobox wrapper has aria-expanded="true" when open', async () => {
@@ -600,7 +600,7 @@ describe('hx-time-picker', () => {
       expect(selectedOption).toBeTruthy();
     });
 
-    it('unselected options have aria-selected="false"', async () => {
+    it('unselected options have no aria-selected', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker format="24h" min="09:00" max="10:00" step="60"></hx-time-picker>',
       );
@@ -609,7 +609,7 @@ describe('hx-time-picker', () => {
       await el.updateComplete;
       const options = shadowQueryAll(el, '[role="option"]');
       options.forEach((opt) => {
-        expect(opt.getAttribute('aria-selected')).toBe('false');
+        expect(opt.hasAttribute('aria-selected')).toBe(false);
       });
     });
   });
@@ -858,10 +858,10 @@ describe('hx-time-picker', () => {
       expect(comboboxDiv).toBeNull();
     });
 
-    it('input has aria-expanded="false" when closed (A-01)', async () => {
+    it('input has no aria-expanded when closed (A-01)', async () => {
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-expanded')).toBe('false');
+      expect(input.hasAttribute('aria-expanded')).toBe(false);
     });
 
     it('input has aria-expanded="true" when open (A-01)', async () => {

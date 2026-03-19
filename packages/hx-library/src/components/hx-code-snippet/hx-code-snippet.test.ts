@@ -221,13 +221,13 @@ describe('hx-code-snippet', () => {
       expect(expandBtn).toBeTruthy();
     });
 
-    it('expand button has aria-expanded="false" when collapsed', async () => {
+    it('expand button has no aria-expanded when collapsed', async () => {
       const el = await fixture<HelixCodeSnippet>(
         '<hx-code-snippet max-lines="2">line1\nline2\nline3\nline4</hx-code-snippet>',
       );
       await el.updateComplete;
       const expandBtn = shadowQuery(el, '[part~="expand-button"]');
-      expect(expandBtn?.getAttribute('aria-expanded')).toBe('false');
+      expect(expandBtn?.hasAttribute('aria-expanded')).toBe(false);
     });
 
     it('expand button has aria-expanded="true" after click', async () => {
