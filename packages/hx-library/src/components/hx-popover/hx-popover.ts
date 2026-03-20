@@ -20,6 +20,8 @@ type PopoverPlacement =
 
 type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
 
+let _popoverCounter = 0;
+
 /**
  * A popover that displays rich floating content attached to a trigger element.
  *
@@ -45,10 +47,10 @@ type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
  * @cssprop [--hx-popover-transition-duration=0.2s] - Show/hide transition duration.
  * @cssprop [--hx-popover-arrow-size=10px] - Size of the arrow indicator.
  *
- * @fires hx-show - Dispatched when the popover begins to show.
- * @fires hx-after-show - Dispatched after the popover is fully visible.
- * @fires hx-hide - Dispatched when the popover begins to hide.
- * @fires hx-after-hide - Dispatched after the popover is fully hidden.
+ * @fires {CustomEvent} hx-show - Emitted when the popover begins to show.
+ * @fires {CustomEvent} hx-after-show - Emitted after the popover is fully visible.
+ * @fires {CustomEvent} hx-hide - Emitted when the popover begins to hide.
+ * @fires {CustomEvent} hx-after-hide - Emitted after the popover is fully hidden.
  *
  * @example
  * ```html
@@ -58,7 +60,6 @@ type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
  * </hx-popover>
  * ```
  */
-let _popoverCounter = 0;
 
 @customElement('hx-popover')
 export class HelixPopover extends LitElement {
