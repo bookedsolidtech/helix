@@ -97,7 +97,7 @@ export class HelixRadio extends LitElement {
      * @internal
      */
     this.dispatchEvent(
-      new CustomEvent('hx-radio-select', {
+      new CustomEvent<{ value: string }>('hx-radio-select', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },

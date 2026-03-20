@@ -131,7 +131,7 @@ export class HelixList extends LitElement {
     if (item.disabled) return;
 
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<{ item: HelixListItem; value: string | undefined }>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { item, value: item.value },

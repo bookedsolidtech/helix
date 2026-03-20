@@ -144,7 +144,7 @@ export class HelixImage extends LitElement {
   private _hasCaptionSlot = false;
 
   private _handleLoad(): void {
-    this.dispatchEvent(new CustomEvent('hx-load', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-load', { bubbles: true, composed: true }));
   }
 
   private _handleError(): void {
@@ -154,7 +154,7 @@ export class HelixImage extends LitElement {
       return;
     }
     this._error = true;
-    this.dispatchEvent(new CustomEvent('hx-error', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-error', { bubbles: true, composed: true }));
   }
 
   private _onCaptionSlotChange(e: Event): void {

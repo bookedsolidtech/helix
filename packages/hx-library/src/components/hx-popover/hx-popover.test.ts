@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixPopover } from './hx-popover.js';
@@ -328,8 +328,10 @@ describe('hx-popover', () => {
       expect(body?.classList.contains('visible')).toBe(true);
 
       // The document click listener is registered via setTimeout(0) in _show(),
-      // so we must wait for the macrotask to fire before dispatching outside click.
-      await new Promise((r) => setTimeout(r, 0));
+      // so we must advance fake timers to let that macrotask fire before dispatching outside click.
+      vi.useFakeTimers();
+      await vi.advanceTimersByTimeAsync(0);
+      vi.useRealTimers();
 
       // Simulate click on an unrelated element outside the component
       document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));

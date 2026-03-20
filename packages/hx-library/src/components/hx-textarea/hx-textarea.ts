@@ -372,7 +372,7 @@ export class HelixTextarea extends LitElement {
      * @event hx-input
      */
     this.dispatchEvent(
-      new CustomEvent('hx-input', {
+      new CustomEvent<{ value: string }>('hx-input', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },
@@ -392,7 +392,7 @@ export class HelixTextarea extends LitElement {
      * @event hx-change
      */
     this.dispatchEvent(
-      new CustomEvent('hx-change', {
+      new CustomEvent<{ value: string }>('hx-change', {
         bubbles: true,
         composed: true,
         detail: { value: this.value },

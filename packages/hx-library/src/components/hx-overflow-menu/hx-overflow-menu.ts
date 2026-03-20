@@ -137,13 +137,13 @@ export class HelixOverflowMenu extends LitElement {
     await this.updateComplete;
     await this._updatePosition();
     this._focusFirstItem();
-    this.dispatchEvent(new CustomEvent('hx-show', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
-    this.dispatchEvent(new CustomEvent('hx-hide', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
   }
 
   private _toggle(): void {
@@ -254,7 +254,7 @@ export class HelixOverflowMenu extends LitElement {
     if (menuItem.hasAttribute('disabled') || (menuItem as HTMLButtonElement).disabled) return;
     const value = menuItem.getAttribute('data-value') ?? menuItem.textContent?.trim() ?? '';
     this.dispatchEvent(
-      new CustomEvent('hx-select', {
+      new CustomEvent<{ value: string }>('hx-select', {
         bubbles: true,
         composed: true,
         detail: { value },

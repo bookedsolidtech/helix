@@ -294,7 +294,7 @@ export class HelixFileUpload extends LitElement {
 
     if (invalidFiles.length > 0) {
       this.dispatchEvent(
-        new CustomEvent('hx-error', {
+        new CustomEvent<{ message: string; files: File[] }>('hx-error', {
           bubbles: true,
           composed: true,
           detail: { message: errorMessages.join(' '), files: invalidFiles },
@@ -312,7 +312,7 @@ export class HelixFileUpload extends LitElement {
 
     if (allowedFiles.length === 0 && this.maxFiles > 0) {
       this.dispatchEvent(
-        new CustomEvent('hx-error', {
+        new CustomEvent<{ message: string; files: File[] }>('hx-error', {
           bubbles: true,
           composed: true,
           detail: {
@@ -334,7 +334,7 @@ export class HelixFileUpload extends LitElement {
       }
 
       this.dispatchEvent(
-        new CustomEvent('hx-upload', {
+        new CustomEvent<{ files: File[] }>('hx-upload', {
           bubbles: true,
           composed: true,
           detail: { files: allowedFiles },
@@ -346,7 +346,7 @@ export class HelixFileUpload extends LitElement {
     const overflow = validFiles.slice(capacity);
     if (overflow.length > 0 && this.maxFiles > 0) {
       this.dispatchEvent(
-        new CustomEvent('hx-error', {
+        new CustomEvent<{ message: string; files: File[] }>('hx-error', {
           bubbles: true,
           composed: true,
           detail: {
@@ -447,7 +447,7 @@ export class HelixFileUpload extends LitElement {
     this._files = this._files.filter((_, i) => i !== index);
 
     this.dispatchEvent(
-      new CustomEvent('hx-remove', {
+      new CustomEvent<{ file: File; index: number }>('hx-remove', {
         bubbles: true,
         composed: true,
         detail: { file: removedFile, index },

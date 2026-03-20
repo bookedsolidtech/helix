@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HxCombobox } from './hx-combobox.js';
 import './index.js';
@@ -800,19 +800,24 @@ describe('hx-combobox', () => {
 
   describe('Filter debounce', () => {
     it('delays hx-input event when filterDebounce > 0', async () => {
-      const el = await fixture<HxCombobox>(withOptions('filter-debounce="200"'));
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      let eventFired = false;
-      el.addEventListener('hx-input', () => {
-        eventFired = true;
-      });
-      input.value = 'app';
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      // Event should NOT have fired immediately
-      expect(eventFired).toBe(false);
-      // Wait for debounce to complete
-      await new Promise((resolve) => setTimeout(resolve, 250));
-      expect(eventFired).toBe(true);
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HxCombobox>(withOptions('filter-debounce="200"'));
+        const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+        let eventFired = false;
+        el.addEventListener('hx-input', () => {
+          eventFired = true;
+        });
+        input.value = 'app';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        // Event should NOT have fired immediately
+        expect(eventFired).toBe(false);
+        // Advance past the 200ms debounce
+        await vi.advanceTimersByTimeAsync(250);
+        expect(eventFired).toBe(true);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

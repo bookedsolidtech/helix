@@ -365,7 +365,7 @@ export class HelixCarousel extends LitElement {
     const slide = this._slides[next];
     if (!slide) return;
     this.dispatchEvent(
-      new CustomEvent('hx-slide-change', {
+      new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
         bubbles: true,
         composed: true,
         detail: { index: next, slide },

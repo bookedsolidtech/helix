@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixNumberInput } from './hx-number-input.js';
 import './index.js';
@@ -431,8 +431,13 @@ describe('hx-number-input', () => {
   // ─── Long-press stepper (5) ───
 
   describe('Long-press stepper', () => {
-    // Helper to pause execution for async animation/transition waits
-    const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
 
     it('fires hx-change immediately on pointerdown', async () => {
       const el = await fixture<HelixNumberInput>('<hx-number-input value="0"></hx-number-input>');
@@ -459,8 +464,8 @@ describe('hx-number-input', () => {
       await el.updateComplete;
       expect(changeCount).toBe(1);
 
-      // Wait past 400ms delay + at least one 100ms interval
-      await wait(550);
+      // Advance past 400ms delay + at least one 100ms interval
+      await vi.advanceTimersByTimeAsync(550);
       await el.updateComplete;
       expect(changeCount).toBeGreaterThanOrEqual(2);
 
@@ -479,8 +484,8 @@ describe('hx-number-input', () => {
       increment.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
       const countAfterUp = changeCount;
 
-      // Wait past delay + interval — no more events should fire
-      await wait(550);
+      // Advance past delay + interval — no more events should fire
+      await vi.advanceTimersByTimeAsync(550);
       expect(changeCount).toBe(countAfterUp);
     });
 
@@ -495,7 +500,7 @@ describe('hx-number-input', () => {
       increment.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
       const countAfterLeave = changeCount;
 
-      await wait(550);
+      await vi.advanceTimersByTimeAsync(550);
       expect(changeCount).toBe(countAfterLeave);
     });
 
@@ -510,7 +515,7 @@ describe('hx-number-input', () => {
       increment.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true }));
       const countAfterCancel = changeCount;
 
-      await wait(550);
+      await vi.advanceTimersByTimeAsync(550);
       expect(changeCount).toBe(countAfterCancel);
     });
 
@@ -525,7 +530,7 @@ describe('hx-number-input', () => {
       const countBeforeDisconnect = changeCount;
 
       el.remove();
-      await wait(550);
+      await vi.advanceTimersByTimeAsync(550);
       expect(changeCount).toBe(countBeforeDisconnect);
     });
   });

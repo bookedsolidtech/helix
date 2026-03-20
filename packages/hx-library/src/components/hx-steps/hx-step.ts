@@ -158,7 +158,7 @@ export class HelixStep extends LitElement {
      * @internal
      */
     this.dispatchEvent(
-      new CustomEvent('hx-step-click-internal', {
+      new CustomEvent<void>('hx-step-click-internal', {
         bubbles: true,
         composed: true,
       }),
