@@ -112,7 +112,10 @@ export class HelixOverflowMenu extends LitElement {
    */
   private readonly _panelId = `hx-overflow-menu-panel-${++_counter}`;
 
+  /** @internal */
   @query('[part~="button"]') private _buttonEl!: HTMLButtonElement | null;
+
+  /** @internal */
   @query('[part~="panel"]') private _panelEl!: HTMLElement | null;
 
   // ─── Lifecycle ───
@@ -200,11 +203,13 @@ export class HelixOverflowMenu extends LitElement {
 
   // ─── Event Handlers (arrow function class fields — stable reference, no bind needed) ───
 
+  /** @internal */
   private readonly _handleTriggerClick = (e: MouseEvent): void => {
     e.stopPropagation();
     this._toggle();
   };
 
+  /** @internal */
   private readonly _handleDocumentClick = (e: MouseEvent): void => {
     if (!this._open) return;
     const path = e.composedPath();
@@ -213,6 +218,7 @@ export class HelixOverflowMenu extends LitElement {
     }
   };
 
+  /** @internal */
   private readonly _handleKeydown = (e: KeyboardEvent): void => {
     if (!this._open) return;
     if (e.key === 'Escape') {
@@ -245,6 +251,7 @@ export class HelixOverflowMenu extends LitElement {
     }
   };
 
+  /** @internal */
   private readonly _handleSlotClick = (e: Event): void => {
     const target = e.target as HTMLElement;
     const menuItem = target.closest(
