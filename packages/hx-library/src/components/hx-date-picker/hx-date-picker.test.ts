@@ -932,7 +932,7 @@ describe('hx-date-picker', () => {
       expect(el.previousMonthLabel).toBe('Previous month');
     });
 
-    it('renders custom labelPrevMonth when set via property', async () => {
+    it('renders custom previousMonthLabel when set via property', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
       el.previousMonthLabel = 'Mois précédent';
       await el.updateComplete;
