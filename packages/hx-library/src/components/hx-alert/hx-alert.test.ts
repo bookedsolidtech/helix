@@ -498,4 +498,5 @@ describe('hx-alert', () => {
       expect(violations).toEqual([]);
     });
   });
+
 });

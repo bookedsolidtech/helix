@@ -142,6 +142,23 @@ export class HelixRating extends LitElement {
   @property({ type: String })
   label = '';
 
+  /**
+   * Generates the accessible label for individual star elements.
+   * Handles singular/plural automatically.
+   * @param count - star count (1-based)
+   */
+  @property({ attribute: false })
+  labelStar: (count: number) => string = (count) => (count === 1 ? '1 star' : `${count} stars`);
+
+  /**
+   * Generates the aria-valuetext for the composite rating widget.
+   * @param value - current rating value
+   * @param max - maximum rating value
+   */
+  @property({ attribute: false })
+  labelValueText: (value: number, max: number) => string = (value, max) =>
+    `${value} out of ${max} stars`;
+
   /** @internal */
   @state() private _hoverValue: number | null = null;
 
@@ -199,11 +216,7 @@ export class HelixRating extends LitElement {
   }
 
   private _ariaValueText(): string {
-    const v = this.value;
-    if (v === 0) return `0 out of ${this.max} stars`;
-    const isHalf = v % 1 !== 0;
-    if (isHalf) return `${v.toFixed(1)} out of ${this.max} stars`;
-    return `${v} out of ${this.max} stars`;
+    return this.labelValueText(this.value, this.max);
   }
 
   private _getStarState(i: number): 'full' | 'half' | 'empty' {
@@ -480,7 +493,7 @@ export class HelixRating extends LitElement {
           const i = idx + 1;
           const state = this._getStarState(i);
           const checked = this._isChecked(i);
-          const starLabel = i === 1 ? '1 star' : `${i} stars`;
+          const starLabel = this.labelStar(i);
           const isActiveTabStop = this.value > 0 ? Math.ceil(this.value) === i : i === 1;
 
           return html`

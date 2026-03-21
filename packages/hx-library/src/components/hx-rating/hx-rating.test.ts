@@ -436,4 +436,20 @@ describe('hx-rating', () => {
       expect(assigned).toHaveLength(0);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('labelStar returns singular English format for 1 star', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="3" label="Rating"></hx-rating>');
+      await el.updateComplete;
+      expect(el.labelStar(1)).toBe('1 star');
+    });
+
+    it('labelStar returns plural English format for multiple stars', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="3" label="Rating"></hx-rating>');
+      await el.updateComplete;
+      expect(el.labelStar(3)).toBe('3 stars');
+    });
+  });
 });

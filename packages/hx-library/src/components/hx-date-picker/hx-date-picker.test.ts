@@ -922,4 +922,21 @@ describe('hx-date-picker', () => {
       expect((assigned[0] as HTMLElement).textContent).toBe('MM/DD/YYYY');
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for previous month button', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
+      await el.updateComplete;
+      expect(el.previousMonthLabel).toBe('Previous month');
+    });
+
+    it('renders custom labelPrevMonth when set via property', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
+      el.previousMonthLabel = 'Mois précédent';
+      await el.updateComplete;
+      expect(el.previousMonthLabel).toBe('Mois précédent');
+    });
+  });
 });
