@@ -12,14 +12,13 @@
  *   node scripts/measure-component-size.js hx-button --include-lit
  */
 
-import { createRequire } from 'module';
 import { existsSync, readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { gzipSync } from 'zlib';
 import { fileURLToPath } from 'url';
+import { Buffer } from 'node:buffer';
 
-const require = createRequire(import.meta.url);
-const esbuild = await import('/Volumes/Development/booked/helix/node_modules/esbuild/lib/main.js');
+const esbuild = await import('esbuild');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');

@@ -15,22 +15,14 @@ import { existsSync, readFileSync, readdirSync } from 'fs';
 import { resolve, dirname, relative } from 'path';
 import { gzipSync } from 'zlib';
 import { fileURLToPath } from 'url';
+import { Buffer } from 'buffer';
 
-const esbuild = await import('/Volumes/Development/booked/helix/node_modules/esbuild/lib/main.js');
+const esbuild = await import('esbuild');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const COMPONENTS_DIR = resolve(ROOT, 'packages/hx-library/src/components');
 const TOKENS_SRC = resolve(ROOT, 'packages/hx-tokens/src');
-
-const EXTERNAL_NO_LIT = [
-  'lit',
-  'lit/*',
-  '@lit/*',
-  '@helixui/tokens',
-  '@helixui/tokens/*',
-  '@floating-ui/*',
-];
 
 /**
  * Analyze the import dependencies of a component using esbuild metafile.
@@ -61,7 +53,7 @@ export async function analyzeComponentDependencies(componentName) {
     const dependencies = [];
     const externalImports = [];
 
-    for (const [inputPath, inputData] of Object.entries(inputs)) {
+    for (const inputData of Object.values(inputs)) {
       // Collect imports from this input
       for (const imp of inputData.imports || []) {
         if (imp.external) {
@@ -274,13 +266,6 @@ export async function analyzeDeduplication(componentNames) {
       outdir: '/tmp/hx-dedup-analysis',
       metafile: true,
     });
-
-    const outputs = result.metafile?.outputs || {};
-    const chunks = Object.entries(outputs);
-    const sharedChunks = chunks.filter(
-      ([path]) =>
-        !entryPoints.some((ep) => ep.includes(path.replace('/tmp/hx-dedup-analysis/', ''))),
-    );
 
     const sharedUtilitiesSize = result.outputFiles
       .filter((f) => !entryPoints.some((ep) => f.path && ep.includes(f.path)))
