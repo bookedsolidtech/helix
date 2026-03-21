@@ -986,6 +986,9 @@ describe('hx-date-picker', () => {
     it('Shift+Tab from first focusable element wraps focus to last focusable element', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
+      // Wait an extra cycle so _focusActiveDay's inner updateComplete.then() has run
+      // and tabindex attributes have settled before we snapshot the focusable list.
+      await el.updateComplete;
 
       const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
 
@@ -996,7 +999,6 @@ describe('hx-date-picker', () => {
       expect(focusableEls.length).toBeGreaterThan(1);
 
       const firstEl = focusableEls[0]!;
-      const lastEl = focusableEls[focusableEls.length - 1]!;
 
       // Focus the first focusable element so shadow active element === first.
       firstEl.focus();
@@ -1012,8 +1014,15 @@ describe('hx-date-picker', () => {
       calendar.dispatchEvent(tabEvent);
       await el.updateComplete;
 
+      // Re-query focusable elements after the trap fires so we compare against the
+      // live DOM state (the component uses the same query internally).
+      const focusableElsAfter = Array.from(
+        calendar.querySelectorAll<HTMLElement>('button:not([disabled]), [tabindex="0"]'),
+      );
+      const lastElAfter = focusableElsAfter[focusableElsAfter.length - 1]!;
+
       // After wrapping, the last focusable element should be shadow-active.
-      expect(el.shadowRoot!.activeElement).toBe(lastEl);
+      expect(el.shadowRoot!.activeElement).toBe(lastElAfter);
     });
   });
 
@@ -1184,6 +1193,9 @@ describe('hx-date-picker', () => {
       calendar.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }),
       );
+      // The component sets _focusedDay inside a nested updateComplete.then(), so we need
+      // two update cycles: one for the month change re-render, one for the tabindex update.
+      await el.updateComplete;
       await el.updateComplete;
 
       const monthLabelAfter = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
