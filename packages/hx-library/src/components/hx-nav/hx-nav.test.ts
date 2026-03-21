@@ -688,4 +688,21 @@ describe('hx-nav', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for mobile menu toggle', async () => {
+      const el = await fixture<HelixNav>('<hx-nav label="Main navigation"></hx-nav>');
+      await el.updateComplete;
+      expect(el.labelOpenMenu).toBe('Open navigation menu');
+    });
+
+    it('renders custom labelOpenMenu when set via property', async () => {
+      const el = await fixture<HelixNav>('<hx-nav label="Main navigation"></hx-nav>');
+      el.labelOpenMenu = 'Ouvrir le menu de navigation';
+      await el.updateComplete;
+      expect(el.labelOpenMenu).toBe('Ouvrir le menu de navigation');
+    });
+  });
 });

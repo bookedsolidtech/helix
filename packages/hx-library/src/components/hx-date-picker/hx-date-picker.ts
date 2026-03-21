@@ -150,6 +150,26 @@ export class HelixDatePicker extends LitElement {
   @property({ type: String })
   locale = 'en-US';
 
+  /** Accessible label for the calendar grid/dialog. */
+  @property({ type: String, attribute: 'label-choose-date' })
+  labelChooseDate = 'Choose a date';
+
+  /** Accessible label for the "previous month" button. */
+  @property({ type: String, attribute: 'label-prev-month' })
+  labelPrevMonth = 'Previous month';
+
+  /** Accessible label for the "next month" button. */
+  @property({ type: String, attribute: 'label-next-month' })
+  labelNextMonth = 'Next month';
+
+  /** Accessible label for the calendar trigger button when calendar is closed. */
+  @property({ type: String, attribute: 'label-open-calendar' })
+  labelOpenCalendar = 'Open calendar';
+
+  /** Accessible label for the calendar trigger button when calendar is open. */
+  @property({ type: String, attribute: 'label-close-calendar' })
+  labelCloseCalendar = 'Close calendar';
+
   // ─── Internal State ───
 
   /**
@@ -913,7 +933,7 @@ export class HelixDatePicker extends LitElement {
             part="trigger"
             class="field__trigger"
             type="button"
-            aria-label=${this._isOpen ? 'Close calendar' : 'Open calendar'}
+            aria-label=${this._isOpen ? this.labelCloseCalendar : this.labelOpenCalendar}
             aria-haspopup="dialog"
             aria-expanded=${this._isOpen ? 'true' : nothing}
             aria-controls=${this._calendarId}
@@ -950,7 +970,7 @@ export class HelixDatePicker extends LitElement {
                 id=${this._calendarId}
                 role="dialog"
                 aria-modal="true"
-                aria-label="Choose a date"
+                aria-label=${this.labelChooseDate}
                 @keydown=${this._handleCalendarKeydown}
               >
                 <!-- Screen reader live region -->
@@ -968,7 +988,7 @@ export class HelixDatePicker extends LitElement {
                   <button
                     class="calendar__nav-btn"
                     type="button"
-                    aria-label="Previous month"
+                    aria-label=${this.labelPrevMonth}
                     ?disabled=${this._isPrevMonthDisabled()}
                     @click=${this._prevMonth}
                   >
@@ -980,7 +1000,7 @@ export class HelixDatePicker extends LitElement {
                   <button
                     class="calendar__nav-btn"
                     type="button"
-                    aria-label="Next month"
+                    aria-label=${this.labelNextMonth}
                     ?disabled=${this._isNextMonthDisabled()}
                     @click=${this._nextMonth}
                   >

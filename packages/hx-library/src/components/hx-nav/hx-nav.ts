@@ -92,6 +92,14 @@ export class HelixNav extends LitElement {
   @property({ type: String })
   label = 'Main navigation';
 
+  /** Accessible label for the navigation toggle button when menu is closed. */
+  @property({ type: String, attribute: 'label-open-menu' })
+  labelOpenMenu = 'Open navigation menu';
+
+  /** Accessible label for the navigation toggle button when menu is open. */
+  @property({ type: String, attribute: 'label-close-menu' })
+  labelCloseMenu = 'Close navigation menu';
+
   // ─── State ───
 
   /**
@@ -419,7 +427,7 @@ export class HelixNav extends LitElement {
           class="nav__toggle"
           aria-expanded=${this._mobileOpen ? 'true' : nothing}
           aria-controls="nav-list"
-          aria-label=${this._mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-label=${this._mobileOpen ? this.labelCloseMenu : this.labelOpenMenu}
           @click=${this._handleToggle}
         >
           ${this._renderHamburgerIcon()}

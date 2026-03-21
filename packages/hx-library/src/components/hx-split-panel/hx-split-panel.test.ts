@@ -827,4 +827,26 @@ describe('hx-split-panel', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for resize divider', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel><div slot="start">Start</div><div slot="end">End</div></hx-split-panel>',
+      );
+      await el.updateComplete;
+      expect(el.labelResize).toBe('Resize panels');
+    });
+
+    it('divider aria-label reflects custom labelResize', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel><div slot="start">Start</div><div slot="end">End</div></hx-split-panel>',
+      );
+      el.labelResize = 'Redimensionner les panneaux';
+      await el.updateComplete;
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+      expect(divider?.getAttribute('aria-label')).toBe('Redimensionner les panneaux');
+    });
+  });
 });

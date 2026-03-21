@@ -105,6 +105,22 @@ export class HelixAlert extends LitElement {
   @property({ type: String, attribute: 'return-focus-to' })
   returnFocusTo: string | null = null;
 
+  /**
+   * Map of severity variant labels prepended to screen-reader announcements.
+   * Override to provide localized severity prefixes.
+   */
+  @property({ attribute: false })
+  severityLabels: Partial<Record<string, string>> = {
+    info: 'Info:',
+    success: 'Success:',
+    warning: 'Warning:',
+    error: 'Error:',
+  };
+
+  /** Accessible label for the dismiss button. Override for localized text. */
+  @property({ type: String, attribute: 'close-label' })
+  closeLabel = 'Close alert';
+
   // ─── State ───
 
   @state()
@@ -204,13 +220,7 @@ export class HelixAlert extends LitElement {
               // Second microtask ensures the clear is processed before re-injection,
               // guaranteeing the AT sees a content change rather than no-op.
               Promise.resolve().then(() => {
-                const severityLabels: Record<string, string> = {
-                  info: 'Info:',
-                  success: 'Success:',
-                  warning: 'Warning:',
-                  error: 'Error:',
-                };
-                const prefix = severityLabels[this.variant] ?? '';
+                const prefix = this.severityLabels[this.variant] ?? '';
                 const message = this.textContent?.trim() ?? '';
                 announcer.textContent = prefix ? `${prefix} ${message}` : message;
               });
@@ -332,13 +342,7 @@ export class HelixAlert extends LitElement {
 
     // WCAG 1.4.1: Always render a visually-hidden severity label so the variant
     // is never conveyed by color alone, regardless of whether showIcon is set.
-    const SEVERITY_LABELS: Record<string, string> = {
-      info: 'Info:',
-      success: 'Success:',
-      warning: 'Warning:',
-      error: 'Error:',
-    };
-    const severityLabel = SEVERITY_LABELS[this.variant] ?? '';
+    const severityLabel = this.severityLabels[this.variant] ?? '';
 
     return html`
       <div
@@ -374,7 +378,7 @@ export class HelixAlert extends LitElement {
               <button
                 part="close-button"
                 class="alert__close-button"
-                aria-label=${`Close ${this.heading ? `${this.heading} ` : ''}alert`}
+                aria-label=${this.closeLabel}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}

@@ -131,6 +131,31 @@ export class HelixPagination extends LitElement {
   @property({ type: String, attribute: 'label-rows-per-page' })
   labelRowsPerPage = 'Rows per page:';
 
+  /** Accessible label for the first-page button. */
+  @property({ type: String, attribute: 'label-first-page' })
+  labelFirstPage = 'First page';
+
+  /** Accessible label for the previous-page button. */
+  @property({ type: String, attribute: 'label-prev-page' })
+  labelPrevPage = 'Previous page';
+
+  /** Accessible label for the next-page button. */
+  @property({ type: String, attribute: 'label-next-page' })
+  labelNextPage = 'Next page';
+
+  /** Accessible label for the last-page button. */
+  @property({ type: String, attribute: 'label-last-page' })
+  labelLastPage = 'Last page';
+
+  /**
+   * Generates the live-region text announcing the current page.
+   * @param current - current page number
+   * @param total - total page count
+   */
+  @property({ attribute: false })
+  labelPageOf: (current: number, total: number) => string = (current, total) =>
+    `Page ${current} of ${total}`;
+
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   @state() private _rovingKey: number | string | null = null;
 
@@ -199,7 +224,7 @@ export class HelixPagination extends LitElement {
 
     this.currentPage = clamped;
     this._rovingKey = null; // reset so focus follows the new current page
-    this._liveMessage = `Page ${clamped} of ${this.totalPages}`;
+    this._liveMessage = this.labelPageOf(clamped, this.totalPages);
     this.dispatchEvent(
       new CustomEvent<{ page: number }>('hx-page-change', {
         detail: { page: clamped },
@@ -314,7 +339,7 @@ export class HelixPagination extends LitElement {
                       ?disabled=${isFirst}
                       tabindex=${rovingKey === 'first' ? 0 : -1}
                       data-roving-key="first"
-                      aria-label="First page"
+                      aria-label=${this.labelFirstPage}
                       @click=${() => this._navigate(1)}
                     >
                       «
@@ -330,7 +355,7 @@ export class HelixPagination extends LitElement {
                 ?disabled=${isFirst}
                 tabindex=${rovingKey === 'prev' ? 0 : -1}
                 data-roving-key="prev"
-                aria-label="Previous page"
+                aria-label=${this.labelPrevPage}
                 @click=${() => this._navigate(this.currentPage - 1)}
               >
                 ‹
@@ -375,7 +400,7 @@ export class HelixPagination extends LitElement {
                 ?disabled=${isLast}
                 tabindex=${rovingKey === 'next' ? 0 : -1}
                 data-roving-key="next"
-                aria-label="Next page"
+                aria-label=${this.labelNextPage}
                 @click=${() => this._navigate(this.currentPage + 1)}
               >
                 ›
@@ -391,7 +416,7 @@ export class HelixPagination extends LitElement {
                       ?disabled=${isLast}
                       tabindex=${rovingKey === 'last' ? 0 : -1}
                       data-roving-key="last"
-                      aria-label="Last page"
+                      aria-label=${this.labelLastPage}
                       @click=${() => this._navigate(this.totalPages)}
                     >
                       »
