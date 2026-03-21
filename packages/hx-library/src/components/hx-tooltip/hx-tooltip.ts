@@ -4,6 +4,8 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset, arrow, type Placement } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
+let _tooltipCounter = 0;
+
 /**
  * A tooltip that displays contextual help text on hover or focus.
  *
@@ -44,7 +46,6 @@ import { helixTooltipStyles } from './hx-tooltip.styles.js';
  * </hx-tooltip>
  * ```
  */
-let _tooltipCounter = 0;
 
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
@@ -84,10 +85,15 @@ export class HelixTooltip extends LitElement {
   /** @internal */
   private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
+  /** @internal */
   @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;
+  /** @internal */
   @query('slot[name="content"]') private _contentSlot!: HTMLSlotElement | null;
+  /** @internal */
   @query('.trigger-wrapper') private _triggerWrapper!: HTMLElement | null;
+  /** @internal */
   @query('[part="tooltip"]') private _tooltipEl!: HTMLElement | null;
+  /** @internal */
   @query('[part="arrow"]') private _arrowEl!: HTMLElement | null;
 
   /**
