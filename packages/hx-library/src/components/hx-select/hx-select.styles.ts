@@ -14,8 +14,6 @@ export const helixSelectStyles = css`
     box-sizing: border-box;
   }
 
-  /* ─── Field Container ─── */
-
   .field {
     display: flex;
     flex-direction: column;
@@ -23,8 +21,6 @@ export const helixSelectStyles = css`
     font-family: var(--hx-select-font-family, var(--hx-font-family-sans, sans-serif));
     position: relative;
   }
-
-  /* ─── Label ─── */
 
   .field__label {
     display: flex;
@@ -41,14 +37,10 @@ export const helixSelectStyles = css`
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
-  /* ─── Select Wrapper ─── */
-
   .field__select-wrapper {
     position: relative;
     display: block;
   }
-
-  /* ─── Trigger Button ─── */
 
   .field__trigger {
     display: flex;
@@ -56,6 +48,7 @@ export const helixSelectStyles = css`
     justify-content: space-between;
     gap: var(--hx-space-2, 0.5rem);
     width: 100%;
+    min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
     border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
@@ -73,37 +66,21 @@ export const helixSelectStyles = css`
     outline: none;
   }
 
-  /* Fallback focus ring for environments where :focus-visible is unavailable */
-  .field__trigger:focus {
-    border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-  }
-
-  /* Enhanced focus ring with opacity via color-mix when :focus-visible is available */
+  .field__trigger:focus,
   .field__trigger:focus-visible {
     border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
-  }
-
-  @supports (color: color-mix(in srgb, red 50%, blue)) {
-    .field__trigger:focus-visible {
-      box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-        color-mix(
-          in srgb,
-          var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
-            calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-          transparent
-        );
-    }
+      color-mix(
+        in srgb,
+        var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        transparent
+      );
   }
 
   .field__trigger[aria-disabled='true'] {
     cursor: not-allowed;
   }
-
-  /* ─── Trigger size variants ─── */
 
   .field__trigger--sm {
     min-height: var(--hx-input-height-sm, var(--hx-size-8, 2rem));
@@ -111,19 +88,11 @@ export const helixSelectStyles = css`
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
   }
 
-  .field__trigger--md {
-    min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
-    font-size: var(--hx-font-size-md, 1rem);
-    padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
-  }
-
   .field__trigger--lg {
     min-height: var(--hx-input-height-lg, var(--hx-size-12, 3rem));
     font-size: var(--hx-font-size-lg, 1.125rem);
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
   }
-
-  /* ─── Trigger value ─── */
 
   .field__trigger-value {
     flex: 1;
@@ -136,8 +105,6 @@ export const helixSelectStyles = css`
   .field__trigger--placeholder .field__trigger-value {
     color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
   }
-
-  /* ─── Chevron (CSS-drawn) ─── */
 
   .field__chevron {
     flex-shrink: 0;
@@ -165,43 +132,21 @@ export const helixSelectStyles = css`
     transform: rotate(180deg);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .field__chevron {
-      transition: none;
-    }
-  }
-
-  /* ─── Error State (trigger) ─── */
-
   .field--error .field__trigger {
     border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
   }
 
-  .field--error .field__trigger:focus {
-    border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
-  }
-
+  .field--error .field__trigger:focus,
   .field--error .field__trigger:focus-visible {
     border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+      color-mix(
+        in srgb,
+        var(--hx-select-error-color, var(--hx-color-error-500, #dc3545))
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        transparent
+      );
   }
-
-  @supports (color: color-mix(in srgb, red 50%, blue)) {
-    .field--error .field__trigger:focus-visible {
-      box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-        color-mix(
-          in srgb,
-          var(--hx-select-error-color, var(--hx-color-error-500, #dc3545))
-            calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-          transparent
-        );
-    }
-  }
-
-  /* ─── Listbox Panel ─── */
 
   .field__listbox {
     position: absolute;
@@ -227,15 +172,11 @@ export const helixSelectStyles = css`
     display: none;
   }
 
-  /* ─── Options Container ─── */
-
   .field__options {
     overflow-y: auto;
     flex: 1;
     padding: var(--hx-space-1, 0.25rem) 0;
   }
-
-  /* ─── Individual Options ─── */
 
   .field__option {
     display: flex;
@@ -283,16 +224,12 @@ export const helixSelectStyles = css`
     text-overflow: ellipsis;
   }
 
-  /* ─── No Options State ─── */
-
   .field__no-options {
     padding: var(--hx-space-3, 0.75rem);
     text-align: center;
     color: var(--hx-color-neutral-400, #adb5bd);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
-
-  /* ─── Hidden native select (form participation + test compat) ─── */
 
   .field__select {
     position: absolute;
@@ -304,41 +241,23 @@ export const helixSelectStyles = css`
     clip: rect(0, 0, 0, 0);
   }
 
-  /* ─── Size Variants (mirrored on native select for test compat) ─── */
-
-  .field__select--sm {
-    min-height: var(--hx-input-height-sm, var(--hx-size-8, 2rem));
-    font-size: var(--hx-font-size-sm, 0.875rem);
+  .field__help-text,
+  .field__error {
+    font-size: var(--hx-font-size-xs, 0.75rem);
+    line-height: var(--hx-line-height-normal, 1.5);
   }
-
-  .field__select--md {
-    min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
-    font-size: var(--hx-font-size-md, 1rem);
-  }
-
-  .field__select--lg {
-    min-height: var(--hx-input-height-lg, var(--hx-size-12, 3rem));
-    font-size: var(--hx-font-size-lg, 1.125rem);
-  }
-
-  /* ─── Help Text & Error Messages ─── */
 
   .field__help-text {
-    font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-color-neutral-500, #6c757d);
-    line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .field__error {
-    font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
-    line-height: var(--hx-line-height-normal, 1.5);
   }
-
-  /* ─── Reduced Motion ─── */
 
   @media (prefers-reduced-motion: reduce) {
     .field__trigger,
+    .field__chevron,
     .field__option {
       transition: none;
     }
