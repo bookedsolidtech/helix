@@ -5,14 +5,14 @@
   "methodology": "esbuild bundle analysis with gzip level 9. Per-component measurements externalize Lit, @helixui/tokens, and @floating-ui to isolate component-only overhead. Three iterations averaged per component to account for JIT variance. Competitor benchmarks sourced from bundlephobia and npm registry (March 2026) — not directly measured.",
   "summary": {
     "totalComponents": 77,
-    "avgBundleSize": 14164,
-    "avgGzipSize": 2971,
-    "totalBulkSize": 1090661,
-    "totalBulkGzip": 160114,
-    "totalBulkGzipWithLit": 166151,
+    "avgBundleSize": 13659,
+    "avgGzipSize": 2902,
+    "totalBulkSize": 1051777,
+    "totalBulkGzip": 155893,
+    "totalBulkGzipWithLit": 161930,
     "litCoreGzip": 6037,
-    "componentsBelowBudget": 70,
-    "componentsOverBudget": 7
+    "componentsBelowBudget": 77,
+    "componentsOverBudget": 0
   },
   "components": [
     {
@@ -198,24 +198,24 @@
     {
       "name": "hx-color-picker",
       "entryPoint": "src/components/hx-color-picker/index.ts",
-      "bundleSize": 33470,
-      "minifiedSize": 24347,
-      "gzipSize": 5962,
+      "bundleSize": 29793,
+      "minifiedSize": 20672,
+      "gzipSize": 5443,
       "gzipStdDev": 0,
-      "cssSize": 9450,
-      "cssPercent": 39,
+      "cssSize": 5677,
+      "cssPercent": 27,
       "dependencies": [],
       "sideEffectsValid": true
     },
     {
       "name": "hx-combobox",
       "entryPoint": "src/components/hx-combobox/index.ts",
-      "bundleSize": 33516,
-      "minifiedSize": 26076,
-      "gzipSize": 6270,
+      "bundleSize": 30327,
+      "minifiedSize": 22887,
+      "gzipSize": 5811,
       "gzipStdDev": 0,
-      "cssSize": 11520,
-      "cssPercent": 44,
+      "cssSize": 8139,
+      "cssPercent": 36,
       "dependencies": [],
       "sideEffectsValid": true
     },
@@ -272,12 +272,12 @@
     {
       "name": "hx-date-picker",
       "entryPoint": "src/components/hx-date-picker/index.ts",
-      "bundleSize": 37755,
-      "minifiedSize": 27751,
-      "gzipSize": 6509,
+      "bundleSize": 34135,
+      "minifiedSize": 24131,
+      "gzipSize": 6130,
       "gzipStdDev": 0,
-      "cssSize": 12163,
-      "cssPercent": 44,
+      "cssSize": 8399,
+      "cssPercent": 35,
       "dependencies": [],
       "sideEffectsValid": true
     },
@@ -374,9 +374,9 @@
     {
       "name": "hx-form",
       "entryPoint": "src/components/hx-form/index.ts",
-      "bundleSize": 49191,
-      "minifiedSize": 41553,
-      "gzipSize": 6715,
+      "bundleSize": 33508,
+      "minifiedSize": 25870,
+      "gzipSize": 5048,
       "gzipStdDev": 0,
       "cssSize": 0,
       "cssPercent": 0,
@@ -615,9 +615,9 @@
     {
       "name": "hx-prose",
       "entryPoint": "src/components/hx-prose/index.ts",
-      "bundleSize": 28101,
-      "minifiedSize": 24472,
-      "gzipSize": 5416,
+      "bundleSize": 19719,
+      "minifiedSize": 16909,
+      "gzipSize": 3734,
       "gzipStdDev": 0,
       "cssSize": 0,
       "cssPercent": 0,
@@ -654,12 +654,12 @@
     {
       "name": "hx-select",
       "entryPoint": "src/components/hx-select/index.ts",
-      "bundleSize": 28263,
-      "minifiedSize": 21303,
-      "gzipSize": 5367,
+      "bundleSize": 25807,
+      "minifiedSize": 18847,
+      "gzipSize": 5007,
       "gzipStdDev": 0,
-      "cssSize": 10128,
-      "cssPercent": 48,
+      "cssSize": 7480,
+      "cssPercent": 40,
       "dependencies": [
         "packages/hx-library/src/utils/dev-warn.ts"
       ],
@@ -902,12 +902,12 @@
     {
       "name": "hx-time-picker",
       "entryPoint": "src/components/hx-time-picker/index.ts",
-      "bundleSize": 27578,
-      "minifiedSize": 19524,
-      "gzipSize": 5295,
+      "bundleSize": 25701,
+      "minifiedSize": 17647,
+      "gzipSize": 5027,
       "gzipStdDev": 0,
-      "cssSize": 7221,
-      "cssPercent": 37,
+      "cssSize": 5248,
+      "cssPercent": 30,
       "dependencies": [],
       "sideEffectsValid": true
     },
@@ -987,10 +987,10 @@
     }
   ],
   "bulkImportAnalysis": {
-    "totalSize": 1090661,
-    "minifiedSize": 805078,
-    "gzipSize": 160114,
-    "sumOfIndividual": 805078,
+    "totalSize": 1051777,
+    "minifiedSize": 767015,
+    "gzipSize": 155893,
+    "sumOfIndividual": 767015,
     "deduplicationSavings": 0,
     "deduplicationPercent": 0,
     "note": "All sizes exclude Lit core. Add litCoreGzip from deduplication section for true first-load cost."
@@ -1004,8 +1004,8 @@
         "hx-select",
         "hx-dialog"
       ],
-      "combinedSize": 64328,
-      "gzipSize": 13144,
+      "combinedSize": 61872,
+      "gzipSize": 12818,
       "sharedDependencies": [
         {
           "path": "packages/hx-library/src/utils/dev-warn.ts",
@@ -1024,9 +1024,9 @@
     "litCoreGzip": 6037,
     "sharedUtilitiesSize": 0,
     "deduplicationRatio": 1,
-    "sumOfIndividualMinified": 805078,
-    "bulkMinified": 805078,
-    "analysis": "When all 77 components are bundled together, esbuild code splitting deduplicates shared code and saves 0.0KB (0%) vs naive sum. Lit core (5.9KB gzip) is the primary shared dependency. With Lit included, total CDN bundle is ~162.3KB gzip — EXCEEDS the 50KB full-bundle budget."
+    "sumOfIndividualMinified": 767015,
+    "bulkMinified": 767015,
+    "analysis": "When all 77 components are bundled together, esbuild code splitting deduplicates shared code and saves 0.0KB (0%) vs naive sum. Lit core (5.9KB gzip) is the primary shared dependency. With Lit included, total CDN bundle is ~158.1KB gzip — EXCEEDS the 50KB full-bundle budget."
   },
   "sideEffectsAnalysis": {
     "validComponents": [
@@ -1052,8 +1052,8 @@
   "benchmarks": {
     "helix": {
       "componentCount": 5,
-      "bundleSize": 64328,
-      "gzipSize": 13144,
+      "bundleSize": 61872,
+      "gzipSize": 12818,
       "components": [
         "hx-button",
         "hx-card",
@@ -1116,7 +1116,7 @@
         "name": "individual-imports",
         "description": "Import each component from its own entry point: @helixui/library/components/hx-button",
         "useCase": "Applications using 1-5 components. Maximum tree-shaking, smallest per-page payload.",
-        "estimatedSize": 2971,
+        "estimatedSize": 2902,
         "pros": [
           "True tree-shaking: only used components loaded",
           "Per-component lazy loading possible",
@@ -1134,7 +1134,7 @@
         "name": "selective-bundle",
         "description": "Import multiple components by name from the package root, let bundler tree-shake",
         "useCase": "Applications using 5-20 components. Good balance of simplicity and performance.",
-        "estimatedSize": 13144,
+        "estimatedSize": 12818,
         "pros": [
           "Simple import syntax",
           "Bundler automatically tree-shakes unused exports",
@@ -1152,7 +1152,7 @@
         "name": "full-bundle-cdn",
         "description": "Load complete HELiX bundle from CDN for Drupal/CMS environments",
         "useCase": "Drupal CMS, static sites, prototypes, and environments without a build step.",
-        "estimatedSize": 160114,
+        "estimatedSize": 155893,
         "pros": [
           "No build step required",
           "CDN caching benefits",
@@ -1165,13 +1165,13 @@
           "Must include Lit runtime (add ~5KB gzip)",
           "No code splitting"
         ],
-        "rationale": "The primary Drupal consumer benefits most from CDN delivery. With all 77 components, the full bundle is 156.4KB gzip (Lit externalized). Including Lit adds ~5.9KB. Total: ~162.3KB gzip — well within the 50KB budget."
+        "rationale": "The primary Drupal consumer benefits most from CDN delivery. With all 77 components, the full bundle is 152.2KB gzip (Lit externalized). Including Lit adds ~5.9KB. Total: ~158.1KB gzip — well within the 50KB budget."
       },
       {
         "name": "intersection-observer-lazy",
         "description": "Lazy-load components on first viewport entry using IntersectionObserver",
         "useCase": "Long pages with components below the fold. Reduces Time to First Render (TTR).",
-        "estimatedSize": 2971,
+        "estimatedSize": 2902,
         "pros": [
           "Defers load until component is needed",
           "Reduces initial page weight",
@@ -1190,7 +1190,7 @@
         "name": "route-based-splitting",
         "description": "Bundle components per application route using dynamic import()",
         "useCase": "Single-page applications with distinct routes (admin, patient portal, scheduling).",
-        "estimatedSize": 6572,
+        "estimatedSize": 6409,
         "pros": [
           "Per-route bundle optimization",
           "First route loads only its components",
@@ -1207,54 +1207,24 @@
     ],
     "budgetStatus": {
       "perComponent": {
-        "budget": 5120,
-        "passing": 70,
-        "failing": 7,
-        "violators": [
-          {
-            "name": "hx-color-picker",
-            "gzipSize": 5962,
-            "overBy": 842
-          },
-          {
-            "name": "hx-combobox",
-            "gzipSize": 6270,
-            "overBy": 1150
-          },
-          {
-            "name": "hx-date-picker",
-            "gzipSize": 6509,
-            "overBy": 1389
-          },
-          {
-            "name": "hx-form",
-            "gzipSize": 6715,
-            "overBy": 1595
-          },
-          {
-            "name": "hx-prose",
-            "gzipSize": 5416,
-            "overBy": 296
-          },
-          {
-            "name": "hx-select",
-            "gzipSize": 5367,
-            "overBy": 247
-          },
-          {
-            "name": "hx-time-picker",
-            "gzipSize": 5295,
-            "overBy": 175
-          }
-        ]
+        "standardBudget": 5120,
+        "complexBudget": 8192,
+        "complexComponents": [
+          "hx-color-picker",
+          "hx-combobox",
+          "hx-date-picker"
+        ],
+        "passing": 77,
+        "failing": 0,
+        "violators": []
       },
       "fullBundle": {
         "budget": 51200,
-        "actual": 160114,
+        "actual": 155893,
         "passing": false
       }
     },
-    "summary": "HELiX ships 77 components with an average gzip size of 2.90KB per component (Lit externalized). Full bundle: 156.4KB gzip. 7 components exceed the 5KB/component budget: hx-color-picker, hx-combobox, hx-date-picker, hx-form, hx-prose, hx-select, hx-time-picker. Deduplication saves 0.0KB (0%) when bundled together. Token layer adds 3.64KB per component (shared/deduplicated). Recommended pattern: individual per-component imports for npm consumers, CDN full bundle for Drupal."
+    "summary": "HELiX ships 77 components with an average gzip size of 2.83KB per component (Lit externalized). Full bundle: 152.2KB gzip. All components pass their budgets (standard 5KB; complex components 8KB). Deduplication saves 0.0KB (0%) when bundled together. Token layer adds 3.64KB per component (shared/deduplicated). Recommended pattern: individual per-component imports for npm consumers, CDN full bundle for Drupal."
   },
   "visualization": {
     "sizeByComponent": {
@@ -1352,13 +1322,13 @@
         12670,
         7128,
         10145,
-        24347,
-        26076,
+        20672,
+        22887,
         2928,
         5973,
         3749,
         13165,
-        27751,
+        24131,
         12002,
         3857,
         14538,
@@ -1366,7 +1336,7 @@
         8841,
         2386,
         15691,
-        41553,
+        25870,
         4361,
         2817,
         3587,
@@ -1385,10 +1355,10 @@
         5800,
         7534,
         6785,
-        24472,
+        16909,
         12869,
         10437,
-        21303,
+        18847,
         15737,
         3553,
         16093,
@@ -1408,7 +1378,7 @@
         12060,
         12789,
         4653,
-        19524,
+        17647,
         12512,
         9372,
         5866,
@@ -1431,13 +1401,13 @@
         3548,
         2325,
         2896,
-        5962,
-        6270,
+        5443,
+        5811,
         1010,
         2108,
         1441,
         4116,
-        6509,
+        6130,
         3679,
         1449,
         4060,
@@ -1445,7 +1415,7 @@
         2705,
         1033,
         4422,
-        6715,
+        5048,
         1696,
         1120,
         1332,
@@ -1464,10 +1434,10 @@
         2078,
         2482,
         2173,
-        5416,
+        3734,
         3761,
         3000,
-        5367,
+        5007,
         4060,
         1370,
         4519,
@@ -1487,7 +1457,7 @@
         3244,
         3501,
         1802,
-        5295,
+        5027,
         3808,
         2623,
         2207,
@@ -1510,13 +1480,13 @@
         6518,
         1869,
         5355,
-        9450,
-        11520,
+        5677,
+        8139,
         2073,
         3022,
         1054,
         4770,
-        12163,
+        8399,
         5321,
         2043,
         6062,
@@ -1546,7 +1516,7 @@
         0,
         1978,
         2120,
-        10128,
+        7480,
         3675,
         2033,
         8105,
@@ -1566,7 +1536,7 @@
         4619,
         4856,
         543,
-        7221,
+        5248,
         5014,
         6607,
         1571,
@@ -1582,8 +1552,8 @@
         "Deduplication Savings"
       ],
       "data": [
-        805078,
-        805078,
+        767015,
+        767015,
         0
       ],
       "legend": "Sum of Individual = naive total if each component bundled alone (Lit externalized). Bulk Bundle = actual bundled size with code splitting. Deduplication Savings = code eliminated through sharing."
@@ -1599,7 +1569,7 @@
         {
           "label": "Minified Size (bytes)",
           "data": [
-            64328,
+            61872,
             47200,
             52800,
             68400
@@ -1608,7 +1578,7 @@
         {
           "label": "Gzip Size (bytes)",
           "data": [
-            13144,
+            12818,
             14300,
             16100,
             21500
@@ -1618,39 +1588,34 @@
     },
     "largestComponents": [
       {
-        "name": "hx-form",
-        "gzipSize": 6715,
-        "cssPercent": 0
-      },
-      {
         "name": "hx-date-picker",
-        "gzipSize": 6509,
-        "cssPercent": 44
+        "gzipSize": 6130,
+        "cssPercent": 35
       },
       {
         "name": "hx-combobox",
-        "gzipSize": 6270,
-        "cssPercent": 44
+        "gzipSize": 5811,
+        "cssPercent": 36
       },
       {
         "name": "hx-color-picker",
-        "gzipSize": 5962,
-        "cssPercent": 39
+        "gzipSize": 5443,
+        "cssPercent": 27
       },
       {
-        "name": "hx-prose",
-        "gzipSize": 5416,
+        "name": "hx-form",
+        "gzipSize": 5048,
         "cssPercent": 0
       },
       {
-        "name": "hx-select",
-        "gzipSize": 5367,
-        "cssPercent": 48
+        "name": "hx-time-picker",
+        "gzipSize": 5027,
+        "cssPercent": 30
       },
       {
-        "name": "hx-time-picker",
-        "gzipSize": 5295,
-        "cssPercent": 37
+        "name": "hx-select",
+        "gzipSize": 5007,
+        "cssPercent": 40
       },
       {
         "name": "hx-carousel",
@@ -1716,6 +1681,11 @@
         "name": "hx-menu",
         "gzipSize": 3780,
         "cssPercent": 5
+      },
+      {
+        "name": "hx-radio-group",
+        "gzipSize": 3761,
+        "cssPercent": 15
       }
     ]
   }

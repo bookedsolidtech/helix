@@ -287,9 +287,13 @@ export class HelixCarousel extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-    this._reducedMotion = this._mql.matches;
-    this._mql.addEventListener('change', this._handleMotionChange);
+
+    // Guard for SSR — window.matchMedia is unavailable server-side
+    if (typeof window !== 'undefined') {
+      this._mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      this._reducedMotion = this._mql.matches;
+      this._mql.addEventListener('change', this._handleMotionChange);
+    }
 
     this.addEventListener('mouseenter', this._handleMouseEnter);
     this.addEventListener('mouseleave', this._handleMouseLeave);
