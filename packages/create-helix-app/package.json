@@ -1,0 +1,55 @@
+{
+  "name": "@helixui/create",
+  "version": "0.1.0",
+  "description": "Scaffold a new project with HELiX web components — TUI-powered CLI",
+  "type": "module",
+  "bin": {
+    "create-helix-app": "./dist/index.js",
+    "@helixui/create": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "picocolors": "^1.1.1",
+    "fs-extra": "^11.3.0",
+    "fast-glob": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.15.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/create-helix-app"
+  },
+  "keywords": [
+    "helix",
+    "web-components",
+    "lit",
+    "scaffold",
+    "cli",
+    "create-app",
+    "starter-kit",
+    "healthcare",
+    "design-system"
+  ]
+}
