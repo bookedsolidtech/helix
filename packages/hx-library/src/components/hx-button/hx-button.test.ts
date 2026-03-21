@@ -544,6 +544,16 @@ describe('hx-button', () => {
       const ctor = customElements.get('hx-button') as { prototype: Record<string, unknown> };
       expect(typeof ctor.prototype['formResetCallback']).toBe('undefined');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Accessibility (axe-core) ───

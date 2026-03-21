@@ -396,6 +396,41 @@ describe('hx-toggle-button', () => {
       );
       expect(el.pressed).toBe(false);
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
+
+    it('checkValidity returns true when not required', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('checkValidity returns false when required and not pressed', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button required>Toggle</hx-toggle-button>');
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity returns true when required and pressed', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button required pressed>Toggle</hx-toggle-button>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity is a function', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      expect(typeof el.reportValidity).toBe('function');
+    });
+
+    it('validity.valueMissing is true when required and not pressed', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button required>Toggle</hx-toggle-button>');
+      expect(el.validity.valueMissing).toBe(true)
+    });
   });
 
   // ─── Slots (3) ───

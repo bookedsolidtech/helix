@@ -610,6 +610,33 @@ describe('hx-color-picker', () => {
   // ─── Form Association ───
 
   describe('Form Association', () => {
+    it('formResetCallback resets value to #000000', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#ff0000"></hx-color-picker>',
+      );
+      expect(el.value).toBe('#ff0000');
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe('#000000');
+    });
+
+    it('formStateRestoreCallback restores value from string state', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      el.formStateRestoreCallback('#3b82f6', 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe('#3b82f6');
+    });
+
+    it('formStateRestoreCallback ignores non-string state', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#ff0000"></hx-color-picker>',
+      );
+      el.formStateRestoreCallback(null, 'restore');
+      await el.updateComplete;
+      // value should remain unchanged when state is null
+      expect(el.value).toBe('#ff0000');
+    });
+
     it('submits color value in FormData', async () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-color-picker name="brand-color" value="#3b82f6"></hx-color-picker>';
@@ -642,6 +669,31 @@ describe('hx-color-picker', () => {
       const data = new FormData(form);
       expect(data.get('theme-color')).toBe('#ff0000');
       form.remove();
+    });
+
+    it('checkValidity returns true when not required', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('checkValidity returns false when required and value is empty', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker required value=""></hx-color-picker>');
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity returns true when required and value is set', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker required value="#ff0000"></hx-color-picker>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity is a function', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(typeof el.reportValidity).toBe('function');
+    });
+
+    it('validity.valueMissing is true when required and value is empty', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker required value=""></hx-color-picker>');
+      expect(el.validity.valueMissing).toBe(true);
     });
   });
 

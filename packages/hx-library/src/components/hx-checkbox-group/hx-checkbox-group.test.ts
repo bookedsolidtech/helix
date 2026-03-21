@@ -431,6 +431,28 @@ describe('hx-checkbox-group', () => {
       expect(el.checkValidity()).toBe(true);
     });
 
+    it('submits checked values in FormData directly (not via restore callback)', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-checkbox-group label="Options" name="options">
+          <hx-checkbox value="a" label="Option A" checked></hx-checkbox>
+          <hx-checkbox value="b" label="Option B"></hx-checkbox>
+          <hx-checkbox value="c" label="Option C" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `;
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      container.appendChild(form);
+      const el = form.querySelector('hx-checkbox-group') as HelixCheckboxGroup;
+      await el.updateComplete;
+      const data = new FormData(form);
+      const submitted = data.getAll('options').map((v) => String(v));
+      expect(submitted).toContain('a');
+      expect(submitted).toContain('c');
+      expect(submitted).not.toContain('b');
+      form.remove();
+    });
+
     it('formResetCallback resets all child checkboxes to unchecked', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" name="options">
@@ -447,6 +469,20 @@ describe('hx-checkbox-group', () => {
 
       expect(checkboxes[0].checked).toBe(false);
       expect(checkboxes[1].checked).toBe(false);
+    });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
     });
   });
 
