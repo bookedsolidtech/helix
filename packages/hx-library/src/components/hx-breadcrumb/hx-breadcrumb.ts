@@ -46,6 +46,7 @@ export class HelixBreadcrumb extends LitElement {
    * injected JSON-LD script tags. Deterministic IDs (vs Math.random()) allow
    * SSR frameworks to match server-rendered script tags during hydration.
    */
+  /** @internal */
   private static _instanceCounter = 0;
 
   /**
@@ -104,6 +105,7 @@ export class HelixBreadcrumb extends LitElement {
    * treating a previously component-set `current` attribute as a consumer-set
    * explicit override.
    */
+  /** @internal */
   private readonly _managedCurrentItems = new WeakSet<Element>();
 
   /**
@@ -116,11 +118,13 @@ export class HelixBreadcrumb extends LitElement {
    * Uses a static counter (not Math.random()) so IDs are deterministic across
    * server and client renders, enabling SSR hydration matching.
    */
+  /** @internal */
   private readonly _jsonLdId = `hx-breadcrumb-ld-${++HelixBreadcrumb._instanceCounter}`;
 
   // ─── Item Helpers ───
 
   /** Returns only real breadcrumb items, excluding the managed ellipsis element. */
+  /** @internal */
   private _getBreadcrumbItems(slot: HTMLSlotElement): Element[] {
     return slot
       .assignedElements({ flatten: true })
@@ -141,6 +145,7 @@ export class HelixBreadcrumb extends LitElement {
    * This separation allows Drupal to control current-page marking without
    * relying on item order.
    */
+  /** @internal */
   private _applyItemAttributes(items: Element[]): void {
     // Detect consumer-set 'current' attributes. An item has an explicit consumer
     // current if it has the 'current' attribute AND the component did not set it
@@ -180,6 +185,7 @@ export class HelixBreadcrumb extends LitElement {
 
   // ─── Slot Handling ───
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
     const items = this._getBreadcrumbItems(e.target);
@@ -198,6 +204,7 @@ export class HelixBreadcrumb extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSeparatorSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
     const assigned = e.target.assignedElements({ flatten: true });
@@ -209,6 +216,7 @@ export class HelixBreadcrumb extends LitElement {
 
   // ─── Collapse ───
 
+  /** @internal */
   private _applyCollapse(items: Element[]): void {
     // Show only first and last; hide all middle items
     items.forEach((item, i) => {
@@ -244,6 +252,7 @@ export class HelixBreadcrumb extends LitElement {
     }
   }
 
+  /** @internal */
   private _removeCollapse(items: Element[]): void {
     items.forEach((item) => {
       (item as HTMLElement).removeAttribute('data-bc-hidden');
@@ -254,12 +263,14 @@ export class HelixBreadcrumb extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleEllipsisClick(e: Event): void {
     if ((e.target as Element)?.closest?.('.hx-bc-ellipsis')) {
       this._expandBreadcrumb();
     }
   }
 
+  /** @internal */
   private _handleEllipsisKeydown(e: Event): void {
     if (!(e instanceof KeyboardEvent)) return;
     if (e.key === 'Enter' || e.key === ' ') {
@@ -274,6 +285,7 @@ export class HelixBreadcrumb extends LitElement {
    * Expands a collapsed breadcrumb by resetting maxItems to 0.
    * Called by the ellipsis expand button (click or Enter/Space).
    */
+  /** @internal */
   private _expandBreadcrumb(): void {
     this.maxItems = 0;
     // updated() will detect the maxItems change and call _removeCollapse.
@@ -284,6 +296,7 @@ export class HelixBreadcrumb extends LitElement {
   /**
    * JSON-LD ListItem entry with typed fields to avoid Record<string, unknown>.
    */
+  /** @internal */
   private _buildListItem(item: Element, position: number): JsonLdListItem {
     const href = (item as HTMLElement).getAttribute('href');
     const name = (item as HTMLElement).textContent?.trim() ?? '';
@@ -296,6 +309,7 @@ export class HelixBreadcrumb extends LitElement {
     return entry;
   }
 
+  /** @internal */
   private _updateJsonLd(items: Element[]): void {
     const schema = {
       '@context': 'https://schema.org',
@@ -323,6 +337,7 @@ export class HelixBreadcrumb extends LitElement {
     this._jsonLdScript.textContent = JSON.stringify(schema);
   }
 
+  /** @internal */
   private _removeJsonLd(): void {
     this._jsonLdScript?.remove();
     this._jsonLdScript = null;

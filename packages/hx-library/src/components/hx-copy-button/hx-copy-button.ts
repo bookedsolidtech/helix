@@ -111,12 +111,15 @@ export class HelixCopyButton extends LitElement {
   // ─── Private State ───
 
   /** True while the success feedback window is active. */
+  /** @internal */
   @state() private _copied = false;
 
   /** Non-empty string shown in the aria-live region; cleared when not active. */
+  /** @internal */
   @state() private _announcement = '';
 
   /** Timeout handle used to revert the copied state. */
+  /** @internal */
   private _feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ─── Lifecycle ───
@@ -133,6 +136,7 @@ export class HelixCopyButton extends LitElement {
    * value. Prevents zero/negative timeouts that would cause the success state
    * to immediately revert with no visible or audible feedback.
    */
+  /** @internal */
   private _effectiveDuration(): number {
     return Math.max(this.feedbackDuration, MIN_FEEDBACK_DURATION);
   }
@@ -142,10 +146,12 @@ export class HelixCopyButton extends LitElement {
    * not in the set of valid sizes. Prevents `button--xl` and similar class
    * names that have no matching CSS rule.
    */
+  /** @internal */
   private _effectiveSize(): 'sm' | 'md' | 'lg' {
     return VALID_SIZES.has(this.size) ? this.size : 'md';
   }
 
+  /** @internal */
   private _clearFeedbackTimer(): void {
     if (this._feedbackTimer !== null) {
       clearTimeout(this._feedbackTimer);
@@ -153,12 +159,14 @@ export class HelixCopyButton extends LitElement {
     }
   }
 
+  /** @internal */
   private async _copyToClipboard(): Promise<void> {
     await navigator.clipboard.writeText(this.value);
   }
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleClick(): void {
     if (this.disabled) {
       return;
@@ -167,6 +175,7 @@ export class HelixCopyButton extends LitElement {
     void this._performCopy();
   }
 
+  /** @internal */
   private async _performCopy(): Promise<void> {
     try {
       await this._copyToClipboard();
@@ -215,6 +224,7 @@ export class HelixCopyButton extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _buttonClasses() {
     const size = this._effectiveSize();
     return {
@@ -224,6 +234,7 @@ export class HelixCopyButton extends LitElement {
     };
   }
 
+  /** @internal */
   private _renderIcon() {
     // Show success-icon slot when copied, copy-icon slot otherwise.
     return html`

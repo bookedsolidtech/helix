@@ -67,9 +67,11 @@ export class HelixNavItem extends LitElement {
   // ─── State ───
 
   /** Whether the children slot has assigned nodes. Updated via slotchange. */
+  /** @internal */
   @state() private _hasChildren = false;
 
   /** Whether this item is in collapsed mode. Set externally by hx-side-nav via data-collapsed attribute. */
+  /** @internal */
   @state() private _isCollapsed = false;
 
   // ─── Attribute Observer ───
@@ -87,6 +89,7 @@ export class HelixNavItem extends LitElement {
 
   // ─── Slot Change Handler ───
 
+  /** @internal */
   private _onChildrenSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasChildren = slot.assignedNodes({ flatten: true }).length > 0;
@@ -94,6 +97,7 @@ export class HelixNavItem extends LitElement {
 
   // ─── Private Helpers ───
 
+  /** @internal */
   private _getDirectText(): string {
     return Array.from(this.childNodes)
       .filter((n) => n.nodeType === Node.TEXT_NODE)
@@ -102,12 +106,14 @@ export class HelixNavItem extends LitElement {
       .join(' ');
   }
 
+  /** @internal */
   private _handleToggle(e: Event): void {
     if (this.disabled) return;
     e.preventDefault();
     this.expanded = !this.expanded;
   }
 
+  /** @internal */
   private _renderExpandArrow() {
     return html`<span class="nav-item__arrow" aria-hidden="true">
       <svg viewBox="0 0 20 20">

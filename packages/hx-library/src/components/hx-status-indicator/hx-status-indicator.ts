@@ -87,6 +87,7 @@ export class HelixStatusIndicator extends LitElement {
   @property({ type: String })
   label = '';
 
+  /** @internal */
   private _getLabel(): string {
     if (this.label) return this.label;
     const statusText = STATUS_LABELS[this.status] ?? 'Unknown';

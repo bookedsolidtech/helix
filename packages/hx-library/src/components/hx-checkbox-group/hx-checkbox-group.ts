@@ -58,6 +58,7 @@ export class HelixCheckboxGroup extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -113,6 +114,7 @@ export class HelixCheckboxGroup extends LitElement {
     }
     this._orientation = value as 'vertical' | 'horizontal';
   }
+  /** @internal */
   private _orientation: 'vertical' | 'horizontal' = 'vertical';
 
   /** Whether the named error slot contains projected content. @internal */
@@ -122,17 +124,22 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Internal IDs ───
 
+  /** @internal */
   private _groupId = `hx-checkbox-group-${++_uid}`;
+  /** @internal */
   private _helpTextId = `${this._groupId}-help`;
+  /** @internal */
   private _errorId = `${this._groupId}-error`;
 
   // ─── Slot Handlers ───
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -174,16 +181,19 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Checkbox Management ───
 
+  /** @internal */
   private _getCheckboxes(): HelixCheckbox[] {
     return Array.from(this.children).filter((c): c is HelixCheckbox => c.tagName === 'HX-CHECKBOX');
   }
 
+  /** @internal */
   private _getCheckedValues(): string[] {
     return this._getCheckboxes()
       .filter((cb) => cb.checked)
       .map((cb) => cb.value);
   }
 
+  /** @internal */
   private _syncCheckboxes(): void {
     const checkboxes = this._getCheckboxes();
     checkboxes.forEach((cb) => {
@@ -191,6 +201,7 @@ export class HelixCheckboxGroup extends LitElement {
     });
   }
 
+  /** @internal */
   private _syncCheckboxNames(): void {
     if (!this.name) return;
     const checkboxes = this._getCheckboxes();
@@ -201,6 +212,7 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleCheckboxChange = (e: Event): void => {
     // Only intercept events from direct hx-checkbox children — do not re-intercept
     // the hx-change we dispatch ourselves from this element.
@@ -225,6 +237,7 @@ export class HelixCheckboxGroup extends LitElement {
     );
   };
 
+  /** @internal */
   private _handleSlotChange(): void {
     this._syncCheckboxes();
     this._syncCheckboxNames();
@@ -235,6 +248,7 @@ export class HelixCheckboxGroup extends LitElement {
 
   // ─── Form Integration ───
 
+  /** @internal */
   private _updateFormValue(values: string[]): void {
     if (values.length === 0) {
       this._internals.setFormValue(null);
@@ -245,6 +259,7 @@ export class HelixCheckboxGroup extends LitElement {
     this._internals.setFormValue(formData);
   }
 
+  /** @internal */
   private _updateValidity(values?: string[]): void {
     const checkedValues = values ?? this._getCheckedValues();
     if (this.required && checkedValues.length === 0) {

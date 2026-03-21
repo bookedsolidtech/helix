@@ -82,11 +82,16 @@ export class HelixCounter extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _displayValue = 0;
 
+  /** @internal */
   private _animationId: number | null = null;
+  /** @internal */
   private _startTime: number | null = null;
+  /** @internal */
   private _startValue = 0;
+  /** @internal */
   private _prefersReducedMotion = false;
 
   // ─── Lifecycle ───
@@ -137,6 +142,7 @@ export class HelixCounter extends LitElement {
 
   // ─── Animation ───
 
+  /** @internal */
   private _cancelAnimation(): void {
     if (this._animationId !== null) {
       cancelAnimationFrame(this._animationId);
@@ -144,6 +150,7 @@ export class HelixCounter extends LitElement {
     }
   }
 
+  /** @internal */
   private _applyEasing(t: number): number {
     switch (this.easing) {
       case 'linear':
@@ -157,6 +164,7 @@ export class HelixCounter extends LitElement {
     }
   }
 
+  /** @internal */
   private _startAnimation(): void {
     this._cancelAnimation();
 
@@ -184,6 +192,7 @@ export class HelixCounter extends LitElement {
 
   // ─── Formatting ───
 
+  /** @internal */
   private _formatValue(): string {
     const num =
       this.format === 'integer'

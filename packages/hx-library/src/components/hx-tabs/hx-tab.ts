@@ -77,6 +77,7 @@ export class HelixTab extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleClick(): void {
     if (this.disabled) {
       return;
@@ -95,11 +96,13 @@ export class HelixTab extends LitElement {
     );
   }
 
+  /** @internal */
   private _handlePrefixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasPrefixSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleSuffixSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasSuffixSlot = slot.assignedNodes({ flatten: true }).length > 0;

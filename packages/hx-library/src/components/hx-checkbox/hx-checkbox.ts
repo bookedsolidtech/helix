@@ -60,10 +60,12 @@ export class HelixCheckbox extends LitElement {
 
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -146,13 +148,16 @@ export class HelixCheckbox extends LitElement {
   @property({ type: String, attribute: 'hx-size', reflect: true })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /** @internal */
   @query('.checkbox__input')
   private _inputEl: HTMLInputElement | undefined;
 
+  /** @internal */
   @state() private _hasErrorSlot = false;
 
   // ─── Slot Handlers ───
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -198,6 +203,7 @@ export class HelixCheckbox extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
@@ -229,6 +235,7 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleChange(): void {
     if (this.disabled) return;
 
@@ -251,6 +258,7 @@ export class HelixCheckbox extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (e.key === ' ') {
       e.preventDefault();
@@ -269,9 +277,13 @@ export class HelixCheckbox extends LitElement {
   // ─── Render ───
 
   // P2-05: monotonic counter — collision-free and deterministic
+  /** @internal */
   private _id = `hx-checkbox-${++_checkboxCounter}`;
+  /** @internal */
   private _helpTextId = `${this._id}-help`;
+  /** @internal */
   private _errorId = `${this._id}-error`;
+  /** @internal */
   private _labelId = `${this._id}-label`;
 
   override render() {

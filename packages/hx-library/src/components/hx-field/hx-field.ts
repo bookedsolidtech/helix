@@ -127,16 +127,19 @@ export class HelixField extends LitElement {
    */
   @state() private _hasHelpSlot = false;
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
   }
 
+  /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedElements().length > 0;
@@ -230,6 +233,7 @@ export class HelixField extends LitElement {
   }
 
   /** Creates a visually-hidden span in light DOM used as the ARIA description anchor. */
+  /** @internal */
   private _ensureA11yDescEl(): void {
     if (this._a11yDescEl) return;
     // Guard for SSR — document is unavailable server-side
@@ -244,6 +248,7 @@ export class HelixField extends LitElement {
   }
 
   /** Keeps the light-DOM description span in sync with the current error/help text. */
+  /** @internal */
   private _syncA11yDescEl(): void {
     if (!this._a11yDescEl) return;
     const hasError = !!this.error || this._hasErrorSlot;
@@ -257,6 +262,7 @@ export class HelixField extends LitElement {
   }
 
   /** Tracks the first form control assigned to the default slot. */
+  /** @internal */
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const assigned = slot.assignedElements();
@@ -269,6 +275,7 @@ export class HelixField extends LitElement {
    * The shadow `<label>` cannot use `for`/`id` to link to a slotted input
    * across the shadow boundary, so we handle focus programmatically.
    */
+  /** @internal */
   private _handleLabelClick(_e: Event): void {
     this._slottedControl?.focus();
   }
@@ -287,6 +294,7 @@ export class HelixField extends LitElement {
    * - Elements with `data-aria-managed` attribute opt out of ARIA mutation;
    *   bridging is skipped entirely for those elements.
    */
+  /** @internal */
   private _syncSlottedControl(): void {
     const control = this._slottedControl;
     if (!control) return;

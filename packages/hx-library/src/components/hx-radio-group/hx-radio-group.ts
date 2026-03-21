@@ -52,6 +52,7 @@ export class HelixRadioGroup extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 

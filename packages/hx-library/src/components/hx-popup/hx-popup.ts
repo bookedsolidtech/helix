@@ -139,7 +139,9 @@ type ArrowData = { x?: number; y?: number; centerOffset: number };
 export class HelixPopup extends LitElement {
   static override styles = [tokenStyles, helixPopupStyles];
 
+  /** @internal */
   private _anchorSlotEl: Element | null = null;
+  /** @internal */
   private _cleanupAutoUpdate: (() => void) | null = null;
 
   /**
@@ -327,6 +329,7 @@ export class HelixPopup extends LitElement {
 
   // ─── Anchor Resolution ───
 
+  /** @internal */
   private _getAnchorElement(): Element | null {
     if (this.anchor instanceof Element) {
       return this.anchor;
@@ -337,6 +340,7 @@ export class HelixPopup extends LitElement {
     return this._anchorSlotEl;
   }
 
+  /** @internal */
   private _handleAnchorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const assigned = slot.assignedElements();
@@ -348,6 +352,7 @@ export class HelixPopup extends LitElement {
 
   // ─── Positioning ───
 
+  /** @internal */
   private _startAutoUpdate(): void {
     this._stopAutoUpdate();
     const anchorEl = this._getAnchorElement();
@@ -359,11 +364,13 @@ export class HelixPopup extends LitElement {
     });
   }
 
+  /** @internal */
   private _stopAutoUpdate(): void {
     this._cleanupAutoUpdate?.();
     this._cleanupAutoUpdate = null;
   }
 
+  /** @internal */
   private async _reposition(): Promise<void> {
     const anchorEl = this._getAnchorElement();
     const popupEl = this.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
@@ -433,6 +440,7 @@ export class HelixPopup extends LitElement {
     this.dispatchEvent(new CustomEvent<void>('hx-reposition', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _positionArrow(
     arrowEl: HTMLElement,
     placement: Placement,

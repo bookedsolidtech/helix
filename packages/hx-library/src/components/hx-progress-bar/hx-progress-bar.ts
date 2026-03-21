@@ -94,9 +94,12 @@ export class HelixProgressBar extends LitElement {
 
   /** @internal */
   @state() private _liveMessage = '';
+  /** @internal */
   @state() private _hasLabelSlotContent = false;
 
+  /** @internal */
   private static _counter = 0;
+  /** @internal */
   private _uid = `hx-pb-${++HelixProgressBar._counter}`;
 
   /** @internal */
@@ -144,6 +147,7 @@ export class HelixProgressBar extends LitElement {
     }
   }
 
+  /** @internal */
   private _onLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
@@ -154,12 +158,14 @@ export class HelixProgressBar extends LitElement {
   // The variant label is included in aria-valuetext for AT users and rendered
   // as visually-hidden text for users in high contrast or color-blind contexts.
 
+  /** @internal */
   private static readonly _VARIANT_LABELS: Partial<Record<HelixProgressBar['variant'], string>> = {
     success: 'Success',
     warning: 'Warning',
     danger: 'Danger',
   };
 
+  /** @internal */
   private get _variantLabel(): string {
     return HelixProgressBar._VARIANT_LABELS[this.variant] ?? '';
   }

@@ -184,10 +184,12 @@ export class HelixSplitPanel extends LitElement {
    */
   private _cachedContainerHeight = 0;
 
+  /** @internal */
   private _clamp(value: number): number {
     return Math.min(this.max, Math.max(this.min, value));
   }
 
+  /** @internal */
   private _snapToPoint(value: number): number {
     if (!this.snap.length) return value;
     const threshold = 5;
@@ -197,6 +199,7 @@ export class HelixSplitPanel extends LitElement {
     return value;
   }
 
+  /** @internal */
   private _setPosition(percent: number): void {
     const clamped = this._clamp(this._snapToPoint(percent));
     if (clamped === this.position) return;
@@ -210,6 +213,7 @@ export class HelixSplitPanel extends LitElement {
     );
   }
 
+  /** @internal */
   private _getHostSize(): number {
     if (this.orientation === 'horizontal') {
       return this.offsetWidth;
@@ -353,6 +357,7 @@ export class HelixSplitPanel extends LitElement {
     }
   }
 
+  /** @internal */
   private _startPanelStyleMap(): Record<string, string> {
     if (this.orientation === 'horizontal') {
       return { width: `${this.position}%` };

@@ -60,6 +60,7 @@ export class HelixTextInput extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 

@@ -97,10 +97,12 @@ export class HelixIconButton extends LitElement {
 
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -129,6 +131,7 @@ export class HelixIconButton extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled) {
       e.preventDefault();
@@ -160,10 +163,12 @@ export class HelixIconButton extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _normalizedLabel(): string {
     return this.label.trim();
   }
 
+  /** @internal */
   private _classes() {
     return {
       button: true,
@@ -172,6 +177,7 @@ export class HelixIconButton extends LitElement {
     };
   }
 
+  /** @internal */
   private _iconSlot() {
     return html`<span part="icon" class="icon"><slot></slot></span>`;
   }

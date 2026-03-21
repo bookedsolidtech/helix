@@ -57,6 +57,7 @@ export class HelixFileUpload extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -157,14 +158,20 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Stable IDs ───
 
+  /** @internal */
   private readonly _baseId = `hx-file-upload-${++_hxFileUploadIdCounter}`;
+  /** @internal */
   private readonly _labelId = `${this._baseId}-label`;
+  /** @internal */
   private readonly _errorId = `${this._baseId}-error`;
+  /** @internal */
   private readonly _dropzoneId = `${this._baseId}-dropzone`;
+  /** @internal */
   private readonly _liveId = `${this._baseId}-live`;
 
   // ─── Slot Handling ───
 
+  /** @internal */
   private _handleFileListSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasFileListSlot = slot.assignedElements({ flatten: true }).length > 0;
@@ -234,6 +241,7 @@ export class HelixFileUpload extends LitElement {
     }
   }
 
+  /** @internal */
   private _syncFormValue(): void {
     if (this._files.length === 0) {
       this._internals.setFormValue(null);
@@ -263,6 +271,7 @@ export class HelixFileUpload extends LitElement {
    * Validates a file against `accept` and `maxSize` constraints.
    * Returns null on success, or an error message string on failure.
    */
+  /** @internal */
   private _validateFile(file: File): string | null {
     if (this.accept) {
       const accepted = this._isAccepted(file);
@@ -284,6 +293,7 @@ export class HelixFileUpload extends LitElement {
    * Handles MIME types (e.g. "image/png"), wildcard MIME types (e.g. "image/*"),
    * and extensions (e.g. ".pdf").
    */
+  /** @internal */
   private _isAccepted(file: File): boolean {
     const tokens = this.accept.split(',').map((t) => t.trim().toLowerCase());
 
@@ -306,6 +316,7 @@ export class HelixFileUpload extends LitElement {
 
   // ─── File Processing ───
 
+  /** @internal */
   private _processFiles(rawFiles: File[]): void {
     if (this.disabled) return;
 
@@ -414,12 +425,14 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Drag and Drop Handlers ───
 
+  /** @internal */
   private _handleDragOver(e: DragEvent): void {
     e.preventDefault();
     if (this.disabled) return;
     this._dragOver = true;
   }
 
+  /** @internal */
   private _handleDragLeave(e: DragEvent): void {
     // Only clear drag state when leaving the dropzone entirely
     const target = e.relatedTarget as Node | null;
@@ -429,6 +442,7 @@ export class HelixFileUpload extends LitElement {
     this._dragOver = false;
   }
 
+  /** @internal */
   private _handleDrop(e: DragEvent): void {
     e.preventDefault();
     this._dragOver = false;
@@ -445,11 +459,13 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Click / Keyboard Handlers ───
 
+  /** @internal */
   private _handleDropzoneClick(): void {
     if (this.disabled) return;
     this._fileInput?.click();
   }
 
+  /** @internal */
   private _handleDropzoneKeyDown(e: KeyboardEvent): void {
     if (this.disabled) return;
     if (e.key === 'Enter' || e.key === ' ') {
@@ -458,6 +474,7 @@ export class HelixFileUpload extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleFileInputChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -470,6 +487,7 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Remove Handler ───
 
+  /** @internal */
   private _handleRemove(index: number): void {
     if (this.disabled) return;
     const entry = this._files[index];
@@ -489,6 +507,7 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Formatters ───
 
+  /** @internal */
   private _formatSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -497,6 +516,7 @@ export class HelixFileUpload extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderFileList() {
     if (this._hasFileListSlot) return nothing;
     if (this._files.length === 0) return nothing;

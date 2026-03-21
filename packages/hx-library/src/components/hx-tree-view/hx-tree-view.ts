@@ -72,9 +72,11 @@ export class HelixTreeView extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _currentIndex = 0;
 
   /** Tracks whether the tree has any visible items, to decide the container tabindex. */
+  /** @internal */
   @state() private _hasVisibleItems = false;
 
   // ─── Internal Helpers ───
@@ -83,10 +85,12 @@ export class HelixTreeView extends LitElement {
    * Returns a flat ordered list of all visible (not inside a collapsed item) hx-tree-items
    * in depth-first order.
    */
+  /** @internal */
   private _getVisibleItems(): HelixTreeItem[] {
     return this._collectVisibleItems(this);
   }
 
+  /** @internal */
   private _collectVisibleItems(container: Element): HelixTreeItem[] {
     const items: HelixTreeItem[] = [];
     for (const child of Array.from(container.children)) {
@@ -103,6 +107,7 @@ export class HelixTreeView extends LitElement {
     return items;
   }
 
+  /** @internal */
   private _getSelectedItems(): HelixTreeItem[] {
     return Array.from(this.querySelectorAll<HelixTreeItem>('hx-tree-item[selected]'));
   }
@@ -112,12 +117,14 @@ export class HelixTreeView extends LitElement {
    * item at `activeIndex` has `tabindex="0"`. All others receive `tabindex="-1"`.
    * This is called whenever the active item changes (navigation, initial render).
    */
+  /** @internal */
   private _updateRovingTabindex(items: HelixTreeItem[], activeIndex: number): void {
     items.forEach((item, i) => {
       item.setRovingActive(i === activeIndex);
     });
   }
 
+  /** @internal */
   private _focusItem(index: number): void {
     const items = this._getVisibleItems();
     if (items.length === 0) return;
@@ -129,6 +136,7 @@ export class HelixTreeView extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleTreeItemSelect(e: Event): void {
     if (!(e instanceof CustomEvent)) return;
     const event = e as CustomEvent<HxTreeItemSelectDetail>;
@@ -155,6 +163,7 @@ export class HelixTreeView extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     const items = this._getVisibleItems();
     if (items.length === 0) return;
@@ -227,6 +236,7 @@ export class HelixTreeView extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleFocusIn(e: FocusEvent): void {
     // With roving tabindex, the tree container (tabindex="-1") should only receive
     // focus when the tree is empty. If focus does land on the container (e.g. the
@@ -245,6 +255,7 @@ export class HelixTreeView extends LitElement {
    * so a Tab into the tree lands directly on the first item without a redirect.
    * Also updates `_hasVisibleItems` so the container tabindex re-renders correctly.
    */
+  /** @internal */
   private _handleSlotChange(): void {
     const items = this._getVisibleItems();
     this._hasVisibleItems = items.length > 0;

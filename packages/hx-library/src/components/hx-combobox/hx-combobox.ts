@@ -76,17 +76,24 @@ export class HelixCombobox extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
   // ─── Stable IDs ───
 
   // P2-6: Use module-level counter instead of Math.random() to guarantee uniqueness
+  /** @internal */
   private _id = `hx-combobox-${++_comboboxIdCounter}`;
+  /** @internal */
   private _listboxId = `${this._id}-listbox`;
+  /** @internal */
   private _helpTextId = `${this._id}-help`;
+  /** @internal */
   private _errorId = `${this._id}-error`;
+  /** @internal */
   private _labelId = `${this._id}-label`;
+  /** @internal */
   private _liveRegionId = `${this._id}-live`;
 
   // ─── Public Properties ───
@@ -233,11 +240,13 @@ export class HelixCombobox extends LitElement {
 
   // ─── Debounce timer ───
 
+  /** @internal */
   private _debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ─── Multiple Selection ───
 
   // P0-1: Derive selected values Set from the comma-separated value property
+  /** @internal */
   private get _selectedValuesSet(): Set<string> {
     if (!this.multiple || !this.value) return new Set();
     return new Set(this.value.split(',').filter(Boolean));
@@ -245,6 +254,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Filtered options ───
 
+  /** @internal */
   private get _filteredOptions(): ComboboxOption[] {
     if (!this._filterText) return this._options;
     const lower = this._filterText.toLowerCase();
@@ -301,10 +311,12 @@ export class HelixCombobox extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateFormValue(): void {
     this._internals.setFormValue(this.value || null);
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -342,14 +354,17 @@ export class HelixCombobox extends LitElement {
 
   // ─── Option Syncing from Slot ───
 
+  /** @internal */
   private _handleSlotChange(): void {
     this._readOptions();
   }
 
+  /** @internal */
   private _parseOption(el: HTMLOptionElement): ComboboxOption {
     return { value: el.value, label: el.textContent?.trim() ?? el.value, disabled: el.disabled };
   }
 
+  /** @internal */
   private _readOptions(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="option"]');
     if (!slot) return;
@@ -371,6 +386,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Slot Change Handlers ───
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -378,6 +394,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Dropdown Control ───
 
+  /** @internal */
   private _openDropdown(): void {
     if (this.disabled || this._open) return;
     this._open = true;
@@ -385,6 +402,7 @@ export class HelixCombobox extends LitElement {
     this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _closeDropdown(): void {
     if (!this._open) return;
     this._open = false;
@@ -394,6 +412,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Input Handling ───
 
+  /** @internal */
   private _handleInput(e: Event): void {
     const input = e.target as HTMLInputElement;
     this._filterText = input.value;
@@ -418,6 +437,7 @@ export class HelixCombobox extends LitElement {
     }
   }
 
+  /** @internal */
   private _announceFilterResults(): void {
     const count = this._filteredOptions.length;
     this._filterAnnouncement =
@@ -426,6 +446,7 @@ export class HelixCombobox extends LitElement {
         : `${count} ${count === 1 ? 'option' : 'options'} available`;
   }
 
+  /** @internal */
   private _emitInput(): void {
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-input', {
@@ -436,12 +457,14 @@ export class HelixCombobox extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleFocus(): void {
     this._openDropdown();
   }
 
   // ─── Keyboard Navigation ───
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (this.disabled) return;
 
@@ -523,6 +546,7 @@ export class HelixCombobox extends LitElement {
   // ─── Selection ───
 
   // P0-1: Handle both single and multiple selection modes
+  /** @internal */
   private _selectOption(option: ComboboxOption): void {
     if (option.disabled) return;
     if (this.multiple) {
@@ -545,6 +569,7 @@ export class HelixCombobox extends LitElement {
   }
 
   // P0-1: Remove a single value from multi-selection
+  /** @internal */
   private _removeValue(val: string): void {
     const next = this._selectedValuesSet;
     next.delete(val);
@@ -554,6 +579,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Clear ───
 
+  /** @internal */
   private _handleClear(e: Event): void {
     e.stopPropagation();
     this.value = '';
@@ -569,6 +595,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Event Dispatchers ───
 
+  /** @internal */
   private _dispatchChange(): void {
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-change', {
@@ -581,6 +608,7 @@ export class HelixCombobox extends LitElement {
 
   // ─── Outside Click Handler ───
 
+  /** @internal */
   private _handleOutsideClick = (e: MouseEvent): void => {
     if (this._open && !e.composedPath().includes(this)) {
       this._closeDropdown();
@@ -596,10 +624,12 @@ export class HelixCombobox extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _optionId(index: number): string {
     return `${this._id}-option-${index}`;
   }
 
+  /** @internal */
   private get _displayValue(): string {
     // P0-1: In multiple mode, chips render selected values — input shows only filter text
     if (this.multiple) return '';
@@ -608,6 +638,7 @@ export class HelixCombobox extends LitElement {
     return opt ? opt.label : this.value;
   }
 
+  /** @internal */
   private _renderOptions() {
     const filtered = this._filteredOptions;
 

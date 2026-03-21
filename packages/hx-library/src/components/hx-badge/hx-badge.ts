@@ -109,6 +109,7 @@ export class HelixBadge extends LitElement {
 
   /**
    * Tracks whether the default slot has assigned content.
+   * @internal
    */
   @state()
   private _hasSlotContent = false;
@@ -128,6 +129,7 @@ export class HelixBadge extends LitElement {
 
   // ─── Slot Change Handling ───
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
@@ -143,6 +145,7 @@ export class HelixBadge extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleRemove(): void {
     this.dispatchEvent(
       new CustomEvent<void>('hx-remove', {
@@ -154,6 +157,7 @@ export class HelixBadge extends LitElement {
 
   // ─── Count Display ───
 
+  /** @internal */
   private get _countDisplay(): string {
     if (this.count === undefined) return '';
     return this.count > this.max ? `${this.max}+` : String(this.count);
@@ -164,6 +168,7 @@ export class HelixBadge extends LitElement {
   // Visually-hidden text is prepended so screen reader users and color-blind
   // users get the variant context even when no icon is slotted.
 
+  /** @internal */
   private static readonly _SEMANTIC_VARIANT_LABELS: Partial<Record<HelixBadge['variant'], string>> =
     {
       success: 'Success',
@@ -172,6 +177,7 @@ export class HelixBadge extends LitElement {
       info: 'Info',
     };
 
+  /** @internal */
   private get _semanticVariantLabel(): string {
     return HelixBadge._SEMANTIC_VARIANT_LABELS[this.variant] ?? '';
   }

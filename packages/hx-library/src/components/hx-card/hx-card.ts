@@ -103,21 +103,25 @@ export class HelixCard extends LitElement {
    */
   @state() private _hasActions = false;
 
+  /** @internal */
   private _onImageSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasImage = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _onHeadingSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHeading = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _onFooterSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasFooter = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _onActionsSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
@@ -148,6 +152,7 @@ export class HelixCard extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _dispatchCardClick(originalEvent: MouseEvent | KeyboardEvent): void {
     if (!this.hxHref) return;
 
@@ -165,10 +170,12 @@ export class HelixCard extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     this._dispatchCardClick(e);
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (!this.hxHref) return;
 

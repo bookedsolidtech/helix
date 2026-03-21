@@ -68,6 +68,7 @@ export class HelixDatePicker extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -289,6 +290,7 @@ export class HelixDatePicker extends LitElement {
    */
   private _hasErrorSlot = false;
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
@@ -301,6 +303,7 @@ export class HelixDatePicker extends LitElement {
     this.requestUpdate();
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
@@ -377,6 +380,7 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleOutsideClick(e: MouseEvent): void {
     const path = e.composedPath();
     if (!path.includes(this)) {
@@ -384,6 +388,7 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleDocumentKeydown(e: KeyboardEvent): void {
     if (e.key === 'Escape' && this._isOpen) {
       this._closeCalendar();
@@ -415,6 +420,7 @@ export class HelixDatePicker extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -455,12 +461,14 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Date Utilities ───
 
+  /** @internal */
   private _parseISODate(iso: string): Date | null {
     if (!iso) return null;
     const d = new Date(iso + 'T00:00:00');
     return isNaN(d.getTime()) ? null : d;
   }
 
+  /** @internal */
   private _toISO(date: Date): string {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -468,6 +476,7 @@ export class HelixDatePicker extends LitElement {
     return `${y}-${m}-${d}`;
   }
 
+  /** @internal */
   private _formatForDisplay(iso: string): string {
     const date = this._parseISODate(iso);
     if (!date) return '';
@@ -478,6 +487,7 @@ export class HelixDatePicker extends LitElement {
     });
   }
 
+  /** @internal */
   private _isDateDisabled(date: Date): boolean {
     const iso = this._toISO(date);
     if (this.min && iso < this.min) return true;
@@ -485,6 +495,7 @@ export class HelixDatePicker extends LitElement {
     return false;
   }
 
+  /** @internal */
   private _isSameDay(a: Date, b: Date): boolean {
     return (
       a.getFullYear() === b.getFullYear() &&
@@ -493,14 +504,17 @@ export class HelixDatePicker extends LitElement {
     );
   }
 
+  /** @internal */
   private _isToday(date: Date): boolean {
     return this._isSameDay(date, new Date());
   }
 
+  /** @internal */
   private _getMonthName(month: number): string {
     return new Date(2000, month, 1).toLocaleDateString(this.locale, { month: 'long' });
   }
 
+  /** @internal */
   private _getDayName(dayIndex: number): string {
     // dayIndex: 0=Sun, 1=Mon, ...
     return new Date(2000, 0, 2 + dayIndex).toLocaleDateString(this.locale, {
@@ -514,6 +528,7 @@ export class HelixDatePicker extends LitElement {
    * Returns an array of Date objects (or null for padding cells) representing
    * the 6-week grid for the current view month.
    */
+  /** @internal */
   private _getDaysInGrid(): (Date | null)[] {
     const firstOfMonth = new Date(this._viewYear, this._viewMonth, 1);
     const leadingBlanks = firstOfMonth.getDay(); // 0=Sun
@@ -544,11 +559,13 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Calendar Open/Close ───
 
+  /** @internal */
   private _openCalendar(): void {
     if (this.disabled) return;
     this._isOpen = true;
   }
 
+  /** @internal */
   private _closeCalendar(): void {
     this._isOpen = false;
     // Return focus to trigger after calendar closes.
@@ -557,6 +574,7 @@ export class HelixDatePicker extends LitElement {
     });
   }
 
+  /** @internal */
   private _toggleCalendar(): void {
     if (this._isOpen) {
       this._closeCalendar();
@@ -567,6 +585,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Focus Management ───
 
+  /** @internal */
   private _focusActiveDay(): void {
     if (!this._calendar) return;
 
@@ -615,6 +634,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Month Navigation ───
 
+  /** @internal */
   private _prevMonth(): void {
     if (this._viewMonth === 0) {
       this._viewMonth = 11;
@@ -624,6 +644,7 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _nextMonth(): void {
     if (this._viewMonth === 11) {
       this._viewMonth = 0;
@@ -635,6 +656,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Day Selection ───
 
+  /** @internal */
   private _selectDay(date: Date): void {
     if (this._isDateDisabled(date)) return;
 
@@ -656,6 +678,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Calendar Keyboard Navigation ───
 
+  /** @internal */
   private _handleCalendarKeydown(e: KeyboardEvent): void {
     const { key } = e;
 
@@ -779,6 +802,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Navigation Boundary Checks ───
 
+  /** @internal */
   private _isPrevMonthDisabled(): boolean {
     if (!this.min) return false;
     const firstOfCurrentView = new Date(this._viewYear, this._viewMonth, 1);
@@ -787,6 +811,7 @@ export class HelixDatePicker extends LitElement {
     return firstOfCurrentView <= minDate;
   }
 
+  /** @internal */
   private _isNextMonthDisabled(): boolean {
     if (!this.max) return false;
     const lastOfCurrentView = new Date(this._viewYear, this._viewMonth + 1, 0);
@@ -797,6 +822,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Focus Trap ───
 
+  /** @internal */
   private _handleCalendarTab(e: KeyboardEvent): void {
     if (e.key !== 'Tab' || !this._isOpen) return;
 
@@ -828,6 +854,7 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderWeekdayHeaders() {
     const headers = Array.from(
       { length: 7 },
@@ -839,6 +866,7 @@ export class HelixDatePicker extends LitElement {
     return html`<div class="calendar__row" role="row">${headers}</div>`;
   }
 
+  /** @internal */
   private _renderDayGrid() {
     const cells = this._getDaysInGrid();
     const selectedDate = this._parseISODate(this.value);
