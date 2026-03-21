@@ -142,7 +142,8 @@ export class HelixTooltip extends LitElement {
         .join(' ')
         .trim() ?? '';
 
-    if (!this._lightDomDescription) {
+    // Guard for SSR — document is unavailable server-side
+    if (!this._lightDomDescription && typeof document !== 'undefined') {
       this._lightDomDescription = document.createElement('span');
       this._lightDomDescription.id = this._tooltipId;
       // Visually hidden but accessible to screen readers via aria-describedby
@@ -150,7 +151,9 @@ export class HelixTooltip extends LitElement {
         'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
       this.appendChild(this._lightDomDescription);
     }
-    this._lightDomDescription.textContent = contentText;
+    if (this._lightDomDescription) {
+      this._lightDomDescription.textContent = contentText;
+    }
 
     if (trigger) {
       trigger.setAttribute('aria-describedby', this._tooltipId);
@@ -253,10 +256,9 @@ export class HelixTooltip extends LitElement {
   private _handleTriggerMouseleave(): void {
     const slot = this._defaultSlot;
     const trigger = slot?.assignedElements()[0] as HTMLElement | undefined;
-    if (
-      trigger &&
-      (trigger === document.activeElement || trigger.contains(document.activeElement))
-    ) {
+    // Guard for SSR — document is unavailable server-side
+    const active = typeof document !== 'undefined' ? document.activeElement : null;
+    if (trigger && (trigger === active || trigger.contains(active))) {
       return;
     }
     this._scheduleHide();

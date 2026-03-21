@@ -93,6 +93,12 @@ export class HelixCounter extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
 
+    // Guard for SSR — window.matchMedia and requestAnimationFrame are unavailable server-side
+    if (typeof window === 'undefined') {
+      this._displayValue = this.value;
+      return;
+    }
+
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     this._prefersReducedMotion = mq.matches;
 
