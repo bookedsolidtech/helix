@@ -522,11 +522,11 @@ describe('hx-dialog', () => {
       expect(el.open).toBe(false);
     });
 
-    it('close button aria-label uses heading when provided, falls back to "Close dialog"', async () => {
+    it('close button aria-label uses closeLabel property (default: "Close dialog")', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog open heading="A11y Test"></hx-dialog>');
       await el.updateComplete;
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-button"]');
-      expect(closeBtn?.getAttribute('aria-label')).toBe('Close A11y Test');
+      expect(closeBtn?.getAttribute('aria-label')).toBe('Close dialog');
     });
 
     it('close button has aria-label="Close dialog" when no heading is set', async () => {
