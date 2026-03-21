@@ -152,6 +152,11 @@ export class HelixToggleButton extends LitElement {
     this.pressed = typeof state === 'string' && state === 'pressed';
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Private Helpers ───
 
   private _syncFormValue(): void {

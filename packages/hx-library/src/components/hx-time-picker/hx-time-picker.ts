@@ -473,6 +473,11 @@ export class HelixTimePicker extends LitElement {
     this.value = clamped;
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Listbox helpers ───
 
   private _openListbox(): void {
