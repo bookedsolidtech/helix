@@ -175,6 +175,7 @@ export class HelixPopover extends LitElement {
   // ─── ARIA setup ───
 
   // HIGH-02: set aria-haspopup="dialog" on firstUpdated and keep aria-expanded in sync
+  /** @internal */
   private _setAnchorAriaAttributes(expanded: boolean): void {
     const anchorSlot = this.shadowRoot?.querySelector(
       'slot[name="anchor"]',
@@ -192,6 +193,7 @@ export class HelixPopover extends LitElement {
   // ─── Focus helpers ───
 
   /** Return all keyboard-focusable elements inside the popover body's slotted content. */
+  /** @internal */
   private _getFocusableElements(): HTMLElement[] {
     const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
     if (!bodyEl) return [];
@@ -216,6 +218,7 @@ export class HelixPopover extends LitElement {
   }
 
   /** Trap Tab/Shift+Tab focus within the popover body when it contains interactive elements. */
+  /** @internal */
   private _handleFocusTrap = (e: KeyboardEvent): void => {
     if (e.key !== 'Tab' || !this._visible) return;
 
@@ -245,6 +248,7 @@ export class HelixPopover extends LitElement {
 
   // ─── Show/Hide ───
 
+  /** @internal */
   private async _show(): Promise<void> {
     if (this._visible) return;
     // P0-02: save focus target before moving focus into dialog
@@ -279,6 +283,7 @@ export class HelixPopover extends LitElement {
 
   // HIGH-03: _hideWithFocusRestore controls whether _previousFocus is restored.
   // Escape and programmatic close restore focus; click-outside does not.
+  /** @internal */
   private async _hide(restoreFocus = true): Promise<void> {
     if (!this._visible) return;
     document.removeEventListener('click', this._handleDocumentClick);
@@ -299,6 +304,7 @@ export class HelixPopover extends LitElement {
 
   // ─── Positioning ───
 
+  /** @internal */
   private async _updatePosition(): Promise<void> {
     const anchorSlot = this.shadowRoot?.querySelector(
       'slot[name="anchor"]',
@@ -462,6 +468,7 @@ export class HelixPopover extends LitElement {
     void this._hide(true);
   };
 
+  /** @internal */
   private _handleAnchorSlotChange(): void {
     this._setAnchorAriaAttributes(this._visible);
   }

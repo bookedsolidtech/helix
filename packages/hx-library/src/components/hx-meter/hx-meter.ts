@@ -39,7 +39,9 @@ type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
 export class HelixMeter extends LitElement {
   static override styles = [tokenStyles, helixMeterStyles];
 
+  /** @internal */
   private static _counter = 0;
+  /** @internal */
   private _uid = `hx-meter-${++HelixMeter._counter}`;
 
   /**
@@ -93,19 +95,23 @@ export class HelixMeter extends LitElement {
   @property({ type: String })
   label?: string;
 
+  /** @internal */
   @state()
   private _hasSlotContent = false;
 
+  /** @internal */
   private _clampedValue(): number {
     return Math.min(Math.max(this.value, this.min), this.max);
   }
 
+  /** @internal */
   private _percentage(): number {
     const range = this.max - this.min;
     if (range === 0) return 0;
     return ((this._clampedValue() - this.min) / range) * 100;
   }
 
+  /** @internal */
   private _resolveState(): MeterState {
     const v = this._clampedValue();
     const hasLow = this.low !== undefined;
@@ -147,6 +153,7 @@ export class HelixMeter extends LitElement {
     }
   }
 
+  /** @internal */
   private _onLabelSlotChange(e: Event) {
     const slot = e.target as HTMLSlotElement;
     this._hasSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
@@ -166,6 +173,7 @@ export class HelixMeter extends LitElement {
   // (optimum/warning/danger) is active, providing a non-color visual cue.
   // aria-valuetext already embeds the state for AT users.
 
+  /** @internal */
   private static readonly _STATE_LABELS: Partial<Record<MeterState, string>> = {
     optimum: 'Optimum',
     warning: 'Warning',

@@ -98,6 +98,7 @@ export class HelixLink extends LitElement {
 
   // --- Event Handling ---
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled) {
       e.preventDefault();
@@ -116,12 +117,14 @@ export class HelixLink extends LitElement {
 
   // --- Render Helpers ---
 
+  /** @internal */
   private _computeRel(): string | undefined {
     if (this.rel) return this.rel;
     if (this.target === '_blank') return 'noopener noreferrer';
     return undefined;
   }
 
+  /** @internal */
   private _renderExternalIcon() {
     if (this.target !== '_blank') return nothing;
 

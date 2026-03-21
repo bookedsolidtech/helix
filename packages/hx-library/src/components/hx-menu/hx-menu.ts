@@ -56,6 +56,7 @@ export class HelixMenu extends LitElement {
    */
   private _typeaheadTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /** @internal */
   private _getItems(): HelixMenuItem[] {
     return Array.from(this.querySelectorAll<HelixMenuItem>('hx-menu-item')).filter(
       (item) => !item.disabled && !item.loading,
@@ -66,6 +67,7 @@ export class HelixMenu extends LitElement {
    * Synchronize roving tabindex across all enabled items.
    * Only the active item (or first item if none active) gets tabindex=0.
    */
+  /** @internal */
   private _syncRovingTabIndex(): void {
     const items = this._getItems();
     const activeIndex = this._focusedIndex >= 0 ? this._focusedIndex : 0;
@@ -96,6 +98,7 @@ export class HelixMenu extends LitElement {
     }
   }
 
+  /** @internal */
   private _focusItem(index: number): void {
     const items = this._getItems();
     if (items.length === 0) return;
@@ -105,6 +108,7 @@ export class HelixMenu extends LitElement {
     if (target !== undefined) target.focus();
   }
 
+  /** @internal */
   private _updateFocusedIndex(): void {
     const items = this._getItems();
     const active = this.shadowRoot?.activeElement ?? document.activeElement;
@@ -113,6 +117,7 @@ export class HelixMenu extends LitElement {
     if (idx !== -1) this._focusedIndex = idx;
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     this._updateFocusedIndex();
     const items = this._getItems();
@@ -147,6 +152,7 @@ export class HelixMenu extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleTypeahead(char: string, items: HelixMenuItem[]): void {
     if (this._typeaheadTimer !== null) {
       clearTimeout(this._typeaheadTimer);
@@ -168,6 +174,7 @@ export class HelixMenu extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     const slot = e.target;
     if (!(slot instanceof HTMLSlotElement)) return;
@@ -185,6 +192,7 @@ export class HelixMenu extends LitElement {
     this._syncRovingTabIndex();
   }
 
+  /** @internal */
   private _handleItemSelect(e: Event): void {
     if (!(e instanceof CustomEvent)) return;
     const detail = (e as CustomEvent<{ item: HelixMenuItem; value: string }>).detail;

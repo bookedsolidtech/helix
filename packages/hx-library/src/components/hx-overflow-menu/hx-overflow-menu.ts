@@ -134,6 +134,7 @@ export class HelixOverflowMenu extends LitElement {
 
   // ─── Open / Close ───
 
+  /** @internal */
   private async _show(): Promise<void> {
     if (this._open || this.disabled) return;
     this._open = true;
@@ -143,12 +144,14 @@ export class HelixOverflowMenu extends LitElement {
     this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
     this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _toggle(): void {
     if (this._open) {
       this._hide();
@@ -159,6 +162,7 @@ export class HelixOverflowMenu extends LitElement {
 
   // ─── Positioning (Floating UI) ───
 
+  /** @internal */
   private async _updatePosition(): Promise<void> {
     const trigger = this._buttonEl as HTMLElement | null;
     const panel = this._panelEl;
@@ -178,11 +182,13 @@ export class HelixOverflowMenu extends LitElement {
 
   // ─── Focus management ───
 
+  /** @internal */
   private _focusFirstItem(): void {
     const items = this._getMenuItems();
     items[0]?.focus();
   }
 
+  /** @internal */
   private _getMenuItems(): HTMLElement[] {
     const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
     return (
@@ -272,6 +278,7 @@ export class HelixOverflowMenu extends LitElement {
 
   // ─── SVG Icons ───
 
+  /** @internal */
   private _renderIcon() {
     if (this.icon === 'horizontal') {
       return html`

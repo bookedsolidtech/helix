@@ -57,10 +57,12 @@ export class HelixTextarea extends LitElement {
   static formAssociated = true;
 
   /** ElementInternals instance for form association, validation, and ARIA. */
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 

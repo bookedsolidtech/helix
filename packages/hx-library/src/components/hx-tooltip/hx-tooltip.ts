@@ -126,6 +126,7 @@ export class HelixTooltip extends LitElement {
 
   // ─── ARIA setup ───
 
+  /** @internal */
   private _setupTriggerAria(): void {
     const slot = this._defaultSlot;
     if (!slot) return;
@@ -162,6 +163,7 @@ export class HelixTooltip extends LitElement {
 
   // ─── Show/Hide ───
 
+  /** @internal */
   private _scheduleShow(): void {
     this._clearTimers();
     this._showTimer = setTimeout(() => {
@@ -169,6 +171,7 @@ export class HelixTooltip extends LitElement {
     }, this.showDelay);
   }
 
+  /** @internal */
   private _scheduleHide(): void {
     this._clearTimers();
     this._hideTimer = setTimeout(() => {
@@ -176,16 +179,19 @@ export class HelixTooltip extends LitElement {
     }, this.hideDelay);
   }
 
+  /** @internal */
   private async _show(): Promise<void> {
     this._visible = true;
     await this.updateComplete;
     await this._updatePosition();
   }
 
+  /** @internal */
   private _hide(): void {
     this._visible = false;
   }
 
+  /** @internal */
   private _clearTimers(): void {
     if (this._showTimer !== null) {
       clearTimeout(this._showTimer);
@@ -199,6 +205,7 @@ export class HelixTooltip extends LitElement {
 
   // ─── Positioning ───
 
+  /** @internal */
   private async _updatePosition(): Promise<void> {
     const reference = this._triggerWrapper;
     const tooltipEl = this._tooltipEl;

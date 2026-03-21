@@ -169,6 +169,7 @@ export class HelixTableHeader extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleSort(): void {
     const next: 'asc' | 'desc' = this.sortDirection === 'asc' ? 'desc' : 'asc';
     this.sortDirection = next;
@@ -183,6 +184,7 @@ export class HelixTableHeader extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderSortIcon() {
     const isActive = this.sortDirection !== 'none';
     const iconClass = [
@@ -208,6 +210,7 @@ export class HelixTableHeader extends LitElement {
     `;
   }
 
+  /** @internal */
   private _ariaSort(): 'ascending' | 'descending' | 'none' | typeof nothing {
     if (!this.sortable) return nothing;
     if (this.sortDirection === 'asc') return 'ascending';
@@ -215,6 +218,7 @@ export class HelixTableHeader extends LitElement {
     return 'none';
   }
 
+  /** @internal */
   private _sortLabel(): string {
     if (this.sortDirection === 'asc') return 'Sort descending';
     if (this.sortDirection === 'desc') return 'Sort ascending';

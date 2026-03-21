@@ -125,6 +125,7 @@ export class HelixNav extends LitElement {
    * Sanitizes a URL to prevent XSS via javascript: or data: URIs.
    * Only allows http:, https:, relative paths, and fragment-only links.
    */
+  /** @internal */
   private _sanitizeHref(href: string | undefined): string {
     if (!href || href === '#') return '#';
     // Allow relative paths, fragments, and http(s)
@@ -149,6 +150,7 @@ export class HelixNav extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleToggle(): void {
     this._mobileOpen = !this._mobileOpen;
     if (!this._mobileOpen) {
@@ -156,6 +158,7 @@ export class HelixNav extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleItemClick(item: NavItem, index: number, e: Event): void {
     e.preventDefault();
     if (item.children?.length) {
@@ -173,6 +176,7 @@ export class HelixNav extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSubItemClick(item: NavItem, e: Event): void {
     e.preventDefault();
     this._mobileOpen = false;
@@ -186,6 +190,7 @@ export class HelixNav extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent, index: number, item: NavItem): void {
     const items = this.shadowRoot?.querySelectorAll<HTMLElement>(
       '[part="list"] > [part="item"] > [part="link"]',
@@ -245,6 +250,7 @@ export class HelixNav extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSubKeydown(e: KeyboardEvent, parentIndex: number): void {
     const subItems = this.shadowRoot?.querySelectorAll<HTMLElement>(
       `.nav__submenu:not([hidden]) [part="link"]`,
@@ -279,6 +285,7 @@ export class HelixNav extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleOutsideClick(e: MouseEvent): void {
     const path = e.composedPath();
     if (!path.includes(this)) {
@@ -300,6 +307,7 @@ export class HelixNav extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderHamburgerIcon() {
     return html`<svg
       width="24"
@@ -320,6 +328,7 @@ export class HelixNav extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderChevronIcon() {
     return html`<svg
       class="nav__chevron"
@@ -340,6 +349,7 @@ export class HelixNav extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderSubMenu(children: NavItem[], parentIndex: number, parentLabel: string) {
     const isExpanded = this._expandedIndex === parentIndex;
     return html`
@@ -372,6 +382,7 @@ export class HelixNav extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderItem(item: NavItem, index: number) {
     const hasChildren = !!item.children?.length;
     const isExpanded = this._expandedIndex === index;

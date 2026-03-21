@@ -44,12 +44,15 @@ export class HelixToggleButton extends LitElement {
 
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
+  /** @internal */
   @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -190,6 +193,7 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Private Helpers ───
 
+  /** @internal */
   private _syncFormValue(): void {
     if (this.pressed && this.value !== undefined) {
       // Pass explicit state 'pressed' so formStateRestoreCallback can reliably detect it.
@@ -200,6 +204,7 @@ export class HelixToggleButton extends LitElement {
     this._updateValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.pressed) {
       this._internals.setValidity(
@@ -214,6 +219,7 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled) {
       e.preventDefault();
@@ -239,6 +245,7 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderInner() {
     return html`
       <span part="prefix" class="button__prefix">

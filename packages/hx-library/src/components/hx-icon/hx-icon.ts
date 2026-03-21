@@ -89,6 +89,7 @@ export class HelixIcon extends LitElement {
 
   /**
    * Stores the sanitized inner markup of an externally fetched SVG.
+   * @internal
    */
   @state()
   private _inlineSvg = '';
@@ -96,6 +97,7 @@ export class HelixIcon extends LitElement {
   /**
    * Tracks the `src` URL that was last successfully fetched so that we only
    * refetch when it genuinely changes.
+   * @internal
    */
   @state()
   private _fetchedSrc: string | undefined = undefined;
@@ -104,6 +106,7 @@ export class HelixIcon extends LitElement {
    * Monotonically-increasing sequence number. Incremented before each fetch so
    * that stale out-of-order responses can be discarded.
    */
+  /** @internal */
   private _fetchSeq = 0;
 
   // ─── Lifecycle ───
@@ -116,6 +119,7 @@ export class HelixIcon extends LitElement {
 
   // ─── Inline SVG Fetch ───
 
+  /** @internal */
   private async _fetchInlineSvg(url: string | undefined): Promise<void> {
     const seq = ++this._fetchSeq;
 
@@ -171,6 +175,7 @@ export class HelixIcon extends LitElement {
    * any ARIA attributes from the inner SVG to prevent conflicts with the
    * wrapper's own ARIA semantics.
    */
+  /** @internal */
   private _sanitizeSvg(raw: string): string {
     const parser = new DOMParser();
     const doc = parser.parseFromString(raw, 'image/svg+xml');
@@ -241,6 +246,7 @@ export class HelixIcon extends LitElement {
    * Returns the href used in the `<use>` element for sprite mode.
    * If `name` already begins with `#` it is treated as an inline reference.
    */
+  /** @internal */
   private _spriteHref(): string {
     const n = this.name;
     if (n.startsWith('#')) {
@@ -250,6 +256,7 @@ export class HelixIcon extends LitElement {
     return base ? `${base}#${n}` : `#${n}`;
   }
 
+  /** @internal */
   private _renderSprite() {
     const isDecorative = !this.label.trim();
 
@@ -270,6 +277,7 @@ export class HelixIcon extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderInline() {
     if (!this._inlineSvg) {
       return nothing;

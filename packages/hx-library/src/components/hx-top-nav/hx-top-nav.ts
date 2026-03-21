@@ -60,6 +60,7 @@ export class HelixTopNav extends LitElement {
   // ─── Private State ───
 
   /** Whether the mobile collapsible menu is currently open. */
+  /** @internal */
   @state() private _mobileOpen = false;
 
   // ─── Lifecycle ───
@@ -76,6 +77,7 @@ export class HelixTopNav extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleMobileToggle(): void {
     this._mobileOpen = !this._mobileOpen;
 
@@ -117,6 +119,7 @@ export class HelixTopNav extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this._mobileOpen) {
       this._mobileOpen = false;
@@ -134,6 +137,7 @@ export class HelixTopNav extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderHamburgerIcon() {
     return html`
       <svg

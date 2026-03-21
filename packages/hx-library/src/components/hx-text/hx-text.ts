@@ -101,6 +101,7 @@ export class HelixText extends LitElement {
   as: 'span' | 'p' | 'strong' | 'em' | 'div' = 'span';
 
   /** Validates `as` against the allowed element list to prevent injection. */
+  /** @internal */
   private get _safeTag(): string {
     const allowed = new Set(['span', 'p', 'strong', 'em', 'div']);
     return allowed.has(this.as) ? this.as : 'span';

@@ -70,6 +70,7 @@ export class HelixTable extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _hasCaptionSlot = false;
 
   // ─── Lifecycle ───
@@ -88,6 +89,7 @@ export class HelixTable extends LitElement {
     }
   }
 
+  /** @internal */
   private _onCaptionSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasCaptionSlot = slot.assignedNodes({ flatten: true }).length > 0;

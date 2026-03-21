@@ -80,18 +80,21 @@ export class HelixAvatar extends LitElement {
 
   /**
    * Tracks whether the image failed to load, triggering the fallback chain.
+   * @internal
    */
   @state()
   private _imgError = false;
 
   /**
    * Tracks whether the default slot has assigned content.
+   * @internal
    */
   @state()
   private _hasDefaultSlot = false;
 
   /**
    * Tracks whether the badge slot has assigned content.
+   * @internal
    */
   @state()
   private _hasBadgeSlot = false;
@@ -151,6 +154,7 @@ export class HelixAvatar extends LitElement {
 
   // ─── Slot Change Handling ───
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
@@ -163,6 +167,7 @@ export class HelixAvatar extends LitElement {
     });
   }
 
+  /** @internal */
   private _handleBadgeSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
@@ -200,12 +205,14 @@ export class HelixAvatar extends LitElement {
 
   // ─── Image Error Handling ───
 
+  /** @internal */
   private _handleImgError(): void {
     this._imgError = true;
   }
 
   // ─── Fallback Icon ───
 
+  /** @internal */
   private _renderFallbackIcon() {
     return html`
       <svg

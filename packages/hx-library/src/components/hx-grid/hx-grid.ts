@@ -79,6 +79,7 @@ export class HelixGrid extends LitElement {
   @property({ reflect: true })
   justify: JustifyValue = 'stretch';
 
+  /** @internal */
   private _gridTemplateColumns(): string {
     const cols = this.columns;
     if (typeof cols === 'number' || /^\d+$/.test(String(cols))) {
@@ -87,10 +88,12 @@ export class HelixGrid extends LitElement {
     return `var(--hx-grid-columns, ${cols})`;
   }
 
+  /** @internal */
   private _resolveGap(size: GapSize): string {
     return GAP_TOKENS[size] ?? GAP_TOKENS.md;
   }
 
+  /** @internal */
   private _computedRowGap(): string {
     if (this.rowGap) {
       return `var(--hx-grid-row-gap, ${this._resolveGap(this.rowGap)})`;
@@ -98,6 +101,7 @@ export class HelixGrid extends LitElement {
     return `var(--hx-grid-row-gap, var(--hx-grid-gap, ${this._resolveGap(this.gap)}))`;
   }
 
+  /** @internal */
   private _computedColumnGap(): string {
     if (this.columnGap) {
       return `var(--hx-grid-column-gap, ${this._resolveGap(this.columnGap)})`;
@@ -105,6 +109,7 @@ export class HelixGrid extends LitElement {
     return `var(--hx-grid-column-gap, var(--hx-grid-gap, ${this._resolveGap(this.gap)}))`;
   }
 
+  /** @internal */
   private _baseStyleMap(): Record<string, string> {
     return {
       display: 'grid',
@@ -172,6 +177,7 @@ export class HelixGridItem extends LitElement {
     this._applyHostGridStyles();
   }
 
+  /** @internal */
   private _applyHostGridStyles(): void {
     if (this.column) {
       this.style.gridColumn = this.column;
