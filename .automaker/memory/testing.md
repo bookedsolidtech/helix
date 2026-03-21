@@ -5,9 +5,9 @@ relevantTo: [testing]
 importance: 0.7
 relatedFiles: []
 usageStats:
-  loaded: 179
-  referenced: 76
-  successfulFeatures: 76
+  loaded: 183
+  referenced: 77
+  successfulFeatures: 77
 ---
 # testing
 
@@ -1784,3 +1784,13 @@ usageStats:
 - **Problem solved:** The build pipeline gave no errors despite CEM descriptions being absent. The only signal was HELiXiR health scores dropping, which required tracing back to the manifest JSON to find the root cause.
 - **Why this works:** CEM treats missing JSDoc as valid — components without descriptions are legal. There is no validation step that fails the build when expected metadata is absent, making silent data loss possible.
 - **Trade-offs:** Ad-hoc JSON inspection scripts are fast to write and definitive, but they are not part of the automated quality gate. A proper solution would add a CEM schema validation step to `npm run verify` that asserts required fields are present for components above a certain complexity threshold.
+
+#### [Gotcha] No component tests actual browser-driven fieldset disabled propagation — all tests invoke formDisabledCallback directly, bypassing the real browser delegation path (2026-03-21)
+- **Situation:** Unit tests call component.formDisabledCallback(true) directly rather than placing the component inside a disabled fieldset in a real DOM
+- **Root cause:** Direct invocation is easier to set up in Vitest/jsdom, but jsdom does not implement the ElementInternals form-association lifecycle the same way browsers do
+- **How to avoid:** Faster tests, simpler setup; but does not catch cases where the callback is implemented correctly but never connected to ElementInternals properly
+
+#### [Pattern] Audit compliance matrices should track both implementation presence AND test coverage as separate dimensions — a component can have the right code but zero tests, which is a different risk class than missing implementation (2026-03-21)
+- **Problem solved:** Audit found 10 components with formDisabledCallback implemented but untested, distinct from 8 components where the callback is absent entirely
+- **Why this works:** Untested implementations can silently regress; missing implementations are caught by type-checking or spec review. Mixing these categories obscures which risk requires source changes vs. test-only PRs
+- **Trade-offs:** Two-dimensional matrix requires more upfront audit tooling; enables precise issue categorization and prevents agents from making source changes when only tests are needed

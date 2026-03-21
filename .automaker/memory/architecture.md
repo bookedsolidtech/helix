@@ -1799,3 +1799,25 @@ usageStats:
 - **Situation:** After regenerating CEM to verify `@internal` annotations took effect, `git diff` showed nothing because the file is gitignored. The fix appeared to have no effect until direct file inspection confirmed otherwise.
 - **Root cause:** Generated manifests are intentionally excluded from version control to avoid merge conflicts on every build. The source of truth is the source TypeScript, not the artifact.
 - **How to avoid:** Must use out-of-band verification (Python script, jq, etc.) to confirm generated output is correct before treating the fix as complete.
+
+#### [Gotcha] formAssociatedCallback is not implemented by any HELiX component, which is spec-compliant — it is an optional notification, not a required contract method (2026-03-21)
+- **Situation:** Audit of 18 form-associated Web Components using ElementInternals across the HELiX design system
+- **Root cause:** The ElementInternals spec makes formAssociatedCallback optional; it fires when the element is associated with a form but provides no capabilities beyond what ElementInternals already exposes at construction time
+- **How to avoid:** Easier to skip safely; harder to detect misunderstanding of spec (devs may think it is required)
+
+#### [Gotcha] formDisabledCallback is the highest-impact missing implementation: 8 components silently ignore fieldset disabled state, breaking accessibility and UX without throwing errors (2026-03-21)
+- **Situation:** Components inside a disabled <fieldset> receive formDisabledCallback but if unimplemented, the component stays interactive while the surrounding form signals disabled
+- **Root cause:** The browser delegates disabled propagation to the component via the callback — it does not forcibly disable custom elements the way it does native inputs
+- **How to avoid:** Implementing it requires explicit disabled state management per component; skipping it causes silent UX failures that are hard to detect in automated tests
+
+### formStateRestoreCallback for hx-file-upload should be a documented no-op stub rather than omitted entirely (2026-03-21)
+- **Context:** File objects cannot be serialized into browser session state, so restore is meaningless for file inputs — but omitting the callback entirely leaves the form-association contract incomplete
+- **Why:** A documented no-op communicates intentional design (Files are not restorable) versus accidental omission; it also prevents future developers from adding a broken implementation thinking it was missed
+- **Rejected:** Omitting the callback entirely — rejected because it leaves ambiguity about whether the omission is intentional or a bug
+- **Trade-offs:** Adds a small amount of dead code; eliminates ambiguity about contract completeness
+- **Breaking if changed:** If removed again, future audits will flag it as a gap and risk someone attempting a broken File serialization implementation
+
+#### [Pattern] Issue grouping by fix pattern (not per-component) reduces issue sprawl and creates actionable work units — 8 components missing the same callback becomes one issue with a table, not 8 separate issues (2026-03-21)
+- **Problem solved:** 18-component audit producing 5 issues rather than potentially 30+ per-component issues
+- **Why this works:** Per-component issues for identical fixes would flood the board, make prioritization harder, and create merge conflict risk if agents work them in parallel with similar file changes
+- **Trade-offs:** Grouped issues are harder to assign to a single component feature; easier to see systemic patterns and prioritize by fix type
