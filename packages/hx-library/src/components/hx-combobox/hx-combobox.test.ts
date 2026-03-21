@@ -545,6 +545,16 @@ describe('hx-combobox', () => {
       await combobox.updateComplete;
       expect(combobox.checkValidity()).toBe(false);
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Validation (3) ───

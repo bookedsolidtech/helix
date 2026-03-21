@@ -374,6 +374,16 @@ describe('hx-switch', () => {
       await el.updateComplete;
       expect(el.checked).toBe(true);
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // --- Validation (6) ---
