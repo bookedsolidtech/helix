@@ -764,6 +764,7 @@ declare module 'react' {
       'hx-tab': HxElement;
       'hx-tab-panel': HxElement;
       'hx-tabs': HxElement;
+      'hx-tag': HxElement;
       'hx-text': HxElement;
       'hx-text-input': HxElement;
       'hx-textarea': HxElement;
@@ -1016,6 +1017,283 @@ hx-button::part(button) {
         </hx-tab-panel>
       </hx-tabs>
     </main>
+  );
+}
+`,
+  );
+
+  // Forms example page — demonstrates form participation with web components
+  const examplesDir = path.join(appDir, 'examples');
+  const formsDir = path.join(examplesDir, 'forms');
+  await fs.ensureDir(formsDir);
+
+  await fs.writeFile(
+    path.join(formsDir, 'page.tsx'),
+    `'use client';
+
+import { useRef, useEffect, useState } from 'react';
+
+/**
+ * Form Participation Example
+ *
+ * HELiX form components use ElementInternals to participate in native HTML forms.
+ * This means they work with FormData, form validation, and submit/reset events.
+ *
+ * Key patterns demonstrated:
+ * 1. Native form submission with FormData
+ * 2. Custom event handling for real-time validation
+ * 3. Form reset behavior
+ * 4. Accessible error states
+ */
+export default function FormsExample() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const handleSubmit = (e: Event) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const entries: Record<string, string> = {};
+      data.forEach((value, key) => {
+        entries[key] = value.toString();
+      });
+      setFormData(entries);
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 5000);
+    };
+
+    form.addEventListener('submit', handleSubmit);
+    return () => form.removeEventListener('submit', handleSubmit);
+  }, []);
+
+  return (
+    <main className="container" style={{ paddingTop: '2rem', paddingBottom: '4rem', maxWidth: '800px', margin: '0 auto' }}>
+      <h1>Form Participation</h1>
+      <p style={{ color: 'var(--hx-color-text-secondary, #666)', marginBottom: '2rem' }}>
+        HELiX form components participate in native HTML forms via ElementInternals.
+        No special React wrappers needed — just use a standard {'<form>'} element.
+      </p>
+
+      <hx-card>
+        <div slot="header"><h2>Registration Form</h2></div>
+        <form ref={formRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+            <hx-text-input name="firstName" label="First name" placeholder="Jane" required></hx-text-input>
+            <hx-text-input name="lastName" label="Last name" placeholder="Doe" required></hx-text-input>
+          </div>
+          <hx-text-input name="email" label="Email" type="email" placeholder="jane@example.com" required></hx-text-input>
+          <hx-textarea name="bio" label="Bio" placeholder="Tell us about yourself..." rows={3}></hx-textarea>
+          <hx-select name="role" label="Role">
+            <option value="">Select a role...</option>
+            <option value="developer">Developer</option>
+            <option value="designer">Designer</option>
+            <option value="manager">Manager</option>
+          </hx-select>
+          <hx-checkbox name="terms" label="I agree to the terms and conditions" required></hx-checkbox>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <hx-button variant="primary" type="submit">Submit</hx-button>
+            <hx-button variant="secondary" type="reset">Reset</hx-button>
+          </div>
+        </form>
+      </hx-card>
+
+      {submitted && (
+        <hx-card style={{ marginTop: '1.5rem' }}>
+          <div slot="header">
+            <h3>Form Data (from FormData API)</h3>
+            <hx-badge variant="success">Submitted</hx-badge>
+          </div>
+          <pre style={{
+            padding: '1rem',
+            background: 'var(--hx-color-surface-hover, #f5f5f5)',
+            borderRadius: '0.5rem',
+            fontSize: '0.85rem',
+            overflow: 'auto',
+          }}>
+            {JSON.stringify(formData, null, 2)}
+          </pre>
+        </hx-card>
+      )}
+
+      <hx-card style={{ marginTop: '1.5rem' }}>
+        <div slot="header"><h3>How It Works</h3></div>
+        <ul style={{ lineHeight: '2' }}>
+          <li><strong>ElementInternals:</strong> Each HELiX form component calls <code>this.internals.setFormValue()</code></li>
+          <li><strong>FormData:</strong> Values appear in <code>new FormData(form)</code> automatically</li>
+          <li><strong>Validation:</strong> Components report validity via <code>internals.setValidity()</code></li>
+          <li><strong>Reset:</strong> Forms reset web components via <code>formResetCallback()</code></li>
+          <li><strong>No wrappers needed:</strong> This is native browser behavior, not framework-specific</li>
+        </ul>
+      </hx-card>
+    </main>
+  );
+}
+`,
+  );
+
+  // Dashboard example page
+  const dashboardDir = path.join(examplesDir, 'dashboard');
+  await fs.ensureDir(dashboardDir);
+
+  await fs.writeFile(
+    path.join(dashboardDir, 'page.tsx'),
+    `'use client';
+
+/**
+ * Dashboard Example
+ *
+ * Shows data display components, layout patterns, and theming with CSS custom properties.
+ */
+export default function DashboardExample() {
+  return (
+    <main className="container" style={{ paddingTop: '2rem', paddingBottom: '4rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h1>Dashboard</h1>
+          <p style={{ color: 'var(--hx-color-text-secondary, #666)' }}>HELiX data display components in action.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <hx-button variant="secondary" size="sm">Export</hx-button>
+          <hx-button variant="primary" size="sm">New Report</hx-button>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '2rem' }}>
+        <hx-card>
+          <div slot="header"><h3 style={{ fontSize: '0.85rem', color: 'var(--hx-color-text-secondary, #888)' }}>Total Users</h3></div>
+          <div style={{ fontSize: '2rem', fontWeight: 700 }}>2,847</div>
+          <hx-badge variant="success" style={{ marginTop: '0.5rem' }}>+12.5%</hx-badge>
+        </hx-card>
+        <hx-card>
+          <div slot="header"><h3 style={{ fontSize: '0.85rem', color: 'var(--hx-color-text-secondary, #888)' }}>Active Sessions</h3></div>
+          <div style={{ fontSize: '2rem', fontWeight: 700 }}>1,024</div>
+          <hx-badge variant="info" style={{ marginTop: '0.5rem' }}>Live</hx-badge>
+        </hx-card>
+        <hx-card>
+          <div slot="header"><h3 style={{ fontSize: '0.85rem', color: 'var(--hx-color-text-secondary, #888)' }}>Uptime</h3></div>
+          <div style={{ fontSize: '2rem', fontWeight: 700 }}>99.9%</div>
+          <hx-progress-bar value={99.9} max={100} style={{ marginTop: '0.5rem' }}></hx-progress-bar>
+        </hx-card>
+        <hx-card>
+          <div slot="header"><h3 style={{ fontSize: '0.85rem', color: 'var(--hx-color-text-secondary, #888)' }}>Response Time</h3></div>
+          <div style={{ fontSize: '2rem', fontWeight: 700 }}>142ms</div>
+          <hx-badge variant="warning" style={{ marginTop: '0.5rem' }}>Avg</hx-badge>
+        </hx-card>
+      </div>
+
+      <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: '2fr 1fr' }}>
+        <hx-card>
+          <div slot="header">
+            <h3>Recent Activity</h3>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {[
+              { user: 'Sarah Chen', action: 'Deployed v2.4.1', time: '2 min ago', variant: 'success' as const },
+              { user: 'Mike Johnson', action: 'Created pull request #847', time: '15 min ago', variant: 'info' as const },
+              { user: 'Emily Park', action: 'Merged feature/auth-flow', time: '1 hr ago', variant: 'info' as const },
+              { user: 'Alex Rivera', action: 'Reported bug #312', time: '3 hrs ago', variant: 'warning' as const },
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem 0', borderBottom: '1px solid var(--hx-color-border, #eee)' }}>
+                <hx-avatar size="sm">{item.user.split(' ').map(n => n[0]).join('')}</hx-avatar>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 500 }}>{item.user}</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--hx-color-text-secondary, #888)' }}>{item.action}</div>
+                </div>
+                <hx-badge variant={item.variant}>{item.time}</hx-badge>
+              </div>
+            ))}
+          </div>
+        </hx-card>
+
+        <hx-card>
+          <div slot="header"><h3>System Status</h3></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                <span>CPU</span><span>67%</span>
+              </div>
+              <hx-progress-bar value={67} max={100}></hx-progress-bar>
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                <span>Memory</span><span>4.2 / 8 GB</span>
+              </div>
+              <hx-progress-bar value={52} max={100}></hx-progress-bar>
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                <span>Storage</span><span>180 / 500 GB</span>
+              </div>
+              <hx-progress-bar value={36} max={100}></hx-progress-bar>
+            </div>
+            <hx-divider></hx-divider>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <hx-tag>us-east-1</hx-tag>
+              <hx-tag>production</hx-tag>
+              <hx-tag>k8s</hx-tag>
+            </div>
+          </div>
+        </hx-card>
+      </div>
+
+      <hx-card style={{ marginTop: '1.5rem' }}>
+        <div slot="header"><h3>Styling Web Components</h3></div>
+        <p>All components above are styled via CSS custom properties. Override them in your globals.css:</p>
+        <pre style={{ marginTop: '1rem', padding: '1rem', background: 'var(--hx-color-surface-hover, #f5f5f5)', borderRadius: '0.5rem', fontSize: '0.85rem' }}>
+{String.raw\`/* Override design tokens globally */
+:root {
+  --hx-color-primary: #0066cc;
+  --hx-color-success: #22c55e;
+}
+
+/* Style specific component internals via ::part() */
+hx-card::part(card) {
+  border: 1px solid var(--hx-color-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+hx-button::part(button) {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}\`}
+        </pre>
+      </hx-card>
+    </main>
+  );
+}
+`,
+  );
+
+  // Examples layout with navigation
+  await fs.writeFile(
+    path.join(examplesDir, 'layout.tsx'),
+    `'use client';
+
+export default function ExamplesLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <nav style={{
+        padding: '0.75rem 2rem',
+        borderBottom: '1px solid var(--hx-color-border, #eee)',
+        display: 'flex',
+        gap: '1rem',
+        alignItems: 'center',
+      }}>
+        <a href="/" style={{ textDecoration: 'none', fontWeight: 600 }}>HELiX</a>
+        <hx-divider vertical style={{ height: '1.5rem' }}></hx-divider>
+        <a href="/examples/forms" style={{ textDecoration: 'none', color: 'var(--hx-color-text-secondary, #666)' }}>Forms</a>
+        <a href="/examples/dashboard" style={{ textDecoration: 'none', color: 'var(--hx-color-text-secondary, #666)' }}>Dashboard</a>
+      </nav>
+      {children}
+    </div>
   );
 }
 `,
