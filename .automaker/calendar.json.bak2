@@ -1,0 +1,1472 @@
+[
+  {
+    "title": "Started: infra: add CodeRabbit review gate to dev→staging promotion PRs",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773693870128-s4c4zjw4q",
+    "sourceId": "ops:feature:started:feature-1773507896491-4911xipq6",
+    "createdAt": "2026-03-16T20:44:30.123Z",
+    "updatedAt": "2026-03-16T20:44:30.123Z"
+  },
+  {
+    "title": "Merged: feature-1773507896491-4911xipq6",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773694282559-gpq9ljmbf",
+    "sourceId": "ops:feature:pr-merged:feature-1773507896491-4911xipq6",
+    "createdAt": "2026-03-16T20:51:22.554Z",
+    "updatedAt": "2026-03-16T20:51:22.554Z"
+  },
+  {
+    "title": "Completed: infra: add CodeRabbit review gate to dev→staging promotion PRs",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773694282569-taqet05vn",
+    "sourceId": "ops:feature:completed:feature-1773507896491-4911xipq6",
+    "createdAt": "2026-03-16T20:51:22.568Z",
+    "updatedAt": "2026-03-16T20:51:22.568Z"
+  },
+  {
+    "title": "Started: infra: migrate from npm to pnpm",
+    "date": "2026-03-16",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773698662625-ntkfwbme4",
+    "sourceId": "ops:feature:started:feature-1773276879351-6wqwreeb3",
+    "createdAt": "2026-03-16T22:04:22.620Z",
+    "updatedAt": "2026-03-16T22:04:22.620Z"
+  },
+  {
+    "title": "Auto-mode started",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Autonomous feature processing started",
+    "id": "event-1773708079870-a0p2zetx2",
+    "sourceId": "ops:auto-mode:started:2026-03-17",
+    "createdAt": "2026-03-17T00:41:19.869Z",
+    "updatedAt": "2026-03-17T00:41:19.869Z"
+  },
+  {
+    "title": "Started: infra: fix .gitignore for .automaker — use granular rules instead of blanket ignore",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773708110732-eaw1x5fpc",
+    "sourceId": "ops:feature:started:feature-1773703765100-xduds4ly0",
+    "createdAt": "2026-03-17T00:41:50.730Z",
+    "updatedAt": "2026-03-17T00:41:50.730Z"
+  },
+  {
+    "title": "Started: BUG: @helixui/tokens export path misleading — dist/tokens.css vs tokens.css",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773708113686-0qc9cvrk4",
+    "sourceId": "ops:feature:started:feature-1773707938071-om2k678dx",
+    "createdAt": "2026-03-17T00:41:53.685Z",
+    "updatedAt": "2026-03-17T00:41:53.685Z"
+  },
+  {
+    "title": "Merged: feature-1773707938071-om2k678dx",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773708223826-65i7fvra4",
+    "sourceId": "ops:feature:pr-merged:feature-1773707938071-om2k678dx",
+    "createdAt": "2026-03-17T00:43:43.821Z",
+    "updatedAt": "2026-03-17T00:43:43.821Z"
+  },
+  {
+    "title": "Completed: BUG: @helixui/tokens export path misleading — dist/tokens.css vs tokens.css",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773708223832-fqqotz5dp",
+    "sourceId": "ops:feature:completed:feature-1773707938071-om2k678dx",
+    "createdAt": "2026-03-17T00:43:43.832Z",
+    "updatedAt": "2026-03-17T00:43:43.832Z"
+  },
+  {
+    "title": "Started: chore: validate pnpm publish pipeline — dry-run and CI audit",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773711595099-9bp71bvjm",
+    "sourceId": "ops:feature:started:feature-1773711562565-153ymwpjw",
+    "createdAt": "2026-03-17T01:39:55.097Z",
+    "updatedAt": "2026-03-17T01:39:55.097Z"
+  },
+  {
+    "title": "Completed: chore: validate pnpm publish pipeline — dry-run and CI audit",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773712028299-xhvz9x8wa",
+    "sourceId": "ops:feature:completed:feature-1773711562565-153ymwpjw",
+    "createdAt": "2026-03-17T01:47:08.297Z",
+    "updatedAt": "2026-03-17T01:47:08.297Z"
+  },
+  {
+    "title": "Started: chore: test release — cut patch version to verify pnpm changeset pipeline e2e",
+    "date": "2026-03-17",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773712033125-izja9nwec",
+    "sourceId": "ops:feature:started:feature-1773711578696-whcylpfeu",
+    "createdAt": "2026-03-17T01:47:13.123Z",
+    "updatedAt": "2026-03-17T01:47:13.123Z"
+  },
+  {
+    "title": "Auto-mode started",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Autonomous feature processing started",
+    "id": "event-1773792149896-enwk4up3c",
+    "sourceId": "ops:auto-mode:started:2026-03-18",
+    "createdAt": "2026-03-18T00:02:29.895Z",
+    "updatedAt": "2026-03-18T08:30:54.135Z"
+  },
+  {
+    "title": "Started: bug: hx-stat and hx-counter components missing from @helixui/library@0.3.3",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773792180829-s62yeynt4",
+    "sourceId": "ops:feature:started:feature-1773727976392-ibx4vqy1g",
+    "createdAt": "2026-03-18T00:03:00.818Z",
+    "updatedAt": "2026-03-18T02:02:59.320Z"
+  },
+  {
+    "title": "Started: feat: add `full` boolean attribute to hx-button for full-width stretch",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773794202460-2tlgojlzo",
+    "sourceId": "ops:feature:started:feature-1773794171634-dfdc17a0w",
+    "createdAt": "2026-03-18T00:36:42.454Z",
+    "updatedAt": "2026-03-18T02:03:02.274Z"
+  },
+  {
+    "title": "Started: feat: add `--hx-button-hover-bg` CSS custom property for hover state override",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773794211502-8my0qi85e",
+    "sourceId": "ops:feature:started:feature-1773794178793-7t69bm0wo",
+    "createdAt": "2026-03-18T00:36:51.498Z",
+    "updatedAt": "2026-03-18T02:03:05.275Z"
+  },
+  {
+    "title": "Started: feat: add `inverted` attribute for hx-button on dark backgrounds",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773794217698-0gm4p4oss",
+    "sourceId": "ops:feature:started:feature-1773794185077-rh9jrrfv4",
+    "createdAt": "2026-03-18T00:36:57.687Z",
+    "updatedAt": "2026-03-18T02:10:43.235Z"
+  },
+  {
+    "title": "Merged: feature-1773794178793-7t69bm0wo",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773799832846-1upk6wwyl",
+    "sourceId": "ops:feature:pr-merged:feature-1773794178793-7t69bm0wo",
+    "createdAt": "2026-03-18T02:10:32.776Z",
+    "updatedAt": "2026-03-18T02:10:32.776Z"
+  },
+  {
+    "title": "Merged: feature-1773794185077-rh9jrrfv4",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773800144626-4r1f3wtqt",
+    "sourceId": "ops:feature:pr-merged:feature-1773794185077-rh9jrrfv4",
+    "createdAt": "2026-03-18T02:15:44.611Z",
+    "updatedAt": "2026-03-18T02:15:44.611Z"
+  },
+  {
+    "title": "Started: a11y-CRITICAL: hx-data-table — add accessible name + fix keyboard row selection + verify focus styles",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800433386-laeplbq6a",
+    "sourceId": "ops:feature:started:feature-1773800402081-ww9uqce4a",
+    "createdAt": "2026-03-18T02:20:33.382Z",
+    "updatedAt": "2026-03-18T02:20:33.382Z"
+  },
+  {
+    "title": "Started: a11y-CRITICAL: hx-date-picker — fix keyboard trap in calendar popup shadow DOM",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800442005-2cezwt5eu",
+    "sourceId": "ops:feature:started:feature-1773800410654-bhoewdgbp",
+    "createdAt": "2026-03-18T02:20:42.002Z",
+    "updatedAt": "2026-03-18T02:20:42.002Z"
+  },
+  {
+    "title": "Started: a11y-CRITICAL: hx-carousel — throttle live region during autoplay + fix aria-current",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800450701-tlmc8lvet",
+    "sourceId": "ops:feature:started:feature-1773800420272-h05ukdasi",
+    "createdAt": "2026-03-18T02:20:50.698Z",
+    "updatedAt": "2026-03-18T02:20:50.698Z"
+  },
+  {
+    "title": "Started: feat: add hx-stat and hx-counter components for statistics display",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800456465-gjls4rj0k",
+    "sourceId": "ops:feature:started:feature-1773800425306-ezysjch9z",
+    "createdAt": "2026-03-18T02:20:56.463Z",
+    "updatedAt": "2026-03-18T02:20:56.463Z"
+  },
+  {
+    "title": "Completed: a11y-CRITICAL: hx-date-picker — fix keyboard trap in calendar popup shadow DOM",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773800713671-1u5gdrt33",
+    "sourceId": "ops:feature:completed:feature-1773800410654-bhoewdgbp",
+    "createdAt": "2026-03-18T02:25:13.670Z",
+    "updatedAt": "2026-03-18T02:25:13.670Z"
+  },
+  {
+    "title": "Started: a11y-CRITICAL: hx-color-picker — thumb contrast + dialog focus trap + slider labeling",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800719544-lt9kn73pa",
+    "sourceId": "ops:feature:started:feature-1773800429149-1twdy9koq",
+    "createdAt": "2026-03-18T02:25:19.540Z",
+    "updatedAt": "2026-03-18T02:25:19.540Z"
+  },
+  {
+    "title": "Completed: feat: add hx-stat and hx-counter components for statistics display",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773800925533-3aqn94js1",
+    "sourceId": "ops:feature:completed:feature-1773800425306-ezysjch9z",
+    "createdAt": "2026-03-18T02:28:45.533Z",
+    "updatedAt": "2026-03-18T02:28:45.533Z"
+  },
+  {
+    "title": "Started: fix-CRITICAL: replace crypto.randomUUID() with monotonic counters in hx-tooltip, hx-popover, hx-field",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800954449-gs9og6t2m",
+    "sourceId": "ops:feature:started:feature-1773800531129-z8o6okq4s",
+    "createdAt": "2026-03-18T02:29:14.443Z",
+    "updatedAt": "2026-03-18T02:29:14.443Z"
+  },
+  {
+    "title": "Started: fix-CRITICAL: hardcoded IDs in hx-accordion-item, hx-meter, hx-progress-bar cause duplicate ID collisions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773800957407-skxukc1hj",
+    "sourceId": "ops:feature:started:feature-1773800539644-fp6090iyf",
+    "createdAt": "2026-03-18T02:29:17.405Z",
+    "updatedAt": "2026-03-18T02:29:17.405Z"
+  },
+  {
+    "title": "Merged: feature-1773800429149-1twdy9koq",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773801058422-ho4bi2wit",
+    "sourceId": "ops:feature:pr-merged:feature-1773800429149-1twdy9koq",
+    "createdAt": "2026-03-18T02:30:58.418Z",
+    "updatedAt": "2026-03-18T02:30:58.418Z"
+  },
+  {
+    "title": "Completed: a11y-CRITICAL: hx-color-picker — thumb contrast + dialog focus trap + slider labeling",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773801058431-w8aw1sg1x",
+    "sourceId": "ops:feature:completed:feature-1773800429149-1twdy9koq",
+    "createdAt": "2026-03-18T02:30:58.431Z",
+    "updatedAt": "2026-03-18T02:30:58.431Z"
+  },
+  {
+    "title": "Started: fix-CRITICAL: hx-toast auto-dismiss broken for reduced-motion users",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801065580-lzvva1asa",
+    "sourceId": "ops:feature:started:feature-1773800546879-zi6z0yu70",
+    "createdAt": "2026-03-18T02:31:05.575Z",
+    "updatedAt": "2026-03-18T02:31:05.575Z"
+  },
+  {
+    "title": "Merged: feature-1773800531129-z8o6okq4s",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773801148729-q5wghtot7",
+    "sourceId": "ops:feature:pr-merged:feature-1773800531129-z8o6okq4s",
+    "createdAt": "2026-03-18T02:32:28.728Z",
+    "updatedAt": "2026-03-18T02:32:28.728Z"
+  },
+  {
+    "title": "Completed: fix-CRITICAL: hardcoded IDs in hx-accordion-item, hx-meter, hx-progress-bar cause duplicate ID collisions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773801298725-bb0npdieg",
+    "sourceId": "ops:feature:completed:feature-1773800539644-fp6090iyf",
+    "createdAt": "2026-03-18T02:34:58.725Z",
+    "updatedAt": "2026-03-18T02:34:58.725Z"
+  },
+  {
+    "title": "Started: fix-HIGH: eliminate all 20+ non-null assertions on @query results across codebase",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801368762-yh126sfdy",
+    "sourceId": "ops:feature:started:feature-1773800558031-o9tmlg579",
+    "createdAt": "2026-03-18T02:36:08.757Z",
+    "updatedAt": "2026-03-18T02:36:08.757Z"
+  },
+  {
+    "title": "Started: health(F→A): hx-date-picker — add component description, document all properties and events",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801371747-g7wvu3fgy",
+    "sourceId": "ops:feature:started:feature-1773801257586-hf3qurkb1",
+    "createdAt": "2026-03-18T02:36:11.745Z",
+    "updatedAt": "2026-03-18T02:36:11.745Z"
+  },
+  {
+    "title": "Started: health(D→A): hx-radio-group — add event types, document all properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773801960284-ysjo4qx5e",
+    "sourceId": "ops:feature:started:feature-1773801262970-1nzf872ti",
+    "createdAt": "2026-03-18T02:46:00.276Z",
+    "updatedAt": "2026-03-18T02:46:00.276Z"
+  },
+  {
+    "title": "Started: a11y-HIGH: hx-tree-view — convert to roving tabindex on items, remove container tabindex",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773802133399-zuhdofui7",
+    "sourceId": "ops:feature:started:feature-1773800435670-503wlfe9t",
+    "createdAt": "2026-03-18T02:48:53.394Z",
+    "updatedAt": "2026-03-18T02:48:53.394Z"
+  },
+  {
+    "title": "Completed: a11y-HIGH: hx-tree-view — convert to roving tabindex on items, remove container tabindex",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773802527590-51kg9s9ns",
+    "sourceId": "ops:feature:completed:feature-1773800435670-503wlfe9t",
+    "createdAt": "2026-03-18T02:55:27.589Z",
+    "updatedAt": "2026-03-18T02:55:27.589Z"
+  },
+  {
+    "title": "Started: a11y-HIGH: hx-combobox — add label `for` attribute + filter results live region",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773802531677-34476igns",
+    "sourceId": "ops:feature:started:feature-1773800443502-b4xuldq11",
+    "createdAt": "2026-03-18T02:55:31.673Z",
+    "updatedAt": "2026-03-18T02:55:31.673Z"
+  },
+  {
+    "title": "Merged: feature-1773800443502-b4xuldq11",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773802838585-ot4khia1x",
+    "sourceId": "ops:feature:pr-merged:feature-1773800443502-b4xuldq11",
+    "createdAt": "2026-03-18T03:00:38.583Z",
+    "updatedAt": "2026-03-18T03:00:38.583Z"
+  },
+  {
+    "title": "Started: fix: hx-card CSS custom properties don't cascade to slotted content",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804180549-6grnko07u",
+    "sourceId": "ops:feature:started:feature-1773800444925-uyyta58r1",
+    "createdAt": "2026-03-18T03:23:00.544Z",
+    "updatedAt": "2026-03-18T03:23:00.544Z"
+  },
+  {
+    "title": "Merged: feature-1773800444925-uyyta58r1",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773804364208-jqe729kq0",
+    "sourceId": "ops:feature:pr-merged:feature-1773800444925-uyyta58r1",
+    "createdAt": "2026-03-18T03:26:04.205Z",
+    "updatedAt": "2026-03-18T03:26:04.205Z"
+  },
+  {
+    "title": "Started: fix: hx-progress-bar and hx-spinner missing accessibility labels",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804654955-hdqp8djlz",
+    "sourceId": "ops:feature:started:feature-1773800450293-0ad6y5kec",
+    "createdAt": "2026-03-18T03:30:54.951Z",
+    "updatedAt": "2026-03-18T04:30:09.688Z"
+  },
+  {
+    "title": "Started: a11y-HIGH: hx-meter non-unique ID + hx-rating half-star radio model",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804657966-82wypsjhm",
+    "sourceId": "ops:feature:started:feature-1773800456357-xv266mqn4",
+    "createdAt": "2026-03-18T03:30:57.964Z",
+    "updatedAt": "2026-03-18T03:30:57.964Z"
+  },
+  {
+    "title": "Started: a11y-HIGH: hx-time-picker empty describedby + hx-structured-list + hx-split-button name",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804660941-16xbygcdc",
+    "sourceId": "ops:feature:started:feature-1773800462407-ksk85lzm5",
+    "createdAt": "2026-03-18T03:31:00.939Z",
+    "updatedAt": "2026-03-18T03:31:00.939Z"
+  },
+  {
+    "title": "Started: fix-HIGH: boolean properties defaulting to true — hx-alert open, showIcon + hx-code-snippet copyable",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804663911-gpy367hgz",
+    "sourceId": "ops:feature:started:feature-1773800566693-lm1486mnj",
+    "createdAt": "2026-03-18T03:31:03.910Z",
+    "updatedAt": "2026-03-18T03:31:03.910Z"
+  },
+  {
+    "title": "Started: fix-HIGH: unify `size` vs `hx-size` attribute naming + `help` vs `help-text` slot naming across all components",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773804806863-204zw0cfi",
+    "sourceId": "ops:feature:started:feature-1773800574751-qg3ees6wf",
+    "createdAt": "2026-03-18T03:33:26.858Z",
+    "updatedAt": "2026-03-18T04:31:37.930Z"
+  },
+  {
+    "title": "Started: fix-HIGH: document.body.style.overflow race in hx-dialog/hx-drawer + consolidate document-level click listeners",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805305022-uszw310ip",
+    "sourceId": "ops:feature:started:feature-1773800591866-1ma486f27",
+    "createdAt": "2026-03-18T03:41:45.016Z",
+    "updatedAt": "2026-03-18T03:55:13.327Z"
+  },
+  {
+    "title": "Started: fix-MEDIUM: implement formDisabledCallback on all 10 form-associated components",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805308092-1f3kf3c4t",
+    "sourceId": "ops:feature:started:feature-1773800598530-ngjlphtlz",
+    "createdAt": "2026-03-18T03:41:48.090Z",
+    "updatedAt": "2026-03-18T04:31:40.826Z"
+  },
+  {
+    "title": "Started: fix-HIGH: eliminate `as EventListener` casts + `as Type[]` assertions — use proper type narrowing",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805311157-8pysbj1wm",
+    "sourceId": "ops:feature:started:feature-1773800627359-jcux3aiya",
+    "createdAt": "2026-03-18T03:41:51.156Z",
+    "updatedAt": "2026-03-18T04:36:08.865Z"
+  },
+  {
+    "title": "Started: health(C→A): hx-breadcrumb + hx-progress-bar — add descriptions, document events",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805314338-h5ragece3",
+    "sourceId": "ops:feature:started:feature-1773801269197-10p5j6i7l",
+    "createdAt": "2026-03-18T03:41:54.334Z",
+    "updatedAt": "2026-03-18T04:40:01.901Z"
+  },
+  {
+    "title": "Started: feat: CEM accessibility analyzer — extract a11y metadata from component source into CEM extensions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805317530-dlalru15u",
+    "sourceId": "ops:feature:started:feature-1773801725278-c7fcdoxys",
+    "createdAt": "2026-03-18T03:41:57.518Z",
+    "updatedAt": "2026-03-18T04:41:34.810Z"
+  },
+  {
+    "title": "Started: feat: add hx-table component for semantic data grids",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805475595-sxsl1f6hc",
+    "sourceId": "ops:feature:started:feature-1773800431136-2v3g6sivu",
+    "createdAt": "2026-03-18T03:44:35.589Z",
+    "updatedAt": "2026-03-18T03:44:35.589Z"
+  },
+  {
+    "title": "Started: feat: add hx-banner component for page-level notifications",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805548602-vet1utvkx",
+    "sourceId": "ops:feature:started:feature-1773800436937-hlj6t6xgr",
+    "createdAt": "2026-03-18T03:45:48.601Z",
+    "updatedAt": "2026-03-18T03:48:09.273Z"
+  },
+  {
+    "title": "Started: a11y-MEDIUM: hx-textarea counter + hx-file-upload labels + hx-top-nav focus + hx-action-bar role",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805551532-iwpicw30s",
+    "sourceId": "ops:feature:started:feature-1773800472670-m1v8nq0o4",
+    "createdAt": "2026-03-18T03:45:51.530Z",
+    "updatedAt": "2026-03-18T04:53:13.172Z"
+  },
+  {
+    "title": "Started: a11y-MEDIUM: hx-steps list semantics + hx-side-nav Home/End + hx-overflow-menu label + aria-controls",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805554479-wub8r9oxv",
+    "sourceId": "ops:feature:started:feature-1773800480280-oq9ubg3u2",
+    "createdAt": "2026-03-18T03:45:54.478Z",
+    "updatedAt": "2026-03-18T05:00:02.146Z"
+  },
+  {
+    "title": "Started: fix-MEDIUM: expose hardcoded English strings as i18n-overridable properties across all components",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805557446-7b0j4ly26",
+    "sourceId": "ops:feature:started:feature-1773800605192-wdbh1dsar",
+    "createdAt": "2026-03-18T03:45:57.443Z",
+    "updatedAt": "2026-03-18T05:00:10.129Z"
+  },
+  {
+    "title": "Started: fix-MEDIUM: remove 20+ console.warn from production + replace execCommand with Clipboard API + fix color-picker CSS",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805560586-0yqrzrqa6",
+    "sourceId": "ops:feature:started:feature-1773800616135-cg44zqmgm",
+    "createdAt": "2026-03-18T03:46:00.584Z",
+    "updatedAt": "2026-03-18T05:14:16.567Z"
+  },
+  {
+    "title": "Started: health(B→A): hx-carousel — document 25 private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805563588-q252t5ie0",
+    "sourceId": "ops:feature:started:feature-1773801274530-44jxrbxnz",
+    "createdAt": "2026-03-18T03:46:03.584Z",
+    "updatedAt": "2026-03-18T05:14:19.493Z"
+  },
+  {
+    "title": "Started: health(B→A): hx-drawer + hx-time-picker — document private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805566625-7mubup5wv",
+    "sourceId": "ops:feature:started:feature-1773801281644-tlbkken4p",
+    "createdAt": "2026-03-18T03:46:06.622Z",
+    "updatedAt": "2026-03-18T05:14:22.434Z"
+  },
+  {
+    "title": "Started: health(B→A): hx-popover + hx-color-picker + hx-split-panel — document private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805569726-9dlyusanx",
+    "sourceId": "ops:feature:started:feature-1773801288373-iybjfawjw",
+    "createdAt": "2026-03-18T03:46:09.724Z",
+    "updatedAt": "2026-03-18T05:14:25.522Z"
+  },
+  {
+    "title": "Started: a11y-LOW: hx-switch label element + hx-tabs dual tabindex + hx-toggle-button missing name warning",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805572737-ib5ppc6ag",
+    "sourceId": "ops:feature:started:feature-1773800488058-vys906iux",
+    "createdAt": "2026-03-18T03:46:12.735Z",
+    "updatedAt": "2026-03-18T05:36:39.278Z"
+  },
+  {
+    "title": "Started: health(B→A): hx-menu + hx-accordion + hx-dropdown — document remaining private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773805575712-m80nolift",
+    "sourceId": "ops:feature:started:feature-1773801292364-2q1h5ykiz",
+    "createdAt": "2026-03-18T03:46:15.710Z",
+    "updatedAt": "2026-03-18T05:37:06.973Z"
+  },
+  {
+    "title": "Merged: feature-1773800591866-1ma486f27",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773806374038-rnjxwsaau",
+    "sourceId": "ops:feature:pr-merged:feature-1773800591866-1ma486f27",
+    "createdAt": "2026-03-18T03:59:34.035Z",
+    "updatedAt": "2026-03-18T03:59:34.035Z"
+  },
+  {
+    "title": "Merged: feature-1773800431136-2v3g6sivu",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773806744593-zfbkuplo8",
+    "sourceId": "ops:feature:pr-merged:feature-1773800431136-2v3g6sivu",
+    "createdAt": "2026-03-18T04:05:44.591Z",
+    "updatedAt": "2026-03-18T05:04:48.619Z"
+  },
+  {
+    "title": "Completed: feat: add hx-table component for semantic data grids",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773806744599-pn1xah5al",
+    "sourceId": "ops:feature:completed:feature-1773800431136-2v3g6sivu",
+    "createdAt": "2026-03-18T04:05:44.598Z",
+    "updatedAt": "2026-03-18T04:05:44.598Z"
+  },
+  {
+    "title": "Started: [Escalation] pr_warning_feedback - feature-1773800431136-2v3g6sivu (PR #975)",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773808108988-fz4hnjvdk",
+    "sourceId": "ops:feature:started:feature-1773808076575-hii5xp223",
+    "createdAt": "2026-03-18T04:28:28.985Z",
+    "updatedAt": "2026-03-18T04:28:28.985Z"
+  },
+  {
+    "title": "Auto-mode stopped",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Autonomous feature processing stopped",
+    "id": "event-1773808262762-y7g2atjns",
+    "sourceId": "ops:auto-mode:stopped:2026-03-18",
+    "createdAt": "2026-03-18T04:31:02.758Z",
+    "updatedAt": "2026-03-18T04:31:02.758Z"
+  },
+  {
+    "title": "Merged: feature-1773800627359-jcux3aiya",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773808890178-uws6q45v0",
+    "sourceId": "ops:feature:pr-merged:feature-1773800627359-jcux3aiya",
+    "createdAt": "2026-03-18T04:41:30.175Z",
+    "updatedAt": "2026-03-18T04:41:30.175Z"
+  },
+  {
+    "title": "Completed: feat: CEM accessibility analyzer — extract a11y metadata from component source into CEM extensions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773809713087-76wk96saq",
+    "sourceId": "ops:feature:completed:feature-1773801725278-c7fcdoxys",
+    "createdAt": "2026-03-18T04:55:13.086Z",
+    "updatedAt": "2026-03-18T04:55:13.086Z"
+  },
+  {
+    "title": "Merged: feature-1773800472670-m1v8nq0o4",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773809997514-mhf00ph6d",
+    "sourceId": "ops:feature:pr-merged:feature-1773800472670-m1v8nq0o4",
+    "createdAt": "2026-03-18T04:59:57.512Z",
+    "updatedAt": "2026-03-18T04:59:57.512Z"
+  },
+  {
+    "title": "Completed: a11y-MEDIUM: hx-textarea counter + hx-file-upload labels + hx-top-nav focus + hx-action-bar role",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773809997525-9x4kc85zw",
+    "sourceId": "ops:feature:completed:feature-1773800472670-m1v8nq0o4",
+    "createdAt": "2026-03-18T04:59:57.524Z",
+    "updatedAt": "2026-03-18T04:59:57.524Z"
+  },
+  {
+    "title": "Merged: feature-1773801288373-iybjfawjw",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773811083125-ygyjpvown",
+    "sourceId": "ops:feature:pr-merged:feature-1773801288373-iybjfawjw",
+    "createdAt": "2026-03-18T05:18:03.123Z",
+    "updatedAt": "2026-03-18T05:18:03.123Z"
+  },
+  {
+    "title": "Merged: feature-1773801274530-44jxrbxnz",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773811115726-q2m2v8w0s",
+    "sourceId": "ops:feature:pr-merged:feature-1773801274530-44jxrbxnz",
+    "createdAt": "2026-03-18T05:18:35.725Z",
+    "updatedAt": "2026-03-18T05:18:35.725Z"
+  },
+  {
+    "title": "Completed: a11y-MEDIUM: hx-steps list semantics + hx-side-nav Home/End + hx-overflow-menu label + aria-controls",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773811958544-eh2mk9s90",
+    "sourceId": "ops:feature:completed:feature-1773800480280-oq9ubg3u2",
+    "createdAt": "2026-03-18T05:32:38.543Z",
+    "updatedAt": "2026-03-18T05:32:38.543Z"
+  },
+  {
+    "title": "Completed: a11y-LOW: hx-switch label element + hx-tabs dual tabindex + hx-toggle-button missing name warning",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773812536590-tjbpnenpu",
+    "sourceId": "ops:feature:completed:feature-1773800488058-vys906iux",
+    "createdAt": "2026-03-18T05:42:16.589Z",
+    "updatedAt": "2026-03-18T05:42:16.589Z"
+  },
+  {
+    "title": "Completed: EPIC: WCAG 2.1 AA Healthcare Compliance — 30 findings across 21 components",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773812537363-fzmv0hpky",
+    "sourceId": "ops:feature:completed:feature-1773800385971-h7ecbemtm",
+    "createdAt": "2026-03-18T05:42:17.356Z",
+    "updatedAt": "2026-03-18T05:42:17.356Z"
+  },
+  {
+    "title": "Started: health(F→A): hx-date-picker — add description, document all private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773812859817-89sniwzn0",
+    "sourceId": "ops:feature:started:feature-1773812732523-npq0szxl4",
+    "createdAt": "2026-03-18T05:47:39.814Z",
+    "updatedAt": "2026-03-18T05:47:39.814Z"
+  },
+  {
+    "title": "Started: health(D→A): hx-radio-group — document all private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773812862794-js0518t8y",
+    "sourceId": "ops:feature:started:feature-1773812735222-uqgsogabf",
+    "createdAt": "2026-03-18T05:47:42.793Z",
+    "updatedAt": "2026-03-18T05:47:42.793Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 2 — hx-combobox, hx-nav, hx-select, hx-file-upload, hx-checkbox-group — document private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773812865794-jfgltee4y",
+    "sourceId": "ops:feature:started:feature-1773812744214-olkwun7fp",
+    "createdAt": "2026-03-18T05:47:45.792Z",
+    "updatedAt": "2026-03-18T05:47:45.792Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 3 — hx-overflow-menu, hx-split-button, hx-button-group, hx-card, hx-field — document private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773812868690-xgbg5rh49",
+    "sourceId": "ops:feature:started:feature-1773812748311-spoj4b0ra",
+    "createdAt": "2026-03-18T05:47:48.688Z",
+    "updatedAt": "2026-03-18T05:47:48.688Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 4 — hx-form, hx-tree-item, hx-drawer, hx-time-picker — document private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773813041799-izaodiipz",
+    "sourceId": "ops:feature:started:feature-1773812752549-tkhxqtu9n",
+    "createdAt": "2026-03-18T05:50:41.796Z",
+    "updatedAt": "2026-03-18T05:50:41.796Z"
+  },
+  {
+    "title": "Completed: health(B→A): batch 2 — hx-combobox, hx-nav, hx-select, hx-file-upload, hx-checkbox-group — document private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773813121831-ihx8ahqut",
+    "sourceId": "ops:feature:completed:feature-1773812744214-olkwun7fp",
+    "createdAt": "2026-03-18T05:52:01.830Z",
+    "updatedAt": "2026-03-18T05:52:01.830Z"
+  },
+  {
+    "title": "Merged: feature-1773812732523-npq0szxl4",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773813139188-qaeslgtx4",
+    "sourceId": "ops:feature:pr-merged:feature-1773812732523-npq0szxl4",
+    "createdAt": "2026-03-18T05:52:19.183Z",
+    "updatedAt": "2026-03-18T05:52:19.183Z"
+  },
+  {
+    "title": "Completed: EPIC: HELiXiR Health Score — Raise All Components to A Grade",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773813685852-98m9mdirq",
+    "sourceId": "ops:feature:completed:feature-1773801241190-6k3l4fh19",
+    "createdAt": "2026-03-18T06:01:25.848Z",
+    "updatedAt": "2026-03-18T06:01:25.848Z"
+  },
+  {
+    "title": "Started: health(F→A): hx-date-picker — add JSDoc descriptions to all private properties + component summary",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773822685079-8xgo9wsz2",
+    "sourceId": "ops:feature:started:feature-1773822617658-3feinao8j",
+    "createdAt": "2026-03-18T08:31:25.074Z",
+    "updatedAt": "2026-03-18T08:31:25.074Z"
+  },
+  {
+    "title": "Started: health(D→A): hx-radio-group — add JSDoc descriptions to all private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773822688081-qlcjxqamn",
+    "sourceId": "ops:feature:started:feature-1773822622422-9yt358k2k",
+    "createdAt": "2026-03-18T08:31:28.079Z",
+    "updatedAt": "2026-03-18T08:31:28.079Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 5 — hx-carousel, hx-menu, hx-accordion, hx-drawer — add JSDoc descriptions to private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773822690958-iyb3xf9eq",
+    "sourceId": "ops:feature:started:feature-1773822633596-0z01x25zt",
+    "createdAt": "2026-03-18T08:31:30.957Z",
+    "updatedAt": "2026-03-18T08:31:30.957Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 6 — hx-popover, hx-time-picker, hx-color-picker, hx-dropdown, hx-split-panel — add JSDoc descriptions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773822693990-kz5kvwsv1",
+    "sourceId": "ops:feature:started:feature-1773822638051-9nbjuccyq",
+    "createdAt": "2026-03-18T08:31:33.989Z",
+    "updatedAt": "2026-03-18T08:31:33.989Z"
+  },
+  {
+    "title": "Merged: feature-1773822617658-3feinao8j",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773822891475-u7c7aajai",
+    "sourceId": "ops:feature:pr-merged:feature-1773822617658-3feinao8j",
+    "createdAt": "2026-03-18T08:34:51.471Z",
+    "updatedAt": "2026-03-18T08:34:51.471Z"
+  },
+  {
+    "title": "Merged: feature-1773822622422-9yt358k2k",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773822939523-y8ll8gthw",
+    "sourceId": "ops:feature:pr-merged:feature-1773822622422-9yt358k2k",
+    "createdAt": "2026-03-18T08:35:39.519Z",
+    "updatedAt": "2026-03-18T08:35:39.519Z"
+  },
+  {
+    "title": "Completed: health(D→A): hx-radio-group — add JSDoc descriptions to all private properties",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773822939533-8wyl8fuqi",
+    "sourceId": "ops:feature:completed:feature-1773822622422-9yt358k2k",
+    "createdAt": "2026-03-18T08:35:39.533Z",
+    "updatedAt": "2026-03-18T08:35:39.533Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 7 — hx-combobox, hx-select, hx-checkbox-group, hx-file-upload — add JSDoc descriptions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773822942086-7iiztzbyz",
+    "sourceId": "ops:feature:started:feature-1773822641621-cz62aovjb",
+    "createdAt": "2026-03-18T08:35:42.082Z",
+    "updatedAt": "2026-03-18T08:35:42.082Z"
+  },
+  {
+    "title": "Merged: feature-1773822633596-0z01x25zt",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773823000154-jjbpat8e5",
+    "sourceId": "ops:feature:pr-merged:feature-1773822633596-0z01x25zt",
+    "createdAt": "2026-03-18T08:36:40.152Z",
+    "updatedAt": "2026-03-18T08:36:40.152Z"
+  },
+  {
+    "title": "Started: health(B→A): batch 8 — hx-button-group, hx-nav, hx-overflow-menu, hx-split-button, hx-card, hx-field, hx-form, hx-tree-item — add JSDoc descriptions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773823005313-epjl2mtil",
+    "sourceId": "ops:feature:started:feature-1773822646788-je8cc6tht",
+    "createdAt": "2026-03-18T08:36:45.308Z",
+    "updatedAt": "2026-03-18T08:36:45.308Z"
+  },
+  {
+    "title": "Merged: feature-1773822638051-9nbjuccyq",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773823062128-v1yjhjymk",
+    "sourceId": "ops:feature:pr-merged:feature-1773822638051-9nbjuccyq",
+    "createdAt": "2026-03-18T08:37:42.123Z",
+    "updatedAt": "2026-03-18T08:37:42.123Z"
+  },
+  {
+    "title": "Merged: feature-1773822641621-cz62aovjb",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773823201994-p82uutm1b",
+    "sourceId": "ops:feature:pr-merged:feature-1773822641621-cz62aovjb",
+    "createdAt": "2026-03-18T08:40:01.992Z",
+    "updatedAt": "2026-03-18T08:40:01.992Z"
+  },
+  {
+    "title": "Merged: feature-1773822646788-je8cc6tht",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773823334556-y8fp44knk",
+    "sourceId": "ops:feature:pr-merged:feature-1773822646788-je8cc6tht",
+    "createdAt": "2026-03-18T08:42:14.552Z",
+    "updatedAt": "2026-03-18T08:42:14.552Z"
+  },
+  {
+    "title": "Completed: health(B→A): batch 8 — hx-button-group, hx-nav, hx-overflow-menu, hx-split-button, hx-card, hx-field, hx-form, hx-tree-item — add JSDoc descriptions",
+    "date": "2026-03-18",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773823334569-k7k48hqc0",
+    "sourceId": "ops:feature:completed:feature-1773822646788-je8cc6tht",
+    "createdAt": "2026-03-18T08:42:14.568Z",
+    "updatedAt": "2026-03-18T08:42:14.568Z"
+  },
+  {
+    "title": "Auto-mode started",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Autonomous feature processing started",
+    "id": "event-1773895065925-6ckxsfehc",
+    "sourceId": "ops:auto-mode:started:2026-03-19",
+    "createdAt": "2026-03-19T04:37:45.925Z",
+    "updatedAt": "2026-03-19T05:08:40.939Z"
+  },
+  {
+    "title": "Started: a11y audit: hx-popover — fix WCAG 2.1 AA violations",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773895096818-j3lr68x2u",
+    "sourceId": "ops:feature:started:feature-1773894524885-v8d0wdsmx",
+    "createdAt": "2026-03-19T04:38:16.814Z",
+    "updatedAt": "2026-03-19T04:38:16.814Z"
+  },
+  {
+    "title": "Started: a11y audit: hx-accordion — fix WCAG 2.1 AA violations",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773895844293-lk1bxlynh",
+    "sourceId": "ops:feature:started:feature-1773895811551-y19pnr7cz",
+    "createdAt": "2026-03-19T04:50:44.289Z",
+    "updatedAt": "2026-03-19T04:50:44.289Z"
+  },
+  {
+    "title": "Merged: feature-1773895811551-y19pnr7cz",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773896188714-hqh14m9mm",
+    "sourceId": "ops:feature:pr-merged:feature-1773895811551-y19pnr7cz",
+    "createdAt": "2026-03-19T04:56:28.712Z",
+    "updatedAt": "2026-03-19T04:56:28.712Z"
+  },
+  {
+    "title": "Started: a11y audit batch 1: overlays — popover, dialog, drawer, dropdown, tooltip, combobox, select, date-picker, time-picker",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773896951841-48l0huawy",
+    "sourceId": "ops:feature:started:feature-1773896777624-rrsd41hqf",
+    "createdAt": "2026-03-19T05:09:11.838Z",
+    "updatedAt": "2026-03-19T05:09:11.838Z"
+  },
+  {
+    "title": "Started: a11y audit batch 2: form inputs — text-input, textarea, number-input, checkbox, checkbox-group, radio-group, switch, slider, file-upload",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773896966838-g9dnw4iy7",
+    "sourceId": "ops:feature:started:feature-1773896781201-gd189r7az",
+    "createdAt": "2026-03-19T05:09:26.836Z",
+    "updatedAt": "2026-03-19T05:09:26.836Z"
+  },
+  {
+    "title": "Started: a11y audit batch 3: actions — button, button-group, icon-button, split-button, toggle-button, copy-button, link, overflow-menu, menu",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773896981838-i6zqi2t03",
+    "sourceId": "ops:feature:started:feature-1773896784390-zuxg1su7s",
+    "createdAt": "2026-03-19T05:09:41.835Z",
+    "updatedAt": "2026-03-19T05:09:41.835Z"
+  },
+  {
+    "title": "Merged: feature-1773894524885-v8d0wdsmx",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773897133868-maqfd2z95",
+    "sourceId": "ops:feature:pr-merged:feature-1773894524885-v8d0wdsmx",
+    "createdAt": "2026-03-19T05:12:13.865Z",
+    "updatedAt": "2026-03-19T05:12:50.680Z"
+  },
+  {
+    "title": "Merged: feature-1773896784390-zuxg1su7s",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773897315608-swfigeo9e",
+    "sourceId": "ops:feature:pr-merged:feature-1773896784390-zuxg1su7s",
+    "createdAt": "2026-03-19T05:15:15.605Z",
+    "updatedAt": "2026-03-19T05:16:52.425Z"
+  },
+  {
+    "title": "Completed: a11y audit batch 3: actions — button, button-group, icon-button, split-button, toggle-button, copy-button, link, overflow-menu, menu",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773897315651-at4ql1b1c",
+    "sourceId": "ops:feature:completed:feature-1773896784390-zuxg1su7s",
+    "createdAt": "2026-03-19T05:15:15.650Z",
+    "updatedAt": "2026-03-19T05:16:45.493Z"
+  },
+  {
+    "title": "Merged: feature-1773896777624-rrsd41hqf",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773897334176-t55ok7pcd",
+    "sourceId": "ops:feature:pr-merged:feature-1773896777624-rrsd41hqf",
+    "createdAt": "2026-03-19T05:15:34.173Z",
+    "updatedAt": "2026-03-19T05:15:34.173Z"
+  },
+  {
+    "title": "Completed: a11y audit batch 1: overlays — popover, dialog, drawer, dropdown, tooltip, combobox, select, date-picker, time-picker",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773897334230-nlhpbzanr",
+    "sourceId": "ops:feature:completed:feature-1773896777624-rrsd41hqf",
+    "createdAt": "2026-03-19T05:15:34.229Z",
+    "updatedAt": "2026-03-19T05:15:34.229Z"
+  },
+  {
+    "title": "Started: a11y audit batch 4: navigation — tabs, breadcrumb, nav, side-nav, top-nav, pagination, steps, tree-view",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773897337380-3fcsee9jm",
+    "sourceId": "ops:feature:started:feature-1773896788453-hn3fqazw5",
+    "createdAt": "2026-03-19T05:15:37.377Z",
+    "updatedAt": "2026-03-19T05:15:37.377Z"
+  },
+  {
+    "title": "Started: a11y audit batch 5: data — data-table, table, structured-list, list, accordion, carousel",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773897352383-ze8jw0265",
+    "sourceId": "ops:feature:started:feature-1773896792012-6zbt64dsa",
+    "createdAt": "2026-03-19T05:15:52.381Z",
+    "updatedAt": "2026-03-19T05:15:52.381Z"
+  },
+  {
+    "title": "Started: a11y audit batch 6: feedback — alert, banner, toast, progress-bar, progress-ring, spinner, skeleton, meter, rating, color-picker",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773897415893-sx9uuv14s",
+    "sourceId": "ops:feature:started:feature-1773896795625-pzar8k96y",
+    "createdAt": "2026-03-19T05:16:55.891Z",
+    "updatedAt": "2026-03-19T05:16:55.891Z"
+  },
+  {
+    "title": "Merged: feature-1773896781201-gd189r7az",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773897418112-v7z6ck7rj",
+    "sourceId": "ops:feature:pr-merged:feature-1773896781201-gd189r7az",
+    "createdAt": "2026-03-19T05:16:58.111Z",
+    "updatedAt": "2026-03-19T05:19:47.246Z"
+  },
+  {
+    "title": "Completed: a11y audit batch 2: form inputs — text-input, textarea, number-input, checkbox, checkbox-group, radio-group, switch, slider, file-upload",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773897418166-oe3wwlmb0",
+    "sourceId": "ops:feature:completed:feature-1773896781201-gd189r7az",
+    "createdAt": "2026-03-19T05:16:58.166Z",
+    "updatedAt": "2026-03-19T05:19:39.733Z"
+  },
+  {
+    "title": "Started: a11y audit batch 7: display + layout — card, avatar, badge, tag, status-indicator, stat, counter, code-snippet, action-bar, field, form, split-panel",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773897588895-bo98w55gj",
+    "sourceId": "ops:feature:started:feature-1773896798904-ry1r8daet",
+    "createdAt": "2026-03-19T05:19:48.892Z",
+    "updatedAt": "2026-03-19T05:19:48.892Z"
+  },
+  {
+    "title": "Completed: a11y audit batch 5: data — data-table, table, structured-list, list, accordion, carousel",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773897701700-xrl0a9hlp",
+    "sourceId": "ops:feature:completed:feature-1773896792012-6zbt64dsa",
+    "createdAt": "2026-03-19T05:21:41.699Z",
+    "updatedAt": "2026-03-19T05:21:41.699Z"
+  },
+  {
+    "title": "Merged: feature-1773896798904-ry1r8daet",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773897915510-efm8idkvk",
+    "sourceId": "ops:feature:pr-merged:feature-1773896798904-ry1r8daet",
+    "createdAt": "2026-03-19T05:25:15.505Z",
+    "updatedAt": "2026-03-19T05:25:15.505Z"
+  },
+  {
+    "title": "Started: a11y fix: keyboard-inaccessible components (GH #1021)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773899400804-ccvjj8zgp",
+    "sourceId": "ops:feature:started:feature-1773899368900-5v14v9w5r",
+    "createdAt": "2026-03-19T05:50:00.799Z",
+    "updatedAt": "2026-03-19T05:50:00.799Z"
+  },
+  {
+    "title": "Started: a11y fix: missing focus-visible indicators (GH #1028)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773899406598-agcg23kik",
+    "sourceId": "ops:feature:started:feature-1773899375639-d01vhg6fr",
+    "createdAt": "2026-03-19T05:50:06.592Z",
+    "updatedAt": "2026-03-19T05:50:06.592Z"
+  },
+  {
+    "title": "Started: a11y fix: incorrect ARIA roles on semantic elements (GH #1024)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773899412309-obihqijv8",
+    "sourceId": "ops:feature:started:feature-1773899380615-9u5cb136i",
+    "createdAt": "2026-03-19T05:50:12.307Z",
+    "updatedAt": "2026-03-19T05:50:12.307Z"
+  },
+  {
+    "title": "Started: a11y fix: missing accessible names on interactive elements (GH #1023)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773899415360-kapbdr709",
+    "sourceId": "ops:feature:started:feature-1773899384668-8d1v2zuzo",
+    "createdAt": "2026-03-19T05:50:15.359Z",
+    "updatedAt": "2026-03-19T05:50:15.359Z"
+  },
+  {
+    "title": "Completed: a11y fix: keyboard-inaccessible components (GH #1021)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773899948311-m9bzwxeec",
+    "sourceId": "ops:feature:completed:feature-1773899368900-5v14v9w5r",
+    "createdAt": "2026-03-19T05:59:08.310Z",
+    "updatedAt": "2026-03-19T05:59:08.310Z"
+  },
+  {
+    "title": "Started: a11y fix: broken aria-controls, aria-haspopup, aria-labelledby relationships (GH #1026)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773899953519-bkg5fga69",
+    "sourceId": "ops:feature:started:feature-1773899394841-2irml9r44",
+    "createdAt": "2026-03-19T05:59:13.516Z",
+    "updatedAt": "2026-03-19T05:59:13.516Z"
+  },
+  {
+    "title": "Merged: feature-1773899375639-d01vhg6fr",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773900026622-9vco8vnmq",
+    "sourceId": "ops:feature:pr-merged:feature-1773899375639-d01vhg6fr",
+    "createdAt": "2026-03-19T06:00:26.617Z",
+    "updatedAt": "2026-03-19T07:21:39.108Z"
+  },
+  {
+    "title": "Started: a11y fix: incorrect ARIA state attributes (GH #1025)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900031523-l0iv8kkkj",
+    "sourceId": "ops:feature:started:feature-1773899400450-0jmw197uf",
+    "createdAt": "2026-03-19T06:00:31.520Z",
+    "updatedAt": "2026-03-19T06:00:31.520Z"
+  },
+  {
+    "title": "Merged: feature-1773899384668-8d1v2zuzo",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773900170035-cepn4e014",
+    "sourceId": "ops:feature:pr-merged:feature-1773899384668-8d1v2zuzo",
+    "createdAt": "2026-03-19T06:02:50.034Z",
+    "updatedAt": "2026-03-19T06:02:50.034Z"
+  },
+  {
+    "title": "Started: a11y fix: aria-live region timing and announcement failures (GH #1022)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900171642-4jmjv4rtr",
+    "sourceId": "ops:feature:started:feature-1773899405794-nzj7ke1bo",
+    "createdAt": "2026-03-19T06:02:51.639Z",
+    "updatedAt": "2026-03-19T06:02:51.639Z"
+  },
+  {
+    "title": "Completed: a11y fix: broken aria-controls, aria-haspopup, aria-labelledby relationships (GH #1026)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773900426311-v8wymepia",
+    "sourceId": "ops:feature:completed:feature-1773899394841-2irml9r44",
+    "createdAt": "2026-03-19T06:07:06.311Z",
+    "updatedAt": "2026-03-19T06:07:06.311Z"
+  },
+  {
+    "title": "Started: a11y fix: insufficient touch targets below 44px (GH #1027)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900429703-inju9to4t",
+    "sourceId": "ops:feature:started:feature-1773899411180-8d65egi2m",
+    "createdAt": "2026-03-19T06:07:09.699Z",
+    "updatedAt": "2026-03-19T06:07:09.699Z"
+  },
+  {
+    "title": "Completed: a11y fix: incorrect ARIA state attributes (GH #1025)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773900480429-42nm2w5gz",
+    "sourceId": "ops:feature:completed:feature-1773899400450-0jmw197uf",
+    "createdAt": "2026-03-19T06:08:00.428Z",
+    "updatedAt": "2026-03-19T06:08:00.428Z"
+  },
+  {
+    "title": "Started: a11y fix: focus restoration delayed by animation (GH #1031)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900482774-q5a8x6tf3",
+    "sourceId": "ops:feature:started:feature-1773899428236-dflo21y81",
+    "createdAt": "2026-03-19T06:08:02.770Z",
+    "updatedAt": "2026-03-19T06:08:02.770Z"
+  },
+  {
+    "title": "Completed: a11y fix: focus restoration delayed by animation (GH #1031)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773900683072-myj5p52ty",
+    "sourceId": "ops:feature:completed:feature-1773899428236-dflo21y81",
+    "createdAt": "2026-03-19T06:11:23.070Z",
+    "updatedAt": "2026-03-19T06:11:23.070Z"
+  },
+  {
+    "title": "Started: a11y fix: color used as sole indicator for status (GH #1029)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900685738-5t3z0a1fo",
+    "sourceId": "ops:feature:started:feature-1773899433240-jhefazoe7",
+    "createdAt": "2026-03-19T06:11:25.735Z",
+    "updatedAt": "2026-03-19T06:11:25.735Z"
+  },
+  {
+    "title": "Started: a11y fix: missing aria-required on form controls (GH #1030)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900773785-8gtexjhig",
+    "sourceId": "ops:feature:started:feature-1773899437828-iospb6z9o",
+    "createdAt": "2026-03-19T06:12:53.782Z",
+    "updatedAt": "2026-03-19T06:12:53.782Z"
+  },
+  {
+    "title": "Started: a11y fix: timing and reduced-motion violations (GH #1032)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773900831710-v48gmr9bn",
+    "sourceId": "ops:feature:started:feature-1773899443038-ojo109pke",
+    "createdAt": "2026-03-19T06:13:51.706Z",
+    "updatedAt": "2026-03-19T06:13:51.706Z"
+  },
+  {
+    "title": "Completed: a11y fix: color used as sole indicator for status (GH #1029)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773901182438-vjld19gzk",
+    "sourceId": "ops:feature:completed:feature-1773899433240-jhefazoe7",
+    "createdAt": "2026-03-19T06:19:42.436Z",
+    "updatedAt": "2026-03-19T06:19:42.436Z"
+  },
+  {
+    "title": "Completed: a11y fix: missing aria-required on form controls (GH #1030)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773901185966-cepvqid2w",
+    "sourceId": "ops:feature:completed:feature-1773899437828-iospb6z9o",
+    "createdAt": "2026-03-19T06:19:45.965Z",
+    "updatedAt": "2026-03-19T06:19:45.965Z"
+  },
+  {
+    "title": "Started: a11y fix: missing axe-core and keyboard test coverage (GH #1033)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773904412485-6k2nzkwhy",
+    "sourceId": "ops:feature:started:feature-1773899449144-1uqtldlw3",
+    "createdAt": "2026-03-19T07:13:32.479Z",
+    "updatedAt": "2026-03-19T07:13:32.479Z"
+  },
+  {
+    "title": "Completed: a11y fix: insufficient touch targets below 44px (GH #1027)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773904534846-92akh05p0",
+    "sourceId": "ops:feature:completed:feature-1773899411180-8d65egi2m",
+    "createdAt": "2026-03-19T07:15:34.845Z",
+    "updatedAt": "2026-03-19T07:15:34.845Z"
+  },
+  {
+    "title": "Started: [Escalation] pr_warning_feedback - feature-1773899411180-8d65egi2m (PR #1043)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773904597277-9yxm8ssuw",
+    "sourceId": "ops:feature:started:feature-1773904369854-q8kgz7gm5",
+    "createdAt": "2026-03-19T07:16:37.275Z",
+    "updatedAt": "2026-03-19T07:16:37.275Z"
+  },
+  {
+    "title": "Merged: feature-1773899411180-8d65egi2m",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773904605528-pkusaf95z",
+    "sourceId": "ops:feature:pr-merged:feature-1773899411180-8d65egi2m",
+    "createdAt": "2026-03-19T07:16:45.525Z",
+    "updatedAt": "2026-03-19T07:17:14.471Z"
+  },
+  {
+    "title": "Started: [Escalation] pr_warning_feedback - feature-1773899375639-d01vhg6fr (PR #1036)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation started",
+    "id": "event-1773904758658-g7pb4z6v8",
+    "sourceId": "ops:feature:started:feature-1773904728421-xkfhmx9fn",
+    "createdAt": "2026-03-19T07:19:18.655Z",
+    "updatedAt": "2026-03-19T07:19:18.655Z"
+  },
+  {
+    "title": "Merged: feature-1773899449144-1uqtldlw3",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773904953468-f2ejj25m4",
+    "sourceId": "ops:feature:pr-merged:feature-1773899449144-1uqtldlw3",
+    "createdAt": "2026-03-19T07:22:33.462Z",
+    "updatedAt": "2026-03-19T07:22:33.462Z"
+  },
+  {
+    "title": "Merged: feature-1773904728421-xkfhmx9fn",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature PR merged",
+    "id": "event-1773905642013-y2ua0u5ie",
+    "sourceId": "ops:feature:pr-merged:feature-1773904728421-xkfhmx9fn",
+    "createdAt": "2026-03-19T07:34:02.010Z",
+    "updatedAt": "2026-03-19T07:34:02.010Z"
+  },
+  {
+    "title": "Completed: [Escalation] pr_warning_feedback - feature-1773899375639-d01vhg6fr (PR #1036)",
+    "date": "2026-03-19",
+    "type": "ops",
+    "description": "Feature implementation completed",
+    "id": "event-1773905642071-vzgxmf7ze",
+    "sourceId": "ops:feature:completed:feature-1773904728421-xkfhmx9fn",
+    "createdAt": "2026-03-19T07:34:02.071Z",
+    "updatedAt": "2026-03-19T07:34:02.071Z"
+  }
+]

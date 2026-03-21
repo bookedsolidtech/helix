@@ -1,0 +1,86 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "opus",
+  "component": "hx-popover",
+  "summary": {
+    "totalFindings": 7,
+    "critical": 1,
+    "high": 3,
+    "medium": 2,
+    "low": 1
+  },
+  "findings": [
+    {
+      "severity": "critical",
+      "wcagCriteria": "1.4.13",
+      "title": "Hover-triggered popover cannot be hovered without dismissing",
+      "description": "When trigger='hover', the popover opens on mouseenter of the trigger-wrapper and closes on mouseleave of the trigger-wrapper. The popover body is positioned via fixed positioning outside the trigger-wrapper DOM hierarchy, so moving the mouse from the trigger to the popover content causes a mouseleave on the trigger-wrapper, immediately dismissing the popover. WCAG 1.4.13 (Content on Hover or Focus) requires that users can move the pointer over the additional content without it disappearing ('Hoverable' criterion). This is a direct violation because hover-revealed content cannot be interacted with.",
+      "file": "src/components/hx-popover/hx-popover.ts",
+      "line": 319,
+      "fix": "Move the mouseenter/mouseleave listeners to the host element (or a wrapper that contains both trigger and body), or add mouseenter/mouseleave handlers on the popover body itself that cancel the hide timeout. A common pattern is to use a short delay (e.g., 100-200ms) before hiding on mouseleave, and cancel that timeout if the pointer enters the popover body.",
+      "pattern": "keyboard-inaccessible-hover"
+    },
+    {
+      "severity": "high",
+      "wcagCriteria": "1.4.13",
+      "title": "Hover-triggered popover lacks a dismissal mechanism without moving pointer or focus",
+      "description": "WCAG 1.4.13 requires that content shown on hover can be dismissed without moving the pointer or focus (the 'Dismissible' criterion), typically via Escape key. The Escape key handler is only registered inside _show(), but when trigger='hover', the popover opens without keyboard interaction. If a user hovers to reveal the popover, the Escape listener is registered on the document, but there is no indication to the user that Escape works. More critically, the hover trigger does not call _show() with proper focus management — the popover body gets focus (line 187), which would trigger focusout on the anchor and potentially interfere. The Escape handler does work for hover, but dismissing hover content should not require focus to move into the popover first.",
+      "file": "src/components/hx-popover/hx-popover.ts",
+      "line": 313,
+      "fix": "Ensure the Escape key dismisses hover-triggered popovers regardless of focus state. The current implementation does register the document-level keydown listener in _show() which covers this, but verify in manual testing that Escape works when focus remains on the trigger (not inside the popover body).",
+      "pattern": "keyboard-inaccessible-hover"
+    },
+    {
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "Anchor element missing aria-haspopup attribute",
+      "description": "The anchor/trigger element does not receive an aria-haspopup attribute. ARIA authoring practices for popover triggers require aria-haspopup to indicate that activating the trigger will display a popup. The component sets aria-expanded on the anchor (line 161) but never sets aria-haspopup. Screen readers will announce the trigger as expandable but will not communicate what type of content will appear.",
+      "file": "src/components/hx-popover/hx-popover.ts",
+      "line": 154,
+      "fix": "In _setAnchorAriaExpanded (or a renamed _setupAnchorAria method), also set aria-haspopup='dialog' (or 'true') on the anchor element if it does not already have one. Example: anchorEl.setAttribute('aria-haspopup', 'dialog');",
+      "pattern": "missing-aria-haspopup"
+    },
+    {
+      "severity": "high",
+      "wcagCriteria": "2.4.7",
+      "title": "No visible focus indicator on popover body when it receives focus",
+      "description": "The popover body (part='body') receives programmatic focus via bodyEl.focus() at line 187, and has tabindex='-1' to make it focusable. However, the styles file contains no :focus or :focus-visible rule for [part='body']. When focus moves to the popover body, there will be no visible focus indicator, violating WCAG 2.4.7 (Focus Visible). Users navigating with keyboard will not see where focus has moved.",
+      "file": "src/components/hx-popover/hx-popover.styles.ts",
+      "line": 14,
+      "fix": "Add a :focus-visible style for [part='body'] using the design token focus ring: [part='body']:focus-visible { outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, var(--hx-color-primary-500)); outline-offset: var(--hx-focus-ring-offset, 2px); }",
+      "pattern": "missing-focus-visible"
+    },
+    {
+      "severity": "medium",
+      "wcagCriteria": "4.1.2",
+      "title": "Role 'region' is inappropriate for a popover — should use 'dialog' or no role",
+      "description": "The popover body uses role='region' (line 357). The ARIA Authoring Practices Guide specifies that non-modal popover overlays should use role='dialog' (for rich interactive content) or role='tooltip' (for simple descriptive text shown on hover). A 'region' landmark is intended for large sections of a page that a user might want to navigate to, not for transient floating overlays. Using 'region' causes screen readers to announce the popover as a landmark, which is semantically incorrect and can clutter landmark navigation.",
+      "file": "src/components/hx-popover/hx-popover.ts",
+      "line": 357,
+      "fix": "Change role='region' to role='dialog' for click/focus-triggered popovers. If the component also supports a tooltip-like mode (hover with simple text), consider dynamically setting role='tooltip' for trigger='hover'. The dialog role better communicates the purpose of the floating content to assistive technology.",
+      "pattern": "incorrect-aria-role"
+    },
+    {
+      "severity": "medium",
+      "wcagCriteria": "2.1.1",
+      "title": "Missing test coverage for keyboard accessibility scenarios",
+      "description": "The test suite lacks dedicated keyboard accessibility tests. There are no tests for: (1) Tab key moving focus into popover content when open, (2) focus restoration to the trigger after closing via Escape (the implementation exists at line 204 but is untested), (3) keyboard activation of the trigger (Enter/Space on the anchor button), (4) Tab trapping or focus containment within popover content. While the Escape key test exists (line 293), it dispatches the event on document rather than testing actual keyboard navigation flow.",
+      "file": "src/components/hx-popover/hx-popover.test.ts",
+      "line": 293,
+      "fix": "Add dedicated keyboard accessibility tests: (1) test that pressing Enter/Space on the anchor button opens the popover, (2) test that focus moves to the popover body on open, (3) test that Escape closes and returns focus to the anchor, (4) test that Tab within the popover cycles through focusable content.",
+      "pattern": "missing-a11y-tests"
+    },
+    {
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "aria-hidden uses string interpolation instead of conditional attribute removal",
+      "description": "Line 359 uses aria-hidden=\"${!this._visible ? 'true' : 'false'}\" which always renders the attribute as either 'true' or 'false'. While aria-hidden='false' is technically valid, it is redundant — elements are not hidden by default. The ARIA spec notes that aria-hidden='false' can cause confusion and some older assistive technologies may not handle it correctly. The component also uses the inert attribute (line 361) which already prevents interaction with hidden content, making aria-hidden='false' doubly redundant when visible.",
+      "file": "src/components/hx-popover/hx-popover.ts",
+      "line": 359,
+      "fix": "Use Lit's 'nothing' directive to conditionally omit the attribute: aria-hidden=${!this._visible ? 'true' : nothing}. This removes aria-hidden entirely when the popover is visible, which is cleaner and consistent with the project's ARIA pattern conventions documented in the system context.",
+      "pattern": "incorrect-aria-state"
+    }
+  ]
+}

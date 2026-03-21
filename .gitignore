@@ -65,7 +65,9 @@ apps/mcp-servers/*/coverage/
 apps/admin/src/data/library-registry.json
 
 # protoLabs Studio — operational state (never committed)
-# context/, memory/, skills/, spec.md are TRACKED (project knowledge)
+# context/, skills/, spec.md are TRACKED (project knowledge)
+# memory/ is gitignored — protoLabs server mutates these at runtime, breaking worktree merges
+.automaker/memory/
 .automaker/archive/
 .automaker/authority/
 .automaker/checkpoints/

@@ -1,0 +1,547 @@
+{
+  "audit": "Lit Architecture Audit",
+  "date": "2026-03-19",
+  "auditor": "lit-specialist",
+  "scope": "All components in packages/hx-library/src/components/ (~76 main + sub-components)",
+  "categories": [
+    "Lifecycle Correctness",
+    "Reactive Property Hygiene",
+    "Form Association (ElementInternals)",
+    "Event Patterns",
+    "Template & Directive Patterns",
+    "Shadow DOM & Query Patterns",
+    "CEM Annotations",
+    "Import Patterns"
+  ],
+  "summary": {
+    "total_findings": 52,
+    "by_severity": {
+      "critical": 2,
+      "high": 16,
+      "medium": 22,
+      "low": 12
+    }
+  },
+  "findings": [
+    {
+      "id": "LA-001",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-text-input",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "line": 320,
+      "description": "formStateRestoreCallback has wrong signature: `state: string` instead of `state: string | File | FormData | null`. The browser can pass File or FormData types; failing to guard against them risks a runtime error.",
+      "fix": "Change signature to `formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete'): void` and add a `typeof state === 'string'` guard before assigning."
+    },
+    {
+      "id": "LA-002",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-textarea",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.ts",
+      "line": 328,
+      "description": "formStateRestoreCallback has wrong signature: `state: string` instead of `state: string | File | FormData | null`.",
+      "fix": "Change signature to `formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete'): void` and add a type guard."
+    },
+    {
+      "id": "LA-003",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "line": 330,
+      "description": "formStateRestoreCallback has wrong signature: `state: string` instead of `state: string | File | FormData | null`.",
+      "fix": "Change signature to `formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete'): void` and add a type guard."
+    },
+    {
+      "id": "LA-004",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.ts",
+      "line": 0,
+      "description": "formStateRestoreCallback has wrong signature: `state: string`. Also, formResetCallback calls `setFormValue('')` instead of `setFormValue(null)` — empty string is submitted as a form value whereas null correctly removes the entry.",
+      "fix": "Update formStateRestoreCallback signature to include `string | File | FormData | null`. In formResetCallback, change `setFormValue('')` to `setFormValue(null)`."
+    },
+    {
+      "id": "LA-005",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-checkbox-group",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.ts",
+      "line": 0,
+      "description": "formStateRestoreCallback missing `null` in union type. Signature should include `string | File | FormData | null` per the HTML spec.",
+      "fix": "Add `| null` to the state parameter type in formStateRestoreCallback."
+    },
+    {
+      "id": "LA-006",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.ts",
+      "line": 0,
+      "description": "Component is form-associated (static formAssociated = true) but missing formResetCallback and formStateRestoreCallback. Form resets and bfcache restores will not work.",
+      "fix": "Add `formResetCallback()` that resets value to default, and `formStateRestoreCallback(state: string | File | FormData | null)` that restores the value."
+    },
+    {
+      "id": "LA-007",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-icon-button",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.ts",
+      "line": 0,
+      "description": "Component is form-associated but missing formResetCallback and formStateRestoreCallback.",
+      "fix": "Add formResetCallback and formStateRestoreCallback methods, or remove form association if the component does not submit form data."
+    },
+    {
+      "id": "LA-008",
+      "severity": "high",
+      "category": "Form Association (ElementInternals)",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.ts",
+      "line": 0,
+      "description": "Component is form-associated but missing formResetCallback and formStateRestoreCallback.",
+      "fix": "Add formResetCallback (reset value to 0) and formStateRestoreCallback (restore from string state)."
+    },
+    {
+      "id": "LA-009",
+      "severity": "critical",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.ts",
+      "line": 111,
+      "description": "Uses `Math.random().toString(36).slice(2, 9)` for panel ID generation. This is NOT SSR-safe — Math.random() produces different values on server vs client, causing hydration mismatches. All other components in the library use module-level counters.",
+      "fix": "Replace with a module-level counter pattern: `let _hxOverflowMenuIdCounter = 0;` and use `hx-overflow-menu-panel-${++_hxOverflowMenuIdCounter}`."
+    },
+    {
+      "id": "LA-010",
+      "severity": "medium",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.ts",
+      "line": 155,
+      "description": "Uses `this.shadowRoot?.querySelector('[part~=\"button\"]')` and `this.shadowRoot?.querySelector('[part~=\"panel\"]')` instead of the `@query` decorator.",
+      "fix": "Replace with `@query('[part~=\"button\"]') private _triggerButton` and `@query('[part~=\"panel\"]') private _panel` decorators."
+    },
+    {
+      "id": "LA-011",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "line": 0,
+      "description": "The `updated()` method does not call `super.updated()`. While LitElement's base updated() is a no-op, omitting super is a latent bug — if a mixin or future base class adds behavior to updated(), it will be silently skipped.",
+      "fix": "Add `super.updated(changedProperties);` as the first line in the updated() method."
+    },
+    {
+      "id": "LA-012",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-counter",
+      "file": "packages/hx-library/src/components/hx-counter/hx-counter.ts",
+      "line": 0,
+      "description": "The `updated()` method does not call `super.updated()`.",
+      "fix": "Add `super.updated(changedProperties);` as the first line."
+    },
+    {
+      "id": "LA-013",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.ts",
+      "line": 99,
+      "description": "The `updated()` method does not call `super.updated()`. The method handles the `open` property change but omits the super call.",
+      "fix": "Add `super.updated(changedProperties);` as the first line."
+    },
+    {
+      "id": "LA-014",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-top-nav",
+      "file": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.ts",
+      "line": 98,
+      "description": "Floating promise from `this.updateComplete.then(...)` in _handleMobileToggle. The promise is not voided or caught, which can cause unhandled rejection warnings.",
+      "fix": "Prefix with `void this.updateComplete.then(...)` or use an async function with try/catch."
+    },
+    {
+      "id": "LA-015",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-split-button",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.ts",
+      "line": 280,
+      "description": "Floating promise from `this.updateComplete.then(...).catch(...)` in _openMenu. While the catch prevents unhandled rejection, the pattern should use void or async/await for clarity.",
+      "fix": "Use `void this.updateComplete.then(...)` or convert _openMenu to async."
+    },
+    {
+      "id": "LA-016",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.ts",
+      "line": 196,
+      "description": "Two instances of floating `updateComplete.then()` without `void` prefix (lines 196 and 227).",
+      "fix": "Add `void` prefix to both `this.updateComplete.then(...)` calls."
+    },
+    {
+      "id": "LA-017",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-time-picker",
+      "file": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "line": 810,
+      "description": "Inline arrow functions in template: `@click=${() => this._handleOptionClick(slot)}` and `@mouseenter=${() => this._handleOptionMouseEnter(index)}` inside the repeat() callback. Creates new function allocations on every render cycle for every option.",
+      "fix": "Use event delegation on the listbox parent with data attributes to identify the clicked option, or accept the overhead as acceptable for a bounded set of time slots."
+    },
+    {
+      "id": "LA-018",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-carousel",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.ts",
+      "line": 0,
+      "description": "Inline arrow functions in template bindings and inline style string interpolation. Creates new function allocations and bypasses the CSS-only styling convention.",
+      "fix": "Extract arrow functions to named methods. Replace inline style strings with classMap or CSS custom properties."
+    },
+    {
+      "id": "LA-019",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-pagination",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.ts",
+      "line": 318,
+      "description": "Multiple inline arrow functions throughout the template (lines 318, 334, 363, 379, 395). Each creates a new function on every render.",
+      "fix": "Use event delegation with data attributes on the wrapper, or extract to bound methods."
+    },
+    {
+      "id": "LA-020",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.ts",
+      "line": 0,
+      "description": "Inline arrow functions in template bindings for star rendering.",
+      "fix": "Use event delegation on the star container with data attributes."
+    },
+    {
+      "id": "LA-021",
+      "severity": "low",
+      "category": "Template & Directive Patterns",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.ts",
+      "line": 0,
+      "description": "Inline arrow function in template for close button click handler.",
+      "fix": "Extract to a named private method."
+    },
+    {
+      "id": "LA-022",
+      "severity": "low",
+      "category": "Template & Directive Patterns",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.ts",
+      "line": 0,
+      "description": "Inline arrow function in template for close button click handler.",
+      "fix": "Extract to a named private method."
+    },
+    {
+      "id": "LA-023",
+      "severity": "low",
+      "category": "Template & Directive Patterns",
+      "component": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "line": 591,
+      "description": "Inline arrow functions for stepper pointerdown handlers (lines 591, 605).",
+      "fix": "Extract to named bound methods."
+    },
+    {
+      "id": "LA-024",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-grid",
+      "file": "packages/hx-library/src/components/hx-grid/hx-grid.ts",
+      "line": 107,
+      "description": "Inline style string construction via `_baseStyle()` method that builds a CSS string and applies it via `style=` attribute. This bypasses shadow DOM styling encapsulation.",
+      "fix": "Replace with CSS custom properties set via `styleMap()` or `:host` selectors that read properties."
+    },
+    {
+      "id": "LA-025",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.ts",
+      "line": 318,
+      "description": "Inline style string via `_startPanelStyle()` method that returns a raw CSS string.",
+      "fix": "Use `styleMap()` directive or CSS custom properties."
+    },
+    {
+      "id": "LA-026",
+      "severity": "low",
+      "category": "Template & Directive Patterns",
+      "component": "hx-code-snippet",
+      "file": "packages/hx-library/src/components/hx-code-snippet/hx-code-snippet.ts",
+      "line": 0,
+      "description": "Inline style on live region span element.",
+      "fix": "Move the style to the component's styles file."
+    },
+    {
+      "id": "LA-027",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-tooltip",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts",
+      "line": 139,
+      "description": "Sets inline styles via `this._lightDomDescription.style.cssText` for the visually-hidden span. Also sets `Object.assign(tooltipEl.style, ...)` and `Object.assign(arrowEl.style, ...)` for positioning (lines 202, 216).",
+      "fix": "The visually-hidden inline style is acceptable for a light DOM element. The positioning styles from Floating UI are also acceptable as they must be dynamic. Low priority."
+    },
+    {
+      "id": "LA-028",
+      "severity": "medium",
+      "category": "Template & Directive Patterns",
+      "component": "hx-prose",
+      "file": "packages/hx-library/src/components/hx-prose/hx-prose.ts",
+      "line": 79,
+      "description": "Sets inline styles via `this.style` property in lifecycle hooks (lines 79, 95). The component uses Light DOM intentionally, but setting `this.style.maxWidth` directly on the host is an inline style pattern.",
+      "fix": "Use a CSS custom property and `:host` selector instead: set `--_max-width` and consume it in the stylesheet."
+    },
+    {
+      "id": "LA-029",
+      "severity": "low",
+      "category": "Template & Directive Patterns",
+      "component": "hx-data-table",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "line": 0,
+      "description": "Uses `key=${i}` in skeleton row rendering — this is a React-ism. In Lit, use the `repeat()` directive with a key function for keyed rendering, or omit keys entirely as Lit's default rendering handles index-based lists efficiently.",
+      "fix": "Remove `key=${i}` attributes from skeleton row templates."
+    },
+    {
+      "id": "LA-030",
+      "severity": "medium",
+      "category": "Reactive Property Hygiene",
+      "component": "hx-text-input",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "line": 189,
+      "description": "Slot tracking booleans (_hasLabelSlot, _hasErrorSlot, _hasPrefixSlot, _hasSuffixSlot, _hasHelpTextSlot) are plain `private` properties that call `this.requestUpdate()` manually instead of using `@state()`. This bypasses Lit's reactive system and can cause update timing issues.",
+      "fix": "Change all slot tracking booleans to use `@state()` decorator and remove the manual `this.requestUpdate()` calls."
+    },
+    {
+      "id": "LA-031",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-progress-ring",
+      "file": "packages/hx-library/src/components/hx-progress-ring/hx-progress-ring.ts",
+      "line": 108,
+      "description": "Sets ARIA attributes directly on the host element via `this.setAttribute()` in `willUpdate()` and `connectedCallback()` (lines 108-137). While this works, it mixes imperative host attribute mutation with Lit's declarative rendering.",
+      "fix": "Consider moving ARIA attributes to the template render method using Lit bindings, or document the intentional imperative approach."
+    },
+    {
+      "id": "LA-032",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-radio",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio.ts",
+      "line": 66,
+      "description": "Sets ARIA attributes imperatively on the host element in connectedCallback (lines 68-70) and updated (lines 73-80). Uses `this.setAttribute('role', 'radio')`, `this.setAttribute('aria-checked', ...)` etc. This is a valid pattern for components that need ARIA on the host, but should be documented.",
+      "fix": "Consider using `@property({ reflect: true, attribute: 'role' })` or document the intentional imperative approach."
+    },
+    {
+      "id": "LA-033",
+      "severity": "low",
+      "category": "Lifecycle Correctness",
+      "component": "hx-tab-panel",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tab-panel.ts",
+      "line": 36,
+      "description": "Sets `role=\"tabpanel\"` imperatively in connectedCallback. This is fine for host-level ARIA, but a static property or attribute default would be more declarative.",
+      "fix": "Minor — consider using `this.setAttribute('role', 'tabpanel')` in the constructor or via a static initializer, or leave as-is since connectedCallback is the conventional pattern."
+    },
+    {
+      "id": "LA-034",
+      "severity": "high",
+      "category": "Lifecycle Correctness",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.ts",
+      "line": 0,
+      "description": "Uses `.bind(this)` in connectedCallback for event listeners instead of arrow function class fields. The `.bind()` pattern creates a new function reference each time connectedCallback fires (e.g., if the element is moved in the DOM), which means `removeEventListener` in disconnectedCallback will not remove the original listener, causing memory leaks.",
+      "fix": "Replace `.bind(this)` with arrow function class fields (e.g., `private _handleX = (e: Event): void => { ... }`)."
+    },
+    {
+      "id": "LA-035",
+      "severity": "critical",
+      "category": "CEM Annotations",
+      "component": "hx-status-indicator",
+      "file": "packages/hx-library/src/components/hx-status-indicator/hx-status-indicator.ts",
+      "line": 40,
+      "description": "Uses `@cssproperty` instead of `@cssprop` for all CSS custom property annotations (lines 40-50). `@cssproperty` is NOT a valid CEM JSDoc tag — the correct tag is `@cssprop`. These 11 CSS properties will be missing from the Custom Elements Manifest.",
+      "fix": "Replace all `@cssproperty` tags with `@cssprop`."
+    },
+    {
+      "id": "LA-036",
+      "severity": "high",
+      "category": "Template & Directive Patterns",
+      "component": "hx-carousel-item",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel-item.ts",
+      "line": 16,
+      "description": "Styles are defined inline via `css` tagged template in the component file instead of a separate `*.styles.ts` file. This violates the project's file structure convention and makes styles harder to maintain.",
+      "fix": "Extract styles to `hx-carousel-item.styles.ts` and import them."
+    },
+    {
+      "id": "LA-037",
+      "severity": "low",
+      "category": "Template & Directive Patterns",
+      "component": "hx-carousel-item",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel-item.ts",
+      "line": 37,
+      "description": "Uses `:focus` selector (line 37) in addition to `:focus-visible`. The project convention requires `:focus-visible` only, never `:focus`.",
+      "fix": "Remove the `.slide-group:focus` selector and keep only `.slide-group:focus-visible`."
+    },
+    {
+      "id": "LA-038",
+      "severity": "high",
+      "category": "Template & Directive Patterns",
+      "component": "hx-list-item",
+      "file": "packages/hx-library/src/components/hx-list/hx-list-item.ts",
+      "line": 189,
+      "description": "Uses string concatenation for CSS classes: `class=\"list-item ${this.selected ? 'list-item--selected' : ''} ${this.disabled ? 'list-item--disabled' : ''}\"` in multiple render paths (lines 189, 220). Should use `classMap()` directive for consistency and correctness.",
+      "fix": "Replace string concatenation with `classMap()` directive in all render paths."
+    },
+    {
+      "id": "LA-039",
+      "severity": "high",
+      "category": "Template & Directive Patterns",
+      "component": "hx-tree-item",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.ts",
+      "line": 322,
+      "description": "Uses string concatenation for CSS classes: `class=\"children ${this.expanded ? 'children--expanded' : ''}\"`. Should use `classMap()` directive.",
+      "fix": "Replace with `class=${classMap({ children: true, 'children--expanded': this.expanded })}`."
+    },
+    {
+      "id": "LA-040",
+      "severity": "high",
+      "category": "Reactive Property Hygiene",
+      "component": "hx-step",
+      "file": "packages/hx-library/src/components/hx-steps/hx-step.ts",
+      "line": 79,
+      "description": "The `orientation` and `size` properties are marked `@internal` but use `@property({ reflect: true })` which makes them part of the public attribute API. Internal properties that are set by the parent should use `@property({ attribute: false })` or `@state()` to avoid exposing them as public attributes.",
+      "fix": "Change `orientation` and `size` to use `attribute: false` since they are set programmatically by the parent hx-steps."
+    },
+    {
+      "id": "LA-041",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-step",
+      "file": "packages/hx-library/src/components/hx-steps/hx-step.ts",
+      "line": 102,
+      "description": "Sets host attributes imperatively in connectedCallback (`role`, `tabindex`) and updated (`aria-current`, `aria-disabled`, `tabindex`). This mixes imperative host mutation with Lit's reactive system.",
+      "fix": "Group all host attribute mutations into a single private method called from updated(), or use a HostElement mixin pattern."
+    },
+    {
+      "id": "LA-042",
+      "severity": "medium",
+      "category": "Lifecycle Correctness",
+      "component": "hx-list-item",
+      "file": "packages/hx-library/src/components/hx-list/hx-list-item.ts",
+      "line": 82,
+      "description": "The `_syncHostAria()` method sets ARIA attributes imperatively on the host element from within `updated()`. While functional, this creates a fragile coupling between the reactive system and imperative DOM manipulation.",
+      "fix": "Consider moving host ARIA to the constructor or connectedCallback for static attributes, or document the intentional pattern."
+    },
+    {
+      "id": "LA-043",
+      "severity": "low",
+      "category": "Lifecycle Correctness",
+      "component": "hx-breadcrumb-item",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb-item.ts",
+      "line": 34,
+      "description": "Sets role attribute conditionally in connectedCallback based on parent context. This is a valid defensive pattern but will not react if the element is moved between parents without disconnection/reconnection.",
+      "fix": "Acceptable pattern — document that the role is only set on initial connection."
+    },
+    {
+      "id": "LA-044",
+      "severity": "low",
+      "category": "Event Patterns",
+      "component": "hx-accordion-item",
+      "file": "packages/hx-library/src/components/hx-accordion/hx-accordion-item.ts",
+      "line": 110,
+      "description": "The `_dispatchToggleEvent` method is not prefixed with underscore consistently — it lacks the `private` keyword while other internal methods use `private`. It's a package-internal method used by the parent accordion.",
+      "fix": "Add `private` modifier or document it as `@internal` if it needs to be called by the parent."
+    },
+    {
+      "id": "LA-045",
+      "severity": "high",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-tooltip",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts",
+      "line": 118,
+      "description": "Uses `this.shadowRoot?.querySelector()` in multiple places (_setupTriggerAria line 118, _handleTriggerMouseleave line 244, _updatePosition lines 190-192) instead of `@query` decorators.",
+      "fix": "Replace querySelector calls with `@query` decorators where possible. Note: some usages query slot elements which are acceptable."
+    },
+    {
+      "id": "LA-046",
+      "severity": "high",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.ts",
+      "line": 192,
+      "description": "Uses `this.shadowRoot?.querySelector('.toast')` instead of `@query` decorator.",
+      "fix": "Replace with `@query('.toast') private _toastEl: HTMLElement | undefined;`"
+    },
+    {
+      "id": "LA-047",
+      "severity": "medium",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-toggle-button",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.ts",
+      "line": 120,
+      "description": "Uses `this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')` in firstUpdated instead of `@query` decorator.",
+      "fix": "Replace with `@query('slot:not([name])') private _defaultSlot: HTMLSlotElement | undefined;`"
+    },
+    {
+      "id": "LA-048",
+      "severity": "high",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-menu-item",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu-item.ts",
+      "line": 92,
+      "description": "Uses `this.shadowRoot?.querySelector<HTMLElement>('.menu-item')` in the focus() override instead of `@query` decorator.",
+      "fix": "Replace with `@query('.menu-item') private _menuItemEl: HTMLElement | undefined;` and reference it in focus()."
+    },
+    {
+      "id": "LA-049",
+      "severity": "low",
+      "category": "Shadow DOM & Query Patterns",
+      "component": "hx-tree-item",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.ts",
+      "line": 264,
+      "description": "Uses `this.shadowRoot?.querySelector<HTMLElement>('.item-row')` in focus() override instead of `@query` decorator.",
+      "fix": "Replace with `@query('.item-row') private _rowEl: HTMLElement | undefined;`"
+    },
+    {
+      "id": "LA-050",
+      "severity": "low",
+      "category": "Import Patterns",
+      "component": "hx-carousel-item",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel-item.ts",
+      "line": 1,
+      "description": "Imports `css` from 'lit' and defines styles inline in the component file. The `css` import is not needed when styles are in a separate file.",
+      "fix": "Move styles to hx-carousel-item.styles.ts and remove the `css` import."
+    },
+    {
+      "id": "LA-051",
+      "severity": "medium",
+      "category": "Event Patterns",
+      "component": "hx-nav-item",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-nav-item.ts",
+      "line": 0,
+      "description": "The component does not dispatch any prefixed `hx-` custom events for expand/collapse or click actions. Parent hx-side-nav must directly manipulate child properties. This limits composability and event-driven architectures.",
+      "fix": "Consider adding `hx-nav-item-toggle` or `hx-nav-item-click` events for consistency with the library's event-driven pattern."
+    },
+    {
+      "id": "LA-052",
+      "severity": "low",
+      "category": "CEM Annotations",
+      "component": "hx-carousel-item",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel-item.ts",
+      "line": 6,
+      "description": "Missing `@csspart` annotation. The component does not expose any CSS parts despite having a `.slide-group` wrapper element.",
+      "fix": "Add `part=\"slide\"` to the `.slide-group` div and document with `@csspart slide - The slide wrapper element.`"
+    }
+  ]
+}
