@@ -610,6 +610,33 @@ describe('hx-color-picker', () => {
   // ─── Form Association ───
 
   describe('Form Association', () => {
+    it('formResetCallback resets value to #000000', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#ff0000"></hx-color-picker>',
+      );
+      expect(el.value).toBe('#ff0000');
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe('#000000');
+    });
+
+    it('formStateRestoreCallback restores value from string state', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      el.formStateRestoreCallback('#3b82f6', 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe('#3b82f6');
+    });
+
+    it('formStateRestoreCallback ignores non-string state', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#ff0000"></hx-color-picker>',
+      );
+      el.formStateRestoreCallback(null, 'restore');
+      await el.updateComplete;
+      // value should remain unchanged when state is null
+      expect(el.value).toBe('#ff0000');
+    });
+
     it('submits color value in FormData', async () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-color-picker name="brand-color" value="#3b82f6"></hx-color-picker>';
