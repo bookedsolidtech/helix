@@ -473,6 +473,22 @@ describe('hx-file-upload', () => {
       expect(el.files).toHaveLength(0);
     });
 
+    it('formStateRestoreCallback exists and handles restore mode without throwing', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload multiple></hx-file-upload>');
+      simulateFileInput(el, [makeFile('restore-test.pdf', 512, 'application/pdf')]);
+      await el.updateComplete;
+      expect(el.files).toHaveLength(1);
+
+      expect(() => el.formStateRestoreCallback('', 'restore')).not.toThrow();
+      await el.updateComplete;
+      expect(el.files).toHaveLength(0);
+    });
+
+    it('formStateRestoreCallback handles autocomplete mode without throwing', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      expect(() => el.formStateRestoreCallback('', 'autocomplete')).not.toThrow();
+    });
+
     it('formResetCallback removes the rendered file list from shadow DOM', async () => {
       const el = await fixture<HelixFileUpload>('<hx-file-upload multiple></hx-file-upload>');
       simulateFileInput(el, [makeFile('gone.pdf', 512, 'application/pdf')]);
