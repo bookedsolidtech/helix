@@ -826,16 +826,16 @@ describe('hx-data-table', () => {
       el.columns = COLUMNS;
       el.rows = ROWS;
       await el.updateComplete;
-      expect(el.labelSelectAll).toBe('Select all rows');
+      expect(el.selectAllLabel).toBe('Select all rows');
     });
 
-    it('renders custom labelSelectAll when set via property', async () => {
+    it('renders custom selectAllLabel when set via property', async () => {
       const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
       el.columns = COLUMNS;
       el.rows = ROWS;
-      el.labelSelectAll = 'Tout sélectionner';
+      el.selectAllLabel = 'Tout sélectionner';
       await el.updateComplete;
-      expect(el.labelSelectAll).toBe('Tout sélectionner');
+      expect(el.selectAllLabel).toBe('Tout sélectionner');
     });
   });
 });
