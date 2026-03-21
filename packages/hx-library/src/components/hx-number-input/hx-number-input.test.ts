@@ -766,6 +766,16 @@ describe('hx-number-input', () => {
       await el.updateComplete;
       expect(el.value).toBeNull();
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input></hx-number-input>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── CSS Parts (9) ───

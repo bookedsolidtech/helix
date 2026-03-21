@@ -455,6 +455,16 @@ describe('hx-select', () => {
       await el.updateComplete;
       expect(el.value).toBe('restored');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Validation (6) ───
