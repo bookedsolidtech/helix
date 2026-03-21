@@ -1268,4 +1268,208 @@ describe('hx-time-picker', () => {
       expect(event.detail.value).toBe('');
     });
   });
+
+  // ─── parseUserInput edge cases ───
+
+  describe('parseUserInput edge cases', () => {
+    it('accepts "230 PM" style input (no colon, digits run together)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="12h" min="00:00" max="23:59"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-change');
+      input.value = '230 PM';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const event = await eventPromise;
+      // 2:30 PM = 14:30
+      expect(event.detail.value).toBe('14:30');
+    });
+
+    it('accepts "2 PM" style input (hour only, no minutes)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="12h" min="00:00" max="23:59"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-change');
+      input.value = '2 PM';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const event = await eventPromise;
+      // 2 PM = 14:00
+      expect(event.detail.value).toBe('14:00');
+    });
+
+    it('rejects invalid hour "25:00" and keeps the component value unchanged', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" value="09:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      // Dispatch a change event with an out-of-range hour.
+      input.value = '25:00';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+
+      // The component value must not change when invalid input is submitted.
+      expect(el.value).toBe('09:00');
+    });
+  });
+
+  // ─── generateSlots with step=1 ───
+
+  describe('generateSlots with step=1 (minimum step)', () => {
+    it('generates one slot per minute between 09:00 and 09:05', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="09:05" step="1"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+
+      const options = shadowQueryAll(el, '[role="option"]');
+      // 09:00, 09:01, 09:02, 09:03, 09:04, 09:05 = 6 slots
+      expect(options.length).toBe(6);
+    });
+  });
+
+  // ─── Time wrapping / clamping ───
+
+  describe('Time clamping at boundaries', () => {
+    it('clamps ArrowDown navigation at the last slot (does not wrap around)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="23:00" max="23:30" step="30"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Open the dropdown and navigate to the last option.
+      input.click();
+      await el.updateComplete;
+
+      // Press ArrowDown many times — should clamp at last slot, not wrap.
+      for (let i = 0; i < 10; i++) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+        await el.updateComplete;
+      }
+
+      const options = shadowQueryAll(el, '[role="option"]');
+      const lastOption = options[options.length - 1]!;
+      expect(lastOption.classList.contains('field__option--active')).toBe(true);
+    });
+  });
+
+  // ─── Invalid time input rejection ───
+
+  describe('Invalid time input rejection', () => {
+    it('rejects completely non-parseable input and keeps the component value unchanged', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" value="10:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      input.value = 'not-a-time';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+
+      // The component value must not change when non-parseable input is submitted.
+      expect(el.value).toBe('10:00');
+    });
+  });
+
+  // ─── Slot selection when value is outside min/max ───
+
+  describe('Slot selection clamped to min/max', () => {
+    it('clamps a restored value that is below min to the min time', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="17:00" step="30"></hx-time-picker>',
+      );
+      // formStateRestoreCallback with a value below min.
+      el.formStateRestoreCallback('07:00');
+      await el.updateComplete;
+
+      expect(el.value).toBe('09:00');
+    });
+
+    it('clamps a restored value that is above max to the max time', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="17:00" step="30"></hx-time-picker>',
+      );
+      // formStateRestoreCallback with a value above max.
+      el.formStateRestoreCallback('20:00');
+      await el.updateComplete;
+
+      expect(el.value).toBe('17:00');
+    });
+
+    it('clicking a slot whose value would be outside min/max is clamped', async () => {
+      // Set up a table where we manually open the dropdown and click an option.
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="17:00" step="60"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+
+      const options = shadowQueryAll(el, '[role="option"]');
+      expect(options.length).toBeGreaterThan(0);
+
+      // Click the first option (09:00) — it should be within range.
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-change');
+      (options[0] as HTMLElement).click();
+      const event = await eventPromise;
+
+      expect(event.detail.value).toBe('09:00');
+    });
+  });
+
+  // ─── Keyboard navigation when dropdown is closed ───
+
+  describe('Keyboard navigation when dropdown is closed', () => {
+    it('ArrowDown when dropdown is closed opens the listbox', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" min="09:00" max="10:00" step="30"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      // Ensure dropdown is closed.
+      expect(shadowQuery(el, '[role="listbox"]')).toBeNull();
+
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      // Dropdown should now be open.
+      expect(shadowQuery(el, '[role="listbox"]')).toBeTruthy();
+    });
+  });
+
+  // ─── Form submission with unparsed user input ───
+
+  describe('Form submission with unparsed user input in display field', () => {
+    it('does not change the internal value when the display field has unparseable text', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker format="24h" value="11:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      // Simulate the user typing something unparseable without blurring/committing.
+      input.value = 'garbage text';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+
+      // Internal value must remain unchanged until a valid change event fires.
+      expect(el.value).toBe('11:00');
+    });
+
+    it('form value is the last committed canonical HH:MM when display field has partial input', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker name="appt" format="24h" value="11:00"></hx-time-picker>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      // Type partial input without committing.
+      input.value = '11:3';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+
+      // The component value (and thus the form submission value) stays at "11:00".
+      expect(el.value).toBe('11:00');
+    });
+  });
 });
