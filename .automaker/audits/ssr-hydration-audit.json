@@ -1,0 +1,184 @@
+{
+  "schema": "1.0.0",
+  "metadata": {
+    "scanDate": "2026-03-20",
+    "toolVersion": "claude-opus-4.6",
+    "totalComponents": 96,
+    "totalDirectories": 77,
+    "litVersion": "3.x",
+    "litLabsSsrStatus": "experimental",
+    "categorySummary": {
+      "ssr-safe": 61,
+      "needs-wrapper": 27,
+      "client-only": 8
+    },
+    "notes": "All HELiX components are Lit 3.x web components using Shadow DOM. Without @lit-labs/ssr, all components require client-side JavaScript. This audit categorizes components by their additional SSR constraints beyond the base Lit requirement. 'ssr-safe' means compatible with @lit-labs/ssr and Declarative Shadow DOM. 'needs-wrapper' means browser APIs accessed in lifecycle but guarded/deferred. 'client-only' means imperative DOM operations that require full browser environment."
+  },
+  "blockerSummary": {
+    "documentEventListeners": {
+      "description": "Components using document.addEventListener for outside-click/keyboard handling. Safe in lifecycle methods but break during SSR render.",
+      "components": ["hx-date-picker", "hx-popover", "hx-select", "hx-time-picker", "hx-nav", "hx-dropdown", "hx-split-button", "hx-color-picker", "hx-overflow-menu", "hx-combobox", "hx-drawer"]
+    },
+    "documentActiveElement": {
+      "description": "Components reading document.activeElement for focus management. Only in event handlers.",
+      "components": ["hx-action-bar", "hx-popover", "hx-dialog", "hx-side-nav", "hx-dropdown", "hx-split-button", "hx-tree-view", "hx-tabs", "hx-drawer", "hx-accordion", "hx-menu", "hx-tooltip"]
+    },
+    "documentCreateElement": {
+      "description": "Components imperatively creating DOM elements. Breaks SSR.",
+      "components": ["hx-toast", "hx-breadcrumb", "hx-tooltip", "hx-field"]
+    },
+    "windowMatchMedia": {
+      "description": "Components calling window.matchMedia() for prefers-reduced-motion or prefers-color-scheme.",
+      "components": ["hx-toast", "hx-carousel", "hx-theme", "hx-counter", "hx-drawer"]
+    },
+    "requestAnimationFrame": {
+      "description": "Components using requestAnimationFrame for animations or layout.",
+      "components": ["hx-split-panel", "hx-counter", "hx-slider"]
+    },
+    "mutationObserver": {
+      "description": "Components using MutationObserver for dynamic child tracking.",
+      "components": ["hx-tabs"]
+    },
+    "clipboardApi": {
+      "description": "Components using navigator.clipboard API.",
+      "components": ["hx-copy-button", "hx-code-snippet"]
+    },
+    "formAssociated": {
+      "description": "Components using static formAssociated = true with ElementInternals. SSR-safe with @lit-labs/ssr but needs client hydration for form participation.",
+      "components": ["hx-button", "hx-checkbox", "hx-checkbox-group", "hx-color-picker", "hx-combobox", "hx-date-picker", "hx-file-upload", "hx-icon-button", "hx-number-input", "hx-radio-group", "hx-rating", "hx-select", "hx-slider", "hx-switch", "hx-text-input", "hx-textarea", "hx-time-picker", "hx-toggle-button"]
+    }
+  },
+  "components": [
+    { "name": "hx-accordion", "category": "needs-wrapper", "blockers": ["document.activeElement in keyboard handler"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-accordion-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-action-bar", "category": "needs-wrapper", "blockers": ["document.activeElement in keyboard handler"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-alert", "category": "needs-wrapper", "blockers": ["document.querySelector for returnFocusTo"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-avatar", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "client:idle or client:visible", "nuxt": "direct usage" },
+    { "name": "hx-badge", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-banner", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "client:idle", "nuxt": "direct usage" },
+    { "name": "hx-breadcrumb", "category": "client-only", "blockers": ["document.createElement for ellipsis/button", "document.head.appendChild for JSON-LD"], "litLabsSsrCompatible": false, "nextjs": "'use client' required", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-breadcrumb-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-button", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-button-group", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-card", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-carousel", "category": "client-only", "blockers": ["window.matchMedia in connectedCallback", "setInterval for autoplay"], "litLabsSsrCompatible": false, "nextjs": "'use client' + ssr:false", "astro": "client:visible", "nuxt": "<ClientOnly>" },
+    { "name": "hx-carousel-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-checkbox", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-checkbox-group", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-code-snippet", "category": "needs-wrapper", "blockers": ["navigator.clipboard.writeText", "setTimeout for copy feedback"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-color-picker", "category": "client-only", "blockers": ["document.addEventListener for pointermove/pointerup", "Canvas 2D context"], "litLabsSsrCompatible": false, "nextjs": "'use client' + ssr:false", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-combobox", "category": "needs-wrapper", "blockers": ["document.addEventListener for outside click", "setTimeout for debounce"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-container", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-copy-button", "category": "needs-wrapper", "blockers": ["navigator.clipboard.writeText", "setTimeout for feedback"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "<ClientOnly>" },
+    { "name": "hx-counter", "category": "client-only", "blockers": ["window.matchMedia", "requestAnimationFrame animation"], "litLabsSsrCompatible": false, "nextjs": "'use client' + ssr:false", "astro": "client:visible", "nuxt": "<ClientOnly>" },
+    { "name": "hx-data-table", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:visible", "nuxt": "direct usage" },
+    { "name": "hx-date-picker", "category": "needs-wrapper", "blockers": ["document.addEventListener in updated()", "document.removeEventListener in disconnectedCallback"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-dialog", "category": "needs-wrapper", "blockers": ["document.activeElement for focus trap"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-divider", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-drawer", "category": "client-only", "blockers": ["window.matchMedia for reduced motion", "document.addEventListener for keydown", "document.body.children for inert", "document.activeElement for focus trap"], "litLabsSsrCompatible": false, "nextjs": "'use client' + ssr:false", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-dropdown", "category": "needs-wrapper", "blockers": ["document.addEventListener in open/close", "document.activeElement"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-field", "category": "needs-wrapper", "blockers": ["document.createElement in _ensureHelpText"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-field-label", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "direct usage" },
+    { "name": "hx-file-upload", "category": "needs-wrapper", "blockers": ["File API is browser-only"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-form", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-format-date", "category": "needs-wrapper", "blockers": ["document.documentElement.lang", "navigator.language"], "litLabsSsrCompatible": false, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-grid", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-help-text", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-icon", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-icon-button", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-image", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-link", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-list", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-list-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-menu", "category": "needs-wrapper", "blockers": ["document.activeElement in keyboard handler", "setTimeout for typeahead"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-menu-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-menu-divider", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-meter", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-nav", "category": "needs-wrapper", "blockers": ["window.location.href for URL comparison", "document.addEventListener for outside click"], "litLabsSsrCompatible": false, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-nav-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-number-input", "category": "needs-wrapper", "blockers": ["setTimeout/setInterval for long press repeat"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-overflow-menu", "category": "needs-wrapper", "blockers": ["document.addEventListener for outside click", "document.activeElement"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "<ClientOnly>" },
+    { "name": "hx-pagination", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "direct usage" },
+    { "name": "hx-popover", "category": "needs-wrapper", "blockers": ["document.addEventListener for click/keydown", "document.activeElement for focus trap", "setTimeout for show delay"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "<ClientOnly>" },
+    { "name": "hx-popup", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-progress-bar", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-progress-ring", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-prose", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-radio", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-radio-group", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-rating", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:visible", "nuxt": "direct usage" },
+    { "name": "hx-select", "category": "needs-wrapper", "blockers": ["document.addEventListener for outside click"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-side-nav", "category": "needs-wrapper", "blockers": ["document.activeElement in keyboard handler"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "<ClientOnly>" },
+    { "name": "hx-skeleton", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-slider", "category": "needs-wrapper", "blockers": ["requestAnimationFrame in connectedCallback"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-spinner", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-split-button", "category": "needs-wrapper", "blockers": ["document.addEventListener for outside click/keydown", "document.activeElement"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-split-panel", "category": "needs-wrapper", "blockers": ["requestAnimationFrame for layout"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-stack", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-stat", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-status-indicator", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-step", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-steps", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "client:idle", "nuxt": "direct usage" },
+    { "name": "hx-structured-list", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-switch", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-table", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-tbody", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-td", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-tfoot", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-th", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-thead", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-tr", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-tab", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-tab-panel", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-tabs", "category": "needs-wrapper", "blockers": ["document.activeElement in keyboard handler", "MutationObserver for child tracking"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-tag", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-text", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" },
+    { "name": "hx-text-input", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-textarea", "category": "needs-wrapper", "blockers": ["setTimeout for character count announcement"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-theme", "category": "client-only", "blockers": ["window.matchMedia in connectedCallback for system theme detection", "MediaQueryList listener"], "litLabsSsrCompatible": false, "nextjs": "'use client' + ssr:false", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-time-picker", "category": "needs-wrapper", "blockers": ["document.addEventListener for outside click"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-toast", "category": "client-only", "blockers": ["window.matchMedia for reduced motion", "document.querySelector/createElement/body.appendChild"], "litLabsSsrCompatible": false, "nextjs": "'use client' + ssr:false", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-toast-stack", "category": "client-only", "blockers": ["created imperatively by toast-factory on document.body"], "litLabsSsrCompatible": false, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-toggle-button", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "direct usage" },
+    { "name": "hx-tooltip", "category": "needs-wrapper", "blockers": ["document.createElement for light DOM description span", "document.activeElement in hide", "setTimeout for delays"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "<ClientOnly>" },
+    { "name": "hx-top-nav", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:idle", "nuxt": "direct usage" },
+    { "name": "hx-tree-item", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "follows parent", "astro": "follows parent", "nuxt": "follows parent" },
+    { "name": "hx-tree-view", "category": "needs-wrapper", "blockers": ["document.activeElement in keyboard handler"], "litLabsSsrCompatible": true, "nextjs": "'use client' boundary", "astro": "client:load", "nuxt": "<ClientOnly>" },
+    { "name": "hx-visually-hidden", "category": "ssr-safe", "blockers": [], "litLabsSsrCompatible": true, "nextjs": "dynamic import", "astro": "no directive needed", "nuxt": "direct usage" }
+  ],
+  "sharedStrategies": {
+    "nextjs-app-router": {
+      "description": "Next.js 15 App Router SSR strategy for HELiX web components",
+      "pattern": "All HELiX components require 'use client' boundary since they register custom elements. Create a ClientComponents wrapper that imports and re-exports components.",
+      "recommendation": "Use dynamic imports with next/dynamic for code splitting. Place 'use client' at the boundary component level, not at each individual component usage.",
+      "hydrationWarningFix": "No crypto.randomUUID() usage in codebase. Module-level counters produce deterministic IDs. No suppressHydrationWarning needed."
+    },
+    "astro-islands": {
+      "description": "Astro 5 island architecture for HELiX web components",
+      "pattern": "Use client:load for interactive components, client:idle for non-critical interactive, client:visible for below-fold, and no directive for SSR-safe display-only components (with @lit-labs/ssr).",
+      "recommendation": "Create wrapper .astro components that handle the client directive selection based on component category from this audit."
+    },
+    "nuxt-ssr": {
+      "description": "Nuxt 4 SSR strategy for HELiX web components",
+      "pattern": "Register components in a .client.ts plugin to ensure they only load client-side. Use <ClientOnly> wrapper for client-only components. Use defineNuxtPlugin with mode: 'client'.",
+      "recommendation": "Create a composable useSsrSafe() that checks typeof window for conditional rendering."
+    },
+    "lit-labs-ssr": {
+      "description": "@lit-labs/ssr compatibility for Declarative Shadow DOM",
+      "status": "experimental",
+      "compatible": "61 of 96 components are fully @lit-labs/ssr compatible (ssr-safe). 27 are compatible with client hydration guards. 8 require client-only rendering.",
+      "recommendation": "For maximum SSR benefit, use @lit-labs/ssr with Declarative Shadow DOM for display-only components. Interactive components should hydrate client-side."
+    }
+  },
+  "tripPlannerRecommendations": {
+    "context": "Trip-planner team uses Next.js 15 App Router. Primary hydration issues are with interactive form components and theme provider.",
+    "recommendations": [
+      "Create a single 'use client' boundary component that imports all HELiX components used in the app",
+      "Use next/dynamic with ssr: false for hx-toast, hx-drawer, hx-carousel, hx-counter, hx-color-picker, and hx-theme",
+      "For hx-theme: pass explicit theme='light' or theme='dark' prop instead of relying on system detection to avoid matchMedia SSR error",
+      "Module-level counters in form components (hx-text-input, hx-select, etc.) are already SSR-safe — no crypto.randomUUID() warnings",
+      "Wrap interactive form sections in React Suspense boundaries for streaming SSR",
+      "Do NOT use suppressHydrationWarning — all hydration mismatches in HELiX have been resolved via module-level counters"
+    ]
+  }
+}
