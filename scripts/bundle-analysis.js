@@ -19,8 +19,9 @@ import { readdirSync, existsSync, mkdirSync, writeFileSync, readFileSync } from 
 import { resolve, dirname } from 'path';
 import { gzipSync } from 'zlib';
 import { fileURLToPath } from 'url';
+import { Buffer } from 'buffer';
 
-const esbuild = await import('/Volumes/Development/booked/helix/node_modules/esbuild/lib/main.js');
+const esbuild = await import('esbuild');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -134,7 +135,7 @@ async function measureComponent(componentName) {
     // Extract dependencies from metafile (internal only)
     const inputs = rawResult.metafile?.inputs || {};
     const deps = [];
-    for (const [inputPath, inputData] of Object.entries(inputs)) {
+    for (const inputData of Object.values(inputs)) {
       for (const imp of inputData.imports || []) {
         if (!imp.external && imp.path && !imp.path.includes(`/${componentName}/`)) {
           const relPath = imp.path.replace(ROOT + '/', '');
@@ -529,7 +530,7 @@ function validateSideEffects() {
  * Methodology: These are documented published sizes from public registries,
  * not measured directly. Limitations are noted per component.
  */
-function buildCompetitorBenchmarks(helixComponents, helixGzip) {
+function buildCompetitorBenchmarks(helixComponents) {
   return {
     helix: {
       componentCount: 5,
@@ -639,11 +640,6 @@ async function main() {
 
   // Step 5: Deduplication analysis
   logAlways('Step 5/8: Analyzing deduplication...');
-  const avgComponentGzip =
-    validComponents.length > 0
-      ? Math.round(validComponents.reduce((s, r) => s + r.gzipSize, 0) / validComponents.length)
-      : 0;
-
   const deduplicationRatio =
     sumOfIndividual > 0 ? Math.round((bulkResult.minifiedSize / sumOfIndividual) * 100) / 100 : 1;
 
@@ -661,7 +657,7 @@ async function main() {
 
   // Step 8: Competitor benchmarks
   logAlways('Step 8/8: Building competitor benchmarks...');
-  const benchmarks = buildCompetitorBenchmarks(selectiveResult, selectiveResult.gzipSize);
+  const benchmarks = buildCompetitorBenchmarks(selectiveResult);
 
   // ---------------------------------------------------------------------------
   // Build visualization data
