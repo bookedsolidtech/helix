@@ -34,6 +34,10 @@
       "dependsOn": ["^build"],
       "outputs": ["custom-elements.json"]
     },
+    "generate": {
+      "dependsOn": ["^cem"],
+      "outputs": ["packages/hx-react/src/components/**"]
+    },
     "storybook:build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
