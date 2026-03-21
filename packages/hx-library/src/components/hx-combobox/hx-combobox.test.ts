@@ -916,4 +916,247 @@ describe('hx-combobox', () => {
       expect(el.labelRemoveOption('Pomme')).toBe('Supprimer Pomme');
     });
   });
+
+  // ─── Multiple Selection: edge cases (3) ─────────────────────────────────
+
+  describe('Multiple Selection: edge cases', () => {
+    it('handles trailing commas in value without creating empty selections', async () => {
+      // _selectedValuesSet uses .split(',').filter(Boolean) — trailing/double commas produce no empty entries.
+      const el = await fixture<HxCombobox>(withOptions('multiple'));
+      // Directly set a value with trailing comma and double comma.
+      el.value = 'apple,,banana,';
+      await el.updateComplete;
+
+      // Only two real values should be represented as chips.
+      const chips = el.shadowRoot?.querySelectorAll('.field__chip');
+      expect(chips?.length).toBe(2);
+    });
+
+    it('empty value string in multiple mode produces no chips', async () => {
+      const el = await fixture<HxCombobox>(withOptions('multiple value=""'));
+      await el.updateComplete;
+
+      const chips = el.shadowRoot?.querySelectorAll('.field__chip');
+      expect(chips?.length ?? 0).toBe(0);
+    });
+
+    it('form value is null when multiple=true and no option is selected', async () => {
+      // _updateFormValue calls setFormValue(this.value || null).
+      // With value='', setFormValue(null) is called — FormData should contain no entry.
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-combobox name="fruit" multiple>
+          <option slot="option" value="apple">Apple</option>
+        </hx-combobox>
+      `;
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-combobox') as HxCombobox;
+      await el.updateComplete;
+
+      // No selection — value is ''.
+      expect(el.value).toBe('');
+      const data = new FormData(form);
+      // When setFormValue(null) is called, the field does not appear in FormData.
+      expect(data.get('fruit')).toBeNull();
+      form.remove();
+    });
+  });
+
+  // ─── Filter: special regex characters in labels (1) ─────────────────────
+
+  describe('Filter: special regex characters in option labels', () => {
+    it('does not throw when filtering options with special characters in labels', async () => {
+      // _filteredOptions uses String.includes, not RegExp — special chars are safe.
+      const el = await fixture<HxCombobox>(`
+        <hx-combobox label="Tech">
+          <option slot="option" value="cpp">C++</option>
+          <option slot="option" value="item1">Item (1)</option>
+          <option slot="option" value="dot">file.ext</option>
+        </hx-combobox>
+      `);
+      await el.updateComplete;
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+
+      let threw = false;
+      try {
+        // Type "C++" which would break a naive regex implementation.
+        input.value = 'C++';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        await el.updateComplete;
+      } catch {
+        threw = true;
+      }
+
+      expect(threw).toBe(false);
+
+      // Should find the C++ option by label.
+      const options = el.shadowRoot?.querySelectorAll('[role="option"]');
+      expect(options?.length).toBe(1);
+    });
+
+    it('does not throw when filtering with parentheses in label', async () => {
+      const el = await fixture<HxCombobox>(`
+        <hx-combobox label="Items">
+          <option slot="option" value="item1">Item (1)</option>
+          <option slot="option" value="item2">Item (2)</option>
+        </hx-combobox>
+      `);
+      await el.updateComplete;
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+
+      let threw = false;
+      try {
+        input.value = 'Item (1)';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        await el.updateComplete;
+      } catch {
+        threw = true;
+      }
+
+      expect(threw).toBe(false);
+      const options = el.shadowRoot?.querySelectorAll('[role="option"]');
+      expect(options?.length).toBe(1);
+    });
+  });
+
+  // ─── filterDebounce === 0: immediate filter (1) ──────────────────────────
+
+  describe('filterDebounce === 0: immediate emission', () => {
+    it('fires hx-input immediately without debounce when filterDebounce is 0', async () => {
+      // The default filterDebounce is 0 — _emitInput() is called synchronously in _handleInput.
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      let eventFired = false;
+      el.addEventListener('hx-input', () => {
+        eventFired = true;
+      });
+
+      input.value = 'app';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      // No await needed — event fires synchronously (no setTimeout with filterDebounce=0).
+
+      expect(eventFired).toBe(true);
+    });
+  });
+
+  // ─── Keyboard navigation when all options filtered out (1) ───────────────
+
+  describe('Keyboard navigation: all options filtered out', () => {
+    it('arrow keys do not throw when all options are filtered out', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      // Filter to show nothing.
+      input.value = 'zzz';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+
+      // Verify no options visible.
+      const options = el.shadowRoot?.querySelectorAll('[role="option"]');
+      expect(options?.length ?? 0).toBe(0);
+
+      let threw = false;
+      try {
+        // Arrow keys with empty enabledIndices should not throw.
+        input.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+        );
+        await el.updateComplete;
+        input.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }),
+        );
+        await el.updateComplete;
+        input.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }),
+        );
+        await el.updateComplete;
+        input.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }),
+        );
+        await el.updateComplete;
+      } catch {
+        threw = true;
+      }
+
+      expect(threw).toBe(false);
+    });
+
+    it('Enter key does nothing when all options filtered out', async () => {
+      const el = await fixture<HxCombobox>(withOptions());
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+
+      // Open, then filter to nothing.
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+      input.value = 'zzz';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+
+      const valueBefore = el.value;
+
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+
+      // Value should be unchanged — no option was selected.
+      expect(el.value).toBe(valueBefore);
+    });
+  });
+
+  // ─── Slot projection: option elements recognised (1) ─────────────────────
+
+  describe('Slot projection: option element recognition', () => {
+    it('slotted option elements are parsed into internal option models', async () => {
+      const el = await fixture<HxCombobox>(`
+        <hx-combobox label="Fruit">
+          <option slot="option" value="mango">Mango</option>
+          <option slot="option" value="papaya">Papaya</option>
+        </hx-combobox>
+      `);
+      await el.updateComplete;
+
+      // Open the dropdown to render options.
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+
+      const renderedOptions = el.shadowRoot?.querySelectorAll('[role="option"]');
+      expect(renderedOptions?.length).toBe(2);
+
+      // Verify labels match slotted content.
+      const labels = Array.from(renderedOptions ?? []).map(
+        (o) => o.querySelector('.field__option-label')?.textContent?.trim(),
+      );
+      expect(labels).toContain('Mango');
+      expect(labels).toContain('Papaya');
+    });
+
+    it('disabled slotted options are reflected as aria-disabled in the listbox', async () => {
+      const el = await fixture<HxCombobox>(`
+        <hx-combobox label="Fruit">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="durian" disabled>Durian</option>
+        </hx-combobox>
+      `);
+      await el.updateComplete;
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new Event('focus'));
+      await el.updateComplete;
+
+      const disabledOption = el.shadowRoot?.querySelector('[role="option"][aria-disabled="true"]');
+      expect(disabledOption).toBeTruthy();
+      expect(disabledOption?.querySelector('.field__option-label')?.textContent?.trim()).toBe(
+        'Durian',
+      );
+    });
+  });
 });
