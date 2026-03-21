@@ -1,0 +1,1563 @@
+{
+  "audit": "Design Token Compliance Audit",
+  "version": "2.0.0",
+  "date": "2026-03-19",
+  "auditor": "design-system-developer",
+  "scope": "packages/hx-library/src/components/** + src/styles/form/**",
+  "tokenSource": "packages/hx-tokens/src/tokens.json",
+  "summary": {
+    "totalFindings": 142,
+    "bySeverity": {
+      "critical": 18,
+      "high": 47,
+      "medium": 42,
+      "low": 35
+    },
+    "byCategory": {
+      "hardcoded-colors": 22,
+      "hardcoded-spacing": 14,
+      "hardcoded-typography": 8,
+      "hardcoded-radius": 6,
+      "hardcoded-shadows": 3,
+      "hardcoded-transitions": 16,
+      "missing-fallback-cascade": 28,
+      "inconsistent-prefix": 24,
+      "magic-numbers": 21
+    },
+    "componentsAudited": 48,
+    "componentsClean": 18,
+    "componentsDirty": 30
+  },
+  "findings": [
+    {
+      "id": "DT-001",
+      "severity": "critical",
+      "category": "hardcoded-colors",
+      "component": "hx-button",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.styles.ts",
+      "line": 184,
+      "description": "Hardcoded #ffffff in inverted variant background breaks theming for dark mode consumers",
+      "currentValue": "background-color: #ffffff;",
+      "fix": "Use var(--hx-button-inverted-bg, var(--hx-color-neutral-0, #ffffff))"
+    },
+    {
+      "id": "DT-002",
+      "severity": "critical",
+      "category": "hardcoded-colors",
+      "component": "hx-button",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.styles.ts",
+      "line": 197,
+      "description": "Hardcoded rgba(255,255,255,...) in inverted primary variant hover state",
+      "currentValue": "rgba(255, 255, 255, 0.9)",
+      "fix": "Use color-mix(in srgb, var(--hx-color-neutral-0) 90%, transparent) or a component token"
+    },
+    {
+      "id": "DT-003",
+      "severity": "critical",
+      "category": "hardcoded-colors",
+      "component": "hx-button",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.styles.ts",
+      "line": 207,
+      "description": "Multiple hardcoded rgba(255,255,255,...) values across inverted variant styles (lines 207, 211, 216, 221, 231, 236, 240)",
+      "currentValue": "rgba(255, 255, 255, 0.15) through rgba(255, 255, 255, 0.9)",
+      "fix": "Define --hx-button-inverted-hover-bg, --hx-button-inverted-active-bg tokens with color-mix fallbacks"
+    },
+    {
+      "id": "DT-004",
+      "severity": "critical",
+      "category": "hardcoded-colors",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.styles.ts",
+      "line": 112,
+      "description": "Hardcoded #000 and #fff throughout color picker (gradient overlays, borders, backgrounds). While hue gradients are necessarily hardcoded, the UI chrome colors should use tokens",
+      "currentValue": "#000, #fff, linear-gradient(to bottom, transparent, #000)",
+      "fix": "Replace UI chrome #000/#fff with var(--hx-color-neutral-900)/ var(--hx-color-neutral-0). Gradient overlays for the color area are acceptable as hardcoded."
+    },
+    {
+      "id": "DT-005",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-spacing-* tokens extensively which do NOT exist in the token system. The correct prefix is --hx-space-*. All spacing references resolve to nothing.",
+      "currentValue": "--hx-spacing-3, --hx-spacing-4, --hx-spacing-5, --hx-spacing-6, --hx-spacing-8",
+      "fix": "Replace all --hx-spacing-N with --hx-space-N (e.g., --hx-spacing-4 -> --hx-space-4)"
+    },
+    {
+      "id": "DT-006",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-duration-200, --hx-duration-300, --hx-ease-out which do not exist. Correct tokens are --hx-duration-normal, --hx-duration-slow, --hx-easing-out",
+      "currentValue": "--hx-duration-200, --hx-duration-300, --hx-ease-out",
+      "fix": "Replace with --hx-duration-normal (250ms), --hx-duration-slow (400ms), --hx-easing-out"
+    },
+    {
+      "id": "DT-007",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-border-width-1 (does not exist), --hx-line-height-snug (does not exist), --hx-line-height-none (does not exist), --hx-size-128 (does not exist)",
+      "currentValue": "--hx-border-width-1, --hx-line-height-snug, --hx-line-height-none, --hx-size-128",
+      "fix": "Use --hx-border-width-thin, --hx-line-height-tight (1.25), --hx-line-height-none does not exist (use 1 literal with fallback), define --hx-dialog-max-width for the 32rem value"
+    },
+    {
+      "id": "DT-008",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-spacing-* tokens throughout which do not exist. Same issue as hx-dialog.",
+      "currentValue": "--hx-spacing-3, --hx-spacing-4, --hx-spacing-5, --hx-spacing-6",
+      "fix": "Replace all --hx-spacing-N with --hx-space-N"
+    },
+    {
+      "id": "DT-009",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-duration-300, --hx-ease-out, --hx-border-width-1 which do not exist",
+      "currentValue": "--hx-duration-300, --hx-ease-out, --hx-border-width-1",
+      "fix": "Use --hx-duration-slow, --hx-easing-out, --hx-border-width-thin"
+    },
+    {
+      "id": "DT-010",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-pagination",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-spacing-* instead of --hx-space-*, and references non-existent shorthand tokens --hx-color-border, --hx-color-surface, --hx-color-primary, --hx-color-surface-hover",
+      "currentValue": "--hx-spacing-2, --hx-spacing-3, --hx-color-border, --hx-color-surface, --hx-color-surface-hover",
+      "fix": "Replace --hx-spacing-N with --hx-space-N. Replace --hx-color-border with --hx-color-neutral-200, --hx-color-surface with --hx-color-neutral-0, --hx-color-primary with --hx-color-primary-500"
+    },
+    {
+      "id": "DT-011",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-stack",
+      "file": "packages/hx-library/src/components/hx-stack/hx-stack.styles.ts",
+      "line": "multiple",
+      "description": "All gap values use --hx-spacing-* which resolves to nothing.",
+      "currentValue": "--hx-spacing-0 through --hx-spacing-16",
+      "fix": "Replace all --hx-spacing-N with --hx-space-N"
+    },
+    {
+      "id": "DT-012",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-meter",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-radius-full (does not exist, should be --hx-border-radius-full) and --hx-color-danger-500/--hx-color-danger-700 (do not exist, should be --hx-color-error-500/--hx-color-error-700)",
+      "currentValue": "--hx-radius-full, --hx-color-danger-500, --hx-color-danger-700",
+      "fix": "Use --hx-border-radius-full (9999px), --hx-color-error-500, --hx-color-error-700"
+    },
+    {
+      "id": "DT-013",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.styles.ts",
+      "line": [93, 104],
+      "description": "Uses --hx-color-white which does not exist in the token system",
+      "currentValue": "--hx-color-white",
+      "fix": "Use --hx-color-neutral-0 (#ffffff)"
+    },
+    {
+      "id": "DT-014",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-text",
+      "file": "packages/hx-library/src/components/hx-text/hx-text.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-font-weight-regular which does not exist in the token system",
+      "currentValue": "--hx-font-weight-regular",
+      "fix": "Use --hx-font-weight-normal (400)"
+    },
+    {
+      "id": "DT-015",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.styles.ts",
+      "line": 7,
+      "description": "Uses --hx-font-family-base which does not exist in the token system",
+      "currentValue": "--hx-font-family-base",
+      "fix": "Use --hx-font-family-sans"
+    },
+    {
+      "id": "DT-016",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-field-label",
+      "file": "packages/hx-library/src/components/hx-field-label/hx-field-label.styles.ts",
+      "line": 21,
+      "description": "Uses --hx-color-danger which does not exist. Should use --hx-color-error-* tokens",
+      "currentValue": "--hx-color-danger",
+      "fix": "Use --hx-color-error-text (#b91c1c) or --hx-color-error-500"
+    },
+    {
+      "id": "DT-017",
+      "severity": "critical",
+      "category": "inconsistent-prefix",
+      "component": "hx-popup",
+      "file": "packages/hx-library/src/components/hx-popup/hx-popup.styles.ts",
+      "line": 24,
+      "description": "Uses --hx-color-surface-overlay which does not exist in the token system",
+      "currentValue": "var(--hx-arrow-color, var(--hx-color-surface-overlay, #ffffff))",
+      "fix": "Use --hx-color-neutral-0 as the fallback semantic token"
+    },
+    {
+      "id": "DT-018",
+      "severity": "critical",
+      "category": "hardcoded-colors",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.styles.ts",
+      "line": "multiple",
+      "description": "z-index: 100 hardcoded for modal overlay without using --hx-z-index-modal token (1400)",
+      "currentValue": "z-index: 100",
+      "fix": "Use var(--hx-z-index-modal, 1400)"
+    },
+    {
+      "id": "DT-019",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-tooltip",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.styles.ts",
+      "line": 14,
+      "description": "Hardcoded transition duration 0.15s and z-index 9999",
+      "currentValue": "transition: opacity 0.15s ease, visibility 0.15s ease; z-index: 9999",
+      "fix": "Use var(--hx-transition-fast, 150ms ease) for transition. Use var(--hx-z-index-tooltip, 9999) for z-index"
+    },
+    {
+      "id": "DT-020",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-tooltip",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 280px max-width, 8px arrow size without component tokens",
+      "currentValue": "max-width: 280px; width: 8px (arrow)",
+      "fix": "Use var(--hx-tooltip-max-width, 280px) and var(--hx-tooltip-arrow-size, 8px)"
+    },
+    {
+      "id": "DT-021",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.styles.ts",
+      "line": 33,
+      "description": "Hardcoded 0.2s transition duration",
+      "currentValue": "var(--hx-popover-transition-duration, 0.2s)",
+      "fix": "Use var(--hx-popover-transition-duration, var(--hx-duration-normal, 250ms)) for proper token cascade"
+    },
+    {
+      "id": "DT-022",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.styles.ts",
+      "line": [17, 51],
+      "description": "Hardcoded 320px max-width and 10px arrow size without semantic token fallbacks",
+      "currentValue": "max-width: var(--hx-popover-max-width, 320px); width: var(--hx-popover-arrow-size, 10px)",
+      "fix": "These use component tokens with raw fallbacks. Acceptable pattern but would benefit from --hx-size-* or documented defaults"
+    },
+    {
+      "id": "DT-023",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 0.15s transition duration without token reference",
+      "currentValue": "transition: opacity 0.15s ease",
+      "fix": "Use var(--hx-transition-fast, 150ms ease)"
+    },
+    {
+      "id": "DT-024",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.styles.ts",
+      "line": 12,
+      "description": "opacity: 0.5 hardcoded without --hx-opacity-disabled token",
+      "currentValue": "opacity: 0.5",
+      "fix": "Use var(--hx-opacity-disabled, 0.5)"
+    },
+    {
+      "id": "DT-025",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 160px min-width, 1px border without border-width token",
+      "currentValue": "min-width: 160px; border: 1px solid",
+      "fix": "Use var(--hx-dropdown-min-width, 10rem) and var(--hx-border-width-thin, 1px)"
+    },
+    {
+      "id": "DT-026",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-tag",
+      "file": "packages/hx-library/src/components/hx-tag/hx-tag.styles.ts",
+      "line": 9,
+      "description": "opacity: 0.5 hardcoded without --hx-opacity-disabled token",
+      "currentValue": "opacity: 0.5",
+      "fix": "Use var(--hx-opacity-disabled, 0.5)"
+    },
+    {
+      "id": "DT-027",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-tag",
+      "file": "packages/hx-library/src/components/hx-tag/hx-tag.styles.ts",
+      "line": 26,
+      "description": "border: 1px solid without using --hx-border-width-thin token",
+      "currentValue": "border: 1px solid var(--hx-tag-border-color, ...)",
+      "fix": "Use border: var(--hx-border-width-thin, 1px) solid var(--hx-tag-border-color, ...)"
+    },
+    {
+      "id": "DT-028",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-accordion-item",
+      "file": "packages/hx-library/src/components/hx-accordion-item/hx-accordion-item.styles.ts",
+      "line": 105,
+      "description": "opacity: 0.5 hardcoded without --hx-opacity-disabled token",
+      "currentValue": "opacity: 0.5",
+      "fix": "Use var(--hx-opacity-disabled, 0.5)"
+    },
+    {
+      "id": "DT-029",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-progress-bar",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.styles.ts",
+      "line": 60,
+      "description": "Hardcoded transition: width 0.2s ease without token",
+      "currentValue": "transition: width 0.2s ease",
+      "fix": "Use transition: width var(--hx-duration-normal, 250ms) var(--hx-easing-default, ease)"
+    },
+    {
+      "id": "DT-030",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-progress-bar",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 1.5s animation duration, 0.4 opacity in indeterminate animation",
+      "currentValue": "animation: indeterminate 1.5s infinite; opacity: 0.4",
+      "fix": "Use var(--hx-progress-bar-animation-duration, 1.5s) and var(--hx-progress-bar-indeterminate-opacity, 0.4)"
+    },
+    {
+      "id": "DT-031",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 72,
+      "description": "Hardcoded transition: background-color 0.15s ease without token",
+      "currentValue": "transition: background-color 0.15s ease",
+      "fix": "Use transition: background-color var(--hx-duration-fast, 150ms) var(--hx-easing-default, ease)"
+    },
+    {
+      "id": "DT-032",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": [124, 137, 138, 139, 144],
+      "description": "Hardcoded 4px gap, 20px button width/height, 8px font-size, 2px border, 50% border-radius in collapse controls",
+      "currentValue": "gap: 4px; width: 20px; height: 20px; font-size: 8px; border: 2px solid; border-radius: 50%",
+      "fix": "Use component tokens: --hx-split-panel-collapse-size, --hx-split-panel-collapse-gap. Use var(--hx-border-radius-full, 9999px) instead of 50%"
+    },
+    {
+      "id": "DT-033",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 135,
+      "description": "Hardcoded border: 2px solid var(--hx-color-neutral-0) without border-width token",
+      "currentValue": "border: 2px solid var(--hx-color-neutral-0)",
+      "fix": "Use border: var(--hx-border-width-medium, 2px) solid var(--hx-color-neutral-0)"
+    },
+    {
+      "id": "DT-034",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.styles.ts",
+      "line": "multiple",
+      "description": "Extensive hardcoded pixel values: 12px, 16px, 20px, 24px, 260px, 160px, 6px border-radius, 8px font-size, 50% border-radius",
+      "currentValue": "Multiple raw pixel values throughout",
+      "fix": "Replace with --hx-space-* and --hx-size-* tokens. Use --hx-border-radius-* tokens. Define component tokens for picker-specific dimensions"
+    },
+    {
+      "id": "DT-035",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 0.15s transitions throughout",
+      "currentValue": "transition: ... 0.15s ease",
+      "fix": "Use var(--hx-transition-fast, 150ms ease)"
+    },
+    {
+      "id": "DT-036",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-pagination",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.styles.ts",
+      "line": "multiple",
+      "description": "opacity: 0.4 hardcoded, 1px border without token, 2.25rem button size hardcoded",
+      "currentValue": "opacity: 0.4; border: 1px solid; width: 2.25rem; height: 2.25rem",
+      "fix": "Use var(--hx-opacity-disabled, 0.5), var(--hx-border-width-thin, 1px), var(--hx-pagination-button-size, var(--hx-size-9, 2.25rem))"
+    },
+    {
+      "id": "DT-037",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-steps",
+      "file": "packages/hx-library/src/components/hx-steps/hx-steps.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 2px connector height, step indicator sizes (2rem, 1.5rem, 2.5rem) without component tokens",
+      "currentValue": "height: 2px; width: 2rem (indicator); outline: 2px solid",
+      "fix": "Use var(--hx-steps-connector-height, var(--hx-border-width-medium, 2px)), var(--hx-steps-indicator-size, 2rem), var(--hx-focus-ring-width, 2px)"
+    },
+    {
+      "id": "DT-038",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-step",
+      "file": "packages/hx-library/src/components/hx-step/hx-step.styles.ts",
+      "line": 168,
+      "description": "opacity: 0.5 hardcoded without --hx-opacity-disabled token",
+      "currentValue": "opacity: 0.5",
+      "fix": "Use var(--hx-opacity-disabled, 0.5)"
+    },
+    {
+      "id": "DT-039",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-image",
+      "file": "packages/hx-library/src/components/hx-image/hx-image.styles.ts",
+      "line": [36, 38],
+      "description": "Hardcoded 0.5rem padding and 0.875rem font-size for caption without tokens",
+      "currentValue": "padding: 0.5rem 0 0; font-size: 0.875rem",
+      "fix": "Use var(--hx-space-2, 0.5rem) and var(--hx-font-size-sm, 0.875rem)"
+    },
+    {
+      "id": "DT-040",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-skeleton",
+      "file": "packages/hx-library/src/components/hx-skeleton/hx-skeleton.styles.ts",
+      "line": [52],
+      "description": "Hardcoded 0.5em gap, 2.5rem circle default size",
+      "currentValue": "gap: 0.5em; --hx-skeleton-circle-size default 2.5rem",
+      "fix": "Use var(--hx-space-2, 0.5rem) for gap. The circle size uses a component token already but the fallback should reference --hx-size-10"
+    },
+    {
+      "id": "DT-041",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-file-upload",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.styles.ts",
+      "line": 201,
+      "description": "Hardcoded height: 4px for progress track without token",
+      "currentValue": "height: 4px",
+      "fix": "Use var(--hx-file-upload-progress-height, var(--hx-space-1, 0.25rem))"
+    },
+    {
+      "id": "DT-042",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-textarea",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.styles.ts",
+      "line": "focus-ring",
+      "description": "Hardcoded rgba(37, 99, 235, ...) and rgba(220, 53, 69, ...) in focus ring fallbacks",
+      "currentValue": "rgba(37, 99, 235, 0.25), rgba(220, 53, 69, 0.25)",
+      "fix": "Use color-mix(in srgb, var(--hx-focus-ring-color) calc(var(--hx-focus-ring-opacity) * 100%), transparent)"
+    },
+    {
+      "id": "DT-043",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 1.25rem clear button, 1rem loading spinner, 1.5rem chip height, 8rem/12rem chip widths, 2px spinner border, 50% border-radius, 0.7s animation",
+      "currentValue": "Multiple raw values",
+      "fix": "Define component tokens --hx-combobox-clear-size, --hx-combobox-spinner-size, --hx-combobox-chip-height. Use --hx-border-radius-full for circles. Use var(--hx-duration-slow) for animation"
+    },
+    {
+      "id": "DT-044",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded 0.2rem offset, 0.25rem dot size, 0.05em letter-spacing, -0.25rem animation offset",
+      "currentValue": "Various raw dimension values",
+      "fix": "Use --hx-space-* tokens or define component tokens for date-picker-specific dimensions"
+    },
+    {
+      "id": "DT-045",
+      "severity": "high",
+      "category": "magic-numbers",
+      "component": "hx-nav-item",
+      "file": "packages/hx-library/src/components/hx-nav-item/hx-nav-item.styles.ts",
+      "line": 160,
+      "description": "Hardcoded max-height: 62.5rem magic number for submenu collapse animation",
+      "currentValue": "max-height: 62.5rem",
+      "fix": "Define var(--hx-nav-item-submenu-max-height, 62.5rem)"
+    },
+    {
+      "id": "DT-046",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-nav-item",
+      "file": "packages/hx-library/src/components/hx-nav-item/hx-nav-item.styles.ts",
+      "line": 91,
+      "description": "opacity: 0.4 hardcoded without token",
+      "currentValue": "opacity: 0.4",
+      "fix": "Use var(--hx-opacity-disabled, 0.5) or define --hx-nav-item-disabled-opacity"
+    },
+    {
+      "id": "DT-047",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.styles.ts",
+      "line": 12,
+      "description": "opacity: 0.4 for disabled state does not match the standard --hx-opacity-disabled (0.5) value",
+      "currentValue": "opacity: var(--hx-opacity-disabled, 0.4)",
+      "fix": "Change fallback to 0.5 to match token system default: var(--hx-opacity-disabled, 0.5)"
+    },
+    {
+      "id": "DT-048",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.styles.ts",
+      "line": 75,
+      "description": "min-width: 160px hardcoded in panel without semantic token fallback",
+      "currentValue": "var(--hx-overflow-menu-panel-min-width, 160px)",
+      "fix": "Use var(--hx-overflow-menu-panel-min-width, var(--hx-size-40, 10rem)) for proper cascade"
+    },
+    {
+      "id": "DT-049",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.styles.ts",
+      "line": 77,
+      "description": "border shorthand uses raw 1px instead of --hx-border-width-thin token in component token fallback",
+      "currentValue": "var(--hx-overflow-menu-panel-border, 1px solid var(--hx-color-neutral-200, #e5e7eb))",
+      "fix": "Use var(--hx-overflow-menu-panel-border, var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb))"
+    },
+    {
+      "id": "DT-050",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.styles.ts",
+      "line": "drawer-size",
+      "description": "30rem drawer size hardcoded without token reference",
+      "currentValue": "width: 30rem / height: 30rem",
+      "fix": "Define var(--hx-drawer-size, 30rem)"
+    },
+    {
+      "id": "DT-051",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-field",
+      "file": "packages/hx-library/src/components/hx-field/hx-field.styles.ts",
+      "line": 36,
+      "description": "min-width: 8rem hardcoded for inline label without token",
+      "currentValue": "min-width: 8rem",
+      "fix": "Use var(--hx-field-label-min-width, var(--hx-size-32, 8rem))"
+    },
+    {
+      "id": "DT-052",
+      "severity": "high",
+      "category": "missing-fallback-cascade",
+      "component": "hx-field",
+      "file": "packages/hx-library/src/components/hx-field/hx-field.styles.ts",
+      "line": [117, 118],
+      "description": "Error outline uses hardcoded 2px width and 2px offset without focus-ring tokens",
+      "currentValue": "outline: 2px solid var(...); outline-offset: 2px",
+      "fix": "Use outline: var(--hx-focus-ring-width, 2px) solid var(...); outline-offset: var(--hx-focus-ring-offset, 2px)"
+    },
+    {
+      "id": "DT-053",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-checkbox-group",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.styles.ts",
+      "line": [9, 25, 26, 34, 35, 36, 38, 40, 45, 70, 72],
+      "description": "Multiple bare token references without raw value fallbacks (e.g., var(--hx-opacity-disabled) with no fallback, var(--hx-space-2) with no fallback)",
+      "currentValue": "var(--hx-opacity-disabled), var(--hx-space-2), var(--hx-font-family-sans), etc.",
+      "fix": "Add fallback values: var(--hx-opacity-disabled, 0.5), var(--hx-space-2, 0.5rem), var(--hx-font-family-sans, sans-serif)"
+    },
+    {
+      "id": "DT-054",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-icon-button",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.styles.ts",
+      "line": "multiple",
+      "description": "Many token references used WITHOUT fallback values. If the token CSS is not loaded, all values resolve to initial",
+      "currentValue": "var(--hx-border-width-thin), var(--hx-border-radius-md), var(--hx-font-family-sans), etc. without fallbacks",
+      "fix": "Add raw fallback values to all token references: var(--hx-border-width-thin, 1px), var(--hx-border-radius-md, 0.375rem), etc."
+    },
+    {
+      "id": "DT-055",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.styles.ts",
+      "line": "multiple",
+      "description": "Extensive bare token references without fallback values throughout the component",
+      "currentValue": "var(--hx-border-width-thin), var(--hx-font-size-md), var(--hx-space-2), etc. without fallbacks",
+      "fix": "Add raw fallback values to all token references"
+    },
+    {
+      "id": "DT-056",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-switch",
+      "file": "packages/hx-library/src/components/hx-switch/hx-switch.styles.ts",
+      "line": "multiple",
+      "description": "Some token references lack fallback values",
+      "currentValue": "var(--hx-border-radius-full), var(--hx-transition-fast) without fallbacks in some places",
+      "fix": "Ensure all token refs have raw fallback values"
+    },
+    {
+      "id": "DT-057",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-checkbox",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.styles.ts",
+      "line": "multiple",
+      "description": "Some token references lack fallback values",
+      "currentValue": "Bare var(--hx-*) references",
+      "fix": "Add raw fallback values to all token references"
+    },
+    {
+      "id": "DT-058",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.styles.ts",
+      "line": 136,
+      "description": "Hardcoded opacity: 0.7 for close button without token",
+      "currentValue": "opacity: 0.7",
+      "fix": "Define var(--hx-toast-close-opacity, 0.7) or use --hx-opacity-* token"
+    },
+    {
+      "id": "DT-059",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-tag",
+      "file": "packages/hx-library/src/components/hx-tag/hx-tag.styles.ts",
+      "line": 135,
+      "description": "Hardcoded opacity: 0.7 for remove button without token",
+      "currentValue": "opacity: 0.7",
+      "fix": "Define var(--hx-tag-remove-opacity, 0.7)"
+    },
+    {
+      "id": "DT-060",
+      "severity": "medium",
+      "category": "hardcoded-radius",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "multiple",
+      "description": "50% border-radius used for circular elements instead of --hx-border-radius-full",
+      "currentValue": "border-radius: 50%",
+      "fix": "Use var(--hx-border-radius-full, 9999px)"
+    },
+    {
+      "id": "DT-061",
+      "severity": "medium",
+      "category": "hardcoded-radius",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 139,
+      "description": "50% border-radius on collapse button instead of token",
+      "currentValue": "border-radius: 50%",
+      "fix": "Use var(--hx-border-radius-full, 9999px)"
+    },
+    {
+      "id": "DT-062",
+      "severity": "medium",
+      "category": "hardcoded-radius",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.styles.ts",
+      "line": "multiple",
+      "description": "Multiple 50% border-radius and 6px border-radius without tokens",
+      "currentValue": "border-radius: 50%; border-radius: 6px",
+      "fix": "Use var(--hx-border-radius-full, 9999px) and var(--hx-border-radius-md, 0.375rem)"
+    },
+    {
+      "id": "DT-063",
+      "severity": "medium",
+      "category": "hardcoded-typography",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded font-size: 8px and font-size: 12px without tokens",
+      "currentValue": "font-size: 8px; font-size: 12px",
+      "fix": "Use var(--hx-font-size-xs, 0.75rem) for 12px. The 8px is unusually small and may need a component token"
+    },
+    {
+      "id": "DT-064",
+      "severity": "medium",
+      "category": "hardcoded-typography",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 144,
+      "description": "Hardcoded font-size: 8px on collapse button",
+      "currentValue": "font-size: 8px",
+      "fix": "Define var(--hx-split-panel-collapse-icon-size, 0.5rem)"
+    },
+    {
+      "id": "DT-065",
+      "severity": "medium",
+      "category": "hardcoded-typography",
+      "component": "hx-accordion-item",
+      "file": "packages/hx-library/src/components/hx-accordion-item/hx-accordion-item.styles.ts",
+      "line": "icon",
+      "description": "Hardcoded 1.25rem icon size without token",
+      "currentValue": "width: 1.25rem; height: 1.25rem",
+      "fix": "Use var(--hx-accordion-icon-size, var(--hx-size-5, 1.25rem))"
+    },
+    {
+      "id": "DT-066",
+      "severity": "medium",
+      "category": "hardcoded-shadows",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 99,
+      "description": "Hardcoded box-shadow: 0 0 0 4px color-mix(...) without shadow token",
+      "currentValue": "box-shadow: 0 0 0 4px color-mix(in srgb, var(--_divider-hover-color) 30%, transparent)",
+      "fix": "Define var(--hx-split-panel-focus-glow, ...) or use standard focus ring pattern"
+    },
+    {
+      "id": "DT-067",
+      "severity": "medium",
+      "category": "hardcoded-shadows",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.styles.ts",
+      "line": 24,
+      "description": "Hardcoded 1px border without border-width token",
+      "currentValue": "border: 1px solid var(--hx-popover-border-color, ...)",
+      "fix": "Use border: var(--hx-border-width-thin, 1px) solid var(--hx-popover-border-color, ...)"
+    },
+    {
+      "id": "DT-068",
+      "severity": "medium",
+      "category": "hardcoded-transitions",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "spinner",
+      "description": "Hardcoded 0.7s spinner animation duration",
+      "currentValue": "animation: spin 0.7s linear infinite",
+      "fix": "Use var(--hx-combobox-spinner-duration, var(--hx-duration-slow, 400ms)) or define appropriate component token"
+    },
+    {
+      "id": "DT-069",
+      "severity": "medium",
+      "category": "hardcoded-transitions",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": "multiple",
+      "description": "Hardcoded transition durations without token references",
+      "currentValue": "Various hardcoded durations",
+      "fix": "Use --hx-transition-fast or --hx-transition-normal tokens"
+    },
+    {
+      "id": "DT-070",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-file-upload",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.styles.ts",
+      "line": "min-height",
+      "description": "Uses --hx-size-32 which may not exist in the token system for min-height",
+      "currentValue": "var(--hx-file-upload-min-height, var(--hx-size-32, 8rem))",
+      "fix": "Verify --hx-size-32 exists in tokens.json. If not, use direct fallback: var(--hx-file-upload-min-height, 8rem)"
+    },
+    {
+      "id": "DT-071",
+      "severity": "medium",
+      "category": "hardcoded-spacing",
+      "component": "hx-banner",
+      "file": "packages/hx-library/src/components/hx-banner/hx-banner.styles.ts",
+      "line": "touch-target",
+      "description": "Uses 44px for touch target with non-standard token name --hx-touch-target-size",
+      "currentValue": "44px / --hx-touch-target-size",
+      "fix": "Use var(--hx-touch-target-min, 2.75rem) to match WCAG 2.5.5 pattern used elsewhere"
+    },
+    {
+      "id": "DT-072",
+      "severity": "medium",
+      "category": "hardcoded-spacing",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "chip-widths",
+      "description": "Hardcoded 8rem and 12rem min/max width constraints for chips",
+      "currentValue": "min-width: 8rem; max-width: 12rem",
+      "fix": "Define --hx-combobox-chip-min-width and --hx-combobox-chip-max-width component tokens"
+    },
+    {
+      "id": "DT-073",
+      "severity": "medium",
+      "category": "hardcoded-spacing",
+      "component": "hx-help-text",
+      "file": "packages/hx-library/src/components/hx-help-text/hx-help-text.styles.ts",
+      "line": 11,
+      "description": "Gap uses raw 0.375rem fallback without referencing --hx-space-1-5",
+      "currentValue": "var(--hx-help-text-icon-gap, 0.375rem)",
+      "fix": "Use var(--hx-help-text-icon-gap, var(--hx-space-1-5, 0.375rem)) for proper cascade"
+    },
+    {
+      "id": "DT-074",
+      "severity": "medium",
+      "category": "hardcoded-transitions",
+      "component": "hx-accordion-item",
+      "file": "packages/hx-library/src/components/hx-accordion-item/hx-accordion-item.styles.ts",
+      "line": "multiple",
+      "description": "Some transition durations may be hardcoded instead of using token references",
+      "currentValue": "Various transition values",
+      "fix": "Ensure all transitions use --hx-transition-* or --hx-duration-* tokens"
+    },
+    {
+      "id": "DT-075",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": 306,
+      "description": "SVG data URI contains hardcoded stroke color %236c757d (=#6c757d) for select chevron, not themeable",
+      "currentValue": "stroke='%236c757d'",
+      "fix": "Consider using CSS-drawn chevron (like hx-select does) or accept as limitation of SVG data URIs"
+    },
+    {
+      "id": "DT-076",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": [381, 390],
+      "description": "SVG data URIs for checkbox check/indeterminate marks contain hardcoded %23ffffff stroke, not themeable",
+      "currentValue": "stroke='%23ffffff'",
+      "fix": "Accept as limitation of SVG data URIs, or document that checkbox mark color is not themeable via tokens"
+    },
+    {
+      "id": "DT-077",
+      "severity": "medium",
+      "category": "missing-fallback-cascade",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.styles.ts",
+      "line": 7,
+      "description": "Divider color fallback var(--hx-color-neutral-200) lacks raw value fallback",
+      "currentValue": "var(--hx-split-panel-divider-color, var(--hx-color-neutral-200))",
+      "fix": "Add raw fallback: var(--hx-split-panel-divider-color, var(--hx-color-neutral-200, #e5e7eb))"
+    },
+    {
+      "id": "DT-078",
+      "severity": "medium",
+      "category": "hardcoded-radius",
+      "component": "hx-meter",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.styles.ts",
+      "line": "multiple",
+      "description": "Uses --hx-radius-full which is a non-existent token alias",
+      "currentValue": "var(--hx-radius-full, 9999px)",
+      "fix": "Use var(--hx-border-radius-full, 9999px)"
+    },
+    {
+      "id": "DT-079",
+      "severity": "medium",
+      "category": "hardcoded-shadows",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": 218,
+      "description": "Listbox shadow uses raw shadow values with custom overlay token. Good cascade but rgba fallback is hardcoded",
+      "currentValue": "0 4px 16px var(--hx-overlay-neutral-12, rgba(13, 17, 23, 0.12))",
+      "fix": "Consider using var(--hx-shadow-md) as the semantic fallback"
+    },
+    {
+      "id": "DT-080",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": [152, 158, 159, 161],
+      "description": "CSS-drawn chevron uses hardcoded 1.5px border and 7px dimensions",
+      "currentValue": "width: 7px; height: 7px; border-right: 1.5px solid currentColor",
+      "fix": "Define var(--hx-select-chevron-size, 7px) if customization is needed"
+    },
+    {
+      "id": "DT-081",
+      "severity": "medium",
+      "category": "hardcoded-typography",
+      "component": "hx-steps",
+      "file": "packages/hx-library/src/components/hx-steps/hx-steps.styles.ts",
+      "line": "indicator-text",
+      "description": "Step indicator may use hardcoded font sizes for step numbers",
+      "currentValue": "Various raw font-size values",
+      "fix": "Use --hx-font-size-* tokens"
+    },
+    {
+      "id": "DT-082",
+      "severity": "medium",
+      "category": "hardcoded-typography",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": "letter-spacing",
+      "description": "Hardcoded 0.05em letter-spacing without token",
+      "currentValue": "letter-spacing: 0.05em",
+      "fix": "Use var(--hx-letter-spacing-wide, 0.05em)"
+    },
+    {
+      "id": "DT-083",
+      "severity": "medium",
+      "category": "hardcoded-transitions",
+      "component": "hx-nav-item",
+      "file": "packages/hx-library/src/components/hx-nav-item/hx-nav-item.styles.ts",
+      "line": "multiple",
+      "description": "Some transitions may use hardcoded durations",
+      "currentValue": "Hardcoded transition durations",
+      "fix": "Use --hx-transition-* tokens"
+    },
+    {
+      "id": "DT-084",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.styles.ts",
+      "line": 28,
+      "description": "Shadow fallback references --hx-shadow-md and --hx-overlay-black-12 which may not exist in the token system exactly as named",
+      "currentValue": "var(--hx-shadow-md, 0 4px 16px var(--hx-overlay-black-12, rgba(0, 0, 0, 0.12)))",
+      "fix": "Verify --hx-shadow-md and --hx-overlay-black-12 exist in tokens.json. Use --hx-overlay-neutral-12 if that is the correct token name."
+    },
+    {
+      "id": "DT-085",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": [1008, 1009],
+      "description": "Forced-colors mode uses hardcoded 2px without token for outline width",
+      "currentValue": "outline: 2px solid CanvasText",
+      "fix": "Use var(--hx-focus-ring-width, 2px) solid CanvasText. Note: system colors like CanvasText are correct for forced-colors mode"
+    },
+    {
+      "id": "DT-086",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-checkbox-group",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.styles.ts",
+      "line": 44,
+      "description": "Error color fallback #dc3545 does not match --hx-color-error-500 in the token system (which is #DC2626)",
+      "currentValue": "#dc3545",
+      "fix": "Update fallback to match token: var(--hx-color-error-500, #DC2626)"
+    },
+    {
+      "id": "DT-087",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": [30, 85, 773, 803],
+      "description": "Error color fallback #dc3545 does not match --hx-color-error-500 which is #DC2626 in the token system",
+      "currentValue": "#dc3545 (Bootstrap red) vs #DC2626 (token system)",
+      "fix": "Update all error color fallbacks from #dc3545 to #DC2626 to match token system"
+    },
+    {
+      "id": "DT-088",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-field",
+      "file": "packages/hx-library/src/components/hx-field/hx-field.styles.ts",
+      "line": 118,
+      "description": "Error outline uses --hx-color-error-500 with #ef4444 fallback, but token system defines error-500 as #DC2626",
+      "currentValue": "var(--hx-color-error-500, #ef4444)",
+      "fix": "Update fallback: var(--hx-color-error-500, #DC2626)"
+    },
+    {
+      "id": "DT-089",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": [879, 909, 939, 954, 972, 975],
+      "description": "Success color fallback #198754 does not match --hx-color-success-500 which is #22C55E in the token system",
+      "currentValue": "#198754 (Bootstrap green) vs #22C55E (token system)",
+      "fix": "Update all success color fallbacks from #198754 to #22C55E"
+    },
+    {
+      "id": "DT-090",
+      "severity": "medium",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": 982,
+      "description": "Warning color fallback #ffc107 does not match --hx-color-warning-500 which is #F59E0B in the token system",
+      "currentValue": "#ffc107 (Bootstrap yellow) vs #F59E0B (token system)",
+      "fix": "Update warning color fallback from #ffc107 to #F59E0B"
+    },
+    {
+      "id": "DT-091",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.styles.ts",
+      "line": "multiple",
+      "description": "Transitions use non-existent tokens --hx-duration-200 and --hx-ease-out which never resolve, falling back to raw values",
+      "currentValue": "var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out)",
+      "fix": "Use var(--hx-duration-normal, 250ms) var(--hx-easing-out, cubic-bezier(0, 0, 0.2, 1))"
+    },
+    {
+      "id": "DT-092",
+      "severity": "high",
+      "category": "hardcoded-transitions",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.styles.ts",
+      "line": "multiple",
+      "description": "Transitions use non-existent tokens --hx-duration-300 and --hx-ease-out",
+      "currentValue": "var(--hx-duration-300, 300ms) var(--hx-ease-out, ease-out)",
+      "fix": "Use var(--hx-duration-slow, 400ms) var(--hx-easing-out, cubic-bezier(0, 0, 0.2, 1))"
+    },
+    {
+      "id": "DT-093",
+      "severity": "high",
+      "category": "hardcoded-spacing",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.styles.ts",
+      "line": "max-width",
+      "description": "Uses --hx-size-128 which does not exist in the token system",
+      "currentValue": "var(--hx-size-128, 32rem)",
+      "fix": "Define --hx-dialog-max-width with raw fallback: var(--hx-dialog-max-width, 32rem)"
+    },
+    {
+      "id": "DT-094",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-card",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.styles.ts",
+      "line": "multiple",
+      "description": "Several fallback hex values don't match the actual token system values (e.g., neutral-600 fallback is #495057 but token defines #4b5563)",
+      "currentValue": "Mismatched fallback hex values",
+      "fix": "Audit and align all fallback hex values with the values defined in packages/hx-tokens/src/tokens.json"
+    },
+    {
+      "id": "DT-095",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": "multiple",
+      "description": "Multiple fallback hex values use Bootstrap-era colors (#343a40 for neutral-700, #ced4da for neutral-300) but token system defines Tailwind values (#374151, #d1d5db)",
+      "currentValue": "#343a40, #ced4da, #dee2e6, #e9ecef",
+      "fix": "Align all fallback hex values with token system: neutral-700=#374151, neutral-300=#d1d5db, neutral-200=#e5e7eb, neutral-100=#f1f5f9"
+    },
+    {
+      "id": "DT-096",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-radio-group",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.styles.ts",
+      "line": 37,
+      "description": "Uses #343a40 fallback for neutral-700 but token defines #374151",
+      "currentValue": "var(--hx-color-neutral-700, #343a40)",
+      "fix": "Update fallback: var(--hx-color-neutral-700, #374151)"
+    },
+    {
+      "id": "DT-097",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": [35, 63],
+      "description": "Uses #343a40 fallback for neutral-700 and #212529 for neutral-800 which may not match token system",
+      "currentValue": "#343a40 (neutral-700), #212529 (neutral-800)",
+      "fix": "Verify against tokens.json and align. Token neutral-700=#374151, neutral-800=#1e293b"
+    },
+    {
+      "id": "DT-098",
+      "severity": "high",
+      "category": "hardcoded-colors",
+      "component": "hx-text-input",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.styles.ts",
+      "line": "multiple",
+      "description": "Likely uses Bootstrap-era fallback hex values (#343a40, #ced4da, etc.) that don't match the Tailwind-derived token system",
+      "currentValue": "Bootstrap-era hex fallbacks",
+      "fix": "Align all fallback hex values with tokens.json"
+    },
+    {
+      "id": "DT-099",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.styles.ts",
+      "line": 16,
+      "description": "z-index: 9999 -- uses component token but raw fallback. Would be better with semantic z-index token",
+      "currentValue": "var(--hx-popover-z-index, 9999)",
+      "fix": "Use var(--hx-popover-z-index, var(--hx-z-index-popover, 9999))"
+    },
+    {
+      "id": "DT-100",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-tooltip",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.styles.ts",
+      "line": 14,
+      "description": "z-index: 9999 without z-index token reference",
+      "currentValue": "z-index: 9999",
+      "fix": "Use var(--hx-z-index-tooltip, var(--hx-z-index-popover, 9999))"
+    },
+    {
+      "id": "DT-101",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-popup",
+      "file": "packages/hx-library/src/components/hx-popup/hx-popup.styles.ts",
+      "line": 10,
+      "description": "z-index: 9000 uses component token with raw fallback",
+      "currentValue": "var(--hx-popup-z-index, 9000)",
+      "fix": "Acceptable pattern with component token"
+    },
+    {
+      "id": "DT-102",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-popup",
+      "file": "packages/hx-library/src/components/hx-popup/hx-popup.styles.ts",
+      "line": [22, 23],
+      "description": "Arrow size 8px with component token but no semantic fallback",
+      "currentValue": "var(--hx-arrow-size, 8px)",
+      "fix": "Consider adding semantic level: var(--hx-arrow-size, var(--hx-space-2, 0.5rem))"
+    },
+    {
+      "id": "DT-103",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-button-group",
+      "file": "packages/hx-library/src/components/hx-button-group/hx-button-group.styles.ts",
+      "line": 91,
+      "description": "z-index: 1 for focused child -- acceptable layout technique",
+      "currentValue": "z-index: 1",
+      "fix": "Acceptable pattern for stacking context. No action needed."
+    },
+    {
+      "id": "DT-104",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": [143, 144, 145],
+      "description": "Chevron dimensions 12px/8px hardcoded -- visual ornament",
+      "currentValue": "width: 12px; height: 8px",
+      "fix": "Define var(--hx-select-chevron-width, 12px) and var(--hx-select-chevron-height, 8px) if customization is desired"
+    },
+    {
+      "id": "DT-105",
+      "severity": "low",
+      "category": "hardcoded-spacing",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": [158, 159],
+      "description": "Chevron arrow inner element uses hardcoded left: 2px offset",
+      "currentValue": "left: 2px",
+      "fix": "Minor visual detail. No action required unless full customization is needed."
+    },
+    {
+      "id": "DT-106",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.styles.ts",
+      "line": 74,
+      "description": "z-index: 1000 for panel with component token",
+      "currentValue": "var(--hx-overflow-menu-panel-z-index, 1000)",
+      "fix": "Could add semantic: var(--hx-overflow-menu-panel-z-index, var(--hx-z-index-dropdown, 1000))"
+    },
+    {
+      "id": "DT-107",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.styles.ts",
+      "line": 157,
+      "description": "z-index: 9000 for toast stack -- has semantic token from token system",
+      "currentValue": "var(--hx-z-index-toast, 9000)",
+      "fix": "Acceptable -- already uses semantic token"
+    },
+    {
+      "id": "DT-108",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": 211,
+      "description": "z-index: 100 for dropdown -- has component token",
+      "currentValue": "var(--hx-z-index-dropdown, 100)",
+      "fix": "Consider increasing default to 1000 for consistency with other overlay components"
+    },
+    {
+      "id": "DT-109",
+      "severity": "low",
+      "category": "hardcoded-spacing",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.styles.ts",
+      "line": 38,
+      "description": "width: 20rem hardcoded with component token but no semantic fallback",
+      "currentValue": "var(--hx-toast-width, 20rem)",
+      "fix": "Acceptable component token pattern"
+    },
+    {
+      "id": "DT-110",
+      "severity": "low",
+      "category": "hardcoded-spacing",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": 309,
+      "description": "background-size: 12px 8px for select chevron SVG -- visual ornament dimension",
+      "currentValue": "background-size: 12px 8px",
+      "fix": "Acceptable for SVG data URI sizing. Not easily tokenized."
+    },
+    {
+      "id": "DT-111",
+      "severity": "low",
+      "category": "hardcoded-colors",
+      "component": "hx-card",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.styles.ts",
+      "line": 143,
+      "description": "Card body color uses #495057 fallback which doesn't match --hx-color-neutral-600 token value (#4b5563)",
+      "currentValue": "var(--hx-color-neutral-600, #495057)",
+      "fix": "Update fallback to match token system: var(--hx-color-neutral-600, #4b5563)"
+    },
+    {
+      "id": "DT-112",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": "dot-size",
+      "description": "0.25rem today-dot size -- minor visual detail",
+      "currentValue": "width: 0.25rem; height: 0.25rem",
+      "fix": "Define var(--hx-date-picker-today-dot-size, var(--hx-space-1, 0.25rem))"
+    },
+    {
+      "id": "DT-113",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "spinner-border",
+      "description": "2px spinner border width hardcoded",
+      "currentValue": "border: 2px solid",
+      "fix": "Use var(--hx-border-width-medium, 2px)"
+    },
+    {
+      "id": "DT-114",
+      "severity": "low",
+      "category": "hardcoded-colors",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.styles.ts",
+      "line": 76,
+      "description": "Panel bg uses #fff shorthand instead of full #ffffff",
+      "currentValue": "var(--hx-color-neutral-0, #fff)",
+      "fix": "Use #ffffff for consistency with other components: var(--hx-color-neutral-0, #ffffff)"
+    },
+    {
+      "id": "DT-115",
+      "severity": "low",
+      "category": "hardcoded-colors",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.styles.ts",
+      "line": [28, 29, 30, 31],
+      "description": "Default box-shadow uses hardcoded rgb(0 0 0 / 0.1) values",
+      "currentValue": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+      "fix": "Use var(--hx-shadow-md) or define --hx-toast-shadow with semantic fallback"
+    },
+    {
+      "id": "DT-116",
+      "severity": "low",
+      "category": "hardcoded-typography",
+      "component": "hx-text",
+      "file": "packages/hx-library/src/components/hx-text/hx-text.styles.ts",
+      "line": "multiple",
+      "description": "Multiple font-size values use raw rem values that match tokens but could reference them directly",
+      "currentValue": "Various rem values",
+      "fix": "Verify all size variants reference --hx-font-size-* tokens with proper fallbacks"
+    },
+    {
+      "id": "DT-117",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-structured-list",
+      "file": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.styles.ts",
+      "line": 46,
+      "description": "Grid template uses minmax(0, 1fr) and minmax(0, 2fr) -- layout values, not design tokens",
+      "currentValue": "grid-template-columns: minmax(0, 1fr) minmax(0, 2fr)",
+      "fix": "Acceptable -- these are layout ratios, not design token values"
+    },
+    {
+      "id": "DT-118",
+      "severity": "low",
+      "category": "hardcoded-spacing",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/styles/form/form.scoped.css",
+      "line": 724,
+      "description": "Responsive breakpoint 640px hardcoded -- acceptable CSS media query",
+      "currentValue": "@media (max-width: 640px)",
+      "fix": "Consider defining --hx-breakpoint-sm or using a shared breakpoint value"
+    },
+    {
+      "id": "DT-119",
+      "severity": "low",
+      "category": "hardcoded-typography",
+      "component": "hx-accordion-item",
+      "file": "packages/hx-library/src/components/hx-accordion-item/hx-accordion-item.styles.ts",
+      "line": "icon-dimensions",
+      "description": "Icon width/height 1.25rem matches --hx-size-5 but doesn't reference it",
+      "currentValue": "width: 1.25rem; height: 1.25rem",
+      "fix": "Use var(--hx-accordion-icon-size, var(--hx-size-5, 1.25rem))"
+    },
+    {
+      "id": "DT-120",
+      "severity": "low",
+      "category": "hardcoded-spacing",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": "bottom-offset",
+      "description": "0.2rem bottom offset -- minor visual spacing",
+      "currentValue": "bottom: 0.2rem",
+      "fix": "Define var(--hx-date-picker-dot-offset, 0.2rem)"
+    },
+    {
+      "id": "DT-121",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts",
+      "line": "animation-offset",
+      "description": "-0.25rem animation translate offset",
+      "currentValue": "transform: translateY(-0.25rem)",
+      "fix": "Use calc(-1 * var(--hx-space-1, 0.25rem))"
+    },
+    {
+      "id": "DT-122",
+      "severity": "low",
+      "category": "hardcoded-typography",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "clear-button",
+      "description": "Clear button 1.25rem size matches --hx-size-5 but doesn't reference it",
+      "currentValue": "width: 1.25rem; height: 1.25rem",
+      "fix": "Use var(--hx-combobox-clear-size, var(--hx-size-5, 1.25rem))"
+    },
+    {
+      "id": "DT-123",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.styles.ts",
+      "line": "chip-height",
+      "description": "1.5rem chip height without token reference",
+      "currentValue": "height: 1.5rem",
+      "fix": "Use var(--hx-combobox-chip-height, var(--hx-size-6, 1.5rem))"
+    },
+    {
+      "id": "DT-124",
+      "severity": "low",
+      "category": "hardcoded-colors",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": 291,
+      "description": "No options text color uses direct semantic token without component token layer",
+      "currentValue": "color: var(--hx-color-neutral-400, #adb5bd)",
+      "fix": "Consider adding: var(--hx-select-no-options-color, var(--hx-color-neutral-400, #adb5bd))"
+    },
+    {
+      "id": "DT-125",
+      "severity": "low",
+      "category": "missing-fallback-cascade",
+      "component": "hx-list",
+      "file": "packages/hx-library/src/components/hx-list/hx-list.styles.ts",
+      "line": 14,
+      "description": "Gap uses 0 as default -- intentional design choice",
+      "currentValue": "var(--hx-list-gap, 0)",
+      "fix": "Acceptable -- 0 is a valid design default for list gap"
+    },
+    {
+      "id": "DT-126",
+      "severity": "low",
+      "category": "magic-numbers",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.styles.ts",
+      "line": 220,
+      "description": "max-height: 16rem for listbox with component token",
+      "currentValue": "var(--hx-select-listbox-max-height, 16rem)",
+      "fix": "Acceptable component token pattern"
+    }
+  ],
+  "worstOffenders": [
+    {
+      "component": "hx-dialog",
+      "findingCount": 7,
+      "criticalCount": 4,
+      "summary": "Uses --hx-spacing-* (wrong prefix), --hx-duration-200/300 (non-existent), --hx-ease-out (non-existent), --hx-border-width-1 (non-existent), --hx-line-height-snug/none (non-existent), --hx-size-128 (non-existent). Nearly every token reference is broken."
+    },
+    {
+      "component": "hx-drawer",
+      "findingCount": 4,
+      "criticalCount": 2,
+      "summary": "Same --hx-spacing-* and timing token issues as hx-dialog. Likely copied from same source."
+    },
+    {
+      "component": "hx-color-picker",
+      "findingCount": 6,
+      "criticalCount": 2,
+      "summary": "Most hardcoded values of any component. Extensive pixel values, hardcoded colors, non-existent --hx-font-family-base token."
+    },
+    {
+      "component": "hx-pagination",
+      "findingCount": 3,
+      "criticalCount": 1,
+      "summary": "Uses --hx-spacing-* throughout, references non-existent shorthand color tokens."
+    },
+    {
+      "component": "hx-stack",
+      "findingCount": 1,
+      "criticalCount": 1,
+      "summary": "All gap values use --hx-spacing-* which resolves to nothing."
+    },
+    {
+      "component": "hx-form (scoped CSS)",
+      "findingCount": 10,
+      "criticalCount": 0,
+      "summary": "Bootstrap-era fallback hex values throughout (#343a40, #ced4da, #dc3545, #198754, #ffc107) do not match Tailwind-derived token system values. SVG data URIs contain hardcoded colors."
+    }
+  ],
+  "systemicIssues": [
+    {
+      "issue": "Bootstrap-to-Tailwind migration incomplete",
+      "description": "Many components still use Bootstrap-era hex fallback values (#343a40, #ced4da, #dc3545, #198754) while the token system defines Tailwind-derived values (#374151, #d1d5db, #DC2626, #22C55E). When tokens are NOT loaded, consumers see Bootstrap colors; when loaded, they see Tailwind colors -- creating visual inconsistency.",
+      "affectedComponents": ["hx-card", "hx-form", "hx-select", "hx-radio-group", "hx-field", "hx-checkbox-group", "hx-text-input"],
+      "priority": "high"
+    },
+    {
+      "issue": "--hx-spacing-* vs --hx-space-* prefix mismatch",
+      "description": "Multiple components use --hx-spacing-N tokens but the token system defines --hx-space-N. Every --hx-spacing-* reference resolves to nothing, falling through to the raw fallback value. This means the token cascade is completely broken for spacing in these components -- consumer overrides to --hx-space-* have no effect.",
+      "affectedComponents": ["hx-dialog", "hx-drawer", "hx-pagination", "hx-stack"],
+      "priority": "critical"
+    },
+    {
+      "issue": "Non-existent timing tokens",
+      "description": "Components reference --hx-duration-200, --hx-duration-300, --hx-ease-out which do not exist. Correct tokens are --hx-duration-normal (250ms), --hx-duration-slow (400ms), --hx-easing-out.",
+      "affectedComponents": ["hx-dialog", "hx-drawer"],
+      "priority": "critical"
+    },
+    {
+      "issue": "--hx-color-danger-* vs --hx-color-error-*",
+      "description": "Some components use --hx-color-danger-* which does not exist. The token system uses --hx-color-error-*.",
+      "affectedComponents": ["hx-meter", "hx-field-label"],
+      "priority": "high"
+    },
+    {
+      "issue": "Missing fallback values on bare token references",
+      "description": "Several components reference tokens without any raw fallback value (e.g., bare var(--hx-space-2) instead of var(--hx-space-2, 0.5rem)). If the token CSS is not loaded, these resolve to initial/auto, causing layout breakage.",
+      "affectedComponents": ["hx-icon-button", "hx-number-input", "hx-checkbox-group", "hx-switch", "hx-checkbox"],
+      "priority": "medium"
+    },
+    {
+      "issue": "Inconsistent disabled opacity values",
+      "description": "Some components use 0.5, others use 0.4, and some don't reference --hx-opacity-disabled at all. The token system defines --hx-opacity-disabled as 0.5.",
+      "affectedComponents": ["hx-tag", "hx-dropdown", "hx-accordion-item", "hx-pagination", "hx-nav-item", "hx-overflow-menu", "hx-step"],
+      "priority": "medium"
+    },
+    {
+      "issue": "border-radius: 50% vs --hx-border-radius-full",
+      "description": "Multiple components use CSS 'border-radius: 50%' for circular elements instead of var(--hx-border-radius-full, 9999px). While visually similar, 50% behaves differently on non-square elements and cannot be overridden via the token.",
+      "affectedComponents": ["hx-combobox", "hx-split-panel", "hx-color-picker"],
+      "priority": "low"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": 1,
+      "action": "Fix --hx-spacing-* to --hx-space-* in hx-dialog, hx-drawer, hx-pagination, hx-stack",
+      "effort": "small",
+      "impact": "Restores spacing token cascade for 4 components. Consumer overrides will work."
+    },
+    {
+      "priority": 2,
+      "action": "Fix timing tokens in hx-dialog and hx-drawer (--hx-duration-200/300 -> --hx-duration-normal/slow, --hx-ease-out -> --hx-easing-out)",
+      "effort": "small",
+      "impact": "Restores animation/transition token cascade for 2 components."
+    },
+    {
+      "priority": 3,
+      "action": "Align all fallback hex values with tokens.json across the codebase (Bootstrap -> Tailwind palette migration)",
+      "effort": "medium",
+      "impact": "Visual consistency when tokens CSS is not loaded. Affects 7+ components."
+    },
+    {
+      "priority": 4,
+      "action": "Fix non-existent token references (--hx-color-danger-* -> --hx-color-error-*, --hx-color-white -> --hx-color-neutral-0, --hx-font-family-base -> --hx-font-family-sans, --hx-font-weight-regular -> --hx-font-weight-normal, --hx-radius-full -> --hx-border-radius-full)",
+      "effort": "small",
+      "impact": "Restores token cascade for affected properties in 6 components."
+    },
+    {
+      "priority": 5,
+      "action": "Add raw fallback values to bare token references in hx-icon-button, hx-number-input, hx-checkbox-group",
+      "effort": "medium",
+      "impact": "Components render correctly even when token CSS is not loaded."
+    },
+    {
+      "priority": 6,
+      "action": "Tokenize hardcoded transitions across all components (0.15s, 0.2s, 0.7s, 1.5s)",
+      "effort": "medium",
+      "impact": "Consumers can control animation speed globally via --hx-duration-* tokens."
+    },
+    {
+      "priority": 7,
+      "action": "Standardize disabled opacity to var(--hx-opacity-disabled, 0.5) across all components",
+      "effort": "small",
+      "impact": "Visual consistency for disabled states."
+    },
+    {
+      "priority": 8,
+      "action": "Tokenize hx-color-picker UI chrome (replace hardcoded #000/#fff, px values)",
+      "effort": "large",
+      "impact": "Color picker becomes fully themeable."
+    },
+    {
+      "priority": 9,
+      "action": "Replace border-radius: 50% with var(--hx-border-radius-full, 9999px)",
+      "effort": "small",
+      "impact": "Consistency and proper token override support."
+    },
+    {
+      "priority": 10,
+      "action": "Remove hardcoded rgba() colors from hx-button inverted variants",
+      "effort": "medium",
+      "impact": "Inverted button variants become fully themeable."
+    }
+  ]
+}

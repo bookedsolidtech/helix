@@ -1,0 +1,506 @@
+{
+  "auditType": "test-architecture",
+  "date": "2026-03-19",
+  "auditor": "test-architect",
+  "scope": "packages/hx-library/src/components/**/*.test.ts",
+  "categories": [
+    "missing-test-file",
+    "missing-render-test",
+    "missing-property-test",
+    "missing-event-test",
+    "missing-keyboard-test",
+    "missing-form-test",
+    "missing-slot-test",
+    "missing-a11y-test",
+    "flaky-pattern",
+    "missing-edge-case",
+    "test-isolation",
+    "snapshot-overuse"
+  ],
+  "summary": {
+    "total_findings": 44,
+    "by_severity": {
+      "critical": 3,
+      "high": 13,
+      "medium": 19,
+      "low": 9
+    },
+    "by_category": {
+      "missing-form-test": 14,
+      "flaky-pattern": 15,
+      "missing-slot-test": 7,
+      "missing-event-test": 1,
+      "missing-edge-case": 7
+    },
+    "components_audited": 76,
+    "components_with_tests": 76,
+    "components_without_tests": 0,
+    "total_test_count": 4157,
+    "total_test_files": 78,
+    "form_associated_components": 19,
+    "form_components_with_full_coverage": 4,
+    "form_components_with_partial_coverage": 15,
+    "components_using_settimeout": 22,
+    "components_using_onevent": "all event-emitting components",
+    "components_with_axe_core": 76,
+    "components_with_aria_assertions": 76,
+    "components_with_snapshot_tests": 0,
+    "components_with_skipped_tests": 0
+  },
+  "strengths": [
+    "100% of components have test files (76/76 components, 78 test files)",
+    "All 76 components have rendering tests with shadow DOM verification",
+    "All event-emitting components use oneEvent() helper for async event testing",
+    "All components have axe-core accessibility audits via checkA11y()",
+    "All components have ARIA attribute assertions",
+    "All custom events are tested for bubbles and composed flags",
+    "All interactive components have disabled state tests",
+    "Zero snapshot-based tests -- all tests use behavioral assertions",
+    "Zero skipped or todo tests -- full test suite executes",
+    "All test files use afterEach(cleanup) for proper DOM isolation",
+    "4,157 total test cases across the library",
+    "Consistent test structure with describe blocks for Rendering, Properties, Events, Keyboard, Slots, Accessibility"
+  ],
+  "findings": [
+    {
+      "id": "TEST-001",
+      "severity": "critical",
+      "category": "missing-form-test",
+      "component": "hx-button-group",
+      "file": "packages/hx-library/src/components/hx-button-group/hx-button-group.test.ts",
+      "line": 0,
+      "description": "Form-associated component (static formAssociated = true) has no FormData, reset, restore, or validation tests.",
+      "fix": "Add describe('Form Association') block with tests for: formdata event populates FormData, form.reset() restores default, formStateRestoreCallback works, checkValidity returns correct boolean."
+    },
+    {
+      "id": "TEST-002",
+      "severity": "critical",
+      "category": "missing-form-test",
+      "component": "hx-icon-button",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.test.ts",
+      "line": 0,
+      "description": "Form-associated component missing FormData submission, formStateRestoreCallback, setFormValue, and validation tests.",
+      "fix": "Add form integration tests: FormData includes button value on submit, restore callback works, validation states are correct."
+    },
+    {
+      "id": "TEST-003",
+      "severity": "critical",
+      "category": "missing-form-test",
+      "component": "hx-file-upload",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.test.ts",
+      "line": 0,
+      "description": "Form-associated component missing FormData, restore, and setFormValue tests. File upload is critical form interaction.",
+      "fix": "Add tests: FormData contains uploaded files, form.reset() clears file list, formStateRestoreCallback restores files."
+    },
+    {
+      "id": "TEST-004",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-button",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.test.ts",
+      "line": 0,
+      "description": "Form-associated button missing FormData submission test (type=submit), restore callback, and validation tests.",
+      "fix": "Add tests: button type='submit' triggers formdata event, button type='reset' calls form.reset(), form restore works."
+    },
+    {
+      "id": "TEST-005",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-checkbox",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.test.ts",
+      "line": 0,
+      "description": "Form-associated checkbox missing FormData population test and explicit setFormValue verification.",
+      "fix": "Add test: checkbox value appears in FormData when checked, absent when unchecked. Verify setFormValue called with correct value."
+    },
+    {
+      "id": "TEST-006",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.test.ts",
+      "line": 0,
+      "description": "Form-associated color picker missing FormData, form reset, and form restore tests.",
+      "fix": "Add form integration tests for FormData value, reset to initial color, and restore callback."
+    },
+    {
+      "id": "TEST-007",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.test.ts",
+      "line": 0,
+      "description": "Form-associated combobox missing FormData population test.",
+      "fix": "Add test: selected combobox option value appears in FormData on form submission."
+    },
+    {
+      "id": "TEST-008",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.test.ts",
+      "line": 0,
+      "description": "Form-associated date picker missing FormData population test.",
+      "fix": "Add test: selected date value appears in FormData on form submission."
+    },
+    {
+      "id": "TEST-009",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.test.ts",
+      "line": 0,
+      "description": "Form-associated number input missing FormData population test.",
+      "fix": "Add test: numeric value appears in FormData on form submission."
+    },
+    {
+      "id": "TEST-010",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-radio-group",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.test.ts",
+      "line": 0,
+      "description": "Form-associated radio group missing FormData population test.",
+      "fix": "Add test: selected radio value appears in FormData on form submission."
+    },
+    {
+      "id": "TEST-011",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.test.ts",
+      "line": 0,
+      "description": "Form-associated rating component missing form reset and validation tests.",
+      "fix": "Add tests: form.reset() resets to initial rating, required validation works."
+    },
+    {
+      "id": "TEST-012",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.test.ts",
+      "line": 0,
+      "description": "Form-associated select missing FormData population test.",
+      "fix": "Add test: selected option value appears in FormData on form submission."
+    },
+    {
+      "id": "TEST-013",
+      "severity": "high",
+      "category": "missing-form-test",
+      "component": "hx-switch",
+      "file": "packages/hx-library/src/components/hx-switch/hx-switch.test.ts",
+      "line": 0,
+      "description": "Form-associated switch missing FormData population and explicit setFormValue verification.",
+      "fix": "Add test: switch value appears in FormData when on, absent when off. Verify setFormValue called correctly."
+    },
+    {
+      "id": "TEST-014",
+      "severity": "medium",
+      "category": "missing-form-test",
+      "component": "hx-toggle-button",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.test.ts",
+      "line": 0,
+      "description": "Form-associated toggle button missing validation tests.",
+      "fix": "Add validation tests: checkValidity, reportValidity, setCustomValidity work correctly."
+    },
+    {
+      "id": "TEST-015",
+      "severity": "high",
+      "category": "flaky-pattern",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.test.ts",
+      "line": 100,
+      "description": "19 instances of setTimeout-based waits (up to 400ms). Most egregious use of arbitrary delays in the test suite. High flakiness risk under CI CPU pressure.",
+      "fix": "Replace setTimeout waits with oneEvent() for hx-show/hx-after-show/hx-hide/hx-after-hide events, or await el.updateComplete for property changes."
+    },
+    {
+      "id": "TEST-016",
+      "severity": "high",
+      "category": "flaky-pattern",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.test.ts",
+      "line": 794,
+      "description": "Uses 250ms setTimeout delay, likely waiting for debounced input. Flaky under CPU pressure.",
+      "fix": "Replace with vi.useFakeTimers() to advance time deterministically, or use oneEvent('hx-input')."
+    },
+    {
+      "id": "TEST-017",
+      "severity": "high",
+      "category": "flaky-pattern",
+      "component": "hx-top-nav",
+      "file": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.test.ts",
+      "line": 267,
+      "description": "Uses 200ms setTimeout delay. Brittle timing dependency.",
+      "fix": "Replace with await el.updateComplete or oneEvent() for the specific state change being waited on."
+    },
+    {
+      "id": "TEST-018",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-tree-view",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-view.test.ts",
+      "line": 341,
+      "description": "9 instances of setTimeout(0) microtask yields. While less dangerous than long delays, these indicate missing proper Lit lifecycle waits.",
+      "fix": "Replace with await el.updateComplete after each mutation. If waiting for nested component updates, await the child's updateComplete too."
+    },
+    {
+      "id": "TEST-019",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-tabs",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.test.ts",
+      "line": 658,
+      "description": "3 instances of setTimeout(0) microtask yields for tab panel updates.",
+      "fix": "Replace with await el.updateComplete to properly wait for Lit rendering."
+    },
+    {
+      "id": "TEST-020",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-card",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for timing-sensitive test. Minor flakiness risk.",
+      "fix": "Replace with await el.updateComplete or oneEvent()."
+    },
+    {
+      "id": "TEST-021",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for dialog open/close transitions.",
+      "fix": "Replace with oneEvent('hx-open') or oneEvent('hx-close') to await the dialog state change."
+    },
+    {
+      "id": "TEST-022",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-slider",
+      "file": "packages/hx-library/src/components/hx-slider/hx-slider.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for slider interaction timing.",
+      "fix": "Replace with await el.updateComplete or oneEvent('hx-change')."
+    },
+    {
+      "id": "TEST-023",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-split-button",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for menu open/close timing.",
+      "fix": "Replace with oneEvent('hx-show') or oneEvent('hx-hide')."
+    },
+    {
+      "id": "TEST-024",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-toggle-button",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for toggle state timing.",
+      "fix": "Replace with await el.updateComplete after toggle."
+    },
+    {
+      "id": "TEST-025",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-checkbox",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for checkbox state timing.",
+      "fix": "Replace with await el.updateComplete after property change."
+    },
+    {
+      "id": "TEST-026",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for input debounce timing.",
+      "fix": "Replace with vi.useFakeTimers() for deterministic debounce testing."
+    },
+    {
+      "id": "TEST-027",
+      "severity": "medium",
+      "category": "flaky-pattern",
+      "component": "hx-copy-button",
+      "file": "packages/hx-library/src/components/hx-copy-button/hx-copy-button.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(50) for copy feedback timing.",
+      "fix": "Replace with await el.updateComplete or oneEvent('hx-copy')."
+    },
+    {
+      "id": "TEST-028",
+      "severity": "low",
+      "category": "flaky-pattern",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(10) for popover positioning. Low risk but inconsistent with test patterns.",
+      "fix": "Replace with oneEvent('hx-show') or oneEvent('hx-after-show')."
+    },
+    {
+      "id": "TEST-029",
+      "severity": "low",
+      "category": "flaky-pattern",
+      "component": "hx-popup",
+      "file": "packages/hx-library/src/components/hx-popup/hx-popup.test.ts",
+      "line": 0,
+      "description": "Uses setTimeout(10) for popup positioning. Low risk but inconsistent with test patterns.",
+      "fix": "Replace with oneEvent('hx-reposition') or await el.updateComplete."
+    },
+    {
+      "id": "TEST-030",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.test.ts",
+      "line": 0,
+      "description": "Missing slot projection tests for named slots: empty-label, error, help-text, label, prefix, suffix (6 untested slots).",
+      "fix": "Add tests verifying each named slot renders its projected content correctly in the shadow DOM."
+    },
+    {
+      "id": "TEST-031",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.test.ts",
+      "line": 0,
+      "description": "Missing slot projection tests for named slots: error, help-text, label.",
+      "fix": "Add tests verifying label, error, and help-text slot content renders correctly."
+    },
+    {
+      "id": "TEST-032",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.test.ts",
+      "line": 0,
+      "description": "Missing slot projection tests for named slots: error, label.",
+      "fix": "Add tests verifying label and error slot content renders correctly."
+    },
+    {
+      "id": "TEST-033",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-radio-group",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.test.ts",
+      "line": 0,
+      "description": "Missing slot projection tests for named slots: error, help-text.",
+      "fix": "Add tests verifying error and help-text slot content renders correctly."
+    },
+    {
+      "id": "TEST-034",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.test.ts",
+      "line": 0,
+      "description": "Missing slot projection tests for named slot: icon.",
+      "fix": "Add test verifying custom icon slot content replaces default star icons."
+    },
+    {
+      "id": "TEST-035",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.test.ts",
+      "line": 0,
+      "description": "Missing slot projection tests for named slot: label.",
+      "fix": "Add test verifying label slot content renders correctly."
+    },
+    {
+      "id": "TEST-036",
+      "severity": "medium",
+      "category": "missing-slot-test",
+      "component": "hx-carousel",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.test.ts",
+      "line": 0,
+      "description": "Missing slot projection test for named slot: previous-button.",
+      "fix": "Add test verifying custom previous-button slot content replaces default button."
+    },
+    {
+      "id": "TEST-037",
+      "severity": "medium",
+      "category": "missing-event-test",
+      "component": "hx-radio-group",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.test.ts",
+      "line": 0,
+      "description": "Missing test for hx-radio-select event. The component fires this event but only hx-change is tested.",
+      "fix": "Add test: selecting a radio fires hx-radio-select with correct detail payload, bubbles, and composed flags."
+    },
+    {
+      "id": "TEST-038",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-counter",
+      "file": "packages/hx-library/src/components/hx-counter/hx-counter.test.ts",
+      "line": 0,
+      "description": "No boundary value tests (e.g., min=0, max overflow, negative values, NaN).",
+      "fix": "Add edge case tests for boundary values: 0, negative, exceeding max, NaN, Infinity."
+    },
+    {
+      "id": "TEST-039",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-progress-ring",
+      "file": "packages/hx-library/src/components/hx-progress-ring/hx-progress-ring.test.ts",
+      "line": 0,
+      "description": "No boundary value tests (e.g., min=0, max overflow, negative values, NaN).",
+      "fix": "Add edge case tests for boundary values: 0, negative, exceeding max, NaN, Infinity."
+    },
+    {
+      "id": "TEST-040",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-meter",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.test.ts",
+      "line": 0,
+      "description": "No boundary value tests (e.g., min=0, max overflow, negative values, NaN).",
+      "fix": "Add edge case tests for boundary values: 0, negative, exceeding max, NaN, Infinity."
+    },
+    {
+      "id": "TEST-041",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.test.ts",
+      "line": 0,
+      "description": "No boundary value tests (e.g., min=0, max overflow, negative values, NaN).",
+      "fix": "Add edge case tests for boundary values: 0, negative, exceeding max, NaN, Infinity."
+    },
+    {
+      "id": "TEST-042",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-spinner",
+      "file": "packages/hx-library/src/components/hx-spinner/hx-spinner.test.ts",
+      "line": 0,
+      "description": "No boundary value tests (e.g., min=0, max overflow, negative values, NaN).",
+      "fix": "Add edge case tests for boundary values: 0, negative, exceeding max, NaN, Infinity."
+    },
+    {
+      "id": "TEST-043",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-icon",
+      "file": "packages/hx-library/src/components/hx-icon/hx-icon.test.ts",
+      "line": 0,
+      "description": "No empty state tests (null/undefined/empty string for primary content property).",
+      "fix": "Add tests for empty/null/undefined primary property values and verify graceful degradation."
+    },
+    {
+      "id": "TEST-044",
+      "severity": "low",
+      "category": "missing-edge-case",
+      "component": "hx-format-date",
+      "file": "packages/hx-library/src/components/hx-format-date/hx-format-date.test.ts",
+      "line": 0,
+      "description": "No empty state tests (null/undefined/empty string for primary content property).",
+      "fix": "Add tests for empty/null/undefined primary property values and verify graceful degradation."
+    }
+  ]
+}

@@ -1,0 +1,1540 @@
+{
+  "auditType": "storybook-coverage",
+  "date": "2026-03-19",
+  "auditor": "storybook-specialist",
+  "scope": "packages/hx-library/src/components/**/*.stories.ts",
+  "categories": [
+    "missing-stories",
+    "missing-variant",
+    "missing-size",
+    "missing-state",
+    "missing-slot",
+    "missing-event-docs",
+    "incomplete-argtypes",
+    "missing-dark-mode",
+    "missing-a11y-story",
+    "stale-meta",
+    "missing-composition",
+    "autodocs-gaps",
+    "missing-css-stories",
+    "missing-interaction-test"
+  ],
+  "summary": {
+    "total_findings": 148,
+    "by_severity": {
+      "critical": 0,
+      "high": 18,
+      "medium": 85,
+      "low": 45
+    },
+    "by_category": {
+      "missing-stories": 0,
+      "missing-variant": 3,
+      "missing-size": 0,
+      "missing-state": 6,
+      "missing-slot": 7,
+      "missing-event-docs": 6,
+      "incomplete-argtypes": 2,
+      "missing-dark-mode": 64,
+      "missing-a11y-story": 0,
+      "stale-meta": 0,
+      "missing-composition": 9,
+      "autodocs-gaps": 0,
+      "missing-css-stories": 45,
+      "missing-interaction-test": 1,
+      "missing-slot-stories": 5
+    },
+    "components_with_stories": 79,
+    "components_without_stories": 0,
+    "total_components": 79,
+    "total_stories_count": 1306,
+    "average_stories_per_component": 16.5,
+    "stories_with_play_functions": 78,
+    "stories_without_play_functions": 1,
+    "stories_with_autodocs": 79,
+    "stories_with_satisfies_meta": 79,
+    "components_with_complete_jsdoc": 79
+  },
+  "findings": [
+    {
+      "id": "SB-001",
+      "severity": "high",
+      "category": "missing-variant",
+      "component": "hx-progress-bar",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.stories.ts",
+      "line": null,
+      "description": "Component has 4 variants (default, success, warning, danger) and 3 sizes (sm, md, lg) but only has a combined 'Variants' and 'Sizes' story. No individual stories per variant for visual regression baseline.",
+      "fix": "Add individual stories: VariantSuccess, VariantWarning, VariantDanger, SizeSmall, SizeMedium, SizeLarge to provide stable baselines for visual regression testing."
+    },
+    {
+      "id": "SB-002",
+      "severity": "high",
+      "category": "missing-variant",
+      "component": "hx-help-text",
+      "file": "packages/hx-library/src/components/hx-help-text/hx-help-text.stories.ts",
+      "line": null,
+      "description": "Only 6 stories for a component with 4 variants. Missing CSSCustomProperties, CSSParts, interaction tests, and composition examples. No play functions despite being a critical form infrastructure component.",
+      "fix": "Add CSSCustomProperties story, CSSParts story, interaction test verifying variant rendering, and composition story showing hx-help-text inside hx-field with hx-text-input."
+    },
+    {
+      "id": "SB-003",
+      "severity": "high",
+      "category": "missing-variant",
+      "component": "hx-table",
+      "file": "packages/hx-library/src/components/hx-table/hx-table.stories.ts",
+      "line": null,
+      "description": "Component has 4 variants (default, striped, hover, compact) but 'AllVariants' is a combined story. No individual variant stories for stable visual regression.",
+      "fix": "Supplement AllVariants with individual VariantStriped, VariantHover, VariantCompact stories."
+    },
+    {
+      "id": "SB-004",
+      "severity": "high",
+      "category": "missing-state",
+      "component": "hx-banner",
+      "file": "packages/hx-library/src/components/hx-banner/hx-banner.stories.ts",
+      "line": null,
+      "description": "Only 10 stories for a component with 7 properties, 2 slots, and 1 event. Missing: AllVariants combined story, heading property demo, action-label/action-href demo (separate from WithAction), AllStates overview, CSSCustomProperties, CSSParts.",
+      "fix": "Add AllVariants, WithHeading, AllStates, CSSCustomProperties, CSSParts stories. Add composition story showing banner above page content."
+    },
+    {
+      "id": "SB-005",
+      "severity": "high",
+      "category": "missing-state",
+      "component": "hx-side-nav",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.stories.ts",
+      "line": null,
+      "description": "Only 5 stories for a navigation component with 2 events, 3 slots, 7 CSS parts, and 8 CSS custom properties. Missing event documentation, CSSCustomProperties, CSSParts, keyboard navigation interaction test, and mobile/responsive story.",
+      "fix": "Add CSSCustomProperties, CSSParts, EventHandling, KeyboardNavigation (play function), MobileResponsive stories."
+    },
+    {
+      "id": "SB-006",
+      "severity": "high",
+      "category": "missing-state",
+      "component": "hx-stat",
+      "file": "packages/hx-library/src/components/hx-stat/hx-stat.stories.ts",
+      "line": null,
+      "description": "Only 6 stories for a component with 4 properties, 6 CSS parts, and 18 CSS custom properties. Missing CSSCustomProperties, CSSParts, individual size stories, and slot demos.",
+      "fix": "Add CSSCustomProperties, CSSParts, SizeSmall, SizeMedium, SizeLarge, SlotDemo stories."
+    },
+    {
+      "id": "SB-007",
+      "severity": "high",
+      "category": "missing-state",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.stories.ts",
+      "line": null,
+      "description": "Only 6 stories for a component with 4 properties, 3 events, 2 slots, and 4 CSS parts. Missing: Open state, event documentation stories, CSSCustomProperties, CSSParts, AllStates.",
+      "fix": "Add Open, EventHandling, CSSCustomProperties, CSSParts, AllStates stories."
+    },
+    {
+      "id": "SB-008",
+      "severity": "high",
+      "category": "missing-state",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.stories.ts",
+      "line": null,
+      "description": "Only 12 stories for a component with 7 properties, 5 events, 6 slots, and 7 CSS parts. Missing: CSSCustomProperties, CSSParts, event documentation, keyboard navigation (Escape close), dark mode, AllStates.",
+      "fix": "Add CSSCustomProperties, CSSParts, EventHandling, KeyboardNavigation, AllStates stories."
+    },
+    {
+      "id": "SB-009",
+      "severity": "high",
+      "category": "missing-state",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.stories.ts",
+      "line": null,
+      "description": "Only 7 stories with no play functions (interaction tests). Component has 2 events, 12 CSS parts, and 14 CSS custom properties. Missing: CSSCustomProperties, CSSParts, event documentation, interaction tests.",
+      "fix": "Add CSSCustomProperties, CSSParts, EventHandling, KeyboardNavigation (with play function) stories."
+    },
+    {
+      "id": "SB-010",
+      "severity": "high",
+      "category": "missing-event-docs",
+      "component": "hx-code-snippet",
+      "file": "packages/hx-library/src/components/hx-code-snippet/hx-code-snippet.stories.ts",
+      "line": null,
+      "description": "Component dispatches 1 event (copy) but stories do not demonstrate event handling or include @action decorators for the event.",
+      "fix": "Add a CopyEvent story that demonstrates listening for the copy event with an action handler."
+    },
+    {
+      "id": "SB-011",
+      "severity": "high",
+      "category": "missing-event-docs",
+      "component": "hx-data-table",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.stories.ts",
+      "line": null,
+      "description": "Component dispatches 3 events (sort, select, page) but no stories demonstrate event handling patterns.",
+      "fix": "Add SortEvent, SelectEvent, PageEvent stories showing event listener usage."
+    },
+    {
+      "id": "SB-012",
+      "severity": "high",
+      "category": "missing-event-docs",
+      "component": "hx-image",
+      "file": "packages/hx-library/src/components/hx-image/hx-image.stories.ts",
+      "line": null,
+      "description": "Component dispatches 2 events (load, error) but no stories demonstrate event handling.",
+      "fix": "Add LoadEvent and ErrorEvent stories showing how to listen for image lifecycle events."
+    },
+    {
+      "id": "SB-013",
+      "severity": "high",
+      "category": "missing-event-docs",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.stories.ts",
+      "line": null,
+      "description": "Component dispatches 2 events but no stories demonstrate event handling.",
+      "fix": "Add NavigateEvent story showing how to listen for navigation events."
+    },
+    {
+      "id": "SB-014",
+      "severity": "high",
+      "category": "missing-event-docs",
+      "component": "hx-progress-bar",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.stories.ts",
+      "line": null,
+      "description": "Component dispatches 1 event but no stories demonstrate event handling.",
+      "fix": "Add CompleteEvent story showing how to listen for progress completion."
+    },
+    {
+      "id": "SB-015",
+      "severity": "high",
+      "category": "missing-event-docs",
+      "component": "hx-side-nav",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.stories.ts",
+      "line": null,
+      "description": "Component dispatches 2 events but no stories demonstrate event handling.",
+      "fix": "Add NavigateEvent, CollapseEvent stories showing event listener patterns."
+    },
+    {
+      "id": "SB-016",
+      "severity": "high",
+      "category": "incomplete-argtypes",
+      "component": "hx-menu",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu.stories.ts",
+      "line": 12,
+      "description": "No argTypes defined in meta. Component has 1 @property and 2 events. CEM autodocs may cover properties but argTypes provide better Storybook controls UX with descriptions and categories.",
+      "fix": "Add argTypes for all public properties with control types, descriptions, categories, and default values."
+    },
+    {
+      "id": "SB-017",
+      "severity": "high",
+      "category": "incomplete-argtypes",
+      "component": "hx-visually-hidden",
+      "file": "packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.stories.ts",
+      "line": 10,
+      "description": "No argTypes defined in meta. While hx-visually-hidden has only 1 property (focusable), explicit argTypes with descriptions improve autodocs quality.",
+      "fix": "Add argTypes for 'focusable' property with boolean control and description."
+    },
+    {
+      "id": "SB-018",
+      "severity": "medium",
+      "category": "missing-interaction-test",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.stories.ts",
+      "line": null,
+      "description": "Only component with zero play functions. Navigation is a critical interactive component that requires keyboard navigation testing.",
+      "fix": "Add play functions for keyboard navigation (arrow keys, Enter, Tab) and ARIA state verification."
+    },
+    {
+      "id": "SB-019",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-accordion",
+      "file": "packages/hx-library/src/components/hx-accordion/hx-accordion.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Component renders visual UI elements that may need dark theme verification.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-020",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-action-bar",
+      "file": "packages/hx-library/src/components/hx-action-bar/hx-action-bar.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-021",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-alert",
+      "file": "packages/hx-library/src/components/hx-alert/hx-alert.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Alert variants (info, success, warning, error) likely need dark theme visual verification.",
+      "fix": "Add a DarkMode story showing all alert variants inside <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-022",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-avatar",
+      "file": "packages/hx-library/src/components/hx-avatar/hx-avatar.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-023",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-banner",
+      "file": "packages/hx-library/src/components/hx-banner/hx-banner.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Banner variants need dark theme verification.",
+      "fix": "Add a DarkMode story showing all banner variants inside <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-024",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-breadcrumb",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-025",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-button",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Button is the most used component and all 6 variants need dark theme verification.",
+      "fix": "Add a DarkMode story showing all button variants inside <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-026",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-button-group",
+      "file": "packages/hx-library/src/components/hx-button-group/hx-button-group.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-027",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-carousel",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-028",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-checkbox-group",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-029",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-code-snippet",
+      "file": "packages/hx-library/src/components/hx-code-snippet/hx-code-snippet.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Code snippets often have distinct dark theme appearances.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-030",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-031",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Complex form component needs dark theme verification.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-032",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-copy-button",
+      "file": "packages/hx-library/src/components/hx-copy-button/hx-copy-button.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-033",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-counter",
+      "file": "packages/hx-library/src/components/hx-counter/hx-counter.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-034",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-data-table",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Data tables with multiple visual states need dark theme verification.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-035",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-divider",
+      "file": "packages/hx-library/src/components/hx-divider/hx-divider.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-036",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-037",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-038",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-field-label",
+      "file": "packages/hx-library/src/components/hx-field-label/hx-field-label.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-039",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-file-upload",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-040",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-format-date",
+      "file": "packages/hx-library/src/components/hx-format-date/hx-format-date.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-041",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-form",
+      "file": "packages/hx-library/src/components/hx-form/hx-form.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Forms aggregate many components that need dark theme verification together.",
+      "fix": "Add a DarkMode story wrapping a complete form in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-042",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-grid",
+      "file": "packages/hx-library/src/components/hx-grid/hx-grid.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-043",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-help-text",
+      "file": "packages/hx-library/src/components/hx-help-text/hx-help-text.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-044",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-icon",
+      "file": "packages/hx-library/src/components/hx-icon/hx-icon.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-045",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-icon-button",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-046",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-image",
+      "file": "packages/hx-library/src/components/hx-image/hx-image.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-047",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-link",
+      "file": "packages/hx-library/src/components/hx-link/hx-link.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Link colors are especially important in dark mode.",
+      "fix": "Add a DarkMode story showing all link variants inside <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-048",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-list",
+      "file": "packages/hx-library/src/components/hx-list/hx-list.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-049",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-menu",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-050",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-meter",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-051",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-052",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-053",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-pagination",
+      "file": "packages/hx-library/src/components/hx-pagination/hx-pagination.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-054",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-055",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-popup",
+      "file": "packages/hx-library/src/components/hx-popup/hx-popup.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-056",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-progress-bar",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-057",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-progress-ring",
+      "file": "packages/hx-library/src/components/hx-progress-ring/hx-progress-ring.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-058",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-prose",
+      "file": "packages/hx-library/src/components/hx-prose/hx-prose.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story. Prose content (headings, links, tables) has significant dark mode styling needs.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-059",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-radio-group",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-060",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-061",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.stories.ts",
+      "line": null,
+      "description": "Has only 1 dark mode reference but no dedicated DarkMode story.",
+      "fix": "Add a dedicated DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-062",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-side-nav",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-063",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-skeleton",
+      "file": "packages/hx-library/src/components/hx-skeleton/hx-skeleton.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-064",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-slider",
+      "file": "packages/hx-library/src/components/hx-slider/hx-slider.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-065",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-split-button",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-066",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-067",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-stack",
+      "file": "packages/hx-library/src/components/hx-stack/hx-stack.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-068",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-stat",
+      "file": "packages/hx-library/src/components/hx-stat/hx-stat.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-069",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-status-indicator",
+      "file": "packages/hx-library/src/components/hx-status-indicator/hx-status-indicator.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-070",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-steps",
+      "file": "packages/hx-library/src/components/hx-steps/hx-steps.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-071",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-structured-list",
+      "file": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-072",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-table",
+      "file": "packages/hx-library/src/components/hx-table/hx-table.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-073",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-tabs",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-074",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-tag",
+      "file": "packages/hx-library/src/components/hx-tag/hx-tag.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-075",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-textarea",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-076",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-077",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-toggle-button",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-078",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-tooltip",
+      "file": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-079",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-tree-view",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-view.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-080",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-visually-hidden",
+      "file": "packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-081",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-container",
+      "file": "packages/hx-library/src/components/hx-container/hx-container.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-082",
+      "severity": "medium",
+      "category": "missing-dark-mode",
+      "component": "hx-counter",
+      "file": "packages/hx-library/src/components/hx-counter/hx-counter.stories.ts",
+      "line": null,
+      "description": "No dark mode / theme story.",
+      "fix": "Add a DarkMode story wrapping the component in <hx-theme mode='dark'>."
+    },
+    {
+      "id": "SB-083",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-action-bar",
+      "file": "packages/hx-library/src/components/hx-action-bar/hx-action-bar.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 5 CSS custom properties documented in JSDoc.",
+      "fix": "Add CSSCustomProperties and CSSParts stories demonstrating token override and ::part() styling."
+    },
+    {
+      "id": "SB-084",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-avatar",
+      "file": "packages/hx-library/src/components/hx-avatar/hx-avatar.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-085",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-banner",
+      "file": "packages/hx-library/src/components/hx-banner/hx-banner.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 12 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-086",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-breadcrumb",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 8 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-087",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-button-group",
+      "file": "packages/hx-library/src/components/hx-button-group/hx-button-group.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 1 CSS custom property.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-088",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-carousel",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 8 CSS parts and 4 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-089",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 7 CSS parts and 8 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-090",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 11 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-091",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-copy-button",
+      "file": "packages/hx-library/src/components/hx-copy-button/hx-copy-button.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-092",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-counter",
+      "file": "packages/hx-library/src/components/hx-counter/hx-counter.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 6 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-093",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-data-table",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 8 CSS parts and 8 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-094",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-divider",
+      "file": "packages/hx-library/src/components/hx-divider/hx-divider.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-095",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 7 CSS parts and 11 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-096",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-dropdown",
+      "file": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 6 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-097",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-format-date",
+      "file": "packages/hx-library/src/components/hx-format-date/hx-format-date.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part (minimal, but should still be documented).",
+      "fix": "Add CSSParts story."
+    },
+    {
+      "id": "SB-098",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-grid",
+      "file": "packages/hx-library/src/components/hx-grid/hx-grid.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 4 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-099",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-help-text",
+      "file": "packages/hx-library/src/components/hx-help-text/hx-help-text.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 3 CSS parts and 6 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-100",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-icon",
+      "file": "packages/hx-library/src/components/hx-icon/hx-icon.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 2 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-101",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-icon-button",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 6 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-102",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-image",
+      "file": "packages/hx-library/src/components/hx-image/hx-image.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 7 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-103",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-list",
+      "file": "packages/hx-library/src/components/hx-list/hx-list.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 2 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-104",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-menu",
+      "file": "packages/hx-library/src/components/hx-menu/hx-menu.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-105",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-meter",
+      "file": "packages/hx-library/src/components/hx-meter/hx-meter.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 4 CSS parts and 8 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-106",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-nav",
+      "file": "packages/hx-library/src/components/hx-nav/hx-nav.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 14 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-107",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-overflow-menu",
+      "file": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 4 CSS parts and 7 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-108",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-progress-bar",
+      "file": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 3 CSS parts and 10 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-109",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-progress-ring",
+      "file": "packages/hx-library/src/components/hx-progress-ring/hx-progress-ring.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 4 CSS parts and 3 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-110",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-111",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-side-nav",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 8 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-112",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-skeleton",
+      "file": "packages/hx-library/src/components/hx-skeleton/hx-skeleton.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 8 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-113",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-split-button",
+      "file": "packages/hx-library/src/components/hx-split-button/hx-split-button.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 3 CSS parts and 13 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-114",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-split-panel",
+      "file": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 3 CSS parts and 3 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-115",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-stack",
+      "file": "packages/hx-library/src/components/hx-stack/hx-stack.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part.",
+      "fix": "Add CSSParts story."
+    },
+    {
+      "id": "SB-116",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-stat",
+      "file": "packages/hx-library/src/components/hx-stat/hx-stat.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 6 CSS parts and 18 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-117",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-status-indicator",
+      "file": "packages/hx-library/src/components/hx-status-indicator/hx-status-indicator.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 11 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-118",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-steps",
+      "file": "packages/hx-library/src/components/hx-steps/hx-steps.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 4 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-119",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-structured-list",
+      "file": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 9 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-120",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-table",
+      "file": "packages/hx-library/src/components/hx-table/hx-table.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 6 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-121",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-tabs",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 2 CSS parts and 18 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-122",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-tag",
+      "file": "packages/hx-library/src/components/hx-tag/hx-tag.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 10 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-123",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-text",
+      "file": "packages/hx-library/src/components/hx-text/hx-text.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-124",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-theme",
+      "file": "packages/hx-library/src/components/hx-theme/hx-theme.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. As the theme component, documenting available CSS custom properties is especially important.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-125",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 5 CSS parts and 5 CSS custom properties.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-126",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-tree-view",
+      "file": "packages/hx-library/src/components/hx-tree-view/hx-tree-view.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story. Component has 1 CSS part and 1 CSS custom property.",
+      "fix": "Add CSSCustomProperties and CSSParts stories."
+    },
+    {
+      "id": "SB-127",
+      "severity": "low",
+      "category": "missing-css-stories",
+      "component": "hx-visually-hidden",
+      "file": "packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.stories.ts",
+      "line": null,
+      "description": "No CSSCustomProperties or CSSParts story.",
+      "fix": "Add CSSParts story."
+    },
+    {
+      "id": "SB-128",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.stories.ts",
+      "line": null,
+      "description": "Complex form component with 16 properties but no composition story showing integration with hx-field, hx-field-label, hx-help-text in a realistic form.",
+      "fix": "Add InAForm, InAField composition stories showing hx-combobox wrapped in hx-field with label and help text."
+    },
+    {
+      "id": "SB-129",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.stories.ts",
+      "line": null,
+      "description": "No composition story showing integration in a form or settings panel.",
+      "fix": "Add InAForm, InAField composition stories."
+    },
+    {
+      "id": "SB-130",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-tabs",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.stories.ts",
+      "line": null,
+      "description": "Only 9 stories. Missing composition with forms, cards, or other content-rich scenarios.",
+      "fix": "Add TabsWithForms, TabsWithCards composition stories."
+    },
+    {
+      "id": "SB-131",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.stories.ts",
+      "line": null,
+      "description": "Only 12 stories. Missing composition showing dialog with complex form, confirmation patterns, and nested dialogs.",
+      "fix": "Add NestedDialog, ComplexFormDialog, ConfirmationPattern composition stories."
+    },
+    {
+      "id": "SB-132",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-toast",
+      "file": "packages/hx-library/src/components/hx-toast/hx-toast.stories.ts",
+      "line": null,
+      "description": "Missing composition story showing toast triggered from form submission or button click interaction.",
+      "fix": "Add FormSubmitToast, ButtonTriggerToast interaction composition stories."
+    },
+    {
+      "id": "SB-133",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-data-table",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.stories.ts",
+      "line": null,
+      "description": "Missing composition with hx-pagination, hx-action-bar, and hx-badge for a full data management pattern.",
+      "fix": "Add DataTableWithActionBar, DataTableWithPagination composition stories."
+    },
+    {
+      "id": "SB-134",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-steps",
+      "file": "packages/hx-library/src/components/hx-steps/hx-steps.stories.ts",
+      "line": null,
+      "description": "Missing composition showing steps integrated with forms (multi-step wizard pattern).",
+      "fix": "Add MultiStepWizard composition story showing steps with form content switching."
+    },
+    {
+      "id": "SB-135",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-breadcrumb",
+      "file": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.stories.ts",
+      "line": null,
+      "description": "Missing composition showing breadcrumb integrated with page layout (hx-container, hx-top-nav).",
+      "fix": "Add PageLayout composition story."
+    },
+    {
+      "id": "SB-136",
+      "severity": "low",
+      "category": "missing-composition",
+      "component": "hx-carousel",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.stories.ts",
+      "line": null,
+      "description": "Only 9 stories for a complex component with 12 properties. Missing composition with hx-card items and responsive behavior.",
+      "fix": "Add CardCarousel, ResponsiveCarousel composition stories."
+    },
+    {
+      "id": "SB-137",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-drawer",
+      "file": "packages/hx-library/src/components/hx-drawer/hx-drawer.stories.ts",
+      "line": null,
+      "description": "Component has 6 named slots (header, header-actions, footer, close-button, and default) but only WithHeaderActions and WithForm demonstrate slot usage. Missing dedicated slot stories.",
+      "fix": "Add SlotHeader, SlotFooter, SlotCloseButton, AllSlots stories."
+    },
+    {
+      "id": "SB-138",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.stories.ts",
+      "line": null,
+      "description": "Component has 7 slots but stories only show prefix/suffix and custom-empty-label. Missing label, help-text, error slot stories.",
+      "fix": "Add SlotLabel, SlotHelpText, SlotError stories."
+    },
+    {
+      "id": "SB-139",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-alert",
+      "file": "packages/hx-library/src/components/hx-alert/hx-alert.stories.ts",
+      "line": null,
+      "description": "Component has 4 named slots (icon, title, default, actions) but only icon and actions have dedicated stories. Missing title slot demo.",
+      "fix": "Add WithTitle slot-focused story (distinct from WithTitle that may exist but focuses on the slot element pattern)."
+    },
+    {
+      "id": "SB-140",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-dialog",
+      "file": "packages/hx-library/src/components/hx-dialog/hx-dialog.stories.ts",
+      "line": null,
+      "description": "Component has 3 slots but only header and footer are demonstrated. Missing slot for default content pattern demonstration.",
+      "fix": "Add AllSlots story showing all slot combinations."
+    },
+    {
+      "id": "SB-141",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-data-table",
+      "file": "packages/hx-library/src/components/hx-data-table/hx-data-table.stories.ts",
+      "line": null,
+      "description": "Component has 3 slots (toolbar, empty, loading) with dedicated stories for empty and loading but toolbar is only shown in WithToolbar and FullFeatured.",
+      "fix": "Add dedicated SlotToolbar story focusing on toolbar slot customization."
+    },
+    {
+      "id": "SB-142",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-side-nav",
+      "file": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.stories.ts",
+      "line": null,
+      "description": "Component has 3 named slots but only 5 stories total. Missing dedicated slot demonstrations for header, footer, and toggle slots.",
+      "fix": "Add SlotHeader, SlotFooter, SlotToggle stories."
+    },
+    {
+      "id": "SB-143",
+      "severity": "medium",
+      "category": "missing-slot",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.stories.ts",
+      "line": null,
+      "description": "Component has 3 slots including trigger but only 9 stories. Missing dedicated slot demonstrations.",
+      "fix": "Add SlotTrigger, SlotContent, AllSlots stories."
+    },
+    {
+      "id": "SB-144",
+      "severity": "medium",
+      "category": "missing-state",
+      "component": "hx-tabs",
+      "file": "packages/hx-library/src/components/hx-tabs/hx-tabs.stories.ts",
+      "line": null,
+      "description": "Only 9 stories for a core navigation component. Missing: AllStates, CSSCustomProperties, CSSParts, DarkMode, full slot demos.",
+      "fix": "Add AllStates, CSSCustomProperties (18 custom properties!), CSSParts stories."
+    },
+    {
+      "id": "SB-145",
+      "severity": "medium",
+      "category": "missing-state",
+      "component": "hx-carousel",
+      "file": "packages/hx-library/src/components/hx-carousel/hx-carousel.stories.ts",
+      "line": null,
+      "description": "Only 9 stories for a complex component with 12 properties. Missing disabled, AllStates, CSSCustomProperties, CSSParts.",
+      "fix": "Add Disabled, AllStates, CSSCustomProperties, CSSParts stories."
+    },
+    {
+      "id": "SB-146",
+      "severity": "medium",
+      "category": "missing-state",
+      "component": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.stories.ts",
+      "line": null,
+      "description": "Only 12 stories for a complex component with 8 properties and 12 CSS parts. Missing AllStates, CSSCustomProperties, CSSParts.",
+      "fix": "Add AllStates, CSSCustomProperties, CSSParts stories."
+    },
+    {
+      "id": "SB-147",
+      "severity": "medium",
+      "category": "missing-state",
+      "component": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.stories.ts",
+      "line": null,
+      "description": "Only 11 stories. Missing AllStates, CSSCustomProperties, CSSParts stories.",
+      "fix": "Add AllStates, CSSCustomProperties, CSSParts stories."
+    },
+    {
+      "id": "SB-148",
+      "severity": "medium",
+      "category": "missing-state",
+      "component": "hx-popover",
+      "file": "packages/hx-library/src/components/hx-popover/hx-popover.stories.ts",
+      "line": null,
+      "description": "Only 9 stories for a component with 7 properties and 4 events. Missing AllStates, CSSCustomProperties, DarkMode.",
+      "fix": "Add AllStates, CSSCustomProperties, DarkMode stories."
+    }
+  ]
+}
