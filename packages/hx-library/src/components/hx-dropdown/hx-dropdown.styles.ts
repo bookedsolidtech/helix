@@ -30,8 +30,8 @@ export const helixDropdownStyles = css`
     opacity: 0;
     pointer-events: none;
     transition:
-      opacity 0.15s ease,
-      visibility 0.15s ease;
+      opacity var(--hx-transition-fast, 150ms ease),
+      visibility var(--hx-transition-fast, 150ms ease);
     outline: none;
   }
 

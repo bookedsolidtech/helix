@@ -487,6 +487,22 @@ describe('hx-radio-group', () => {
   // ─── Form Association (5) ───
 
   describe('Form Association', () => {
+    it('submits selected radio value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-radio-group label="Color" name="color" value="blue">
+          <hx-radio value="red" label="Red"></hx-radio>
+          <hx-radio value="blue" label="Blue"></hx-radio>
+        </hx-radio-group>
+      `;
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-radio-group') as WcRadioGroup;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('color')).toBe('blue');
+      form.remove();
+    });
+
     it('has formAssociated=true', () => {
       const ctor = customElements.get('hx-radio-group') as unknown as { formAssociated: boolean };
       expect(ctor.formAssociated).toBe(true);
@@ -799,6 +815,45 @@ describe('hx-radio-group', () => {
       </hx-radio-group>`);
       const { violations } = await checkA11y(el, axeOptions);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Slot projection ───
+
+  describe('Slot projection', () => {
+    it('projects radio elements into the default slot', async () => {
+      const el = await fixture<WcRadioGroup>(
+        `<hx-radio-group label="Color" name="color">
+          <hx-radio value="red" label="Red"></hx-radio>
+          <hx-radio value="blue" label="Blue"></hx-radio>
+        </hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot:not([name])')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(2);
+    });
+
+    it('projects content into the error slot', async () => {
+      const el = await fixture<WcRadioGroup>(
+        `<hx-radio-group label="Color" name="color"><span slot="error">Required</span></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="error"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Required');
+    });
+
+    it('projects content into the help-text slot', async () => {
+      const el = await fixture<WcRadioGroup>(
+        `<hx-radio-group label="Color" name="color" help-text=" "><span slot="help-text">Choose one</span></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const slot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="help-text"]')!;
+      const assigned = slot.assignedElements();
+      expect(assigned).toHaveLength(1);
+      expect((assigned[0] as HTMLElement).textContent).toBe('Choose one');
     });
   });
 });

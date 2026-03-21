@@ -642,3 +642,20 @@ export const MultipleWithSizeAndTypeConstraints: Story = {
     maxFiles: 20,
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    name: 'document',
+  },
+};
+
+export const WithSlots: Story = {
+  render: () => html`
+    <hx-file-upload name="medical-records" multiple>
+      <div slot="file-list" style="padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.25rem; margin-top: 0.5rem;">
+        <p style="margin: 0; font-size: 0.875rem; color: #374151;">Custom file list: lab-results.pdf (120 KB)</p>
+      </div>
+    </hx-file-upload>
+  `,
+};

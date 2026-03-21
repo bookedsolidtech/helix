@@ -1459,3 +1459,11 @@ export const PatientSafetyStack: Story = {
     }
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    variant: 'info',
+    message: 'Your session will expire in 15 minutes. Please save your work.',
+  },
+};

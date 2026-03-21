@@ -377,6 +377,32 @@ describe('hx-checkbox', () => {
     });
   });
 
+  // ─── Form Association ───
+
+  describe('Form Association', () => {
+    it('submits value in FormData when checked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-checkbox name="terms" value="accepted" checked></hx-checkbox>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('terms')).toBe('accepted');
+      form.remove();
+    });
+
+    it('does not submit value in FormData when unchecked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-checkbox name="terms" value="accepted"></hx-checkbox>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('terms')).toBeNull();
+      form.remove();
+    });
+  });
+
   // ─── Form (5) ───
 
   describe('Form', () => {
@@ -518,8 +544,7 @@ describe('hx-checkbox', () => {
     it('focus() moves focus to input element', async () => {
       const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
       el.focus();
-      // Allow brief settle time for focus to propagate into the shadow DOM input
-      await new Promise((r) => setTimeout(r, 50));
+      await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(el.shadowRoot?.activeElement).toBe(input);
     });

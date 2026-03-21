@@ -444,9 +444,6 @@ describe('hx-image', () => {
         '<hx-image src="https://example.com/img.png" alt="Test"><span slot="caption">Photo credit</span></hx-image>',
       );
       await el.updateComplete;
-      // Wait for slotchange event to fire
-      await new Promise((r) => setTimeout(r, 0));
-      await el.updateComplete;
 
       const caption = shadowQuery(el, '.image__caption--visible');
       expect(caption).toBeTruthy();

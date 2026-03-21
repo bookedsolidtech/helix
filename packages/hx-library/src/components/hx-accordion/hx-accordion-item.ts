@@ -56,7 +56,9 @@ const chevronIcon = svg`
 export class HelixAccordionItem extends LitElement {
   static override styles = [tokenStyles, helixAccordionItemStyles];
 
+  /** @internal */
   private static _counter = 0;
+  /** @internal */
   private _uid = `hx-accordion-item-${++HelixAccordionItem._counter}`;
 
   /**

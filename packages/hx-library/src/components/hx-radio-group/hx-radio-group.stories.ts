@@ -1308,3 +1308,11 @@ export const TreatmentPreference: Story = {
     expect(group!.value).toBe('undecided');
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    label: 'Preferred Contact Method',
+    helpText: 'Choose how you would like us to reach you.',
+  },
+};

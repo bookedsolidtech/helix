@@ -259,3 +259,13 @@ export const TableSkeleton: Story = {
     </div>
   `,
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    variant: 'rect',
+    width: '300px',
+    height: '1rem',
+    animated: true,
+  },
+};

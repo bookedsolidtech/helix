@@ -674,3 +674,14 @@ export const TimezoneComparison: Story = {
     `;
   },
 };
+
+export const DarkMode: Story = {
+  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    date: DEMO_DATE,
+    lang: 'en-US',
+    month: 'long',
+    year: 'numeric',
+    day: 'numeric',
+  },
+};

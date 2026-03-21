@@ -355,7 +355,7 @@ export class HelixRadioGroup extends LitElement {
     if (nextRadio) {
       nextRadio.focus();
       nextRadio.dispatchEvent(
-        new CustomEvent('hx-radio-select', {
+        new CustomEvent<{ value: string }>('hx-radio-select', {
           bubbles: true,
           composed: true,
           detail: { value: nextRadio.value },
