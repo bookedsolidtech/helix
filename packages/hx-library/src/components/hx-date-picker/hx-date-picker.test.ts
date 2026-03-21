@@ -929,14 +929,14 @@ describe('hx-date-picker', () => {
     it('uses default English label for previous month button', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
       await el.updateComplete;
-      expect(el.labelPrevMonth).toBe('Previous month');
+      expect(el.previousMonthLabel).toBe('Previous month');
     });
 
     it('renders custom labelPrevMonth when set via property', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
-      el.labelPrevMonth = 'Mois précédent';
+      el.previousMonthLabel = 'Mois précédent';
       await el.updateComplete;
-      expect(el.labelPrevMonth).toBe('Mois précédent');
+      expect(el.previousMonthLabel).toBe('Mois précédent');
     });
   });
 });
