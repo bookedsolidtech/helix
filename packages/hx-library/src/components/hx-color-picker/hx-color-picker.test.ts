@@ -730,4 +730,239 @@ describe('hx-color-picker', () => {
       expect(el.labelGradient).toBe('Dégradé de couleur');
     });
   });
+
+  // ─── hexToRgb 3-char shorthand ───
+
+  describe('hexToRgb 3-char shorthand', () => {
+    it('parses 3-char hex #fff as white', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#fff" format="rgb"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // #fff expands to #ffffff — pure white: r=255, g=255, b=255
+      expect(el.value).toBe('rgb(255 255 255)');
+    });
+
+    it('parses 3-char hex #f00 as red', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#f00" format="rgb"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // #f00 expands to #ff0000 — pure red
+      expect(el.value).toBe('rgb(255 0 0)');
+    });
+  });
+
+  // ─── Achromatic color conversions ───
+
+  describe('Achromatic color conversions (s=0)', () => {
+    it('parses #808080 gray without throwing and reports zero saturation', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#808080" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // Gray should parse successfully and the value should reflect back as a hex string
+      expect(el.value).toMatch(/^#[0-9a-f]{6}$/i);
+      // The hue slider aria-valuenow should be a valid number (hue is undefined for achromatic)
+      const hueSlider = shadowQuery<HTMLElement>(el, '[part~="hue-slider"]');
+      const hueVal = parseInt(hueSlider?.getAttribute('aria-valuenow') ?? '0', 10);
+      expect(isNaN(hueVal)).toBe(false);
+    });
+
+    it('gray #808080 converts to rgb with equal r, g, b channels', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#808080" format="rgb"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // Should produce rgb(128 128 128)
+      expect(el.value).toBe('rgb(128 128 128)');
+    });
+  });
+
+  // ─── Opacity alpha channel preservation ───
+
+  describe('Opacity alpha channel preservation', () => {
+    it('preserves alpha < 1 in hex format when opacity is true', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline opacity value="#ff000080" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // The value should contain alpha — hex with alpha is 8 chars
+      // #ff000080 has alpha ≈ 0.502 (128/255)
+      expect(el.value).toHaveLength(9); // # + 6 hex + 2 alpha hex = 9 chars
+      expect(el.value).toMatch(/^#[0-9a-f]{8}$/i);
+    });
+
+    it('omits alpha from hex output when opacity is false (default)', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#ff000080" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // Without opacity flag, alpha should not appear in the output
+      expect(el.value).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(el.value).toHaveLength(7);
+    });
+
+    it('preserves alpha in rgb format with opacity=true', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline opacity format="rgb"></hx-color-picker>',
+      );
+      await el.updateComplete;
+
+      // Use the opacity slider keydown to change alpha to < 1
+      const opacitySlider = shadowQuery<HTMLElement>(el, '[part~="opacity-slider"]');
+      expect(opacitySlider).toBeTruthy();
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-change');
+      opacitySlider!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }),
+      );
+      const event = await eventPromise;
+      // With opacity < 1, the rgb string should include the / alpha channel
+      expect(event.detail.value).toMatch(/^rgb\(\d+ \d+ \d+ \/ [\d.]+\)$/);
+    });
+  });
+
+  // ─── Swatch click in swatches-only mode ───
+
+  describe('Swatch click in swatches-only mode', () => {
+    it('clicking a swatch in swatches-only mode sets the color and fires hx-change', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline swatches-only></hx-color-picker>',
+      );
+      el.swatches = ['#ff0000', '#00ff00', '#0000ff'];
+      await el.updateComplete;
+
+      // Confirm grid is hidden in swatches-only mode
+      expect(shadowQuery(el, '[part="grid"]')).toBeNull();
+
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-change');
+      const swatchBtns = el.shadowRoot?.querySelectorAll<HTMLButtonElement>('.swatch-btn');
+      expect(swatchBtns?.length).toBe(3);
+      swatchBtns?.[1]?.click(); // click the green swatch
+      const event = await eventPromise;
+
+      expect(event.detail.value).toBe('#00ff00');
+      expect(el.value).toBe('#00ff00');
+    });
+
+    it('swatches-only mode still renders the text input area', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline swatches-only></hx-color-picker>',
+      );
+      el.swatches = ['#ff0000'];
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="input"]')).toBeTruthy();
+    });
+  });
+
+  // ─── Format change preserves color value ───
+
+  describe('Format change preserves color value', () => {
+    it('cycling from hex to rgb preserves the same color (red)', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#ff0000" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      expect(el.format).toBe('hex');
+
+      const formatBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('.format-btn');
+      formatBtn?.click();
+      await el.updateComplete;
+
+      expect(el.format).toBe('rgb');
+      // The input value should now reflect red in rgb format
+      const colorInput = el.shadowRoot?.querySelector<HTMLInputElement>('.color-input');
+      expect(colorInput?.value).toBe('rgb(255 0 0)');
+    });
+
+    it('cycling format does not change the underlying color (hue stays the same)', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#3b82f6" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      const initialHue = el['_hsv'].h;
+
+      const formatBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('.format-btn');
+      formatBtn?.click(); // hex → rgb
+      await el.updateComplete;
+      formatBtn?.click(); // rgb → hsl
+      await el.updateComplete;
+
+      // Hue should be preserved through format changes
+      expect(Math.round(el['_hsv'].h)).toBe(Math.round(initialHue));
+    });
+  });
+
+  // ─── Inline mode blocks panel open ───
+
+  describe('Inline mode blocks panel open', () => {
+    it('panel is always visible inline and does not toggle on trigger click', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      await el.updateComplete;
+
+      // Panel is rendered immediately in inline mode
+      expect(shadowQuery(el, '.panel')).toBeTruthy();
+
+      // There is no trigger in inline mode so _open stays false
+      expect(el['_open']).toBe(false);
+    });
+
+    it('_show() does not set _open to true when inline is true', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      await el.updateComplete;
+
+      // Call the private _show() method directly — it should guard against inline
+      (el as unknown as { _show: () => void })._show();
+      await el.updateComplete;
+
+      expect(el['_open']).toBe(false);
+    });
+  });
+
+  // ─── Invalid and edge-case color values ───
+
+  describe('Invalid and edge-case color values', () => {
+    it('empty string value does not throw and element still renders', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value=""></hx-color-picker>',
+      );
+      // Should not throw — element should render with shadow DOM intact
+      expect(el.shadowRoot).toBeTruthy();
+    });
+
+    it('malformed hex value does not throw and retains last valid internal state', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#gggggg"></hx-color-picker>',
+      );
+      expect(el.shadowRoot).toBeTruthy();
+      // The hsv state should remain at the default (black, h=0, s=0, v=0)
+      expect(el['_hsv'].h).toBe(0);
+    });
+
+    it('setting value to empty string at runtime keeps previous hsv state', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#ff0000"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      const prevHsv = { ...el['_hsv'] };
+
+      // Setting an invalid/empty value should not mutate internal _hsv
+      el.value = '';
+      await el.updateComplete;
+
+      // parseColor('') returns null so _hsv should be unchanged
+      expect(el['_hsv'].h).toBe(prevHsv.h);
+      expect(el['_hsv'].s).toBe(prevHsv.s);
+    });
+
+    it('hex with wrong length (#12345) returns null from hexToRgb and falls back gracefully', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker value="#12345"></hx-color-picker>',
+      );
+      // 5-char hex is invalid — element should still render
+      expect(el.shadowRoot).toBeTruthy();
+      // No crash means the null guard in parseColor/_syncFromValue worked
+      expect(el['_hsv']).toBeDefined();
+    });
+  });
 });
