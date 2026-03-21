@@ -659,4 +659,21 @@ describe('hx-dialog', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for close button', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog><p>Content</p></hx-dialog>');
+      await el.updateComplete;
+      expect(el.closeLabel).toBe('Close dialog');
+    });
+
+    it('renders custom closeLabel when set via property', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog><p>Content</p></hx-dialog>');
+      el.closeLabel = 'Fermer la boîte de dialogue';
+      await el.updateComplete;
+      expect(el.closeLabel).toBe('Fermer la boîte de dialogue');
+    });
+  });
 });

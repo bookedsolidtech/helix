@@ -817,4 +817,25 @@ describe('hx-data-table', () => {
       expect(shadowQuery(el, '[part~="checkbox"]')).toBeTruthy();
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for select-all checkbox', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+      expect(el.labelSelectAll).toBe('Select all rows');
+    });
+
+    it('renders custom labelSelectAll when set via property', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      el.labelSelectAll = 'Tout sélectionner';
+      await el.updateComplete;
+      expect(el.labelSelectAll).toBe('Tout sélectionner');
+    });
+  });
 });
