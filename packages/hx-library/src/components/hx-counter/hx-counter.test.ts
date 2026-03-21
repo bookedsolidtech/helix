@@ -45,22 +45,36 @@ describe('hx-counter', () => {
   // ─── Property: size (3) ───
 
   describe('Property: size', () => {
-    it('applies sm class', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter size="sm" value="5"></hx-counter>');
+    it('applies sm class via hx-size', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter hx-size="sm" value="5"></hx-counter>');
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--sm')).toBe(true);
     });
 
-    it('applies md class', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter size="md" value="5"></hx-counter>');
+    it('applies md class via hx-size', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter hx-size="md" value="5"></hx-counter>');
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--md')).toBe(true);
     });
 
-    it('applies lg class', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter size="lg" value="5"></hx-counter>');
+    it('applies lg class via hx-size', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter hx-size="lg" value="5"></hx-counter>');
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--lg')).toBe(true);
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter size="sm" value="5"></hx-counter>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixCounter>(
+        '<hx-counter size="sm" hx-size="lg" value="5"></hx-counter>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
@@ -295,10 +309,10 @@ describe('hx-counter', () => {
     it('has no axe violations across all sizes', async () => {
       for (const size of ['sm', 'md', 'lg']) {
         const el = await fixture<HelixCounter>(
-          `<hx-counter size="${size}" value="42"></hx-counter>`,
+          `<hx-counter hx-size="${size}" value="42"></hx-counter>`,
         );
         const { violations } = await checkA11y(el);
-        expect(violations, `size="${size}" should have no violations`).toEqual([]);
+        expect(violations, `hx-size="${size}" should have no violations`).toEqual([]);
         el.remove();
       }
     });

@@ -45,9 +45,9 @@ export class HelixProgressRing extends LitElement {
 
   /**
    * Size of the ring. Controls SVG diameter.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
@@ -105,6 +105,13 @@ export class HelixProgressRing extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-progress-ring', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as 'sm' | 'md' | 'lg';
+    }
     this.setAttribute('role', 'progressbar');
     this.setAttribute('aria-valuemin', '0');
   }

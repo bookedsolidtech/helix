@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixStepsStyles } from './hx-steps.styles.js';
 import type { HelixStep } from './hx-step.js';
 
@@ -42,9 +43,9 @@ export class HelixSteps extends LitElement {
 
   /**
    * Size variant of the steps.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
@@ -58,6 +59,13 @@ export class HelixSteps extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-steps', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as 'sm' | 'md' | 'lg';
+    }
     this.addEventListener('hx-step-click-internal', this._handleStepClickInternal);
   }
 

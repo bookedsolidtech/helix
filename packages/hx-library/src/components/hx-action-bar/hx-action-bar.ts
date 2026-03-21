@@ -4,6 +4,9 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
+// Re-export size type for external consumers.
+export type ActionBarSize = 'sm' | 'md' | 'lg';
+
 /**
  * A horizontal toolbar container for grouping related action buttons and controls.
  * Implements the ARIA toolbar pattern with roving tabindex keyboard navigation.
@@ -46,10 +49,10 @@ export class HelixActionBar extends LitElement {
 
   /**
    * Size of the action bar — propagated as a data attribute to slotted children.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
-  size: 'sm' | 'md' | 'lg' = 'md';
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
+  size: ActionBarSize = 'md';
 
   /**
    * Visual variant controlling the bar background.
@@ -137,6 +140,13 @@ export class HelixActionBar extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-action-bar', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as ActionBarSize;
+    }
     // Prevent dual aria-label announcement: the host carries the consumer's
     // aria-label attribute while the inner div[role="toolbar"] receives the
     // same value. Setting role="none" on the host hides it from the
