@@ -122,6 +122,13 @@ export class HelixDataTable extends LitElement {
   label = '';
 
   /**
+   * Accessible label for the "select all rows" checkbox in the table header.
+   * @attr select-all-label
+   */
+  @property({ attribute: 'select-all-label' })
+  selectAllLabel = 'Select all rows';
+
+  /**
    * When true, the header row is sticky (position: sticky; top: 0).
    * @attr sticky-header
    */
@@ -358,7 +365,7 @@ export class HelixDataTable extends LitElement {
                 <input
                   type="checkbox"
                   part="checkbox"
-                  aria-label="Select all rows"
+                  aria-label=${this.selectAllLabel}
                   .indeterminate=${this._selectedRows.size > 0 &&
                   this._selectedRows.size < this.rows.length}
                   .checked=${this._selectedRows.size === this.rows.length && this.rows.length > 0}
