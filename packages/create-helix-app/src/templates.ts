@@ -112,7 +112,7 @@ export const TEMPLATES: TemplateConfig[] = [
       '@angular/platform-browser-dynamic': '^18.0.0',
       '@helixui/library': '^1.0.0',
       '@helixui/tokens': '^0.3.0',
-      'rxjs': '^7.8.0',
+      rxjs: '^7.8.0',
       'zone.js': '^0.15.0',
     },
     devDependencies: {
