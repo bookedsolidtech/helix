@@ -1,0 +1,775 @@
+{
+  "metadata": {
+    "auditType": "form-participation",
+    "auditDate": "2026-03-20",
+    "agent": "lit-specialist",
+    "model": "opus",
+    "description": "Deep audit of ElementInternals form association implementation across all form-associated HELiX components",
+    "specReference": "https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements"
+  },
+  "summary": {
+    "totalFormAssociatedComponents": 18,
+    "fullyCompliant": 7,
+    "partiallyCompliant": 9,
+    "intentionallyLimited": 2,
+    "totalFindings": 22,
+    "critical": 0,
+    "high": 8,
+    "medium": 9,
+    "low": 5,
+    "callbackCoverage": {
+      "formAssociatedCallback": {
+        "implemented": 0,
+        "missing": 18,
+        "note": "formAssociatedCallback is an optional notification callback. No component overrides it, which is acceptable per spec. The browser calls it automatically; override only needed for custom form-association logic."
+      },
+      "formDisabledCallback": {
+        "implemented": 10,
+        "missing": 8,
+        "missingComponents": [
+          "hx-checkbox-group",
+          "hx-date-picker",
+          "hx-file-upload",
+          "hx-icon-button",
+          "hx-rating",
+          "hx-time-picker",
+          "hx-toggle-button",
+          "hx-button"
+        ]
+      },
+      "formResetCallback": {
+        "implemented": 17,
+        "missing": 1,
+        "missingComponents": ["hx-button"],
+        "note": "hx-button intentionally omits formResetCallback -- submit buttons have no stateful value to reset"
+      },
+      "formStateRestoreCallback": {
+        "implemented": 16,
+        "missing": 2,
+        "missingComponents": ["hx-file-upload", "hx-button"],
+        "note": "hx-button intentional (submit button). hx-file-upload cannot restore File objects from browser state."
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "hx-button",
+      "tagName": "hx-button",
+      "file": "packages/hx-library/src/components/hx-button/hx-button.ts",
+      "componentType": "submit-button",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback, acceptable to omit" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "low", "note": "Submit buttons could benefit from fieldset disabled propagation but not critical" },
+        "formResetCallback": { "status": "not-implemented", "severity": "info", "note": "Intentional omission -- submit buttons have no stateful value to reset" },
+        "formStateRestoreCallback": { "status": "not-implemented", "severity": "info", "note": "Intentional omission -- submit buttons have no state to restore" }
+      },
+      "intentionalOmissions": ["formResetCallback", "formStateRestoreCallback"],
+      "formSubmission": { "setFormValue": true, "mechanism": "setFormValue on submit click when name+value set" },
+      "validation": { "checkValidity": false, "reportValidity": false, "setValidity": false, "note": "Submit buttons do not participate in constraint validation" },
+      "tests": {
+        "submission": true,
+        "validation": false,
+        "disabled": false,
+        "reset": true,
+        "autofill": false,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "intentionally-limited",
+      "gaps": []
+    },
+    {
+      "name": "hx-checkbox",
+      "tagName": "hx-checkbox",
+      "file": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "Sets checked value or null in updated()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": true,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": []
+    },
+    {
+      "name": "hx-checkbox-group",
+      "tagName": "hx-checkbox-group",
+      "file": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "high", "note": "Group should propagate disabled from parent fieldset to child checkboxes" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "FormData with multiple entries for checked checkboxes" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": false,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "CBG-01",
+          "severity": "high",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-checkbox-group does not implement formDisabledCallback. When placed inside a disabled <fieldset>, the group will not propagate disabled state to child checkboxes.",
+          "fix": "Add formDisabledCallback(disabled: boolean) that sets this.disabled = disabled and propagates to children"
+        },
+        {
+          "id": "CBG-02",
+          "severity": "medium",
+          "title": "No FormData submission test",
+          "description": "No test verifies that checked checkboxes appear in FormData when parent form is submitted.",
+          "fix": "Add test wrapping checkbox-group in <form>, check FormData entries"
+        }
+      ]
+    },
+    {
+      "name": "hx-color-picker",
+      "tagName": "hx-color-picker",
+      "file": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "Sets formatted color string in updated()" },
+      "validation": { "checkValidity": false, "reportValidity": false, "setValidity": false },
+      "tests": {
+        "submission": true,
+        "validation": false,
+        "disabled": false,
+        "reset": false,
+        "autofill": false,
+        "formDisabledCallback": true,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "CP-01",
+          "severity": "medium",
+          "title": "Missing checkValidity/reportValidity/setValidity",
+          "description": "hx-color-picker has no constraint validation support. Cannot participate in form validation flow.",
+          "fix": "Add checkValidity(), reportValidity() delegating to _internals, and _updateValidity() with required constraint"
+        },
+        {
+          "id": "CP-02",
+          "severity": "low",
+          "title": "No formResetCallback or formStateRestoreCallback tests",
+          "description": "Color picker reset and restore callbacks are implemented but untested.",
+          "fix": "Add tests for formResetCallback and formStateRestoreCallback"
+        }
+      ]
+    },
+    {
+      "name": "hx-combobox",
+      "tagName": "hx-combobox",
+      "file": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "Sets value or null in _updateFormValue()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "CMB-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but no test verifies fieldset-disabled propagation.",
+          "fix": "Add test calling formDisabledCallback(true) and verifying disabled state"
+        }
+      ]
+    },
+    {
+      "name": "hx-date-picker",
+      "tagName": "hx-date-picker",
+      "file": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "high", "note": "Date picker should respect fieldset disabled state" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "ISO date string via _internals.setFormValue()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "DP-01",
+          "severity": "high",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-date-picker does not implement formDisabledCallback. Disabled <fieldset> will not propagate to the date picker.",
+          "fix": "Add formDisabledCallback(disabled: boolean) { this.disabled = disabled; }"
+        }
+      ]
+    },
+    {
+      "name": "hx-file-upload",
+      "tagName": "hx-file-upload",
+      "file": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "high", "note": "File upload should respect fieldset disabled state" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "not-implemented", "severity": "medium", "note": "File objects cannot be serialized for browser state restore, but a no-op stub documents the intention" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "File or FormData for multi-file" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": false },
+      "tests": {
+        "submission": false,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": false,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "FU-01",
+          "severity": "high",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-file-upload does not implement formDisabledCallback.",
+          "fix": "Add formDisabledCallback(disabled: boolean) { this.disabled = disabled; }"
+        },
+        {
+          "id": "FU-02",
+          "severity": "medium",
+          "title": "Missing formStateRestoreCallback stub",
+          "description": "hx-file-upload lacks formStateRestoreCallback. While File objects cannot be restored, a no-op implementation documents the contract.",
+          "fix": "Add formStateRestoreCallback() as no-op with comment explaining Files cannot be restored"
+        },
+        {
+          "id": "FU-03",
+          "severity": "medium",
+          "title": "No FormData submission test",
+          "description": "No test verifies file upload values appear in FormData.",
+          "fix": "Add test with form submission verifying FormData contains file entries"
+        }
+      ]
+    },
+    {
+      "name": "hx-icon-button",
+      "tagName": "hx-icon-button",
+      "file": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.ts",
+      "componentType": "submit-button",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "medium", "note": "Icon button should respect fieldset disabled state" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": false, "mechanism": "Icon buttons typically act as submit triggers, not value holders" },
+      "validation": { "checkValidity": false, "reportValidity": false, "setValidity": false },
+      "tests": {
+        "submission": false,
+        "validation": false,
+        "disabled": false,
+        "reset": false,
+        "autofill": false,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "IB-01",
+          "severity": "medium",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-icon-button does not propagate disabled state from parent fieldset.",
+          "fix": "Add formDisabledCallback(disabled: boolean) { this.disabled = disabled; }"
+        },
+        {
+          "id": "IB-02",
+          "severity": "low",
+          "title": "No form association tests",
+          "description": "hx-icon-button has ElementInternals and formResetCallback/formStateRestoreCallback but no tests for these callbacks.",
+          "fix": "Add tests for formResetCallback and formStateRestoreCallback"
+        }
+      ]
+    },
+    {
+      "name": "hx-number-input",
+      "tagName": "hx-number-input",
+      "file": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "String(value) or null in _updateValidity()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "NI-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but untested.",
+          "fix": "Add test calling formDisabledCallback(true/false) and verifying disabled state"
+        }
+      ]
+    },
+    {
+      "name": "hx-radio-group",
+      "tagName": "hx-radio-group",
+      "file": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "Selected radio value or null" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "RG-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but untested.",
+          "fix": "Add test calling formDisabledCallback(true/false) and verifying disabled propagation to child radios"
+        }
+      ]
+    },
+    {
+      "name": "hx-rating",
+      "tagName": "hx-rating",
+      "file": "packages/hx-library/src/components/hx-rating/hx-rating.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "high", "note": "Rating should respect fieldset disabled state" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "String(value) in updated()" },
+      "validation": { "checkValidity": false, "reportValidity": false, "setValidity": false },
+      "tests": {
+        "submission": true,
+        "validation": false,
+        "disabled": false,
+        "reset": false,
+        "autofill": false,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "RT-01",
+          "severity": "high",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-rating does not implement formDisabledCallback.",
+          "fix": "Add formDisabledCallback(disabled: boolean) { this.disabled = disabled; }"
+        },
+        {
+          "id": "RT-02",
+          "severity": "medium",
+          "title": "Missing checkValidity/reportValidity/setValidity",
+          "description": "hx-rating has no constraint validation support.",
+          "fix": "Add checkValidity(), reportValidity() delegating to _internals, and _updateValidity() for required constraint"
+        },
+        {
+          "id": "RT-03",
+          "severity": "medium",
+          "title": "No formResetCallback or formStateRestoreCallback tests",
+          "description": "Reset and restore callbacks exist but are untested.",
+          "fix": "Add tests for formResetCallback and formStateRestoreCallback"
+        }
+      ]
+    },
+    {
+      "name": "hx-select",
+      "tagName": "hx-select",
+      "file": "packages/hx-library/src/components/hx-select/hx-select.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "value or null in _updateFormValue()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "SL-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but untested.",
+          "fix": "Add test calling formDisabledCallback(true/false) and verifying disabled state"
+        }
+      ]
+    },
+    {
+      "name": "hx-slider",
+      "tagName": "hx-slider",
+      "file": "packages/hx-library/src/components/hx-slider/hx-slider.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "String(value) in updated() and event handlers" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": false, "note": "Has checkValidity/reportValidity but no setValidity constraint enforcement" },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "SLD-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but untested.",
+          "fix": "Add test calling formDisabledCallback(true/false) and verifying disabled state"
+        }
+      ]
+    },
+    {
+      "name": "hx-switch",
+      "tagName": "hx-switch",
+      "file": "packages/hx-library/src/components/hx-switch/hx-switch.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "checked ? value : null in updated()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": []
+    },
+    {
+      "name": "hx-text-input",
+      "tagName": "hx-text-input",
+      "file": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "value in updated() and input handler" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "TI-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but untested.",
+          "fix": "Add test calling formDisabledCallback(true/false) and verifying disabled state"
+        }
+      ]
+    },
+    {
+      "name": "hx-textarea",
+      "tagName": "hx-textarea",
+      "file": "packages/hx-library/src/components/hx-textarea/hx-textarea.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "implemented", "severity": "pass" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "value in updated()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": true,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "full",
+      "gaps": [
+        {
+          "id": "TA-01",
+          "severity": "low",
+          "title": "No formDisabledCallback test",
+          "description": "formDisabledCallback is implemented but untested.",
+          "fix": "Add test calling formDisabledCallback(true/false) and verifying disabled state"
+        }
+      ]
+    },
+    {
+      "name": "hx-time-picker",
+      "tagName": "hx-time-picker",
+      "file": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "high", "note": "Time picker should respect fieldset disabled state" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "value or null in updated()" },
+      "validation": { "checkValidity": true, "reportValidity": true, "setValidity": true },
+      "tests": {
+        "submission": false,
+        "validation": true,
+        "disabled": false,
+        "reset": true,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "TP-01",
+          "severity": "high",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-time-picker does not implement formDisabledCallback.",
+          "fix": "Add formDisabledCallback(disabled: boolean) { this.disabled = disabled; }"
+        },
+        {
+          "id": "TP-02",
+          "severity": "medium",
+          "title": "No FormData submission test",
+          "description": "No test verifies time picker value appears in FormData.",
+          "fix": "Add test wrapping time-picker in <form>, verify FormData contains time value"
+        }
+      ]
+    },
+    {
+      "name": "hx-toggle-button",
+      "tagName": "hx-toggle-button",
+      "file": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.ts",
+      "componentType": "form-input",
+      "callbacks": {
+        "formAssociatedCallback": { "status": "not-implemented", "severity": "info", "note": "Optional notification callback" },
+        "formDisabledCallback": { "status": "not-implemented", "severity": "medium", "note": "Toggle button should respect fieldset disabled state" },
+        "formResetCallback": { "status": "implemented", "severity": "pass" },
+        "formStateRestoreCallback": { "status": "implemented", "severity": "pass" }
+      },
+      "intentionalOmissions": [],
+      "formSubmission": { "setFormValue": true, "mechanism": "value when pressed, null when not pressed" },
+      "validation": { "checkValidity": false, "reportValidity": false, "setValidity": false },
+      "tests": {
+        "submission": true,
+        "validation": false,
+        "disabled": false,
+        "reset": false,
+        "autofill": true,
+        "formDisabledCallback": false,
+        "fieldsetDisabled": false
+      },
+      "compliance": "partial",
+      "gaps": [
+        {
+          "id": "TB-01",
+          "severity": "medium",
+          "title": "Missing formDisabledCallback",
+          "description": "hx-toggle-button does not implement formDisabledCallback.",
+          "fix": "Add formDisabledCallback(disabled: boolean) { this.disabled = disabled; }"
+        },
+        {
+          "id": "TB-02",
+          "severity": "medium",
+          "title": "Missing checkValidity/reportValidity",
+          "description": "Toggle button has no constraint validation. If used with required, form cannot validate.",
+          "fix": "Add checkValidity(), reportValidity() delegating to _internals"
+        }
+      ]
+    }
+  ],
+  "crossCuttingFindings": [
+    {
+      "id": "CC-01",
+      "severity": "high",
+      "title": "8 components missing formDisabledCallback",
+      "description": "hx-checkbox-group, hx-date-picker, hx-file-upload, hx-icon-button, hx-rating, hx-time-picker, hx-toggle-button, and hx-button do not implement formDisabledCallback. When placed inside a disabled <fieldset>, these components will not automatically become disabled.",
+      "components": ["hx-checkbox-group", "hx-date-picker", "hx-file-upload", "hx-icon-button", "hx-rating", "hx-time-picker", "hx-toggle-button", "hx-button"],
+      "pattern": "formDisabledCallback(disabled: boolean) { this.disabled = disabled; }",
+      "litLabsReference": "https://lit.dev/docs/components/lifecycle/#formDisabledCallback"
+    },
+    {
+      "id": "CC-02",
+      "severity": "medium",
+      "title": "3 form-input components missing constraint validation",
+      "description": "hx-color-picker, hx-rating, and hx-toggle-button lack checkValidity()/reportValidity()/setValidity() support. They cannot participate in native form validation.",
+      "components": ["hx-color-picker", "hx-rating", "hx-toggle-button"]
+    },
+    {
+      "id": "CC-03",
+      "severity": "medium",
+      "title": "formDisabledCallback tests nearly absent across codebase",
+      "description": "Only hx-checkbox and hx-color-picker have tests for formDisabledCallback. The other 8 components that implement it (hx-textarea, hx-slider, hx-select, hx-combobox, hx-number-input, hx-text-input, hx-switch, hx-radio-group) lack formDisabledCallback test coverage.",
+      "components": ["hx-textarea", "hx-slider", "hx-select", "hx-combobox", "hx-number-input", "hx-text-input", "hx-switch", "hx-radio-group"]
+    },
+    {
+      "id": "CC-04",
+      "severity": "medium",
+      "title": "No real fieldset disabled propagation tests",
+      "description": "No tests verify actual <fieldset disabled> propagation through the browser's native mechanism. All existing formDisabledCallback tests call the method directly rather than using a real disabled fieldset.",
+      "components": "all form-associated components"
+    },
+    {
+      "id": "CC-05",
+      "severity": "low",
+      "title": "formAssociatedCallback not implemented by any component",
+      "description": "No component overrides formAssociatedCallback. This is acceptable per spec -- it is an optional notification callback. Documented for completeness.",
+      "note": "No action required unless components need to react to form association/disassociation events."
+    }
+  ],
+  "litLabsComparison": {
+    "patternsFollowed": [
+      "static formAssociated = true",
+      "attachInternals() in constructor",
+      "setFormValue() in updated lifecycle",
+      "formResetCallback with value restoration",
+      "formStateRestoreCallback with string/File/FormData handling"
+    ],
+    "deviations": [
+      {
+        "pattern": "formDisabledCallback coverage",
+        "expected": "All form-associated components implement formDisabledCallback",
+        "actual": "Only 10 of 18 components implement it",
+        "severity": "high"
+      },
+      {
+        "pattern": "Constraint validation on all input-type components",
+        "expected": "All form inputs expose checkValidity/reportValidity",
+        "actual": "hx-color-picker, hx-rating, hx-toggle-button lack validation",
+        "severity": "medium"
+      },
+      {
+        "pattern": "Consistent _updateValidity() pattern",
+        "expected": "All components with setValidity use a unified _updateValidity method",
+        "actual": "Most do, but naming varies (_updateValidity, _syncValidity, inline calls)",
+        "severity": "low"
+      }
+    ]
+  }
+}
