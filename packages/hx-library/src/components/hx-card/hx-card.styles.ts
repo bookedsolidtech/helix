@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const helixCardStyles = css`
   :host {
     display: block;
-    color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-card-color, inherit);
     background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
   }
 
@@ -140,7 +140,7 @@ export const helixCardStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-color-neutral-600, #495057);
+    color: var(--hx-card-color, var(--hx-color-neutral-600, #495057));
   }
 
   .card__footer {
