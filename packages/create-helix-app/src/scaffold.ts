@@ -138,6 +138,17 @@ function getScripts(options: ProjectOptions): Record<string, string> {
         build: 'astro build',
         preview: 'astro preview',
       };
+    case 'vue-nuxt':
+      return {
+        dev: 'nuxt dev',
+        build: 'nuxt build',
+        preview: 'nuxt preview',
+      };
+    case 'angular':
+      return {
+        dev: 'ng serve',
+        build: 'ng build',
+      };
     case 'vanilla':
       return {
         dev: 'npx http-server . -p 3000 -o',
