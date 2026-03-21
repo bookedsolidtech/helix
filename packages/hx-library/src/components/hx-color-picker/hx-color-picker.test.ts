@@ -736,20 +736,19 @@ describe('hx-color-picker', () => {
   describe('hexToRgb 3-char shorthand', () => {
     it('parses 3-char hex #fff as white', async () => {
       const el = await fixture<HelixColorPicker>(
-        '<hx-color-picker value="#fff" format="rgb"></hx-color-picker>',
+        '<hx-color-picker inline value="#fff" format="rgb"></hx-color-picker>',
       );
       await el.updateComplete;
-      // value property stays as the original attribute; the display input shows rgb format
+      // Panel must be visible (inline) for .color-input to render
       const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
       expect(colorInput?.value).toBe('rgb(255 255 255)');
     });
 
     it('parses 3-char hex #f00 as red', async () => {
       const el = await fixture<HelixColorPicker>(
-        '<hx-color-picker value="#f00" format="rgb"></hx-color-picker>',
+        '<hx-color-picker inline value="#f00" format="rgb"></hx-color-picker>',
       );
       await el.updateComplete;
-      // value property stays as the original attribute; the display input shows rgb format
       const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
       expect(colorInput?.value).toBe('rgb(255 0 0)');
     });
@@ -773,10 +772,10 @@ describe('hx-color-picker', () => {
 
     it('gray #808080 converts to rgb with equal r, g, b channels', async () => {
       const el = await fixture<HelixColorPicker>(
-        '<hx-color-picker value="#808080" format="rgb"></hx-color-picker>',
+        '<hx-color-picker inline value="#808080" format="rgb"></hx-color-picker>',
       );
       await el.updateComplete;
-      // value property stays as-is; the display input shows the rgb-formatted value
+      // Panel must be visible (inline) for .color-input to render
       const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
       expect(colorInput?.value).toBe('rgb(128 128 128)');
     });
