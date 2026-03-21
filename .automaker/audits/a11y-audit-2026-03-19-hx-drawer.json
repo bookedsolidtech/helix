@@ -1,0 +1,66 @@
+{
+  "auditType": "accessibility",
+  "date": "2026-03-19",
+  "agent": "accessibility-engineer",
+  "model": "opus",
+  "component": "hx-drawer",
+  "summary": {
+    "totalFindings": 5,
+    "critical": 1,
+    "high": 2,
+    "medium": 1,
+    "low": 1
+  },
+  "findings": [
+    {
+      "severity": "critical",
+      "wcagCriteria": "2.4.7",
+      "title": "Close button touch target below 44x44px minimum",
+      "description": "The close button (.drawer-close-button) has explicit dimensions of 2rem x 2rem (32x32px). WCAG 2.5.8 (Target Size Minimum) requires interactive elements to have a minimum target size of 24x24px (AA), but the healthcare mandate and WCAG 2.5.5 (Target Size Enhanced, AAA best practice for healthcare) recommends 44x44px.",
+      "file": "src/components/hx-drawer/hx-drawer.styles.ts",
+      "line": 188,
+      "fix": "Change width and height of .drawer-close-button from 2rem to 2.75rem (44px), or use min-width/min-height: 44px to ensure the touch target meets the 44x44px guideline.",
+      "pattern": "missing-focus-visible"
+    },
+    {
+      "severity": "high",
+      "wcagCriteria": "4.1.2",
+      "title": "role=\"document\" on panel is incorrect for a drawer",
+      "description": "The drawer panel element has role=\"document\" (line 588). The 'document' role causes screen readers to exit forms/application mode and enter browse mode, which can interfere with keyboard interaction patterns.",
+      "file": "src/components/hx-drawer/hx-drawer.ts",
+      "line": 588,
+      "fix": "Remove role=\"document\" from the panel div. The panel is a structural child of the dialog and needs no explicit role.",
+      "pattern": "incorrect-aria-role"
+    },
+    {
+      "severity": "high",
+      "wcagCriteria": "2.1.2",
+      "title": "No-header mode removes close button, leaving no keyboard-accessible dismiss mechanism",
+      "description": "When no-header is set to true (line 506), the entire header including the close button is removed from the DOM. Keyboard-only users have no visible, discoverable way to close the drawer.",
+      "file": "src/components/hx-drawer/hx-drawer.ts",
+      "line": 506,
+      "fix": "When noHeader is true, render a visually hidden but focusable close button so keyboard and screen reader users always have a discoverable close mechanism.",
+      "pattern": "keyboard-inaccessible-hover"
+    },
+    {
+      "severity": "medium",
+      "wcagCriteria": "2.4.3",
+      "title": "Focus restoration occurs after animation delay, leaving focus in limbo",
+      "description": "In _closeDrawer() (line 327-334), focus restoration to the trigger element is deferred by the animation duration (300ms). During this window, focus remains on an element inside the drawer that is becoming invisible.",
+      "file": "src/components/hx-drawer/hx-drawer.ts",
+      "line": 328,
+      "fix": "Move focus restoration to happen immediately when _closeDrawer() is called, before the animation timeout.",
+      "pattern": "incorrect-focus-restore"
+    },
+    {
+      "severity": "low",
+      "wcagCriteria": "4.1.2",
+      "title": "Missing test for aria-labelledby pointing to correct title ID",
+      "description": "The test suite verifies that aria-labelledby is present but does not verify that the value matches the actual ID of the title element.",
+      "file": "src/components/hx-drawer/hx-drawer.test.ts",
+      "line": 528,
+      "fix": "Add an assertion that verifies the aria-labelledby value equals the id attribute of the title element.",
+      "pattern": "missing-a11y-tests"
+    }
+  ]
+}
