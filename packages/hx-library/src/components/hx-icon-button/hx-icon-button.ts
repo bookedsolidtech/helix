@@ -122,6 +122,11 @@ export class HelixIconButton extends LitElement {
     // hx-icon-button does not submit a value; no state to restore.
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Event Handling ───
 
   private _handleClick(e: MouseEvent): void {

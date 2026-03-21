@@ -197,6 +197,11 @@ export class HelixRating extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Helpers ───
 
   private get _displayValue(): number {

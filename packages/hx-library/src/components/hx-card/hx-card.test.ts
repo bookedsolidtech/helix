@@ -354,6 +354,27 @@ describe('hx-card', () => {
     });
   });
 
+  // ─── CSS Custom Properties (2) ───
+
+  describe('CSS custom properties', () => {
+    it('--hx-card-color propagates to slotted content via host inheritance', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card style="--hx-card-color: rgb(255, 255, 255)"><span id="slotted">Text</span></hx-card>',
+      );
+      const slotted = el.querySelector('#slotted') as HTMLElement;
+      const styles = getComputedStyle(slotted);
+      expect(styles.color).toBe('rgb(255, 255, 255)');
+    });
+
+    it('--hx-card-color on host computes correct color', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card style="--hx-card-color: rgb(255, 0, 0)">Content</hx-card>',
+      );
+      const styles = getComputedStyle(el);
+      expect(styles.color).toBe('rgb(255, 0, 0)');
+    });
+  });
+
   // ─── Interactive + Actions Anti-Pattern ───
 
   describe('Interactive + Actions slot (known limitation)', () => {

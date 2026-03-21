@@ -220,8 +220,8 @@ export class HelixBreadcrumb extends LitElement {
       }
     });
 
-    // Create the ellipsis element once
-    if (!this._ellipsisItem) {
+    // Create the ellipsis element once (guard for SSR — document is unavailable server-side)
+    if (!this._ellipsisItem && typeof document !== 'undefined') {
       const ellipsis = document.createElement('hx-breadcrumb-item');
       ellipsis.classList.add('hx-bc-ellipsis');
 
@@ -238,7 +238,7 @@ export class HelixBreadcrumb extends LitElement {
 
     // Insert ellipsis after first item only if not already correctly placed
     const firstItem = items[0];
-    if (!firstItem) return;
+    if (!firstItem || !this._ellipsisItem) return;
     if (this._ellipsisItem.previousElementSibling !== firstItem) {
       firstItem.after(this._ellipsisItem);
     }
@@ -302,6 +302,9 @@ export class HelixBreadcrumb extends LitElement {
       '@type': 'BreadcrumbList',
       itemListElement: items.map((item, i) => this._buildListItem(item, i + 1)),
     };
+
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document === 'undefined') return;
 
     if (!this._jsonLdScript) {
       // Dedup guard: remove any stale script with this instance's ID before
