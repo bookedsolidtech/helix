@@ -72,6 +72,24 @@ describe('hx-drawer', () => {
       expect(el.size).toBe('md');
     });
 
+    it('reflects hx-size attribute', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="lg"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer size="sm"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer size="sm" hx-size="lg"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
     it('no-header attribute hides the header', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer no-header></hx-drawer>');
       await el.updateComplete;
