@@ -165,6 +165,14 @@ export class HelixNumberInput extends LitElement {
   @property({ type: Boolean, attribute: 'no-stepper' })
   noStepper = false;
 
+  /** Accessible label for the increment button. */
+  @property({ type: String, attribute: 'label-increment' })
+  labelIncrement = 'Increment';
+
+  /** Accessible label for the decrement button. */
+  @property({ type: String, attribute: 'label-decrement' })
+  labelDecrement = 'Decrement';
+
   // ─── Internal References ───
 
   @query('.field__input')
@@ -590,7 +598,7 @@ export class HelixNumberInput extends LitElement {
                     part="increment"
                     class="field__stepper-btn"
                     type="button"
-                    aria-label="Increment"
+                    aria-label=${this.labelIncrement}
                     ?disabled=${this.disabled || this.readonly || this._atMax}
                     tabindex="-1"
                     @pointerdown=${(e: PointerEvent) => this._handleStepperPointerDown(e, 1)}
@@ -604,7 +612,7 @@ export class HelixNumberInput extends LitElement {
                     part="decrement"
                     class="field__stepper-btn"
                     type="button"
-                    aria-label="Decrement"
+                    aria-label=${this.labelDecrement}
                     ?disabled=${this.disabled || this.readonly || this._atMin}
                     tabindex="-1"
                     @pointerdown=${(e: PointerEvent) => this._handleStepperPointerDown(e, -1)}

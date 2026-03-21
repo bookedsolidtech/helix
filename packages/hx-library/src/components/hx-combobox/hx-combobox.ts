@@ -203,6 +203,13 @@ export class HelixCombobox extends LitElement {
   @property({ type: String, attribute: 'label-required' })
   labelRequired = 'Please select an option.';
 
+  /**
+   * Generates the accessible label for multi-select chip remove buttons.
+   * @param label - the option label text
+   */
+  @property({ attribute: false })
+  labelRemoveOption: (label: string) => string = (label) => `Remove ${label}`;
+
   // ─── Internal State ───
 
   /** Parsed option models derived from slotted `<option>` and `<optgroup>` elements. @internal */
@@ -706,7 +713,7 @@ export class HelixCombobox extends LitElement {
                     <button
                       type="button"
                       class="field__chip-remove"
-                      aria-label="Remove ${label}"
+                      aria-label=${this.labelRemoveOption(label)}
                       @click=${(e: Event) => {
                         e.stopPropagation();
                         this._removeValue(val);

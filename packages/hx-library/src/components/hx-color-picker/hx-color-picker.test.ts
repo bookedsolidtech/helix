@@ -662,4 +662,20 @@ describe('hx-color-picker', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for gradient area', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.labelGradient).toBe('Color gradient');
+    });
+
+    it('renders custom labelGradient when set via property', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      el.labelGradient = 'Dégradé de couleur';
+      await el.updateComplete;
+      expect(el.labelGradient).toBe('Dégradé de couleur');
+    });
+  });
 });
