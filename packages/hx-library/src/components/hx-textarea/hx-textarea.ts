@@ -168,6 +168,13 @@ export class HelixTextarea extends LitElement {
   showCount = false;
 
   /**
+   * Validation message shown when the field is required but empty.
+   * @attr required-message
+   */
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'This field is required.';
+
+  /**
    * Accessible name for screen readers, if different from the visible label.
    * @attr aria-label
    */
@@ -294,7 +301,7 @@ export class HelixTextarea extends LitElement {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'This field is required.',
+        this.error || this.requiredMessage,
         anchor,
       );
     } else if (

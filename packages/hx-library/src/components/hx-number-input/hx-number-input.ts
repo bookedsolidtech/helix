@@ -165,6 +165,27 @@ export class HelixNumberInput extends LitElement {
   @property({ type: Boolean, attribute: 'no-stepper' })
   noStepper = false;
 
+  /**
+   * Validation message shown when the field is required but empty.
+   * @attr required-message
+   */
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'This field is required.';
+
+  /**
+   * Accessible label for the increment (+) stepper button.
+   * @attr increment-label
+   */
+  @property({ attribute: 'increment-label' })
+  incrementLabel = 'Increment';
+
+  /**
+   * Accessible label for the decrement (-) stepper button.
+   * @attr decrement-label
+   */
+  @property({ attribute: 'decrement-label' })
+  decrementLabel = 'Decrement';
+
   // ─── Internal References ───
 
   @query('.field__input')
@@ -278,7 +299,7 @@ export class HelixNumberInput extends LitElement {
     if (this.required && this.value === null) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'This field is required.',
+        this.error || this.requiredMessage,
         this._input ?? undefined,
       );
       return;
@@ -590,7 +611,7 @@ export class HelixNumberInput extends LitElement {
                     part="increment"
                     class="field__stepper-btn"
                     type="button"
-                    aria-label="Increment"
+                    aria-label=${this.incrementLabel}
                     ?disabled=${this.disabled || this.readonly || this._atMax}
                     tabindex="-1"
                     @pointerdown=${(e: PointerEvent) => this._handleStepperPointerDown(e, 1)}
@@ -604,7 +625,7 @@ export class HelixNumberInput extends LitElement {
                     part="decrement"
                     class="field__stepper-btn"
                     type="button"
-                    aria-label="Decrement"
+                    aria-label=${this.decrementLabel}
                     ?disabled=${this.disabled || this.readonly || this._atMin}
                     tabindex="-1"
                     @pointerdown=${(e: PointerEvent) => this._handleStepperPointerDown(e, -1)}

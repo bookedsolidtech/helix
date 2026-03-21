@@ -131,6 +131,34 @@ export class HelixPagination extends LitElement {
   @property({ type: String, attribute: 'label-rows-per-page' })
   labelRowsPerPage = 'Rows per page:';
 
+  /**
+   * Accessible label for the "First page" navigation button.
+   * @attr first-page-label
+   */
+  @property({ attribute: 'first-page-label' })
+  firstPageLabel = 'First page';
+
+  /**
+   * Accessible label for the "Previous page" navigation button.
+   * @attr previous-page-label
+   */
+  @property({ attribute: 'previous-page-label' })
+  previousPageLabel = 'Previous page';
+
+  /**
+   * Accessible label for the "Next page" navigation button.
+   * @attr next-page-label
+   */
+  @property({ attribute: 'next-page-label' })
+  nextPageLabel = 'Next page';
+
+  /**
+   * Accessible label for the "Last page" navigation button.
+   * @attr last-page-label
+   */
+  @property({ attribute: 'last-page-label' })
+  lastPageLabel = 'Last page';
+
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   @state() private _rovingKey: number | string | null = null;
 
@@ -314,7 +342,7 @@ export class HelixPagination extends LitElement {
                       ?disabled=${isFirst}
                       tabindex=${rovingKey === 'first' ? 0 : -1}
                       data-roving-key="first"
-                      aria-label="First page"
+                      aria-label=${this.firstPageLabel}
                       @click=${() => this._navigate(1)}
                     >
                       «
@@ -330,7 +358,7 @@ export class HelixPagination extends LitElement {
                 ?disabled=${isFirst}
                 tabindex=${rovingKey === 'prev' ? 0 : -1}
                 data-roving-key="prev"
-                aria-label="Previous page"
+                aria-label=${this.previousPageLabel}
                 @click=${() => this._navigate(this.currentPage - 1)}
               >
                 ‹
@@ -375,7 +403,7 @@ export class HelixPagination extends LitElement {
                 ?disabled=${isLast}
                 tabindex=${rovingKey === 'next' ? 0 : -1}
                 data-roving-key="next"
-                aria-label="Next page"
+                aria-label=${this.nextPageLabel}
                 @click=${() => this._navigate(this.currentPage + 1)}
               >
                 ›
@@ -391,7 +419,7 @@ export class HelixPagination extends LitElement {
                       ?disabled=${isLast}
                       tabindex=${rovingKey === 'last' ? 0 : -1}
                       data-roving-key="last"
-                      aria-label="Last page"
+                      aria-label=${this.lastPageLabel}
                       @click=${() => this._navigate(this.totalPages)}
                     >
                       »
