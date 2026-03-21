@@ -87,22 +87,38 @@ describe('hx-steps', () => {
   // ─── Property: size ───
 
   describe('Property: size', () => {
-    it('reflects size attr to host', async () => {
+    it('reflects hx-size attr to host', async () => {
       const el = await fixture<HelixSteps>(
-        '<hx-steps size="lg"><hx-step label="A" status="pending"></hx-step></hx-steps>',
+        '<hx-steps hx-size="lg"><hx-step label="A" status="pending"></hx-step></hx-steps>',
       );
-      expect(el.getAttribute('size')).toBe('lg');
+      expect(el.getAttribute('hx-size')).toBe('lg');
     });
 
-    it('propagates size to child hx-step elements', async () => {
+    it('propagates size to child hx-step elements via hx-size', async () => {
       const el = await fixture<HelixSteps>(
-        '<hx-steps size="sm"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="pending"></hx-step></hx-steps>',
+        '<hx-steps hx-size="sm"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="pending"></hx-step></hx-steps>',
       );
       await el.updateComplete;
       const steps = el.querySelectorAll('hx-step');
       steps.forEach((step) => {
         expect((step as HelixStep).size).toBe('sm');
       });
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps size="sm"><hx-step label="A" status="pending"></hx-step></hx-steps>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps size="sm" hx-size="lg"><hx-step label="A" status="pending"></hx-step></hx-steps>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 

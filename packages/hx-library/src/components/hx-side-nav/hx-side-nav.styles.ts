@@ -21,7 +21,7 @@ export const helixSideNavStyles = css`
     color: var(--hx-side-nav-color, var(--hx-color-neutral-100, #f3f4f6));
     transition: width var(--hx-transition-normal, 300ms) ease;
     overflow: hidden;
-    border-right: var(--hx-border-width-thin, 1px) solid
+    border-inline-end: var(--hx-border-width-thin, 1px) solid
       var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #374151));
   }
 
@@ -84,7 +84,7 @@ export const helixSideNavStyles = css`
     justify-content: center;
     width: var(--hx-space-8, 2rem);
     height: var(--hx-space-8, 2rem);
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
     padding: 0;
     border: none;

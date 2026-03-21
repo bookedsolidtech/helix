@@ -454,9 +454,12 @@ export class HelixColorPicker extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     // P1-1: Remove using the same stored references added in connectedCallback
-    document.removeEventListener('click', this._boundDocumentClick, true);
-    document.removeEventListener('pointermove', this._boundPointerMove);
-    document.removeEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._boundDocumentClick, true);
+      document.removeEventListener('pointermove', this._boundPointerMove);
+      document.removeEventListener('pointerup', this._boundPointerUp);
+    }
   }
 
   override willUpdate(changedProperties: PropertyValues<this>): void {
@@ -520,13 +523,19 @@ export class HelixColorPicker extends LitElement {
   private _show(): void {
     if (this._open || this.inline) return;
     this._open = true;
-    document.addEventListener('click', this._boundDocumentClick, true);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._boundDocumentClick, true);
+    }
   }
 
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
-    document.removeEventListener('click', this._boundDocumentClick, true);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._boundDocumentClick, true);
+    }
   }
 
   private _handleDocumentClick(e: MouseEvent): void {
@@ -560,8 +569,11 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingGrid = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointermove', this._boundPointerMove);
+      document.addEventListener('pointerup', this._boundPointerUp);
+    }
     this._updateGridFromPointer(e);
   }
 
@@ -613,8 +625,11 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingHue = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointermove', this._boundPointerMove);
+      document.addEventListener('pointerup', this._boundPointerUp);
+    }
     this._updateHueFromPointer(e);
   }
 
@@ -635,8 +650,11 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingOpacity = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointermove', this._boundPointerMove);
+      document.addEventListener('pointerup', this._boundPointerUp);
+    }
     this._updateOpacityFromPointer(e);
   }
 
@@ -663,8 +681,11 @@ export class HelixColorPicker extends LitElement {
       this._draggingGrid = false;
       this._draggingHue = false;
       this._draggingOpacity = false;
-      document.removeEventListener('pointermove', this._boundPointerMove);
-      document.removeEventListener('pointerup', this._boundPointerUp);
+      // Guard for SSR — document is unavailable server-side
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('pointermove', this._boundPointerMove);
+        document.removeEventListener('pointerup', this._boundPointerUp);
+      }
       this._commit('change');
     }
   }

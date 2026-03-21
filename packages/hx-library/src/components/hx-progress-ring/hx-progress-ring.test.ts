@@ -170,18 +170,34 @@ describe('hx-progress-ring', () => {
       expect(el.size).toBe('md');
     });
 
-    it('reflects size attribute sm', async () => {
+    it('reflects hx-size attribute sm', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring hx-size="sm"></hx-progress-ring>',
+      );
+      expect(el.getAttribute('hx-size')).toBe('sm');
+    });
+
+    it('reflects hx-size attribute lg', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring hx-size="lg"></hx-progress-ring>',
+      );
+      expect(el.getAttribute('hx-size')).toBe('lg');
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
       const el = await fixture<HelixProgressRing>(
         '<hx-progress-ring size="sm"></hx-progress-ring>',
       );
-      expect(el.getAttribute('size')).toBe('sm');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
     });
 
-    it('reflects size attribute lg', async () => {
+    it('hx-size takes precedence over legacy size attribute', async () => {
       const el = await fixture<HelixProgressRing>(
-        '<hx-progress-ring size="lg"></hx-progress-ring>',
+        '<hx-progress-ring size="sm" hx-size="lg"></hx-progress-ring>',
       );
-      expect(el.getAttribute('size')).toBe('lg');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 

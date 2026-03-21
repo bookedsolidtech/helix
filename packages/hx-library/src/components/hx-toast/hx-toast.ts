@@ -87,6 +87,8 @@ export class HelixToast extends LitElement {
 
   /** @internal Returns true when the user has opted into reduced motion. */
   private get _reducedMotion(): boolean {
+    // Guard for SSR — window.matchMedia is unavailable server-side
+    if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 

@@ -2,6 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixStatStyles } from './hx-stat.styles.js';
 
 export type StatSize = 'sm' | 'md' | 'lg';
@@ -69,10 +70,23 @@ export class HelixStat extends LitElement {
 
   /**
    * Size variant controlling font size.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: StatSize = 'md';
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-stat', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as StatSize;
+    }
+  }
 
   // ─── Slot Detection ───
 

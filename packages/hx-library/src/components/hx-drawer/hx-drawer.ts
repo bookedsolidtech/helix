@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -170,9 +171,9 @@ export class HelixDrawer extends LitElement {
 
   /**
    * The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: DrawerSize = 'md';
 
   /**
@@ -213,6 +214,17 @@ export class HelixDrawer extends LitElement {
   closeLabel = 'Close drawer';
 
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-drawer', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as DrawerSize;
+    }
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -277,7 +289,8 @@ export class HelixDrawer extends LitElement {
 
   private _openDrawer(): void {
     // Capture trigger for focus restoration (P2-04: use instanceof guard)
-    const active = document.activeElement;
+    // Guard for SSR — document is unavailable server-side
+    const active = typeof document !== 'undefined' ? document.activeElement : null;
     this._triggerElement = active instanceof HTMLElement ? active : null;
 
     // P1-05: clear any pending animation timeout before scheduling a new one
@@ -347,7 +360,12 @@ export class HelixDrawer extends LitElement {
   }
 
   private _getAnimationDuration(): number {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
+    // Guard for SSR — window.matchMedia is unavailable server-side
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return 0;
     return 300;
   }
 
@@ -355,6 +373,8 @@ export class HelixDrawer extends LitElement {
 
   private _hideBackgroundFromScreenReaders(): void {
     if (this.contained) return;
+    // Guard for SSR — document.body is unavailable server-side
+    if (typeof document === 'undefined') return;
     this._siblingAriaHiddenElements = [];
     Array.from(document.body.children).forEach((child) => {
       if (child === this || child.contains(this)) return;
@@ -375,11 +395,17 @@ export class HelixDrawer extends LitElement {
   // ─── Event Listeners (P1-01: use only document listener, not overlay) ───
 
   private _addListeners(): void {
-    document.addEventListener('keydown', this._handleKeyDown);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', this._handleKeyDown);
+    }
   }
 
   private _removeListeners(): void {
-    document.removeEventListener('keydown', this._handleKeyDown);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('keydown', this._handleKeyDown);
+    }
   }
 
   // ─── Keyboard Handler ───
