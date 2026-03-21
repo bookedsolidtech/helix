@@ -643,6 +643,31 @@ describe('hx-color-picker', () => {
       expect(data.get('theme-color')).toBe('#ff0000');
       form.remove();
     });
+
+    it('checkValidity returns true when not required', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('checkValidity returns false when required and value is empty', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker required value=""></hx-color-picker>');
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity returns true when required and value is set', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker required value="#ff0000"></hx-color-picker>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity is a function', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(typeof el.reportValidity).toBe('function');
+    });
+
+    it('validity.valueMissing is true when required and value is empty', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker required value=""></hx-color-picker>');
+      expect(el.validity.valueMissing).toBe(true);
+    });
   });
 
   // ─── Accessibility (axe-core) (2) ───
