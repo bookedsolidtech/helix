@@ -685,20 +685,35 @@ export const HxDataTable = createComponent({
  * Wrap your layout with this provider to ensure components are available.
  *
  * In Next.js App Router, this MUST be a client component ('use client').
+ *
+ * SSR Notes (from HELiX SSR audit):
+ * - 61 components are fully SSR-safe (no browser API in render path)
+ * - 27 components need client hydration for interactivity
+ * - 8 components are client-only (toast, drawer, carousel, color-picker, counter, theme)
+ * - All form components use module-level counters (no crypto.randomUUID — SSR-safe)
+ * - For client-only components, use next/dynamic with ssr: false
  */
 import { useEffect, useState, type ReactNode } from 'react';
 
 interface HelixProviderProps {
   children: ReactNode;
+  /** Explicit theme — avoids window.matchMedia SSR error from hx-theme */
+  theme?: 'light' | 'dark' | 'system';
 }
 
-export function HelixProvider({ children }: HelixProviderProps) {
+export function HelixProvider({ children, theme }: HelixProviderProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     // Dynamic import ensures HELiX only loads on the client
-    import('@helixui/library').then(() => setReady(true)).catch(() => setReady(true));
-  }, []);
+    import('@helixui/library').then(() => {
+      // Set explicit theme to avoid hx-theme's matchMedia SSR issue
+      if (theme && theme !== 'system') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+      setReady(true);
+    }).catch(() => setReady(true));
+  }, [theme]);
 
   // Render children immediately — components will upgrade when loaded
   return <>{children}</>;
