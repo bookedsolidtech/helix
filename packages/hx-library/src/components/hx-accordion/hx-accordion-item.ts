@@ -94,12 +94,14 @@ export class HelixAccordionItem extends LitElement {
    * an `<h3>` (which breaks the native toggle), we apply
    * `role="heading" aria-level="N"` directly on `<summary>`.
    */
+  /** @internal */
   private get _headingLevel(): number {
     return Math.max(1, Math.min(6, this.level));
   }
 
   // ─── Toggle Logic ───
 
+  /** @internal */
   private _toggle(): void {
     if (this.disabled) return;
 
@@ -109,6 +111,7 @@ export class HelixAccordionItem extends LitElement {
     this._dispatchToggleEvent(willExpand);
   }
 
+  /** @internal */
   _dispatchToggleEvent(expanded: boolean): void {
     const detail = { expanded, itemId: this.id || '' };
     const options = { bubbles: true, composed: true, detail };
@@ -126,11 +129,13 @@ export class HelixAccordionItem extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleSummaryClick(e: MouseEvent): void {
     e.preventDefault();
     this._toggle();
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();

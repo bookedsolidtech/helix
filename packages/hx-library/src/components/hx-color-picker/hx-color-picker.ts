@@ -323,10 +323,14 @@ export class HelixColorPicker extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
     // P1-1: Store bound references so connectedCallback/disconnectedCallback use the same object
+    /** @internal */
     this._boundPointerMove = this._handlePointerMove.bind(this);
+    /** @internal */
     this._boundPointerUp = this._handlePointerUp.bind(this);
+    /** @internal */
     this._boundDocumentClick = this._handleDocumentClick.bind(this);
   }
 
@@ -515,6 +519,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Sync ────────────────────────────────────────────────────────────────
 
+  /** @internal */
   private _syncFromValue(): void {
     const parsed = parseColor(this.value);
     if (parsed) {
@@ -566,6 +571,7 @@ export class HelixColorPicker extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -580,6 +586,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _commit(source: 'drag' | 'change'): void {
     const formatted = formatColor(this._hsv, this.format, this.opacity);
     this.value = formatted;
@@ -600,6 +607,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Panel open/close ────────────────────────────────────────────────────
 
+  /** @internal */
   private _show(): void {
     if (this._open || this.inline) return;
     this._open = true;
@@ -609,6 +617,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
@@ -618,6 +627,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleDocumentClick(e: MouseEvent): void {
     if (!this._open) return;
     if (!e.composedPath().includes(this)) {
@@ -625,6 +635,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleTriggerClick(e: MouseEvent): void {
     e.stopPropagation();
     if (this._open) {
@@ -634,6 +645,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handlePanelKeydown(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
       e.stopPropagation();
@@ -644,6 +656,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Gradient grid dragging ───────────────────────────────────────────────
 
+  /** @internal */
   private _handleGridPointerDown(e: PointerEvent): void {
     if (this.disabled) return;
     e.preventDefault();
@@ -657,6 +670,7 @@ export class HelixColorPicker extends LitElement {
     this._updateGridFromPointer(e);
   }
 
+  /** @internal */
   private _updateGridFromPointer(e: PointerEvent): void {
     const grid = this.shadowRoot?.querySelector<HTMLElement>('[part="grid"]');
     if (!grid) return;
@@ -669,6 +683,7 @@ export class HelixColorPicker extends LitElement {
   }
 
   // P0-1: Keyboard support for gradient grid — fixes WCAG 2.1 SC 2.1.1 failure
+  /** @internal */
   private _handleGridKeydown(e: KeyboardEvent): void {
     let sDelta = 0;
     let vDelta = 0;
@@ -700,6 +715,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Hue slider dragging ─────────────────────────────────────────────────
 
+  /** @internal */
   private _handleHuePointerDown(e: PointerEvent): void {
     if (this.disabled) return;
     e.preventDefault();
@@ -713,6 +729,7 @@ export class HelixColorPicker extends LitElement {
     this._updateHueFromPointer(e);
   }
 
+  /** @internal */
   private _updateHueFromPointer(e: PointerEvent): void {
     const track = this.shadowRoot?.querySelector<HTMLElement>('[part="hue-slider"]');
     if (!track) return;
@@ -725,6 +742,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Opacity slider dragging ──────────────────────────────────────────────
 
+  /** @internal */
   private _handleOpacityPointerDown(e: PointerEvent): void {
     if (this.disabled) return;
     e.preventDefault();
@@ -738,6 +756,7 @@ export class HelixColorPicker extends LitElement {
     this._updateOpacityFromPointer(e);
   }
 
+  /** @internal */
   private _updateOpacityFromPointer(e: PointerEvent): void {
     const track = this.shadowRoot?.querySelector<HTMLElement>('[part="opacity-slider"]');
     if (!track) return;
@@ -750,12 +769,14 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Document-level pointer handlers ─────────────────────────────────────
 
+  /** @internal */
   private _handlePointerMove(e: PointerEvent): void {
     if (this._draggingGrid) this._updateGridFromPointer(e);
     else if (this._draggingHue) this._updateHueFromPointer(e);
     else if (this._draggingOpacity) this._updateOpacityFromPointer(e);
   }
 
+  /** @internal */
   private _handlePointerUp(): void {
     if (this._draggingGrid || this._draggingHue || this._draggingOpacity) {
       this._draggingGrid = false;
@@ -772,6 +793,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Keyboard handling for sliders ───────────────────────────────────────
 
+  /** @internal */
   private _handleHueKeydown(e: KeyboardEvent): void {
     let delta = 0;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') delta = -1;
@@ -794,6 +816,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleOpacityKeydown(e: KeyboardEvent): void {
     let delta = 0;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') delta = -0.01;
@@ -819,6 +842,7 @@ export class HelixColorPicker extends LitElement {
   // ─── Input ───────────────────────────────────────────────────────────────
 
   // P1-7: Bound to @input (was @change) for real-time color preview while typing
+  /** @internal */
   private _handleInputChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     const parsed = parseColor(input.value.trim());
@@ -829,6 +853,7 @@ export class HelixColorPicker extends LitElement {
     this._inputValue = input.value;
   }
 
+  /** @internal */
   private _handleInputBlur(e: FocusEvent): void {
     const input = e.target as HTMLInputElement;
     const parsed = parseColor(input.value.trim());
@@ -841,6 +866,7 @@ export class HelixColorPicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleFormatCycle(): void {
     const formats: ColorFormat[] = ['hex', 'rgb', 'hsl', 'hsv'];
     const idx = formats.indexOf(this.format);
@@ -851,6 +877,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Swatches ────────────────────────────────────────────────────────────
 
+  /** @internal */
   private _handleSwatchClick(color: string): void {
     const parsed = parseColor(color);
     if (parsed) {
@@ -861,10 +888,12 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Computed values ──────────────────────────────────────────────────────
 
+  /** @internal */
   private _hueColor(): string {
     return `hsl(${Math.round(this._hsv.h)}, 100%, 50%)`;
   }
 
+  /** @internal */
   private _previewColor(): string {
     const rgb = hsvToRgb(this._hsv);
     if (this.opacity && this._hsv.a < 1) {
@@ -875,6 +904,7 @@ export class HelixColorPicker extends LitElement {
 
   // ─── Render helpers ───────────────────────────────────────────────────────
 
+  /** @internal */
   private _renderGrid() {
     const thumbX = `${this._hsv.s}%`;
     const thumbY = `${100 - this._hsv.v}%`;
@@ -912,6 +942,7 @@ export class HelixColorPicker extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderHueSlider() {
     const pct = `${(this._hsv.h / 360) * 100}%`;
     const hueColor = this._hueColor();
@@ -941,6 +972,7 @@ export class HelixColorPicker extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderOpacitySlider() {
     if (!this.opacity) return nothing;
     const pct = `${this._hsv.a * 100}%`;
@@ -974,6 +1006,7 @@ export class HelixColorPicker extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderSwatches() {
     if (!this.swatches?.length) return nothing;
     return html`
@@ -994,6 +1027,7 @@ export class HelixColorPicker extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderInput() {
     return html`
       <div part="input" class="input-area">
@@ -1025,6 +1059,7 @@ export class HelixColorPicker extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderPanel() {
     // A11y fix (WCAG 4.1.2): use role="group" instead of role="dialog" + aria-modal="true".
     // aria-modal="true" requires a programmatic focus trap so screen readers restrict virtual

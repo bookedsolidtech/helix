@@ -88,6 +88,7 @@ export class HelixRating extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -232,6 +233,7 @@ export class HelixRating extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && this.value === 0) {
       this._internals.setValidity(
@@ -246,10 +248,12 @@ export class HelixRating extends LitElement {
 
   // ─── Helpers ───
 
+  /** @internal */
   private get _displayValue(): number {
     return this._hoverValue ?? this.value;
   }
 
+  /** @internal */
   private _clampAndSnap(v: number): number {
     const clamped = Math.min(Math.max(0, v), this.max);
     const steps = Math.round(clamped / this.precision);
@@ -257,10 +261,12 @@ export class HelixRating extends LitElement {
     return parseFloat(snapped.toFixed(this.precision === 0.5 ? 1 : 0));
   }
 
+  /** @internal */
   private _ariaValueText(): string {
     return this.labelValueText(this.value, this.max);
   }
 
+  /** @internal */
   private _getStarState(i: number): 'full' | 'half' | 'empty' {
     const dv = this._displayValue;
     if (dv >= i) return 'full';
@@ -269,6 +275,7 @@ export class HelixRating extends LitElement {
   }
 
   /** Star i is "checked" when its integer value or its half-value matches the current value. */
+  /** @internal */
   private _isChecked(i: number): boolean {
     if (Math.abs(this.value - i) < 0.01) return true;
     if (this.precision === 0.5 && Math.abs(this.value - (i - 0.5)) < 0.01) return true;
@@ -276,6 +283,7 @@ export class HelixRating extends LitElement {
   }
 
   /** Resolve the clicked/hovered value from mouse position within a star element. */
+  /** @internal */
   private _resolveValue(e: MouseEvent, i: number): number {
     if (this.precision === 0.5) {
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -287,6 +295,7 @@ export class HelixRating extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _setValue(v: number): void {
     if (this.readonly || this.disabled) return;
     const next = this._clampAndSnap(v);
@@ -301,6 +310,7 @@ export class HelixRating extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (this.readonly || this.disabled) return;
     let next: number | null = null;
@@ -338,11 +348,13 @@ export class HelixRating extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSymbolClick(e: MouseEvent, i: number): void {
     if (this.readonly || this.disabled) return;
     this._setValue(this._resolveValue(e, i));
   }
 
+  /** @internal */
   private _handleSymbolMouseEnter(e: MouseEvent, i: number): void {
     if (this.readonly || this.disabled) return;
     const val = this._resolveValue(e, i);
@@ -356,6 +368,7 @@ export class HelixRating extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleSymbolMouseMove(e: MouseEvent, i: number): void {
     if (this.readonly || this.disabled || this.precision !== 0.5) return;
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -373,12 +386,14 @@ export class HelixRating extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleMouseLeave(): void {
     this._hoverValue = null;
   }
 
   // ─── SVG Star Icons ───
 
+  /** @internal */
   private _renderFullStar() {
     return html`
       <svg
@@ -396,6 +411,7 @@ export class HelixRating extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderHalfStar() {
     return html`
       <span class="star-half" aria-hidden="true">
@@ -429,6 +445,7 @@ export class HelixRating extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderEmptyStar() {
     return html`
       <svg
@@ -448,6 +465,7 @@ export class HelixRating extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderStarIcon(state: 'full' | 'half' | 'empty') {
     if (state === 'full') return this._renderFullStar();
     if (state === 'half') return this._renderHalfStar();

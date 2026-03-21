@@ -55,10 +55,12 @@ export class HelixNumberInput extends LitElement {
 
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -175,32 +177,43 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Internal References ───
 
+  /** @internal */
   @query('.field__input')
   declare private _input: HTMLInputElement | null;
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _hasLabelSlot = false;
+  /** @internal */
   @state() private _hasErrorSlot = false;
+  /** @internal */
   @state() private _hasHelpSlot = false;
 
   /** The value captured at first render, used by formResetCallback. */
+  /** @internal */
   private _defaultValue: number | null = null;
 
   /** Timer ID for the long-press initial delay. */
+  /** @internal */
   private _longPressTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Interval ID for the long-press rapid-repeat phase. */
+  /** @internal */
   private _repeatInterval: ReturnType<typeof setInterval> | null = null;
 
   // ─── Stable IDs ───
 
+  /** @internal */
   private readonly _inputId = `hx-number-input-${++_hxNumberInputIdCounter}`;
+  /** @internal */
   private readonly _helpTextId = `${this._inputId}-help`;
+  /** @internal */
   private readonly _errorId = `${this._inputId}-error`;
 
   // ─── Slot Tracking ───
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedElements().length > 0;
@@ -212,6 +225,7 @@ export class HelixNumberInput extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const assigned = slot.assignedElements();
@@ -221,6 +235,7 @@ export class HelixNumberInput extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedElements().length > 0;
@@ -278,10 +293,12 @@ export class HelixNumberInput extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _syncFormValue(): void {
     this._internals.setFormValue(this.value !== null ? String(this.value) : null);
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && this.value === null) {
       this._internals.setValidity(
@@ -352,16 +369,19 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Value Parsing ───
 
+  /** @internal */
   private _finite(value: number | undefined): number | undefined {
     return Number.isFinite(value) ? value : undefined;
   }
 
+  /** @internal */
   private _parseInput(raw: string): number | null {
     if (raw === '' || raw === null) return null;
     const parsed = parseFloat(raw);
     return isNaN(parsed) ? null : parsed;
   }
 
+  /** @internal */
   private _clamp(v: number): number {
     let result = v;
     const min = this._finite(this.min);
@@ -373,14 +393,17 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Stepper Helpers ───
 
+  /** @internal */
   private get _atMin(): boolean {
     return this.value !== null && this.min !== undefined && this.value <= this.min;
   }
 
+  /** @internal */
   private get _atMax(): boolean {
     return this.value !== null && this.max !== undefined && this.value >= this.max;
   }
 
+  /** @internal */
   private _applyStep(delta: number): void {
     if (this.disabled || this.readonly) return;
 
@@ -402,6 +425,7 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Long-press ───
 
+  /** @internal */
   private _clearLongPress(): void {
     if (this._longPressTimer !== null) {
       clearTimeout(this._longPressTimer);
@@ -413,6 +437,7 @@ export class HelixNumberInput extends LitElement {
     }
   }
 
+  /** @internal */
   private _startLongPress(delta: number): void {
     this._applyStep(delta);
     this._longPressTimer = setTimeout(() => {
@@ -422,18 +447,21 @@ export class HelixNumberInput extends LitElement {
     }, 400);
   }
 
+  /** @internal */
   private _handleStepperPointerDown(e: PointerEvent, delta: number): void {
     if (this.disabled || this.readonly) return;
     e.preventDefault();
     this._startLongPress(delta);
   }
 
+  /** @internal */
   private _handleStepperPointerUp(): void {
     this._clearLongPress();
   }
 
   // ─── Keyboard ───
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (this.disabled || this.readonly) return;
     if (e.key === 'ArrowUp') {
@@ -447,6 +475,7 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Input Events ───
 
+  /** @internal */
   private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = this._parseInput(target.value);
@@ -461,6 +490,7 @@ export class HelixNumberInput extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     const parsed = this._parseInput(target.value);
@@ -491,6 +521,7 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderIncrementIcon() {
     return html`<svg
       xmlns="http://www.w3.org/2000/svg"
@@ -502,6 +533,7 @@ export class HelixNumberInput extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderDecrementIcon() {
     return html`<svg
       xmlns="http://www.w3.org/2000/svg"

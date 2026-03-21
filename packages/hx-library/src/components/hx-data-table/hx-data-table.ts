@@ -166,6 +166,7 @@ export class HelixDataTable extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state()
   private _selectedRows: Set<number> = new Set();
 
@@ -222,6 +223,7 @@ export class HelixDataTable extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleSort(key: string): void {
     const direction =
       this.sortKey === key ? (this.sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
@@ -236,6 +238,7 @@ export class HelixDataTable extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleRowClick(row: Record<string, unknown>, index: number): void {
     this.dispatchEvent(
       new CustomEvent<{ row: Record<string, unknown>; index: number }>('hx-row-click', {
@@ -246,6 +249,7 @@ export class HelixDataTable extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleSelect(index: number, checked: boolean): void {
     const next = new Set(this._selectedRows);
     if (checked) {
@@ -257,11 +261,13 @@ export class HelixDataTable extends LitElement {
     this._dispatchSelect();
   }
 
+  /** @internal */
   private _handleSelectAll(checked: boolean): void {
     this._selectedRows = checked ? new Set(this.rows.map((_, i) => i)) : new Set<number>();
     this._dispatchSelect();
   }
 
+  /** @internal */
   private _dispatchSelect(): void {
     this.dispatchEvent(
       new CustomEvent<{ selectedRows: Record<string, unknown>[] }>('hx-select', {
@@ -279,6 +285,7 @@ export class HelixDataTable extends LitElement {
 
   // ─── Keyboard Navigation ───
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', ' '].includes(e.key))
       return;
@@ -346,6 +353,7 @@ export class HelixDataTable extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderSortIcon(key: string) {
     const isActive = this.sortKey === key;
     const iconClass = [
@@ -371,6 +379,7 @@ export class HelixDataTable extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderHeaderRow() {
     return html`
       <tr part="tr">
@@ -425,6 +434,7 @@ export class HelixDataTable extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderSkeletonRows() {
     return Array.from(
       { length: 3 },
@@ -447,6 +457,7 @@ export class HelixDataTable extends LitElement {
     );
   }
 
+  /** @internal */
   private _renderEmptyRow() {
     const colSpan = this.columns.length + (this.selectable ? 1 : 0);
     return html`
@@ -458,6 +469,7 @@ export class HelixDataTable extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderDataRows() {
     let displayRows = this.rows;
 

@@ -80,31 +80,39 @@ export class HelixDialog extends LitElement {
 
   // ─── Queries ───
 
+  /** @internal */
   @query('dialog')
   private _dialogEl: HTMLDialogElement | null | undefined;
 
   // ─── Internal state ───
 
-  /** Tracks whether a header slot has been assigned content. */
+  /** Tracks whether a header slot has been assigned content.  * @internal
+   */
   @state()
   private _hasHeaderSlot = false;
 
-  /** Tracks whether a footer slot has been assigned content. */
+  /** Tracks whether a footer slot has been assigned content.  * @internal
+   */
   @state()
   private _hasFooterSlot = false;
 
   /** Cached focusable elements — populated on open, cleared on close. */
+  /** @internal */
   private _cachedFocusableElements: HTMLElement[] = [];
 
   /** The element that had focus when the dialog opened — restored on close (D1). */
+  /** @internal */
   private _triggerElement: HTMLElement | null = null;
 
   /** Pending returnValue to pass to native dialog.close() (D11). */
+  /** @internal */
   private _pendingReturnValue: string | undefined = undefined;
 
   // ─── Unique IDs for aria-labelledby / aria-describedby ───
 
+  /** @internal */
   private readonly _headingId = `hx-dialog-heading-${++_dialogCounter}`;
+  /** @internal */
   private readonly _descriptionId = `hx-dialog-description-${_dialogCounter}`;
 
   // ─── Public Properties ───
@@ -240,6 +248,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Private: Open / Close ───
 
+  /** @internal */
   private _openDialog(): void {
     const dialog = this._dialogEl;
     if (!dialog) return;
@@ -279,6 +288,7 @@ export class HelixDialog extends LitElement {
     );
   }
 
+  /** @internal */
   private _closeDialog(): void {
     const dialog = this._dialogEl;
     if (!dialog) return;
@@ -317,12 +327,14 @@ export class HelixDialog extends LitElement {
 
   // ─── Event Listeners ───
 
+  /** @internal */
   private _addGlobalListeners(): void {
     this._dialogEl?.addEventListener('keydown', this._handleKeyDown);
     this._dialogEl?.addEventListener('click', this._handleDialogClick);
     this._dialogEl?.addEventListener('cancel', this._handleNativeCancel);
   }
 
+  /** @internal */
   private _removeGlobalListeners(): void {
     this._dialogEl?.removeEventListener('keydown', this._handleKeyDown);
     this._dialogEl?.removeEventListener('click', this._handleDialogClick);
@@ -331,6 +343,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Keyboard Handler ───
 
+  /** @internal */
   private _handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') {
       // Native dialog fires a 'cancel' event before close when Escape is pressed.
@@ -348,6 +361,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Focus Trap ───
 
+  /** @internal */
   private _getFocusableElements(): HTMLElement[] {
     const focusableSelectors = [
       'a[href]',
@@ -386,6 +400,7 @@ export class HelixDialog extends LitElement {
     );
   }
 
+  /** @internal */
   private _trapFocus(e: KeyboardEvent): void {
     const focusable =
       this._cachedFocusableElements.length > 0
@@ -423,6 +438,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Backdrop Click ───
 
+  /** @internal */
   private _handleDialogClick = (e: MouseEvent): void => {
     if (!this.closeOnBackdrop) return;
 
@@ -437,6 +453,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Non-modal backdrop click ───
 
+  /** @internal */
   private _handleBackdropClick = (): void => {
     if (!this.closeOnBackdrop) return;
     this._cancel();
@@ -444,6 +461,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Native cancel (Escape via browser, before our handler runs) ───
 
+  /** @internal */
   private _handleNativeCancel = (e: Event): void => {
     // We always prevent the native cancel so we can manage close state ourselves.
     e.preventDefault();
@@ -451,6 +469,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Cancel logic ───
 
+  /** @internal */
   private _cancel(): void {
     this.dispatchEvent(
       new CustomEvent<void>('hx-cancel', {
@@ -465,11 +484,13 @@ export class HelixDialog extends LitElement {
 
   // ─── Slot change handlers ───
 
+  /** @internal */
   private _handleHeaderSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHeaderSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleFooterSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasFooterSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -477,6 +498,7 @@ export class HelixDialog extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderHeader() {
     const hasHeading = this.heading.trim().length > 0;
 
@@ -498,6 +520,7 @@ export class HelixDialog extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderFooter() {
     return html`
       <div part="footer" class="dialog__footer" ?hidden=${!this._hasFooterSlot}>
@@ -506,6 +529,7 @@ export class HelixDialog extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderNonModalBackdrop() {
     if (this.modal || !this.open) return nothing;
     return html`
@@ -519,6 +543,7 @@ export class HelixDialog extends LitElement {
   }
 
   // D8 — render visually-hidden description for aria-describedby
+  /** @internal */
   private _renderDescription() {
     if (!this.description) return nothing;
     return html`<span id=${this._descriptionId} class="dialog__description"

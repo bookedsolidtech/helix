@@ -21,7 +21,9 @@ export class HelixFormatDate extends LitElement {
   static override styles = [tokenStyles, helixFormatDateStyles];
 
   // ─── Intl formatter caches (keyed by locale+options fingerprint) ───
+  /** @internal */
   private static _dtfCache = new Map<string, Intl.DateTimeFormat>();
+  /** @internal */
   private static _rtfCache = new Map<string, Intl.RelativeTimeFormat>();
 
   /**
@@ -136,6 +138,7 @@ export class HelixFormatDate extends LitElement {
 
   // ─── Private helpers ───
 
+  /** @internal */
   private _getDate(): Date {
     const val = this.date;
     if (val === '') return new Date();
@@ -158,11 +161,13 @@ export class HelixFormatDate extends LitElement {
     return isNaN(parsed.getTime()) ? new Date() : parsed;
   }
 
+  /** @internal */
   private _getLocale(): string {
     if (this.lang) return this.lang;
     return document.documentElement.lang || navigator.language || 'en';
   }
 
+  /** @internal */
   private _getHour12(): boolean | undefined {
     if (this.hourFormat === '12') return true;
     if (this.hourFormat === '24') return false;
@@ -174,6 +179,7 @@ export class HelixFormatDate extends LitElement {
    * timezone-offset ISO string (e.g. `2024-09-20T05:00:00-04:00`) so that
    * assistive technology reads the same local time as the visual display.
    */
+  /** @internal */
   private _getDatetimeAttr(date: Date): string {
     if (!this.timeZone) return date.toISOString();
     try {
@@ -220,6 +226,7 @@ export class HelixFormatDate extends LitElement {
     }
   }
 
+  /** @internal */
   private _formatRelative(date: Date): string {
     const now = new Date();
     const diffMs = date.getTime() - now.getTime();
@@ -259,6 +266,7 @@ export class HelixFormatDate extends LitElement {
     }
   }
 
+  /** @internal */
   private _formatAbsolute(date: Date): string {
     const options: Intl.DateTimeFormatOptions = {};
 

@@ -114,10 +114,14 @@ export class HelixCodeSnippet extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _copied: boolean = false;
+  /** @internal */
   @state() private _expanded: boolean = false;
+  /** @internal */
   @state() private _codeText: string = '';
 
+  /** @internal */
   private _copyTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ─── Lifecycle ───
@@ -143,6 +147,7 @@ export class HelixCodeSnippet extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement | null;
     if (!slot) return;
@@ -150,6 +155,7 @@ export class HelixCodeSnippet extends LitElement {
     this._codeText = nodes.map((n) => n.textContent ?? '').join('');
   }
 
+  /** @internal */
   private _handleCopy(): void {
     const text = this._codeText;
 
@@ -174,12 +180,14 @@ export class HelixCodeSnippet extends LitElement {
     }, 2000);
   }
 
+  /** @internal */
   private _handleExpand(): void {
     this._expanded = !this._expanded;
   }
 
   // ─── Helpers ───
 
+  /** @internal */
   private _getDisplayLines(): string[] {
     const lines = this._codeText.split('\n');
     if (!this.maxLines || this.maxLines <= 0 || this._expanded) {
@@ -191,12 +199,14 @@ export class HelixCodeSnippet extends LitElement {
     return lines.slice(0, this.maxLines);
   }
 
+  /** @internal */
   private _isTruncated(): boolean {
     if (!this.maxLines || this.maxLines <= 0) return false;
     const lines = this._codeText.split('\n');
     return lines.length > this.maxLines;
   }
 
+  /** @internal */
   private _renderLines(lines: string[]): TemplateResult {
     if (!this.lineNumbers) {
       return html`${lines.join('\n')}`;

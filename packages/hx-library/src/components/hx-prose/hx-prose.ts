@@ -82,6 +82,7 @@ export class HelixProse extends LitElement {
 
   // ─── Private ───
 
+  /** @internal */
   private _applyMaxWidth(): void {
     if (this.maxWidth) {
       this.style.setProperty('--hx-prose-max-width', this.maxWidth);
@@ -90,6 +91,7 @@ export class HelixProse extends LitElement {
     }
   }
 
+  /** @internal */
   private _applySize(): void {
     const sizeMap: Record<string, string> = {
       sm: 'var(--hx-font-size-sm, 0.875rem)',

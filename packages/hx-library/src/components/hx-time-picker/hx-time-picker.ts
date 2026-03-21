@@ -185,6 +185,7 @@ export class HelixTimePicker extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -443,6 +444,7 @@ export class HelixTimePicker extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -480,6 +482,7 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Listbox helpers ───
 
+  /** @internal */
   private _openListbox(): void {
     if (this._open) return;
     // Pre-set active index to currently selected slot (or 0)
@@ -488,18 +491,21 @@ export class HelixTimePicker extends LitElement {
     this._open = true;
   }
 
+  /** @internal */
   private _closeListbox(): void {
     if (!this._open) return;
     this._open = false;
     this._activeIndex = -1;
   }
 
+  /** @internal */
   private _scrollActiveOptionIntoView(): void {
     if (!this._listboxEl) return;
     const active = this._listboxEl.querySelector<HTMLElement>('.field__option--active');
     active?.scrollIntoView({ block: 'nearest' });
   }
 
+  /** @internal */
   private _selectSlot(slot: TimeSlot): void {
     const clamped = clampValue(slot.value, this.min, this.max);
     this.value = clamped;
@@ -509,6 +515,7 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Slot tracking ───
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const nodes = slot.assignedNodes({ flatten: true });
@@ -530,11 +537,13 @@ export class HelixTimePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -542,6 +551,7 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Event Dispatch ───
 
+  /** @internal */
   private _dispatchChange(value: string): void {
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-change', {
@@ -554,10 +564,12 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Input Handlers ───
 
+  /** @internal */
   private _handleInputClick(): void {
     if (!this.disabled) this._openListbox();
   }
 
+  /** @internal */
   private _handleToggleClick(e: MouseEvent): void {
     e.stopPropagation();
     if (this.disabled) return;
@@ -569,6 +581,7 @@ export class HelixTimePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleInputInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this._inputDisplayValue = target.value;
@@ -576,6 +589,7 @@ export class HelixTimePicker extends LitElement {
     if (!this._open) this._openListbox();
   }
 
+  /** @internal */
   private _handleInputChange(e: Event): void {
     const target = e.target as HTMLInputElement;
     const raw = target.value.trim();
@@ -604,6 +618,7 @@ export class HelixTimePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleInputKeyDown(e: KeyboardEvent): void {
     switch (e.key) {
       case 'ArrowDown':
@@ -659,16 +674,19 @@ export class HelixTimePicker extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleOptionPointerDown(e: MouseEvent): void {
     // Prevent the input from losing focus when clicking an option
     e.preventDefault();
   }
 
+  /** @internal */
   private _handleOptionClick(slot: TimeSlot): void {
     this._selectSlot(slot);
     this._inputEl?.focus();
   }
 
+  /** @internal */
   private _handleOptionMouseEnter(index: number): void {
     this._activeIndex = index;
   }

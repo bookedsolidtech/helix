@@ -84,15 +84,21 @@ export class HelixSelect extends LitElement {
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
   // ─── Stable IDs ───
 
+  /** @internal */
   private _selectId = `hx-select-${++_hxSelectIdCounter}`;
+  /** @internal */
   private _listboxId = `${this._selectId}-listbox`;
+  /** @internal */
   private _labelId = `${this._selectId}-label`;
+  /** @internal */
   private _helpTextId = `${this._selectId}-help`;
+  /** @internal */
   private _errorId = `${this._selectId}-error`;
 
   // ─── Public Properties ───
@@ -195,6 +201,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Computed helpers ───
 
+  /** @internal */
   private get _displayValue(): string {
     if (!this.value) return '';
     const opt = this._options.find((o) => o.value === this.value);
@@ -257,10 +264,12 @@ export class HelixSelect extends LitElement {
     return this._internals.reportValidity();
   }
 
+  /** @internal */
   private _updateFormValue(): void {
     this._internals.setFormValue(this.value || null);
   }
 
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -296,6 +305,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Native Select Sync ───
 
+  /** @internal */
   private _syncNativeSelect(): void {
     if (!this._select) return;
     if (this.value) {
@@ -305,6 +315,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Option Syncing from Slot ───
 
+  /** @internal */
   private _parseOption(el: HTMLOptionElement): SelectOption {
     return { value: el.value, label: el.textContent?.trim() ?? el.value, disabled: el.disabled };
   }
@@ -314,6 +325,7 @@ export class HelixSelect extends LitElement {
    * listbox AND clones them into the native <select> for form participation.
    * Handles both top-level <option> and <optgroup> children.
    */
+  /** @internal */
   private _handleSlotChange(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
@@ -360,6 +372,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Slot Change Handlers ───
 
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -367,6 +380,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Dropdown Control ───
 
+  /** @internal */
   private _toggleDropdown(): void {
     if (!this.disabled) {
       this.open = !this.open;
@@ -382,6 +396,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Keyboard Navigation ───
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (this.disabled) return;
 
@@ -489,6 +504,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Selection ───
 
+  /** @internal */
   private _selectOption(option: SelectOption): void {
     if (option.disabled) return;
     this.value = option.value; // triggers updated() → sync + formValue + validity
@@ -499,6 +515,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Event Dispatchers ───
 
+  /** @internal */
   private _dispatchChange(): void {
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-change', {
@@ -509,6 +526,7 @@ export class HelixSelect extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleNativeChange(e: Event): void {
     this.value = (e.target as HTMLSelectElement).value; // triggers updated()
     this._dispatchChange();
@@ -516,6 +534,7 @@ export class HelixSelect extends LitElement {
 
   // ─── Outside Click Handler ───
 
+  /** @internal */
   private _handleOutsideClick = (e: MouseEvent): void => {
     if (this.open && !e.composedPath().includes(this)) {
       this.open = false;
@@ -531,10 +550,12 @@ export class HelixSelect extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _optionId(index: number): string {
     return `hx-select-option-${this._selectId}-${index}`;
   }
 
+  /** @internal */
   private _renderOptions() {
     if (this._options.length === 0) {
       return html`<div class="field__no-options">No options found</div>`;

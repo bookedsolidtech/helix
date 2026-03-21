@@ -136,6 +136,7 @@ export class HelixDropdown extends LitElement {
 
   // ─── Open/Close ───
 
+  /** @internal */
   private async _show(): Promise<void> {
     if (this.open || this.disabled) return;
     this.open = true;
@@ -157,6 +158,7 @@ export class HelixDropdown extends LitElement {
   }
 
   // P2-02: returnFocus=true only on Escape; Tab should let focus advance naturally.
+  /** @internal */
   private _hide(returnFocus = true): void {
     if (!this.open) return;
     this.open = false;
@@ -172,6 +174,7 @@ export class HelixDropdown extends LitElement {
 
   // ─── Positioning ───
 
+  /** @internal */
   private async _updatePosition(): Promise<void> {
     const reference = this._triggerWrapper;
     const panel = this._panel;
@@ -196,6 +199,7 @@ export class HelixDropdown extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleTriggerClick(e: MouseEvent): void {
     e.stopPropagation();
     if (this.open) {
@@ -205,6 +209,7 @@ export class HelixDropdown extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleTriggerKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
       e.preventDefault();
@@ -212,6 +217,7 @@ export class HelixDropdown extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.open) {
       e.stopPropagation();
@@ -230,6 +236,7 @@ export class HelixDropdown extends LitElement {
   };
 
   // P2-01: Move focus among menuitem elements using arrow keys.
+  /** @internal */
   private _handleMenuNavigation(key: string): void {
     const items = this._getFocusableMenuItems();
     if (items.length === 0) return;
@@ -248,6 +255,7 @@ export class HelixDropdown extends LitElement {
   }
 
   // P0-01 / P2-01: Get focusable menu items from slotted content.
+  /** @internal */
   private _getFocusableMenuItems(): HTMLElement[] {
     const panel = this._panel;
     if (!panel) return [];
@@ -266,6 +274,7 @@ export class HelixDropdown extends LitElement {
   }
 
   // P0-01: Find the first focusable element in slotted panel content.
+  /** @internal */
   private _getFirstFocusableItem(): HTMLElement | null {
     const panel = this._panel;
     if (!panel) return null;
@@ -282,6 +291,7 @@ export class HelixDropdown extends LitElement {
     return null;
   }
 
+  /** @internal */
   private _handleOutsideClick = (e: MouseEvent): void => {
     const path = e.composedPath();
     if (!path.includes(this)) {
@@ -289,6 +299,7 @@ export class HelixDropdown extends LitElement {
     }
   };
 
+  /** @internal */
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
     // P2-06: Narrow selector — bare 'li' and 'button' cause spurious hx-select events.
@@ -335,6 +346,7 @@ export class HelixDropdown extends LitElement {
 
   // ─── ARIA setup for trigger slot ───
 
+  /** @internal */
   private _onTriggerSlotChange(): void {
     this._setupTriggerAria();
   }
@@ -343,6 +355,7 @@ export class HelixDropdown extends LitElement {
     this._setupTriggerAria();
   }
 
+  /** @internal */
   private _setupTriggerAria(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
     if (!slot) return;

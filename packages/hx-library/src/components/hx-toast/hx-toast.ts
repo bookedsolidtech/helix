@@ -78,6 +78,7 @@ export class HelixToast extends LitElement {
 
   // ─── Private State ───
 
+  /** @internal */
   @query('.toast') private _toastEl!: HTMLElement | null;
 
   /** @internal */
@@ -249,6 +250,7 @@ export class HelixToast extends LitElement {
   // Each semantic variant renders a default icon when no icon is slotted,
   // ensuring the severity is not conveyed by color alone.
 
+  /** @internal */
   private _renderSuccessIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true" width="16" height="16">
       <path
@@ -258,6 +260,7 @@ export class HelixToast extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderWarningIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true" width="16" height="16">
       <path
@@ -267,6 +270,7 @@ export class HelixToast extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderDangerIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true" width="16" height="16">
       <path
@@ -276,6 +280,7 @@ export class HelixToast extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderInfoIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true" width="16" height="16">
       <path
@@ -303,6 +308,7 @@ export class HelixToast extends LitElement {
 
   // ─── WCAG 1.4.1: Severity label map ───
 
+  /** @internal */
   private static readonly _SEVERITY_LABELS: Partial<Record<ToastVariant, string>> = {
     success: 'Success',
     warning: 'Warning',
@@ -310,6 +316,7 @@ export class HelixToast extends LitElement {
     info: 'Info',
   };
 
+  /** @internal */
   private get _severityLabel(): string {
     return HelixToast._SEVERITY_LABELS[this.variant] ?? '';
   }
