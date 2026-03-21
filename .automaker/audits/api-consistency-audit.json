@@ -1,0 +1,1369 @@
+{
+  "auditType": "api-naming-consistency",
+  "date": "2026-03-20",
+  "agent": "principal-engineer",
+  "model": "opus",
+  "summary": {
+    "componentsAudited": 77,
+    "subComponentsAudited": 19,
+    "totalFindings": 47,
+    "critical": 3,
+    "high": 8,
+    "medium": 18,
+    "low": 18,
+    "breakingChangePatterns": 6,
+    "keyMetrics": {
+      "propertiesTotal": 500,
+      "eventsTotal": 45,
+      "slotsTotal": 120,
+      "cssPartsTotal": 95,
+      "cssCustomPropertiesTotal": 200,
+      "publicMethodsTotal": 35,
+      "componentsWithSizeProperty": 32,
+      "componentsUsingSizeWithHxAttribute": 19,
+      "componentsUsingSizeWithoutHxAttribute": 13,
+      "componentsUsingVariant": 21,
+      "componentsUsingType": 5,
+      "booleanDefaultingTrue": 4,
+      "componentsWithHelpText": 11,
+      "componentsWithHardcodedCssValues": 43,
+      "hxEventPrefixCompliance": "100%"
+    }
+  },
+  "components": [
+    {
+      "name": "hx-accordion",
+      "properties": [
+        { "name": "mode", "type": "String", "default": "'single'", "reflect": true, "attribute": "mode" }
+      ],
+      "subComponents": [
+        {
+          "name": "hx-accordion-item",
+          "properties": [
+            { "name": "expanded", "type": "Boolean", "default": "false", "reflect": true, "attribute": "expanded" },
+            { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+            { "name": "level", "type": "Number", "default": "3", "reflect": false, "attribute": "level" }
+          ]
+        }
+      ],
+      "events": ["hx-expand", "hx-collapse"],
+      "slots": ["default", "header"],
+      "cssParts": ["base", "header", "content"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-action-bar",
+      "properties": [
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" },
+        { "name": "position", "type": "String", "default": "'top'", "reflect": true, "attribute": "position" },
+        { "name": "ariaLabel", "type": "String", "default": "'Actions'", "reflect": false, "attribute": "aria-label" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-alert",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'info'", "reflect": true, "attribute": "variant" },
+        { "name": "dismissible", "type": "Boolean", "default": "false", "reflect": true, "attribute": "dismissible" },
+        { "name": "heading", "type": "String", "default": "''", "reflect": false, "attribute": "heading" },
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" },
+        { "name": "showIcon", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-icon" },
+        { "name": "accent", "type": "Boolean", "default": "false", "reflect": true, "attribute": "accent" },
+        { "name": "returnFocusTo", "type": "String", "default": "null", "reflect": false, "attribute": "return-focus-to" }
+      ],
+      "events": ["hx-close", "hx-after-hide"],
+      "slots": ["default", "icon", "title", "action", "close-button"],
+      "cssParts": ["base", "alert", "icon", "title", "message", "actions", "close-button"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-avatar",
+      "properties": [
+        { "name": "src", "type": "String", "default": "undefined", "reflect": false, "attribute": "src" },
+        { "name": "alt", "type": "String", "default": "''", "reflect": false, "attribute": "alt" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "initials", "type": "String", "default": "''", "reflect": false, "attribute": "initials" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "shape", "type": "String", "default": "'circle'", "reflect": true, "attribute": "shape" }
+      ],
+      "events": [],
+      "slots": ["default", "icon"],
+      "cssParts": ["base", "image", "initials", "icon"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-badge",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "pill", "type": "Boolean", "default": "false", "reflect": true, "attribute": "pill" },
+        { "name": "pulse", "type": "Boolean", "default": "false", "reflect": true, "attribute": "pulse" },
+        { "name": "removable", "type": "Boolean", "default": "false", "reflect": true, "attribute": "removable" },
+        { "name": "count", "type": "Number", "default": "undefined", "reflect": true, "attribute": "count" },
+        { "name": "max", "type": "Number", "default": "99", "reflect": true, "attribute": "max" }
+      ],
+      "events": ["hx-remove"],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-banner",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'info'", "reflect": true, "attribute": "variant" },
+        { "name": "dismissible", "type": "Boolean", "default": "false", "reflect": true, "attribute": "dismissible" },
+        { "name": "open", "type": "Boolean", "default": "true", "reflect": true, "attribute": "open", "anomaly": "boolean-default-true" },
+        { "name": "showIcon", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-icon" },
+        { "name": "actionHref", "type": "String", "default": "''", "reflect": false, "attribute": "action-href" },
+        { "name": "actionLabel", "type": "String", "default": "'Action'", "reflect": false, "attribute": "action-label" }
+      ],
+      "events": ["hx-dismiss"],
+      "slots": ["default", "icon", "action"],
+      "cssParts": ["base", "icon", "message", "actions", "close-button"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-breadcrumb",
+      "properties": [
+        { "name": "maxItems", "type": "Number", "default": "3", "reflect": false, "attribute": "max-items" },
+        { "name": "jsonLd", "type": "Boolean", "default": "false", "reflect": true, "attribute": "json-ld" }
+      ],
+      "subComponents": [
+        {
+          "name": "hx-breadcrumb-item",
+          "properties": [
+            { "name": "dataBcLast", "type": "Boolean", "default": "false", "reflect": false, "attribute": "data-bc-last", "anomaly": "non-standard-naming" }
+          ]
+        }
+      ],
+      "events": [],
+      "slots": ["default", "separator"],
+      "cssParts": ["base", "list", "separator"],
+      "anomalies": ["non-standard-naming"]
+    },
+    {
+      "name": "hx-button",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "loading", "type": "Boolean", "default": "false", "reflect": true, "attribute": "loading" },
+        { "name": "type", "type": "String", "default": "'button'", "reflect": false, "attribute": "type" },
+        { "name": "href", "type": "String", "default": "undefined", "reflect": false, "attribute": "href" },
+        { "name": "target", "type": "String", "default": "undefined", "reflect": false, "attribute": "target" },
+        { "name": "name", "type": "String", "default": "undefined", "reflect": false, "attribute": "name" },
+        { "name": "value", "type": "String", "default": "undefined", "reflect": false, "attribute": "value" },
+        { "name": "full", "type": "Boolean", "default": "false", "reflect": true, "attribute": "full" },
+        { "name": "inverted", "type": "Boolean", "default": "false", "reflect": true, "attribute": "inverted" }
+      ],
+      "events": ["hx-click"],
+      "slots": ["default", "prefix", "suffix"],
+      "cssParts": ["button", "label", "prefix", "suffix", "spinner"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-button-group",
+      "properties": [
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-card",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'outline'", "reflect": true, "attribute": "variant" },
+        { "name": "hxHref", "type": "String", "default": "''", "reflect": false, "attribute": "hx-href", "anomaly": "non-standard-naming" },
+        { "name": "hxAriaLabel", "type": "String", "default": "''", "reflect": false, "attribute": "hx-aria-label", "anomaly": "non-standard-naming" }
+      ],
+      "events": ["hx-click"],
+      "slots": ["default", "header", "footer", "media"],
+      "cssParts": ["base", "header", "body", "footer", "media"],
+      "anomalies": ["non-standard-naming"]
+    },
+    {
+      "name": "hx-carousel",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'carousel'", "reflect": true, "attribute": "variant" },
+        { "name": "slidesPerPage", "type": "Number", "default": "1", "reflect": false, "attribute": "slides-per-page" },
+        { "name": "slidesPerMove", "type": "Number", "default": "1", "reflect": false, "attribute": "slides-per-move" },
+        { "name": "autoplay", "type": "Boolean", "default": "false", "reflect": true, "attribute": "autoplay" },
+        { "name": "autoplayInterval", "type": "Number", "default": "5000", "reflect": false, "attribute": "autoplay-interval" },
+        { "name": "mouseDragging", "type": "Boolean", "default": "false", "reflect": false, "attribute": "mouse-dragging" }
+      ],
+      "events": ["hx-slide-change"],
+      "slots": ["default", "previous-button", "next-button"],
+      "cssParts": ["base", "slides", "navigation", "pagination"],
+      "methods": ["next()", "previous()", "goToSlide(index)"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-checkbox",
+      "properties": [
+        { "name": "checked", "type": "Boolean", "default": "false", "reflect": true, "attribute": "checked" },
+        { "name": "indeterminate", "type": "Boolean", "default": "false", "reflect": true, "attribute": "indeterminate" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "value", "type": "String", "default": "'on'", "reflect": false, "attribute": "value" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" }
+      ],
+      "events": ["hx-change"],
+      "slots": ["default", "help-text"],
+      "cssParts": ["base", "control", "label", "help-text"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-checkbox-group",
+      "properties": [
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "orientation", "type": "String", "default": "'vertical'", "reflect": true, "attribute": "orientation" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" }
+      ],
+      "events": ["hx-change"],
+      "slots": ["default", "label", "help-text", "error"],
+      "cssParts": ["group", "label", "items", "help-text", "error-message"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-code-snippet",
+      "properties": [
+        { "name": "code", "type": "String", "default": "''", "reflect": false, "attribute": "code" },
+        { "name": "lang", "type": "String", "default": "'plaintext'", "reflect": true, "attribute": "lang" },
+        { "name": "lineNumbers", "type": "Boolean", "default": "false", "reflect": true, "attribute": "line-numbers" },
+        { "name": "maxLines", "type": "Number", "default": "undefined", "reflect": false, "attribute": "max-lines" },
+        { "name": "copyable", "type": "Boolean", "default": "true", "reflect": true, "attribute": "copyable", "anomaly": "boolean-default-true" }
+      ],
+      "events": ["hx-copy"],
+      "slots": ["default"],
+      "cssParts": ["base", "code", "copy-button", "expand-button"],
+      "methods": ["show()", "hide()"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-color-picker",
+      "properties": [
+        { "name": "value", "type": "String", "default": "'#2563EB'", "reflect": true, "attribute": "value" },
+        { "name": "swatchesOnly", "type": "Boolean", "default": "false", "reflect": true, "attribute": "swatches-only" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" }
+      ],
+      "events": ["hx-change", "hx-input"],
+      "slots": ["label", "help-text", "error"],
+      "cssParts": ["base", "trigger", "panel"],
+      "methods": ["show()", "hide()"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-combobox",
+      "properties": [
+        { "name": "value", "type": "String", "default": "''", "reflect": true, "attribute": "value" },
+        { "name": "placeholder", "type": "String", "default": "'Select...'", "reflect": false, "attribute": "placeholder" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "multiple", "type": "Boolean", "default": "false", "reflect": true, "attribute": "multiple" },
+        { "name": "filterDebounce", "type": "Number", "default": "200", "reflect": false, "attribute": "filter-debounce" },
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" }
+      ],
+      "events": ["hx-change", "hx-input", "hx-show", "hx-hide"],
+      "slots": ["default", "label", "prefix", "suffix", "help-text", "error", "empty-label"],
+      "cssParts": ["field", "label", "input", "trigger", "listbox", "option", "prefix", "suffix", "help-text", "error", "clear-button"],
+      "methods": ["checkValidity()", "reportValidity()", "focus()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-container",
+      "properties": [
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": ["inner"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-copy-button",
+      "properties": [
+        { "name": "value", "type": "String", "default": "''", "reflect": false, "attribute": "value" },
+        { "name": "variant", "type": "String", "default": "'secondary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "feedbackDuration", "type": "Number", "default": "2000", "reflect": false, "attribute": "feedback-duration" }
+      ],
+      "events": ["hx-copy", "hx-copy-error"],
+      "slots": ["default", "copied"],
+      "cssParts": ["button"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-counter",
+      "properties": [
+        { "name": "value", "type": "Number", "default": "0", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "Number", "default": "undefined", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "Number", "default": "undefined", "reflect": false, "attribute": "max" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": ["hx-change"],
+      "slots": [],
+      "cssParts": ["base", "button", "value"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-data-table",
+      "properties": [
+        { "name": "data", "type": "Array", "default": "[]", "reflect": false, "attribute": null },
+        { "name": "columns", "type": "Array", "default": "[]", "reflect": false, "attribute": null },
+        { "name": "sortKey", "type": "String", "default": "''", "reflect": false, "attribute": "sort-key" },
+        { "name": "sortDirection", "type": "String", "default": "'asc'", "reflect": false, "attribute": "sort-direction" },
+        { "name": "pageSize", "type": "Number", "default": "10", "reflect": false, "attribute": "page-size" },
+        { "name": "currentPage", "type": "Number", "default": "1", "reflect": false, "attribute": "current-page" },
+        { "name": "emptyLabel", "type": "String", "default": "'No data'", "reflect": false, "attribute": "empty-label" },
+        { "name": "stickyHeader", "type": "Boolean", "default": "false", "reflect": true, "attribute": "sticky-header" },
+        { "name": "variant", "type": "String", "default": "'table'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": ["hx-sort", "hx-row-click", "hx-page-change"],
+      "slots": ["default", "empty"],
+      "cssParts": ["base", "header", "body", "row", "cell", "sort-button"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-date-picker",
+      "properties": [
+        { "name": "value", "type": "String", "default": "''", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "String", "default": "''", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "String", "default": "''", "reflect": false, "attribute": "max" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "placeholder", "type": "String", "default": "'YYYY-MM-DD'", "reflect": false, "attribute": "placeholder" }
+      ],
+      "events": ["hx-change", "hx-input"],
+      "slots": ["label", "prefix", "suffix", "help-text", "error"],
+      "cssParts": ["field", "label", "input", "trigger", "help-text", "error"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-dialog",
+      "properties": [
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" },
+        { "name": "modal", "type": "Boolean", "default": "true", "reflect": true, "attribute": "modal", "anomaly": "boolean-default-true" },
+        { "name": "heading", "type": "String", "default": "''", "reflect": false, "attribute": "heading" },
+        { "name": "closable", "type": "Boolean", "default": "true", "reflect": true, "attribute": "closable", "anomaly": "boolean-default-true" }
+      ],
+      "events": ["hx-open", "hx-close", "hx-cancel"],
+      "slots": ["default", "header", "footer"],
+      "cssParts": ["base", "dialog", "header", "body", "footer", "backdrop", "close-button"],
+      "methods": ["show()", "showModal()", "close(returnValue?)"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-divider",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'horizontal'", "reflect": true, "attribute": "variant" },
+        { "name": "spacing", "type": "String", "default": "'md'", "reflect": true, "attribute": "spacing" }
+      ],
+      "events": [],
+      "slots": [],
+      "cssParts": ["base"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-drawer",
+      "properties": [
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" },
+        { "name": "direction", "type": "String", "default": "'start'", "reflect": true, "attribute": "direction" },
+        { "name": "heading", "type": "String", "default": "''", "reflect": false, "attribute": "heading" },
+        { "name": "closable", "type": "Boolean", "default": "true", "reflect": true, "attribute": "closable", "anomaly": "boolean-default-true" },
+        { "name": "overlay", "type": "Boolean", "default": "true", "reflect": true, "attribute": "overlay", "anomaly": "boolean-default-true" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "noHeader", "type": "Boolean", "default": "false", "reflect": true, "attribute": "no-header" },
+        { "name": "noFooter", "type": "Boolean", "default": "false", "reflect": true, "attribute": "no-footer" }
+      ],
+      "events": ["hx-show", "hx-after-show", "hx-hide", "hx-after-hide", "hx-initial-focus"],
+      "slots": ["default", "header", "footer"],
+      "cssParts": ["base", "dialog", "header", "body", "footer", "backdrop", "close-button"],
+      "methods": ["show()", "close()"],
+      "anomalies": ["boolean-default-true", "missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-dropdown",
+      "properties": [
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" },
+        { "name": "placement", "type": "String", "default": "'bottom'", "reflect": true, "attribute": "placement" },
+        { "name": "trigger", "type": "String", "default": "'click'", "reflect": false, "attribute": "trigger" },
+        { "name": "distance", "type": "Number", "default": "8", "reflect": false, "attribute": "distance" },
+        { "name": "skidding", "type": "Number", "default": "0", "reflect": false, "attribute": "skidding" }
+      ],
+      "events": ["hx-show", "hx-hide", "hx-select"],
+      "slots": ["default", "trigger"],
+      "cssParts": ["base", "trigger", "panel"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-field",
+      "properties": [
+        { "name": "hxSize", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size", "anomaly": "non-standard-naming" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "orientation", "type": "String", "default": "'vertical'", "reflect": true, "attribute": "orientation" }
+      ],
+      "events": [],
+      "slots": ["default", "label", "help-text", "error"],
+      "cssParts": ["field", "label", "help-text", "error"],
+      "anomalies": ["non-standard-naming"]
+    },
+    {
+      "name": "hx-field-label",
+      "properties": [
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": false, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": false, "attribute": "disabled" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": ["label", "required-indicator"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-file-upload",
+      "properties": [
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "accept", "type": "String", "default": "''", "reflect": false, "attribute": "accept" },
+        { "name": "multiple", "type": "Boolean", "default": "false", "reflect": false, "attribute": "multiple" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "maxFiles", "type": "Number", "default": "5", "reflect": false, "attribute": "max-files" },
+        { "name": "maxSize", "type": "Number", "default": "5242880", "reflect": false, "attribute": "max-size" }
+      ],
+      "events": ["hx-upload", "hx-remove", "hx-error"],
+      "slots": ["default", "label", "help-text", "error", "file-list"],
+      "cssParts": ["base", "dropzone", "file-list"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-form",
+      "properties": [
+        { "name": "novalidate", "type": "Boolean", "default": "false", "reflect": false, "attribute": "novalidate" },
+        { "name": "action", "type": "String", "default": "''", "reflect": false, "attribute": "action" },
+        { "name": "method", "type": "String", "default": "'post'", "reflect": false, "attribute": "method" }
+      ],
+      "events": ["hx-submit", "hx-invalid", "hx-reset"],
+      "slots": ["default"],
+      "cssParts": ["form"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-format-date",
+      "properties": [
+        { "name": "value", "type": "String", "default": "''", "reflect": false, "attribute": "value" },
+        { "name": "locale", "type": "String", "default": "'en-US'", "reflect": false, "attribute": "locale" },
+        { "name": "hourFormat", "type": "String", "default": "'auto'", "reflect": false, "attribute": "hour-format" },
+        { "name": "timeZone", "type": "String", "default": "'UTC'", "reflect": false, "attribute": "time-zone" },
+        { "name": "timeZoneName", "type": "String", "default": "'short'", "reflect": false, "attribute": "time-zone-name" }
+      ],
+      "events": [],
+      "slots": [],
+      "cssParts": [],
+      "anomalies": []
+    },
+    {
+      "name": "hx-grid",
+      "properties": [
+        { "name": "columns", "type": "Number", "default": "12", "reflect": true, "attribute": "columns" },
+        { "name": "gap", "type": "String", "default": "'md'", "reflect": true, "attribute": "gap" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": []
+    },
+    {
+      "name": "hx-help-text",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": []
+    },
+    {
+      "name": "hx-icon",
+      "properties": [
+        { "name": "icon", "type": "String", "default": "''", "reflect": true, "attribute": "icon" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "spriteUrl", "type": "String", "default": "''", "reflect": false, "attribute": "sprite-url" },
+        { "name": "title", "type": "String", "default": "''", "reflect": false, "attribute": "title" }
+      ],
+      "events": [],
+      "slots": [],
+      "cssParts": ["base", "svg"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-icon-button",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'secondary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "loading", "type": "Boolean", "default": "false", "reflect": true, "attribute": "loading" },
+        { "name": "type", "type": "String", "default": "'button'", "reflect": false, "attribute": "type" },
+        { "name": "href", "type": "String", "default": "undefined", "reflect": false, "attribute": "href" },
+        { "name": "target", "type": "String", "default": "undefined", "reflect": false, "attribute": "target" }
+      ],
+      "events": ["hx-click"],
+      "slots": ["default"],
+      "cssParts": ["button", "spinner"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-image",
+      "properties": [
+        { "name": "src", "type": "String", "default": "''", "reflect": true, "attribute": "src" },
+        { "name": "alt", "type": "String", "default": "''", "reflect": false, "attribute": "alt" },
+        { "name": "sizes", "type": "String", "default": "''", "reflect": false, "attribute": "sizes" },
+        { "name": "fallbackSrc", "type": "String", "default": "''", "reflect": false, "attribute": "fallback-src" },
+        { "name": "aspectRatio", "type": "String", "default": "undefined", "reflect": true, "attribute": "aspect-ratio" },
+        { "name": "objectFit", "type": "String", "default": "'cover'", "reflect": true, "attribute": "object-fit" }
+      ],
+      "events": ["hx-load", "hx-error"],
+      "slots": ["fallback"],
+      "cssParts": ["base", "image"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-link",
+      "properties": [
+        { "name": "href", "type": "String", "default": "''", "reflect": true, "attribute": "href" },
+        { "name": "target", "type": "String", "default": "''", "reflect": false, "attribute": "target" },
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" }
+      ],
+      "events": ["hx-click"],
+      "slots": ["default", "prefix", "suffix"],
+      "cssParts": ["base", "link"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-list",
+      "properties": [
+        { "name": "orientation", "type": "String", "default": "'vertical'", "reflect": true, "attribute": "orientation" }
+      ],
+      "subComponents": [
+        {
+          "name": "hx-list-item",
+          "properties": [
+            { "name": "selected", "type": "Boolean", "default": "false", "reflect": true, "attribute": "selected" },
+            { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+            { "name": "type", "type": "String", "default": "'default'", "reflect": true, "attribute": "type", "anomaly": "type-should-be-variant" }
+          ]
+        }
+      ],
+      "events": ["hx-select", "hx-list-item-click"],
+      "slots": ["default"],
+      "cssParts": ["base", "item"],
+      "anomalies": ["type-should-be-variant"]
+    },
+    {
+      "name": "hx-menu",
+      "subComponents": [
+        {
+          "name": "hx-menu-item",
+          "properties": [
+            { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+            { "name": "type", "type": "String", "default": "'default'", "reflect": true, "attribute": "type", "anomaly": "type-should-be-variant" }
+          ]
+        }
+      ],
+      "events": ["hx-select", "hx-item-select", "hx-close"],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": ["type-should-be-variant"]
+    },
+    {
+      "name": "hx-meter",
+      "properties": [
+        { "name": "value", "type": "Number", "default": "0", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "Number", "default": "0", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "Number", "default": "100", "reflect": false, "attribute": "max" },
+        { "name": "low", "type": "Number", "default": "33", "reflect": false, "attribute": "low" },
+        { "name": "high", "type": "Number", "default": "67", "reflect": false, "attribute": "high" },
+        { "name": "optimum", "type": "Number", "default": "50", "reflect": false, "attribute": "optimum" },
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": [],
+      "slots": ["label"],
+      "cssParts": ["base", "bar", "fill"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-nav",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": ["hx-nav-select"],
+      "slots": ["default"],
+      "cssParts": ["nav", "list"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-number-input",
+      "properties": [
+        { "name": "value", "type": "String", "default": "''", "reflect": false, "attribute": "value" },
+        { "name": "min", "type": "Number", "default": "undefined", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "Number", "default": "undefined", "reflect": false, "attribute": "max" },
+        { "name": "step", "type": "Number", "default": "1", "reflect": false, "attribute": "step" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "placeholder", "type": "String", "default": "''", "reflect": false, "attribute": "placeholder" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "noStepper", "type": "Boolean", "default": "false", "reflect": true, "attribute": "no-stepper" }
+      ],
+      "events": ["hx-change", "hx-input"],
+      "slots": ["label", "prefix", "suffix", "help-text", "error"],
+      "cssParts": ["field", "label", "input", "prefix", "suffix", "help-text", "error"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-overflow-menu",
+      "properties": [
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "menuLabel", "type": "String", "default": "'Menu'", "reflect": false, "attribute": "menu-label" }
+      ],
+      "events": ["hx-select", "hx-show", "hx-hide"],
+      "slots": ["default"],
+      "cssParts": ["base", "trigger", "menu"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-pagination",
+      "properties": [
+        { "name": "currentPage", "type": "Number", "default": "1", "reflect": false, "attribute": "current-page" },
+        { "name": "totalPages", "type": "Number", "default": "1", "reflect": false, "attribute": "total-pages" },
+        { "name": "boundaryCount", "type": "Number", "default": "1", "reflect": false, "attribute": "boundary-count" },
+        { "name": "siblingCount", "type": "Number", "default": "1", "reflect": false, "attribute": "sibling-count" },
+        { "name": "showFirstLast", "type": "Boolean", "default": "true", "reflect": true, "attribute": "show-first-last", "anomaly": "boolean-default-true" },
+        { "name": "pageSize", "type": "Number", "default": "10", "reflect": false, "attribute": "page-size" },
+        { "name": "showPageSize", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-page-size" }
+      ],
+      "events": ["hx-page-change", "hx-page-size-change"],
+      "slots": [],
+      "cssParts": ["base", "list", "item", "button"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-popover",
+      "properties": [],
+      "events": ["hx-show", "hx-hide", "hx-after-show", "hx-after-hide"],
+      "slots": ["default", "trigger"],
+      "cssParts": ["base", "trigger", "panel"],
+      "methods": ["reposition()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-popup",
+      "properties": [
+        { "name": "anchor", "type": "String", "default": "''", "reflect": false, "attribute": "anchor" },
+        { "name": "placement", "type": "String", "default": "'bottom'", "reflect": false, "attribute": "placement" },
+        { "name": "distance", "type": "Number", "default": "8", "reflect": false, "attribute": "distance" },
+        { "name": "skidding", "type": "Number", "default": "0", "reflect": false, "attribute": "skidding" },
+        { "name": "arrowPlacement", "type": "String", "default": "'center'", "reflect": false, "attribute": "arrow-placement" },
+        { "name": "arrowPadding", "type": "Number", "default": "0", "reflect": false, "attribute": "arrow-padding" },
+        { "name": "autoSize", "type": "String", "default": "'none'", "reflect": false, "attribute": "auto-size" },
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" }
+      ],
+      "events": ["hx-reposition"],
+      "slots": ["default", "anchor"],
+      "cssParts": ["base", "arrow"],
+      "methods": ["reposition()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-progress-bar",
+      "properties": [
+        { "name": "value", "type": "Number", "default": "0", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "Number", "default": "0", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "Number", "default": "100", "reflect": false, "attribute": "max" },
+        { "name": "indeterminate", "type": "Boolean", "default": "false", "reflect": true, "attribute": "indeterminate" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" },
+        { "name": "showValue", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-value" }
+      ],
+      "events": ["hx-complete"],
+      "slots": ["label"],
+      "cssParts": ["base", "bar", "fill", "label"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-progress-ring",
+      "properties": [
+        { "name": "value", "type": "Number", "default": "0", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "Number", "default": "0", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "Number", "default": "100", "reflect": false, "attribute": "max" },
+        { "name": "indeterminate", "type": "Boolean", "default": "false", "reflect": true, "attribute": "indeterminate" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "strokeWidth", "type": "Number", "default": "4", "reflect": false, "attribute": "stroke-width" },
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": ["base", "ring"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-prose",
+      "properties": [
+        { "name": "maxWidth", "type": "String", "default": "'65ch'", "reflect": false, "attribute": "max-width" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-radio-group",
+      "properties": [
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "value", "type": "String", "default": "''", "reflect": true, "attribute": "value" },
+        { "name": "orientation", "type": "String", "default": "'vertical'", "reflect": true, "attribute": "orientation" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" }
+      ],
+      "events": ["hx-change"],
+      "slots": ["default", "label", "help-text", "error"],
+      "cssParts": ["group", "label", "items", "help-text", "error-message"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-rating",
+      "properties": [
+        { "name": "value", "type": "Number", "default": "0", "reflect": true, "attribute": "value" },
+        { "name": "interactive", "type": "Boolean", "default": "true", "reflect": true, "attribute": "interactive", "anomaly": "boolean-default-true" },
+        { "name": "max", "type": "Number", "default": "5", "reflect": false, "attribute": "max" },
+        { "name": "icon", "type": "String", "default": "'star'", "reflect": false, "attribute": "icon" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": ["hx-change", "hx-hover"],
+      "slots": ["icon"],
+      "cssParts": ["base", "symbol"],
+      "anomalies": ["boolean-default-true", "missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-select",
+      "properties": [
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "placeholder", "type": "String", "default": "''", "reflect": false, "attribute": "placeholder" },
+        { "name": "value", "type": "String", "default": "''", "reflect": true, "attribute": "value" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "open", "type": "Boolean", "default": "false", "reflect": true, "attribute": "open" }
+      ],
+      "events": ["hx-change", "hx-show", "hx-hide"],
+      "slots": ["default", "label", "prefix", "help-text", "error"],
+      "cssParts": ["field", "label", "trigger", "listbox", "option", "prefix", "help-text", "error", "clear-button"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-side-nav",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" },
+        { "name": "collapsible", "type": "Boolean", "default": "true", "reflect": false, "attribute": "collapsible", "anomaly": "boolean-default-true" },
+        { "name": "collapsed", "type": "Boolean", "default": "false", "reflect": true, "attribute": "collapsed" }
+      ],
+      "events": ["hx-expand", "hx-collapse"],
+      "slots": ["default", "header", "footer"],
+      "cssParts": ["base", "nav"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-skeleton",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'text'", "reflect": true, "attribute": "variant" },
+        { "name": "animated", "type": "Boolean", "default": "true", "reflect": true, "attribute": "animated", "anomaly": "boolean-default-true" },
+        { "name": "width", "type": "String", "default": "'100%'", "reflect": false, "attribute": "width" },
+        { "name": "height", "type": "String", "default": "'1em'", "reflect": false, "attribute": "height" }
+      ],
+      "events": ["hx-loaded"],
+      "slots": [],
+      "cssParts": ["base"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-slider",
+      "properties": [
+        { "name": "value", "type": "Number", "default": "0", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "Number", "default": "0", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "Number", "default": "100", "reflect": false, "attribute": "max" },
+        { "name": "step", "type": "Number", "default": "1", "reflect": false, "attribute": "step" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "showValue", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-value" },
+        { "name": "showTicks", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-ticks" }
+      ],
+      "events": ["hx-change", "hx-input"],
+      "slots": ["label", "help-text", "error"],
+      "cssParts": ["base", "track", "fill", "thumb", "label", "help-text", "error"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-spinner",
+      "properties": [
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" }
+      ],
+      "events": [],
+      "slots": [],
+      "cssParts": ["base"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-split-button",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'primary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "menuLabel", "type": "String", "default": "'Options'", "reflect": false, "attribute": "menu-label" },
+        { "name": "triggerLabel", "type": "String", "default": "''", "reflect": false, "attribute": "trigger-label" }
+      ],
+      "events": ["hx-click", "hx-select"],
+      "slots": ["default", "menu"],
+      "cssParts": ["base", "button", "trigger", "menu"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-split-panel",
+      "properties": [
+        { "name": "direction", "type": "String", "default": "'horizontal'", "reflect": true, "attribute": "direction" },
+        { "name": "dividerPosition", "type": "Number", "default": "50", "reflect": true, "attribute": "divider-position" },
+        { "name": "minSize", "type": "String", "default": "'200px'", "reflect": false, "attribute": "min-size" }
+      ],
+      "events": ["hx-reposition"],
+      "slots": ["start", "end", "divider"],
+      "cssParts": ["base", "start", "end", "divider"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-stack",
+      "properties": [
+        { "name": "direction", "type": "String", "default": "'vertical'", "reflect": true, "attribute": "direction" },
+        { "name": "gap", "type": "String", "default": "'md'", "reflect": true, "attribute": "gap" },
+        { "name": "align", "type": "String", "default": "'flex-start'", "reflect": true, "attribute": "align" },
+        { "name": "justify", "type": "String", "default": "'flex-start'", "reflect": true, "attribute": "justify" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": []
+    },
+    {
+      "name": "hx-stat",
+      "properties": [
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "value", "type": "String", "default": "''", "reflect": false, "attribute": "value" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": [],
+      "slots": ["icon", "label", "value", "trend"],
+      "cssParts": ["base", "container", "icon", "label", "value", "trend"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-status-indicator",
+      "properties": [
+        { "name": "status", "type": "String", "default": "'neutral'", "reflect": true, "attribute": "status" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "pulse", "type": "Boolean", "default": "false", "reflect": true, "attribute": "pulse" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": ["base", "dot", "pulse-ring"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-steps",
+      "properties": [
+        { "name": "current", "type": "Number", "default": "0", "reflect": true, "attribute": "current" },
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" },
+        { "name": "orientation", "type": "String", "default": "'horizontal'", "reflect": true, "attribute": "orientation" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": ["hx-step-click"],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-structured-list",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" },
+        { "name": "selection", "type": "String", "default": "'none'", "reflect": true, "attribute": "selection" }
+      ],
+      "events": ["hx-select"],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-switch",
+      "properties": [
+        { "name": "checked", "type": "Boolean", "default": "false", "reflect": true, "attribute": "checked" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "value", "type": "String", "default": "'on'", "reflect": false, "attribute": "value" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" }
+      ],
+      "events": ["hx-change"],
+      "slots": ["default", "help-text"],
+      "cssParts": ["base", "control", "thumb", "label", "help-text"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-table",
+      "properties": [
+        { "name": "fullWidth", "type": "Boolean", "default": "true", "reflect": true, "attribute": "full-width", "anomaly": "boolean-default-true" },
+        { "name": "stickyHeader", "type": "Boolean", "default": "false", "reflect": true, "attribute": "sticky-header" },
+        { "name": "sortKey", "type": "String", "default": "''", "reflect": false, "attribute": "sort-key" },
+        { "name": "sortDirection", "type": "String", "default": "'asc'", "reflect": false, "attribute": "sort-direction" }
+      ],
+      "events": ["hx-sort"],
+      "slots": ["default"],
+      "cssParts": ["base"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-tabs",
+      "properties": [
+        { "name": "active", "type": "String", "default": "''", "reflect": true, "attribute": "active" },
+        { "name": "activation", "type": "String", "default": "'auto'", "reflect": false, "attribute": "activation" }
+      ],
+      "events": ["hx-tab-change"],
+      "slots": ["default", "nav"],
+      "cssParts": ["base", "nav", "tabs", "body"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-tag",
+      "properties": [
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "variant", "type": "String", "default": "'secondary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "removable", "type": "Boolean", "default": "false", "reflect": true, "attribute": "removable" }
+      ],
+      "events": ["hx-remove"],
+      "slots": ["default", "prefix"],
+      "cssParts": ["base", "label", "remove-button"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-text",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'body'", "reflect": true, "attribute": "variant" },
+        { "name": "as", "type": "String", "default": "'span'", "reflect": false, "attribute": "as" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": []
+    },
+    {
+      "name": "hx-text-input",
+      "properties": [
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "placeholder", "type": "String", "default": "''", "reflect": false, "attribute": "placeholder" },
+        { "name": "value", "type": "String", "default": "''", "reflect": false, "attribute": "value" },
+        { "name": "type", "type": "String", "default": "'text'", "reflect": false, "attribute": "type" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "readonly", "type": "Boolean", "default": "false", "reflect": true, "attribute": "readonly" },
+        { "name": "minlength", "type": "Number", "default": "undefined", "reflect": false, "attribute": "minlength" },
+        { "name": "maxlength", "type": "Number", "default": "undefined", "reflect": false, "attribute": "maxlength" },
+        { "name": "pattern", "type": "String", "default": "''", "reflect": false, "attribute": "pattern" },
+        { "name": "autocomplete", "type": "String", "default": "''", "reflect": false, "attribute": "autocomplete" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" }
+      ],
+      "events": ["hx-change", "hx-input"],
+      "slots": ["label", "prefix", "suffix", "help-text", "error"],
+      "cssParts": ["field", "label", "input", "prefix", "suffix", "help-text", "error"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-textarea",
+      "properties": [
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "placeholder", "type": "String", "default": "''", "reflect": false, "attribute": "placeholder" },
+        { "name": "value", "type": "String", "default": "''", "reflect": false, "attribute": "value" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "readonly", "type": "Boolean", "default": "false", "reflect": true, "attribute": "readonly" },
+        { "name": "minlength", "type": "Number", "default": "undefined", "reflect": false, "attribute": "minlength" },
+        { "name": "maxlength", "type": "Number", "default": "undefined", "reflect": false, "attribute": "maxlength" },
+        { "name": "rows", "type": "Number", "default": "4", "reflect": false, "attribute": "rows" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "showCount", "type": "Boolean", "default": "false", "reflect": true, "attribute": "show-count" }
+      ],
+      "events": ["hx-change", "hx-input"],
+      "slots": ["label", "help-text", "error"],
+      "cssParts": ["field", "label", "textarea", "help-text", "error", "count"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-theme",
+      "properties": [
+        { "name": "theme", "type": "String", "default": "'light'", "reflect": true, "attribute": "theme" }
+      ],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": []
+    },
+    {
+      "name": "hx-time-picker",
+      "properties": [
+        { "name": "value", "type": "String", "default": "''", "reflect": true, "attribute": "value" },
+        { "name": "min", "type": "String", "default": "'00:00'", "reflect": false, "attribute": "min" },
+        { "name": "max", "type": "String", "default": "'23:59'", "reflect": false, "attribute": "max" },
+        { "name": "required", "type": "Boolean", "default": "false", "reflect": true, "attribute": "required" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "name", "type": "String", "default": "''", "reflect": false, "attribute": "name" },
+        { "name": "label", "type": "String", "default": "''", "reflect": false, "attribute": "label" },
+        { "name": "error", "type": "String", "default": "''", "reflect": false, "attribute": "error" },
+        { "name": "helpText", "type": "String", "default": "''", "reflect": false, "attribute": "help-text" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" }
+      ],
+      "events": ["hx-change"],
+      "slots": ["label", "prefix", "suffix", "help-text", "error"],
+      "cssParts": ["field", "label", "input", "prefix", "suffix", "help-text", "error"],
+      "methods": ["checkValidity()", "reportValidity()"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-toast",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'info'", "reflect": true, "attribute": "variant" },
+        { "name": "heading", "type": "String", "default": "''", "reflect": false, "attribute": "heading" },
+        { "name": "closable", "type": "Boolean", "default": "true", "reflect": true, "attribute": "closable", "anomaly": "boolean-default-true" },
+        { "name": "duration", "type": "Number", "default": "5000", "reflect": false, "attribute": "duration" }
+      ],
+      "events": ["hx-show", "hx-hide", "hx-after-hide"],
+      "slots": ["default", "icon", "title", "message", "action", "close-button"],
+      "cssParts": ["base", "icon", "title", "message", "actions", "close-button"],
+      "anomalies": ["boolean-default-true"]
+    },
+    {
+      "name": "hx-toggle-button",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'secondary'", "reflect": true, "attribute": "variant" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "hx-size" },
+        { "name": "pressed", "type": "Boolean", "default": "false", "reflect": true, "attribute": "pressed" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+        { "name": "type", "type": "String", "default": "'button'", "reflect": false, "attribute": "type" }
+      ],
+      "events": ["hx-toggle", "hx-click"],
+      "slots": ["default", "prefix", "suffix"],
+      "cssParts": ["button", "label", "prefix", "suffix"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-tooltip",
+      "properties": [
+        { "name": "content", "type": "String", "default": "''", "reflect": false, "attribute": "content" },
+        { "name": "placement", "type": "String", "default": "'top'", "reflect": true, "attribute": "placement" },
+        { "name": "trigger", "type": "String", "default": "'hover'", "reflect": false, "attribute": "trigger" },
+        { "name": "size", "type": "String", "default": "'md'", "reflect": true, "attribute": "size", "anomaly": "missing-hx-size-attribute" },
+        { "name": "variant", "type": "String", "default": "'dark'", "reflect": true, "attribute": "variant" },
+        { "name": "showDelay", "type": "Number", "default": "200", "reflect": false, "attribute": "show-delay" },
+        { "name": "hideDelay", "type": "Number", "default": "200", "reflect": false, "attribute": "hide-delay" },
+        { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" }
+      ],
+      "events": ["hx-show", "hx-hide"],
+      "slots": ["default"],
+      "cssParts": ["base", "trigger", "panel"],
+      "anomalies": ["missing-hx-size-attribute"]
+    },
+    {
+      "name": "hx-top-nav",
+      "properties": [
+        { "name": "variant", "type": "String", "default": "'default'", "reflect": true, "attribute": "variant" },
+        { "name": "sticky", "type": "Boolean", "default": "false", "reflect": true, "attribute": "sticky" }
+      ],
+      "events": ["hx-mobile-toggle"],
+      "slots": ["default", "brand", "actions", "toggle"],
+      "cssParts": ["base", "nav", "toggle"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-tree-view",
+      "subComponents": [
+        {
+          "name": "hx-tree-item",
+          "properties": [
+            { "name": "expanded", "type": "Boolean", "default": "false", "reflect": true, "attribute": "expanded" },
+            { "name": "selected", "type": "Boolean", "default": "false", "reflect": true, "attribute": "selected" },
+            { "name": "disabled", "type": "Boolean", "default": "false", "reflect": true, "attribute": "disabled" },
+            { "name": "level", "type": "Number", "default": "0", "reflect": false, "attribute": "level" }
+          ]
+        }
+      ],
+      "events": ["hx-select", "hx-tree-item-select"],
+      "slots": ["default"],
+      "cssParts": ["base", "item", "label"],
+      "anomalies": []
+    },
+    {
+      "name": "hx-visually-hidden",
+      "properties": [],
+      "events": [],
+      "slots": ["default"],
+      "cssParts": [],
+      "anomalies": []
+    }
+  ],
+  "patterns": {
+    "properties": {
+      "sizeAttributeSplit": {
+        "description": "32 components have a 'size' property. 19 use the custom 'hx-size' attribute (form/interactive components), while 13 use the standard 'size' attribute (presentational components). This creates an inconsistent consumer experience.",
+        "severity": "critical",
+        "breakingChange": true,
+        "affectedComponents": {
+          "usingHxSize": ["hx-avatar", "hx-button", "hx-button-group", "hx-checkbox", "hx-combobox", "hx-copy-button", "hx-date-picker", "hx-field", "hx-icon", "hx-icon-button", "hx-number-input", "hx-overflow-menu", "hx-progress-bar", "hx-select", "hx-slider", "hx-split-button", "hx-switch", "hx-tag", "hx-text-input", "hx-textarea", "hx-toggle-button"],
+          "usingSizeStandard": ["hx-action-bar", "hx-badge", "hx-color-picker", "hx-container", "hx-counter", "hx-drawer", "hx-progress-ring", "hx-prose", "hx-rating", "hx-spinner", "hx-stat", "hx-status-indicator", "hx-steps", "hx-time-picker", "hx-tooltip"]
+        },
+        "count": 32,
+        "recommendation": "Standardize all components to use 'hx-size' attribute. Add deprecation warning for 'size' attribute in v1.x, remove in v2.0."
+      },
+      "typeVsVariant": {
+        "description": "21 components use 'variant' for visual style options. 2 sub-components (hx-list-item, hx-menu-item) incorrectly use 'type' for visual variants. 3 components (hx-button, hx-text-input, hx-icon-button) correctly use 'type' for HTML-native purposes.",
+        "severity": "high",
+        "breakingChange": true,
+        "affectedComponents": ["hx-list-item", "hx-menu-item"],
+        "count": 2,
+        "recommendation": "Rename 'type' to 'variant' on hx-list-item and hx-menu-item. Add deprecation alias in v1.x, remove in v2.0."
+      },
+      "booleanDefaultTrue": {
+        "description": "10 properties across 8 components default to true, which is unusual for HTML boolean attributes. Some are semantically correct (dialog.modal, dialog.closable, drawer.closable, drawer.overlay, side-nav.collapsible, toast.closable, skeleton.animated), while others need review (banner.open, table.fullWidth, code-snippet.copyable, pagination.showFirstLast, rating.interactive).",
+        "severity": "medium",
+        "breakingChange": true,
+        "affectedComponents": {
+          "approvedExceptions": [
+            { "component": "hx-dialog", "property": "modal", "rationale": "Dialogs should be modal by default per WAI-ARIA best practices" },
+            { "component": "hx-dialog", "property": "closable", "rationale": "Close button expected by default" },
+            { "component": "hx-drawer", "property": "closable", "rationale": "Close button expected by default" },
+            { "component": "hx-drawer", "property": "overlay", "rationale": "Overlay expected by default for drawers" },
+            { "component": "hx-side-nav", "property": "collapsible", "rationale": "Collapsibility expected for responsive side nav" },
+            { "component": "hx-toast", "property": "closable", "rationale": "Close button expected by default" },
+            { "component": "hx-skeleton", "property": "animated", "rationale": "Skeletons animate by default universally" }
+          ],
+          "needsReview": [
+            { "component": "hx-banner", "property": "open", "issue": "Banners showing by default may flash before JS dismisses them" },
+            { "component": "hx-table", "property": "fullWidth", "issue": "Not standard default; tables are often constrained" },
+            { "component": "hx-code-snippet", "property": "copyable", "issue": "Opt-in is safer for code snippets in read-only contexts" },
+            { "component": "hx-pagination", "property": "showFirstLast", "issue": "Could be opt-in" },
+            { "component": "hx-rating", "property": "interactive", "issue": "Display-only should be the default; interaction should be opt-in" }
+          ]
+        },
+        "count": 12,
+        "recommendation": "Review each case individually. banner.open, table.fullWidth, code-snippet.copyable, and rating.interactive should default to false in v2.0."
+      },
+      "nonStandardNaming": {
+        "description": "Several components use non-standard property/attribute naming patterns that deviate from library conventions.",
+        "severity": "high",
+        "breakingChange": true,
+        "affectedComponents": [
+          { "component": "hx-card", "property": "hxHref", "attribute": "hx-href", "issue": "Should be 'href' like hx-button and hx-link" },
+          { "component": "hx-card", "property": "hxAriaLabel", "attribute": "hx-aria-label", "issue": "Should be standard 'aria-label'" },
+          { "component": "hx-field", "property": "hxSize", "attribute": "hx-size", "issue": "Property should be 'size' with 'hx-size' attribute, not 'hxSize' as property name" },
+          { "component": "hx-breadcrumb-item", "property": "dataBcLast", "attribute": "data-bc-last", "issue": "Non-standard naming; should use internal state or standard boolean" }
+        ],
+        "count": 4,
+        "recommendation": "Fix all non-standard names. hx-card: rename hxHref to href, hxAriaLabel to ariaLabel. hx-field: rename hxSize property to size."
+      }
+    },
+    "events": {
+      "hxPrefixCompliance": {
+        "description": "All 45+ custom events use the 'hx-' prefix consistently. 100% compliance.",
+        "severity": "low",
+        "breakingChange": false,
+        "count": 0,
+        "recommendation": "No action needed. Event naming is exemplary."
+      },
+      "inconsistentEventDetails": {
+        "description": "Some events with the same name have different detail types across components.",
+        "severity": "medium",
+        "breakingChange": false,
+        "affectedComponents": [
+          { "event": "hx-remove", "components": ["hx-badge", "hx-tag", "hx-file-upload"], "issue": "badge/tag fire void detail, file-upload fires {file, index}" },
+          { "event": "hx-error", "components": ["hx-image", "hx-file-upload"], "issue": "image fires void detail, file-upload fires rich detail" },
+          { "event": "hx-reposition", "components": ["hx-popup", "hx-split-panel"], "issue": "popup fires void, split-panel fires {position: number}" }
+        ],
+        "count": 3,
+        "recommendation": "Standardize event details: hx-remove should always include {item, index?}. hx-error should always include {error, details?}."
+      },
+      "showHideVsOpenClose": {
+        "description": "Overlay components use hx-show/hx-hide events, while dialog uses hx-open/hx-close. This creates confusion about which event pair to listen for.",
+        "severity": "medium",
+        "breakingChange": false,
+        "affectedComponents": {
+          "usingShowHide": ["hx-combobox", "hx-drawer", "hx-dropdown", "hx-overflow-menu", "hx-popover", "hx-toast", "hx-tooltip"],
+          "usingOpenClose": ["hx-dialog"]
+        },
+        "count": 8,
+        "recommendation": "Standardize on hx-show/hx-hide for all overlay components. Add hx-show/hx-hide as aliases on hx-dialog, deprecate hx-open/hx-close for v2.0."
+      }
+    },
+    "slots": {
+      "helpTextConsistency": {
+        "description": "11 form components consistently use 'help-text' as a slot name. No 'help' or 'footer-help' variations found. Slot naming is consistent.",
+        "severity": "low",
+        "breakingChange": false,
+        "affectedComponents": ["hx-checkbox", "hx-checkbox-group", "hx-combobox", "hx-date-picker", "hx-field", "hx-file-upload", "hx-number-input", "hx-radio-group", "hx-select", "hx-slider", "hx-switch", "hx-text-input", "hx-textarea", "hx-time-picker"],
+        "count": 14,
+        "recommendation": "No action needed. help-text slot naming is consistent."
+      },
+      "prefixSuffixCoverage": {
+        "description": "Not all form input components expose prefix/suffix slots consistently.",
+        "severity": "medium",
+        "breakingChange": false,
+        "affectedComponents": {
+          "hasPrefix": ["hx-button", "hx-combobox", "hx-date-picker", "hx-link", "hx-number-input", "hx-select", "hx-tag", "hx-text-input", "hx-time-picker", "hx-toggle-button"],
+          "missingPrefix": ["hx-checkbox", "hx-switch", "hx-slider", "hx-textarea"]
+        },
+        "count": 4,
+        "recommendation": "Add prefix/suffix slots to hx-textarea where semantically useful. Checkbox, switch, slider correctly omit these."
+      }
+    },
+    "cssParts": {
+      "errorNaming": {
+        "description": "CSS part naming for error containers varies: some use 'error', others use 'error-message'.",
+        "severity": "low",
+        "breakingChange": true,
+        "affectedComponents": {
+          "usingError": ["hx-combobox", "hx-date-picker", "hx-number-input", "hx-select", "hx-slider", "hx-text-input", "hx-textarea", "hx-time-picker"],
+          "usingErrorMessage": ["hx-checkbox-group", "hx-radio-group"]
+        },
+        "count": 10,
+        "recommendation": "Standardize to 'error' (shorter, consistent with slot naming). Add 'error' as alias on checkbox-group and radio-group."
+      },
+      "baseVsContainerNaming": {
+        "description": "Most components use 'base' for the outermost wrapper. Some use 'container' (hx-stat). This is minor but inconsistent.",
+        "severity": "low",
+        "breakingChange": true,
+        "affectedComponents": {
+          "usingBase": ["majority of components"],
+          "usingContainer": ["hx-stat"]
+        },
+        "count": 1,
+        "recommendation": "Low priority. Stat has both 'base' and 'container' which is acceptable."
+      }
+    },
+    "cssVars": {
+      "hardcodedValues": {
+        "description": "43+ components have hardcoded fallback values (hex colors, rgb, pixel values) in their styles instead of using token references.",
+        "severity": "medium",
+        "breakingChange": false,
+        "affectedComponents": ["hx-alert", "hx-button", "hx-combobox", "hx-dialog", "hx-drawer", "hx-text-input", "hx-textarea", "hx-number-input", "hx-popover", "hx-toast"],
+        "count": 43,
+        "recommendation": "Replace hardcoded fallbacks with semantic tokens. This is a non-breaking change that can be done incrementally."
+      },
+      "hxPrefixCompliance": {
+        "description": "All CSS custom properties follow the --hx- prefix convention. 100% compliance.",
+        "severity": "low",
+        "breakingChange": false,
+        "count": 0,
+        "recommendation": "No action needed."
+      }
+    },
+    "methods": {
+      "showHideVsOpenClose": {
+        "description": "Dialog uses show()/showModal()/close(), drawer uses show()/close(), color-picker uses show()/hide(), code-snippet uses show()/hide(). The method names are inconsistent for overlay patterns.",
+        "severity": "medium",
+        "breakingChange": true,
+        "affectedComponents": {
+          "showClose": ["hx-dialog", "hx-drawer"],
+          "showHide": ["hx-color-picker", "hx-code-snippet"]
+        },
+        "count": 4,
+        "recommendation": "Standardize: overlay components (dialog, drawer) use show()/close(). Collapsible content (code-snippet) uses expand()/collapse(). Color-picker as dropdown uses show()/hide()."
+      },
+      "formValidationConsistency": {
+        "description": "All 10 form components consistently implement checkValidity() and reportValidity(). Consistent pattern.",
+        "severity": "low",
+        "breakingChange": false,
+        "affectedComponents": ["hx-checkbox-group", "hx-combobox", "hx-date-picker", "hx-number-input", "hx-radio-group", "hx-select", "hx-text-input", "hx-textarea", "hx-time-picker"],
+        "count": 9,
+        "recommendation": "No action needed. Form validation API is consistent."
+      }
+    },
+    "reflection": {
+      "description": "Attribute reflection is generally consistent: visual state properties (variant, size, open, disabled, expanded) reflect, while content properties (label, placeholder, value for strings) do not. Boolean form properties (required, checked) reflect correctly.",
+      "severity": "low",
+      "breakingChange": false,
+      "count": 0,
+      "recommendation": "No action needed. Reflection patterns are intentional and correct."
+    }
+  }
+}
