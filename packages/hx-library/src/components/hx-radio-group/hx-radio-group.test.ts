@@ -553,6 +553,20 @@ describe('hx-radio-group', () => {
       await el.updateComplete;
       expect(el.value).toBe('b');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Validation (3) ───

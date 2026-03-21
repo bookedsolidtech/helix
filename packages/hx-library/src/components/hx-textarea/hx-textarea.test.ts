@@ -437,6 +437,16 @@ describe('hx-textarea', () => {
       const formData = new FormData(form);
       expect(formData.get('notes')).toBe('new value');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // --- Validation (3) ---
