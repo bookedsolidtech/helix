@@ -174,45 +174,45 @@ export const helixToastStackStyles = css`
 
   :host([placement='top-start']) {
     top: 0;
-    left: 0;
-    right: auto;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
     bottom: auto;
   }
 
   :host([placement='top-center']) {
     top: 0;
-    left: 50%;
+    inset-inline-start: 50%;
     transform: translateX(-50%);
-    right: auto;
+    inset-inline-end: auto;
     bottom: auto;
   }
 
   :host([placement='top-end']) {
     top: 0;
-    right: 0;
-    left: auto;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
     bottom: auto;
   }
 
   :host([placement='bottom-start']) {
     bottom: 0;
-    left: 0;
-    right: auto;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
     top: auto;
   }
 
   :host([placement='bottom-center']) {
     bottom: 0;
-    left: 50%;
+    inset-inline-start: 50%;
     transform: translateX(-50%);
-    right: auto;
+    inset-inline-end: auto;
     top: auto;
   }
 
   :host([placement='bottom-end']) {
     bottom: 0;
-    right: 0;
-    left: auto;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
     top: auto;
   }
 
