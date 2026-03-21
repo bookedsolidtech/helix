@@ -42,24 +42,36 @@ describe('hx-spinner', () => {
       expect(el.size).toBe('md');
     });
 
-    it('reflects size attr to host', async () => {
-      const el = await fixture<HelixSpinner>('<hx-spinner size="sm"></hx-spinner>');
-      expect(el.getAttribute('size')).toBe('sm');
+    it('reflects hx-size attr to host', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="sm"></hx-spinner>');
+      expect(el.getAttribute('hx-size')).toBe('sm');
     });
 
-    it('accepts "sm" size', async () => {
-      const el = await fixture<HelixSpinner>('<hx-spinner size="sm"></hx-spinner>');
+    it('accepts "sm" size via hx-size', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="sm"></hx-spinner>');
       expect(el.size).toBe('sm');
     });
 
-    it('accepts "lg" size', async () => {
-      const el = await fixture<HelixSpinner>('<hx-spinner size="lg"></hx-spinner>');
+    it('accepts "lg" size via hx-size', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="lg"></hx-spinner>');
       expect(el.size).toBe('lg');
     });
 
-    it('accepts custom CSS size string', async () => {
-      const el = await fixture<HelixSpinner>('<hx-spinner size="3rem"></hx-spinner>');
+    it('accepts custom CSS size string via hx-size', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="3rem"></hx-spinner>');
       expect(el.size).toBe('3rem');
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner size="sm"></hx-spinner>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner size="sm" hx-size="lg"></hx-spinner>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
@@ -242,14 +254,14 @@ describe('hx-spinner', () => {
     });
 
     it('has no axe violations for sm size', async () => {
-      const el = await fixture<HelixSpinner>('<hx-spinner size="sm"></hx-spinner>');
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="sm"></hx-spinner>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
     it('has no axe violations for lg size', async () => {
-      const el = await fixture<HelixSpinner>('<hx-spinner size="lg"></hx-spinner>');
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="lg"></hx-spinner>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

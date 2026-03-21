@@ -94,22 +94,36 @@ describe('hx-badge', () => {
   // ─── Property: size (3) ───
 
   describe('Property: size', () => {
-    it('applies sm class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge size="sm">S</hx-badge>');
+    it('applies sm class via hx-size', async () => {
+      const el = await fixture<WcBadge>('<hx-badge hx-size="sm">S</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--sm')).toBe(true);
     });
 
-    it('applies md class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge size="md">M</hx-badge>');
+    it('applies md class via hx-size', async () => {
+      const el = await fixture<WcBadge>('<hx-badge hx-size="md">M</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--md')).toBe(true);
     });
 
-    it('applies lg class', async () => {
-      const el = await fixture<WcBadge>('<hx-badge size="lg">L</hx-badge>');
+    it('applies lg class via hx-size', async () => {
+      const el = await fixture<WcBadge>('<hx-badge hx-size="lg">L</hx-badge>');
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--lg')).toBe(true);
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<WcBadge>('<hx-badge size="sm">S</hx-badge>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--sm')).toBe(true);
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<WcBadge>('<hx-badge size="sm" hx-size="lg">L</hx-badge>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
@@ -315,7 +329,7 @@ describe('hx-badge', () => {
     });
 
     it('updates size class when property changes', async () => {
-      const el = await fixture<WcBadge>('<hx-badge size="sm">S</hx-badge>');
+      const el = await fixture<WcBadge>('<hx-badge hx-size="sm">S</hx-badge>');
       el.size = 'lg';
       await el.updateComplete;
       const badge = shadowQuery(el, 'span')!;
