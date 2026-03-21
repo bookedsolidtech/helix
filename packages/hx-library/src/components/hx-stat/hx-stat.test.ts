@@ -72,22 +72,34 @@ describe('hx-stat', () => {
   // ─── Property: size (3) ───
 
   describe('Property: size', () => {
-    it('applies sm class', async () => {
-      const el = await fixture<HelixStat>('<hx-stat size="sm" value="5"></hx-stat>');
+    it('applies sm class via hx-size', async () => {
+      const el = await fixture<HelixStat>('<hx-stat hx-size="sm" value="5"></hx-stat>');
       const container = shadowQuery(el, '.stat');
       expect(container?.classList.contains('stat--sm')).toBe(true);
     });
 
-    it('applies md class', async () => {
-      const el = await fixture<HelixStat>('<hx-stat size="md" value="5"></hx-stat>');
+    it('applies md class via hx-size', async () => {
+      const el = await fixture<HelixStat>('<hx-stat hx-size="md" value="5"></hx-stat>');
       const container = shadowQuery(el, '.stat');
       expect(container?.classList.contains('stat--md')).toBe(true);
     });
 
-    it('applies lg class', async () => {
-      const el = await fixture<HelixStat>('<hx-stat size="lg" value="5"></hx-stat>');
+    it('applies lg class via hx-size', async () => {
+      const el = await fixture<HelixStat>('<hx-stat hx-size="lg" value="5"></hx-stat>');
       const container = shadowQuery(el, '.stat');
       expect(container?.classList.contains('stat--lg')).toBe(true);
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixStat>('<hx-stat size="sm" value="5"></hx-stat>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixStat>('<hx-stat size="sm" hx-size="lg" value="5"></hx-stat>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
@@ -231,10 +243,10 @@ describe('hx-stat', () => {
     it('has no axe violations across all sizes', async () => {
       for (const size of ['sm', 'md', 'lg']) {
         const el = await fixture<HelixStat>(
-          `<hx-stat label="Metric" value="42" size="${size}"></hx-stat>`,
+          `<hx-stat label="Metric" value="42" hx-size="${size}"></hx-stat>`,
         );
         const { violations } = await checkA11y(el);
-        expect(violations, `size="${size}" should have no violations`).toEqual([]);
+        expect(violations, `hx-size="${size}" should have no violations`).toEqual([]);
         el.remove();
       }
     });

@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixSpinnerStyles } from './hx-spinner.styles.js';
 
 /**
@@ -41,9 +42,9 @@ export class HelixSpinner extends LitElement {
    * The type is `SpinnerSize | string` which widens to `string` at the TypeScript
    * level — this is intentional to support CSS size overrides. Use `SpinnerSize`
    * values for standard sizing; custom strings bypass token-based scaling.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: SpinnerSize | string = 'md';
 
   /**
@@ -69,6 +70,19 @@ export class HelixSpinner extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   decorative = false;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-spinner', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize;
+    }
+  }
 
   private _isTokenSize(): this is { size: SpinnerSize } {
     return this.size === 'sm' || this.size === 'md' || this.size === 'lg';

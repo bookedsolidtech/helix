@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBadgeStyles } from './hx-badge.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A small status indicator for notifications, counts, and labels.
@@ -48,9 +49,9 @@ export class HelixBadge extends LitElement {
 
   /**
    * Size of the badge.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
@@ -111,6 +112,19 @@ export class HelixBadge extends LitElement {
    */
   @state()
   private _hasSlotContent = false;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-badge', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as 'sm' | 'md' | 'lg';
+    }
+  }
 
   // ─── Slot Change Handling ───
 
