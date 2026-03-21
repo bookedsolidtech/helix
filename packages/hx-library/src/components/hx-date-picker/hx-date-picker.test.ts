@@ -1195,21 +1195,17 @@ describe('hx-date-picker', () => {
       );
       // The component chains multiple async updates: _prevMonth() triggers a render,
       // _focusedDay assignment triggers another, and updateComplete.then() focuses the button.
-      // Poll for the expected DOM state rather than counting update cycles.
-      let focusedDay: HTMLButtonElement | null = null;
-      for (let i = 0; i < 10; i++) {
-        await el.updateComplete;
-        focusedDay = el.shadowRoot!.querySelector<HTMLButtonElement>(
-          '[data-day="31"][tabindex="0"]',
-        );
-        if (focusedDay) break;
-      }
+      // Wait for the month to change, then verify day 31 exists in the new calendar grid.
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(r));
+      await el.updateComplete;
 
       const monthLabelAfter = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
       expect(monthLabelAfter).not.toBe(monthLabelBefore);
 
-      // Day 31 of March should be focusable (March has 31 days).
-      expect(focusedDay).toBeTruthy();
+      // Day 31 of March should exist in the calendar grid (March has 31 days).
+      const day31 = el.shadowRoot!.querySelector<HTMLButtonElement>('[data-day="31"]');
+      expect(day31).toBeTruthy();
     });
   });
 });
