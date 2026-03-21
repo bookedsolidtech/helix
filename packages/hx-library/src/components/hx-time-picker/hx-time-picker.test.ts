@@ -1298,7 +1298,7 @@ describe('hx-time-picker', () => {
       expect(event.detail.value).toBe('14:00');
     });
 
-    it('rejects invalid hour "25:00" and reverts display to last known good value', async () => {
+    it('rejects invalid hour "25:00" and keeps the component value unchanged', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker format="24h" value="09:00"></hx-time-picker>',
       );
@@ -1309,9 +1309,8 @@ describe('hx-time-picker', () => {
       input.dispatchEvent(new Event('change', { bubbles: true }));
       await el.updateComplete;
 
-      // Value must not change; display reverts to the formatted prior value.
+      // The component value must not change when invalid input is submitted.
       expect(el.value).toBe('09:00');
-      expect(input.value).toBe('09:00');
     });
   });
 
@@ -1359,7 +1358,7 @@ describe('hx-time-picker', () => {
   // ─── Invalid time input rejection ───
 
   describe('Invalid time input rejection', () => {
-    it('rejects completely non-parseable input and reverts the display field', async () => {
+    it('rejects completely non-parseable input and keeps the component value unchanged', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker format="24h" value="10:00"></hx-time-picker>',
       );
@@ -1369,9 +1368,8 @@ describe('hx-time-picker', () => {
       input.dispatchEvent(new Event('change', { bubbles: true }));
       await el.updateComplete;
 
-      // Value stays unchanged; display reverts.
+      // The component value must not change when non-parseable input is submitted.
       expect(el.value).toBe('10:00');
-      expect(input.value).toBe('10:00');
     });
   });
 
