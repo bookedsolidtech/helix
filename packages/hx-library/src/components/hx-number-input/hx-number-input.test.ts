@@ -1024,4 +1024,22 @@ describe('hx-number-input', () => {
       expect((assigned[0] as HTMLElement).textContent).toBe('Enter a whole number');
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for increment button', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      await el.updateComplete;
+      expect(el.labelIncrement).toBe('Increment');
+    });
+
+    it('increment button aria-label reflects custom labelIncrement', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      el.labelIncrement = 'Augmenter';
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="increment"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Augmenter');
+    });
+  });
 });

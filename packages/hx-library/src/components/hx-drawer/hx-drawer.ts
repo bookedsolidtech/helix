@@ -206,6 +206,10 @@ export class HelixDrawer extends LitElement {
   @property({ type: String })
   label = '';
 
+  /** Accessible label for the built-in close button. Override for localized text. */
+  @property({ type: String, attribute: 'close-label' })
+  closeLabel = 'Close drawer';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -541,7 +545,7 @@ export class HelixDrawer extends LitElement {
           <button
             part="close-btn"
             class="drawer-close-button"
-            aria-label="Close drawer"
+            aria-label=${this.closeLabel}
             @click=${() => {
               this.open = false;
             }}

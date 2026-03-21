@@ -763,4 +763,21 @@ describe('hx-file-upload', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for file list region', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload label="Upload"></hx-file-upload>');
+      await el.updateComplete;
+      expect(el.labelFileList).toBe('Selected files');
+    });
+
+    it('renders custom labelFileList when set via property', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload label="Upload"></hx-file-upload>');
+      el.labelFileList = 'Fichiers sélectionnés';
+      await el.updateComplete;
+      expect(el.labelFileList).toBe('Fichiers sélectionnés');
+    });
+  });
 });

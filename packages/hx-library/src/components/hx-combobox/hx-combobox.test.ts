@@ -888,4 +888,22 @@ describe('hx-combobox', () => {
       expect((assigned[0] as HTMLElement).textContent).toBe('Type to search');
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('labelRemoveOption returns default English format', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit"></hx-combobox>');
+      await el.updateComplete;
+      expect(el.labelRemoveOption('Apple')).toBe('Remove Apple');
+    });
+
+    it('labelRemoveOption can be overridden with a custom function', async () => {
+      const el = await fixture<HxCombobox>('<hx-combobox label="Fruit"></hx-combobox>');
+      await el.updateComplete;
+      el.labelRemoveOption = (option: string) => `Supprimer ${option}`;
+      await el.updateComplete;
+      expect(el.labelRemoveOption('Pomme')).toBe('Supprimer Pomme');
+    });
+  });
 });

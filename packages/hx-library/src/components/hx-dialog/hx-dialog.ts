@@ -162,6 +162,10 @@ export class HelixDialog extends LitElement {
   @property({ type: String })
   description = '';
 
+  /** Accessible label for the close button. Override for localized text. */
+  @property({ type: String, attribute: 'close-label' })
+  closeLabel = 'Close dialog';
+
   /**
    * Returns the dialog's return value — the string passed to `close(returnValue)`.
    * Mirrors `HTMLDialogElement.returnValue`.
@@ -487,7 +491,7 @@ export class HelixDialog extends LitElement {
           part="close-button"
           class="dialog__close-btn"
           type="button"
-          aria-label=${`Close ${this.heading.trim() || 'dialog'}`}
+          aria-label=${this.closeLabel}
           @click=${() => this.close()}
         ></button>
       </div>
