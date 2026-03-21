@@ -448,6 +448,20 @@ describe('hx-checkbox-group', () => {
       expect(checkboxes[0].checked).toBe(false);
       expect(checkboxes[1].checked).toBe(false);
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Test Group" name="options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Form State Restore & Getters (5) ───
