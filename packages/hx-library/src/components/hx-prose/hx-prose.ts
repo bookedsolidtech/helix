@@ -1,6 +1,7 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixProseScopedCss } from './hx-prose.styles.js';
 
 /**
@@ -41,9 +42,9 @@ export class HelixProse extends LitElement {
 
   /**
    * Typography scale for the prose content.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'base' | 'lg' = 'base';
 
   /**
@@ -58,6 +59,13 @@ export class HelixProse extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-prose', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as 'sm' | 'base' | 'lg';
+    }
     this.style.display = 'block';
     this._applyMaxWidth();
     this._applySize();

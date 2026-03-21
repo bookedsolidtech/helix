@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -170,9 +171,9 @@ export class HelixDrawer extends LitElement {
 
   /**
    * The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: DrawerSize = 'md';
 
   /**
@@ -206,6 +207,17 @@ export class HelixDrawer extends LitElement {
   label = '';
 
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-drawer', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as DrawerSize;
+    }
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();

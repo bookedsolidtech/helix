@@ -36,10 +36,24 @@ describe('hx-prose', () => {
       expect(el.size).toBe('base');
     });
 
-    it('size attribute is reflected', async () => {
-      const el = await fixture<HelixProse>('<hx-prose size="sm"><p>Text</p></hx-prose>');
-      expect(el.getAttribute('size')).toBe('sm');
+    it('hx-size attribute is reflected', async () => {
+      const el = await fixture<HelixProse>('<hx-prose hx-size="sm"><p>Text</p></hx-prose>');
+      expect(el.getAttribute('hx-size')).toBe('sm');
       expect(el.size).toBe('sm');
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixProse>('<hx-prose size="sm"><p>Text</p></hx-prose>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose size="sm" hx-size="lg"><p>Text</p></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
 
     it('max-width sets --hx-prose-max-width custom property', async () => {
@@ -145,23 +159,23 @@ describe('hx-prose', () => {
   // ─── Size Variants ───
 
   describe('Size Variants', () => {
-    it('size="lg" sets --hx-prose-font-size to lg token', async () => {
-      const el = await fixture<HelixProse>('<hx-prose size="lg"><p>Text</p></hx-prose>');
-      expect(el.getAttribute('size')).toBe('lg');
+    it('hx-size="lg" sets --hx-prose-font-size to lg token', async () => {
+      const el = await fixture<HelixProse>('<hx-prose hx-size="lg"><p>Text</p></hx-prose>');
+      expect(el.getAttribute('hx-size')).toBe('lg');
       expect(el.style.getPropertyValue('--hx-prose-font-size')).toBe(
         'var(--hx-font-size-lg, 1.125rem)',
       );
     });
 
-    it('size="sm" sets --hx-prose-font-size to sm token', async () => {
-      const el = await fixture<HelixProse>('<hx-prose size="sm"><p>Text</p></hx-prose>');
+    it('hx-size="sm" sets --hx-prose-font-size to sm token', async () => {
+      const el = await fixture<HelixProse>('<hx-prose hx-size="sm"><p>Text</p></hx-prose>');
       expect(el.style.getPropertyValue('--hx-prose-font-size')).toBe(
         'var(--hx-font-size-sm, 0.875rem)',
       );
     });
 
-    it('size="base" removes --hx-prose-font-size custom property', async () => {
-      const el = await fixture<HelixProse>('<hx-prose size="base"><p>Text</p></hx-prose>');
+    it('hx-size="base" removes --hx-prose-font-size custom property', async () => {
+      const el = await fixture<HelixProse>('<hx-prose hx-size="base"><p>Text</p></hx-prose>');
       expect(el.style.getPropertyValue('--hx-prose-font-size')).toBe('');
     });
 

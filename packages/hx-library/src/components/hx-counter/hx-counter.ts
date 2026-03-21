@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCounterStyles } from './hx-counter.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 export type CounterSize = 'sm' | 'md' | 'lg';
 export type CounterEasing = 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
@@ -74,9 +75,9 @@ export class HelixCounter extends LitElement {
 
   /**
    * Size variant controlling font size.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: CounterSize = 'md';
 
   // ─── Internal State ───
@@ -92,6 +93,13 @@ export class HelixCounter extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-counter', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as CounterSize;
+    }
 
     // Guard for SSR — window.matchMedia and requestAnimationFrame are unavailable server-side
     if (typeof window === 'undefined') {

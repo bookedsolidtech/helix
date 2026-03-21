@@ -1,0 +1,2518 @@
+{
+  "auditType": "i18n-readiness",
+  "date": "2026-03-20",
+  "agent": "frontend-specialist",
+  "summary": {
+    "totalComponents": 77,
+    "componentsWithHardcodedStrings": 15,
+    "componentsWithRTLIssues": 9,
+    "componentsWithFormattingIssues": 2,
+    "componentsWithSlotSupport": 52,
+    "componentsFullyI18nReady": 44,
+    "formattingCheckCount": 2
+  },
+  "components": [
+    {
+      "name": "hx-accordion",
+      "path": "packages/hx-library/src/components/hx-accordion/hx-accordion.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["summary", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-action-bar",
+      "path": "packages/hx-library/src/components/hx-action-bar/hx-action-bar.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["start", "end", "overflow"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-alert",
+      "path": "packages/hx-library/src/components/hx-alert/hx-alert.ts",
+      "status": "stable",
+      "i18nScore": 55,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "visually-hidden-text",
+            "value": "Info:",
+            "line": 208,
+            "file": "hx-alert.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose severity label map as a `severityLabels` property of type `Partial<Record<AlertVariant, string>>`"
+          },
+          {
+            "type": "visually-hidden-text",
+            "value": "Success:",
+            "line": 209,
+            "file": "hx-alert.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Part of the same severity label map as above"
+          },
+          {
+            "type": "visually-hidden-text",
+            "value": "Warning:",
+            "line": 210,
+            "file": "hx-alert.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Part of the same severity label map as above"
+          },
+          {
+            "type": "visually-hidden-text",
+            "value": "Error:",
+            "line": 211,
+            "file": "hx-alert.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Part of the same severity label map as above"
+          },
+          {
+            "type": "aria-label",
+            "value": "Close ${this.heading} alert (dynamic template)",
+            "line": 377,
+            "file": "hx-alert.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `closeLabel` property with default 'Close alert'; let consumer interpolate heading context"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "margin-left: auto",
+            "value": "auto (centering intent)",
+            "line": 139,
+            "file": "hx-alert.styles.ts",
+            "recommendation": "Replace with margin-inline-start: auto"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "action"],
+        "ariaCustomizable": false,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add `severityLabels` property to override the hardcoded Info/Success/Warning/Error prefixes",
+        "Add `closeLabel` property (default: 'Close alert') to allow localization of dismiss button",
+        "Replace margin-left with margin-inline-start in styles"
+      ]
+    },
+    {
+      "name": "hx-avatar",
+      "path": "packages/hx-library/src/components/hx-avatar/hx-avatar.ts",
+      "status": "stable",
+      "i18nScore": 70,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Avatar",
+            "line": 239,
+            "file": "hx-avatar.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Hardcoded as fallback when neither `label` nor `alt` is provided. The existing `label` property covers this use case — document that consumers must provide label for accessible avatars in localized apps."
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "right: 0",
+            "value": "0 (badge positioning)",
+            "line": 104,
+            "file": "hx-avatar.styles.ts",
+            "recommendation": "Replace with inset-inline-end: 0 for RTL badge positioning"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "badge"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Document that `label` property must be set for localization",
+        "Replace right: 0 with inset-inline-end: 0 in badge positioning"
+      ]
+    },
+    {
+      "name": "hx-badge",
+      "path": "packages/hx-library/src/components/hx-badge/hx-badge.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["prefix", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-banner",
+      "path": "packages/hx-library/src/components/hx-banner/hx-banner.ts",
+      "status": "stable",
+      "i18nScore": 80,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Dismiss ${this.heading} banner (dynamic template)",
+            "line": 269,
+            "file": "hx-banner.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `closeLabel` property so consumers can provide localized dismiss text independent of heading interpolation"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "left: 0 / right: 0",
+            "value": "full-width positioning",
+            "line": 9,
+            "file": "hx-banner.styles.ts",
+            "recommendation": "Replace with inset-inline: 0 for sticky banner positioning"
+          },
+          {
+            "property": "margin-left: auto",
+            "value": "auto",
+            "line": 101,
+            "file": "hx-banner.styles.ts",
+            "recommendation": "Replace with margin-inline-start: auto"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "action"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add `closeLabel` property for localizable dismiss button label",
+        "Replace left/right positioning with logical CSS properties"
+      ]
+    },
+    {
+      "name": "hx-breadcrumb",
+      "path": "packages/hx-library/src/components/hx-breadcrumb/hx-breadcrumb.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-button",
+      "path": "packages/hx-library/src/components/hx-button/hx-button.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["prefix", "default", "suffix"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-button-group",
+      "path": "packages/hx-library/src/components/hx-button-group/hx-button-group.ts",
+      "status": "stable",
+      "i18nScore": 80,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "margin-left",
+            "value": "calc(-1 * var(--hx-border-width-thin, 1px))",
+            "line": 27,
+            "file": "hx-button-group.styles.ts",
+            "recommendation": "Replace with margin-inline-start to maintain negative border overlap in RTL"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Replace margin-left with margin-inline-start for RTL border overlap"
+      ]
+    },
+    {
+      "name": "hx-card",
+      "path": "packages/hx-library/src/components/hx-card/hx-card.ts",
+      "status": "stable",
+      "i18nScore": 75,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "padding-left / padding-right",
+            "value": "var(--hx-space-3) / var(--hx-card-padding)",
+            "line": 57,
+            "file": "hx-card.styles.ts",
+            "recommendation": "Replace all padding-left/padding-right with padding-inline-start/padding-inline-end or shorthand padding-inline"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 4,
+        "namedSlots": ["header", "default", "footer", "image"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Migrate 8 instances of padding-left/padding-right to logical CSS properties"
+      ]
+    },
+    {
+      "name": "hx-carousel",
+      "path": "packages/hx-library/src/components/hx-carousel/hx-carousel.ts",
+      "status": "stable",
+      "i18nScore": 75,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-live-text",
+            "value": "Slide ${i + 1} of ${count} (live region template)",
+            "line": 364,
+            "file": "hx-carousel.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelSlideOf` property accepting a function `(index: number, total: number) => string` or a template string with {index}/{total} placeholders"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["default", "previous-button", "next-button"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Expose `labelSlideOf` property for localizing the live region 'Slide N of M' announcement",
+        "Note: labelPrevSlide, labelNextSlide, labelPauseAutoplay, labelPlayAutoplay are already exposed as properties — good coverage"
+      ]
+    },
+    {
+      "name": "hx-checkbox",
+      "path": "packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts",
+      "status": "stable",
+      "i18nScore": 80,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "padding-left",
+            "value": "calc(var(--hx-size-4) + var(--hx-space-2)) (multiple lines)",
+            "line": 168,
+            "file": "hx-checkbox.styles.ts",
+            "recommendation": "Replace all padding-left instances with padding-inline-start (4 occurrences at lines 168, 177, 195, 209)"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["default", "error", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Replace 4 padding-left usages with padding-inline-start for proper RTL checkbox indentation"
+      ]
+    },
+    {
+      "name": "hx-checkbox-group",
+      "path": "packages/hx-library/src/components/hx-checkbox-group/hx-checkbox-group.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "error"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-code-snippet",
+      "path": "packages/hx-library/src/components/hx-code-snippet/hx-code-snippet.ts",
+      "status": "stable",
+      "i18nScore": 85,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "padding-right",
+            "value": "var(--hx-space-3, 0.75rem)",
+            "line": 145,
+            "file": "hx-code-snippet.styles.ts",
+            "recommendation": "Replace with padding-inline-end to account for RTL code block copy button positioning"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "labelCopy and labelCopied are already exposed as properties — good coverage",
+        "Replace padding-right with padding-inline-end in copy button positioning"
+      ]
+    },
+    {
+      "name": "hx-color-picker",
+      "path": "packages/hx-library/src/components/hx-color-picker/hx-color-picker.ts",
+      "status": "stable",
+      "i18nScore": 35,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Color gradient",
+            "line": 796,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelGradient` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Hue",
+            "line": 826,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelHue` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Opacity",
+            "line": 858,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelOpacity` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Preset colors",
+            "line": 879,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelSwatches` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Switch color format",
+            "line": 907,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelSwitchFormat` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Color value",
+            "line": 917,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelColorValue` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Color picker",
+            "line": 937,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelPicker` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Choose color: ${this._inputValue} (dynamic template)",
+            "line": 966,
+            "file": "hx-color-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelTrigger` function property: (color: string) => string"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "left: 0 (gradient origin)",
+            "value": "0",
+            "line": 65,
+            "file": "hx-color-picker.styles.ts",
+            "recommendation": "Gradient and slider thumb positioning via left: is correct for color logic — these are value-axis positions, not layout. No change needed for color gradient canvas (RTL does not affect color space). Document as intentional."
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": false,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add 8 label properties to cover all internal aria-label strings: labelGradient, labelHue, labelOpacity, labelSwatches, labelSwitchFormat, labelColorValue, labelPicker, and a labelTrigger function",
+        "This is the highest-priority component for i18n remediation — 8 hardcoded non-overrideable strings"
+      ]
+    },
+    {
+      "name": "hx-combobox",
+      "path": "packages/hx-library/src/components/hx-combobox/hx-combobox.ts",
+      "status": "stable",
+      "i18nScore": 80,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Remove ${label} (dynamic template for multi-select chips)",
+            "line": 709,
+            "file": "hx-combobox.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelRemoveOption` function property: (label: string) => string, defaulting to (label) => `Remove ${label}`"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "left: 0 / right: 0",
+            "value": "listbox full-width positioning",
+            "line": 209,
+            "file": "hx-combobox.styles.ts",
+            "recommendation": "Replace with inset-inline: 0 for RTL-safe listbox width"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "empty-label", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Note: labelNoOptions and labelRequired are already exposed — good coverage",
+        "Add labelRemoveOption function property for multi-select chip removal button",
+        "Replace left/right with inset-inline in listbox positioning"
+      ]
+    },
+    {
+      "name": "hx-container",
+      "path": "packages/hx-library/src/components/hx-container/hx-container.ts",
+      "status": "stable",
+      "i18nScore": 75,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "margin-left: auto / margin-right: auto",
+            "value": "auto (centering)",
+            "line": 48,
+            "file": "hx-container.styles.ts",
+            "recommendation": "Replace with margin-inline: auto for RTL-safe centering"
+          },
+          {
+            "property": "padding-left / padding-right",
+            "value": "var(--hx-container-gutter)",
+            "line": 50,
+            "file": "hx-container.styles.ts",
+            "recommendation": "Replace with padding-inline shorthand"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Replace margin-left/margin-right with margin-inline: auto",
+        "Replace padding-left/padding-right with padding-inline"
+      ]
+    },
+    {
+      "name": "hx-copy-button",
+      "path": "packages/hx-library/src/components/hx-copy-button/hx-copy-button.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["default", "copy-icon", "success-icon"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "label and labelCopied are both exposed as properties — fully i18n ready"
+      ]
+    },
+    {
+      "name": "hx-counter",
+      "path": "packages/hx-library/src/components/hx-counter/hx-counter.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-data-table",
+      "path": "packages/hx-library/src/components/hx-data-table/hx-data-table.ts",
+      "status": "stable",
+      "i18nScore": 45,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Select all rows",
+            "line": 361,
+            "file": "hx-data-table.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelSelectAll` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Sort by ${col.label}, currently sorted ascending (dynamic template)",
+            "line": 391,
+            "file": "hx-data-table.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelSortBy` function: (col: string, dir: 'asc' | 'desc' | null) => string"
+          },
+          {
+            "type": "aria-sort-text",
+            "value": "ascending / descending",
+            "line": 380,
+            "file": "hx-data-table.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "These are aria-sort attribute values (standard ARIA vocabulary, not translated). No change needed — ARIA attributes are not localized."
+          },
+          {
+            "type": "aria-label",
+            "value": "Select row ${globalIndex + 1} (dynamic template)",
+            "line": 470,
+            "file": "hx-data-table.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelSelectRow` function: (index: number) => string"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "padding-right",
+            "value": "var(--hx-space-2, 0.5rem) (sort icon spacing)",
+            "line": 68,
+            "file": "hx-data-table.styles.ts",
+            "recommendation": "Replace with padding-inline-end"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": false,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelSelectAll property",
+        "Add labelSortBy function property for sort button aria-labels",
+        "Add labelSelectRow function property for row checkbox aria-labels",
+        "Replace padding-right with padding-inline-end for sort icon spacing"
+      ]
+    },
+    {
+      "name": "hx-date-picker",
+      "path": "packages/hx-library/src/components/hx-date-picker/hx-date-picker.ts",
+      "status": "stable",
+      "i18nScore": 50,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Choose a date",
+            "line": 953,
+            "file": "hx-date-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelChooseDate` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Previous month",
+            "line": 971,
+            "file": "hx-date-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelPrevMonth` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Next month",
+            "line": 983,
+            "file": "hx-date-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelNextMonth` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Open calendar / Close calendar (dynamic toggle)",
+            "line": 916,
+            "file": "hx-date-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelOpenCalendar` and `labelCloseCalendar` properties"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "left: 0",
+            "value": "0 (calendar popup anchor)",
+            "line": 156,
+            "file": "hx-date-picker.styles.ts",
+            "recommendation": "Replace with inset-inline-start: 0 to anchor popup to the text start edge in RTL"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "error", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": true
+      },
+      "recommendations": [
+        "Already uses Intl.DateTimeFormat for month/day names via locale property — excellent",
+        "Add 4 label properties: labelChooseDate, labelPrevMonth, labelNextMonth, labelOpenCalendar/labelCloseCalendar",
+        "Replace left: 0 with inset-inline-start: 0 for calendar popup"
+      ]
+    },
+    {
+      "name": "hx-dialog",
+      "path": "packages/hx-library/src/components/hx-dialog/hx-dialog.ts",
+      "status": "stable",
+      "i18nScore": 70,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Close ${this.heading || 'dialog'} (dynamic template)",
+            "line": 490,
+            "file": "hx-dialog.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `closeLabel` property; default can remain contextual but must be overrideable"
+          },
+          {
+            "type": "aria-label-fallback",
+            "value": "Dialog (fallback when no heading)",
+            "line": 537,
+            "file": "hx-dialog.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "The existing `label` property already covers this — document that label must be set in localized apps"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "margin-left: auto",
+            "value": "auto (close button push to end)",
+            "line": 127,
+            "file": "hx-dialog.styles.ts",
+            "recommendation": "Replace with margin-inline-start: auto"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["header", "default", "footer"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add `closeLabel` property to allow localization of close button",
+        "Replace margin-left: auto with margin-inline-start: auto"
+      ]
+    },
+    {
+      "name": "hx-divider",
+      "path": "packages/hx-library/src/components/hx-divider/hx-divider.ts",
+      "status": "stable",
+      "i18nScore": 100,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-drawer",
+      "path": "packages/hx-library/src/components/hx-drawer/hx-drawer.ts",
+      "status": "stable",
+      "i18nScore": 60,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Close drawer",
+            "line": 532,
+            "file": "hx-drawer.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `closeLabel` property (default: 'Close drawer')"
+          },
+          {
+            "type": "aria-label-fallback",
+            "value": "Drawer (fallback when no label slot)",
+            "line": 579,
+            "file": "hx-drawer.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "The existing `label` property already covers this; document that it must be set for localization"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "right: 0",
+            "value": "right panel positioning",
+            "line": 92,
+            "file": "hx-drawer.styles.ts",
+            "recommendation": "Drawer start/end sides already have separate CSS rules; verify :dir(rtl) selector is applied to swap start/end panel positioning"
+          },
+          {
+            "property": "left: 0",
+            "value": "left panel positioning",
+            "line": 109,
+            "file": "hx-drawer.styles.ts",
+            "recommendation": "Replace with inset-inline-start: 0; use inset-inline-end: 0 for the end-side drawer"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "default", "footer"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add `closeLabel` property (default: 'Close drawer')",
+        "Migrate drawer side positioning to logical inset properties"
+      ]
+    },
+    {
+      "name": "hx-dropdown",
+      "path": "packages/hx-library/src/components/hx-dropdown/hx-dropdown.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["trigger", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-field",
+      "path": "packages/hx-library/src/components/hx-field/hx-field.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["label", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-field-label",
+      "path": "packages/hx-library/src/components/hx-field-label/hx-field-label.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-file-upload",
+      "path": "packages/hx-library/src/components/hx-file-upload/hx-file-upload.ts",
+      "status": "stable",
+      "i18nScore": 65,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Selected files",
+            "line": 473,
+            "file": "hx-file-upload.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelFileList` property (default: 'Selected files')"
+          },
+          {
+            "type": "aria-label",
+            "value": "Upload progress for ${entry.file.name}: ${entry.progress}% (dynamic template)",
+            "line": 513,
+            "file": "hx-file-upload.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelUploadProgress` function: (name: string, progress: number) => string"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "file-list"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Note: labelDropzone is already exposed — good coverage",
+        "Add labelFileList property",
+        "Add labelUploadProgress function property for progress announcements"
+      ]
+    },
+    {
+      "name": "hx-form",
+      "path": "packages/hx-library/src/components/hx-form/hx-form.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-format-date",
+      "path": "packages/hx-library/src/components/hx-format-date/hx-format-date.ts",
+      "status": "stable",
+      "i18nScore": 100,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": true
+      },
+      "recommendations": [
+        "This component is a model for i18n implementation — fully uses Intl.DateTimeFormat and Intl.RelativeTimeFormat with locale property"
+      ]
+    },
+    {
+      "name": "hx-grid",
+      "path": "packages/hx-library/src/components/hx-grid/hx-grid.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-help-text",
+      "path": "packages/hx-library/src/components/hx-help-text/hx-help-text.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-icon",
+      "path": "packages/hx-library/src/components/hx-icon/hx-icon.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-icon-button",
+      "path": "packages/hx-library/src/components/hx-icon-button/hx-icon-button.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-image",
+      "path": "packages/hx-library/src/components/hx-image/hx-image.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-link",
+      "path": "packages/hx-library/src/components/hx-link/hx-link.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-list",
+      "path": "packages/hx-library/src/components/hx-list/hx-list.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-menu",
+      "path": "packages/hx-library/src/components/hx-menu/hx-menu.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 4,
+        "namedSlots": ["default", "prefix", "suffix", "submenu"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-meter",
+      "path": "packages/hx-library/src/components/hx-meter/hx-meter.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["label"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-nav",
+      "path": "packages/hx-library/src/components/hx-nav/hx-nav.ts",
+      "status": "stable",
+      "i18nScore": 60,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Close navigation menu / Open navigation menu (dynamic toggle)",
+            "line": 422,
+            "file": "hx-nav.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelOpenMenu` and `labelCloseMenu` properties (defaults: 'Open navigation menu', 'Close navigation menu')"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "left: 0",
+            "value": "mobile nav overlay position",
+            "line": 123,
+            "file": "hx-nav.styles.ts",
+            "recommendation": "Replace with inset-inline-start: 0"
+          },
+          {
+            "property": "padding-left",
+            "value": "var(--hx-space-4) (submenu indentation)",
+            "line": 173,
+            "file": "hx-nav.styles.ts",
+            "recommendation": "Replace with padding-inline-start for proper RTL submenu indentation"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelOpenMenu and labelCloseMenu properties",
+        "Replace left: 0 with inset-inline-start: 0 in mobile overlay",
+        "Replace padding-left with padding-inline-start in submenu indentation"
+      ]
+    },
+    {
+      "name": "hx-number-input",
+      "path": "packages/hx-library/src/components/hx-number-input/hx-number-input.ts",
+      "status": "stable",
+      "i18nScore": 65,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Increment",
+            "line": 593,
+            "file": "hx-number-input.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelIncrement` property (default: 'Increment')"
+          },
+          {
+            "type": "aria-label",
+            "value": "Decrement",
+            "line": 607,
+            "file": "hx-number-input.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelDecrement` property (default: 'Decrement')"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 4,
+        "namedSlots": ["label", "prefix", "suffix", "error"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelIncrement and labelDecrement properties to allow localization of stepper buttons",
+        "Consider also: numeric values may need locale-aware formatting for display (Intl.NumberFormat)"
+      ]
+    },
+    {
+      "name": "hx-overflow-menu",
+      "path": "packages/hx-library/src/components/hx-overflow-menu/hx-overflow-menu.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "The label property (default: 'More actions') is exposed and overrideable — fully i18n ready"
+      ]
+    },
+    {
+      "name": "hx-pagination",
+      "path": "packages/hx-library/src/components/hx-pagination/hx-pagination.ts",
+      "status": "stable",
+      "i18nScore": 55,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "First page",
+            "line": 317,
+            "file": "hx-pagination.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelFirstPage` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Previous page",
+            "line": 333,
+            "file": "hx-pagination.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelPrevPage` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Next page",
+            "line": 378,
+            "file": "hx-pagination.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelNextPage` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Last page",
+            "line": 394,
+            "file": "hx-pagination.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelLastPage` property"
+          },
+          {
+            "type": "aria-live-text",
+            "value": "Page ${clamped} of ${this.totalPages} (live region template)",
+            "line": 202,
+            "file": "hx-pagination.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelPageOf` function property: (current: number, total: number) => string"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Note: label (nav aria-label) and labelRowsPerPage are already exposed — good start",
+        "Add 5 label properties: labelFirstPage, labelPrevPage, labelNextPage, labelLastPage, labelPageOf",
+        "Consider arrow direction inversion for RTL (prev/next icon mirroring)"
+      ]
+    },
+    {
+      "name": "hx-popover",
+      "path": "packages/hx-library/src/components/hx-popover/hx-popover.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["anchor", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-popup",
+      "path": "packages/hx-library/src/components/hx-popup/hx-popup.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-progress-bar",
+      "path": "packages/hx-library/src/components/hx-progress-bar/hx-progress-bar.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["label"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-progress-ring",
+      "path": "packages/hx-library/src/components/hx-progress-ring/hx-progress-ring.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-prose",
+      "path": "packages/hx-library/src/components/hx-prose/hx-prose.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-radio-group",
+      "path": "packages/hx-library/src/components/hx-radio-group/hx-radio-group.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["default", "error", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-rating",
+      "path": "packages/hx-library/src/components/hx-rating/hx-rating.ts",
+      "status": "stable",
+      "i18nScore": 50,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "1 star / ${i} stars (individual star labels)",
+            "line": 478,
+            "file": "hx-rating.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelStar` function: (count: number) => string to handle singular/plural"
+          },
+          {
+            "type": "aria-valuetext",
+            "value": "${v} out of ${this.max} stars / Rating: ${v} out of ${max}",
+            "line": 198,
+            "file": "hx-rating.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelValueText` function: (value: number, max: number) => string for the composite aria-valuetext"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["icon"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelStar function property for single-star aria-label (handles pluralization)",
+        "Add labelValueText function property for the composite value text",
+        "Consider using Intl.PluralRules for star pluralization handling"
+      ]
+    },
+    {
+      "name": "hx-select",
+      "path": "packages/hx-library/src/components/hx-select/hx-select.ts",
+      "status": "stable",
+      "i18nScore": 85,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "left: 2px",
+            "value": "focus ring offset",
+            "line": 156,
+            "file": "hx-select.styles.ts",
+            "recommendation": "Replace with inset-inline-start: 2px"
+          },
+          {
+            "property": "left: 0 / right: 0",
+            "value": "listbox full-width",
+            "line": 209,
+            "file": "hx-select.styles.ts",
+            "recommendation": "Replace with inset-inline: 0"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "error", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Replace left: 2px with inset-inline-start: 2px",
+        "Replace left/right listbox positioning with inset-inline: 0"
+      ]
+    },
+    {
+      "name": "hx-side-nav",
+      "path": "packages/hx-library/src/components/hx-side-nav/hx-side-nav.ts",
+      "status": "stable",
+      "i18nScore": 70,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "margin-left: auto",
+            "value": "auto (collapse toggle and badge push)",
+            "line": 87,
+            "file": "hx-side-nav.styles.ts",
+            "recommendation": "Replace with margin-inline-start: auto"
+          },
+          {
+            "property": "margin-left: auto (nav-item badge)",
+            "value": "auto",
+            "line": 119,
+            "file": "hx-nav-item.styles.ts",
+            "recommendation": "Replace with margin-inline-start: auto (2 occurrences)"
+          },
+          {
+            "property": "padding-left",
+            "value": "var(--hx-space-6) (nested item indentation)",
+            "line": 164,
+            "file": "hx-nav-item.styles.ts",
+            "recommendation": "Replace with padding-inline-start for RTL-safe nesting"
+          },
+          {
+            "property": "left: calc(100% + var(--hx-space-2))",
+            "value": "tooltip position",
+            "line": 171,
+            "file": "hx-nav-item.styles.ts",
+            "recommendation": "Replace with inset-inline-start: calc(100% + var(--hx-space-2))"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 4,
+        "namedSlots": ["header", "default", "footer", "children"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Replace 5 instances of left/margin-left/padding-left with logical CSS properties in both hx-nav-item.styles.ts and hx-side-nav.styles.ts"
+      ]
+    },
+    {
+      "name": "hx-skeleton",
+      "path": "packages/hx-library/src/components/hx-skeleton/hx-skeleton.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-slider",
+      "path": "packages/hx-library/src/components/hx-slider/hx-slider.ts",
+      "status": "stable",
+      "i18nScore": 80,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "left: 0 / left: calc(...)",
+            "value": "track fill and thumb positioning",
+            "line": 102,
+            "file": "hx-slider.styles.ts",
+            "recommendation": "Slider fill-direction is value-axis dependent (min-to-max), not layout. These left: values are intentional for LTR value direction. Add dir=rtl handling to reverse fill direction if RTL support is needed."
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "min-label", "max-label"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Slider fill direction needs :dir(rtl) CSS rule to reverse value direction in RTL contexts"
+      ]
+    },
+    {
+      "name": "hx-spinner",
+      "path": "packages/hx-library/src/components/hx-spinner/hx-spinner.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": false,
+        "slotCount": 0,
+        "namedSlots": [],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "label property (default: 'Loading') is exposed — fully i18n ready"
+      ]
+    },
+    {
+      "name": "hx-split-button",
+      "path": "packages/hx-library/src/components/hx-split-button/hx-split-button.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "menu"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-split-panel",
+      "path": "packages/hx-library/src/components/hx-split-panel/hx-split-panel.ts",
+      "status": "stable",
+      "i18nScore": 50,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Resize panels",
+            "line": 352,
+            "file": "hx-split-panel.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelResize` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Collapse start panel",
+            "line": 380,
+            "file": "hx-split-panel.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelCollapseStart` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Collapse end panel",
+            "line": 388,
+            "file": "hx-split-panel.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelCollapseEnd` property"
+          },
+          {
+            "type": "aria-label",
+            "value": "Expand ${this.collapsed} panel (dynamic template)",
+            "line": 370,
+            "file": "hx-split-panel.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelExpand` function: (side: 'start' | 'end') => string"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "left: 50%",
+            "value": "divider center positioning",
+            "line": 119,
+            "file": "hx-split-panel.styles.ts",
+            "recommendation": "Replace with inset-inline-start: 50% for RTL-aware centering"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["start", "end"],
+        "ariaCustomizable": false,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelResize, labelCollapseStart, labelCollapseEnd, and labelExpand (function) properties",
+        "Replace left: 50% with inset-inline-start: 50% for divider positioning"
+      ]
+    },
+    {
+      "name": "hx-stack",
+      "path": "packages/hx-library/src/components/hx-stack/hx-stack.ts",
+      "status": "stable",
+      "i18nScore": 100,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-stat",
+      "path": "packages/hx-library/src/components/hx-stat/hx-stat.ts",
+      "status": "stable",
+      "i18nScore": 65,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Trend: ${this.trend} (dynamic template)",
+            "line": 150,
+            "file": "hx-stat.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelTrend` function property: (trend: StatTrend) => string, defaulting to (t) => `Trend: ${t}`"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["icon"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelTrend function property to allow localized trend announcements"
+      ]
+    },
+    {
+      "name": "hx-status-indicator",
+      "path": "packages/hx-library/src/components/hx-status-indicator/hx-status-indicator.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-steps",
+      "path": "packages/hx-library/src/components/hx-steps/hx-steps.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["icon", "label", "description"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-structured-list",
+      "path": "packages/hx-library/src/components/hx-structured-list/hx-structured-list.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "actions", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-switch",
+      "path": "packages/hx-library/src/components/hx-switch/hx-switch.ts",
+      "status": "stable",
+      "i18nScore": 75,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "left: var(--hx-switch-thumb-offset)",
+            "value": "thumb starting position",
+            "line": 81,
+            "file": "hx-switch.styles.ts",
+            "recommendation": "Replace with inset-inline-start to position thumb at start edge in RTL (3 occurrences at lines 81, 101, 121)"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["default", "error", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Replace 3 instances of left: positioning with inset-inline-start for RTL thumb positioning in switch track"
+      ]
+    },
+    {
+      "name": "hx-table",
+      "path": "packages/hx-library/src/components/hx-table/hx-table.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["caption", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-tabs",
+      "path": "packages/hx-library/src/components/hx-tabs/hx-tabs.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["nav", "default"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-tag",
+      "path": "packages/hx-library/src/components/hx-tag/hx-tag.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["prefix", "default", "suffix"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-text",
+      "path": "packages/hx-library/src/components/hx-text/hx-text.ts",
+      "status": "stable",
+      "i18nScore": 100,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-text-input",
+      "path": "packages/hx-library/src/components/hx-text-input/hx-text-input.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 4,
+        "namedSlots": ["label", "prefix", "suffix", "error"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-textarea",
+      "path": "packages/hx-library/src/components/hx-textarea/hx-textarea.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["label", "error", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-theme",
+      "path": "packages/hx-library/src/components/hx-theme/hx-theme.ts",
+      "status": "stable",
+      "i18nScore": 100,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-time-picker",
+      "path": "packages/hx-library/src/components/hx-time-picker/hx-time-picker.ts",
+      "status": "stable",
+      "i18nScore": 60,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Open time picker / Close time picker (dynamic toggle)",
+            "line": 758,
+            "file": "hx-time-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelOpenPicker` and `labelClosePicker` properties"
+          },
+          {
+            "type": "placeholder",
+            "value": "hh:mm AM (format-dependent hardcoded placeholder)",
+            "line": 696,
+            "file": "hx-time-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `placeholder` property to allow locale-appropriate time format hints"
+          },
+          {
+            "type": "format-string",
+            "value": "AM / PM (12-hour format strings in to12h helper)",
+            "line": 41,
+            "file": "hx-time-picker.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Consider using Intl.DateTimeFormat with hour12 option to generate locale-appropriate AM/PM markers, or expose labelAM and labelPM properties"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [
+          {
+            "type": "locale-unaware-formatting",
+            "description": "AM/PM period strings are hardcoded English; some locales use different period markers",
+            "line": 41,
+            "file": "hx-time-picker.ts",
+            "recommendation": "Use Intl.DateTimeFormat with hour12: true and hourCycle: 'h12' to get locale AM/PM equivalents"
+          }
+        ],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["label", "help-text"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelOpenPicker and labelClosePicker properties",
+        "Add `placeholder` property to allow locale format hints",
+        "Use Intl.DateTimeFormat to derive AM/PM equivalents for non-English locales"
+      ]
+    },
+    {
+      "name": "hx-toast",
+      "path": "packages/hx-library/src/components/hx-toast/hx-toast.ts",
+      "status": "stable",
+      "i18nScore": 85,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [
+          {
+            "property": "left: 0 / right: 0 / left: 50% (toast stack positions)",
+            "value": "position-dependent placement",
+            "line": 177,
+            "file": "hx-toast.styles.ts",
+            "recommendation": "Replace left/right with inset-inline-start/inset-inline-end for RTL-aware toast stack positioning (multiple occurrences)"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["icon", "default", "action"],
+        "ariaCustomizable": true,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Note: closeLabel property is already exposed (default: 'Dismiss notification') — good coverage",
+        "Replace 8 left/right positioning rules with logical inset properties for RTL toast stack"
+      ]
+    },
+    {
+      "name": "hx-toggle-button",
+      "path": "packages/hx-library/src/components/hx-toggle-button/hx-toggle-button.ts",
+      "status": "stable",
+      "i18nScore": 90,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["prefix", "default", "suffix"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-tooltip",
+      "path": "packages/hx-library/src/components/hx-tooltip/hx-tooltip.ts",
+      "status": "stable",
+      "i18nScore": 95,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 2,
+        "namedSlots": ["default", "content"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    },
+    {
+      "name": "hx-top-nav",
+      "path": "packages/hx-library/src/components/hx-top-nav/hx-top-nav.ts",
+      "status": "stable",
+      "i18nScore": 65,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Close navigation / Open navigation (dynamic toggle)",
+            "line": 185,
+            "file": "hx-top-nav.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelOpenNav` and `labelCloseNav` properties"
+          }
+        ],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["logo", "default", "actions"],
+        "ariaCustomizable": true,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelOpenNav and labelCloseNav properties for mobile hamburger toggle"
+      ]
+    },
+    {
+      "name": "hx-tree-view",
+      "path": "packages/hx-library/src/components/hx-tree-view/hx-tree-item.ts",
+      "status": "stable",
+      "i18nScore": 60,
+      "issues": {
+        "hardcodedStrings": [
+          {
+            "type": "aria-label",
+            "value": "Collapse / Expand (tree item expand toggle)",
+            "line": 285,
+            "file": "hx-tree-item.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelExpand` and `labelCollapse` properties on hx-tree-item"
+          },
+          {
+            "type": "aria-label",
+            "value": "${this._labelText} children (children group label)",
+            "line": 327,
+            "file": "hx-tree-item.ts",
+            "translatable": true,
+            "overrideable": false,
+            "recommendation": "Expose as `labelChildren` function property: (label: string) => string, defaulting to (l) => `${l} children`"
+          }
+        ],
+        "rtlIssues": [
+          {
+            "property": "padding-left: calc(...)",
+            "value": "nested depth indentation",
+            "line": 27,
+            "file": "hx-tree-item.styles.ts",
+            "recommendation": "Replace with padding-inline-start for RTL-safe tree indentation"
+          }
+        ],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 3,
+        "namedSlots": ["icon", "default", "children"],
+        "ariaCustomizable": false,
+        "supportsRTL": false,
+        "usesIntlApi": false
+      },
+      "recommendations": [
+        "Add labelExpand and labelCollapse properties to hx-tree-item",
+        "Add labelChildren function property for children group label",
+        "Replace padding-left with padding-inline-start for depth indentation"
+      ]
+    },
+    {
+      "name": "hx-visually-hidden",
+      "path": "packages/hx-library/src/components/hx-visually-hidden/hx-visually-hidden.ts",
+      "status": "stable",
+      "i18nScore": 100,
+      "issues": {
+        "hardcodedStrings": [],
+        "rtlIssues": [],
+        "formattingIssues": [],
+        "slotIssues": []
+      },
+      "capabilities": {
+        "hasSlots": true,
+        "slotCount": 1,
+        "namedSlots": ["default"],
+        "ariaCustomizable": false,
+        "supportsRTL": true,
+        "usesIntlApi": false
+      },
+      "recommendations": []
+    }
+  ],
+  "recommendations": {
+    "strategy": "property-based-override",
+    "rationale": "The library already uses a property-based pattern for label overrides (e.g., labelCopy, labelCopied, labelRowsPerPage, closeLabel on hx-toast). Extending this pattern consistently across all 15 affected components is the lowest-friction path: no new framework dependency, Drupal Twig integration is trivial via attributes, and it preserves the existing API shape. A secondary recommendation is to adopt Intl.PluralRules for components with count-dependent strings (hx-rating stars).",
+    "implementationRoadmap": {
+      "phase1": {
+        "description": "Critical path: Add missing label properties to the 5 highest-impact components used in every healthcare application. These components have the most hardcoded strings or appear in every page layout.",
+        "components": ["hx-color-picker", "hx-pagination", "hx-data-table", "hx-date-picker", "hx-alert"],
+        "changes": [
+          "hx-color-picker: Add 8 label properties (labelGradient, labelHue, labelOpacity, labelSwatches, labelSwitchFormat, labelColorValue, labelPicker, labelTrigger function)",
+          "hx-pagination: Add labelFirstPage, labelPrevPage, labelNextPage, labelLastPage, labelPageOf function",
+          "hx-data-table: Add labelSelectAll, labelSortBy function, labelSelectRow function",
+          "hx-date-picker: Add labelChooseDate, labelPrevMonth, labelNextMonth, labelOpenCalendar, labelCloseCalendar",
+          "hx-alert: Add severityLabels partial-override map, add closeLabel property"
+        ],
+        "estimatedHours": 16
+      },
+      "phase2": {
+        "description": "Secondary: Address navigation components, overlays, and complex composites. These appear frequently in app shells and must be localizable for any international deployment.",
+        "components": ["hx-split-panel", "hx-drawer", "hx-dialog", "hx-nav", "hx-top-nav", "hx-number-input", "hx-rating"],
+        "changes": [
+          "hx-split-panel: Add labelResize, labelCollapseStart, labelCollapseEnd, labelExpand function",
+          "hx-drawer: Add closeLabel property",
+          "hx-dialog: Add closeLabel property",
+          "hx-nav: Add labelOpenMenu, labelCloseMenu properties",
+          "hx-top-nav: Add labelOpenNav, labelCloseNav properties",
+          "hx-number-input: Add labelIncrement, labelDecrement properties",
+          "hx-rating: Add labelStar function, labelValueText function"
+        ],
+        "estimatedHours": 12
+      },
+      "phase3": {
+        "description": "RTL layout support: Migrate all physical CSS properties (margin-left, padding-right, left:, right:) to logical CSS equivalents across all 9 affected components. Also addresses remaining minor string issues in hx-carousel, hx-combobox, hx-file-upload, hx-stat, hx-tree-view, hx-time-picker, hx-avatar.",
+        "components": [
+          "hx-checkbox", "hx-container", "hx-card", "hx-nav", "hx-side-nav",
+          "hx-button-group", "hx-drawer", "hx-switch", "hx-tree-view",
+          "hx-carousel", "hx-combobox", "hx-file-upload", "hx-stat", "hx-time-picker", "hx-avatar"
+        ],
+        "changes": [
+          "Migrate all margin-left/margin-right to margin-inline-start/end or margin-inline shorthand",
+          "Migrate all padding-left/padding-right to padding-inline-start/end or padding-inline",
+          "Replace left:/right: absolute positioning with inset-inline-start/end",
+          "Add dir=rtl test coverage for all affected layout components",
+          "hx-time-picker: Use Intl.DateTimeFormat for AM/PM locale handling"
+        ],
+        "estimatedHours": 20
+      }
+    },
+    "priorityComponents": [
+      "hx-color-picker",
+      "hx-data-table",
+      "hx-pagination",
+      "hx-date-picker",
+      "hx-alert"
+    ],
+    "estimatedTotalHours": 48
+  }
+}

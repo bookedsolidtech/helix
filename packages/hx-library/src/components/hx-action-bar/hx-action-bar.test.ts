@@ -56,15 +56,29 @@ describe('hx-action-bar', () => {
       expect(el.size).toBe('md');
     });
 
-    it('reflects size attribute to host', async () => {
-      const el = await fixture<HelixActionBar>('<hx-action-bar size="sm"></hx-action-bar>');
-      expect(el.getAttribute('size')).toBe('sm');
+    it('reflects hx-size attribute to host', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar hx-size="sm"></hx-action-bar>');
+      expect(el.getAttribute('hx-size')).toBe('sm');
     });
 
-    it('applies size class to base element', async () => {
-      const el = await fixture<HelixActionBar>('<hx-action-bar size="lg"></hx-action-bar>');
+    it('applies size class to base element via hx-size', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar hx-size="lg"></hx-action-bar>');
       const base = shadowQuery(el, '[part="base"]');
       expect(base?.classList.contains('base--lg')).toBe(true);
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar size="sm"></hx-action-bar>');
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixActionBar>(
+        '<hx-action-bar size="sm" hx-size="lg"></hx-action-bar>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
