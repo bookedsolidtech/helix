@@ -1,0 +1,568 @@
+{
+  "researchType": "wc-library-comparison",
+  "date": "2026-03-19",
+  "researcher": "principal-engineer",
+  "librariesExamined": 16,
+  "helixComponentCount": 78,
+  "libraries": [
+    {
+      "name": "@material/web",
+      "path": "material",
+      "framework": "Lit 3.x",
+      "version": "2.4.1",
+      "componentCount": 26,
+      "patterns": {
+        "formAssociation": "Best-in-class mixin architecture. Uses composable mixins: mixinElementInternals -> mixinFormAssociated -> mixinConstraintValidation -> mixinOnReportValidity. Each mixin handles one responsibility. Symbol-based protected API (internals, getFormValue, getFormState, createValidator, getValidityAnchor) prevents naming collisions. Form value synchronization happens in requestUpdate() for synchronous form API compat. Separate Validator class per component with caching.",
+        "theming": "SCSS-based with design token CSS custom properties compiled at build time. Uses Sass modules for per-variant style sheets (filled-styles.scss, outlined-styles.scss). Tokens resolve through md-sys-color-* system. No runtime token layer -- all compiled. Each variant is a separate element (md-filled-button, md-outlined-button).",
+        "accessibility": "mixinDelegatesAria shifts aria-* attributes from host to data-* attributes to prevent duplicate announcements in Shadow DOM. delegatesFocus: true on all interactive elements. Soft-disabled pattern (focusable but non-interactive) follows ARIA APG guidance. ARIAMixinStrict type for type-safe ARIA property access in templates.",
+        "events": "Minimal custom events -- prefers native events (change, input). Uses redispatchEvent() utility to bubble events from internal elements. Custom events only for component-specific actions (opening, opened, closing, closed). No event prefix.",
+        "ssr": "First-class SSR support. isServer checks throughout to guard DOM APIs. SSR-specific attributes (display-text, has-leading-icon) for initial render without JS. Declarative shadow DOM support. Value initialization handles streaming DOM case.",
+        "bundling": "Per-component entry points. Each variant is a standalone file. Abstract base classes shared via internal imports. Tree-shakeable by design -- import only md-filled-button if you only need that.",
+        "testing": "Jasmine + @web/test-runner-playwright. Tests colocated with source (button_test.ts alongside button.ts). Browser-based testing with Playwright.",
+        "cem": "Generated CEM. Uses @lit-labs/analyzer. JSDoc-based API documentation. @fires tags for events, @nocollapse for Closure Compiler compat."
+      },
+      "strengthsToAdopt": [
+        "Composable form-association mixins with symbol-based protected API -- eliminates code duplication across all form elements",
+        "Synchronous form value sync in requestUpdate() -- critical for form API compatibility that many libraries get wrong",
+        "ARIA delegation mixin that shifts aria-* to data-* to prevent duplicate announcements in Shadow DOM",
+        "Soft-disabled pattern (focusable but non-interactive) for accessible disabled states per ARIA APG",
+        "Constraint validation mixin with Validator class pattern -- type-safe, cacheable, per-component validators",
+        "isServer guards for SSR compatibility baked into base classes",
+        "Separate abstract base + concrete variants pattern for clean extension"
+      ],
+      "weaknessesHelixAvoids": [
+        "SCSS build dependency adds complexity -- HELiX correctly uses Lit CSS tagged templates",
+        "Separate elements per variant (md-filled-button, md-outlined-button) increases API surface -- HELiX correctly uses a single element with variant property",
+        "Closure Compiler constraints pollute the codebase with workarounds",
+        "No Storybook stories -- docs are separate catalog app"
+      ]
+    },
+    {
+      "name": "@shoelace-style/shoelace",
+      "path": "shoelace",
+      "framework": "Lit 3.x",
+      "version": "2.20.1",
+      "componentCount": 58,
+      "patterns": {
+        "formAssociation": "FormControlController (reactive controller pattern) handles form registration, validation, submission. WeakMap-based form tracking. Monitors user interaction via configurable event names (assumeInteractionOn). Manual form submission/reset via controller.submit()/reset(). Does NOT use ElementInternals -- uses hidden input workaround for broader browser compat.",
+        "theming": "CSS custom properties via theme stylesheets (light.css, dark.css). Component styles use --sl-* tokens. Base component.styles.ts sets box-sizing inheritance. Separate form-control.styles.ts for shared form layout. Theme loaded as external stylesheet in document.",
+        "accessibility": "Comprehensive ARIA attributes in templates. aria-describedby for help text. LocalizeController for i18n of ARIA labels (clearEntry, hidePassword, showPassword). HasSlotController detects slot presence for conditional ARIA. Keyboard handling explicitly coded per component.",
+        "events": "Typed emit() method on base class (ShoelaceElement). Events registered on GlobalEventHandlersEventMap for type safety. Conditional detail requirement enforced at type level. sl-* prefixed events. @watch decorator for property change side effects.",
+        "ssr": "Limited SSR support. No explicit isServer guards. Components assume DOM availability.",
+        "bundling": "Per-component entry points. Static dependencies declaration for auto-registration of child components (sl-icon, sl-spinner). Tree-shakeable imports.",
+        "testing": "@web/test-runner with Playwright. Chromium + WebKit browsers. Per-component test groups via globbySync. esbuild plugin for TypeScript. 3-second timeout with 1 retry.",
+        "cem": "Rich CEM config with custom plugins: infer tag names from file paths, custom JSDoc tags (@animation, @dependency, @since, @status), React event name generation, VS Code/JetBrains/Vue integration plugins. Module path translation for dist output."
+      },
+      "strengthsToAdopt": [
+        "Typed emit() method on base class with GlobalEventHandlersEventMap registration -- compile-time event type safety",
+        "@watch decorator for clean property change side effects without overriding updated()",
+        "@defaultValue decorator for form reset behavior -- tracks initial attribute value separately",
+        "HasSlotController for conditional rendering based on slot presence -- avoids empty wrapper elements",
+        "Static dependencies map for auto-registration of child components",
+        "CEM plugins for VS Code, JetBrains, and Vue type generation -- IDE integration",
+        "FormControlController as reactive controller pattern -- composable and testable",
+        "Per-component test groups for targeted test runs"
+      ],
+      "weaknessesHelixAvoids": [
+        "No ElementInternals -- uses hidden input workaround for form association, which is fragile",
+        "Limited SSR support -- no isServer guards",
+        "WebKit browser testing disabled in config (Firefox 'started failing randomly') -- HELiX should maintain stable cross-browser testing"
+      ]
+    },
+    {
+      "name": "@lion/root",
+      "path": "lion",
+      "framework": "Lit (LitElement)",
+      "version": "monorepo",
+      "componentCount": 41,
+      "patterns": {
+        "formAssociation": "Deep form system: FormControlMixin, FormatMixin, InteractionStateMixin, NativeTextFieldMixin. Validation architecture with typed validators (Required, StringValidators, NumberValidators, DateValidators), ResultValidator for cross-field validation. Async validation queue. Unparseable type for handling invalid parse states while still validating. FocusMixin for consistent focus management.",
+        "theming": "Intentionally unstyled -- provides only behavior and accessibility. Consumers provide all styling. This is the 'headless UI' approach.",
+        "accessibility": "FocusMixin handles focus delegation. Validation feedback via LionValidationFeedback component. SyncUpdatableMixin ensures synchronous property updates for ARIA state consistency. Localize integration for error messages.",
+        "events": "Standard CustomEvent dispatch. No typed event system. Relies on Lit property change callbacks.",
+        "ssr": "Not SSR-focused. DOM-dependent mixins.",
+        "bundling": "Monorepo with per-package entry points (e.g., @lion/ui/input-date). ScopedElementsMixin for scoped custom element registration -- allows multiple versions on same page.",
+        "testing": "@lit-labs/testing, Mocha, Chai. Puppeteer for browser automation. Integration tests with real form submission.",
+        "cem": "Uses @custom-elements-manifest/analyzer with @custom-elements-manifest/to-markdown for docs generation."
+      },
+      "strengthsToAdopt": [
+        "Validation architecture with typed validator classes, async validation queue, and ResultValidator for cross-field validation",
+        "Unparseable type for handling invalid input states while still running validators -- critical for healthcare forms",
+        "ScopedElementsMixin for version-safe custom element registration -- enterprise requirement for gradual upgrades",
+        "FormatMixin separating parse/format/serialize concerns -- clean data pipeline for form values",
+        "InteractionStateMixin tracking dirty/touched/prefilled states -- standard form UX patterns"
+      ],
+      "weaknessesHelixAvoids": [
+        "Intentionally unstyled means consumers must build entire design system on top -- HELiX correctly provides opinionated design",
+        "Heavy mixin chain (5+ deep) creates complex class hierarchies -- HELiX should prefer composition",
+        "Plain JavaScript (not TypeScript) source -- HELiX correctly mandates TypeScript strict"
+      ]
+    },
+    {
+      "name": "@vaadin/web-components",
+      "path": "vaadin",
+      "framework": "LitElement (Polymer-derived)",
+      "version": "monorepo",
+      "componentCount": 70,
+      "patterns": {
+        "formAssociation": "Mixin-based: ActiveMixin, FocusMixin, TabindexMixin compose into ButtonMixin. Vaadin uses Polymer-era static properties pattern with camelToDash conversion. FieldBase provides common field structure.",
+        "theming": "Lumo and Material theme variants via injector pattern. Themes as separate packages. CSS custom properties (--vaadin-* and --lumo-*). Theme overlay architecture for component-specific overrides.",
+        "accessibility": "Dedicated @vaadin/a11y-base package with ActiveMixin, FocusMixin, TabindexMixin, DisabledMixin. Role-based components (role='button' set in ready()). _activeKeys pattern for keyboard activation.",
+        "events": "Standard DOM events. Vaadin-specific events for complex components (grid, combo-box). Event suppression on disabled elements via stopImmediatePropagation.",
+        "ssr": "Server-side rendering via Java backend (Vaadin Flow). Web components serve as thin frontend layer. Not relevant to HELiX architecture.",
+        "bundling": "Per-package entry points. Lerna monorepo. Each component is separate npm package.",
+        "testing": "@web/test-runner with Playwright. Visual regression testing via @web/test-runner-visual-regression. Testing helpers package.",
+        "cem": "Sophisticated CEM config with custom plugins: mixesPlugin for JSDoc @mixes tag resolution, readonlyPlugin for readonly property detection, classPrivacyPlugin for @private/@protected filtering. Extensive post-processing to clean up inherited members, private APIs, and attribute naming."
+      },
+      "strengthsToAdopt": [
+        "Dedicated a11y-base package with composable accessibility mixins (ActiveMixin, FocusMixin, TabindexMixin, DisabledMixin)",
+        "Event suppression pattern on disabled elements using stopImmediatePropagation in capture phase",
+        "Visual regression testing integrated into test runner",
+        "CEM plugin for resolving @mixes JSDoc tags to cross-package mixin references",
+        "CEM post-processing to filter private/protected members and normalize attribute naming"
+      ],
+      "weaknessesHelixAvoids": [
+        "Polymer-era patterns (static get properties, ready() lifecycle) -- HELiX correctly uses modern Lit decorators",
+        "Java server dependency for full functionality -- HELiX correctly targets static/CDN deployment",
+        "Plain JavaScript source (not TypeScript) -- HELiX mandates strict TypeScript"
+      ]
+    },
+    {
+      "name": "@spectrum-web-components",
+      "path": "spectrum",
+      "framework": "Lit (custom base)",
+      "version": "0.0.9 (monorepo)",
+      "componentCount": 68,
+      "patterns": {
+        "formAssociation": "ButtonBase class hierarchy with SizedMixin. PendingStateController for async operations (loading/pending states). Form submission handled at component level.",
+        "theming": "Adobe Spectrum design tokens. CSS files compiled from Spectrum CSS source. Per-component CSS overrides (button-overrides.css). SizedMixin for standardized size variants. Theme provider component.",
+        "accessibility": "Playwright-based a11y testing with @axe-core/playwright. a11ySnapshot and findAccessibilityNode utilities for testing accessibility tree. Dedicated a11y Playwright config.",
+        "events": "Standard Lit patterns. No typed event system.",
+        "ssr": "2nd-gen rewrite in progress. Limited SSR focus in 1st-gen.",
+        "bundling": "Per-package monorepo (68 packages). Each component is standalone npm package. Heavy -- many small packages.",
+        "testing": "@open-wc/testing + @web/test-runner-commands. a11ySnapshot for accessibility tree verification. sinon for mocks/stubs.",
+        "cem": "Generated CEM at monorepo root."
+      },
+      "strengthsToAdopt": [
+        "PendingStateController for standardized loading/pending state management across components",
+        "a11ySnapshot testing pattern -- verifies actual accessibility tree, not just ARIA attributes",
+        "SizedMixin for standardized size variant handling across all components",
+        "Dedicated a11y Playwright config separate from unit tests"
+      ],
+      "weaknessesHelixAvoids": [
+        "68 separate npm packages is excessive overhead -- HELiX correctly uses single package with per-component entry points",
+        "External CSS compilation from Spectrum CSS source creates build complexity",
+        "Debug mode via window.__swc.DEBUG is brittle"
+      ]
+    },
+    {
+      "name": "@patternfly/patternfly-elements",
+      "path": "patternfly",
+      "framework": "Lit",
+      "version": "monorepo",
+      "componentCount": 46,
+      "patterns": {
+        "formAssociation": "Standard Lit patterns with @lit/react wrappers.",
+        "theming": "PatternFly design tokens. Separate core CSS package (@patternfly/patternfly).",
+        "accessibility": "Commitlint for commit conventions. Standard ARIA patterns.",
+        "events": "Standard CustomEvent patterns.",
+        "ssr": "Not SSR-focused.",
+        "bundling": "Per-element packages within monorepo. @lit/react for React wrappers.",
+        "testing": "Playwright-based testing.",
+        "cem": "Uses @pwrs/cem analyzer variant."
+      },
+      "strengthsToAdopt": [
+        "@lit/react wrapper generation pattern for React consumers"
+      ],
+      "weaknessesHelixAvoids": [
+        "Separate packages per element adds publishing/versioning overhead"
+      ]
+    },
+    {
+      "name": "@microsoft/fast",
+      "path": "fast",
+      "framework": "FAST Element (custom)",
+      "version": "1.8.0",
+      "componentCount": 6,
+      "patterns": {
+        "formAssociation": "Custom ElementController manages lifecycle, properties, and form behavior. Fully custom reactive system separate from Lit.",
+        "theming": "Design token system with DesignToken.create() API. Tokens are typed, composable, and CSS custom property backed. Runtime token resolution.",
+        "accessibility": "Standards-first approach. Custom element definitions include ARIA role mappings.",
+        "events": "Custom event system with defaultEventOptions (bubbles: true, composed: true, cancelable: true). Template-driven event binding.",
+        "ssr": "First-class SSR via fast-ssr package. DOM shim, declarative shadow DOM polyfill, hydration markup, template caching, request-scoped storage. Most mature SSR story among web component libraries.",
+        "bundling": "Monorepo with few large packages (fast-element, fast-html, fast-router, fast-ssr). No per-component packages.",
+        "testing": "Playwright + Chai. API extractor for public API verification. Benchmark package for performance testing.",
+        "cem": "Not CEM-based. Uses @microsoft/api-extractor for API documentation."
+      },
+      "strengthsToAdopt": [
+        "SSR architecture with DOM shim, hydration markup, and request-scoped storage -- reference implementation for SSR",
+        "Typed design token system with DesignToken.create() API -- compile-time token safety",
+        "API extractor for public API verification and breaking change detection",
+        "Benchmark package for systematic performance testing"
+      ],
+      "weaknessesHelixAvoids": [
+        "Custom reactive system (not Lit) means ecosystem incompatibility -- HELiX correctly uses Lit",
+        "Low component count (6 packages, not many components) -- framework without furniture",
+        "Complex hydration story adds DX overhead"
+      ]
+    },
+    {
+      "name": "carbon-web-components",
+      "path": "carbon",
+      "framework": "lit-element (v1)",
+      "version": "1.21.0",
+      "componentCount": 43,
+      "patterns": {
+        "formAssociation": "Standard form patterns. Uses lit-element v1 (older).",
+        "theming": "Carbon Design System tokens. Depends on carbon-components CSS package.",
+        "accessibility": "Standard ARIA patterns following Carbon guidelines.",
+        "events": "Standard CustomEvent with carbon prefix.",
+        "ssr": "Not SSR-focused.",
+        "bundling": "Single package. Gulp-based build system (legacy).",
+        "testing": "Multi-framework test examples (Angular, React, Vue).",
+        "cem": "Generated custom-elements.json."
+      },
+      "strengthsToAdopt": [
+        "Multi-framework example apps (Angular, React, Vue) -- proves cross-framework compat"
+      ],
+      "weaknessesHelixAvoids": [
+        "Gulp build system is legacy -- HELiX correctly uses Vite",
+        "lit-element v1 dependency is outdated -- HELiX correctly uses Lit 3.x",
+        "Heavy dependency on carbon-components CSS package"
+      ]
+    },
+    {
+      "name": "calcite-design-system",
+      "path": "calcite",
+      "framework": "Stencil",
+      "version": "monorepo",
+      "componentCount": 110,
+      "patterns": {
+        "formAssociation": "Stencil-based with TypeScript decorators for properties/events.",
+        "theming": "Dedicated design-tokens package. Calcite design system tokens. Tailwind preset for consumer utility classes.",
+        "accessibility": "Standard ARIA patterns.",
+        "events": "Stencil @Event decorator with typed payloads.",
+        "ssr": "Stencil hydrate module for SSR.",
+        "bundling": "Stencil's built-in lazy loading and tree shaking. React wrappers auto-generated.",
+        "testing": "Vitest workspace configuration at monorepo root.",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [
+        "Dedicated design-tokens package as standalone dependency -- clean separation of concerns",
+        "Tailwind preset for consumer utility class generation from tokens",
+        "Vitest workspace configuration pattern for monorepo testing"
+      ],
+      "weaknessesHelixAvoids": [
+        "Stencil framework dependency -- HELiX correctly uses standards-based Lit",
+        "110 components is large surface area with potential quality dilution"
+      ]
+    },
+    {
+      "name": "ionic",
+      "path": "ionic",
+      "framework": "Stencil",
+      "version": "monorepo",
+      "componentCount": 99,
+      "patterns": {
+        "formAssociation": "Stencil-based form handling.",
+        "theming": "iOS and Material Design theme modes. CSS custom properties.",
+        "accessibility": "Mobile-first accessibility patterns.",
+        "events": "Stencil @Event decorator.",
+        "ssr": "SSR via Stencil hydrate.",
+        "bundling": "Lazy-loading via Stencil. Auto-generated framework wrappers (React, Vue, Angular).",
+        "testing": "Lerna monorepo with per-package testing.",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [
+        "Auto-generated framework wrappers for React, Vue, Angular"
+      ],
+      "weaknessesHelixAvoids": [
+        "Mobile-first focus doesn't align with HELiX enterprise desktop-first use case",
+        "Stencil framework lock-in"
+      ]
+    },
+    {
+      "name": "porsche-design-system",
+      "path": "porsche",
+      "framework": "Custom (JSS-based)",
+      "version": "monorepo",
+      "componentCount": "unknown",
+      "patterns": {
+        "formAssociation": "Custom implementation.",
+        "theming": "JSS (CSS-in-JS) based theming. Enterprise design system.",
+        "accessibility": "@axe-core/playwright for automated a11y testing.",
+        "events": "Standard patterns.",
+        "ssr": "Docker-based testing environment.",
+        "bundling": "Rollup-based build with multiple plugins.",
+        "testing": "Playwright with axe-core integration. Biome for linting (Rust-based, faster than ESLint).",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [
+        "Biome as ESLint alternative -- significantly faster linting for large codebases",
+        "axe-core/playwright integration for automated accessibility regression testing"
+      ],
+      "weaknessesHelixAvoids": [
+        "JSS-based styling has poor SSR story and larger runtime",
+        "Docker-based test environment adds infrastructure complexity"
+      ]
+    },
+    {
+      "name": "elix",
+      "path": "elix",
+      "framework": "Vanilla (no framework)",
+      "version": "15.0.1",
+      "componentCount": "unknown",
+      "patterns": {
+        "formAssociation": "Vanilla custom element patterns.",
+        "theming": "CSS custom properties only.",
+        "accessibility": "Standard patterns.",
+        "events": "Standard CustomEvent.",
+        "ssr": "Not SSR-focused.",
+        "bundling": "No build tools. Plain ES modules.",
+        "testing": "Mocha + Chai + Puppeteer.",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [
+        "Zero-dependency approach demonstrates web standards baseline"
+      ],
+      "weaknessesHelixAvoids": [
+        "No TypeScript -- HELiX requires strict typing",
+        "No build optimization -- HELiX correctly uses Vite"
+      ]
+    },
+    {
+      "name": "@fluentui/fluentui-repo",
+      "path": "fluentui",
+      "framework": "FAST Element (web components subset)",
+      "version": "1.0.0",
+      "componentCount": "unknown",
+      "patterns": {
+        "formAssociation": "FAST-based patterns for web component subset.",
+        "theming": "Fluent design tokens. Multi-framework (React primary, WC secondary).",
+        "accessibility": "Microsoft accessibility standards.",
+        "events": "FAST event system.",
+        "ssr": "Azure Pipelines CI/CD.",
+        "bundling": "Beachball for versioning. Complex monorepo with many frameworks.",
+        "testing": "Playwright for web component testing.",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [
+        "Beachball versioning tool as changesets alternative"
+      ],
+      "weaknessesHelixAvoids": [
+        "Multi-framework monorepo dilutes web component focus",
+        "Complex Azure Pipelines CI -- HELiX's GitHub Actions is simpler"
+      ]
+    },
+    {
+      "name": "@anthropic/ui5-webcomponents",
+      "path": "ui5",
+      "framework": "Custom (no Lit)",
+      "version": "monorepo",
+      "componentCount": "unknown",
+      "patterns": {
+        "formAssociation": "Custom framework patterns.",
+        "theming": "SAP Fiori design system. Enterprise theming.",
+        "accessibility": "SAP accessibility guidelines (enterprise-grade).",
+        "events": "Custom event system.",
+        "ssr": "Not SSR-focused.",
+        "bundling": "Lerna monorepo. Vite plugin for development.",
+        "testing": "Commitlint + semantic-release.",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [
+        "Enterprise-grade theming architecture (SAP Fiori) -- proven at massive scale"
+      ],
+      "weaknessesHelixAvoids": [
+        "Custom framework without Lit ecosystem benefits",
+        "Heavy SAP-specific patterns not transferable"
+      ]
+    },
+    {
+      "name": "wired-elements",
+      "path": "wired",
+      "framework": "Lit",
+      "version": "3.0.0-rc.7",
+      "componentCount": "unknown",
+      "patterns": {
+        "formAssociation": "Minimal -- decorative library.",
+        "theming": "roughjs-based hand-drawn aesthetic.",
+        "accessibility": "Minimal.",
+        "events": "Standard patterns.",
+        "ssr": "Not applicable.",
+        "bundling": "Simple TypeScript compilation.",
+        "testing": "Minimal.",
+        "cem": "Generated CEM."
+      },
+      "strengthsToAdopt": [],
+      "weaknessesHelixAvoids": [
+        "Novelty library -- not enterprise-grade"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "REC-001",
+      "priority": "high",
+      "title": "Adopt Material Web's form association mixin architecture",
+      "description": "Extract HELiX's inline ElementInternals code into composable mixins: mixinElementInternals, mixinFormAssociated, mixinConstraintValidation. Use Symbol-based protected API to prevent naming collisions. Material Web's pattern of syncing form values in requestUpdate() (not updated()) ensures synchronous form API compatibility. With 78 components and many form elements, this eliminates massive code duplication and ensures consistent form behavior.",
+      "sourceLibrary": "@material/web",
+      "helixImpact": "Create packages/hx-library/src/mixins/ directory with FormAssociatedMixin, ConstraintValidationMixin, ElementInternalsMixin. Refactor hx-button, hx-text-input, hx-select, hx-checkbox, and all form elements to use these mixins instead of inline attachInternals() + manual setFormValue() calls. Reduces per-component form boilerplate from ~20 lines to ~5 lines."
+    },
+    {
+      "id": "REC-002",
+      "priority": "high",
+      "title": "Adopt Shoelace's typed emit() method on base element",
+      "description": "Create a HelixElement base class (extending LitElement) with a typed emit() method that registers events on GlobalEventHandlersEventMap. This provides compile-time type safety for event detail payloads, enforces consistent event options (bubbles: true, composed: true), and eliminates the manual new CustomEvent() boilerplate scattered across all 78 components. Shoelace's type-level enforcement of required detail properties is particularly valuable.",
+      "sourceLibrary": "@shoelace-style/shoelace",
+      "helixImpact": "Create HelixElement base class in packages/hx-library/src/internal/helix-element.ts. All components extend HelixElement instead of LitElement directly. Add GlobalEventHandlersEventMap declarations for all hx-* events. Replace all manual dispatchEvent(new CustomEvent(...)) with this.emit('hx-click', { detail: ... })."
+    },
+    {
+      "id": "REC-003",
+      "priority": "high",
+      "title": "Adopt Material Web's ARIA delegation mixin",
+      "description": "Shadow DOM causes duplicate ARIA announcements when aria-* attributes exist on both host and internal elements. Material Web's mixinDelegatesAria shifts aria-* attributes to data-* attributes on the host, preventing double-announcement while preserving the property values for template binding. This is a critical accessibility fix for healthcare -- screenreader users hearing every label twice is a WCAG failure in practice.",
+      "sourceLibrary": "@material/web",
+      "helixImpact": "Add mixinDelegatesAria to HelixElement base class. Remove manual aria-label property forwarding from hx-button, hx-text-input, and all interactive elements. The mixin handles this automatically. Requires delegatesFocus: true on all interactive element shadow roots."
+    },
+    {
+      "id": "REC-004",
+      "priority": "high",
+      "title": "Adopt Shoelace's @watch decorator pattern",
+      "description": "The @watch decorator provides clean property change side effects without overriding updated() or willUpdate(). It fires before the component updates, supports waitUntilFirstUpdate option, and receives both old and new values. Multiple @watch decorators can be used on different properties without conflict. This is cleaner than the switch/if chains in updated() that HELiX currently uses.",
+      "sourceLibrary": "@shoelace-style/shoelace",
+      "helixImpact": "Add @watch decorator to packages/hx-library/src/internal/watch.ts. Refactor components that have complex updated() methods to use @watch for individual property reactions. Particularly valuable for form validation triggers, ARIA state updates, and conditional rendering."
+    },
+    {
+      "id": "REC-005",
+      "priority": "high",
+      "title": "Adopt Lion's validation architecture for healthcare forms",
+      "description": "Lion's validation system provides: typed Validator classes (Required, StringValidators, NumberValidators, DateValidators), ResultValidator for cross-field validation, async validation queue, and the Unparseable type for handling invalid input states while still running validators. For healthcare forms where validation accuracy is critical (medication dosages, patient IDs, date ranges), this architecture prevents entire categories of validation bugs.",
+      "sourceLibrary": "@lion/root",
+      "helixImpact": "Create packages/hx-library/src/validation/ with Validator base class, built-in validators (Required, MinLength, MaxLength, Pattern, Min, Max, DateRange), and ValidationController. Integrate with form association mixins. Components like hx-text-input, hx-number-input, hx-date-picker gain declarative validation: <hx-text-input .validators=${[new Required(), new MinLength(3)]}>"
+    },
+    {
+      "id": "REC-006",
+      "priority": "medium",
+      "title": "Adopt Shoelace's HasSlotController for conditional rendering",
+      "description": "HasSlotController monitors slot presence via slotchange events and mutation observers. Components can conditionally render wrapper elements only when slots are populated, reducing DOM weight and preventing empty slot containers from affecting layout. Particularly valuable for HELiX's prefix/suffix/help-text patterns where empty wrappers can create unwanted spacing.",
+      "sourceLibrary": "@shoelace-style/shoelace",
+      "helixImpact": "Add HasSlotController to packages/hx-library/src/internal/slot.ts. Apply to all components with named slots (hx-button prefix/suffix, hx-text-input prefix/suffix/help-text/error, hx-card header/footer). Reduces DOM weight and fixes layout issues with empty slots."
+    },
+    {
+      "id": "REC-007",
+      "priority": "medium",
+      "title": "Adopt Shoelace's @defaultValue decorator for form reset",
+      "description": "The @defaultValue decorator tracks the initial attribute value separately from the current value, enabling proper form reset behavior. Without this, components either fail to reset to their initial value or must manually track defaults. Shoelace's implementation hooks into attributeChangedCallback to capture the initial attribute value before any property changes.",
+      "sourceLibrary": "@shoelace-style/shoelace",
+      "helixImpact": "Add @defaultValue decorator to packages/hx-library/src/internal/default-value.ts. Apply to all form elements (hx-text-input, hx-textarea, hx-select, hx-checkbox, etc.) so formResetCallback() can restore the original attribute value."
+    },
+    {
+      "id": "REC-008",
+      "priority": "medium",
+      "title": "Add isServer guards for Lit SSR compatibility",
+      "description": "Material Web and FAST both demonstrate isServer guard patterns for SSR-safe components. While HELiX's primary consumer is Drupal (which server-renders Twig templates and hydrates client-side), SSR compatibility ensures components work in Next.js, Astro, and other SSR frameworks. The cost is minimal -- add isServer checks before addEventListener, DOM queries, and window/document access.",
+      "sourceLibrary": "@material/web",
+      "helixImpact": "Audit all components for DOM API usage in constructors, connectedCallback, and property setters. Add isServer guards from 'lit'. Primary areas: constructor event listeners (hx-button click handler), querySelector calls, window/document access. Low effort, high compatibility payoff."
+    },
+    {
+      "id": "REC-009",
+      "priority": "medium",
+      "title": "Adopt Material Web's soft-disabled pattern",
+      "description": "Standard disabled removes elements from tab order, making them invisible to keyboard users. Material Web's soft-disabled pattern keeps elements focusable but non-interactive, with aria-disabled='true' instead of the disabled attribute. This follows ARIA APG guidance for when disabled controls need increased visibility. Critical for healthcare where a disabled 'Submit Prescription' button must still be discoverable.",
+      "sourceLibrary": "@material/web",
+      "helixImpact": "Add soft-disabled property to all interactive HELiX components. When soft-disabled: element remains in tab order, aria-disabled='true' is set, click/interaction is suppressed via stopImmediatePropagation, visual styling indicates non-interactive state. Approximately 2-3 hours per component to implement."
+    },
+    {
+      "id": "REC-010",
+      "priority": "medium",
+      "title": "Adopt Spectrum's a11ySnapshot testing pattern",
+      "description": "Testing ARIA attributes in the DOM does not guarantee correct screenreader behavior. Spectrum and other libraries use a11ySnapshot from @web/test-runner-commands to capture the actual accessibility tree and verify node roles, names, and states. This catches bugs that attribute-level testing misses, like aria-label being ignored due to role conflicts.",
+      "sourceLibrary": "@spectrum-web-components",
+      "helixImpact": "Add @web/test-runner-commands to test dependencies (or equivalent for Vitest browser mode). Add accessibility tree verification tests alongside existing ARIA attribute tests. Priority: form elements (hx-text-input, hx-select, hx-checkbox) and interactive elements (hx-button, hx-dialog, hx-tabs)."
+    },
+    {
+      "id": "REC-011",
+      "priority": "medium",
+      "title": "Enhance CEM config with Shoelace and Vaadin patterns",
+      "description": "Shoelace generates VS Code, JetBrains, and Vue type definitions from CEM. Vaadin has sophisticated post-processing plugins for filtering private members, resolving mixin references, normalizing attribute names, and marking readonly properties. Combined, these patterns would give HELiX CEM output that powers IDE autocomplete across all major editors and frameworks.",
+      "sourceLibrary": "@shoelace-style/shoelace + @vaadin/web-components",
+      "helixImpact": "Add CEM plugins: custom-element-vs-code-integration, custom-element-jet-brains-integration, custom-element-vuejs-integration. Add post-processing to filter private/protected members, normalize hx-* attribute names, and resolve mixin inheritance chains. Improves DX for all consumers."
+    },
+    {
+      "id": "REC-012",
+      "priority": "medium",
+      "title": "Adopt Vaadin's visual regression testing",
+      "description": "Vaadin integrates @web/test-runner-visual-regression for screenshot-based testing. For a healthcare design system where visual consistency is critical (e.g., error states must always be red, disabled states must always be muted), visual regression catches CSS changes that functional tests miss.",
+      "sourceLibrary": "@vaadin/web-components",
+      "helixImpact": "Add visual regression testing to HELiX's Vitest/Playwright setup. Capture baseline screenshots for all component variants and states. Run on every PR to catch unintended visual changes. Integrate with existing __screenshots__ directories already present in component folders."
+    },
+    {
+      "id": "REC-013",
+      "priority": "low",
+      "title": "Adopt Shoelace's static dependencies pattern",
+      "description": "Shoelace components declare their child component dependencies as a static map: static dependencies = { 'sl-icon': SlIcon, 'sl-spinner': SlSpinner }. This enables lazy/scoped registration without global side effects and makes dependency graphs explicit and analyzable.",
+      "sourceLibrary": "@shoelace-style/shoelace",
+      "helixImpact": "Add static dependencies to components that compose other HELiX components (hx-select using hx-popover, hx-date-picker using hx-popover + hx-text-input, etc.). Enables future scoped registration and makes the component dependency graph explicit in code."
+    },
+    {
+      "id": "REC-014",
+      "priority": "low",
+      "title": "Adopt Spectrum's PendingStateController for async operations",
+      "description": "Spectrum's PendingStateController standardizes loading/pending state management. Components that trigger async operations (form submission, data fetching, file upload) get consistent loading UI, aria-busy management, and interaction prevention. This is a reactive controller that composes cleanly with other controllers.",
+      "sourceLibrary": "@spectrum-web-components",
+      "helixImpact": "Create PendingStateController in packages/hx-library/src/controllers/. Apply to hx-button (already has loading state), hx-file-upload, hx-data-table (loading rows), hx-select (async options). Standardizes the loading pattern currently implemented ad-hoc per component."
+    },
+    {
+      "id": "REC-015",
+      "priority": "low",
+      "title": "Evaluate Biome as ESLint replacement for performance",
+      "description": "Porsche Design System uses Biome (Rust-based linter/formatter) which is significantly faster than ESLint+Prettier. With 78 components and growing, lint/format time in CI becomes meaningful. Biome combines linting and formatting in a single pass.",
+      "sourceLibrary": "porsche-design-system",
+      "helixImpact": "Benchmark Biome vs current ESLint+Prettier on HELiX codebase. If CI lint time exceeds 30 seconds, consider migration. Risk: Biome has fewer rules than ESLint ecosystem. Evaluate after v1.0 when stability is more critical than build speed."
+    }
+  ],
+  "architecturalInsights": {
+    "formAssociationApproaches": {
+      "materialWeb": "Composable mixins with symbol-based API (BEST for complex form elements)",
+      "shoelace": "ReactiveController pattern (GOOD, more composable)",
+      "helixCurrent": "Inline attachInternals() per component (ADEQUATE but duplicative)",
+      "recommendation": "Adopt Material Web's mixin pattern for shared form behavior, wrapped in HELiX-specific HelixFormMixin"
+    },
+    "baseClassPatterns": {
+      "materialWeb": "Abstract base + concrete variants (e.g., Button -> ElevatedButton)",
+      "shoelace": "ShoelaceElement extends LitElement with emit() and dir/lang support",
+      "lion": "Heavy mixin chains (5+ deep)",
+      "helixCurrent": "Direct LitElement extension",
+      "recommendation": "Create HelixElement base class with emit(), dir/lang, and isServer guards. Keep it thin -- under 100 lines."
+    },
+    "eventPatterns": {
+      "materialWeb": "Native events + redispatch. No custom prefix.",
+      "shoelace": "Typed emit() on base class. sl-* prefix. GlobalEventHandlersEventMap registration.",
+      "helixCurrent": "Manual new CustomEvent() with hx-* prefix.",
+      "recommendation": "Adopt Shoelace's typed emit() approach with HELiX's existing hx-* prefix convention."
+    },
+    "testingStack": {
+      "materialWeb": "Jasmine + @web/test-runner-playwright",
+      "shoelace": "@web/test-runner + Playwright (Chromium + WebKit)",
+      "spectrum": "@open-wc/testing + @web/test-runner-commands + a11ySnapshot",
+      "vaadin": "@web/test-runner + visual regression",
+      "helixCurrent": "Vitest browser mode + Playwright (Chromium)",
+      "recommendation": "HELiX's Vitest browser mode is modern and correct. Add a11ySnapshot testing for accessibility tree verification and visual regression for CSS stability."
+    },
+    "ssrReadiness": {
+      "materialWeb": "First-class with isServer guards (Lit SSR)",
+      "fast": "First-class with dedicated fast-ssr package",
+      "shoelace": "Limited",
+      "helixCurrent": "Not addressed",
+      "recommendation": "Add isServer guards to all components. Low cost, high compatibility. Required for Astro SSR and future Drupal SSR scenarios."
+    }
+  },
+  "implementationPriority": [
+    "Phase 1 (Foundation): HelixElement base class with typed emit(), @watch decorator, HasSlotController, @defaultValue",
+    "Phase 2 (Form): Form association mixins (ElementInternalsMixin, FormAssociatedMixin, ConstraintValidationMixin)",
+    "Phase 3 (Accessibility): ARIA delegation mixin, soft-disabled pattern, a11ySnapshot testing",
+    "Phase 4 (Validation): Validator architecture with typed validators and async queue",
+    "Phase 5 (DX): Enhanced CEM plugins, visual regression testing, SSR guards"
+  ]
+}
