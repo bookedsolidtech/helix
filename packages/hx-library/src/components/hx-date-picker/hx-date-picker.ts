@@ -442,6 +442,11 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Public Methods ───
 
   override focus(options?: FocusOptions): void {

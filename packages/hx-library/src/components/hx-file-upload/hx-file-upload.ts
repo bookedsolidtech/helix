@@ -202,6 +202,11 @@ export class HelixFileUpload extends LitElement {
     this._internals.setFormValue(null);
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   private _syncFormValue(): void {
     if (this._files.length === 0) {
       this._internals.setFormValue(null);

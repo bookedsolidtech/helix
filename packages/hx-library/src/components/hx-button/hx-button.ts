@@ -151,6 +151,11 @@ export class HelixButton extends LitElement {
     return this._internals.form;
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Event Handling ───
 
   /** @private */
