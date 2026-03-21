@@ -342,6 +342,16 @@ describe('hx-rating', () => {
       const el = await fixture<HelixRating>('<hx-rating name="stars"></hx-rating>');
       expect(el.name).toBe('stars');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixRating>('<hx-rating></hx-rating>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── ARIA (4) ───

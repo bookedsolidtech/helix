@@ -359,6 +359,16 @@ describe('hx-time-picker', () => {
       await el.updateComplete;
       expect(el.value).toBe('10:30');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Validation (5) ───
