@@ -369,6 +369,17 @@ describe('hx-time-picker', () => {
       await el.updateComplete;
       expect(el.disabled).toBe(false);
     });
+
+    it('submits time value in FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-time-picker name="appointment-time" value="14:30"></hx-time-picker>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-time-picker') as HelixTimePicker;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('appointment-time')).toBe('14:30');
+      form.remove();
+    });
   });
 
   // ─── Validation (5) ───

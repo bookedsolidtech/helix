@@ -319,11 +319,55 @@ describe('hx-rating', () => {
     });
   });
 
-  // ─── Form Participation (3) ───
+  // ─── Form Participation (5) ───
 
   describe('Form Participation', () => {
     it('is form-associated', () => {
       expect((HelixRating as unknown as { formAssociated: boolean }).formAssociated).toBe(true);
+    });
+
+    it('formResetCallback resets value to default', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="4" max="5"></hx-rating>');
+      expect(el.value).toBe(4);
+      el.formResetCallback();
+      await el.updateComplete;
+      // default value is captured at firstUpdated from the initial value attribute
+      expect(el.value).toBe(4);
+    });
+
+    it('formResetCallback resets to 0 when no default value set', async () => {
+      const el = await fixture<HelixRating>('<hx-rating max="5"></hx-rating>');
+      // Simulate user interaction changing value
+      const symbols = shadowQueryAll<HTMLElement>(el, '[part="symbol"]');
+      symbols[2]?.click();
+      await el.updateComplete;
+      expect(el.value).toBe(3);
+      el.formResetCallback();
+      await el.updateComplete;
+      // _defaultValue was 0 at firstUpdated (no value attribute)
+      expect(el.value).toBe(0);
+    });
+
+    it('formStateRestoreCallback restores numeric value from string state', async () => {
+      const el = await fixture<HelixRating>('<hx-rating max="5"></hx-rating>');
+      el.formStateRestoreCallback('3', 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe(3);
+    });
+
+    it('formStateRestoreCallback ignores non-numeric string state', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="2" max="5"></hx-rating>');
+      el.formStateRestoreCallback('not-a-number', 'restore');
+      await el.updateComplete;
+      // value should remain unchanged
+      expect(el.value).toBe(2);
+    });
+
+    it('formStateRestoreCallback ignores null state', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="2" max="5"></hx-rating>');
+      el.formStateRestoreCallback(null, 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe(2);
     });
 
     it('submits value in form data', async () => {
