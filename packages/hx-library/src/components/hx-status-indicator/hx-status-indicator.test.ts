@@ -80,23 +80,23 @@ describe('hx-status-indicator', () => {
       expect(el.size).toBe('md');
     });
 
-    it('reflects size attr to host', async () => {
+    it('reflects hx-size attr to host', async () => {
       const el = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="sm"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="sm"></hx-status-indicator>',
       );
-      expect(el.getAttribute('size')).toBe('sm');
+      expect(el.getAttribute('hx-size')).toBe('sm');
     });
 
-    it('accepts "sm" size', async () => {
+    it('accepts "sm" size via hx-size', async () => {
       const el = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="sm"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="sm"></hx-status-indicator>',
       );
       expect(el.size).toBe('sm');
     });
 
-    it('accepts "lg" size', async () => {
+    it('accepts "lg" size via hx-size', async () => {
       const el = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="lg"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="lg"></hx-status-indicator>',
       );
       expect(el.size).toBe('lg');
     });
@@ -106,26 +106,42 @@ describe('hx-status-indicator', () => {
     // reflected attribute rather than computed layout dimensions.
     it('"sm" size is a distinct value from "md"', async () => {
       const sm = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="sm"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="sm"></hx-status-indicator>',
       );
       const md = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="md"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="md"></hx-status-indicator>',
       );
-      expect(sm.getAttribute('size')).toBe('sm');
-      expect(md.getAttribute('size')).toBe('md');
-      expect(sm.getAttribute('size')).not.toBe(md.getAttribute('size'));
+      expect(sm.getAttribute('hx-size')).toBe('sm');
+      expect(md.getAttribute('hx-size')).toBe('md');
+      expect(sm.getAttribute('hx-size')).not.toBe(md.getAttribute('hx-size'));
     });
 
     it('"lg" size is a distinct value from "md"', async () => {
       const md = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="md"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="md"></hx-status-indicator>',
       );
       const lg = await fixture<HelixStatusIndicator>(
-        '<hx-status-indicator size="lg"></hx-status-indicator>',
+        '<hx-status-indicator hx-size="lg"></hx-status-indicator>',
       );
-      expect(md.getAttribute('size')).toBe('md');
-      expect(lg.getAttribute('size')).toBe('lg');
-      expect(lg.getAttribute('size')).not.toBe(md.getAttribute('size'));
+      expect(md.getAttribute('hx-size')).toBe('md');
+      expect(lg.getAttribute('hx-size')).toBe('lg');
+      expect(lg.getAttribute('hx-size')).not.toBe(md.getAttribute('hx-size'));
+    });
+
+    it('backward compat: legacy size attribute maps to hx-size', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="sm"></hx-status-indicator>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('sm');
+    });
+
+    it('hx-size takes precedence over legacy size attribute', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="sm" hx-size="lg"></hx-status-indicator>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 

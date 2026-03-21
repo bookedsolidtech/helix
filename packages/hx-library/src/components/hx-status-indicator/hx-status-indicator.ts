@@ -1,6 +1,7 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixStatusIndicatorStyles } from './hx-status-indicator.styles.js';
 
 export type StatusIndicatorStatus = 'online' | 'offline' | 'away' | 'busy' | 'unknown';
@@ -62,9 +63,9 @@ export class HelixStatusIndicator extends LitElement {
 
   /**
    * Size of the indicator dot.
-   * @attr size
+   * @attr hx-size
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: StatusIndicatorSize = 'md';
 
   /**
@@ -96,6 +97,13 @@ export class HelixStatusIndicator extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: accept legacy `size` attribute. When present and `hx-size`
+    // is not set, map the value and emit a deprecation warning.
+    const legacySize = this.getAttribute('size');
+    if (legacySize !== null && !this.hasAttribute('hx-size')) {
+      devWarn('hx-status-indicator', 'The "size" attribute is deprecated. Use "hx-size" instead.');
+      this.size = legacySize as StatusIndicatorSize;
+    }
     // T3-01-4: Place role="img" on the host element for robust AT traversal.
     // Some screen reader + browser combinations skip shadow children; host-level
     // ARIA attributes are more reliable across the flat accessibility tree.
