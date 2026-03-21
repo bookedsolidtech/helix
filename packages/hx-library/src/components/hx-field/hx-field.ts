@@ -232,6 +232,8 @@ export class HelixField extends LitElement {
   /** Creates a visually-hidden span in light DOM used as the ARIA description anchor. */
   private _ensureA11yDescEl(): void {
     if (this._a11yDescEl) return;
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document === 'undefined') return;
     const span = document.createElement('span');
     span.id = this._a11yDescId;
     // Visually hidden but present in the accessibility tree
