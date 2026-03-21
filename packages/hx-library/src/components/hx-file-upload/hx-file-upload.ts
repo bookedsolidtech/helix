@@ -220,6 +220,20 @@ export class HelixFileUpload extends LitElement {
     this.disabled = disabled;
   }
 
+  /**
+   * Called by the browser to restore form state during back/forward navigation
+   * or autocomplete. File objects cannot be persisted across navigation sessions,
+   * so this callback clears the selection to avoid stale UI state.
+   * @param _state - Previously saved form state (not usable for File restoration).
+   * @param mode - 'restore' for back/forward navigation, 'autocomplete' for autofill.
+   */
+  formStateRestoreCallback(_state: string | File | FormData, mode: string): void {
+    if (mode === 'restore' || mode === 'autocomplete') {
+      this._files = [];
+      this._internals.setFormValue(null);
+    }
+  }
+
   private _syncFormValue(): void {
     if (this._files.length === 0) {
       this._internals.setFormValue(null);
