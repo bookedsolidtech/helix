@@ -89,7 +89,7 @@ export const helixDrawerStyles = css`
   :host([placement='end']) .drawer-panel,
   :host(:not([placement])) .drawer-panel {
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: var(--_drawer-size, var(--hx-drawer-size-md, 30rem));
     max-width: 100%;
@@ -106,7 +106,7 @@ export const helixDrawerStyles = css`
 
   :host([placement='start']) .drawer-panel {
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
     bottom: 0;
     width: var(--_drawer-size, var(--hx-drawer-size-md, 30rem));
     max-width: 100%;
@@ -122,8 +122,8 @@ export const helixDrawerStyles = css`
 
   :host([placement='top']) .drawer-panel {
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     height: var(--_drawer-size, var(--hx-drawer-size-md, 30rem));
     max-height: 100%;
     width: 100%;
@@ -139,8 +139,8 @@ export const helixDrawerStyles = css`
 
   :host([placement='bottom']) .drawer-panel {
     bottom: 0;
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     height: var(--_drawer-size, var(--hx-drawer-size-md, 30rem));
     max-height: 100%;
     width: 100%;
