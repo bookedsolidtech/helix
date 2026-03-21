@@ -352,6 +352,31 @@ describe('hx-rating', () => {
       await el.updateComplete;
       expect(el.disabled).toBe(false);
     });
+
+    it('checkValidity returns true when not required', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="0"></hx-rating>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('checkValidity returns false when required and value is 0', async () => {
+      const el = await fixture<HelixRating>('<hx-rating required value="0"></hx-rating>');
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity returns true when required and value is non-zero', async () => {
+      const el = await fixture<HelixRating>('<hx-rating required value="3"></hx-rating>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity is a function', async () => {
+      const el = await fixture<HelixRating>('<hx-rating></hx-rating>');
+      expect(typeof el.reportValidity).toBe('function');
+    });
+
+    it('validity.valueMissing is true when required and value is 0', async () => {
+      const el = await fixture<HelixRating>('<hx-rating required value="0"></hx-rating>');
+      expect(el.validity.valueMissing).toBe(true)
+    });
   });
 
   // ─── ARIA (4) ───
