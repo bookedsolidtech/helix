@@ -75,10 +75,12 @@ export class HelixProgressRing extends LitElement {
 
   // ─── Private Helpers ───
 
+  /** @internal */
   private get _isIndeterminate(): boolean {
     return this.value === null;
   }
 
+  /** @internal */
   private get _clampedValue(): number {
     if (this.value === null) return 0;
     return Math.min(this.max, Math.max(0, this.value));
@@ -87,18 +89,22 @@ export class HelixProgressRing extends LitElement {
   /**
    * SVG viewBox is 100x100. Radius leaves room for the stroke.
    */
+  /** @internal */
   private get _radius(): number {
     return (100 - this.strokeWidth) / 2;
   }
 
+  /** @internal */
   private get _circumference(): number {
     return 2 * Math.PI * this._radius;
   }
 
+  /** @internal */
   private get _strokeDashoffset(): number {
     return this._circumference * (1 - this._clampedValue / this.max);
   }
 
+  /** @internal */
   private _labelWarned = false;
 
   // ─── Lifecycle ───

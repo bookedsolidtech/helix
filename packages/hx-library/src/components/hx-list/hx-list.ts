@@ -76,6 +76,7 @@ export class HelixList extends LitElement {
    * Sets the `interactive` property on all child hx-list-item elements
    * so they can style and behave correctly without `:host-context()`.
    */
+  /** @internal */
   private _updateItemStates(): void {
     const isInteractive = this.variant === 'interactive';
     const items = this.querySelectorAll('hx-list-item');
@@ -84,10 +85,12 @@ export class HelixList extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSlotChange(): void {
     this._updateItemStates();
   }
 
+  /** @internal */
   private readonly _handleKeydown = (e: KeyboardEvent): void => {
     if (this.variant !== 'interactive') return;
 
@@ -123,6 +126,7 @@ export class HelixList extends LitElement {
     items[nextIndex]?.focus();
   };
 
+  /** @internal */
   private _handleItemClick(e: Event): void {
     if (this.variant !== 'interactive') return;
 

@@ -140,6 +140,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Outside-click / document keydown ───
 
+  /** @internal */
   private readonly _handleOutsideClick = (e: MouseEvent): void => {
     if (!this._open) return;
     const target = e.target as Node;
@@ -148,6 +149,7 @@ export class HelixSplitButton extends LitElement {
     }
   };
 
+  /** @internal */
   private readonly _handleDocumentKeydown = (e: KeyboardEvent): void => {
     if (!this._open) return;
     if (e.key === 'Tab') {
@@ -157,6 +159,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Primary Button Handlers ───
 
+  /** @internal */
   private _handlePrimaryClick(e: MouseEvent): void {
     if (this.disabled) {
       e.preventDefault();
@@ -177,6 +180,7 @@ export class HelixSplitButton extends LitElement {
     );
   }
 
+  /** @internal */
   private _handlePrimaryKeydown(e: KeyboardEvent): void {
     if (this.disabled) return;
     if (e.key === 'ArrowDown') {
@@ -187,6 +191,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Trigger Button Handlers ───
 
+  /** @internal */
   private _handleTriggerClick(e: MouseEvent): void {
     if (this.disabled) {
       e.preventDefault();
@@ -198,6 +203,7 @@ export class HelixSplitButton extends LitElement {
     this._toggleMenu();
   }
 
+  /** @internal */
   private _handleTriggerKeydown(e: KeyboardEvent): void {
     if (this.disabled) return;
     if (e.key === 'ArrowDown') {
@@ -208,6 +214,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Menu Key Navigation ───
 
+  /** @internal */
   private _handleMenuKeydown(e: KeyboardEvent): void {
     const items = this._getMenuItems();
     if (items.length === 0) return;
@@ -250,6 +257,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Menu Item Selection ───
 
+  /** @internal */
   private _handleMenuItemSelect(e: Event): void {
     if (!(e instanceof CustomEvent)) return;
     const custom = e as CustomEvent<{ item: HelixMenuItem; value: string }>;
@@ -274,6 +282,7 @@ export class HelixSplitButton extends LitElement {
 
   // ─── Menu Helpers ───
 
+  /** @internal */
   private _openMenu(): void {
     if (this._open) return;
     this._open = true;
@@ -286,10 +295,12 @@ export class HelixSplitButton extends LitElement {
       .catch(() => undefined);
   }
 
+  /** @internal */
   private _closeMenu(): void {
     this._open = false;
   }
 
+  /** @internal */
   private _toggleMenu(): void {
     if (this._open) {
       this._closeMenu();
@@ -304,6 +315,7 @@ export class HelixSplitButton extends LitElement {
    * .focus() on hosts works correctly. document.activeElement returns the host
    * element when the inner shadow element has focus, enabling correct index tracking.
    */
+  /** @internal */
   private _getMenuItems(): HelixMenuItem[] {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="menu"]');
     if (!slot) return [];

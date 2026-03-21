@@ -228,6 +228,7 @@ export class HelixCarousel extends LitElement {
    * @internal
    */
   @state() private _liveText = '';
+  /** @internal */
   @state() private _livePolite = true;
 
   /**
@@ -323,6 +324,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Slide Management ───
 
+  /** @internal */
   private _syncSlides(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
@@ -347,6 +349,7 @@ export class HelixCarousel extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSlotChange(): void {
     this._syncSlides();
   }
@@ -421,12 +424,14 @@ export class HelixCarousel extends LitElement {
     }
   };
 
+  /** @internal */
   private _startAutoplay(): void {
     if (this._autoplayTimer !== null) return;
     this._isPlaying = true;
     this._autoplayTimer = setInterval(this._autoplayTick, this.autoplayInterval);
   }
 
+  /** @internal */
   private _stopAutoplay(): void {
     if (this._autoplayTimer !== null) {
       clearInterval(this._autoplayTimer);
@@ -435,6 +440,7 @@ export class HelixCarousel extends LitElement {
     this._isPlaying = false;
   }
 
+  /** @internal */
   private _toggleAutoplay(): void {
     if (this._isPlaying) {
       this._stopAutoplay();
@@ -443,12 +449,14 @@ export class HelixCarousel extends LitElement {
     }
   }
 
+  /** @internal */
   private _pauseAutoplay(): void {
     if (!this._isPlaying || this._autoplayTimer === null) return;
     clearInterval(this._autoplayTimer);
     this._autoplayTimer = null;
   }
 
+  /** @internal */
   private _resumeAutoplay(): void {
     if (!this.autoplay || !this._isPlaying || this._reducedMotion) return;
     if (this._autoplayTimer !== null) return;
@@ -544,6 +552,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Drag Handlers ───
 
+  /** @internal */
   private _handleDragStart(e: MouseEvent): void {
     if (!this.mouseDragging) return;
     this._isDragging = true;
@@ -553,6 +562,7 @@ export class HelixCarousel extends LitElement {
     e.preventDefault();
   }
 
+  /** @internal */
   private _handleDragMove(e: MouseEvent): void {
     if (!this._isDragging) return;
     const current = this.orientation === 'horizontal' ? e.clientX : e.clientY;
@@ -562,6 +572,7 @@ export class HelixCarousel extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleDragEnd(e: MouseEvent): void {
     if (!this._isDragging) return;
     const current = this.orientation === 'horizontal' ? e.clientX : e.clientY;
@@ -581,6 +592,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Touch Handlers ───
 
+  /** @internal */
   private _handleTouchStart(e: TouchEvent): void {
     if (!this.mouseDragging) return;
     const touch = e.touches[0];
@@ -590,6 +602,7 @@ export class HelixCarousel extends LitElement {
     this._touchStartCoord = this.orientation === 'horizontal' ? touch.clientX : touch.clientY;
   }
 
+  /** @internal */
   private _handleTouchMove(e: TouchEvent): void {
     if (!this._isDragging) return;
     const touch = e.touches[0];
@@ -601,6 +614,7 @@ export class HelixCarousel extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleTouchEnd(e: TouchEvent): void {
     if (!this._isDragging) return;
     const touch = e.changedTouches[0];
@@ -619,6 +633,7 @@ export class HelixCarousel extends LitElement {
     this._touchMoved = false;
   }
 
+  /** @internal */
   private _goToManual(index: number): void {
     this._livePolite = true;
     this.goTo(index);
@@ -656,6 +671,7 @@ export class HelixCarousel extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderNavigation() {
     return html`
       <div class="navigation" part="navigation">
@@ -700,6 +716,7 @@ export class HelixCarousel extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderPagination() {
     const count = this._slides.length;
     if (count <= 1) return nothing;
@@ -729,18 +746,22 @@ export class HelixCarousel extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderPrevIcon() {
     return this.orientation === 'horizontal' ? _svgChevronLeft : _svgChevronUp;
   }
 
+  /** @internal */
   private _renderNextIcon() {
     return this.orientation === 'horizontal' ? _svgChevronRight : _svgChevronDown;
   }
 
+  /** @internal */
   private _renderPlayIcon() {
     return _svgPlay;
   }
 
+  /** @internal */
   private _renderPauseIcon() {
     return _svgPause;
   }

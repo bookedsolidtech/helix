@@ -44,6 +44,7 @@ export class HelixSwitch extends LitElement {
   static override styles = [tokenStyles, helixSwitchStyles];
 
   /** Monotonic counter for deterministic, unique IDs across instances. */
+  /** @internal */
   private static _instanceCounter = 0;
 
   // ─── Form Association ───
@@ -52,10 +53,12 @@ export class HelixSwitch extends LitElement {
   static formAssociated = true;
 
   /** ElementInternals instance for form association, validation, and ARIA. */
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -172,6 +175,7 @@ export class HelixSwitch extends LitElement {
   }
 
   /** Recalculates and sets the validity state based on required and checked. */
+  /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
@@ -202,25 +206,30 @@ export class HelixSwitch extends LitElement {
     this.disabled = disabled;
   }
 
-  /** Reference to the native button element acting as the switch track. */
+  /** Reference to the native button element acting as the switch track.  * @internal
+   */
   @query('.switch__track')
   private _trackEl: HTMLButtonElement | null | undefined;
 
   /** Whether the error slot has assigned content. */
+  /** @internal */
   @state() private _hasErrorSlot = false;
 
   /** Whether the default slot has assigned content (slotted label). */
+  /** @internal */
   @state() private _hasDefaultSlot = false;
 
   // ─── Slot Handlers ───
 
   /** Updates _hasErrorSlot when error slot content changes. */
+  /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   /** Updates _hasDefaultSlot when default slot content changes. */
+  /** @internal */
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasDefaultSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -229,6 +238,7 @@ export class HelixSwitch extends LitElement {
   // ─── Event Handling ───
 
   /** Toggles checked state and dispatches hx-change event. */
+  /** @internal */
   private _toggle(): void {
     if (this.disabled) return;
     this.checked = !this.checked;
@@ -243,11 +253,13 @@ export class HelixSwitch extends LitElement {
   }
 
   /** Handles click events on the track. */
+  /** @internal */
   private _handleClick(): void {
     this._toggle();
   }
 
   /** Handles keydown events — Space toggles the switch per ARIA APG. */
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (e.key === ' ') {
       e.preventDefault();
@@ -265,12 +277,16 @@ export class HelixSwitch extends LitElement {
   // ─── Render ───
 
   /** Unique ID for this switch instance, used for ARIA associations. */
+  /** @internal */
   private _switchId = `hx-switch-${++HelixSwitch._instanceCounter}`;
   /** ID for the label element, referenced by aria-labelledby. */
+  /** @internal */
   private _labelId = `${this._switchId}-label`;
   /** ID for the help text element, referenced by aria-describedby. */
+  /** @internal */
   private _helpTextId = `${this._switchId}-help`;
   /** ID for the error element, referenced by aria-describedby. */
+  /** @internal */
   private _errorId = `${this._switchId}-error`;
 
   override render() {

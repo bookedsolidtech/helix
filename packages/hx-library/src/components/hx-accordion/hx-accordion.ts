@@ -61,6 +61,7 @@ export class HelixAccordion extends LitElement {
 
   // ─── Single-expand coordination ───
 
+  /** @internal */
   private _enforceSingleMode(): void {
     if (this.mode !== 'single') return;
 
@@ -149,6 +150,7 @@ export class HelixAccordion extends LitElement {
     targetSummary?.focus();
   };
 
+  /** @internal */
   private _getTriggers(): HTMLElement[] {
     const items = this.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
     const triggers: HTMLElement[] = [];
@@ -161,6 +163,7 @@ export class HelixAccordion extends LitElement {
 
   // ─── Slot validation ───
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     const slot = e.target;
     if (!(slot instanceof HTMLSlotElement)) return;

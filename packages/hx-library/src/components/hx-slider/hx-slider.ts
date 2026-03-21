@@ -65,10 +65,12 @@ export class HelixSlider extends LitElement {
   static formAssociated = true;
 
   /** ElementInternals instance for form value, validity, and label association. */
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -162,35 +164,47 @@ export class HelixSlider extends LitElement {
   // ─── Internal State ───
 
   /** Whether the label slot has assigned content. */
+  /** @internal */
   @state() private _hasLabelSlot = false;
   /** Whether the min-label slot has assigned content. */
+  /** @internal */
   @state() private _hasMinLabelSlot = false;
   /** Whether the max-label slot has assigned content. */
+  /** @internal */
   @state() private _hasMaxLabelSlot = false;
   /** Whether the help slot has assigned content. */
+  /** @internal */
   @state() private _hasHelpSlot = false;
 
   // ─── Internal References ───
 
-  /** Reference to the native range `<input>` inside shadow DOM. */
+  /**
+   * Reference to the native range `<input>` inside shadow DOM.
+   * @internal
+   */
   @query('.slider__input')
   declare private _input: HTMLInputElement | null;
 
   // ─── Unique IDs ───
 
   /** Unique ID for the native range input element. */
+  /** @internal */
   private readonly _sliderId = `hx-slider-${++_hxSliderIdCounter}`;
   /** Unique ID for the label element, derived from _sliderId. */
+  /** @internal */
   private readonly _labelId = `${this._sliderId}-label`;
   /** Unique ID for the help text element, derived from _sliderId. */
+  /** @internal */
   private readonly _helpId = `${this._sliderId}-help`;
 
   // ─── Computed Values ───
 
+  /** @internal */
   private _clamp(v: number): number {
     return Math.min(Math.max(v, this.min), this.max);
   }
 
+  /** @internal */
   private _fillPercent(): number {
     const clamped = this._clamp(this.value);
     const range = this.max - this.min;
@@ -200,8 +214,10 @@ export class HelixSlider extends LitElement {
 
   // Cached tick array — recomputed only when showTicks, min, max, or step change.
   // Avoids redundant array allocation on every render during continuous drag updates.
+  /** @internal */
   private _cachedTicks: number[] = [];
 
+  /** @internal */
   private _computeTicks(): number[] {
     if (!this.showTicks) return [];
     const ticks: number[] = [];
@@ -330,21 +346,25 @@ export class HelixSlider extends LitElement {
 
   // ─── Slot Handlers ───
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleMinLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasMinLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleMaxLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasMaxLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -352,6 +372,7 @@ export class HelixSlider extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleInput(e: Event): void {
     if (this.disabled) return;
     const target = e.target as HTMLInputElement;
@@ -371,6 +392,7 @@ export class HelixSlider extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleChange(e: Event): void {
     if (this.disabled) return;
     const target = e.target as HTMLInputElement;

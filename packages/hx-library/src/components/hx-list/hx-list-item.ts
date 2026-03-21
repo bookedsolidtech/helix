@@ -95,6 +95,7 @@ export class HelixListItem extends LitElement {
    * Syncs ARIA attributes to the host element when in interactive (listbox option) mode.
    * This ensures correct ARIA ownership: ul[role=listbox] > hx-list-item[role=option].
    */
+  /** @internal */
   private _syncHostAria(): void {
     if (this.interactive) {
       this.setAttribute('role', 'option');
@@ -117,6 +118,7 @@ export class HelixListItem extends LitElement {
     }
   }
 
+  /** @internal */
   private _dispatchListItemClick(): void {
     this.dispatchEvent(
       new CustomEvent<{ item: HelixListItem; value: string | undefined }>('hx-list-item-click', {
@@ -127,6 +129,7 @@ export class HelixListItem extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled) {
       e.preventDefault();
@@ -137,6 +140,7 @@ export class HelixListItem extends LitElement {
     this._dispatchListItemClick();
   }
 
+  /** @internal */
   private _renderContent() {
     return html`
       <span part="prefix" class="list-item__prefix">
@@ -239,6 +243,7 @@ export class HelixListItem extends LitElement {
     `;
   }
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();

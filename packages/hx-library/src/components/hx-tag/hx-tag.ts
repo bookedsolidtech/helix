@@ -139,12 +139,14 @@ export class HelixTag extends LitElement {
   // distinguish variants by color alone (e.g. color-blind or high-contrast mode)
   // still receive the status context from assistive technology.
 
+  /** @internal */
   private static readonly _SEMANTIC_VARIANT_LABELS: Partial<Record<HelixTag['variant'], string>> = {
     success: 'Success',
     warning: 'Warning',
     danger: 'Danger',
   };
 
+  /** @internal */
   private get _semanticVariantLabel(): string {
     return HelixTag._SEMANTIC_VARIANT_LABELS[this.variant] ?? '';
   }

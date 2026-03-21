@@ -157,16 +157,20 @@ export class HelixPagination extends LitElement {
     `Page ${current} of ${total}`;
 
   /** Tracks the roving tabindex target. Null means default to currentPage. */
+  /** @internal */
   @state() private _rovingKey: number | string | null = null;
 
   /** Text for the aria-live region, updated on navigation. */
+  /** @internal */
   @state() private _liveMessage = '';
 
   /** Memoization cache for _buildPageRange. */
+  /** @internal */
   private _pageRangeCache: { key: string; result: Array<number | 'ellipsis'> } | null = null;
 
   // ─── Helpers ───
 
+  /** @internal */
   private _buildPageRange(): Array<number | 'ellipsis'> {
     const key = `${this.totalPages}-${this.currentPage}-${this.siblingCount}-${this.boundaryCount}`;
     if (this._pageRangeCache?.key === key) return this._pageRangeCache.result;
@@ -212,12 +216,14 @@ export class HelixPagination extends LitElement {
     return items;
   }
 
+  /** @internal */
   private _range(start: number, end: number): number[] {
     const result: number[] = [];
     for (let i = start; i <= end; i++) result.push(i);
     return result;
   }
 
+  /** @internal */
   private _navigate(page: number): void {
     const clamped = Math.min(Math.max(1, page), this.totalPages);
     if (clamped === this.currentPage) return;
@@ -234,6 +240,7 @@ export class HelixPagination extends LitElement {
     );
   }
 
+  /** @internal */
   private _handlePageSizeChange(e: Event): void {
     const select = e.target as HTMLSelectElement;
     const newSize = Number(select.value);
@@ -249,10 +256,12 @@ export class HelixPagination extends LitElement {
     );
   }
 
+  /** @internal */
   private get _effectiveRovingKey(): number | string {
     return this._rovingKey ?? this.currentPage;
   }
 
+  /** @internal */
   private _handleFocusin(e: FocusEvent): void {
     const btn = e.target as HTMLElement;
     if (btn.tagName !== 'BUTTON') return;
@@ -261,6 +270,7 @@ export class HelixPagination extends LitElement {
     this._rovingKey = isNaN(Number(key)) ? key : Number(key);
   }
 
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();

@@ -134,19 +134,24 @@ export class HelixImage extends LitElement {
   @property({ type: String, reflect: true })
   sizes: string | undefined = undefined;
 
+  /** @internal */
   @state()
   private _error = false;
 
+  /** @internal */
   @state()
   private _usedFallbackSrc = false;
 
+  /** @internal */
   @state()
   private _hasCaptionSlot = false;
 
+  /** @internal */
   private _handleLoad(): void {
     this.dispatchEvent(new CustomEvent<void>('hx-load', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _handleError(): void {
     if (!this._error && this.fallbackSrc && !this._usedFallbackSrc) {
       // Try the fallback-src before showing the fallback slot
@@ -157,11 +162,13 @@ export class HelixImage extends LitElement {
     this.dispatchEvent(new CustomEvent<void>('hx-error', { bubbles: true, composed: true }));
   }
 
+  /** @internal */
   private _onCaptionSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasCaptionSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _computeBorderRadius(): string | undefined {
     if (this.rounded === true || this.rounded === '' || this.rounded === 'true') {
       return 'var(--hx-border-radius-md, 0.375rem)';
@@ -172,6 +179,7 @@ export class HelixImage extends LitElement {
     return undefined;
   }
 
+  /** @internal */
   private _currentSrc(): string {
     if (this._usedFallbackSrc && this.fallbackSrc) {
       return this.fallbackSrc;

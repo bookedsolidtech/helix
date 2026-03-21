@@ -57,9 +57,11 @@ export class HelixDivider extends LitElement {
   @property({ type: String, reflect: true })
   label?: string;
 
+  /** @internal */
   @state()
   private _hasLabel = false;
 
+  /** @internal */
   private _checkSlot(slot: HTMLSlotElement): void {
     const nodes = slot.assignedNodes({ flatten: true });
     this._hasLabel = nodes.some((node) =>
@@ -69,6 +71,7 @@ export class HelixDivider extends LitElement {
     );
   }
 
+  /** @internal */
   private _slotChangeHandler = (e: Event): void => {
     this._checkSlot(e.target as HTMLSlotElement);
   };

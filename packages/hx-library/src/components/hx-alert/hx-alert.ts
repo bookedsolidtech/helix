@@ -123,20 +123,25 @@ export class HelixAlert extends LitElement {
 
   // ─── State ───
 
+  /** @internal */
   @state()
   private _hasActions = false;
 
+  /** @internal */
   @state()
   private _hasTitle = false;
 
   // ─── Private Handler References ───
 
+  /** @internal */
   private _actionsSlotChangeHandler: (() => void) | null = null;
+  /** @internal */
   private _titleSlotChangeHandler: (() => void) | null = null;
 
   // ─── Private Helpers ───
 
   /** Returns true when the variant requires assertive announcement. */
+  /** @internal */
   private get _isAssertive(): boolean {
     return this.variant === 'error';
   }
@@ -146,6 +151,7 @@ export class HelixAlert extends LitElement {
    * role="alert" implies aria-live="assertive"; role="status" implies aria-live="polite".
    * We do NOT set aria-live explicitly to avoid double-announcements in JAWS.
    */
+  /** @internal */
   private get _role(): string {
     return this._isAssertive ? 'alert' : 'status';
   }
@@ -240,6 +246,7 @@ export class HelixAlert extends LitElement {
 
   // ─── Default Icons ───
 
+  /** @internal */
   private _renderInfoIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true">
       <path
@@ -248,6 +255,7 @@ export class HelixAlert extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderSuccessIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true">
       <path
@@ -256,6 +264,7 @@ export class HelixAlert extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderWarningIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true">
       <path
@@ -264,6 +273,7 @@ export class HelixAlert extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderErrorIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true">
       <path
@@ -272,6 +282,7 @@ export class HelixAlert extends LitElement {
     </svg>`;
   }
 
+  /** @internal */
   private _renderDefaultIcon() {
     switch (this.variant) {
       case 'success':
@@ -286,6 +297,7 @@ export class HelixAlert extends LitElement {
     }
   }
 
+  /** @internal */
   private _renderCloseIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true">
       <path
@@ -296,6 +308,7 @@ export class HelixAlert extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleDismiss(): void {
     this.open = false;
 
