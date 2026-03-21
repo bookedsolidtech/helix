@@ -483,6 +483,16 @@ describe('hx-file-upload', () => {
       await el.updateComplete;
       expect(shadowQuery(el, '[part="file-list"]')).toBeNull();
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Form Validation API (4) ───
