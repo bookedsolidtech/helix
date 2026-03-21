@@ -150,6 +150,48 @@ export class HelixDatePicker extends LitElement {
   @property({ type: String })
   locale = 'en-US';
 
+  /**
+   * Validation message shown when the field is required but empty.
+   * @attr required-message
+   */
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'This field is required.';
+
+  /**
+   * Accessible label for the calendar dialog.
+   * @attr choose-date-label
+   */
+  @property({ attribute: 'choose-date-label' })
+  chooseDateLabel = 'Choose a date';
+
+  /**
+   * Accessible label for the calendar trigger button when the calendar is closed.
+   * @attr open-calendar-label
+   */
+  @property({ attribute: 'open-calendar-label' })
+  openCalendarLabel = 'Open calendar';
+
+  /**
+   * Accessible label for the calendar trigger button when the calendar is open.
+   * @attr close-calendar-label
+   */
+  @property({ attribute: 'close-calendar-label' })
+  closeCalendarLabel = 'Close calendar';
+
+  /**
+   * Accessible label for the previous month navigation button.
+   * @attr previous-month-label
+   */
+  @property({ attribute: 'previous-month-label' })
+  previousMonthLabel = 'Previous month';
+
+  /**
+   * Accessible label for the next month navigation button.
+   * @attr next-month-label
+   */
+  @property({ attribute: 'next-month-label' })
+  nextMonthLabel = 'Next month';
+
   // ─── Internal State ───
 
   /**
@@ -377,7 +419,7 @@ export class HelixDatePicker extends LitElement {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'This field is required.',
+        this.error || this.requiredMessage,
         this._input,
       );
     } else {
@@ -913,7 +955,7 @@ export class HelixDatePicker extends LitElement {
             part="trigger"
             class="field__trigger"
             type="button"
-            aria-label=${this._isOpen ? 'Close calendar' : 'Open calendar'}
+            aria-label=${this._isOpen ? this.closeCalendarLabel : this.openCalendarLabel}
             aria-haspopup="dialog"
             aria-expanded=${this._isOpen ? 'true' : nothing}
             aria-controls=${this._calendarId}
@@ -950,7 +992,7 @@ export class HelixDatePicker extends LitElement {
                 id=${this._calendarId}
                 role="dialog"
                 aria-modal="true"
-                aria-label="Choose a date"
+                aria-label=${this.chooseDateLabel}
                 @keydown=${this._handleCalendarKeydown}
               >
                 <!-- Screen reader live region -->
@@ -968,7 +1010,7 @@ export class HelixDatePicker extends LitElement {
                   <button
                     class="calendar__nav-btn"
                     type="button"
-                    aria-label="Previous month"
+                    aria-label=${this.previousMonthLabel}
                     ?disabled=${this._isPrevMonthDisabled()}
                     @click=${this._prevMonth}
                   >
@@ -980,7 +1022,7 @@ export class HelixDatePicker extends LitElement {
                   <button
                     class="calendar__nav-btn"
                     type="button"
-                    aria-label="Next month"
+                    aria-label=${this.nextMonthLabel}
                     ?disabled=${this._isNextMonthDisabled()}
                     @click=${this._nextMonth}
                   >

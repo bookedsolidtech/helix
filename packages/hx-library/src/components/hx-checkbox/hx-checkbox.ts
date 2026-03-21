@@ -133,6 +133,13 @@ export class HelixCheckbox extends LitElement {
   helpText = '';
 
   /**
+   * Validation message shown when the field is required but empty.
+   * @attr required-message
+   */
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'This field is required.';
+
+  /**
    * The size of the checkbox.
    * @attr hx-size
    */
@@ -195,7 +202,7 @@ export class HelixCheckbox extends LitElement {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'This field is required.',
+        this.error || this.requiredMessage,
         this._inputEl ?? undefined,
       );
     } else {
