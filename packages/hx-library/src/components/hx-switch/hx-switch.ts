@@ -124,6 +124,13 @@ export class HelixSwitch extends LitElement {
   @property({ type: String, attribute: 'help-text' })
   helpText = '';
 
+  /**
+   * Validation message shown when the field is required but empty.
+   * @attr required-message
+   */
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'This field is required.';
+
   // ─── Lifecycle ───
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -169,7 +176,7 @@ export class HelixSwitch extends LitElement {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'This field is required.',
+        this.error || this.requiredMessage,
         this._trackEl ?? undefined,
       );
     } else {

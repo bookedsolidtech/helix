@@ -309,6 +309,11 @@ export class HelixCheckboxGroup extends LitElement {
     this._updateValidity(restoredValues);
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Render ───
 
   override render() {

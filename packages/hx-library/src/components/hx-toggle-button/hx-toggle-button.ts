@@ -106,11 +106,38 @@ export class HelixToggleButton extends LitElement {
   @property({ type: String })
   label: string | undefined = undefined;
 
+  /**
+   * When true, the button must be in the pressed state for the form to be submitted.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
   // ─── Form API ───
 
   /** Returns the associated form element, if any. */
   get form(): HTMLFormElement | null {
     return this._internals.form;
+  }
+
+  /** Returns the ValidityState object. */
+  get validity(): ValidityState {
+    return this._internals.validity;
+  }
+
+  /** Returns the current validation message. */
+  get validationMessage(): string {
+    return this._internals.validationMessage;
+  }
+
+  /** Checks whether the button satisfies its constraints. */
+  checkValidity(): boolean {
+    return this._internals.checkValidity();
+  }
+
+  /** Reports validity and shows the browser's constraint validation UI. */
+  reportValidity(): boolean {
+    return this._internals.reportValidity();
   }
 
   // ─── Lifecycle ───
@@ -134,7 +161,11 @@ export class HelixToggleButton extends LitElement {
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
-    if (changedProperties.has('pressed') || changedProperties.has('value')) {
+    if (
+      changedProperties.has('pressed') ||
+      changedProperties.has('value') ||
+      changedProperties.has('required')
+    ) {
       this._syncFormValue();
     }
   }
@@ -152,6 +183,11 @@ export class HelixToggleButton extends LitElement {
     this.pressed = typeof state === 'string' && state === 'pressed';
   }
 
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
   // ─── Private Helpers ───
 
   private _syncFormValue(): void {
@@ -160,6 +196,19 @@ export class HelixToggleButton extends LitElement {
       this._internals.setFormValue(this.value, 'pressed');
     } else {
       this._internals.setFormValue(null);
+    }
+    this._updateValidity();
+  }
+
+  private _updateValidity(): void {
+    if (this.required && !this.pressed) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        'Please activate this toggle button.',
+        this.shadowRoot?.querySelector<HTMLElement>('[part="button"]') ?? undefined,
+      );
+    } else {
+      this._internals.setValidity({});
     }
   }
 

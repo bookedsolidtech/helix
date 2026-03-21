@@ -42,7 +42,7 @@ export const helixDataTableStyles = css`
   th,
   td {
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
-    text-align: left;
+    text-align: start;
     border-bottom: var(--hx-border-width-thin, 1px) solid
       var(--hx-data-table-border-color, var(--hx-color-neutral-200, #e2e8f0));
     vertical-align: middle;
@@ -65,7 +65,7 @@ export const helixDataTableStyles = css`
     /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
     width: var(--hx-touch-target-min, 2.75rem);
     min-width: var(--hx-touch-target-min, 2.75rem);
-    padding-right: var(--hx-space-2, 0.5rem);
+    padding-inline-end: var(--hx-space-2, 0.5rem);
   }
 
   th.col-checkbox {

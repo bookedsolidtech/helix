@@ -403,6 +403,16 @@ describe('hx-text-input', () => {
       expect(data.get('username')).toBe('jane');
       form.remove();
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── Validation (3) ───

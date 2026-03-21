@@ -171,6 +171,13 @@ export class HelixTextInput extends LitElement {
   autocomplete = '';
 
   /**
+   * Validation message shown when the field is required but empty.
+   * @attr required-message
+   */
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'This field is required.';
+
+  /**
    * Visual size of the input field.
    * @attr hx-size
    */
@@ -281,7 +288,7 @@ export class HelixTextInput extends LitElement {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'This field is required.',
+        this.error || this.requiredMessage,
         this._input,
       );
     } else if (

@@ -319,11 +319,55 @@ describe('hx-rating', () => {
     });
   });
 
-  // ─── Form Participation (3) ───
+  // ─── Form Participation (5) ───
 
   describe('Form Participation', () => {
     it('is form-associated', () => {
       expect((HelixRating as unknown as { formAssociated: boolean }).formAssociated).toBe(true);
+    });
+
+    it('formResetCallback resets value to default', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="4" max="5"></hx-rating>');
+      expect(el.value).toBe(4);
+      el.formResetCallback();
+      await el.updateComplete;
+      // default value is captured at firstUpdated from the initial value attribute
+      expect(el.value).toBe(4);
+    });
+
+    it('formResetCallback resets to 0 when no default value set', async () => {
+      const el = await fixture<HelixRating>('<hx-rating max="5"></hx-rating>');
+      // Simulate user interaction changing value
+      const symbols = shadowQueryAll<HTMLElement>(el, '[part="symbol"]');
+      symbols[2]?.click();
+      await el.updateComplete;
+      expect(el.value).toBe(3);
+      el.formResetCallback();
+      await el.updateComplete;
+      // _defaultValue was 0 at firstUpdated (no value attribute)
+      expect(el.value).toBe(0);
+    });
+
+    it('formStateRestoreCallback restores numeric value from string state', async () => {
+      const el = await fixture<HelixRating>('<hx-rating max="5"></hx-rating>');
+      el.formStateRestoreCallback('3', 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe(3);
+    });
+
+    it('formStateRestoreCallback ignores non-numeric string state', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="2" max="5"></hx-rating>');
+      el.formStateRestoreCallback('not-a-number', 'restore');
+      await el.updateComplete;
+      // value should remain unchanged
+      expect(el.value).toBe(2);
+    });
+
+    it('formStateRestoreCallback ignores null state', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="2" max="5"></hx-rating>');
+      el.formStateRestoreCallback(null, 'restore');
+      await el.updateComplete;
+      expect(el.value).toBe(2);
     });
 
     it('submits value in form data', async () => {
@@ -341,6 +385,41 @@ describe('hx-rating', () => {
     it('reflects name property', async () => {
       const el = await fixture<HelixRating>('<hx-rating name="stars"></hx-rating>');
       expect(el.name).toBe('stars');
+    });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixRating>('<hx-rating></hx-rating>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
+
+    it('checkValidity returns true when not required', async () => {
+      const el = await fixture<HelixRating>('<hx-rating value="0"></hx-rating>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('checkValidity returns false when required and value is 0', async () => {
+      const el = await fixture<HelixRating>('<hx-rating required value="0"></hx-rating>');
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('checkValidity returns true when required and value is non-zero', async () => {
+      const el = await fixture<HelixRating>('<hx-rating required value="3"></hx-rating>');
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('reportValidity is a function', async () => {
+      const el = await fixture<HelixRating>('<hx-rating></hx-rating>');
+      expect(typeof el.reportValidity).toBe('function');
+    });
+
+    it('validity.valueMissing is true when required and value is 0', async () => {
+      const el = await fixture<HelixRating>('<hx-rating required value="0"></hx-rating>');
+      expect(el.validity.valueMissing).toBe(true)
     });
   });
 

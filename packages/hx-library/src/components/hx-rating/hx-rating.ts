@@ -143,6 +143,13 @@ export class HelixRating extends LitElement {
   label = '';
 
   /**
+   * When true, a non-zero rating is required for form submission.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  /**
    * Generates the accessible label for individual star elements.
    * Handles singular/plural automatically.
    * @param count - star count (1-based)
@@ -175,6 +182,9 @@ export class HelixRating extends LitElement {
     if (changedProps.has('value') || changedProps.has('name')) {
       this._internals.setFormValue(String(this.value));
     }
+    if (changedProps.has('value') || changedProps.has('required')) {
+      this._updateValidity();
+    }
   }
 
   /** Called by the browser when the form is reset. */
@@ -194,6 +204,43 @@ export class HelixRating extends LitElement {
         this.value = parsed;
         this._internals.setFormValue(state);
       }
+    }
+  }
+
+  /** Called when a parent fieldset is disabled/enabled. */
+  formDisabledCallback(disabled: boolean): void {
+    this.disabled = disabled;
+  }
+
+  /** Returns the ValidityState object. */
+  get validity(): ValidityState {
+    return this._internals.validity;
+  }
+
+  /** Returns the current validation message. */
+  get validationMessage(): string {
+    return this._internals.validationMessage;
+  }
+
+  /** Checks whether the rating satisfies its constraints. */
+  checkValidity(): boolean {
+    return this._internals.checkValidity();
+  }
+
+  /** Reports validity and shows the browser's constraint validation UI. */
+  reportValidity(): boolean {
+    return this._internals.reportValidity();
+  }
+
+  private _updateValidity(): void {
+    if (this.required && this.value === 0) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        'Please select a rating.',
+        this.shadowRoot?.querySelector<HTMLElement>('[part="base"]') ?? undefined,
+      );
+    } else {
+      this._internals.setValidity({});
     }
   }
 

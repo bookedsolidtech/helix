@@ -1,410 +1,495 @@
 ---
-title: SSR & Hydration Compatibility
-description: Server-side rendering strategies for HELiX web components across Next.js, Astro, and Nuxt
+title: 'SSR & Hydration Guide'
+description: 'Server-side rendering compatibility for HELiX web components across Next.js 15 App Router, Astro 5, and Nuxt 4.'
+sidebar:
+  order: 1
 ---
 
-HELiX web components are built with Lit 3.x and use Shadow DOM. This guide covers how to integrate them with server-side rendering frameworks, including hydration strategies, known blockers, and framework-specific patterns.
+# SSR & Hydration Guide
 
-## Component SSR Categories
+HELiX web components are built on [Lit 3.x](https://lit.dev) and use the Custom Elements standard. This guide explains how they interact with server-side rendering across Next.js 15 App Router, Astro 5, and Nuxt 4.
 
-Every HELiX component falls into one of three categories based on its browser API usage:
+## How Web Components Behave on the Server
 
-| Category | Count | Description | Examples |
-|----------|-------|-------------|----------|
-| **ssr-safe** | 61 | No browser API access in render path. Compatible with @lit-labs/ssr and Declarative Shadow DOM. | hx-card, hx-badge, hx-text, hx-button, hx-divider, hx-grid, hx-stack |
-| **needs-wrapper** | 27 | Browser APIs accessed in lifecycle/event handlers only. Safe for DSD render but needs client hydration for interactivity. | hx-accordion, hx-tabs, hx-popover, hx-select, hx-dialog, hx-combobox |
-| **client-only** | 8 | Imperative DOM operations that require full browser environment. Must render exclusively on client. | hx-toast, hx-drawer, hx-carousel, hx-color-picker, hx-counter, hx-theme |
+When a server renders an unknown HTML element like `<hx-button>`, it produces the tag verbatim in the HTML output. The browser receives valid HTML and displays it as an undefined custom element (visually unstyled until the JavaScript loads). After the JS bundle executes and custom elements are registered, the element **upgrades** — it gets its Shadow DOM, styles, and behavior.
 
-The full per-component audit is available in `.automaker/audits/ssr-hydration-audit.json`.
+This means:
 
-## Understanding the Blockers
+- **No crashes** from `customElements.define` not existing on the server
+- **No hydration mismatches** from the tag itself — Next.js, Astro, and Nuxt all handle unknown HTML elements safely
+- **Flash of unstyled content (FOUC)** if JS is deferred — mitigate with critical CSS or a `<link rel="modulepreload">`
 
-### Why Web Components Need Special SSR Handling
+The key constraint: **never import `@helixui/library` at module scope in code that runs on the server.** The `customElements` registry and browser APIs like `window` don't exist in Node.js.
 
-Web components use the `CustomElementRegistry` (`customElements.define()`) which only exists in browsers. Without `@lit-labs/ssr`, web components render as empty custom element tags on the server:
+## Component SSR Compatibility Reference
 
-```html
-<!-- Server output without @lit-labs/ssr -->
-<hx-card>
-  <!-- Shadow DOM content missing - renders empty until client JS loads -->
-</hx-card>
-```
+All 77 HELiX components fall into one of three categories:
 
-With `@lit-labs/ssr` and Declarative Shadow DOM (DSD), the server can emit the shadow root inline:
+### SSR Safe (43 components)
 
-```html
-<!-- Server output with @lit-labs/ssr -->
-<hx-card>
-  <template shadowrootmode="open">
-    <style>/* component styles */</style>
-    <div part="container"><slot></slot></div>
-  </template>
-  Card content here
-</hx-card>
-```
+These components are purely presentational. Their HTML output is meaningful as static markup and they access no browser APIs in their rendering path.
 
-### Common SSR Blockers in HELiX
+Render these directly in Server Components (Next.js RSC, Astro server-rendered templates, Nuxt pages):
 
-1. **`document.addEventListener`** (27 components): Used for outside-click detection and global keyboard handlers. Only called in interaction methods (open/close), not during construction or render. Safe for DSD but needs client JS for interactivity.
+| Component | Notes |
+|-----------|-------|
+| `hx-avatar` | Display only |
+| `hx-badge` | Display only |
+| `hx-banner` | Static layout |
+| `hx-button` | Form-associated; HTML renders without JS |
+| `hx-button-group` | Layout wrapper |
+| `hx-card` | Display container |
+| `hx-checkbox` | Form-associated; renders as inert input without JS |
+| `hx-checkbox-group` | Layout wrapper |
+| `hx-container` | Layout wrapper |
+| `hx-data-table` | Static table structure |
+| `hx-divider` | Decorative |
+| `hx-field-label` | Label element |
+| `hx-file-upload` | Form-associated |
+| `hx-form` | Wraps native form |
+| `hx-grid` | Layout |
+| `hx-help-text` | Display only |
+| `hx-icon` | SVG display |
+| `hx-icon-button` | Display only |
+| `hx-image` | Display only |
+| `hx-link` | Anchor element |
+| `hx-list` | Display only |
+| `hx-meter` | Display only |
+| `hx-number-input` | Form-associated |
+| `hx-pagination` | Display + navigation |
+| `hx-progress-bar` | Display only |
+| `hx-progress-ring` | Display only |
+| `hx-prose` | Text container |
+| `hx-radio-group` | Form-associated |
+| `hx-rating` | Display/form |
+| `hx-spinner` | Display only |
+| `hx-stack` | Layout |
+| `hx-stat` | Display only |
+| `hx-status-indicator` | Display only |
+| `hx-steps` | Display only |
+| `hx-structured-list` | Display only |
+| `hx-switch` | Form-associated |
+| `hx-table` | Display only |
+| `hx-tag` | Display only |
+| `hx-text` | Typography |
+| `hx-text-input` | Form-associated |
+| `hx-textarea` | Form-associated |
+| `hx-toggle-button` | Display only |
+| `hx-visually-hidden` | Accessibility wrapper |
 
-2. **`window.matchMedia`** (5 components): Used for `prefers-reduced-motion` and `prefers-color-scheme` detection. Called in `connectedCallback` or methods. Workaround: pass explicit props instead of relying on media queries.
+### Needs `'use client'` Boundary (33 components)
 
-3. **`document.createElement`** (4 components): Imperative DOM element creation. Used by hx-toast (toast factory), hx-breadcrumb (ellipsis/JSON-LD), hx-tooltip (a11y span), and hx-field (help text). These components must be client-only.
+These components access browser APIs (`document`, `window`, `navigator`) in lifecycle hooks (`connectedCallback`, `firstUpdated`) or event handlers — not in their rendering path. They render as valid HTML on the server but need a client boundary for full interactivity.
 
-4. **`document.body.appendChild`** (2 components): hx-toast and hx-breadcrumb append elements to the document body. Fundamentally incompatible with SSR.
+**Strategy:** The HTML tag renders fine in RSC. Wrap event handling and `ref` usage in a `'use client'` component.
 
-### What's Already SSR-Safe
+| Component | Browser APIs Used | Notes |
+|-----------|------------------|-------|
+| `hx-accordion` | `document.activeElement` | Focus management |
+| `hx-action-bar` | `document.activeElement` | Keyboard navigation |
+| `hx-alert` | `document.addEventListener` | Auto-dismiss timer |
+| `hx-breadcrumb` | `document.createElement`, `document.head` | ⚠️ JSON-LD injection into `<head>` — client-side only |
+| `hx-carousel` | `window.matchMedia` | Reduced-motion |
+| `hx-code-snippet` | `navigator.clipboard` | Copy button |
+| `hx-color-picker` | `document.addEventListener` | Pointer capture |
+| `hx-combobox` | `document.activeElement`, `document.addEventListener` | Focus + outside-click |
+| `hx-counter` | `window.matchMedia` | Animation timing |
+| `hx-date-picker` | `document.addEventListener` | Outside-click, keyboard |
+| `hx-dialog` | `document.activeElement` | Focus trap and return |
+| `hx-drawer` | `window.matchMedia`, `document.activeElement` | Motion + focus |
+| `hx-dropdown` | `document.addEventListener` | Outside-click |
+| `hx-field` | `document.createElement` | Accessible description span |
+| `hx-format-date` | `document.documentElement.lang`, `navigator.language` | ⚠️ See note below |
+| `hx-menu` | `document.activeElement` | Type-ahead focus |
+| `hx-nav` | `window.location.href` | Active link detection |
+| `hx-overflow-menu` | `document.addEventListener` | Outside-click |
+| `hx-popover` | `document.addEventListener`, `document.activeElement` | Focus trap |
+| `hx-popup` | `window`, `document.getElementById` | Float positioning |
+| `hx-select` | `document.addEventListener` | Outside-click |
+| `hx-side-nav` | `document.activeElement` | Keyboard focus |
+| `hx-skeleton` | `setTimeout`, `requestAnimationFrame` | Animation timing |
+| `hx-slider` | `document.addEventListener` | Drag handlers |
+| `hx-split-button` | `document.addEventListener` | Outside-click, keyboard |
+| `hx-split-panel` | `document.addEventListener` | Resize drag |
+| `hx-tabs` | `document.activeElement` | Arrow key navigation |
+| `hx-theme` | `window.matchMedia` | Has SSR guard; safe |
+| `hx-time-picker` | `document.addEventListener` | Outside-click |
+| `hx-toast` | `document.body` | Stacking and positioning |
+| `hx-tooltip` | `document.createElement`, `document.body` | Light DOM description |
+| `hx-top-nav` | `window`, `document.addEventListener` | Scroll detection |
+| `hx-tree-view` | `document.activeElement` | Tree keyboard nav |
 
-HELiX components have already been updated to avoid common SSR pitfalls:
+> **`hx-format-date` special case:** This component calls `document.documentElement.lang` and `navigator.language` inside its `_getLocale()` method, which is called from `render()`. In standard browser-only Lit execution this is harmless, but it bypasses the public `lang` prop. Always pass `lang` explicitly to avoid the browser API lookup:
+>
+> ```html
+> <!-- Always provide lang to avoid document.documentElement.lang lookup -->
+> <hx-format-date lang="en-US" date="2026-01-15"></hx-format-date>
+> ```
 
-- **No `crypto.randomUUID()`**: All components use module-level monotonic counters for deterministic IDs. This eliminates hydration mismatch warnings caused by non-deterministic ID generation.
-- **No `Math.random()` for IDs**: Replaced across all 14 components that generate IDs.
-- **Form-associated components** use `ElementInternals` which is handled correctly by `@lit-labs/ssr`.
+> **`hx-breadcrumb` JSON-LD note:** `hx-breadcrumb` injects a JSON-LD `<script>` into `document.head` for SEO structured data. This runs in `updated()` and requires a live `document.head`. If you need the JSON-LD for SEO in SSR, emit the structured data from your server instead and suppress the component's injection by omitting the `json-ld` attribute.
 
-## Next.js 15 (App Router)
+### Client Only (1 component)
 
-### Strategy: 'use client' Boundaries
+| Component | Reason |
+|-----------|--------|
+| `hx-copy-button` | `navigator.clipboard.writeText` is only available in secure browser contexts |
 
-All HELiX components require client-side JavaScript because they register custom elements. In Next.js App Router, this means using `'use client'` directives.
+Use `next/dynamic` with `ssr: false`, or wrap in `<ClientOnly>` / `<client-only>`.
 
-**Recommended pattern**: Create a single client boundary component:
+---
+
+## Next.js 15 App Router
+
+### Recommended Pattern: Global HelixLoader
+
+Register components once in a Client Component at the root. Server Components can then use `<hx-*>` tags freely.
 
 ```tsx
-// components/HelixComponents.tsx
+// components/helix-loader.tsx
 'use client';
 
-// Import registers all custom elements
-import '@helixui/library';
+import { useEffect } from 'react';
 
-// Re-export for use in server components
-export function HelixProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export function HelixLoader() {
+  useEffect(() => {
+    import('@helixui/library');
+  }, []);
+  return null;
 }
 ```
 
-Then use it in your layout:
-
 ```tsx
-// app/layout.tsx
-import { HelixProvider } from '../components/HelixComponents';
+// app/layout.tsx  — Server Component
+import { HelixLoader } from '@/components/helix-loader';
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html lang="en">
       <body>
-        <HelixProvider>{children}</HelixProvider>
+        <HelixLoader />
+        {children}
       </body>
     </html>
   );
 }
 ```
 
-### Dynamic Imports for Client-Only Components
-
-For components in the **client-only** category, use `next/dynamic` with `ssr: false`:
+Server Components can now render HELiX tags as static HTML:
 
 ```tsx
-'use client';
-import dynamic from 'next/dynamic';
-
-// Toast, Drawer, Carousel, etc. must be dynamically imported
-const ToastDemo = dynamic(
-  () => import('./ToastDemo'),
-  { ssr: false }
-);
-
-export default function Page() {
+// app/dashboard/page.tsx  — Server Component (no 'use client')
+export default async function DashboardPage() {
+  const data = await fetchData();
   return (
-    <div>
-      {/* SSR-safe and needs-wrapper components render normally */}
+    <main>
       <hx-card>
-        <hx-text>Patient Summary</hx-text>
+        <hx-text slot="heading">{data.title}</hx-text>
         <hx-badge variant="success">Active</hx-badge>
       </hx-card>
-
-      {/* Client-only components use dynamic import */}
-      <ToastDemo />
-    </div>
+    </main>
   );
 }
 ```
 
-### Streaming SSR with React Suspense
+### Interactive Components: Client Boundary
 
-Use Suspense boundaries to stream component-heavy sections:
+For components needing event listeners, create a thin `'use client'` wrapper:
 
 ```tsx
-import { Suspense } from 'react';
+// components/patient-form.tsx
+'use client';
 
-export default function Dashboard() {
+import { useRef, useEffect } from 'react';
+
+export function PatientForm({ onSubmit }: { onSubmit: (data: FormData) => void }) {
+  const formRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const handler = (e: Event) => {
+      e.preventDefault();
+      // FormData picks up hx-text-input values via ElementInternals
+      onSubmit(new FormData(form as HTMLFormElement));
+    };
+    form.addEventListener('submit', handler);
+    return () => form.removeEventListener('submit', handler);
+  }, [onSubmit]);
+
   return (
-    <div>
-      <Suspense fallback={<hx-skeleton effect="wave" />}>
-        <PatientVitals />
-      </Suspense>
-      <Suspense fallback={<hx-spinner />}>
-        <MedicationList />
-      </Suspense>
-    </div>
+    <hx-form ref={formRef}>
+      <hx-text-input name="name" label="Patient name" required />
+      <hx-text-input name="dob" type="date" label="Date of birth" required />
+      <hx-button type="submit" variant="primary">Save</hx-button>
+    </hx-form>
   );
 }
 ```
 
-### Avoiding Hydration Mismatches
+### `next/dynamic` for Client-Only Components
 
-HELiX components use module-level counters for ID generation, which produces deterministic IDs when module evaluation order is consistent between server and client. This means:
+For `hx-copy-button` or page-specific heavy components, use `next/dynamic`:
 
-- **No `suppressHydrationWarning` needed** for HELiX components
-- **No `crypto.randomUUID()` warnings** in the console
-- IDs like `hx-text-input-1`, `hx-text-input-2` are stable across renders
+```tsx
+import dynamic from 'next/dynamic';
 
-If you see hydration mismatch warnings, check for:
-1. Conditional rendering based on `typeof window` (use the client boundary pattern instead)
-2. Non-deterministic data in component props (dates, random values)
-3. Browser extensions injecting content into your page
-
-### Trip-Planner Team Recommendations
-
-For the trip-planner Next.js App Router application:
-
-1. Create a single `'use client'` boundary that imports `@helixui/library`
-2. Use `next/dynamic` with `ssr: false` for: hx-toast, hx-drawer, hx-carousel, hx-counter, hx-color-picker
-3. For `hx-theme`: pass explicit `theme="light"` or `theme="dark"` prop to avoid `window.matchMedia` SSR error
-4. Wrap form-heavy sections in React Suspense for streaming SSR
-5. Module-level counters in form components are already SSR-safe
-
-## Astro 5 (Islands Architecture)
-
-### Strategy: Client Directives
-
-Astro's island architecture maps naturally to HELiX component categories:
-
-| HELiX Category | Astro Directive | When to Use |
-|----------------|-----------------|-------------|
-| ssr-safe | No directive (with @astrojs/lit) or `client:idle` | Display-only components that benefit from DSD |
-| needs-wrapper | `client:load` | Interactive components needed immediately |
-| needs-wrapper | `client:idle` | Interactive components not immediately needed |
-| client-only | `client:load` or `client:visible` | Components requiring browser APIs |
-
-### Setup with @astrojs/lit
-
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import lit from '@astrojs/lit';
-
-export default defineConfig({
-  integrations: [lit()],
-});
+const CopyButton = dynamic(
+  () => import('@helixui/library/components/hx-copy-button').then(() => {
+    // Return a wrapper that renders the element
+    return function HxCopyButtonWrapper(props: { value: string }) {
+      return <hx-copy-button value={props.value} />;
+    };
+  }),
+  { ssr: false, loading: () => null }
+);
 ```
 
-### Usage Examples
+### Trip-Planner Checklist
+
+If you are the trip-planner team integrating HELiX into Next.js 15:
+
+- [ ] Add `HelixLoader` to `app/layout.tsx`
+- [ ] Add `transpilePackages: ['@helixui/library']` to `next.config.ts` if you see ESM warnings
+- [ ] Create `src/helix.d.ts` with JSX intrinsic element types (see [Next.js guide](/framework-integration/nextjs))
+- [ ] Use `ref` + `addEventListener` for all `hx-*` custom events (not React's `onClick`)
+- [ ] Pass `lang` explicitly to `hx-format-date` — do not rely on `document.documentElement.lang`
+- [ ] Use `next/dynamic` with `ssr: false` for `hx-copy-button`
+
+---
+
+## Astro 5
+
+Astro's island architecture is a natural fit for web components.
+
+### Global registration via `<script>`
+
+Register HELiX in your base layout:
 
 ```astro
 ---
-// src/pages/index.astro
+// src/layouts/Base.astro
 ---
-
-<!-- SSR-safe: renders via Declarative Shadow DOM with @lit-labs/ssr -->
-<hx-card>
-  <hx-text variant="heading-md">Patient Info</hx-text>
-  <hx-badge variant="info">New</hx-badge>
-</hx-card>
-
-<!-- Interactive: hydrate immediately -->
-<hx-tabs client:load>
-  <hx-tab slot="tab">Demographics</hx-tab>
-  <hx-tab slot="tab">History</hx-tab>
-  <hx-tab-panel slot="panel">Content...</hx-tab-panel>
-  <hx-tab-panel slot="panel">Content...</hx-tab-panel>
-</hx-tabs>
-
-<!-- Below-fold: hydrate when visible -->
-<hx-carousel client:visible autoplay>
-  <hx-carousel-item>Slide 1</hx-carousel-item>
-  <hx-carousel-item>Slide 2</hx-carousel-item>
-</hx-carousel>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{Astro.props.title}</title>
+  </head>
+  <body>
+    <slot />
+    <script>
+      import '@helixui/library';
+    </script>
+  </body>
+</html>
 ```
 
-### Deferred Island Rendering
+The `<script>` tag is bundled by Vite and runs only in the browser — no Node.js execution.
 
-For healthcare dashboards with many components, use priority-based hydration:
+### Server-rendered pages
+
+Use HELiX tags directly in `.astro` files. They render as inert HTML on the server and upgrade in the browser:
 
 ```astro
-<!-- Critical: hydrate immediately (patient actions) -->
-<hx-button variant="danger" client:load>Emergency Alert</hx-button>
-
-<!-- Important: hydrate when idle (navigation) -->
-<hx-side-nav client:idle>
-  <hx-nav-item href="/patients">Patients</hx-nav-item>
-</hx-side-nav>
-
-<!-- Nice-to-have: hydrate when visible (charts, data) -->
-<hx-data-table client:visible>...</hx-data-table>
+---
+const patients = await fetchPatients();
+---
+<ul>
+  {patients.map(p => (
+    <li>
+      <hx-card>
+        <hx-text slot="heading">{p.name}</hx-text>
+        <hx-badge variant={p.status === 'active' ? 'success' : 'neutral'}>
+          {p.status}
+        </hx-badge>
+      </hx-card>
+    </li>
+  ))}
+</ul>
 ```
+
+### Interactive islands
+
+For components needing JavaScript interactivity, use `client:load` or `client:visible`:
+
+```astro
+---
+import PatientSearch from './PatientSearch.tsx';
+---
+
+<!-- Loads and hydrates immediately -->
+<PatientSearch client:load />
+
+<!-- Loads when visible in viewport (lazy) -->
+<PatientSearch client:visible />
+```
+
+Inside the island component (React/Solid/Vue), use standard HELiX patterns.
+
+### Reduced-motion and SSR in Astro
+
+Components like `hx-carousel`, `hx-counter`, and `hx-drawer` access `window.matchMedia` in `connectedCallback`. Astro does not run `connectedCallback` during SSR — this is safe.
+
+---
 
 ## Nuxt 4
 
-### Strategy: Client-Only Plugin + ClientOnly Wrapper
+### Client plugin for global registration
 
-### Configuration
-
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  vue: {
-    compilerOptions: {
-      // Tell Vue to treat hx-* tags as custom elements
-      isCustomElement: (tag) => tag.startsWith('hx-'),
-    },
-  },
-});
-```
-
-### Client-Only Plugin for Component Registration
+Create a Nuxt client plugin to register HELiX components:
 
 ```ts
 // plugins/helix.client.ts
-export default defineNuxtPlugin(() => {
-  // This runs only on the client
-  import('@helixui/library');
+export default defineNuxtPlugin(async () => {
+  if (process.client) {
+    await import('@helixui/library');
+  }
 });
 ```
 
-### Using Components in Templates
+The `.client.ts` suffix ensures this plugin only runs in the browser. No `customElements` error in SSR.
+
+### Using components in pages
+
+After the plugin loads, use HELiX tags anywhere:
+
+```vue
+<!-- pages/dashboard.vue -->
+<template>
+  <main>
+    <hx-card v-for="item in items" :key="item.id">
+      <hx-text slot="heading">{{ item.title }}</hx-text>
+    </hx-card>
+  </main>
+</template>
+```
+
+### Client-only wrapper for browser-dependent components
+
+For `hx-copy-button` or components you want to delay until after hydration:
 
 ```vue
 <template>
-  <!-- SSR-safe components render as custom element tags -->
-  <!-- Vue passes attributes through; Lit hydrates on client -->
-  <hx-card>
-    <hx-text>Patient Card</hx-text>
-    <hx-badge variant="success">Active</hx-badge>
-  </hx-card>
-
-  <!-- Client-only components wrapped in <ClientOnly> -->
   <ClientOnly>
-    <hx-toast-stack placement="top-end" />
+    <hx-copy-button :value="codeSnippet" />
     <template #fallback>
-      <div class="toast-placeholder" />
+      <hx-spinner />
     </template>
   </ClientOnly>
-
-  <!-- Conditional rendering with composable -->
-  <hx-tooltip v-if="isMounted" content="Patient details">
-    <hx-button>View</hx-button>
-  </hx-tooltip>
 </template>
+```
 
+### Event handling in Vue
+
+Nuxt/Vue does not forward web component custom events through `v-on`. Use a template ref:
+
+```vue
 <script setup>
-const { isMounted } = useSsrSafe();
-</script>
-```
+import { ref, onMounted, onUnmounted } from 'vue';
 
-### SSR-Safe Composable
+const buttonRef = ref(null);
 
-```ts
-// composables/useSsrSafe.ts
-export function useSsrSafe() {
-  const isMounted = ref(false);
-
-  onMounted(() => {
-    isMounted.value = true;
-  });
-
-  const safeWindow = computed(() =>
-    typeof window !== 'undefined' ? window : undefined
-  );
-
-  return { isMounted, safeWindow };
+function handleClick(e) {
+  console.log('hx-click', e.detail);
 }
+
+onMounted(() => {
+  buttonRef.value?.addEventListener('hx-click', handleClick);
+});
+onUnmounted(() => {
+  buttonRef.value?.removeEventListener('hx-click', handleClick);
+});
+</script>
+
+<template>
+  <hx-button ref="buttonRef" variant="primary">Save</hx-button>
+</template>
 ```
 
-## @lit-labs/ssr Compatibility
+---
 
-### Status: Experimental
+## Declarative Shadow DOM (DSD)
 
-`@lit-labs/ssr` provides server-side rendering for Lit components using Declarative Shadow DOM. Current compatibility:
+Lit 3.x supports [Declarative Shadow DOM](https://developer.chrome.com/docs/css-ui/declarative-shadow-dom) via `@lit-labs/ssr`. This allows the Shadow DOM to be rendered in server HTML, eliminating FOUC entirely.
 
-| Category | Compatible | Notes |
-|----------|-----------|-------|
-| ssr-safe (61) | Yes | Full DSD rendering on server |
-| needs-wrapper (27) | Partial | DSD renders structure; browser APIs need client hydration |
-| client-only (8) | No | Must render client-side only |
+**Current status: not recommended for production.**
 
-### How Declarative Shadow DOM Works
+Two HELiX components have known blockers for streaming SSR:
 
-```html
-<!-- Browser support: Chrome 111+, Edge 111+, Firefox 123+, Safari 16.4+ -->
-<hx-card>
-  <template shadowrootmode="open">
-    <style>:host { display: block; }</style>
-    <div part="container">
-      <slot></slot>
-    </div>
-  </template>
-  <!-- Light DOM content -->
-  <hx-text>Visible immediately, no JS needed</hx-text>
-</hx-card>
+1. **`hx-format-date`** — calls `document.documentElement.lang` inside `render()`. Pass an explicit `lang` prop to work around this.
+2. **`hx-breadcrumb`** — injects `<script type="application/ld+json">` into `document.head` in `updated()`. Incompatible with streaming SSR where `<head>` is already sent.
+
+Until these are resolved and `@lit-labs/ssr` is integrated into the build pipeline, use the `'use client'` / island patterns above.
+
+---
+
+## Hydration Mismatch Prevention
+
+### What causes mismatches
+
+Hydration mismatches occur when the server-rendered HTML differs from what the client-side JavaScript produces on first render. For HELiX, the common culprits are:
+
+**1. Dynamic values that differ between server and client**
+
+```tsx
+// Bad — different values server vs client
+<hx-card data-rendered-at={Date.now()}>...</hx-card>
+
+// Good — stable server-safe value
+<hx-card data-id={item.id}>...</hx-card>
 ```
 
-Users see styled content before JavaScript loads. When Lit hydrates, it attaches to the existing shadow root instead of creating a new one.
+**2. Checking `typeof window` to conditionally render**
 
-### Streaming SSR Patterns
+```tsx
+// Bad — boolean flips between SSR and browser
+<hx-button disabled={typeof window === 'undefined'}>...</hx-button>
 
-| Framework | Pattern | HELiX Integration |
-|-----------|---------|-------------------|
-| Next.js | React Suspense boundaries | Wrap component sections in `<Suspense>` with hx-skeleton fallbacks |
-| Astro | Island architecture | Use `client:visible` for below-fold, `client:idle` for non-critical |
-| Nuxt | `<ClientOnly>` + asyncData | Use `<ClientOnly>` with `#fallback` slots for loading states |
+// Good — mount guard
+'use client';
+const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+return <hx-button disabled={!mounted || undefined}>...</hx-button>;
+```
 
-## Debugging Hydration Issues
+**3. Locale-dependent rendering without explicit locale**
 
-### Common Symptoms and Fixes
+```tsx
+// Bad — hx-format-date falls back to document.documentElement.lang
+<hx-format-date date="2026-01-15" />
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| "Hydration mismatch" warning | Non-deterministic rendering | HELiX uses module counters; check your own data |
-| Empty custom elements | Missing client JS | Add `'use client'` (Next.js) or `client:load` (Astro) |
-| "window is not defined" | SSR accessing browser API | Use `<ClientOnly>` or dynamic import with `ssr: false` |
-| "document is not defined" | Component in SSR render | Move to client boundary; check audit JSON for category |
-| Flash of unstyled content | DSD not supported in browser | Add polyfill or accept brief flash |
-| Double rendering | Client creates new shadow root | Ensure @lit-labs/ssr hydration mode; Lit 3.x handles this |
+// Good — explicit locale from server
+<hx-format-date lang={locale} date="2026-01-15" />
+```
 
-### Debug Checklist
+### Suppressing unavoidable warnings
 
-1. Check the component's category in `ssr-hydration-audit.json`
-2. Verify the component is in the correct boundary (`'use client'`, `client:load`, `<ClientOnly>`)
-3. If using `hx-theme`, pass an explicit `theme` prop
-4. Check that `@helixui/library` is imported in a client-side context
-5. Look for non-deterministic data in props (timestamps, random IDs)
+If a third-party wrapper produces unavoidable warnings, use `suppressHydrationWarning` on the wrapper element only (not broadly):
 
-## Complete Component Reference
+```tsx
+<div suppressHydrationWarning>
+  <hx-some-component />
+</div>
+```
 
-### SSR-Safe Components (61)
+Use sparingly — it hides real bugs too.
 
-These can render via Declarative Shadow DOM and hydrate without issues:
+---
 
-`hx-accordion-item`, `hx-avatar`, `hx-badge`, `hx-banner`, `hx-breadcrumb-item`, `hx-button`, `hx-button-group`, `hx-card`, `hx-carousel-item`, `hx-checkbox`, `hx-checkbox-group`, `hx-container`, `hx-data-table`, `hx-divider`, `hx-field-label`, `hx-form`, `hx-grid`, `hx-help-text`, `hx-icon`, `hx-icon-button`, `hx-image`, `hx-link`, `hx-list`, `hx-list-item`, `hx-menu-item`, `hx-menu-divider`, `hx-meter`, `hx-nav-item`, `hx-pagination`, `hx-popup`, `hx-progress-bar`, `hx-progress-ring`, `hx-prose`, `hx-radio`, `hx-radio-group`, `hx-rating`, `hx-skeleton`, `hx-spinner`, `hx-stack`, `hx-stat`, `hx-status-indicator`, `hx-step`, `hx-steps`, `hx-structured-list`, `hx-switch`, `hx-table`, `hx-tbody`, `hx-td`, `hx-tfoot`, `hx-th`, `hx-thead`, `hx-tr`, `hx-tab`, `hx-tab-panel`, `hx-tag`, `hx-text`, `hx-text-input`, `hx-toggle-button`, `hx-top-nav`, `hx-tree-item`, `hx-visually-hidden`
+## Audit Report
 
-### Needs-Wrapper Components (27)
+The full per-component SSR compatibility data is in `.automaker/audits/ssr-hydration-audit.json`. This includes:
+- Per-component browser API usage
+- SSR category classification
+- Per-framework recommendations
+- Known `@lit-labs/ssr` blockers
 
-These use browser APIs in lifecycle/event handlers but can render server-side with client hydration:
+---
 
-`hx-accordion`, `hx-action-bar`, `hx-alert`, `hx-code-snippet`, `hx-combobox`, `hx-copy-button`, `hx-date-picker`, `hx-dialog`, `hx-dropdown`, `hx-field`, `hx-file-upload`, `hx-format-date`, `hx-menu`, `hx-nav`, `hx-number-input`, `hx-overflow-menu`, `hx-popover`, `hx-select`, `hx-side-nav`, `hx-slider`, `hx-split-button`, `hx-split-panel`, `hx-tabs`, `hx-textarea`, `hx-time-picker`, `hx-tooltip`, `hx-tree-view`
+## Next Steps
 
-### Client-Only Components (8)
-
-These must render exclusively on the client:
-
-`hx-breadcrumb`, `hx-carousel`, `hx-color-picker`, `hx-counter`, `hx-drawer`, `hx-theme`, `hx-toast`, `hx-toast-stack`
-
-**Why these are client-only:**
-
-- **hx-toast / hx-toast-stack**: Factory pattern creates elements on `document.body`
-- **hx-drawer**: Uses `document.body.children` for `inert` attribute, `window.matchMedia`
-- **hx-carousel**: `window.matchMedia` in `connectedCallback`, `setInterval` for autoplay
-- **hx-counter**: `requestAnimationFrame` animation, `window.matchMedia`
-- **hx-color-picker**: Canvas 2D context, pointer event tracking on `document`
-- **hx-theme**: `window.matchMedia` for system theme detection in `connectedCallback`
-- **hx-breadcrumb**: Imperative `document.createElement` and `document.head.appendChild` for JSON-LD
+- [Next.js 15 App Router Integration](/framework-integration/nextjs) — full guide with Server Actions and TypeScript
+- [React Integration](/framework-integration/react) — React 18+ patterns
+- [Astro Integration](/framework-integration/astro) — Astro 5 islands
+- [Vue Integration](/framework-integration/vue) — Vue 3 / Nuxt patterns
+- [Design Tokens](/design-tokens/overview) — theming in SSR contexts

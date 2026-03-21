@@ -379,6 +379,16 @@ describe('hx-slider', () => {
       const data = new FormData(form);
       expect(data.get('dosage')).toBe('10');
     });
+
+    it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider></hx-slider>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      expect(el.disabled).toBe(true);
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      expect(el.disabled).toBe(false);
+    });
   });
 
   // ─── CSS Parts (7) ───

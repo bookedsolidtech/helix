@@ -391,6 +391,13 @@ export class HelixColorPicker extends LitElement {
   @property({ type: Boolean, reflect: true })
   inline = false;
 
+  /**
+   * When true, the picker requires a non-empty value for form submission.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
   /** Accessible label for the color gradient canvas. */
   @property({ type: String, attribute: 'label-gradient' })
   labelGradient = 'Color gradient';
@@ -489,14 +496,20 @@ export class HelixColorPicker extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     // P1-1: Remove using the same stored references added in connectedCallback
-    document.removeEventListener('click', this._boundDocumentClick, true);
-    document.removeEventListener('pointermove', this._boundPointerMove);
-    document.removeEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._boundDocumentClick, true);
+      document.removeEventListener('pointermove', this._boundPointerMove);
+      document.removeEventListener('pointerup', this._boundPointerUp);
+    }
   }
 
   override willUpdate(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('value')) {
       this._syncFromValue();
+    }
+    if (changedProperties.has('required')) {
+      this._updateValidity();
     }
   }
 
@@ -509,6 +522,7 @@ export class HelixColorPicker extends LitElement {
     }
     this._inputValue = formatColor(this._hsv, this.format, this.opacity);
     this._internals.setFormValue(this.value);
+    this._updateValidity();
   }
 
   /** Called when a parent fieldset is disabled/enabled. */
@@ -529,6 +543,40 @@ export class HelixColorPicker extends LitElement {
   ): void {
     if (typeof state === 'string') {
       this.value = state;
+    }
+  }
+
+  /** Returns the ValidityState object. */
+  get validity(): ValidityState {
+    return this._internals.validity;
+  }
+
+  /** Returns the current validation message. */
+  get validationMessage(): string {
+    return this._internals.validationMessage;
+  }
+
+  /** Checks whether the picker satisfies its constraints. */
+  checkValidity(): boolean {
+    return this._internals.checkValidity();
+  }
+
+  /** Reports validity and shows the browser's constraint validation UI. */
+  reportValidity(): boolean {
+    return this._internals.reportValidity();
+  }
+
+  private _updateValidity(): void {
+    if (this.required && !this.value) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        'Please select a color.',
+        this.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]') ??
+          this.shadowRoot?.querySelector<HTMLElement>('[part="grid"]') ??
+          undefined,
+      );
+    } else {
+      this._internals.setValidity({});
     }
   }
 
@@ -555,13 +603,19 @@ export class HelixColorPicker extends LitElement {
   private _show(): void {
     if (this._open || this.inline) return;
     this._open = true;
-    document.addEventListener('click', this._boundDocumentClick, true);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._boundDocumentClick, true);
+    }
   }
 
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
-    document.removeEventListener('click', this._boundDocumentClick, true);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._boundDocumentClick, true);
+    }
   }
 
   private _handleDocumentClick(e: MouseEvent): void {
@@ -595,8 +649,11 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingGrid = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointermove', this._boundPointerMove);
+      document.addEventListener('pointerup', this._boundPointerUp);
+    }
     this._updateGridFromPointer(e);
   }
 
@@ -648,8 +705,11 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingHue = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointermove', this._boundPointerMove);
+      document.addEventListener('pointerup', this._boundPointerUp);
+    }
     this._updateHueFromPointer(e);
   }
 
@@ -670,8 +730,11 @@ export class HelixColorPicker extends LitElement {
     e.preventDefault();
     this._draggingOpacity = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    document.addEventListener('pointermove', this._boundPointerMove);
-    document.addEventListener('pointerup', this._boundPointerUp);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointermove', this._boundPointerMove);
+      document.addEventListener('pointerup', this._boundPointerUp);
+    }
     this._updateOpacityFromPointer(e);
   }
 
@@ -698,8 +761,11 @@ export class HelixColorPicker extends LitElement {
       this._draggingGrid = false;
       this._draggingHue = false;
       this._draggingOpacity = false;
-      document.removeEventListener('pointermove', this._boundPointerMove);
-      document.removeEventListener('pointerup', this._boundPointerUp);
+      // Guard for SSR — document is unavailable server-side
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('pointermove', this._boundPointerMove);
+        document.removeEventListener('pointerup', this._boundPointerUp);
+      }
       this._commit('change');
     }
   }
