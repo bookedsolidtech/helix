@@ -82,10 +82,12 @@ export class HelixRadio extends LitElement {
 
   // ─── Internal IDs ───
 
+  /** @internal */
   private _inputId = `hx-radio-${++_hxRadioIdCounter}`;
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleClick(): void {
     if (this.disabled) {
       return;

@@ -48,10 +48,12 @@ export class HelixButton extends LitElement {
 
   static formAssociated = true;
 
+  /** @internal */
   private _internals: ElementInternals;
 
   constructor() {
     super();
+    /** @internal */
     this._internals = this.attachInternals();
   }
 
@@ -159,6 +161,7 @@ export class HelixButton extends LitElement {
   // ─── Event Handling ───
 
   /** @private */
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled || this.loading) {
       e.preventDefault();
@@ -192,6 +195,7 @@ export class HelixButton extends LitElement {
   // ─── Render Helpers ───
 
   /** @private */
+  /** @internal */
   private _renderSpinner(): TemplateResult {
     return html`
       <svg
@@ -222,6 +226,7 @@ export class HelixButton extends LitElement {
   }
 
   /** @private */
+  /** @internal */
   private _renderInner(): TemplateResult {
     return html`
       ${this.loading ? this._renderSpinner() : nothing}

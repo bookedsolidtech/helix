@@ -111,6 +111,7 @@ export class HelixTabs extends LitElement {
     }
   }
 
+  /** @internal */
   private _getTabs(): HelixTab[] {
     if (!this._cachedTabs) {
       this._cachedTabs = Array.from(this.querySelectorAll(':scope > hx-tab')).filter(
@@ -120,6 +121,7 @@ export class HelixTabs extends LitElement {
     return this._cachedTabs;
   }
 
+  /** @internal */
   private _getPanels(): HelixTabPanel[] {
     if (!this._cachedPanels) {
       this._cachedPanels = Array.from(this.querySelectorAll(':scope > hx-tab-panel')).filter(
@@ -129,6 +131,7 @@ export class HelixTabs extends LitElement {
     return this._cachedPanels;
   }
 
+  /** @internal */
   private _getEnabledTabs(): HelixTab[] {
     return this._getTabs().filter((tab) => !tab.disabled);
   }
@@ -186,6 +189,7 @@ export class HelixTabs extends LitElement {
 
   // ─── Tab / Panel Sync ───
 
+  /** @internal */
   private _syncTabsAndPanels(): void {
     const tabs = this._getTabs();
     const panels = this._getPanels();
@@ -221,6 +225,7 @@ export class HelixTabs extends LitElement {
     this._updateTabsAndPanels();
   }
 
+  /** @internal */
   private _updateTabsAndPanels(): void {
     const tabs = this._getTabs();
     const panels = this._getPanels();
@@ -250,6 +255,7 @@ export class HelixTabs extends LitElement {
 
   // ─── Tab Activation ───
 
+  /** @internal */
   private _activateTab(tab: HelixTab, dispatchEvent = true): void {
     if (tab.disabled) {
       return;

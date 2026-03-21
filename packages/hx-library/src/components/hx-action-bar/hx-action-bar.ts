@@ -92,6 +92,7 @@ export class HelixActionBar extends LitElement {
     this._sticky = value;
     this.requestUpdate('sticky', old);
   }
+  /** @internal */
   private _sticky = false;
 
   /**
@@ -103,15 +104,18 @@ export class HelixActionBar extends LitElement {
   ariaLabel: string = 'Actions';
 
   /** Cached list of focusable items — invalidated on slot change. */
+  /** @internal */
   private _focusableCache: HTMLElement[] | null = null;
 
-  /** Whether the overflow slot has assigned content. */
+  /** Whether the overflow slot has assigned content.  * @internal
+   */
   @state()
   private _hasOverflow = false;
 
   // ─── Lifecycle ───
 
   /** Arrow function field — stable reference for add/removeEventListener. */
+  /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'ArrowRight') {
       e.preventDefault();
@@ -176,6 +180,7 @@ export class HelixActionBar extends LitElement {
 
   // ─── Focusable item discovery ───
 
+  /** @internal */
   private _isFocusable(el: HTMLElement): boolean {
     // Check disabled via DOM attribute (native elements) or property (custom elements)
     if (el.hasAttribute('disabled')) return false;
@@ -190,6 +195,7 @@ export class HelixActionBar extends LitElement {
     return tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea';
   }
 
+  /** @internal */
   private _getFocusableItems(): HTMLElement[] {
     if (this._focusableCache) return this._focusableCache;
 
@@ -222,6 +228,7 @@ export class HelixActionBar extends LitElement {
 
   // ─── Roving tabindex helpers ───
 
+  /** @internal */
   private _initRovingTabindex(): void {
     this._focusableCache = null; // invalidate cache on slot change
     const items = this._getFocusableItems();
@@ -239,6 +246,7 @@ export class HelixActionBar extends LitElement {
     }
   }
 
+  /** @internal */
   private _moveFocus(direction: 'next' | 'prev'): void {
     const items = this._getFocusableItems();
     if (!items.length) return;
@@ -262,6 +270,7 @@ export class HelixActionBar extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     if (slot.name === 'overflow') {

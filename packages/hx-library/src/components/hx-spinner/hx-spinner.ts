@@ -84,6 +84,7 @@ export class HelixSpinner extends LitElement {
     }
   }
 
+  /** @internal */
   private _isTokenSize(): this is { size: SpinnerSize } {
     return this.size === 'sm' || this.size === 'md' || this.size === 'lg';
   }

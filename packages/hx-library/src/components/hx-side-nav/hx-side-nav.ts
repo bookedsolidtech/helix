@@ -69,6 +69,7 @@ export class HelixSideNav extends LitElement {
    * setting or removing the `data-collapsed` attribute. This allows child
    * items to respond to collapsed mode via their CSS selectors.
    */
+  /** @internal */
   private _propagateCollapsedToChildren(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
@@ -91,6 +92,7 @@ export class HelixSideNav extends LitElement {
    * Handles the default slot's slotchange event so that if items are added
    * after initial render, they immediately receive the correct collapsed state.
    */
+  /** @internal */
   private _onDefaultSlotChange(): void {
     this._propagateCollapsedToChildren();
   }
@@ -103,6 +105,7 @@ export class HelixSideNav extends LitElement {
    * skipped. Focus is applied to the interactive element inside the shadow DOM
    * of each item (anchor or button with part="link").
    */
+  /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') return;
 
@@ -155,6 +158,7 @@ export class HelixSideNav extends LitElement {
 
   // ─── Event Handling ───
 
+  /** @internal */
   private _handleToggle(): void {
     this.collapsed = !this.collapsed;
 
@@ -187,6 +191,7 @@ export class HelixSideNav extends LitElement {
 
   // ─── Render ───
 
+  /** @internal */
   private _renderToggleIcon() {
     return html`<svg viewBox="0 0 20 20" aria-hidden="true">
       <path

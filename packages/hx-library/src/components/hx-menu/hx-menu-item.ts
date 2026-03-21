@@ -84,9 +84,11 @@ export class HelixMenuItem extends LitElement {
   @property({ type: Boolean, reflect: true })
   loading = false;
 
+  /** @internal */
   @state()
   private _hasSubmenu = false;
 
+  /** @internal */
   @query('.menu-item') private _menuItemEl!: HTMLElement | null;
 
   /** Focus the inner interactive element. */
@@ -108,11 +110,13 @@ export class HelixMenuItem extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleSubmenuSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasSubmenu = slot.assignedElements().length > 0;
   }
 
+  /** @internal */
   private _activate(): void {
     if (this.disabled || this.loading) return;
 
@@ -140,6 +144,7 @@ export class HelixMenuItem extends LitElement {
     );
   }
 
+  /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled || this.loading) {
       e.preventDefault();
@@ -149,6 +154,7 @@ export class HelixMenuItem extends LitElement {
     this._activate();
   }
 
+  /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -168,6 +174,7 @@ export class HelixMenuItem extends LitElement {
     }
   }
 
+  /** @internal */
   private _renderCheckedIcon() {
     return html`
       <span part="checked-icon" class="menu-item__checked-icon" aria-hidden="true">
@@ -187,6 +194,7 @@ export class HelixMenuItem extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderSubmenuIcon() {
     return html`
       <span part="submenu-icon" class="menu-item__submenu-icon" aria-hidden="true">
@@ -206,6 +214,7 @@ export class HelixMenuItem extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderSpinner() {
     return html`
       <svg class="menu-item__spinner" aria-hidden="true" viewBox="0 0 24 24" fill="none">
@@ -220,6 +229,7 @@ export class HelixMenuItem extends LitElement {
     `;
   }
 
+  /** @internal */
   private _getRole(): string {
     switch (this.type) {
       case 'checkbox':

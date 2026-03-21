@@ -140,6 +140,7 @@ export class HelixDrawer extends LitElement {
    */
   private _animationTimeout: ReturnType<typeof setTimeout> | null = null;
   /** Whether this drawer instance currently holds a body-scroll lock. */
+  /** @internal */
   private _hasScrollLock = false;
   /**
    * Elements outside the drawer that were given aria-hidden during open, restored on close.
@@ -262,6 +263,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Private: Size CSS variable ───
 
+  /** @internal */
   private _applySizeVar(): void {
     const resolvedSize = DRAWER_SIZE_MAP[this.size as DrawerSizePreset] ?? this.size;
     this.style.setProperty('--_drawer-size', resolvedSize);
@@ -269,6 +271,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Private: Open / Close ───
 
+  /** @internal */
   private _lockBodyScroll(): void {
     if (this.contained || this._hasScrollLock) return;
     // Uses a shared reference-counted lock so that simultaneous hx-dialog / hx-drawer
@@ -278,12 +281,14 @@ export class HelixDrawer extends LitElement {
     this._hasScrollLock = true;
   }
 
+  /** @internal */
   private _restoreBodyScroll(): void {
     if (!this._hasScrollLock) return;
     unlockBodyScroll();
     this._hasScrollLock = false;
   }
 
+  /** @internal */
   private _openDrawer(): void {
     // Capture trigger for focus restoration (P2-04: use instanceof guard)
     const active = document.activeElement;
@@ -326,6 +331,7 @@ export class HelixDrawer extends LitElement {
       .catch(console.error);
   }
 
+  /** @internal */
   private _closeDrawer(): void {
     // P1-05: clear any pending animation timeout before scheduling a new one
     if (this._animationTimeout !== null) {
@@ -355,6 +361,7 @@ export class HelixDrawer extends LitElement {
     }, duration);
   }
 
+  /** @internal */
   private _getAnimationDuration(): number {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
     return 300;
@@ -362,6 +369,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Background aria-hidden management (P1-03) ───
 
+  /** @internal */
   private _hideBackgroundFromScreenReaders(): void {
     if (this.contained) return;
     this._siblingAriaHiddenElements = [];
@@ -374,6 +382,7 @@ export class HelixDrawer extends LitElement {
     });
   }
 
+  /** @internal */
   private _restoreBackgroundForScreenReaders(): void {
     this._siblingAriaHiddenElements.forEach((el) => {
       el.removeAttribute('aria-hidden');
@@ -383,10 +392,12 @@ export class HelixDrawer extends LitElement {
 
   // ─── Event Listeners (P1-01: use only document listener, not overlay) ───
 
+  /** @internal */
   private _addListeners(): void {
     document.addEventListener('keydown', this._handleKeyDown);
   }
 
+  /** @internal */
   private _removeListeners(): void {
     document.removeEventListener('keydown', this._handleKeyDown);
   }
@@ -413,6 +424,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Focus ───
 
+  /** @internal */
   private _setInitialFocus(): void {
     const event = new CustomEvent<void>('hx-initial-focus', {
       bubbles: true,
@@ -431,6 +443,7 @@ export class HelixDrawer extends LitElement {
     }
   }
 
+  /** @internal */
   private _getFocusableElements(): HTMLElement[] {
     const shadowFocusable = Array.from(
       this.shadowRoot?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS) ?? [],
@@ -457,6 +470,7 @@ export class HelixDrawer extends LitElement {
     );
   }
 
+  /** @internal */
   private _trapFocus(e: KeyboardEvent): void {
     const focusable =
       this._cachedFocusableElements.length > 0
@@ -506,16 +520,19 @@ export class HelixDrawer extends LitElement {
 
   // ─── Slot change handlers ───
 
+  /** @internal */
   private _handleHeaderActionsSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHeaderActionsSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleFooterSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasFooterSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
@@ -523,6 +540,7 @@ export class HelixDrawer extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderHeader() {
     if (this.noHeader) return nothing;
 
@@ -571,6 +589,7 @@ export class HelixDrawer extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderFooter() {
     if (this.noFooter) return nothing;
 

@@ -90,8 +90,10 @@ export class HelixStat extends LitElement {
 
   // ─── Slot Detection ───
 
+  /** @internal */
   @state() private _hasIcon = false;
 
+  /** @internal */
   private _onIconSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasIcon = slot.assignedNodes({ flatten: true }).length > 0;
@@ -99,6 +101,7 @@ export class HelixStat extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderTrendArrow(trend: 'up' | 'down'): ReturnType<typeof html> {
     if (trend === 'up') {
       return html`
