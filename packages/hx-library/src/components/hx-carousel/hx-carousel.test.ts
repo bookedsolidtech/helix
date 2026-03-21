@@ -866,4 +866,33 @@ describe('hx-carousel', () => {
       expect(assigned[0].tagName.toLowerCase()).toBe('button');
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('labelSlideOf returns default English format', async () => {
+      const el = await fixture<HelixCarousel>(
+        `<hx-carousel label="Photos">
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>`,
+      );
+      await el.updateComplete;
+      expect(el.labelSlideOf(2, 3)).toBe('Slide 2 of 3');
+    });
+
+    it('labelSlideOf can be overridden with a custom function', async () => {
+      const el = await fixture<HelixCarousel>(
+        `<hx-carousel label="Photos">
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+        </hx-carousel>`,
+      );
+      await el.updateComplete;
+      el.labelSlideOf = (current: number, total: number) => `Diapositive ${current} sur ${total}`;
+      await el.updateComplete;
+      expect(el.labelSlideOf(1, 2)).toBe('Diapositive 1 sur 2');
+    });
+  });
 });

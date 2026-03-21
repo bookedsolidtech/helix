@@ -430,4 +430,18 @@ describe('hx-banner', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for close button', async () => {
+      const el = await fixture<HxBanner>('<hx-banner>Test</hx-banner>');
+      expect(el.closeLabel).toBe('Dismiss banner');
+    });
+
+    it('renders custom closeLabel when set via attribute', async () => {
+      const el = await fixture<HxBanner>('<hx-banner close-label="Cerrar">Test</hx-banner>');
+      expect(el.closeLabel).toBe('Cerrar');
+    });
+  });
 });

@@ -675,4 +675,24 @@ describe('hx-pagination', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for first page button', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5"></hx-pagination>',
+      );
+      await el.updateComplete;
+      expect(el.labelFirstPage).toBe('First page');
+    });
+
+    it('labelPageOf returns default English format', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="3"></hx-pagination>',
+      );
+      await el.updateComplete;
+      expect(el.labelPageOf(3, 10)).toBe('Page 3 of 10');
+    });
+  });
 });

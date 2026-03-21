@@ -633,4 +633,22 @@ describe('hx-drawer', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── i18n / label overrides ───
+
+  describe('i18n / label overrides', () => {
+    it('uses default English label for close button', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open><p>Content</p></hx-drawer>');
+      await el.updateComplete;
+      expect(el.closeLabel).toBe('Close drawer');
+    });
+
+    it('close button aria-label reflects custom closeLabel', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open><p>Content</p></hx-drawer>');
+      el.closeLabel = 'Cerrar panel';
+      await el.updateComplete;
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-btn"]');
+      expect(closeBtn?.getAttribute('aria-label')).toBe('Cerrar panel');
+    });
+  });
 });

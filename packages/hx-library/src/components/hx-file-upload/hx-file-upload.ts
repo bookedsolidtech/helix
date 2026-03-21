@@ -127,6 +127,19 @@ export class HelixFileUpload extends LitElement {
   @property({ type: String, attribute: 'label-dropzone' })
   labelDropzone = 'Drag files here or click to browse';
 
+  /** Accessible label for the selected files list. */
+  @property({ type: String, attribute: 'label-file-list' })
+  labelFileList = 'Selected files';
+
+  /**
+   * Generates upload progress description for screen readers.
+   * @param name - file name
+   * @param progress - progress percentage 0-100
+   */
+  @property({ attribute: false })
+  labelUploadProgress: (name: string, progress: number) => string = (name, progress) =>
+    `Upload progress for ${name}: ${progress}%`;
+
   // ─── Internal State ───
 
   /** The list of currently selected file entries, each with a file reference and upload progress. @internal */
@@ -475,7 +488,7 @@ export class HelixFileUpload extends LitElement {
     if (this._files.length === 0) return nothing;
 
     return html`
-      <ul part="file-list" class="file-list" aria-label="Selected files">
+      <ul part="file-list" class="file-list" aria-label=${this.labelFileList}>
         ${repeat(
           this._files,
           (entry) => entry.file.name + entry.file.size,
@@ -515,7 +528,7 @@ export class HelixFileUpload extends LitElement {
                 aria-valuenow=${entry.progress}
                 aria-valuemin="0"
                 aria-valuemax="100"
-                aria-label=${`Upload progress for ${entry.file.name}: ${entry.progress}%`}
+                aria-label=${this.labelUploadProgress(entry.file.name, entry.progress)}
               >
                 <div
                   class="progress-bar"

@@ -200,6 +200,15 @@ export class HelixCarousel extends LitElement {
   labelPlayAutoplay = 'Play autoplay';
 
   /**
+   * Generates the live-region text for a slide position.
+   * @param index - 1-based slide index
+   * @param total - total slide count
+   */
+  @property({ attribute: false })
+  labelSlideOf: (index: number, total: number) => string = (index, total) =>
+    `Slide ${index} of ${total}`;
+
+  /**
    * Index of the currently visible slide.
    * @internal
    */
@@ -365,7 +374,7 @@ export class HelixCarousel extends LitElement {
     if (next === this._currentIndex) return;
 
     this._currentIndex = next;
-    this._liveText = `Slide ${next + 1} of ${this._slides.length}`;
+    this._liveText = this.labelSlideOf(next + 1, this._slides.length);
     const slide = this._slides[next];
     if (!slide) return;
     this.dispatchEvent(
@@ -707,7 +716,7 @@ export class HelixCarousel extends LitElement {
                 })}
                 part="pagination-item"
                 type="button"
-                aria-label="Slide ${i + 1} of ${count}"
+                aria-label=${this.labelSlideOf(i + 1, count)}
                 aria-current=${i === this._currentIndex ? 'true' : nothing}
                 @click=${() => this._goToManual(i)}
               >
