@@ -286,7 +286,8 @@ export class HelixDrawer extends LitElement {
 
   private _openDrawer(): void {
     // Capture trigger for focus restoration (P2-04: use instanceof guard)
-    const active = document.activeElement;
+    // Guard for SSR — document is unavailable server-side
+    const active = typeof document !== 'undefined' ? document.activeElement : null;
     this._triggerElement = active instanceof HTMLElement ? active : null;
 
     // P1-05: clear any pending animation timeout before scheduling a new one
@@ -356,7 +357,12 @@ export class HelixDrawer extends LitElement {
   }
 
   private _getAnimationDuration(): number {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
+    // Guard for SSR — window.matchMedia is unavailable server-side
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return 0;
     return 300;
   }
 
@@ -364,6 +370,8 @@ export class HelixDrawer extends LitElement {
 
   private _hideBackgroundFromScreenReaders(): void {
     if (this.contained) return;
+    // Guard for SSR — document.body is unavailable server-side
+    if (typeof document === 'undefined') return;
     this._siblingAriaHiddenElements = [];
     Array.from(document.body.children).forEach((child) => {
       if (child === this || child.contains(this)) return;
@@ -384,11 +392,17 @@ export class HelixDrawer extends LitElement {
   // ─── Event Listeners (P1-01: use only document listener, not overlay) ───
 
   private _addListeners(): void {
-    document.addEventListener('keydown', this._handleKeyDown);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', this._handleKeyDown);
+    }
   }
 
   private _removeListeners(): void {
-    document.removeEventListener('keydown', this._handleKeyDown);
+    // Guard for SSR — document is unavailable server-side
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('keydown', this._handleKeyDown);
+    }
   }
 
   // ─── Keyboard Handler ───
