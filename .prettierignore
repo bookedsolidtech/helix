@@ -34,3 +34,7 @@ apps/admin/public/helix/
 testing/static-html/helix-bundle.js
 testing/static-html/helix-bundle.css
 test-results/
+
+# Minified CSS assets — bundle-size optimized, must not be reformatted
+packages/hx-library/src/styles/form/form.scoped.css
+packages/hx-library/src/styles/prose/prose.scoped.css
