@@ -739,8 +739,9 @@ describe('hx-color-picker', () => {
         '<hx-color-picker value="#fff" format="rgb"></hx-color-picker>',
       );
       await el.updateComplete;
-      // #fff expands to #ffffff — pure white: r=255, g=255, b=255
-      expect(el.value).toBe('rgb(255 255 255)');
+      // value property stays as the original attribute; the display input shows rgb format
+      const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
+      expect(colorInput?.value).toBe('rgb(255 255 255)');
     });
 
     it('parses 3-char hex #f00 as red', async () => {
@@ -748,8 +749,9 @@ describe('hx-color-picker', () => {
         '<hx-color-picker value="#f00" format="rgb"></hx-color-picker>',
       );
       await el.updateComplete;
-      // #f00 expands to #ff0000 — pure red
-      expect(el.value).toBe('rgb(255 0 0)');
+      // value property stays as the original attribute; the display input shows rgb format
+      const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
+      expect(colorInput?.value).toBe('rgb(255 0 0)');
     });
   });
 
@@ -774,8 +776,9 @@ describe('hx-color-picker', () => {
         '<hx-color-picker value="#808080" format="rgb"></hx-color-picker>',
       );
       await el.updateComplete;
-      // Should produce rgb(128 128 128)
-      expect(el.value).toBe('rgb(128 128 128)');
+      // value property stays as-is; the display input shows the rgb-formatted value
+      const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
+      expect(colorInput?.value).toBe('rgb(128 128 128)');
     });
   });
 
@@ -793,14 +796,15 @@ describe('hx-color-picker', () => {
       expect(el.value).toMatch(/^#[0-9a-f]{8}$/i);
     });
 
-    it('omits alpha from hex output when opacity is false (default)', async () => {
+    it('omits alpha from hex display when opacity is false (default)', async () => {
       const el = await fixture<HelixColorPicker>(
         '<hx-color-picker inline value="#ff000080" format="hex"></hx-color-picker>',
       );
       await el.updateComplete;
-      // Without opacity flag, alpha should not appear in the output
-      expect(el.value).toMatch(/^#[0-9a-f]{6}$/i);
-      expect(el.value).toHaveLength(7);
+      // Without opacity flag, the display input should show 6-char hex (no alpha)
+      const colorInput = shadowQuery<HTMLInputElement>(el, '.color-input');
+      expect(colorInput?.value).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(colorInput?.value).toHaveLength(7);
     });
 
     it('preserves alpha in rgb format with opacity=true', async () => {
