@@ -8,8 +8,10 @@
 # all code before it reaches main via the staging→main promotion flow.
 #
 # Required secrets:
-#   GITHUB_TOKEN  — auto-provided by Actions (needs contents:write + pull-requests:write)
-#   NPM_TOKEN     — npm automation token (must be added to repo settings by repo admin)
+#   CHANGESET_TOKEN — PAT or fine-grained token with contents:write + pull-requests:write
+#                     (GITHUB_TOKEN suppresses workflow events on PRs it creates, so a
+#                     dedicated token is required to trigger CI on version bump PRs)
+#   NPM_TOKEN       — npm automation token (must be added to repo settings by repo admin)
 # ============================================================================
 
 name: Publish
@@ -59,7 +61,7 @@ jobs:
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
           # Disable husky pre-push hooks during CI git operations (tag pushes,
