@@ -391,6 +391,13 @@ export class HelixColorPicker extends LitElement {
   @property({ type: Boolean, reflect: true })
   inline = false;
 
+  /**
+   * When true, the picker requires a non-empty value for form submission.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
   /** Accessible label for the color gradient canvas. */
   @property({ type: String, attribute: 'label-gradient' })
   labelGradient = 'Color gradient';
@@ -501,6 +508,9 @@ export class HelixColorPicker extends LitElement {
     if (changedProperties.has('value')) {
       this._syncFromValue();
     }
+    if (changedProperties.has('required')) {
+      this._updateValidity();
+    }
   }
 
   // ─── Sync ────────────────────────────────────────────────────────────────
@@ -512,6 +522,7 @@ export class HelixColorPicker extends LitElement {
     }
     this._inputValue = formatColor(this._hsv, this.format, this.opacity);
     this._internals.setFormValue(this.value);
+    this._updateValidity();
   }
 
   /** Called when a parent fieldset is disabled/enabled. */
@@ -532,6 +543,40 @@ export class HelixColorPicker extends LitElement {
   ): void {
     if (typeof state === 'string') {
       this.value = state;
+    }
+  }
+
+  /** Returns the ValidityState object. */
+  get validity(): ValidityState {
+    return this._internals.validity;
+  }
+
+  /** Returns the current validation message. */
+  get validationMessage(): string {
+    return this._internals.validationMessage;
+  }
+
+  /** Checks whether the picker satisfies its constraints. */
+  checkValidity(): boolean {
+    return this._internals.checkValidity();
+  }
+
+  /** Reports validity and shows the browser's constraint validation UI. */
+  reportValidity(): boolean {
+    return this._internals.reportValidity();
+  }
+
+  private _updateValidity(): void {
+    if (this.required && !this.value) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        'Please select a color.',
+        this.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]') ??
+          this.shadowRoot?.querySelector<HTMLElement>('[part="grid"]') ??
+          undefined,
+      );
+    } else {
+      this._internals.setValidity({});
     }
   }
 
