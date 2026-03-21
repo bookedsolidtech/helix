@@ -99,6 +99,10 @@ export class HelixBanner extends LitElement {
   @property({ type: Boolean, reflect: true })
   open = true;
 
+  /** Accessible label for the dismiss button. Override for localized text. */
+  @property({ type: String, attribute: 'close-label' })
+  closeLabel = 'Dismiss banner';
+
   // ─── Private Helpers ───
 
   /** Returns true when the variant requires assertive announcement. */
@@ -266,7 +270,7 @@ export class HelixBanner extends LitElement {
               <button
                 part="close-button"
                 class="banner__close-button"
-                aria-label=${`Dismiss ${this.heading ? `${this.heading} ` : ''}banner`}
+                aria-label=${this.closeLabel}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}

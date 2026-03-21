@@ -391,6 +391,41 @@ export class HelixColorPicker extends LitElement {
   @property({ type: Boolean, reflect: true })
   inline = false;
 
+  /** Accessible label for the color gradient canvas. */
+  @property({ type: String, attribute: 'label-gradient' })
+  labelGradient = 'Color gradient';
+
+  /** Accessible label for the hue slider. */
+  @property({ type: String, attribute: 'label-hue' })
+  labelHue = 'Hue';
+
+  /** Accessible label for the opacity slider. */
+  @property({ type: String, attribute: 'label-opacity' })
+  labelOpacity = 'Opacity';
+
+  /** Accessible label for the preset color swatches section. */
+  @property({ type: String, attribute: 'label-swatches' })
+  labelSwatches = 'Preset colors';
+
+  /** Accessible label for the format-switch button. */
+  @property({ type: String, attribute: 'label-switch-format' })
+  labelSwitchFormat = 'Switch color format';
+
+  /** Accessible label for the color value input. */
+  @property({ type: String, attribute: 'label-color-value' })
+  labelColorValue = 'Color value';
+
+  /** Accessible label for the color picker dialog/panel. */
+  @property({ type: String, attribute: 'label-picker' })
+  labelPicker = 'Color picker';
+
+  /**
+   * Generates the accessible label for the trigger button.
+   * @param color - current color value string
+   */
+  @property({ attribute: false })
+  labelTrigger: (color: string) => string = (color) => `Choose color: ${color}`;
+
   // ─── Internal State ──────────────────────────────────────────────────────
 
   /**
@@ -793,7 +828,7 @@ export class HelixColorPicker extends LitElement {
         class="gradient-grid"
         role="slider"
         tabindex="0"
-        aria-label="Color gradient"
+        aria-label=${this.labelGradient}
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow=${Math.round(this._hsv.s)}
@@ -823,7 +858,7 @@ export class HelixColorPicker extends LitElement {
         class="slider-track hue-track"
         role="slider"
         tabindex="0"
-        aria-label="Hue"
+        aria-label=${this.labelHue}
         aria-valuemin="0"
         aria-valuemax="360"
         aria-valuenow=${Math.round(this._hsv.h)}
@@ -855,7 +890,7 @@ export class HelixColorPicker extends LitElement {
         class="slider-track opacity-track"
         role="slider"
         tabindex="0"
-        aria-label="Opacity"
+        aria-label=${this.labelOpacity}
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow=${Math.round(this._hsv.a * 100)}
@@ -876,7 +911,7 @@ export class HelixColorPicker extends LitElement {
   private _renderSwatches() {
     if (!this.swatches?.length) return nothing;
     return html`
-      <div part="swatches" class="swatches" role="group" aria-label="Preset colors">
+      <div part="swatches" class="swatches" role="group" aria-label=${this.labelSwatches}>
         ${this.swatches.map(
           (color) => html`
             <button
@@ -904,7 +939,7 @@ export class HelixColorPicker extends LitElement {
         <button
           type="button"
           class="format-btn"
-          aria-label="Switch color format"
+          aria-label=${this.labelSwitchFormat}
           title="Switch format"
           @click=${this._handleFormatCycle}
         >
@@ -914,7 +949,7 @@ export class HelixColorPicker extends LitElement {
           type="text"
           class="color-input"
           .value=${this._inputValue}
-          aria-label="Color value"
+          aria-label=${this.labelColorValue}
           autocomplete="off"
           spellcheck="false"
           @input=${this._handleInputChange}
@@ -934,7 +969,7 @@ export class HelixColorPicker extends LitElement {
       <div
         class="panel"
         role="group"
-        aria-label="Color picker"
+        aria-label=${this.labelPicker}
         tabindex="-1"
         @keydown=${this._handlePanelKeydown}
       >
@@ -963,7 +998,7 @@ export class HelixColorPicker extends LitElement {
         part="trigger"
         type="button"
         class="trigger"
-        aria-label="Choose color: ${this._inputValue}"
+        aria-label=${this.labelTrigger(this._inputValue)}
         aria-expanded=${this._open ? 'true' : nothing}
         ?disabled=${this.disabled}
         style=${styleMap({ '--_preview-color': previewColor })}
