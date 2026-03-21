@@ -369,7 +369,7 @@ describe('hx-icon-button', () => {
     });
   });
 
-  // ─── Form (3) ───
+  // ─── Form (6) ───
 
   describe('Form', () => {
     it('has formAssociated=true', () => {
@@ -430,6 +430,40 @@ describe('hx-icon-button', () => {
       btn?.click();
       await el.updateComplete;
       expect(submitted).toBe(true);
+    });
+
+    it('formResetCallback is a no-op (icon-button has no value to reset)', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      // formResetCallback must not throw and leaves the element in a valid state
+      expect(() => el.formResetCallback()).not.toThrow();
+      await el.updateComplete;
+      expect(el.shadowRoot).toBeTruthy();
+    });
+
+    it('formStateRestoreCallback is a no-op (icon-button has no value to restore)', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      // formStateRestoreCallback must not throw and leaves the element in a valid state
+      expect(() => el.formStateRestoreCallback('any-state', 'restore')).not.toThrow();
+      await el.updateComplete;
+      expect(el.shadowRoot).toBeTruthy();
+    });
+
+    it('does not submit a name/value pair in FormData (participates only for submit/reset)', async () => {
+      const form = document.createElement('form');
+      form.innerHTML =
+        '<hx-icon-button label="Submit" type="submit" name="action" value="save"></hx-icon-button>';
+      const container = document.getElementById('test-fixture-container');
+      expect(container).toBeTruthy();
+      container?.appendChild(form);
+      const el = form.querySelector('hx-icon-button') as HelixIconButton;
+      await el.updateComplete;
+      // FormData is constructed without submitting — icon-button should not append a value
+      // (form-associated custom elements only include a value in FormData when setFormValue is called)
+      const data = new FormData(form);
+      // The button participates via ElementInternals but never calls setFormValue,
+      // so no entry for "action" appears in FormData pre-submit.
+      expect(data.has('action')).toBe(false);
+      form.remove();
     });
 
     it('type=reset triggers form reset', async () => {
