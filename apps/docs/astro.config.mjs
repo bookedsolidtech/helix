@@ -639,6 +639,14 @@ export default defineConfig({
               label: 'Boolean Attributes',
               slug: 'guides/boolean-attributes',
             },
+            {
+              label: 'Troubleshooting',
+              slug: 'guides/troubleshooting',
+            },
+            {
+              label: 'Best Practices',
+              slug: 'guides/best-practices',
+            },
           ],
         },
         {
