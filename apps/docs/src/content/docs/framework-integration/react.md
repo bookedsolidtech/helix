@@ -9,6 +9,12 @@ sidebar:
 
 HELIX components work in React 18+ with a few important patterns to follow. React 19 introduced native custom element support; React 18 requires `ref`-based event binding.
 
+:::tip[Prefer the wrapper package for React projects]
+If you are building a React 18+ or Next.js application, consider using [`@helixui/react`](/framework-integration/react-wrappers) instead of the raw web components. It provides typed `onHxClick`/`onHxChange` callback props, automatic ref forwarding, and React DevTools labels — no `addEventListener` boilerplate required.
+
+This guide documents the raw web component approach, which is also valid and works in any framework.
+:::
+
 ## Installation
 
 ```bash
@@ -216,6 +222,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Next Steps
 
+- [React Wrappers](/framework-integration/react-wrappers) — `@helixui/react` typed wrappers with `onHxClick` props (preferred for React apps)
 - [Vue Integration](/framework-integration/vue)
 - [Boolean Attributes reference](/guides/boolean-attributes)
 - [Component Library](/component-library/overview)

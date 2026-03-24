@@ -23,7 +23,8 @@ Web components are framework-agnostic by design, but frameworks differ in:
 
 | Framework | Use Case |
 |-----------|----------|
-| [React](/framework-integration/react) | React 18+ |
+| [React](/framework-integration/react) | React 18+ (raw web components) |
+| [React Wrappers](/framework-integration/react-wrappers) | `@helixui/react` — typed props, no `addEventListener` boilerplate |
 | [Next.js 15](/framework-integration/nextjs) | Next.js 15 App Router, SSR, Server Actions |
 | [Vue](/framework-integration/vue) | Vue 3, Nuxt |
 | [Angular](/framework-integration/angular) | Angular 16+ |
