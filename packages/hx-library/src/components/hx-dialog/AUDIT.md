@@ -101,3 +101,13 @@ Component JSDoc includes:
 ## Verdict
 
 **SHIP-READY.** All 24 original defects resolved. Zero P0/P1/P2 issues remaining. Component meets WCAG 2.1 AA, TypeScript strict, design token compliance, and full test/story coverage.
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

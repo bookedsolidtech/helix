@@ -200,3 +200,18 @@ All 9 P1 and 8 P2 issues from the previous audit have been resolved:
 ## Recommendation
 
 **Ship-ready with one caveat.** The P1 CEM issue (BC-A01) should be fixed before release — it's a configuration fix (adding `@internal` JSDoc tags), not a code change. The P2-P3 findings are quality improvements that can be addressed in a follow-up iteration. The component is architecturally sound, accessible, well-tested, and Drupal-compatible.
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** HIGH
+
+**Violation:** Injects JSON-LD `<script>` into `document.head` in `updated()` lifecycle (line 321). Has SSR guard (`typeof document === 'undefined'`), but incompatible with streaming SSR where `<head>` is already sent.
+
+**Workaround:** For SSR SEO structured data, use framework-native metadata APIs instead:
+- **Next.js:** Use `generateMetadata()` or `<script>` in `layout.tsx`
+- **Astro:** Inject JSON-LD from frontmatter
+- **Nuxt:** Use `useHead()` composable
+
+The component's JSON-LD injection works correctly after client hydration.

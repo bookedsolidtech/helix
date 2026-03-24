@@ -181,3 +181,13 @@ No hardcoded colors in component logic. All color references in styles use token
 ## Recommendation
 
 **APPROVED for merge** pending verification gate passage. The component meets all 7 quality gates (bundle size measurement recommended as follow-up). All P0 and functional P1 items from the previous audit have been resolved. Remaining items are architectural platform limitations (P1-4) and accepted design decisions (P2-5, P2-8, P2-14).
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

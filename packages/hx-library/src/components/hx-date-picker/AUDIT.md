@@ -202,3 +202,13 @@ All colors, spacing, typography, border widths, focus rings, and transitions use
 | DisabledNoInteraction | Interaction: disabled prevents all input |
 
 **Total: 23 stories**
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.
