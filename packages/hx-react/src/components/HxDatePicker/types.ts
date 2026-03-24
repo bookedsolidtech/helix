@@ -34,6 +34,16 @@ export interface HxDatePickerProps {
   format?: string;
   /** Locale string used for formatting the display value. */
   locale?: string;
+  /** Accessible label for the calendar grid/dialog. */
+  labelChooseDate?: string;
+  /** Accessible label for the "previous month" button. */
+  labelPrevMonth?: string;
+  /** Accessible label for the "next month" button. */
+  labelNextMonth?: string;
+  /** Accessible label for the calendar trigger button when calendar is closed. */
+  labelOpenCalendar?: string;
+  /** Accessible label for the calendar trigger button when calendar is open. */
+  labelCloseCalendar?: string;
   /** The form element associated with this component, or null if not in a form. */
   form?: HTMLFormElement | null;
   /** The current validation message, or an empty string if the field is valid. */

@@ -42,6 +42,8 @@ export interface HxTextInputProps {
   pattern?: string;
   /** Hint for the browser's autocomplete feature. Accepts standard HTML autocomplete values. */
   autocomplete?: string;
+  /** Validation message shown when the field is required but empty. */
+  requiredMessage?: string;
   /** Visual size of the input field. */
   size?: 'sm' | 'md' | 'lg';
   /** Returns the associated form element, if any. */

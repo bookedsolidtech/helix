@@ -32,6 +32,10 @@ Mirrors the native `<input type="file" accept>` attribute. */
   /** Instructional text shown in the dropzone when no custom slot content is provided.
 Also used as the accessible label for the dropzone. */
   labelDropzone?: string;
+  /** Accessible label for the selected files list. */
+  labelFileList?: string;
+  /** Generates upload progress description for screen readers. */
+  labelUploadProgress?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */

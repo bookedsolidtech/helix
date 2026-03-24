@@ -31,6 +31,16 @@ export interface HxPaginationProps {
   showPageSize?: boolean;
   /** Label text for the rows-per-page selector. */
   labelRowsPerPage?: string;
+  /** Accessible label for the first-page button. */
+  labelFirstPage?: string;
+  /** Accessible label for the previous-page button. */
+  labelPrevPage?: string;
+  /** Accessible label for the next-page button. */
+  labelNextPage?: string;
+  /** Accessible label for the last-page button. */
+  labelLastPage?: string;
+  /** Generates the live-region text announcing the current page. */
+  labelPageOf?: string;
 
   // Event callbacks
   /** Fired when the user navigates to a new page. */

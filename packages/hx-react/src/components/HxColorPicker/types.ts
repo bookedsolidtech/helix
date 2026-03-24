@@ -32,6 +32,28 @@ Useful for compact preset-only color selection UIs. */
   name?: string;
   /** When true the picker is shown inline instead of in a popover. */
   inline?: boolean;
+  /** When true, the picker requires a non-empty value for form submission. */
+  required?: boolean;
+  /** Accessible label for the color gradient canvas. */
+  labelGradient?: string;
+  /** Accessible label for the hue slider. */
+  labelHue?: string;
+  /** Accessible label for the opacity slider. */
+  labelOpacity?: string;
+  /** Accessible label for the preset color swatches section. */
+  labelSwatches?: string;
+  /** Accessible label for the format-switch button. */
+  labelSwitchFormat?: string;
+  /** Accessible label for the color value input. */
+  labelColorValue?: string;
+  /** Accessible label for the color picker dialog/panel. */
+  labelPicker?: string;
+  /** Generates the accessible label for the trigger button. */
+  labelTrigger?: string;
+  /** Returns the ValidityState object. */
+  validity?: ValidityState;
+  /** Returns the current validation message. */
+  validationMessage?: string;
 
   // Event callbacks
   /** Dispatched while dragging sliders or grid. */

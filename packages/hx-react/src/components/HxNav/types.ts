@@ -18,6 +18,10 @@ export interface HxNavProps {
   orientation?: string;
   /** Accessible label for the nav landmark. */
   label?: string;
+  /** Accessible label for the navigation toggle button when menu is closed. */
+  labelOpenMenu?: string;
+  /** Accessible label for the navigation toggle button when menu is open. */
+  labelCloseMenu?: string;
 
   // Event callbacks
   /** Dispatched when a nav item is activated. */

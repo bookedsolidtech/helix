@@ -44,6 +44,8 @@ export interface HxComboboxProps {
   labelNoOptions?: string;
   /** Validation message shown when the field is required but empty. */
   labelRequired?: string;
+  /** Generates the accessible label for multi-select chip remove buttons. */
+  labelRemoveOption?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */

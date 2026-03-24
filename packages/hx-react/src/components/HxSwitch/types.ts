@@ -30,6 +30,8 @@ export interface HxSwitchProps {
   error?: string;
   /** Help text displayed below the switch for guidance. */
   helpText?: string;
+  /** Validation message shown when the field is required but empty. */
+  requiredMessage?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */

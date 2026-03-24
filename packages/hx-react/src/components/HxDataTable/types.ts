@@ -33,6 +33,12 @@ Required when the table has columns — a missing label is a WCAG 4.1.2 violatio
   label?: string;
   /** When true, the header row is sticky (position: sticky; top: 0). */
   stickyHeader?: boolean;
+  /** Accessible label for the "select all rows" checkbox. */
+  labelSelectAll?: string;
+  /** Generates the accessible label for column sort buttons. */
+  labelSortBy?: string | 'desc' | string;
+  /** Generates the accessible label for row selection checkboxes. */
+  labelSelectRow?: string;
   /** Current page (1-based). Set to 0 or leave at default (0) to disable pagination. */
   page?: number;
   /** Number of rows per page. Set to 0 to disable pagination (show all rows). */

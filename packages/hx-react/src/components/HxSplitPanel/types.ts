@@ -33,6 +33,14 @@ Accepts JSON array string in HTML: snap="[25, 50, 75]" */
   collapsible?: boolean;
   /** Which panel is collapsed: 'start', 'end', or null (not collapsed). */
   collapsed?: 'start' | 'end' | null;
+  /** Accessible label for the resize divider handle. */
+  labelResize?: string;
+  /** Accessible label for the collapse-start panel button. */
+  labelCollapseStart?: string;
+  /** Accessible label for the collapse-end panel button. */
+  labelCollapseEnd?: string;
+  /** Generates the accessible label for the expand button when a panel is collapsed. */
+  labelExpand?: (side: 'start' | 'end') => string;
 
   // Event callbacks
   /** Fired when the divider is moved. Detail: `{ position: number }`. */

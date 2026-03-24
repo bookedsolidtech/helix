@@ -28,8 +28,14 @@ Reflected as an attribute so CSS selectors like `:host([pressed])` work. */
   /** Accessible label forwarded to the inner `<button>` as `aria-label`.
 Required for icon-only toggle buttons where no visible text is present. */
   label?: string | undefined;
+  /** When true, the button must be in the pressed state for the form to be submitted. */
+  required?: boolean;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
+  /** Returns the ValidityState object. */
+  validity?: ValidityState;
+  /** Returns the current validation message. */
+  validationMessage?: string;
 
   // Event callbacks
   /** Dispatched when the toggle state changes. Not dispatched when the button is disabled. */

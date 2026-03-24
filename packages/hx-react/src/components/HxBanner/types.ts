@@ -27,6 +27,8 @@ close button's accessible labels. */
   actionHref?: string;
   /** Whether the banner is visible. Defaults to true — banners are shown by default. */
   open?: boolean;
+  /** Accessible label for the dismiss button. Override for localized text. */
+  closeLabel?: string;
 
   // Event callbacks
   /** Dispatched when the user dismisses the banner. */

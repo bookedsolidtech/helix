@@ -28,6 +28,8 @@ The host element must have `position: relative` (or the library handles it via :
   /** Accessible label for the dialog when the `label` slot is not populated.
 When the `label` slot is used, `aria-labelledby` takes precedence. */
   label?: string;
+  /** Accessible label for the built-in close button. Override for localized text. */
+  closeLabel?: string;
 
   // Event callbacks
   /** Fired when the drawer begins to open. */

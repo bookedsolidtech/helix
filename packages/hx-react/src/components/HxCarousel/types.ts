@@ -38,6 +38,8 @@ Automatically pauses on hover, focus, and when prefers-reduced-motion is active.
   labelPauseAutoplay?: string;
   /** Accessible label for the autoplay play button. */
   labelPlayAutoplay?: string;
+  /** Generates the live-region text for a slide position. */
+  labelSlideOf?: string;
 
   // Event callbacks
   /** Dispatched when the active slide changes. */

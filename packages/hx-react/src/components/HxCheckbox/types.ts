@@ -30,6 +30,8 @@ export interface HxCheckboxProps {
   error?: string;
   /** Help text displayed below the checkbox for guidance. */
   helpText?: string;
+  /** Validation message shown when the field is required but empty. */
+  requiredMessage?: string;
   /** The size of the checkbox. */
   size?: 'sm' | 'md' | 'lg';
   /** Returns the associated form element, if any. */

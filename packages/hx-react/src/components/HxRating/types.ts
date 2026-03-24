@@ -26,6 +26,17 @@ export interface HxRatingProps {
   name?: string;
   /** Accessible label for the rating group. */
   label?: string;
+  /** When true, a non-zero rating is required for form submission. */
+  required?: boolean;
+  /** Generates the accessible label for individual star elements.
+Handles singular/plural automatically. */
+  labelStar?: string;
+  /** Generates the aria-valuetext for the composite rating widget. */
+  labelValueText?: string;
+  /** Returns the ValidityState object. */
+  validity?: ValidityState;
+  /** Returns the current validation message. */
+  validationMessage?: string;
 
   // Event callbacks
   /** Dispatched when the rating value changes. */

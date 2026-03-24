@@ -38,6 +38,10 @@ export interface HxNumberInputProps {
   size?: 'sm' | 'md' | 'lg';
   /** When set, hides the +/- stepper buttons. */
   noStepper?: boolean;
+  /** Accessible label for the increment button. */
+  labelIncrement?: string;
+  /** Accessible label for the decrement button. */
+  labelDecrement?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */
