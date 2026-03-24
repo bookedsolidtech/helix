@@ -330,3 +330,13 @@ If a consumer sets `hx-size="xl"` or `hx-size="foobar"`, the CSS class `field__t
 ## Verdict
 
 **BLOCKED — Do not merge.** The two P0 defects (optgroup form submission data loss; contradictory ARIA live semantics on error) and five P1 accessibility defects (combobox role on button; missing typeahead; outline suppression without guarantee; Tab not handled; wrong aria-label test target) must all be resolved before this component can be considered production-quality for a healthcare design system.
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

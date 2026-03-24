@@ -1,0 +1,1299 @@
+{
+  "auditType": "ssr-hydration",
+  "date": "2026-03-24",
+  "agent": "principal-engineer",
+  "model": "opus",
+  "frameworks": ["nextjs-15-app-router", "astro-5", "nuxt-4"],
+  "primaryFocus": "nextjs-15-app-router",
+  "methodology": "static-analysis-with-line-level-verification",
+  "notes": "Components analyzed via comprehensive grep scan and manual source file verification for window/document/navigator/globalThis usage patterns. All Lit web components render as inert HTML tags in RSC — the import boundary is the critical constraint. Browser APIs in lifecycle hooks (connectedCallback, firstUpdated, updated) and event handlers are safe because these only execute client-side after hydration.",
+  "summary": {
+    "componentsAudited": 77,
+    "ssrSafe": 43,
+    "clientOnly": 1,
+    "needsWrapper": 33,
+    "violations": 3
+  },
+  "findings": [
+    {
+      "component": "hx-accordion",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-accordion/hx-accordion.ts",
+          "line": 110,
+          "description": "Uses document.activeElement in keyboard handler for focus management",
+          "remediation": "Safe — only called from event handlers which execute client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as inert HTML in RSC. Wrap in 'use client' component for keyboard interaction.",
+        "astro": "Works with Astro Islands. Use client:load for interactive accordion.",
+        "nuxt": "Works with Nuxt hybrid rendering. No <ClientOnly> needed unless keyboard interactivity required immediately."
+      }
+    },
+    {
+      "component": "hx-action-bar",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-action-bar/hx-action-bar.ts",
+          "line": 254,
+          "description": "Uses document.activeElement in keyboard handler",
+          "remediation": "Safe — event handler only, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as inert HTML in RSC. Wrap in 'use client' for keyboard navigation.",
+        "astro": "Use client:load directive for interactivity.",
+        "nuxt": "Works in hybrid rendering mode."
+      }
+    },
+    {
+      "component": "hx-alert",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-alert/hx-alert.ts",
+          "line": 340,
+          "description": "Uses document.querySelector for returnFocusTo in close handler",
+          "remediation": "Safe — only called from event/close handlers, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as static HTML in RSC. Wrap in 'use client' for dismiss behavior.",
+        "astro": "Use client:load for interactive alerts.",
+        "nuxt": "Works in hybrid rendering."
+      }
+    },
+    {
+      "component": "hx-avatar",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Renders as static HTML in RSC.",
+        "astro": "Works in static and server-rendered pages without client directives.",
+        "nuxt": "Works in all rendering modes."
+      }
+    },
+    {
+      "component": "hx-badge",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Renders as static HTML in RSC.",
+        "astro": "Works in static and server-rendered pages.",
+        "nuxt": "Works in all rendering modes."
+      }
+    },
+    {
+      "component": "hx-banner",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Renders as static HTML in RSC.",
+        "astro": "Works in static and server-rendered pages.",
+        "nuxt": "Works in all rendering modes."
+      }
+    },
+    {
+      "component": "hx-breadcrumb",
+      "category": "needs-wrapper",
+      "severity": "high",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-breadcrumb/hx-breadcrumb.ts",
+          "line": 321,
+          "description": "Has SSR guard (typeof document === 'undefined'), but injects JSON-LD <script> into document.head in updated() lifecycle",
+          "remediation": "SSR-guarded — silently skips on server. JSON-LD injection is client-only. For SSR SEO, emit structured data from server framework instead."
+        },
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-breadcrumb/hx-breadcrumb.ts",
+          "line": 233,
+          "description": "Uses document.createElement to build ellipsis overflow elements",
+          "remediation": "Safe — called from _renderOverflow which runs in updated() lifecycle, client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "HTML tag renders safely in RSC. JSON-LD injection requires client hydration. For SEO structured data in SSR, use Next.js metadata API instead.",
+        "astro": "Use client:load. For SEO structured data, inject JSON-LD from Astro frontmatter script.",
+        "nuxt": "JSON-LD injection works after client hydration. Use Nuxt useHead() for SSR-time structured data."
+      }
+    },
+    {
+      "component": "hx-button",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated via ElementInternals (constructor-only). Renders as static HTML.",
+        "astro": "Works in static and server-rendered pages.",
+        "nuxt": "Works in all rendering modes."
+      }
+    },
+    {
+      "component": "hx-button-group",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Layout wrapper only.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-card",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Display container.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-carousel",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-carousel/hx-carousel.ts",
+          "line": 292,
+          "description": "Uses window.matchMedia for prefers-reduced-motion check. Has SSR guard: typeof window !== 'undefined'",
+          "remediation": "Already SSR-guarded. Safe in connectedCallback."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "HTML renders safely in RSC. Autoplay and slide navigation require client hydration.",
+        "astro": "Use client:load or client:visible for interactive carousel.",
+        "nuxt": "Works in hybrid rendering. Autoplay starts after hydration."
+      }
+    },
+    {
+      "component": "hx-checkbox",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated via ElementInternals.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-checkbox-group",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated layout wrapper.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-code-snippet",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "navigator access",
+          "file": "src/components/hx-code-snippet/hx-code-snippet.ts",
+          "line": 162,
+          "description": "Uses navigator.clipboard.writeText in copy handler method",
+          "remediation": "Safe — only called from click event handler, runs client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Code display renders in RSC. Copy button requires client hydration for clipboard access.",
+        "astro": "Use client:load for copy functionality.",
+        "nuxt": "Works in hybrid rendering. Clipboard API available after hydration."
+      }
+    },
+    {
+      "component": "hx-color-picker",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-color-picker/hx-color-picker.ts",
+          "line": 505,
+          "description": "Uses document.addEventListener/removeEventListener for pointer capture and outside-click in open/close handlers",
+          "remediation": "Safe — only called from interaction handlers, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as inert element in RSC. Full picker UI requires client hydration.",
+        "astro": "Use client:load for interactive color picker.",
+        "nuxt": "Use <ClientOnly> wrapper for full interactivity."
+      }
+    },
+    {
+      "component": "hx-combobox",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-combobox/hx-combobox.ts",
+          "line": 268,
+          "description": "Uses document.addEventListener('click') in connectedCallback for outside-click detection. No SSR guard.",
+          "remediation": "connectedCallback only runs client-side in standard Lit execution. Safe for Next.js RSC pattern but would need guard for @lit-labs/ssr."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as inert input in RSC. Dropdown requires 'use client' wrapper.",
+        "astro": "Use client:load for interactive combobox.",
+        "nuxt": "Works in hybrid rendering after hydration."
+      }
+    },
+    {
+      "component": "hx-container",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Layout wrapper.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-copy-button",
+      "category": "client-only",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "navigator access",
+          "file": "src/components/hx-copy-button/hx-copy-button.ts",
+          "line": 164,
+          "description": "Uses navigator.clipboard.writeText — only available in secure browser contexts (HTTPS or localhost). Component's primary function is clipboard copying.",
+          "remediation": "Wrap with next/dynamic({ ssr: false }), <ClientOnly>, or client:load. Component degrades to non-functional without clipboard API."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Use next/dynamic with ssr: false, or wrap in 'use client' component.",
+        "astro": "Use client:load directive. Component is non-functional without browser context.",
+        "nuxt": "Wrap with <ClientOnly> component."
+      }
+    },
+    {
+      "component": "hx-counter",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-counter/hx-counter.ts",
+          "line": 109,
+          "description": "Uses window.matchMedia and requestAnimationFrame. Has explicit SSR guard: typeof window === 'undefined'",
+          "remediation": "Already SSR-guarded. Falls back to static number display without animation."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders static number in RSC. Animation requires client hydration.",
+        "astro": "Use client:visible for animated counters (lazy hydration ideal).",
+        "nuxt": "Works in hybrid rendering. Animation starts after hydration."
+      }
+    },
+    {
+      "component": "hx-data-table",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Static table structure.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-date-picker",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-date-picker/hx-date-picker.ts",
+          "line": 334,
+          "description": "Uses document.addEventListener in open/close handlers for outside-click and keyboard detection",
+          "remediation": "Safe — only called from interaction methods, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as input in RSC. Calendar popup requires 'use client' wrapper.",
+        "astro": "Use client:load for date picker interaction.",
+        "nuxt": "Works in hybrid rendering after hydration."
+      }
+    },
+    {
+      "component": "hx-dialog",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-dialog/hx-dialog.ts",
+          "line": 257,
+          "description": "Uses document.activeElement in show/close handlers for focus trap and return",
+          "remediation": "Safe — only called from show()/close() methods, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders hidden dialog in RSC. Show/hide requires 'use client' wrapper.",
+        "astro": "Use client:load for dialog interactivity.",
+        "nuxt": "Works after hydration. Use <ClientOnly> if dialog must render immediately."
+      }
+    },
+    {
+      "component": "hx-divider",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Decorative element.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-drawer",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-drawer/hx-drawer.ts",
+          "line": 366,
+          "description": "Uses window.matchMedia('prefers-reduced-motion') in _getAnimationDuration without SSR guard",
+          "remediation": "Method is only called from _openDrawer/_closeDrawer which are user-triggered. Safe in practice but should add SSR guard for @lit-labs/ssr."
+        },
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-drawer/hx-drawer.ts",
+          "line": 376,
+          "description": "Accesses document.body.children to set aria-hidden on siblings",
+          "remediation": "Only called from _hideBackgroundFromScreenReaders in open flow. Client-side only."
+        },
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-drawer/hx-drawer.ts",
+          "line": 397,
+          "description": "Uses document.addEventListener('keydown') for escape key handler",
+          "remediation": "Only called from _openDrawer. Client-side only."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders hidden panel in RSC. Open/close requires 'use client' wrapper.",
+        "astro": "Use client:load for drawer interactivity.",
+        "nuxt": "Works after hydration. Use <ClientOnly> for immediate drawer availability."
+      }
+    },
+    {
+      "component": "hx-dropdown",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-dropdown/hx-dropdown.ts",
+          "line": 146,
+          "description": "Uses document.addEventListener in open handler for outside-click detection",
+          "remediation": "Safe — only called from interaction methods"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders trigger in RSC. Menu popup requires 'use client' wrapper.",
+        "astro": "Use client:load for dropdown.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-field",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-field/hx-field.ts",
+          "line": 241,
+          "description": "Uses document.createElement('span') to create accessible description element",
+          "remediation": "Safe — called from firstUpdated/slot handling, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as wrapper in RSC. Accessible description span created client-side.",
+        "astro": "Works in all modes. Description span created after hydration.",
+        "nuxt": "Works in hybrid rendering."
+      }
+    },
+    {
+      "component": "hx-field-label",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Label element.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-file-upload",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated via ElementInternals.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-form",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Wraps native form behavior.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-format-date",
+      "category": "needs-wrapper",
+      "severity": "critical",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-format-date/hx-format-date.ts",
+          "line": 167,
+          "description": "Calls document.documentElement.lang and navigator.language inside _getLocale() which is called from render(). Would crash with @lit-labs/ssr streaming render.",
+          "remediation": "Always pass explicit lang prop: <hx-format-date lang=\"en-US\"> to bypass browser API lookup. When lang prop is provided, _getLocale() returns it directly without touching document/navigator."
+        }
+      ],
+      "hydrationStrategy": "eager-client-hydration",
+      "frameworkNotes": {
+        "next-app-router": "CRITICAL: Always provide lang prop. Without it, _getLocale() accesses document.documentElement.lang in render path. With explicit lang prop, renders safely in RSC as inert tag.",
+        "astro": "Provide lang prop explicitly. Works with client:load but crashes in @lit-labs/ssr streaming without lang.",
+        "nuxt": "Provide lang prop. Works after client hydration without issues."
+      }
+    },
+    {
+      "component": "hx-grid",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Layout component.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-help-text",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-icon",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. SVG loaded client-side via fetch after hydration.",
+        "astro": "Works in all modes. Icon loads after JS executes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-icon-button",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated via ElementInternals.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-image",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-link",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Anchor element.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-list",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-menu",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-menu/hx-menu.ts",
+          "line": 114,
+          "description": "Uses document.activeElement in keyboard navigation handler for type-ahead focus tracking",
+          "remediation": "Safe — event handler only, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as list in RSC. Keyboard navigation requires 'use client'.",
+        "astro": "Use client:load for menu interaction.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-meter",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-nav",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-nav/hx-nav.ts",
+          "line": 141,
+          "description": "Uses new URL(href, window.location.href) in _sanitizeHref() for active link detection. No SSR guard.",
+          "remediation": "Method is called from render path but only for href sanitization. In RSC (inert tag) render() never executes server-side. Would crash with @lit-labs/ssr."
+        },
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-nav/hx-nav.ts",
+          "line": 300,
+          "description": "Uses document.addEventListener in connectedCallback for outside-click detection",
+          "remediation": "Safe — connectedCallback runs client-side only in standard Lit"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders nav structure in RSC. Active link detection requires client hydration.",
+        "astro": "Use client:load for interactive navigation with active state.",
+        "nuxt": "Works in hybrid rendering. Active link detection after hydration."
+      }
+    },
+    {
+      "component": "hx-number-input",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated. setTimeout/setInterval only in pointer event handlers.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-overflow-menu",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-overflow-menu/hx-overflow-menu.ts",
+          "line": 125,
+          "description": "Uses document.addEventListener in open handler for outside-click detection",
+          "remediation": "Safe — only called from interaction methods"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders trigger button in RSC. Menu popup requires 'use client'.",
+        "astro": "Use client:load.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-pagination",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-popover",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-popover/hx-popover.ts",
+          "line": 262,
+          "description": "Uses document.addEventListener for keydown and click in _show() method for focus trap and outside-click",
+          "remediation": "Safe — only called from show interaction methods, runs client-side"
+        },
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-popover/hx-popover.ts",
+          "line": 255,
+          "description": "Uses document.activeElement for focus return tracking",
+          "remediation": "Safe — called from _show(), runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders hidden popover in RSC. Open/close requires 'use client' wrapper.",
+        "astro": "Use client:load for popover interaction.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-popup",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-popup/hx-popup.ts",
+          "line": 0,
+          "description": "Uses Floating UI positioning logic which requires DOM measurements (getBoundingClientRect, viewport dimensions)",
+          "remediation": "Positioning only runs client-side. Safe for RSC inert tag pattern."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders hidden popup in RSC. Positioning requires 'use client'.",
+        "astro": "Use client:load for positioned popups.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-progress-bar",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-progress-ring",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-prose",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Text container.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-radio-group",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-rating",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-select",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-select/hx-select.ts",
+          "line": 215,
+          "description": "Uses document.addEventListener('click') in connectedCallback for outside-click detection. No SSR guard.",
+          "remediation": "connectedCallback only runs client-side in standard Lit. Safe for RSC pattern. Would need guard for @lit-labs/ssr."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as select wrapper in RSC. Dropdown requires 'use client'.",
+        "astro": "Use client:load for interactive select.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-side-nav",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-side-nav/hx-side-nav.ts",
+          "line": 125,
+          "description": "Uses document.activeElement in keyboard navigation handler",
+          "remediation": "Safe — event handler only, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders nav structure in RSC. Keyboard navigation requires 'use client'.",
+        "astro": "Use client:load for interactive side nav.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-skeleton",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "timer APIs",
+          "file": "src/components/hx-skeleton/hx-skeleton.ts",
+          "line": 0,
+          "description": "Uses animation timing APIs (setTimeout, requestAnimationFrame) for loading animation",
+          "remediation": "Safe — animation is browser-only enhancement. Component renders static placeholder in RSC."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as static placeholder in RSC. Animation starts after hydration.",
+        "astro": "Works in all modes. Animation client-side only.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-slider",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-slider/hx-slider.ts",
+          "line": 249,
+          "description": "Uses requestAnimationFrame in firstUpdated for ready state",
+          "remediation": "Safe — firstUpdated runs client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as input in RSC. Drag interaction requires 'use client'.",
+        "astro": "Use client:load for interactive slider.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-spinner",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. CSS animation only.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-split-button",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-split-button/hx-split-button.ts",
+          "line": 131,
+          "description": "Uses document.addEventListener in open handler for outside-click and keyboard navigation",
+          "remediation": "Safe — only called from interaction methods"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders button group in RSC. Menu requires 'use client'.",
+        "astro": "Use client:load.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-split-panel",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-split-panel/hx-split-panel.ts",
+          "line": 347,
+          "description": "Uses requestAnimationFrame in connectedCallback for resize layout",
+          "remediation": "Safe — connectedCallback runs client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as layout container in RSC. Resize drag requires 'use client'.",
+        "astro": "Use client:load for interactive resizing.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-stack",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Layout component.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-stat",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-status-indicator",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-steps",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-structured-list",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-switch",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-table",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-tabs",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-tabs/hx-tabs.ts",
+          "line": 146,
+          "description": "Uses MutationObserver in connectedCallback and document.activeElement in keyboard handler",
+          "remediation": "Safe — connectedCallback and event handlers run client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders tab structure in RSC. Tab switching requires 'use client'.",
+        "astro": "Use client:load for interactive tabs.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-tag",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-text",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Typography element.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-text-input",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-textarea",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated. setTimeout only in event handlers.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-theme",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-theme/hx-theme.ts",
+          "line": 213,
+          "description": "Uses window.matchMedia in effectiveTheme getter. Has explicit SSR guard: typeof window === 'undefined' returns 'light'.",
+          "remediation": "Already SSR-guarded. Returns 'light' theme during SSR. Safe."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "SSR-guarded: defaults to 'light' theme on server. Detects OS preference after hydration.",
+        "astro": "Safe in all modes. Defaults to light theme until JS loads.",
+        "nuxt": "Works in hybrid rendering. OS preference detection after hydration."
+      }
+    },
+    {
+      "component": "hx-time-picker",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-time-picker/hx-time-picker.ts",
+          "line": 389,
+          "description": "Uses document.addEventListener in open handler for outside-click detection",
+          "remediation": "Safe — only called from interaction methods"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as input in RSC. Time picker popup requires 'use client'.",
+        "astro": "Use client:load for time picker interaction.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-toast",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "window access",
+          "file": "src/components/hx-toast/hx-toast.ts",
+          "line": 91,
+          "description": "Uses window.matchMedia for prefers-reduced-motion. Has SSR guard: typeof window === 'undefined'.",
+          "remediation": "Already SSR-guarded. Safe."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Toast system is inherently client-side (programmatic show/hide). Do not render in RSC.",
+        "astro": "Use client:load. Toast is a client-side notification pattern.",
+        "nuxt": "Use <ClientOnly> wrapper."
+      }
+    },
+    {
+      "component": "hx-toggle-button",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Form-associated.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    },
+    {
+      "component": "hx-tooltip",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-tooltip/hx-tooltip.ts",
+          "line": 147,
+          "description": "Uses document.createElement to create light DOM description span. Has SSR guard: typeof document !== 'undefined'.",
+          "remediation": "Already SSR-guarded. Description span created client-side only."
+        },
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-tooltip/hx-tooltip.ts",
+          "line": 267,
+          "description": "Uses document.activeElement in dismiss handler. Has SSR guard: typeof document !== 'undefined'.",
+          "remediation": "Already SSR-guarded. Safe."
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders as wrapper in RSC. Tooltip display requires client hydration.",
+        "astro": "Use client:load for tooltip behavior.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-top-nav",
+      "category": "needs-wrapper",
+      "severity": "medium",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-top-nav/hx-top-nav.ts",
+          "line": 0,
+          "description": "Uses document.addEventListener and window for scroll/resize detection in sticky positioning",
+          "remediation": "Safe — lifecycle-gated, runs client-side only"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders nav structure in RSC. Sticky behavior requires client hydration.",
+        "astro": "Use client:load for sticky navigation.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-tree-view",
+      "category": "needs-wrapper",
+      "severity": "low",
+      "violations": [
+        {
+          "pattern": "document access",
+          "file": "src/components/hx-tree-view/hx-tree-view.ts",
+          "line": 172,
+          "description": "Uses document.activeElement in keyboard navigation handler",
+          "remediation": "Safe — event handler only, runs client-side"
+        }
+      ],
+      "hydrationStrategy": "client-only-boundary",
+      "frameworkNotes": {
+        "next-app-router": "Renders tree structure in RSC. Keyboard navigation requires 'use client'.",
+        "astro": "Use client:load for interactive tree.",
+        "nuxt": "Works after hydration."
+      }
+    },
+    {
+      "component": "hx-visually-hidden",
+      "category": "ssr-safe",
+      "severity": "low",
+      "violations": [],
+      "hydrationStrategy": "none",
+      "frameworkNotes": {
+        "next-app-router": "Fully SSR-safe. Accessibility wrapper.",
+        "astro": "Works in all modes.",
+        "nuxt": "Works in all modes."
+      }
+    }
+  ],
+  "litLabsSsr": {
+    "status": "not_tested",
+    "notes": "@lit-labs/ssr streaming SSR was NOT tested in this audit. Components marked 'ssr-safe' are categorized based on absence of browser APIs in render()/constructor() only.",
+    "blockers": [
+      "hx-format-date: document.documentElement.lang in render() — MUST use explicit lang prop",
+      "hx-breadcrumb: document.head.appendChild in updated() — has SSR guard but incompatible with streaming",
+      "hx-nav: window.location.href in _sanitizeHref() called from render path — needs guard",
+      "hx-drawer: window.matchMedia in _getAnimationDuration() — needs SSR guard"
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "title": "Always provide lang prop to hx-format-date",
+      "description": "hx-format-date calls document.documentElement.lang in render path. Without explicit lang prop, this would crash with @lit-labs/ssr.",
+      "action": "Document: always use <hx-format-date lang=\"en-US\">"
+    },
+    {
+      "priority": "high",
+      "title": "Document hx-breadcrumb JSON-LD as client-only",
+      "description": "JSON-LD injection into document.head is SSR-guarded but incompatible with streaming SSR. Use framework metadata APIs for SSR SEO.",
+      "action": "Add warning to breadcrumb docs"
+    },
+    {
+      "priority": "medium",
+      "title": "Add SSR guard to hx-drawer._getAnimationDuration",
+      "description": "window.matchMedia called without typeof window guard. Safe in practice (only from user-triggered methods) but should be guarded for consistency.",
+      "action": "Add typeof window === 'undefined' guard returning 0"
+    },
+    {
+      "priority": "medium",
+      "title": "Add SSR guard to hx-nav._sanitizeHref",
+      "description": "window.location.href used in render path. Safe when rendered as inert RSC tag but would crash with @lit-labs/ssr.",
+      "action": "Add typeof window === 'undefined' guard returning href unchanged"
+    },
+    {
+      "priority": "low",
+      "title": "Evaluate @lit-labs/ssr streaming compatibility",
+      "description": "Full @lit-labs/ssr compatibility testing is a separate effort. Known blockers: hx-format-date, hx-breadcrumb, hx-nav, hx-drawer.",
+      "action": "File separate audit feature"
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+---
+title: 'hx-banner'
+description: Full-width page-level banner for persistent notifications with variant-based styling and ARIA live regions.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-banner" section="summary" />
+
+## Overview
+
+`hx-banner` is a full-width notification bar designed to sit at the top of a page or section. It communicates persistent, page-level messages — system maintenance alerts, compliance notices, session warnings — across four semantic variants: `info`, `success`, `warning`, and `error`.
+
+**Use `hx-banner` when:** you need a persistent, full-width message that remains visible as the user scrolls (sticky) or is pinned to the viewport (fixed).
+
+**Use `hx-alert` instead when:** the notification is inline, contextual, and scoped to a specific content area rather than the whole page.
+
+## Live Demo
+
+### Variants
+
+Info, success, warning, and error styles.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+    <hx-banner variant="info" heading="System Notice">
+      Scheduled maintenance on Saturday from 2–4 AM EST.
+    </hx-banner>
+    <hx-banner variant="success" heading="Update Applied">
+      Patient record saved successfully.
+    </hx-banner>
+    <hx-banner variant="warning" heading="Session Expiring">
+      Your session will expire in 5 minutes.
+    </hx-banner>
+    <hx-banner variant="error" heading="Action Required">
+      Critical lab results require immediate review.
+    </hx-banner>
+  </div>
+</ComponentDemo>
+
+### Dismissible
+
+Add `dismissible` to show a close button.
+
+<ComponentDemo title="Dismissible">
+  <hx-banner variant="info" heading="Update Available" dismissible>
+    A new version of the application is available. Refresh to update.
+  </hx-banner>
+</ComponentDemo>
+
+### With Action Link
+
+Combine `action-label` and `action-href` to add a call-to-action link.
+
+<ComponentDemo title="With Action">
+  <hx-banner
+    variant="warning"
+    heading="Consent Form Required"
+    action-label="Complete Now"
+    action-href="#"
+    dismissible
+  >
+    Patient consent form must be completed before proceeding.
+  </hx-banner>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-banner';
+```
+
+## Basic Usage
+
+```html
+<hx-banner variant="info" heading="Notice">
+  Scheduled maintenance on Saturday from 2–4 AM EST.
+</hx-banner>
+```
+
+## Properties
+
+| Property      | Attribute      | Type                                          | Default            | Description                                                                                |
+| ------------- | -------------- | --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| `variant`     | `variant`      | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'`           | Visual variant that determines colors and ARIA semantics.                                  |
+| `position`    | `position`     | `'sticky' \| 'fixed'`                         | `'sticky'`         | CSS positioning behavior. `sticky` keeps the banner in flow; `fixed` pins to the viewport. |
+| `heading`     | `heading`      | `string`                                      | `''`               | Heading text, used in accessible labels for the action link and close button.              |
+| `dismissible` | `dismissible`  | `boolean`                                     | `false`            | Whether the banner can be dismissed by the user.                                           |
+| `open`        | `open`         | `boolean`                                     | `true`             | Whether the banner is visible. Defaults to `true`.                                         |
+| `actionLabel` | `action-label` | `string`                                      | `''`               | Label text for the optional action link. Requires `action-href` to render.                 |
+| `actionHref`  | `action-href`  | `string`                                      | `''`               | URL for the optional action link. Requires `action-label` to render.                       |
+| `closeLabel`  | `close-label`  | `string`                                      | `'Dismiss banner'` | Accessible label for the dismiss button. Override for localized text.                      |
+
+## Events
+
+| Event        | Detail Type          | Description                                    |
+| ------------ | -------------------- | ---------------------------------------------- |
+| `hx-dismiss` | `{ reason: string }` | Dispatched when the user dismisses the banner. |
+
+## CSS Custom Properties
+
+| Property                   | Default                               | Description                           |
+| -------------------------- | ------------------------------------- | ------------------------------------- |
+| `--hx-banner-bg`           | `var(--hx-color-info-50)`             | Banner background color.              |
+| `--hx-banner-color`        | `var(--hx-color-info-800)`            | Banner text color.                    |
+| `--hx-banner-border-color` | `var(--hx-color-info-200)`            | Banner bottom border color.           |
+| `--hx-banner-border-width` | `var(--hx-border-width-thin)`         | Banner bottom border width.           |
+| `--hx-banner-padding`      | `var(--hx-space-3) var(--hx-space-4)` | Banner padding.                       |
+| `--hx-banner-gap`          | `var(--hx-space-3)`                   | Gap between banner elements.          |
+| `--hx-banner-icon-color`   | `var(--hx-color-info-500)`            | Banner icon color.                    |
+| `--hx-banner-font-family`  | `var(--hx-font-family-sans)`          | Banner font family.                   |
+| `--hx-banner-action-color` | `var(--hx-banner-color)`              | Action link color.                    |
+| `--hx-banner-position`     | `sticky`                              | CSS position value (sticky or fixed). |
+| `--hx-banner-z-index`      | `100`                                 | Banner z-index for stacking context.  |
+
+## CSS Parts
+
+| Part           | Description                                                                            |
+| -------------- | -------------------------------------------------------------------------------------- |
+| `banner`       | The outer banner container.                                                            |
+| `icon`         | The icon container.                                                                    |
+| `message`      | The message content area.                                                              |
+| `action`       | The action link element (only rendered when `action-label` and `action-href` are set). |
+| `close-button` | The dismiss button (only rendered when `dismissible`).                                 |
+
+## Slots
+
+| Slot        | Description                                            |
+| ----------- | ------------------------------------------------------ |
+| _(default)_ | Banner message content.                                |
+| `action`    | Override the built-in action link with custom content. |
+
+## Accessibility
+
+| Topic         | Details                                                                                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | `role="region"` with `aria-label` derived from the `heading` property. The `error` and `warning` variants use `aria-live="assertive"`; `info` and `success` use `aria-live="polite"`. |
+| Keyboard      | `Tab` navigates to the action link and dismiss button. `Enter` or `Space` activates them.                                                                                             |
+| Screen reader | Content changes are announced via the ARIA live region. The dismiss button label is set from `close-label`.                                                                           |
+| Focus         | Focus is not moved on banner appearance; users are notified via the live region.                                                                                                      |
+| WCAG          | Meets WCAG 2.1 AA. Error and warning banners use `assertive` announcements for urgent healthcare alerts.                                                                              |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/page-banner.html.twig #}
+<hx-banner
+  variant="{{ variant|default('info') }}"
+  heading="{{ heading }}"
+  {% if dismissible %}dismissible{% endif %}
+  {% if action_label and action_href %}
+    action-label="{{ action_label }}"
+    action-href="{{ action_href }}"
+  {% endif %}
+>
+  {{ message }}
+</hx-banner>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for dismiss events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixBanner = {
+  attach(context) {
+    once('helixBanner', 'hx-banner', context).forEach((el) => {
+      el.addEventListener('hx-dismiss', (e) => {
+        console.log('Banner dismissed, reason:', e.detail.reason);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-banner example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; margin: 0;">
+    <hx-banner
+      variant="warning"
+      heading="Session Expiring"
+      action-label="Extend Session"
+      action-href="#"
+      dismissible
+      id="session-banner"
+    >
+      Your session will expire in 5 minutes. Save your work.
+    </hx-banner>
+
+    <main style="padding: 2rem;">
+      <p>Page content here.</p>
+    </main>
+
+    <script>
+      document.getElementById('session-banner').addEventListener('hx-dismiss', (e) => {
+        console.log('Banner dismissed:', e.detail.reason);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-banner" section="api" />

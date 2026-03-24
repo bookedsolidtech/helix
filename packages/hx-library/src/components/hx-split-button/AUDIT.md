@@ -313,3 +313,13 @@ Note: The `label` property does not use `reflect: true`, so the `label` attribut
 - Twig-renderable: **Pass** — standard HTML attribute API works
 - label attribute: **Pass** (with caveat — P2-08)
 - Behavior file: **Missing** (P2-08)
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.
