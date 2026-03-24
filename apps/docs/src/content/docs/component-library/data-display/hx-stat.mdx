@@ -1,0 +1,188 @@
+---
+title: 'hx-stat'
+description: Displays a labeled metric value with optional trend indicator and icon slot.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-stat" section="summary" />
+
+## Overview
+
+`hx-stat` is a compact metric display component. It renders a prominent `value` with a descriptive `label` below it, an optional trend indicator (`up`, `down`, `neutral`), and an optional icon slot alongside the value.
+
+**Use `hx-stat` when:** you need a labeled, contextualized metric — beds occupied, patient wait time, appointment count — especially in dashboards where trend direction matters.
+
+**Use `hx-counter` instead when:** you only need an animated number without a label or trend indicator.
+
+## Live Demo
+
+### Basic Stat
+
+<ComponentDemo title="Basic Stat">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    <hx-stat value="2,847" label="Total Patients"></hx-stat>
+    <hx-stat value="94%" label="Bed Occupancy"></hx-stat>
+    <hx-stat value="18 min" label="Avg Wait Time"></hx-stat>
+  </div>
+</ComponentDemo>
+
+### Trend Indicators
+
+Up, down, and neutral trend states.
+
+<ComponentDemo title="Trend Indicators">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    <hx-stat value="142" label="New Admissions" trend="up"></hx-stat>
+    <hx-stat value="23" label="Discharges" trend="down"></hx-stat>
+    <hx-stat value="98.6°F" label="Avg Temperature" trend="neutral"></hx-stat>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large variants.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-end;">
+    <hx-stat value="500" label="Records" hx-size="sm"></hx-stat>
+    <hx-stat value="500" label="Records" hx-size="md"></hx-stat>
+    <hx-stat value="500" label="Records" hx-size="lg"></hx-stat>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-stat';
+```
+
+## Basic Usage
+
+```html
+<hx-stat value="2,847" label="Total Patients" trend="up"></hx-stat>
+```
+
+## Properties
+
+| Property | Attribute | Type                          | Default     | Description                                               |
+| -------- | --------- | ----------------------------- | ----------- | --------------------------------------------------------- |
+| `value`  | `value`   | `string`                      | `''`        | The metric value displayed prominently.                   |
+| `label`  | `label`   | `string`                      | `''`        | The metric label displayed below the value.               |
+| `trend`  | `trend`   | `'up' \| 'down' \| 'neutral'` | `'neutral'` | Trend direction indicator. `neutral` hides the indicator. |
+| `size`   | `hx-size` | `'sm' \| 'md' \| 'lg'`        | `'md'`      | Size variant controlling font size.                       |
+
+## Events
+
+`hx-stat` does not dispatch any custom events.
+
+## CSS Custom Properties
+
+| Property                       | Default                       | Description                                   |
+| ------------------------------ | ----------------------------- | --------------------------------------------- |
+| `--hx-stat-gap`                | `var(--hx-space-1)`           | Gap between value and label.                  |
+| `--hx-stat-header-gap`         | `var(--hx-space-2)`           | Gap between icon and value in the header row. |
+| `--hx-stat-color`              | `var(--hx-color-neutral-800)` | Default text color.                           |
+| `--hx-stat-value-color`        | `var(--hx-color-neutral-900)` | Value text color.                             |
+| `--hx-stat-label-color`        | `var(--hx-color-neutral-500)` | Label text color.                             |
+| `--hx-stat-icon-color`         | `var(--hx-color-primary-500)` | Icon color.                                   |
+| `--hx-stat-value-font-weight`  | `var(--hx-font-weight-bold)`  | Value font weight.                            |
+| `--hx-stat-font-family`        | `var(--hx-font-family-sans)`  | Font family.                                  |
+| `--hx-stat-value-font-size-sm` | `var(--hx-font-size-xl)`      | Value font size at `sm`.                      |
+| `--hx-stat-value-font-size-md` | `var(--hx-font-size-3xl)`     | Value font size at `md`.                      |
+| `--hx-stat-value-font-size-lg` | `var(--hx-font-size-5xl)`     | Value font size at `lg`.                      |
+| `--hx-stat-label-font-size-sm` | `var(--hx-font-size-xs)`      | Label font size at `sm`.                      |
+| `--hx-stat-label-font-size-md` | `var(--hx-font-size-sm)`      | Label font size at `md`.                      |
+| `--hx-stat-label-font-size-lg` | `var(--hx-font-size-md)`      | Label font size at `lg`.                      |
+| `--hx-stat-trend-up-color`     | `var(--hx-color-success-700)` | Trend up text color.                          |
+| `--hx-stat-trend-up-bg`        | `var(--hx-color-success-50)`  | Trend up background color.                    |
+| `--hx-stat-trend-down-color`   | `var(--hx-color-error-700)`   | Trend down text color.                        |
+| `--hx-stat-trend-down-bg`      | `var(--hx-color-error-50)`    | Trend down background color.                  |
+
+## CSS Parts
+
+| Part        | Description                                                              |
+| ----------- | ------------------------------------------------------------------------ |
+| `container` | The outer stat container element.                                        |
+| `header`    | The row containing the value and optional icon.                          |
+| `value`     | The stat value element.                                                  |
+| `label`     | The stat label element.                                                  |
+| `trend`     | The trend indicator element (only rendered when trend is not `neutral`). |
+| `icon`      | The icon slot container.                                                 |
+
+## Slots
+
+| Slot   | Description                                  |
+| ------ | -------------------------------------------- |
+| `icon` | Optional icon displayed alongside the value. |
+
+## Accessibility
+
+| Topic         | Details                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | The stat container uses `role="group"` with an `aria-label` combining the value and label for grouped metric announcement.  |
+| Trend         | The trend indicator includes visually hidden text (`↑ Trending up` / `↓ Trending down`) so screen readers convey direction. |
+| Screen reader | Value and label are read as a pair. Trend direction is announced after the value.                                           |
+| Color         | Trend colors (`success` for up, `error` for down) are supplemented with directional icons — color is never the only signal. |
+| WCAG          | Meets WCAG 2.1 AA. Trend direction is conveyed via both color and icon/text, meeting SC 1.4.1 (Use of Color).               |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/stat-widget.html.twig #}
+<hx-stat
+  value="{{ value }}"
+  label="{{ label }}"
+  trend="{{ trend|default('neutral') }}"
+  hx-size="{{ size|default('md') }}"
+>
+  {% if icon %}
+    <hx-icon slot="icon" name="{{ icon }}"></hx-icon>
+  {% endif %}
+</hx-stat>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-stat example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem;"
+    >
+      <hx-stat value="2,847" label="Total Patients" trend="up" hx-size="md"></hx-stat>
+      <hx-stat value="94%" label="Bed Occupancy" trend="down" hx-size="md"></hx-stat>
+      <hx-stat value="18 min" label="Avg Wait Time" trend="neutral" hx-size="md"></hx-stat>
+      <hx-stat value="$4.2M" label="Monthly Revenue" trend="up" hx-size="md"></hx-stat>
+    </div>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-stat" section="api" />
