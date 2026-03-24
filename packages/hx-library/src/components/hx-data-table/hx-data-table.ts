@@ -122,33 +122,18 @@ export class HelixDataTable extends LitElement {
   label = '';
 
   /**
+   * Accessible label for the "select all rows" checkbox in the table header.
+   * @attr select-all-label
+   */
+  @property({ attribute: 'select-all-label' })
+  selectAllLabel = 'Select all rows';
+
+  /**
    * When true, the header row is sticky (position: sticky; top: 0).
    * @attr sticky-header
    */
   @property({ type: Boolean, reflect: true, attribute: 'sticky-header' })
   stickyHeader = false;
-
-  /** Accessible label for the "select all rows" checkbox. */
-  @property({ type: String, attribute: 'label-select-all' })
-  labelSelectAll = 'Select all rows';
-
-  /**
-   * Generates the accessible label for column sort buttons.
-   * @param col - column label
-   * @param dir - current sort direction
-   */
-  @property({ attribute: false })
-  labelSortBy: (col: string, dir: 'asc' | 'desc' | null) => string = (col, dir) =>
-    dir
-      ? `Sort by ${col}, currently sorted ${dir === 'asc' ? 'ascending' : 'descending'}`
-      : `Sort by ${col}`;
-
-  /**
-   * Generates the accessible label for row selection checkboxes.
-   * @param index - 1-based row index
-   */
-  @property({ attribute: false })
-  labelSelectRow: (index: number) => string = (index) => `Select row ${index}`;
 
   /**
    * Current page (1-based). Set to 0 or leave at default (0) to disable pagination.
@@ -389,7 +374,7 @@ export class HelixDataTable extends LitElement {
                 <input
                   type="checkbox"
                   part="checkbox"
-                  aria-label=${this.labelSelectAll}
+                  aria-label=${this.selectAllLabel}
                   .indeterminate=${this._selectedRows.size > 0 &&
                   this._selectedRows.size < this.rows.length}
                   .checked=${this._selectedRows.size === this.rows.length && this.rows.length > 0}
@@ -418,10 +403,9 @@ export class HelixDataTable extends LitElement {
                     <button
                       class="sort-btn"
                       @click=${() => this._handleSort(col.key)}
-                      aria-label=${this.labelSortBy(
-                        col.label,
-                        this.sortKey === col.key ? this.sortDirection : null,
-                      )}
+                      aria-label=${this.sortKey === col.key
+                        ? `Sort by ${col.label}, currently sorted ${this.sortDirection === 'asc' ? 'ascending' : 'descending'}`
+                        : `Sort by ${col.label}`}
                     >
                       ${col.label} ${this._renderSortIcon(col.key)}
                     </button>
@@ -502,7 +486,7 @@ export class HelixDataTable extends LitElement {
                     <input
                       type="checkbox"
                       part="checkbox"
-                      aria-label=${this.labelSelectRow(globalIndex + 1)}
+                      aria-label=${`Select row ${globalIndex + 1}`}
                       .checked=${this._selectedRows.has(globalIndex)}
                       @click=${(e: Event) => e.stopPropagation()}
                       @change=${(e: Event) =>

@@ -360,3 +360,13 @@ The restored state is set directly to `this.value` without validation. If the br
 **P2 count: 9**
 
 The two P0 findings (A-01, A-02) are correctness defects affecting screen reader behavior. A-01 misplaces `role="combobox"` in violation of the ARIA 1.2 specification; A-02 emits semantically contradictory accessibility attributes on error messages. Both must be resolved before this component is considered WCAG 2.1 AA compliant for healthcare deployment.
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

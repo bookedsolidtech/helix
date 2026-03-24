@@ -316,3 +316,13 @@ Using `void` to discard promises suppresses any rejection silently. If `updateCo
 | P3-03 | P3       | Code quality           | Overlay `addEventListener` is effectively unreachable          |
 
 **Total: 1 P0, 6 P1, 5 P2, 3 P3 — Merge BLOCKED pending P0 and P1 resolution.**
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

@@ -197,7 +197,7 @@ export default defineConfig({
         {
           label: 'Component Library',
           collapsed: true,
-          badge: { text: '87', variant: 'success' },
+          badge: { text: '77', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
             {
@@ -639,6 +639,14 @@ export default defineConfig({
               label: 'Boolean Attributes',
               slug: 'guides/boolean-attributes',
             },
+            {
+              label: 'Troubleshooting',
+              slug: 'guides/troubleshooting',
+            },
+            {
+              label: 'Best Practices',
+              slug: 'guides/best-practices',
+            },
           ],
         },
         {
@@ -649,6 +657,8 @@ export default defineConfig({
             { label: 'React', slug: 'framework-integration/react' },
             { label: 'Vue', slug: 'framework-integration/vue' },
             { label: 'Angular', slug: 'framework-integration/angular' },
+            { label: 'Astro 5', slug: 'framework-integration/astro' },
+            { label: 'Svelte', slug: 'framework-integration/svelte' },
             { label: 'Plain HTML / CDN', slug: 'framework-integration/html' },
             { label: 'Drupal', slug: 'framework-integration/drupal' },
           ],

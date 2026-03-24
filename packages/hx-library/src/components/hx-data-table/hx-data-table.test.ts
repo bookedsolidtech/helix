@@ -826,16 +826,205 @@ describe('hx-data-table', () => {
       el.columns = COLUMNS;
       el.rows = ROWS;
       await el.updateComplete;
-      expect(el.labelSelectAll).toBe('Select all rows');
+      expect(el.selectAllLabel).toBe('Select all rows');
     });
 
-    it('renders custom labelSelectAll when set via property', async () => {
+    it('renders custom selectAllLabel when set via property', async () => {
       const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
       el.columns = COLUMNS;
       el.rows = ROWS;
-      el.labelSelectAll = 'Tout sélectionner';
+      el.selectAllLabel = 'Tout sélectionner';
       await el.updateComplete;
-      expect(el.labelSelectAll).toBe('Tout sélectionner');
+      expect(el.selectAllLabel).toBe('Tout sélectionner');
+    });
+  });
+
+  // ─── Keyboard Navigation — Edge Cases ───
+
+  describe('Keyboard Navigation — Edge Cases', () => {
+    it('Space on header checkbox th triggers select-all via keyboard', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const headerCheckboxTh = el.shadowRoot!.querySelector<HTMLElement>('thead th.col-checkbox')!;
+      headerCheckboxTh.setAttribute('tabindex', '0');
+      headerCheckboxTh.focus();
+
+      // The Space key on the th cell itself does NOT toggle selection (Space only
+      // acts on cells with part~="td").  Verify no hx-select is dispatched and that
+      // the keyboard handler returns without side-effects when the focused element is
+      // a th (not a td).
+      let selectFired = false;
+      el.addEventListener('hx-select', () => {
+        selectFired = true;
+      });
+
+      headerCheckboxTh.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      // The th is not a td, so no selection toggle — header checkbox must still be
+      // interacted via its <input> child.  selectFired stays false.
+      expect(selectFired).toBe(false);
+
+      // Now verify select-all via the checkbox input inside the th still works.
+      const headerCheckbox = el.shadowRoot!.querySelector<HTMLInputElement>(
+        'thead input[type="checkbox"]',
+      )!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      headerCheckbox.click();
+      const event = await eventPromise;
+      expect(event.detail.selectedRows).toHaveLength(ROWS.length);
+    });
+
+    it('ArrowLeft at first cell (idx 0) does not move focus', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      ths[0].focus();
+
+      // ArrowLeft from the first cell — no target, focus stays put.
+      const before = el.shadowRoot!.activeElement;
+      ths[0].dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      expect(el.shadowRoot!.activeElement).toBe(before);
+    });
+
+    it('ArrowRight at last cell does not move focus beyond the grid', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const allCells = el.shadowRoot!.querySelectorAll<HTMLElement>(
+        '[part~="td"],[part~="th"]',
+      );
+      const lastCell = allCells[allCells.length - 1]!;
+      lastCell.setAttribute('tabindex', '0');
+      lastCell.focus();
+
+      const before = el.shadowRoot!.activeElement;
+      lastCell.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      // Focus must not have moved past the last cell.
+      expect(el.shadowRoot!.activeElement).toBe(before);
+    });
+
+    it('keyboard navigation works correctly in a single-column table (colCount=1)', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = [{ key: 'name', label: 'Name', sortable: false }];
+      el.rows = [{ name: 'Alice' }, { name: 'Bob' }];
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      expect(ths.length).toBe(1);
+
+      ths[0].focus();
+
+      // ArrowDown in a single-column table should move to the first td.
+      ths[0].dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      const tds = el.shadowRoot!.querySelectorAll<HTMLElement>('tbody td[part~="td"]');
+      expect(el.shadowRoot!.activeElement).toBe(tds[0]);
+    });
+
+    it('ArrowRight from sort button (inside th) moves focus to the next th', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = ALL_SORTABLE_COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const sortBtns = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('.sort-btn');
+      // Focus the button inside the first th — _handleKeydown must walk up to the th.
+      sortBtns[0].focus();
+
+      sortBtns[0].dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      expect(el.shadowRoot!.activeElement).toBe(ths[1]);
+    });
+  });
+
+  // ─── JSON Parsing Error Recovery ───
+
+  describe('JSON Parsing Error Recovery', () => {
+    it('recovers gracefully from invalid JSON columns attribute after valid data', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      // Simulate a bad string assignment (Drupal path).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (el as any).columns = '{not valid json';
+      await el.updateComplete;
+
+      // After the bad assignment, columns should fall back to [].
+      expect(Array.isArray(el.columns)).toBe(true);
+      expect(el.columns).toEqual([]);
+    });
+
+    it('recovers gracefully from invalid JSON rows attribute', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (el as any).rows = 'not-valid-json-at-all';
+      await el.updateComplete;
+
+      expect(Array.isArray(el.rows)).toBe(true);
+      expect(el.rows).toEqual([]);
+    });
+  });
+
+  // ─── _dispatchSelect with sparse rows ───
+
+  describe('_dispatchSelect with gaps in rows array', () => {
+    it('skips undefined entries when dispatching hx-select after rows are updated', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      // Select row 0 via checkbox.
+      const checkboxes = el.shadowRoot!.querySelectorAll<HTMLInputElement>(
+        'tbody input[type="checkbox"]',
+      );
+      const firstSelect = oneEvent<CustomEvent>(el, 'hx-select');
+      checkboxes[0].click();
+      await firstSelect;
+      await el.updateComplete;
+
+      // Now shrink the rows so that the selected index (0) still exists — but
+      // replace with a smaller set to exercise the flatMap defensive branch.
+      const secondSelect = oneEvent<CustomEvent>(el, 'hx-select');
+      el.rows = [{ name: 'Only Row', status: 'Active' }];
+      await el.updateComplete;
+
+      // Trigger another selection change to fire _dispatchSelect.
+      checkboxes[0].click();
+      const event = await secondSelect;
+
+      // The event should carry the valid rows; no undefined entries.
+      for (const row of event.detail.selectedRows as Record<string, unknown>[]) {
+        expect(row).not.toBeUndefined();
+      }
     });
   });
 

@@ -118,3 +118,13 @@ npm run cem             # CEM generation → PASS (2 events, 7 parts, 8 CSS prop
 npm run build --workspace=packages/hx-library  # Library build → PASS
 npx vitest run src/components/hx-color-picker/hx-color-picker.test.ts  # 59/59 pass
 ```
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

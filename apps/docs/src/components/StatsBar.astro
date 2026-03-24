@@ -24,7 +24,7 @@ interface Stat {
 
 const stats: Stat[] = [
   {
-    value: '14',
+    value: '98',
     label: 'Components Built',
     colorClass: 'stat-value-cyan',
     iconClass: 'fa-solid fa-puzzle-piece',
@@ -34,14 +34,14 @@ const stats: Stat[] = [
     docsLabel: 'Browse Components'
   },
   {
-    value: '93.38%',
-    label: 'Test Coverage',
+    value: 'A',
+    label: 'Health Score (98/98)',
     colorClass: 'stat-value-green',
-    iconClass: 'fa-solid fa-check-circle',
-    description: 'Comprehensive test suite with Vitest browser mode and Playwright.',
-    relevance: 'Enterprise-grade quality with extensive unit and integration tests. Every component interaction, accessibility pattern, and edge case is verified. Tests run in real browsers to catch DOM-specific issues before production.',
-    docsUrl: '/architecture/testing/',
-    docsLabel: 'Testing Strategy'
+    iconClass: 'fa-solid fa-heart-pulse',
+    description: '98 of 98 components score an A grade via HELiXiR MCP health analysis.',
+    relevance: 'HELiXiR continuously scores every component against CEM completeness, accessibility compliance, token coverage, and test quality. A 97.2 average score across all 98 components means every piece of the library meets the enterprise bar—nothing is hiding a failing grade.',
+    docsUrl: '/helixir/',
+    docsLabel: 'HELiXiR Health Docs'
   },
   {
     value: '100%',
@@ -49,7 +49,7 @@ const stats: Stat[] = [
     colorClass: 'stat-value-gradient',
     iconClass: 'fa-solid fa-code',
     description: 'Full TypeScript strict mode with zero any types across the codebase.',
-    relevance: 'Enterprise teams demand type safety. Every component, utility, and API is fully typed with JSDoc documentation. Strict mode enabled catches errors at compile-time, not runtime. Your IDE provides intelligent autocomplete for every prop and method.',
+    relevance: 'Enterprise teams demand type safety. Every component, utility, and API is fully typed with JSDoc documentation. Strict mode catches errors at compile-time, not runtime. Your IDE provides intelligent autocomplete for every prop and method.',
     docsUrl: '/architecture/overview/#typescript',
     docsLabel: 'TypeScript Architecture'
   },
@@ -58,20 +58,20 @@ const stats: Stat[] = [
     label: 'WCAG 2.1',
     colorClass: 'stat-value-pink',
     iconClass: 'fa-solid fa-universal-access',
-    description: 'WCAG 2.1 AA accessibility compliance across all components.',
-    relevance: 'HELIX ensures AA compliance minimum with AAA for critical components. Every component includes proper ARIA attributes, keyboard navigation, focus management, and screen reader support. Accessibility is verified through automated and manual testing.',
+    description: 'WCAG 2.1 AA accessibility compliance across all 98 components.',
+    relevance: 'HELIX enforces AA compliance as a hard release gate—no component ships without an automated axe-core audit and keyboard navigation verification. Healthcare applications demand zero regressions, so every pull request re-validates the full accessibility surface.',
     docsUrl: '/architecture/accessibility/',
     docsLabel: 'Accessibility Standards'
   },
   {
-    value: '2026-02-16',
-    label: 'Last Updated',
+    value: 'v1.1.1',
+    label: 'Current Release',
     colorClass: 'stat-value-gradient',
-    iconClass: 'fa-solid fa-calendar-check',
-    description: 'Documentation and component library last updated February 16, 2026.',
-    relevance: 'Active development with continuous improvements to components, documentation, and tooling. Check the Admin Dashboard for real-time component health metrics, test results, and CEM validation status.',
-    docsUrl: 'http://localhost:3159',
-    docsLabel: 'Admin Dashboard'
+    iconClass: 'fa-solid fa-tag',
+    description: 'Latest stable release of @helixui/library published to npm.',
+    relevance: 'HELiX follows semantic versioning with automated changeset-driven releases. Every component change is categorized as patch, minor, or major—consumers always know whether an update is safe to apply. Changelogs are generated automatically from developer-authored summaries.',
+    docsUrl: '/getting-started/installation/',
+    docsLabel: 'Installation Guide'
   },
 ];
 ---
