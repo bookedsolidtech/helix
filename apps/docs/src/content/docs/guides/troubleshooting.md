@@ -412,8 +412,12 @@ Shadow DOM prevents most conflicts, but global CSS resets can affect the host el
 /* Wrong: affects hx-button host element */
 * { box-sizing: border-box; margin: 0; }
 
-/* Better: exclude custom elements */
-*:not(:defined) { box-sizing: border-box; }
+/* Better: scope reset to standard elements only */
+html, body, div, span, p, a, ul, ol, li,
+h1, h2, h3, h4, h5, h6, img,
+button, input, textarea, select, table {
+  box-sizing: border-box;
+}
 ```
 
 For complete Drupal integration guidance, see [Drupal Integration Overview](/drupal-integration/overview).

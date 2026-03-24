@@ -232,7 +232,7 @@ await import('@helixui/library/components/hx-button');
 Only import the components you use. Barrel imports load every component:
 
 ```javascript
-// Wrong: loads all 87 components
+// Wrong: loads all 77 components
 import '@helixui/library';
 
 // Correct: loads only what you need
@@ -326,7 +326,7 @@ Global theme overrides belong on `:root` (or `<html>`). Component-scoped overrid
 For dark mode sections or multi-brand layouts, use the `hx-theme` component to scope token overrides without CSS class gymnastics:
 
 ```html
-<hx-theme color-scheme="dark">
+<hx-theme theme="dark">
   <!-- All HELiX components inside use dark mode tokens -->
   <hx-card>
     <hx-button>Dark mode button</hx-button>
