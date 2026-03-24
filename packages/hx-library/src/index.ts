@@ -8,6 +8,12 @@
  * Run `npm run generate:barrel` to regenerate.
  */
 
+// ─── Base infrastructure ────────────────────────────────────────────────────
+export { HelixElement } from './base/index.js';
+export { createIdCounter, resetIdCounter } from './base/index.js';
+export { mergeTokenStyles } from './base/index.js';
+
+// ─── Components ──────────────────────────────────────────────────────────────
 export { HelixAccordion } from './components/hx-accordion/index.js';
 export { HelixAccordionItem } from './components/hx-accordion/index.js';
 export { HelixActionBar } from './components/hx-action-bar/index.js';
