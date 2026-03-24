@@ -32,7 +32,7 @@ export function toast(options: ToastOptions): HelixToast {
   const stackSelector = `hx-toast-stack[placement="${placement}"]`;
   let stack = document.querySelector<HelixToastStack>(stackSelector);
   if (!stack) {
-    stack = document.createElement('hx-toast-stack') as HelixToastStack;
+    stack = document.createElement('hx-toast-stack');
     stack.placement = placement;
     // Intentional design decision: the toast stack is appended to document.body rather
     // than inserted near the caller. This is required so that the fixed-position overlay
@@ -54,7 +54,7 @@ export function toast(options: ToastOptions): HelixToast {
   }
 
   // Create toast element
-  const toastEl = document.createElement('hx-toast') as HelixToast;
+  const toastEl = document.createElement('hx-toast');
   toastEl.variant = options.variant ?? 'default';
   toastEl.duration = options.duration ?? 3000;
   toastEl.closable = true;

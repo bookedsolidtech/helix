@@ -33,7 +33,7 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  *
  * @fires {CustomEvent<{value: string}>} hx-copy - Dispatched after the value
  *   has been successfully written to the clipboard.
- * @fires {CustomEvent<{value: string; error: unknown}>} hx-copy-error - Dispatched
+ * @fires {CustomEvent<{value: string; error: Error}>} hx-copy-error - Dispatched
  *   when the clipboard write fails (permission denied, iframe restriction, etc.).
  *   The `error` detail contains the caught error for diagnostic use.
  *
@@ -189,10 +189,13 @@ export class HelixCopyButton extends LitElement {
        * @event hx-copy-error
        */
       this.dispatchEvent(
-        new CustomEvent<{ value: string; error: unknown }>('hx-copy-error', {
+        new CustomEvent<{ value: string; error: Error }>('hx-copy-error', {
           bubbles: true,
           composed: true,
-          detail: { value: this.value, error },
+          detail: {
+            value: this.value,
+            error: error instanceof Error ? error : new Error(String(error)),
+          },
         }),
       );
       return;
