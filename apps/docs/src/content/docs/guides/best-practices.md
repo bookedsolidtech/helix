@@ -57,7 +57,7 @@ select.value = 'option-1';
 
 In frameworks, this is typically handled by the component's own lifecycle. For vanilla JS, `whenDefined()` is the correct hook.
 
-### Use `part::` selectors over inline styles for customization
+### Use `::part()` selectors over inline styles for customization
 
 Prefer `::part()` and CSS custom properties over inline styles. This keeps customization maintainable and lets you scope overrides:
 

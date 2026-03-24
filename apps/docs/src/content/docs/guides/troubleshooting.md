@@ -173,10 +173,10 @@ For programmatic validation state, see [Form Validation](/components/forms/valid
 
 ### `ElementInternals` errors in older browsers
 
-`ElementInternals` requires Chrome 77+, Firefox 93+, Safari 16.4+. For older browser support, use the [@ungap/custom-elements](https://github.com/ungap/custom-elements) polyfill:
+`ElementInternals` requires Chrome 77+, Firefox 93+, Safari 16.4+. For older browser support, use the [element-internals-polyfill](https://www.npmjs.com/package/element-internals-polyfill):
 
 ```javascript
-import '@ungap/custom-elements';
+import 'element-internals-polyfill';
 ```
 
 ---
@@ -234,17 +234,21 @@ if (typeof window !== 'undefined') {
 }
 ```
 
-In frameworks like Astro, use `client:only` directive:
+In Astro, custom elements don't need a `client:only` directive (that's for framework components like React or Svelte). Instead, import the component script in a `<script>` tag:
 
 ```astro
-<hx-button client:only="lit">Click me</hx-button>
+<hx-button>Click me</hx-button>
+
+<script>
+  import '@helixui/library/components/hx-button';
+</script>
 ```
 
 ### Hydration mismatch warnings
 
 Web components render their shadow DOM on the client. Server-rendered HTML will not include the shadow DOM content, causing hydration mismatches in frameworks that compare server vs client output.
 
-Use the `client:only` pattern and avoid rendering component internals server-side. The custom element tag itself (`<hx-button>`) is safe to include in server HTML — the shadow DOM is created on the client when the element upgrades.
+Avoid rendering component internals server-side. The custom element tag itself (`<hx-button>`) is safe to include in server HTML — the shadow DOM is created on the client when the element upgrades. Import the component JS in a client-side `<script>` tag.
 
 ### Component appears unstyled / FOUC (Flash of Unstyled Content)
 
