@@ -34,7 +34,7 @@ const config = {
   },
   compilerOptions: {
     // Treat any element starting with hx- as a custom element
-    customElement: false, // keep false — this configures Svelte components as CEs
+    customElement: false, // keep false — Svelte components are NOT compiled as custom elements
   },
   vite: {
     plugins: [],
@@ -92,7 +92,6 @@ Import HELIX once at the top of your root layout. In SvelteKit, use the `+layout
   let { children } = $props();
 </script>
 
-<slot />
 {@render children?.()}
 ```
 
@@ -419,15 +418,12 @@ For app-wide registration in `+layout.svelte`:
 
 ```svelte
 <script>
-  import { browser } from '$app/environment';
   import { onMount } from 'svelte';
 
   let { children } = $props();
 
   onMount(async () => {
-    if (browser) {
-      await import('@helixui/library');
-    }
+    await import('@helixui/library');
   });
 </script>
 

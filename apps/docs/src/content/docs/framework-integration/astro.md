@@ -159,7 +159,7 @@ Astro's `<script>` tags run in the browser with full DOM access. Attach event li
 
 ## Hybrid Rendering with SSR
 
-When using Astro's SSR adapter (`output: 'server'` or `output: 'hybrid'`), custom element registration must happen client-side only. The patterns above already handle this — `<script>` tags in `.astro` files are always client-side.
+When using Astro's SSR adapter (`output: 'server'`), custom element registration must happen client-side only. Astro 5 removed the `'hybrid'` output mode — use `output: 'server'` with per-page `export const prerender = true` to achieve the same selective-SSR pattern. The patterns above already handle this — `<script>` tags in `.astro` files are always client-side.
 
 For server-rendered pages that need dynamic data driving HELIX component props:
 
@@ -212,7 +212,7 @@ import { actions } from 'astro:actions';
 ```ts
 // src/actions/index.ts
 import { defineAction } from 'astro:actions';
-import { z } from 'astro:schema';
+import { z } from 'zod';
 
 export const server = {
   contact: defineAction({
