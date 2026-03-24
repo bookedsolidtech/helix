@@ -8,7 +8,7 @@ node_modules
 .env*.local
 
 # Build outputs
-dist/
+dist
 build/
 
 # Auto-generated files (regenerated at build time, never commit)
