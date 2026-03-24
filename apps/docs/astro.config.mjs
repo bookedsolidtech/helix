@@ -197,7 +197,7 @@ export default defineConfig({
         {
           label: 'Component Library',
           collapsed: true,
-          badge: { text: '92', variant: 'success' },
+          badge: { text: '77', variant: 'success' },
           items: [
             { label: 'Overview', slug: 'component-library/overview' },
             {
@@ -207,7 +207,6 @@ export default defineConfig({
                 { label: 'hx-button', slug: 'component-library/hx-button' },
                 { label: 'hx-button-group', slug: 'component-library/hx-button-group' },
                 { label: 'hx-copy-button', slug: 'component-library/hx-copy-button' },
-                { label: 'hx-icon-button', slug: 'component-library/actions/hx-icon-button' },
                 { label: 'hx-link', slug: 'component-library/hx-link' },
                 { label: 'hx-split-button', slug: 'component-library/hx-split-button' },
                 { label: 'hx-toggle-button', slug: 'component-library/hx-toggle-button' },
@@ -266,18 +265,15 @@ export default defineConfig({
                 { label: 'hx-carousel', slug: 'component-library/hx-carousel' },
                 { label: 'hx-carousel-item', slug: 'component-library/hx-carousel-item' },
                 { label: 'hx-code-snippet', slug: 'component-library/hx-code-snippet' },
-                { label: 'hx-counter', slug: 'component-library/data-display/hx-counter' },
                 { label: 'hx-data-table', slug: 'component-library/hx-data-table' },
                 { label: 'hx-list', slug: 'component-library/hx-list' },
                 { label: 'hx-list-item', slug: 'component-library/hx-list-item' },
                 { label: 'hx-rating', slug: 'component-library/hx-rating' },
-                { label: 'hx-stat', slug: 'component-library/data-display/hx-stat' },
                 { label: 'hx-structured-list', slug: 'component-library/hx-structured-list' },
                 {
                   label: 'hx-structured-list-row',
                   slug: 'component-library/hx-structured-list-row',
                 },
-                { label: 'hx-table', slug: 'component-library/data-display/hx-table' },
                 { label: 'hx-tag', slug: 'component-library/hx-tag' },
                 { label: 'hx-tree-item', slug: 'component-library/hx-tree-item' },
                 { label: 'hx-tree-view', slug: 'component-library/hx-tree-view' },
@@ -289,7 +285,6 @@ export default defineConfig({
               items: [
                 { label: 'hx-alert', slug: 'component-library/hx-alert' },
                 { label: 'hx-badge', slug: 'component-library/hx-badge' },
-                { label: 'hx-banner', slug: 'component-library/feedback-status/hx-banner' },
                 { label: 'hx-meter', slug: 'component-library/hx-meter' },
                 { label: 'hx-progress-bar', slug: 'component-library/hx-progress-bar' },
                 { label: 'hx-progress-ring', slug: 'component-library/hx-progress-ring' },
