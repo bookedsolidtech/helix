@@ -115,3 +115,21 @@ Static `_dtfCache` and `_rtfCache` Maps memoize `Intl.DateTimeFormat` and
 - `vitest run` — 35/35 tests pass
 
 **P0 count: 0** — Component is **ready to ship**.
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** CRITICAL
+
+**Violation:** `_getLocale()` (line 167) calls `document.documentElement.lang` and `navigator.language` inside the render path. Would crash with `@lit-labs/ssr` streaming render.
+
+**Workaround:** Always provide an explicit `lang` prop to bypass the browser API lookup:
+```html
+<hx-format-date lang="en-US" date="2026-01-15"></hx-format-date>
+```
+
+**Framework guidance:**
+- **Next.js 15:** Always provide `lang` prop. Without it, `_getLocale()` accesses `document.documentElement.lang` in render. With explicit `lang`, renders safely as inert RSC tag.
+- **Astro 5:** Provide `lang` prop explicitly. Works with `client:load`.
+- **Nuxt 4:** Provide `lang` prop. Works after client hydration.

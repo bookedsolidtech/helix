@@ -187,3 +187,13 @@ Module-level mutable state causes ID collisions when the module is imported in m
 - **TypeScript types**: `PopoverPlacement` and `TriggerMode` union types are correct and complete. No `any` types found. P2-02 (arrow border logic) ✅ FIXED.
 - **Token usage (general)**: CSS custom properties follow the `--hx-*` pattern consistently (except P2-01 above).
 - **`@floating-ui/dom` `arrow` function naming**: The imported `arrow` function and the `@property() arrow` boolean coexist without TypeScript conflict because `this.arrow` (class property) and `arrow` (module import) are distinct identifiers. This is not a defect, though it reduces readability.
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

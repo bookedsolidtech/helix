@@ -233,3 +233,16 @@ Remaining P2/P3 items are informational and do not block merge:
 - P2: Brightness filter fallbacks are raw numbers (valid for filter function values)
 - P3: Touch target size depends on token values (design system concern)
 - P3: execCommand fallback forces sync DOM (legacy path only)
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** client-only | **Severity:** MEDIUM
+
+**Reason:** `navigator.clipboard.writeText` (line 164) is only available in secure browser contexts. Component's primary function (clipboard copying) is non-functional without browser context.
+
+**Framework guidance:**
+- **Next.js 15:** Use `next/dynamic` with `ssr: false`, or wrap in `'use client'` component
+- **Astro 5:** Use `client:load` directive
+- **Nuxt 4:** Wrap with `<ClientOnly>` component
