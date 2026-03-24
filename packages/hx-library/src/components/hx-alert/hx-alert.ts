@@ -97,6 +97,14 @@ export class HelixAlert extends LitElement {
   accent = false;
 
   /**
+   * Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:").
+   * When not set, defaults to the English label matching the current variant.
+   * @attr severity-label
+   */
+  @property({ attribute: 'severity-label' })
+  severityLabel: string | undefined;
+
+  /**
    * CSS selector for the element to return focus to after the alert is dismissed.
    * When set, the component will find and focus the matching element after dismissal.
    * If not set, focus management is the caller's responsibility via the hx-after-close event.
@@ -104,22 +112,6 @@ export class HelixAlert extends LitElement {
    */
   @property({ type: String, attribute: 'return-focus-to' })
   returnFocusTo: string | null = null;
-
-  /**
-   * Map of severity variant labels prepended to screen-reader announcements.
-   * Override to provide localized severity prefixes.
-   */
-  @property({ attribute: false })
-  severityLabels: Partial<Record<string, string>> = {
-    info: 'Info:',
-    success: 'Success:',
-    warning: 'Warning:',
-    error: 'Error:',
-  };
-
-  /** Accessible label for the dismiss button. Override for localized text. */
-  @property({ type: String, attribute: 'close-label' })
-  closeLabel = 'Close alert';
 
   // ─── State ───
 
@@ -139,6 +131,22 @@ export class HelixAlert extends LitElement {
   private _titleSlotChangeHandler: (() => void) | null = null;
 
   // ─── Private Helpers ───
+
+  /** Returns the default English severity label for the current variant. */
+  private _defaultSeverityLabel(): string {
+    const labels: Record<string, string> = {
+      info: 'Info:',
+      success: 'Success:',
+      warning: 'Warning:',
+      error: 'Error:',
+    };
+    return labels[this.variant] ?? '';
+  }
+
+  /** Returns the effective severity label, using the override if provided. */
+  private get _effectiveSeverityLabel(): string {
+    return this.severityLabel ?? this._defaultSeverityLabel();
+  }
 
   /** Returns true when the variant requires assertive announcement. */
   /** @internal */
@@ -226,7 +234,7 @@ export class HelixAlert extends LitElement {
               // Second microtask ensures the clear is processed before re-injection,
               // guaranteeing the AT sees a content change rather than no-op.
               Promise.resolve().then(() => {
-                const prefix = this.severityLabels[this.variant] ?? '';
+                const prefix = this._effectiveSeverityLabel;
                 const message = this.textContent?.trim() ?? '';
                 announcer.textContent = prefix ? `${prefix} ${message}` : message;
               });
@@ -355,7 +363,7 @@ export class HelixAlert extends LitElement {
 
     // WCAG 1.4.1: Always render a visually-hidden severity label so the variant
     // is never conveyed by color alone, regardless of whether showIcon is set.
-    const severityLabel = this.severityLabels[this.variant] ?? '';
+    const severityLabel = this._effectiveSeverityLabel;
 
     return html`
       <div
@@ -391,7 +399,7 @@ export class HelixAlert extends LitElement {
               <button
                 part="close-button"
                 class="alert__close-button"
-                aria-label=${this.closeLabel}
+                aria-label=${`Close ${this.heading ? `${this.heading} ` : ''}alert`}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}

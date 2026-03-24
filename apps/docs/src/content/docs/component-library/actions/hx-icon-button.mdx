@@ -1,0 +1,235 @@
+---
+title: 'hx-icon-button'
+description: Icon-only action button with full accessibility support.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-icon-button" section="summary" />
+
+## Overview
+
+`hx-icon-button` is a square button designed to contain a single icon. Because it has no visible text, the `label` property is **required** — it provides the accessible name rendered as `aria-label` and `title` on the underlying element.
+
+**Use `hx-icon-button` when:** the action is universally understood from the icon alone (close, edit, delete, search) and space is at a premium.
+
+**Use `hx-button` instead when:** a visible text label is needed for clarity, or when the action is not represented by a standard icon.
+
+## Live Demo
+
+### Variants
+
+Primary, secondary, tertiary, danger, and ghost styles.
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-icon-button label="Add item" variant="primary">
+      <span aria-hidden="true">+</span>
+    </hx-icon-button>
+    <hx-icon-button label="Edit item" variant="secondary">
+      <span aria-hidden="true">✎</span>
+    </hx-icon-button>
+    <hx-icon-button label="View details" variant="tertiary">
+      <span aria-hidden="true">◉</span>
+    </hx-icon-button>
+    <hx-icon-button label="Delete item" variant="danger">
+      <span aria-hidden="true">✕</span>
+    </hx-icon-button>
+    <hx-icon-button label="More options" variant="ghost">
+      <span aria-hidden="true">⋯</span>
+    </hx-icon-button>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large size variants.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-icon-button label="Small action" hx-size="sm" variant="ghost">
+      <span aria-hidden="true">✕</span>
+    </hx-icon-button>
+    <hx-icon-button label="Medium action" hx-size="md" variant="ghost">
+      <span aria-hidden="true">✕</span>
+    </hx-icon-button>
+    <hx-icon-button label="Large action" hx-size="lg" variant="ghost">
+      <span aria-hidden="true">✕</span>
+    </hx-icon-button>
+  </div>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-icon-button label="Disabled action" variant="primary" disabled>
+      <span aria-hidden="true">+</span>
+    </hx-icon-button>
+    <hx-icon-button label="Disabled action" variant="ghost" disabled>
+      <span aria-hidden="true">✕</span>
+    </hx-icon-button>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-icon-button';
+```
+
+## Basic Usage
+
+```html
+<hx-icon-button label="Close dialog" variant="ghost">
+  <hx-icon name="x"></hx-icon>
+</hx-icon-button>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                                            | Default     | Description                                                                                                   |
+| ---------- | ---------- | --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
+| `label`    | `label`    | `string`                                                        | `''`        | **Required.** Accessible name rendered as `aria-label` and `title`. A console warning is emitted when absent. |
+| `variant`  | `variant`  | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| 'ghost'` | `'ghost'`   | Visual style variant of the button.                                                                           |
+| `size`     | `hx-size`  | `'sm' \| 'md' \| 'lg'`                                          | `'md'`      | Size of the button.                                                                                           |
+| `type`     | `type`     | `'button' \| 'submit' \| 'reset'`                               | `'button'`  | The type attribute for the underlying button. Ignored when `href` is set.                                     |
+| `disabled` | `disabled` | `boolean`                                                       | `false`     | Whether the button is disabled.                                                                               |
+| `href`     | `href`     | `string \| undefined`                                           | `undefined` | When set, renders an `<a>` element instead of `<button>`.                                                     |
+| `name`     | `name`     | `string \| undefined`                                           | `undefined` | Name submitted with form data. Only applicable when rendering as a button.                                    |
+| `value`    | `value`    | `string \| undefined`                                           | `undefined` | Value submitted with form data. Only applicable when rendering as a button.                                   |
+
+## Events
+
+| Event      | Detail Type                     | Description                                           |
+| ---------- | ------------------------------- | ----------------------------------------------------- |
+| `hx-click` | `{ originalEvent: MouseEvent }` | Dispatched when the button is clicked (not disabled). |
+
+## CSS Custom Properties
+
+| Property                            | Default                       | Description                         |
+| ----------------------------------- | ----------------------------- | ----------------------------------- |
+| `--hx-icon-button-bg`               | `transparent`                 | Button background color.            |
+| `--hx-icon-button-color`            | `var(--hx-color-primary-500)` | Icon color.                         |
+| `--hx-icon-button-border-color`     | `transparent`                 | Button border color.                |
+| `--hx-icon-button-border-radius`    | `var(--hx-border-radius-md)`  | Button border radius.               |
+| `--hx-icon-button-size`             | _(size-dependent)_            | Explicit width and height override. |
+| `--hx-icon-button-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color.                   |
+
+## CSS Parts
+
+| Part     | Description                                            |
+| -------- | ------------------------------------------------------ |
+| `button` | The native `<button>` or `<a>` element.                |
+| `icon`   | The icon container `<span>` wrapping the default slot. |
+
+## Slots
+
+| Slot        | Description                                               |
+| ----------- | --------------------------------------------------------- |
+| _(default)_ | Icon element to display (`hx-icon`, `<svg>`, or `<img>`). |
+
+## Accessibility
+
+| Topic         | Details                                                                                                                                   |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | Inherits native `button` role (or `link` when `href` is set).                                                                             |
+| `aria-label`  | Set from the `label` property. **Always required.** Without a visible label, this is the only accessible name for screen reader users.    |
+| `title`       | Set from the `label` property. Provides a tooltip on hover for sighted users.                                                             |
+| Keyboard      | `Tab` to focus; `Enter` / `Space` to activate.                                                                                            |
+| Screen reader | The `label` value is announced as the button's accessible name. The slotted icon should use `aria-hidden="true"` to avoid double-reading. |
+| Focus         | Focus stays on the button after click. `delegatesFocus: true` routes host focus to the internal element.                                  |
+| Touch target  | Minimum 44×44 px touch target enforced via the component's size system, meeting WCAG 2.5.5.                                               |
+| WCAG          | Meets WCAG 2.1 AA. A missing `label` emits a console warning during development.                                                          |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/icon-button.html.twig #}
+<hx-icon-button
+  label="{{ label }}"
+  variant="{{ variant|default('ghost') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if disabled %}disabled{% endif %}
+>
+  <hx-icon name="{{ icon_name }}"></hx-icon>
+</hx-icon-button>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixIconButton = {
+  attach(context) {
+    once('helixIconButton', 'hx-icon-button', context).forEach((el) => {
+      el.addEventListener('hx-click', (e) => {
+        console.log('Icon button clicked:', e.detail.originalEvent);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-icon-button example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;"
+  >
+    <!-- Close button -->
+    <hx-icon-button label="Close dialog" variant="ghost" id="close-btn">
+      <span aria-hidden="true" style="font-size: 1.25rem;">✕</span>
+    </hx-icon-button>
+
+    <!-- Edit button -->
+    <hx-icon-button label="Edit record" variant="secondary">
+      <span aria-hidden="true">✎</span>
+    </hx-icon-button>
+
+    <!-- Delete button -->
+    <hx-icon-button label="Delete record" variant="danger">
+      <span aria-hidden="true">🗑</span>
+    </hx-icon-button>
+
+    <!-- Disabled -->
+    <hx-icon-button label="Action unavailable" variant="primary" disabled>
+      <span aria-hidden="true">+</span>
+    </hx-icon-button>
+
+    <script>
+      document.getElementById('close-btn').addEventListener('hx-click', (e) => {
+        console.log('Close clicked:', e.detail.originalEvent);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-icon-button" section="api" />

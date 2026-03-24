@@ -1,0 +1,312 @@
+---
+title: 'hx-table'
+description: Semantic HTML table with variant styling, sticky header, and responsive layout.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-table" section="summary" />
+
+## Overview
+
+`hx-table` wraps a semantic `<table>` element with variant-based styling, an optional sticky header, and responsive horizontal scrolling. It accepts `hx-thead`, `hx-tbody`, and `hx-tfoot` sub-components as slotted children and requires a `label` property for accessibility.
+
+**Use `hx-table` when:** you need to present tabular data — patient records, lab results, appointment lists — in a semantically correct, accessible table structure.
+
+**Use `hx-data-table` instead when:** you need built-in sorting, filtering, pagination, and row selection behavior on top of the table structure.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default Table">
+  <hx-table label="Patient appointments">
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Date</th>
+          <th>Provider</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>John Smith</td>
+          <td>2026-03-24</td>
+          <td>Dr. Chen</td>
+          <td>Confirmed</td>
+        </tr>
+        <tr>
+          <td>Maria Garcia</td>
+          <td>2026-03-25</td>
+          <td>Dr. Patel</td>
+          <td>Pending</td>
+        </tr>
+        <tr>
+          <td>Robert Lee</td>
+          <td>2026-03-26</td>
+          <td>Dr. Chen</td>
+          <td>Confirmed</td>
+        </tr>
+      </tbody>
+    </table>
+  </hx-table>
+</ComponentDemo>
+
+### Striped Rows
+
+Alternating row background for easier scanning.
+
+<ComponentDemo title="Striped">
+  <hx-table label="Lab results" variant="striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Test</th>
+          <th>Result</th>
+          <th>Reference Range</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hemoglobin</td>
+          <td>14.2 g/dL</td>
+          <td>13.5–17.5</td>
+          <td>Normal</td>
+        </tr>
+        <tr>
+          <td>Glucose</td>
+          <td>126 mg/dL</td>
+          <td>70–99</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Creatinine</td>
+          <td>0.9 mg/dL</td>
+          <td>0.7–1.2</td>
+          <td>Normal</td>
+        </tr>
+      </tbody>
+    </table>
+  </hx-table>
+</ComponentDemo>
+
+### Compact
+
+Reduced cell padding for dense data views.
+
+<ComponentDemo title="Compact">
+  <hx-table label="Medication list" variant="compact">
+    <table>
+      <thead>
+        <tr>
+          <th>Medication</th>
+          <th>Dose</th>
+          <th>Frequency</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Metformin</td>
+          <td>500 mg</td>
+          <td>Twice daily</td>
+        </tr>
+        <tr>
+          <td>Lisinopril</td>
+          <td>10 mg</td>
+          <td>Once daily</td>
+        </tr>
+        <tr>
+          <td>Atorvastatin</td>
+          <td>20 mg</td>
+          <td>Once daily at bedtime</td>
+        </tr>
+      </tbody>
+    </table>
+  </hx-table>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-table';
+```
+
+## Basic Usage
+
+```html
+<hx-table label="Patient list">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>DOB</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>John Smith</td>
+        <td>1982-04-15</td>
+        <td>Active</td>
+      </tr>
+    </tbody>
+  </table>
+</hx-table>
+```
+
+## Properties
+
+| Property       | Attribute       | Type                                             | Default     | Description                                                                                     |
+| -------------- | --------------- | ------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------------------- |
+| `label`        | `label`         | `string`                                         | `''`        | **Required for accessibility.** Exposed as `aria-label` on the `<table>` element (WCAG 4.1.2).  |
+| `caption`      | `caption`       | `string`                                         | `''`        | Visible caption text. Renders a `<caption>` element. Use the `caption` slot for richer content. |
+| `variant`      | `variant`       | `'default' \| 'striped' \| 'hover' \| 'compact'` | `'default'` | Visual variant controlling row styling.                                                         |
+| `stickyHeader` | `sticky-header` | `boolean`                                        | `false`     | When true, the header row stays fixed while the table body scrolls.                             |
+| `fullWidth`    | `full-width`    | `boolean`                                        | `true`      | When true, the table expands to fill 100% of its container width.                               |
+
+## Events
+
+`hx-table` does not dispatch any custom events.
+
+## CSS Custom Properties
+
+| Property                  | Default                                | Description             |
+| ------------------------- | -------------------------------------- | ----------------------- |
+| `--hx-table-border-color` | `var(--hx-color-neutral-200, #e2e8f0)` | Cell border color.      |
+| `--hx-table-header-bg`    | `var(--hx-color-neutral-50, #f8fafc)`  | Header row background.  |
+| `--hx-table-header-color` | `var(--hx-color-neutral-700, #334155)` | Header text color.      |
+| `--hx-table-cell-color`   | `var(--hx-color-neutral-900, #0f172a)` | Cell text color.        |
+| `--hx-table-row-hover-bg` | `var(--hx-color-neutral-50, #f8fafc)`  | Row hover background.   |
+| `--hx-table-stripe-bg`    | `var(--hx-color-neutral-50, #f8fafc)`  | Striped row background. |
+
+## CSS Parts
+
+| Part      | Description              |
+| --------- | ------------------------ |
+| `table`   | The `<table>` element.   |
+| `caption` | The `<caption>` element. |
+
+## Slots
+
+| Slot        | Description                                                                                         |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| _(default)_ | Accepts `<thead>`, `<tbody>`, and `<tfoot>` (or `hx-thead`, `hx-tbody`, `hx-tfoot`) sub-components. |
+| `caption`   | Custom caption content rendered inside the `<caption>` element.                                     |
+
+## Accessibility
+
+| Topic         | Details                                                                                                                                        |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aria-label`  | Applied to the `<table>` element from the `label` property. **Always provide a descriptive label** (e.g., `"Patient appointments for March"`). |
+| Caption       | Use the `caption` property or slot for a visible table title. This supplements `aria-label` for users who browse by table.                     |
+| Header cells  | Use `<th scope="col">` for column headers and `<th scope="row">` for row headers inside the slotted content.                                   |
+| Keyboard      | Standard table keyboard navigation: `Tab` moves through interactive cells; arrow keys are not intercepted by the component.                    |
+| Screen reader | Table structure (rows, columns, headers) is announced natively by the browser. The `label` provides context for the table as a whole.          |
+| Responsive    | The table wrapper scrolls horizontally when content overflows, preserving table structure rather than collapsing rows.                         |
+| WCAG          | Meets WCAG 2.1 AA when `label` is provided and `<th>` elements include `scope` attributes on all header cells.                                 |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/data-table.html.twig #}
+<hx-table
+  label="{{ table_label }}"
+  variant="{{ variant|default('default') }}"
+  {% if sticky_header %}sticky-header{% endif %}
+>
+  <table>
+    <thead>
+      <tr>
+        {% for header in headers %}
+          <th scope="col">{{ header }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          {% for cell in row %}
+            <td>{{ cell }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</hx-table>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-table example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto;">
+    <hx-table label="Patient appointment schedule for March 2026" variant="striped" sticky-header>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Patient</th>
+            <th scope="col">Appointment Date</th>
+            <th scope="col">Provider</th>
+            <th scope="col">Department</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John Smith</td>
+            <td>2026-03-24 09:00</td>
+            <td>Dr. Chen</td>
+            <td>Cardiology</td>
+            <td>Confirmed</td>
+          </tr>
+          <tr>
+            <td>Maria Garcia</td>
+            <td>2026-03-24 10:30</td>
+            <td>Dr. Patel</td>
+            <td>Internal Medicine</td>
+            <td>Pending</td>
+          </tr>
+          <tr>
+            <td>Robert Lee</td>
+            <td>2026-03-25 14:00</td>
+            <td>Dr. Chen</td>
+            <td>Cardiology</td>
+            <td>Confirmed</td>
+          </tr>
+        </tbody>
+      </table>
+    </hx-table>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-table" section="api" />

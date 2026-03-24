@@ -452,3 +452,13 @@ The hamburger icon is copy-pasted between the two components. Any SVG change mus
 8. **[HIGH]** Add keyboard tests to Vitest suite (§3.1 / §3.2)
 9. **[MEDIUM]** Add mobile viewport story (§4.2)
 10. **[MEDIUM]** Add `aria-current` example story (§4.3)
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.
