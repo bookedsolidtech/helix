@@ -895,4 +895,239 @@ describe('hx-carousel', () => {
       expect(el.labelSlideOf(1, 2)).toBe('Diapositive 1 sur 2');
     });
   });
+
+  // ─── Touch drag on vertical carousel ───
+
+  describe('Touch drag (vertical orientation)', () => {
+    it('swipe up (negative clientY diff) on vertical carousel calls next()', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel orientation="vertical" mouse-dragging>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+
+      const touchStart = new TouchEvent('touchstart', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 100, clientY: 200 })],
+      });
+      const touchMove = new TouchEvent('touchmove', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 100, clientY: 140 })],
+      });
+      const touchEnd = new TouchEvent('touchend', {
+        bubbles: true,
+        cancelable: true,
+        changedTouches: [
+          new Touch({ identifier: 1, target: container, clientX: 100, clientY: 140 }),
+        ],
+      });
+
+      container.dispatchEvent(touchStart);
+      container.dispatchEvent(touchMove);
+      container.dispatchEvent(touchEnd);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(1);
+    });
+
+    it('swipe down (positive clientY diff) on vertical carousel calls previous()', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel orientation="vertical" mouse-dragging>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(2);
+      await el.updateComplete;
+
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+
+      const touchStart = new TouchEvent('touchstart', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 100, clientY: 100 })],
+      });
+      const touchMove = new TouchEvent('touchmove', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 100, clientY: 160 })],
+      });
+      const touchEnd = new TouchEvent('touchend', {
+        bubbles: true,
+        cancelable: true,
+        changedTouches: [
+          new Touch({ identifier: 1, target: container, clientX: 100, clientY: 160 }),
+        ],
+      });
+
+      container.dispatchEvent(touchStart);
+      container.dispatchEvent(touchMove);
+      container.dispatchEvent(touchEnd);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(1);
+    });
+  });
+
+  // ─── Autoplay tick edge cases ───
+
+  describe('Autoplay tick edge cases', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('non-loop autoplay at last slide wraps to index 0', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="500">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      // Navigate to last slide manually before autoplay ticks
+      el.goTo(2);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      // Tick the autoplay — non-loop at maxIndex should wrap to 0
+      vi.advanceTimersByTime(600);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('_resumeAutoplay does not resume when both _isHovered and _isFocused are true', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="1000" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      expect(el['_isPlaying']).toBe(true);
+
+      // Simulate both hover and focus — timer should be cleared
+      el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      el.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      await el.updateComplete;
+
+      expect(el['_autoplayTimer']).toBeNull();
+
+      // mouseleave while still focused — should NOT resume because _isFocused is still true
+      el.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      await el.updateComplete;
+
+      expect(el['_autoplayTimer']).toBeNull();
+    });
+  });
+
+  // ─── Drag end without movement ───
+
+  describe('Drag end without movement (click, not drag)', () => {
+    it('mouseup without prior movement does not navigate and resets cursor', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel mouse-dragging>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+
+      // mousedown starts drag but no mousemove to set _dragMoved
+      container.dispatchEvent(
+        new MouseEvent('mousedown', { clientX: 100, bubbles: true, cancelable: true }),
+      );
+      // mouseup immediately — _dragMoved is still false
+      container.dispatchEvent(new MouseEvent('mouseup', { clientX: 100, bubbles: true }));
+      await el.updateComplete;
+
+      // No navigation should occur
+      expect(el['_currentIndex']).toBe(0);
+      // Cursor style should be reset
+      expect(container.style.cursor).toBe('');
+    });
+  });
+
+  // ─── Vertical orientation icon rendering ───
+
+  describe('Vertical orientation icon rendering', () => {
+    it('prev button contains up-chevron polyline in vertical orientation', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel orientation="vertical" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const prevBtn = shadowQuery(el, '[part="prev-btn"]');
+      // Vertical prev uses chevron-up: points="18 15 12 9 6 15"
+      const svgInPrev = prevBtn?.querySelector('svg');
+      const polyline = svgInPrev?.querySelector('polyline');
+      expect(polyline?.getAttribute('points')).toBe('18 15 12 9 6 15');
+    });
+
+    it('next button contains down-chevron polyline in vertical orientation', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel orientation="vertical" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const nextBtn = shadowQuery(el, '[part="next-btn"]');
+      // Vertical next uses chevron-down: points="6 9 12 15 18 9"
+      const svgInNext = nextBtn?.querySelector('svg');
+      const polyline = svgInNext?.querySelector('polyline');
+      expect(polyline?.getAttribute('points')).toBe('6 9 12 15 18 9');
+    });
+
+    it('prev button contains left-chevron polyline in horizontal orientation', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const prevBtn = shadowQuery(el, '[part="prev-btn"]');
+      // Horizontal prev uses chevron-left: points="15 18 9 12 15 6"
+      const svgInPrev = prevBtn?.querySelector('svg');
+      const polyline = svgInPrev?.querySelector('polyline');
+      expect(polyline?.getAttribute('points')).toBe('15 18 9 12 15 6');
+    });
+  });
+
+  // ─── disconnectedCallback with null _mql ───
+
+  describe('disconnectedCallback with null _mql', () => {
+    it('does not throw when _mql is null on disconnect', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>1</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      // Force _mql to null to simulate SSR-like scenario
+      el['_mql'] = null;
+
+      expect(() => el.remove()).not.toThrow();
+    });
+  });
 });

@@ -949,4 +949,263 @@ describe('hx-date-picker', () => {
       expect(el.labelPrevMonth).toBe('Mois précédent');
     });
   });
+
+  // ─── Focus Trap: edge cases (2) ────────────────────────────────────────
+
+  describe('Focus Trap: edge cases', () => {
+    it('_handleCalendarTab does nothing when calendar has no focusable elements', async () => {
+      // Open calendar then remove all focusable children from the shadow root's calendar element
+      // to exercise the early-return branch in _handleCalendarTab when focusableEls.length === 0.
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      await openCalendar(el);
+
+      const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
+      // Disable every button so querySelectorAll returns zero focusable elements.
+      const buttons = Array.from(calendar.querySelectorAll<HTMLButtonElement>('button'));
+      buttons.forEach((b) => {
+        b.disabled = true;
+        b.setAttribute('tabindex', '-1');
+      });
+
+      // Dispatching Tab should not throw and the calendar should remain open.
+      let threw = false;
+      try {
+        calendar.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }),
+        );
+        await el.updateComplete;
+      } catch {
+        threw = true;
+      }
+
+      expect(threw).toBe(false);
+      // Calendar still open — no navigation side-effect occurred.
+      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+    });
+
+    it('Shift+Tab from first focusable element wraps focus to last focusable element', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      await openCalendar(el);
+      // Wait an extra cycle so _focusActiveDay's inner updateComplete.then() has run
+      // and tabindex attributes have settled before we snapshot the focusable list.
+      await el.updateComplete;
+
+      const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
+
+      // Collect focusable elements to identify first and last.
+      const focusableEls = Array.from(
+        calendar.querySelectorAll<HTMLElement>('button:not([disabled]), [tabindex="0"]'),
+      );
+      expect(focusableEls.length).toBeGreaterThan(1);
+
+      const firstEl = focusableEls[0]!;
+
+      // Focus the first focusable element so shadow active element === first.
+      firstEl.focus();
+      await el.updateComplete;
+
+      // Dispatch Shift+Tab on the calendar — the focus trap should wrap to last.
+      const tabEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      calendar.dispatchEvent(tabEvent);
+      await el.updateComplete;
+
+      // Re-query focusable elements after the trap fires so we compare against the
+      // live DOM state (the component uses the same query internally).
+      const focusableElsAfter = Array.from(
+        calendar.querySelectorAll<HTMLElement>('button:not([disabled]), [tabindex="0"]'),
+      );
+      const lastElAfter = focusableElsAfter[focusableElsAfter.length - 1]!;
+
+      // After wrapping, the last focusable element should be shadow-active.
+      expect(el.shadowRoot!.activeElement).toBe(lastElAfter);
+    });
+  });
+
+  // ─── _focusActiveDay: all days disabled (1) ─────────────────────────────
+
+  describe('Focus Management: all days disabled', () => {
+    it('does not throw when all days in view are disabled via min/max covering entire month', async () => {
+      // min > last day of the month forces every day in Jan 2026 to be "before min" — all disabled.
+      // The component sets min/max via ISO strings; use a min that is after all days in the view.
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-01-15" min="2026-02-01" max="2026-02-28"></hx-date-picker>',
+      );
+
+      // Open calendar — this triggers _focusActiveDay. With min=2026-02-01 the view is at Jan 2026
+      // (because the selected value is in Jan), but all Jan days are before min so none are enabled.
+      let threw = false;
+      try {
+        await openCalendar(el);
+        await el.updateComplete;
+      } catch {
+        threw = true;
+      }
+
+      expect(threw).toBe(false);
+      // Calendar renders even though no day can be focused.
+      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+    });
+  });
+
+  // ─── _parseISODate: invalid input (1) ───────────────────────────────────
+
+  describe('_parseISODate: invalid input', () => {
+    it('does not display a value when an invalid ISO string is set', async () => {
+      // _parseISODate returns null for malformed strings; _formatForDisplay returns '' in that case.
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="not-a-date"></hx-date-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // The display value should be empty — not the raw invalid string.
+      expect(input.value).toBe('');
+    });
+
+    it('treats completely garbage date strings as invalid', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      el.value = 'garbage!!';
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.value).toBe('');
+    });
+  });
+
+  // ─── _updateValidity: error prop + required simultaneously (1) ──────────
+
+  describe('_updateValidity: error prop and required together', () => {
+    it('uses error prop as the validation message when both error and required are set and value is empty', async () => {
+      // When required=true, value='', and error is set, _updateValidity picks
+      // `this.error || 'This field is required.'` — so the error prop string wins.
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker required error="Custom error message"></hx-date-picker>',
+      );
+      await el.updateComplete;
+
+      // Field is invalid because required + no value.
+      expect(el.checkValidity()).toBe(false);
+      expect(el.validity.valueMissing).toBe(true);
+      // The validation message should reflect the error prop, not the default text.
+      expect(el.validationMessage).toBe('Custom error message');
+    });
+
+    it('renders both the error message div and the required marker simultaneously', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker label="Date" required error="Pick a date"></hx-date-picker>',
+      );
+      await el.updateComplete;
+
+      const errorDiv = shadowQuery(el, '[role="alert"]');
+      const requiredMarker = shadowQuery(el, '.field__required-marker');
+
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.textContent?.trim()).toBe('Pick a date');
+      expect(requiredMarker).toBeTruthy();
+    });
+  });
+
+  // ─── Keyboard ignored when calendar is closed (1) ───────────────────────
+
+  describe('Keyboard: ignored when calendar is closed', () => {
+    it('arrow keys have no effect when calendar is not open', async () => {
+      // The calendar keydown handler is only bound when _isOpen=true (element renders conditionally).
+      // Dispatching arrow keys on a closed picker should not open the calendar or change state.
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-10"></hx-date-picker>',
+      );
+
+      // Confirm calendar is closed.
+      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+
+      // Dispatch several arrow keys on the component host — no calendar listener is attached.
+      el.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }),
+      );
+      el.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+
+      // Calendar must still be closed and value unchanged.
+      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(el.value).toBe('2026-03-10');
+    });
+
+    it('document Escape key has no effect when calendar is already closed', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+
+      // Ensure closed.
+      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+
+      // The document keydown handler checks `this._isOpen` before closing — no-op when closed.
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+
+      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+    });
+  });
+
+  // ─── Arrow key wrapping to next/prev month (2) ──────────────────────────
+
+  describe('Keyboard Navigation: arrow key month wrapping', () => {
+    it('ArrowRight from last day of month wraps to first day of next month', async () => {
+      // March 2026 has 31 days. Arrow right from day 31 should go to April 1.
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-03-31"></hx-date-picker>',
+      );
+      await openCalendar(el);
+
+      const monthLabelBefore =
+        shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+
+      // Month label should change from March 2026 to April 2026.
+      const monthLabelAfter = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      expect(monthLabelAfter).not.toBe(monthLabelBefore);
+
+      // Day 1 of the new month should be focusable.
+      const focusedDay = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        '[data-day="1"][tabindex="0"]',
+      );
+      expect(focusedDay).toBeTruthy();
+    });
+
+    it('ArrowLeft from first day of month wraps to last day of previous month', async () => {
+      // April 1, 2026 → arrow left → March 31, 2026.
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker value="2026-04-01"></hx-date-picker>',
+      );
+      await openCalendar(el);
+
+      const monthLabelBefore =
+        shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      const calendar = shadowQuery(el, '[part="calendar"]')!;
+
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }),
+      );
+      // The component chains multiple async updates: _prevMonth() triggers a render,
+      // _focusedDay assignment triggers another, and updateComplete.then() focuses the button.
+      // Wait for the month to change, then verify day 31 exists in the new calendar grid.
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(r));
+      await el.updateComplete;
+
+      const monthLabelAfter = shadowQuery(el, '.calendar__month-label')?.textContent?.trim() ?? '';
+      expect(monthLabelAfter).not.toBe(monthLabelBefore);
+
+      // Day 31 of March should exist in the calendar grid (March has 31 days).
+      const day31 = el.shadowRoot!.querySelector<HTMLButtonElement>('[data-day="31"]');
+      expect(day31).toBeTruthy();
+    });
+  });
 });
