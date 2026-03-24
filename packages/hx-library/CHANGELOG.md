@@ -1,5 +1,45 @@
 # @helixui/library
 
+## 1.1.1
+
+### Patch Changes
+
+- 6f4a462: add @internal annotations to private members across all components to exclude them from the custom elements manifest
+- 0119575: add checkValidity/reportValidity constraint validation to hx-color-picker, hx-rating, and hx-toggle-button
+- ae0755f: add formDisabledCallback to 8 form-associated components so they respond to fieldset disabled propagation: hx-button, hx-checkbox-group, hx-date-picker, hx-file-upload, hx-icon-button, hx-rating, hx-time-picker, hx-toggle-button
+- 3f8d001: fix(hx-card): make --hx-card-color propagate to slotted content
+
+  Setting --hx-card-color on hx-card now correctly applies to slotted (light DOM) content. The :host color fallback is changed to `inherit` so cards on dark backgrounds inherit ambient color when --hx-card-color is not set. The .card\_\_body section also now respects --hx-card-color.
+
+- 3ce07d7: add form reset, submission, and state restore tests for 5 form-associated components
+- cd5405a: Add missing formDisabledCallback to 8 form-associated components (hx-button, hx-checkbox-group, hx-date-picker, hx-file-upload, hx-icon-button, hx-rating, hx-time-picker, hx-toggle-button) so they correctly respond to fieldset[disabled] state changes via ElementInternals.
+- 98fcf63: add formStateRestoreCallback to hx-file-upload for browser form restoration compliance
+- 3e4bfb4: fix(i18n): add overridable string properties for localization across 11 components
+
+  Replace hardcoded English strings with `@property()` declarations that default to English
+  but can be overridden by consumers for i18n/l10n. Components: hx-alert, hx-checkbox,
+  hx-data-table, hx-date-picker, hx-drawer, hx-number-input, hx-pagination, hx-split-panel,
+  hx-switch, hx-text-input, hx-textarea.
+
+- 3a2c159: Replace physical CSS properties with logical properties for RTL support in hx-side-nav, hx-drawer, hx-toast, hx-data-table, and hx-split-panel
+- cc4eb00: Reduce bundle sizes for 7 over-budget components via CSS minification. Brings hx-form, hx-prose, hx-select, and hx-time-picker under the 5KB standard budget. Documents an 8KB exception for hx-color-picker, hx-combobox, and hx-date-picker whose inherent JS complexity (color math, full ARIA combobox pattern, calendar grid) leaves no room under 5KB. All 77 components now report zero budget violations.
+- 4ea13de: fix(ssr): guard browser APIs in 8 client-only components for SSR compatibility
+
+  Added `typeof window !== 'undefined'` and `typeof document !== 'undefined'` guards
+  to all browser API access (window.matchMedia, document.createElement, document.addEventListener,
+  document.body.children, document.activeElement, requestAnimationFrame) in:
+  - hx-breadcrumb: document.createElement for ellipsis, document.head.appendChild for JSON-LD
+  - hx-carousel: window.matchMedia in connectedCallback
+  - hx-color-picker: document.addEventListener/removeEventListener for pointer and click handlers
+  - hx-counter: window.matchMedia and requestAnimationFrame in connectedCallback
+  - hx-drawer: window.matchMedia, document.addEventListener, document.body.children, document.activeElement
+  - hx-toast: window.matchMedia in \_reducedMotion getter
+  - hx-field: document.createElement in \_ensureA11yDescEl
+  - hx-tooltip: document.createElement in \_setupTriggerAria, document.activeElement in mouseleave handler
+
+  These guards prevent crashes when components are rendered server-side in SSR environments
+  like Next.js, Astro, or any Node.js-based rendering pipeline.
+
 ## 1.1.0
 
 ### Minor Changes
