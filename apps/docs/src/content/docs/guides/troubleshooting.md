@@ -127,7 +127,7 @@ If you're authoring a component, use `:host` in the component's shadow styles. I
 
 ### Form submission not including component values
 
-HELiX form components use `ElementInternals` for form association. Ensure you're not wrapping in a `<div>` that breaks the form context, and that the component has a `name` attribute:
+HELiX form components use `ElementInternals` for form association. Form-associated custom elements retain their form association when nested inside wrapper elements (like `<div>`) as long as they are inside a `<form>` or linked via the `form` attribute. Ensure the component has a `name` attribute for form submission:
 
 ```html
 <!-- Wrong: name attribute missing -->
@@ -364,6 +364,7 @@ my-helix-components:
     js/my-helix-components.js: {}
   dependencies:
     - core/drupal
+    - core/once
 ```
 
 Attach the library in a hook so it loads on every page that might use AJAX to inject components:

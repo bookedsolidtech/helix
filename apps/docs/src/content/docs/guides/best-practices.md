@@ -345,7 +345,10 @@ For healthcare applications with multiple brand or department themes, define eac
 ```
 
 ```javascript
-document.documentElement.className = `theme-${department}`;
+const root = document.documentElement;
+const themeClasses = Array.from(root.classList).filter((c) => c.startsWith('theme-'));
+if (themeClasses.length) root.classList.remove(...themeClasses);
+root.classList.add(`theme-${department}`);
 ```
 
 For full theming guidance, see [Theming](/design-tokens/theming) and [Theming Recipes](/guides/theming-recipes).
