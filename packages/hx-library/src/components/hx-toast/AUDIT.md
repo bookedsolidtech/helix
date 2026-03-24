@@ -215,3 +215,13 @@ The story is misleading to developers evaluating the component.
 | CSS (tokens, animation, parts) | PASS    | P2-01, P2-04, P2-05, P2-08 all fixed       |
 | Performance (bundle size)      | PASS    | ~14KB raw, well under 5KB gzipped estimate |
 | Drupal integration             | PASS    | P1-04 FIXED                                |
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

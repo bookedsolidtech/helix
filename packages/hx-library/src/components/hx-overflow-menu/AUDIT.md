@@ -190,3 +190,13 @@ Files reviewed:
 | Starlight documentation                         | PASS   | Complete with live demos, API, accessibility, Drupal, examples |
 | `label` property                                | PASS   | Configurable accessible name                                   |
 | `outline-offset: 0` on focus-visible menu items | PASS   | WCAG 2.1 SC 1.4.11 compliant                                   |
+
+---
+
+## SSR/Hydration Compatibility (2026-03-24)
+
+**Category:** needs-wrapper | **Severity:** medium
+
+Browser APIs used only in lifecycle hooks or event handlers — not in render path or constructor. Renders safely as inert HTML in Server Components. Requires `'use client'` boundary for interactivity.
+
+See `.automaker/audits/ssr-hydration-audit-2026-03-24.json` for detailed violation analysis.

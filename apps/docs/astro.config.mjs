@@ -657,6 +657,8 @@ export default defineConfig({
             { label: 'React', slug: 'framework-integration/react' },
             { label: 'Vue', slug: 'framework-integration/vue' },
             { label: 'Angular', slug: 'framework-integration/angular' },
+            { label: 'Astro 5', slug: 'framework-integration/astro' },
+            { label: 'Svelte', slug: 'framework-integration/svelte' },
             { label: 'Plain HTML / CDN', slug: 'framework-integration/html' },
             { label: 'Drupal', slug: 'framework-integration/drupal' },
           ],

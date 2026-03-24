@@ -1,0 +1,171 @@
+---
+title: 'hx-counter'
+description: Displays an animated numeric counter that transitions to a target value.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-counter" section="summary" />
+
+## Overview
+
+`hx-counter` renders a single numeric metric that animates from zero to a target `value` when the component mounts. It supports prefix/suffix text (e.g., `$` or `%`), two number formats (integer and decimal), three size variants, and four easing functions.
+
+**Use `hx-counter` when:** you want a visually impactful, animated number display — patient counts, revenue figures, appointment totals.
+
+**Use `hx-stat` instead when:** you need a labeled metric with a trend indicator and contextual label below the value.
+
+## Live Demo
+
+### Basic Counter
+
+Animates from zero to the target value on load.
+
+<ComponentDemo title="Basic Counter">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-end;">
+    <hx-counter value="1247"></hx-counter>
+    <hx-counter value="98.6" format="decimal" suffix="°F"></hx-counter>
+    <hx-counter value="94" suffix="%"></hx-counter>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+Small, medium, and large size variants.
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-end;">
+    <hx-counter value="500" hx-size="sm"></hx-counter>
+    <hx-counter value="500" hx-size="md"></hx-counter>
+    <hx-counter value="500" hx-size="lg"></hx-counter>
+  </div>
+</ComponentDemo>
+
+### With Prefix and Suffix
+
+Currency and percentage formatting examples.
+
+<ComponentDemo title="Prefix & Suffix">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-end;">
+    <hx-counter value="4250000" prefix="$" format="integer" hx-size="md"></hx-counter>
+    <hx-counter value="73.5" format="decimal" suffix="%" hx-size="md"></hx-counter>
+  </div>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-counter';
+```
+
+## Basic Usage
+
+```html
+<hx-counter value="1247"></hx-counter>
+```
+
+## Properties
+
+| Property   | Attribute  | Type                                                   | Default      | Description                                                                                      |
+| ---------- | ---------- | ------------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------ |
+| `value`    | `value`    | `number`                                               | `0`          | The target numeric value to count to.                                                            |
+| `duration` | `duration` | `number`                                               | `1000`       | Animation duration in milliseconds.                                                              |
+| `easing`   | `easing`   | `'linear' \| 'ease-in' \| 'ease-out' \| 'ease-in-out'` | `'ease-out'` | Easing function applied to the animation progress.                                               |
+| `format`   | `format`   | `'integer' \| 'decimal'`                               | `'integer'`  | Number format. `integer` rounds to the nearest whole number; `decimal` shows two decimal places. |
+| `prefix`   | `prefix`   | `string`                                               | `''`         | String prepended to the formatted value (e.g., `$`).                                             |
+| `suffix`   | `suffix`   | `string`                                               | `''`         | String appended to the formatted value (e.g., `%`).                                              |
+| `size`     | `hx-size`  | `'sm' \| 'md' \| 'lg'`                                 | `'md'`       | Size variant controlling font size.                                                              |
+
+## Events
+
+`hx-counter` does not dispatch any custom events.
+
+## CSS Custom Properties
+
+| Property                    | Default                       | Description         |
+| --------------------------- | ----------------------------- | ------------------- |
+| `--hx-counter-font-family`  | `var(--hx-font-family-sans)`  | Font family.        |
+| `--hx-counter-font-weight`  | `var(--hx-font-weight-bold)`  | Font weight.        |
+| `--hx-counter-color`        | `var(--hx-color-neutral-900)` | Counter text color. |
+| `--hx-counter-font-size-sm` | `var(--hx-font-size-xl)`      | Font size at `sm`.  |
+| `--hx-counter-font-size-md` | `var(--hx-font-size-3xl)`     | Font size at `md`.  |
+| `--hx-counter-font-size-lg` | `var(--hx-font-size-5xl)`     | Font size at `lg`.  |
+
+## CSS Parts
+
+| Part      | Description                |
+| --------- | -------------------------- |
+| `counter` | The outer counter element. |
+
+## Slots
+
+`hx-counter` does not expose any slots. All content is rendered via properties.
+
+## Accessibility
+
+| Topic          | Details                                                                                                                                   |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role      | `role="timer"` applied to the counter element to convey animated numeric content to assistive technologies.                               |
+| `aria-live`    | The counter element uses `aria-live="polite"` so screen readers announce the final value after the animation completes.                   |
+| Screen reader  | The final formatted value (including prefix/suffix) is announced when the animation ends.                                                 |
+| Reduced motion | When `prefers-reduced-motion: reduce` is active, the counter skips animation and renders the final value immediately, meeting WCAG 2.3.3. |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/stats-block.html.twig #}
+<hx-counter
+  value="{{ count }}"
+  prefix="{{ prefix|default('') }}"
+  suffix="{{ suffix|default('') }}"
+  hx-size="{{ size|default('md') }}"
+  format="{{ format|default('integer') }}"
+></hx-counter>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-counter example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body
+    style="font-family: sans-serif; padding: 2rem; display: flex; gap: 3rem; flex-wrap: wrap; align-items: flex-end;"
+  >
+    <!-- Patient count -->
+    <hx-counter value="2847" hx-size="lg"></hx-counter>
+
+    <!-- Revenue with prefix -->
+    <hx-counter value="142500" prefix="$" hx-size="md"></hx-counter>
+
+    <!-- Percentage with suffix -->
+    <hx-counter value="98.4" format="decimal" suffix="%" hx-size="md" duration="1500"></hx-counter>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-counter" section="api" />

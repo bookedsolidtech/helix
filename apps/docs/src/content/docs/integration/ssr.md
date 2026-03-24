@@ -478,7 +478,7 @@ Use sparingly — it hides real bugs too.
 
 ## Audit Report
 
-The full per-component SSR compatibility data is in `.automaker/audits/ssr-hydration-audit.json`. This includes:
+The full per-component SSR compatibility data is in `.automaker/audits/ssr-hydration-audit-2026-03-24.json`. This includes:
 - Per-component browser API usage
 - SSR category classification
 - Per-framework recommendations
