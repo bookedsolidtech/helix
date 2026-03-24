@@ -1,0 +1,267 @@
+---
+/**
+ * HelixirBanner — CTA banner showcasing HELiXiR, the AI-powered MCP CEM analyzer.
+ *
+ * Features:
+ * - Full-bleed dark section with purple/violet gradient accent
+ * - Health grade badge grid visual showing A-grade across all 98 components
+ * - Key stats: 98/98 A-grade, 97.2 avg score
+ * - CTA linking to HELiXiR MCP server docs
+ * - Follows DXBanner / GalleryBanner pattern
+ * - Scroll-reveal animation + responsive layout
+ */
+---
+
+<section class="hx-banner" aria-label="HELiXiR Component Health Intelligence">
+  <div class="hx-banner-glow-1" aria-hidden="true"></div>
+  <div class="hx-banner-glow-2" aria-hidden="true"></div>
+
+  <div class="hx-banner-inner scroll-reveal">
+    <div class="hx-banner-content">
+      <span class="hx-banner-label">
+        <i class="fa-solid fa-brain" aria-hidden="true"></i>
+        HELiXiR &mdash; MCP Component Intelligence
+      </span>
+
+      <h2 class="hx-banner-title">
+        98 Components. 98&nbsp;A&#8209;Grades.
+      </h2>
+
+      <p class="hx-banner-description">
+        HELiXiR is an AI-powered MCP server that scores component health directly
+        from the Custom Elements Manifest. Ask your AI assistant to audit any component,
+        compare API surface, detect breaking changes, or surface accessibility gaps &mdash;
+        all from a single tool call.
+      </p>
+
+      <div class="hx-banner-stats">
+        <div class="hx-banner-stat">
+          <span class="hx-banner-stat-value">98/98</span>
+          <span class="hx-banner-stat-label">A&#8209;Grade</span>
+        </div>
+        <div class="hx-banner-stat-divider" aria-hidden="true"></div>
+        <div class="hx-banner-stat">
+          <span class="hx-banner-stat-value">97.2</span>
+          <span class="hx-banner-stat-label">Avg Score</span>
+        </div>
+        <div class="hx-banner-stat-divider" aria-hidden="true"></div>
+        <div class="hx-banner-stat">
+          <span class="hx-banner-stat-value">MCP</span>
+          <span class="hx-banner-stat-label">Protocol</span>
+        </div>
+      </div>
+
+      <a href="/helixir/" class="hx-banner-cta">
+        Explore HELiXiR
+        <span class="hx-banner-cta-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+
+    <div class="hx-banner-visual" aria-hidden="true">
+      <div class="hx-banner-grade-grid">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div class="hx-banner-grade-badge" style={`--delay:${(i * 0.05).toFixed(2)}s`}>
+            A
+          </div>
+        ))}
+      </div>
+      <div class="hx-banner-grade-label">All components passing</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hx-banner {
+    width: 100% !important;
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-12) var(--space-8);
+    background: linear-gradient(135deg, #0a0a1a 0%, #120a1a 50%, #0a0a1a 100%);
+    border-top: 1px solid rgba(139, 92, 246, 0.1);
+    border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+  }
+
+  .hx-banner-glow-1 {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+    top: -200px;
+    right: -100px;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .hx-banner-glow-2 {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.1), transparent 70%);
+    bottom: -150px;
+    left: -100px;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .hx-banner-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .hx-banner-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a78bfa;
+    margin-bottom: var(--space-4);
+  }
+  .hx-banner-label i { font-size: 0.75rem; }
+
+  .hx-banner-title {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: var(--space-4);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.75) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hx-banner-description {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  .hx-banner-stats {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+  .hx-banner-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .hx-banner-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: #a78bfa;
+    font-family: var(--font-heading);
+    margin: 0;
+    padding: 0;
+  }
+  .hx-banner-stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+    padding: 0;
+  }
+  .hx-banner-stat-divider {
+    width: 1px;
+    align-self: center;
+    height: 2rem;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .hx-banner-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-8);
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+    min-height: 48px;
+    line-height: 1;
+  }
+  .hx-banner-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(124, 58, 237, 0.45), 0 0 60px rgba(139, 92, 246, 0.2);
+    color: #fff;
+  }
+  .hx-banner-cta-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+  }
+  .hx-banner-cta:hover .hx-banner-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Grade badge grid */
+  .hx-banner-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+  .hx-banner-grade-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+  }
+  .hx-banner-grade-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    font-size: 1rem;
+    font-weight: 800;
+    color: #a78bfa;
+    font-family: var(--font-heading);
+    animation: fadeInUp 0.4s ease-out calc(var(--delay) + 0.2s) both;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .hx-banner-grade-badge:hover {
+    background: rgba(139, 92, 246, 0.22);
+    border-color: rgba(167, 139, 250, 0.5);
+  }
+  .hx-banner-grade-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 768px) {
+    .hx-banner { padding: var(--space-12) var(--space-4); }
+    .hx-banner-inner { grid-template-columns: 1fr; gap: var(--space-8); text-align: center; }
+    .hx-banner-visual { display: none; }
+    .hx-banner-label { justify-content: center; }
+    .hx-banner-stats { flex-wrap: wrap; gap: var(--space-4); justify-content: center; }
+    .hx-banner-stat-divider { display: none; }
+    .hx-banner-stat { align-items: center; }
+    .hx-banner-cta { width: 100%; justify-content: center; }
+  }
+</style>
