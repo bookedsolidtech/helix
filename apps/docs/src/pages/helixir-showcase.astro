@@ -1,0 +1,734 @@
+---
+/**
+ * HELiXiR Showcase - AI-Powered Component Intelligence
+ *
+ * Standalone Astro page showcasing HELiXiR, the MCP (Model Context Protocol)
+ * server that brings AI-assisted development to the HELIX component library.
+ *
+ * Sections:
+ * 1. Hero - "HELiXiR — AI-Powered Component Intelligence"
+ * 2. What is HELiXiR - MCP server role and purpose
+ * 3. Health Scoring System - 7-dimension scoring explained
+ * 4. Claude Code Integration - AI-assisted development workflows
+ * 5. Live Health Metrics - Component health scores
+ * 6. CEM Analysis - Custom Elements Manifest intelligence
+ * 7. Available MCP Tools - Key tools and capabilities
+ */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+---
+
+<ShowcaseLayout
+  title="HELiXiR Showcase"
+  description="HELiXiR — the MCP server that brings AI-powered component intelligence to HELIX. Health scoring, CEM analysis, and Claude Code integration for enterprise web components."
+>
+  <style is:inline>
+    /* Page-specific gradient-hero override */
+    :root {
+      --gradient-hero: linear-gradient(135deg, #0a0a1a 0%, #0a1a10 40%, #0f1030 100%);
+      --helixir-green: #10b981;
+      --helixir-teal: #14b8a6;
+      --helixir-cyan: #06b6d4;
+      --glow-helixir: 0 0 40px rgba(16, 185, 129, 0.25);
+    }
+
+    /* Top Navigation */
+    .hx-topbar { position:fixed; top:3.5rem; left:0; right:0; z-index:90; display:flex; align-items:center; justify-content:space-between; padding:var(--space-3) var(--space-8); background:rgba(10,10,20,0.85); backdrop-filter:blur(16px) saturate(180%); -webkit-backdrop-filter:blur(16px) saturate(180%); border-bottom:1px solid rgba(255,255,255,0.06); }
+    .hx-topbar-left { display:flex; align-items:center; gap:var(--space-4); }
+    .hx-back-link { display:inline-flex; align-items:center; gap:var(--space-2); font-size:0.875rem; font-weight:600; color:var(--text-secondary); transition:all 0.2s ease; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); }
+    .hx-back-link:hover { color:var(--text-primary); background:var(--glass-bg-strong); }
+    .hx-topbar-title { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
+    .hx-topbar-right { display:flex; align-items:center; gap:var(--space-4); }
+    .hx-topbar-link { font-size:0.8125rem; font-weight:500; color:var(--text-secondary); display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); transition:all 0.2s ease; }
+    .hx-topbar-link:hover { color:var(--helixir-green); background:rgba(16,185,129,0.06); }
+
+    /* Hero */
+    .hx-hero { position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:calc(var(--space-24) + 3.5rem) var(--space-8) var(--space-24); background:var(--gradient-hero); overflow:hidden; }
+    .hx-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(16,185,129,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.02) 1px,transparent 1px); background-size:60px 60px; }
+    .hx-hero-orb { position:absolute; border-radius:50%; pointer-events:none; }
+    .hx-hero-orb-1 { width:500px; height:500px; background:radial-gradient(circle,rgba(16,185,129,0.18),transparent 70%); top:-10%; right:-5%; animation:float-slow 20s ease-in-out infinite, orb-pulse 8s ease-in-out infinite; }
+    .hx-hero-orb-2 { width:400px; height:400px; background:radial-gradient(circle,rgba(6,182,212,0.12),transparent 70%); bottom:-5%; left:-5%; animation:float-slow 25s ease-in-out infinite reverse, orb-pulse 10s ease-in-out infinite 2s; }
+    .hx-hero-orb-3 { width:300px; height:300px; background:radial-gradient(circle,rgba(20,184,166,0.1),transparent 70%); top:30%; left:15%; animation:float-slow 18s ease-in-out infinite 3s, orb-pulse 12s ease-in-out infinite 4s; }
+    .hx-hero-content { position:relative; z-index:2; max-width:800px; }
+    .hx-hero-badge { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-4); background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:var(--radius-full); font-size:0.8125rem; font-weight:600; color:var(--helixir-green); margin-bottom:var(--space-8); animation:fadeInDown 0.8s ease-out; }
+    .hx-hero-badge-dot { width:8px; height:8px; border-radius:50%; background:var(--helixir-green); box-shadow:0 0 8px var(--helixir-green); }
+    .hx-hero-title { font-size:clamp(2.5rem,7vw,4.5rem); font-weight:800; letter-spacing:-0.04em; line-height:1.15; margin-bottom:var(--space-6); animation:fadeInUp 1s ease-out 0.2s both; }
+    .hx-hero-title .gradient-text { background:linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #8b5cf6 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hx-hero-subtitle { font-size:clamp(1.125rem,2.5vw,1.5rem); color:var(--text-secondary); font-weight:400; letter-spacing:-0.01em; margin-bottom:var(--space-6); animation:fadeInUp 1s ease-out 0.4s both; }
+    .hx-hero-description { font-size:1.0625rem; color:var(--text-muted); line-height:1.8; max-width:600px; margin:0 auto; animation:fadeInUp 1s ease-out 0.6s both; }
+
+    /* Sections */
+    .hx-section { position:relative; }
+    .hx-section-inner { max-width:1200px; margin:0 auto; padding:var(--space-24) var(--space-8); }
+    .hx-section-header { text-align:center; margin-bottom:var(--space-16); }
+    .hx-section-label { display:inline-block; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:var(--space-1) var(--space-4); border-radius:var(--radius-full); margin-bottom:var(--space-4); background:rgba(16,185,129,0.08); color:var(--helixir-green); border:1px solid rgba(16,185,129,0.15); }
+    .hx-section-title { font-size:clamp(2rem,5vw,3rem); margin-bottom:var(--space-4); }
+    .hx-section-description { font-size:1.0625rem; color:var(--text-secondary); max-width:700px; margin:0 auto; line-height:1.8; }
+
+    /* Cards */
+    .hx-card { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-xl); padding:var(--space-8) var(--space-6); transition:all 0.5s cubic-bezier(0.22,1,0.36,1); position:relative; overflow:hidden; }
+    .hx-card::before { content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; background:conic-gradient(from var(--gradient-angle),#10b981,#14b8a6,#06b6d4,#8b5cf6,#10b981); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity 0.5s ease; pointer-events:none; animation:border-rotate 4s linear infinite; }
+    .hx-card::after { content:''; position:absolute; width:250px; height:250px; border-radius:50%; background:radial-gradient(circle,rgba(16,185,129,0.1),transparent 70%); opacity:0; transition:opacity 0.5s ease; pointer-events:none; top:var(--mouse-y,50%); left:var(--mouse-x,50%); transform:translate(-50%,-50%); }
+    .hx-card:hover::before { opacity:1; }
+    .hx-card:hover::after { opacity:1; }
+    .hx-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-xl),var(--glow-helixir); background:var(--surface-2); }
+    .hx-card-icon { width:64px; height:64px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:var(--space-5); position:relative; z-index:1; }
+    .hx-card-title { font-size:1.25rem; font-weight:700; margin-bottom:var(--space-3); color:var(--text-primary); position:relative; z-index:1; }
+    .hx-card-desc { font-size:0.9375rem; color:var(--text-secondary); line-height:1.7; position:relative; z-index:1; }
+
+    /* Grid layouts */
+    .hx-grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-6); }
+    .hx-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-6); }
+    .hx-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-6); }
+
+    /* Dimension score bars */
+    .hx-dimension { display:flex; flex-direction:column; gap:var(--space-2); padding:var(--space-4); background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); }
+    .hx-dimension-header { display:flex; align-items:center; justify-content:space-between; }
+    .hx-dimension-name { font-size:0.875rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:var(--space-2); }
+    .hx-dimension-score { font-size:0.875rem; font-weight:800; color:var(--helixir-green); font-family:var(--font-mono); }
+    .hx-dimension-bar { height:6px; background:var(--surface-3); border-radius:var(--radius-full); overflow:hidden; }
+    .hx-dimension-fill { height:100%; border-radius:var(--radius-full); background:linear-gradient(90deg, var(--helixir-green), var(--helixir-cyan)); transition:width 1.2s cubic-bezier(0.22,1,0.36,1); }
+    .hx-dimension-desc { font-size:0.8125rem; color:var(--text-muted); line-height:1.5; }
+
+    /* Tool list */
+    .hx-tool { display:flex; align-items:flex-start; gap:var(--space-4); padding:var(--space-4); background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); transition:all 0.3s ease; }
+    .hx-tool:hover { background:var(--surface-2); border-color:rgba(16,185,129,0.2); transform:translateX(4px); }
+    .hx-tool-icon { width:40px; height:40px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:0.875rem; flex-shrink:0; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:var(--helixir-green); }
+    .hx-tool-name { font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:var(--helixir-cyan); margin-bottom:var(--space-1); }
+    .hx-tool-desc { font-size:0.875rem; color:var(--text-secondary); line-height:1.5; }
+
+    /* Stats */
+    .hx-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-6); margin-top:var(--space-12); }
+    .hx-stat { text-align:center; }
+    .hx-stat-value { font-size:2.5rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:var(--space-1); }
+    .hx-stat-label { font-size:0.875rem; color:var(--text-secondary); font-weight:500; }
+
+    /* Code block */
+    .hx-code-block { background:var(--surface-1); border:1px solid var(--surface-3); border-radius:var(--radius-lg); overflow:hidden; }
+    .hx-code-titlebar { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) var(--space-4); background:rgba(0,0,0,0.3); border-bottom:1px solid var(--surface-3); }
+    .hx-code-dot { width:10px; height:10px; border-radius:50%; }
+    .hx-code-dot:nth-child(1) { background:#ff5f57; }
+    .hx-code-dot:nth-child(2) { background:#ffbd2e; }
+    .hx-code-dot:nth-child(3) { background:#28c840; }
+    .hx-code-filename { font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); margin-left:var(--space-2); }
+    .hx-code-body { padding:var(--space-4) var(--space-5); overflow-x:auto; }
+    .hx-code-body pre { font-size:0.8125rem; line-height:1.7; color:#d6deeb; white-space:pre; margin:0; }
+    .hx-code-body .cmt { color:#637777; font-style:italic; }
+    .hx-code-body .kw { color:#c792ea; }
+    .hx-code-body .fn { color:#82aaff; }
+    .hx-code-body .str { color:#c3e88d; }
+    .hx-code-body .tag { color:#7fdbca; }
+
+    /* CEM pipeline */
+    .hx-pipeline { display:flex; align-items:center; justify-content:center; gap:var(--space-4); flex-wrap:wrap; padding:var(--space-8) 0; }
+    .hx-pipeline-step { display:flex; flex-direction:column; align-items:center; gap:var(--space-2); text-align:center; min-width:120px; }
+    .hx-pipeline-icon { width:72px; height:72px; border-radius:var(--radius-xl); display:flex; align-items:center; justify-content:center; font-size:1.75rem; transition:all 0.3s ease; }
+    .hx-pipeline-icon:hover { transform:scale(1.1); }
+    .hx-pipeline-label { font-size:0.875rem; font-weight:700; color:var(--text-primary); }
+    .hx-pipeline-sub { font-size:0.75rem; color:var(--text-muted); }
+    .hx-pipeline-arrow { font-size:1.25rem; color:var(--text-muted); }
+
+    /* Footer CTA */
+    .hx-footer-cta { border-top:1px solid var(--surface-3); }
+    .hx-footer-cta-inner { max-width:800px; margin:0 auto; padding:var(--space-24) var(--space-8); text-align:center; }
+    .hx-footer-cta-inner h2 { font-size:clamp(1.75rem,4vw,2.5rem); margin-bottom:var(--space-4); }
+    .hx-footer-cta-inner p { font-size:1.0625rem; color:var(--text-secondary); line-height:1.8; margin-bottom:var(--space-8); }
+    .hx-footer-cta-buttons { display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap; }
+    .hx-btn { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-3) var(--space-6); border-radius:var(--radius-full); font-weight:600; font-size:0.9375rem; transition:all 0.3s ease; text-decoration:none; }
+    .hx-btn-solid { background:linear-gradient(135deg, #10b981 0%, #06b6d4 100%); color:#0a1a14; border:none; box-shadow:var(--shadow-md); }
+    .hx-btn-solid:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg), var(--glow-helixir); color:#0a1a14; }
+    .hx-btn-ghost { background:var(--glass-bg); color:var(--text-secondary); border:1px solid var(--glass-border-strong); }
+    .hx-btn-ghost:hover { background:var(--glass-bg-strong); color:var(--text-primary); transform:translateY(-2px); }
+    .hx-btn-arrow { transition:transform 0.2s ease; }
+    .hx-btn:hover .hx-btn-arrow { transform:translateX(4px); }
+
+    /* Color helpers */
+    .icon-green { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05)); border:1px solid rgba(16,185,129,0.2); color:var(--wc-green); }
+    .icon-cyan { background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05)); border:1px solid rgba(6,182,212,0.2); color:var(--wc-cyan); }
+    .icon-accent { background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05)); border:1px solid rgba(139,92,246,0.2); color:var(--wc-accent); }
+    .icon-teal { background:linear-gradient(135deg,rgba(20,184,166,0.15),rgba(20,184,166,0.05)); border:1px solid rgba(20,184,166,0.2); color:var(--helixir-teal); }
+    .icon-amber { background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); border:1px solid rgba(245,158,11,0.2); color:var(--wc-amber); }
+
+    /* Responsive */
+    @media (max-width:1100px) {
+      .hx-grid-4 { grid-template-columns:repeat(2,1fr); }
+      .hx-stats { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width:768px) {
+      .hx-topbar { padding:var(--space-3) var(--space-4); }
+      .hx-topbar-title { display:none; }
+      .hx-hero { min-height:auto; padding:calc(var(--space-24) + var(--space-8)) var(--space-4) var(--space-16); }
+      .hx-section-inner { padding:var(--space-16) var(--space-4); }
+      .hx-grid-2, .hx-grid-3, .hx-grid-4 { grid-template-columns:1fr; }
+      .hx-stats { grid-template-columns:1fr; gap:var(--space-4); }
+      .hx-pipeline { flex-direction:column; }
+      .hx-pipeline-arrow { transform:rotate(90deg); }
+      .hx-footer-cta-buttons { flex-direction:column; align-items:stretch; }
+      .hx-btn { width:100%; justify-content:center; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .hx-hero-orb { animation:none !important; opacity:0.15; }
+    }
+    .hx-btn:focus-visible, .hx-back-link:focus-visible, .hx-topbar-link:focus-visible {
+      outline:3px solid var(--helixir-green); outline-offset:3px;
+    }
+  </style>
+
+  <nav class="hx-topbar" aria-label="Page navigation">
+    <div class="hx-topbar-left">
+      <a href="/" class="hx-back-link" aria-label="Back to HELIX Dashboard">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Dashboard
+      </a>
+      <span class="hx-topbar-title" aria-hidden="true">|</span>
+      <span class="hx-topbar-title">HELiXiR Showcase</span>
+    </div>
+    <div class="hx-topbar-right">
+      <a href="/architecture/overview/" class="hx-topbar-link">
+        <i class="fa-solid fa-book" aria-hidden="true"></i>
+        Architecture Docs
+      </a>
+      <a href="/component-genome/" class="hx-topbar-link">
+        <i class="fa-solid fa-dna" aria-hidden="true"></i>
+        Component Genome
+      </a>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- SECTION 1: HERO -->
+    <section class="hx-hero" aria-label="HELiXiR AI-Powered Component Intelligence">
+      <div class="hx-hero-grid" aria-hidden="true"></div>
+      <div class="hx-hero-orb hx-hero-orb-1" aria-hidden="true"></div>
+      <div class="hx-hero-orb hx-hero-orb-2" aria-hidden="true"></div>
+      <div class="hx-hero-orb hx-hero-orb-3" aria-hidden="true"></div>
+
+      <div class="hx-hero-content">
+        <div class="hx-hero-badge">
+          <span class="hx-hero-badge-dot" aria-hidden="true"></span>
+          MCP Server &middot; AI Intelligence Layer
+        </div>
+        <h1 class="hx-hero-title">
+          HELiXiR<br />
+          <span class="gradient-text">AI-Powered Component Intelligence</span>
+        </h1>
+        <p class="hx-hero-subtitle">The MCP server that makes Claude Code understand your design system.</p>
+        <p class="hx-hero-description">
+          HELiXiR connects the HELIX component library to AI assistants via the Model Context Protocol.
+          It exposes health scoring, CEM analysis, accessibility auditing, and component intelligence
+          directly inside Claude Code &mdash; so every developer works with a senior design system expert
+          built in.
+        </p>
+      </div>
+
+      <div class="mouse-scroll-wrap mouse-scroll-wrap--absolute" aria-hidden="true">
+        <div class="mouse-scroll-body"><div class="mouse-scroll-wheel"></div></div>
+        <span class="mouse-scroll-label">Scroll</span>
+      </div>
+    </section>
+
+    <!-- SECTION 2: WHAT IS HELIXIR -->
+    <section class="hx-section" aria-label="What is HELiXiR">
+      <div class="hx-section-inner">
+        <div class="hx-section-header scroll-reveal">
+          <span class="hx-section-label">MCP Server</span>
+          <h2 class="hx-section-title">What is HELiXiR?</h2>
+          <p class="hx-section-description">
+            HELiXiR is a Model Context Protocol server that gives AI assistants deep knowledge
+            of the HELIX web component library. It is not a chatbot &mdash; it is a structured
+            intelligence layer that answers precise questions about components, tokens, health
+            scores, and usage patterns.
+          </p>
+        </div>
+
+        <div class="hx-grid-3">
+          <div class="hx-card scroll-reveal scroll-reveal-delay-1">
+            <div class="hx-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-brain"></i></div>
+            <div class="hx-card-title">Component Intelligence</div>
+            <div class="hx-card-desc">
+              Deep knowledge of every component: its properties, events, slots, CSS parts,
+              design tokens, and health status. Ask any question and get a structured,
+              accurate answer sourced from the Custom Elements Manifest.
+            </div>
+          </div>
+
+          <div class="hx-card scroll-reveal scroll-reveal-delay-2">
+            <div class="hx-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="hx-card-title">Health Scoring Engine</div>
+            <div class="hx-card-desc">
+              Seven-dimension health scoring for every component. Completeness, accessibility,
+              testing, documentation, token coverage, performance, and Storybook coverage
+              scored and tracked over time.
+            </div>
+          </div>
+
+          <div class="hx-card scroll-reveal scroll-reveal-delay-3">
+            <div class="hx-card-icon icon-accent" aria-hidden="true"><i class="fa-solid fa-plug"></i></div>
+            <div class="hx-card-title">Claude Code Integration</div>
+            <div class="hx-card-desc">
+              Available as MCP tools inside Claude Code. Developers can ask for component
+              analysis, generate import statements, validate usage, and score accessibility
+              without leaving their editor.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: HEALTH SCORING SYSTEM -->
+    <section class="hx-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3); border-bottom:1px solid var(--surface-3);" aria-label="Health scoring system">
+      <div class="hx-section-inner">
+        <div class="hx-section-header scroll-reveal">
+          <span class="hx-section-label">Quality Measurement</span>
+          <h2 class="hx-section-title">7-Dimension Health Scoring</h2>
+          <p class="hx-section-description">
+            Every component in the HELIX library is scored across seven quality dimensions.
+            No component ships below the minimum threshold. Health scores are computed from
+            the Custom Elements Manifest and source code analysis.
+          </p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:var(--space-4);">
+          <div class="hx-dimension scroll-reveal scroll-reveal-delay-1">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-file-code" aria-hidden="true" style="color:var(--helixir-green);"></i>
+                Completeness
+              </div>
+              <div class="hx-dimension-score">Dimension 1</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:88%;"></div></div>
+            <div class="hx-dimension-desc">Measures whether the component has all required elements: JSDoc annotations, CEM-registered properties, events, slots, and CSS custom properties documented.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal scroll-reveal-delay-2">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-universal-access" aria-hidden="true" style="color:var(--helixir-cyan);"></i>
+                Accessibility
+              </div>
+              <div class="hx-dimension-score">Dimension 2</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:92%;"></div></div>
+            <div class="hx-dimension-desc">WCAG 2.1 AA compliance indicators: ARIA role presence, keyboard navigation support, focus management patterns, and screen reader compatibility markers.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal scroll-reveal-delay-3">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-vial" aria-hidden="true" style="color:var(--wc-accent);"></i>
+                Testing
+              </div>
+              <div class="hx-dimension-score">Dimension 3</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:93%;"></div></div>
+            <div class="hx-dimension-desc">Coverage percentage, number of test cases, presence of property tests, event dispatch tests, slot projection tests, and accessibility assertion tests.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal scroll-reveal-delay-4">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-book-open" aria-hidden="true" style="color:var(--wc-amber);"></i>
+                Documentation
+              </div>
+              <div class="hx-dimension-score">Dimension 4</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:85%;"></div></div>
+            <div class="hx-dimension-desc">JSDoc quality for the component class and all public members, summary present, param and return documentation, usage examples in comments.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal scroll-reveal-delay-5">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-palette" aria-hidden="true" style="color:var(--helixir-teal);"></i>
+                Token Coverage
+              </div>
+              <div class="hx-dimension-score">Dimension 5</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:90%;"></div></div>
+            <div class="hx-dimension-desc">Ratio of design token usage to hardcoded values. Components using only <code style="font-size:0.75rem;background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-teal);">--hx-*</code> tokens score highest. Zero hardcoded colors or spacing required.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal scroll-reveal-delay-6">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-gauge-high" aria-hidden="true" style="color:var(--wc-pink);"></i>
+                Performance
+              </div>
+              <div class="hx-dimension-score">Dimension 6</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:95%;"></div></div>
+            <div class="hx-dimension-desc">Estimated bundle size (min+gz), render complexity indicators, use of Lit directives for efficient DOM updates, avoidance of forced synchronous layout patterns.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-book" aria-hidden="true" style="color:var(--wc-electric);"></i>
+                Storybook Coverage
+              </div>
+              <div class="hx-dimension-score">Dimension 7</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:82%;"></div></div>
+            <div class="hx-dimension-desc">Whether a story file exists, number of story variants, presence of controls for all public properties, and interaction test coverage in Storybook.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: CLAUDE CODE INTEGRATION -->
+    <section class="hx-section" aria-label="Claude Code integration">
+      <div class="hx-section-inner">
+        <div class="hx-section-header scroll-reveal">
+          <span class="hx-section-label">AI-Assisted Development</span>
+          <h2 class="hx-section-title">Claude Code Integration</h2>
+          <p class="hx-section-description">
+            HELiXiR registers itself as an MCP server in Claude Code. From that point, every
+            developer has instant access to component intelligence without switching context,
+            searching docs, or guessing at API shapes.
+          </p>
+        </div>
+
+        <div class="hx-grid-2" style="margin-bottom:var(--space-8);">
+          <div class="scroll-reveal scroll-reveal-delay-1">
+            <div class="hx-code-block">
+              <div class="hx-code-titlebar">
+                <div class="hx-code-dot"></div>
+                <div class="hx-code-dot"></div>
+                <div class="hx-code-dot"></div>
+                <span class="hx-code-filename">.claude/mcp.json</span>
+              </div>
+              <div class="hx-code-body">
+                <pre><span style="color:#637777;">// Register HELiXiR as MCP server</span>
+&#123;
+  <span style="color:#addb67;">"mcpServers"</span>: &#123;
+    <span style="color:#addb67;">"helixir"</span>: &#123;
+      <span style="color:#addb67;">"command"</span>: <span style="color:#c3e88d;">"node"</span>,
+      <span style="color:#addb67;">"args"</span>: [<span style="color:#c3e88d;">"./helixir/dist/index.js"</span>],
+      <span style="color:#addb67;">"env"</span>: &#123;
+        <span style="color:#addb67;">"HELIX_ROOT"</span>: <span style="color:#c3e88d;">"."</span>
+      &#125;
+    &#125;
+  &#125;
+&#125;</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="scroll-reveal scroll-reveal-delay-2">
+            <div class="hx-code-block">
+              <div class="hx-code-titlebar">
+                <div class="hx-code-dot"></div>
+                <div class="hx-code-dot"></div>
+                <div class="hx-code-dot"></div>
+                <span class="hx-code-filename">Claude Code — example query</span>
+              </div>
+              <div class="hx-code-body">
+                <pre><span style="color:#637777;">// Developer asks Claude Code:</span>
+<span style="color:#82aaff;">"What is the health score for hx-button
+and what dimensions need improvement?"</span>
+
+<span style="color:#637777;">// HELiXiR responds with structured data:</span>
+&#123;
+  <span style="color:#addb67;">"component"</span>: <span style="color:#c3e88d;">"hx-button"</span>,
+  <span style="color:#addb67;">"overallScore"</span>: <span style="color:#f78c6c;">92</span>,
+  <span style="color:#addb67;">"dimensions"</span>: &#123;
+    <span style="color:#addb67;">"completeness"</span>: <span style="color:#f78c6c;">95</span>,
+    <span style="color:#addb67;">"accessibility"</span>: <span style="color:#f78c6c;">98</span>,
+    <span style="color:#addb67;">"storybook"</span>: <span style="color:#f78c6c;">78</span>
+  &#125;
+&#125;</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hx-grid-3">
+          <div class="hx-card scroll-reveal scroll-reveal-delay-1">
+            <div class="hx-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+            <div class="hx-card-title">Instant Component Analysis</div>
+            <div class="hx-card-desc">
+              Ask Claude Code to analyze any component. HELiXiR reads the CEM, computes health
+              scores, identifies gaps, and returns structured improvement recommendations in
+              seconds.
+            </div>
+          </div>
+
+          <div class="hx-card scroll-reveal scroll-reveal-delay-2">
+            <div class="hx-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-code"></i></div>
+            <div class="hx-card-title">Import Generation</div>
+            <div class="hx-card-desc">
+              Generate correct import statements for any component or set of components.
+              HELiXiR knows the exact export path, version, and tree-shaking-safe import
+              pattern for every element in the library.
+            </div>
+          </div>
+
+          <div class="hx-card scroll-reveal scroll-reveal-delay-3">
+            <div class="hx-card-icon icon-teal" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="hx-card-title">Usage Validation</div>
+            <div class="hx-card-desc">
+              Paste a Twig template or HTML snippet and HELiXiR validates it against the
+              component API. Catches unknown attributes, invalid property values, and missing
+              required slots before they hit the browser.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: LIVE HEALTH METRICS -->
+    <section class="hx-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3); border-bottom:1px solid var(--surface-3);" aria-label="Live health metrics">
+      <div class="hx-section-inner">
+        <div class="hx-section-header scroll-reveal">
+          <span class="hx-section-label">Component Health</span>
+          <h2 class="hx-section-title">Library Health Metrics</h2>
+          <p class="hx-section-description">
+            HELiXiR computes a health summary across the entire library. These metrics
+            reflect the current state of the HELIX component system at build time.
+          </p>
+        </div>
+
+        <div class="hx-stats scroll-reveal scroll-reveal-delay-1">
+          <div class="hx-stat">
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#10b981,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">77</div>
+            <div class="hx-stat-label">Components Tracked</div>
+          </div>
+          <div class="hx-stat">
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">7</div>
+            <div class="hx-stat-label">Health Dimensions</div>
+          </div>
+          <div class="hx-stat">
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">80%</div>
+            <div class="hx-stat-label">Min Score Gate</div>
+          </div>
+          <div class="hx-stat">
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#f59e0b,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">30+</div>
+            <div class="hx-stat-label">MCP Tools Available</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: CEM ANALYSIS -->
+    <section class="hx-section" aria-label="CEM analysis">
+      <div class="hx-section-inner">
+        <div class="hx-section-header scroll-reveal">
+          <span class="hx-section-label">Single Source of Truth</span>
+          <h2 class="hx-section-title">CEM Analysis Engine</h2>
+          <p class="hx-section-description">
+            HELiXiR reads the Custom Elements Manifest as its primary data source.
+            Every component property, event, slot, and CSS part is parsed and indexed
+            for instant AI query resolution.
+          </p>
+        </div>
+
+        <div class="hx-pipeline scroll-reveal scroll-reveal-delay-1">
+          <div class="hx-pipeline-step">
+            <div class="hx-pipeline-icon icon-green"><i class="fa-solid fa-code" aria-hidden="true"></i></div>
+            <div class="hx-pipeline-label">Source Code</div>
+            <div class="hx-pipeline-sub">JSDoc + TypeScript</div>
+          </div>
+          <div class="hx-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="hx-pipeline-step">
+            <div class="hx-pipeline-icon icon-cyan"><i class="fa-solid fa-gears" aria-hidden="true"></i></div>
+            <div class="hx-pipeline-label">CEM Analyzer</div>
+            <div class="hx-pipeline-sub">Build Step</div>
+          </div>
+          <div class="hx-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="hx-pipeline-step">
+            <div class="hx-pipeline-icon icon-accent"><i class="fa-solid fa-file-code" aria-hidden="true"></i></div>
+            <div class="hx-pipeline-label">CEM JSON</div>
+            <div class="hx-pipeline-sub">Manifest</div>
+          </div>
+          <div class="hx-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="hx-pipeline-step">
+            <div class="hx-pipeline-icon icon-teal"><i class="fa-solid fa-brain" aria-hidden="true"></i></div>
+            <div class="hx-pipeline-label">HELiXiR</div>
+            <div class="hx-pipeline-sub">MCP Server</div>
+          </div>
+          <div class="hx-pipeline-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></div>
+          <div class="hx-pipeline-step">
+            <div class="hx-pipeline-icon icon-amber"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
+            <div class="hx-pipeline-label">Claude Code</div>
+            <div class="hx-pipeline-sub">AI Tools</div>
+          </div>
+        </div>
+
+        <div class="hx-grid-2 scroll-reveal scroll-reveal-delay-2">
+          <div class="hx-card">
+            <div class="hx-card-icon icon-green" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="hx-card-title">Deep Manifest Parsing</div>
+            <div class="hx-card-desc">
+              HELiXiR parses the entire CEM on startup and builds an in-memory index.
+              Every component, every member, every declaration is indexed for O(1) lookup.
+              Breaking change detection, API diff, and deprecation tracking are all computed
+              from CEM diffs between versions.
+            </div>
+          </div>
+
+          <div class="hx-card">
+            <div class="hx-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-arrows-rotate"></i></div>
+            <div class="hx-card-title">Live Reload Integration</div>
+            <div class="hx-card-desc">
+              In development mode, HELiXiR watches for CEM changes and reloads its index
+              automatically. Run <code style="font-size:0.8125rem;color:var(--helixir-cyan);background:rgba(6,182,212,0.08);padding:0.1em 0.4em;border-radius:4px;">pnpm run cem</code> and the MCP server reflects
+              the updated API instantly &mdash; no server restart required.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7: AVAILABLE MCP TOOLS -->
+    <section class="hx-section" style="background:var(--surface-1); border-top:1px solid var(--surface-3);" aria-label="Available MCP tools">
+      <div class="hx-section-inner">
+        <div class="hx-section-header scroll-reveal">
+          <span class="hx-section-label">Developer Toolbox</span>
+          <h2 class="hx-section-title">Available MCP Tools</h2>
+          <p class="hx-section-description">
+            HELiXiR exposes over 30 structured tools to Claude Code. These tools cover
+            every aspect of the component lifecycle from discovery to scoring to generation.
+          </p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+          <div class="hx-tool scroll-reveal scroll-reveal-delay-1">
+            <div class="hx-tool-icon"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">score_component</div>
+              <div class="hx-tool-desc">Compute the full 7-dimension health score for a specific component. Returns dimension breakdown, overall score, and improvement recommendations.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal scroll-reveal-delay-2">
+            <div class="hx-tool-icon"><i class="fa-solid fa-universal-access" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">analyze_accessibility</div>
+              <div class="hx-tool-desc">Run an accessibility analysis on a component. Returns ARIA pattern assessment, keyboard navigation gaps, focus management evaluation, and WCAG criterion mapping.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal scroll-reveal-delay-3">
+            <div class="hx-tool-icon"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">get_health_summary</div>
+              <div class="hx-tool-desc">Retrieve a library-wide health summary showing component count, average scores per dimension, components below threshold, and top improvement candidates.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal scroll-reveal-delay-4">
+            <div class="hx-tool-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">find_component</div>
+              <div class="hx-tool-desc">Search for components by name, tag, category, or capability. Returns matching components with their summary, properties, and health score.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal scroll-reveal-delay-5">
+            <div class="hx-tool-icon"><i class="fa-solid fa-code" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">generate_import</div>
+              <div class="hx-tool-desc">Generate the correct import statement for one or more components. Supports named imports, side-effect imports, CDN URLs, and Drupal libraries.yml format.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal scroll-reveal-delay-6">
+            <div class="hx-tool-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">validate_usage</div>
+              <div class="hx-tool-desc">Validate a Twig template, HTML snippet, or JSX against the component API. Detects unknown attributes, invalid property types, and missing required slots.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal">
+            <div class="hx-tool-icon"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">get_health_diff</div>
+              <div class="hx-tool-desc">Compare health scores between two CEM versions. Returns dimension-by-dimension delta, components that regressed, and components that improved.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal">
+            <div class="hx-tool-icon"><i class="fa-solid fa-palette" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">get_design_tokens</div>
+              <div class="hx-tool-desc">Retrieve all design tokens used by a component, with their current values, semantic tier, and theming override points.</div>
+            </div>
+          </div>
+
+          <div class="hx-tool scroll-reveal">
+            <div class="hx-tool-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+            <div>
+              <div class="hx-tool-name">generate_story</div>
+              <div class="hx-tool-desc">Generate a Storybook story scaffold for a component using its CEM definition. Produces correct argTypes, default args, and story variants for every public property.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER CTA -->
+    <section class="hx-footer-cta" aria-label="Next steps">
+      <div class="hx-footer-cta-inner scroll-reveal">
+        <h2>AI-Powered from Day One</h2>
+        <p>
+          HELiXiR is not an add-on. It is a first-class part of the HELIX development
+          experience. Every component ships with the metadata that makes AI assistance
+          accurate, reliable, and useful.
+        </p>
+        <div class="hx-footer-cta-buttons">
+          <a href="/architecture/overview/" class="hx-btn hx-btn-solid">
+            Architecture Docs
+            <span class="hx-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/component-genome/" class="hx-btn hx-btn-ghost">
+            Component Genome
+            <span class="hx-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="/" class="hx-btn hx-btn-ghost">
+            Back to Dashboard
+            <span class="hx-btn-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script is:inline slot="scripts">
+    (function () {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (prefersReduced) {
+        document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+          el.classList.add('is-visible');
+        });
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      );
+
+      document.querySelectorAll('.scroll-reveal').forEach(function (el) {
+        observer.observe(el);
+      });
+
+      document.querySelectorAll('.hx-card').forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+          var rect = card.getBoundingClientRect();
+          card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+          card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+        });
+      });
+    })();
+  </script>
+</ShowcaseLayout>
