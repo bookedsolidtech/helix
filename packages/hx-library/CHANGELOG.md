@@ -1,5 +1,54 @@
 # @helixui/library
 
+## 1.1.0
+
+### Minor Changes
+
+- 6d43fbb: Normalize `size` property to reflect as `hx-size` attribute across 10 components (hx-action-bar, hx-badge, hx-counter, hx-drawer, hx-progress-ring, hx-prose, hx-spinner, hx-stat, hx-status-indicator, hx-steps). Backward compat: legacy `size` attribute is still accepted with a dev-mode deprecation warning; `hx-size` takes precedence when both are present.
+- 5de72db: feat(i18n): replace hardcoded English strings with customizable label properties across 15 components
+
+  All 15 components that contained hardcoded English ARIA labels and live-region text now expose
+  `@property`-backed overrides, allowing consumers to provide localized strings without patching
+  Shadow DOM internals.
+
+  **Components updated:** hx-alert, hx-banner, hx-carousel, hx-color-picker, hx-combobox,
+  hx-data-table, hx-date-picker, hx-dialog, hx-drawer, hx-file-upload, hx-nav, hx-number-input,
+  hx-pagination, hx-rating, hx-split-panel.
+
+  **Breaking change:** None — all new properties carry English defaults matching prior hardcoded values.
+
+### Patch Changes
+
+- dab0d0f: Add missing JSDoc descriptions to hx-popover, hx-tooltip, and hx-accordion-item to bring all components to A-grade CEM health score.
+- cefa51f: Add `@internal` JSDoc annotations to private members in hx-overflow-menu so they are excluded from the Custom Elements Manifest public API.
+- 8a26619: fix(cem): move counter variables before JSDoc blocks in hx-popover and hx-tooltip so CEM correctly associates class descriptions and event descriptions; add @internal to hx-tooltip @query fields
+- af939f6: fix(components): address CodeRabbit findings — dropdown capture leak, rating formReset, untyped events
+- 9902b62: fix non-compositable css animations: replace width/max-height transitions with transform/grid alternatives for gpu acceleration
+- 7003dbf: add missing prefers-reduced-motion overrides to 17 components for wcag 2.1 aa compliance
+- 9d07190: extract hx-carousel-item styles to separate file; remove :focus in favor of :focus-visible
+- afa2df7: fix cem annotation issues: replace invalid @cssproperty tags with @cssprop in hx-status-indicator (11 properties now visible in manifest); add missing @csspart slide annotation and part="slide" attribute to hx-carousel-item
+- 0a26250: replace string concatenation for css classes with classmap() directive in hx-list-item and hx-tree-item
+- fe3d26b: fix: correct formStateRestoreCallback signatures to accept string | File | FormData | null across 8 form-associated components (LA-001 through LA-008)
+- 1c9f1ea: replace inline style string construction with proper lit patterns (styleMap directive, css custom properties) in hx-grid, hx-split-panel, hx-prose; remove no-op key attribute react-ism from hx-data-table skeleton rows
+- f2fad64: Fix lifecycle correctness: add missing super.updated() calls in hx-combobox, hx-counter, and hx-toast; prefix floating updateComplete promises with void in hx-top-nav, hx-split-button, and hx-nav
+- ef971fc: Fix .bind() memory leak in hx-dropdown, @state slot tracking in hx-text-input, and internal property attribute exposure in hx-step
+- 92bc38e: replace math.random() id generation with module-level counter in hx-overflow-menu; replace shadowroot.queryselector calls with @query decorators across hx-overflow-menu, hx-tooltip, hx-toast, hx-menu-item, hx-toggle-button, hx-tree-item
+- 033820b: fix three critical performance findings from audit: narrow sideEffects in package.json to css-only to restore tree-shaking, replace per-render querySelector in hx-table with slotchange-driven state, and make hx-color-picker global listeners conditional on open/drag state
+- 467eb85: fix(perf): add repeat() directive to data-table, select, combobox; fix timer leaks in menu and popover; cache layout reads in split-panel; scope MutationObserver in tabs
+- 06e5cbd: add DarkMode story variants to 64 visual components and slot demo stories for 7 components to achieve full Storybook coverage across all visual components
+- 814a3eb: fix(stories): add missing variant, state, event, and interaction stories for 18 components
+- 7eac21a: fix(tests): replace setTimeout with updateComplete and add slot projection tests
+  - Replace all non-intentional `setTimeout`-based waits across 22 test files with `await el.updateComplete` for deterministic DOM/state settling
+  - Replace hx-drawer 400ms animation-complete waits with `await oneEvent(el, 'hx-after-show')` and `await oneEvent(el, 'hx-after-hide')`
+  - Preserve intentional real timers: hx-number-input long-press stepper helper and hx-tooltip `vi.useFakeTimers()` describe blocks
+  - Add "Slot projection" describe blocks to 7 components: hx-combobox, hx-date-picker, hx-select, hx-radio-group, hx-rating, hx-number-input, hx-carousel
+
+- 4c03c2f: Add missing form association integration tests to 14 form-associated components: hx-button, hx-button-group, hx-checkbox, hx-color-picker, hx-combobox, hx-date-picker, hx-file-upload, hx-icon-button, hx-number-input, hx-radio-group, hx-rating, hx-select, hx-switch, hx-toggle-button
+- 370e59c: fix: remove forbidden prefers-color-scheme dark blocks from hx-step and hx-table, rename wc- keyframe to hx- in hx-badge, align spacing token prefix (--hx-spacing-_ → --hx-space-_) in hx-stack, hx-dialog, hx-drawer, hx-pagination, fix non-standard token vocabulary in hx-pagination and hx-color-picker, replace hardcoded rgba/hex colors with overlay tokens in hx-button inverted mode
+- 0a0c027: fix(tokens): add missing semantic fallback chains to component css custom properties
+- 630c7de: fix(typescript): remove double-cast as unknown as patterns and add generic types to CustomEvent dispatches
+- 7846a6a: fix: replace Map<string, unknown> with PropertyValues<this> in lifecycle methods and add type guards for unsafe Event casts
+
 ## 1.0.1
 
 ### Patch Changes
