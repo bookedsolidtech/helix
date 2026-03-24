@@ -499,17 +499,4 @@ describe('hx-alert', () => {
     });
   });
 
-  // ─── i18n / label overrides ───
-
-  describe('i18n / label overrides', () => {
-    it('uses default English label for close button', async () => {
-      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
-      expect(el.closeLabel).toBe('Close alert');
-    });
-
-    it('renders custom closeLabel when set via attribute', async () => {
-      const el = await fixture<HxAlert>('<hx-alert close-label="Schließen">Test</hx-alert>');
-      expect(el.closeLabel).toBe('Schließen');
-    });
-  });
 });

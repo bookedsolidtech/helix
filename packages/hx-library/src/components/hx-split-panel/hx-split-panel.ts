@@ -132,24 +132,26 @@ export class HelixSplitPanel extends LitElement {
   @property({ type: String, reflect: true })
   collapsed: 'start' | 'end' | null = null;
 
-  /** Accessible label for the resize divider handle. */
-  @property({ type: String, attribute: 'label-resize' })
-  labelResize = 'Resize panels';
-
-  /** Accessible label for the collapse-start panel button. */
-  @property({ type: String, attribute: 'label-collapse-start' })
-  labelCollapseStart = 'Collapse start panel';
-
-  /** Accessible label for the collapse-end panel button. */
-  @property({ type: String, attribute: 'label-collapse-end' })
-  labelCollapseEnd = 'Collapse end panel';
+  /**
+   * Accessible label for the divider separator element.
+   * @attr resize-label
+   */
+  @property({ attribute: 'resize-label' })
+  resizeLabel = 'Resize panels';
 
   /**
-   * Generates the accessible label for the expand button when a panel is collapsed.
-   * @param side - which panel was collapsed
+   * Accessible label for the button that collapses the start panel.
+   * @attr collapse-start-label
    */
-  @property({ attribute: false })
-  labelExpand: (side: 'start' | 'end') => string = (side) => `Expand ${side} panel`;
+  @property({ attribute: 'collapse-start-label' })
+  collapseStartLabel = 'Collapse start panel';
+
+  /**
+   * Accessible label for the button that collapses the end panel.
+   * @attr collapse-end-label
+   */
+  @property({ attribute: 'collapse-end-label' })
+  collapseEndLabel = 'Collapse end panel';
 
   /**
    * Whether the user is currently dragging the divider.
@@ -373,7 +375,7 @@ export class HelixSplitPanel extends LitElement {
           part="divider"
           class="divider"
           role="separator"
-          aria-label=${this.labelResize}
+          aria-label=${this.resizeLabel}
           aria-orientation=${this.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
           aria-valuenow=${this.position}
           aria-valuemin=${this.min}
@@ -391,7 +393,7 @@ export class HelixSplitPanel extends LitElement {
                 <button
                   type="button"
                   class="collapse-btn"
-                  aria-label=${this.labelExpand(this.collapsed as 'start' | 'end')}
+                  aria-label=${`Expand ${this.collapsed} panel`}
                   @click=${this._expand}
                 >
                   ${this.collapsed === 'start' ? '▶' : '◀'}
@@ -401,7 +403,7 @@ export class HelixSplitPanel extends LitElement {
                 <button
                   type="button"
                   class="collapse-btn"
-                  aria-label=${this.labelCollapseStart}
+                  aria-label=${this.collapseStartLabel}
                   @click=${this._collapseStart}
                 >
                   ◀
@@ -409,7 +411,7 @@ export class HelixSplitPanel extends LitElement {
                 <button
                   type="button"
                   class="collapse-btn"
-                  aria-label=${this.labelCollapseEnd}
+                  aria-label=${this.collapseEndLabel}
                   @click=${this._collapseEnd}
                 >
                   ▶

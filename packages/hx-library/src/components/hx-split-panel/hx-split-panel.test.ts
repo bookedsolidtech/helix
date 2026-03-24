@@ -836,14 +836,14 @@ describe('hx-split-panel', () => {
         '<hx-split-panel><div slot="start">Start</div><div slot="end">End</div></hx-split-panel>',
       );
       await el.updateComplete;
-      expect(el.labelResize).toBe('Resize panels');
+      expect(el.resizeLabel).toBe('Resize panels');
     });
 
-    it('divider aria-label reflects custom labelResize', async () => {
+    it('divider aria-label reflects custom resizeLabel', async () => {
       const el = await fixture<HelixSplitPanel>(
         '<hx-split-panel><div slot="start">Start</div><div slot="end">End</div></hx-split-panel>',
       );
-      el.labelResize = 'Redimensionner les panneaux';
+      el.resizeLabel = 'Redimensionner les panneaux';
       await el.updateComplete;
       const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
       expect(divider?.getAttribute('aria-label')).toBe('Redimensionner les panneaux');

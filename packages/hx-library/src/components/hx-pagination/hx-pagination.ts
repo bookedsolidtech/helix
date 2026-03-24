@@ -131,30 +131,33 @@ export class HelixPagination extends LitElement {
   @property({ type: String, attribute: 'label-rows-per-page' })
   labelRowsPerPage = 'Rows per page:';
 
-  /** Accessible label for the first-page button. */
-  @property({ type: String, attribute: 'label-first-page' })
-  labelFirstPage = 'First page';
-
-  /** Accessible label for the previous-page button. */
-  @property({ type: String, attribute: 'label-prev-page' })
-  labelPrevPage = 'Previous page';
-
-  /** Accessible label for the next-page button. */
-  @property({ type: String, attribute: 'label-next-page' })
-  labelNextPage = 'Next page';
-
-  /** Accessible label for the last-page button. */
-  @property({ type: String, attribute: 'label-last-page' })
-  labelLastPage = 'Last page';
+  /**
+   * Accessible label for the "First page" navigation button.
+   * @attr first-page-label
+   */
+  @property({ attribute: 'first-page-label' })
+  firstPageLabel = 'First page';
 
   /**
-   * Generates the live-region text announcing the current page.
-   * @param current - current page number
-   * @param total - total page count
+   * Accessible label for the "Previous page" navigation button.
+   * @attr previous-page-label
    */
-  @property({ attribute: false })
-  labelPageOf: (current: number, total: number) => string = (current, total) =>
-    `Page ${current} of ${total}`;
+  @property({ attribute: 'previous-page-label' })
+  previousPageLabel = 'Previous page';
+
+  /**
+   * Accessible label for the "Next page" navigation button.
+   * @attr next-page-label
+   */
+  @property({ attribute: 'next-page-label' })
+  nextPageLabel = 'Next page';
+
+  /**
+   * Accessible label for the "Last page" navigation button.
+   * @attr last-page-label
+   */
+  @property({ attribute: 'last-page-label' })
+  lastPageLabel = 'Last page';
 
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   /** @internal */
@@ -230,7 +233,7 @@ export class HelixPagination extends LitElement {
 
     this.currentPage = clamped;
     this._rovingKey = null; // reset so focus follows the new current page
-    this._liveMessage = this.labelPageOf(clamped, this.totalPages);
+    this._liveMessage = `Page ${clamped} of ${this.totalPages}`;
     this.dispatchEvent(
       new CustomEvent<{ page: number }>('hx-page-change', {
         detail: { page: clamped },
@@ -349,7 +352,7 @@ export class HelixPagination extends LitElement {
                       ?disabled=${isFirst}
                       tabindex=${rovingKey === 'first' ? 0 : -1}
                       data-roving-key="first"
-                      aria-label=${this.labelFirstPage}
+                      aria-label=${this.firstPageLabel}
                       @click=${() => this._navigate(1)}
                     >
                       «
@@ -365,7 +368,7 @@ export class HelixPagination extends LitElement {
                 ?disabled=${isFirst}
                 tabindex=${rovingKey === 'prev' ? 0 : -1}
                 data-roving-key="prev"
-                aria-label=${this.labelPrevPage}
+                aria-label=${this.previousPageLabel}
                 @click=${() => this._navigate(this.currentPage - 1)}
               >
                 ‹
@@ -410,7 +413,7 @@ export class HelixPagination extends LitElement {
                 ?disabled=${isLast}
                 tabindex=${rovingKey === 'next' ? 0 : -1}
                 data-roving-key="next"
-                aria-label=${this.labelNextPage}
+                aria-label=${this.nextPageLabel}
                 @click=${() => this._navigate(this.currentPage + 1)}
               >
                 ›
@@ -426,7 +429,7 @@ export class HelixPagination extends LitElement {
                       ?disabled=${isLast}
                       tabindex=${rovingKey === 'last' ? 0 : -1}
                       data-roving-key="last"
-                      aria-label=${this.labelLastPage}
+                      aria-label=${this.lastPageLabel}
                       @click=${() => this._navigate(this.totalPages)}
                     >
                       »
