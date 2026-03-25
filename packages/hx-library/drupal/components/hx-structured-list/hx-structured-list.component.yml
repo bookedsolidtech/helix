@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Structured List
+status: experimental
+group: HELiX
+description: 'Container for structured key-value data display. Renders as a description list for accessible term/definition semantics. Use `hx-structured-list-row` as direct children.'
+props:
+  type: object
+  properties:
+    bordered:
+      type: boolean
+      title: Bordered
+      description: 'Renders a border around the entire list.'
+      default: false
+    condensed:
+      type: boolean
+      title: Condensed
+      description: 'Reduces row padding for denser layouts.'
+      default: false
+    striped:
+      type: boolean
+      title: Striped
+      description: 'Alternates row background colors for easier scanning.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'One or more `hx-structured-list-row` elements.'
+libraryOverrides: {}

@@ -1,0 +1,25 @@
+{#
+ /**
+ * @file
+ * HX Th component template.
+ *
+ * Semantic table header cell. Must be a child of `hx-tr`.
+ * Supports sortable columns with accessible sort state.
+ *
+ * Available variables:
+ * - sortable: boolean - When true, the header renders a sort button and emits `hx-sort` on activation.
+ * - sortDirection: object - Current sort direction. Reflected for CSS targeting.
+ * - scope: object - The `scope` attribute for the underlying `<th>` element.
+ * - colspan: number - Number of columns this header spans.
+ * - rowspan: number - Number of rows this header spans.
+ */
+#}
+<hx-th
+  {% if sortable %}sortable{% endif %}
+  {% if sortDirection is defined and sortDirection is not empty %}sort-direction="{{ sortDirection }}"{% endif %}
+  {% if scope is defined and scope is not empty %}scope="{{ scope }}"{% endif %}
+  {% if colspan is defined and colspan is not empty %}colspan="{{ colspan }}"{% endif %}
+  {% if rowspan is defined and rowspan is not empty %}rowspan="{{ rowspan }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-th>

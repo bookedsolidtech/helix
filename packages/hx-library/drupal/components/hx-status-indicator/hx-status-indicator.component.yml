@@ -1,0 +1,29 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Status Indicator
+status: experimental
+group: HELiX
+description: 'A colored dot/badge indicating system or entity health status. Purely visual — no slots. Supports an animated pulse ring.  Uses `role="img"` with an auto-generated `aria-label` (e.g. "Status: Online"). When used decoratively alongside visible text that conveys the same status information (e.g. "Provider is available"), set `aria-hidden="true"` on the host element to prevent duplicate announcements to screen reader users. This is the recommended composition pattern in healthcare dashboards.'
+props:
+  type: object
+  properties:
+    status:
+      type: object
+      title: Status
+      description: 'The status to display.'
+      default: 'unknown'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the indicator dot.'
+      default: 'md'
+    pulse:
+      type: boolean
+      title: Pulse
+      description: 'Whether to show an animated pulse ring around the dot. Animation is suppressed when prefers-reduced-motion is active.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the indicator. Defaults to "Status: {Status}". Set aria-hidden="true" on the host when status is conveyed by adjacent text.'
+      default: ''
+libraryOverrides: {}

@@ -1,0 +1,47 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Menu Item
+status: experimental
+group: HELiX
+description: 'A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting. Use `aria-label` on the parent `hx-menu` to provide an accessible name.'
+props:
+  type: object
+  properties:
+    value:
+      type: string
+      title: Value
+      description: 'The value associated with this item, emitted in the hx-select event.'
+      default: ''
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the item is disabled. Prevents interaction and event dispatch.'
+      default: false
+    checked:
+      type: boolean
+      title: Checked
+      description: 'Whether the item is checked. Only meaningful when type="checkbox".'
+      default: false
+    type:
+      type: object
+      title: Type
+      description: 'The type of menu item. "checkbox" renders a checkmark and toggles checked state. "radio" renders a checkmark and emits selection for radio-group behavior.'
+      default: 'normal'
+    loading:
+      type: boolean
+      title: Loading
+      description: 'Whether the item is in a loading state. Shows a spinner and prevents interaction.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the item label.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Shortcut text or icon rendered after the label.'
+  submenu:
+    title: Submenu
+    description: 'A nested hx-menu for submenu content.'
+libraryOverrides: {}

@@ -1,0 +1,31 @@
+/**
+ * HX Time Picker component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-time-picker-bg: Input background color. (default: var(--hx-color-neutral-0))
+ * --hx-time-picker-color: Input text color. (default: var(--hx-color-neutral-800))
+ * --hx-time-picker-border-color: Border color. (default: var(--hx-color-neutral-300))
+ * --hx-time-picker-border-radius: Border radius. (default: var(--hx-border-radius-md))
+ * --hx-time-picker-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-time-picker-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-time-picker-error-color: Error state color. (default: var(--hx-color-error-500))
+ * --hx-time-picker-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-time-picker-chevron-color: Toggle chevron color. (default: var(--hx-color-neutral-500))
+ * --hx-time-picker-listbox-bg: Listbox background. (default: var(--hx-color-neutral-0))
+ * --hx-time-picker-listbox-max-height: Maximum height of the dropdown. (default: 16rem)
+ * --hx-time-picker-listbox-shadow: Box shadow for the dropdown listbox. (default: 0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900) 12%, transparent))
+ * --hx-time-picker-option-color: Option text color. (default: var(--hx-color-neutral-800))
+ * --hx-time-picker-option-hover-bg: Option hover background. (default: var(--hx-color-primary-50))
+ * --hx-time-picker-option-hover-color: Option hover text color. (default: var(--hx-color-primary-700))
+ * --hx-time-picker-option-selected-bg: Selected option background. (default: var(--hx-color-primary-100))
+ * --hx-time-picker-option-selected-color: Selected option text color. (default: var(--hx-color-primary-800))
+ */
+
+/* Component host styles */
+hx-time-picker {
+  display: block;
+}

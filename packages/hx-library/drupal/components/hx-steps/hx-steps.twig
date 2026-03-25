@@ -1,0 +1,24 @@
+{#
+ /**
+ * @file
+ * HX Steps component template.
+ *
+ * A multi-step wizard / stepper progress indicator. Renders a sequence of
+ * `<hx-step>` children as a horizontal or vertical step tracker with connector
+ * lines and status-based styling.
+ * 
+ * Provide an `aria-label` on `<hx-steps>` to describe the step process for assistive technology.
+ *
+ * Available variables:
+ * - orientation: object - Layout orientation of the steps.
+ * - size: object - Size variant of the steps.
+ * - ariaLabel: object - Accessible label for the list. Forwarded to the inner list element.
+ */
+#}
+<hx-steps
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if ariaLabel is defined and ariaLabel is not empty %}aria-label="{{ ariaLabel }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-steps>

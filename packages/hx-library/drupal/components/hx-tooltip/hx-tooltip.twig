@@ -1,0 +1,23 @@
+{#
+ /**
+ * @file
+ * HX Tooltip component template.
+ *
+ * A tooltip that displays contextual help text on hover or focus.
+ *
+ * Available variables:
+ * - placement: object - Preferred placement of the tooltip relative to the trigger. Supports all Floating UI placement values including alignment variants (e.g. 'top-start', 'bottom-end') and 'auto'.
+ * - showDelay: number - Delay in milliseconds before the tooltip is shown.
+ * - hideDelay: number - Delay in milliseconds before the tooltip is hidden.
+ */
+#}
+<hx-tooltip
+  {% if placement is defined and placement is not empty %}placement="{{ placement }}"{% endif %}
+  {% if showDelay is defined and showDelay is not empty %}show-delay="{{ showDelay }}"{% endif %}
+  {% if hideDelay is defined and hideDelay is not empty %}hide-delay="{{ hideDelay }}"{% endif %}
+>
+  {% if slots.content is defined %}
+    <slot name="content">{{ slots.content }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tooltip>

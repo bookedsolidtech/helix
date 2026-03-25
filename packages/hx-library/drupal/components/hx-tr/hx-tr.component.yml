@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tr
+status: experimental
+group: HELiX
+description: 'Semantic table row. Must be a child of `hx-thead`, `hx-tbody`, or `hx-tfoot`. Contains `hx-th` or `hx-td` cells.'
+props:
+  type: object
+  properties:
+    selected:
+      type: boolean
+      title: Selected
+      description: 'When true, marks the row as selected and applies selected styling.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'When true, the row is visually disabled and non-interactive.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `hx-th` and `hx-td` elements.'
+libraryOverrides: {}

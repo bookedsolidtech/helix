@@ -1,0 +1,23 @@
+/**
+ * HX Container component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-container-bg: Background color on the outer wrapper. (default: transparent)
+ * --hx-container-gutter: Horizontal padding on the inner box. (default: var(--hx-space-6))
+ * --hx-container-max-width: Override the max-width set by the width property.
+ * --hx-container-content: Max-width for the content width preset. (default: 72rem)
+ * --hx-container-narrow: Max-width for the narrow width preset. (default: 48rem)
+ * --hx-container-sm: Max-width for the sm width preset. (default: 640px)
+ * --hx-container-md: Max-width for the md width preset. (default: 768px)
+ * --hx-container-lg: Max-width for the lg width preset. (default: 1024px)
+ * --hx-container-xl: Max-width for the xl width preset. (default: 1280px)
+ */
+
+/* Component host styles */
+hx-container {
+  display: block;
+}

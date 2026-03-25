@@ -1,0 +1,15 @@
+/**
+ * HX Td component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-table-cell-color: Cell text color. (default: var(--hx-color-neutral-900, #0f172a))
+ */
+
+/* Component host styles */
+hx-td {
+  display: block;
+}

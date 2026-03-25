@@ -1,0 +1,32 @@
+{#
+ /**
+ * @file
+ * HX Nav Item component template.
+ *
+ * A navigation item for use inside hx-side-nav.
+ * Supports icons, badges, sub-navigation, and active/disabled states.
+ *
+ * Available variables:
+ * - href: string - The URL this nav item links to.
+ * - active: boolean - Whether this item is the current/active page.
+ * - expanded: boolean - Whether the sub-navigation is expanded.
+ * - disabled: boolean - Whether this nav item is disabled.
+ */
+#}
+<hx-nav-item
+  {% if href is defined and href is not empty %}href="{{ href }}"{% endif %}
+  {% if active %}active{% endif %}
+  {% if expanded %}expanded{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {% if slots.icon is defined %}
+    <slot name="icon">{{ slots.icon }}</slot>
+  {% endif %}
+  {% if slots.badge is defined %}
+    <slot name="badge">{{ slots.badge }}</slot>
+  {% endif %}
+  {% if slots.children is defined %}
+    <slot name="children">{{ slots.children }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-nav-item>

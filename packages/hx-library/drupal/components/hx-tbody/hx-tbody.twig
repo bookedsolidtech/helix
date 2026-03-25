@@ -1,0 +1,12 @@
+{#
+ /**
+ * @file
+ * HX Tbody component template.
+ *
+ * Semantic table body section. Must be a direct child of `hx-table`.
+ * Contains `hx-tr` rows with `hx-td` data cells.
+ */
+#}
+<hx-tbody>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tbody>

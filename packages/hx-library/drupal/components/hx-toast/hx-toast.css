@@ -1,0 +1,19 @@
+/**
+ * HX Toast component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-toast-bg: Toast background color. (default: var(--hx-color-neutral-900))
+ * --hx-toast-color: Toast text color. (default: var(--hx-color-neutral-0))
+ * --hx-toast-border-radius: Toast border radius. (default: var(--hx-border-radius-md))
+ * --hx-toast-shadow: Toast box shadow.
+ * --hx-toast-width: Toast width. (default: 20rem)
+ */
+
+/* Component host styles */
+hx-toast {
+  display: block;
+}

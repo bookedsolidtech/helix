@@ -1,0 +1,46 @@
+{#
+ /**
+ * @file
+ * HX Button component template.
+ *
+ * A production-grade button component for user interaction. Supports multiple
+ * visual variants, sizes, loading state, prefix/suffix slots, anchor rendering,
+ * and full ElementInternals form association.
+ *
+ * Available variables:
+ * - variant: object - Visual style variant of the button.
+ * - size: object - Size of the button.
+ * - disabled: boolean - Whether the button is disabled. Prevents all interaction and form actions.
+ * - loading: boolean - Whether the button is in a loading state. Shows spinner, prevents interaction, and sets aria-busy. Does not set the disabled attribute.
+ * - type: object - The type attribute for the underlying button element. Ignored when href is set.
+ * - href: object - When set, renders an anchor element instead of a button.
+ * - target: object - Anchor target attribute. Only used when href is set.
+ * - name: object - Form field name submitted via ElementInternals.setFormValue on submit.
+ * - value: object - Form field value submitted via ElementInternals.setFormValue on submit.
+ * - full: boolean - When true, the button stretches to fill its container width. Sets the host to `display: block` and the inner element to `width: 100%`.
+ * - inverted: boolean - When true, flips button colors for placement on dark or gradient backgrounds. Forces text to white and adjusts hover/focus ring colors across all variants.
+ * - ariaLabel: object - Accessible label forwarded to the inner button/anchor. Required for icon-only usage.
+ */
+#}
+<hx-button
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if loading %}loading{% endif %}
+  {% if type is defined and type is not empty %}type="{{ type }}"{% endif %}
+  {% if href is defined and href is not empty %}href="{{ href }}"{% endif %}
+  {% if target is defined and target is not empty %}target="{{ target }}"{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if full %}full{% endif %}
+  {% if inverted %}inverted{% endif %}
+  {% if ariaLabel is defined and ariaLabel is not empty %}aria-label="{{ ariaLabel }}"{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-button>

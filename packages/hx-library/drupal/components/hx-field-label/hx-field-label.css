@@ -1,0 +1,20 @@
+/**
+ * HX Field Label component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-field-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-field-label-required-color: Required indicator color. (default: var(--hx-color-danger, var(--hx-color-error-text, #b91c1c)))
+ * --hx-font-label-size: Label font size. (default: var(--hx-font-size-sm))
+ * --hx-font-label-weight: Label font weight. (default: var(--hx-font-weight-medium))
+ * --hx-font-label-line-height: Label line height. (default: var(--hx-line-height-normal))
+ * --hx-font-label-family: Label font family. (default: var(--hx-font-family-sans))
+ */
+
+/* Component host styles */
+hx-field-label {
+  display: block;
+}

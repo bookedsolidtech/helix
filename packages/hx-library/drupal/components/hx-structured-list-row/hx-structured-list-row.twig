@@ -1,0 +1,18 @@
+{#
+ /**
+ * @file
+ * HX Structured List Row component template.
+ *
+ * A single row within an `hx-structured-list`. Renders a label/value pair
+ * with an optional actions area.
+ */
+#}
+<hx-structured-list-row>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.actions is defined %}
+    <slot name="actions">{{ slots.actions }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-structured-list-row>

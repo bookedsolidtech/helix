@@ -1,0 +1,45 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Card
+status: experimental
+group: HELiX
+description: 'A flexible card component for displaying grouped content.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the card.'
+      default: 'default'
+    elevation:
+      type: object
+      title: Elevation
+      description: 'Elevation (shadow depth) of the card.'
+      default: 'flat'
+    hxHref:
+      type: object
+      title: Hx Href
+      description: 'Optional URL. When set, the card becomes interactive (clickable) and navigates to this URL on click. Uses hx-href to avoid conflicting with the native HTML href attribute.'
+      default: 'undefined'
+    hxAriaLabel:
+      type: object
+      title: Hx Aria Label
+      description: "Accessible label for interactive cards. Use this to provide a meaningful description of the card's purpose rather than exposing the raw URL. Only applies when hx-href is set."
+      default: 'undefined'
+slots:
+  image:
+    title: Image
+    description: 'Optional image or media content at the top of the card.'
+  heading:
+    title: Heading
+    description: 'The card heading/title content. Use a semantic heading element (h2, h3, etc.) for proper accessibility.'
+  default:
+    title: Default
+    description: 'Default slot for the card body content.'
+  footer:
+    title: Footer
+    description: 'Optional footer content below the body.'
+  actions:
+    title: Actions
+    description: 'Optional action buttons, rendered with a top border separator. Do NOT use together with hx-href (interactive card + focusable actions is an ARIA anti-pattern).'
+libraryOverrides: {}

@@ -1,0 +1,32 @@
+/**
+ * HX Stat component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-stat-gap: Gap between value and label. (default: var(--hx-space-1))
+ * --hx-stat-header-gap: Gap between icon and value in the header row. (default: var(--hx-space-2))
+ * --hx-stat-color: Default text color. (default: var(--hx-color-neutral-800))
+ * --hx-stat-value-color: Value text color. (default: var(--hx-color-neutral-900))
+ * --hx-stat-label-color: Label text color. (default: var(--hx-color-neutral-500))
+ * --hx-stat-icon-color: Icon color. (default: var(--hx-color-primary-500))
+ * --hx-stat-value-font-weight: Value font weight. (default: var(--hx-font-weight-bold))
+ * --hx-stat-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-stat-value-font-size-sm: Value font size at sm. (default: var(--hx-font-size-xl))
+ * --hx-stat-value-font-size-md: Value font size at md. (default: var(--hx-font-size-3xl))
+ * --hx-stat-value-font-size-lg: Value font size at lg. (default: var(--hx-font-size-5xl))
+ * --hx-stat-label-font-size-sm: Label font size at sm. (default: var(--hx-font-size-xs))
+ * --hx-stat-label-font-size-md: Label font size at md. (default: var(--hx-font-size-sm))
+ * --hx-stat-label-font-size-lg: Label font size at lg. (default: var(--hx-font-size-md))
+ * --hx-stat-trend-up-color: Trend up text color. (default: var(--hx-color-success-700))
+ * --hx-stat-trend-up-bg: Trend up background color. (default: var(--hx-color-success-50))
+ * --hx-stat-trend-down-color: Trend down text color. (default: var(--hx-color-error-700))
+ * --hx-stat-trend-down-bg: Trend down background color. (default: var(--hx-color-error-50))
+ */
+
+/* Component host styles */
+hx-stat {
+  display: block;
+}

@@ -1,0 +1,21 @@
+{#
+ /**
+ * @file
+ * HX Breadcrumb component template.
+ *
+ * Breadcrumb navigation component with automatic truncation and JSON-LD structured data.
+ *
+ * Available variables:
+ * - separator: string - The separator character displayed between breadcrumb items.
+ * - label: string - The accessible label for the nav landmark.
+ * - maxItems: number - Maximum number of items to show before collapsing middle items with an ellipsis. Set to 0 (default) to show all items. The ellipsis is a keyboard-accessible button; activating it expands the full breadcrumb by setting maxItems to 0.
+ * - jsonLd: boolean - When true, injects a JSON-LD BreadcrumbList structured data script into the document head.  NOTE: Drupal manages `<head>` content via its own render pipeline. Injecting a `<script>` directly via `document.head.appendChild()` in a Drupal context: 1. Bypasses Drupal's deduplication and `hook_html_head_alter()` hook. 2. Is not cacheable by Drupal's page cache. 3. Will be wiped on BigPipe partial page replacements.  For Drupal integrations, leave `json-ld` false and use the structured data Twig template instead (see `hx-breadcrumb.twig` in the component directory).
+ */
+#}
+<hx-breadcrumb
+  {% if separator is defined and separator is not empty %}separator="{{ separator }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if maxItems is defined and maxItems is not empty %}max-items="{{ maxItems }}"{% endif %}
+  {% if jsonLd %}json-ld{% endif %}
+>
+</hx-breadcrumb>

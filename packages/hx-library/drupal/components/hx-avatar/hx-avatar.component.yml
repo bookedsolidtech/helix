@@ -1,0 +1,46 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Avatar
+status: experimental
+group: HELiX
+description: 'A user avatar component that displays an image, initials, or a fallback icon. Supports a badge slot for status indicator overlays.'
+props:
+  type: object
+  properties:
+    src:
+      type: object
+      title: Src
+      description: 'Image URL. When provided and successfully loaded, displays the image.'
+      default: 'undefined'
+    alt:
+      type: string
+      title: Alt
+      description: "Accessible label for the image. Required when `src` is provided. Used as the container's aria-label in image mode."
+      default: ''
+    label:
+      type: string
+      title: Label
+      description: 'Human-readable accessible name for non-image states (initials, fallback icon). In healthcare contexts, provide the full person name (e.g., "Dr. Jane Doe") rather than relying on raw initials, which screen readers announce as individual letters. When set, takes precedence over raw initials and the generic "Avatar" fallback.'
+      default: ''
+    initials:
+      type: string
+      title: Initials
+      description: 'Fallback initials text displayed when no image is available.'
+      default: ''
+    size:
+      type: object
+      title: Size
+      description: 'Size variant of the avatar.'
+      default: 'md'
+    shape:
+      type: object
+      title: Shape
+      description: 'Shape variant of the avatar.'
+      default: 'circle'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for custom avatar content. Overrides src and initials when slotted content is present.'
+  badge:
+    title: Badge
+    description: 'Status indicator overlay, positioned at the bottom-right of the avatar container.'
+libraryOverrides: {}

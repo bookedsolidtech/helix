@@ -1,0 +1,22 @@
+{#
+ /**
+ * @file
+ * HX Radio component template.
+ *
+ * An individual radio button, designed to be used inside a `<hx-radio-group>`.
+ *
+ * Available variables:
+ * - value: string - The value this radio represents.
+ * - label: string - Visible label text for the radio.
+ * - disabled: boolean - Whether this radio is disabled.
+ * - checked: boolean - Whether this radio is checked. Managed by the parent group.
+ */
+#}
+<hx-radio
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if checked %}checked{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-radio>

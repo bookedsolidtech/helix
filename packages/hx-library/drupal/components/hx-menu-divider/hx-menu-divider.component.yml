@@ -1,0 +1,6 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Menu Divider
+status: experimental
+group: HELiX
+description: 'A visual separator for grouping items within an `hx-menu`.'
+libraryOverrides: {}

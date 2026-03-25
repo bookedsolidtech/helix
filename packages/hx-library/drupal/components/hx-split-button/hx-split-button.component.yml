@@ -1,0 +1,46 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Split Button
+status: experimental
+group: HELiX
+description: 'A split button combining a primary action button with an attached dropdown menu for secondary actions. Implements the ARIA menu button pattern for full keyboard and screen reader support.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the split button.'
+      default: 'primary'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the split button.'
+      default: 'md'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the split button is disabled. Both the primary button and the trigger are disabled when this is true.'
+      default: false
+    label:
+      type: object
+      title: Label
+      description: 'Primary button label text. When set, overrides the default slot content.'
+      default: 'undefined'
+    triggerLabel:
+      type: string
+      title: Trigger Label
+      description: 'Accessible label for the dropdown trigger button. Override for localization.'
+      default: 'More actions'
+    menuLabel:
+      type: string
+      title: Menu Label
+      description: 'Accessible label for the dropdown menu panel. Override for localization.'
+      default: 'Secondary actions'
+slots:
+  default:
+    title: Default
+    description: 'Primary button label text.'
+  menu:
+    title: Menu
+    description: '`hx-menu-item` children rendered in the dropdown panel.'
+libraryOverrides: {}

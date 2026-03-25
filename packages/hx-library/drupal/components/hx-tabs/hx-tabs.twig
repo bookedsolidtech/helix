@@ -1,0 +1,25 @@
+{#
+ /**
+ * @file
+ * HX Tabs component template.
+ *
+ * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
+ * Supports horizontal and vertical orientations, automatic and manual activation modes,
+ * and full keyboard navigation per the ARIA Authoring Practices Guide.
+ *
+ * Available variables:
+ * - orientation: object - The layout orientation of the tabs.
+ * - activation: object - Controls how keyboard navigation activates tabs. In `automatic` mode, focus also activates the tab. In `manual` mode, focus moves independently; Space or Enter activates.
+ * - label: string - Accessible label for the tablist. Rendered as `aria-label` on the tablist container. Provide a brief description of what the tabs represent (e.g., "Patient record sections").
+ */
+#}
+<hx-tabs
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+  {% if activation is defined and activation is not empty %}activation="{{ activation }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if slots.tab is defined %}
+    <slot name="tab">{{ slots.tab }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tabs>

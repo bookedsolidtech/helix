@@ -1,0 +1,25 @@
+{#
+ /**
+ * @file
+ * HX Skeleton component template.
+ *
+ * An animated placeholder used to indicate loading content.
+ * Purely decorative — hidden from assistive technology.
+ * Supports a `loaded` state that announces content availability to screen readers.
+ *
+ * Available variables:
+ * - variant: object - Shape variant of the skeleton placeholder.
+ * - width: string - CSS width of the skeleton. Accepts any valid CSS width value.
+ * - height: object - CSS height of the skeleton. Accepts any valid CSS height value. Defaults vary by variant when not set.
+ * - animated: boolean - Whether the shimmer wave animation is active. Set to false to display a static skeleton.
+ * - loaded: boolean - When true, hides the skeleton and dispatches an `hx-loaded` event. Consumers should pair this with an external `aria-live` region to announce loading completion to assistive technology users.
+ */
+#}
+<hx-skeleton
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if width is defined and width is not empty %}width="{{ width }}"{% endif %}
+  {% if height is defined and height is not empty %}height="{{ height }}"{% endif %}
+  {% if animated %}animated{% endif %}
+  {% if loaded %}loaded{% endif %}
+>
+</hx-skeleton>

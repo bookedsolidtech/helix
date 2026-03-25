@@ -1,0 +1,31 @@
+{#
+ /**
+ * @file
+ * HX Popover component template.
+ *
+ * A popover that displays rich floating content attached to a trigger element.
+ *
+ * Available variables:
+ * - open: boolean - Whether the popover is open.
+ * - placement: object - Preferred placement of the popover relative to the anchor.
+ * - trigger: object - How the popover is triggered.
+ * - distance: number - Distance in pixels between the popover and the anchor.
+ * - skidding: number - Alignment offset in pixels along the anchor.
+ * - arrow: boolean - Whether to show an arrow pointing to the anchor.
+ * - label: string - Accessible label for the popover body (sets aria-label on the dialog).
+ */
+#}
+<hx-popover
+  {% if open %}open{% endif %}
+  {% if placement is defined and placement is not empty %}placement="{{ placement }}"{% endif %}
+  {% if trigger is defined and trigger is not empty %}trigger="{{ trigger }}"{% endif %}
+  {% if distance is defined and distance is not empty %}distance="{{ distance }}"{% endif %}
+  {% if skidding is defined and skidding is not empty %}skidding="{{ skidding }}"{% endif %}
+  {% if arrow %}arrow{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if slots.anchor is defined %}
+    <slot name="anchor">{{ slots.anchor }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-popover>

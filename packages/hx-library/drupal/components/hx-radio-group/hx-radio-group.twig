@@ -1,0 +1,36 @@
+{#
+ /**
+ * @file
+ * HX Radio Group component template.
+ *
+ * A form-associated radio group that manages a set of `<hx-radio>` children.
+ *
+ * Available variables:
+ * - value: string - The selected radio's value.
+ * - name: string - The name used for form submission.
+ * - label: string - The fieldset legend/label text.
+ * - required: boolean - Whether a selection is required for form submission.
+ * - disabled: boolean - Whether the entire group is disabled.
+ * - error: string - Error message to display. When set, the group enters an error state.
+ * - helpText: string - Help text displayed below the group for guidance.
+ * - orientation: object - Layout orientation of the radio items.
+ */
+#}
+<hx-radio-group
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+>
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-radio-group>

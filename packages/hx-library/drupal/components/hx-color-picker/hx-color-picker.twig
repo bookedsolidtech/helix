@@ -1,0 +1,47 @@
+{#
+ /**
+ * @file
+ * HX Color Picker component template.
+ *
+ * A color picker control with gradient picker, hue/opacity sliders, swatches,
+ * and formatted text input. Supports hex, rgb, hsl, and hsv output formats.
+ *
+ * Available variables:
+ * - value: string - Current color value as a CSS color string.
+ * - format: object - Output format for the color value.
+ * - opacity: boolean - Whether to show the alpha/opacity channel slider and include alpha in the output.
+ * - swatchesOnly: boolean - When true, hides the gradient grid and sliders, showing only swatches and the input. Useful for compact preset-only color selection UIs.
+ * - disabled: boolean - Whether the control is disabled.
+ * - name: string - Form field name for form participation.
+ * - inline: boolean - When true the picker is shown inline instead of in a popover.
+ * - required: boolean - When true, the picker requires a non-empty value for form submission.
+ * - labelGradient: string - Accessible label for the color gradient canvas.
+ * - labelHue: string - Accessible label for the hue slider.
+ * - labelOpacity: string - Accessible label for the opacity slider.
+ * - labelSwatches: string - Accessible label for the preset color swatches section.
+ * - labelSwitchFormat: string - Accessible label for the format-switch button.
+ * - labelColorValue: string - Accessible label for the color value input.
+ * - labelPicker: string - Accessible label for the color picker dialog/panel.
+ */
+#}
+<hx-color-picker
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if format is defined and format is not empty %}format="{{ format }}"{% endif %}
+  {% if opacity %}opacity{% endif %}
+  {% if swatchesOnly %}swatches-only{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if inline %}inline{% endif %}
+  {% if required %}required{% endif %}
+  {% if labelGradient is defined and labelGradient is not empty %}label-gradient="{{ labelGradient }}"{% endif %}
+  {% if labelHue is defined and labelHue is not empty %}label-hue="{{ labelHue }}"{% endif %}
+  {% if labelOpacity is defined and labelOpacity is not empty %}label-opacity="{{ labelOpacity }}"{% endif %}
+  {% if labelSwatches is defined and labelSwatches is not empty %}label-swatches="{{ labelSwatches }}"{% endif %}
+  {% if labelSwitchFormat is defined and labelSwitchFormat is not empty %}label-switch-format="{{ labelSwitchFormat }}"{% endif %}
+  {% if labelColorValue is defined and labelColorValue is not empty %}label-color-value="{{ labelColorValue }}"{% endif %}
+  {% if labelPicker is defined and labelPicker is not empty %}label-picker="{{ labelPicker }}"{% endif %}
+>
+  {% if slots.trigger is defined %}
+    <slot name="trigger">{{ slots.trigger }}</slot>
+  {% endif %}
+</hx-color-picker>

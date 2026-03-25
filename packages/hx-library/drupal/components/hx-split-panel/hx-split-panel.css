@@ -1,0 +1,17 @@
+/**
+ * HX Split Panel component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-split-panel-divider-size: Width (horizontal) or height (vertical) of the divider. (default: 4px)
+ * --hx-split-panel-divider-color: Default divider color. (default: var(--hx-color-neutral-200))
+ * --hx-split-panel-divider-hover-color: Divider color on hover/focus. (default: var(--hx-color-primary-500))
+ */
+
+/* Component host styles */
+hx-split-panel {
+  display: block;
+}

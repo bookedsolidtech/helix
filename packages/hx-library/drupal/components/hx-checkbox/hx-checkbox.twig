@@ -1,0 +1,42 @@
+{#
+ /**
+ * @file
+ * HX Checkbox component template.
+ *
+ * A checkbox component with label, validation, and form association.
+ *
+ * Available variables:
+ * - checked: boolean - Whether the checkbox is checked.
+ * - indeterminate: boolean - Whether the checkbox is in an indeterminate state (e.g., for "select all" patterns).
+ * - disabled: boolean - Whether the checkbox is disabled.
+ * - required: boolean - Whether the checkbox is required for form submission.
+ * - name: string - The name of the checkbox, used for form submission.
+ * - value: string - The value submitted when the checkbox is checked.
+ * - label: string - The visible label text for the checkbox.
+ * - error: string - Error message to display. When set, the checkbox enters an error state.
+ * - helpText: string - Help text displayed below the checkbox for guidance.
+ * - requiredMessage: string - Validation message shown when the field is required but empty.
+ * - size: object - The size of the checkbox.
+ */
+#}
+<hx-checkbox
+  {% if checked %}checked{% endif %}
+  {% if indeterminate %}indeterminate{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if required %}required{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if requiredMessage is defined and requiredMessage is not empty %}required-message="{{ requiredMessage }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+>
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-checkbox>

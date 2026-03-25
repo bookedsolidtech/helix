@@ -1,0 +1,60 @@
+{#
+ /**
+ * @file
+ * HX Number Input component template.
+ *
+ * A numeric input component with stepper controls, label, validation, and
+ * full form association. Designed for healthcare data-entry contexts where
+ * precise numeric values (dosage, age, measurements) must be captured safely.
+ *
+ * Available variables:
+ * - name: string - The name of the input, used for form submission.
+ * - value: object - The current numeric value of the input. Null when the field is empty.
+ * - required: boolean - Whether the input is required for form submission.
+ * - disabled: boolean - Whether the input is disabled.
+ * - readonly: boolean - Whether the input is read-only.
+ * - min: object - Minimum allowed value. When reached, the decrement button is disabled.
+ * - max: object - Maximum allowed value. When reached, the increment button is disabled.
+ * - step: number - The amount to increment or decrement on each step action.
+ * - label: string - The visible label text for the input.
+ * - error: string - Error message to display. When set, the input enters an error state.
+ * - helpText: string - Help text displayed below the input for guidance.
+ * - size: object - Size variant controlling input padding and font size.
+ * - noStepper: boolean - When set, hides the +/- stepper buttons.
+ * - labelIncrement: string - Accessible label for the increment button.
+ * - labelDecrement: string - Accessible label for the decrement button.
+ */
+#}
+<hx-number-input
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if step is defined and step is not empty %}step="{{ step }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if noStepper %}no-stepper{% endif %}
+  {% if labelIncrement is defined and labelIncrement is not empty %}label-increment="{{ labelIncrement }}"{% endif %}
+  {% if labelDecrement is defined and labelDecrement is not empty %}label-decrement="{{ labelDecrement }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+</hx-number-input>

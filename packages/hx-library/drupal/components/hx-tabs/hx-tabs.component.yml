@@ -1,0 +1,31 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tabs
+status: experimental
+group: HELiX
+description: 'A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children. Supports horizontal and vertical orientations, automatic and manual activation modes, and full keyboard navigation per the ARIA Authoring Practices Guide.'
+props:
+  type: object
+  properties:
+    orientation:
+      type: object
+      title: Orientation
+      description: 'The layout orientation of the tabs.'
+      default: 'horizontal'
+    activation:
+      type: object
+      title: Activation
+      description: 'Controls how keyboard navigation activates tabs. In `automatic` mode, focus also activates the tab. In `manual` mode, focus moves independently; Space or Enter activates.'
+      default: 'automatic'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the tablist. Rendered as `aria-label` on the tablist container. Provide a brief description of what the tabs represent (e.g., "Patient record sections").'
+      default: ''
+slots:
+  tab:
+    title: Tab
+    description: 'Slot for `<hx-tab>` elements. Rendered inside the tablist.'
+  default:
+    title: Default
+    description: 'Default slot for `<hx-tab-panel>` elements.'
+libraryOverrides: {}

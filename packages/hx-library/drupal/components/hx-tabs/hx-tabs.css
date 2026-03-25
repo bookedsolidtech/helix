@@ -1,0 +1,32 @@
+/**
+ * HX Tabs component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-tabs-border-color: Tablist border color. (default: var(--hx-color-neutral-200, #e9ecef))
+ * --hx-tabs-border-width: Tablist border width. (default: 1px)
+ * --hx-tabs-vertical-width: Width of the tablist in vertical orientation. (default: 12rem)
+ * --hx-tabs-gap: Gap between the tablist and panels container. (default: 0)
+ * --hx-tabs-tab-color: Inactive tab text color. (default: var(--hx-color-neutral-600, #495057))
+ * --hx-tabs-tab-active-color: Active tab text color. (default: var(--hx-color-primary-600, #1d4ed8))
+ * --hx-tabs-tab-hover-color: Tab hover text color. (default: var(--hx-color-neutral-800, #212529))
+ * --hx-tabs-tab-hover-bg: Tab hover background. (default: var(--hx-color-neutral-50, #f8f9fa))
+ * --hx-tabs-tab-font-size: Tab font size. (default: var(--hx-font-size-md, 1rem))
+ * --hx-tabs-tab-font-weight: Tab font weight. (default: var(--hx-font-weight-medium, 500))
+ * --hx-tabs-tab-active-font-weight: Active tab font weight. (default: var(--hx-font-weight-semibold, 600))
+ * --hx-tabs-tab-padding-x: Horizontal tab padding. (default: var(--hx-space-4, 1rem))
+ * --hx-tabs-tab-padding-y: Vertical tab padding. (default: var(--hx-space-2, 0.5rem))
+ * --hx-tabs-indicator-color: Active indicator color. (default: var(--hx-color-primary-500, #2563eb))
+ * --hx-tabs-indicator-size: Active indicator thickness. (default: 2px)
+ * --hx-tabs-focus-ring-color: Focus ring color for tabs and panels. (default: var(--hx-focus-ring-color, #2563eb))
+ * --hx-tabs-panel-padding: Panel inner padding. (default: var(--hx-space-4, 1rem))
+ * --hx-tabs-panel-color: Panel text color. (default: var(--hx-color-neutral-700, #343a40))
+ */
+
+/* Component host styles */
+hx-tabs {
+  display: block;
+}

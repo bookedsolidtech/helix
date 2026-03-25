@@ -1,0 +1,81 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Popup
+status: experimental
+group: HELiX
+description: 'A low-level positioning primitive that anchors a floating panel to a reference element. This is the base that hx-tooltip, hx-dropdown, and hx-popover build upon.'
+props:
+  type: object
+  properties:
+    anchor:
+      type: object
+      title: Anchor
+      description: 'The reference element to anchor the popup to.  - **Attribute form** (`anchor="#selector"`): Accepts a CSS selector string resolved via   `querySelector` from the component''s root node. Use this in HTML/Twig markup. - **Property form** (`el.anchor = element`): Accepts an `Element` reference directly.   Setting an Element via JS property does NOT reflect to the attribute.  If not set, the element in the `anchor` slot is used.'
+      default: 'null'
+    placement:
+      type: object
+      title: Placement
+      description: 'Preferred placement of the popup relative to the anchor.'
+      default: 'bottom'
+    active:
+      type: boolean
+      title: Active
+      description: 'Whether the popup is visible.'
+      default: false
+    distance:
+      type: number
+      title: Distance
+      description: 'Gap in pixels between the popup and the anchor element.'
+      default: 0
+    skidding:
+      type: number
+      title: Skidding
+      description: "Offset in pixels along the anchor element's axis."
+      default: 0
+    arrow:
+      type: boolean
+      title: Arrow
+      description: 'Whether to show an arrow pointing to the anchor element.'
+      default: false
+    arrowPlacement:
+      type: object
+      title: Arrow Placement
+      description: 'Manual placement of the arrow along the popup edge. When not set, floating-ui calculates the optimal position.'
+      default: 'null'
+    arrowPadding:
+      type: number
+      title: Arrow Padding
+      description: 'Minimum padding in pixels from the popup edge to the arrow.'
+      default: 10
+    flip:
+      type: boolean
+      title: Flip
+      description: 'When true, flips the popup to the opposite side to avoid overflow.'
+      default: false
+    flipFallbackPlacements:
+      type: object
+      title: Flip Fallback Placements
+      description: 'Fallback placements to try when flipping. Accepts a JSON array string.'
+      default: '[]'
+    shift:
+      type: boolean
+      title: Shift
+      description: 'When true, shifts the popup along the axis to remain in the viewport.'
+      default: false
+    autoSize:
+      type: boolean
+      title: Auto Size
+      description: 'When true, resizes the popup to fit within the viewport. Sets --hx-auto-size-available-width and --hx-auto-size-available-height CSS custom properties on `:host` so they cascade into shadow DOM and are readable from light DOM.'
+      default: false
+    strategy:
+      type: object
+      title: Strategy
+      description: "Positioning strategy passed to floating-ui's `computePosition`.  - `'fixed'` (default): works for most cases; positions relative to the viewport. - `'absolute'`: use inside `overflow: hidden` / scroll containers where the popup is   positioned relative to the nearest positioned ancestor instead of the viewport."
+      default: 'fixed'
+slots:
+  anchor:
+    title: Anchor
+    description: 'The reference element the popup is anchored to.'
+  default:
+    title: Default
+    description: 'Default slot for popup content.'
+libraryOverrides: {}

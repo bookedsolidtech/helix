@@ -1,0 +1,34 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tab
+status: experimental
+group: HELiX
+description: 'An individual tab button, designed to be used inside an `<hx-tabs>` container. Must be placed in the `tab` named slot of `<hx-tabs>`.'
+props:
+  type: object
+  properties:
+    panel:
+      type: string
+      title: Panel
+      description: 'The name of the `<hx-tab-panel>` this tab controls. Must match the `name` attribute on the corresponding `<hx-tab-panel>`.'
+      default: ''
+    selected:
+      type: boolean
+      title: Selected
+      description: 'Whether this tab is currently selected. Managed by the parent `<hx-tabs>`.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether this tab is disabled. Prevents selection and keyboard navigation.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the tab label text or content.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Icon or content rendered after the label.'
+libraryOverrides: {}

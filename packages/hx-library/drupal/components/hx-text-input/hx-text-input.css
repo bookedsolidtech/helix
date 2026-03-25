@@ -1,0 +1,24 @@
+/**
+ * HX Text Input component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-input-bg: Input background color. (default: var(--hx-color-neutral-0))
+ * --hx-input-color: Input text color. (default: var(--hx-color-neutral-800))
+ * --hx-input-border-color: Input border color. (default: var(--hx-color-neutral-300))
+ * --hx-input-border-radius: Input border radius. (default: var(--hx-border-radius-md))
+ * --hx-input-font-family: Input font family. (default: var(--hx-font-family-sans))
+ * --hx-input-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-input-error-color: Error state color. (default: var(--hx-color-error-500))
+ * --hx-input-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-input-sm-font-size: Font size for the sm size variant. (default: 0.875rem)
+ * --hx-input-lg-font-size: Font size for the lg size variant. (default: 1.125rem)
+ */
+
+/* Component host styles */
+hx-text-input {
+  display: block;
+}

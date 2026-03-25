@@ -1,0 +1,18 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Visually Hidden
+status: experimental
+group: HELiX
+description: 'A utility component that hides content visually while keeping it accessible to screen readers. Uses the standard visually-hidden CSS technique — does NOT use `visibility: hidden` or `display: none`, which would also hide content from assistive technologies.'
+props:
+  type: object
+  properties:
+    focusable:
+      type: boolean
+      title: Focusable
+      description: 'When true, the component becomes visible when a focusable child (such as a skip link) receives focus. This enables the standard "skip to content" accessibility pattern.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'The content to hide visually but expose to screen readers.'
+libraryOverrides: {}

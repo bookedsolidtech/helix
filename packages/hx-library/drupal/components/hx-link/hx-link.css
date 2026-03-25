@@ -1,0 +1,26 @@
+/**
+ * HX Link component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-link-color: Default link color. (default: var(--hx-color-primary-500))
+ * --hx-link-color-hover: Hover color. (default: var(--hx-color-primary-700))
+ * --hx-link-color-active: Active color. (default: var(--hx-color-primary-800))
+ * --hx-link-color-disabled: Disabled color. (default: var(--hx-color-neutral-400))
+ * --hx-link-color-subtle: Subtle variant color. (default: var(--hx-color-neutral-600))
+ * --hx-link-color-danger: Danger variant color. (default: var(--hx-color-error-text))
+ * --hx-link-color-danger-hover: Danger variant hover color. (default: var(--hx-color-error-700))
+ * --hx-link-font-family: Link font family. (default: var(--hx-font-family-sans))
+ * --hx-link-text-decoration: Link text decoration. (default: underline)
+ * --hx-link-text-decoration-hover: Hover text decoration. (default: underline)
+ * --hx-link-underline-offset: Text underline offset. (default: 2px)
+ * --hx-link-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ */
+
+/* Component host styles */
+hx-link {
+  display: block;
+}

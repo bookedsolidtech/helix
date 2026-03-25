@@ -1,0 +1,34 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Skeleton
+status: experimental
+group: HELiX
+description: 'An animated placeholder used to indicate loading content. Purely decorative — hidden from assistive technology. Supports a `loaded` state that announces content availability to screen readers.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Shape variant of the skeleton placeholder.'
+      default: 'rect'
+    width:
+      type: string
+      title: Width
+      description: 'CSS width of the skeleton. Accepts any valid CSS width value.'
+      default: '100%'
+    height:
+      type: object
+      title: Height
+      description: 'CSS height of the skeleton. Accepts any valid CSS height value. Defaults vary by variant when not set.'
+      default: 'undefined'
+    animated:
+      type: boolean
+      title: Animated
+      description: 'Whether the shimmer wave animation is active. Set to false to display a static skeleton.'
+      default: true
+    loaded:
+      type: boolean
+      title: Loaded
+      description: 'When true, hides the skeleton and dispatches an `hx-loaded` event. Consumers should pair this with an external `aria-live` region to announce loading completion to assistive technology users.'
+      default: false
+libraryOverrides: {}

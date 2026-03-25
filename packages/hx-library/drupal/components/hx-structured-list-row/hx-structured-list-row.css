@@ -1,0 +1,16 @@
+/**
+ * HX Structured List Row component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-structured-list-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-structured-list-value-color: Value text color. (default: var(--hx-color-neutral-900))
+ */
+
+/* Component host styles */
+hx-structured-list-row {
+  display: block;
+}

@@ -1,0 +1,27 @@
+{#
+ /**
+ * @file
+ * HX Overflow Menu component template.
+ *
+ * An overflow menu (kebab/meatball menu) that reveals hidden actions via a
+ * floating panel. Composed from a trigger button and a slotted menu panel.
+ *
+ * Available variables:
+ * - placement: object - Preferred placement of the floating panel relative to the trigger.
+ * - size: object - Size of the trigger button.
+ * - disabled: boolean - Whether the trigger button is disabled.
+ * - icon: object - Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···).
+ * - label: string - Accessible label for the trigger button.
+ * - menuLabel: string - Accessible label for the menu panel. Reflected as `menu-label`.
+ */
+#}
+<hx-overflow-menu
+  {% if placement is defined and placement is not empty %}placement="{{ placement }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if icon is defined and icon is not empty %}icon="{{ icon }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if menuLabel is defined and menuLabel is not empty %}menu-label="{{ menuLabel }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-overflow-menu>

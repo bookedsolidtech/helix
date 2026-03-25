@@ -1,0 +1,29 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Top Nav
+status: experimental
+group: HELiX
+description: 'Top-of-page site navigation bar with logo, menu items, and utility area. Supports sticky positioning, responsive hamburger menu, and full slot-driven content composition for Drupal and other CMS consumers.'
+props:
+  type: object
+  properties:
+    sticky:
+      type: boolean
+      title: Sticky
+      description: 'When true, the navigation bar sticks to the top of the viewport during scroll.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label applied to the `<nav>` element via `aria-label`.'
+      default: 'Site Navigation'
+slots:
+  logo:
+    title: Logo
+    description: 'Brand area rendered on the left side.'
+  default:
+    title: Default
+    description: 'Default slot for primary navigation items rendered in the center. IMPORTANT: Do NOT place a `<nav>` element in this slot — the component already renders a `<nav>` landmark internally. Use a `<div>` or bare links.'
+  actions:
+    title: Actions
+    description: 'Utility area rendered on the right side (search, user menu, etc.).'
+libraryOverrides: {}

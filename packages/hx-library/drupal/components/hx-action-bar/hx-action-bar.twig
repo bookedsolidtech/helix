@@ -1,0 +1,34 @@
+{#
+ /**
+ * @file
+ * HX Action Bar component template.
+ *
+ * A horizontal toolbar container for grouping related action buttons and controls.
+ * Implements the ARIA toolbar pattern with roving tabindex keyboard navigation.
+ *
+ * Available variables:
+ * - size: object - Size of the action bar — propagated as a data attribute to slotted children.
+ * - variant: object - Visual variant controlling the bar background.
+ * - position: object - Position and sticky behavior of the action bar. - `top` — normal flow (default) - `sticky` — sticks to the top of the scroll container; add `scroll-padding-top` to the   scroll container equal to the bar height to prevent anchor targets from scrolling behind it - `bottom` — sticks to the bottom of the scroll container with iOS safe-area-inset support
+ * - sticky: boolean - 
+ * - ariaLabel: string - Accessible label for the toolbar. Required when multiple toolbars appear on the same page.
+ */
+#}
+<hx-action-bar
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if position is defined and position is not empty %}position="{{ position }}"{% endif %}
+  {% if sticky %}sticky{% endif %}
+  {% if ariaLabel is defined and ariaLabel is not empty %}aria-label="{{ ariaLabel }}"{% endif %}
+>
+  {% if slots.start is defined %}
+    <slot name="start">{{ slots.start }}</slot>
+  {% endif %}
+  {% if slots.end is defined %}
+    <slot name="end">{{ slots.end }}</slot>
+  {% endif %}
+  {% if slots.overflow is defined %}
+    <slot name="overflow">{{ slots.overflow }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-action-bar>

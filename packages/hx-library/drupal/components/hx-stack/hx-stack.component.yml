@@ -1,0 +1,43 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Stack
+status: experimental
+group: HELiX
+description: 'A flexbox layout wrapper for consistent vertical/horizontal spacing between children.'
+props:
+  type: object
+  properties:
+    direction:
+      type: object
+      title: Direction
+      description: 'Direction of the stack layout.'
+      default: 'vertical'
+    gap:
+      type: object
+      title: Gap
+      description: 'Gap between children using design tokens.'
+      default: 'md'
+    align:
+      type: object
+      title: Align
+      description: 'Align-items value for cross-axis alignment.'
+      default: 'stretch'
+    justify:
+      type: object
+      title: Justify
+      description: 'Justify-content value for main-axis distribution.'
+      default: 'start'
+    wrap:
+      type: boolean
+      title: Wrap
+      description: 'When true, children wrap onto multiple lines.'
+      default: false
+    inline:
+      type: boolean
+      title: Inline
+      description: 'When true, the component renders as `display: inline-flex`.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for any child content.'
+libraryOverrides: {}

@@ -1,0 +1,79 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Data Table
+status: experimental
+group: HELiX
+description: 'An enterprise data table with sorting, row selection, and keyboard navigation.'
+props:
+  type: object
+  properties:
+    columns:
+      type: object
+      title: Columns
+      description: 'Column definitions. Each item: `{ key, label, sortable?, width? }`. Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).'
+      default: '[]'
+    rows:
+      type: object
+      title: Rows
+      description: 'Row data. Each item is a plain object keyed by column `key` values. Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).'
+      default: '[]'
+    selectable:
+      type: boolean
+      title: Selectable
+      description: 'When true, renders a checkbox column for row selection.'
+      default: false
+    sortKey:
+      type: string
+      title: Sort Key
+      description: 'The column key currently used for sorting.'
+      default: ''
+    sortDirection:
+      type: object
+      title: Sort Direction
+      description: 'Current sort direction.'
+      default: 'asc'
+    loading:
+      type: boolean
+      title: Loading
+      description: 'When true, renders a loading skeleton and sets `aria-busy="true"` on the host.'
+      default: false
+    emptyLabel:
+      type: string
+      title: Empty Label
+      description: 'Text displayed in the default empty state when `rows` is empty and not loading.'
+      default: 'No data'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible name for the table. Exposed via `aria-label` on the `<table>` element. Required when the table has columns — a missing label is a WCAG 4.1.2 violation.'
+      default: ''
+    stickyHeader:
+      type: boolean
+      title: Sticky Header
+      description: 'When true, the header row is sticky (position: sticky; top: 0).'
+      default: false
+    labelSelectAll:
+      type: string
+      title: Label Select All
+      description: 'Accessible label for the "select all rows" checkbox.'
+      default: 'Select all rows'
+    page:
+      type: number
+      title: Page
+      description: 'Current page (1-based). Set to 0 or leave at default (0) to disable pagination.'
+      default: 1
+    pageSize:
+      type: number
+      title: Page Size
+      description: 'Number of rows per page. Set to 0 to disable pagination (show all rows).'
+      default: 0
+slots:
+  toolbar:
+    title: Toolbar
+    description: 'Content rendered above the table (e.g., search, actions).'
+  empty:
+    title: Empty
+    description: 'Custom empty-state content rendered when `rows` is empty and not loading.'
+  loading:
+    title: Loading
+    description: 'Custom loading content rendered when `loading` is true.'
+libraryOverrides: {}

@@ -1,0 +1,44 @@
+{#
+ /**
+ * @file
+ * HX Popup component template.
+ *
+ * A low-level positioning primitive that anchors a floating panel to a reference element.
+ * This is the base that hx-tooltip, hx-dropdown, and hx-popover build upon.
+ *
+ * Available variables:
+ * - anchor: object - The reference element to anchor the popup to.  - **Attribute form** (`anchor="#selector"`): Accepts a CSS selector string resolved via   `querySelector` from the component's root node. Use this in HTML/Twig markup. - **Property form** (`el.anchor = element`): Accepts an `Element` reference directly.   Setting an Element via JS property does NOT reflect to the attribute.  If not set, the element in the `anchor` slot is used.
+ * - placement: object - Preferred placement of the popup relative to the anchor.
+ * - active: boolean - Whether the popup is visible.
+ * - distance: number - Gap in pixels between the popup and the anchor element.
+ * - skidding: number - Offset in pixels along the anchor element's axis.
+ * - arrow: boolean - Whether to show an arrow pointing to the anchor element.
+ * - arrowPlacement: object - Manual placement of the arrow along the popup edge. When not set, floating-ui calculates the optimal position.
+ * - arrowPadding: number - Minimum padding in pixels from the popup edge to the arrow.
+ * - flip: boolean - When true, flips the popup to the opposite side to avoid overflow.
+ * - flipFallbackPlacements: object - Fallback placements to try when flipping. Accepts a JSON array string.
+ * - shift: boolean - When true, shifts the popup along the axis to remain in the viewport.
+ * - autoSize: boolean - When true, resizes the popup to fit within the viewport. Sets --hx-auto-size-available-width and --hx-auto-size-available-height CSS custom properties on `:host` so they cascade into shadow DOM and are readable from light DOM.
+ * - strategy: object - Positioning strategy passed to floating-ui's `computePosition`.  - `'fixed'` (default): works for most cases; positions relative to the viewport. - `'absolute'`: use inside `overflow: hidden` / scroll containers where the popup is   positioned relative to the nearest positioned ancestor instead of the viewport.
+ */
+#}
+<hx-popup
+  {% if anchor is defined and anchor is not empty %}anchor="{{ anchor }}"{% endif %}
+  {% if placement is defined and placement is not empty %}placement="{{ placement }}"{% endif %}
+  {% if active %}active{% endif %}
+  {% if distance is defined and distance is not empty %}distance="{{ distance }}"{% endif %}
+  {% if skidding is defined and skidding is not empty %}skidding="{{ skidding }}"{% endif %}
+  {% if arrow %}arrow{% endif %}
+  {% if arrowPlacement is defined and arrowPlacement is not empty %}arrow-placement="{{ arrowPlacement }}"{% endif %}
+  {% if arrowPadding is defined and arrowPadding is not empty %}arrow-padding="{{ arrowPadding }}"{% endif %}
+  {% if flip %}flip{% endif %}
+  {% if flipFallbackPlacements is defined and flipFallbackPlacements is not empty %}flip-fallback-placements="{{ flipFallbackPlacements }}"{% endif %}
+  {% if shift %}shift{% endif %}
+  {% if autoSize %}auto-size{% endif %}
+  {% if strategy is defined and strategy is not empty %}strategy="{{ strategy }}"{% endif %}
+>
+  {% if slots.anchor is defined %}
+    <slot name="anchor">{{ slots.anchor }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-popup>

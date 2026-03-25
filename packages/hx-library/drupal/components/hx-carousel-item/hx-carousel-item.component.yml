@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Carousel Item
+status: experimental
+group: HELiX
+description: 'A wrapper for individual carousel slides.'
+props:
+  type: object
+  properties:
+    slideIndex:
+      type: number
+      title: Slide Index
+      description: 'The 0-based index of this slide within the carousel. Set by hx-carousel.'
+      default: 0
+    totalSlides:
+      type: number
+      title: Total Slides
+      description: 'Total number of slides in the carousel. Set by hx-carousel.'
+      default: 0
+slots:
+  default:
+    title: Default
+    description: 'Slide content.'
+libraryOverrides: {}

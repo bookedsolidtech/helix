@@ -1,0 +1,45 @@
+{#
+ /**
+ * @file
+ * HX Format Date component template.
+ *
+ * Formats and displays a date/time value using the browser's `Intl.DateTimeFormat`
+ * (or `Intl.RelativeTimeFormat` when `relative` is set). Renders as an inline
+ * `<time>` element — machine-readable via `datetime`, human-readable via formatted text.
+ * 
+ * No external dependencies. Uses native Intl APIs only.
+ *
+ * Available variables:
+ * - date: object - The date/time value to format. Accepts an ISO string, a Unix timestamp (ms), or a `Date` object. Defaults to the current date/time when empty.
+ * - lang: string - BCP 47 locale tag used for formatting (e.g. `"en-US"`, `"de"`, `"ja"`). Defaults to `document.documentElement.lang`, then `navigator.language`.
+ * - month: object - Month display format.
+ * - year: object - Year display format.
+ * - day: object - Day display format.
+ * - weekday: object - Weekday display format.
+ * - hour: object - Hour display format.
+ * - minute: object - Minute display format.
+ * - second: object - Second display format.
+ * - timeZoneName: object - Time zone name display format. Accepts all values supported by `Intl.DateTimeFormatOptions.timeZoneName` including `'short'`, `'long'`, `'shortOffset'`, `'longOffset'`, `'shortGeneric'`, and `'longGeneric'`.
+ * - timeZone: object - IANA time zone identifier (e.g. `"America/New_York"`, `"UTC"`).
+ * - hourFormat: object - Whether to use 12-hour or 24-hour clock. `"auto"` defers to locale default.
+ * - numeric: object - Controls whether `Intl.RelativeTimeFormat` always shows numeric output (`"always"`) or uses natural language when possible (`"auto"`, e.g. "yesterday"). Only used when `relative` is true.
+ * - relative: boolean - When true, displays a relative time string such as "2 hours ago" or "in 3 days" using `Intl.RelativeTimeFormat`.  **Important:** The relative time string is computed once at render time and does not auto-update. If the displayed text must stay current (e.g. a live "X minutes ago" counter), the consuming component must re-set the `date` property on its own interval to trigger a re-render.
+ */
+#}
+<hx-format-date
+  {% if date is defined and date is not empty %}date="{{ date }}"{% endif %}
+  {% if lang is defined and lang is not empty %}lang="{{ lang }}"{% endif %}
+  {% if month is defined and month is not empty %}month="{{ month }}"{% endif %}
+  {% if year is defined and year is not empty %}year="{{ year }}"{% endif %}
+  {% if day is defined and day is not empty %}day="{{ day }}"{% endif %}
+  {% if weekday is defined and weekday is not empty %}weekday="{{ weekday }}"{% endif %}
+  {% if hour is defined and hour is not empty %}hour="{{ hour }}"{% endif %}
+  {% if minute is defined and minute is not empty %}minute="{{ minute }}"{% endif %}
+  {% if second is defined and second is not empty %}second="{{ second }}"{% endif %}
+  {% if timeZoneName is defined and timeZoneName is not empty %}time-zone-name="{{ timeZoneName }}"{% endif %}
+  {% if timeZone is defined and timeZone is not empty %}time-zone="{{ timeZone }}"{% endif %}
+  {% if hourFormat is defined and hourFormat is not empty %}hour-format="{{ hourFormat }}"{% endif %}
+  {% if numeric is defined and numeric is not empty %}numeric="{{ numeric }}"{% endif %}
+  {% if relative %}relative{% endif %}
+>
+</hx-format-date>

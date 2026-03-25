@@ -1,0 +1,44 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Toast
+status: experimental
+group: HELiX
+description: 'A transient notification message that auto-dismisses after a configurable duration. Supports multiple visual variants, a closable button, icon/action slots, and full ARIA live region semantics for screen readers.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant.'
+      default: 'default'
+    duration:
+      type: number
+      title: Duration
+      description: 'Auto-dismiss duration in milliseconds. Set to 0 for persistent toasts.'
+      default: 3000
+    closable:
+      type: boolean
+      title: Closable
+      description: 'Whether to show a close button.'
+      default: false
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the toast is currently visible.'
+      default: false
+    closeLabel:
+      type: string
+      title: Close Label
+      description: 'Accessible label for the close button. Override for localization.'
+      default: 'Dismiss notification'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the notification message.'
+  icon:
+    title: Icon
+    description: 'Optional icon rendered before the message.'
+  action:
+    title: Action
+    description: 'Optional action button rendered after the message.'
+libraryOverrides: {}

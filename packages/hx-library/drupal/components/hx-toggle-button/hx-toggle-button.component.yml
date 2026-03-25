@@ -1,0 +1,59 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Toggle Button
+status: experimental
+group: HELiX
+description: 'A two-state toggle button that communicates a pressed/unpressed status to assistive technology via `aria-pressed`. Supports multiple visual variants and sizes, prefix/suffix slots, full ElementInternals form association, and a distinct pressed visual state for every variant.'
+props:
+  type: object
+  properties:
+    pressed:
+      type: boolean
+      title: Pressed
+      description: 'Whether the toggle button is in the pressed state. Reflected as an attribute so CSS selectors like `:host([pressed])` work.'
+      default: false
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the button.'
+      default: 'secondary'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the button.'
+      default: 'md'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the button is disabled. Prevents all interaction and form actions.'
+      default: false
+    name:
+      type: object
+      title: Name
+      description: 'Form field name submitted via ElementInternals when the button is pressed.'
+      default: 'undefined'
+    value:
+      type: object
+      title: Value
+      description: 'Form field value submitted via ElementInternals when the button is pressed.'
+      default: 'undefined'
+    label:
+      type: object
+      title: Label
+      description: 'Accessible label forwarded to the inner `<button>` as `aria-label`. Required for icon-only toggle buttons where no visible text is present.'
+      default: 'undefined'
+    required:
+      type: boolean
+      title: Required
+      description: 'When true, the button must be in the pressed state for the form to be submitted.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the button label text or content.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Icon or content rendered after the label.'
+libraryOverrides: {}

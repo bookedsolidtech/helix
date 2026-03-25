@@ -1,0 +1,28 @@
+{#
+ /**
+ * @file
+ * HX Table component template.
+ *
+ * A semantic table container with variant styling and accessibility support.
+ * Compose with `hx-thead`, `hx-tbody`, `hx-tfoot`, `hx-tr`, `hx-th`, and `hx-td`.
+ *
+ * Available variables:
+ * - label: string - Accessible name for the table (WCAG 4.1.2 requirement). Exposed via `aria-label` on the `<table>` element.
+ * - caption: string - Visible caption text. When set, renders a `<caption>` element. Use the `caption` slot for richer caption content.
+ * - variant: object - Visual variant that controls row styling.
+ * - stickyHeader: boolean - When true, the header row stays fixed while the table body scrolls.
+ * - fullWidth: boolean - When true, the table expands to fill 100% of its container width.
+ */
+#}
+<hx-table
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if caption is defined and caption is not empty %}caption="{{ caption }}"{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if stickyHeader %}sticky-header{% endif %}
+  {% if fullWidth %}full-width{% endif %}
+>
+  {% if slots.caption is defined %}
+    <slot name="caption">{{ slots.caption }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-table>

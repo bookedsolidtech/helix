@@ -1,0 +1,16 @@
+/**
+ * HX Icon component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-icon-size: Width and height of the icon. (default: var(--hx-size-6,1.5rem))
+ * --hx-icon-color: Icon color. (default: currentColor)
+ */
+
+/* Component host styles */
+hx-icon {
+  display: block;
+}

@@ -1,0 +1,43 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Overflow Menu
+status: experimental
+group: HELiX
+description: 'An overflow menu (kebab/meatball menu) that reveals hidden actions via a floating panel. Composed from a trigger button and a slotted menu panel.'
+props:
+  type: object
+  properties:
+    placement:
+      type: object
+      title: Placement
+      description: 'Preferred placement of the floating panel relative to the trigger.'
+      default: 'bottom-end'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the trigger button.'
+      default: 'md'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the trigger button is disabled.'
+      default: false
+    icon:
+      type: object
+      title: Icon
+      description: 'Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···).'
+      default: 'vertical'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the trigger button.'
+      default: 'More actions'
+    menuLabel:
+      type: string
+      title: Menu Label
+      description: 'Accessible label for the menu panel. Reflected as `menu-label`.'
+      default: 'Actions'
+slots:
+  default:
+    title: Default
+    description: 'Menu items (e.g. `<button role="menuitem">` or `<hx-menu-item>` elements).'
+libraryOverrides: {}

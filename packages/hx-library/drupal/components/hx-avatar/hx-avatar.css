@@ -1,0 +1,19 @@
+/**
+ * HX Avatar component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-avatar-size: Computed width and height from the size variant.
+ * --hx-avatar-border-radius: Circle = 50%, Square = var(--hx-border-radius-md).
+ * --hx-avatar-bg: Background color of the avatar container. (default: var(--hx-color-primary-100))
+ * --hx-avatar-color: Text and icon color inside the avatar. (default: var(--hx-color-primary-700))
+ * --hx-avatar-font-size: Font size for the initials text, set per size variant.
+ */
+
+/* Component host styles */
+hx-avatar {
+  display: block;
+}

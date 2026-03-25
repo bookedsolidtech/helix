@@ -1,0 +1,28 @@
+/**
+ * HX Nav component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-nav-bg: Navigation background color. (default: var(--hx-color-neutral-900))
+ * --hx-nav-color: Navigation text color. (default: var(--hx-color-neutral-100))
+ * --hx-nav-font-family: Navigation font family. (default: var(--hx-font-family-sans))
+ * --hx-nav-link-color: Link text color. (default: var(--hx-color-neutral-100))
+ * --hx-nav-link-hover-bg: Link hover background. (default: var(--hx-color-neutral-700))
+ * --hx-nav-link-hover-color: Link hover text color. (default: var(--hx-color-white))
+ * --hx-nav-link-active-bg: Active link background. (default: var(--hx-color-primary-600))
+ * --hx-nav-link-active-color: Active link text color. (default: var(--hx-color-white))
+ * --hx-nav-submenu-bg: Submenu background color. (default: var(--hx-color-neutral-800))
+ * --hx-nav-submenu-min-width: Submenu minimum width. (default: 12rem)
+ * --hx-nav-font-size: Navigation font size. (default: var(--hx-font-size-sm))
+ * --hx-nav-padding: Navigation padding. (default: var(--hx-space-2) var(--hx-space-4))
+ * --hx-nav-item-padding: Item padding. (default: var(--hx-space-2) var(--hx-space-3))
+ * --hx-nav-border-radius: Item border radius. (default: var(--hx-border-radius-sm))
+ */
+
+/* Component host styles */
+hx-nav {
+  display: block;
+}

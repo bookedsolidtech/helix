@@ -1,0 +1,34 @@
+{#
+ /**
+ * @file
+ * HX Card component template.
+ *
+ * A flexible card component for displaying grouped content.
+ *
+ * Available variables:
+ * - variant: object - Visual style variant of the card.
+ * - elevation: object - Elevation (shadow depth) of the card.
+ * - hxHref: object - Optional URL. When set, the card becomes interactive (clickable) and navigates to this URL on click. Uses hx-href to avoid conflicting with the native HTML href attribute.
+ * - hxAriaLabel: object - Accessible label for interactive cards. Use this to provide a meaningful description of the card's purpose rather than exposing the raw URL. Only applies when hx-href is set.
+ */
+#}
+<hx-card
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if elevation is defined and elevation is not empty %}elevation="{{ elevation }}"{% endif %}
+  {% if hxHref is defined and hxHref is not empty %}hx-href="{{ hxHref }}"{% endif %}
+  {% if hxAriaLabel is defined and hxAriaLabel is not empty %}hx-aria-label="{{ hxAriaLabel }}"{% endif %}
+>
+  {% if slots.image is defined %}
+    <slot name="image">{{ slots.image }}</slot>
+  {% endif %}
+  {% if slots.heading is defined %}
+    <slot name="heading">{{ slots.heading }}</slot>
+  {% endif %}
+  {% if slots.footer is defined %}
+    <slot name="footer">{{ slots.footer }}</slot>
+  {% endif %}
+  {% if slots.actions is defined %}
+    <slot name="actions">{{ slots.actions }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-card>

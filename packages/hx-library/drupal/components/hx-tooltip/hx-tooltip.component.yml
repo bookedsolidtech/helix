@@ -1,0 +1,31 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tooltip
+status: experimental
+group: HELiX
+description: 'A tooltip that displays contextual help text on hover or focus.'
+props:
+  type: object
+  properties:
+    placement:
+      type: object
+      title: Placement
+      description: "Preferred placement of the tooltip relative to the trigger. Supports all Floating UI placement values including alignment variants (e.g. 'top-start', 'bottom-end') and 'auto'."
+      default: 'top'
+    showDelay:
+      type: number
+      title: Show Delay
+      description: 'Delay in milliseconds before the tooltip is shown.'
+      default: 300
+    hideDelay:
+      type: number
+      title: Hide Delay
+      description: 'Delay in milliseconds before the tooltip is hidden.'
+      default: 100
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the trigger element.'
+  content:
+    title: Content
+    description: 'Tooltip content to display.'
+libraryOverrides: {}

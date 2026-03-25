@@ -1,0 +1,28 @@
+{#
+ /**
+ * @file
+ * HX Status Indicator component template.
+ *
+ * A colored dot/badge indicating system or entity health status.
+ * Purely visual — no slots. Supports an animated pulse ring.
+ * 
+ * Uses `role="img"` with an auto-generated `aria-label` (e.g. "Status: Online").
+ * When used decoratively alongside visible text that conveys the same status information
+ * (e.g. "Provider is available"), set `aria-hidden="true"` on the host element to prevent
+ * duplicate announcements to screen reader users. This is the recommended composition
+ * pattern in healthcare dashboards.
+ *
+ * Available variables:
+ * - status: object - The status to display.
+ * - size: object - Size of the indicator dot.
+ * - pulse: boolean - Whether to show an animated pulse ring around the dot. Animation is suppressed when prefers-reduced-motion is active.
+ * - label: string - Accessible label for the indicator. Defaults to "Status: {Status}". Set aria-hidden="true" on the host when status is conveyed by adjacent text.
+ */
+#}
+<hx-status-indicator
+  {% if status is defined and status is not empty %}status="{{ status }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if pulse %}pulse{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+</hx-status-indicator>

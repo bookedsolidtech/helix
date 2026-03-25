@@ -1,0 +1,43 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Progress Ring
+status: experimental
+group: HELiX
+description: 'SVG-based circular progress indicator. Supports determinate and indeterminate modes, multiple size variants, semantic color variants, and a center content slot.'
+props:
+  type: object
+  properties:
+    value:
+      type: object
+      title: Value
+      description: 'Current progress value (0–max). When null, renders in indeterminate mode.'
+      default: 'null'
+    max:
+      type: number
+      title: Max
+      description: 'Maximum value for the progress range. Defaults to 100. Used for aria-valuemax.'
+      default: 100
+    size:
+      type: object
+      title: Size
+      description: 'Size of the ring. Controls SVG diameter.'
+      default: 'md'
+    strokeWidth:
+      type: number
+      title: Stroke Width
+      description: 'Stroke width of the ring circles in SVG user units.'
+      default: 4
+    variant:
+      type: object
+      title: Variant
+      description: 'Semantic color variant.'
+      default: 'default'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the progressbar. Exposed as aria-label. Set this attribute to satisfy WCAG 4.1.2. When absent, aria-busy reflects indeterminate state and a console warning is emitted.'
+      default: ''
+slots:
+  default:
+    title: Default
+    description: 'Default slot for center content (percentage text, icon, etc.).'
+libraryOverrides: {}

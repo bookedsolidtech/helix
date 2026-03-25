@@ -1,0 +1,57 @@
+{#
+ /**
+ * @file
+ * HX Slider component template.
+ *
+ * A range slider component for selecting a numeric value within a min/max boundary.
+ * Supports tick marks, value display, range labels, and native form participation
+ * via ElementInternals.
+ * 
+ * The native `<input type="range">` receives `role="slider"` with `aria-valuenow`,
+ * `aria-valuemin`, and `aria-valuemax`. Label association uses `aria-labelledby`
+ * when a label is present, or `aria-label` as a fallback. Help text is linked via
+ * `aria-describedby`. Keyboard navigation follows the native range behavior:
+ * Arrow keys increment/decrement by step, Home jumps to min, End jumps to max.
+ *
+ * Available variables:
+ * - name: string - The name submitted with the form.
+ * - value: number - The current numeric value of the slider.
+ * - min: number - The minimum allowed value.
+ * - max: number - The maximum allowed value.
+ * - step: number - The stepping interval between values.
+ * - disabled: boolean - Whether the slider is disabled.
+ * - label: string - The visible label text for the slider.
+ * - helpText: string - Help text displayed below the slider for guidance.
+ * - showValue: boolean - When true, the current value is shown next to the label.
+ * - showTicks: boolean - When true, tick marks are rendered at each step interval.
+ * - size: object - The size variant of the slider.
+ * - valueText: string - Human-readable text alternative for the current value, announced by screen readers instead of the numeric value. For example, on a pain scale: "7 — Moderate-Severe".
+ */
+#}
+<hx-slider
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if step is defined and step is not empty %}step="{{ step }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if showValue %}show-value{% endif %}
+  {% if showTicks %}show-ticks{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if valueText is defined and valueText is not empty %}value-text="{{ valueText }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if slots.min-label is defined %}
+    <slot name="min-label">{{ slots.min-label }}</slot>
+  {% endif %}
+  {% if slots.max-label is defined %}
+    <slot name="max-label">{{ slots.max-label }}</slot>
+  {% endif %}
+</hx-slider>

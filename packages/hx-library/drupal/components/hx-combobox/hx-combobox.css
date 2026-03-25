@@ -1,0 +1,25 @@
+/**
+ * HX Combobox component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-combobox-bg: Input background color. (default: var(--hx-color-neutral-0))
+ * --hx-combobox-color: Input text color. (default: var(--hx-color-neutral-800))
+ * --hx-combobox-border-color: Border color. (default: var(--hx-color-neutral-300))
+ * --hx-combobox-border-radius: Border radius. (default: var(--hx-border-radius-md))
+ * --hx-combobox-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-combobox-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-combobox-error-color: Error state color. (default: var(--hx-color-error-500))
+ * --hx-combobox-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-combobox-listbox-bg: Listbox background color. (default: var(--hx-color-neutral-0))
+ * --hx-combobox-option-hover-bg: Option hover background. (default: var(--hx-color-primary-50))
+ * --hx-combobox-option-selected-bg: Selected option background. (default: var(--hx-color-primary-100))
+ */
+
+/* Component host styles */
+hx-combobox {
+  display: block;
+}

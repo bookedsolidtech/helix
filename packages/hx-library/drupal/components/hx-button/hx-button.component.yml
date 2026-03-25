@@ -1,0 +1,79 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Button
+status: experimental
+group: HELiX
+description: 'A production-grade button component for user interaction. Supports multiple visual variants, sizes, loading state, prefix/suffix slots, anchor rendering, and full ElementInternals form association.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the button.'
+      default: 'primary'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the button.'
+      default: 'md'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the button is disabled. Prevents all interaction and form actions.'
+      default: false
+    loading:
+      type: boolean
+      title: Loading
+      description: 'Whether the button is in a loading state. Shows spinner, prevents interaction, and sets aria-busy. Does not set the disabled attribute.'
+      default: false
+    type:
+      type: object
+      title: Type
+      description: 'The type attribute for the underlying button element. Ignored when href is set.'
+      default: 'button'
+    href:
+      type: object
+      title: Href
+      description: 'When set, renders an anchor element instead of a button.'
+      default: 'undefined'
+    target:
+      type: object
+      title: Target
+      description: 'Anchor target attribute. Only used when href is set.'
+      default: 'undefined'
+    name:
+      type: object
+      title: Name
+      description: 'Form field name submitted via ElementInternals.setFormValue on submit.'
+      default: 'undefined'
+    value:
+      type: object
+      title: Value
+      description: 'Form field value submitted via ElementInternals.setFormValue on submit.'
+      default: 'undefined'
+    full:
+      type: boolean
+      title: Full
+      description: 'When true, the button stretches to fill its container width. Sets the host to `display: block` and the inner element to `width: 100%`.'
+      default: false
+    inverted:
+      type: boolean
+      title: Inverted
+      description: 'When true, flips button colors for placement on dark or gradient backgrounds. Forces text to white and adjusts hover/focus ring colors across all variants.'
+      default: false
+    ariaLabel:
+      type: object
+      title: Aria Label
+      description: 'Accessible label forwarded to the inner button/anchor. Required for icon-only usage.'
+      default: 'null'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for button label text or content.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Icon or content rendered after the label.'
+libraryOverrides: {}

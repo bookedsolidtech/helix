@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Steps
+status: experimental
+group: HELiX
+description: 'A multi-step wizard / stepper progress indicator. Renders a sequence of `<hx-step>` children as a horizontal or vertical step tracker with connector lines and status-based styling.  Provide an `aria-label` on `<hx-steps>` to describe the step process for assistive technology.'
+props:
+  type: object
+  properties:
+    orientation:
+      type: object
+      title: Orientation
+      description: 'Layout orientation of the steps.'
+      default: 'horizontal'
+    size:
+      type: object
+      title: Size
+      description: 'Size variant of the steps.'
+      default: 'md'
+    ariaLabel:
+      type: object
+      title: Aria Label
+      description: 'Accessible label for the list. Forwarded to the inner list element.'
+      default: 'null'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `<hx-step>` elements.'
+libraryOverrides: {}

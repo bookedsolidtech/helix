@@ -1,0 +1,42 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Nav Item
+status: experimental
+group: HELiX
+description: 'A navigation item for use inside hx-side-nav. Supports icons, badges, sub-navigation, and active/disabled states.'
+props:
+  type: object
+  properties:
+    href:
+      type: string
+      title: Href
+      description: 'The URL this nav item links to.'
+      default: ''
+    active:
+      type: boolean
+      title: Active
+      description: 'Whether this item is the current/active page.'
+      default: false
+    expanded:
+      type: boolean
+      title: Expanded
+      description: 'Whether the sub-navigation is expanded.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether this nav item is disabled.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for item label text.'
+  icon:
+    title: Icon
+    description: 'Icon to display before the label.'
+  badge:
+    title: Badge
+    description: 'Badge content (e.g., notification count).'
+  children:
+    title: Children
+    description: 'Nested hx-nav-item children for sub-navigation.'
+libraryOverrides: {}

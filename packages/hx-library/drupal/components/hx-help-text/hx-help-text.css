@@ -1,0 +1,20 @@
+/**
+ * HX Help Text component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-help-text-color: Text color. (default: var(--hx-color-neutral-500))
+ * --hx-help-text-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-help-text-font-size: Font size. (default: var(--hx-font-size-sm))
+ * --hx-help-text-font-weight: Font weight. (default: var(--hx-font-weight-normal))
+ * --hx-help-text-line-height: Line height. (default: var(--hx-line-height-normal))
+ * --hx-help-text-icon-gap: Gap between icon and text. (default: 0.375rem)
+ */
+
+/* Component host styles */
+hx-help-text {
+  display: block;
+}

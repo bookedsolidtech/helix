@@ -1,0 +1,15 @@
+/**
+ * HX Tree View component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-tree-font-family: Tree font family. (default: var(--hx-font-family-sans))
+ */
+
+/* Component host styles */
+hx-tree-view {
+  display: block;
+}

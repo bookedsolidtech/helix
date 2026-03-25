@@ -1,0 +1,25 @@
+/**
+ * HX Drawer component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-drawer-bg: Drawer panel background color. (default: var(--hx-color-neutral-0))
+ * --hx-drawer-color: Drawer panel text color. (default: var(--hx-color-neutral-900))
+ * --hx-drawer-shadow: Drawer panel box shadow. (default: var(--hx-shadow-xl))
+ * --hx-drawer-backdrop-color: Backdrop color. (default: var(--hx-color-neutral-900))
+ * --hx-drawer-backdrop-opacity: Backdrop opacity. (default: 0.5)
+ * --hx-drawer-header-padding: Padding inside the header.
+ * --hx-drawer-header-border-color: Header border color. (default: var(--hx-color-neutral-200))
+ * --hx-drawer-title-color: Title text color. (default: var(--hx-color-neutral-900))
+ * --hx-drawer-body-padding: Padding inside the body.
+ * --hx-drawer-footer-padding: Padding inside the footer.
+ * --hx-drawer-footer-border-color: Footer border color. (default: var(--hx-color-neutral-200))
+ */
+
+/* Component host styles */
+hx-drawer {
+  display: block;
+}

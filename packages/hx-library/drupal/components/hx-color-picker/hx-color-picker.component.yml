@@ -1,0 +1,88 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Color Picker
+status: experimental
+group: HELiX
+description: 'A color picker control with gradient picker, hue/opacity sliders, swatches, and formatted text input. Supports hex, rgb, hsl, and hsv output formats.'
+props:
+  type: object
+  properties:
+    value:
+      type: string
+      title: Value
+      description: 'Current color value as a CSS color string.'
+      default: '#000000'
+    format:
+      type: object
+      title: Format
+      description: 'Output format for the color value.'
+      default: 'hex'
+    opacity:
+      type: boolean
+      title: Opacity
+      description: 'Whether to show the alpha/opacity channel slider and include alpha in the output.'
+      default: false
+    swatchesOnly:
+      type: boolean
+      title: Swatches Only
+      description: 'When true, hides the gradient grid and sliders, showing only swatches and the input. Useful for compact preset-only color selection UIs.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the control is disabled.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'Form field name for form participation.'
+      default: ''
+    inline:
+      type: boolean
+      title: Inline
+      description: 'When true the picker is shown inline instead of in a popover.'
+      default: false
+    required:
+      type: boolean
+      title: Required
+      description: 'When true, the picker requires a non-empty value for form submission.'
+      default: false
+    labelGradient:
+      type: string
+      title: Label Gradient
+      description: 'Accessible label for the color gradient canvas.'
+      default: 'Color gradient'
+    labelHue:
+      type: string
+      title: Label Hue
+      description: 'Accessible label for the hue slider.'
+      default: 'Hue'
+    labelOpacity:
+      type: string
+      title: Label Opacity
+      description: 'Accessible label for the opacity slider.'
+      default: 'Opacity'
+    labelSwatches:
+      type: string
+      title: Label Swatches
+      description: 'Accessible label for the preset color swatches section.'
+      default: 'Preset colors'
+    labelSwitchFormat:
+      type: string
+      title: Label Switch Format
+      description: 'Accessible label for the format-switch button.'
+      default: 'Switch color format'
+    labelColorValue:
+      type: string
+      title: Label Color Value
+      description: 'Accessible label for the color value input.'
+      default: 'Color value'
+    labelPicker:
+      type: string
+      title: Label Picker
+      description: 'Accessible label for the color picker dialog/panel.'
+      default: 'Color picker'
+slots:
+  trigger:
+    title: Trigger
+    description: 'Custom trigger element. Default: a color swatch button.'
+libraryOverrides: {}

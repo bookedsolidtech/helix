@@ -1,0 +1,19 @@
+/**
+ * HX Field component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-field-label-color: Label color. (default: var(--hx-color-neutral-700))
+ * --hx-field-error-color: Error color. (default: var(--hx-color-error-500))
+ * --hx-field-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-field-gap: Gap between field segments. (default: var(--hx-space-1, 0.25rem))
+ * --hx-field-help-text-color: Help text color. (default: var(--hx-color-neutral-500))
+ */
+
+/* Component host styles */
+hx-field {
+  display: block;
+}

@@ -1,0 +1,60 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Field
+status: experimental
+group: HELiX
+description: 'Layout wrapper providing consistent label + input + help text + validation message structure for any form control. Use this when wrapping non-HELiX form controls or native HTML elements in the HELiX form field pattern.  This component is NOT form-associated — it is a pure visual layout wrapper.  **Light DOM side effect:** This component injects a visually-hidden `<span>` into its light DOM children for ARIA describedby linkage across the shadow DOM boundary. This span has `id="${fieldId}-desc"` and is removed on `disconnectedCallback`. This is an intentional, documented accessibility mechanism.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the field.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required. Shows a required indicator on the label.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the field enters an error state.'
+      default: ''
+    helpText:
+      type: string
+      title: Help Text
+      description: 'Help text displayed below the control for guidance.'
+      default: ''
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Visual disabled state applied via opacity. Does not affect slotted control interactivity — set disabled on the slotted control directly.'
+      default: false
+    hxSize:
+      type: object
+      title: Hx Size
+      description: 'Size variant controlling label and help text font sizes.'
+      default: 'md'
+    layout:
+      type: object
+      title: Layout
+      description: "Layout variant. 'column' stacks label above control; 'inline' places them side-by-side."
+      default: 'column'
+slots:
+  default:
+    title: Default
+    description: 'The form control element (native or custom).'
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property).'
+  help-text:
+    title: Help Text
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  description:
+    title: Description
+    description: 'Additional descriptive content above the control.'
+libraryOverrides: {}

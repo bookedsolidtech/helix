@@ -1,0 +1,39 @@
+{#
+ /**
+ * @file
+ * HX Toggle Button component template.
+ *
+ * A two-state toggle button that communicates a pressed/unpressed status to
+ * assistive technology via `aria-pressed`. Supports multiple visual variants
+ * and sizes, prefix/suffix slots, full ElementInternals form association, and
+ * a distinct pressed visual state for every variant.
+ *
+ * Available variables:
+ * - pressed: boolean - Whether the toggle button is in the pressed state. Reflected as an attribute so CSS selectors like `:host([pressed])` work.
+ * - variant: object - Visual style variant of the button.
+ * - size: object - Size of the button.
+ * - disabled: boolean - Whether the button is disabled. Prevents all interaction and form actions.
+ * - name: object - Form field name submitted via ElementInternals when the button is pressed.
+ * - value: object - Form field value submitted via ElementInternals when the button is pressed.
+ * - label: object - Accessible label forwarded to the inner `<button>` as `aria-label`. Required for icon-only toggle buttons where no visible text is present.
+ * - required: boolean - When true, the button must be in the pressed state for the form to be submitted.
+ */
+#}
+<hx-toggle-button
+  {% if pressed %}pressed{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-toggle-button>

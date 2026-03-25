@@ -1,0 +1,42 @@
+{#
+ /**
+ * @file
+ * HX Copy Button component template.
+ *
+ * A clipboard copy button component that writes a given value to the system
+ * clipboard. Provides idle and success states with configurable feedback
+ * duration, slot-based icon overrides, and an accessible live region that
+ * announces copy completion to screen reader users.
+ * 
+ * The `aria-label` reflects the current copy state: idle shows `label`,
+ * copied state appends " — Copied" so screen reader users who re-focus the
+ * button after copy receive an accurate accessible name.
+ * 
+ * Note: `aria-pressed` is intentionally NOT used. This is not a toggle button;
+ * copied is a transient feedback state, not a persistent on/off toggle.
+ *
+ * Available variables:
+ * - value: string - The text value to write to the clipboard on click. Required for the component to perform a copy operation.
+ * - label: string - Accessible label applied as `aria-label` and `title` on the button.
+ * - feedbackDuration: number - Duration in milliseconds to display the success (copied) state before reverting to the idle state. Values below 300 ms are clamped to 300 ms to ensure the success announcement remains visible long enough for assistive technology and human perception.
+ * - size: object - Visual size of the button. Maps to fixed height and padding tokens. Accepts: 'sm' | 'md' | 'lg'. Invalid values are silently coerced to 'md'.  **Accessibility (WCAG 2.5.8):** The `sm` variant uses `--hx-size-8` for its minimum width and height. Ensure this token resolves to at least 24×24 px (WCAG 2.5.8 AA minimum target size). For touch-primary interfaces such as mobile clinical apps, prefer `md` or `lg` to meet the 44×44 px recommended target size (WCAG 2.5.5 AAA / Apple HIG / Android guidelines).
+ * - disabled: boolean - Whether the button is disabled. When true, click events are suppressed and clipboard writes do not occur.
+ * - labelCopied: string - Text announced to screen readers and appended to aria-label after a successful copy. Also used as the content of the aria-live announcement.
+ */
+#}
+<hx-copy-button
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if feedbackDuration is defined and feedbackDuration is not empty %}feedback-duration="{{ feedbackDuration }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if labelCopied is defined and labelCopied is not empty %}label-copied="{{ labelCopied }}"{% endif %}
+>
+  {% if slots.copy-icon is defined %}
+    <slot name="copy-icon">{{ slots.copy-icon }}</slot>
+  {% endif %}
+  {% if slots.success-icon is defined %}
+    <slot name="success-icon">{{ slots.success-icon }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-copy-button>

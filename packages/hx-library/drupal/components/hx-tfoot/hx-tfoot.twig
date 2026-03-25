@@ -1,0 +1,12 @@
+{#
+ /**
+ * @file
+ * HX Tfoot component template.
+ *
+ * Semantic table foot section. Must be a direct child of `hx-table`.
+ * Typically contains summary or totals rows.
+ */
+#}
+<hx-tfoot>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tfoot>

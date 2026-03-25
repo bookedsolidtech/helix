@@ -1,0 +1,20 @@
+{#
+ /**
+ * @file
+ * HX Help Text component template.
+ *
+ * Standardized help/hint text displayed below form fields.
+ * Used by hx-field as a consistent sub-component for guidance and validation messages.
+ * 
+ * Non-default variants render an inline icon alongside the text to satisfy
+ * WCAG 1.4.1 (color is not the sole visual indicator). The `error` variant
+ * uses `role="alert"` for immediate screen-reader announcement; `warning`
+ * and `success` use `aria-live="polite"` for non-intrusive announcements.
+ *
+ * Available variables:
+ * - variant: object - Visual variant that determines the text color and icon. Use `error` for validation errors, `warning` for cautions, `success` for confirmation.
+ */
+#}
+<hx-help-text {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-help-text>

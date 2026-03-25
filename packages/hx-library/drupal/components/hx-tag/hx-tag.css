@@ -1,0 +1,24 @@
+/**
+ * HX Tag component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-tag-bg: Tag background color. (default: var(--hx-color-neutral-100))
+ * --hx-tag-color: Tag text color. (default: var(--hx-color-neutral-700))
+ * --hx-tag-border-color: Tag border color. (default: var(--hx-color-neutral-200))
+ * --hx-tag-font-size: Tag font size (set per size variant).
+ * --hx-tag-font-weight: Tag font weight. (default: var(--hx-font-weight-medium))
+ * --hx-tag-font-family: Tag font family. (default: var(--hx-font-family-sans))
+ * --hx-tag-border-radius: Tag border radius (non-pill mode). (default: var(--hx-border-radius-sm))
+ * --hx-tag-border-radius-pill: Border radius in pill mode. Independent of --hx-tag-border-radius so consumer overrides don't break pill shape. (default: var(--hx-border-radius-full))
+ * --hx-tag-padding-x: Tag horizontal padding (set per size variant).
+ * --hx-tag-padding-y: Tag vertical padding (set per size variant).
+ */
+
+/* Component host styles */
+hx-tag {
+  display: block;
+}

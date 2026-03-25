@@ -1,0 +1,10 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tbody
+status: experimental
+group: HELiX
+description: 'Semantic table body section. Must be a direct child of `hx-table`. Contains `hx-tr` rows with `hx-td` data cells.'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `hx-tr` elements.'
+libraryOverrides: {}

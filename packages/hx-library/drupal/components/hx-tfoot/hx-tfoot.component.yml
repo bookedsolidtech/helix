@@ -1,0 +1,10 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tfoot
+status: experimental
+group: HELiX
+description: 'Semantic table foot section. Must be a direct child of `hx-table`. Typically contains summary or totals rows.'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `hx-tr` elements.'
+libraryOverrides: {}

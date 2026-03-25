@@ -1,0 +1,44 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Meter
+status: experimental
+group: HELiX
+description: 'A scalar measurement within a known range — e.g., disk usage, health score, or any numeric value with defined min/max bounds. Supports low/high/optimum threshold markers for semantic color feedback.'
+props:
+  type: object
+  properties:
+    value:
+      type: number
+      title: Value
+      description: 'Current value of the meter.'
+      default: 0
+    min:
+      type: number
+      title: Min
+      description: 'Minimum value of the range.'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'Maximum value of the range.'
+      default: 100
+    low:
+      type: object
+      title: Low
+      description: 'Threshold below which the value is considered suboptimal (lower range warning).'
+    high:
+      type: object
+      title: High
+      description: 'Threshold above which the value is considered suboptimal (upper range warning).'
+    optimum:
+      type: object
+      title: Optimum
+      description: 'The optimal value within the range. Used to determine which zone is "good".'
+    label:
+      type: object
+      title: Label
+      description: 'Accessible label for the meter. Used as the visible label text and as the source for `aria-labelledby`. When only slot content is provided (no `label` attribute), the slot content is used for the accessible name.'
+slots:
+  label:
+    title: Label
+    description: 'Visible label rendered above the meter track. When using this slot without the `label` attribute, the accessible name is derived from the slot content via `aria-labelledby`. The `label` attribute is NOT required when slot content is provided — the component detects slot content and switches to `aria-labelledby` automatically.'
+libraryOverrides: {}

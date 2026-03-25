@@ -1,0 +1,23 @@
+/**
+ * HX Toggle Button component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-toggle-button-bg: Button background color. (default: var(--hx-color-primary-500))
+ * --hx-toggle-button-color: Button text color. (default: var(--hx-color-neutral-0))
+ * --hx-toggle-button-border-color: Button border color. (default: transparent)
+ * --hx-toggle-button-border-radius: Button border radius. (default: var(--hx-border-radius-md))
+ * --hx-toggle-button-font-family: Button font family. (default: var(--hx-font-family-sans))
+ * --hx-toggle-button-font-weight: Button font weight. (default: var(--hx-font-weight-semibold))
+ * --hx-toggle-button-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-toggle-button-pressed-bg: Background when pressed (variant-specific fallback applies). (default: var(--hx-color-primary-500))
+ * --hx-toggle-button-pressed-color: Text color when pressed (variant-specific fallback applies). (default: var(--hx-color-neutral-0))
+ */
+
+/* Component host styles */
+hx-toggle-button {
+  display: block;
+}

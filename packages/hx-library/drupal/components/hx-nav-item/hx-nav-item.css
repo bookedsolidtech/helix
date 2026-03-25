@@ -1,0 +1,21 @@
+/**
+ * HX Nav Item component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-nav-item-color: Item text color. (default: var(--hx-color-neutral-300))
+ * --hx-nav-item-hover-bg: Item hover background.
+ * --hx-nav-item-hover-color: Item hover text color. (default: var(--hx-color-neutral-100))
+ * --hx-nav-item-active-bg: Active item background. (default: var(--hx-color-primary-600))
+ * --hx-nav-item-active-color: Active item text color. (default: var(--hx-color-neutral-50))
+ * --hx-nav-item-padding: Item padding.
+ * --hx-nav-item-host-bg: Component host background color. (default: var(--hx-color-neutral-900))
+ */
+
+/* Component host styles */
+hx-nav-item {
+  display: block;
+}

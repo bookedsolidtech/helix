@@ -1,0 +1,27 @@
+/**
+ * HX Dialog component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-dialog-bg: Dialog background color. (default: var(--hx-color-neutral-0))
+ * --hx-dialog-color: Dialog text color. (default: var(--hx-color-neutral-900))
+ * --hx-dialog-border-radius: Dialog corner radius. (default: var(--hx-border-radius-lg))
+ * --hx-dialog-shadow: Dialog box shadow. (default: var(--hx-shadow-xl))
+ * --hx-dialog-width: Dialog width. (default: 32rem)
+ * --hx-dialog-backdrop-color: Backdrop overlay color. (default: var(--hx-color-neutral-900))
+ * --hx-dialog-backdrop-opacity: Backdrop overlay opacity (set to 0 to hide; note that opacity:0 makes the backdrop invisible but still present in the layout — use pointer-events carefully if you need a fully non-blocking backdrop). (default: 0.5)
+ * --hx-dialog-header-padding: Padding inside the dialog header.
+ * --hx-dialog-header-border-color: Header bottom border color. (default: var(--hx-color-neutral-200))
+ * --hx-dialog-heading-color: Heading text color. (default: var(--hx-color-neutral-900))
+ * --hx-dialog-body-padding: Padding inside the dialog body.
+ * --hx-dialog-footer-padding: Padding inside the dialog footer.
+ * --hx-dialog-footer-border-color: Footer top border color. (default: var(--hx-color-neutral-200))
+ */
+
+/* Component host styles */
+hx-dialog {
+  display: block;
+}

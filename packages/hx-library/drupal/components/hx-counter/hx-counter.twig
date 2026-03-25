@@ -1,0 +1,28 @@
+{#
+ /**
+ * @file
+ * HX Counter component template.
+ *
+ * Animated number counter that counts from 0 (or the previous value) to the
+ * target value using requestAnimationFrame. Respects prefers-reduced-motion.
+ *
+ * Available variables:
+ * - value: number - The target numeric value to count to.
+ * - duration: number - Animation duration in milliseconds.
+ * - easing: object - Easing function applied to the animation progress.
+ * - format: object - Number format. 'integer' rounds to the nearest whole number; 'decimal' shows two decimal places.
+ * - prefix: string - String prepended to the formatted value (e.g., '$').
+ * - suffix: string - String appended to the formatted value (e.g., '%').
+ * - size: object - Size variant controlling font size.
+ */
+#}
+<hx-counter
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if duration is defined and duration is not empty %}duration="{{ duration }}"{% endif %}
+  {% if easing is defined and easing is not empty %}easing="{{ easing }}"{% endif %}
+  {% if format is defined and format is not empty %}format="{{ format }}"{% endif %}
+  {% if prefix is defined and prefix is not empty %}prefix="{{ prefix }}"{% endif %}
+  {% if suffix is defined and suffix is not empty %}suffix="{{ suffix }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+>
+</hx-counter>

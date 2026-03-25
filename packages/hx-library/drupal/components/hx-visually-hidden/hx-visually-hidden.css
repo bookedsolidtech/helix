@@ -1,0 +1,12 @@
+/**
+ * HX Visually Hidden component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ */
+
+/* Component host styles */
+hx-visually-hidden {
+  display: block;
+}

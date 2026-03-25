@@ -1,0 +1,24 @@
+/**
+ * HX Tooltip component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-tooltip-bg: Tooltip background color. (default: var(--hx-color-neutral-900))
+ * --hx-tooltip-color: Tooltip text color. (default: var(--hx-color-neutral-50))
+ * --hx-tooltip-font-size: Tooltip font size. (default: var(--hx-font-size-xs))
+ * --hx-tooltip-max-width: Maximum tooltip width. (default: 280px)
+ * --hx-tooltip-padding: Tooltip padding.
+ * --hx-tooltip-border-radius: Tooltip border radius. (default: var(--hx-border-radius-sm))
+ * --hx-tooltip-shadow: Tooltip box shadow.
+ * --hx-tooltip-z-index: Tooltip z-index. (default: 9999)
+ * --hx-tooltip-transition-duration: Show/hide transition duration. (default: 0.15s)
+ * --hx-tooltip-arrow-size: Size of the arrow indicator. (default: 8px)
+ */
+
+/* Component host styles */
+hx-tooltip {
+  display: block;
+}

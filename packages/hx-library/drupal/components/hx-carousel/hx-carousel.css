@@ -1,0 +1,18 @@
+/**
+ * HX Carousel component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-carousel-gap: Gap between slides. (default: 0px)
+ * --hx-carousel-slide-width: Width override for each slide. (default: 100%)
+ * --hx-carousel-nav-btn-size: Size of previous/next navigation buttons. (default: 2.5rem)
+ * --hx-carousel-pagination-dot-size: Size of pagination dots. (default: 0.5rem)
+ */
+
+/* Component host styles */
+hx-carousel {
+  display: block;
+}

@@ -1,0 +1,22 @@
+/**
+ * HX Side Nav component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-side-nav-width: Full expanded width. (default: 16rem)
+ * --hx-side-nav-collapsed-width: Collapsed icon-only width. (default: 3.5rem)
+ * --hx-side-nav-bg: Background color. (default: var(--hx-color-neutral-900))
+ * --hx-side-nav-color: Text color. (default: var(--hx-color-neutral-100))
+ * --hx-side-nav-border-color: Border color. (default: var(--hx-color-neutral-700))
+ * --hx-side-nav-header-padding: Header padding. (default: var(--hx-space-4))
+ * --hx-side-nav-footer-padding: Footer padding. (default: var(--hx-space-4))
+ * --hx-side-nav-toggle-color: Toggle button icon color. (default: var(--hx-color-neutral-400))
+ */
+
+/* Component host styles */
+hx-side-nav {
+  display: block;
+}

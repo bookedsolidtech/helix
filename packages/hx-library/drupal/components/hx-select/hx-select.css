@@ -1,0 +1,27 @@
+/**
+ * HX Select component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-select-bg: Select background color. (default: var(--hx-color-neutral-0))
+ * --hx-select-color: Select text color. (default: var(--hx-color-neutral-800))
+ * --hx-select-border-color: Select border color. (default: var(--hx-color-neutral-300))
+ * --hx-select-border-radius: Select border radius. (default: var(--hx-border-radius-md))
+ * --hx-select-font-family: Select font family. (default: var(--hx-font-family-sans))
+ * --hx-select-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-select-error-color: Error state color. (default: var(--hx-color-error-500))
+ * --hx-select-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-select-chevron-color: Chevron indicator color. (default: var(--hx-color-neutral-500))
+ * --hx-select-listbox-bg: Listbox panel background color. (default: var(--hx-color-neutral-0))
+ * --hx-select-option-hover-bg: Option hover background color. (default: var(--hx-color-primary-50))
+ * --hx-select-option-selected-bg: Selected option background color. (default: var(--hx-color-primary-100))
+ * --hx-select-placeholder-color: Placeholder text color. (default: var(--hx-color-neutral-400))
+ */
+
+/* Component host styles */
+hx-select {
+  display: block;
+}

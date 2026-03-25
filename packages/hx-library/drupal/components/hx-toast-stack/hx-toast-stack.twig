@@ -1,0 +1,19 @@
+{#
+ /**
+ * @file
+ * HX Toast Stack component template.
+ *
+ * A fixed-position container that stacks `hx-toast` elements at the specified
+ * corner of the viewport. Enforces a maximum visible toast count via `stack-limit`.
+ *
+ * Available variables:
+ * - placement: object - Corner of the viewport where toasts appear.
+ * - stackLimit: number - Maximum number of simultaneously visible toasts. 0 = unlimited.
+ */
+#}
+<hx-toast-stack
+  {% if placement is defined and placement is not empty %}placement="{{ placement }}"{% endif %}
+  {% if stackLimit is defined and stackLimit is not empty %}stack-limit="{{ stackLimit }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-toast-stack>

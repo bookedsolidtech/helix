@@ -1,0 +1,33 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Stat
+status: experimental
+group: HELiX
+description: 'A static stat display component for presenting key metrics in a healthcare dashboard.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The metric label displayed below the value.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The metric value displayed prominently.'
+      default: ''
+    trend:
+      type: object
+      title: Trend
+      description: "Trend direction indicator. 'neutral' hides the indicator."
+      default: 'neutral'
+    size:
+      type: object
+      title: Size
+      description: 'Size variant controlling font size.'
+      default: 'md'
+slots:
+  icon:
+    title: Icon
+    description: 'Optional icon displayed alongside the stat value.'
+libraryOverrides: {}

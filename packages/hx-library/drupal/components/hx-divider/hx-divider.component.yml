@@ -1,0 +1,32 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Divider
+status: experimental
+group: HELiX
+description: 'A visual separator element for dividing content sections. Supports horizontal and vertical orientations, configurable spacing, and an optional centered label rendered between two lines.'
+props:
+  type: object
+  properties:
+    orientation:
+      type: object
+      title: Orientation
+      description: 'Orientation of the divider.'
+      default: 'horizontal'
+    spacing:
+      type: object
+      title: Spacing
+      description: 'Spacing applied to the block axis (horizontal) or inline axis (vertical).'
+      default: 'md'
+    decorative:
+      type: boolean
+      title: Decorative
+      description: 'When true, renders the divider as decorative only (role="presentation"). Screen readers will not announce decorative dividers.'
+      default: false
+    label:
+      type: object
+      title: Label
+      description: 'Optional text label rendered centered between the divider lines. Also sets aria-label on the separator for assistive technologies.'
+slots:
+  default:
+    title: Default
+    description: 'Optional label text rendered centered between two lines.'
+libraryOverrides: {}

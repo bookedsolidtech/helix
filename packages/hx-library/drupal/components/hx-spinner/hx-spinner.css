@@ -1,0 +1,17 @@
+/**
+ * HX Spinner component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-spinner-color: Spinner arc color. Defaults per variant.
+ * --hx-spinner-track-color: Spinner track color. Defaults per variant.
+ * --hx-duration-spinner: Duration of the rotation animation. Defaults to 750ms.
+ */
+
+/* Component host styles */
+hx-spinner {
+  display: block;
+}

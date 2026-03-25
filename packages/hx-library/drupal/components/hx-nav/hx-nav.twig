@@ -1,0 +1,25 @@
+{#
+ /**
+ * @file
+ * HX Nav component template.
+ *
+ * Primary and secondary navigation component.
+ * Supports horizontal menu bar and vertical sidebar patterns.
+ * Mobile responsive with hamburger toggle.
+ *
+ * Available variables:
+ * - items: object - Navigation items array.
+ * - orientation: object - Layout orientation: 'horizontal' (menu bar) or 'vertical' (sidebar).
+ * - label: string - Accessible label for the nav landmark.
+ * - labelOpenMenu: string - Accessible label for the navigation toggle button when menu is closed.
+ * - labelCloseMenu: string - Accessible label for the navigation toggle button when menu is open.
+ */
+#}
+<hx-nav
+  {% if items is defined and items is not empty %}items="{{ items }}"{% endif %}
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if labelOpenMenu is defined and labelOpenMenu is not empty %}label-open-menu="{{ labelOpenMenu }}"{% endif %}
+  {% if labelCloseMenu is defined and labelCloseMenu is not empty %}label-close-menu="{{ labelCloseMenu }}"{% endif %}
+>
+</hx-nav>

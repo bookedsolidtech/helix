@@ -1,0 +1,51 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Popover
+status: experimental
+group: HELiX
+description: 'A popover that displays rich floating content attached to a trigger element.'
+props:
+  type: object
+  properties:
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the popover is open.'
+      default: false
+    placement:
+      type: object
+      title: Placement
+      description: 'Preferred placement of the popover relative to the anchor.'
+      default: 'bottom'
+    trigger:
+      type: object
+      title: Trigger
+      description: 'How the popover is triggered.'
+      default: 'click'
+    distance:
+      type: number
+      title: Distance
+      description: 'Distance in pixels between the popover and the anchor.'
+      default: 8
+    skidding:
+      type: number
+      title: Skidding
+      description: 'Alignment offset in pixels along the anchor.'
+      default: 0
+    arrow:
+      type: boolean
+      title: Arrow
+      description: 'Whether to show an arrow pointing to the anchor.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the popover body (sets aria-label on the dialog).'
+      default: 'Popover'
+slots:
+  anchor:
+    title: Anchor
+    description: 'The trigger element that opens the popover.'
+  default:
+    title: Default
+    description: 'Default slot for popover body content.'
+libraryOverrides: {}

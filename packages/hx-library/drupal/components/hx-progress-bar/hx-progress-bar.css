@@ -1,0 +1,24 @@
+/**
+ * HX Progress Bar component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-progress-bar-track-bg: Track background color. (default: var(--hx-color-neutral-100))
+ * --hx-progress-bar-indicator-bg: Indicator fill color. (default: var(--hx-color-primary-500))
+ * --hx-progress-bar-border-radius: Track border radius. (default: var(--hx-border-radius-full))
+ * --hx-progress-bar-height-sm: Track height for size="sm". (default: var(--hx-size-1))
+ * --hx-progress-bar-height-md: Track height for size="md". (default: var(--hx-size-2))
+ * --hx-progress-bar-height-lg: Track height for size="lg". (default: var(--hx-size-3))
+ * --hx-progress-bar-label-font-family: Label font family. (default: var(--hx-font-family-sans))
+ * --hx-progress-bar-label-font-size: Label font size. (default: var(--hx-font-size-sm))
+ * --hx-progress-bar-label-font-weight: Label font weight. (default: var(--hx-font-weight-medium))
+ * --hx-progress-bar-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ */
+
+/* Component host styles */
+hx-progress-bar {
+  display: block;
+}

@@ -1,0 +1,79 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Format Date
+status: experimental
+group: HELiX
+description: "Formats and displays a date/time value using the browser's `Intl.DateTimeFormat` (or `Intl.RelativeTimeFormat` when `relative` is set). Renders as an inline `<time>` element — machine-readable via `datetime`, human-readable via formatted text.  No external dependencies. Uses native Intl APIs only."
+props:
+  type: object
+  properties:
+    date:
+      type: object
+      title: Date
+      description: 'The date/time value to format. Accepts an ISO string, a Unix timestamp (ms), or a `Date` object. Defaults to the current date/time when empty.'
+      default: ''
+    lang:
+      type: string
+      title: Lang
+      description: 'BCP 47 locale tag used for formatting (e.g. `"en-US"`, `"de"`, `"ja"`). Defaults to `document.documentElement.lang`, then `navigator.language`.'
+      default: ''
+    month:
+      type: object
+      title: Month
+      description: 'Month display format.'
+      default: 'undefined'
+    year:
+      type: object
+      title: Year
+      description: 'Year display format.'
+      default: 'undefined'
+    day:
+      type: object
+      title: Day
+      description: 'Day display format.'
+      default: 'undefined'
+    weekday:
+      type: object
+      title: Weekday
+      description: 'Weekday display format.'
+      default: 'undefined'
+    hour:
+      type: object
+      title: Hour
+      description: 'Hour display format.'
+      default: 'undefined'
+    minute:
+      type: object
+      title: Minute
+      description: 'Minute display format.'
+      default: 'undefined'
+    second:
+      type: object
+      title: Second
+      description: 'Second display format.'
+      default: 'undefined'
+    timeZoneName:
+      type: object
+      title: Time Zone Name
+      description: "Time zone name display format. Accepts all values supported by `Intl.DateTimeFormatOptions.timeZoneName` including `'short'`, `'long'`, `'shortOffset'`, `'longOffset'`, `'shortGeneric'`, and `'longGeneric'`."
+      default: 'undefined'
+    timeZone:
+      type: object
+      title: Time Zone
+      description: 'IANA time zone identifier (e.g. `"America/New_York"`, `"UTC"`).'
+      default: 'undefined'
+    hourFormat:
+      type: object
+      title: Hour Format
+      description: 'Whether to use 12-hour or 24-hour clock. `"auto"` defers to locale default.'
+      default: 'auto'
+    numeric:
+      type: object
+      title: Numeric
+      description: 'Controls whether `Intl.RelativeTimeFormat` always shows numeric output (`"always"`) or uses natural language when possible (`"auto"`, e.g. "yesterday"). Only used when `relative` is true.'
+      default: 'auto'
+    relative:
+      type: boolean
+      title: Relative
+      description: 'When true, displays a relative time string such as "2 hours ago" or "in 3 days" using `Intl.RelativeTimeFormat`.  **Important:** The relative time string is computed once at render time and does not auto-update. If the displayed text must stay current (e.g. a live "X minutes ago" counter), the consuming component must re-set the `date` property on its own interval to trigger a re-render.'
+      default: false
+libraryOverrides: {}

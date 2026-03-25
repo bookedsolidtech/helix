@@ -1,0 +1,100 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Number Input
+status: experimental
+group: HELiX
+description: 'A numeric input component with stepper controls, label, validation, and full form association. Designed for healthcare data-entry contexts where precise numeric values (dosage, age, measurements) must be captured safely.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The name of the input, used for form submission.'
+      default: ''
+    value:
+      type: object
+      title: Value
+      description: 'The current numeric value of the input. Null when the field is empty.'
+      default: 'null'
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the input is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the input is disabled.'
+      default: false
+    readonly:
+      type: boolean
+      title: Readonly
+      description: 'Whether the input is read-only.'
+      default: false
+    min:
+      type: object
+      title: Min
+      description: 'Minimum allowed value. When reached, the decrement button is disabled.'
+      default: 'undefined'
+    max:
+      type: object
+      title: Max
+      description: 'Maximum allowed value. When reached, the increment button is disabled.'
+      default: 'undefined'
+    step:
+      type: number
+      title: Step
+      description: 'The amount to increment or decrement on each step action.'
+      default: 1
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the input.'
+      default: ''
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the input enters an error state.'
+      default: ''
+    helpText:
+      type: string
+      title: Help Text
+      description: 'Help text displayed below the input for guidance.'
+      default: ''
+    size:
+      type: object
+      title: Size
+      description: 'Size variant controlling input padding and font size.'
+      default: 'md'
+    noStepper:
+      type: boolean
+      title: No Stepper
+      description: 'When set, hides the +/- stepper buttons.'
+      default: false
+    labelIncrement:
+      type: string
+      title: Label Increment
+      description: 'Accessible label for the increment button.'
+      default: 'Increment'
+    labelDecrement:
+      type: string
+      title: Label Decrement
+      description: 'Accessible label for the decrement button.'
+      default: 'Decrement'
+slots:
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property). Use for Drupal Form API rendered labels.'
+  help-text:
+    title: Help Text
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property). Use for Drupal Form API rendered errors.'
+  prefix:
+    title: Prefix
+    description: 'Content rendered before the input (e.g., a unit icon).'
+  suffix:
+    title: Suffix
+    description: 'Content rendered after the input and before the stepper buttons (e.g., a unit label).'
+libraryOverrides: {}

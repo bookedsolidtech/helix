@@ -1,0 +1,25 @@
+{#
+ /**
+ * @file
+ * HX Side Nav component template.
+ *
+ * A collapsible left-side navigation panel with nested menu item support.
+ * Designed for clinical portals, admin dashboards, and department navigation.
+ *
+ * Available variables:
+ * - collapsed: boolean - When true, the nav collapses to show icons only.
+ * - label: string - The accessible label for the nav landmark.
+ */
+#}
+<hx-side-nav
+  {% if collapsed %}collapsed{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if slots.header is defined %}
+    <slot name="header">{{ slots.header }}</slot>
+  {% endif %}
+  {% if slots.footer is defined %}
+    <slot name="footer">{{ slots.footer }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-side-nav>

@@ -1,0 +1,20 @@
+/**
+ * HX Counter component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-counter-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-counter-font-weight: Font weight. (default: var(--hx-font-weight-bold))
+ * --hx-counter-color: Counter text color. (default: var(--hx-color-neutral-900))
+ * --hx-counter-font-size-sm: Font size at sm. (default: var(--hx-font-size-xl))
+ * --hx-counter-font-size-md: Font size at md. (default: var(--hx-font-size-3xl))
+ * --hx-counter-font-size-lg: Font size at lg. (default: var(--hx-font-size-5xl))
+ */
+
+/* Component host styles */
+hx-counter {
+  display: block;
+}

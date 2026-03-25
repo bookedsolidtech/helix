@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX List
+status: experimental
+group: HELiX
+description: 'A styled list container supporting plain, bulleted, numbered, description, and interactive variants.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual variant of the list.'
+      default: 'plain'
+    divided:
+      type: boolean
+      title: Divided
+      description: 'Whether to show dividers between list items.'
+      default: false
+    label:
+      type: object
+      title: Label
+      description: 'Accessible label for the list. Required when variant is "interactive" (listbox role).'
+      default: 'undefined'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `hx-list-item` elements.'
+libraryOverrides: {}

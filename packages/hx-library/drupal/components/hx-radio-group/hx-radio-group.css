@@ -1,0 +1,18 @@
+/**
+ * HX Radio Group component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-radio-group-gap: Gap between radio items. (default: var(--hx-space-3, 0.75rem))
+ * --hx-radio-group-label-color: Label text color. (default: var(--hx-color-neutral-700, #343a40))
+ * --hx-radio-group-error-color: Error message color. (default: var(--hx-color-error-500, #dc3545))
+ * --hx-radio-group-help-text-color: Help text color. (default: var(--hx-color-neutral-500, #6c757d))
+ */
+
+/* Component host styles */
+hx-radio-group {
+  display: block;
+}

@@ -1,0 +1,62 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Drawer
+status: experimental
+group: HELiX
+description: 'A slide-in drawer panel that can appear from any edge of the viewport. Supports focus trapping, overlay backdrop, keyboard navigation, and full ARIA labelling for enterprise healthcare accessibility requirements.'
+props:
+  type: object
+  properties:
+    open:
+      type: boolean
+      title: Open
+      description: 'Controls whether the drawer is open.'
+      default: false
+    placement:
+      type: object
+      title: Placement
+      description: 'Which edge of the viewport the drawer slides in from.'
+      default: 'end'
+    size:
+      type: object
+      title: Size
+      description: "The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length."
+      default: 'md'
+    contained:
+      type: boolean
+      title: Contained
+      description: 'When true, the drawer is constrained to its positioned parent instead of the viewport. The host element must have `position: relative` (or the library handles it via :host).'
+      default: false
+    noHeader:
+      type: boolean
+      title: No Header
+      description: 'When true, the header (title, header-actions, close button) is hidden.'
+      default: false
+    noFooter:
+      type: boolean
+      title: No Footer
+      description: 'When true, the footer slot is hidden.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the dialog when the `label` slot is not populated. When the `label` slot is used, `aria-labelledby` takes precedence.'
+      default: ''
+    closeLabel:
+      type: string
+      title: Close Label
+      description: 'Accessible label for the built-in close button. Override for localized text.'
+      default: 'Close drawer'
+slots:
+  label:
+    title: Label
+    description: 'The drawer title text.'
+  header-actions:
+    title: Header Actions
+    description: 'Action buttons displayed in the header near the close button.'
+  default:
+    title: Default
+    description: 'Default slot for the drawer body content.'
+  footer:
+    title: Footer
+    description: 'Action buttons or footer content.'
+libraryOverrides: {}

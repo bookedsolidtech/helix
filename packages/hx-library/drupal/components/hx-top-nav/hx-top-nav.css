@@ -1,0 +1,21 @@
+/**
+ * HX Top Nav component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-top-nav-bg: Navigation bar background color. (default: var(--hx-color-neutral-0))
+ * --hx-top-nav-color: Navigation bar text color. (default: var(--hx-color-neutral-800))
+ * --hx-top-nav-border-color: Bottom border color. (default: var(--hx-color-neutral-200))
+ * --hx-top-nav-height: Navigation bar height. (default: var(--hx-space-16))
+ * --hx-top-nav-padding-x: Horizontal padding. (default: var(--hx-space-6))
+ * --hx-top-nav-z-index: Z-index for sticky mode. (default: var(--hx-z-index-sticky))
+ * --hx-top-nav-toggle-color: Hamburger icon color. (default: var(--hx-color-neutral-700))
+ */
+
+/* Component host styles */
+hx-top-nav {
+  display: block;
+}

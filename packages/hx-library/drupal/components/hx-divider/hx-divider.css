@@ -1,0 +1,19 @@
+/**
+ * HX Divider component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-divider-color: Line color. (default: var(--hx-color-neutral-200))
+ * --hx-divider-width: Line thickness. (default: var(--hx-border-width-thin))
+ * --hx-divider-label-color: Label text color. (default: var(--hx-color-neutral-500))
+ * --hx-divider-label-font-size: Label font size. (default: var(--hx-font-size-sm))
+ * --hx-divider-label-gap: Gap between lines and label. (default: var(--hx-space-3))
+ */
+
+/* Component host styles */
+hx-divider {
+  display: block;
+}

@@ -1,0 +1,76 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Image
+status: experimental
+group: HELiX
+description: 'An accessible image wrapper with lazy loading, fallback support, aspect ratio control, responsive image (srcset/sizes) support, and optional caption.'
+props:
+  type: object
+  properties:
+    src:
+      type: string
+      title: Src
+      description: 'The URL of the image to display.'
+      default: ''
+    alt:
+      type: object
+      title: Alt
+      description: 'Accessible text description of the image. Required for informative images. Use the `decorative` prop for decorative images instead of setting this to an empty string — explicit decorative intent is preferred.'
+      default: 'undefined'
+    decorative:
+      type: boolean
+      title: Decorative
+      description: 'Marks the image as decorative (hidden from screen readers). Use this instead of `alt=""` to make decorative intent explicit in markup. When set, the inner img receives `alt=""` and `role="presentation"`.'
+      default: false
+    width:
+      type: object
+      title: Width
+      description: 'Width of the image element.'
+      default: 'undefined'
+    height:
+      type: object
+      title: Height
+      description: 'Height of the image element.'
+      default: 'undefined'
+    loading:
+      type: object
+      title: Loading
+      description: 'Loading strategy for the image.'
+      default: 'lazy'
+    fit:
+      type: object
+      title: Fit
+      description: 'How the image should be resized to fit its container. Maps to CSS object-fit.'
+      default: 'undefined'
+    ratio:
+      type: object
+      title: Ratio
+      description: 'CSS aspect-ratio value (e.g. "16/9", "1", "4/3"). When set, the container maintains this ratio.'
+      default: 'undefined'
+    rounded:
+      type: object
+      title: Rounded
+      description: 'Border radius for the image. Boolean attribute (or `true`) applies the theme''s medium radius token. A string value is used directly as a CSS border-radius value (e.g. "1rem", "50%").  Note: When set as an HTML attribute (`<hx-image rounded>`), Lit receives the value as an empty string (`''''`). When set programmatically (`el.rounded = true`), it receives a boolean. Both forms apply the theme radius token.'
+      default: 'undefined'
+    fallbackSrc:
+      type: object
+      title: Fallback Src
+      description: 'Fallback image URL shown when the primary src fails to load.'
+      default: 'undefined'
+    srcset:
+      type: object
+      title: Srcset
+      description: "A comma-separated list of image candidates for responsive images. Passed directly to the inner img's srcset attribute. Enables Drupal responsive image styles and browser-native image selection."
+      default: 'undefined'
+    sizes:
+      type: object
+      title: Sizes
+      description: 'Media conditions indicating which image size to use alongside srcset. Works in conjunction with the `srcset` attribute.'
+      default: 'undefined'
+slots:
+  fallback:
+    title: Fallback
+    description: 'Custom content shown when the image fails to load and no fallback-src is set.'
+  caption:
+    title: Caption
+    description: 'Optional caption content rendered in a figcaption element below the image.'
+libraryOverrides: {}

@@ -1,0 +1,38 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Th
+status: experimental
+group: HELiX
+description: 'Semantic table header cell. Must be a child of `hx-tr`. Supports sortable columns with accessible sort state.'
+props:
+  type: object
+  properties:
+    sortable:
+      type: boolean
+      title: Sortable
+      description: 'When true, the header renders a sort button and emits `hx-sort` on activation.'
+      default: false
+    sortDirection:
+      type: object
+      title: Sort Direction
+      description: 'Current sort direction. Reflected for CSS targeting.'
+      default: 'none'
+    scope:
+      type: object
+      title: Scope
+      description: 'The `scope` attribute for the underlying `<th>` element.'
+      default: 'col'
+    colspan:
+      type: number
+      title: Colspan
+      description: 'Number of columns this header spans.'
+      default: 0
+    rowspan:
+      type: number
+      title: Rowspan
+      description: 'Number of rows this header spans.'
+      default: 0
+slots:
+  default:
+    title: Default
+    description: 'Default slot for header label content.'
+libraryOverrides: {}

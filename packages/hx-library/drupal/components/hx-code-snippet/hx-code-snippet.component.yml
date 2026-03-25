@@ -1,0 +1,63 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Code Snippet
+status: experimental
+group: HELiX
+description: 'A styled code block with optional copy button and max-lines truncation. Supports block (`<pre><code>`) and inline (`<code>`) rendering modes. No external syntax highlighting dependency — use the `language` attribute as a hint for consumers integrating their own highlighter via slotted content.'
+props:
+  type: object
+  properties:
+    language:
+      type: string
+      title: Language
+      description: 'Language hint for consumers to apply syntax highlighting. Does not affect rendering directly; it is applied as a `language-*` class on the `<code>` element so external highlighters can target it.'
+      default: ''
+    inline:
+      type: boolean
+      title: Inline
+      description: 'When true, renders as an inline `<code>` element instead of a `<pre><code>` block.'
+      default: false
+    wrap:
+      type: boolean
+      title: Wrap
+      description: 'When true, enables word-wrap in block mode.'
+      default: false
+    copyable:
+      type: boolean
+      title: Copyable
+      description: 'When true, shows a copy-to-clipboard button. Add the `copyable` attribute to enable it.'
+      default: false
+    maxLines:
+      type: number
+      title: Max Lines
+      description: 'Maximum number of lines to display before showing a "Show more" button. Set to 0 (default) to disable truncation.'
+      default: 0
+    lineNumbers:
+      type: boolean
+      title: Line Numbers
+      description: 'When true, prepends line numbers to each displayed line in block mode. Line numbers are rendered as `aria-hidden` spans so screen readers skip them.'
+      default: false
+    labelCopy:
+      type: string
+      title: Label Copy
+      description: 'Label for the copy button in idle state.'
+      default: 'Copy code'
+    labelCopied:
+      type: string
+      title: Label Copied
+      description: 'Label for the copy button after successful copy.'
+      default: 'Copied!'
+    labelShowMore:
+      type: string
+      title: Label Show More
+      description: 'Label for the expand button when content is collapsed.'
+      default: 'Show more'
+    labelShowLess:
+      type: string
+      title: Label Show Less
+      description: 'Label for the expand button when content is expanded.'
+      default: 'Show less'
+slots:
+  default:
+    title: Default
+    description: 'Code content as plain text. Note: HTML markup in slot content will be stripped — only text content is extracted. Pre-highlighted HTML is not supported.'
+libraryOverrides: {}

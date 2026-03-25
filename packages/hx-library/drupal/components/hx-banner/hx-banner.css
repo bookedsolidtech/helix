@@ -1,0 +1,26 @@
+/**
+ * HX Banner component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-banner-bg: Banner background color. (default: var(--hx-color-info-50))
+ * --hx-banner-color: Banner text color. (default: var(--hx-color-info-800))
+ * --hx-banner-border-color: Banner bottom border color. (default: var(--hx-color-info-200))
+ * --hx-banner-border-width: Banner bottom border width. (default: var(--hx-border-width-thin))
+ * --hx-banner-padding: Banner padding. (default: var(--hx-space-3) var(--hx-space-4))
+ * --hx-banner-gap: Gap between banner elements. (default: var(--hx-space-3))
+ * --hx-banner-icon-color: Banner icon color. (default: var(--hx-color-info-500))
+ * --hx-banner-font-family: Banner font family. (default: var(--hx-font-family-sans))
+ * --hx-banner-action-color: Action link color. (default: var(--hx-banner-color))
+ * --hx-banner-position: CSS position value (sticky or fixed). (default: sticky)
+ * --hx-banner-z-index: Banner z-index for stacking context. (default: 100)
+ * --hx-touch-target-size: Minimum touch target size for the close button. (default: 44px)
+ */
+
+/* Component host styles */
+hx-banner {
+  display: block;
+}

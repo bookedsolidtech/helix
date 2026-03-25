@@ -1,0 +1,21 @@
+/**
+ * HX Structured List component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-structured-list-border-color: Border color when bordered. (default: var(--hx-color-neutral-200))
+ * --hx-structured-list-border-width: Border width when bordered. (default: var(--hx-border-width-thin))
+ * --hx-structured-list-stripe-bg: Stripe background color. (default: var(--hx-color-neutral-50))
+ * --hx-structured-list-padding-block: Row block padding. (default: var(--hx-space-4))
+ * --hx-structured-list-padding-inline: Row inline padding. (default: var(--hx-space-4))
+ * --hx-structured-list-condensed-padding-block: Row block padding (condensed). (default: var(--hx-space-2))
+ * --hx-structured-list-condensed-padding-inline: Row inline padding (condensed). (default: var(--hx-space-3))
+ */
+
+/* Component host styles */
+hx-structured-list {
+  display: block;
+}

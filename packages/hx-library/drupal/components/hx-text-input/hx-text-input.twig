@@ -1,0 +1,65 @@
+{#
+ /**
+ * @file
+ * HX Text Input component template.
+ *
+ * A text input component with label, validation, and form association.
+ * Supports accessible labeling via `label` property, `aria-label` attribute, or the `label` slot.
+ * Uses `aria-invalid` and `aria-describedby` on the native input for screen reader support. Native `required` provides implicit aria-required mapping per HTML-AAM.
+ * Error messages are announced via `role="alert"`. Keyboard navigation follows native input behavior.
+ *
+ * Available variables:
+ * - label: string - The visible label text for the input.
+ * - placeholder: string - Placeholder text shown when the input is empty.
+ * - value: string - The current value of the input.
+ * - type: object - The type of the native input element.
+ * - required: boolean - Whether the input is required for form submission.
+ * - disabled: boolean - Whether the input is disabled.
+ * - error: string - Error message to display. When set, the input enters an error state.
+ * - helpText: string - Help text displayed below the input for guidance.
+ * - name: string - The name of the input, used for form submission.
+ * - ariaLabel: object - Accessible name for screen readers, if different from the visible label.
+ * - readonly: boolean - Whether the input is read-only.
+ * - minlength: object - Minimum number of characters allowed.
+ * - maxlength: object - Maximum number of characters allowed.
+ * - pattern: string - A regular expression pattern the value must match for form validation.
+ * - autocomplete: string - Hint for the browser's autocomplete feature. Accepts standard HTML autocomplete values.
+ * - requiredMessage: string - Validation message shown when the field is required but empty.
+ * - size: object - Visual size of the input field.
+ */
+#}
+<hx-text-input
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if type is defined and type is not empty %}type="{{ type }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if ariaLabel is defined and ariaLabel is not empty %}aria-label="{{ ariaLabel }}"{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if minlength is defined and minlength is not empty %}minlength="{{ minlength }}"{% endif %}
+  {% if maxlength is defined and maxlength is not empty %}maxlength="{{ maxlength }}"{% endif %}
+  {% if pattern is defined and pattern is not empty %}pattern="{{ pattern }}"{% endif %}
+  {% if autocomplete is defined and autocomplete is not empty %}autocomplete="{{ autocomplete }}"{% endif %}
+  {% if requiredMessage is defined and requiredMessage is not empty %}required-message="{{ requiredMessage }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+</hx-text-input>

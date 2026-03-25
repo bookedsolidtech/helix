@@ -1,0 +1,30 @@
+/**
+ * HX Date Picker component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-date-picker-bg: Input background color. (default: var(--hx-color-neutral-0))
+ * --hx-date-picker-color: Input text color. (default: var(--hx-color-neutral-800))
+ * --hx-date-picker-border-color: Border color. (default: var(--hx-color-neutral-300))
+ * --hx-date-picker-border-radius: Border radius. (default: var(--hx-border-radius-md))
+ * --hx-date-picker-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-date-picker-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-date-picker-error-color: Error state color. (default: var(--hx-color-error-500))
+ * --hx-date-picker-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-date-picker-trigger-color: Trigger icon color. (default: var(--hx-color-neutral-500))
+ * --hx-date-picker-calendar-bg: Calendar background color. (default: var(--hx-color-neutral-0))
+ * --hx-date-picker-calendar-border-color: Calendar border color. (default: var(--hx-color-neutral-200))
+ * --hx-date-picker-calendar-min-width: Calendar minimum width. (default: 18rem)
+ * --hx-date-picker-selected-bg: Selected day background. (default: var(--hx-color-primary-500))
+ * --hx-date-picker-selected-color: Selected day text color. (default: var(--hx-color-neutral-0))
+ * --hx-date-picker-today-color: Today indicator color. (default: var(--hx-color-primary-600))
+ * --hx-date-picker-calendar-shadow: Calendar popup box shadow. (default: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1))
+ */
+
+/* Component host styles */
+hx-date-picker {
+  display: block;
+}

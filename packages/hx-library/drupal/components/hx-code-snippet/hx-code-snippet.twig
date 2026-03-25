@@ -1,0 +1,37 @@
+{#
+ /**
+ * @file
+ * HX Code Snippet component template.
+ *
+ * A styled code block with optional copy button and max-lines truncation.
+ * Supports block (`<pre><code>`) and inline (`<code>`) rendering modes.
+ * No external syntax highlighting dependency — use the `language` attribute
+ * as a hint for consumers integrating their own highlighter via slotted content.
+ *
+ * Available variables:
+ * - language: string - Language hint for consumers to apply syntax highlighting. Does not affect rendering directly; it is applied as a `language-*` class on the `<code>` element so external highlighters can target it.
+ * - inline: boolean - When true, renders as an inline `<code>` element instead of a `<pre><code>` block.
+ * - wrap: boolean - When true, enables word-wrap in block mode.
+ * - copyable: boolean - When true, shows a copy-to-clipboard button. Add the `copyable` attribute to enable it.
+ * - maxLines: number - Maximum number of lines to display before showing a "Show more" button. Set to 0 (default) to disable truncation.
+ * - lineNumbers: boolean - When true, prepends line numbers to each displayed line in block mode. Line numbers are rendered as `aria-hidden` spans so screen readers skip them.
+ * - labelCopy: string - Label for the copy button in idle state.
+ * - labelCopied: string - Label for the copy button after successful copy.
+ * - labelShowMore: string - Label for the expand button when content is collapsed.
+ * - labelShowLess: string - Label for the expand button when content is expanded.
+ */
+#}
+<hx-code-snippet
+  {% if language is defined and language is not empty %}language="{{ language }}"{% endif %}
+  {% if inline %}inline{% endif %}
+  {% if wrap %}wrap{% endif %}
+  {% if copyable %}copyable{% endif %}
+  {% if maxLines is defined and maxLines is not empty %}max-lines="{{ maxLines }}"{% endif %}
+  {% if lineNumbers %}line-numbers{% endif %}
+  {% if labelCopy is defined and labelCopy is not empty %}label-copy="{{ labelCopy }}"{% endif %}
+  {% if labelCopied is defined and labelCopied is not empty %}label-copied="{{ labelCopied }}"{% endif %}
+  {% if labelShowMore is defined and labelShowMore is not empty %}label-show-more="{{ labelShowMore }}"{% endif %}
+  {% if labelShowLess is defined and labelShowLess is not empty %}label-show-less="{{ labelShowLess }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-code-snippet>

@@ -1,0 +1,18 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Menu
+status: experimental
+group: HELiX
+description: 'A menu container that manages keyboard navigation over a list of menu items. Use with `hx-menu-item` and `hx-menu-divider`.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the menu. Rendered as `aria-label` on the inner `role="menu"` element when set.'
+      default: ''
+slots:
+  default:
+    title: Default
+    description: 'Default slot for hx-menu-item and hx-menu-divider elements.'
+libraryOverrides: {}

@@ -1,0 +1,27 @@
+{#
+ /**
+ * @file
+ * HX Tab component template.
+ *
+ * An individual tab button, designed to be used inside an `<hx-tabs>` container.
+ * Must be placed in the `tab` named slot of `<hx-tabs>`.
+ *
+ * Available variables:
+ * - panel: string - The name of the `<hx-tab-panel>` this tab controls. Must match the `name` attribute on the corresponding `<hx-tab-panel>`.
+ * - selected: boolean - Whether this tab is currently selected. Managed by the parent `<hx-tabs>`.
+ * - disabled: boolean - Whether this tab is disabled. Prevents selection and keyboard navigation.
+ */
+#}
+<hx-tab
+  {% if panel is defined and panel is not empty %}panel="{{ panel }}"{% endif %}
+  {% if selected %}selected{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tab>

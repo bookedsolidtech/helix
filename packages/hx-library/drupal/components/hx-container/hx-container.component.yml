@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Container
+status: experimental
+group: HELiX
+description: "A layout container that constrains content width and provides consistent vertical spacing and horizontal gutters.  Uses a two-layer model: the outer host spans full width (background, vertical padding), while the inner wrapper constrains max-width, centers content, and applies horizontal gutters.  ## Accessibility  `hx-container` is a purely visual layout primitive with no semantic meaning. It carries no ARIA role and is intentionally transparent to assistive technologies. Screen readers announce the container's children directly, not the container itself.  The inner wrapper always centers content horizontally (via `margin: auto`). This is by design for page-layout use cases. If you need non-centered alignment at a specific breakpoint, override `margin-left` and `margin-right` on `::part(inner)` from your stylesheet."
+props:
+  type: object
+  properties:
+    width:
+      type: object
+      title: Width
+      description: 'Controls the max-width of the inner content wrapper.'
+      default: 'content'
+    padding:
+      type: object
+      title: Padding
+      description: 'Vertical padding applied to the outer wrapper.'
+      default: 'none'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for container content.'
+libraryOverrides: {}

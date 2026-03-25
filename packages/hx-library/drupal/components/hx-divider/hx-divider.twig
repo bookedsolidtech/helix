@@ -1,0 +1,24 @@
+{#
+ /**
+ * @file
+ * HX Divider component template.
+ *
+ * A visual separator element for dividing content sections. Supports
+ * horizontal and vertical orientations, configurable spacing, and an optional
+ * centered label rendered between two lines.
+ *
+ * Available variables:
+ * - orientation: object - Orientation of the divider.
+ * - spacing: object - Spacing applied to the block axis (horizontal) or inline axis (vertical).
+ * - decorative: boolean - When true, renders the divider as decorative only (role="presentation"). Screen readers will not announce decorative dividers.
+ * - label: object - Optional text label rendered centered between the divider lines. Also sets aria-label on the separator for assistive technologies.
+ */
+#}
+<hx-divider
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+  {% if spacing is defined and spacing is not empty %}spacing="{{ spacing }}"{% endif %}
+  {% if decorative %}decorative{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-divider>

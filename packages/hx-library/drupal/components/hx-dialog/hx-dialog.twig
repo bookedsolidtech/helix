@@ -1,0 +1,36 @@
+{#
+ /**
+ * @file
+ * HX Dialog component template.
+ *
+ * A modal and non-modal dialog component built on the native HTML `<dialog>` element.
+ * Provides focus trapping, backdrop interaction, keyboard navigation, and full
+ * ARIA labelling for enterprise healthcare accessibility requirements.
+ *
+ * Available variables:
+ * - open: boolean - Controls whether the dialog is open.
+ * - modal: boolean - When true, renders as a modal dialog with a backdrop and focus trap. When false, renders as a non-modal dialog.
+ * - closeOnBackdrop: boolean - When true, clicking the backdrop closes the dialog.
+ * - heading: string - Text content for the dialog heading. Used as the accessible label via aria-labelledby.
+ * - variant: object - ARIA role variant. Use `'alertdialog'` for urgent dialogs requiring immediate attention (e.g., drug interaction warnings, critical lab alerts). Defaults to `'dialog'`.
+ * - description: string - Optional description text linked to the dialog via `aria-describedby`. When provided, screen readers will announce this text when the dialog receives focus. Recommended for dialogs that surface critical clinical information.
+ * - closeLabel: string - Accessible label for the close button. Override for localized text.
+ */
+#}
+<hx-dialog
+  {% if open %}open{% endif %}
+  {% if modal %}modal{% endif %}
+  {% if closeOnBackdrop %}close-on-backdrop{% endif %}
+  {% if heading is defined and heading is not empty %}heading="{{ heading }}"{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if description is defined and description is not empty %}description="{{ description }}"{% endif %}
+  {% if closeLabel is defined and closeLabel is not empty %}close-label="{{ closeLabel }}"{% endif %}
+>
+  {% if slots.header is defined %}
+    <slot name="header">{{ slots.header }}</slot>
+  {% endif %}
+  {% if slots.footer is defined %}
+    <slot name="footer">{{ slots.footer }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-dialog>

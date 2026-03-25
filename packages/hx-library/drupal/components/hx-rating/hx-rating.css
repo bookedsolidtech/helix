@@ -1,0 +1,19 @@
+/**
+ * HX Rating component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-rating-color: Filled star color. (default: var(--hx-color-warning-400,#fbbf24))
+ * --hx-rating-empty-color: Empty star color. (default: var(--hx-color-neutral-300,#d1d5db))
+ * --hx-rating-hover-color: Star color on hover. (default: var(--hx-color-warning-300,#fcd34d))
+ * --hx-rating-size: Star icon size. (default: var(--hx-font-size-xl,1.25rem))
+ * --hx-rating-gap: Gap between stars. (default: var(--hx-space-1,0.25rem))
+ */
+
+/* Component host styles */
+hx-rating {
+  display: block;
+}

@@ -1,0 +1,18 @@
+/**
+ * HX Grid component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-grid-columns: Override the computed grid-template-columns.
+ * --hx-grid-gap: Override the computed gap.
+ * --hx-grid-row-gap: Override the computed row-gap.
+ * --hx-grid-column-gap: Override the computed column-gap.
+ */
+
+/* Component host styles */
+hx-grid {
+  display: block;
+}

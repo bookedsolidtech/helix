@@ -1,0 +1,22 @@
+/**
+ * HX Switch component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-switch-track-bg: Track background color. (default: var(--hx-color-neutral-300))
+ * --hx-switch-track-checked-bg: Track background when checked. (default: var(--hx-color-primary-500))
+ * --hx-switch-thumb-bg: Thumb background color. (default: var(--hx-color-neutral-0))
+ * --hx-switch-thumb-shadow: Thumb box shadow. (default: var(--hx-shadow-sm))
+ * --hx-switch-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-switch-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-switch-error-color: Error message color. (default: var(--hx-color-error-500))
+ * --hx-switch-help-text-color: Help text color. (default: var(--hx-color-neutral-500))
+ */
+
+/* Component host styles */
+hx-switch {
+  display: block;
+}

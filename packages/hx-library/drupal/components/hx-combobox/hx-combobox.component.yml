@@ -1,0 +1,111 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Combobox
+status: experimental
+group: HELiX
+description: 'A form-associated combobox component combining a text input with a listbox for autocomplete and typeahead. Supports filtering, free-text entry, keyboard navigation, and async option loading.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the combobox.'
+      default: ''
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text shown in the input when no value is entered.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The current value of the combobox.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the combobox is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the combobox is disabled.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'The name used for form submission.'
+      default: ''
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the field enters an error state.'
+      default: ''
+    helpText:
+      type: string
+      title: Help Text
+      description: 'Help text displayed below the combobox for guidance.'
+      default: ''
+    size:
+      type: object
+      title: Size
+      description: 'Size variant of the combobox.'
+      default: 'md'
+    multiple:
+      type: boolean
+      title: Multiple
+      description: 'Whether multiple options can be selected.'
+      default: false
+    clearable:
+      type: boolean
+      title: Clearable
+      description: 'Whether the combobox shows a clear button when a value is set.'
+      default: false
+    loading:
+      type: boolean
+      title: Loading
+      description: 'Whether the combobox is in a loading state (shows spinner).'
+      default: false
+    filterDebounce:
+      type: number
+      title: Filter Debounce
+      description: 'Debounce delay in milliseconds for the filter input event.'
+      default: 0
+    ariaLabel:
+      type: object
+      title: Aria Label
+      description: 'Accessible name for screen readers, if different from the visible label.'
+      default: 'null'
+    labelNoOptions:
+      type: string
+      title: Label No Options
+      description: 'Text shown when no options match the current filter.'
+      default: 'No options found'
+    labelRequired:
+      type: string
+      title: Label Required
+      description: 'Validation message shown when the field is required but empty.'
+      default: 'Please select an option.'
+slots:
+  option:
+    title: Option
+    description: 'Slot for `<option>` elements that populate the listbox.'
+  prefix:
+    title: Prefix
+    description: 'Content to display before the text input.'
+  suffix:
+    title: Suffix
+    description: 'Content to display after the text input.'
+  empty-label:
+    title: Empty Label
+    description: 'Content shown when no options match the filter.'
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  help-text:
+    title: Help Text
+    description: 'Custom help text content (overrides the helpText property).'
+libraryOverrides: {}

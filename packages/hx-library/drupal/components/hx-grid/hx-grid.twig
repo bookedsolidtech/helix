@@ -1,0 +1,26 @@
+{#
+ /**
+ * @file
+ * HX Grid component template.
+ *
+ * A CSS Grid layout wrapper with design-token-based column and gap system.
+ *
+ * Available variables:
+ * - columns: object - Number of equal columns (`repeat(N, 1fr)`) or a CSS grid-template-columns string.
+ * - gap: object - Gap size applied to both row and column gaps.
+ * - rowGap: object - Row gap override. When set, takes precedence over `gap` for row spacing.
+ * - columnGap: object - Column gap override. When set, takes precedence over `gap` for column spacing.
+ * - align: object - Aligns grid items along the block axis (align-items).
+ * - justify: object - Justifies grid items along the inline axis (justify-items).
+ */
+#}
+<hx-grid
+  {% if columns is defined and columns is not empty %}columns="{{ columns }}"{% endif %}
+  {% if gap is defined and gap is not empty %}gap="{{ gap }}"{% endif %}
+  {% if rowGap is defined and rowGap is not empty %}row-gap="{{ rowGap }}"{% endif %}
+  {% if columnGap is defined and columnGap is not empty %}column-gap="{{ columnGap }}"{% endif %}
+  {% if align is defined and align is not empty %}align="{{ align }}"{% endif %}
+  {% if justify is defined and justify is not empty %}justify="{{ justify }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-grid>

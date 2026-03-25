@@ -1,0 +1,39 @@
+{#
+ /**
+ * @file
+ * HX Pagination component template.
+ *
+ * A pagination component for navigating content listings.
+ *
+ * Available variables:
+ * - totalPages: number - Total number of pages.
+ * - currentPage: number - The currently active page (1-based).
+ * - siblingCount: number - Number of page buttons shown on each side of the current page.
+ * - boundaryCount: number - Number of pages always shown at the start and end of the list.
+ * - showFirstLast: boolean - Whether to show First and Last page buttons.
+ * - label: string - Accessible label for the `<nav>` element.
+ * - pageSize: number - The number of items displayed per page. When set, a page-size selector `<select>` is rendered. Set `show-page-size` to display the selector.
+ * - showPageSize: boolean - Whether to show the page-size selector UI.
+ * - labelRowsPerPage: string - Label text for the rows-per-page selector.
+ * - labelFirstPage: string - Accessible label for the first-page button.
+ * - labelPrevPage: string - Accessible label for the previous-page button.
+ * - labelNextPage: string - Accessible label for the next-page button.
+ * - labelLastPage: string - Accessible label for the last-page button.
+ */
+#}
+<hx-pagination
+  {% if totalPages is defined and totalPages is not empty %}total-pages="{{ totalPages }}"{% endif %}
+  {% if currentPage is defined and currentPage is not empty %}current-page="{{ currentPage }}"{% endif %}
+  {% if siblingCount is defined and siblingCount is not empty %}sibling-count="{{ siblingCount }}"{% endif %}
+  {% if boundaryCount is defined and boundaryCount is not empty %}boundary-count="{{ boundaryCount }}"{% endif %}
+  {% if showFirstLast %}show-first-last{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if pageSize is defined and pageSize is not empty %}page-size="{{ pageSize }}"{% endif %}
+  {% if showPageSize %}show-page-size{% endif %}
+  {% if labelRowsPerPage is defined and labelRowsPerPage is not empty %}label-rows-per-page="{{ labelRowsPerPage }}"{% endif %}
+  {% if labelFirstPage is defined and labelFirstPage is not empty %}label-first-page="{{ labelFirstPage }}"{% endif %}
+  {% if labelPrevPage is defined and labelPrevPage is not empty %}label-prev-page="{{ labelPrevPage }}"{% endif %}
+  {% if labelNextPage is defined and labelNextPage is not empty %}label-next-page="{{ labelNextPage }}"{% endif %}
+  {% if labelLastPage is defined and labelLastPage is not empty %}label-last-page="{{ labelLastPage }}"{% endif %}
+>
+</hx-pagination>

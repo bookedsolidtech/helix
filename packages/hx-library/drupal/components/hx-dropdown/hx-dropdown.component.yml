@@ -1,0 +1,36 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Dropdown
+status: experimental
+group: HELiX
+description: 'A dropdown component — a button that opens a floating panel on click.'
+props:
+  type: object
+  properties:
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the dropdown panel is open.'
+      default: false
+    placement:
+      type: object
+      title: Placement
+      description: 'Preferred placement of the panel relative to the trigger.'
+      default: 'bottom-start'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the dropdown is disabled. Prevents opening.'
+      default: false
+    distance:
+      type: number
+      title: Distance
+      description: 'Gap in pixels between the trigger and the panel.'
+      default: 4
+slots:
+  trigger:
+    title: Trigger
+    description: 'The element that opens the dropdown (e.g. hx-button).'
+  default:
+    title: Default
+    description: 'Default slot for dropdown panel content (e.g. menu items).'
+libraryOverrides: {}

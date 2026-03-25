@@ -1,0 +1,14 @@
+{#
+ /**
+ * @file
+ * HX Tab Panel component template.
+ *
+ * A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.
+ *
+ * Available variables:
+ * - name: string - The name that corresponds to the `panel` attribute on the associated `<hx-tab>`.
+ */
+#}
+<hx-tab-panel {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tab-panel>

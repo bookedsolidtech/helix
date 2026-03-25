@@ -1,0 +1,26 @@
+{#
+ /**
+ * @file
+ * HX Text component template.
+ *
+ * A semantic typography wrapper that applies consistent text styles using design tokens.
+ *
+ * Available variables:
+ * - variant: object - Typography variant controlling font size, line height, and letter spacing.  Note: The public variant set (body / body-sm / body-lg / label / label-sm / caption / code / overline) intentionally extends the original audit spec (body / lead / small / caption / overline). `lead` and `small` were replaced with the more granular `body-lg`, `body-sm`, `label`, `label-sm`, and `code` variants to better serve healthcare UI density requirements. There are no `lead` or `small` variants — consumers must use `body-lg` and `body-sm` respectively.
+ * - weight: object - Font weight override. When unset, the variant's default weight is used.
+ * - color: object - Semantic color intent.
+ * - truncate: boolean - When true, clips text to a single line with an ellipsis overflow.
+ * - lines: number - Maximum number of lines to display before clamping with ellipsis. When set, overrides `truncate`. Set to 0 to disable.
+ * - as: object - The HTML element to render as the inner base element. Use to produce semantically appropriate markup (e.g., `p`, `strong`, `em`). Defaults to `span` for inline usage.  In Drupal Twig: `<hx-text as="p" variant="body">...</hx-text>`
+ */
+#}
+<hx-text
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if weight is defined and weight is not empty %}weight="{{ weight }}"{% endif %}
+  {% if color is defined and color is not empty %}color="{{ color }}"{% endif %}
+  {% if truncate %}truncate{% endif %}
+  {% if lines is defined and lines is not empty %}lines="{{ lines }}"{% endif %}
+  {% if as is defined and as is not empty %}as="{{ as }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-text>

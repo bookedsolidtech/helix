@@ -1,0 +1,18 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tab Panel
+status: experimental
+group: HELiX
+description: 'A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The name that corresponds to the `panel` attribute on the associated `<hx-tab>`.'
+      default: ''
+slots:
+  default:
+    title: Default
+    description: 'Default slot for panel content.'
+libraryOverrides: {}

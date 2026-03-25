@@ -1,0 +1,22 @@
+/**
+ * HX Meter component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-meter-track-height: Height of the track bar.
+ * --hx-meter-track-color: Background color of the unfilled track.
+ * --hx-meter-track-radius: Border radius of the track.
+ * --hx-meter-indicator-color: Default filled bar color (no thresholds).
+ * --hx-meter-color-optimum: Color when value is in the optimum zone.
+ * --hx-meter-color-warning: Color when value is in a warning zone.
+ * --hx-meter-color-danger: Color when value is in the danger zone.
+ * --hx-meter-label-color: Label text color.
+ */
+
+/* Component host styles */
+hx-meter {
+  display: block;
+}

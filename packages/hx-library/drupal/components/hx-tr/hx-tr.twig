@@ -1,0 +1,19 @@
+{#
+ /**
+ * @file
+ * HX Tr component template.
+ *
+ * Semantic table row. Must be a child of `hx-thead`, `hx-tbody`, or `hx-tfoot`.
+ * Contains `hx-th` or `hx-td` cells.
+ *
+ * Available variables:
+ * - selected: boolean - When true, marks the row as selected and applies selected styling.
+ * - disabled: boolean - When true, the row is visually disabled and non-interactive.
+ */
+#}
+<hx-tr
+  {% if selected %}selected{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tr>

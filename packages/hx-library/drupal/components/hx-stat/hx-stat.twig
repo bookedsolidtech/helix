@@ -1,0 +1,24 @@
+{#
+ /**
+ * @file
+ * HX Stat component template.
+ *
+ * A static stat display component for presenting key metrics in a healthcare dashboard.
+ *
+ * Available variables:
+ * - label: string - The metric label displayed below the value.
+ * - value: string - The metric value displayed prominently.
+ * - trend: object - Trend direction indicator. 'neutral' hides the indicator.
+ * - size: object - Size variant controlling font size.
+ */
+#}
+<hx-stat
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if trend is defined and trend is not empty %}trend="{{ trend }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+>
+  {% if slots.icon is defined %}
+    <slot name="icon">{{ slots.icon }}</slot>
+  {% endif %}
+</hx-stat>

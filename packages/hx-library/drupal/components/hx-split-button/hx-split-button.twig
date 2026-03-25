@@ -1,0 +1,31 @@
+{#
+ /**
+ * @file
+ * HX Split Button component template.
+ *
+ * A split button combining a primary action button with an attached dropdown
+ * menu for secondary actions. Implements the ARIA menu button pattern for
+ * full keyboard and screen reader support.
+ *
+ * Available variables:
+ * - variant: object - Visual style variant of the split button.
+ * - size: object - Size of the split button.
+ * - disabled: boolean - Whether the split button is disabled. Both the primary button and the trigger are disabled when this is true.
+ * - label: object - Primary button label text. When set, overrides the default slot content.
+ * - triggerLabel: string - Accessible label for the dropdown trigger button. Override for localization.
+ * - menuLabel: string - Accessible label for the dropdown menu panel. Override for localization.
+ */
+#}
+<hx-split-button
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if triggerLabel is defined and triggerLabel is not empty %}trigger-label="{{ triggerLabel }}"{% endif %}
+  {% if menuLabel is defined and menuLabel is not empty %}menu-label="{{ menuLabel }}"{% endif %}
+>
+  {% if slots.menu is defined %}
+    <slot name="menu">{{ slots.menu }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-split-button>

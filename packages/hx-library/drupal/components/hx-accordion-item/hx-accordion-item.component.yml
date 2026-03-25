@@ -1,0 +1,31 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Accordion Item
+status: experimental
+group: HELiX
+description: 'An individual accordion item with collapsible content.'
+props:
+  type: object
+  properties:
+    expanded:
+      type: boolean
+      title: Expanded
+      description: 'Whether this item is expanded.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether this item is disabled (cannot be toggled).'
+      default: false
+    level:
+      type: object
+      title: Level
+      description: 'Heading level (1–6) applied via `role="heading" aria-level` on the summary trigger. Defaults to 3. Set to match the document outline around the accordion so screen readers surface accordion items in the heading list.'
+      default: '3'
+slots:
+  trigger:
+    title: Trigger
+    description: 'The heading/trigger content for this item.'
+  default:
+    title: Default
+    description: 'Default slot for the collapsible body content.'
+libraryOverrides: {}

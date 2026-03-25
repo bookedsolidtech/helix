@@ -1,0 +1,15 @@
+/**
+ * HX Menu Divider component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-menu-divider-color: Divider line color. (default: var(--hx-color-neutral-200))
+ */
+
+/* Component host styles */
+hx-menu-divider {
+  display: block;
+}

@@ -1,0 +1,35 @@
+{#
+ /**
+ * @file
+ * HX List Item component template.
+ *
+ * A rich list item for use inside `hx-list`.
+ *
+ * Available variables:
+ * - disabled: boolean - Whether the item is disabled. Prevents interaction.
+ * - selected: boolean - Whether the item is selected (used in interactive mode).
+ * - href: object - When set, renders the item as a link (only in non-interactive variants).
+ * - value: object - The value associated with this item (used with hx-select).
+ * - interactive: boolean - Set by the parent hx-list to indicate this item is part of an interactive listbox. Controls CSS styling and ARIA role via host attributes.
+ * - type: object - Item type for description list variant. Use 'term' for <dt> and 'definition' for <dd>.
+ */
+#}
+<hx-list-item
+  {% if disabled %}disabled{% endif %}
+  {% if selected %}selected{% endif %}
+  {% if href is defined and href is not empty %}href="{{ href }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if interactive %}interactive{% endif %}
+  {% if type is defined and type is not empty %}type="{{ type }}"{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if slots.description is defined %}
+    <slot name="description">{{ slots.description }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-list-item>

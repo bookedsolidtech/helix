@@ -1,0 +1,23 @@
+{#
+ /**
+ * @file
+ * HX Accordion Item component template.
+ *
+ * An individual accordion item with collapsible content.
+ *
+ * Available variables:
+ * - expanded: boolean - Whether this item is expanded.
+ * - disabled: boolean - Whether this item is disabled (cannot be toggled).
+ * - level: object - Heading level (1–6) applied via `role="heading" aria-level` on the summary trigger. Defaults to 3. Set to match the document outline around the accordion so screen readers surface accordion items in the heading list.
+ */
+#}
+<hx-accordion-item
+  {% if expanded %}expanded{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if level is defined and level is not empty %}level="{{ level }}"{% endif %}
+>
+  {% if slots.trigger is defined %}
+    <slot name="trigger">{{ slots.trigger }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-accordion-item>

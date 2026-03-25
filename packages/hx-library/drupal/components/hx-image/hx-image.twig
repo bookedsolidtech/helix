@@ -1,0 +1,44 @@
+{#
+ /**
+ * @file
+ * HX Image component template.
+ *
+ * An accessible image wrapper with lazy loading, fallback support, aspect ratio control,
+ * responsive image (srcset/sizes) support, and optional caption.
+ *
+ * Available variables:
+ * - src: string - The URL of the image to display.
+ * - alt: object - Accessible text description of the image. Required for informative images. Use the `decorative` prop for decorative images instead of setting this to an empty string — explicit decorative intent is preferred.
+ * - decorative: boolean - Marks the image as decorative (hidden from screen readers). Use this instead of `alt=""` to make decorative intent explicit in markup. When set, the inner img receives `alt=""` and `role="presentation"`.
+ * - width: object - Width of the image element.
+ * - height: object - Height of the image element.
+ * - loading: object - Loading strategy for the image.
+ * - fit: object - How the image should be resized to fit its container. Maps to CSS object-fit.
+ * - ratio: object - CSS aspect-ratio value (e.g. "16/9", "1", "4/3"). When set, the container maintains this ratio.
+ * - rounded: object - Border radius for the image. Boolean attribute (or `true`) applies the theme's medium radius token. A string value is used directly as a CSS border-radius value (e.g. "1rem", "50%").  Note: When set as an HTML attribute (`<hx-image rounded>`), Lit receives the value as an empty string (`''`). When set programmatically (`el.rounded = true`), it receives a boolean. Both forms apply the theme radius token.
+ * - fallbackSrc: object - Fallback image URL shown when the primary src fails to load.
+ * - srcset: object - A comma-separated list of image candidates for responsive images. Passed directly to the inner img's srcset attribute. Enables Drupal responsive image styles and browser-native image selection.
+ * - sizes: object - Media conditions indicating which image size to use alongside srcset. Works in conjunction with the `srcset` attribute.
+ */
+#}
+<hx-image
+  {% if src is defined and src is not empty %}src="{{ src }}"{% endif %}
+  {% if alt is defined and alt is not empty %}alt="{{ alt }}"{% endif %}
+  {% if decorative %}decorative{% endif %}
+  {% if width is defined and width is not empty %}width="{{ width }}"{% endif %}
+  {% if height is defined and height is not empty %}height="{{ height }}"{% endif %}
+  {% if loading is defined and loading is not empty %}loading="{{ loading }}"{% endif %}
+  {% if fit is defined and fit is not empty %}fit="{{ fit }}"{% endif %}
+  {% if ratio is defined and ratio is not empty %}ratio="{{ ratio }}"{% endif %}
+  {% if rounded is defined and rounded is not empty %}rounded="{{ rounded }}"{% endif %}
+  {% if fallbackSrc is defined and fallbackSrc is not empty %}fallback-src="{{ fallbackSrc }}"{% endif %}
+  {% if srcset is defined and srcset is not empty %}srcset="{{ srcset }}"{% endif %}
+  {% if sizes is defined and sizes is not empty %}sizes="{{ sizes }}"{% endif %}
+>
+  {% if slots.fallback is defined %}
+    <slot name="fallback">{{ slots.fallback }}</slot>
+  {% endif %}
+  {% if slots.caption is defined %}
+    <slot name="caption">{{ slots.caption }}</slot>
+  {% endif %}
+</hx-image>

@@ -1,0 +1,43 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Link
+status: experimental
+group: HELiX
+description: 'A semantic hyperlink component with accessibility-first design. Renders a native `<a>` element for enabled state and a `<span>` for disabled state with full keyboard and screen reader support.'
+props:
+  type: object
+  properties:
+    href:
+      type: object
+      title: Href
+      description: 'The URL the link points to.'
+      default: 'undefined'
+    target:
+      type: object
+      title: Target
+      description: 'Where to display the linked URL (_self, _blank, etc.). When set to "_blank", automatically adds rel="noopener noreferrer" and shows an external-link indicator.'
+      default: 'undefined'
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the link.'
+      default: 'default'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the link is disabled. Renders a span instead of an anchor. The disabled span is keyboard-focusable (tabindex="0") and announces as a disabled link to screen readers.'
+      default: false
+    download:
+      type: object
+      title: Download
+      description: 'Prompts the user to download the linked URL. When set to a string, the value is used as the suggested filename.'
+      default: 'undefined'
+    rel:
+      type: object
+      title: Rel
+      description: 'Relationship between the current document and the linked URL. Automatically set to "noopener noreferrer" when target="_blank".'
+      default: 'undefined'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for link label text or content.'
+libraryOverrides: {}

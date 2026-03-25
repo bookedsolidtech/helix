@@ -1,0 +1,25 @@
+/**
+ * HX Button component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-button-bg: Button background color. (default: var(--hx-color-primary-500))
+ * --hx-button-hover-bg: Hover background color override. When set, overrides the variant default hover background from outside the shadow DOM.
+ * --hx-button-color: Button text color. (default: var(--hx-color-neutral-0))
+ * --hx-button-border-color: Button border color. (default: transparent)
+ * --hx-button-border-radius: Button border radius. (default: var(--hx-border-radius-md))
+ * --hx-button-font-family: Button font family. (default: var(--hx-font-family-sans))
+ * --hx-button-font-weight: Button font weight. (default: var(--hx-font-weight-semibold))
+ * --hx-button-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-button-inverted-color: Text color when inverted. (default: #ffffff)
+ * --hx-button-inverted-ghost-hover-bg: Ghost hover bg when inverted. (default: rgba(255,255,255,0.15))
+ * --hx-button-inverted-focus-ring-color: Focus ring color when inverted. (default: rgba(255,255,255,0.5))
+ */
+
+/* Component host styles */
+hx-button {
+  display: block;
+}

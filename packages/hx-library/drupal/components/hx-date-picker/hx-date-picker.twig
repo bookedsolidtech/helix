@@ -1,0 +1,54 @@
+{#
+ /**
+ * @file
+ * HX Date Picker component template.
+ *
+ * Date picker component for selecting dates with keyboard-accessible calendar popup.
+ *
+ * Available variables:
+ * - name: string - The name of the field, used for form submission.
+ * - value: string - The current value as an ISO 8601 date string (e.g. 2026-03-04).
+ * - min: string - The minimum selectable date as an ISO 8601 string.
+ * - max: string - The maximum selectable date as an ISO 8601 string.
+ * - label: string - The visible label text.
+ * - required: boolean - Whether the field is required for form submission.
+ * - disabled: boolean - Whether the field is disabled.
+ * - error: string - Error message to display. When set, the field enters an error state.
+ * - helpText: string - Help text displayed below the field for guidance.
+ * - format: string - Display format hint shown as placeholder (e.g. MM/DD/YYYY).
+ * - locale: string - Locale string used for formatting the display value.
+ * - labelChooseDate: string - Accessible label for the calendar grid/dialog.
+ * - labelPrevMonth: string - Accessible label for the "previous month" button.
+ * - labelNextMonth: string - Accessible label for the "next month" button.
+ * - labelOpenCalendar: string - Accessible label for the calendar trigger button when calendar is closed.
+ * - labelCloseCalendar: string - Accessible label for the calendar trigger button when calendar is open.
+ */
+#}
+<hx-date-picker
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if format is defined and format is not empty %}format="{{ format }}"{% endif %}
+  {% if locale is defined and locale is not empty %}locale="{{ locale }}"{% endif %}
+  {% if labelChooseDate is defined and labelChooseDate is not empty %}label-choose-date="{{ labelChooseDate }}"{% endif %}
+  {% if labelPrevMonth is defined and labelPrevMonth is not empty %}label-prev-month="{{ labelPrevMonth }}"{% endif %}
+  {% if labelNextMonth is defined and labelNextMonth is not empty %}label-next-month="{{ labelNextMonth }}"{% endif %}
+  {% if labelOpenCalendar is defined and labelOpenCalendar is not empty %}label-open-calendar="{{ labelOpenCalendar }}"{% endif %}
+  {% if labelCloseCalendar is defined and labelCloseCalendar is not empty %}label-close-calendar="{{ labelCloseCalendar }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+</hx-date-picker>

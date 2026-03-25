@@ -1,0 +1,21 @@
+/**
+ * HX Radio component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-radio-size: Radio circle size. (default: var(--hx-size-5, 1.25rem))
+ * --hx-radio-border-color: Radio border color. (default: var(--hx-color-neutral-300, #ced4da))
+ * --hx-radio-checked-bg: Checked background color. (default: var(--hx-color-primary-500, #2563EB))
+ * --hx-radio-checked-border-color: Checked border color. (default: var(--hx-color-primary-500, #2563EB))
+ * --hx-radio-dot-color: Inner dot color when checked. (default: var(--hx-color-neutral-0, #ffffff))
+ * --hx-radio-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color, #2563EB))
+ * --hx-radio-label-color: Label text color. (default: var(--hx-color-neutral-700, #343a40))
+ */
+
+/* Component host styles */
+hx-radio {
+  display: block;
+}

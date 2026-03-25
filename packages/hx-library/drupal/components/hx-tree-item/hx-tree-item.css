@@ -1,0 +1,21 @@
+/**
+ * HX Tree Item component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-tree-item-color: Item text color. (default: var(--hx-color-neutral-900))
+ * --hx-tree-item-hover-bg: Hover background color. (default: var(--hx-color-neutral-100))
+ * --hx-tree-item-selected-bg: Selected background color. (default: var(--hx-color-primary-100))
+ * --hx-tree-item-selected-color: Selected text color. (default: var(--hx-color-primary-800))
+ * --hx-tree-item-padding-x: Horizontal padding. (default: var(--hx-space-2))
+ * --hx-tree-item-padding-y: Vertical padding. (default: var(--hx-space-1))
+ * --hx-tree-indent-size: Indentation size per level. (default: 1.5rem)
+ */
+
+/* Component host styles */
+hx-tree-item {
+  display: block;
+}

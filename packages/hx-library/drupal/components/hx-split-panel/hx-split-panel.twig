@@ -1,0 +1,43 @@
+{#
+ /**
+ * @file
+ * HX Split Panel component template.
+ *
+ * A resizable two-pane layout with a draggable divider.
+ *
+ * Available variables:
+ * - position: number - Position of the divider as a percentage (0–100) of the start panel.
+ * - positionInPixels: object - Position of the divider in pixels (alternative to `position`). When set, takes precedence over `position` until the host is measured.
+ * - orientation: object - Orientation of the split.
+ * - min: number - Minimum position as a percentage (0–100). Prevents full collapse of start panel.
+ * - max: number - Maximum position as a percentage (0–100). Prevents full expansion of start panel.
+ * - snap: object - Snap points as an array of percentages. The divider snaps to the nearest point within a 5% threshold. Accepts JSON array string in HTML: snap="[25, 50, 75]"
+ * - disabled: boolean - When true, the divider cannot be dragged.
+ * - collapsible: boolean - When true, collapse/expand buttons appear on the divider.
+ * - collapsed: object - Which panel is collapsed: 'start', 'end', or null (not collapsed).
+ * - labelResize: string - Accessible label for the resize divider handle.
+ * - labelCollapseStart: string - Accessible label for the collapse-start panel button.
+ * - labelCollapseEnd: string - Accessible label for the collapse-end panel button.
+ */
+#}
+<hx-split-panel
+  {% if position is defined and position is not empty %}position="{{ position }}"{% endif %}
+  {% if positionInPixels is defined and positionInPixels is not empty %}position-in-pixels="{{ positionInPixels }}"{% endif %}
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if snap is defined and snap is not empty %}snap="{{ snap }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if collapsible %}collapsible{% endif %}
+  {% if collapsed is defined and collapsed is not empty %}collapsed="{{ collapsed }}"{% endif %}
+  {% if labelResize is defined and labelResize is not empty %}label-resize="{{ labelResize }}"{% endif %}
+  {% if labelCollapseStart is defined and labelCollapseStart is not empty %}label-collapse-start="{{ labelCollapseStart }}"{% endif %}
+  {% if labelCollapseEnd is defined and labelCollapseEnd is not empty %}label-collapse-end="{{ labelCollapseEnd }}"{% endif %}
+>
+  {% if slots.start is defined %}
+    <slot name="start">{{ slots.start }}</slot>
+  {% endif %}
+  {% if slots.end is defined %}
+    <slot name="end">{{ slots.end }}</slot>
+  {% endif %}
+</hx-split-panel>

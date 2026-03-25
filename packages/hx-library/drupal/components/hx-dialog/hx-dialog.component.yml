@@ -1,0 +1,54 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Dialog
+status: experimental
+group: HELiX
+description: 'A modal and non-modal dialog component built on the native HTML `<dialog>` element. Provides focus trapping, backdrop interaction, keyboard navigation, and full ARIA labelling for enterprise healthcare accessibility requirements.'
+props:
+  type: object
+  properties:
+    open:
+      type: boolean
+      title: Open
+      description: 'Controls whether the dialog is open.'
+      default: false
+    modal:
+      type: boolean
+      title: Modal
+      description: 'When true, renders as a modal dialog with a backdrop and focus trap. When false, renders as a non-modal dialog.'
+      default: true
+    closeOnBackdrop:
+      type: boolean
+      title: Close On Backdrop
+      description: 'When true, clicking the backdrop closes the dialog.'
+      default: true
+    heading:
+      type: string
+      title: Heading
+      description: 'Text content for the dialog heading. Used as the accessible label via aria-labelledby.'
+      default: ''
+    variant:
+      type: object
+      title: Variant
+      description: "ARIA role variant. Use `'alertdialog'` for urgent dialogs requiring immediate attention (e.g., drug interaction warnings, critical lab alerts). Defaults to `'dialog'`."
+      default: 'dialog'
+    description:
+      type: string
+      title: Description
+      description: 'Optional description text linked to the dialog via `aria-describedby`. When provided, screen readers will announce this text when the dialog receives focus. Recommended for dialogs that surface critical clinical information.'
+      default: ''
+    closeLabel:
+      type: string
+      title: Close Label
+      description: 'Accessible label for the close button. Override for localized text.'
+      default: 'Close dialog'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the dialog body content.'
+  header:
+    title: Header
+    description: 'Slot for custom header content. When provided, replaces the built-in heading.'
+  footer:
+    title: Footer
+    description: 'Slot for action buttons or footer content.'
+libraryOverrides: {}

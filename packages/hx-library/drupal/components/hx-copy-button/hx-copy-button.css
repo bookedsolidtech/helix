@@ -1,0 +1,19 @@
+/**
+ * HX Copy Button component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-copy-button-bg: Button background color. (default: transparent)
+ * --hx-copy-button-color: Icon and text color. (default: var(--hx-color-primary-500))
+ * --hx-copy-button-border-color: Button border color. (default: transparent)
+ * --hx-copy-button-border-radius: Button border radius. (default: var(--hx-border-radius-md))
+ * --hx-copy-button-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ */
+
+/* Component host styles */
+hx-copy-button {
+  display: block;
+}

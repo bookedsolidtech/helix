@@ -1,0 +1,45 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Action Bar
+status: experimental
+group: HELiX
+description: 'A horizontal toolbar container for grouping related action buttons and controls. Implements the ARIA toolbar pattern with roving tabindex keyboard navigation.'
+props:
+  type: object
+  properties:
+    size:
+      type: object
+      title: Size
+      description: 'Size of the action bar — propagated as a data attribute to slotted children.'
+      default: 'md'
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual variant controlling the bar background.'
+      default: 'default'
+    position:
+      type: object
+      title: Position
+      description: 'Position and sticky behavior of the action bar. - `top` — normal flow (default) - `sticky` — sticks to the top of the scroll container; add `scroll-padding-top` to the   scroll container equal to the bar height to prevent anchor targets from scrolling behind it - `bottom` — sticks to the bottom of the scroll container with iOS safe-area-inset support'
+      default: 'top'
+    sticky:
+      type: boolean
+      title: Sticky
+    ariaLabel:
+      type: string
+      title: Aria Label
+      description: 'Accessible label for the toolbar. Required when multiple toolbars appear on the same page.'
+      default: 'Actions'
+slots:
+  start:
+    title: Start
+    description: 'Left-aligned actions.'
+  default:
+    title: Default
+    description: 'Center content (default slot).'
+  end:
+    title: End
+    description: 'Right-aligned actions.'
+  overflow:
+    title: Overflow
+    description: 'Actions revealed when the bar is constrained for space.'
+libraryOverrides: {}

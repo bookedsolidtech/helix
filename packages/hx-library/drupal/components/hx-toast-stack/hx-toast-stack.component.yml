@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Toast Stack
+status: experimental
+group: HELiX
+description: 'A fixed-position container that stacks `hx-toast` elements at the specified corner of the viewport. Enforces a maximum visible toast count via `stack-limit`.'
+props:
+  type: object
+  properties:
+    placement:
+      type: object
+      title: Placement
+      description: 'Corner of the viewport where toasts appear.'
+      default: 'bottom-end'
+    stackLimit:
+      type: number
+      title: Stack Limit
+      description: 'Maximum number of simultaneously visible toasts. 0 = unlimited.'
+      default: 3
+slots:
+  default:
+    title: Default
+    description: 'Accepts `hx-toast` elements.'
+libraryOverrides: {}

@@ -29,6 +29,8 @@
   "scripts": {
     "dev": "vite build --watch",
     "generate:barrel": "node scripts/generate-barrel.js",
+    "generate:sdc": "tsx scripts/generate-sdc.ts",
+    "test:scripts": "vitest run --config vitest.config.scripts.ts",
     "prepare": "node scripts/generate-barrel.js",
     "prebuild": "node scripts/generate-barrel.js",
     "build": "vite build && pnpm run cem",

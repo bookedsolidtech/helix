@@ -1,0 +1,24 @@
+/**
+ * HX Step component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-steps-indicator-size: Indicator circle diameter. (default: 2rem)
+ * --hx-steps-indicator-font-size: Indicator text size. (default: var(--hx-font-size-sm))
+ * --hx-steps-indicator-icon-size: Indicator icon size. (default: 1rem)
+ * --hx-steps-label-font-size: Label font size. (default: var(--hx-font-size-sm))
+ * --hx-steps-description-font-size: Description font size. (default: var(--hx-font-size-xs))
+ * --hx-steps-connector-color: Connector line color. (default: var(--hx-color-neutral-200))
+ * --hx-steps-connector-complete-color: Connector color when step is complete. (default: var(--hx-color-primary-500))
+ * --hx-steps-connector-thickness: Connector line thickness. (default: var(--hx-border-width,2px))
+ * --hx-steps-label-color: Label text color. (default: var(--hx-color-neutral-600))
+ * --hx-steps-description-color: Description text color. (default: var(--hx-color-neutral-500))
+ */
+
+/* Component host styles */
+hx-step {
+  display: block;
+}

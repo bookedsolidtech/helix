@@ -1,0 +1,21 @@
+/**
+ * HX Image component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-image-object-fit: Controls how the image fills its container. Maps to object-fit.
+ * --hx-image-border-radius: Border radius of the image. Overridden by the `rounded` prop.
+ * --hx-image-aspect-ratio: Aspect ratio of the image container. Overridden by the `ratio` prop.
+ * --hx-image-caption-color: Text color for the caption.
+ * --hx-image-caption-font-size: Font size for the caption.
+ * --hx-image-caption-padding: Padding for the caption.
+ * --hx-image-fallback-min-height: Minimum height of the error/fallback container.
+ */
+
+/* Component host styles */
+hx-image {
+  display: block;
+}

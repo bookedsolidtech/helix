@@ -1,0 +1,49 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Copy Button
+status: experimental
+group: HELiX
+description: 'A clipboard copy button component that writes a given value to the system clipboard. Provides idle and success states with configurable feedback duration, slot-based icon overrides, and an accessible live region that announces copy completion to screen reader users.  The `aria-label` reflects the current copy state: idle shows `label`, copied state appends " — Copied" so screen reader users who re-focus the button after copy receive an accurate accessible name.  Note: `aria-pressed` is intentionally NOT used. This is not a toggle button; copied is a transient feedback state, not a persistent on/off toggle.'
+props:
+  type: object
+  properties:
+    value:
+      type: string
+      title: Value
+      description: 'The text value to write to the clipboard on click. Required for the component to perform a copy operation.'
+      default: ''
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label applied as `aria-label` and `title` on the button.'
+      default: 'Copy to clipboard'
+    feedbackDuration:
+      type: number
+      title: Feedback Duration
+      description: 'Duration in milliseconds to display the success (copied) state before reverting to the idle state. Values below 300 ms are clamped to 300 ms to ensure the success announcement remains visible long enough for assistive technology and human perception.'
+      default: 2000
+    size:
+      type: object
+      title: Size
+      description: "Visual size of the button. Maps to fixed height and padding tokens. Accepts: 'sm' | 'md' | 'lg'. Invalid values are silently coerced to 'md'.  **Accessibility (WCAG 2.5.8):** The `sm` variant uses `--hx-size-8` for its minimum width and height. Ensure this token resolves to at least 24×24 px (WCAG 2.5.8 AA minimum target size). For touch-primary interfaces such as mobile clinical apps, prefer `md` or `lg` to meet the 44×44 px recommended target size (WCAG 2.5.5 AAA / Apple HIG / Android guidelines)."
+      default: 'md'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the button is disabled. When true, click events are suppressed and clipboard writes do not occur.'
+      default: false
+    labelCopied:
+      type: string
+      title: Label Copied
+      description: 'Text announced to screen readers and appended to aria-label after a successful copy. Also used as the content of the aria-live announcement.'
+      default: 'Copied'
+slots:
+  default:
+    title: Default
+    description: 'Optional label text rendered inside the button alongside the icon.'
+  copy-icon:
+    title: Copy Icon
+    description: 'Icon shown in the idle (pre-copy) state.'
+  success-icon:
+    title: Success Icon
+    description: 'Icon shown after a successful clipboard write.'
+libraryOverrides: {}

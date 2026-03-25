@@ -1,0 +1,25 @@
+/**
+ * HX Popover component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-popover-bg: Popover background color. (default: var(--hx-color-neutral-0))
+ * --hx-popover-color: Popover text color. (default: var(--hx-color-neutral-900))
+ * --hx-popover-font-size: Popover font size. (default: var(--hx-font-size-sm))
+ * --hx-popover-max-width: Maximum popover width. (default: 320px)
+ * --hx-popover-padding: Popover padding.
+ * --hx-popover-border-color: Popover border color. (default: var(--hx-color-neutral-200))
+ * --hx-popover-border-radius: Popover border radius. (default: var(--hx-border-radius-md))
+ * --hx-popover-shadow: Popover box shadow.
+ * --hx-popover-z-index: Popover z-index. (default: 9999)
+ * --hx-popover-transition-duration: Show/hide transition duration. (default: 0.2s)
+ * --hx-popover-arrow-size: Size of the arrow indicator. (default: 10px)
+ */
+
+/* Component host styles */
+hx-popover {
+  display: block;
+}

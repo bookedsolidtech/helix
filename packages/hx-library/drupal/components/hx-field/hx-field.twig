@@ -1,0 +1,50 @@
+{#
+ /**
+ * @file
+ * HX Field component template.
+ *
+ * Layout wrapper providing consistent label + input + help text + validation
+ * message structure for any form control. Use this when wrapping non-HELiX
+ * form controls or native HTML elements in the HELiX form field pattern.
+ * 
+ * This component is NOT form-associated — it is a pure visual layout wrapper.
+ * 
+ * **Light DOM side effect:** This component injects a visually-hidden `<span>`
+ * into its light DOM children for ARIA describedby linkage across the shadow
+ * DOM boundary. This span has `id="${fieldId}-desc"` and is removed on
+ * `disconnectedCallback`. This is an intentional, documented accessibility
+ * mechanism.
+ *
+ * Available variables:
+ * - label: string - The visible label text for the field.
+ * - required: boolean - Whether the field is required. Shows a required indicator on the label.
+ * - error: string - Error message to display. When set, the field enters an error state.
+ * - helpText: string - Help text displayed below the control for guidance.
+ * - disabled: boolean - Visual disabled state applied via opacity. Does not affect slotted control interactivity — set disabled on the slotted control directly.
+ * - hxSize: object - Size variant controlling label and help text font sizes.
+ * - layout: object - Layout variant. 'column' stacks label above control; 'inline' places them side-by-side.
+ */
+#}
+<hx-field
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if hxSize is defined and hxSize is not empty %}hx-size="{{ hxSize }}"{% endif %}
+  {% if layout is defined and layout is not empty %}layout="{{ layout }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.description is defined %}
+    <slot name="description">{{ slots.description }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-field>

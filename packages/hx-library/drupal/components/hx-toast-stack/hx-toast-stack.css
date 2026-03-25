@@ -1,0 +1,15 @@
+/**
+ * HX Toast Stack component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-z-index-toast: Z-index for the fixed stack. (default: 9000)
+ */
+
+/* Component host styles */
+hx-toast-stack {
+  display: block;
+}

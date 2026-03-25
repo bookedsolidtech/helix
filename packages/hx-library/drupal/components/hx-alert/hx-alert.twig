@@ -1,0 +1,40 @@
+{#
+ /**
+ * @file
+ * HX Alert component template.
+ *
+ * A feedback component for communicating status messages, warnings, and errors.
+ * Critical for healthcare patient safety alerts.
+ *
+ * Available variables:
+ * - variant: object - Visual variant of the alert that determines colors and ARIA semantics.
+ * - dismissible: boolean - Whether the alert can be dismissed by the user.
+ * - heading: string - Optional heading text that provides context for the close button's accessible label. When provided, the close button is announced as "Close [heading] alert". When absent, the close button falls back to "Close alert".
+ * - open: boolean - Whether the alert is visible. Add the `open` attribute to show the alert.
+ * - showIcon: boolean - Whether to show the default variant icon. Add `show-icon` attribute to display the icon.
+ * - accent: boolean - When true, applies a left border accent stripe instead of a full border. Common healthcare/enterprise dashboard pattern for visual distinction of alert types.
+ * - returnFocusTo: object - CSS selector for the element to return focus to after the alert is dismissed. When set, the component will find and focus the matching element after dismissal. If not set, focus management is the caller's responsibility via the hx-after-close event.
+ * - closeLabel: string - Accessible label for the dismiss button. Override for localized text.
+ */
+#}
+<hx-alert
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if dismissible %}dismissible{% endif %}
+  {% if heading is defined and heading is not empty %}heading="{{ heading }}"{% endif %}
+  {% if open %}open{% endif %}
+  {% if showIcon %}show-icon{% endif %}
+  {% if accent %}accent{% endif %}
+  {% if returnFocusTo is defined and returnFocusTo is not empty %}return-focus-to="{{ returnFocusTo }}"{% endif %}
+  {% if closeLabel is defined and closeLabel is not empty %}close-label="{{ closeLabel }}"{% endif %}
+>
+  {% if slots.title is defined %}
+    <slot name="title">{{ slots.title }}</slot>
+  {% endif %}
+  {% if slots.icon is defined %}
+    <slot name="icon">{{ slots.icon }}</slot>
+  {% endif %}
+  {% if slots.actions is defined %}
+    <slot name="actions">{{ slots.actions }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-alert>

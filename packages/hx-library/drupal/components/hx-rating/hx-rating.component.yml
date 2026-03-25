@@ -1,0 +1,53 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Rating
+status: experimental
+group: HELiX
+description: 'A star rating input component for user feedback and display. Supports whole and half-star ratings, keyboard navigation, hover preview, and native form participation via ElementInternals.  ### Accessibility  - **Interactive mode (precision=1)**: Uses `role="radiogroup"` with individual `role="radio"` stars.   Each star has `aria-label` ("1 star", "2 stars", etc.) and `aria-checked`. - **Interactive mode (precision=0.5)**: Uses `role="slider"` with `aria-valuemin`, `aria-valuemax`,   `aria-valuenow`, and `aria-valuetext` (e.g. "2.5 out of 5 stars"). Star elements are   `aria-hidden="true"` decorative visuals. This avoids a WCAG 2.5.3 label-content-name mismatch   that would occur if a `role="radio"` labeled "3 stars" were checked for a value of 2.5. - **Readonly mode**: Uses `role="img"` with a descriptive `aria-label` ("Rating: 3 out of 5"). - **Keyboard**: Arrow keys (Left/Right/Up/Down) adjust value by `precision` step.   Home sets to 0, End sets to `max`. Focus follows the active tab stop. - **Disabled**: Sets `aria-disabled="true"` on the group and prevents interaction.'
+props:
+  type: object
+  properties:
+    value:
+      type: number
+      title: Value
+      description: 'The current rating value (0 to max).'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'The maximum number of stars.'
+      default: 5
+    precision:
+      type: object
+      title: Precision
+      description: 'The minimum selectable increment. Use 0.5 for half-star ratings.'
+      default: '1'
+    readonly:
+      type: boolean
+      title: Readonly
+      description: 'When true, the rating is display-only and cannot be changed.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'When true, the rating is disabled and cannot be interacted with.'
+      default: false
+    name:
+      type: string
+      title: Name
+      description: 'The name submitted with the form.'
+      default: ''
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the rating group.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'When true, a non-zero rating is required for form submission.'
+      default: false
+slots:
+  icon:
+    title: Icon
+    description: 'Custom rating icon. Receives `data-state` attribute ("full" | "half" | "empty").'
+libraryOverrides: {}

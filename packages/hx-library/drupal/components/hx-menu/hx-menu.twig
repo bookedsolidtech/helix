@@ -1,0 +1,15 @@
+{#
+ /**
+ * @file
+ * HX Menu component template.
+ *
+ * A menu container that manages keyboard navigation over a list of menu items.
+ * Use with `hx-menu-item` and `hx-menu-divider`.
+ *
+ * Available variables:
+ * - label: string - Accessible label for the menu. Rendered as `aria-label` on the inner `role="menu"` element when set.
+ */
+#}
+<hx-menu {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-menu>

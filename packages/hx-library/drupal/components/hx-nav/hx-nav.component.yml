@@ -1,0 +1,34 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Nav
+status: experimental
+group: HELiX
+description: 'Primary and secondary navigation component. Supports horizontal menu bar and vertical sidebar patterns. Mobile responsive with hamburger toggle.'
+props:
+  type: object
+  properties:
+    items:
+      type: object
+      title: Items
+      description: 'Navigation items array.'
+      default: '[]'
+    orientation:
+      type: object
+      title: Orientation
+      description: "Layout orientation: 'horizontal' (menu bar) or 'vertical' (sidebar)."
+      default: 'horizontal'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the nav landmark.'
+      default: 'Main navigation'
+    labelOpenMenu:
+      type: string
+      title: Label Open Menu
+      description: 'Accessible label for the navigation toggle button when menu is closed.'
+      default: 'Open navigation menu'
+    labelCloseMenu:
+      type: string
+      title: Label Close Menu
+      description: 'Accessible label for the navigation toggle button when menu is open.'
+      default: 'Close navigation menu'
+libraryOverrides: {}

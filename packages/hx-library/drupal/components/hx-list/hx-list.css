@@ -1,0 +1,16 @@
+/**
+ * HX List component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-list-gap: Gap between list items. (default: 0)
+ * --hx-list-divider-color: Divider line color. (default: var(--hx-color-neutral-200))
+ */
+
+/* Component host styles */
+hx-list {
+  display: block;
+}

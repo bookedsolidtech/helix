@@ -1,0 +1,30 @@
+{#
+ /**
+ * @file
+ * HX Tag component template.
+ *
+ * A compact label for categorization, filtering, and selection.
+ *
+ * Available variables:
+ * - variant: object - Visual style variant of the tag.
+ * - size: object - Size of the tag.
+ * - pill: boolean - Whether the tag uses fully rounded (pill) styling.
+ * - removable: boolean - Whether the tag renders a dismiss button.
+ * - disabled: boolean - Whether the tag is disabled. When disabled, interactions are suppressed.
+ */
+#}
+<hx-tag
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if pill %}pill{% endif %}
+  {% if removable %}removable{% endif %}
+  {% if disabled %}disabled{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-tag>

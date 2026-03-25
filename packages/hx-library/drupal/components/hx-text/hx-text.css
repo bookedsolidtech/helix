@@ -1,0 +1,19 @@
+/**
+ * HX Text component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-text-font-size: Font size (set per variant).
+ * --hx-text-font-weight: Font weight (overridden by weight prop).
+ * --hx-text-line-height: Line height (set per variant).
+ * --hx-text-letter-spacing: Letter spacing (set per variant).
+ * --hx-text-color: Text color (set per color prop).
+ */
+
+/* Component host styles */
+hx-text {
+  display: block;
+}

@@ -1,0 +1,27 @@
+/**
+ * HX Pagination component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-pagination-gap: Gap between pagination buttons. Inherits from --hx-spacing-1. (default: 0.25rem)
+ * --hx-pagination-button-size: Minimum width and height of each button. (default: 2.25rem)
+ * --hx-pagination-border-color: Border color of buttons. Inherits from --hx-color-border (final fallback: #d1d5db).
+ * --hx-pagination-border-radius: Border radius of buttons. Inherits from --hx-border-radius-md (final fallback: 0.375rem).
+ * --hx-pagination-bg: Background color of buttons. Inherits from --hx-color-surface (final fallback: #ffffff).
+ * --hx-pagination-color: Text color of buttons. Inherits from --hx-color-text-primary (final fallback: #111827).
+ * --hx-pagination-hover-bg: Background color of buttons on hover. Inherits from --hx-color-surface-hover (final fallback: #f3f4f6).
+ * --hx-pagination-hover-border-color: Border color of buttons on hover. Inherits from --hx-color-primary (final fallback: #2563eb).
+ * --hx-pagination-active-bg: Background color of the active/current page button. Inherits from --hx-color-primary (final fallback: #2563eb).
+ * --hx-pagination-active-color: Text color of the active/current page button. Inherits from --hx-color-surface (final fallback: #ffffff).
+ * --hx-pagination-active-border-color: Border color of the active/current page button. Defaults to --hx-pagination-active-bg.
+ * --hx-pagination-ellipsis-color: Color of ellipsis characters. Inherits from --hx-color-text-secondary (final fallback: #6b7280).
+ * --hx-transition-fast: Duration used for hover/focus transitions. (default: 150ms)
+ */
+
+/* Component host styles */
+hx-pagination {
+  display: block;
+}

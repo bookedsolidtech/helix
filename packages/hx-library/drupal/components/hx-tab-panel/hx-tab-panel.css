@@ -1,0 +1,17 @@
+/**
+ * HX Tab Panel component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-tabs-panel-padding: Panel inner padding. (default: var(--hx-space-4, 1rem))
+ * --hx-tabs-panel-color: Panel text color. (default: var(--hx-color-neutral-700, #343a40))
+ * --hx-tabs-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color, #2563eb))
+ */
+
+/* Component host styles */
+hx-tab-panel {
+  display: block;
+}

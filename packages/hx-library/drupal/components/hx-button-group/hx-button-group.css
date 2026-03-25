@@ -1,0 +1,15 @@
+/**
+ * HX Button Group component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-button-group-size: Size token forwarded to child buttons. Accepts 'sm', 'md', or 'lg'. (default: md)
+ */
+
+/* Component host styles */
+hx-button-group {
+  display: block;
+}

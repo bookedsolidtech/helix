@@ -1,0 +1,22 @@
+{#
+ /**
+ * @file
+ * HX Td component template.
+ *
+ * Semantic table data cell. Must be a child of `hx-tr`.
+ *
+ * Available variables:
+ * - align: object - Horizontal alignment for cell content.
+ * - colspan: number - Number of columns this cell spans.
+ * - rowspan: number - Number of rows this cell spans.
+ * - label: string - Column header label for this cell. Forwarded as `data-label` on the native `<td>` for the mobile card layout (`td::before { content: attr(data-label) }`) and as `aria-label` so screen readers identify the column when the header row is hidden.
+ */
+#}
+<hx-td
+  {% if align is defined and align is not empty %}align="{{ align }}"{% endif %}
+  {% if colspan is defined and colspan is not empty %}colspan="{{ colspan }}"{% endif %}
+  {% if rowspan is defined and rowspan is not empty %}rowspan="{{ rowspan }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-td>

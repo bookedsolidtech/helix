@@ -1,0 +1,18 @@
+/**
+ * HX Checkbox Group component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-checkbox-group-gap: Gap between checkbox items. (default: var(--hx-space-3, 0.75rem))
+ * --hx-checkbox-group-label-color: Label text color. (default: var(--hx-color-neutral-700, #343a40))
+ * --hx-checkbox-group-error-color: Error message color. (default: var(--hx-color-error-500, #dc3545))
+ * --hx-checkbox-group-help-text-color: Help text color. (default: var(--hx-color-neutral-500))
+ */
+
+/* Component host styles */
+hx-checkbox-group {
+  display: block;
+}

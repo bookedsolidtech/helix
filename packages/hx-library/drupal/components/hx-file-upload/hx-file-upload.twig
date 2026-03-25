@@ -1,0 +1,38 @@
+{#
+ /**
+ * @file
+ * HX File Upload component template.
+ *
+ * A drag-and-drop file upload component with client-side validation,
+ * file list management, per-file progress, and native form association.
+ *
+ * Available variables:
+ * - name: string - The form field name used during form submission.
+ * - accept: string - Accepted file types as a comma-separated list of MIME types or extensions. Mirrors the native `<input type="file" accept>` attribute.
+ * - maxSize: number - Maximum allowed file size in bytes. 0 means unlimited.
+ * - maxFiles: number - Maximum number of files that can be selected. 0 means unlimited.
+ * - multiple: boolean - Whether multiple files may be selected at once.
+ * - label: string - Visible label text for the dropzone.
+ * - disabled: boolean - Whether the component is disabled.
+ * - error: string - Error message displayed below the dropzone. Also puts the dropzone in an error visual state.
+ * - labelDropzone: string - Instructional text shown in the dropzone when no custom slot content is provided. Also used as the accessible label for the dropzone.
+ * - labelFileList: string - Accessible label for the selected files list.
+ */
+#}
+<hx-file-upload
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if accept is defined and accept is not empty %}accept="{{ accept }}"{% endif %}
+  {% if maxSize is defined and maxSize is not empty %}max-size="{{ maxSize }}"{% endif %}
+  {% if maxFiles is defined and maxFiles is not empty %}max-files="{{ maxFiles }}"{% endif %}
+  {% if multiple %}multiple{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if labelDropzone is defined and labelDropzone is not empty %}label-dropzone="{{ labelDropzone }}"{% endif %}
+  {% if labelFileList is defined and labelFileList is not empty %}label-file-list="{{ labelFileList }}"{% endif %}
+>
+  {% if slots.file-list is defined %}
+    <slot name="file-list">{{ slots.file-list }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-file-upload>

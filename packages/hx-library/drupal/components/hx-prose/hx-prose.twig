@@ -1,0 +1,24 @@
+{#
+ /**
+ * @file
+ * HX Prose component template.
+ *
+ * A Light DOM prose container that applies typographic styles to rich text
+ * content such as CKEditor output, Markdown-rendered HTML, or any structured
+ * body copy.
+ * 
+ * Renders in the Light DOM (no Shadow DOM) so that global and scoped styles
+ * can target child elements directly. Uses the AdoptedStylesheetsController
+ * to inject scoped prose CSS into the document without duplication.
+ *
+ * Available variables:
+ * - size: object - Typography scale for the prose content.
+ * - maxWidth: string - Maximum content width. When set, overrides the --hx-prose-max-width token. Accepts any valid CSS width value (e.g., '640px', '80ch', '100%').
+ */
+#}
+<hx-prose
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if maxWidth is defined and maxWidth is not empty %}max-width="{{ maxWidth }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-prose>

@@ -1,0 +1,27 @@
+/**
+ * HX Split Button component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-split-button-menu-max-height: Maximum height of the dropdown menu panel before scrolling. (default: 18rem)
+ * --hx-split-button-bg: Background color for both buttons. (default: var(--hx-color-primary-500))
+ * --hx-split-button-color: Text/icon color for both buttons. (default: var(--hx-color-neutral-0))
+ * --hx-split-button-border-color: Border color. (default: transparent)
+ * --hx-split-button-border-radius: Border radius. (default: var(--hx-border-radius-md))
+ * --hx-split-button-divider-color: Color of the divider between primary and trigger. (default: var(--hx-color-primary-400))
+ * --hx-split-button-font-family: Font family. (default: var(--hx-font-family-sans))
+ * --hx-split-button-font-weight: Font weight. (default: var(--hx-font-weight-semibold))
+ * --hx-split-button-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-split-button-menu-bg: Dropdown menu background. (default: var(--hx-color-neutral-0))
+ * --hx-split-button-menu-border-color: Dropdown menu border color. (default: var(--hx-color-neutral-200))
+ * --hx-split-button-menu-border-radius: Dropdown menu border radius. (default: var(--hx-border-radius-md))
+ * --hx-split-button-menu-shadow: Dropdown menu box shadow.
+ */
+
+/* Component host styles */
+hx-split-button {
+  display: block;
+}

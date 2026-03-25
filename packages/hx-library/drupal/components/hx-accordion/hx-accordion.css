@@ -1,0 +1,15 @@
+/**
+ * HX Accordion component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-accordion-border-radius: Outer border radius. (default: var(--hx-border-radius-md))
+ */
+
+/* Component host styles */
+hx-accordion {
+  display: block;
+}

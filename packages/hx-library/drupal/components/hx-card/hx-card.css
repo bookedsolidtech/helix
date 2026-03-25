@@ -1,0 +1,21 @@
+/**
+ * HX Card component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-card-bg: Card background color. (default: var(--hx-color-neutral-0))
+ * --hx-card-color: Card text color. (default: var(--hx-color-neutral-800))
+ * --hx-card-border-color: Card border color. (default: var(--hx-color-neutral-200))
+ * --hx-card-border-radius: Card border radius. (default: var(--hx-border-radius-lg))
+ * --hx-card-padding: Internal padding for card sections. (default: var(--hx-space-6))
+ * --hx-card-gap: Gap between card sections. (default: var(--hx-space-4))
+ * --hx-card-image-aspect-ratio: Aspect ratio for the image slot. (default: 16/9)
+ */
+
+/* Component host styles */
+hx-card {
+  display: block;
+}

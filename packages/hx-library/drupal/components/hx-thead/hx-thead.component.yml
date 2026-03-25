@@ -1,0 +1,10 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Thead
+status: experimental
+group: HELiX
+description: 'Semantic table head section. Must be a direct child of `hx-table`. Contains `hx-tr` rows with `hx-th` header cells.'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `hx-tr` elements.'
+libraryOverrides: {}

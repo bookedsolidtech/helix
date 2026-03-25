@@ -1,0 +1,34 @@
+{#
+ /**
+ * @file
+ * HX Banner component template.
+ *
+ * A full-width page-level banner for persistent notifications and announcements.
+ * Designed for healthcare applications requiring prominent system-level messaging.
+ *
+ * Available variables:
+ * - variant: object - Visual variant of the banner that determines colors and ARIA semantics.
+ * - position: object - CSS positioning behavior. "sticky" keeps the banner in flow; "fixed" pins it to the viewport.
+ * - dismissible: boolean - Whether the banner can be dismissed by the user.
+ * - heading: string - Heading text for the banner, used to provide context in the action link's and close button's accessible labels.
+ * - actionLabel: string - Label text for the optional action link. Requires action-href to render.
+ * - actionHref: string - URL for the optional action link. Requires action-label to render.
+ * - open: boolean - Whether the banner is visible. Defaults to true — banners are shown by default.
+ * - closeLabel: string - Accessible label for the dismiss button. Override for localized text.
+ */
+#}
+<hx-banner
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if position is defined and position is not empty %}position="{{ position }}"{% endif %}
+  {% if dismissible %}dismissible{% endif %}
+  {% if heading is defined and heading is not empty %}heading="{{ heading }}"{% endif %}
+  {% if actionLabel is defined and actionLabel is not empty %}action-label="{{ actionLabel }}"{% endif %}
+  {% if actionHref is defined and actionHref is not empty %}action-href="{{ actionHref }}"{% endif %}
+  {% if open %}open{% endif %}
+  {% if closeLabel is defined and closeLabel is not empty %}close-label="{{ closeLabel }}"{% endif %}
+>
+  {% if slots.action is defined %}
+    <slot name="action">{{ slots.action }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-banner>

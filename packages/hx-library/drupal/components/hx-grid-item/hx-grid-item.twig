@@ -1,0 +1,22 @@
+{#
+ /**
+ * @file
+ * HX Grid Item component template.
+ *
+ * Optional companion element for precise grid item placement.
+ * Applies grid-column and grid-row directly to the host element
+ * so it participates correctly in the parent CSS grid layout.
+ *
+ * Available variables:
+ * - column: object - CSS grid-column value (e.g., "1 / 3", "span 2").
+ * - row: object - CSS grid-row value (e.g., "1 / 2").
+ * - span: object - Column span shorthand — equivalent to setting `column: "span N"`.
+ */
+#}
+<hx-grid-item
+  {% if column is defined and column is not empty %}column="{{ column }}"{% endif %}
+  {% if row is defined and row is not empty %}row="{{ row }}"{% endif %}
+  {% if span is defined and span is not empty %}span="{{ span }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-grid-item>

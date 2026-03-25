@@ -1,0 +1,32 @@
+{#
+ /**
+ * @file
+ * HX Progress Bar component template.
+ *
+ * A linear progress indicator for determinate and indeterminate states.
+ *
+ * Available variables:
+ * - value: object - Current progress value (min–max). Set to null for indeterminate state.
+ * - min: number - Minimum value for the progress bar.
+ * - max: number - Maximum value for the progress bar.
+ * - indeterminate: boolean - When true, displays an animated indeterminate loading state regardless of value.
+ * - label: string - Accessible label for the progress bar (maps to aria-label when no label slot content is used).
+ * - description: string - Additional description for the progress operation, linked via aria-describedby.
+ * - size: object - Size of the progress bar track.
+ * - variant: object - Visual variant controlling the indicator color.
+ */
+#}
+<hx-progress-bar
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if indeterminate %}indeterminate{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if description is defined and description is not empty %}description="{{ description }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+</hx-progress-bar>

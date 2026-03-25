@@ -1,0 +1,26 @@
+{#
+ /**
+ * @file
+ * HX Top Nav component template.
+ *
+ * Top-of-page site navigation bar with logo, menu items, and utility area.
+ * Supports sticky positioning, responsive hamburger menu, and full slot-driven
+ * content composition for Drupal and other CMS consumers.
+ *
+ * Available variables:
+ * - sticky: boolean - When true, the navigation bar sticks to the top of the viewport during scroll.
+ * - label: string - Accessible label applied to the `<nav>` element via `aria-label`.
+ */
+#}
+<hx-top-nav
+  {% if sticky %}sticky{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if slots.logo is defined %}
+    <slot name="logo">{{ slots.logo }}</slot>
+  {% endif %}
+  {% if slots.actions is defined %}
+    <slot name="actions">{{ slots.actions }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-top-nav>

@@ -1,0 +1,39 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Step
+status: experimental
+group: HELiX
+description: 'An individual step, designed to be used inside an `<hx-steps>` container. Represents a single step in a multi-step wizard or progress indicator.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The step label text.'
+      default: ''
+    status:
+      type: object
+      title: Status
+      description: 'Current status of the step.'
+      default: 'pending'
+    description:
+      type: string
+      title: Description
+      description: 'Optional description text shown below the label.'
+      default: ''
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the step is disabled and non-interactive.'
+      default: false
+slots:
+  icon:
+    title: Icon
+    description: 'Custom icon for the step indicator. Shown when status is `pending` or `active`.'
+  label:
+    title: Label
+    description: 'Step label text. Falls back to the `label` property.'
+  description:
+    title: Description
+    description: 'Step description text. Falls back to the `description` property.'
+libraryOverrides: {}

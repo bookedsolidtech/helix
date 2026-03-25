@@ -1,0 +1,30 @@
+{#
+ /**
+ * @file
+ * HX Avatar component template.
+ *
+ * A user avatar component that displays an image, initials, or a fallback icon.
+ * Supports a badge slot for status indicator overlays.
+ *
+ * Available variables:
+ * - src: object - Image URL. When provided and successfully loaded, displays the image.
+ * - alt: string - Accessible label for the image. Required when `src` is provided. Used as the container's aria-label in image mode.
+ * - label: string - Human-readable accessible name for non-image states (initials, fallback icon). In healthcare contexts, provide the full person name (e.g., "Dr. Jane Doe") rather than relying on raw initials, which screen readers announce as individual letters. When set, takes precedence over raw initials and the generic "Avatar" fallback.
+ * - initials: string - Fallback initials text displayed when no image is available.
+ * - size: object - Size variant of the avatar.
+ * - shape: object - Shape variant of the avatar.
+ */
+#}
+<hx-avatar
+  {% if src is defined and src is not empty %}src="{{ src }}"{% endif %}
+  {% if alt is defined and alt is not empty %}alt="{{ alt }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if initials is defined and initials is not empty %}initials="{{ initials }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if shape is defined and shape is not empty %}shape="{{ shape }}"{% endif %}
+>
+  {% if slots.badge is defined %}
+    <slot name="badge">{{ slots.badge }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-avatar>

@@ -1,0 +1,20 @@
+/**
+ * HX Dropdown component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-dropdown-panel-bg: Panel background color. (default: var(--hx-color-neutral-0))
+ * --hx-dropdown-panel-border-color: Panel border color. (default: var(--hx-color-neutral-200))
+ * --hx-dropdown-panel-border-radius: Panel border radius. (default: var(--hx-border-radius-md))
+ * --hx-dropdown-panel-shadow: Panel box shadow. (default: 0 4px 16px rgba(0,0,0,0.12))
+ * --hx-dropdown-panel-z-index: Panel z-index. (default: 1000)
+ * --hx-dropdown-panel-min-width: Panel minimum width. (default: 160px)
+ */
+
+/* Component host styles */
+hx-dropdown {
+  display: block;
+}

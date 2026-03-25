@@ -1,0 +1,17 @@
+{#
+ /**
+ * @file
+ * HX Visually Hidden component template.
+ *
+ * A utility component that hides content visually while keeping it
+ * accessible to screen readers. Uses the standard visually-hidden CSS
+ * technique — does NOT use `visibility: hidden` or `display: none`,
+ * which would also hide content from assistive technologies.
+ *
+ * Available variables:
+ * - focusable: boolean - When true, the component becomes visible when a focusable child (such as a skip link) receives focus. This enables the standard "skip to content" accessibility pattern.
+ */
+#}
+<hx-visually-hidden {% if focusable %}focusable{% endif %}>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-visually-hidden>

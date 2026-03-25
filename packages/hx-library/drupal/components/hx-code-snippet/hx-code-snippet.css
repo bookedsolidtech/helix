@@ -1,0 +1,20 @@
+/**
+ * HX Code Snippet component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-code-snippet-bg: Background color. (default: var(--hx-color-neutral-900,#0f172a))
+ * --hx-code-snippet-color: Text color. (default: var(--hx-color-neutral-100,#f1f5f9))
+ * --hx-code-snippet-font-family: Font family. (default: var(--hx-font-family-mono,monospace))
+ * --hx-code-snippet-font-size: Font size. (default: var(--hx-font-size-sm,0.875rem))
+ * --hx-code-snippet-border-radius: Border radius. (default: var(--hx-border-radius-md,0.375rem))
+ * --hx-code-snippet-padding: Inner padding (block mode). (default: var(--hx-space-4,1rem))
+ */
+
+/* Component host styles */
+hx-code-snippet {
+  display: block;
+}

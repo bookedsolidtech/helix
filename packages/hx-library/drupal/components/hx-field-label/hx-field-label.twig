@@ -1,0 +1,43 @@
+{#
+ /**
+ * @file
+ * HX Field Label component template.
+ *
+ * Standardized label for form fields. Used as a consistent sub-component
+ * for hx-field and other form field components.
+ * 
+ * ## Label Association
+ * 
+ * **For inputs in light DOM (the typical consumer deployment):** Use
+ * `aria-labelledby` pointing to the host element's `id`. The `for` attribute
+ * renders a native `<label for="...">` inside shadow DOM, but the HTML spec
+ * scopes `for`/`id` lookup to the same tree — a shadow-DOM label cannot
+ * associate with a light-DOM input. Example:
+ * 
+ * ```html
+ * <hx-field-label id="label-email">Email</hx-field-label>
+ * <input id="email" aria-labelledby="label-email" />
+ * ```
+ * 
+ * **For inputs in the same shadow root:** The `for` attribute works as
+ * expected for direct label association.
+ * 
+ * When `for` is unset, renders a `<span>` that can be referenced via
+ * `aria-labelledby` for labeling controls across the shadow DOM boundary.
+ *
+ * Available variables:
+ * - for: string - The ID of the associated form control. When set, renders a native `<label for="...">` element for direct label association.
+ * - required: boolean - Whether the associated field is required. Shows a required indicator (*).
+ * - optional: boolean - Whether the associated field is optional. Shows "(optional)" text.
+ */
+#}
+<hx-field-label
+  {% if for is defined and for is not empty %}for="{{ for }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if optional %}optional{% endif %}
+>
+  {% if slots.required-indicator is defined %}
+    <slot name="required-indicator">{{ slots.required-indicator }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-field-label>

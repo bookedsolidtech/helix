@@ -1,0 +1,35 @@
+{#
+ /**
+ * @file
+ * HX Badge component template.
+ *
+ * A small status indicator for notifications, counts, and labels.
+ *
+ * Available variables:
+ * - variant: object - Visual style variant of the badge.
+ * - size: object - Size of the badge.
+ * - pill: boolean - Whether the badge uses fully rounded (pill) styling.
+ * - pulse: boolean - Whether the badge displays an animated pulse for attention.
+ * - removable: boolean - Whether the badge renders a dismiss button.
+ * - count: object - Numeric count to display. When set, renders the count as badge content. When count exceeds `max`, displays `${max}+` (e.g. `99+`).
+ * - max: number - Maximum count value before truncation to `${max}+`. Defaults to 99.
+ * - dotLabel: string - Accessible label for the dot indicator mode (pulse + empty slot). Required for WCAG 4.1.2 compliance when using the dot indicator pattern. Example: `dot-label="3 new messages"`.
+ * - removeLabel: string - Accessible label for the remove button. Should describe what is being removed. Defaults to "Remove". For better accessibility, include context: e.g. "Remove Critical badge".
+ */
+#}
+<hx-badge
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if pill %}pill{% endif %}
+  {% if pulse %}pulse{% endif %}
+  {% if removable %}removable{% endif %}
+  {% if count is defined and count is not empty %}count="{{ count }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if dotLabel is defined and dotLabel is not empty %}dot-label="{{ dotLabel }}"{% endif %}
+  {% if removeLabel is defined and removeLabel is not empty %}remove-label="{{ removeLabel }}"{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-badge>

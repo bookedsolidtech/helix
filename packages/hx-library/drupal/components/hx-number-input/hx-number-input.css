@@ -1,0 +1,22 @@
+/**
+ * HX Number Input component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-number-input-bg: Input background color. (default: var(--hx-color-neutral-0))
+ * --hx-number-input-color: Input text color. (default: var(--hx-color-neutral-800))
+ * --hx-number-input-border-color: Input border color. (default: var(--hx-color-neutral-300))
+ * --hx-number-input-border-radius: Input border radius. (default: var(--hx-border-radius-md))
+ * --hx-number-input-error-color: Error state color. (default: var(--hx-color-error-500))
+ * --hx-number-input-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-number-input-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-number-input-font-family: Font family. (default: var(--hx-font-family-sans))
+ */
+
+/* Component host styles */
+hx-number-input {
+  display: block;
+}

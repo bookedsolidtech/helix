@@ -1,0 +1,79 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Carousel
+status: experimental
+group: HELiX
+description: 'A scrollable carousel/slider for images or content slides.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label identifying this carousel to assistive technology. When multiple carousels appear on the same page, each must have a unique label.'
+      default: 'Carousel'
+    loop:
+      type: boolean
+      title: Loop
+      description: 'Whether the carousel wraps around from last to first slide and vice-versa.'
+      default: false
+    autoplay:
+      type: boolean
+      title: Autoplay
+      description: 'Whether the carousel auto-advances slides. Automatically pauses on hover, focus, and when prefers-reduced-motion is active.'
+      default: false
+    autoplayInterval:
+      type: number
+      title: Autoplay Interval
+      description: 'Milliseconds between auto-advance transitions.'
+      default: 3000
+    slidesPerPage:
+      type: number
+      title: Slides Per Page
+      description: 'Number of slides visible at once.'
+      default: 1
+    slidesPerMove:
+      type: number
+      title: Slides Per Move
+      description: 'Number of slides to advance per navigation action.'
+      default: 1
+    orientation:
+      type: object
+      title: Orientation
+      description: 'Scroll axis of the carousel.'
+      default: 'horizontal'
+    mouseDragging:
+      type: boolean
+      title: Mouse Dragging
+      description: 'Whether click-drag scrolling is enabled.'
+      default: false
+    labelPrevSlide:
+      type: string
+      title: Label Prev Slide
+      description: 'Accessible label for the previous slide button.'
+      default: 'Previous slide'
+    labelNextSlide:
+      type: string
+      title: Label Next Slide
+      description: 'Accessible label for the next slide button.'
+      default: 'Next slide'
+    labelPauseAutoplay:
+      type: string
+      title: Label Pause Autoplay
+      description: 'Accessible label for the autoplay pause button.'
+      default: 'Pause autoplay'
+    labelPlayAutoplay:
+      type: string
+      title: Label Play Autoplay
+      description: 'Accessible label for the autoplay play button.'
+      default: 'Play autoplay'
+slots:
+  default:
+    title: Default
+    description: '`hx-carousel-item` elements (the slides).'
+  next-button:
+    title: Next Button
+    description: 'Custom next navigation button.'
+  previous-button:
+    title: Previous Button
+    description: 'Custom previous navigation button.'
+libraryOverrides: {}

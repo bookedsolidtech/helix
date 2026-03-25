@@ -1,0 +1,20 @@
+{#
+ /**
+ * @file
+ * HX List component template.
+ *
+ * A styled list container supporting plain, bulleted, numbered, description, and interactive variants.
+ *
+ * Available variables:
+ * - variant: object - Visual variant of the list.
+ * - divided: boolean - Whether to show dividers between list items.
+ * - label: object - Accessible label for the list. Required when variant is "interactive" (listbox role).
+ */
+#}
+<hx-list
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if divided %}divided{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-list>

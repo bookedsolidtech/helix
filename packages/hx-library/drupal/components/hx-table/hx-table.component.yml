@@ -1,0 +1,41 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Table
+status: experimental
+group: HELiX
+description: 'A semantic table container with variant styling and accessibility support. Compose with `hx-thead`, `hx-tbody`, `hx-tfoot`, `hx-tr`, `hx-th`, and `hx-td`.'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible name for the table (WCAG 4.1.2 requirement). Exposed via `aria-label` on the `<table>` element.'
+      default: ''
+    caption:
+      type: string
+      title: Caption
+      description: 'Visible caption text. When set, renders a `<caption>` element. Use the `caption` slot for richer caption content.'
+      default: ''
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual variant that controls row styling.'
+      default: 'default'
+    stickyHeader:
+      type: boolean
+      title: Sticky Header
+      description: 'When true, the header row stays fixed while the table body scrolls.'
+      default: false
+    fullWidth:
+      type: boolean
+      title: Full Width
+      description: 'When true, the table expands to fill 100% of its container width.'
+      default: true
+slots:
+  default:
+    title: Default
+    description: 'Default slot for `hx-thead`, `hx-tbody`, and `hx-tfoot` sub-components.'
+  caption:
+    title: Caption
+    description: 'Custom caption content rendered inside the `<caption>` element.'
+libraryOverrides: {}

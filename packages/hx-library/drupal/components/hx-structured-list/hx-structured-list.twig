@@ -1,0 +1,22 @@
+{#
+ /**
+ * @file
+ * HX Structured List component template.
+ *
+ * Container for structured key-value data display. Renders as a description
+ * list for accessible term/definition semantics. Use `hx-structured-list-row`
+ * as direct children.
+ *
+ * Available variables:
+ * - bordered: boolean - Renders a border around the entire list.
+ * - condensed: boolean - Reduces row padding for denser layouts.
+ * - striped: boolean - Alternates row background colors for easier scanning.
+ */
+#}
+<hx-structured-list
+  {% if bordered %}bordered{% endif %}
+  {% if condensed %}condensed{% endif %}
+  {% if striped %}striped{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-structured-list>

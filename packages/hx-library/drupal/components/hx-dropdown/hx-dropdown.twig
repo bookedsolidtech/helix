@@ -1,0 +1,25 @@
+{#
+ /**
+ * @file
+ * HX Dropdown component template.
+ *
+ * A dropdown component — a button that opens a floating panel on click.
+ *
+ * Available variables:
+ * - open: boolean - Whether the dropdown panel is open.
+ * - placement: object - Preferred placement of the panel relative to the trigger.
+ * - disabled: boolean - Whether the dropdown is disabled. Prevents opening.
+ * - distance: number - Gap in pixels between the trigger and the panel.
+ */
+#}
+<hx-dropdown
+  {% if open %}open{% endif %}
+  {% if placement is defined and placement is not empty %}placement="{{ placement }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if distance is defined and distance is not empty %}distance="{{ distance }}"{% endif %}
+>
+  {% if slots.trigger is defined %}
+    <slot name="trigger">{{ slots.trigger }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-dropdown>

@@ -1,0 +1,34 @@
+# HX Breadcrumb
+
+Breadcrumb navigation component with automatic truncation and JSON-LD structured data.
+
+## Usage
+
+```twig
+{% include 'helix:hx-breadcrumb' with {
+  separator: '/',
+  label: 'Breadcrumb',
+  maxItems: 0,
+  jsonLd: false,
+} %}
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| separator | string | / | The separator character displayed between breadcrumb items. |
+| label | string | Breadcrumb | The accessible label for the nav landmark. |
+| maxItems | number | 0 | Maximum number of items to show before collapsing middle items with an ellipsis.
+Set to 0 (default) to show all items. The ellipsis is a keyboard-accessible
+button; activating it expands the full breadcrumb by setting maxItems to 0. |
+| jsonLd | boolean | false | When true, injects a JSON-LD BreadcrumbList structured data script into the document head.
+
+NOTE: Drupal manages `<head>` content via its own render pipeline. Injecting a
+`<script>` directly via `document.head.appendChild()` in a Drupal context:
+1. Bypasses Drupal's deduplication and `hook_html_head_alter()` hook.
+2. Is not cacheable by Drupal's page cache.
+3. Will be wiped on BigPipe partial page replacements.
+
+For Drupal integrations, leave `json-ld` false and use the structured data
+Twig template instead (see `hx-breadcrumb.twig` in the component directory). |

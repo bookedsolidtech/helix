@@ -1,0 +1,25 @@
+/**
+ * HX Alert component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-alert-bg: Alert background color. (default: var(--hx-color-info-50))
+ * --hx-alert-color: Alert text color. (default: var(--hx-color-info-800))
+ * --hx-alert-border-color: Alert border color. (default: var(--hx-color-info-200))
+ * --hx-alert-border-radius: Alert border radius. (default: var(--hx-border-radius-md))
+ * --hx-alert-border-width: Alert border width. (default: var(--hx-border-width-thin))
+ * --hx-alert-padding: Alert padding. (default: var(--hx-space-4))
+ * --hx-alert-gap: Gap between alert elements. (default: var(--hx-space-3))
+ * --hx-alert-icon-color: Alert icon color. (default: var(--hx-color-info-500))
+ * --hx-alert-font-family: Alert font family. (default: var(--hx-font-family-sans))
+ * --hx-touch-target-size: Minimum touch target size for the close button. (default: 44px)
+ * --hx-alert-accent-width: Width of the left border accent stripe. (default: 4px)
+ */
+
+/* Component host styles */
+hx-alert {
+  display: block;
+}

@@ -1,0 +1,21 @@
+/**
+ * HX Breadcrumb Item component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-breadcrumb-link-color: Link text color. (default: var(--hx-color-primary-600))
+ * --hx-breadcrumb-link-hover-color: Link hover text color. (default: var(--hx-color-primary-700))
+ * --hx-breadcrumb-text-color: Current page text color. (default: var(--hx-color-neutral-700))
+ * --hx-breadcrumb-separator-content: Separator character displayed after non-last items. (default: '/')
+ * --hx-breadcrumb-separator-color: Separator color. (default: var(--hx-color-neutral-400))
+ * --hx-breadcrumb-separator-gap: Horizontal margin around separator. (default: var(--hx-space-1))
+ * --hx-breadcrumb-item-max-width: Optional max-width for text truncation.
+ */
+
+/* Component host styles */
+hx-breadcrumb-item {
+  display: block;
+}

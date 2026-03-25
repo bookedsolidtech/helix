@@ -1,0 +1,74 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Pagination
+status: experimental
+group: HELiX
+description: 'A pagination component for navigating content listings.'
+props:
+  type: object
+  properties:
+    totalPages:
+      type: number
+      title: Total Pages
+      description: 'Total number of pages.'
+      default: 1
+    currentPage:
+      type: number
+      title: Current Page
+      description: 'The currently active page (1-based).'
+      default: 1
+    siblingCount:
+      type: number
+      title: Sibling Count
+      description: 'Number of page buttons shown on each side of the current page.'
+      default: 1
+    boundaryCount:
+      type: number
+      title: Boundary Count
+      description: 'Number of pages always shown at the start and end of the list.'
+      default: 1
+    showFirstLast:
+      type: boolean
+      title: Show First Last
+      description: 'Whether to show First and Last page buttons.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the `<nav>` element.'
+      default: 'Pagination'
+    pageSize:
+      type: number
+      title: Page Size
+      description: 'The number of items displayed per page. When set, a page-size selector `<select>` is rendered. Set `show-page-size` to display the selector.'
+      default: 25
+    showPageSize:
+      type: boolean
+      title: Show Page Size
+      description: 'Whether to show the page-size selector UI.'
+      default: false
+    labelRowsPerPage:
+      type: string
+      title: Label Rows Per Page
+      description: 'Label text for the rows-per-page selector.'
+      default: 'Rows per page:'
+    labelFirstPage:
+      type: string
+      title: Label First Page
+      description: 'Accessible label for the first-page button.'
+      default: 'First page'
+    labelPrevPage:
+      type: string
+      title: Label Prev Page
+      description: 'Accessible label for the previous-page button.'
+      default: 'Previous page'
+    labelNextPage:
+      type: string
+      title: Label Next Page
+      description: 'Accessible label for the next-page button.'
+      default: 'Next page'
+    labelLastPage:
+      type: string
+      title: Label Last Page
+      description: 'Accessible label for the last-page button.'
+      default: 'Last page'
+libraryOverrides: {}

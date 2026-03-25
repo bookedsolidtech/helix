@@ -1,0 +1,18 @@
+/**
+ * HX Steps component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-steps-indicator-size: Step indicator circle diameter. (default: 2rem)
+ * --hx-steps-connector-color: Connector line color. (default: var(--hx-color-neutral-200))
+ * --hx-steps-label-color: Step label text color. (default: var(--hx-color-neutral-600))
+ * --hx-steps-description-color: Step description color. (default: var(--hx-color-neutral-500))
+ */
+
+/* Component host styles */
+hx-steps {
+  display: block;
+}

@@ -1,0 +1,44 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Counter
+status: experimental
+group: HELiX
+description: 'Animated number counter that counts from 0 (or the previous value) to the target value using requestAnimationFrame. Respects prefers-reduced-motion.'
+props:
+  type: object
+  properties:
+    value:
+      type: number
+      title: Value
+      description: 'The target numeric value to count to.'
+      default: 0
+    duration:
+      type: number
+      title: Duration
+      description: 'Animation duration in milliseconds.'
+      default: 1000
+    easing:
+      type: object
+      title: Easing
+      description: 'Easing function applied to the animation progress.'
+      default: 'ease-out'
+    format:
+      type: object
+      title: Format
+      description: "Number format. 'integer' rounds to the nearest whole number; 'decimal' shows two decimal places."
+      default: 'integer'
+    prefix:
+      type: string
+      title: Prefix
+      description: "String prepended to the formatted value (e.g., '$')."
+      default: ''
+    suffix:
+      type: string
+      title: Suffix
+      description: "String appended to the formatted value (e.g., '%')."
+      default: ''
+    size:
+      type: object
+      title: Size
+      description: 'Size variant controlling font size.'
+      default: 'md'
+libraryOverrides: {}

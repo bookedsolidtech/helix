@@ -1,0 +1,26 @@
+{#
+ /**
+ * @file
+ * HX Spinner component template.
+ *
+ * A circular loading indicator for inline and overlay loading states.
+ * Purely visual — no slots. Announces loading state to screen readers via
+ * `role="status"` and an `aria-label` (customizable via the `label` prop).
+ * 
+ * When used alongside visible loading text, set `decorative` to suppress
+ * duplicate AT announcements.
+ *
+ * Available variables:
+ * - size: object - Size of the spinner. Accepts `SpinnerSize` token values ('sm' | 'md' | 'lg'), or any valid CSS size string (e.g. "3rem", "48px") for custom dimensions.  The type is `SpinnerSize | string` which widens to `string` at the TypeScript level — this is intentional to support CSS size overrides. Use `SpinnerSize` values for standard sizing; custom strings bypass token-based scaling.
+ * - variant: object - Visual variant of the spinner.
+ * - label: string - Accessible label announced to screen readers. Defaults to "Loading". Reflected as an attribute for Drupal/Twig compatibility.
+ * - decorative: boolean - When true, the spinner is decorative and suppresses all ARIA announcements. Use this when the spinner appears alongside visible loading text to prevent duplicate announcements. Sets `role="presentation"` and removes `aria-label`.
+ */
+#}
+<hx-spinner
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if decorative %}decorative{% endif %}
+>
+</hx-spinner>

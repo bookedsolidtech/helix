@@ -1,0 +1,26 @@
+{#
+ /**
+ * @file
+ * HX Stack component template.
+ *
+ * A flexbox layout wrapper for consistent vertical/horizontal spacing between children.
+ *
+ * Available variables:
+ * - direction: object - Direction of the stack layout.
+ * - gap: object - Gap between children using design tokens.
+ * - align: object - Align-items value for cross-axis alignment.
+ * - justify: object - Justify-content value for main-axis distribution.
+ * - wrap: boolean - When true, children wrap onto multiple lines.
+ * - inline: boolean - When true, the component renders as `display: inline-flex`.
+ */
+#}
+<hx-stack
+  {% if direction is defined and direction is not empty %}direction="{{ direction }}"{% endif %}
+  {% if gap is defined and gap is not empty %}gap="{{ gap }}"{% endif %}
+  {% if align is defined and align is not empty %}align="{{ align }}"{% endif %}
+  {% if justify is defined and justify is not empty %}justify="{{ justify }}"{% endif %}
+  {% if wrap %}wrap{% endif %}
+  {% if inline %}inline{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-stack>

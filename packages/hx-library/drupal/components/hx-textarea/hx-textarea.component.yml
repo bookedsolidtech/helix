@@ -1,0 +1,97 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Textarea
+status: experimental
+group: HELiX
+description: 'A multi-line text area component with label, validation, and form association.  Uses `aria-invalid` to convey error state and `aria-describedby` to link error/help text to the textarea. Label association is handled through `aria-labelledby` (for slotted labels) or the standard `<label for>` pattern. Supports `aria-label` for cases where a visible label is not present. Validation errors are announced via `role="alert"` (assertive live region).'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the textarea.'
+      default: ''
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text shown when the textarea is empty.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The current value of the textarea.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the textarea is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the textarea is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the textarea enters an error state.'
+      default: ''
+    helpText:
+      type: string
+      title: Help Text
+      description: 'Help text displayed below the textarea for guidance.'
+      default: ''
+    name:
+      type: string
+      title: Name
+      description: 'The name of the textarea, used for form submission.'
+      default: ''
+    rows:
+      type: number
+      title: Rows
+      description: 'The number of visible text rows. Must be a positive integer (minimum 1). Invalid values are clamped to the nearest valid value.'
+      default: 4
+    minlength:
+      type: object
+      title: Minlength
+      description: 'Minimum number of characters required.'
+    maxlength:
+      type: object
+      title: Maxlength
+      description: 'Maximum number of characters allowed.'
+    readonly:
+      type: boolean
+      title: Readonly
+      description: 'Whether the textarea is read-only. Read-only fields are visible but cannot be edited by the user. Common in healthcare for displaying non-editable patient data inline with editable fields.'
+      default: false
+    resize:
+      type: object
+      title: Resize
+      description: "Controls how the textarea can be resized. Use 'auto' for auto-grow behavior."
+      default: 'vertical'
+    showCount:
+      type: boolean
+      title: Show Count
+      description: 'Whether to show a character count below the textarea.'
+      default: false
+    requiredMessage:
+      type: string
+      title: Required Message
+      description: 'Validation message shown when the field is required but empty.'
+      default: 'This field is required.'
+    ariaLabel:
+      type: object
+      title: Aria Label
+      description: 'Accessible name for screen readers, if different from the visible label.'
+      default: 'null'
+slots:
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property). Use for Drupal Form API rendered labels.'
+  help-text:
+    title: Help Text
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property). Use for Drupal Form API rendered errors.'
+libraryOverrides: {}

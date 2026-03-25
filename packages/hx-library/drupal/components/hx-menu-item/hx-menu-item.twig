@@ -1,0 +1,35 @@
+{#
+ /**
+ * @file
+ * HX Menu Item component template.
+ *
+ * A single interactive item for use inside `hx-menu`. Supports normal, checkbox,
+ * and radio types, loading state, prefix/suffix slots, and submenu nesting.
+ * Use `aria-label` on the parent `hx-menu` to provide an accessible name.
+ *
+ * Available variables:
+ * - value: string - The value associated with this item, emitted in the hx-select event.
+ * - disabled: boolean - Whether the item is disabled. Prevents interaction and event dispatch.
+ * - checked: boolean - Whether the item is checked. Only meaningful when type="checkbox".
+ * - type: object - The type of menu item. "checkbox" renders a checkmark and toggles checked state. "radio" renders a checkmark and emits selection for radio-group behavior.
+ * - loading: boolean - Whether the item is in a loading state. Shows a spinner and prevents interaction.
+ */
+#}
+<hx-menu-item
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if checked %}checked{% endif %}
+  {% if type is defined and type is not empty %}type="{{ type }}"{% endif %}
+  {% if loading %}loading{% endif %}
+>
+  {% if slots.prefix is defined %}
+    <slot name="prefix">{{ slots.prefix }}</slot>
+  {% endif %}
+  {% if slots.suffix is defined %}
+    <slot name="suffix">{{ slots.suffix }}</slot>
+  {% endif %}
+  {% if slots.submenu is defined %}
+    <slot name="submenu">{{ slots.submenu }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-menu-item>

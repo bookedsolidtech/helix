@@ -1,0 +1,61 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Badge
+status: experimental
+group: HELiX
+description: 'A small status indicator for notifications, counts, and labels.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the badge.'
+      default: 'primary'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the badge.'
+      default: 'md'
+    pill:
+      type: boolean
+      title: Pill
+      description: 'Whether the badge uses fully rounded (pill) styling.'
+      default: false
+    pulse:
+      type: boolean
+      title: Pulse
+      description: 'Whether the badge displays an animated pulse for attention.'
+      default: false
+    removable:
+      type: boolean
+      title: Removable
+      description: 'Whether the badge renders a dismiss button.'
+      default: false
+    count:
+      type: object
+      title: Count
+      description: 'Numeric count to display. When set, renders the count as badge content. When count exceeds `max`, displays `${max}+` (e.g. `99+`).'
+      default: 'undefined'
+    max:
+      type: number
+      title: Max
+      description: 'Maximum count value before truncation to `${max}+`. Defaults to 99.'
+      default: 99
+    dotLabel:
+      type: string
+      title: Dot Label
+      description: 'Accessible label for the dot indicator mode (pulse + empty slot). Required for WCAG 4.1.2 compliance when using the dot indicator pattern. Example: `dot-label="3 new messages"`.'
+      default: ''
+    removeLabel:
+      type: string
+      title: Remove Label
+      description: 'Accessible label for the remove button. Should describe what is being removed. Defaults to "Remove". For better accessibility, include context: e.g. "Remove Critical badge".'
+      default: 'Remove'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for badge content (text, number). When empty with pulse enabled, renders as a dot indicator.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the badge text.'
+libraryOverrides: {}

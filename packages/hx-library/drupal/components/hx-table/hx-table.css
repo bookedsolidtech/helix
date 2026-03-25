@@ -1,0 +1,20 @@
+/**
+ * HX Table component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-table-border-color: Cell border color. (default: var(--hx-color-neutral-200, #e2e8f0))
+ * --hx-table-header-bg: Header row background. (default: var(--hx-color-neutral-50, #f8fafc))
+ * --hx-table-header-color: Header text color. (default: var(--hx-color-neutral-700, #334155))
+ * --hx-table-cell-color: Cell text color. (default: var(--hx-color-neutral-900, #0f172a))
+ * --hx-table-row-hover-bg: Row hover background. (default: var(--hx-color-neutral-50, #f8fafc))
+ * --hx-table-stripe-bg: Striped row background. (default: var(--hx-color-neutral-50, #f8fafc))
+ */
+
+/* Component host styles */
+hx-table {
+  display: block;
+}

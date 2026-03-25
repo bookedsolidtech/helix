@@ -1,0 +1,52 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX List Item
+status: experimental
+group: HELiX
+description: 'A rich list item for use inside `hx-list`.'
+props:
+  type: object
+  properties:
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the item is disabled. Prevents interaction.'
+      default: false
+    selected:
+      type: boolean
+      title: Selected
+      description: 'Whether the item is selected (used in interactive mode).'
+      default: false
+    href:
+      type: object
+      title: Href
+      description: 'When set, renders the item as a link (only in non-interactive variants).'
+      default: 'undefined'
+    value:
+      type: object
+      title: Value
+      description: 'The value associated with this item (used with hx-select).'
+      default: 'undefined'
+    interactive:
+      type: boolean
+      title: Interactive
+      description: 'Set by the parent hx-list to indicate this item is part of an interactive listbox. Controls CSS styling and ARIA role via host attributes.'
+      default: false
+    type:
+      type: object
+      title: Type
+      description: "Item type for description list variant. Use 'term' for <dt> and 'definition' for <dd>."
+      default: 'default'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for the item label text.'
+  prefix:
+    title: Prefix
+    description: 'Icon, avatar, or content rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Icon, badge, or text rendered after the label.'
+  description:
+    title: Description
+    description: 'Secondary descriptive text rendered below the label.'
+libraryOverrides: {}

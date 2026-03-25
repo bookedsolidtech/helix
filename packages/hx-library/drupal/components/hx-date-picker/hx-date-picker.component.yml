@@ -1,0 +1,99 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Date Picker
+status: experimental
+group: HELiX
+description: 'Date picker component for selecting dates with keyboard-accessible calendar popup.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The name of the field, used for form submission.'
+      default: ''
+    value:
+      type: string
+      title: Value
+      description: 'The current value as an ISO 8601 date string (e.g. 2026-03-04).'
+      default: ''
+    min:
+      type: string
+      title: Min
+      description: 'The minimum selectable date as an ISO 8601 string.'
+      default: ''
+    max:
+      type: string
+      title: Max
+      description: 'The maximum selectable date as an ISO 8601 string.'
+      default: ''
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the field is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the field enters an error state.'
+      default: ''
+    helpText:
+      type: string
+      title: Help Text
+      description: 'Help text displayed below the field for guidance.'
+      default: ''
+    format:
+      type: string
+      title: Format
+      description: 'Display format hint shown as placeholder (e.g. MM/DD/YYYY).'
+      default: 'MM/DD/YYYY'
+    locale:
+      type: string
+      title: Locale
+      description: 'Locale string used for formatting the display value.'
+      default: 'en-US'
+    labelChooseDate:
+      type: string
+      title: Label Choose Date
+      description: 'Accessible label for the calendar grid/dialog.'
+      default: 'Choose a date'
+    labelPrevMonth:
+      type: string
+      title: Label Prev Month
+      description: 'Accessible label for the "previous month" button.'
+      default: 'Previous month'
+    labelNextMonth:
+      type: string
+      title: Label Next Month
+      description: 'Accessible label for the "next month" button.'
+      default: 'Next month'
+    labelOpenCalendar:
+      type: string
+      title: Label Open Calendar
+      description: 'Accessible label for the calendar trigger button when calendar is closed.'
+      default: 'Open calendar'
+    labelCloseCalendar:
+      type: string
+      title: Label Close Calendar
+      description: 'Accessible label for the calendar trigger button when calendar is open.'
+      default: 'Close calendar'
+slots:
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property).'
+  help-text:
+    title: Help Text
+    description: 'Custom help text content (overrides the helpText property).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+libraryOverrides: {}

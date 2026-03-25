@@ -1,0 +1,15 @@
+/**
+ * HX Theme component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-*: All design tokens for the selected theme are injected as CSS custom properties on the host element.
+ */
+
+/* Component host styles */
+hx-theme {
+  display: block;
+}

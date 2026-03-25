@@ -1,0 +1,41 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Grid
+status: experimental
+group: HELiX
+description: 'A CSS Grid layout wrapper with design-token-based column and gap system.'
+props:
+  type: object
+  properties:
+    columns:
+      type: object
+      title: Columns
+      description: 'Number of equal columns (`repeat(N, 1fr)`) or a CSS grid-template-columns string.'
+      default: '1'
+    gap:
+      type: object
+      title: Gap
+      description: 'Gap size applied to both row and column gaps.'
+      default: 'md'
+    rowGap:
+      type: object
+      title: Row Gap
+      description: 'Row gap override. When set, takes precedence over `gap` for row spacing.'
+    columnGap:
+      type: object
+      title: Column Gap
+      description: 'Column gap override. When set, takes precedence over `gap` for column spacing.'
+    align:
+      type: object
+      title: Align
+      description: 'Aligns grid items along the block axis (align-items).'
+      default: 'stretch'
+    justify:
+      type: object
+      title: Justify
+      description: 'Justifies grid items along the inline axis (justify-items).'
+      default: 'stretch'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for grid content (use `hx-grid-item` for precise placement).'
+libraryOverrides: {}

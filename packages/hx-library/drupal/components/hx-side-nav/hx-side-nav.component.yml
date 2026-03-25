@@ -1,0 +1,29 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Side Nav
+status: experimental
+group: HELiX
+description: 'A collapsible left-side navigation panel with nested menu item support. Designed for clinical portals, admin dashboards, and department navigation.'
+props:
+  type: object
+  properties:
+    collapsed:
+      type: boolean
+      title: Collapsed
+      description: 'When true, the nav collapses to show icons only.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'The accessible label for the nav landmark.'
+      default: 'Main Navigation'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for hx-nav-item children.'
+  header:
+    title: Header
+    description: 'Logo or branding content.'
+  footer:
+    title: Footer
+    description: 'User profile or settings content.'
+libraryOverrides: {}

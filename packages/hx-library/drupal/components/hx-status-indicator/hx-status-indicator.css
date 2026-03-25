@@ -1,0 +1,25 @@
+/**
+ * HX Status Indicator component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-status-indicator-color-online: Override color for the "online" status dot.
+ * --hx-status-indicator-color-offline: Override color for the "offline" status dot.
+ * --hx-status-indicator-color-away: Override color for the "away" status dot.
+ * --hx-status-indicator-color-busy: Override color for the "busy" status dot.
+ * --hx-status-indicator-color-unknown: Override color for the "unknown" status dot.
+ * --hx-status-indicator-size-sm: Override size for the "sm" variant.
+ * --hx-status-indicator-size-md: Override size for the "md" variant.
+ * --hx-status-indicator-size-lg: Override size for the "lg" variant.
+ * --hx-status-indicator-pulse-duration: Override pulse animation duration.
+ * --hx-status-indicator-pulse-scale: Override pulse animation max scale.
+ * --hx-status-indicator-pulse-color: Override pulse ring color independently from dot color.
+ */
+
+/* Component host styles */
+hx-status-indicator {
+  display: block;
+}

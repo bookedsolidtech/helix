@@ -1,0 +1,75 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Split Panel
+status: experimental
+group: HELiX
+description: 'A resizable two-pane layout with a draggable divider.'
+props:
+  type: object
+  properties:
+    position:
+      type: number
+      title: Position
+      description: 'Position of the divider as a percentage (0–100) of the start panel.'
+      default: 50
+    positionInPixels:
+      type: object
+      title: Position In Pixels
+      description: 'Position of the divider in pixels (alternative to `position`). When set, takes precedence over `position` until the host is measured.'
+    orientation:
+      type: object
+      title: Orientation
+      description: 'Orientation of the split.'
+      default: 'horizontal'
+    min:
+      type: number
+      title: Min
+      description: 'Minimum position as a percentage (0–100). Prevents full collapse of start panel.'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'Maximum position as a percentage (0–100). Prevents full expansion of start panel.'
+      default: 100
+    snap:
+      type: object
+      title: Snap
+      description: 'Snap points as an array of percentages. The divider snaps to the nearest point within a 5% threshold. Accepts JSON array string in HTML: snap="[25, 50, 75]"'
+      default: '[]'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'When true, the divider cannot be dragged.'
+      default: false
+    collapsible:
+      type: boolean
+      title: Collapsible
+      description: 'When true, collapse/expand buttons appear on the divider.'
+      default: false
+    collapsed:
+      type: object
+      title: Collapsed
+      description: "Which panel is collapsed: 'start', 'end', or null (not collapsed)."
+      default: 'null'
+    labelResize:
+      type: string
+      title: Label Resize
+      description: 'Accessible label for the resize divider handle.'
+      default: 'Resize panels'
+    labelCollapseStart:
+      type: string
+      title: Label Collapse Start
+      description: 'Accessible label for the collapse-start panel button.'
+      default: 'Collapse start panel'
+    labelCollapseEnd:
+      type: string
+      title: Label Collapse End
+      description: 'Accessible label for the collapse-end panel button.'
+      default: 'Collapse end panel'
+slots:
+  start:
+    title: Start
+    description: 'The first (start) panel content.'
+  end:
+    title: End
+    description: 'The second (end) panel content.'
+libraryOverrides: {}

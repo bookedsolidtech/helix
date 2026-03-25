@@ -1,0 +1,20 @@
+/**
+ * HX Popup component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-popup-z-index: Z-index of the popup container. (default: 9000)
+ * --hx-popup-transition: Transition applied to the popup element. Consumers who need enter/exit animations can set this property AND override the default `display: none` hide mechanism via `::part(popup)`. Example: ```css hx-popup { --hx-popup-transition: opacity 0.2s ease; } hx-popup:not([active])::part(popup) { display: block; opacity: 0; pointer-events: none; } hx-popup[active]::part(popup) { opacity: 1; } ``` (default: none)
+ * --hx-arrow-size: Size of the arrow element. (default: 8px)
+ * --hx-arrow-color: Color of the arrow element. (default: var(--hx-color-surface-overlay, #ffffff))
+ * --hx-auto-size-available-width: Available width set by auto-size middleware (on :host).
+ * --hx-auto-size-available-height: Available height set by auto-size middleware (on :host).
+ */
+
+/* Component host styles */
+hx-popup {
+  display: block;
+}

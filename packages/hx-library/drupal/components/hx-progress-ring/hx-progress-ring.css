@@ -1,0 +1,17 @@
+/**
+ * HX Progress Ring component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-progress-ring-track-color: Track stroke color. (default: var(--hx-color-neutral-200))
+ * --hx-progress-ring-indicator-color: Indicator stroke color. (default: var(--hx-color-primary-500))
+ * --hx-progress-ring-label-color: Center label text color. (default: var(--hx-color-neutral-900))
+ */
+
+/* Component host styles */
+hx-progress-ring {
+  display: block;
+}

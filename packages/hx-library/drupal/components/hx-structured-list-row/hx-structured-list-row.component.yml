@@ -1,0 +1,16 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Structured List Row
+status: experimental
+group: HELiX
+description: 'A single row within an `hx-structured-list`. Renders a label/value pair with an optional actions area.'
+slots:
+  label:
+    title: Label
+    description: 'The term or key label (`<dt>` semantics).'
+  default:
+    title: Default
+    description: 'The value or definition (`<dd>` semantics).'
+  actions:
+    title: Actions
+    description: 'Optional action controls (edit button, etc.).'
+libraryOverrides: {}

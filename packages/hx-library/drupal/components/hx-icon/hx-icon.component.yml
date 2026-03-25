@@ -1,0 +1,34 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Icon
+status: experimental
+group: HELiX
+description: 'An icon component that supports inline SVG fetching and SVG sprite sheet references. Decorative icons are automatically hidden from assistive technology. When a label is provided the icon is announced as an image with that label.  **Render modes:** - **Sprite mode** (recommended for Drupal/SSR): Set `name` and optionally `sprite-url`.   Renders an `<svg><use href="...#name">` — works server-side without JavaScript. - **Inline mode**: Set `src` to a URL of a standalone SVG file. The component fetches,   sanitizes, and embeds the SVG markup. Requires JavaScript; not server-side renderable.   For Drupal/Twig templates use sprite mode to avoid content shift before hydration.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'Icon name used as the fragment identifier when referencing a sprite sheet. For sprite mode provide the bare symbol id (e.g. `check`). The component will build the full href as `${spriteUrl}#${name}`. If `name` already starts with `#` it is used as-is (inline sprite reference without a base URL).'
+      default: ''
+    src:
+      type: object
+      title: Src
+      description: 'URL of a standalone SVG file to fetch and render inline. Takes precedence over sprite mode when both `src` and `spriteUrl`/`name` are set.  **Note:** Inline mode requires browser JavaScript (`fetch` + `DOMParser`). It is not server-side renderable. For Drupal/Twig use sprite mode instead.'
+      default: 'undefined'
+    spriteUrl:
+      type: object
+      title: Sprite Url
+      description: 'Base URL of the SVG sprite sheet. Used together with `name` to construct the `<use>` href: `${spriteUrl}#${name}`.'
+      default: 'undefined'
+    size:
+      type: object
+      title: Size
+      description: 'Size variant of the icon.  Set via the `hx-size` HTML attribute (e.g. `hx-size="lg"`) or via the `size` JavaScript property (e.g. `el.size = ''lg''`). Both are equivalent — the `attribute: ''hx-size''` mapping is used to avoid colliding with the native `<input>` `size` attribute in Drupal attribute-passthrough scenarios. The CEM exposes both the JS property name (`size`) and the HTML attribute name (`hx-size`).'
+      default: 'md'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the icon. When non-empty, `role="img"` and `aria-label` are applied so assistive technology announces the icon. When empty the icon is treated as decorative and `aria-hidden="true"` is applied.'
+      default: ''
+libraryOverrides: {}

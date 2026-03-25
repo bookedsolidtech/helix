@@ -1,0 +1,51 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Checkbox Group
+status: experimental
+group: HELiX
+description: 'A form-associated checkbox group that manages a set of `<hx-checkbox>` children.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The name used for form submission. Passed to child `hx-checkbox` elements.'
+      default: ''
+    label:
+      type: string
+      title: Label
+      description: 'The fieldset legend/label text.'
+      default: ''
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether at least one checkbox must be checked for form submission.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the entire group is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message to display. When set, the group enters an error state.'
+      default: ''
+    orientation:
+      type: object
+      title: Orientation
+      description: 'Layout orientation of the checkbox items.'
+slots:
+  default:
+    title: Default
+    description: '`<hx-checkbox>` elements.'
+  label:
+    title: Label
+    description: 'Rich HTML group label (overrides the label property when used).'
+  error:
+    title: Error
+    description: 'Custom error content (overrides the error property).'
+  help-text:
+    title: Help Text
+    description: 'Group-level help text.'
+libraryOverrides: {}

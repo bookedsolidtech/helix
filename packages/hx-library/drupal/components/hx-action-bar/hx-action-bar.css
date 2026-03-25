@@ -1,0 +1,19 @@
+/**
+ * HX Action Bar component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-action-bar-bg: Bar background color (default variant). (default: transparent)
+ * --hx-action-bar-border: Bar border (default variant). (default: none)
+ * --hx-action-bar-padding: Inner padding. (default: var(--hx-space-2,0.5rem) var(--hx-space-3,0.75rem))
+ * --hx-action-bar-gap: Gap between slotted items. (default: var(--hx-space-2,0.5rem))
+ * --hx-action-bar-z-index: Z-index when sticky or bottom position. (default: 10)
+ */
+
+/* Component host styles */
+hx-action-bar {
+  display: block;
+}

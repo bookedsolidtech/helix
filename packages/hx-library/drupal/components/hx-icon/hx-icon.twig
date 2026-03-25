@@ -1,0 +1,32 @@
+{#
+ /**
+ * @file
+ * HX Icon component template.
+ *
+ * An icon component that supports inline SVG fetching and SVG sprite sheet references.
+ * Decorative icons are automatically hidden from assistive technology.
+ * When a label is provided the icon is announced as an image with that label.
+ * 
+ * **Render modes:**
+ * - **Sprite mode** (recommended for Drupal/SSR): Set `name` and optionally `sprite-url`.
+ *   Renders an `<svg><use href="...#name">` — works server-side without JavaScript.
+ * - **Inline mode**: Set `src` to a URL of a standalone SVG file. The component fetches,
+ *   sanitizes, and embeds the SVG markup. Requires JavaScript; not server-side renderable.
+ *   For Drupal/Twig templates use sprite mode to avoid content shift before hydration.
+ *
+ * Available variables:
+ * - name: string - Icon name used as the fragment identifier when referencing a sprite sheet. For sprite mode provide the bare symbol id (e.g. `check`). The component will build the full href as `${spriteUrl}#${name}`. If `name` already starts with `#` it is used as-is (inline sprite reference without a base URL).
+ * - src: object - URL of a standalone SVG file to fetch and render inline. Takes precedence over sprite mode when both `src` and `spriteUrl`/`name` are set.  **Note:** Inline mode requires browser JavaScript (`fetch` + `DOMParser`). It is not server-side renderable. For Drupal/Twig use sprite mode instead.
+ * - spriteUrl: object - Base URL of the SVG sprite sheet. Used together with `name` to construct the `<use>` href: `${spriteUrl}#${name}`.
+ * - size: object - Size variant of the icon.  Set via the `hx-size` HTML attribute (e.g. `hx-size="lg"`) or via the `size` JavaScript property (e.g. `el.size = 'lg'`). Both are equivalent — the `attribute: 'hx-size'` mapping is used to avoid colliding with the native `<input>` `size` attribute in Drupal attribute-passthrough scenarios. The CEM exposes both the JS property name (`size`) and the HTML attribute name (`hx-size`).
+ * - label: string - Accessible label for the icon. When non-empty, `role="img"` and `aria-label` are applied so assistive technology announces the icon. When empty the icon is treated as decorative and `aria-hidden="true"` is applied.
+ */
+#}
+<hx-icon
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if src is defined and src is not empty %}src="{{ src }}"{% endif %}
+  {% if spriteUrl is defined and spriteUrl is not empty %}sprite-url="{{ spriteUrl }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+</hx-icon>

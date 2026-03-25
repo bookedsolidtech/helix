@@ -1,0 +1,43 @@
+{#
+ /**
+ * @file
+ * HX Time Picker component template.
+ *
+ * A time-picker component with a combobox pattern: a text input with format
+ * masking and a dropdown listbox of pre-generated time slots.
+ *
+ * Available variables:
+ * - name: string - The name submitted with the form. Value is always HH:MM (24-hour).
+ * - value: string - The current value in HH:MM (24-hour) format.
+ * - min: string - The earliest selectable time in HH:MM format.
+ * - max: string - The latest selectable time in HH:MM format.
+ * - step: number - Step interval between dropdown options, in minutes. Defaults to 30.
+ * - label: string - The visible label text for the field.
+ * - required: boolean - Whether the field is required for form submission.
+ * - disabled: boolean - Whether the field is disabled.
+ * - error: string - Error message to display. When set, the field enters an error state.
+ * - format: object - Display format for the time input. '12h' shows AM/PM; '24h' is bare HH:MM.
+ */
+#}
+<hx-time-picker
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if step is defined and step is not empty %}step="{{ step }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if format is defined and format is not empty %}format="{{ format }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+</hx-time-picker>

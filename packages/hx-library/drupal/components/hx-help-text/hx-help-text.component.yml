@@ -1,0 +1,18 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Help Text
+status: experimental
+group: HELiX
+description: 'Standardized help/hint text displayed below form fields. Used by hx-field as a consistent sub-component for guidance and validation messages.  Non-default variants render an inline icon alongside the text to satisfy WCAG 1.4.1 (color is not the sole visual indicator). The `error` variant uses `role="alert"` for immediate screen-reader announcement; `warning` and `success` use `aria-live="polite"` for non-intrusive announcements.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual variant that determines the text color and icon. Use `error` for validation errors, `warning` for cautions, `success` for confirmation.'
+      default: 'default'
+slots:
+  default:
+    title: Default
+    description: 'The help text content.'
+libraryOverrides: {}

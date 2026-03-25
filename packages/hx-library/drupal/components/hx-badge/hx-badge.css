@@ -1,0 +1,28 @@
+/**
+ * HX Badge component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-badge-bg: Badge background color. The primary override point. (default: var(--hx-color-primary-500))
+ * --hx-badge-color: Badge text color. The primary override point. (default: var(--hx-color-neutral-0))
+ * --hx-badge-font-size: Badge font size (set per size variant).
+ * --hx-badge-font-weight: Badge font weight. (default: var(--hx-font-weight-semibold))
+ * --hx-badge-font-family: Badge font family. (default: var(--hx-font-family-sans))
+ * --hx-badge-border-radius: Badge border radius. (default: var(--hx-border-radius-md))
+ * --hx-badge-padding-x: Badge horizontal padding (set per size variant).
+ * --hx-badge-padding-y: Badge vertical padding (set per size variant).
+ * --hx-badge-pulse-color: Pulse color matching variant background with reduced opacity.
+ * --hx-badge-dot-size: Dot indicator size when rendered without content. (default: var(--hx-size-2))
+ * --hx-badge-secondary-bg: Background for the secondary variant. (default: var(--hx-color-neutral-100))
+ * --hx-badge-secondary-color: Text color for the secondary variant. (default: var(--hx-color-neutral-700))
+ * --hx-badge-info-bg: Background for the info variant. (default: var(--hx-color-info-700))
+ * --hx-badge-info-color: Text color for the info variant. (default: var(--hx-color-neutral-0))
+ */
+
+/* Component host styles */
+hx-badge {
+  display: block;
+}

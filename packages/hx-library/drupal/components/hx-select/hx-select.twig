@@ -1,0 +1,49 @@
+{#
+ /**
+ * @file
+ * HX Select component template.
+ *
+ * A form-associated select component with custom styling, label, error, and
+ * help text. Options are provided via slotted `<option>` (and `<optgroup>`)
+ * elements in the light DOM. The component wraps a hidden native `<select>`
+ * for form participation and provides a combobox trigger for consistent
+ * cross-browser styling.
+ *
+ * Available variables:
+ * - label: string - The visible label text for the select.
+ * - placeholder: string - Placeholder text shown in the trigger when no option is selected.
+ * - value: string - The current value of the select.
+ * - required: boolean - Whether the select is required for form submission.
+ * - disabled: boolean - Whether the select is disabled.
+ * - name: string - The name used for form submission.
+ * - error: string - Error message to display. When set, the field enters an error state.
+ * - helpText: string - Help text displayed below the select for guidance.
+ * - size: object - Size variant of the select trigger.
+ * - ariaLabel: object - Accessible name for screen readers, if different from the visible label.
+ * - open: boolean - Controls whether the dropdown listbox is open.
+ */
+#}
+<hx-select
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if ariaLabel is defined and ariaLabel is not empty %}aria-label="{{ ariaLabel }}"{% endif %}
+  {% if open %}open{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-select>

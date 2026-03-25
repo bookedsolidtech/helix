@@ -1,0 +1,56 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Banner
+status: experimental
+group: HELiX
+description: 'A full-width page-level banner for persistent notifications and announcements. Designed for healthcare applications requiring prominent system-level messaging.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual variant of the banner that determines colors and ARIA semantics.'
+      default: 'info'
+    position:
+      type: object
+      title: Position
+      description: 'CSS positioning behavior. "sticky" keeps the banner in flow; "fixed" pins it to the viewport.'
+      default: 'sticky'
+    dismissible:
+      type: boolean
+      title: Dismissible
+      description: 'Whether the banner can be dismissed by the user.'
+      default: false
+    heading:
+      type: string
+      title: Heading
+      description: "Heading text for the banner, used to provide context in the action link's and close button's accessible labels."
+      default: ''
+    actionLabel:
+      type: string
+      title: Action Label
+      description: 'Label text for the optional action link. Requires action-href to render.'
+      default: ''
+    actionHref:
+      type: string
+      title: Action Href
+      description: 'URL for the optional action link. Requires action-label to render.'
+      default: ''
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the banner is visible. Defaults to true — banners are shown by default.'
+      default: true
+    closeLabel:
+      type: string
+      title: Close Label
+      description: 'Accessible label for the dismiss button. Override for localized text.'
+      default: 'Dismiss banner'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for banner message content.'
+  action:
+    title: Action
+    description: 'Optional slot to override the built-in action link with custom content.'
+libraryOverrides: {}

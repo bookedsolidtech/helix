@@ -1,0 +1,22 @@
+/**
+ * HX Skeleton component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-skeleton-bg: Skeleton background color. (default: var(--hx-color-neutral-200))
+ * --hx-skeleton-shimmer-color: Shimmer highlight color. (default: rgba(255,255,255,0.4))
+ * --hx-skeleton-shimmer-width: Shimmer sweep width (background-size X axis). (default: 200%)
+ * --hx-skeleton-duration: Shimmer animation duration. (default: 1.5s)
+ * --hx-skeleton-text-radius: Border radius for text variant. (default: var(--hx-border-radius-full))
+ * --hx-skeleton-rect-radius: Border radius for rect variant. (default: var(--hx-border-radius-sm))
+ * --hx-skeleton-button-radius: Border radius for button variant. (default: var(--hx-border-radius-md))
+ * --hx-skeleton-circle-radius: Border radius for circle variant. (default: 50%)
+ */
+
+/* Component host styles */
+hx-skeleton {
+  display: block;
+}

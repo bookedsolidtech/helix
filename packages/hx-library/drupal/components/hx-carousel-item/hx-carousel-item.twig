@@ -1,0 +1,18 @@
+{#
+ /**
+ * @file
+ * HX Carousel Item component template.
+ *
+ * A wrapper for individual carousel slides.
+ *
+ * Available variables:
+ * - slideIndex: number - The 0-based index of this slide within the carousel. Set by hx-carousel.
+ * - totalSlides: number - Total number of slides in the carousel. Set by hx-carousel.
+ */
+#}
+<hx-carousel-item
+  {% if slideIndex is defined and slideIndex is not empty %}slide-index="{{ slideIndex }}"{% endif %}
+  {% if totalSlides is defined and totalSlides is not empty %}total-slides="{{ totalSlides }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-carousel-item>

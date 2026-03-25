@@ -1,0 +1,22 @@
+/**
+ * HX Accordion Item component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-accordion-border-color: Border color between items. (default: var(--hx-color-neutral-200))
+ * --hx-accordion-trigger-padding: Trigger padding. (default: var(--hx-space-4))
+ * --hx-accordion-trigger-color: Trigger text color. (default: var(--hx-color-neutral-800))
+ * --hx-accordion-trigger-bg: Trigger background color. (default: transparent)
+ * --hx-accordion-trigger-hover-bg: Trigger hover background. (default: var(--hx-color-neutral-50))
+ * --hx-accordion-icon-color: Icon color. (default: var(--hx-color-neutral-500))
+ * --hx-accordion-content-padding: Content padding. (default: 0 var(--hx-space-4) var(--hx-space-4))
+ * --hx-accordion-content-color: Content text color. (default: var(--hx-color-neutral-600))
+ */
+
+/* Component host styles */
+hx-accordion-item {
+  display: block;
+}

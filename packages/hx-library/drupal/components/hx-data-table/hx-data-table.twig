@@ -1,0 +1,46 @@
+{#
+ /**
+ * @file
+ * HX Data Table component template.
+ *
+ * An enterprise data table with sorting, row selection, and keyboard navigation.
+ *
+ * Available variables:
+ * - columns: object - Column definitions. Each item: `{ key, label, sortable?, width? }`. Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).
+ * - rows: object - Row data. Each item is a plain object keyed by column `key` values. Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).
+ * - selectable: boolean - When true, renders a checkbox column for row selection.
+ * - sortKey: string - The column key currently used for sorting.
+ * - sortDirection: object - Current sort direction.
+ * - loading: boolean - When true, renders a loading skeleton and sets `aria-busy="true"` on the host.
+ * - emptyLabel: string - Text displayed in the default empty state when `rows` is empty and not loading.
+ * - label: string - Accessible name for the table. Exposed via `aria-label` on the `<table>` element. Required when the table has columns — a missing label is a WCAG 4.1.2 violation.
+ * - stickyHeader: boolean - When true, the header row is sticky (position: sticky; top: 0).
+ * - labelSelectAll: string - Accessible label for the "select all rows" checkbox.
+ * - page: number - Current page (1-based). Set to 0 or leave at default (0) to disable pagination.
+ * - pageSize: number - Number of rows per page. Set to 0 to disable pagination (show all rows).
+ */
+#}
+<hx-data-table
+  {% if columns is defined and columns is not empty %}columns="{{ columns }}"{% endif %}
+  {% if rows is defined and rows is not empty %}rows="{{ rows }}"{% endif %}
+  {% if selectable %}selectable{% endif %}
+  {% if sortKey is defined and sortKey is not empty %}sort-key="{{ sortKey }}"{% endif %}
+  {% if sortDirection is defined and sortDirection is not empty %}sort-direction="{{ sortDirection }}"{% endif %}
+  {% if loading %}loading{% endif %}
+  {% if emptyLabel is defined and emptyLabel is not empty %}empty-label="{{ emptyLabel }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if stickyHeader %}sticky-header{% endif %}
+  {% if labelSelectAll is defined and labelSelectAll is not empty %}label-select-all="{{ labelSelectAll }}"{% endif %}
+  {% if page is defined and page is not empty %}page="{{ page }}"{% endif %}
+  {% if pageSize is defined and pageSize is not empty %}page-size="{{ pageSize }}"{% endif %}
+>
+  {% if slots.toolbar is defined %}
+    <slot name="toolbar">{{ slots.toolbar }}</slot>
+  {% endif %}
+  {% if slots.empty is defined %}
+    <slot name="empty">{{ slots.empty }}</slot>
+  {% endif %}
+  {% if slots.loading is defined %}
+    <slot name="loading">{{ slots.loading }}</slot>
+  {% endif %}
+</hx-data-table>

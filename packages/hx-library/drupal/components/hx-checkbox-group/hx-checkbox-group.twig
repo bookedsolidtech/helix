@@ -1,0 +1,35 @@
+{#
+ /**
+ * @file
+ * HX Checkbox Group component template.
+ *
+ * A form-associated checkbox group that manages a set of `<hx-checkbox>` children.
+ *
+ * Available variables:
+ * - name: string - The name used for form submission. Passed to child `hx-checkbox` elements.
+ * - label: string - The fieldset legend/label text.
+ * - required: boolean - Whether at least one checkbox must be checked for form submission.
+ * - disabled: boolean - Whether the entire group is disabled.
+ * - error: string - Error message to display. When set, the group enters an error state.
+ * - orientation: object - Layout orientation of the checkbox items.
+ */
+#}
+<hx-checkbox-group
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-checkbox-group>

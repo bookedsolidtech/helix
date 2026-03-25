@@ -1,0 +1,20 @@
+/**
+ * HX Prose component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-prose-max-width: Maximum content width. (default: 720px)
+ * --hx-prose-font-size: Base font size. (default: var(--hx-font-size-base))
+ * --hx-prose-line-height: Base line height. (default: var(--hx-line-height-relaxed))
+ * --hx-prose-color: Body text color. (default: var(--hx-color-text))
+ * --hx-prose-heading-color: Heading color. (default: var(--hx-color-text-strong))
+ * --hx-prose-link-color: Link color. (default: var(--hx-color-primary))
+ */
+
+/* Component host styles */
+hx-prose {
+  display: block;
+}

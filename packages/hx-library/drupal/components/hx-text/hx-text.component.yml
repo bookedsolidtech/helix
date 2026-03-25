@@ -1,0 +1,43 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Text
+status: experimental
+group: HELiX
+description: 'A semantic typography wrapper that applies consistent text styles using design tokens.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Typography variant controlling font size, line height, and letter spacing.  Note: The public variant set (body / body-sm / body-lg / label / label-sm / caption / code / overline) intentionally extends the original audit spec (body / lead / small / caption / overline). `lead` and `small` were replaced with the more granular `body-lg`, `body-sm`, `label`, `label-sm`, and `code` variants to better serve healthcare UI density requirements. There are no `lead` or `small` variants — consumers must use `body-lg` and `body-sm` respectively.'
+      default: 'body'
+    weight:
+      type: object
+      title: Weight
+      description: "Font weight override. When unset, the variant's default weight is used."
+      default: 'undefined'
+    color:
+      type: object
+      title: Color
+      description: 'Semantic color intent.'
+      default: 'default'
+    truncate:
+      type: boolean
+      title: Truncate
+      description: 'When true, clips text to a single line with an ellipsis overflow.'
+      default: false
+    lines:
+      type: number
+      title: Lines
+      description: 'Maximum number of lines to display before clamping with ellipsis. When set, overrides `truncate`. Set to 0 to disable.'
+      default: 0
+    as:
+      type: object
+      title: As
+      description: 'The HTML element to render as the inner base element. Use to produce semantically appropriate markup (e.g., `p`, `strong`, `em`). Defaults to `span` for inline usage.  In Drupal Twig: `<hx-text as="p" variant="body">...</hx-text>`'
+      default: 'span'
+slots:
+  default:
+    title: Default
+    description: 'Default slot for text content.'
+libraryOverrides: {}

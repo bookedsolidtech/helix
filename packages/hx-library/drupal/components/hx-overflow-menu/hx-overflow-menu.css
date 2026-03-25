@@ -1,0 +1,21 @@
+/**
+ * HX Overflow Menu component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-overflow-menu-panel-bg: Panel background color. (default: var(--hx-color-neutral-0,#fff))
+ * --hx-overflow-menu-panel-border: Panel border. (default: 1px solid var(--hx-color-neutral-200,#e5e7eb))
+ * --hx-overflow-menu-panel-border-radius: Panel border radius. (default: var(--hx-border-radius-md))
+ * --hx-overflow-menu-panel-shadow: Panel box shadow. (default: 0 4px 16px rgba(0,0,0,0.12))
+ * --hx-overflow-menu-panel-min-width: Minimum panel width. (default: 160px)
+ * --hx-overflow-menu-panel-z-index: Panel z-index. (default: 1000)
+ * --hx-overflow-menu-button-color: Trigger icon color. (default: var(--hx-color-neutral-600))
+ */
+
+/* Component host styles */
+hx-overflow-menu {
+  display: block;
+}

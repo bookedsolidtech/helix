@@ -1,0 +1,66 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX File Upload
+status: experimental
+group: HELiX
+description: 'A drag-and-drop file upload component with client-side validation, file list management, per-file progress, and native form association.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name used during form submission.'
+      default: ''
+    accept:
+      type: string
+      title: Accept
+      description: 'Accepted file types as a comma-separated list of MIME types or extensions. Mirrors the native `<input type="file" accept>` attribute.'
+      default: ''
+    maxSize:
+      type: number
+      title: Max Size
+      description: 'Maximum allowed file size in bytes. 0 means unlimited.'
+      default: 0
+    maxFiles:
+      type: number
+      title: Max Files
+      description: 'Maximum number of files that can be selected. 0 means unlimited.'
+      default: 0
+    multiple:
+      type: boolean
+      title: Multiple
+      description: 'Whether multiple files may be selected at once.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text for the dropzone.'
+      default: ''
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the component is disabled.'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Error message displayed below the dropzone. Also puts the dropzone in an error visual state.'
+      default: ''
+    labelDropzone:
+      type: string
+      title: Label Dropzone
+      description: 'Instructional text shown in the dropzone when no custom slot content is provided. Also used as the accessible label for the dropzone.'
+      default: 'Drag files here or click to browse'
+    labelFileList:
+      type: string
+      title: Label File List
+      description: 'Accessible label for the selected files list.'
+      default: 'Selected files'
+slots:
+  default:
+    title: Default
+    description: 'Default dropzone content. Replaces the built-in "Drag files here or click to browse" prompt.'
+  file-list:
+    title: File List
+    description: 'Custom file list display. When provided, the built-in file list is hidden.'
+libraryOverrides: {}

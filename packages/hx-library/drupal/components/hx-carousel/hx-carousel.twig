@@ -1,0 +1,44 @@
+{#
+ /**
+ * @file
+ * HX Carousel component template.
+ *
+ * A scrollable carousel/slider for images or content slides.
+ *
+ * Available variables:
+ * - label: string - Accessible label identifying this carousel to assistive technology. When multiple carousels appear on the same page, each must have a unique label.
+ * - loop: boolean - Whether the carousel wraps around from last to first slide and vice-versa.
+ * - autoplay: boolean - Whether the carousel auto-advances slides. Automatically pauses on hover, focus, and when prefers-reduced-motion is active.
+ * - autoplayInterval: number - Milliseconds between auto-advance transitions.
+ * - slidesPerPage: number - Number of slides visible at once.
+ * - slidesPerMove: number - Number of slides to advance per navigation action.
+ * - orientation: object - Scroll axis of the carousel.
+ * - mouseDragging: boolean - Whether click-drag scrolling is enabled.
+ * - labelPrevSlide: string - Accessible label for the previous slide button.
+ * - labelNextSlide: string - Accessible label for the next slide button.
+ * - labelPauseAutoplay: string - Accessible label for the autoplay pause button.
+ * - labelPlayAutoplay: string - Accessible label for the autoplay play button.
+ */
+#}
+<hx-carousel
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if loop %}loop{% endif %}
+  {% if autoplay %}autoplay{% endif %}
+  {% if autoplayInterval is defined and autoplayInterval is not empty %}autoplay-interval="{{ autoplayInterval }}"{% endif %}
+  {% if slidesPerPage is defined and slidesPerPage is not empty %}slides-per-page="{{ slidesPerPage }}"{% endif %}
+  {% if slidesPerMove is defined and slidesPerMove is not empty %}slides-per-move="{{ slidesPerMove }}"{% endif %}
+  {% if orientation is defined and orientation is not empty %}orientation="{{ orientation }}"{% endif %}
+  {% if mouseDragging %}mouse-dragging{% endif %}
+  {% if labelPrevSlide is defined and labelPrevSlide is not empty %}label-prev-slide="{{ labelPrevSlide }}"{% endif %}
+  {% if labelNextSlide is defined and labelNextSlide is not empty %}label-next-slide="{{ labelNextSlide }}"{% endif %}
+  {% if labelPauseAutoplay is defined and labelPauseAutoplay is not empty %}label-pause-autoplay="{{ labelPauseAutoplay }}"{% endif %}
+  {% if labelPlayAutoplay is defined and labelPlayAutoplay is not empty %}label-play-autoplay="{{ labelPlayAutoplay }}"{% endif %}
+>
+  {% if slots.next-button is defined %}
+    <slot name="next-button">{{ slots.next-button }}</slot>
+  {% endif %}
+  {% if slots.previous-button is defined %}
+    <slot name="previous-button">{{ slots.previous-button }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-carousel>

@@ -1,0 +1,53 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Progress Bar
+status: experimental
+group: HELiX
+description: 'A linear progress indicator for determinate and indeterminate states.'
+props:
+  type: object
+  properties:
+    value:
+      type: object
+      title: Value
+      description: 'Current progress value (min–max). Set to null for indeterminate state.'
+      default: 'null'
+    min:
+      type: number
+      title: Min
+      description: 'Minimum value for the progress bar.'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'Maximum value for the progress bar.'
+      default: 100
+    indeterminate:
+      type: boolean
+      title: Indeterminate
+      description: 'When true, displays an animated indeterminate loading state regardless of value.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the progress bar (maps to aria-label when no label slot content is used).'
+      default: ''
+    description:
+      type: string
+      title: Description
+      description: 'Additional description for the progress operation, linked via aria-describedby.'
+      default: ''
+    size:
+      type: object
+      title: Size
+      description: 'Size of the progress bar track.'
+      default: 'md'
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual variant controlling the indicator color.'
+      default: 'default'
+slots:
+  label:
+    title: Label
+    description: 'Visible label text rendered above the progress bar track.'
+libraryOverrides: {}

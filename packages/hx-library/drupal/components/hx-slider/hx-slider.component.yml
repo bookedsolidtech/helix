@@ -1,0 +1,82 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Slider
+status: experimental
+group: HELiX
+description: 'A range slider component for selecting a numeric value within a min/max boundary. Supports tick marks, value display, range labels, and native form participation via ElementInternals.  The native `<input type="range">` receives `role="slider"` with `aria-valuenow`, `aria-valuemin`, and `aria-valuemax`. Label association uses `aria-labelledby` when a label is present, or `aria-label` as a fallback. Help text is linked via `aria-describedby`. Keyboard navigation follows the native range behavior: Arrow keys increment/decrement by step, Home jumps to min, End jumps to max.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The name submitted with the form.'
+      default: ''
+    value:
+      type: number
+      title: Value
+      description: 'The current numeric value of the slider.'
+      default: 0
+    min:
+      type: number
+      title: Min
+      description: 'The minimum allowed value.'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'The maximum allowed value.'
+      default: 100
+    step:
+      type: number
+      title: Step
+      description: 'The stepping interval between values.'
+      default: 1
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the slider is disabled.'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'The visible label text for the slider.'
+      default: ''
+    helpText:
+      type: string
+      title: Help Text
+      description: 'Help text displayed below the slider for guidance.'
+      default: ''
+    showValue:
+      type: boolean
+      title: Show Value
+      description: 'When true, the current value is shown next to the label.'
+      default: false
+    showTicks:
+      type: boolean
+      title: Show Ticks
+      description: 'When true, tick marks are rendered at each step interval.'
+      default: false
+    size:
+      type: object
+      title: Size
+      description: 'The size variant of the slider.'
+      default: 'md'
+    valueText:
+      type: string
+      title: Value Text
+      description: 'Human-readable text alternative for the current value, announced by screen readers instead of the numeric value. For example, on a pain scale: "7 — Moderate-Severe".'
+      default: ''
+slots:
+  label:
+    title: Label
+    description: 'Custom label content (overrides the label property).'
+  help-text:
+    title: Help Text
+    description: 'Custom help text content (overrides the helpText property).'
+  min-label:
+    title: Min Label
+    description: 'Label rendered at the minimum end of the slider.'
+  max-label:
+    title: Max Label
+    description: 'Label rendered at the maximum end of the slider.'
+libraryOverrides: {}

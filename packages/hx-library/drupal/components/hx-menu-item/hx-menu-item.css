@@ -1,0 +1,16 @@
+/**
+ * HX Menu Item component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-menu-item-color: Item text color. (default: var(--hx-color-neutral-900))
+ * --hx-menu-item-hover-bg: Item hover/focus background. (default: var(--hx-color-neutral-100))
+ */
+
+/* Component host styles */
+hx-menu-item {
+  display: block;
+}

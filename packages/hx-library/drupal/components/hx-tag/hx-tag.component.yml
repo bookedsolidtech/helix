@@ -1,0 +1,44 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: HX Tag
+status: experimental
+group: HELiX
+description: 'A compact label for categorization, filtering, and selection.'
+props:
+  type: object
+  properties:
+    variant:
+      type: object
+      title: Variant
+      description: 'Visual style variant of the tag.'
+      default: 'default'
+    size:
+      type: object
+      title: Size
+      description: 'Size of the tag.'
+      default: 'md'
+    pill:
+      type: boolean
+      title: Pill
+      description: 'Whether the tag uses fully rounded (pill) styling.'
+      default: false
+    removable:
+      type: boolean
+      title: Removable
+      description: 'Whether the tag renders a dismiss button.'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the tag is disabled. When disabled, interactions are suppressed.'
+      default: false
+slots:
+  default:
+    title: Default
+    description: 'Default slot for tag label text.'
+  prefix:
+    title: Prefix
+    description: 'Icon or avatar rendered before the label.'
+  suffix:
+    title: Suffix
+    description: 'Content rendered after the label.'
+libraryOverrides: {}

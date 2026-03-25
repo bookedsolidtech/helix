@@ -1,0 +1,45 @@
+{#
+ /**
+ * @file
+ * HX Switch component template.
+ *
+ * A toggle switch component for on/off states.
+ * 
+ * Uses `role="switch"` with `aria-checked` to convey toggle state.
+ * Supports keyboard activation via Space key (per ARIA APG switch pattern).
+ * Label association is handled through `aria-labelledby`, and
+ * error/help text are linked via `aria-describedby`.
+ *
+ * Available variables:
+ * - checked: boolean - Whether the switch is toggled on.
+ * - disabled: boolean - Whether the switch is disabled.
+ * - required: boolean - Whether the switch is required for form submission.
+ * - name: string - The name of the switch, used for form submission.
+ * - value: string - The value submitted when the switch is checked.
+ * - label: string - The visible label text for the switch.
+ * - size: object - Size variant of the switch.
+ * - error: string - Error message to display. When set, the switch enters an error state.
+ * - helpText: string - Help text displayed below the switch for guidance.
+ * - requiredMessage: string - Validation message shown when the field is required but empty.
+ */
+#}
+<hx-switch
+  {% if checked %}checked{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if required %}required{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if error is defined and error is not empty %}error="{{ error }}"{% endif %}
+  {% if helpText is defined and helpText is not empty %}help-text="{{ helpText }}"{% endif %}
+  {% if requiredMessage is defined and requiredMessage is not empty %}required-message="{{ requiredMessage }}"{% endif %}
+>
+  {% if slots.error is defined %}
+    <slot name="error">{{ slots.error }}</slot>
+  {% endif %}
+  {% if slots.help-text is defined %}
+    <slot name="help-text">{{ slots.help-text }}</slot>
+  {% endif %}
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-switch>

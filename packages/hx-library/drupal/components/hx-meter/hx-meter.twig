@@ -1,0 +1,32 @@
+{#
+ /**
+ * @file
+ * HX Meter component template.
+ *
+ * A scalar measurement within a known range — e.g., disk usage, health score,
+ * or any numeric value with defined min/max bounds. Supports low/high/optimum
+ * threshold markers for semantic color feedback.
+ *
+ * Available variables:
+ * - value: number - Current value of the meter.
+ * - min: number - Minimum value of the range.
+ * - max: number - Maximum value of the range.
+ * - low: object - Threshold below which the value is considered suboptimal (lower range warning).
+ * - high: object - Threshold above which the value is considered suboptimal (upper range warning).
+ * - optimum: object - The optimal value within the range. Used to determine which zone is "good".
+ * - label: object - Accessible label for the meter. Used as the visible label text and as the source for `aria-labelledby`. When only slot content is provided (no `label` attribute), the slot content is used for the accessible name.
+ */
+#}
+<hx-meter
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+  {% if min is defined and min is not empty %}min="{{ min }}"{% endif %}
+  {% if max is defined and max is not empty %}max="{{ max }}"{% endif %}
+  {% if low is defined and low is not empty %}low="{{ low }}"{% endif %}
+  {% if high is defined and high is not empty %}high="{{ high }}"{% endif %}
+  {% if optimum is defined and optimum is not empty %}optimum="{{ optimum }}"{% endif %}
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+>
+  {% if slots.label is defined %}
+    <slot name="label">{{ slots.label }}</slot>
+  {% endif %}
+</hx-meter>

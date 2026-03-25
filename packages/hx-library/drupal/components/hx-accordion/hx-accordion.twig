@@ -1,0 +1,14 @@
+{#
+ /**
+ * @file
+ * HX Accordion component template.
+ *
+ * An accordion container that manages collapsible content sections.
+ *
+ * Available variables:
+ * - mode: object - Expansion mode: 'single' collapses all other items when one expands. 'multi' allows multiple items open simultaneously.
+ */
+#}
+<hx-accordion {% if mode is defined and mode is not empty %}mode="{{ mode }}"{% endif %}>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-accordion>

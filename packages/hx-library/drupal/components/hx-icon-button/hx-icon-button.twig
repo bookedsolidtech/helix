@@ -1,0 +1,33 @@
+{#
+ /**
+ * @file
+ * HX Icon Button component template.
+ *
+ * An icon-only button component for compact, accessible actions.
+ * Renders a square button or anchor element containing a single icon.
+ * The `label` property is required and provides the accessible name
+ * via `aria-label` and a native tooltip via the `title` attribute.
+ *
+ * Available variables:
+ * - label: string - Accessible name for the button. Required. Rendered as `aria-label` and `title` on the underlying element. The component renders nothing when absent, and a console warning is emitted to alert developers during authoring.
+ * - variant: object - Visual style variant of the button.
+ * - size: object - Size of the button.
+ * - type: object - The type attribute for the underlying button element. Has no effect when `href` is set.
+ * - disabled: boolean - Whether the button is disabled.
+ * - href: object - When set, renders an `<a>` element instead of a `<button>`.
+ * - name: object - Name submitted with form data. Only applicable when rendering as a button.
+ * - value: object - Value submitted with form data. Only applicable when rendering as a button.
+ */
+#}
+<hx-icon-button
+  {% if label is defined and label is not empty %}label="{{ label }}"{% endif %}
+  {% if variant is defined and variant is not empty %}variant="{{ variant }}"{% endif %}
+  {% if size is defined and size is not empty %}size="{{ size }}"{% endif %}
+  {% if type is defined and type is not empty %}type="{{ type }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if href is defined and href is not empty %}href="{{ href }}"{% endif %}
+  {% if name is defined and name is not empty %}name="{{ name }}"{% endif %}
+  {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+>
+  {% if content is defined %}{{ content }}{% else %}<slot></slot>{% endif %}
+</hx-icon-button>

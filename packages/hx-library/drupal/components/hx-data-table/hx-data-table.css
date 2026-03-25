@@ -1,0 +1,22 @@
+/**
+ * HX Data Table component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-data-table-header-bg: Header background color. (default: var(--hx-color-neutral-50))
+ * --hx-data-table-header-color: Header text color. (default: var(--hx-color-neutral-700))
+ * --hx-data-table-cell-color: Cell text color. (default: var(--hx-color-neutral-900))
+ * --hx-data-table-border-color: Row border color. (default: var(--hx-color-neutral-200))
+ * --hx-data-table-row-hover-bg: Row hover background. (default: var(--hx-color-neutral-50))
+ * --hx-data-table-row-selected-bg: Selected row background. (default: var(--hx-color-primary-50))
+ * --hx-data-table-empty-color: Empty state text color. (default: var(--hx-color-neutral-600))
+ * --hx-data-table-min-width: Minimum table width before horizontal scrolling. (default: 600px)
+ */
+
+/* Component host styles */
+hx-data-table {
+  display: block;
+}

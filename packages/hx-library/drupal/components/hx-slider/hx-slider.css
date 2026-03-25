@@ -1,0 +1,26 @@
+/**
+ * HX Slider component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-slider-track-bg: Track background color. (default: var(--hx-color-neutral-200))
+ * --hx-slider-fill-bg: Fill/progress color. (default: var(--hx-color-primary-500))
+ * --hx-slider-thumb-bg: Thumb background color. (default: var(--hx-color-neutral-0))
+ * --hx-slider-thumb-border-color: Thumb border color. (default: var(--hx-color-primary-500))
+ * --hx-slider-thumb-border-width: Thumb border width. (default: 2px)
+ * --hx-slider-thumb-shadow: Thumb box shadow. (default: var(--hx-shadow-sm))
+ * --hx-slider-focus-ring-color: Focus ring color. (default: var(--hx-focus-ring-color))
+ * --hx-slider-label-color: Label text color. (default: var(--hx-color-neutral-700))
+ * --hx-slider-value-color: Value display text color. (default: var(--hx-color-neutral-600))
+ * --hx-slider-tick-color: Tick mark color. (default: var(--hx-color-neutral-400))
+ * --hx-slider-range-label-color: Range label text color. (default: var(--hx-color-neutral-500))
+ * --hx-slider-help-text-color: Help text color. (default: var(--hx-color-neutral-500))
+ */
+
+/* Component host styles */
+hx-slider {
+  display: block;
+}

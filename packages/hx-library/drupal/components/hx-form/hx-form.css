@@ -1,0 +1,17 @@
+/**
+ * HX Form component styles.
+ *
+ * This component uses the @helixui/adopted-stylesheets pattern.
+ * The JS file initializes AdoptedStylesheetsController which
+ * handles stylesheet adoption into the shadow DOM.
+ *
+ * CSS Custom Properties:
+ * --hx-form-gap: Gap between form fields. (default: var(--hx-space-4))
+ * --hx-form-max-width: Maximum width of the form. (default: none)
+ * --hx-form-padding: Internal padding of the form. (default: 0)
+ */
+
+/* Component host styles */
+hx-form {
+  display: block;
+}
