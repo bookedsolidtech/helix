@@ -276,6 +276,10 @@ export class HelixCombobox extends LitElement {
     if (this._debounceTimer !== null) {
       clearTimeout(this._debounceTimer);
     }
+    // Reset open state to prevent persisted open state on reconnect
+    if (this._open) {
+      this._open = false;
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {

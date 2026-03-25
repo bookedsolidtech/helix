@@ -677,4 +677,86 @@ describe('hx-popup', () => {
       expect(el.active).toBe(false);
     });
   });
+
+  // ─── anchor property: null / Element / selector ───
+
+  describe('anchor property', () => {
+    it('anchor defaults to null', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      expect(el.anchor).toBeNull();
+    });
+
+    it('setting anchor to an Element reference works', async () => {
+      const anchorEl = document.createElement('button');
+      anchorEl.textContent = 'External';
+      document.body.appendChild(anchorEl);
+      try {
+        const el = await fixture<HelixPopup>('<hx-popup active><div>Content</div></hx-popup>');
+        el.anchor = anchorEl;
+        expect(el.anchor).toBe(anchorEl);
+      } finally {
+        anchorEl.remove();
+      }
+    });
+
+    it('anchor can be set back to null', async () => {
+      const anchorEl = document.createElement('button');
+      document.body.appendChild(anchorEl);
+      try {
+        const el = await fixture<HelixPopup>('<hx-popup active><div>Content</div></hx-popup>');
+        el.anchor = anchorEl;
+        el.anchor = null;
+        expect(el.anchor).toBeNull();
+      } finally {
+        anchorEl.remove();
+      }
+    });
+  });
+
+  // ─── flipFallbackPlacements serialization ───
+
+  describe('flipFallbackPlacements serialization', () => {
+    it('serializes flipFallbackPlacements back to JSON attribute', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup flip-fallback-placements=\'["top","left"]\'><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      expect(el.flipFallbackPlacements).toEqual(['top', 'left']);
+      // Setting via property updates the attribute via the converter
+      el.flipFallbackPlacements = ['right', 'bottom'];
+      await el.updateComplete;
+      expect(el.flipFallbackPlacements).toEqual(['right', 'bottom']);
+    });
+
+    it('handles invalid JSON in flip-fallback-placements attribute gracefully', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup flip-fallback-placements="not-valid-json"><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      // Invalid JSON falls back to empty array per the converter
+      expect(el.flipFallbackPlacements).toEqual([]);
+    });
+  });
+
+  // ─── autoSize property cleans up CSS vars on inactive ───
+
+  describe('autoSize CSS variable cleanup', () => {
+    it('removes --hx-auto-size-* when going from active to inactive with autoSize', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active auto-size><button slot="anchor">A</button><div>C</div></hx-popup>',
+      );
+      await el.updateComplete;
+      // Trigger a reposition so CSS vars are set
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+
+      // Deactivate
+      el.active = false;
+      await el.updateComplete;
+
+      expect(el.style.getPropertyValue('--hx-auto-size-available-width')).toBe('');
+      expect(el.style.getPropertyValue('--hx-auto-size-available-height')).toBe('');
+    });
+  });
 });
