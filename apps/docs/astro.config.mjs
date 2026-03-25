@@ -679,6 +679,7 @@ export default defineConfig({
           badge: { text: 'New', variant: 'tip' },
           items: [
             { label: 'Overview', slug: 'extending' },
+            { label: 'Theming Quick Start', slug: 'extending/theming-quick-start' },
             { label: 'PatientCard Example', slug: 'extending/patient-card' },
           ],
         },
