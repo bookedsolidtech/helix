@@ -42,15 +42,15 @@ export const helixProgressBarStyles = css`
   /* ─── Size Variants ─── */
 
   .progress-bar--sm .progress-bar__track {
-    height: var(--hx-progress-bar-height-sm, var(--hx-size-1, 0.25rem));
+    height: var(--hx-progress-bar-height-sm, var(--hx-space-1, 0.25rem));
   }
 
   .progress-bar--md .progress-bar__track {
-    height: var(--hx-progress-bar-height-md, var(--hx-size-2, 0.5rem));
+    height: var(--hx-progress-bar-height-md, var(--hx-space-2, 0.5rem));
   }
 
   .progress-bar--lg .progress-bar__track {
-    height: var(--hx-progress-bar-height-lg, var(--hx-size-3, 0.75rem));
+    height: var(--hx-progress-bar-height-lg, var(--hx-space-3, 0.75rem));
   }
 
   .progress-bar__fill {
@@ -104,7 +104,8 @@ export const helixProgressBarStyles = css`
   .progress-bar--indeterminate .progress-bar__fill {
     transform: translateX(-100%) scaleX(0.4);
     transform-origin: left center;
-    animation: hx-progress-indeterminate 1.5s ease-in-out infinite;
+    animation: hx-progress-indeterminate var(--hx-progress-bar-indeterminate-duration, 1.5s)
+      ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {

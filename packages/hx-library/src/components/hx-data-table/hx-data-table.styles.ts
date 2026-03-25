@@ -158,7 +158,7 @@ export const helixDataTableStyles = css`
       var(--hx-color-neutral-200, #e2e8f0) 75%
     );
     background-size: 200% 100%;
-    animation: hx-shimmer 1.5s infinite;
+    animation: hx-shimmer var(--hx-data-table-shimmer-duration, 1.5s) infinite;
   }
 
   @keyframes hx-shimmer {
