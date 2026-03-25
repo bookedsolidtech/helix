@@ -1,0 +1,69 @@
+{#
+  helix-form-select.html.twig
+  ---------------------------
+  Renders a HELiX hx-select component for Drupal select form elements.
+  Options are projected as slotted <option> elements in the light DOM,
+  which the component uses for both the combobox UI and the underlying
+  native <select> that participates in form submission.
+
+  The component dispatches hx-change events with detail: { value: string }
+  when the selected option changes. Standard form submission requires no
+  Drupal behavior.
+
+  Variables:
+    label      (string)  Visible label. Required for accessibility.
+    name       (string)  Form field name for submission.
+    options    (array)   Array of { value, label } objects. Flat list only;
+                         optgroups are not currently supported by this template.
+    selected   (string)  Currently selected option value (server-side state).
+    required   (bool)    Marks the field as required.
+    disabled   (bool)    Renders the field in a disabled state.
+    error      (string)  Error message shown below the select.
+    help_text  (string)  Descriptive hint text shown below the select.
+    attributes (object)  Additional HTML attributes spread onto the element.
+
+  Usage — basic select:
+    {% include 'helix-form-select.html.twig' with {
+      label: 'Department',
+      name: 'department',
+      options: [
+        { value: 'cardiology', label: 'Cardiology' },
+        { value: 'oncology', label: 'Oncology' },
+        { value: 'neurology', label: 'Neurology' },
+      ],
+      selected: current_department,
+    } %}
+
+  Drupal Form API — automatic via preprocess:
+    helix_module_preprocess_select() in helix_module.theme.inc maps
+    Drupal select render arrays to these variables automatically.
+    The helix_* prefixed variables are set by the preprocess function;
+    this template falls back to the direct variable names for manual use.
+#}
+
+{% set _label     = helix_label     ?? label     ?? '' %}
+{% set _name      = helix_name      ?? name      ?? '' %}
+{% set _options   = helix_options   ?? options   ?? [] %}
+{% set _selected  = helix_selected  ?? selected  ?? null %}
+{% set _required  = helix_required  ?? required  ?? false %}
+{% set _disabled  = helix_disabled  ?? disabled  ?? false %}
+{% set _error     = helix_error     ?? error     ?? null %}
+{% set _help_text = helix_help_text ?? help_text ?? null %}
+
+<hx-select
+  label="{{ _label }}"
+  {% if _name %}name="{{ _name }}"{% endif %}
+  {% if _required %}required{% endif %}
+  {% if _disabled %}disabled{% endif %}
+  {% if _error %}error="{{ _error }}"{% endif %}
+  {% if _help_text %}help-text="{{ _help_text }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% for option in _options %}
+    <option
+      value="{{ option.value }}"
+      {% if _selected is not null and option.value == _selected %}selected{% endif %}
+      {% if option.disabled is defined and option.disabled %}disabled{% endif %}
+    >{{ option.label }}</option>
+  {% endfor %}
+</hx-select>

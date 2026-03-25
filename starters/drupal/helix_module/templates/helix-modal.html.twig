@@ -1,0 +1,80 @@
+{#
+  helix-modal.html.twig
+  ---------------------
+  Renders a HELiX hx-dialog component as a modal overlay. The hx-dialog
+  component is built on the native HTML <dialog> element and provides focus
+  trapping, backdrop interaction, keyboard navigation, and full ARIA labelling.
+
+  The dialog does not auto-open on page load unless the open attribute is set.
+  To trigger the dialog from a button, use a Drupal behavior with the
+  data-hx-dialog-trigger pattern shown below.
+
+  Slots:
+    default — Dialog body content (body_content variable).
+    header  — Custom header content. Replaces the built-in heading.
+    footer  — Action buttons or footer content.
+
+  Events:
+    hx-open   — Fired when the dialog opens.
+    hx-close  — Fired when the dialog closes for any reason.
+    hx-cancel — Fired when dismissed via Escape key or cancel action.
+
+  Variables:
+    label        (string)  Accessible label (heading text). Required.
+    body_content (string)  The dialog body content (default slot).
+    open         (bool)    Whether the dialog is open on initial render.
+    dismissible  (bool)    Whether the close button is shown. Default: true.
+    modal        (bool)    Whether to render as a modal (blocks background).
+                           Default: true.
+    footer       (string)  Optional footer content (rendered in footer slot).
+    dialog_id    (string)  Optional id attribute for trigger wiring.
+    attributes   (object)  Additional HTML attributes.
+
+  Usage — static modal:
+    {% include 'helix-modal.html.twig' with {
+      label: 'Confirm Discharge',
+      body_content: 'Are you sure you want to discharge this patient?',
+      footer: '<hx-button variant="danger" type="button">Discharge</hx-button>
+               <hx-button variant="secondary" type="button">Cancel</hx-button>',
+    } %}
+
+  Usage — trigger from a button (Drupal behavior):
+    {# In template: #}
+    <hx-button
+      variant="primary"
+      type="button"
+      data-hx-dialog-trigger="confirm-dialog"
+    >Open Dialog</hx-button>
+
+    {% include 'helix-modal.html.twig' with {
+      dialog_id: 'confirm-dialog',
+      label: 'Confirm Action',
+      body_content: 'This action cannot be undone.',
+    } %}
+
+    {# In helix.behaviors.js (already included): #}
+    {# once('hx-dialog-trigger', '[data-hx-dialog-trigger]', context).forEach(...) #}
+
+  Drupal AJAX integration:
+    Use hx-close events to trigger AJAX requests after dialog dismissal:
+      once('helix-modal-ajax', 'hx-dialog[data-ajax-close]', context).forEach(function (el) {
+        el.addEventListener('hx-close', function () {
+          Drupal.ajax({ url: el.getAttribute('data-ajax-close') }).execute();
+        });
+      });
+#}
+
+<hx-dialog
+  heading="{{ label }}"
+  {% if open %}open{% endif %}
+  {% if not dismissible %}hide-close-button{% endif %}
+  {% if modal %}modal{% endif %}
+  {% if dialog_id %}id="{{ dialog_id }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {{ body_content }}
+
+  {% if footer is defined and footer %}
+    <div slot="footer">{{ footer }}</div>
+  {% endif %}
+</hx-dialog>

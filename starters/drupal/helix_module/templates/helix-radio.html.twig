@@ -1,0 +1,52 @@
+{#
+  helix-radio.html.twig
+  ---------------------
+  Renders a HELiX hx-radio component for individual radio button form
+  elements. In Drupal Form API, individual radio buttons are commonly
+  rendered inside a radios (#type: radios) container.
+
+  For grouped radio buttons, wrap multiple hx-radio elements inside an
+  hx-radio-group component. The group handles keyboard navigation,
+  mutual exclusivity, and form association.
+
+  Example group pattern:
+    <hx-radio-group name="appointment_type" label="Appointment Type" required>
+      {% for option in options %}
+        {% include 'helix-radio.html.twig' with {
+          label: option.label,
+          value: option.value,
+          checked: option.value == selected_value,
+        } %}
+      {% endfor %}
+    </hx-radio-group>
+
+  Variables:
+    label    (string)  Visible label text. Required for accessibility.
+    name     (string)  Form field name. Shared across all radios in a group.
+    value    (string)  Value submitted when this radio is selected.
+    checked  (bool)    Pre-renders this radio in the checked state.
+    disabled (bool)    Renders this radio in a disabled state.
+    required (bool)    Marks the radio as required.
+    error    (string)  Error message. Usually set on the group, not individuals.
+    attributes (object) Additional HTML attributes.
+
+  Drupal Form API — automatic via preprocess:
+    helix_module_preprocess_radio() in helix_module.theme.inc maps
+    Drupal radio render arrays to these variables automatically.
+#}
+
+{% set _label    = helix_label    ?? label    ?? '' %}
+{% set _name     = helix_name     ?? name     ?? '' %}
+{% set _value    = helix_value    ?? value    ?? '' %}
+{% set _checked  = helix_checked  ?? checked  ?? false %}
+{% set _disabled = helix_disabled ?? disabled ?? false %}
+{% set _required = helix_required ?? required ?? false %}
+{% set _error    = helix_error    ?? error    ?? null %}
+
+<hx-radio
+  label="{{ _label }}"
+  value="{{ _value }}"
+  {% if _checked %}checked{% endif %}
+  {% if _disabled %}disabled{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+></hx-radio>
