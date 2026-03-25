@@ -260,12 +260,12 @@ describe('hx-nav', () => {
       expect(submenu?.getAttribute('aria-label')).toBe('Patients submenu');
     });
 
-    it('has no aria-expanded on collapsed submenu trigger', async () => {
+    it('submenu trigger aria-expanded is false when collapsed', async () => {
       const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
       el.items = itemsWithSubmenus;
       await el.updateComplete;
       const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('toggles submenu on button click', async () => {
@@ -301,10 +301,10 @@ describe('hx-nav', () => {
   // ─── Mobile Toggle (5) ───
 
   describe('Mobile Toggle', () => {
-    it('toggle button has no aria-expanded initially', async () => {
+    it('toggle button aria-expanded is false initially', async () => {
       const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
       const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
-      expect(toggle?.hasAttribute('aria-expanded')).toBe(false);
+      expect(toggle?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('toggle button updates aria-expanded when clicked', async () => {
@@ -414,7 +414,7 @@ describe('hx-nav', () => {
       expect(btn?.getAttribute('aria-expanded')).toBe('true');
       btn?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('Enter key toggles submenu visibility', async () => {
@@ -452,7 +452,7 @@ describe('hx-nav', () => {
       subLink?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
       // Submenu should be closed
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('second Enter key press closes an open submenu', async () => {
@@ -467,7 +467,7 @@ describe('hx-nav', () => {
       // Second press closes
       btn?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('ArrowRight moves focus to the next top-level item', async () => {
@@ -561,7 +561,7 @@ describe('hx-nav', () => {
       // Click outside
       document.body.click();
       await el.updateComplete;
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('does not close submenu when clicking inside component', async () => {
@@ -604,8 +604,8 @@ describe('hx-nav', () => {
       subLink?.click();
       await el.updateComplete;
       // Both submenu and mobile menu should be closed
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
-      expect(toggle?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
+      expect(toggle?.getAttribute('aria-expanded')).toBe('false');
     });
   });
 
@@ -629,7 +629,7 @@ describe('hx-nav', () => {
       toggle?.click();
       await el.updateComplete;
       // Submenu should be collapsed
-      expect(btn?.hasAttribute('aria-expanded')).toBe(false);
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
     });
   });
 
@@ -703,6 +703,18 @@ describe('hx-nav', () => {
       el.labelOpenMenu = 'Ouvrir le menu de navigation';
       await el.updateComplete;
       expect(el.labelOpenMenu).toBe('Ouvrir le menu de navigation');
+    });
+
+    it('labelCloseMenu defaults to "Close navigation menu"', async () => {
+      const el = await fixture<HelixNav>('<hx-nav label="Main navigation"></hx-nav>');
+      expect(el.labelCloseMenu).toBe('Close navigation menu');
+    });
+
+    it('accepts custom labelCloseMenu', async () => {
+      const el = await fixture<HelixNav>(
+        '<hx-nav label="Main navigation" label-close-menu="Fermer le menu de navigation"></hx-nav>',
+      );
+      expect(el.labelCloseMenu).toBe('Fermer le menu de navigation');
     });
   });
 });

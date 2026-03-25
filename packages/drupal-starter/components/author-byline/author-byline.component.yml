@@ -1,0 +1,32 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Author Byline
+description: 'Author attribution block with avatar, name, role, and publication date. Composes hx-avatar, hx-text, hx-link.'
+status: experimental
+group: 'Content Block'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'Author display name'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'URL for the author avatar image'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the author avatar'
+    role:
+      type: string
+      title: Role
+      description: 'Author role or title'
+    date:
+      type: string
+      title: Date
+      description: 'Publication date string'
+    url:
+      type: string
+      title: URL
+      description: 'Link to the author profile page'

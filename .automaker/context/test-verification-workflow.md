@@ -1,13 +1,24 @@
-# Test Agent Workflow — SMART TESTS ONLY
+# Test Verification Workflow — MANDATORY BEFORE EVERY PUSH
+
+## ZERO TOLERANCE POLICY
+
+`pnpm run verify` is MANDATORY before every push. No exceptions.
+`pnpm run test:smart` is MANDATORY before every push when component source changed. No exceptions.
+
+**If you push code that fails CI, you have failed your task.** The cycle wasted on fixing your broken PR is unacceptable. Run the gates locally. Fix failures locally. Push clean code.
+
+---
 
 ## CRITICAL: Never Run the Full Test Suite
 
-Running `npm run test`, `npm run test:library`, or `npx vitest run` (no filter) runs **all 100+ tests** including broken components (hx-slider, hx-number-input) that timeout at 30s each. This costs $14+ per agent and blocks the pipeline. **This is forbidden.**
+Running `pnpm run test`, `pnpm run test:library`, or `npx vitest run` (no filter) runs **all 100+ tests** including broken components (hx-slider, hx-number-input) that timeout at 30s each. This costs $14+ per agent and blocks the pipeline. **This is forbidden.**
+
+---
 
 ## The Smart Test Command
 
 ```bash
-npm run test:smart
+pnpm run test:smart
 ```
 
 This command:
@@ -16,39 +27,63 @@ This command:
 - Skips entirely if you only changed styles, stories, Twig files, or changesets
 - Completes in seconds instead of minutes
 
-**Use `npm run test:smart` any time you want to verify your tests locally.**
+---
 
-## Correct Workflow
+## Required Workflow
 
-1. **Read the AUDIT.md** for each component to understand what tests are missing
-2. **Write the test code** — add missing test cases to `.test.ts` files
-3. **Run `npm run verify`** (lint + format:check + type-check — fast, ~30s)
-4. **Optionally run `npm run test:smart`** to verify only your changed components pass
-5. **Format and commit:**
+1. **Write your code changes** — component source, tests, styles, etc.
+2. **Format:**
    ```bash
-   npm run format
+   pnpm run format
    git add -u
-   git -c core.hooksPath=/dev/null commit -m "test: add coverage for [components]"
    ```
-6. **Push and open PR** — CI runs the full suite in a proper environment
+3. **Run verify (MANDATORY):**
+   ```bash
+   pnpm run verify
+   ```
+   If this fails: **FIX THE ERRORS.** Do not push. Do not skip.
+
+4. **Run smart tests (MANDATORY when component source changed):**
+   ```bash
+   pnpm run test:smart
+   ```
+   If this fails: **FIX THE TESTS.** Do not push. Do not skip.
+   If no component source files changed, this step is skipped automatically by the command.
+
+5. **Commit and push:**
+   ```bash
+   HUSKY=0 git commit -m "type(scope): lowercase message"
+   HUSKY=0 git push origin <branch>
+   ```
+
+---
 
 ## What NOT To Do
 
-- ❌ NEVER run `npm run test` — runs all 100+ tests, costs $14+
-- ❌ NEVER run `npm run test:library` — same as above
-- ❌ NEVER run `npx vitest run` without a specific filter
-- ❌ Do NOT poll `sleep N && cat task.output` in a loop
-- ❌ Do NOT run tests multiple times seeking confirmation — commit, push, let CI verify
+- NEVER run `pnpm run test` — runs all 100+ tests, costs $14+
+- NEVER run `pnpm run test:library` — same as above
+- NEVER run `npx vitest run` without a specific filter
+- NEVER push without running `pnpm run verify` first
+- NEVER push without running `pnpm run test:smart` when component source changed
+- NEVER assume "CI handles it" — YOU handle it locally before pushing
+- Do NOT poll `sleep N && cat task.output` in a loop
+- Do NOT run tests multiple times seeking confirmation — verify, commit, push, done
 
-## One Verify Pass Is Enough
+---
+
+## The Rules
 
 ```bash
-npm run verify        # lint + format:check + type-check (mandatory)
-npm run test:smart    # optional: only tests YOUR changed components
+pnpm run verify        # MANDATORY — lint + format:check + type-check
+pnpm run test:smart    # MANDATORY — when component source changed
 ```
 
-Push after verify passes. CI handles the full suite. Done.
+If `pnpm run verify` fails, you do NOT push. Period.
+If `pnpm run test:smart` fails, you do NOT push. Period.
+Fix the errors first. Then push. This is non-negotiable.
 
-## If Tests Fail in CI
+---
 
-CI will report failures on the PR. The agent will be re-run with that context. Do not preemptively fix failures you haven't seen — write the code, push, let CI tell you what's broken.
+## If Tests Fail in CI Despite Following This Workflow
+
+CI will report failures on the PR. Fix the failures, run `pnpm run verify` AND `pnpm run test:smart` again locally, and push the fix. The same rules apply to remediation pushes — verify and test before every push, no exceptions.

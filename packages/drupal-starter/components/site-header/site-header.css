@@ -1,0 +1,38 @@
+/**
+ * @file
+ * Site Header SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.site-header {
+  z-index: 100;
+  background-color: var(--hx-color-surface, #ffffff);
+  border-block-end: 1px solid var(--hx-color-border, #e0e0e0);
+}
+
+.site-header--sticky {
+  position: sticky;
+  top: 0;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-md, 1rem);
+  padding-block: var(--hx-spacing-sm, 0.5rem);
+}
+
+.site-header__logo {
+  flex: 0 0 auto;
+}
+
+.site-header__navigation {
+  flex: 1 1 auto;
+}
+
+.site-header__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}

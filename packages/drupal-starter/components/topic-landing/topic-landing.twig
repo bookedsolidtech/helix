@@ -1,0 +1,41 @@
+{#
+  Topic Landing SDC
+  Composes: hx-text, hx-container, hx-divider
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-container') }}
+{{ attach_library('helixui/hx-divider') }}
+
+<div{{ attributes.addClass('topic-landing') }}>
+  <header class="topic-landing__header">
+    <hx-container>
+      {% if title %}
+        <hx-text variant="heading-xl">{{ title }}</hx-text>
+      {% endif %}
+
+      {% if description %}
+        <hx-text variant="body-lg" class="topic-landing__description">{{ description }}</hx-text>
+      {% endif %}
+    </hx-container>
+  </header>
+
+  {% if featured_content %}
+    <section class="topic-landing__featured">
+      <hx-container>
+        {{ featured_content }}
+      </hx-container>
+    </section>
+  {% endif %}
+
+  {% if featured_content and grid_content %}
+    <hx-divider></hx-divider>
+  {% endif %}
+
+  {% if grid_content %}
+    <section class="topic-landing__grid">
+      <hx-container>
+        {{ grid_content }}
+      </hx-container>
+    </section>
+  {% endif %}
+</div>

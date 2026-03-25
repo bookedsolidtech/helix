@@ -15,7 +15,16 @@ export interface HxDropdownProps {
   /** Whether the dropdown panel is open. */
   open?: boolean;
   /** Preferred placement of the panel relative to the trigger. */
-  placement?: string;
+  placement?:
+    | string
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'start'
+    | 'end';
   /** Whether the dropdown is disabled. Prevents opening. */
   disabled?: boolean;
   /** Gap in pixels between the trigger and the panel. */

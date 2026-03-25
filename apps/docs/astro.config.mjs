@@ -432,6 +432,11 @@ export default defineConfig({
                       label: 'Constructable Stylesheets',
                       slug: 'components/styling/constructable-stylesheets',
                     },
+                    {
+                      label: 'AdoptedStylesheets Showcase',
+                      link: '/adopted-stylesheets',
+                      badge: { text: 'New', variant: 'tip' },
+                    },
                     { label: 'Responsive Components', slug: 'components/styling/responsive' },
                     { label: 'Dark Mode', slug: 'components/styling/dark-mode' },
                     { label: 'Animations & Transitions', slug: 'components/styling/animations' },
@@ -576,6 +581,11 @@ export default defineConfig({
                 { label: 'Best Practices', slug: 'drupal-integration/best-practices' },
                 { label: 'Library System', slug: 'drupal-integration/library-system' },
                 {
+                  label: 'SDC Composition',
+                  slug: 'drupal-integration/sdc',
+                  badge: { text: 'New', variant: 'tip' },
+                },
+                {
                   label: 'Installation',
                   collapsed: true,
                   items: [
@@ -636,6 +646,10 @@ export default defineConfig({
               ],
             },
             {
+              label: 'Adopted Stylesheets',
+              slug: 'guides/adopted-stylesheets',
+            },
+            {
               label: 'Boolean Attributes',
               slug: 'guides/boolean-attributes',
             },
@@ -650,6 +664,11 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Extending HELiX',
+          collapsed: true,
+          items: [{ label: 'Overview', slug: 'extending/overview' }],
+        },
+        {
           label: 'Framework Integration',
           collapsed: true,
           items: [
@@ -661,6 +680,21 @@ export default defineConfig({
             { label: 'Svelte', slug: 'framework-integration/svelte' },
             { label: 'Plain HTML / CDN', slug: 'framework-integration/html' },
             { label: 'Drupal', slug: 'framework-integration/drupal' },
+          ],
+        },
+        {
+          label: 'Extending Components',
+          collapsed: true,
+          badge: { text: 'New', variant: 'tip' },
+          items: [
+            { label: 'Overview', slug: 'extending' },
+            { label: 'Theming Quick Start', slug: 'extending/theming-quick-start' },
+            { label: 'PatientCard Example', slug: 'extending/patient-card' },
+            {
+              label: 'Styling with CSS Parts',
+              slug: 'extending/style-components-with-css-parts',
+              badge: { text: 'Deep Dive', variant: 'tip' },
+            },
           ],
         },
         {

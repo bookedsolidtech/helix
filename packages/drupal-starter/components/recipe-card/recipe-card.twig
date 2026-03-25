@@ -1,0 +1,60 @@
+{#
+  Recipe Card SDC
+  Composes: hx-card, hx-badge, hx-text, hx-image
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+
+<div{{ attributes.addClass('recipe-card') }}>
+  <hx-card variant="default" elevation="raised">
+    {% if image_url %}
+      <hx-image
+        slot="image"
+        src="{{ image_url }}"
+        alt="{{ image_alt|default('') }}"
+        loading="lazy"
+      ></hx-image>
+    {% endif %}
+
+    <div class="recipe-card__body">
+      <hx-text variant="heading-sm">
+        {% if url %}
+          <a href="{{ url }}">{{ title }}</a>
+        {% else %}
+          {{ title }}
+        {% endif %}
+      </hx-text>
+
+      <div class="recipe-card__meta">
+        {% if prep_time %}
+          <hx-text variant="body-xs">
+            <span class="recipe-card__meta-label">Prep:</span> {{ prep_time }}
+          </hx-text>
+        {% endif %}
+
+        {% if cook_time %}
+          <hx-text variant="body-xs">
+            <span class="recipe-card__meta-label">Cook:</span> {{ cook_time }}
+          </hx-text>
+        {% endif %}
+      </div>
+    </div>
+
+    <div slot="footer" class="recipe-card__footer">
+      {% if difficulty %}
+        <hx-badge
+          variant="{{ difficulty|lower == 'easy' ? 'success' : (difficulty|lower == 'hard' ? 'danger' : 'warning') }}"
+          size="sm"
+        >{{ difficulty }}</hx-badge>
+      {% endif %}
+
+      {% if actions %}
+        <div class="recipe-card__actions">
+          {{ actions }}
+        </div>
+      {% endif %}
+    </div>
+  </hx-card>
+</div>

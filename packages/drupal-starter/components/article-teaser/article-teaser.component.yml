@@ -1,0 +1,44 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Article Teaser
+description: 'Compact article preview card for listings and grids. Composes hx-card with image, metadata, and linked title.'
+status: experimental
+group: 'Node Display'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'The article title'
+    body:
+      type: string
+      title: Body
+      description: 'Summary or excerpt text'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'URL for the teaser image'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the teaser image'
+    author_name:
+      type: string
+      title: 'Author Name'
+      description: 'Display name of the content author'
+    date:
+      type: string
+      title: Date
+      description: 'Publication date string'
+    category:
+      type: string
+      title: Category
+      description: 'Content category or taxonomy term'
+    url:
+      type: string
+      title: URL
+      description: 'Link target for the article'
+slots:
+  actions:
+    title: Actions
+    description: 'Optional action buttons or links'

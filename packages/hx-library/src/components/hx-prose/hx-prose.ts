@@ -36,6 +36,7 @@ export class HelixProse extends LitElement {
 
   // ─── Adopted Stylesheets ───
 
+  /** @internal */
   private adoptedStyles = new AdoptedStylesheetsController(this, helixProseScopedCss, document);
 
   // ─── Properties ───

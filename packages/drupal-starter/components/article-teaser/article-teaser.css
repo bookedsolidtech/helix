@@ -1,0 +1,43 @@
+/* Article Teaser — layout and spacing only */
+
+.article-teaser {
+  display: block;
+}
+
+.article-teaser__header {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.article-teaser__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.article-teaser__excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-teaser__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.article-teaser__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.article-teaser__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}

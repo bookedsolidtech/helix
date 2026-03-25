@@ -9,6 +9,36 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [Unreleased] — WF-06 CEM API Surface Remediation (2026-03-24)
+
+### Breaking Changes
+
+#### Property Renames
+
+These JS property names have been standardized to match the dominant library patterns:
+
+- **`hx-card`**: `hxHref` → `href` (attribute remains `hx-href`), `hxAriaLabel` → `label`
+- **`hx-field`**: `hxSize` → `size` (attribute remains `hx-size`)
+- **`hx-banner`**: `closeLabel` → `labelClose`
+- **`hx-dialog`**: `closeLabel` → `labelClose`
+- **`hx-drawer`**: `closeLabel` → `labelClose`
+- **`hx-toast`**: `closeLabel` → `labelClose`
+- **`hx-split-button`**: `triggerLabel` → `labelTrigger`, `menuLabel` → `labelMenu`
+- **`hx-overflow-menu`**: `menuLabel` → `labelMenu`
+
+#### CSS Part Renames
+
+- **`hx-drawer`**: `::part(close-btn)` → `::part(close-button)`
+- **`hx-carousel`**: `::part(prev-btn)` → `::part(prev-button)`, `::part(next-btn)` → `::part(next-button)`
+
+### Fixed
+
+- **CEM accuracy**: Expanded type aliases to literal union types in 19 components — CEM now shows actual allowed values (e.g., `'sm' | 'md' | 'lg'` instead of `ActionBarSize`)
+- **CEM pollution**: Added `@internal` to `formAssociated`, form lifecycle callbacks, and private fields across 18+ form-associated components — these browser API markers no longer appear in the public API surface
+- **NAMING_CONVENTION.md**: Added approved naming standards document for future component development
+
+---
+
 ## [Unreleased] — In Progress (2026-02-14)
 
 ### Overview

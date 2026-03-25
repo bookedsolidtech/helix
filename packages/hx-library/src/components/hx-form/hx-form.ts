@@ -249,9 +249,9 @@ export class HelixForm extends LitElement {
   private _getAllValidatableElements(): HTMLElement[] {
     const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
     const wcElements = this.getFormElements().filter(
-      (el) =>
+      (el): el is HTMLElement & { checkValidity: () => boolean } =>
         'checkValidity' in el &&
-        typeof (el as Record<string, unknown>).checkValidity === 'function',
+        typeof (el as { checkValidity: unknown }).checkValidity === 'function',
     );
     return [...native, ...wcElements];
   }
@@ -322,6 +322,13 @@ export class HelixForm extends LitElement {
       const errors = this._collectValidationErrors();
       this._validationErrors = errors;
       this._applyAriaInvalidFromValidity();
+
+      // Move focus to the error summary after it renders so screen readers announce it
+      // immediately. tabindex="-1" on the summary allows programmatic focus (WCAG 2.4.3).
+      void this.updateComplete.then(() => {
+        const summary = this.querySelector<HTMLElement>('.hx-form-error-summary');
+        summary?.focus();
+      });
 
       /**
        * Dispatched when validation fails on submit.
@@ -423,6 +430,7 @@ export class HelixForm extends LitElement {
               role="alert"
               aria-live="assertive"
               aria-atomic="true"
+              tabindex="-1"
             >
               <ul>
                 ${this._validationErrors.map(

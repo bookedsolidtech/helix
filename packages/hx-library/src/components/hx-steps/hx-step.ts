@@ -217,7 +217,7 @@ export class HelixStep extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="step" @click=${this._handleClick}>
+      <div part="base" class="step" role="button" @click=${this._handleClick}>
         <div class="step__track">
           <div part="indicator" class="step__indicator">${this._renderIndicatorContent()}</div>
           <div part="connector" class="step__connector" aria-hidden="true"></div>

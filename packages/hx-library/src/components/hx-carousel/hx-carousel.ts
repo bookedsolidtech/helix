@@ -100,8 +100,8 @@ const _svgPause = html`<svg
  * @csspart pagination - The pagination dot container.
  * @csspart pagination-item - Individual pagination dot button.
  * @csspart navigation - The previous/next button wrapper.
- * @csspart prev-btn - The previous navigation button.
- * @csspart next-btn - The next navigation button.
+ * @csspart prev-button - The previous navigation button.
+ * @csspart next-button - The next navigation button.
  * @csspart play-pause-btn - The autoplay play/pause toggle button.
  *
  * @cssprop [--hx-carousel-gap=0px] - Gap between slides.
@@ -678,7 +678,7 @@ export class HelixCarousel extends LitElement {
         <slot name="previous-button">
           <button
             class="nav-btn"
-            part="prev-btn"
+            part="prev-button"
             type="button"
             aria-label=${this.labelPrevSlide}
             ?disabled=${!this._canGoPrev}
@@ -703,7 +703,7 @@ export class HelixCarousel extends LitElement {
         <slot name="next-button">
           <button
             class="nav-btn"
-            part="next-btn"
+            part="next-button"
             type="button"
             aria-label=${this.labelNextSlide}
             ?disabled=${!this._canGoNext}

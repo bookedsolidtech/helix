@@ -1,4 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDividerStyles } from './hx-divider.styles.js';
@@ -80,6 +81,12 @@ export class HelixDivider extends LitElement {
     super.firstUpdated(_changedProperties);
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (slot) this._checkSlot(slot);
+    if (!this.decorative && !this.label && !this._hasLabel) {
+      devWarn(
+        'hx-divider',
+        'Non-decorative separator has no accessible name. Provide a `label` attribute or slot content, or set `decorative` to suppress this warning (WCAG 4.1.2).',
+      );
+    }
   }
 
   override render() {

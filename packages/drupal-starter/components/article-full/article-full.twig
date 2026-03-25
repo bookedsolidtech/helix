@@ -1,0 +1,82 @@
+{#
+  Article Full SDC
+  Composes: hx-text, hx-image, hx-badge, hx-avatar, hx-divider, hx-prose
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-avatar') }}
+{{ attach_library('helixui/hx-divider') }}
+{{ attach_library('helixui/hx-prose') }}
+
+<article{{ attributes.addClass('article-full') }}>
+  {% if image_url %}
+    <div class="article-full__hero">
+      <hx-image
+        src="{{ image_url }}"
+        alt="{{ image_alt|default('') }}"
+        loading="eager"
+      ></hx-image>
+    </div>
+  {% endif %}
+
+  <div class="article-full__layout">
+    <div class="article-full__main">
+      <header class="article-full__header">
+        {% if categories is not empty %}
+          <div class="article-full__categories">
+            {% for category in categories %}
+              <hx-badge variant="neutral" size="sm">{{ category }}</hx-badge>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <hx-text variant="heading-xl">{{ title }}</hx-text>
+
+        {% if body %}
+          <hx-text variant="body-lg" class="article-full__subtitle">{{ body }}</hx-text>
+        {% endif %}
+
+        <div class="article-full__byline">
+          {% if author_image %}
+            <hx-avatar src="{{ author_image }}" label="{{ author_name|default('Author') }}" size="md"></hx-avatar>
+          {% elseif author_name %}
+            <hx-avatar label="{{ author_name }}" size="md"></hx-avatar>
+          {% endif %}
+
+          <div class="article-full__byline-text">
+            {% if author_name %}
+              <hx-text variant="body-sm"><strong>{{ author_name }}</strong></hx-text>
+            {% endif %}
+            {% if date %}
+              <hx-text variant="body-xs">
+                <time>{{ date }}</time>
+              </hx-text>
+            {% endif %}
+          </div>
+        </div>
+      </header>
+
+      <hx-divider></hx-divider>
+
+      {% if content %}
+        <div class="article-full__content">
+          <hx-prose>{{ content|raw }}</hx-prose>
+        </div>
+      {% endif %}
+
+      {% if after_content %}
+        <hx-divider></hx-divider>
+        <div class="article-full__after-content">
+          {{ after_content }}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if sidebar %}
+      <aside class="article-full__sidebar">
+        {{ sidebar }}
+      </aside>
+    {% endif %}
+  </div>
+</article>

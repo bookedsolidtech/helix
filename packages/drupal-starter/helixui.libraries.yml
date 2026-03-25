@@ -1,0 +1,602 @@
+# HELiX UI Drupal Libraries
+# Maps @helixui/library web components to Drupal library definitions.
+# Each library loads the component JS and optional CSS via CDN or local paths.
+# TODO: Auto-generate from @helixui/library custom-elements.json via CEM-to-Drupal generator.
+
+# --- Base library (tokens + core runtime) ---
+
+hx-core:
+  version: VERSION
+  css:
+    theme:
+      /libraries/helixui/dist/css/helix-tokens.css: { minified: true }
+      /libraries/helixui/dist/css/helix-core.css: { minified: true }
+  js:
+    /libraries/helixui/dist/index.js: { type: module, minified: true }
+
+# --- Individual component libraries ---
+
+hx-accordion:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-accordion/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-action-bar:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-action-bar/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-alert:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-alert/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-avatar:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-avatar/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-badge:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-badge/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-banner:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-banner/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-breadcrumb:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-breadcrumb/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-button:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-button/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-button-group:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-button-group/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-button
+
+hx-card:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-card/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-carousel:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-carousel/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-checkbox:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-checkbox/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-checkbox-group:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-checkbox-group/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-checkbox
+
+hx-code-snippet:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-code-snippet/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-color-picker:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-color-picker/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-combobox:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-combobox/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-container:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-container/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-copy-button:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-copy-button/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-button
+
+hx-counter:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-counter/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-data-table:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-data-table/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-date-picker:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-date-picker/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-dialog:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-dialog/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-divider:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-divider/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-drawer:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-drawer/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-dropdown:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-dropdown/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-field:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-field/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-field-label:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-field-label/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-file-upload:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-file-upload/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-form:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-form/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-format-date:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-format-date/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-grid:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-grid/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-help-text:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-help-text/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-icon:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-icon/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-icon-button:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-icon-button/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-icon
+
+hx-image:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-image/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-link:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-link/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-list:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-list/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-menu:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-menu/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-meter:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-meter/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-nav:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-nav/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-number-input:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-number-input/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-overflow-menu:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-overflow-menu/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-pagination:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-pagination/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-popover:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-popover/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-popup:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-popup/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-progress-bar:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-progress-bar/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-progress-ring:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-progress-ring/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-prose:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-prose/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-radio-group:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-radio-group/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-rating:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-rating/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-select:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-select/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-side-nav:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-side-nav/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-nav
+
+hx-skeleton:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-skeleton/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-slider:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-slider/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-spinner:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-spinner/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-split-button:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-split-button/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-button
+
+hx-split-panel:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-split-panel/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-stack:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-stack/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-stat:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-stat/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-status-indicator:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-status-indicator/index.js:
+      { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-steps:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-steps/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-structured-list:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-structured-list/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-switch:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-switch/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-table:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-table/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-tabs:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-tabs/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-tag:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-tag/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-text:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-text/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-text-input:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-text-input/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-textarea:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-textarea/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-theme:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-theme/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-time-picker:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-time-picker/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-toast:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-toast/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-toggle-button:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-toggle-button/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-button
+
+hx-tooltip:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-tooltip/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-top-nav:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-top-nav/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+    - helixui/hx-nav
+
+hx-tree-view:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-tree-view/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+hx-visually-hidden:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-visually-hidden/index.js: { type: module, minified: true }
+  dependencies:
+    - helixui/hx-core
+
+# --- Drupal behaviors ---
+
+helixui-behaviors:
+  version: VERSION
+  js:
+    js/helixui-behaviors.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+helixui-form-behaviors:
+  version: VERSION
+  js:
+    js/helixui-form-behaviors.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - helixui/helixui-behaviors
+
+# --- Theme override CSS ---
+
+helix-theme-overrides:
+  version: VERSION
+  css:
+    theme:
+      css/helix-theme-overrides.css: {}
+  dependencies:
+    - helixui/hx-core
+
+helix-form-layout:
+  version: VERSION
+  css:
+    layout:
+      css/helix-form-layout.css: {}
+  dependencies:
+    - helixui/hx-core

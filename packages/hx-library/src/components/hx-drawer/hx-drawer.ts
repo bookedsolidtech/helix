@@ -10,7 +10,6 @@ import { helixDrawerStyles } from './hx-drawer.styles.js';
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxDrawerIdCounter = 0;
 
-type DrawerPlacement = 'start' | 'end' | 'top' | 'bottom';
 type DrawerSizePreset = 'sm' | 'md' | 'lg' | 'full';
 type DrawerSize = DrawerSizePreset | (string & Record<never, never>);
 
@@ -56,7 +55,7 @@ const FOCUSABLE_SELECTORS = [
  * @csspart panel - The drawer panel itself.
  * @csspart header - The header region containing the title and actions.
  * @csspart title - The drawer title element.
- * @csspart close-btn - The built-in close button.
+ * @csspart close-button - The built-in close button.
  * @csspart body - The scrollable body region.
  * @csspart footer - The footer region.
  *
@@ -168,14 +167,14 @@ export class HelixDrawer extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: DrawerPlacement = 'end';
+  placement: 'start' | 'end' | 'top' | 'bottom' = 'end';
 
   /**
    * The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length.
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: DrawerSize = 'md';
+  size: 'sm' | 'md' | 'lg' | 'full' | (string & Record<never, never>) = 'md';
 
   /**
    * When true, the drawer is constrained to its positioned parent instead of the viewport.
@@ -208,8 +207,8 @@ export class HelixDrawer extends LitElement {
   label = '';
 
   /** Accessible label for the built-in close button. Override for localized text. */
-  @property({ type: String, attribute: 'close-label' })
-  closeLabel = 'Close drawer';
+  @property({ type: String, attribute: 'label-close' })
+  labelClose = 'Close drawer';
 
   // ─── Lifecycle ───
 
@@ -373,8 +372,19 @@ export class HelixDrawer extends LitElement {
   private _hideBackgroundFromScreenReaders(): void {
     if (this.contained) return;
     this._siblingAriaHiddenElements = [];
+    // Walk the parent chain once to find which body child is an ancestor of this component.
+    // This avoids calling child.contains(this) in a loop (which is O(n * depth)).
+    // Starting from parentElement avoids aliasing `this` to a local variable.
+    let ancestorBodyChild: Element | null = null;
+    let el: Element | null = this.parentElement;
+    while (el && el.parentElement !== document.body) {
+      el = el.parentElement;
+    }
+    if (el && el.parentElement === document.body) {
+      ancestorBodyChild = el;
+    }
     Array.from(document.body.children).forEach((child) => {
-      if (child === this || child.contains(this)) return;
+      if (child === this || child === ancestorBodyChild) return;
       if (!child.hasAttribute('aria-hidden')) {
         child.setAttribute('aria-hidden', 'true');
         this._siblingAriaHiddenElements.push(child);
@@ -542,13 +552,27 @@ export class HelixDrawer extends LitElement {
 
   /** @internal */
   private _renderHeader() {
-    if (this.noHeader) return nothing;
+    if (this.noHeader) {
+      // WCAG 4.1.2: When the header is hidden there must still be a reachable close
+      // mechanism for keyboard and mouse/touch users. Render a visually-hidden close
+      // button that is focusable and announced by screen readers.
+      return html`
+        <button
+          part="close-btn"
+          class="drawer-close-button drawer-close-button--sr-only"
+          aria-label=${this.labelClose}
+          @click=${() => {
+            this.open = false;
+          }}
+        ></button>
+      `;
+    }
 
     return html`
       <div part="header" class="drawer-header">
-        <p part="title" id=${this._titleId} class="drawer-title">
+        <h2 part="title" id=${this._titleId} class="drawer-title">
           <slot name="label" @slotchange=${this._handleLabelSlotChange}></slot>
-        </p>
+        </h2>
         <div class="drawer-header-actions">
           ${this._hasHeaderActionsSlot
             ? html`<slot
@@ -561,9 +585,9 @@ export class HelixDrawer extends LitElement {
                 style="display:none"
               ></slot>`}
           <button
-            part="close-btn"
+            part="close-button"
             class="drawer-close-button"
-            aria-label=${this.closeLabel}
+            aria-label=${this.labelClose}
             @click=${() => {
               this.open = false;
             }}

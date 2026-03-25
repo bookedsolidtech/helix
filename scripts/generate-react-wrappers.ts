@@ -150,8 +150,19 @@ function isKnownSafeType(token: string): boolean {
 function sanitizeType(typeText: string | undefined): string {
   if (!typeText) return 'unknown';
 
+  // Normalize whitespace (CEM types can have newlines and extra spaces)
+  const normalized = typeText.replace(/\s+/g, ' ').trim();
+
+  // Handle parenthesized array types like (A | B | C)[]
+  // These represent a union wrapped in parens with an array suffix.
+  const parenArrayMatch = normalized.match(/^\((.+)\)\[\]$/);
+  if (parenArrayMatch) {
+    const innerSanitized = sanitizeType(parenArrayMatch[1]);
+    return `(${innerSanitized})[]`;
+  }
+
   // Split union type into tokens, sanitize each, rejoin
-  const unionParts = typeText.split('|').map((part) => part.trim());
+  const unionParts = normalized.split('|').map((part) => part.trim());
 
   const sanitizedParts = unionParts.map((part) => {
     // Keep string literals (quoted values)
@@ -263,6 +274,14 @@ function generateComponentFile(
   // Uses the wildcard exports map: "./components/*" -> "./dist/components/*/index.js"
   const elementImportPath = `@helixui/library/components/${componentDir}`;
 
+  // When the CEM class name matches the React component name, alias the import
+  // to avoid TypeScript declaration merge conflicts.
+  const hasNameCollision = elementClassName === componentName;
+  const importAlias = hasNameCollision ? `${elementClassName}Element` : elementClassName;
+  const importStatement = hasNameCollision
+    ? `import { ${elementClassName} as ${importAlias} } from '${elementImportPath}';`
+    : `import { ${elementClassName} } from '${elementImportPath}';`;
+
   const eventMapEntries = events
     .map((e) => {
       const callbackName = toEventCallbackName(e.name);
@@ -281,7 +300,7 @@ function generateComponentFile(
 
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { ${elementClassName} } from '${elementImportPath}';
+${importStatement}
 
 import type { ${componentName}Props } from './types.js';
 
@@ -299,7 +318,7 @@ export type { ${componentName}Props };
  */
 export const ${componentName} = createComponent({
   tagName: '${tagName}',
-  elementClass: ${elementClassName},
+  elementClass: ${importAlias},
   react: React,
   events: ${eventMap},
   displayName: '${componentName}',

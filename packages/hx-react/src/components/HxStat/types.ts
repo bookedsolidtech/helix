@@ -17,7 +17,7 @@ export interface HxStatProps {
   /** The metric value displayed prominently. */
   value?: string;
   /** Trend direction indicator. 'neutral' hides the indicator. */
-  trend?: string;
+  trend?: 'up' | 'down' | 'neutral';
   /** Size variant controlling font size. */
-  size?: string;
+  size?: 'sm' | 'md' | 'lg';
 }

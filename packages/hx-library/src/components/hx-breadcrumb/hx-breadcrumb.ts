@@ -94,9 +94,9 @@ export class HelixBreadcrumb extends LitElement {
   /** @internal */
   private _jsonLdScript: HTMLScriptElement | null = null;
   /** @internal */
-  private _boundEllipsisClick: (e: Event) => void = () => undefined;
+  private readonly _boundEllipsisClick = (e: Event) => this._handleEllipsisClick(e);
   /** @internal */
-  private _boundEllipsisKeydown: (e: Event) => void = () => undefined;
+  private readonly _boundEllipsisKeydown = (e: Event) => this._handleEllipsisKeydown(e);
 
   /**
    * Tracks which items had their `current` attribute set by this component
@@ -347,8 +347,6 @@ export class HelixBreadcrumb extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._boundEllipsisClick = this._handleEllipsisClick.bind(this);
-    this._boundEllipsisKeydown = this._handleEllipsisKeydown.bind(this);
     this.addEventListener('click', this._boundEllipsisClick);
     this.addEventListener('keydown', this._boundEllipsisKeydown);
   }

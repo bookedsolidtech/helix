@@ -1,0 +1,53 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Article Full
+description: 'Full article display with hero image, author byline, categories, and rich body content.'
+status: experimental
+group: 'Node Display'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'The article title'
+    body:
+      type: string
+      title: Body
+      description: 'Short summary or subtitle text'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'URL for the hero image'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the hero image'
+    author_name:
+      type: string
+      title: 'Author Name'
+      description: 'Display name of the content author'
+    author_image:
+      type: string
+      title: 'Author Image'
+      description: 'URL for the author avatar image'
+    date:
+      type: string
+      title: Date
+      description: 'Publication date string'
+    categories:
+      type: array
+      title: Categories
+      description: 'List of category or taxonomy term labels'
+      items:
+        type: string
+    content:
+      type: string
+      title: Content
+      description: 'Rendered body HTML content'
+slots:
+  sidebar:
+    title: Sidebar
+    description: 'Optional sidebar content (related articles, ads, etc.)'
+  after_content:
+    title: 'After Content'
+    description: 'Content placed after the article body (comments, related, etc.)'

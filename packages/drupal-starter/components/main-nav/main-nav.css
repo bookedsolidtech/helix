@@ -1,0 +1,33 @@
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-lg, 1.5rem);
+  padding-block: var(--hx-spacing-sm, 0.5rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+}
+
+.main-nav__logo {
+  flex-shrink: 0;
+}
+
+.main-nav__logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.main-nav__logo-image {
+  max-height: 2.5rem;
+  width: auto;
+}
+
+.main-nav hx-nav {
+  flex: 1 1 auto;
+}
+
+.main-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  flex-shrink: 0;
+}

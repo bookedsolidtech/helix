@@ -1,0 +1,22 @@
+/* Topic Landing — layout and spacing only */
+
+.topic-landing {
+  display: block;
+}
+
+.topic-landing__header {
+  padding-block: var(--hx-spacing-xl, 2rem);
+}
+
+.topic-landing__description {
+  margin-block-start: var(--hx-spacing-sm, 0.5rem);
+  max-width: 65ch;
+}
+
+.topic-landing__featured {
+  padding-block: var(--hx-spacing-lg, 1.5rem);
+}
+
+.topic-landing__grid {
+  padding-block: var(--hx-spacing-lg, 1.5rem);
+}

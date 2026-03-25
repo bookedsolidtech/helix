@@ -1,0 +1,61 @@
+/* Article Full — layout and spacing only */
+
+.article-full {
+  display: block;
+  max-width: var(--hx-container-max-width, 72rem);
+  margin-inline: auto;
+}
+
+.article-full__hero {
+  margin-block-end: var(--hx-spacing-lg, 1.5rem);
+}
+
+.article-full__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--hx-spacing-xl, 2rem);
+}
+
+@media (min-width: 768px) {
+  .article-full__layout:has(.article-full__sidebar) {
+    grid-template-columns: 1fr 300px;
+  }
+}
+
+.article-full__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.article-full__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.article-full__byline {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  margin-block-start: var(--hx-spacing-sm, 0.5rem);
+}
+
+.article-full__byline-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.article-full__content {
+  margin-block: var(--hx-spacing-lg, 1.5rem);
+}
+
+.article-full__after-content {
+  margin-block-start: var(--hx-spacing-lg, 1.5rem);
+}
+
+.article-full__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}

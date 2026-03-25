@@ -13,9 +13,9 @@ export interface HxBannerProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** Visual variant of the banner that determines colors and ARIA semantics. */
-  variant?: string;
+  variant?: 'info' | 'success' | 'warning' | 'error';
   /** CSS positioning behavior. "sticky" keeps the banner in flow; "fixed" pins it to the viewport. */
-  position?: string;
+  position?: 'sticky' | 'fixed';
   /** Whether the banner can be dismissed by the user. */
   dismissible?: boolean;
   /** Heading text for the banner, used to provide context in the action link's and
@@ -28,7 +28,10 @@ close button's accessible labels. */
   /** Whether the banner is visible. Defaults to true — banners are shown by default. */
   open?: boolean;
   /** Accessible label for the dismiss button. Override for localized text. */
-  closeLabel?: string;
+  labelClose?: string;
+  /** Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:").
+When not set, defaults to the English label matching the current variant. */
+  severityLabel?: string | undefined;
 
   // Event callbacks
   /** Dispatched when the user dismisses the banner. */

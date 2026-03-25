@@ -152,8 +152,10 @@ export class HelixSideNav extends LitElement {
 
     const targetItem = navItems[nextIndex];
     if (!targetItem) return;
-    const focusTarget = targetItem.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
-    focusTarget?.focus();
+    // WCAG 2.1.1: call the public focus() method on the nav item rather than
+    // piercing its Shadow DOM directly. hx-nav-item.focus() delegates to the
+    // internal [part="link"] element, preserving shadow encapsulation.
+    targetItem.focus();
   }
 
   // ─── Event Handling ───

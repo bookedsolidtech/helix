@@ -67,7 +67,20 @@ export class HelixRadio extends LitElement {
     super.connectedCallback();
     this.setAttribute('role', 'radio');
     this.setAttribute('aria-checked', String(this.checked));
-    this.setAttribute('aria-disabled', String(this.disabled));
+    // WCAG 4.1.2: expose the label text as aria-label on the host so assistive
+    // technology can associate the visible label with the radio role. The label
+    // span lives inside Shadow DOM and aria-labelledby cannot cross shadow
+    // boundaries, so aria-label on the host is the correct pattern here.
+    if (this.label) {
+      this.setAttribute('aria-label', this.label);
+    }
+    // WCAG 4.1.2: omit aria-disabled entirely when not disabled. Setting
+    // aria-disabled="false" is verbose and unnecessary — omission is preferred.
+    if (this.disabled) {
+      this.setAttribute('aria-disabled', 'true');
+    } else {
+      this.removeAttribute('aria-disabled');
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -75,8 +88,19 @@ export class HelixRadio extends LitElement {
     if (changedProperties.has('checked')) {
       this.setAttribute('aria-checked', String(this.checked));
     }
+    if (changedProperties.has('label')) {
+      if (this.label) {
+        this.setAttribute('aria-label', this.label);
+      } else {
+        this.removeAttribute('aria-label');
+      }
+    }
     if (changedProperties.has('disabled')) {
-      this.setAttribute('aria-disabled', String(this.disabled));
+      if (this.disabled) {
+        this.setAttribute('aria-disabled', 'true');
+      } else {
+        this.removeAttribute('aria-disabled');
+      }
     }
   }
 

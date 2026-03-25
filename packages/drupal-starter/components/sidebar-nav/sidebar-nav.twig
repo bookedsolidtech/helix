@@ -1,0 +1,42 @@
+{#
+  Sidebar Navigation SDC
+  Composes: hx-side-nav, hx-nav, hx-link
+#}
+{{ attach_library('helixui/hx-side-nav') }}
+{{ attach_library('helixui/hx-nav') }}
+{{ attach_library('helixui/hx-link') }}
+
+{% set collapsible = collapsible|default(false) %}
+
+<aside{{ attributes.addClass('sidebar-nav') }} aria-label="{{ title|default('Section navigation'|t) }}">
+  <hx-side-nav{% if collapsible %} collapsible{% endif %}>
+    {% if title %}
+      <span slot="heading">{{ title }}</span>
+    {% endif %}
+
+    <hx-nav>
+      {% if menu_items %}
+        {% for item in menu_items %}
+          {% if item.children is not empty %}
+            <div class="sidebar-nav__group">
+              <hx-link href="{{ item.url }}"{% if item.is_active %} aria-current="page"{% endif %}>
+                {{ item.title }}
+              </hx-link>
+              <hx-nav>
+                {% for child in item.children %}
+                  <hx-link href="{{ child.url }}"{% if child.is_active %} aria-current="page"{% endif %}>
+                    {{ child.title }}
+                  </hx-link>
+                {% endfor %}
+              </hx-nav>
+            </div>
+          {% else %}
+            <hx-link href="{{ item.url }}"{% if item.is_active %} aria-current="page"{% endif %}>
+              {{ item.title }}
+            </hx-link>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </hx-nav>
+  </hx-side-nav>
+</aside>

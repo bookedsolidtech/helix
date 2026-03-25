@@ -29,7 +29,7 @@ When provided, screen readers will announce this text when the dialog receives f
 Recommended for dialogs that surface critical clinical information. */
   description?: string;
   /** Accessible label for the close button. Override for localized text. */
-  closeLabel?: string;
+  labelClose?: string;
   /** Returns the dialog's return value — the string passed to `close(returnValue)`.
 Mirrors `HTMLDialogElement.returnValue`. */
   returnValue?: string;

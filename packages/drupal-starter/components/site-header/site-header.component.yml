@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Site Header
+description: 'Top-level site header with logo, navigation, and action areas. Composes hx-container. Supports sticky positioning.'
+status: experimental
+group: Layout
+props:
+  type: object
+  properties:
+    sticky:
+      type: boolean
+      title: Sticky
+      description: 'Whether the header sticks to the top of the viewport on scroll'
+      default: true
+slots:
+  logo:
+    title: Logo
+    description: 'Site logo area, typically an image or SVG wrapped in a link'
+  navigation:
+    title: Navigation
+    description: 'Main navigation area, typically a nav element or menu'
+  actions:
+    title: Actions
+    description: 'CTA, search, or user account area'

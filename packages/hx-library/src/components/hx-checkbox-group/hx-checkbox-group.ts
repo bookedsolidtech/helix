@@ -100,6 +100,13 @@ export class HelixCheckboxGroup extends LitElement {
   error = '';
 
   /**
+   * Help text to display below the group. Can also be provided via the help-text slot.
+   * @attr help-text
+   */
+  @property({ type: String, attribute: 'help-text' })
+  helpText = '';
+
+  /**
    * Layout orientation of the checkbox items.
    * @attr orientation
    */
@@ -299,7 +306,7 @@ export class HelixCheckboxGroup extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     const checkboxes = this._getCheckboxes();
     checkboxes.forEach((cb) => {
@@ -309,7 +316,7 @@ export class HelixCheckboxGroup extends LitElement {
     this._updateValidity([]);
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -324,7 +331,7 @@ export class HelixCheckboxGroup extends LitElement {
     this._updateValidity(restoredValues);
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -342,7 +349,10 @@ export class HelixCheckboxGroup extends LitElement {
     };
 
     const describedBy =
-      [hasError ? this._errorId : null, this._hasHelpSlot ? this._helpTextId : null]
+      [
+        hasError ? this._errorId : null,
+        this.helpText || this._hasHelpSlot ? this._helpTextId : null,
+      ]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -370,7 +380,7 @@ export class HelixCheckboxGroup extends LitElement {
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
 
         <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </fieldset>
     `;

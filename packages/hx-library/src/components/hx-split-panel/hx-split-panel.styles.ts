@@ -121,7 +121,7 @@ export const helixSplitPanelStyles = css`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: var(--hx-space-1, 0.25rem);
     z-index: 2;
     pointer-events: auto;
   }
@@ -134,17 +134,20 @@ export const helixSplitPanelStyles = css`
     background: var(--_divider-hover-color);
     border: 2px solid var(--hx-color-neutral-0);
     color: var(--hx-color-neutral-0);
-    width: 20px;
-    height: 20px;
+    width: var(--hx-size-5, 1.25rem);
+    height: var(--hx-size-5, 1.25rem);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 8px;
+    font-size: var(--hx-split-panel-btn-icon-size, 0.5rem);
     padding: 0;
     line-height: 1;
     flex-shrink: 0;
+    /* WCAG 2.5.5: minimum 44×44px touch target via transparent hit-area */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .collapse-btn:hover {

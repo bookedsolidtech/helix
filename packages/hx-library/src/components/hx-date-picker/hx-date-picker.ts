@@ -221,6 +221,32 @@ export class HelixDatePicker extends LitElement {
    */
   @state() private _liveMessage = '';
 
+  // ─── Memoized formatters ───
+
+  /**
+   * Cached Intl.DateTimeFormat for weekday-short labels; keyed on locale.
+   * Recreated only when locale changes.
+   * @internal
+   */
+  private _weekdayFormatter: Intl.DateTimeFormat | null = null;
+  /**
+   * Cached Intl.DateTimeFormat for month-long labels; keyed on locale.
+   * Recreated only when locale changes.
+   * @internal
+   */
+  private _monthFormatter: Intl.DateTimeFormat | null = null;
+  /**
+   * Locale used when the cached formatters were last built.
+   * @internal
+   */
+  private _formatterLocale = '';
+  /**
+   * Cached array of 7 weekday header strings.
+   * Depends only on locale — recomputed lazily when locale changes.
+   * @internal
+   */
+  private _cachedWeekdayNames: string[] | null = null;
+
   // ─── Internal References ───
 
   /**
@@ -316,19 +342,18 @@ export class HelixDatePicker extends LitElement {
    * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
    * @internal
    */
-  private _boundHandleOutsideClick: (e: MouseEvent) => void = () => undefined;
+  private readonly _boundHandleOutsideClick = (e: MouseEvent) => this._handleOutsideClick(e);
   /**
    * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
    * @internal
    */
-  private _boundHandleDocumentKeydown: (e: KeyboardEvent) => void = () => undefined;
+  private readonly _boundHandleDocumentKeydown = (e: KeyboardEvent) =>
+    this._handleDocumentKeydown(e);
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._boundHandleOutsideClick = this._handleOutsideClick.bind(this);
-    this._boundHandleDocumentKeydown = this._handleDocumentKeydown.bind(this);
   }
 
   override disconnectedCallback(): void {
@@ -433,12 +458,14 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue(null);
     this._isOpen = false;
   }
 
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -448,7 +475,7 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -509,17 +536,50 @@ export class HelixDatePicker extends LitElement {
     return this._isSameDay(date, new Date());
   }
 
+  /**
+   * Ensure memoized Intl.DateTimeFormat instances exist and match the current locale.
+   * Rebuilds only when locale changes; also clears the cached weekday names.
+   * @internal
+   */
+  private _ensureFormatters(): void {
+    if (this._formatterLocale === this.locale && this._weekdayFormatter && this._monthFormatter) {
+      return;
+    }
+    this._weekdayFormatter = new Intl.DateTimeFormat(this.locale, { weekday: 'short' });
+    this._monthFormatter = new Intl.DateTimeFormat(this.locale, { month: 'long' });
+    this._formatterLocale = this.locale;
+    this._cachedWeekdayNames = null;
+  }
+
   /** @internal */
   private _getMonthName(month: number): string {
-    return new Date(2000, month, 1).toLocaleDateString(this.locale, { month: 'long' });
+    this._ensureFormatters();
+    // _monthFormatter is guaranteed non-null after _ensureFormatters()
+    const fmt = this._monthFormatter ?? new Intl.DateTimeFormat(this.locale, { month: 'long' });
+    return fmt.format(new Date(2000, month, 1));
   }
 
   /** @internal */
   private _getDayName(dayIndex: number): string {
     // dayIndex: 0=Sun, 1=Mon, ...
-    return new Date(2000, 0, 2 + dayIndex).toLocaleDateString(this.locale, {
-      weekday: 'short',
-    });
+    this._ensureFormatters();
+    // _weekdayFormatter is guaranteed non-null after _ensureFormatters()
+    const fmt =
+      this._weekdayFormatter ?? new Intl.DateTimeFormat(this.locale, { weekday: 'short' });
+    return fmt.format(new Date(2000, 0, 2 + dayIndex));
+  }
+
+  /**
+   * Returns the 7 cached weekday header strings for the current locale.
+   * Computed once per locale and reused across all renders.
+   * @internal
+   */
+  private _getWeekdayNames(): string[] {
+    this._ensureFormatters();
+    if (!this._cachedWeekdayNames) {
+      this._cachedWeekdayNames = Array.from({ length: 7 }, (_, i) => this._getDayName(i));
+    }
+    return this._cachedWeekdayNames;
   }
 
   // ─── Calendar Grid ───
@@ -856,11 +916,12 @@ export class HelixDatePicker extends LitElement {
 
   /** @internal */
   private _renderWeekdayHeaders() {
-    const headers = Array.from(
-      { length: 7 },
-      (_, i) =>
-        html`<div class="calendar__weekday" role="columnheader" aria-label=${this._getDayName(i)}>
-          ${this._getDayName(i).slice(0, 2)}
+    // Use pre-cached weekday names (only locale-dependent, never changes within a session)
+    const names = this._getWeekdayNames();
+    const headers = names.map(
+      (name) =>
+        html`<div class="calendar__weekday" role="columnheader" aria-label=${name}>
+          ${name.slice(0, 2)}
         </div>`,
     );
     return html`<div class="calendar__row" role="row">${headers}</div>`;
@@ -907,7 +968,7 @@ export class HelixDatePicker extends LitElement {
             role="gridcell"
             data-day=${dayNumber}
             aria-label=${ariaLabel}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${isDisabled ? 'true' : nothing}
             aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
@@ -990,7 +1051,7 @@ export class HelixDatePicker extends LitElement {
             type="button"
             aria-label=${this._isOpen ? this.closeCalendarLabel : this.openCalendarLabel}
             aria-haspopup="dialog"
-            aria-expanded=${this._isOpen ? 'true' : nothing}
+            aria-expanded=${this._isOpen ? 'true' : 'false'}
             aria-controls=${this._calendarId}
             ?disabled=${this.disabled}
             @click=${this._toggleCalendar}

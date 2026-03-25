@@ -686,5 +686,125 @@ describe('hx-pagination', () => {
       await el.updateComplete;
       expect(el.firstPageLabel).toBe('First page');
     });
+
+    it('previousPageLabel defaults to "Previous page"', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      expect(el.previousPageLabel).toBe('Previous page');
+    });
+
+    it('nextPageLabel defaults to "Next page"', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      expect(el.nextPageLabel).toBe('Next page');
+    });
+
+    it('lastPageLabel defaults to "Last page"', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      expect(el.lastPageLabel).toBe('Last page');
+    });
+
+    it('labelRowsPerPage defaults to "Rows per page:"', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      expect(el.labelRowsPerPage).toBe('Rows per page:');
+    });
+
+    it('uses custom previousPageLabel as aria-label', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3" previous-page-label="Page précédente"></hx-pagination>',
+      );
+      await el.updateComplete;
+      const prevBtn = shadowQuery(el, '[aria-label="Page précédente"]');
+      expect(prevBtn).toBeTruthy();
+    });
+  });
+
+  // ─── Property: boundaryCount ───
+
+  describe('Property: boundaryCount', () => {
+    it('defaults to 1', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5"></hx-pagination>',
+      );
+      expect(el.boundaryCount).toBe(1);
+    });
+
+    it('accepts boundaryCount attribute', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5" boundary-count="2"></hx-pagination>',
+      );
+      expect(el.boundaryCount).toBe(2);
+    });
+
+    it('sets boundaryCount to 0 to hide boundary pages', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="5" boundary-count="0"></hx-pagination>',
+      );
+      expect(el.boundaryCount).toBe(0);
+    });
+  });
+
+  // ─── Property: showFirstLast ───
+
+  describe('Property: showFirstLast', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      expect(el.showFirstLast).toBe(false);
+    });
+
+    it('renders first/last buttons when showFirstLast=true', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3" show-first-last></hx-pagination>',
+      );
+      await el.updateComplete;
+      const firstBtn = shadowQuery(el, '[aria-label="First page"]');
+      expect(firstBtn).toBeTruthy();
+    });
+
+    it('does not render first/last buttons by default', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      await el.updateComplete;
+      const firstBtn = shadowQuery(el, '[aria-label="First page"]');
+      expect(firstBtn).toBeNull();
+    });
+  });
+
+  // ─── Property: showPageSize ───
+
+  describe('Property: showPageSize', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      expect(el.showPageSize).toBe(false);
+    });
+
+    it('renders page size selector when showPageSize=true', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3" show-page-size></hx-pagination>',
+      );
+      await el.updateComplete;
+      const pageSize = shadowQuery(el, '[part="page-size-wrapper"]');
+      expect(pageSize).toBeTruthy();
+    });
+
+    it('does not render page size selector by default', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      await el.updateComplete;
+      const pageSize = shadowQuery(el, '[part="page-size-wrapper"]');
+      expect(pageSize).toBeNull();
+    });
   });
 });

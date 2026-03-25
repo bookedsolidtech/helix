@@ -12,7 +12,6 @@ export interface HxProseProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
-  adoptedStyles?: unknown;
   /** Typography scale for the prose content. */
   size?: 'sm' | 'base' | 'lg';
   /** Maximum content width. When set, overrides the --hx-prose-max-width token.

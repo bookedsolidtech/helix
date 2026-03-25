@@ -52,6 +52,23 @@ for (const component of components) {
   }
 }
 
+// Base infrastructure exports (manually maintained section, always prepended)
+const baseExports = [
+  "export { HelixElement } from './base/index.js';",
+  "export { createIdCounter, resetIdCounter } from './base/index.js';",
+  "export { mergeTokenStyles } from './base/index.js';",
+  '',
+  '// ─── Mixins ───────────────────────────────────────────────────────────────────',
+  "export { FocusMixin } from './mixins/index.js';",
+  "export type { FocusMixinInterface } from './mixins/index.js';",
+].join('\n');
+
+// Controller exports (manually maintained — add new controllers here)
+const controllerExports = [
+  "export { HelixAuditController } from './controllers/helix-audit-controller.js';",
+  "export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';",
+].join('\n');
+
 // Generate the barrel file
 const output = `/**
  * @helixui/library - Enterprise Healthcare Web Component Library
@@ -63,6 +80,13 @@ const output = `/**
  * Run \`npm run generate:barrel\` to regenerate.
  */
 
+// ─── Base infrastructure ────────────────────────────────────────────────────
+${baseExports}
+
+// ─── Controllers ─────────────────────────────────────────────────────────────
+${controllerExports}
+
+// ─── Components ──────────────────────────────────────────────────────────────
 ${exportLines.join('\n')}
 `;
 

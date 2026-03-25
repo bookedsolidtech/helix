@@ -61,7 +61,7 @@ export class HelixSlider extends LitElement {
 
   // ─── Form Association ───
 
-  /** Enables native form participation via ElementInternals. */
+  /** @internal */
   static formAssociated = true;
 
   /** ElementInternals instance for form value, validity, and label association. */
@@ -310,7 +310,7 @@ export class HelixSlider extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** Called by the form when it resets. Restores to the declared `value` attribute (default value). */
+  /** @internal */
   formResetCallback(): void {
     const attrValue = this.getAttribute('value');
     const defaultValue = attrValue !== null ? parseFloat(attrValue) : this.min;
@@ -319,11 +319,7 @@ export class HelixSlider extends LitElement {
     this._internals.setFormValue(String(resetTo));
   }
 
-  /**
-   * Called when the form restores state (e.g., back/forward navigation or autofill).
-   * @param state - The serialized value to restore.
-   * @param _reason - Either "restore" (back/forward) or "autocomplete".
-   */
+  /** @internal */
   formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
     if (typeof state !== 'string' || state === null) return;
     const parsed = parseFloat(state);
@@ -332,7 +328,7 @@ export class HelixSlider extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -514,13 +510,15 @@ export class HelixSlider extends LitElement {
             `}
 
         <!-- Help text -->
-        <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>
-          ${this.helpText
-            ? html`<div part="help-text" class="slider__help-text" id=${this._helpId}>
-                ${this.helpText}
-              </div>`
-            : nothing}
-        </slot>
+        <!-- WCAG 1.3.1: wrap slot in a persistent container so _helpId stays stable
+             regardless of whether help content comes from the slot or the property. -->
+        <div id=${this._helpId}>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>
+            ${this.helpText
+              ? html`<div part="help-text" class="slider__help-text">${this.helpText}</div>`
+              : nothing}
+          </slot>
+        </div>
       </div>
     `;
   }

@@ -21,10 +21,13 @@ trigger are disabled when this is true. */
   disabled?: boolean;
   /** Primary button label text. When set, overrides the default slot content. */
   label?: string | undefined;
+  /** Accessible label for the primary action button. Required for icon-only usage
+or when the button label alone is insufficient context. */
+  ariaLabel?: string;
   /** Accessible label for the dropdown trigger button. Override for localization. */
-  triggerLabel?: string;
+  labelTrigger?: string;
   /** Accessible label for the dropdown menu panel. Override for localization. */
-  menuLabel?: string;
+  labelMenu?: string;
 
   // Event callbacks
   /** Dispatched when the primary button is clicked and is not disabled. */

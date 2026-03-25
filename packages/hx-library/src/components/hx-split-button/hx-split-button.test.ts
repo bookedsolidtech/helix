@@ -208,24 +208,24 @@ describe('hx-split-button', () => {
     });
   });
 
-  // ─── Property: triggerLabel ───
+  // ─── Property: labelTrigger ───
 
-  describe('Property: triggerLabel', () => {
+  describe('Property: labelTrigger', () => {
     it('sets aria-label on the trigger button', async () => {
       const el = await fixture<HelixSplitButton>(`
-        <hx-split-button trigger-label="Show options">Save</hx-split-button>
+        <hx-split-button label-trigger="Show options">Save</hx-split-button>
       `);
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       expect(trigger?.getAttribute('aria-label')).toBe('Show options');
     });
   });
 
-  // ─── Property: menuLabel ───
+  // ─── Property: labelMenu ───
 
-  describe('Property: menuLabel', () => {
+  describe('Property: labelMenu', () => {
     it('sets aria-label on the menu panel', async () => {
       const el = await fixture<HelixSplitButton>(`
-        <hx-split-button menu-label="Additional actions">Save</hx-split-button>
+        <hx-split-button label-menu="Additional actions">Save</hx-split-button>
       `);
       const menu = shadowQuery(el, '.split-button__menu');
       expect(menu?.getAttribute('aria-label')).toBe('Additional actions');
@@ -627,8 +627,8 @@ describe('hx-split-button', () => {
       `);
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
 
-      // Initially absent (false)
-      expect(trigger?.hasAttribute('aria-expanded')).toBe(false);
+      // Initially 'false' (always present per WCAG 4.1.2)
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
 
       // After open
       trigger?.click();

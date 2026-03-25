@@ -59,14 +59,14 @@ export class HelixStatusIndicator extends LitElement {
    * @attr status
    */
   @property({ type: String, reflect: true })
-  status: StatusIndicatorStatus = 'unknown';
+  status: 'online' | 'offline' | 'away' | 'busy' | 'unknown' = 'unknown';
 
   /**
    * Size of the indicator dot.
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: StatusIndicatorSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Whether to show an animated pulse ring around the dot.

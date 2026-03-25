@@ -517,10 +517,10 @@ describe('hx-color-picker', () => {
       expect(trigger?.hasAttribute('aria-haspopup')).toBe(false);
     });
 
-    it('trigger aria-expanded is absent when closed', async () => {
+    it('trigger aria-expanded is "false" when closed', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
       const trigger = shadowQuery(el, '[part="trigger"]');
-      expect(trigger?.hasAttribute('aria-expanded')).toBe(false);
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('hue slider has role="slider"', async () => {
@@ -966,6 +966,55 @@ describe('hx-color-picker', () => {
       expect(el.shadowRoot).toBeTruthy();
       // No crash means the null guard in parseColor/_syncFromValue worked
       expect(el['_hsv']).toBeDefined();
+    });
+  });
+
+  // ─── Property: label overrides (i18n) ───
+
+  describe('Property: label overrides', () => {
+    it('labelHue defaults to "Hue"', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.labelHue).toBe('Hue');
+    });
+
+    it('labelOpacity defaults to "Opacity"', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.labelOpacity).toBe('Opacity');
+    });
+
+    it('labelSwatches defaults to "Preset colors"', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.labelSwatches).toBe('Preset colors');
+    });
+
+    it('labelSwitchFormat defaults to "Switch color format"', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.labelSwitchFormat).toBe('Switch color format');
+    });
+
+    it('labelColorValue defaults to "Color value"', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
+      expect(el.labelColorValue).toBe('Color value');
+    });
+
+    it('uses custom labelHue as property value', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker label-hue="Teinte"></hx-color-picker>',
+      );
+      // Verify the property is set — the slider only renders inside the open panel
+      expect(el.labelHue).toBe('Teinte');
+    });
+
+    it('uses custom labelSwatches and applies aria-label when inline with swatches set', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker label-swatches="Couleurs prédéfinies" inline></hx-color-picker>',
+      );
+      await el.updateComplete;
+      // Programmatically set swatches (as required by the component API)
+      el.swatches = ['#ff0000', '#00ff00'];
+      await el.updateComplete;
+      const swatches = shadowQuery(el, '[part="swatches"]');
+      expect(swatches?.getAttribute('aria-label')).toBe('Couleurs prédéfinies');
     });
   });
 });

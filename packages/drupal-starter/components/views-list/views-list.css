@@ -1,0 +1,13 @@
+/* Views List — vertical list layout */
+
+.views-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+/* When dividers are enabled, add bottom borders between direct children */
+.views-list--dividers > *:not(:last-child) {
+  padding-block-end: var(--hx-spacing-md, 1rem);
+  border-block-end: 1px solid var(--hx-color-border, #e2e8f0);
+}

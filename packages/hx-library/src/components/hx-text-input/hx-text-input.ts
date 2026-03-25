@@ -1,13 +1,16 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
-let _hxTextInputIdCounter = 0;
+const _nextTextInputId = createIdCounter('hx-text-input');
 
 /**
  * A text input component with label, validation, and form association.
@@ -47,22 +50,13 @@ let _hxTextInputIdCounter = 0;
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
 @customElement('hx-text-input')
-export class HelixTextInput extends LitElement {
+export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [tokenStyles, helixTextInputStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -191,6 +185,16 @@ export class HelixTextInput extends LitElement {
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
 
+  // ─── FocusMixin integration ───
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._input ?? null;
+  }
+
   // ─── Slot Tracking ───
 
   /** @internal */
@@ -247,45 +251,27 @@ export class HelixTextInput extends LitElement {
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
     }
-    if (
-      changedProperties.has('value') ||
-      changedProperties.has('required') ||
-      changedProperties.has('minlength') ||
-      changedProperties.has('maxlength')
-    ) {
-      this._updateValidity();
-    }
   }
 
   // ─── Form Integration ───
 
   /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
+  override get form(): HTMLFormElement | null {
     return this._internals.form;
   }
 
   /** Returns the validation message. */
-  get validationMessage(): string {
+  override get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
   /** Returns the ValidityState object. */
-  get validity(): ValidityState {
+  override get validity(): ValidityState {
     return this._internals.validity;
   }
 
-  /** Checks whether the input satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  protected _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -313,15 +299,16 @@ export class HelixTextInput extends LitElement {
     }
   }
 
-  // Called by the form when it resets
-  formResetCallback(): void {
+  // ─── Form Lifecycle Hooks ───
+
+  protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue('');
+    this._resetInteractionState();
   }
 
-  // Called when the form restores state (e.g., back/forward navigation)
-  formStateRestoreCallback(
-    state: string | File | FormData | null,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
@@ -329,8 +316,7 @@ export class HelixTextInput extends LitElement {
     }
   }
 
-  // Called when a parent fieldset is disabled/enabled
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -341,6 +327,7 @@ export class HelixTextInput extends LitElement {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
     this._internals.setFormValue(this.value);
+    this._handleInteractionInput();
 
     /**
      * Dispatched on every keystroke as the user types.
@@ -360,7 +347,7 @@ export class HelixTextInput extends LitElement {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
     this._internals.setFormValue(this.value);
-    this._updateValidity();
+    this._handleInteractionBlur();
 
     /**
      * Dispatched when the input loses focus after its value changed.
@@ -377,11 +364,6 @@ export class HelixTextInput extends LitElement {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the input element. */
-  override focus(options?: FocusOptions): void {
-    this._input?.focus(options);
-  }
-
   /** Selects all text in the input. */
   select(): void {
     this._input?.select();
@@ -390,7 +372,7 @@ export class HelixTextInput extends LitElement {
   // ─── Render ───
 
   /** @internal */
-  private _inputId = `hx-text-input-${++_hxTextInputIdCounter}`;
+  private _inputId = _nextTextInputId();
   /** @internal */
   private _helpTextId = `${this._inputId}-help`;
   /** @internal */
@@ -477,14 +459,18 @@ export class HelixTextInput extends LitElement {
           </span>
         </div>
 
-        <div part="error" class="field__error" id=${this._errorId} role="alert" aria-atomic="true">
-          ${hasError
-            ? html`<slot name="error" @slotchange=${this._handleErrorSlotChange}
-                >${this.error}</slot
-              >`
-            : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
-        </div>
-        ${(this.helpText || this._hasHelpTextSlot) && !hasError
+        ${hasError
+          ? html`<div
+              part="error"
+              class="field__error"
+              id=${this._errorId}
+              role="alert"
+              aria-atomic="true"
+            >
+              <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
+            </div>`
+          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        ${this._hasHelpTextSlot
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
                 <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
@@ -492,7 +478,15 @@ export class HelixTextInput extends LitElement {
                 </slot>
               </div>
             `
-          : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
+          : this.helpText && !hasError
+            ? html`
+                <div part="help-text" class="field__help-text" id=${this._helpTextId}>
+                  <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
+                    ${this.helpText}
+                  </slot>
+                </div>
+              `
+            : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
       </div>
     `;
   }

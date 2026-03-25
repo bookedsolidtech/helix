@@ -188,13 +188,13 @@ export class HelixRating extends LitElement {
     }
   }
 
-  /** Called by the browser when the form is reset. */
+  /** @internal */
   formResetCallback(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(String(this._defaultValue));
   }
 
-  /** Called by the browser to restore form state on navigation. */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -208,7 +208,7 @@ export class HelixRating extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -475,16 +475,20 @@ export class HelixRating extends LitElement {
   // ─── Render ───
 
   override render() {
+    // Interactive mode: fall back to 'Rating' so the group/slider always has a name.
     const ariaLabel = this.label || 'Rating';
+
+    // WCAG 4.1.2: in readonly mode, build the aria-label from the consumer-provided
+    // `label` property rather than a hardcoded 'Rating:' prefix. When a consumer
+    // supplies a label (e.g. "Product quality"), prepending a hardcoded "Rating:"
+    // would create redundancy. The `labelValueText` property (default: "X out of Y
+    // stars") lets consumers customise the value portion independently.
+    const valueText = this.labelValueText(this.value, this.max);
+    const readonlyAriaLabel = this.label ? `${this.label}: ${valueText}` : valueText;
 
     if (this.readonly) {
       return html`
-        <div
-          part="base"
-          class="base base--readonly"
-          role="img"
-          aria-label="${ariaLabel}: ${this.value} out of ${this.max}"
-        >
+        <div part="base" class="base base--readonly" role="img" aria-label=${readonlyAriaLabel}>
           ${Array.from({ length: this.max }, (_, idx) => {
             const i = idx + 1;
             const state = this._getStarState(i);

@@ -66,14 +66,14 @@ export class HelixStat extends LitElement {
    * @attr trend
    */
   @property({ type: String, reflect: true })
-  trend: StatTrend = 'neutral';
+  trend: 'up' | 'down' | 'neutral' = 'neutral';
 
   /**
    * Size variant controlling font size.
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: StatSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   // ─── Lifecycle ───
 
@@ -151,13 +151,25 @@ export class HelixStat extends LitElement {
 
     const hasTrend = this.trend !== 'neutral';
 
+    // WCAG 1.3.1: wrap value and label in a group so screen readers announce them
+    // together with a combined accessible name instead of as disconnected text runs.
+    const groupLabel =
+      this.value && this.label
+        ? `${this.value}: ${this.label}`
+        : this.value || this.label || nothing;
+
     return html`
-      <div part="container" class=${classMap(containerClasses)}>
+      <div
+        part="container"
+        class=${classMap(containerClasses)}
+        role="group"
+        aria-label=${groupLabel}
+      >
         <div part="header" class="stat__header">
           <span part="icon" class="stat__icon" ?hidden=${!this._hasIcon}>
             <slot name="icon" @slotchange=${this._onIconSlotChange}></slot>
           </span>
-          <span part="value" class="stat__value">${this.value}</span>
+          <span part="value" class="stat__value" aria-hidden="true">${this.value}</span>
           ${hasTrend
             ? html`
                 <span
@@ -171,7 +183,7 @@ export class HelixStat extends LitElement {
               `
             : nothing}
         </div>
-        <span part="label" class="stat__label">${this.label}</span>
+        <span part="label" class="stat__label" aria-hidden="true">${this.label}</span>
       </div>
     `;
   }
