@@ -1,0 +1,64 @@
+{#
+  helix-tooltip.html.twig
+  -----------------------
+  Renders a HELiX hx-tooltip component. Show/hide behavior is handled
+  automatically by the component on hover and focus — no Drupal behavior
+  is required for standard usage.
+
+  The trigger element is projected into the default slot; the tooltip
+  content is projected via the content slot.
+
+  Note on htmx: hx-* attributes are reserved by htmx. The placement,
+  show-delay, and hide-delay attributes do not conflict with htmx
+  directives. Avoid other hx-* attribute names on the same element.
+
+  Variables:
+    trigger_label (string)  Visible label for the trigger button.
+    content       (string)  Tooltip text shown on hover/focus.
+    placement     (string)  Floating UI placement value. Default: 'top'.
+                            top | top-start | top-end | bottom | bottom-start |
+                            bottom-end | left | left-start | left-end |
+                            right | right-start | right-end
+    show_delay    (int)     Milliseconds before tooltip appears. Default: 300.
+    hide_delay    (int)     Milliseconds before tooltip disappears. Default: 100.
+    trigger_type  (string)  button | submit | reset. Default: 'button'.
+    aria_label    (string)  Accessible name for icon-only triggers.
+    attributes    (object)  Additional HTML attributes.
+
+  Usage — basic tooltip:
+    {% include 'helix-tooltip.html.twig' with {
+      trigger_label: 'More information',
+      content: 'Blood pressure measured in the left arm.',
+    } %}
+
+  Usage — bottom placement:
+    {% include 'helix-tooltip.html.twig' with {
+      trigger_label: 'Lab Results',
+      content: 'Most recent CBC panel from 2026-03-10.',
+      placement: 'bottom-start',
+    } %}
+
+  Usage — icon-only trigger (aria_label required):
+    {% include 'helix-tooltip.html.twig' with {
+      trigger_label: '',
+      aria_label: 'More information',
+      content: 'Contact your administrator for access.',
+    } %}
+#}
+
+<hx-tooltip
+  {% if placement is defined and placement %}placement="{{ placement }}"{% endif %}
+  {% if show_delay is defined %}show-delay="{{ show_delay }}"{% endif %}
+  {% if hide_delay is defined %}hide-delay="{{ hide_delay }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {%- block trigger -%}
+    <button
+      type="{{ trigger_type|default('button') }}"
+      {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    >{{ trigger_label }}</button>
+  {%- endblock -%}
+  {%- block content -%}
+    <span slot="content">{{ content }}</span>
+  {%- endblock -%}
+</hx-tooltip>

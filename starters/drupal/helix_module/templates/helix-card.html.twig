@@ -1,0 +1,78 @@
+{#
+  helix-card.html.twig
+  --------------------
+  Renders a HELiX hx-card component from a Drupal render array or
+  direct template include.
+
+  Content is slot-projected from Twig, ensuring meaningful fallback
+  content is visible before JavaScript loads (progressive enhancement).
+
+  ARIA note: When href is set the card becomes an interactive link.
+  Do NOT use the actions slot together with href — interactive controls
+  nested inside role="link" violates the ARIA spec.
+
+  Variables:
+    variant     (string)  default | featured | compact. Default: 'default'.
+    elevation   (string)  flat | raised | floating. Default: 'flat'.
+    heading     (string)  Card title text.
+    heading_tag (string)  Semantic heading element. Default: 'h3'.
+    body        (string)  Card body content (rendered as slot default content).
+    footer      (string)  Optional footer content.
+    actions     (string)  Optional action buttons. NOT compatible with href.
+    image       (object)  Optional image. Keys: src, alt.
+    href        (string)  When set, renders the card as a clickable link.
+    aria_label  (string)  Required when href is set. Describes card purpose.
+    attributes  (object)  Additional HTML attributes spread onto the element.
+
+  Usage — basic content card:
+    {% include 'helix-card.html.twig' with {
+      heading: 'Patient: Margaret Thompson',
+      body: 'Last visit: 2026-03-15. Status: Active.',
+      variant: 'default',
+      elevation: 'raised',
+    } %}
+
+  Usage — interactive link card:
+    {% include 'helix-card.html.twig' with {
+      heading: node.title.value,
+      body: node.body.summary,
+      href: path('entity.node.canonical', {node: node.id()}),
+      aria_label: 'View chart for ' ~ node.title.value,
+    } %}
+
+  Drupal Views — use in views-view-unformatted--*.html.twig:
+    {% for row in rows %}
+      {% include 'helix-card.html.twig' with {
+        heading: row.content['#row'].title,
+        body: row.content['#row'].body,
+      } %}
+    {% endfor %}
+#}
+
+<hx-card
+  variant="{{ variant|default('default') }}"
+  elevation="{{ elevation|default('flat') }}"
+  {% if href is defined and href %}
+    hx-href="{{ href }}"
+    {% if aria_label %}hx-aria-label="{{ aria_label }}"{% endif %}
+  {% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% if image is defined and image %}
+    <img slot="image" src="{{ image.src }}" alt="{{ image.alt|default('') }}">
+  {% endif %}
+
+  {% if heading is defined and heading %}
+    <{{ heading_tag|default('h3') }} slot="heading">{{ heading }}</{{ heading_tag|default('h3') }}>
+  {% endif %}
+
+  {{ body }}
+
+  {% if footer is defined and footer %}
+    <span slot="footer">{{ footer }}</span>
+  {% endif %}
+
+  {% if actions is defined and actions and not href %}
+    <span slot="actions">{{ actions }}</span>
+  {% endif %}
+</hx-card>

@@ -1,0 +1,77 @@
+{#
+  helix-alert.html.twig
+  ---------------------
+  Renders a HELiX hx-alert component for status messages, form
+  validation summaries, and contextual notifications.
+
+  Content is slot-projected from Twig, ensuring meaningful fallback
+  content is accessible before JavaScript loads.
+
+  In Drupal, this template is commonly used to render the status_messages
+  block. Map Drupal message types to HELiX variants:
+    status  → success
+    warning → warning
+    error   → error
+    (any)   → info (default)
+
+  Variables:
+    variant     (string)  info | success | warning | error. Default: 'info'.
+    message     (string)  The alert message body content. Required.
+    title       (string)  Optional headline for the alert.
+    dismissible (bool)    Whether a dismiss button is rendered.
+    show_icon   (bool)    Whether the variant icon is shown. Default: true.
+    accent      (bool)    Whether to apply the left-border accent style.
+    open        (bool)    Whether the alert is visible. Default: true.
+    actions     (string)  Optional HTML for action buttons in the actions slot.
+    attributes  (object)  Additional HTML attributes spread onto the element.
+
+  Usage — form validation error:
+    {% include 'helix-alert.html.twig' with {
+      variant: 'error',
+      title: 'Form submission failed',
+      message: 'Please correct the highlighted fields.',
+      dismissible: false,
+    } %}
+
+  Usage — success status message:
+    {% include 'helix-alert.html.twig' with {
+      variant: 'success',
+      message: 'Patient record saved successfully.',
+      dismissible: true,
+    } %}
+
+  Usage — Drupal status_messages integration:
+    {% for type, messages in status_messages %}
+      {% set helix_variant = type == 'status' ? 'success' : (type == 'error' ? 'error' : (type == 'warning' ? 'warning' : 'info')) %}
+      {% for msg in messages %}
+        {% include 'helix-alert.html.twig' with {
+          variant: helix_variant,
+          message: msg,
+          dismissible: true,
+        } %}
+      {% endfor %}
+    {% endfor %}
+#}
+
+{% set variant   = variant|default('info') %}
+{% set show_icon = show_icon is defined ? show_icon : true %}
+{% set open      = open is defined ? open : true %}
+
+<hx-alert
+  variant="{{ variant }}"
+  {% if dismissible %}dismissible{% endif %}
+  {% if open %}open{% endif %}
+  {% if show_icon %}show-icon{% endif %}
+  {% if accent %}accent{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% if title %}
+    <span slot="title">{{ title }}</span>
+  {% endif %}
+
+  {{ message }}
+
+  {% if actions %}
+    <span slot="actions">{{ actions }}</span>
+  {% endif %}
+</hx-alert>

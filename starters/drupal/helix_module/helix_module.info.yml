@@ -1,0 +1,6 @@
+name: HELiX UI Components
+type: module
+description: 'Integrates HELiX enterprise web components (hx-*) via CDN. Provides Twig templates, Drupal.behaviors integration, and form element preprocess functions.'
+core_version_requirement: ^10 || ^11
+package: HELiX
+configure: helix_module.settings
