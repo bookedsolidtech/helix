@@ -655,6 +655,8 @@ describe('hx-popover', () => {
         '<hx-popover trigger="manual"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
       el.open = true;
+      // _show() is async and sets _visible=true triggering a second Lit update cycle
+      await el.updateComplete;
       await el.updateComplete;
       const body = shadowQuery(el, '[part="body"]');
       expect(body?.classList.contains('visible')).toBe(true);
