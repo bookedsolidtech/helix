@@ -22,7 +22,7 @@
     "README.md"
   ],
   "scripts": {
-    "generate": "tsx ../../scripts/generate-react-wrappers.ts",
+    "generate": "tsx ../../scripts/generate-react-wrappers.ts && prettier --write src/",
     "prebuild": "pnpm run generate",
     "build": "vite build",
     "type-check": "tsc --noEmit",

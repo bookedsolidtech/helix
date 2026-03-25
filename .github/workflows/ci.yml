@@ -165,8 +165,12 @@ jobs:
             echo "tests_ran=true" >> "$GITHUB_OUTPUT"
           else
             # General PR: extract changed component dirs from git diff
+            # Exclude .stories.ts, .test.ts, and index.ts — they don't affect component coverage
             CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
               | grep 'src/components/hx-' \
+              | grep -v '\.stories\.ts$' \
+              | grep -v '\.test\.ts$' \
+              | grep -v '/index\.ts$' \
               | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
               | sort -u)
             if [ -z "$CHANGED" ]; then
@@ -185,6 +189,9 @@ jobs:
         run: |
           CHANGED=$(git diff --name-only HEAD~1...HEAD \
             | grep 'src/components/hx-' \
+            | grep -v '\.stories\.ts$' \
+            | grep -v '\.test\.ts$' \
+            | grep -v '/index\.ts$' \
             | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
             | sort -u)
           if [ -z "$CHANGED" ]; then
