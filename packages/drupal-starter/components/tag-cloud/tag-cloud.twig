@@ -1,0 +1,49 @@
+{#
+/**
+ * @file
+ * Tag Cloud SDC — composes hx-tag, hx-link.
+ *
+ * Displays a collection of taxonomy tags in flat or weighted layout.
+ * In weighted variant, tags with higher counts appear larger.
+ */
+#}
+{{ attach_library('helixui/hx-tag') }}
+{{ attach_library('helixui/hx-link') }}
+
+{% set tag_variant = variant|default('flat') %}
+
+<div class="tag-cloud tag-cloud--{{ tag_variant }}" role="navigation" aria-label="Tags">
+  {% if tags|length %}
+    <ul class="tag-cloud__list">
+      {% for tag in tags %}
+        <li class="tag-cloud__item">
+          {% if tag.url %}
+            <hx-link href="{{ tag.url }}">
+              <hx-tag
+                {% if tag_variant == 'weighted' and tag.count is defined %}
+                  size="{{ tag.count > 10 ? 'lg' : (tag.count > 5 ? 'md' : 'sm') }}"
+                {% endif %}
+              >
+                {{ tag.name }}
+                {% if tag.count is defined %}
+                  <span class="visually-hidden">({{ tag.count }} items)</span>
+                {% endif %}
+              </hx-tag>
+            </hx-link>
+          {% else %}
+            <hx-tag
+              {% if tag_variant == 'weighted' and tag.count is defined %}
+                size="{{ tag.count > 10 ? 'lg' : (tag.count > 5 ? 'md' : 'sm') }}"
+              {% endif %}
+            >
+              {{ tag.name }}
+              {% if tag.count is defined %}
+                <span class="visually-hidden">({{ tag.count }} items)</span>
+              {% endif %}
+            </hx-tag>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>

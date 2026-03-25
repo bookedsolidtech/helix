@@ -1,0 +1,45 @@
+/**
+ * @file
+ * Section Container SDC — layout, spacing, and background variants.
+ * Component styling is handled by hx-* web components.
+ */
+
+.section-container {
+  width: 100%;
+}
+
+/* Padding variants */
+.section-container--pad-none {
+  padding-block: 0;
+}
+
+.section-container--pad-sm {
+  padding-block: var(--hx-spacing-md, 1rem);
+}
+
+.section-container--pad-md {
+  padding-block: var(--hx-spacing-xl, 2rem);
+}
+
+.section-container--pad-lg {
+  padding-block: var(--hx-spacing-2xl, 4rem);
+}
+
+/* Background variants */
+.section-container--bg-default {
+  background-color: transparent;
+}
+
+.section-container--bg-muted {
+  background-color: var(--hx-color-surface-variant, #f5f5f5);
+}
+
+.section-container--bg-primary {
+  background-color: var(--hx-color-primary, #0066cc);
+  color: var(--hx-color-on-primary, #ffffff);
+}
+
+.section-container--bg-dark {
+  background-color: var(--hx-color-surface-dark, #1a1a1a);
+  color: var(--hx-color-on-dark, #ffffff);
+}

@@ -1,0 +1,37 @@
+/**
+ * @file
+ * Newsletter Signup SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.newsletter-signup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.newsletter-signup__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.newsletter-signup__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.newsletter-signup__input-group {
+  display: flex;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  align-items: flex-end;
+}
+
+.newsletter-signup__input-group hx-text-input {
+  flex: 1 1 auto;
+}
+
+.newsletter-signup__input-group hx-button {
+  flex: 0 0 auto;
+}

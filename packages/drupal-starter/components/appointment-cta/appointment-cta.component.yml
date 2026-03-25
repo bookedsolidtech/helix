@@ -1,0 +1,48 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Appointment CTA
+description: 'Call-to-action block for scheduling appointments. Supports inline, card, and banner variants with phone and online booking options. Composes hx-card, hx-button, hx-text, hx-icon.'
+status: experimental
+group: Healthcare
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'CTA heading text'
+      default: 'Schedule an Appointment'
+    description:
+      type: string
+      title: Description
+      description: 'Supporting text below the heading'
+    phone:
+      type: string
+      title: Phone Number
+      description: 'Phone number for calling to schedule'
+    online_url:
+      type: string
+      title: Online Booking URL
+      description: 'URL for the online scheduling portal'
+    online_text:
+      type: string
+      title: Online Button Text
+      description: 'Label for the online booking button'
+      default: 'Book Online'
+    phone_text:
+      type: string
+      title: Phone Button Text
+      description: 'Label for the phone call button'
+      default: 'Call Us'
+    variant:
+      type: string
+      title: Variant
+      description: 'Display variant'
+      default: card
+      enum:
+        - inline
+        - card
+        - banner
+slots:
+  extra:
+    title: Extra Content
+    description: 'Additional content such as hours or insurance info'

@@ -1,0 +1,32 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Share Buttons
+description: 'Social sharing button group for distributing content. Composes hx-button, hx-icon, hx-button-group.'
+status: experimental
+group: 'Content Block'
+props:
+  type: object
+  properties:
+    url:
+      type: string
+      title: URL
+      description: 'The URL to share'
+    title:
+      type: string
+      title: Title
+      description: 'The title text to include in shared content'
+    platforms:
+      type: array
+      title: Platforms
+      description: 'List of social platforms to display'
+      default:
+        - twitter
+        - facebook
+        - linkedin
+        - email
+      items:
+        type: string
+        enum:
+          - twitter
+          - facebook
+          - linkedin
+          - email

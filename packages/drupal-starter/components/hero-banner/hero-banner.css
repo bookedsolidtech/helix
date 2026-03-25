@@ -1,0 +1,69 @@
+.hero-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24rem;
+  overflow: hidden;
+}
+
+.hero-banner__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-banner--overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.hero-banner__content {
+  position: relative;
+  z-index: 2;
+  max-width: 48rem;
+  padding-block: var(--hx-spacing-2xl, 3rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+}
+
+.hero-banner--overlay .hero-banner__content {
+  color: var(--hx-color-on-dark, #fff);
+}
+
+.hero-banner--align-left {
+  justify-content: flex-start;
+}
+
+.hero-banner--align-left .hero-banner__content {
+  text-align: start;
+}
+
+.hero-banner--align-center .hero-banner__content {
+  text-align: center;
+}
+
+.hero-banner--align-right {
+  justify-content: flex-end;
+}
+
+.hero-banner--align-right .hero-banner__content {
+  text-align: end;
+}
+
+.hero-banner__title {
+  margin-block-end: var(--hx-spacing-sm, 0.5rem);
+}
+
+.hero-banner__subtitle {
+  margin-block-end: var(--hx-spacing-lg, 1.5rem);
+}
+
+.hero-banner__cta {
+  margin-block-start: var(--hx-spacing-md, 1rem);
+}

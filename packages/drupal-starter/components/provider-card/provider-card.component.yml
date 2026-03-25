@@ -1,0 +1,56 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Provider Card
+description: 'Healthcare provider profile card with credentials, specialty, location, and scheduling actions. Composes hx-card, hx-text, hx-avatar, hx-badge, hx-button, hx-rating, hx-status-indicator.'
+status: experimental
+group: Healthcare
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Provider Name
+      description: 'Full name of the healthcare provider'
+    credentials:
+      type: string
+      title: Credentials
+      description: 'Professional credentials (e.g., MD, DO, NP, PA-C)'
+    specialty:
+      type: string
+      title: Specialty
+      description: 'Medical specialty or department'
+    image_url:
+      type: string
+      title: Image URL
+      description: 'URL for the provider headshot'
+    image_alt:
+      type: string
+      title: Image Alt
+      description: 'Alt text for the provider image'
+    location:
+      type: string
+      title: Location
+      description: 'Primary practice location'
+    phone:
+      type: string
+      title: Phone
+      description: 'Office phone number'
+    rating:
+      type: number
+      title: Rating
+      description: 'Patient satisfaction rating (0-5)'
+    accepting_patients:
+      type: boolean
+      title: Accepting Patients
+      description: 'Whether the provider is accepting new patients'
+      default: true
+    url:
+      type: string
+      title: URL
+      description: 'Link to provider profile page'
+slots:
+  actions:
+    title: Actions
+    description: 'Additional action buttons (e.g., schedule, message)'
+  badges:
+    title: Badges
+    description: 'Additional specialty or certification badges'

@@ -1,0 +1,11 @@
+.sidebar-nav {
+  padding-block: var(--hx-spacing-md, 1rem);
+}
+
+.sidebar-nav__group {
+  margin-block-end: var(--hx-spacing-sm, 0.5rem);
+}
+
+.sidebar-nav__group hx-nav {
+  padding-inline-start: var(--hx-spacing-md, 1rem);
+}

@@ -1,0 +1,37 @@
+{
+  "name": "@helixui/drupal-starter",
+  "version": "0.1.0",
+  "description": "Pre-built composition SDCs for Drupal using HELiX web components",
+  "type": "module",
+  "license": "MIT",
+  "author": "BookedSolid Technologies",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/drupal-starter"
+  },
+  "keywords": [
+    "drupal",
+    "sdc",
+    "web-components",
+    "helix",
+    "healthcare",
+    "enterprise"
+  ],
+  "files": [
+    "components",
+    "js",
+    "helixui.info.yml",
+    "helixui.libraries.yml",
+    "helix-sdc.manifest.yml",
+    "README.md",
+    "ARCHITECTURE.md"
+  ],
+  "peerDependencies": {
+    "@helixui/library": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Landing Page
+description: 'Full-width landing page layout with hero image, intro text, and flexible section slots for nested content.'
+status: experimental
+group: 'Node Display'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'The page title'
+    hero_image:
+      type: string
+      title: 'Hero Image'
+      description: 'URL for the hero background image'
+    hero_alt:
+      type: string
+      title: 'Hero Alt'
+      description: 'Alt text for the hero image'
+    intro:
+      type: string
+      title: Introduction
+      description: 'Introductory text below the hero'
+slots:
+  sections:
+    title: Sections
+    description: 'Flexible content sections (paragraphs, blocks, Layout Builder regions)'

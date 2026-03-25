@@ -1,0 +1,70 @@
+/* Provider Card — layout and spacing only */
+
+.provider-card {
+  display: block;
+}
+
+.provider-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.provider-card__identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-2xs, 0.125rem);
+}
+
+.provider-card__credentials {
+  opacity: 0.8;
+}
+
+.provider-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.provider-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.provider-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-2xs, 0.125rem);
+}
+
+.provider-card__detail {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.provider-card__rating {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.provider-card__status {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.provider-card__footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.provider-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}

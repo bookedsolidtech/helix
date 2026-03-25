@@ -22,6 +22,8 @@ export interface HxCheckboxGroupProps {
   disabled?: boolean;
   /** Error message to display. When set, the group enters an error state. */
   error?: string;
+  /** Help text to display below the group. Can also be provided via the help-text slot. */
+  helpText?: string;
   /** Layout orientation of the checkbox items. */
   orientation?: 'vertical' | 'horizontal';
   /** Returns the associated form element, if any. */

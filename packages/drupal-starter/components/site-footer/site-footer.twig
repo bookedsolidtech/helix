@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Site Footer SDC — composes hx-container, hx-text, hx-link, hx-divider.
+ *
+ * Provides a site-wide footer with column areas, divider, and bottom bar.
+ */
+#}
+{{ attach_library('helixui/hx-container') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-link') }}
+{{ attach_library('helixui/hx-divider') }}
+
+<footer class="site-footer" role="contentinfo">
+  <hx-container>
+    {% if columns %}
+      <div class="site-footer__columns">
+        {{ columns }}
+      </div>
+    {% endif %}
+    <hx-divider></hx-divider>
+    <div class="site-footer__bottom">
+      {% if copyright %}
+        <hx-text variant="body" size="sm">{{ copyright }}</hx-text>
+      {% endif %}
+      {% if bottom %}
+        <div class="site-footer__bottom-links">
+          {{ bottom }}
+        </div>
+      {% endif %}
+    </div>
+  </hx-container>
+</footer>
