@@ -198,7 +198,7 @@ export const helixDrawerStyles = css`
     color: var(--hx-color-neutral-500);
     cursor: pointer;
     flex-shrink: 0;
-    transition: background-color var(--hx-duration-fast, 100ms) ease;
+    transition: background-color var(--hx-duration-fast, 100ms) var(--hx-easing-default, ease);
   }
 
   .drawer-close-button:hover {
