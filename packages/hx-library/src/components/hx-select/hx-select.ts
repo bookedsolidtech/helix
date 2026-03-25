@@ -204,7 +204,6 @@ export class HelixSelect extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._handleOutsideClick);
   }
 
   override disconnectedCallback(): void {
@@ -213,6 +212,13 @@ export class HelixSelect extends HelixElement {
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has('open')) {
+      if (this.open) {
+        document.addEventListener('click', this._handleOutsideClick);
+      } else {
+        document.removeEventListener('click', this._handleOutsideClick);
+      }
+    }
     if (changedProperties.has('value')) {
       this._syncNativeSelect();
       this._updateFormValue();

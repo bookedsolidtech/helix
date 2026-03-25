@@ -63,6 +63,12 @@ const baseExports = [
   "export type { FocusMixinInterface } from './mixins/index.js';",
 ].join('\n');
 
+// Controller exports (manually maintained — add new controllers here)
+const controllerExports = [
+  "export { HelixAuditController } from './controllers/helix-audit-controller.js';",
+  "export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';",
+].join('\n');
+
 // Generate the barrel file
 const output = `/**
  * @helixui/library - Enterprise Healthcare Web Component Library
@@ -76,6 +82,9 @@ const output = `/**
 
 // ─── Base infrastructure ────────────────────────────────────────────────────
 ${baseExports}
+
+// ─── Controllers ─────────────────────────────────────────────────────────────
+${controllerExports}
 
 // ─── Components ──────────────────────────────────────────────────────────────
 ${exportLines.join('\n')}

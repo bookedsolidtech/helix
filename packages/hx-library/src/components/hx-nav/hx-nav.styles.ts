@@ -132,7 +132,7 @@ export const helixNavStyles = css`
       0 4px 6px -1px rgb(0 0 0 / 0.1),
       0 2px 4px -2px rgb(0 0 0 / 0.1)
     );
-    z-index: var(--hx-z-index-dropdown, 100);
+    z-index: var(--hx-z-index-dropdown, 1000);
   }
 
   .nav__submenu[hidden] {

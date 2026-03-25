@@ -41,7 +41,7 @@ export const helixFileUploadStyles = css`
     align-items: center;
     justify-content: center;
     gap: var(--hx-space-2, 0.5rem);
-    min-height: var(--hx-size-32, 8rem);
+    min-height: var(--hx-space-32, 8rem);
     padding: var(--hx-space-6, 1.5rem) var(--hx-space-4, 1rem);
     border: var(--hx-border-width-thin, 1px) dashed
       var(--hx-file-upload-dropzone-border-color, var(--hx-color-neutral-300, #ced4da));
@@ -198,7 +198,7 @@ export const helixFileUploadStyles = css`
 
   .progress-track {
     width: 100%;
-    height: 4px;
+    height: var(--hx-file-upload-progress-height, var(--hx-space-1, 0.25rem));
     background-color: var(--hx-color-neutral-200, #e9ecef);
     border-radius: var(--hx-border-radius-full, 9999px);
     overflow: hidden;

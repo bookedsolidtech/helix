@@ -94,7 +94,7 @@ export const helixCodeSnippetStyles = css`
       color var(--hx-transition-fast, 150ms ease),
       border-color var(--hx-transition-fast, 150ms ease);
     white-space: nowrap;
-    z-index: var(--hx-z-index-raised, 1);
+    z-index: 1; /* @audit-exception: local stacking context within shadow root */
   }
 
   .code-snippet__copy-button:hover {

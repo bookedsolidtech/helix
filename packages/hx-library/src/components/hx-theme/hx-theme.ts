@@ -1,9 +1,18 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenEntries, darkTokenEntries } from '@helixui/tokens';
+import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
+import { mergeBrandTokens } from '../../utils/token-merger.js';
 
 export type { TokenDefinition, TokenEntry } from '@helixui/tokens';
+
+/**
+ * Controls the motion behavior applied to all descendant `hx-*` components.
+ * - `"full"` (default): Full animations. Respects OS `prefers-reduced-motion`.
+ * - `"reduced"`: Collapses all animation durations to 0ms and easings to linear.
+ * - `"none"`: Same as `"reduced"` — all motion tokens resolve to instant/linear.
+ */
+export type MotionMode = 'full' | 'reduced' | 'none';
 
 /**
  * Supported theme names.
@@ -64,6 +73,29 @@ const _hcOverrides: Array<[string, string]> = [
   ['--hx-shadow-2xl', '0 25px 50px -12px rgb(255 255 255 / 0.4)'],
 ];
 
+/**
+ * Motion token overrides applied when reduced or no motion is requested.
+ * All durations collapse to 0ms and all easings become linear so that
+ * every animated component goes instantaneous without modifying its own CSS.
+ */
+const _reducedMotionOverrides: Array<[string, string]> = [
+  ['--hx-duration-fast', '0ms'],
+  ['--hx-duration-normal', '0ms'],
+  ['--hx-duration-slow', '0ms'],
+  ['--hx-duration-slower', '0ms'],
+  ['--hx-duration-spinner', '0ms'],
+  ['--hx-transition-fast', '0ms linear'],
+  ['--hx-transition-normal', '0ms linear'],
+  ['--hx-transition-slow', '0ms linear'],
+  ['--hx-easing-default', 'linear'],
+  ['--hx-easing-in', 'linear'],
+  ['--hx-easing-out', 'linear'],
+  ['--hx-easing-in-out', 'linear'],
+  ['--hx-easing-decelerate', 'linear'],
+  ['--hx-easing-accelerate', 'linear'],
+  ['--hx-easing-spring', 'linear'],
+];
+
 function _buildProps(entries: Iterable<[string, string]>): string {
   return Array.from(entries)
     .map(([name, value]) => `  ${name}: ${value};`)
@@ -118,7 +150,7 @@ function _buildThemeCss(theme: ThemeName): string {
  * - `"high-contrast"` — WCAG 7:1+ contrast token set for low-vision accessibility
  * - `"auto"` — follows the OS `prefers-color-scheme` media query (light or dark)
  *
- * @summary Injects --hx-* design tokens for the specified theme scope.
+ * @summary Injects --hx-* design tokens for the specified theme scope and controls motion behavior.
  *
  * @tag hx-theme
  *
@@ -170,18 +202,61 @@ export class HelixTheme extends LitElement {
   @property({ type: Boolean, reflect: true })
   system = false;
 
+  /**
+   * The registered brand name to apply on top of the base theme.
+   * When set, brand-specific CSS custom property overrides are merged
+   * after the base theme tokens in the adopted stylesheet, enabling
+   * hospital system white-label implementations.
+   *
+   * The brand must first be registered via `HelixBrandRegistry.register()`.
+   * If the brand name is non-empty but not registered, a warning is logged
+   * and the base theme is applied without brand overrides.
+   *
+   * @attr brand
+   * @example
+   * ```html
+   * <hx-theme theme="light" brand="mercy-health">
+   *   <!-- Content inherits Mercy Health brand tokens -->
+   * </hx-theme>
+   * ```
+   */
+  @property({ type: String, reflect: true })
+  brand = '';
+
+  /**
+   * Controls motion behavior for all descendant `hx-*` components.
+   * - `"full"` (default): Full animations. Respects OS `prefers-reduced-motion`.
+   * - `"reduced"`: Collapses all animation durations to 0ms and easings to linear.
+   *   Use this for devices where OS accessibility settings cannot be relied on
+   *   (e.g. healthcare bedside terminals).
+   * - `"none"`: Same as `"reduced"` — all motion tokens resolve to instant/linear.
+   *
+   * When `motion="full"` and the OS reports `prefers-reduced-motion: reduce`,
+   * the same token overrides are applied automatically.
+   * @attr motion
+   */
+  @property({ type: String, reflect: true })
+  motion: MotionMode = 'full';
+
   /** @internal */
   private _mediaQuery: MediaQueryList | null = null;
   /** @internal */
   private _mediaHandler: (() => void) | null = null;
   /** @internal */
   private _themeSheet: CSSStyleSheet | null = null;
+  /** @internal — media query for OS prefers-reduced-motion */
+  private _motionQuery: MediaQueryList | null = null;
+  /** @internal */
+  private _motionHandler: (() => void) | null = null;
 
   override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
     this._initThemeSheet();
     if (this.system || this.theme === 'auto') {
       this._attachMediaQuery();
+    }
+    if (this.motion === 'full') {
+      this._attachMotionQuery();
     }
   }
 
@@ -196,11 +271,23 @@ export class HelixTheme extends LitElement {
       }
       this._applyEffectiveTheme();
     }
+    if (changed.has('motion')) {
+      if (this.motion === 'full') {
+        this._attachMotionQuery();
+      } else {
+        this._detachMotionQuery();
+      }
+      this._applyEffectiveTheme();
+    }
+    if (changed.has('brand')) {
+      this._applyEffectiveTheme();
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._detachMediaQuery();
+    this._detachMotionQuery();
   }
 
   /**
@@ -214,6 +301,22 @@ export class HelixTheme extends LitElement {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     return this.theme;
+  }
+
+  /**
+   * Returns the resolved motion level after considering the `motion` attribute and OS preference.
+   * When `motion="full"` and the OS reports `prefers-reduced-motion: reduce`, returns `"reduced"`.
+   * Otherwise returns `"full"` or `"reduced"` based on the `motion` attribute.
+   */
+  get effectiveMotion(): 'full' | 'reduced' {
+    if (this.motion === 'reduced' || this.motion === 'none') return 'reduced';
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return 'reduced';
+    }
+    return 'full';
   }
 
   /** @internal */
@@ -248,6 +351,25 @@ export class HelixTheme extends LitElement {
     this._mediaHandler = null;
   }
 
+  /** @internal — attach OS prefers-reduced-motion listener when motion="full" */
+  private _attachMotionQuery(): void {
+    if (this._motionQuery || typeof window === 'undefined') return;
+    this._motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this._motionHandler = () => {
+      this._applyEffectiveTheme();
+    };
+    this._motionQuery.addEventListener('change', this._motionHandler);
+  }
+
+  /** @internal */
+  private _detachMotionQuery(): void {
+    if (this._motionQuery && this._motionHandler) {
+      this._motionQuery.removeEventListener('change', this._motionHandler);
+    }
+    this._motionQuery = null;
+    this._motionHandler = null;
+  }
+
   /** @internal — notifies AT users when system theme changes programmatically */
   private _announceThemeChange(): void {
     const announcer = this.shadowRoot?.querySelector('[role="status"]');
@@ -259,7 +381,27 @@ export class HelixTheme extends LitElement {
   /** @internal */
   private _applyEffectiveTheme(): void {
     if (!this._themeSheet) return;
-    void this._themeSheet.replace(_buildThemeCss(this.effectiveTheme));
+
+    let css = _buildThemeCss(this.effectiveTheme);
+
+    if (this.brand !== '') {
+      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
+      if (brandTokens !== undefined) {
+        css = mergeBrandTokens(css, brandTokens);
+      } else {
+        console.warn(
+          `[hx-theme] Brand "${this.brand}" is not registered. ` +
+            `Register it via HelixBrandRegistry.register() before use. ` +
+            `Applying base theme only.`,
+        );
+      }
+    }
+
+    if (this.effectiveMotion === 'reduced') {
+      css += `\n:host {\n${_buildProps(_reducedMotionOverrides)}\n}`;
+    }
+
+    void this._themeSheet.replace(css);
   }
 
   override render() {

@@ -13,9 +13,15 @@ export { HelixElement } from './base/index.js';
 export { createIdCounter, resetIdCounter } from './base/index.js';
 export { mergeTokenStyles } from './base/index.js';
 
+<<<<<<< HEAD
 // ─── Mixins ───────────────────────────────────────────────────────────────────
 export { FocusMixin } from './mixins/index.js';
 export type { FocusMixinInterface } from './mixins/index.js';
+=======
+// ─── Controllers ─────────────────────────────────────────────────────────────
+export { HelixAuditController } from './controllers/helix-audit-controller.js';
+export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';
+>>>>>>> origin/dev
 
 // ─── Components ──────────────────────────────────────────────────────────────
 export { HelixAccordion } from './components/hx-accordion/index.js';
@@ -76,6 +82,8 @@ export { HelixNumberInput } from './components/hx-number-input/index.js';
 export { HelixOverflowMenu } from './components/hx-overflow-menu/index.js';
 export { HelixPagination } from './components/hx-pagination/index.js';
 export type { HxPagination } from './components/hx-pagination/index.js';
+export { HelixPhiField } from './components/hx-phi-field/index.js';
+export type { PhiAccessEventDetail } from './components/hx-phi-field/index.js';
 export { HelixPopover } from './components/hx-popover/index.js';
 export { HelixPopup } from './components/hx-popup/index.js';
 export { HelixProgressBar } from './components/hx-progress-bar/index.js';

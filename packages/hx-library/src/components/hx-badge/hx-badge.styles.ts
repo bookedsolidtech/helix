@@ -137,7 +137,7 @@ export const helixBadgeStyles = css`
 
   .badge--pulse {
     animation: hx-badge-pulse var(--hx-badge-pulse-duration, var(--hx-duration-slow, 2s))
-      var(--hx-badge-pulse-easing, var(--hx-ease-in-out, ease-in-out)) infinite;
+      var(--hx-badge-pulse-easing, var(--hx-easing-in-out, ease-in-out)) infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {

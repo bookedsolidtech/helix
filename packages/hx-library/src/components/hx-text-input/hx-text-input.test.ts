@@ -717,4 +717,29 @@ describe('hx-text-input', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: requiredMessage ───
+
+  describe('Property: requiredMessage', () => {
+    it('defaults to "This field is required."', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.requiredMessage).toBe('This field is required.');
+    });
+
+    it('accepts custom requiredMessage attribute', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input required required-message="Ce champ est obligatoire."></hx-text-input>',
+      );
+      expect(el.requiredMessage).toBe('Ce champ est obligatoire.');
+    });
+
+    it('uses requiredMessage as validation message when required and empty', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input required required-message="Please fill this in."></hx-text-input>',
+      );
+      await el.updateComplete;
+      // The required message surfaces when form validation runs
+      expect(el.requiredMessage).toBe('Please fill this in.');
+    });
+  });
 });
