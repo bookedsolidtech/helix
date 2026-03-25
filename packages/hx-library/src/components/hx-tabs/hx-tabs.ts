@@ -143,15 +143,17 @@ export class HelixTabs extends LitElement {
     this.addEventListener('hx-tab-select', this._handleTabSelect);
     this.addEventListener('keydown', this._handleKeydown);
     // Watch for panel/name attribute changes on child tabs and panels
-    this._observer = new MutationObserver(() => {
-      this._cachedTabs = null;
-      this._cachedPanels = null;
-      this._syncTabsAndPanels();
-    });
-    this._observer.observe(this, {
-      subtree: false,
-      attributeFilter: ['panel', 'name'],
-    });
+    if (typeof MutationObserver !== 'undefined') {
+      this._observer = new MutationObserver(() => {
+        this._cachedTabs = null;
+        this._cachedPanels = null;
+        this._syncTabsAndPanels();
+      });
+      this._observer.observe(this, {
+        subtree: false,
+        attributeFilter: ['panel', 'name'],
+      });
+    }
   }
 
   override disconnectedCallback(): void {
