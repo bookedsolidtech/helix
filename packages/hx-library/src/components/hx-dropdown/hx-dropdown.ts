@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import {
   computePosition,
   flip,
@@ -106,6 +107,13 @@ export class HelixDropdown extends LitElement {
    */
   @state() private _panelVisible = false;
 
+  /**
+   * Guards against accumulating multiple document click listeners when open state
+   * changes faster than the microtask queue can process removeEventListener calls.
+   * @internal
+   */
+  private _documentListenerAttached = false;
+
   // P1-02: Unique panel ID for aria-controls.
   /**
    * Monotonically incrementing counter used to generate unique panel IDs across instances.
@@ -139,7 +147,10 @@ export class HelixDropdown extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown);
-    document.removeEventListener('click', this._handleOutsideClick, { capture: true });
+    if (this._documentListenerAttached) {
+      document.removeEventListener('click', this._handleOutsideClick, { capture: true });
+      this._documentListenerAttached = false;
+    }
   }
 
   // ─── Open/Close ───
@@ -151,7 +162,10 @@ export class HelixDropdown extends LitElement {
     this._panelVisible = true;
     // Add outside-click listener synchronously before any await so it is registered
     // by the time the test fires an outside click after a single await el.updateComplete.
-    document.addEventListener('click', this._handleOutsideClick, { capture: true });
+    if (!this._documentListenerAttached) {
+      document.addEventListener('click', this._handleOutsideClick, { capture: true });
+      this._documentListenerAttached = true;
+    }
     await this.updateComplete;
     // P0-01: Fix focus management — use slot.assignedElements() to traverse slotted (light DOM) content.
     // Focus is set after updateComplete (panel is rendered) but before _updatePosition so
@@ -171,7 +185,10 @@ export class HelixDropdown extends LitElement {
     if (!this.open) return;
     this.open = false;
     this._panelVisible = false;
-    document.removeEventListener('click', this._handleOutsideClick, { capture: true });
+    if (this._documentListenerAttached) {
+      document.removeEventListener('click', this._handleOutsideClick, { capture: true });
+      this._documentListenerAttached = false;
+    }
     this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
     if (returnFocus) {
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
@@ -349,9 +366,24 @@ export class HelixDropdown extends LitElement {
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
       >
-        <slot></slot>
+        <slot @slotchange=${this._onPanelSlotChange}></slot>
       </div>
     `;
+  }
+
+  // ─── Panel slot validation ───
+
+  /** @internal */
+  private _onPanelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const assigned = slot.assignedElements({ flatten: true });
+    const nonItems = assigned.filter((el) => el.tagName.toLowerCase() !== 'hx-dropdown-item');
+    if (nonItems.length > 0) {
+      devWarn(
+        'hx-dropdown',
+        `Default slot should contain only hx-dropdown-item elements. Found unexpected: ${nonItems.map((el) => `<${el.tagName.toLowerCase()}>`).join(', ')}. Non-hx-dropdown-item children will be included in keyboard navigation incorrectly.`,
+      );
+    }
   }
 
   // ─── ARIA setup for trigger slot ───

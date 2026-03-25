@@ -8,6 +8,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
 const _nextTextInputId = createIdCounter('hx-text-input');
@@ -77,6 +78,8 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   /**
    * The current value of the input.
    * @attr value
+   * @remarks When `null` is passed programmatically, Lit coerces it to an empty string.
+   *   This is expected behavior — the input treats null as equivalent to an empty string value.
    */
   @property({ type: String })
   value = '';
@@ -250,6 +253,17 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
+    }
+    if (
+      (changedProperties.has('value') || changedProperties.has('type')) &&
+      this.type === 'number' &&
+      this.value !== '' &&
+      isNaN(Number(this.value))
+    ) {
+      devWarn(
+        'hx-text-input',
+        `type="number" received non-numeric value "${this.value}". Browser will display empty input.`,
+      );
     }
   }
 
