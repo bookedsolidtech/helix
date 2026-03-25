@@ -549,7 +549,7 @@ export class HelixDrawer extends LitElement {
         <button
           part="close-btn"
           class="drawer-close-button drawer-close-button--sr-only"
-          aria-label=${this.closeLabel}
+          aria-label=${this.labelClose}
           @click=${() => {
             this.open = false;
           }}
