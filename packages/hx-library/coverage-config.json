@@ -108,6 +108,11 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-format-date": {
+      "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-grid": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
