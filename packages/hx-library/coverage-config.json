@@ -18,27 +18,7 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-alert": {
-      "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-avatar": {
-      "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-badge": {
-      "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-banner": {
-      "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-breadcrumb": {
       "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
@@ -74,11 +54,6 @@
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
     "hx-clinical-status": {
-      "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-code-snippet": {
       "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
@@ -145,11 +120,6 @@
     },
     "hx-field-label": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-file-upload": {
-      "reason": "Drag-and-drop and file validation paths require browser File API test infrastructure not yet in place.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
