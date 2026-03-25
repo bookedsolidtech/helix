@@ -1204,4 +1204,95 @@ describe('hx-carousel', () => {
       expect(() => el.remove()).not.toThrow();
     });
   });
+
+  // ─── Dynamic Slide Add / Remove ───
+
+  describe('Dynamic Slide Add / Remove', () => {
+    it('newly appended slide is included in _slides array', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      expect(el['_slides'].length).toBe(2);
+
+      const newSlide = document.createElement('hx-carousel-item') as HelixCarouselItem;
+      newSlide.textContent = 'Slide 3';
+      el.appendChild(newSlide);
+
+      await el.updateComplete;
+      await newSlide.updateComplete;
+
+      expect(el['_slides'].length).toBe(3);
+    });
+
+    it('pagination dots update to match new slide count after appending', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      const newSlide = document.createElement('hx-carousel-item') as HelixCarouselItem;
+      newSlide.textContent = 'Slide 3';
+      el.appendChild(newSlide);
+
+      // Wait for slotchange to propagate and Lit to re-render
+      await newSlide.updateComplete;
+      await el.updateComplete;
+      // Additional microtask flush to ensure _syncSlides ran after slotchange
+      await new Promise<void>((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      const dots = el.shadowRoot!.querySelectorAll('[part="pagination-item"]');
+      expect(dots.length).toBe(3);
+    });
+
+    it('currentIndex is clamped when a slide at or beyond it is removed', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(2);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      // Remove the last slide — currentIndex should clamp to 1
+      const slides = el.querySelectorAll('hx-carousel-item');
+      el.removeChild(slides[2]!);
+
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBeLessThanOrEqual(1);
+    });
+
+    it('empty carousel initializes with _slides length 0', async () => {
+      const el = await fixture<HelixCarousel>('<hx-carousel></hx-carousel>');
+      await el.updateComplete;
+      expect(el['_slides'].length).toBe(0);
+    });
+
+    it('goTo on empty carousel does nothing', async () => {
+      const el = await fixture<HelixCarousel>('<hx-carousel></hx-carousel>');
+      await el.updateComplete;
+
+      let fired = false;
+      el.addEventListener('hx-slide-change', () => {
+        fired = true;
+      });
+
+      el.goTo(1);
+      await el.updateComplete;
+
+      expect(fired).toBe(false);
+    });
+  });
 });
