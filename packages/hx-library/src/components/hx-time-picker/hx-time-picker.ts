@@ -377,6 +377,7 @@ export class HelixTimePicker extends LitElement {
    * @internal
    */
   private readonly _handleOutsideClick = (e: MouseEvent): void => {
+    if (!this.isConnected) return;
     if (!this.contains(e.target as Node) && !this.shadowRoot?.contains(e.target as Node)) {
       this._closeListbox();
     }

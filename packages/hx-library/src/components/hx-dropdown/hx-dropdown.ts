@@ -375,6 +375,7 @@ export class HelixDropdown extends LitElement {
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('open')) {
       // Keep aria-expanded in sync
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
