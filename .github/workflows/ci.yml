@@ -144,6 +144,7 @@ jobs:
       - run: pnpm turbo run build --filter='!docs'
       - run: pnpm exec playwright install --with-deps chromium
       - name: Run tests (PR — path-filtered by changed components)
+        id: test-pr
         if: github.event_name == 'pull_request'
         run: |
           BRANCH="${{ github.head_ref }}"
@@ -160,6 +161,7 @@ jobs:
             COMPONENT="${BASH_REMATCH[1]}"
             echo "Audit-fix branch — running tests for: $COMPONENT"
             pnpm exec vitest run "src/components/$COMPONENT/" --coverage.enabled
+            echo "tests_ran=true" >> "$GITHUB_OUTPUT"
           else
             # General PR: extract changed component dirs from git diff
             CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
@@ -173,9 +175,11 @@ jobs:
             PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
             echo "Running tests for: $PATHS"
             pnpm exec vitest run $PATHS --coverage.enabled
+            echo "tests_ran=true" >> "$GITHUB_OUTPUT"
           fi
         working-directory: packages/hx-library
       - name: Run tests (push — path-filtered by merged changes)
+        id: test-push
         if: github.event_name == 'push'
         run: |
           CHANGED=$(git diff --name-only HEAD~1...HEAD \
@@ -189,8 +193,10 @@ jobs:
           PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
           echo "Running tests for: $PATHS"
           npx vitest run $PATHS --coverage.enabled
+          echo "tests_ran=true" >> "$GITHUB_OUTPUT"
         working-directory: packages/hx-library
       - name: Enforce coverage thresholds for changed components
+        if: steps.test-pr.outputs.tests_ran == 'true' || steps.test-push.outputs.tests_ran == 'true'
         run: node scripts/check-coverage.mjs
       - name: Upload test results
         if: always()
