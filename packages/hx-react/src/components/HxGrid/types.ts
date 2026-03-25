@@ -15,13 +15,13 @@ export interface HxGridProps {
   /** Number of equal columns (`repeat(N, 1fr)`) or a CSS grid-template-columns string. */
   columns?: number | string;
   /** Gap size applied to both row and column gaps. */
-  gap?: string;
+  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   /** Row gap override. When set, takes precedence over `gap` for row spacing. */
-  rowGap?: string | undefined;
+  rowGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
   /** Column gap override. When set, takes precedence over `gap` for column spacing. */
-  columnGap?: string | undefined;
+  columnGap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
   /** Aligns grid items along the block axis (align-items). */
-  align?: string;
+  align?: 'start' | 'center' | 'end' | 'stretch';
   /** Justifies grid items along the inline axis (justify-items). */
-  justify?: string;
+  justify?: 'start' | 'center' | 'end' | 'stretch';
 }

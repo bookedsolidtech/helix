@@ -17,14 +17,18 @@ export interface HxCounterProps {
   /** Animation duration in milliseconds. */
   duration?: number;
   /** Easing function applied to the animation progress. */
-  easing?: string;
+  easing?: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
   /** Number format. 'integer' rounds to the nearest whole number;
 'decimal' shows two decimal places. */
-  format?: string;
+  format?: 'integer' | 'decimal';
   /** String prepended to the formatted value (e.g., '$'). */
   prefix?: string;
   /** String appended to the formatted value (e.g., '%'). */
   suffix?: string;
   /** Size variant controlling font size. */
-  size?: string;
+  size?: 'sm' | 'md' | 'lg';
+  /** Accessible label describing the counter's context (e.g. "Total patients", "Active alerts").
+WCAG 4.1.2: a numeric value alone is meaningless without context for screen readers.
+When provided, the value is applied as aria-label on the counter element. */
+  label?: string;
 }

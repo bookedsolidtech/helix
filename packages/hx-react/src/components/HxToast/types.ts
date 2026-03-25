@@ -13,7 +13,7 @@ export interface HxToastProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** Visual style variant. */
-  variant?: string;
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
   /** Auto-dismiss duration in milliseconds. Set to 0 for persistent toasts. */
   duration?: number;
   /** Whether to show a close button. */
@@ -21,7 +21,7 @@ export interface HxToastProps {
   /** Whether the toast is currently visible. */
   open?: boolean;
   /** Accessible label for the close button. Override for localization. */
-  closeLabel?: string;
+  labelClose?: string;
 
   // Event callbacks
   /** Dispatched when the toast becomes visible. */

@@ -15,9 +15,9 @@ export interface HxDrawerProps {
   /** Controls whether the drawer is open. */
   open?: boolean;
   /** Which edge of the viewport the drawer slides in from. */
-  placement?: string;
+  placement?: 'start' | 'end' | 'top' | 'bottom';
   /** The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length. */
-  size?: string;
+  size?: 'sm' | 'md' | 'lg' | 'full' | string;
   /** When true, the drawer is constrained to its positioned parent instead of the viewport.
 The host element must have `position: relative` (or the library handles it via :host). */
   contained?: boolean;
@@ -29,7 +29,7 @@ The host element must have `position: relative` (or the library handles it via :
 When the `label` slot is used, `aria-labelledby` takes precedence. */
   label?: string;
   /** Accessible label for the built-in close button. Override for localized text. */
-  closeLabel?: string;
+  labelClose?: string;
 
   // Event callbacks
   /** Fired when the drawer begins to open. */

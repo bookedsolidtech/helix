@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { createComponent } from '@lit/react';
-import { HxStyleScope as HelixStyleScope } from '@helixui/library/components/hx-style-scope';
+import { HxStyleScope as HxStyleScopeElement } from '@helixui/library/components/hx-style-scope';
 
 import type { HxStyleScopeProps } from './types.js';
 
@@ -34,7 +34,7 @@ The element renders as `display: contents` so it does not affect layout.
  */
 export const HxStyleScope = createComponent({
   tagName: 'hx-style-scope',
-  elementClass: HelixStyleScope,
+  elementClass: HxStyleScopeElement,
   react: React,
   events: {},
   displayName: 'HxStyleScope',
