@@ -37,6 +37,8 @@ and clipboard writes do not occur. */
   /** Text announced to screen readers and appended to aria-label after a
 successful copy. Also used as the content of the aria-live announcement. */
   labelCopied?: string;
+  /** Accessible label announced when copy fails. Override for i18n. */
+  labelError?: string;
 
   // Event callbacks
   /** Dispatched when the clipboard write fails (permission denied, iframe restriction, etc.). The `error` detail contains the caught error for diagnostic use. */

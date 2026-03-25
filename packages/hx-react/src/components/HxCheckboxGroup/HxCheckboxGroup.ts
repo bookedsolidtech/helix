@@ -28,7 +28,7 @@ export const HxCheckboxGroup = createComponent({
   elementClass: HelixCheckboxGroup,
   react: React,
   events: {
-    onHxChange: 'hx-change',
+    onHxChange: 'hx-change'
   },
   displayName: 'HxCheckboxGroup',
 });

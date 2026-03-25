@@ -29,7 +29,7 @@ export const HxPagination = createComponent({
   react: React,
   events: {
     onHxPageChange: 'hx-page-change',
-    onHxPageSizeChange: 'hx-page-size-change',
+    onHxPageSizeChange: 'hx-page-size-change'
   },
   displayName: 'HxPagination',
 });
