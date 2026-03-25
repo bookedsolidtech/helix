@@ -18,6 +18,8 @@
     "build": "tsc && chmod 755 build/index.js build/cli.js",
     "dev": "tsc --watch",
     "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "postinstall": "node scripts/postinstall.cjs"
   },
   "dependencies": {
@@ -26,7 +28,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.7.2"
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
   },
   "publishConfig": {
     "access": "public"

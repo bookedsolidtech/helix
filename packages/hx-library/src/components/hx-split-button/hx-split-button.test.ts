@@ -627,8 +627,8 @@ describe('hx-split-button', () => {
       `);
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
 
-      // Initially absent (false)
-      expect(trigger?.hasAttribute('aria-expanded')).toBe(false);
+      // Initially 'false' (always present per WCAG 4.1.2)
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
 
       // After open
       trigger?.click();

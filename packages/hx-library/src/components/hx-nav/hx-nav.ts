@@ -399,7 +399,7 @@ export class HelixNav extends LitElement {
           <button
             part="link"
             class=${classMap(linkClasses)}
-            aria-expanded=${isExpanded ? 'true' : nothing}
+            aria-expanded=${isExpanded ? 'true' : 'false'}
             @click=${(e: Event) => this._handleItemClick(item, index, e)}
             @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, index, item)}
           >
@@ -436,7 +436,7 @@ export class HelixNav extends LitElement {
         <button
           part="toggle"
           class="nav__toggle"
-          aria-expanded=${this._mobileOpen ? 'true' : nothing}
+          aria-expanded=${this._mobileOpen ? 'true' : 'false'}
           aria-controls="nav-list"
           aria-label=${this._mobileOpen ? this.labelCloseMenu : this.labelOpenMenu}
           @click=${this._handleToggle}

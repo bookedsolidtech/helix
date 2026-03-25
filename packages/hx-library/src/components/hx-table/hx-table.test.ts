@@ -45,10 +45,12 @@ describe('hx-table', () => {
       expect(table?.hasAttribute('aria-label')).toBe(false);
     });
 
-    it('does not warn on initial render when label is not provided', async () => {
+    it('warns on initial render when neither label nor caption is provided', async () => {
+      // WCAG 4.1.2: a table without any accessible name (label, caption, or caption slot)
+      // must emit a developer warning so the issue is caught during development.
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       await fixture<HelixTable>('<hx-table></hx-table>');
-      expect(warn).not.toHaveBeenCalled();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('[hx-table]'));
       warn.mockRestore();
     });
 

@@ -510,13 +510,15 @@ export class HelixSlider extends LitElement {
             `}
 
         <!-- Help text -->
-        <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>
-          ${this.helpText
-            ? html`<div part="help-text" class="slider__help-text" id=${this._helpId}>
-                ${this.helpText}
-              </div>`
-            : nothing}
-        </slot>
+        <!-- WCAG 1.3.1: wrap slot in a persistent container so _helpId stays stable
+             regardless of whether help content comes from the slot or the property. -->
+        <div id=${this._helpId}>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>
+            ${this.helpText
+              ? html`<div part="help-text" class="slider__help-text">${this.helpText}</div>`
+              : nothing}
+          </slot>
+        </div>
       </div>
     `;
   }

@@ -122,6 +122,11 @@ export class HelixTooltip extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('keydown', this._handleKeydown);
+    // Re-run ARIA setup on reconnection (firstUpdated does not re-run).
+    // hasUpdated is true after the first update cycle completes.
+    if (this.hasUpdated) {
+      this._setupTriggerAria();
+    }
   }
 
   override disconnectedCallback(): void {

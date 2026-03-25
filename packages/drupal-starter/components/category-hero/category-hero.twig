@@ -1,0 +1,39 @@
+{#
+  Category Hero SDC
+  Composes: hx-text, hx-image, hx-badge
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-badge') }}
+
+<section{{ attributes.addClass('category-hero') }}>
+  {% if image_url %}
+    <hx-image
+      src="{{ image_url }}"
+      alt="{{ image_alt|default('') }}"
+      class="category-hero__image"
+      loading="eager"
+    ></hx-image>
+    <div class="category-hero__overlay"></div>
+  {% endif %}
+
+  <div class="category-hero__content">
+    {% if title %}
+      <hx-text variant="display" tag="h1" class="category-hero__title">
+        {{ title }}
+      </hx-text>
+    {% endif %}
+
+    {% if description %}
+      <hx-text variant="lead" tag="p" class="category-hero__description">
+        {{ description }}
+      </hx-text>
+    {% endif %}
+
+    {% if article_count is not null %}
+      <hx-badge variant="neutral" class="category-hero__count">
+        {{ article_count }} {{ 'articles'|t }}
+      </hx-badge>
+    {% endif %}
+  </div>
+</section>

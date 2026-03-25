@@ -423,7 +423,7 @@ describe('hx-image', () => {
       expect(errorContainer?.getAttribute('role')).toBe('alert');
     });
 
-    it('error container has aria-live=polite attribute', async () => {
+    it('error container does NOT have aria-live attribute (WCAG 4.1.2: role=alert already implies aria-live=assertive)', async () => {
       const el = await fixture<HelixImage>(
         '<hx-image src="https://broken.url/img.png" alt="Test"></hx-image>',
       );
@@ -432,7 +432,9 @@ describe('hx-image', () => {
       await el.updateComplete;
 
       const errorContainer = shadowQuery(el, '.image__container--error');
-      expect(errorContainer?.getAttribute('aria-live')).toBe('polite');
+      // role="alert" implies aria-live="assertive". Adding aria-live="polite" is
+      // contradictory and was removed to comply with WCAG 4.1.2.
+      expect(errorContainer?.hasAttribute('aria-live')).toBe(false);
     });
   });
 

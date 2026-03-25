@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
@@ -293,7 +293,11 @@ export class HelixTreeView extends LitElement {
         role="tree"
         tabindex=${containerTabindex}
         aria-label=${this.label || 'Tree'}
-        aria-multiselectable=${this.selection === 'multiple' ? 'true' : 'false'}
+        aria-multiselectable=${this.selection === 'none'
+          ? nothing
+          : this.selection === 'multiple'
+            ? 'true'
+            : 'false'}
         @hx-tree-item-select=${this._handleTreeItemSelect}
         @keydown=${this._handleKeyDown}
         @focusin=${this._handleFocusIn}

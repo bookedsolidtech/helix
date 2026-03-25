@@ -1,0 +1,45 @@
+{#
+/**
+ * @file
+ * Related Articles SDC — composes hx-card, hx-text, hx-image, hx-link, hx-badge.
+ *
+ * Displays a grid of related article cards.
+ */
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-link') }}
+{{ attach_library('helixui/hx-badge') }}
+
+<div class="related-articles">
+  <hx-text variant="heading" size="md">{{ title|default('Related Articles') }}</hx-text>
+  {% if items|length %}
+    <div class="related-articles__grid">
+      {% for item in items %}
+        <hx-card variant="default" elevation="raised">
+          {% if item.image_url %}
+            <hx-image
+              slot="image"
+              src="{{ item.image_url }}"
+              alt="{{ item.image_alt|default(item.title) }}"
+            ></hx-image>
+          {% endif %}
+          <span slot="heading">
+            <hx-link href="{{ item.url }}">{{ item.title }}</hx-link>
+          </span>
+          <div class="related-articles__meta">
+            {% if item.category %}
+              <hx-badge variant="subtle">{{ item.category }}</hx-badge>
+            {% endif %}
+            {% if item.date %}
+              <hx-text variant="body" size="xs" color="muted">
+                <time datetime="{{ item.date }}">{{ item.date }}</time>
+              </hx-text>
+            {% endif %}
+          </div>
+        </hx-card>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

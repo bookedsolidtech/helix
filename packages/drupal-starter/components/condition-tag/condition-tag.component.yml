@@ -1,0 +1,29 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Condition Tag
+description: 'Clickable tag for medical conditions, treatments, or specialties. Used in provider profiles, health topic pages, and search filters. Composes hx-tag, hx-link, hx-icon.'
+status: experimental
+group: Healthcare
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'Condition, treatment, or specialty name'
+    url:
+      type: string
+      title: URL
+      description: 'Link to the condition/treatment/specialty page'
+    variant:
+      type: string
+      title: Variant
+      description: 'Tag category variant'
+      default: condition
+      enum:
+        - condition
+        - treatment
+        - specialty
+    icon:
+      type: string
+      title: Icon
+      description: 'Optional icon name to display alongside the tag'

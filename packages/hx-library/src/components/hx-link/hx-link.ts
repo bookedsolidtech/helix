@@ -161,7 +161,6 @@ export class HelixLink extends LitElement {
           part="link"
           class=${classMap(classes)}
           role="link"
-          tabindex="0"
           aria-disabled="true"
           @click=${this._handleClick}
         >

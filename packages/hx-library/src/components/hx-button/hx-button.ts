@@ -264,6 +264,7 @@ export class HelixButton extends LitElement {
           aria-label=${this.ariaLabel ?? nothing}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
+          tabindex=${this.disabled ? '-1' : nothing}
           @click=${this._handleClick}
         >
           ${this._renderInner()}

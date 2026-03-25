@@ -20,6 +20,19 @@ Purely visual — no slots. Announces loading state to screen readers via
 
 When used alongside visible loading text, set `decorative` to suppress
 duplicate AT announcements.
+
+**WCAG 4.1.2 — `aria-busy` pattern for consumers:**
+When this spinner indicates that a region of the page is loading, set
+`aria-busy="true"` on the container element that wraps the loading content
+and remove it (or set `aria-busy="false"`) once loading completes. This
+communicates the loading state to assistive technologies at the region level,
+complementing the spinner's own `role="status"` announcement.
+
+```html
+<section aria-busy="true" aria-label="Patient records">
+  <hx-spinner label="Loading patient records"></hx-spinner>
+</section>
+```
  *
  * @example
  * ```tsx

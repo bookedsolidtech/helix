@@ -232,6 +232,19 @@ function run() {
   writeFileSync(join(OUT_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
   console.log(`[css-bundles] ✓ manifest.json`);
 
+  // Generate index.css with @import statements for all component CSS files
+  const indexLines = [
+    `/* index.css — generated ${new Date().toISOString()} */`,
+    `/* Imports all per-component CSS files for Drupal asset pipeline */`,
+    '',
+  ];
+  for (const entry of componentEntries) {
+    indexLines.push(`@import './${entry.name}.css';`);
+  }
+  indexLines.push('');
+  writeFileSync(join(OUT_DIR, 'index.css'), indexLines.join('\n'));
+  console.log(`[css-bundles] ✓ index.css (${componentEntries.length} imports)`);
+
   const total = componentEntries.length;
   const withStyles = componentEntries.filter((e) => e.css.length > 0).length;
   console.log(`\n[css-bundles] Done. ${total} components processed (${withStyles} with styles).`);

@@ -1,0 +1,50 @@
+/* Recipe Full — layout and spacing only */
+
+.recipe-full {
+  display: block;
+  max-width: var(--hx-container-max-width, 72rem);
+  margin-inline: auto;
+}
+
+.recipe-full__hero {
+  margin-block-end: var(--hx-spacing-lg, 1.5rem);
+}
+
+.recipe-full__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  margin-block-end: var(--hx-spacing-md, 1rem);
+}
+
+.recipe-full__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.recipe-full__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--hx-spacing-xl, 2rem);
+  margin-block-start: var(--hx-spacing-lg, 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .recipe-full__layout:has(.recipe-full__sidebar) {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+.recipe-full__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  margin-block: var(--hx-spacing-md, 1rem);
+}
+
+.recipe-full__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}

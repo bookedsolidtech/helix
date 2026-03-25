@@ -487,10 +487,13 @@ describe('hx-slider', () => {
     it('associates help text with input via aria-describedby', async () => {
       const el = await fixture<HelixSlider>('<hx-slider help-text="Helpful guidance"></hx-slider>');
       const input = shadowQuery(el, 'input[type="range"]');
-      const helpEl = shadowQuery(el, '.slider__help-text');
       const describedBy = input?.getAttribute('aria-describedby');
+      // WCAG 1.3.1: _helpId is on the persistent wrapper div surrounding the help-text
+      // slot, not on the inner .slider__help-text element, so the ID stays stable
+      // whether help content comes from the slot or the property.
+      const helpWrapper = describedBy ? el.shadowRoot?.getElementById(describedBy) : null;
       expect(describedBy).toBeTruthy();
-      expect(describedBy).toBe(helpEl?.id);
+      expect(helpWrapper).toBeTruthy();
     });
   });
 

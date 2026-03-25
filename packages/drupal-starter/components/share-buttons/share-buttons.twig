@@ -1,0 +1,64 @@
+{#
+/**
+ * @file
+ * Share Buttons SDC — composes hx-button, hx-icon, hx-button-group.
+ *
+ * Provides social sharing buttons for Twitter, Facebook, LinkedIn, and email.
+ */
+#}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-icon') }}
+{{ attach_library('helixui/hx-button-group') }}
+
+{% set share_url = url|url_encode %}
+{% set share_title = title|url_encode %}
+{% set active_platforms = platforms|default(['twitter', 'facebook', 'linkedin', 'email']) %}
+
+<div class="share-buttons">
+  <hx-button-group>
+    {% if 'twitter' in active_platforms %}
+      <hx-button
+        variant="ghost"
+        size="sm"
+        aria-label="Share on Twitter"
+        onclick="window.open('https://twitter.com/intent/tweet?url={{ share_url }}&text={{ share_title }}', '_blank', 'noopener,noreferrer')"
+      >
+        <hx-icon name="twitter" slot="prefix"></hx-icon>
+        Twitter
+      </hx-button>
+    {% endif %}
+    {% if 'facebook' in active_platforms %}
+      <hx-button
+        variant="ghost"
+        size="sm"
+        aria-label="Share on Facebook"
+        onclick="window.open('https://www.facebook.com/sharer/sharer.php?u={{ share_url }}', '_blank', 'noopener,noreferrer')"
+      >
+        <hx-icon name="facebook" slot="prefix"></hx-icon>
+        Facebook
+      </hx-button>
+    {% endif %}
+    {% if 'linkedin' in active_platforms %}
+      <hx-button
+        variant="ghost"
+        size="sm"
+        aria-label="Share on LinkedIn"
+        onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url={{ share_url }}', '_blank', 'noopener,noreferrer')"
+      >
+        <hx-icon name="linkedin" slot="prefix"></hx-icon>
+        LinkedIn
+      </hx-button>
+    {% endif %}
+    {% if 'email' in active_platforms %}
+      <hx-button
+        variant="ghost"
+        size="sm"
+        aria-label="Share via email"
+        onclick="window.location.href='mailto:?subject={{ share_title }}&body={{ share_url }}'"
+      >
+        <hx-icon name="email" slot="prefix"></hx-icon>
+        Email
+      </hx-button>
+    {% endif %}
+  </hx-button-group>
+</div>

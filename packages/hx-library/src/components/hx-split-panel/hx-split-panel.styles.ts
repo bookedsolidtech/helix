@@ -145,6 +145,9 @@ export const helixSplitPanelStyles = css`
     padding: 0;
     line-height: 1;
     flex-shrink: 0;
+    /* WCAG 2.5.5: minimum 44×44px touch target via transparent hit-area */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .collapse-btn:hover {

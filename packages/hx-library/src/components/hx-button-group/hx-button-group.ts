@@ -96,6 +96,11 @@ export class HelixButtonGroup extends LitElement {
     this.style.setProperty('--hx-button-group-size', this.size);
     if (this.label) {
       this.internals.ariaLabel = this.label;
+    } else {
+      devWarn(
+        'hx-button-group',
+        'Missing accessible label. Provide a `label` attribute so screen readers can announce the group purpose (WCAG 4.1.2).',
+      );
     }
   }
 

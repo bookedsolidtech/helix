@@ -179,7 +179,9 @@ export class HelixCard extends LitElement {
   private _handleKeyDown(e: KeyboardEvent): void {
     if (!this.href) return;
 
-    if (e.key === 'Enter' || e.key === ' ') {
+    // WCAG 2.1.1 / ARIA APG: role="link" activates on Enter only.
+    // Space is reserved for scrolling and must not activate links.
+    if (e.key === 'Enter') {
       e.preventDefault();
       this._dispatchCardClick(e);
     }

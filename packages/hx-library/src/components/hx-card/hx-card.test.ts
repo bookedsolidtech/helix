@@ -206,13 +206,16 @@ describe('hx-card', () => {
       expect(event.detail.href).toBe('/test');
     });
 
-    it('Space fires hx-click when interactive', async () => {
+    it('Space does NOT fire hx-click when interactive (WCAG 2.1.1 / ARIA APG: links activate on Enter only)', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      let fired = false;
+      el.addEventListener('hx-click', () => {
+        fired = true;
+      });
       card.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-      const event = await eventPromise;
-      expect(event.detail.href).toBe('/test');
+      await el.updateComplete;
+      expect(fired).toBe(false);
     });
 
     it('no keyboard action without hx-href', async () => {

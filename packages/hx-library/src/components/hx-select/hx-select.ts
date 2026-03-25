@@ -1,14 +1,15 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxSelectIdCounter = 0;
+const _nextSelectId = createIdCounter('hx-select');
 
 // ─── Internal option model ───
 
@@ -71,27 +72,18 @@ interface SelectOption {
  * @cssprop [--hx-select-placeholder-color=var(--hx-color-neutral-400)] - Placeholder text color.
  */
 @customElement('hx-select')
-export class HelixSelect extends LitElement {
+export class HelixSelect extends HelixElement {
   static override styles = [tokenStyles, helixSelectStyles];
 
   // ─── Form Association ───
 
   /** Marks this element as form-associated for ElementInternals support. @internal */
-  static formAssociated = true;
-
-  /** Holds the ElementInternals instance used for form value and validity management. @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Stable IDs ───
 
   /** @internal */
-  private _selectId = `hx-select-${++_hxSelectIdCounter}`;
+  private _selectId = _nextSelectId();
   /** @internal */
   private _listboxId = `${this._selectId}-listbox`;
   /** @internal */
@@ -282,15 +274,15 @@ export class HelixSelect extends LitElement {
     }
   }
 
-  /** @internal */
-  formResetCallback(): void {
+  // ─── Form Lifecycle Hooks ───
+
+  protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue(null);
   }
 
-  /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
@@ -298,8 +290,7 @@ export class HelixSelect extends LitElement {
     }
   }
 
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -579,7 +570,7 @@ export class HelixSelect extends LitElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : 'false'}
+            aria-selected=${isSelected ? 'true' : nothing}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >
@@ -593,7 +584,7 @@ export class HelixSelect extends LitElement {
   // ─── Main Render ───
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
 
     const fieldClasses = {
       field: true,

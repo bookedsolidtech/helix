@@ -1,0 +1,100 @@
+{#
+  Provider Card SDC
+  Composes: hx-card, hx-text, hx-avatar, hx-badge, hx-button, hx-rating, hx-status-indicator
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-avatar') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-rating') }}
+{{ attach_library('helixui/hx-status-indicator') }}
+
+<div{{ attributes.addClass('provider-card') }}>
+  <hx-card variant="default" elevation="raised">
+    <div slot="header" class="provider-card__header">
+      <hx-avatar
+        src="{{ image_url|default('') }}"
+        label="{{ image_alt|default(name) }}"
+        size="lg"
+      ></hx-avatar>
+
+      <div class="provider-card__identity">
+        <hx-text variant="heading-sm">
+          {% if url %}
+            <a href="{{ url }}">{{ name }}</a>
+          {% else %}
+            {{ name }}
+          {% endif %}
+        </hx-text>
+
+        {% if credentials %}
+          <hx-text variant="body-sm" class="provider-card__credentials">{{ credentials }}</hx-text>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="provider-card__body">
+      {% if specialty %}
+        <hx-badge variant="neutral" size="sm">{{ specialty }}</hx-badge>
+      {% endif %}
+
+      {% if badges %}
+        <div class="provider-card__badges">
+          {{ badges }}
+        </div>
+      {% endif %}
+
+      <div class="provider-card__details">
+        {% if location %}
+          <div class="provider-card__detail">
+            <hx-text variant="body-xs">{{ location }}</hx-text>
+          </div>
+        {% endif %}
+
+        {% if phone %}
+          <div class="provider-card__detail">
+            <hx-text variant="body-xs">
+              <a href="tel:{{ phone }}">{{ phone }}</a>
+            </hx-text>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if rating %}
+        <div class="provider-card__rating">
+          <hx-rating value="{{ rating }}" readonly></hx-rating>
+        </div>
+      {% endif %}
+
+      <div class="provider-card__status">
+        <hx-status-indicator
+          status="{{ accepting_patients|default(true) ? 'active' : 'inactive' }}"
+        ></hx-status-indicator>
+        <hx-text variant="body-xs">
+          {{ accepting_patients|default(true) ? 'Accepting new patients' : 'Not accepting new patients' }}
+        </hx-text>
+      </div>
+    </div>
+
+    <div slot="footer" class="provider-card__footer">
+      {% if url %}
+        <hx-button variant="primary" size="sm">
+          <a href="{{ url }}">View Profile</a>
+        </hx-button>
+      {% endif %}
+
+      {% if phone %}
+        <hx-button variant="secondary" size="sm">
+          <a href="tel:{{ phone }}">Call Office</a>
+        </hx-button>
+      {% endif %}
+
+      {% if actions %}
+        <div class="provider-card__actions">
+          {{ actions }}
+        </div>
+      {% endif %}
+    </div>
+  </hx-card>
+</div>

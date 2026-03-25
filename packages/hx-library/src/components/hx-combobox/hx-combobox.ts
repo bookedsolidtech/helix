@@ -265,12 +265,16 @@ export class HelixCombobox extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._handleOutsideClick);
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._handleOutsideClick);
+    }
     if (this._debounceTimer !== null) {
       clearTimeout(this._debounceTimer);
     }
@@ -671,7 +675,13 @@ export class HelixCombobox extends LitElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${this.multiple
+              ? isSelected
+                ? 'true'
+                : 'false'
+              : isSelected
+                ? 'true'
+                : nothing}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >

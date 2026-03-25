@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -80,10 +80,26 @@ export class HelixCounter extends LitElement {
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Accessible label describing the counter's context (e.g. "Total patients", "Active alerts").
+   * WCAG 4.1.2: a numeric value alone is meaningless without context for screen readers.
+   * When provided, the value is applied as aria-label on the counter element.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
+
   // ─── Internal State ───
 
   /** @internal */
   @state() private _displayValue = 0;
+
+  /**
+   * The final value announced to screen readers once animation completes.
+   * Updated only at animation end so AT users hear the result, not every frame.
+   * @internal
+   */
+  @state() private _announcedValue = '';
 
   /** @internal */
   private _animationId: number | null = null;
@@ -93,6 +109,16 @@ export class HelixCounter extends LitElement {
   private _startValue = 0;
   /** @internal */
   private _prefersReducedMotion = false;
+  /** @internal */
+  private _motionMql: MediaQueryList | null = null;
+  /** @internal */
+  private readonly _handleMotionChange = (e: MediaQueryListEvent): void => {
+    this._prefersReducedMotion = e.matches;
+    if (this._prefersReducedMotion) {
+      this._cancelAnimation();
+      this._displayValue = this.value;
+    }
+  };
 
   // ─── Lifecycle ───
 
@@ -113,10 +139,13 @@ export class HelixCounter extends LitElement {
     }
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this._motionMql = mq;
     this._prefersReducedMotion = mq.matches;
+    mq.addEventListener('change', this._handleMotionChange);
 
     if (this._prefersReducedMotion) {
       this._displayValue = this.value;
+      this._announcedValue = this._formatValue();
     } else {
       this._startAnimation();
     }
@@ -125,6 +154,8 @@ export class HelixCounter extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._cancelAnimation();
+    this._motionMql?.removeEventListener('change', this._handleMotionChange);
+    this._motionMql = null;
   }
 
   override updated(changedProps: PropertyValues<this>): void {
@@ -132,6 +163,7 @@ export class HelixCounter extends LitElement {
     if (changedProps.has('value') && changedProps.get('value') !== undefined) {
       if (this._prefersReducedMotion) {
         this._displayValue = this.value;
+        this._announcedValue = this._formatValue();
       } else {
         this._startValue = this._displayValue;
         this._startTime = null;
@@ -184,6 +216,10 @@ export class HelixCounter extends LitElement {
       } else {
         this._displayValue = this.value;
         this._animationId = null;
+        // WCAG 4.1.2: announce the final value only once, at animation end.
+        // _announcedValue feeds the off-screen live region so screen readers
+        // hear a single announcement rather than one per animation frame.
+        this._announcedValue = this._formatValue();
       }
     };
 
@@ -211,9 +247,24 @@ export class HelixCounter extends LitElement {
     };
 
     return html`
-      <span part="counter" class=${classMap(classes)} aria-live="polite" aria-atomic="true">
+      <span
+        part="counter"
+        class=${classMap(classes)}
+        aria-label=${this.label ? `${this.label}: ${this._formatValue()}` : nothing}
+      >
         ${this._formatValue()}
       </span>
+      <!--
+        WCAG 4.1.2: off-screen live region updated only at animation end.
+        Prevents screen readers from announcing every intermediate frame value.
+      -->
+      <span
+        class="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-hidden=${this._announcedValue ? nothing : 'true'}
+        >${this._announcedValue}</span
+      >
     `;
   }
 }

@@ -1,0 +1,11 @@
+/**
+ * @file
+ * Share Buttons SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}

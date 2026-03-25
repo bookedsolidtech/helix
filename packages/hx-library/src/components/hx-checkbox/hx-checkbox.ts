@@ -1,13 +1,14 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
-let _checkboxCounter = 0;
+const _nextCheckboxId = createIdCounter('hx-checkbox');
 
 /**
  * A checkbox component with label, validation, and form association.
@@ -43,7 +44,7 @@ let _checkboxCounter = 0;
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
 @customElement('hx-checkbox')
-export class HelixCheckbox extends LitElement {
+export class HelixCheckbox extends HelixElement {
   static override styles = [tokenStyles, helixCheckboxStyles];
 
   // P0-02: observe aria-label on host to forward to inner input
@@ -58,17 +59,7 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Form Association ───
 
-  /** @internal */
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -156,6 +147,15 @@ export class HelixCheckbox extends LitElement {
   /** @internal */
   @state() private _hasErrorSlot = false;
 
+  /**
+   * Deferred copy of this.error used inside the live region. Injected after
+   * the region is visible (via requestAnimationFrame) so screen readers
+   * re-announce the message even if it was set before the region became
+   * visible — see WCAG 4.1.3.
+   * @internal
+   */
+  @state() private _announcedError = '';
+
   // ─── Slot Handlers ───
 
   /** @internal */
@@ -174,6 +174,25 @@ export class HelixCheckbox extends LitElement {
     }
     if (changedProperties.has('required')) {
       this._updateValidity();
+    }
+    // WCAG 4.1.3: Keep _announcedError in sync with the error property.
+    // When error changes from one non-empty value to another, clear the live region
+    // first then re-inject after a rAF tick so screen readers re-announce the updated
+    // message (clearing content before the region is re-populated triggers a new event).
+    // When transitioning from empty to non-empty (initial display), set directly so
+    // the text is immediately available for synchronous DOM assertions.
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string;
+      if (previousError && this.error) {
+        // Changing from one error message to another: defer to trigger re-announcement.
+        this._announcedError = '';
+        requestAnimationFrame(() => {
+          this._announcedError = this.error;
+        });
+      } else {
+        // Transitioning from empty→error or error→empty: set directly.
+        this._announcedError = this.error;
+      }
     }
   }
 
@@ -217,20 +236,22 @@ export class HelixCheckbox extends LitElement {
     }
   }
 
-  /** @internal */
-  formResetCallback(): void {
+  // ─── Form Lifecycle Hooks ───
+
+  protected override _onFormReset(): void {
     this.checked = false;
     this.indeterminate = false;
     this._internals.setFormValue(null);
   }
 
-  /** @internal */
-  formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
     this.checked = typeof state === 'string' && state === this.value;
   }
 
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -279,7 +300,7 @@ export class HelixCheckbox extends LitElement {
 
   // P2-05: monotonic counter — collision-free and deterministic
   /** @internal */
-  private _id = `hx-checkbox-${++_checkboxCounter}`;
+  private _id = _nextCheckboxId();
   /** @internal */
   private _helpTextId = `${this._id}-help`;
   /** @internal */
@@ -376,7 +397,9 @@ export class HelixCheckbox extends LitElement {
           role="status"
           ?hidden=${!hasError}
         >
-          <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>
+            ${this._announcedError}
+          </slot>
         </div>
 
         ${this.helpText && !hasError

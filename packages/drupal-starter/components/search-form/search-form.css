@@ -1,0 +1,31 @@
+/**
+ * @file
+ * Search Form SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.search-form__input-group {
+  display: flex;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  align-items: flex-end;
+}
+
+.search-form__input-group hx-text-input {
+  flex: 1 1 auto;
+}
+
+.search-form__input-group hx-button {
+  flex: 0 0 auto;
+}
+
+.search-form__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}

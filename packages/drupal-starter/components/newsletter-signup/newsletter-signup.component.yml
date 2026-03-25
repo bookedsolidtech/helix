@@ -1,0 +1,39 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Newsletter Signup
+description: 'Email newsletter subscription form composing hx-text-input, hx-button, hx-text, and hx-checkbox for opt-in consent.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Heading text for the signup form'
+      default: 'Subscribe to our newsletter'
+    description:
+      type: string
+      title: Description
+      description: 'Supporting text below the title'
+    action:
+      type: string
+      title: Action
+      description: 'Form action URL for submission'
+    method:
+      type: string
+      title: Method
+      description: 'Form submission method'
+      default: 'post'
+      enum:
+        - get
+        - post
+    email_label:
+      type: string
+      title: 'Email Label'
+      description: 'Label for the email input field'
+      default: 'Email address'
+    button_text:
+      type: string
+      title: 'Button Text'
+      description: 'Text for the submit button'
+      default: 'Subscribe'

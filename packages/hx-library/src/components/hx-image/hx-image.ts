@@ -4,6 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixImageStyles } from './hx-image.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * An accessible image wrapper with lazy loading, fallback support, aspect ratio control,
@@ -188,6 +189,13 @@ export class HelixImage extends LitElement {
   }
 
   override render() {
+    if (!this.decorative && !this.alt) {
+      devWarn(
+        'hx-image',
+        'Informative images require an `alt` attribute for accessibility (WCAG 1.1.1). ' +
+          'Provide a descriptive `alt` value, or set the `decorative` attribute if the image is decorative.',
+      );
+    }
     const isDecorative = this.decorative || this.alt === '';
     const altText = isDecorative ? '' : (this.alt ?? '');
     const borderRadius = this._computeBorderRadius();
@@ -211,7 +219,6 @@ export class HelixImage extends LitElement {
           class="image__container image__container--error"
           style=${styleMap(containerStyles)}
           role="alert"
-          aria-live="polite"
         >
           <slot name="fallback"></slot>
         </figure>

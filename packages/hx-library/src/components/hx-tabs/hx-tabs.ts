@@ -1,4 +1,4 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
@@ -210,7 +210,17 @@ export class HelixTabs extends LitElement {
         // aria-labelledby pointing to hx-tab host IDs fails because the host element's
         // accessible text is inside its shadow DOM (the inner <button>), which AT cannot
         // traverse via aria-labelledby references across shadow roots.
-        const tabLabel = tab.textContent?.trim() ?? '';
+        // Extract only default-slot children (no `slot` attribute) to exclude prefix/suffix
+        // slot content (e.g. badge counts) from the panel accessible name (WCAG 1.3.1).
+        const tabLabel = Array.from(tab.childNodes)
+          .filter(
+            (node) =>
+              node.nodeType === Node.TEXT_NODE ||
+              (node.nodeType === Node.ELEMENT_NODE && !(node as Element).hasAttribute('slot')),
+          )
+          .map((node) => node.textContent ?? '')
+          .join('')
+          .trim();
         if (tabLabel) {
           panel.setAttribute('aria-label', tabLabel);
           panel.removeAttribute('aria-labelledby');
@@ -416,7 +426,7 @@ export class HelixTabs extends LitElement {
           class="tablist"
           role="tablist"
           aria-orientation=${this.orientation}
-          aria-label=${this.label || nothing}
+          aria-label=${this.label || 'Tabs'}
         >
           <slot name="tab" @slotchange=${this._handleSlotChange}></slot>
         </div>
