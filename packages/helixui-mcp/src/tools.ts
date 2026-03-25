@@ -17,6 +17,7 @@ import { validateIntegration } from './tools/validate-integration.js';
 import { scaffoldTheme } from './tools/scaffold-theme.js';
 import { auditTokens, formatAuditReport } from './tools/audit-tokens.js';
 import { scaffoldComponent } from './tools/scaffold-component.js';
+import { migrateVersion, formatMigrationPlan } from './tools/migrate-version.js';
 
 // ─── Input schemas ─────────────────────────────────────────────────────────────
 
@@ -121,6 +122,21 @@ const AuditTokensArgsSchema = z.object({
     .describe(
       'Path to a CSS file or project root directory to scan for --hx-* custom property declarations.',
     ),
+});
+
+const MigrateVersionArgsSchema = z.object({
+  fromVersion: z
+    .string()
+    .min(1)
+    .describe('Semver string for the version the consumer is currently on, e.g. "0.1.3"'),
+  toVersion: z
+    .string()
+    .min(1)
+    .describe('Semver string for the target version to migrate to, e.g. "0.2.0"'),
+  projectRoot: z
+    .string()
+    .min(1)
+    .describe('Absolute or relative path to the consumer project root directory to scan'),
 });
 
 // ─── Tool list ─────────────────────────────────────────────────────────────────
@@ -346,6 +362,33 @@ const TOOL_DEFINITIONS = [
       required: ['path'],
     },
   },
+  {
+    name: 'migrateVersion',
+    description:
+      'Generate a migration plan for upgrading a consumer project between two HELiX library versions. ' +
+      'Reads the bundled breaking-changes manifest to identify renamed imports, properties, events, slots, ' +
+      'and CSS tokens. Scans the consumer project for affected files and returns an ordered migration plan ' +
+      'sorted by impact (number of occurrences). Provides before/after code examples and automated ' +
+      'search-and-replace patterns for each breaking change found.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        fromVersion: {
+          type: 'string',
+          description: 'Semver string for the version the consumer is currently on, e.g. "0.1.3"',
+        },
+        toVersion: {
+          type: 'string',
+          description: 'Semver string for the target version to migrate to, e.g. "0.2.0"',
+        },
+        projectRoot: {
+          type: 'string',
+          description: 'Absolute or relative path to the consumer project root directory to scan',
+        },
+      },
+      required: ['fromVersion', 'toVersion', 'projectRoot'],
+    },
+  },
 ] as const;
 
 // ─── Response helpers ──────────────────────────────────────────────────────────
@@ -476,6 +519,17 @@ export function registerTools(server: Server): void {
           if (!parsed.success) return failure(parsed.error.message);
           const report = auditTokens({ path: parsed.data.path });
           return success(formatAuditReport(report));
+        }
+
+        case 'migrateVersion': {
+          const parsed = MigrateVersionArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const plan = migrateVersion({
+            fromVersion: parsed.data.fromVersion,
+            toVersion: parsed.data.toVersion,
+            projectRoot: parsed.data.projectRoot,
+          });
+          return success(formatMigrationPlan(plan));
         }
 
         default:
