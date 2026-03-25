@@ -59,7 +59,7 @@ export const helixSelectStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     cursor: pointer;
-    text-align: left;
+    text-align: start;
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -129,7 +129,7 @@ export const helixSelectStyles = css`
     left: 2px;
     width: 7px;
     height: 7px;
-    border-right: 1.5px solid currentColor;
+    border-inline-end: 1.5px solid currentColor;
     border-bottom: 1.5px solid currentColor;
     transform: rotate(45deg);
   }

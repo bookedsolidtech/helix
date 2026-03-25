@@ -150,10 +150,10 @@ export const helixCodeSnippetStyles = css`
   .code-snippet__line-number {
     display: inline-block;
     min-width: var(--hx-space-8, 2rem);
-    padding-right: var(--hx-space-3, 0.75rem);
+    padding-inline-end: var(--hx-space-3, 0.75rem);
     color: var(--hx-code-snippet-line-number-color, var(--hx-color-neutral-500, #64748b));
     user-select: none;
-    text-align: right;
+    text-align: end;
   }
 
   @media (prefers-reduced-motion: reduce) {

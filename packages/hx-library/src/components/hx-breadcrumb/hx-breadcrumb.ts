@@ -73,6 +73,12 @@ export class HelixBreadcrumb extends LitElement {
   maxItems = 0;
 
   /**
+   * Accessible label for the expand ellipsis button. Override for i18n.
+   * @attr label-ellipsis
+   */
+  @property({ attribute: 'label-ellipsis' }) labelEllipsis = 'Show all breadcrumb items';
+
+  /**
    * When true, injects a JSON-LD BreadcrumbList structured data script into the document head.
    *
    * NOTE: Drupal manages `<head>` content via its own render pipeline. Injecting a
@@ -238,7 +244,7 @@ export class HelixBreadcrumb extends LitElement {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.textContent = '…';
-      btn.setAttribute('aria-label', 'Show all breadcrumb items');
+      btn.setAttribute('aria-label', this.labelEllipsis);
       ellipsis.appendChild(btn);
 
       this._ellipsisItem = ellipsis;

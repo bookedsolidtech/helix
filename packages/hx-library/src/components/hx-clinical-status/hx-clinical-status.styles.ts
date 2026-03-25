@@ -37,7 +37,7 @@ export const helixClinicalStatusStyles = css`
     padding: var(--hx-clinical-status-padding, var(--hx-space-4, 1rem));
     border: var(--hx-clinical-status-border-width, var(--hx-border-width-thin, 1px)) solid
       var(--hx-clinical-status-border-color, var(--hx-color-info-200, #b3d9ef));
-    border-left: var(--hx-clinical-status-accent-width, 4px) solid
+    border-inline-start: var(--hx-clinical-status-accent-width, 4px) solid
       var(--hx-clinical-status-accent-color, var(--hx-color-info-500, #3b82f6));
     border-radius: var(--hx-clinical-status-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-clinical-status-bg, var(--hx-color-info-50, #e8f4fd));
@@ -97,7 +97,7 @@ export const helixClinicalStatusStyles = css`
     --hx-clinical-status-accent-color: var(--hx-color-error-700, #b91c1c);
     --hx-clinical-status-color: var(--hx-color-error-900, #7f1d1d);
     --hx-clinical-status-icon-color: var(--hx-color-error-700, #b91c1c);
-    border-left-width: var(--hx-clinical-status-emergent-accent-width, 6px);
+    border-inline-start-width: var(--hx-clinical-status-emergent-accent-width, 6px);
     font-weight: var(--hx-font-weight-semibold, 600);
   }
 
@@ -149,7 +149,7 @@ export const helixClinicalStatusStyles = css`
     display: none;
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
   }
 
