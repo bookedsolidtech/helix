@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, fn, userEvent } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import './hx-patient-banner.js';
 import '../hx-phi-field/hx-phi-field.js';
 import '../hx-theme/hx-theme.js';

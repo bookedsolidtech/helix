@@ -102,7 +102,14 @@ export class HelixPatientBanner extends LitElement {
    * slots (name, mrn, dob) are populated.
    * @attr enforce-identifier-rule
    */
-  @property({ type: Boolean, attribute: 'enforce-identifier-rule' })
+  @property({
+    attribute: 'enforce-identifier-rule',
+    reflect: true,
+    converter: {
+      fromAttribute: (value: string | null) => value !== 'false',
+      toAttribute: (value: boolean) => String(value),
+    },
+  })
   enforceIdentifierRule: boolean = true;
 
   // ─── Internal State ───
