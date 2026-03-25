@@ -1,13 +1,14 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
-let _checkboxCounter = 0;
+const _nextCheckboxId = createIdCounter('hx-checkbox');
 
 /**
  * A checkbox component with label, validation, and form association.
@@ -43,7 +44,7 @@ let _checkboxCounter = 0;
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
 @customElement('hx-checkbox')
-export class HelixCheckbox extends LitElement {
+export class HelixCheckbox extends HelixElement {
   static override styles = [tokenStyles, helixCheckboxStyles];
 
   // P0-02: observe aria-label on host to forward to inner input
@@ -58,16 +59,7 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Form Association ───
 
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -216,20 +208,22 @@ export class HelixCheckbox extends LitElement {
     }
   }
 
-  /** Called by the form when it resets. */
-  formResetCallback(): void {
+  // ─── Form Lifecycle Hooks ───
+
+  protected override _onFormReset(): void {
     this.checked = false;
     this.indeterminate = false;
     this._internals.setFormValue(null);
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
-  formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
     this.checked = typeof state === 'string' && state === this.value;
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -278,7 +272,7 @@ export class HelixCheckbox extends LitElement {
 
   // P2-05: monotonic counter — collision-free and deterministic
   /** @internal */
-  private _id = `hx-checkbox-${++_checkboxCounter}`;
+  private _id = _nextCheckboxId();
   /** @internal */
   private _helpTextId = `${this._id}-help`;
   /** @internal */
