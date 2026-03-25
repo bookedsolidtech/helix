@@ -30,7 +30,8 @@
     "./dist/css/helix-data.css": "./dist/css/helix-data.css",
     "./dist/css/helix-media.css": "./dist/css/helix-media.css",
     "./dist/css/helix-utility.css": "./dist/css/helix-utility.css",
-    "./dist/css/manifest.json": "./dist/css/manifest.json"
+    "./dist/css/manifest.json": "./dist/css/manifest.json",
+    "./dist/css/index.css": "./dist/css/index.css"
   },
   "files": [
     "dist",
