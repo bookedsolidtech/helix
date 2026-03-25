@@ -55,12 +55,9 @@ export default defineConfig({
       ],
       reporter: ['text', 'json', 'json-summary'],
       reportsDirectory: '.cache/coverage',
-      thresholds: {
-        statements: 80,
-        branches: 80,
-        functions: 80,
-        lines: 80,
-      },
+      // Thresholds intentionally omitted — enforcement is handled per-component
+      // by scripts/check-coverage.mjs. Global Vitest thresholds fail on partial
+      // (path-filtered) runs where only changed components execute.
     },
   },
 });
