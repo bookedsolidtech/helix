@@ -1,0 +1,772 @@
+---
+title: Form Patterns & Validation
+description: Complete guide to building accessible, validated forms with HELiX — from basic inputs to multi-step wizards and Drupal SDC integration.
+sidebar:
+  order: 5
+---
+
+This guide covers every layer of form building with HELiX: basic composition, validation, error display, complex inputs, accessibility, and Drupal integration.
+
+---
+
+## Basic Form
+
+The core building block is `hx-form` wrapping `hx-text-input` (and other field components). `hx-form` provides consistent spacing, adopted stylesheets for native inputs, and form-level event orchestration.
+
+```html
+<hx-form id="contact-form" action="/api/contact">
+  <hx-text-input name="full-name" label="Full name" placeholder="Jane Doe" required></hx-text-input>
+
+  <hx-text-input
+    name="email"
+    type="email"
+    label="Email address"
+    placeholder="jane@example.com"
+    required
+  ></hx-text-input>
+
+  <hx-textarea name="message" label="Message" placeholder="Tell us more..." rows="4"></hx-textarea>
+
+  <div style="display: flex; gap: 0.75rem;">
+    <hx-button variant="primary" type="submit">Submit</hx-button>
+    <hx-button variant="secondary" type="reset">Reset</hx-button>
+  </div>
+</hx-form>
+```
+
+### Submit handling
+
+`hx-form` dispatches `hx-submit` on valid submission (constraint validation passes) and `hx-invalid` when submission is blocked by invalid fields.
+
+```js
+const form = document.querySelector('#contact-form');
+
+form.addEventListener('hx-submit', (e) => {
+  const data = e.detail.formData; // native FormData
+  fetch('/api/contact', {
+    method: 'POST',
+    body: data,
+  }).then(() => {
+    /* handle response */
+  });
+});
+
+form.addEventListener('hx-invalid', (e) => {
+  console.log('Invalid fields:', e.detail.invalidFields);
+});
+```
+
+### Standalone vs. Drupal mode
+
+`hx-form` operates in two modes:
+
+- **Standalone** — set `action` and `hx-form` renders its own `<form>` element.
+- **Drupal mode** — omit `action` and Drupal provides the `<form>` tag; `hx-form` contributes only styles and validation orchestration.
+
+```html
+<!-- Standalone: hx-form renders <form action="/api/submit"> -->
+<hx-form action="/api/submit">...</hx-form>
+
+<!-- Drupal mode: Drupal's <form> is already in the DOM -->
+<form action="/node/add/article">
+  <hx-form>...</hx-form>
+</form>
+```
+
+---
+
+## Validation
+
+HELiX field components respect HTML constraint validation attributes. Set them directly on the component and `hx-form` coordinates client-side validation before firing `hx-submit`.
+
+### Built-in constraint attributes
+
+```html
+<!-- Required -->
+<hx-text-input name="username" label="Username" required></hx-text-input>
+
+<!-- Pattern -->
+<hx-text-input
+  name="zip"
+  label="ZIP code"
+  pattern="[0-9]{5}"
+  help-text="Five digits, e.g. 90210"
+></hx-text-input>
+
+<!-- Min / Max length -->
+<hx-text-input name="bio" label="Bio" minlength="10" maxlength="280"></hx-text-input>
+
+<!-- Numeric min / max -->
+<hx-number-input name="age" label="Age" min="18" max="120"></hx-number-input>
+
+<!-- Email type (browser validates format) -->
+<hx-text-input name="email" type="email" label="Email" required></hx-text-input>
+```
+
+### Custom validators
+
+Set the `error` attribute programmatically from your own validation logic. Clear it by setting it to an empty string or removing the attribute.
+
+```js
+const input = document.querySelector('hx-text-input[name="username"]');
+
+input.addEventListener('hx-change', async (e) => {
+  const value = e.detail.value;
+
+  if (value.length < 3) {
+    input.error = 'Username must be at least 3 characters.';
+    return;
+  }
+
+  const taken = await checkUsernameAvailability(value);
+  input.error = taken ? 'That username is already taken.' : '';
+});
+```
+
+### Server-side error surfacing
+
+After a form submission, map server error messages back to field components by name:
+
+```js
+form.addEventListener('hx-submit', async (e) => {
+  const res = await fetch('/api/register', {
+    method: 'POST',
+    body: e.detail.formData,
+  });
+
+  if (!res.ok) {
+    const errors = await res.json(); // { username: 'Already taken', email: 'Invalid' }
+
+    Object.entries(errors).forEach(([name, message]) => {
+      const field = form.querySelector(`[name="${name}"]`);
+      if (field) field.error = message;
+    });
+  }
+});
+```
+
+---
+
+## Error Display
+
+### Inline field errors
+
+Every HELiX field component (`hx-text-input`, `hx-select`, `hx-textarea`, etc.) accepts an `error` attribute that renders below the input with `role="alert"` semantics.
+
+```html
+<hx-text-input
+  name="dob"
+  type="date"
+  label="Date of birth"
+  error="Date cannot be in the future."
+  required
+></hx-text-input>
+```
+
+### Help text alongside errors
+
+Use `help-text` for persistent guidance (format hints, requirements). It is always visible. The `error` attribute replaces it visually when set, but `help-text` remains in the DOM for accessibility.
+
+```html
+<hx-text-input
+  name="password"
+  type="password"
+  label="Password"
+  help-text="Minimum 8 characters with at least one number."
+  error="Password must contain a number."
+></hx-text-input>
+```
+
+### `hx-help-text` for standalone messages
+
+For native inputs or custom controls wrapped in `hx-field`, use the `hx-help-text` component directly. Wire it to the control via `aria-describedby`.
+
+```html
+<hx-field label="Medical Record Number" id="mrn-field">
+  <input type="text" name="mrn" aria-describedby="mrn-error" aria-invalid="true" />
+</hx-field>
+<hx-help-text id="mrn-error" variant="error"> Enter a valid 8-digit MRN. </hx-help-text>
+```
+
+### Accessibility checklist — error display
+
+- [ ] Errors use `role="alert"` or `aria-live="polite"` so screen readers announce them immediately
+- [ ] `aria-invalid="true"` is set on the invalid input
+- [ ] `aria-describedby` points to the error element
+- [ ] Error text is descriptive — says what went wrong and how to fix it
+- [ ] Never rely on color alone to indicate an error (use icon + text)
+
+### Common pitfall: clearing errors
+
+Always clear the `error` attribute when the user corrects input. Leaving stale errors confuses both sighted users and screen readers.
+
+```js
+input.addEventListener('hx-input', () => {
+  if (input.error) input.error = ''; // clear on any new input
+});
+```
+
+---
+
+## Form Layout
+
+### Responsive single-column layout
+
+`hx-form` stacks fields vertically by default. Combined with `hx-grid` for multi-column layouts, you can build responsive forms without custom CSS.
+
+```html
+<hx-form action="/api/profile">
+  <!-- Full-width fields -->
+  <hx-text-input name="full-name" label="Full name" required></hx-text-input>
+
+  <!-- Two-column row -->
+  <hx-grid columns="2" gap="md">
+    <hx-grid-item>
+      <hx-text-input name="first-name" label="First name"></hx-text-input>
+    </hx-grid-item>
+    <hx-grid-item>
+      <hx-text-input name="last-name" label="Last name"></hx-text-input>
+    </hx-grid-item>
+  </hx-grid>
+
+  <!-- Three-column row -->
+  <hx-grid columns="3" gap="md">
+    <hx-grid-item>
+      <hx-text-input name="city" label="City"></hx-text-input>
+    </hx-grid-item>
+    <hx-grid-item>
+      <hx-select name="state" label="State">
+        <option value="CA">California</option>
+        <option value="NY">New York</option>
+      </hx-select>
+    </hx-grid-item>
+    <hx-grid-item>
+      <hx-text-input name="zip" label="ZIP" pattern="[0-9]{5}"></hx-text-input>
+    </hx-grid-item>
+  </hx-grid>
+
+  <hx-button variant="primary" type="submit">Save</hx-button>
+</hx-form>
+```
+
+### Responsive breakpoints
+
+`hx-grid` collapses to a single column on mobile automatically. Use the `responsive` attribute to control the breakpoint:
+
+```html
+<!-- Collapses to 1 column below 640px -->
+<hx-grid columns="2" responsive>
+  <hx-grid-item><hx-text-input name="first" label="First"></hx-text-input></hx-grid-item>
+  <hx-grid-item><hx-text-input name="last" label="Last"></hx-text-input></hx-grid-item>
+</hx-grid>
+```
+
+---
+
+## Complex Inputs
+
+### `hx-select` — dropdown selection
+
+```html
+<hx-select name="department" label="Department" placeholder="Select a department" required>
+  <option value="eng">Engineering</option>
+  <option value="design">Design</option>
+  <option value="product">Product</option>
+  <option value="ops">Operations</option>
+</hx-select>
+```
+
+```js
+select.addEventListener('hx-change', (e) => {
+  console.log('Selected:', e.detail.value);
+});
+```
+
+### `hx-combobox` — searchable select
+
+Use `hx-combobox` when the option list is long or users need to type to filter.
+
+```html
+<hx-combobox
+  name="diagnosis"
+  label="Primary diagnosis"
+  placeholder="Search ICD-10 codes..."
+  required
+>
+  <hx-combobox-option value="E11.9">E11.9 — Type 2 diabetes</hx-combobox-option>
+  <hx-combobox-option value="I10">I10 — Essential hypertension</hx-combobox-option>
+  <hx-combobox-option value="J18.9">J18.9 — Pneumonia, unspecified</hx-combobox-option>
+</hx-combobox>
+```
+
+```js
+combobox.addEventListener('hx-change', (e) => {
+  console.log('Code selected:', e.detail.value);
+});
+```
+
+### `hx-date-picker` — date selection
+
+```html
+<hx-date-picker
+  name="appointment-date"
+  label="Appointment date"
+  min="2025-01-01"
+  max="2026-12-31"
+  required
+></hx-date-picker>
+```
+
+```js
+datePicker.addEventListener('hx-change', (e) => {
+  console.log('Date:', e.detail.value); // ISO 8601: "2025-06-15"
+});
+```
+
+### `hx-file-upload` — file attachment
+
+```html
+<hx-file-upload
+  name="attachment"
+  label="Supporting documents"
+  accept=".pdf,.doc,.docx"
+  multiple
+  help-text="PDF or Word documents, max 10 MB each."
+></hx-file-upload>
+```
+
+```js
+fileUpload.addEventListener('hx-change', (e) => {
+  const files = e.detail.files; // FileList
+  console.log(
+    'Files:',
+    [...files].map((f) => f.name),
+  );
+});
+```
+
+---
+
+## Checkbox & Radio Groups
+
+### `hx-checkbox-group` — multiple selection
+
+Wrap related checkboxes in `hx-checkbox-group` to provide accessible `<fieldset>` + `<legend>` semantics automatically.
+
+```html
+<hx-checkbox-group
+  name="notifications"
+  label="Notification preferences"
+  help-text="Select all that apply."
+>
+  <hx-checkbox value="email" label="Email"></hx-checkbox>
+  <hx-checkbox value="sms" label="SMS"></hx-checkbox>
+  <hx-checkbox value="push" label="Push notifications"></hx-checkbox>
+</hx-checkbox-group>
+```
+
+```js
+const group = document.querySelector('hx-checkbox-group');
+group.addEventListener('hx-change', (e) => {
+  console.log('Selected values:', e.detail.values); // string[]
+});
+```
+
+### `hx-radio-group` — single selection
+
+```html
+<hx-radio-group name="contact-method" label="Preferred contact method" required>
+  <hx-radio value="email" label="Email"></hx-radio>
+  <hx-radio value="phone" label="Phone"></hx-radio>
+  <hx-radio value="mail" label="Mail"></hx-radio>
+</hx-radio-group>
+```
+
+```js
+radioGroup.addEventListener('hx-change', (e) => {
+  console.log('Selected:', e.detail.value); // string
+});
+```
+
+### Accessibility — checkbox & radio groups
+
+- [ ] `hx-checkbox-group` and `hx-radio-group` render native `<fieldset>` + `<legend>` automatically — do not add your own
+- [ ] Arrow keys navigate between radio options within a group
+- [ ] Space bar toggles checkboxes
+- [ ] `required` on `hx-radio-group` marks the group as a whole, not individual radios
+- [ ] Error set on the group component (`group.error = 'Select an option'`) announces via `role="alert"`
+
+---
+
+## Multi-Step Forms
+
+Use `hx-steps` with `hx-step` children to indicate progress, and conditionally render form sections based on the current step.
+
+```html
+<hx-steps id="wizard-steps" current="1">
+  <hx-step label="Personal info"></hx-step>
+  <hx-step label="Contact details"></hx-step>
+  <hx-step label="Review & submit"></hx-step>
+</hx-steps>
+
+<!-- Step 1 -->
+<section id="step-1">
+  <hx-form id="step-1-form">
+    <hx-text-input name="first-name" label="First name" required></hx-text-input>
+    <hx-text-input name="last-name" label="Last name" required></hx-text-input>
+    <hx-date-picker name="dob" label="Date of birth" required></hx-date-picker>
+    <hx-button variant="primary" id="next-1">Next</hx-button>
+  </hx-form>
+</section>
+
+<!-- Step 2 (hidden initially) -->
+<section id="step-2" hidden>
+  <hx-form id="step-2-form">
+    <hx-text-input name="email" type="email" label="Email" required></hx-text-input>
+    <hx-text-input name="phone" type="tel" label="Phone"></hx-text-input>
+    <div style="display: flex; gap: 0.75rem;">
+      <hx-button variant="secondary" id="back-2">Back</hx-button>
+      <hx-button variant="primary" id="next-2">Next</hx-button>
+    </div>
+  </hx-form>
+</section>
+
+<!-- Step 3 -->
+<section id="step-3" hidden>
+  <p>Review your details before submitting.</p>
+  <div id="review-summary"></div>
+  <div style="display: flex; gap: 0.75rem;">
+    <hx-button variant="secondary" id="back-3">Back</hx-button>
+    <hx-button variant="primary" id="submit-final">Submit</hx-button>
+  </div>
+</section>
+```
+
+```js
+const steps = document.querySelector('#wizard-steps');
+const formData = {}; // accumulate across steps
+
+function goTo(step) {
+  document.querySelectorAll('section[id^="step-"]').forEach((s, i) => {
+    s.hidden = i + 1 !== step;
+  });
+  steps.current = step;
+}
+
+// Step 1 → 2
+document.querySelector('#next-1').addEventListener('click', () => {
+  const form = document.querySelector('#step-1-form');
+  if (!form.checkValidity()) return form.reportValidity();
+  Object.assign(formData, Object.fromEntries(new FormData(form)));
+  goTo(2);
+});
+
+// Step 2 → 3
+document.querySelector('#next-2').addEventListener('click', () => {
+  const form = document.querySelector('#step-2-form');
+  if (!form.checkValidity()) return form.reportValidity();
+  Object.assign(formData, Object.fromEntries(new FormData(form)));
+  // Populate review summary
+  document.querySelector('#review-summary').textContent = JSON.stringify(formData, null, 2);
+  goTo(3);
+});
+
+// Back buttons
+document.querySelector('#back-2').addEventListener('click', () => goTo(1));
+document.querySelector('#back-3').addEventListener('click', () => goTo(2));
+
+// Final submit
+document.querySelector('#submit-final').addEventListener('click', async () => {
+  await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+  });
+});
+```
+
+### Common pitfall: focus on step change
+
+When advancing to a new step, move focus to the step heading or first field so keyboard and screen reader users are oriented.
+
+```js
+function goTo(step) {
+  // ... show/hide sections
+
+  // Move focus to the first focusable element in the new step
+  const section = document.querySelector(`#step-${step}`);
+  const firstField = section.querySelector('hx-text-input, hx-select, hx-radio-group, h2');
+  firstField?.focus();
+}
+```
+
+---
+
+## Form Submission
+
+### FormData extraction
+
+```js
+form.addEventListener('hx-submit', (e) => {
+  const data = e.detail.formData; // native FormData
+
+  // Iterate entries
+  for (const [key, value] of data.entries()) {
+    console.log(key, value);
+  }
+
+  // Convert to plain object
+  const plain = Object.fromEntries(data);
+
+  // Handle multi-value fields (checkboxes)
+  const all = {};
+  data.forEach((value, key) => {
+    if (all[key]) {
+      all[key] = [].concat(all[key], value);
+    } else {
+      all[key] = value;
+    }
+  });
+});
+```
+
+### JSON serialization
+
+```js
+form.addEventListener('hx-submit', async (e) => {
+  const plain = Object.fromEntries(e.detail.formData);
+
+  const res = await fetch('/api/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(plain),
+  });
+
+  if (!res.ok) {
+    const errors = await res.json();
+    applyServerErrors(form, errors);
+  }
+});
+
+function applyServerErrors(form, errors) {
+  Object.entries(errors).forEach(([name, message]) => {
+    const field = form.querySelector(`[name="${name}"]`);
+    if (field) field.error = message;
+  });
+}
+```
+
+### Fetch with loading state
+
+Disable the submit button during the request to prevent duplicate submissions.
+
+```js
+form.addEventListener('hx-submit', async (e) => {
+  const submitBtn = form.querySelector('[type="submit"]');
+  submitBtn.loading = true;
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      body: e.detail.formData,
+    });
+    if (res.ok) {
+      showSuccessMessage();
+    } else {
+      const errors = await res.json();
+      applyServerErrors(form, errors);
+    }
+  } finally {
+    submitBtn.loading = false;
+    submitBtn.disabled = false;
+  }
+});
+```
+
+---
+
+## Accessibility
+
+### Label association
+
+Every field component manages label association internally. For native inputs wrapped in `hx-field`, the component writes `aria-label` automatically based on the `label` attribute.
+
+```html
+<!-- hx-text-input: label wired internally -->
+<hx-text-input name="email" label="Email address"></hx-text-input>
+
+<!-- hx-field wrapping native input: label wired via aria-label -->
+<hx-field label="Custom input">
+  <input type="text" name="custom" />
+</hx-field>
+
+<!-- Never do this for hx-* components — creates duplicate labels -->
+<label for="email-input">Email</label>
+<hx-text-input id="email-input" label="Email"></hx-text-input>
+```
+
+### Error announcements
+
+When `error` is set on a field component, the message is injected into a `role="alert"` region inside the shadow DOM. It announces to screen readers immediately without requiring focus change.
+
+For custom error placement outside a component, use `aria-live`:
+
+```html
+<div id="form-error-summary" role="alert" aria-live="assertive" aria-atomic="true">
+  <!-- Populated by JS when form is submitted with errors -->
+</div>
+```
+
+```js
+form.addEventListener('hx-invalid', (e) => {
+  const summary = document.querySelector('#form-error-summary');
+  const count = e.detail.invalidFields.length;
+  summary.textContent = `${count} error${count > 1 ? 's' : ''} found. Please correct them below.`;
+});
+```
+
+### Focus management on error
+
+After a failed submission, move focus to the first invalid field.
+
+```js
+form.addEventListener('hx-invalid', (e) => {
+  const first = e.detail.invalidFields[0];
+  if (first) {
+    first.scrollIntoView({ block: 'nearest' });
+    first.focus();
+  }
+});
+```
+
+### Accessibility checklist — forms
+
+- [ ] All form controls have visible labels (not just placeholder text)
+- [ ] Required fields use `required` attribute (not just a visual asterisk)
+- [ ] Errors are announced via `role="alert"` — confirm with a screen reader
+- [ ] `aria-invalid="true"` is applied to invalid fields
+- [ ] Focus moves to first invalid field after failed submission
+- [ ] Submit button describes the action ("Save profile", not just "Submit")
+- [ ] Multi-step forms indicate current step and total steps (`hx-steps` handles this)
+- [ ] File upload accepts keyboard activation and announces selected files
+
+---
+
+## Drupal Integration
+
+### Standalone form in Twig
+
+Use `hx-form` without `action` — Drupal's `<form>` tag is already in the DOM from Drupal's form rendering system.
+
+```twig
+{# my_module/templates/my-contact-form.html.twig #}
+{% set form_id = form['#form_id'] %}
+<hx-form>
+  {{ form.full_name }}
+  {{ form.email }}
+  {{ form.message }}
+
+  <div class="form-actions">
+    <hx-button variant="primary" type="submit">
+      {{ form.actions.submit['#value'] }}
+    </hx-button>
+  </div>
+</hx-form>
+```
+
+### SDC template with `hx-field`
+
+For Single Directory Components, use `hx-field` to wrap native Drupal form elements and gain consistent HELiX field layout.
+
+```twig
+{# components/contact-form/contact-form.html.twig #}
+<hx-form>
+  {% for field_name, element in fields %}
+    {% if element['#type'] in ['textfield', 'email', 'tel'] %}
+      <hx-field
+        label="{{ element['#title'] }}"
+        {% if element['#required'] %}required{% endif %}
+        {% if element['#errors'] %}error="{{ element['#errors'] | striptags }}"{% endif %}
+        help-text="{{ element['#description'] }}"
+      >
+        {{ element }}
+      </hx-field>
+    {% else %}
+      {{ element }}
+    {% endif %}
+  {% endfor %}
+
+  <hx-button variant="primary" type="submit">
+    {{ form.actions.submit['#value'] }}
+  </hx-button>
+</hx-form>
+```
+
+### Drupal behaviors for form events
+
+Wire Drupal behaviors to `hx-submit` and `hx-invalid` for AJAX-enabled forms.
+
+```js
+// my_module/js/contact-form.js
+(function (Drupal, once) {
+  Drupal.behaviors.myContactForm = {
+    attach(context) {
+      once('my-contact-form', 'hx-form', context).forEach((form) => {
+        form.addEventListener('hx-submit', async (e) => {
+          const data = e.detail.formData;
+
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            body: data,
+          });
+
+          if (res.ok) {
+            Drupal.announce('Form submitted successfully.');
+          } else {
+            const errors = await res.json();
+            Object.entries(errors).forEach(([name, message]) => {
+              const field = form.querySelector(`[name="${name}"]`);
+              if (field) field.error = message;
+            });
+          }
+        });
+
+        form.addEventListener('hx-invalid', (e) => {
+          Drupal.announce(
+            `${e.detail.invalidFields.length} form errors. Please review the highlighted fields.`,
+          );
+        });
+      });
+    },
+  };
+})(Drupal, once);
+```
+
+### Loading the library in Drupal
+
+Declare HELiX as a library dependency in your module or theme:
+
+```yaml
+# my_theme.libraries.yml
+helix:
+  js:
+    /path/to/helix-library/index.js:
+      attributes:
+        type: module
+
+my-contact-form:
+  dependencies:
+    - my_theme/helix
+  js:
+    js/contact-form.js: {}
+```
+
+Attach the library in your form hook:
+
+```php
+// my_module.module
+function my_module_form_contact_message_default_form_alter(&$form, $form_state, $form_id) {
+  $form['#attached']['library'][] = 'my_theme/my-contact-form';
+}
+```
