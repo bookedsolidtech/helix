@@ -31,7 +31,7 @@ export const HxFileUpload = createComponent({
   events: {
     onHxError: 'hx-error',
     onHxUpload: 'hx-upload',
-    onHxRemove: 'hx-remove',
+    onHxRemove: 'hx-remove'
   },
   displayName: 'HxFileUpload',
 });
