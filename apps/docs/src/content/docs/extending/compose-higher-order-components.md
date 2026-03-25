@@ -36,7 +36,7 @@ Three signals indicate that composition is preferable to inheritance:
 
 ### File Structure
 
-```
+```text
 src/components/org-search-bar/
   index.ts
   org-search-bar.ts
@@ -455,8 +455,7 @@ export class OrgPatientSearch extends LitElement {
       <hx-text-input
         name="query"
         label="Search"
-        ?error=${!!queryError}
-        error-message=${queryError ?? nothing}
+        .error=${queryError ?? ''}
       ></hx-text-input>
       <hx-button
         variant="primary"
@@ -546,7 +545,7 @@ export class OrgSearchBar extends LitElement {
 
 ## Composition vs. Inheritance: Decision Guide
 
-```
+```text
 Does the new component wrap multiple HELiX components?
 │
 ├─ YES → Use composition
