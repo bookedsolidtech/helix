@@ -60,8 +60,8 @@ export const helixAccordionItemStyles = css`
 
   .icon {
     flex-shrink: 0;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--hx-accordion-icon-size, var(--hx-size-5, 1.25rem));
+    height: var(--hx-accordion-icon-size, var(--hx-size-5, 1.25rem));
     display: flex;
     align-items: center;
     justify-content: center;

@@ -35,8 +35,8 @@ export const helixStepStyles = css`
   /* ─── Focus ─── */
 
   :host(:focus-visible) .step__indicator {
-    outline: 2px solid var(--hx-color-primary-500);
-    outline-offset: 2px;
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-primary-500);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Track (indicator + connector) ─── */
@@ -58,7 +58,7 @@ export const helixStepStyles = css`
     width: var(--hx-steps-indicator-size, 2rem);
     height: var(--hx-steps-indicator-size, 2rem);
     border-radius: var(--hx-border-radius-full, 9999px);
-    border: 2px solid var(--hx-color-neutral-300);
+    border: var(--hx-border-width-medium, 2px) solid var(--hx-color-neutral-300);
     background-color: var(--hx-color-neutral-0);
     color: var(--hx-color-neutral-500);
     font-size: var(--hx-steps-indicator-font-size, var(--hx-font-size-sm));
@@ -163,7 +163,7 @@ export const helixStepStyles = css`
 
   :host([disabled]) .step {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: var(--hx-opacity-disabled, 0.5);
     pointer-events: none;
   }
 
@@ -218,46 +218,6 @@ export const helixStepStyles = css`
 
     .step__connector {
       transition: none;
-    }
-  }
-
-  /* ─── Dark Mode ─── */
-
-  @media (prefers-color-scheme: dark) {
-    .step__indicator {
-      background-color: var(--hx-color-neutral-800);
-      border-color: var(--hx-color-neutral-600);
-      color: var(--hx-color-neutral-300);
-    }
-
-    .step__connector {
-      background-color: var(--hx-color-neutral-700);
-    }
-
-    .step__label {
-      color: var(--hx-color-neutral-300);
-    }
-
-    .step__description {
-      color: var(--hx-color-neutral-400);
-    }
-
-    :host([status='active']) .step__label {
-      color: var(--hx-color-primary-300);
-    }
-
-    :host([status='complete']) .step__label {
-      color: var(--hx-color-neutral-200);
-    }
-
-    :host([status='error']) .step__label {
-      color: var(--hx-color-error-300);
-    }
-
-    :host([disabled]) .step__indicator {
-      background-color: var(--hx-color-neutral-900);
-      border-color: var(--hx-color-neutral-700);
-      color: var(--hx-color-neutral-600);
     }
   }
 `;
