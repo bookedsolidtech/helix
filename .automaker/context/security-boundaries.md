@@ -49,9 +49,9 @@ This includes:
 If you must reference a credential, token, or key: use `[REDACTED]`.
 
 **Examples:**
-- Wrong: `NPM_TOKEN=npm_abc123xyz...`
+- Wrong: `NPM_TOKEN=<actual token value here>`
 - Correct: `NPM_TOKEN=[REDACTED]`
-- Wrong: `Authorization: Bearer eyJhbGci...`
+- Wrong: `Authorization: Bearer <actual JWT here>`
 - Correct: `Authorization: Bearer [REDACTED]`
 
 ---
