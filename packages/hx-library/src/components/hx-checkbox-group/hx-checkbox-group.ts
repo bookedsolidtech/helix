@@ -100,6 +100,13 @@ export class HelixCheckboxGroup extends LitElement {
   error = '';
 
   /**
+   * Help text to display below the group. Can also be provided via the help-text slot.
+   * @attr help-text
+   */
+  @property({ type: String, attribute: 'help-text' })
+  helpText = '';
+
+  /**
    * Layout orientation of the checkbox items.
    * @attr orientation
    */
@@ -342,7 +349,10 @@ export class HelixCheckboxGroup extends LitElement {
     };
 
     const describedBy =
-      [hasError ? this._errorId : null, this._hasHelpSlot ? this._helpTextId : null]
+      [
+        hasError ? this._errorId : null,
+        this.helpText || this._hasHelpSlot ? this._helpTextId : null,
+      ]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -370,7 +380,7 @@ export class HelixCheckboxGroup extends LitElement {
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
 
         <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </fieldset>
     `;

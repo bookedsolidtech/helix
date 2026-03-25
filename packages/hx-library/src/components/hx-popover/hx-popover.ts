@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -492,7 +492,7 @@ export class HelixPopover extends LitElement {
         id=${this._popoverId}
         role="dialog"
         aria-label=${this.label}
-        aria-hidden="${!this._visible ? 'true' : 'false'}"
+        aria-hidden=${!this._visible ? 'true' : nothing}
         tabindex="-1"
         ?inert=${!this._visible}
         class=${this._visible ? 'visible' : ''}

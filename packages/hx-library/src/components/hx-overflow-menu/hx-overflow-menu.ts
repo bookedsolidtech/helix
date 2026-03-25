@@ -328,7 +328,7 @@ export class HelixOverflowMenu extends LitElement {
         type="button"
         aria-label=${this.label}
         aria-haspopup="menu"
-        aria-expanded=${this._open ? 'true' : nothing}
+        aria-expanded=${String(this._open)}
         aria-controls=${this._open ? this._panelId : nothing}
         ?disabled=${this.disabled}
         @click=${this._handleTriggerClick}
