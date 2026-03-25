@@ -37,6 +37,8 @@ paths = [
     # Changelogs and changeset files contain no live secrets
     '''CHANGELOG\.md''',
     '''\.changeset/''',
+    # Agent context files — security policy docs with example patterns, not real secrets
+    '''\.automaker/context/''',
 ]
 
 regexes = [
