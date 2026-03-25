@@ -24,6 +24,7 @@ export default defineConfig({
       'src/components/**/*.test.ts',
       'src/base/**/*.test.ts',
       'src/utilities/**/*.test.ts',
+      'src/utils/**/*.test.ts',
       'src/mixins/**/*.test.ts',
       'src/__tests__/**/*.test.ts',
     ],
