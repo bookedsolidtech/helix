@@ -581,6 +581,11 @@ export default defineConfig({
                 { label: 'Best Practices', slug: 'drupal-integration/best-practices' },
                 { label: 'Library System', slug: 'drupal-integration/library-system' },
                 {
+                  label: 'SDC Composition',
+                  slug: 'drupal-integration/sdc',
+                  badge: { text: 'New', variant: 'tip' },
+                },
+                {
                   label: 'Installation',
                   collapsed: true,
                   items: [
