@@ -75,6 +75,12 @@ export class HelixStat extends LitElement {
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Prefix label for trend indicator. Override for i18n.
+   * @attr label-trend
+   */
+  @property({ attribute: 'label-trend' }) labelTrend = 'Trend';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -176,7 +182,7 @@ export class HelixStat extends LitElement {
                   part="trend"
                   class="stat__trend stat__trend--${this.trend}"
                   role="img"
-                  aria-label="Trend: ${this.trend}"
+                  aria-label="${this.labelTrend}: ${this.trend}"
                 >
                   ${this._renderTrendArrow(this.trend as 'up' | 'down')}
                 </span>

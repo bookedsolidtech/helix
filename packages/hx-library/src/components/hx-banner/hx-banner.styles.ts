@@ -115,7 +115,7 @@ export const helixBannerStyles = css`
     flex-shrink: 0;
     min-width: var(--hx-touch-target-size, 44px);
     min-height: var(--hx-touch-target-size, 44px);
-    margin-left: auto;
+    margin-inline-start: auto;
     padding: 0;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);

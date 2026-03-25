@@ -168,7 +168,7 @@ export const helixCheckboxStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #6c757d));
     line-height: var(--hx-line-height-normal, 1.5);
-    padding-left: calc(
+    padding-inline-start: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)
     );
   }
@@ -177,7 +177,7 @@ export const helixCheckboxStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-checkbox-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
-    padding-left: calc(
+    padding-inline-start: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)
     );
   }
@@ -195,7 +195,7 @@ export const helixCheckboxStyles = css`
   :host([hx-size='sm']) .checkbox__help-text,
   :host([hx-size='sm']) .checkbox__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    padding-left: calc(var(--hx-size-4, 1rem) + var(--hx-space-2, 0.5rem));
+    padding-inline-start: calc(var(--hx-size-4, 1rem) + var(--hx-space-2, 0.5rem));
   }
 
   :host([hx-size='lg']) {
@@ -209,7 +209,7 @@ export const helixCheckboxStyles = css`
   :host([hx-size='lg']) .checkbox__help-text,
   :host([hx-size='lg']) .checkbox__error {
     font-size: var(--hx-font-size-sm, 0.875rem);
-    padding-left: calc(var(--hx-size-6, 1.5rem) + var(--hx-space-2, 0.5rem));
+    padding-inline-start: calc(var(--hx-size-6, 1.5rem) + var(--hx-space-2, 0.5rem));
   }
 
   /* ─── Reduced Motion ─── */
