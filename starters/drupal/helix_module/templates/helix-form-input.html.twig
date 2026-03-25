@@ -1,0 +1,69 @@
+{#
+  helix-form-input.html.twig
+  --------------------------
+  Renders a HELiX hx-text-input component for Drupal text-field form
+  elements. Works for type: text, email, password, number, tel, url.
+
+  Form association is handled automatically via ElementInternals — the
+  component participates in native HTML form submission without requiring
+  a hidden input or custom behavior. Constraint validation (required,
+  pattern, minlength, maxlength) is enforced natively.
+
+  Variables:
+    label       (string)  Visible label text. Required for accessibility.
+    name        (string)  Form field name for submission.
+    value       (string)  Pre-populated value for server-side persistence.
+    type        (string)  text | email | password | number | tel | url.
+                          Default: 'text'.
+    placeholder (string)  Placeholder hint text. Optional.
+    required    (bool)    Marks the field as required.
+    disabled    (bool)    Renders the field in a disabled state.
+    error       (string)  Error message shown below the input.
+    help_text   (string)  Descriptive hint text shown below the input.
+    attributes  (object)  Additional HTML attributes spread onto the element.
+
+  Usage — basic text field:
+    {% include 'helix-form-input.html.twig' with {
+      label: 'Patient Name',
+      name: 'patient_name',
+      required: true,
+    } %}
+
+  Usage — email field with error:
+    {% include 'helix-form-input.html.twig' with {
+      label: 'Email Address',
+      name: 'email',
+      type: 'email',
+      value: form_state_value,
+      error: 'Please enter a valid email address.',
+    } %}
+
+  Drupal Form API — automatic via preprocess:
+    helix_module_preprocess_input() in helix_module.theme.inc maps
+    Drupal textfield render arrays to these variables automatically.
+    The helix_* prefixed variables are set by the preprocess function;
+    this template falls back to the direct variable names for manual use.
+#}
+
+{% set _label       = helix_label      ?? label      ?? '' %}
+{% set _name        = helix_name       ?? name        ?? '' %}
+{% set _value       = helix_value      ?? value       ?? '' %}
+{% set _type        = helix_type       ?? type        ?? 'text' %}
+{% set _placeholder = helix_placeholder ?? placeholder ?? null %}
+{% set _required    = helix_required   ?? required    ?? false %}
+{% set _disabled    = helix_disabled   ?? disabled    ?? false %}
+{% set _error       = helix_error      ?? error       ?? null %}
+{% set _help_text   = helix_help_text  ?? help_text   ?? null %}
+
+<hx-text-input
+  label="{{ _label }}"
+  {% if _name %}name="{{ _name }}"{% endif %}
+  {% if _value %}value="{{ _value }}"{% endif %}
+  type="{{ _type }}"
+  {% if _placeholder %}placeholder="{{ _placeholder }}"{% endif %}
+  {% if _required %}required{% endif %}
+  {% if _disabled %}disabled{% endif %}
+  {% if _error %}error="{{ _error }}"{% endif %}
+  {% if _help_text %}help-text="{{ _help_text }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+></hx-text-input>

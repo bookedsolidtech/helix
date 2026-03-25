@@ -1,0 +1,70 @@
+{#
+  helix-badge.html.twig
+  ---------------------
+  Renders a HELiX hx-badge component for status indicators, notification
+  counts, and category labels.
+
+  The badge is a purely presentational component — it does not manage
+  state or dispatch events except for the hx-remove event when removable
+  is true and the user clicks the dismiss button.
+
+  Variables:
+    label     (string)  Badge text content. Use count instead for numeric badges.
+    variant   (string)  primary | secondary | success | warning | error |
+                        neutral | info. Default: 'primary'.
+    size      (string)  sm | md | lg. Default: 'md'. Rendered as hx-size.
+    removable (bool)    Whether a dismiss button is rendered. Default: false.
+    pill      (bool)    Whether to apply fully rounded (pill) styling.
+    pulse     (bool)    Whether to show an animated pulse indicator.
+    count     (number)  Numeric count. Overrides label for count display.
+                        Values exceeding max are shown as "${max}+".
+    max       (number)  Maximum count before truncation. Default: 99.
+    attributes (object) Additional HTML attributes spread onto the element.
+
+  Usage — status label:
+    {% include 'helix-badge.html.twig' with {
+      label: 'Active',
+      variant: 'success',
+    } %}
+
+  Usage — notification count:
+    {% include 'helix-badge.html.twig' with {
+      variant: 'error',
+      count: unread_messages,
+      pill: true,
+    } %}
+
+  Usage — removable tag:
+    {% include 'helix-badge.html.twig' with {
+      label: 'Cardiology',
+      variant: 'secondary',
+      removable: true,
+    } %}
+
+  Drupal behavior for hx-remove events:
+    (function (Drupal, once) {
+      Drupal.behaviors.helixBadgeRemove = {
+        attach: function (context) {
+          once('hx-badge-remove', 'hx-badge[data-removable-id]', context).forEach(function (badge) {
+            badge.addEventListener('hx-remove', function () {
+              var id = badge.getAttribute('data-removable-id');
+              Drupal.ajax({ url: '/helix/badge/remove/' + id }).execute();
+            });
+          });
+        },
+      };
+    })(Drupal, once);
+#}
+
+<hx-badge
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if removable %}removable{% endif %}
+  {% if pill %}pill{% endif %}
+  {% if pulse %}pulse{% endif %}
+  {% if count is not null %}count="{{ count }}"{% endif %}
+  {% if count is not null and max is defined %}max="{{ max }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {%- if label and count is null %}{{ label }}{% endif -%}
+</hx-badge>

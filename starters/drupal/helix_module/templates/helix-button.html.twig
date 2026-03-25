@@ -1,0 +1,67 @@
+{#
+  helix-button.html.twig
+  ----------------------
+  Renders a HELiX hx-button component from a Drupal render array or
+  direct template include.
+
+  Maps Drupal form button elements (type: submit, button) to the
+  hx-button custom element. Can also be used directly in Twig templates
+  for non-form buttons and link-style buttons (href).
+
+  Note on hx-size: The size attribute is prefixed as `hx-size` on the
+  custom element to avoid conflicts with the native HTML `size` attribute.
+
+  Variables:
+    label      (string)  Visible button label text.
+    variant    (string)  primary | secondary | tertiary | danger | ghost | outline.
+                         Default: 'primary'.
+    size       (string)  sm | md | lg. Default: 'md'. Rendered as hx-size.
+    disabled   (bool)    Renders the button in a disabled state.
+    loading    (bool)    Shows spinner and prevents interaction.
+    type       (string)  button | submit | reset. Default: 'button'.
+    href       (string)  When set, renders an anchor. Overrides type.
+    target     (string)  Anchor target (_blank etc.). Only used with href.
+    name       (string)  Form field name for ElementInternals participation.
+    value      (string)  Form field value submitted with name.
+    aria_label (string)  Accessible name for icon-only buttons.
+    attributes (object)  Additional HTML attributes spread onto the element.
+
+  Usage — direct include:
+    {% include 'helix-button.html.twig' with {
+      label: 'Save Patient Record',
+      variant: 'primary',
+      type: 'submit',
+    } %}
+
+  Usage — link button:
+    {% include 'helix-button.html.twig' with {
+      label: 'View Lab Results',
+      variant: 'ghost',
+      href: node.field_results_url.value,
+      target: '_blank',
+    } %}
+
+  Drupal Form API — automatic via preprocess:
+    The helix_module_preprocess_button() function in helix_module.theme.inc
+    maps form render arrays to these variables automatically.
+#}
+
+<hx-button
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if disabled %}disabled{% endif %}
+  {% if loading %}loading{% endif %}
+  {% if type is defined and not href %}type="{{ type|default('button') }}"{% endif %}
+  {% if href %}href="{{ href }}"{% endif %}
+  {% if target %}target="{{ target }}"{% endif %}
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {%- set prefix_content %}{% block prefix %}{% endblock %}{% endset -%}
+  {%- if prefix_content %}<span slot="prefix">{{ prefix_content }}</span>{% endif -%}
+  {%- block default %}{%- if label %}{{ label }}{% endif -%}{% endblock -%}
+  {%- set suffix_content %}{% block suffix %}{% endblock %}{% endset -%}
+  {%- if suffix_content %}<span slot="suffix">{{ suffix_content }}</span>{% endif -%}
+</hx-button>

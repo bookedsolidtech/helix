@@ -1,0 +1,22 @@
+{
+  "name": "helixui/drupal-helix-module",
+  "type": "drupal-module",
+  "description": "Drupal integration for HELiX enterprise web components",
+  "license": "MIT",
+  "require": {
+    "drupal/core": "^10.0 || ^11.0",
+    "php": "^8.1"
+  },
+  "require-dev": {
+    "drupal/core-dev": "^10.0 || ^11.0"
+  },
+  "extra": {
+    "drupal-scaffold": {
+      "locations": {
+        "web-root": "web/"
+      }
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
