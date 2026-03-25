@@ -66,6 +66,13 @@ export class HelixSteps extends LitElement {
       devWarn('hx-steps', 'The "size" attribute is deprecated. Use "hx-size" instead.');
       this.size = legacySize as 'sm' | 'md' | 'lg';
     }
+    // WCAG 4.1.2: suppress the host element's implicit ARIA role so only the
+    // inner div[role="list"] is announced. Mirrors the hx-action-bar pattern.
+    // Without this, the consumer's aria-label attribute on the host causes dual
+    // announcement — once for the host element and once for the inner list.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'none');
+    }
     this.addEventListener('hx-step-click-internal', this._handleStepClickInternal);
   }
 

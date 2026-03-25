@@ -468,14 +468,18 @@ export class HelixTextInput extends HelixElement {
           </span>
         </div>
 
-        <div part="error" class="field__error" id=${this._errorId} role="alert" aria-atomic="true">
-          ${hasError
-            ? html`<slot name="error" @slotchange=${this._handleErrorSlotChange}
-                >${this.error}</slot
-              >`
-            : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
-        </div>
-        ${(this.helpText || this._hasHelpTextSlot) && !hasError
+        ${hasError
+          ? html`<div
+              part="error"
+              class="field__error"
+              id=${this._errorId}
+              role="alert"
+              aria-atomic="true"
+            >
+              <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
+            </div>`
+          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        ${this._hasHelpTextSlot
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
                 <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
@@ -483,7 +487,15 @@ export class HelixTextInput extends HelixElement {
                 </slot>
               </div>
             `
-          : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
+          : this.helpText && !hasError
+            ? html`
+                <div part="help-text" class="field__help-text" id=${this._helpTextId}>
+                  <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
+                    ${this.helpText}
+                  </slot>
+                </div>
+              `
+            : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
       </div>
     `;
   }

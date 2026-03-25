@@ -611,10 +611,11 @@ describe('hx-textarea', () => {
       expect(counter?.textContent?.trim()).toBe('5');
     });
 
-    it('counter has aria-live="polite"', async () => {
+    it('counter has aria-hidden="true" to prevent double-announcement', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea show-count></hx-textarea>');
       const counter = shadowQuery(el, '[part="counter"]')!;
-      expect(counter.getAttribute('aria-live')).toBe('polite');
+      expect(counter.getAttribute('aria-hidden')).toBe('true');
+      expect(counter.hasAttribute('aria-live')).toBe(false);
     });
 
     it('counter updates when value changes programmatically', async () => {

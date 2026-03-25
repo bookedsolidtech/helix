@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import {
@@ -7,9 +7,10 @@ import {
 } from './hx-structured-list.styles.js';
 
 /**
- * Container for structured key-value data display. Renders as a description
- * list for accessible term/definition semantics. Use `hx-structured-list-row`
- * as direct children.
+ * Container for structured key-value data display. Renders as a list with
+ * `role="list"` on the host and `role="listitem"` on each `hx-structured-list-row`,
+ * preserving the list/listitem relationship across shadow DOM boundaries.
+ * Use `hx-structured-list-row` as direct children.
  *
  * @summary Key-value data display container for detail and summary views.
  *
@@ -41,6 +42,14 @@ export class HelixStructuredList extends LitElement {
   }
 
   /**
+   * Accessible label for the list container. Use when multiple structured lists appear
+   * on the same page so screen readers can distinguish them (WCAG 4.1.2).
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
+
+  /**
    * Renders a border around the entire list.
    * @attr bordered
    */
@@ -63,7 +72,7 @@ export class HelixStructuredList extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="list">
+      <div part="base" class="list" aria-label=${this.label || nothing}>
         <slot></slot>
       </div>
     `;
