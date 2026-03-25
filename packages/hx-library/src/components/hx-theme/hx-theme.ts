@@ -1,7 +1,8 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenEntries, darkTokenEntries } from '@helixui/tokens';
+import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
+import { mergeBrandTokens } from '../../utils/token-merger.js';
 
 export type { TokenDefinition, TokenEntry } from '@helixui/tokens';
 
@@ -170,6 +171,27 @@ export class HelixTheme extends LitElement {
   @property({ type: Boolean, reflect: true })
   system = false;
 
+  /**
+   * The registered brand name to apply on top of the base theme.
+   * When set, brand-specific CSS custom property overrides are merged
+   * after the base theme tokens in the adopted stylesheet, enabling
+   * hospital system white-label implementations.
+   *
+   * The brand must first be registered via `HelixBrandRegistry.register()`.
+   * If the brand name is non-empty but not registered, a warning is logged
+   * and the base theme is applied without brand overrides.
+   *
+   * @attr brand
+   * @example
+   * ```html
+   * <hx-theme theme="light" brand="mercy-health">
+   *   <!-- Content inherits Mercy Health brand tokens -->
+   * </hx-theme>
+   * ```
+   */
+  @property({ type: String, reflect: true })
+  brand = '';
+
   /** @internal */
   private _mediaQuery: MediaQueryList | null = null;
   /** @internal */
@@ -194,6 +216,9 @@ export class HelixTheme extends LitElement {
       } else {
         this._detachMediaQuery();
       }
+      this._applyEffectiveTheme();
+    }
+    if (changed.has('brand')) {
       this._applyEffectiveTheme();
     }
   }
@@ -259,7 +284,23 @@ export class HelixTheme extends LitElement {
   /** @internal */
   private _applyEffectiveTheme(): void {
     if (!this._themeSheet) return;
-    void this._themeSheet.replace(_buildThemeCss(this.effectiveTheme));
+
+    let css = _buildThemeCss(this.effectiveTheme);
+
+    if (this.brand !== '') {
+      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
+      if (brandTokens !== undefined) {
+        css = mergeBrandTokens(css, brandTokens);
+      } else {
+        console.warn(
+          `[hx-theme] Brand "${this.brand}" is not registered. ` +
+            `Register it via HelixBrandRegistry.register() before use. ` +
+            `Applying base theme only.`,
+        );
+      }
+    }
+
+    void this._themeSheet.replace(css);
   }
 
   override render() {
