@@ -1,0 +1,90 @@
+{#
+  Recipe Full SDC
+  Composes: hx-text, hx-image, hx-badge, hx-list, hx-divider, hx-prose
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-list') }}
+{{ attach_library('helixui/hx-divider') }}
+{{ attach_library('helixui/hx-prose') }}
+
+<article{{ attributes.addClass('recipe-full') }}>
+  {% if image_url %}
+    <div class="recipe-full__hero">
+      <hx-image
+        src="{{ image_url }}"
+        alt="{{ image_alt|default('') }}"
+        loading="eager"
+      ></hx-image>
+    </div>
+  {% endif %}
+
+  <header class="recipe-full__header">
+    <hx-text variant="heading-xl">{{ title }}</hx-text>
+
+    <div class="recipe-full__meta">
+      {% if prep_time %}
+        <hx-badge variant="neutral" size="sm">Prep: {{ prep_time }}</hx-badge>
+      {% endif %}
+
+      {% if cook_time %}
+        <hx-badge variant="neutral" size="sm">Cook: {{ cook_time }}</hx-badge>
+      {% endif %}
+
+      {% if servings %}
+        <hx-badge variant="neutral" size="sm">Serves: {{ servings }}</hx-badge>
+      {% endif %}
+
+      {% if difficulty %}
+        <hx-badge
+          variant="{{ difficulty|lower == 'easy' ? 'success' : (difficulty|lower == 'hard' ? 'danger' : 'warning') }}"
+          size="sm"
+        >{{ difficulty }}</hx-badge>
+      {% endif %}
+    </div>
+  </header>
+
+  <hx-divider></hx-divider>
+
+  <div class="recipe-full__layout">
+    <div class="recipe-full__main">
+      {% if ingredients is not empty %}
+        <section class="recipe-full__section">
+          <hx-text variant="heading-md">Ingredients</hx-text>
+          <hx-list>
+            {% for ingredient in ingredients %}
+              <li>{{ ingredient }}</li>
+            {% endfor %}
+          </hx-list>
+        </section>
+      {% endif %}
+
+      <hx-divider></hx-divider>
+
+      {% if instructions is not empty %}
+        <section class="recipe-full__section">
+          <hx-text variant="heading-md">Instructions</hx-text>
+          <hx-list ordered>
+            {% for step in instructions %}
+              <li>{{ step }}</li>
+            {% endfor %}
+          </hx-list>
+        </section>
+      {% endif %}
+
+      {% if content %}
+        <hx-divider></hx-divider>
+        <section class="recipe-full__section">
+          <hx-prose>{{ content|raw }}</hx-prose>
+        </section>
+      {% endif %}
+    </div>
+
+    {% if sidebar %}
+      <aside class="recipe-full__sidebar">
+        {{ sidebar }}
+      </aside>
+    {% endif %}
+  </div>
+</article>

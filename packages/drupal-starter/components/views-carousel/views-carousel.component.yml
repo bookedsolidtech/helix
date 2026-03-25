@@ -1,0 +1,22 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Views Carousel
+description: 'Carousel/slider layout for Views output using the hx-carousel web component.'
+status: experimental
+group: 'Views/Lists'
+props:
+  type: object
+  properties:
+    autoplay:
+      type: boolean
+      title: Autoplay
+      description: 'Automatically advance slides (default: false)'
+      default: false
+    interval:
+      type: integer
+      title: Interval
+      description: 'Autoplay interval in milliseconds (default: 5000)'
+      default: 5000
+slots:
+  items:
+    title: Items
+    description: 'Carousel slides (Views rows, cards, images, etc.)'

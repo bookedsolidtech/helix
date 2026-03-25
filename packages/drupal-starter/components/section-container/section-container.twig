@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Section Container SDC — composes hx-container.
+ *
+ * Provides a configurable page section with width, background, and padding variants.
+ */
+#}
+{{ attach_library('helixui/hx-container') }}
+
+{% set classes = [
+  'section-container',
+  'section-container--' ~ (variant|default('default')),
+  'section-container--bg-' ~ (background|default('default')),
+  'section-container--pad-' ~ (padding|default('md')),
+] %}
+
+<section class="{{ classes|join(' ') }}">
+  <hx-container{% if variant|default('default') == 'narrow' %} size="narrow"{% elseif variant|default('default') == 'wide' %} size="wide"{% elseif variant|default('default') == 'full' %} size="full"{% endif %}>
+    {% if content %}
+      {{ content }}
+    {% endif %}
+  </hx-container>
+</section>

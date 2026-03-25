@@ -1,0 +1,58 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Main Navigation
+description: 'Primary site navigation composing hx-nav, hx-link, hx-icon, and hx-button web components. Supports logo, menu items with dropdowns, and CTA action slots.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    logo_url:
+      type: string
+      title: Logo URL
+      description: 'URL to the site logo image.'
+    logo_alt:
+      type: string
+      title: Logo Alt Text
+      description: 'Alt text for the site logo image.'
+    logo_link:
+      type: string
+      title: Logo Link
+      description: 'URL the logo links to (typically the homepage).'
+    menu_items:
+      type: array
+      title: Menu Items
+      description: 'Array of navigation menu items.'
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+            title: Title
+          url:
+            type: string
+            title: URL
+          is_active:
+            type: boolean
+            title: Is Active
+          children:
+            type: array
+            title: Children
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                  title: Title
+                url:
+                  type: string
+                  title: URL
+                is_active:
+                  type: boolean
+                  title: Is Active
+slots:
+  actions:
+    title: Actions
+    description: 'Slot for CTA buttons or other action elements in the navigation bar.'
+  logo:
+    title: Logo Override
+    description: 'Slot to override the default logo rendering.'

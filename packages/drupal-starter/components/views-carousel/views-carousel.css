@@ -1,0 +1,7 @@
+/* Views Carousel — layout and spacing only */
+
+.views-carousel {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}

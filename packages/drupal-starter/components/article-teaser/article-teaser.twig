@@ -1,0 +1,64 @@
+{#
+  Article Teaser SDC
+  Composes: hx-card, hx-badge, hx-text, hx-avatar, hx-image, hx-link
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-avatar') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-link') }}
+
+<div{{ attributes.addClass('article-teaser') }}>
+  <hx-card variant="default" elevation="raised">
+    {% if image_url %}
+      <hx-image
+        slot="image"
+        src="{{ image_url }}"
+        alt="{{ image_alt|default('') }}"
+        loading="lazy"
+      ></hx-image>
+    {% endif %}
+
+    <div slot="header" class="article-teaser__header">
+      {% if category %}
+        <hx-badge variant="neutral" size="sm">{{ category }}</hx-badge>
+      {% endif %}
+    </div>
+
+    <div class="article-teaser__body">
+      <hx-text variant="heading-sm">
+        {% if url %}
+          <hx-link href="{{ url }}">{{ title }}</hx-link>
+        {% else %}
+          {{ title }}
+        {% endif %}
+      </hx-text>
+
+      {% if body %}
+        <hx-text variant="body-sm" class="article-teaser__excerpt">{{ body }}</hx-text>
+      {% endif %}
+    </div>
+
+    <div slot="footer" class="article-teaser__footer">
+      <div class="article-teaser__meta">
+        {% if author_name %}
+          <hx-avatar size="sm" label="{{ author_name }}"></hx-avatar>
+          <hx-text variant="body-xs">{{ author_name }}</hx-text>
+        {% endif %}
+
+        {% if date %}
+          <hx-text variant="body-xs">
+            <time>{{ date }}</time>
+          </hx-text>
+        {% endif %}
+      </div>
+
+      {% if actions %}
+        <div class="article-teaser__actions">
+          {{ actions }}
+        </div>
+      {% endif %}
+    </div>
+  </hx-card>
+</div>

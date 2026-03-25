@@ -1,0 +1,44 @@
+{#
+  Mobile Drawer SDC
+  Composes: hx-drawer, hx-icon-button
+#}
+{{ attach_library('helixui/hx-drawer') }}
+{{ attach_library('helixui/hx-icon-button') }}
+
+{% set position = position|default('left') %}
+{% set breakpoint = breakpoint|default('768px') %}
+
+<div{{ attributes.addClass('mobile-drawer') }} style="--mobile-drawer-breakpoint: {{ breakpoint }};">
+  <div class="mobile-drawer__trigger">
+    {% if trigger %}
+      {{ trigger }}
+    {% else %}
+      <hx-icon-button
+        name="menu"
+        label="{{ 'Open menu'|t }}"
+        class="mobile-drawer__toggle"
+        aria-controls="mobile-drawer-panel"
+        aria-expanded="false"
+      ></hx-icon-button>
+    {% endif %}
+  </div>
+
+  <hx-drawer
+    id="mobile-drawer-panel"
+    placement="{{ position }}"
+    class="mobile-drawer__panel"
+  >
+    <div class="mobile-drawer__header">
+      <hx-icon-button
+        name="x"
+        label="{{ 'Close menu'|t }}"
+        class="mobile-drawer__close"
+      ></hx-icon-button>
+    </div>
+    <div class="mobile-drawer__content">
+      {% if content %}
+        {{ content }}
+      {% endif %}
+    </div>
+  </hx-drawer>
+</div>

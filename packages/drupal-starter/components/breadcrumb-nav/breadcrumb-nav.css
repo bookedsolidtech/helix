@@ -1,0 +1,4 @@
+.breadcrumb-nav {
+  padding-block: var(--hx-spacing-sm, 0.5rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+}

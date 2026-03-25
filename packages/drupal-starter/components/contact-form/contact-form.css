@@ -1,0 +1,48 @@
+/**
+ * @file
+ * Contact Form SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-lg, 1.5rem);
+}
+
+.contact-form__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.contact-form__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.contact-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+@media (max-width: 600px) {
+  .contact-form__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-form__custom-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.contact-form__actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  padding-block-start: var(--hx-spacing-sm, 0.5rem);
+}

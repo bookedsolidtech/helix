@@ -1,0 +1,51 @@
+{#
+  Main Navigation SDC
+  Composes: hx-nav, hx-link, hx-icon, hx-button, hx-dropdown
+#}
+{{ attach_library('helixui/hx-nav') }}
+{{ attach_library('helixui/hx-link') }}
+{{ attach_library('helixui/hx-icon') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-dropdown') }}
+
+<nav{{ attributes.addClass('main-nav') }} aria-label="{{ 'Main navigation'|t }}">
+  <div class="main-nav__logo">
+    {% if logo %}
+      {{ logo }}
+    {% elseif logo_url %}
+      <a href="{{ logo_link|default('/') }}" class="main-nav__logo-link" rel="home">
+        <img src="{{ logo_url }}" alt="{{ logo_alt|default('Home'|t) }}" class="main-nav__logo-image" loading="eager" />
+      </a>
+    {% endif %}
+  </div>
+
+  <hx-nav aria-label="{{ 'Primary'|t }}">
+    {% if menu_items %}
+      {% for item in menu_items %}
+        {% if item.children is not empty %}
+          <hx-dropdown>
+            <hx-button slot="trigger" variant="text"{% if item.is_active %} aria-current="true"{% endif %}>
+              {{ item.title }}
+              <hx-icon slot="suffix" name="chevron-down" size="small"></hx-icon>
+            </hx-button>
+            {% for child in item.children %}
+              <hx-link href="{{ child.url }}"{% if child.is_active %} aria-current="page"{% endif %}>
+                {{ child.title }}
+              </hx-link>
+            {% endfor %}
+          </hx-dropdown>
+        {% else %}
+          <hx-link href="{{ item.url }}"{% if item.is_active %} aria-current="page"{% endif %}>
+            {{ item.title }}
+          </hx-link>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </hx-nav>
+
+  {% if actions %}
+    <div class="main-nav__actions">
+      {{ actions }}
+    </div>
+  {% endif %}
+</nav>

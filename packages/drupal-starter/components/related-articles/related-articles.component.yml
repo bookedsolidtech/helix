@@ -1,0 +1,38 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Related Articles
+description: 'Grid of related article cards with image, title, date, and category badge. Composes hx-card, hx-text, hx-image, hx-link, hx-badge.'
+status: experimental
+group: 'Content Block'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Section heading for the related articles block'
+      default: 'Related Articles'
+    items:
+      type: array
+      title: Items
+      description: 'Array of related article objects'
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+            title: 'Article Title'
+          url:
+            type: string
+            title: URL
+          image_url:
+            type: string
+            title: 'Image URL'
+          image_alt:
+            type: string
+            title: 'Image Alt'
+          date:
+            type: string
+            title: Date
+          category:
+            type: string
+            title: Category

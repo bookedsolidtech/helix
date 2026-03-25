@@ -1,0 +1,37 @@
+{#
+/**
+ * @file
+ * Search Form SDC — composes hx-text-input, hx-button, hx-icon.
+ *
+ * Provides an accessible search form with optional filter slot.
+ */
+#}
+{{ attach_library('helixui/hx-text-input') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-icon') }}
+
+<form
+  class="search-form"
+  action="{{ action }}"
+  method="{{ method|default('get') }}"
+  role="search"
+  aria-label="{{ label|default('Search') }}"
+>
+  <div class="search-form__input-group">
+    <hx-text-input
+      name="search"
+      type="search"
+      label="{{ label|default('Search') }}"
+      placeholder="{{ placeholder|default('Search...') }}"
+    ></hx-text-input>
+    <hx-button type="submit" variant="primary" aria-label="{{ label|default('Search') }}">
+      <hx-icon name="search" slot="prefix"></hx-icon>
+      {{ label|default('Search') }}
+    </hx-button>
+  </div>
+  {% if filters %}
+    <div class="search-form__filters">
+      {{ filters }}
+    </div>
+  {% endif %}
+</form>

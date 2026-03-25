@@ -1,0 +1,26 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Breadcrumb Navigation
+description: 'Breadcrumb trail composing hx-breadcrumb and hx-link web components. Renders a list of navigational links with configurable separator.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    items:
+      type: array
+      title: Breadcrumb Items
+      description: 'Array of breadcrumb items with title and url. The last item is treated as the current page.'
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+            title: Title
+          url:
+            type: string
+            title: URL
+    separator:
+      type: string
+      title: Separator
+      description: 'Character used between breadcrumb items.'
+      default: '/'

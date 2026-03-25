@@ -1,0 +1,35 @@
+/**
+ * @file
+ * Tag Cloud SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.tag-cloud__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-xs, 0.25rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-cloud__item {
+  display: inline-flex;
+}
+
+.tag-cloud--weighted .tag-cloud__list {
+  align-items: center;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+/* Drupal core utility class for screen-reader-only text */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

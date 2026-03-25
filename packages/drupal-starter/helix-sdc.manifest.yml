@@ -1,0 +1,50 @@
+# HELiX SDC Manifest
+# Documents which HELiX web components each SDC composes.
+# Used for dependency tracking, impact analysis, and upgrade planning.
+#
+# Format: sdc-name: [hx-component, ...]
+
+# --- Node Display ---
+article-teaser: [hx-avatar, hx-badge, hx-card, hx-image, hx-link, hx-text]
+article-full: [hx-avatar, hx-badge, hx-divider, hx-image, hx-prose, hx-text]
+recipe-card: [hx-badge, hx-card, hx-image, hx-text]
+recipe-full: [hx-badge, hx-divider, hx-image, hx-list, hx-prose, hx-text]
+landing-page: [hx-container, hx-image, hx-text]
+
+# --- Views / Lists ---
+views-grid: []
+views-list: [hx-divider, hx-list]
+views-carousel: [hx-carousel]
+topic-landing: [hx-container, hx-divider, hx-text]
+
+# --- Navigation ---
+main-nav: [hx-button, hx-dropdown, hx-icon, hx-link, hx-nav]
+breadcrumb-nav: [hx-breadcrumb, hx-link]
+sidebar-nav: [hx-link, hx-nav, hx-side-nav]
+mobile-drawer: [hx-drawer, hx-icon-button]
+
+# --- Hero / Banner ---
+hero-banner: [hx-button, hx-image, hx-text]
+featured-article: [hx-avatar, hx-badge, hx-card, hx-image, hx-link, hx-text]
+category-hero: [hx-badge, hx-image, hx-text]
+
+# --- Forms ---
+search-form: [hx-button, hx-icon, hx-text-input]
+newsletter-signup: [hx-button, hx-checkbox, hx-text, hx-text-input]
+contact-form: [hx-button, hx-select, hx-text, hx-text-input, hx-textarea]
+
+# --- Layout ---
+site-header: [hx-container]
+site-footer: [hx-container, hx-divider, hx-link, hx-text]
+section-container: [hx-container]
+
+# --- Content Blocks ---
+author-byline: [hx-avatar, hx-link, hx-text]
+related-articles: [hx-badge, hx-card, hx-image, hx-link, hx-text]
+share-buttons: [hx-button, hx-button-group, hx-icon]
+tag-cloud: [hx-link, hx-tag]
+
+# --- Healthcare ---
+provider-card: [hx-avatar, hx-badge, hx-button, hx-card, hx-rating, hx-status-indicator, hx-text]
+appointment-cta: [hx-button, hx-card, hx-icon, hx-text]
+condition-tag: [hx-icon, hx-link, hx-tag]
