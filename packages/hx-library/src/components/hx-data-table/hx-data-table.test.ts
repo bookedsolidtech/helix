@@ -1237,4 +1237,95 @@ describe('hx-data-table', () => {
       expect(el.stickyHeader).toBe(true);
     });
   });
+
+  // ─── Dynamic Data Updates ───
+
+  describe('Dynamic Data Updates', () => {
+    it('renders additional rows when rows property is updated', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const initialRows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(initialRows.length).toBe(ROWS.length);
+
+      el.rows = [
+        ...ROWS,
+        { name: 'New Patient', status: 'Active' },
+        { name: 'Another One', status: 'Pending' },
+      ];
+      await el.updateComplete;
+
+      const updatedRows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(updatedRows.length).toBe(ROWS.length + 2);
+    });
+
+    it('removes rows when rows property is set to a smaller array', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      el.rows = [ROWS[0]!];
+      await el.updateComplete;
+
+      const updatedRows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(updatedRows.length).toBe(1);
+    });
+
+    it('renders empty state after rows are cleared', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      el.rows = [];
+      await el.updateComplete;
+
+      const emptyCell = el.shadowRoot!.querySelector('td.empty-cell');
+      expect(emptyCell).toBeTruthy();
+    });
+
+    it('updates column headers when columns property changes', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const newColumns = [
+        { key: 'name', label: 'Patient Name', sortable: true },
+        { key: 'status', label: 'Status', sortable: false },
+        { key: 'dob', label: 'Date of Birth', sortable: false },
+      ];
+      el.columns = newColumns;
+      await el.updateComplete;
+
+      const headers = el.shadowRoot!.querySelectorAll('th[part~="th"]');
+      expect(headers.length).toBe(3);
+    });
+
+    it('invalidates cell cache when rows change (keyboard nav uses fresh cells)', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = [ROWS[0]!];
+      await el.updateComplete;
+
+      // Add more rows — this must invalidate the cell cache
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const ths = el.shadowRoot!.querySelectorAll<HTMLElement>('th[part~="th"]');
+      ths[0].focus();
+
+      // ArrowDown should navigate to the first td in the refreshed DOM
+      ths[0].dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+
+      const tds = el.shadowRoot!.querySelectorAll<HTMLElement>('tbody td[part~="td"]');
+      expect(el.shadowRoot!.activeElement).toBe(tds[0]);
+    });
+  });
 });

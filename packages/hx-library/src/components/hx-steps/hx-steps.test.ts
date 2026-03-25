@@ -557,3 +557,79 @@ describe('hx-step', () => {
     });
   });
 });
+
+// ─── hx-steps — Dynamic Orientation / Size Changes ─────────────────────────────
+
+describe('hx-steps — Dynamic orientation / size changes', () => {
+  it('changes orientation on children when orientation property is updated', async () => {
+    const el = await fixture<HelixSteps>(
+      '<hx-steps aria-label="Dynamic steps"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="active"></hx-step></hx-steps>',
+    );
+    await el.updateComplete;
+
+    expect(el.orientation).toBe('horizontal');
+
+    el.orientation = 'vertical';
+    await el.updateComplete;
+
+    const steps = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+    steps.forEach((step) => {
+      expect(step.orientation).toBe('vertical');
+    });
+  });
+
+  it('changes size on children when hx-size property is updated programmatically', async () => {
+    const el = await fixture<HelixSteps>(
+      '<hx-steps hx-size="md" aria-label="Size steps"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="pending"></hx-step></hx-steps>',
+    );
+    await el.updateComplete;
+
+    expect(el.size).toBe('md');
+
+    el.size = 'lg';
+    await el.updateComplete;
+
+    const steps = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+    steps.forEach((step) => {
+      expect(step.size).toBe('lg');
+    });
+  });
+
+  it('re-indexes steps when a step is removed', async () => {
+    const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+    await el.updateComplete;
+
+    const stepsBeforeRemoval = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+    expect(stepsBeforeRemoval[0]!.index).toBe(0);
+    expect(stepsBeforeRemoval[1]!.index).toBe(1);
+    expect(stepsBeforeRemoval[2]!.index).toBe(2);
+
+    el.removeChild(stepsBeforeRemoval[0]!);
+    await el.updateComplete;
+
+    const stepsAfterRemoval = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+    expect(stepsAfterRemoval).toHaveLength(2);
+    expect(stepsAfterRemoval[0]!.index).toBe(0);
+    expect(stepsAfterRemoval[1]!.index).toBe(1);
+  });
+
+  it('hx-step active status emits hx-step-click from container when clicked', async () => {
+    const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+    await el.updateComplete;
+
+    const steps = el.querySelectorAll<HelixStep>('hx-step');
+    const activeStep = steps[1]!; // status="active"
+
+    const eventPromise = oneEvent<CustomEvent<{ step: HelixStep; index: number }>>(
+      el,
+      'hx-step-click',
+    );
+    activeStep.shadowRoot
+      ?.querySelector('.step')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    const event = await eventPromise;
+
+    expect(event.detail.index).toBe(1);
+    expect(event.detail.step).toBe(activeStep);
+  });
+});

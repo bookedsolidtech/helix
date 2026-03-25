@@ -993,3 +993,84 @@ describe('hx-tree-item', () => {
     });
   });
 });
+
+// ─────────────────────────────────────────────────
+// hx-tree-view — Dynamic Item Add / Remove
+// ─────────────────────────────────────────────────
+
+describe('hx-tree-view — Dynamic Item Add / Remove', () => {
+  it('reflects newly appended top-level hx-tree-item in visible items', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Dynamic tree">
+        <hx-tree-item>Item 1</hx-tree-item>
+        <hx-tree-item>Item 2</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const newItem = document.createElement('hx-tree-item') as WcTreeItem;
+    newItem.textContent = 'Item 3';
+    el.appendChild(newItem);
+
+    // Wait for slotchange + update
+    await el.updateComplete;
+    await newItem.updateComplete;
+
+    const allItems = el.querySelectorAll('hx-tree-item');
+    expect(allItems.length).toBe(3);
+  });
+
+  it('updates aria-setsize for siblings when a new item is appended', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Dynamic tree">
+        <hx-tree-item>Item 1</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const newItem = document.createElement('hx-tree-item') as WcTreeItem;
+    newItem.textContent = 'Item 2';
+    el.appendChild(newItem);
+
+    await el.updateComplete;
+    await newItem.updateComplete;
+
+    // Both items should now report setsize=2
+    const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+    const row0 = shadowQuery(items[0]!, '.item-row');
+    const row1 = shadowQuery(items[1]!, '.item-row');
+    expect(row0?.getAttribute('aria-setsize')).toBe('2');
+    expect(row1?.getAttribute('aria-setsize')).toBe('2');
+  });
+
+  it('single-mode selection remains stable after removing items', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Dynamic tree" selection="single">
+        <hx-tree-item>Item 1</hx-tree-item>
+        <hx-tree-item>Item 2</hx-tree-item>
+        <hx-tree-item>Item 3</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    // Select item 1
+    const [item1, , item3] = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+    item1!.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item: item1 },
+      }),
+    );
+    await el.updateComplete;
+    expect(item1!.selected).toBe(true);
+
+    // Remove item3 — selection on item1 should not change
+    el.removeChild(item3!);
+    await el.updateComplete;
+
+    expect(item1!.selected).toBe(true);
+    const remaining = el.querySelectorAll('hx-tree-item');
+    expect(remaining.length).toBe(2);
+  });
+});
