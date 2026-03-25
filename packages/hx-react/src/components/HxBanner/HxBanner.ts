@@ -29,7 +29,7 @@ export const HxBanner = createComponent({
   elementClass: HelixBanner,
   react: React,
   events: {
-    onHxDismiss: 'hx-dismiss'
+    onHxDismiss: 'hx-dismiss',
   },
   displayName: 'HxBanner',
 });

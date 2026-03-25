@@ -13,7 +13,14 @@ export interface HxToastStackProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** Corner of the viewport where toasts appear. */
-  placement?: string | 'top-start' | 'top-center' | 'top-end' | 'bottom-start' | 'bottom-center' | 'bottom-end';
+  placement?:
+    | string
+    | 'top-start'
+    | 'top-center'
+    | 'top-end'
+    | 'bottom-start'
+    | 'bottom-center'
+    | 'bottom-end';
   /** Maximum number of simultaneously visible toasts. 0 = unlimited. */
   stackLimit?: number;
 }

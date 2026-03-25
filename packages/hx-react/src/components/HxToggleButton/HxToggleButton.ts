@@ -31,7 +31,7 @@ export const HxToggleButton = createComponent({
   elementClass: HelixToggleButton,
   react: React,
   events: {
-    onHxToggle: 'hx-toggle'
+    onHxToggle: 'hx-toggle',
   },
   displayName: 'HxToggleButton',
 });
