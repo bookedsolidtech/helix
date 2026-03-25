@@ -32,7 +32,7 @@ export const HxDialog = createComponent({
   events: {
     onHxOpen: 'hx-open',
     onHxClose: 'hx-close',
-    onHxCancel: 'hx-cancel',
+    onHxCancel: 'hx-cancel'
   },
   displayName: 'HxDialog',
 });

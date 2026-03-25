@@ -1,18 +1,15 @@
 export { HxAccordionItem, type HxAccordionItemProps } from './components/HxAccordionItem/index.js';
 export { HxAccordion, type HxAccordionProps } from './components/HxAccordion/index.js';
-export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
-export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
 export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/index.js';
+export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
 export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
-export {
-  HxBreadcrumbItem,
-  type HxBreadcrumbItemProps,
-} from './components/HxBreadcrumbItem/index.js';
+export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
+export { HxBreadcrumbItem, type HxBreadcrumbItemProps } from './components/HxBreadcrumbItem/index.js';
 export { HxBreadcrumb, type HxBreadcrumbProps } from './components/HxBreadcrumb/index.js';
-export { HxButtonGroup, type HxButtonGroupProps } from './components/HxButtonGroup/index.js';
 export { HxButton, type HxButtonProps } from './components/HxButton/index.js';
 export { HxCard, type HxCardProps } from './components/HxCard/index.js';
+export { HxButtonGroup, type HxButtonGroupProps } from './components/HxButtonGroup/index.js';
 export { HxCarouselItem, type HxCarouselItemProps } from './components/HxCarouselItem/index.js';
 export { HxCarousel, type HxCarouselProps } from './components/HxCarousel/index.js';
 export { HxCheckbox, type HxCheckboxProps } from './components/HxCheckbox/index.js';
@@ -43,10 +40,10 @@ export { HxImage, type HxImageProps } from './components/HxImage/index.js';
 export { HxLink, type HxLinkProps } from './components/HxLink/index.js';
 export { HxListItem, type HxListItemProps } from './components/HxListItem/index.js';
 export { HxList, type HxListProps } from './components/HxList/index.js';
-export { HxMeter, type HxMeterProps } from './components/HxMeter/index.js';
 export { HxMenuDivider, type HxMenuDividerProps } from './components/HxMenuDivider/index.js';
 export { HxMenuItem, type HxMenuItemProps } from './components/HxMenuItem/index.js';
 export { HxMenu, type HxMenuProps } from './components/HxMenu/index.js';
+export { HxMeter, type HxMeterProps } from './components/HxMeter/index.js';
 export { HxNav, type HxNavProps } from './components/HxNav/index.js';
 export { HxNumberInput, type HxNumberInputProps } from './components/HxNumberInput/index.js';
 export { HxOverflowMenu, type HxOverflowMenuProps } from './components/HxOverflowMenu/index.js';
@@ -70,21 +67,12 @@ export { HxSplitButton, type HxSplitButtonProps } from './components/HxSplitButt
 export { HxSplitPanel, type HxSplitPanelProps } from './components/HxSplitPanel/index.js';
 export { HxStack, type HxStackProps } from './components/HxStack/index.js';
 export { HxStat, type HxStatProps } from './components/HxStat/index.js';
-export {
-  HxStatusIndicator,
-  type HxStatusIndicatorProps,
-} from './components/HxStatusIndicator/index.js';
+export { HxStatusIndicator, type HxStatusIndicatorProps } from './components/HxStatusIndicator/index.js';
+export { HxStyleScope, type HxStyleScopeProps } from './components/HxStyleScope/index.js';
+export { HxStructuredList, type HxStructuredListProps } from './components/HxStructuredList/index.js';
+export { HxStructuredListRow, type HxStructuredListRowProps } from './components/HxStructuredListRow/index.js';
 export { HxStep, type HxStepProps } from './components/HxStep/index.js';
 export { HxSteps, type HxStepsProps } from './components/HxSteps/index.js';
-export {
-  HxStructuredList,
-  type HxStructuredListProps,
-} from './components/HxStructuredList/index.js';
-export {
-  HxStructuredListRow,
-  type HxStructuredListRowProps,
-} from './components/HxStructuredListRow/index.js';
-export { HxStyleScope, type HxStyleScopeProps } from './components/HxStyleScope/index.js';
 export { HxSwitch, type HxSwitchProps } from './components/HxSwitch/index.js';
 export { HxTable, type HxTableProps } from './components/HxTable/index.js';
 export { HxTbody, type HxTbodyProps } from './components/HxTbody/index.js';
@@ -109,7 +97,4 @@ export { HxTooltip, type HxTooltipProps } from './components/HxTooltip/index.js'
 export { HxTopNav, type HxTopNavProps } from './components/HxTopNav/index.js';
 export { HxTreeItem, type HxTreeItemProps } from './components/HxTreeItem/index.js';
 export { HxTreeView, type HxTreeViewProps } from './components/HxTreeView/index.js';
-export {
-  HxVisuallyHidden,
-  type HxVisuallyHiddenProps,
-} from './components/HxVisuallyHidden/index.js';
+export { HxVisuallyHidden, type HxVisuallyHiddenProps } from './components/HxVisuallyHidden/index.js';

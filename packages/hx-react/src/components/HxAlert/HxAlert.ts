@@ -30,7 +30,7 @@ export const HxAlert = createComponent({
   react: React,
   events: {
     onHxClose: 'hx-close',
-    onHxAfterClose: 'hx-after-close',
+    onHxAfterClose: 'hx-after-close'
   },
   displayName: 'HxAlert',
 });

@@ -30,7 +30,7 @@ export const HxButton = createComponent({
   elementClass: HelixButton,
   react: React,
   events: {
-    onHxClick: 'hx-click',
+    onHxClick: 'hx-click'
   },
   displayName: 'HxButton',
 });
