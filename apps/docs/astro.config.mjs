@@ -432,6 +432,11 @@ export default defineConfig({
                       label: 'Constructable Stylesheets',
                       slug: 'components/styling/constructable-stylesheets',
                     },
+                    {
+                      label: 'AdoptedStylesheets Showcase',
+                      link: '/adopted-stylesheets',
+                      badge: { text: 'New', variant: 'tip' },
+                    },
                     { label: 'Responsive Components', slug: 'components/styling/responsive' },
                     { label: 'Dark Mode', slug: 'components/styling/dark-mode' },
                     { label: 'Animations & Transitions', slug: 'components/styling/animations' },
