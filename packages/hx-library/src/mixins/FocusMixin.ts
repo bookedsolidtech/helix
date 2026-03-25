@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js';
  * Mixin constructor type — must use `any[]` args per TypeScript mixin requirements (TS2545).
  * @internal
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T = object> = new (...args: any[]) => T;
 
 /**

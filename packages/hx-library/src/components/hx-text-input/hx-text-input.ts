@@ -5,11 +5,8 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement, createIdCounter } from '../../base/index.js';
-<<<<<<< HEAD
 import { FocusMixin } from '../../mixins/index.js';
-=======
 import { FormMixin } from '../../mixins/FormMixin.js';
->>>>>>> origin/dev
 import { helixTextInputStyles } from './hx-text-input.styles.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
@@ -53,11 +50,7 @@ const _nextTextInputId = createIdCounter('hx-text-input');
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
 @customElement('hx-text-input')
-<<<<<<< HEAD
-export class HelixTextInput extends FocusMixin(HelixElement) {
-=======
-export class HelixTextInput extends FormMixin(HelixElement) {
->>>>>>> origin/dev
+export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [tokenStyles, helixTextInputStyles];
 
   // ─── Form Association ───
