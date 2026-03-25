@@ -342,10 +342,13 @@ export class HelixPopover extends LitElement {
     if (arrowEl && middlewareData.arrow) {
       const arrowData = middlewareData.arrow;
       const basePlacement = placement.split('-')[0] ?? 'bottom';
-      const staticSide =
-        ({ top: 'bottom', right: 'left', bottom: 'top', left: 'right' } as Record<string, string>)[
-          basePlacement
-        ] ?? 'bottom';
+      const oppositeSide: Record<string, string> = {
+        top: 'bottom',
+        right: 'left',
+        bottom: 'top',
+        left: 'right',
+      };
+      const staticSide = oppositeSide[basePlacement] ?? 'bottom';
 
       Object.assign(arrowEl.style, {
         left: arrowData.x != null ? `${arrowData.x}px` : '',

@@ -631,10 +631,10 @@ Valid types: feat, fix, chore, docs, test, refactor, style, perf, ci, build
 ```markdown
 ## Pre-Push Checklist (all required)
 
-- [ ] `npm run format` run and changes re-staged/committed
-- [ ] `npm run verify` -- zero failures
-- [ ] If any `.styles.ts` changed: `npm run test:vrt:update` committed
-- [ ] `npm run test:library` -- all tests pass
+- [ ] `pnpm run format` run and changes re-staged/committed
+- [ ] `pnpm run verify` -- zero failures
+- [ ] If any `.styles.ts` changed: `pnpm run test:vrt:update` committed
+- [ ] `ppnpm run test:smart` -- changed component tests pass
 ```
 
 **3. Show what NOT to do**
@@ -642,7 +642,7 @@ Valid types: feat, fix, chore, docs, test, refactor, style, perf, ci, build
 ```markdown
 ## What NOT To Do
 
-- NEVER run `npm run test` -- runs all 100+ tests, costs $14+
+- NEVER run `pnpm run test` -- runs all 100+ tests, costs $14+
 - NEVER run `npx vitest run` without a specific filter
 - NEVER push partial fixes then format separately
 ```
@@ -714,13 +714,13 @@ These files accumulate operational knowledge over time. Agents learn from past f
 
 ## CRITICAL: Never Run the Full Test Suite
 
-Running `npm run test` runs all 100+ tests including broken components
+Running `pnpm run test` runs all 100+ tests including broken components
 that timeout at 30s each. This costs $14+ per agent. This is forbidden.
 
 ## The Smart Test Command
 
 \`\`\`bash
-npm run test:smart
+pnpm run test:smart
 \`\`\`
 
 This command:
@@ -1211,8 +1211,8 @@ tools: Read, Bash
 model: haiku
 ---
 
-You fix code formatting issues. Run `npm run format` and commit the results.
-Always run `npm run format:check` first to see what needs fixing.
+You fix code formatting issues. Run `pnpm run format` and commit the results.
+Always run `pnpm run format:check` first to see what needs fixing.
 Never modify code logic. Only fix formatting.
 ```
 

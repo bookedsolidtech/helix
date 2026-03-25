@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import {
@@ -287,7 +287,7 @@ export class HelixPopup extends LitElement {
     this._stopAutoUpdate();
   }
 
-  override updated(changedProperties: Map<string | symbol, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
     const activeChanged = changedProperties.has('active');

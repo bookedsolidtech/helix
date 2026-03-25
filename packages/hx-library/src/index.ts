@@ -8,6 +8,12 @@
  * Run `npm run generate:barrel` to regenerate.
  */
 
+// ─── Base infrastructure ────────────────────────────────────────────────────
+export { HelixElement } from './base/index.js';
+export { createIdCounter, resetIdCounter } from './base/index.js';
+export { mergeTokenStyles } from './base/index.js';
+
+// ─── Components ──────────────────────────────────────────────────────────────
 export { HelixAccordion } from './components/hx-accordion/index.js';
 export { HelixAccordionItem } from './components/hx-accordion/index.js';
 export { HelixActionBar } from './components/hx-action-bar/index.js';
@@ -90,6 +96,7 @@ export { HelixStatusIndicator, type StatusIndicatorStatus, type StatusIndicatorS
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
 export { HelixStructuredList, HelixStructuredListRow } from './components/hx-structured-list/index.js';
+export { HxStyleScope } from './components/hx-style-scope/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export type { HxSwitch, WcSwitch } from './components/hx-switch/index.js';
 export { HelixTable } from './components/hx-table/index.js';

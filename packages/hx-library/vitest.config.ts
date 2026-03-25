@@ -20,7 +20,12 @@ export default defineConfig({
       viewport: { width: 1280, height: 720 },
       instances: [{ browser: 'chromium' }],
     },
-    include: ['src/components/**/*.test.ts'],
+    include: [
+      'src/components/**/*.test.ts',
+      'src/base/**/*.test.ts',
+      'src/utilities/**/*.test.ts',
+      'src/__tests__/**/*.test.ts',
+    ],
     exclude: ['.worktrees/**', 'node_modules/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results.json' },

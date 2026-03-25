@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -135,7 +135,7 @@ export class HelixCard extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     // WCAG 4.1.2: interactive cards (with hx-href) must have an accessible name
     if (
