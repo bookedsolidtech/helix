@@ -1,0 +1,42 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Section Container
+description: 'Configurable page section wrapper with variant width, background color, and padding options. Composes hx-container.'
+status: experimental
+group: Layout
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Width variant for the section container'
+      default: 'default'
+      enum:
+        - default
+        - narrow
+        - wide
+        - full
+    background:
+      type: string
+      title: Background
+      description: 'Background color theme for the section'
+      default: 'default'
+      enum:
+        - default
+        - muted
+        - primary
+        - dark
+    padding:
+      type: string
+      title: Padding
+      description: 'Vertical padding size'
+      default: 'md'
+      enum:
+        - none
+        - sm
+        - md
+        - lg
+slots:
+  content:
+    title: Content
+    description: 'Section content'

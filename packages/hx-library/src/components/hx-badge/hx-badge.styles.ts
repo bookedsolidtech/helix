@@ -161,6 +161,9 @@ export const helixBadgeStyles = css`
     opacity: 0.7;
     border-radius: var(--hx-border-radius-sm, 0.125rem);
     line-height: 0;
+    /* WCAG 2.5.5: minimum 44×44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .badge__remove-button:hover {

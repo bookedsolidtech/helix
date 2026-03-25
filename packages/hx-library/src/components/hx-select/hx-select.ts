@@ -577,7 +577,7 @@ export class HelixSelect extends HelixElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : 'false'}
+            aria-selected=${isSelected ? 'true' : nothing}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >
@@ -591,7 +591,7 @@ export class HelixSelect extends HelixElement {
   // ─── Main Render ───
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
 
     const fieldClasses = {
       field: true,

@@ -1,0 +1,62 @@
+{#
+/**
+ * @file
+ * Contact Form SDC — composes hx-text-input, hx-textarea, hx-button, hx-text, hx-select.
+ *
+ * Provides a general-purpose contact form with name, email, subject, and message fields.
+ * Additional fields can be injected via the fields slot.
+ */
+#}
+{{ attach_library('helixui/hx-text-input') }}
+{{ attach_library('helixui/hx-textarea') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-select') }}
+
+<div class="contact-form">
+  <div class="contact-form__header">
+    <hx-text variant="heading" size="lg">{{ title|default('Contact Us') }}</hx-text>
+    {% if description %}
+      <hx-text variant="body" size="md">{{ description }}</hx-text>
+    {% endif %}
+  </div>
+  <form
+    class="contact-form__form"
+    action="{{ action }}"
+    method="{{ method|default('post') }}"
+  >
+    <div class="contact-form__row">
+      <hx-text-input
+        name="name"
+        label="Name"
+        required
+      ></hx-text-input>
+      <hx-text-input
+        name="email"
+        type="email"
+        label="Email"
+        required
+      ></hx-text-input>
+    </div>
+    <hx-select name="subject" label="Subject">
+      <option value="">Select a subject</option>
+      <option value="general">General Inquiry</option>
+      <option value="support">Support</option>
+      <option value="feedback">Feedback</option>
+    </hx-select>
+    <hx-textarea
+      name="message"
+      label="Message"
+      rows="5"
+      required
+    ></hx-textarea>
+    {% if fields %}
+      <div class="contact-form__custom-fields">
+        {{ fields }}
+      </div>
+    {% endif %}
+    <div class="contact-form__actions">
+      <hx-button type="submit" variant="primary">Send Message</hx-button>
+    </div>
+  </form>
+</div>

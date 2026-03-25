@@ -377,6 +377,7 @@ export class HelixTimePicker extends LitElement {
    * @internal
    */
   private readonly _handleOutsideClick = (e: MouseEvent): void => {
+    if (!this.isConnected) return;
     if (!this.contains(e.target as Node) && !this.shadowRoot?.contains(e.target as Node)) {
       this._closeListbox();
     }
@@ -718,10 +719,11 @@ export class HelixTimePicker extends LitElement {
 
     const placeholder = this.format === '12h' ? 'hh:mm AM' : 'hh:mm';
 
+    // WCAG 1.3.1: the help-text div with _helpId always renders in the DOM unconditionally.
+    // Always include _helpId in describedBy — an empty target is harmless for AT and ensures
+    // the link is established immediately without waiting for the slotchange event to fire.
     const describedBy =
-      [hasError ? this._errorId : null, this._hasHelpSlot ? this._helpId : null]
-        .filter(Boolean)
-        .join(' ') || undefined;
+      [hasError ? this._errorId : null, this._helpId].filter(Boolean).join(' ') || undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -758,7 +760,7 @@ export class HelixTimePicker extends LitElement {
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
             aria-autocomplete="list"
-            aria-controls=${ifDefined(this._open ? this._listboxId : undefined)}
+            aria-controls=${this._listboxId}
             aria-activedescendant=${ifDefined(activeDescendant)}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
@@ -802,45 +804,44 @@ export class HelixTimePicker extends LitElement {
             </svg>
           </button>
 
-          <!-- Dropdown listbox -->
-          ${this._open
-            ? html`
-                <ul
-                  part="listbox"
-                  class="field__listbox"
-                  id=${this._listboxId}
-                  role="listbox"
-                  aria-label=${this.label || 'Time options'}
-                >
-                  ${repeat(
-                    slots,
-                    (slot) => slot.value,
-                    (slot, index) => {
-                      const isSelected = slot.value === this.value;
-                      const isActive = index === this._activeIndex;
-                      return html`
-                        <li
-                          part="option"
-                          class=${classMap({
-                            field__option: true,
-                            'field__option--selected': isSelected,
-                            'field__option--active': isActive,
-                          })}
-                          id="${this._listboxId}-option-${index}"
-                          role="option"
-                          aria-selected=${isSelected ? 'true' : 'false'}
-                          @pointerdown=${this._handleOptionPointerDown}
-                          @click=${() => this._handleOptionClick(slot)}
-                          @mouseenter=${() => this._handleOptionMouseEnter(index)}
-                        >
-                          ${slot.label}
-                        </li>
-                      `;
-                    },
-                  )}
-                </ul>
-              `
-            : nothing}
+          <!-- Dropdown listbox: always in DOM so aria-controls is never a dangling reference (WCAG 4.1.2). Hidden via the boolean hidden attribute when closed. -->
+          <ul
+            part="listbox"
+            class="field__listbox"
+            id=${this._listboxId}
+            role="listbox"
+            aria-label=${this.label || 'Time options'}
+            ?hidden=${!this._open}
+          >
+            ${this._open
+              ? repeat(
+                  slots,
+                  (slot) => slot.value,
+                  (slot, index) => {
+                    const isSelected = slot.value === this.value;
+                    const isActive = index === this._activeIndex;
+                    return html`
+                      <li
+                        part="option"
+                        class=${classMap({
+                          field__option: true,
+                          'field__option--selected': isSelected,
+                          'field__option--active': isActive,
+                        })}
+                        id="${this._listboxId}-option-${index}"
+                        role="option"
+                        aria-selected=${isSelected ? 'true' : 'false'}
+                        @pointerdown=${this._handleOptionPointerDown}
+                        @click=${() => this._handleOptionClick(slot)}
+                        @mouseenter=${() => this._handleOptionMouseEnter(index)}
+                      >
+                        ${slot.label}
+                      </li>
+                    `;
+                  },
+                )
+              : nothing}
+          </ul>
         </div>
 
         <!-- Error slot / property -->

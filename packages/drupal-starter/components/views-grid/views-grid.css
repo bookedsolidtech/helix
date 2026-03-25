@@ -1,0 +1,32 @@
+/* Views Grid — responsive CSS grid layout */
+
+.views-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--views-grid-columns, 3), 1fr);
+}
+
+/* Gap size variants using HELiX spacing tokens */
+.views-grid--gap-sm {
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.views-grid--gap-md {
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.views-grid--gap-lg {
+  gap: var(--hx-spacing-lg, 1.5rem);
+}
+
+/* Responsive: stack to 2 columns on tablets, 1 on mobile */
+@media (max-width: 1024px) {
+  .views-grid {
+    grid-template-columns: repeat(min(var(--views-grid-columns, 3), 2), 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .views-grid {
+    grid-template-columns: 1fr;
+  }
+}

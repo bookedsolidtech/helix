@@ -1,0 +1,26 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Views Grid
+description: 'Responsive CSS grid layout for Views output. Accepts slotted items and configurable column count.'
+status: experimental
+group: 'Views/Lists'
+props:
+  type: object
+  properties:
+    columns:
+      type: integer
+      title: Columns
+      description: 'Number of grid columns (default: 3)'
+      default: 3
+    gap:
+      type: string
+      title: Gap
+      description: 'Spacing gap size token (sm, md, lg)'
+      default: md
+      enum:
+        - sm
+        - md
+        - lg
+slots:
+  items:
+    title: Items
+    description: 'Grid items (Views rows, cards, teasers, etc.)'

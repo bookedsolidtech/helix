@@ -265,12 +265,16 @@ export class HelixCombobox extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._handleOutsideClick);
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    // Safety net: remove listener if component is removed while dropdown is open
-    document.removeEventListener('click', this._handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._handleOutsideClick);
+    }
     if (this._debounceTimer !== null) {
       clearTimeout(this._debounceTimer);
     }
@@ -399,7 +403,6 @@ export class HelixCombobox extends LitElement {
     if (this.disabled || this._open) return;
     this._open = true;
     this._focusedOptionIndex = -1;
-    document.addEventListener('click', this._handleOutsideClick);
     this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
@@ -408,7 +411,6 @@ export class HelixCombobox extends LitElement {
     if (!this._open) return;
     this._open = false;
     this._focusedOptionIndex = -1;
-    document.removeEventListener('click', this._handleOutsideClick);
     this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
   }
 
@@ -673,7 +675,13 @@ export class HelixCombobox extends LitElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${this.multiple
+              ? isSelected
+                ? 'true'
+                : 'false'
+              : isSelected
+                ? 'true'
+                : nothing}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >

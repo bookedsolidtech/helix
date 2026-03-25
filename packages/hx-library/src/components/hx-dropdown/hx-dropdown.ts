@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import {
@@ -335,7 +335,9 @@ export class HelixDropdown extends LitElement {
       <div
         part="panel"
         id=${this._panelId}
-        aria-hidden=${this._panelVisible ? 'false' : 'true'}
+        role="menu"
+        aria-hidden=${this._panelVisible ? nothing : 'true'}
+        aria-label="Menu"
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
       >
@@ -375,6 +377,7 @@ export class HelixDropdown extends LitElement {
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('open')) {
       // Keep aria-expanded in sync
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');

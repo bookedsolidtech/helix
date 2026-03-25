@@ -1,0 +1,16 @@
+{#
+  Views Carousel SDC
+  Composes: hx-carousel
+#}
+{{ attach_library('helixui/hx-carousel') }}
+
+<div{{ attributes.addClass('views-carousel') }}>
+  <hx-carousel
+    {% if autoplay %}autoplay{% endif %}
+    {% if interval %}interval="{{ interval }}"{% endif %}
+  >
+    {% if items %}
+      {{ items }}
+    {% endif %}
+  </hx-carousel>
+</div>

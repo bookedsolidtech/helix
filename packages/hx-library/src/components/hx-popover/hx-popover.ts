@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPopoverStyles } from './hx-popover.styles.js';
@@ -138,6 +138,15 @@ export class HelixPopover extends LitElement {
    */
   private _showTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /**
+   * Timer ID for the hover-triggered hide delay.
+   * WCAG 1.4.13: hoverable content must remain visible while the pointer is
+   * over it. A 150 ms delay allows the pointer to move from the anchor into
+   * the popover body without the content dismissing prematurely.
+   * @internal
+   */
+  private _hoverHideTimer: ReturnType<typeof setTimeout> | null = null;
+
   // ─── Lifecycle ───
 
   override disconnectedCallback(): void {
@@ -145,6 +154,10 @@ export class HelixPopover extends LitElement {
     if (this._showTimer !== null) {
       clearTimeout(this._showTimer);
       this._showTimer = null;
+    }
+    if (this._hoverHideTimer !== null) {
+      clearTimeout(this._hoverHideTimer);
+      this._hoverHideTimer = null;
     }
     document.removeEventListener('click', this._handleDocumentClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
@@ -235,9 +248,16 @@ export class HelixPopover extends LitElement {
     // (before _updatePosition) ensures it fires in the same microtask as the test's
     // await-continuation, so tests can rely on a single await el.updateComplete.
     this.dispatchEvent(new CustomEvent<void>('hx-after-show', { bubbles: true, composed: true }));
-    // P0-02: move focus into dialog body
+    // WCAG 2.4.3: only move focus into the popover when it contains interactive
+    // content. For non-interactive (informational) popovers, stealing focus from
+    // the trigger is unexpected and disruptive for keyboard users.
     const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
-    if (bodyEl) bodyEl.focus();
+    if (bodyEl) {
+      const hasInteractive = this._getFocusableElements().length > 0;
+      if (hasInteractive) {
+        bodyEl.focus();
+      }
+    }
     // P0-01: listen for outside clicks; deferred to avoid catching the opening click
     if (this._showTimer !== null) {
       clearTimeout(this._showTimer);
@@ -428,28 +448,54 @@ export class HelixPopover extends LitElement {
 
   /**
    * Closes the popover when the anchor receives a mouseleave event in hover trigger mode.
+   * WCAG 1.4.13: applies a 150 ms delay so the pointer can move from anchor
+   * into the popover body without the content dismissing prematurely.
    * @internal
    */
   private _handleAnchorMouseLeave = (): void => {
     if (this.trigger !== 'hover') return;
-    void this._hide(false);
+    this._scheduleHoverHide();
   };
 
   // CRITICAL-02: body hover handlers so moving the pointer from anchor into
   // the popover content does not trigger a hide.
   /** @internal */
   private _handleBodyMouseEnter = (): void => {
-    // Cancel a pending hide that would have fired from the anchor's mouseleave
-    // by re-showing (no-op if already visible).
+    // Cancel a pending hide that would have fired from the anchor's mouseleave.
     if (this.trigger !== 'hover') return;
-    void this._show();
+    this._cancelHoverHide();
   };
 
   /** @internal */
   private _handleBodyMouseLeave = (): void => {
     if (this.trigger !== 'hover') return;
-    void this._hide(false);
+    this._scheduleHoverHide();
   };
+
+  /**
+   * Schedules a hide with a 150 ms delay for hover-triggered dismissal.
+   * WCAG 1.4.13: the delay allows the pointer to travel between the anchor
+   * and the popover body without the content disappearing.
+   * @internal
+   */
+  private _scheduleHoverHide(): void {
+    this._cancelHoverHide();
+    this._hoverHideTimer = setTimeout(() => {
+      this._hoverHideTimer = null;
+      void this._hide(false);
+    }, 150);
+  }
+
+  /**
+   * Cancels any pending hover-triggered hide.
+   * @internal
+   */
+  private _cancelHoverHide(): void {
+    if (this._hoverHideTimer !== null) {
+      clearTimeout(this._hoverHideTimer);
+      this._hoverHideTimer = null;
+    }
+  }
 
   /** @internal */
   private _handleAnchorFocusIn = (): void => {
@@ -493,7 +539,7 @@ export class HelixPopover extends LitElement {
         id=${this._popoverId}
         role="dialog"
         aria-label=${this.label}
-        aria-hidden="${!this._visible ? 'true' : 'false'}"
+        aria-hidden=${!this._visible ? 'true' : nothing}
         tabindex="-1"
         ?inert=${!this._visible}
         class=${this._visible ? 'visible' : ''}

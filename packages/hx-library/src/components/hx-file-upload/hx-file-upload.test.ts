@@ -560,12 +560,13 @@ describe('hx-file-upload', () => {
       expect(errorDiv).toBeNull();
     });
 
-    it('error container has aria-live="polite"', async () => {
+    it('error container has role="alert" without redundant aria-live', async () => {
       const el = await fixture<HelixFileUpload>(
         '<hx-file-upload error="Upload failed"></hx-file-upload>',
       );
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
 
     it('dropzone gets error CSS class when error is set', async () => {

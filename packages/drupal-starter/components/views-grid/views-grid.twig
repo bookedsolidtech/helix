@@ -1,0 +1,15 @@
+{#
+  Views Grid SDC
+  Uses plain CSS grid. Column count and gap are driven by props mapped to CSS custom properties.
+#}
+
+{% set grid_columns = columns|default(3) %}
+{% set grid_gap = gap|default('md') %}
+
+<div{{ attributes.addClass('views-grid', 'views-grid--gap-' ~ grid_gap) }}
+  style="--views-grid-columns: {{ grid_columns }};"
+>
+  {% if items %}
+    {{ items }}
+  {% endif %}
+</div>

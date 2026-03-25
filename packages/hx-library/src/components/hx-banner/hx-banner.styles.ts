@@ -19,6 +19,22 @@ export const helixBannerStyles = css`
     box-sizing: border-box;
   }
 
+  /* ─── Severity Label (WCAG 1.4.1) ─── */
+  /* Visually hidden — ensures variant is never conveyed by color alone.   */
+  /* Always rendered so screen readers can identify the banner severity.   */
+
+  .banner__severity-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Banner Container ─── */
 
   .banner {

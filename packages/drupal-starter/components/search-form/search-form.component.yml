@@ -1,0 +1,34 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Search Form
+description: 'Accessible search form composing hx-text-input, hx-button, and hx-icon. Supports optional filter slot for advanced search.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text for the search input'
+      default: 'Search...'
+    action:
+      type: string
+      title: Action
+      description: 'Form action URL'
+    method:
+      type: string
+      title: Method
+      description: 'Form submission method'
+      default: 'get'
+      enum:
+        - get
+        - post
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the search input'
+      default: 'Search'
+slots:
+  filters:
+    title: Filters
+    description: 'Additional filter fields displayed below the search input'

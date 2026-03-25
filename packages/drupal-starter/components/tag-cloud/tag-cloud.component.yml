@@ -1,0 +1,32 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Tag Cloud
+description: 'Taxonomy tag cloud in flat or weighted display. Composes hx-tag and hx-link.'
+status: experimental
+group: 'Content Block'
+props:
+  type: object
+  properties:
+    tags:
+      type: array
+      title: Tags
+      description: 'Array of tag objects with name, url, and optional count'
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            title: 'Tag Name'
+          url:
+            type: string
+            title: URL
+          count:
+            type: integer
+            title: Count
+    variant:
+      type: string
+      title: Variant
+      description: 'Display variant — flat shows all tags equally, weighted scales by count'
+      default: 'flat'
+      enum:
+        - flat
+        - weighted

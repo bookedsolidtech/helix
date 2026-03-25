@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Topic Landing
+description: 'Topic/taxonomy landing page with title, description, featured content area, and grid content area.'
+status: experimental
+group: 'Views/Lists'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Topic or taxonomy term title'
+    description:
+      type: string
+      title: Description
+      description: 'Introductory description for the topic'
+slots:
+  featured_content:
+    title: 'Featured Content'
+    description: 'Featured or promoted content area (hero cards, highlighted articles)'
+  grid_content:
+    title: 'Grid Content'
+    description: 'Grid of content items (article teasers, recipe cards, etc.)'

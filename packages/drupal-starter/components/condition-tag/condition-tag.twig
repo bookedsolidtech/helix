@@ -1,0 +1,29 @@
+{#
+  Condition Tag SDC
+  Composes: hx-tag, hx-link, hx-icon
+#}
+{{ attach_library('helixui/hx-tag') }}
+{{ attach_library('helixui/hx-link') }}
+{{ attach_library('helixui/hx-icon') }}
+
+{% set variant = variant|default('condition') %}
+
+<span{{ attributes.addClass('condition-tag', 'condition-tag--' ~ variant) }}>
+  {% if url %}
+    <hx-link href="{{ url }}">
+      <hx-tag variant="{{ variant }}">
+        {% if icon %}
+          <hx-icon name="{{ icon }}" slot="prefix" size="sm"></hx-icon>
+        {% endif %}
+        {{ name }}
+      </hx-tag>
+    </hx-link>
+  {% else %}
+    <hx-tag variant="{{ variant }}">
+      {% if icon %}
+        <hx-icon name="{{ icon }}" slot="prefix" size="sm"></hx-icon>
+      {% endif %}
+      {{ name }}
+    </hx-tag>
+  {% endif %}
+</span>

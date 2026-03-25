@@ -1,0 +1,35 @@
+.featured-article {
+  container-type: inline-size;
+}
+
+.featured-article__header {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.featured-article__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.featured-article__excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-article__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.featured-article__author {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}

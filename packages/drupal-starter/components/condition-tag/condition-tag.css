@@ -1,0 +1,19 @@
+/* Condition Tag — layout and spacing only */
+
+.condition-tag {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Variant-specific spacing adjustments */
+.condition-tag--condition {
+  gap: var(--hx-spacing-2xs, 0.125rem);
+}
+
+.condition-tag--treatment {
+  gap: var(--hx-spacing-2xs, 0.125rem);
+}
+
+.condition-tag--specialty {
+  gap: var(--hx-spacing-2xs, 0.125rem);
+}
