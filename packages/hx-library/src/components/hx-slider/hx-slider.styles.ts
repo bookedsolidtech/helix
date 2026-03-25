@@ -46,7 +46,7 @@ export const helixSliderStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     font-variant-numeric: tabular-nums;
     min-width: var(--hx-size-8, 2rem);
-    text-align: right;
+    text-align: end;
   }
 
   /* ─── Track Container ─── */

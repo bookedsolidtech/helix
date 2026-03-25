@@ -124,7 +124,7 @@ export const helixDialogStyles = css`
     width: var(--hx-touch-target-min, 2.75rem);
     height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
-    margin-left: auto;
+    margin-inline-start: auto;
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);

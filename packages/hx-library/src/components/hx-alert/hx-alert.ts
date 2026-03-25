@@ -75,6 +75,12 @@ export class HelixAlert extends LitElement {
   heading = '';
 
   /**
+   * Accessible label for the close button. Override for i18n.
+   * @attr label-close
+   */
+  @property({ attribute: 'label-close' }) labelClose = 'Close alert';
+
+  /**
    * Whether the alert is visible. Add the `open` attribute to show the alert.
    * @attr open
    */
@@ -399,7 +405,7 @@ export class HelixAlert extends LitElement {
               <button
                 part="close-button"
                 class="alert__close-button"
-                aria-label=${`Close ${this.heading ? `${this.heading} ` : ''}alert`}
+                aria-label=${this.labelClose}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}
