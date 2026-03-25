@@ -624,4 +624,133 @@ describe('hx-popover', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: manual trigger ───
+
+  describe('Property: manual trigger', () => {
+    it('manual trigger does not show on click', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="manual"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.classList.contains('visible')).toBe(false);
+    });
+
+    it('manual trigger does not show on mouseenter', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="manual"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.classList.contains('visible')).toBe(false);
+    });
+
+    it('manual trigger shows when open property is set programmatically', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="manual"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      el.open = true;
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.classList.contains('visible')).toBe(true);
+    });
+  });
+
+  // ─── Property: arrow reflects ───
+
+  describe('Property: arrow reflects', () => {
+    it('arrow=false by default', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      expect(el.arrow).toBe(false);
+    });
+
+    it('arrow=true reflects to attribute', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover arrow><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      expect(el.arrow).toBe(true);
+      expect(el.hasAttribute('arrow')).toBe(true);
+    });
+  });
+
+  // ─── Property: label reflects ───
+
+  describe('Property: label reflects', () => {
+    it('label defaults to "Popover"', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      expect(el.label).toBe('Popover');
+    });
+
+    it('label reflects to attribute', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover label="Clinical notes"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      expect(el.label).toBe('Clinical notes');
+      expect(el.getAttribute('label')).toBe('Clinical notes');
+    });
+  });
+
+  // ─── Placement variants ───
+
+  describe('Placement variants', () => {
+    const placements = [
+      'top',
+      'top-start',
+      'top-end',
+      'right',
+      'right-start',
+      'right-end',
+      'bottom',
+      'bottom-start',
+      'bottom-end',
+      'left',
+      'left-start',
+      'left-end',
+    ] as const;
+
+    for (const placement of placements) {
+      it(`placement="${placement}" reflects to attribute`, async () => {
+        const el = await fixture<HelixPopover>(
+          `<hx-popover placement="${placement}"><button slot="anchor">T</button><p>C</p></hx-popover>`,
+        );
+        expect(el.placement).toBe(placement);
+        expect(el.getAttribute('placement')).toBe(placement);
+        cleanup();
+      });
+    }
+  });
+
+  // ─── Distance / skidding reflect ───
+
+  describe('Distance and skidding reflect', () => {
+    it('distance attribute sets property', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover distance="16"><button slot="anchor">T</button><p>C</p></hx-popover>',
+      );
+      expect(el.distance).toBe(16);
+    });
+
+    it('skidding attribute sets property', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover skidding="5"><button slot="anchor">T</button><p>C</p></hx-popover>',
+      );
+      expect(el.skidding).toBe(5);
+    });
+
+    it('distance reflects to attribute', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover distance="20"><button slot="anchor">T</button><p>C</p></hx-popover>',
+      );
+      expect(el.getAttribute('distance')).toBe('20');
+    });
+  });
 });
