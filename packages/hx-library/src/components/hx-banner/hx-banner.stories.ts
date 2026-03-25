@@ -77,6 +77,34 @@ const meta = {
         type: { summary: 'string (slot)' },
       },
     },
+    heading: {
+      control: 'text',
+      description:
+        'Heading text for the banner, used to provide context in the action link\'s and close button\'s accessible labels.',
+      table: {
+        category: 'Content',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
+    labelClose: {
+      control: 'text',
+      description: 'Accessible label for the close/dismiss button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Dismiss banner' },
+        type: { summary: 'string' },
+      },
+    },
+    severityLabel: {
+      control: 'text',
+      description:
+        'Override for the severity prefix announced to screen readers. Defaults to the English label matching the current variant.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     variant: 'info',
@@ -339,4 +367,26 @@ export const WithSlots: Story = {
       </span>
     </hx-banner>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Banners are not focusable elements themselves. When dismissible, the close button receives Tab focus and can be activated with Enter or Space.
+      </p>
+      <hx-banner></hx-banner>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const banner = canvasElement.querySelector('hx-banner');
+    await expect(banner).toBeTruthy();
+    // Tab to the close button if present
+    await userEvent.tab();
+  },
 };

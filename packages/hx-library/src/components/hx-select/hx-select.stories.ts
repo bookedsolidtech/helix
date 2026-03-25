@@ -99,6 +99,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    ariaLabel: {
+      control: 'text',
+      description:
+        'Accessible label for the select when no visible label is rendered.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Department',

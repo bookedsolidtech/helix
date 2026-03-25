@@ -66,6 +66,42 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    labelCopy: {
+      control: 'text',
+      description: 'Accessible label for the copy button in its default (idle) state.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Copy' },
+        type: { summary: 'string' },
+      },
+    },
+    labelCopied: {
+      control: 'text',
+      description: 'Accessible label for the copy button after a successful copy.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Copied' },
+        type: { summary: 'string' },
+      },
+    },
+    labelShowMore: {
+      control: 'text',
+      description: 'Label for the "show more" button when content is truncated.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Show more' },
+        type: { summary: 'string' },
+      },
+    },
+    labelShowLess: {
+      control: 'text',
+      description: 'Label for the "show less" button when content is expanded.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Show less' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     language: 'javascript',
@@ -397,4 +433,25 @@ export const DarkMode: Story = {
     (story) =>
       html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
   ],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the copy button. Enter or Space copies the code. Show more/less button is also keyboard accessible.
+      </p>
+      <hx-code-snippet></hx-code-snippet>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-code-snippet');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

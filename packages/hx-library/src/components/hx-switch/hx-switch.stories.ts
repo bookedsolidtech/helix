@@ -94,6 +94,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when the required switch is not checked.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     checked: false,

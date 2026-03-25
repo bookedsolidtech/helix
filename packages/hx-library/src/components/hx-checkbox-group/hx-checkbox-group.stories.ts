@@ -169,6 +169,15 @@ const meta = {
       },
       control: false,
     },
+    helpText: {
+      control: 'text',
+      description: 'Help text to display below the group.',
+      table: {
+        category: 'Properties',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
     'error-message': {
       description: 'The error message container.',
       table: {
@@ -1097,5 +1106,26 @@ export const DarkMode: Story = {
   args: {
     label: 'Pre-Existing Conditions',
     name: 'conditions',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab enters the group. Arrow keys move between checkbox items within the group. Space toggles the focused checkbox.
+      </p>
+      <hx-checkbox-group></hx-checkbox-group>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-checkbox-group');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

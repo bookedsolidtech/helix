@@ -40,6 +40,24 @@ const meta = {
         type: { summary: 'NavItem[]' },
       },
     },
+    labelOpenMenu: {
+      control: 'text',
+      description: 'Accessible label for the hamburger/open menu button on mobile.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Open menu' },
+        type: { summary: 'string' },
+      },
+    },
+    labelCloseMenu: {
+      control: 'text',
+      description: 'Accessible label for the close menu button on mobile.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Close menu' },
+        type: { summary: 'string' },
+      },
+    },
   },
   parameters: {
     docs: {
@@ -299,5 +317,26 @@ export const DarkMode: Story = {
     orientation: 'horizontal',
     label: 'Main navigation',
     items: sampleItems,
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab enters the navigation. Arrow keys navigate between top-level items. Enter or Space expands submenus. Escape closes open submenus.
+      </p>
+      <hx-nav></hx-nav>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-nav');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

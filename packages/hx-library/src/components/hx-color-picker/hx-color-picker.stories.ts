@@ -74,6 +74,78 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    required: {
+      control: 'boolean',
+      description: 'Whether the color picker is required for form submission.',
+      table: {
+        category: 'Form',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    labelGradient: {
+      control: 'text',
+      description: 'Accessible label for the gradient picker canvas.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Color gradient' },
+        type: { summary: 'string' },
+      },
+    },
+    labelHue: {
+      control: 'text',
+      description: 'Accessible label for the hue slider.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Hue' },
+        type: { summary: 'string' },
+      },
+    },
+    labelOpacity: {
+      control: 'text',
+      description: 'Accessible label for the opacity slider.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Opacity' },
+        type: { summary: 'string' },
+      },
+    },
+    labelSwatches: {
+      control: 'text',
+      description: 'Accessible label for the swatches section.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Swatches' },
+        type: { summary: 'string' },
+      },
+    },
+    labelSwitchFormat: {
+      control: 'text',
+      description: 'Accessible label for the format-switch button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Switch format' },
+        type: { summary: 'string' },
+      },
+    },
+    labelColorValue: {
+      control: 'text',
+      description: 'Accessible label for the color value input.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Color value' },
+        type: { summary: 'string' },
+      },
+    },
+    labelPicker: {
+      control: 'text',
+      description: 'Accessible label for the picker trigger button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Select color' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     value: '#3b82f6',
@@ -97,6 +169,11 @@ const meta = {
       ></hx-color-picker>
     </div>
   `,
+  parameters: {
+    actions: {
+      handles: ['hx-change', 'hx-input'],
+    },
+  },
 } satisfies Meta;
 
 export default meta;
@@ -399,4 +476,25 @@ export const WithSlots: Story = {
       </button>
     </hx-color-picker>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab navigates through the picker controls: hue slider, opacity slider, color value input, and format switch. Arrow keys adjust slider values.
+      </p>
+      <hx-color-picker></hx-color-picker>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-color-picker');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

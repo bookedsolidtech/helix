@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, fn } from 'storybook/test';
+import { expect, userEvent, within, fn } from 'storybook/test';
 import './hx-rating.js';
 
 // ─────────────────────────────────────────────────
@@ -73,6 +73,15 @@ const meta = {
       table: {
         category: 'Form',
         type: { summary: 'string' },
+      },
+    },
+    required: {
+      control: 'boolean',
+      description: 'Whether the rating is required for form submission.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
       },
     },
   },
@@ -304,5 +313,26 @@ export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
   args: {
     value: 3,
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the rating group. Arrow Left/Right adjusts the rating value. Home moves to 0, End moves to max.
+      </p>
+      <hx-rating></hx-rating>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-rating');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

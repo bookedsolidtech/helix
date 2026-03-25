@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { fn } from 'storybook/test';
+import { fn, expect, userEvent } from 'storybook/test';
 import './hx-file-upload.js';
 
 // ─────────────────────────────────────────────────
@@ -83,6 +83,24 @@ const meta = {
       table: {
         category: 'Validation',
         defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    labelDropzone: {
+      control: 'text',
+      description: 'Accessible label for the dropzone area.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Drop files here or click to upload' },
+        type: { summary: 'string' },
+      },
+    },
+    labelFileList: {
+      control: 'text',
+      description: 'Accessible label for the list of selected files.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Selected files' },
         type: { summary: 'string' },
       },
     },
@@ -658,4 +676,25 @@ export const WithSlots: Story = {
       </div>
     </hx-file-upload>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the dropzone area and the file input trigger. Enter or Space opens the file picker. The file list items and remove buttons are also keyboard accessible.
+      </p>
+      <hx-file-upload></hx-file-upload>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-file-upload');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

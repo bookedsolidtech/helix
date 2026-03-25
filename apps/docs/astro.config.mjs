@@ -646,6 +646,10 @@ export default defineConfig({
               ],
             },
             {
+              label: 'Theming',
+              slug: 'guides/theming',
+            },
+            {
               label: 'Adopted Stylesheets',
               slug: 'guides/adopted-stylesheets',
             },
@@ -699,6 +703,11 @@ export default defineConfig({
               label: 'Styling with CSS Parts',
               slug: 'extending/style-components-with-css-parts',
               badge: { text: 'Deep Dive', variant: 'tip' },
+            },
+            {
+              label: 'Register, Bundle & Publish',
+              slug: 'extending/register-bundle-publish',
+              badge: { text: 'Distribution', variant: 'tip' },
             },
           ],
         },

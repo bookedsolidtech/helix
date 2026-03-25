@@ -104,6 +104,25 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    full: {
+      control: 'boolean',
+      description: 'When true, the button stretches to fill its container width.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    inverted: {
+      control: 'boolean',
+      description:
+        'When true, applies inverted color treatment for use on dark or colored backgrounds.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     variant: 'primary',

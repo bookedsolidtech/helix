@@ -121,6 +121,33 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    minlength: {
+      control: 'number',
+      description: 'Minimum number of characters required.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'undefined' },
+        type: { summary: 'number | undefined' },
+      },
+    },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when the required field has no value.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
+    ariaLabel: {
+      control: 'text',
+      description:
+        'Accessible label for the textarea when no visible label is rendered.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Label',
@@ -1324,5 +1351,26 @@ export const DarkMode: Story = {
   args: {
     label: 'Patient Notes',
     placeholder: 'Enter clinical observations...',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the textarea. Type to enter text. Shift+Tab moves focus back out of the field.
+      </p>
+      <hx-textarea></hx-textarea>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-textarea');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

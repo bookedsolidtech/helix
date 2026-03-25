@@ -1,0 +1,31 @@
+{
+  "name": "helix-react-starter",
+  "version": "0.1.0",
+  "description": "React 19 starter using @helixui/react web component wrappers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@helixui/library": "^1.1.0",
+    "@helixui/react": "^1.1.0",
+    "@hookform/resolvers": "^3.10.0",
+    "@lit/react": "^1.0.6",
+    "lit": "^3.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.2.0"
+  }
+}
