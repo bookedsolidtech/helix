@@ -159,6 +159,19 @@ export class HelixPagination extends LitElement {
   @property({ attribute: 'last-page-label' })
   lastPageLabel = 'Last page';
 
+  /**
+   * Function to format the page navigation announcement. Override for i18n.
+   */
+  @property({ attribute: false })
+  labelPageMessage: (current: number, total: number) => string = (current, total) =>
+    `Page ${current} of ${total}`;
+
+  /**
+   * Function to format page button aria-labels. Override for i18n.
+   */
+  @property({ attribute: false })
+  labelPageButton: (page: number) => string = (page) => `Page ${page}`;
+
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   /** @internal */
   @state() private _rovingKey: number | string | null = null;
@@ -233,7 +246,7 @@ export class HelixPagination extends LitElement {
 
     this.currentPage = clamped;
     this._rovingKey = null; // reset so focus follows the new current page
-    this._liveMessage = `Page ${clamped} of ${this.totalPages}`;
+    this._liveMessage = this.labelPageMessage(clamped, this.totalPages);
     this.dispatchEvent(
       new CustomEvent<{ page: number }>('hx-page-change', {
         detail: { page: clamped },
@@ -396,7 +409,7 @@ export class HelixPagination extends LitElement {
                       tabindex=${rovingKey === page ? 0 : -1}
                       data-roving-key=${page}
                       aria-current=${isCurrent ? 'page' : nothing}
-                      aria-label=${`Page ${page}`}
+                      aria-label=${this.labelPageButton(page)}
                       @click=${() => this._navigate(page)}
                     >
                       ${page}

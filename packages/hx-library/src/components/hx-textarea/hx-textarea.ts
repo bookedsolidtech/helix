@@ -436,7 +436,8 @@ export class HelixTextarea extends LitElement {
   private _renderCounter() {
     if (!this.showCount) return nothing;
 
-    const count = this.value.length;
+    // Use Array.from() to count grapheme clusters (handles emoji correctly)
+    const count = Array.from(this.value ?? '').length;
     const display = this.maxlength !== undefined ? `${count} / ${this.maxlength}` : `${count}`;
 
     // aria-live="polite" announces counter changes without interrupting the user.

@@ -53,7 +53,7 @@ export const helixAlertStyles = css`
 
   .alert--accent {
     border-width: 0;
-    border-left: var(--hx-alert-accent-width, 4px) solid
+    border-inline-start: var(--hx-alert-accent-width, 4px) solid
       var(--hx-alert-border-color, var(--hx-color-info-200, #b3d9ef));
     border-radius: 0;
   }
@@ -136,7 +136,7 @@ export const helixAlertStyles = css`
     flex-shrink: 0;
     min-width: var(--hx-touch-target-size, 44px);
     min-height: var(--hx-touch-target-size, 44px);
-    margin-left: auto;
+    margin-inline-start: auto;
     padding: 0;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
