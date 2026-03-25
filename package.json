@@ -44,6 +44,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
+    "a11y-audit": "node scripts/a11y-audit.js",
     "bundle-size": "node scripts/bundle-size-report.js",
     "bundle-size:ci": "node scripts/bundle-size-report.js --ci",
     "preflight": "bash scripts/preflight.sh",
@@ -90,6 +91,7 @@
     ]
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
