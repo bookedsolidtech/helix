@@ -215,6 +215,32 @@ export const helixDrawerStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
+  /* ─── Visually-hidden close button (no-header mode, WCAG 4.1.2) ─── */
+  /* Keeps the button reachable by keyboard/AT but invisible to sighted users. */
+
+  .drawer-close-button--sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* When focused via keyboard, restore visibility so users know where focus is. */
+  .drawer-close-button--sr-only:focus-visible {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    white-space: normal;
+    overflow: visible;
+    margin: 0;
+  }
+
   /* ─── Body ─── */
 
   .drawer-body {

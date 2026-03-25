@@ -479,6 +479,14 @@ export class HelixDataTable extends LitElement {
             part="tr"
             aria-selected=${this.selectable ? String(this._selectedRows.has(globalIndex)) : nothing}
             @click=${() => this._handleRowClick(row, globalIndex)}
+            @keydown=${(e: KeyboardEvent) => {
+              // WCAG 2.1.1: rows are keyboard-activatable via Enter and Space so that
+              // the hx-row-click event fires equivalently for keyboard users.
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this._handleRowClick(row, globalIndex);
+              }
+            }}
           >
             ${this.selectable
               ? html`

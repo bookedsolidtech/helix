@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -85,6 +85,13 @@ export class HelixCounter extends LitElement {
   /** @internal */
   @state() private _displayValue = 0;
 
+  /**
+   * The final value announced to screen readers once animation completes.
+   * Updated only at animation end so AT users hear the result, not every frame.
+   * @internal
+   */
+  @state() private _announcedValue = '';
+
   /** @internal */
   private _animationId: number | null = null;
   /** @internal */
@@ -117,6 +124,7 @@ export class HelixCounter extends LitElement {
 
     if (this._prefersReducedMotion) {
       this._displayValue = this.value;
+      this._announcedValue = this._formatValue();
     } else {
       this._startAnimation();
     }
@@ -132,6 +140,7 @@ export class HelixCounter extends LitElement {
     if (changedProps.has('value') && changedProps.get('value') !== undefined) {
       if (this._prefersReducedMotion) {
         this._displayValue = this.value;
+        this._announcedValue = this._formatValue();
       } else {
         this._startValue = this._displayValue;
         this._startTime = null;
@@ -184,6 +193,10 @@ export class HelixCounter extends LitElement {
       } else {
         this._displayValue = this.value;
         this._animationId = null;
+        // WCAG 4.1.2: announce the final value only once, at animation end.
+        // _announcedValue feeds the off-screen live region so screen readers
+        // hear a single announcement rather than one per animation frame.
+        this._announcedValue = this._formatValue();
       }
     };
 
@@ -211,9 +224,18 @@ export class HelixCounter extends LitElement {
     };
 
     return html`
-      <span part="counter" class=${classMap(classes)} aria-live="polite" aria-atomic="true">
-        ${this._formatValue()}
-      </span>
+      <span part="counter" class=${classMap(classes)}> ${this._formatValue()} </span>
+      <!--
+        WCAG 4.1.2: off-screen live region updated only at animation end.
+        Prevents screen readers from announcing every intermediate frame value.
+      -->
+      <span
+        class="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-hidden=${this._announcedValue ? nothing : 'true'}
+        >${this._announcedValue}</span
+      >
     `;
   }
 }

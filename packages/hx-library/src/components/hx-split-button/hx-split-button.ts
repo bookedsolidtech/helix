@@ -103,6 +103,14 @@ export class HelixSplitButton extends LitElement {
   label: string | undefined = undefined;
 
   /**
+   * Accessible label for the primary action button. Required for icon-only usage
+   * or when the button label alone is insufficient context.
+   * @attr aria-label
+   */
+  @property({ type: String, attribute: 'aria-label' })
+  override ariaLabel = '';
+
+  /**
    * Accessible label for the dropdown trigger button. Override for localization.
    * @attr trigger-label
    */

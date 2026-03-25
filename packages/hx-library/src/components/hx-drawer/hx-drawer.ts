@@ -542,7 +542,21 @@ export class HelixDrawer extends LitElement {
 
   /** @internal */
   private _renderHeader() {
-    if (this.noHeader) return nothing;
+    if (this.noHeader) {
+      // WCAG 4.1.2: When the header is hidden there must still be a reachable close
+      // mechanism for keyboard and mouse/touch users. Render a visually-hidden close
+      // button that is focusable and announced by screen readers.
+      return html`
+        <button
+          part="close-btn"
+          class="drawer-close-button drawer-close-button--sr-only"
+          aria-label=${this.closeLabel}
+          @click=${() => {
+            this.open = false;
+          }}
+        ></button>
+      `;
+    }
 
     return html`
       <div part="header" class="drawer-header">
