@@ -20,14 +20,8 @@ import { HxButton, HxTextInput, HxDialog } from '@helixui/react';
 function MyForm() {
   return (
     <form>
-      <HxTextInput
-        label="Name"
-        onHxInput={(e) => console.log(e)}
-      />
-      <HxButton
-        variant="primary"
-        onHxClick={() => console.log('clicked')}
-      >
+      <HxTextInput label="Name" onHxInput={(e) => console.log(e)} />
+      <HxButton variant="primary" onHxClick={() => console.log('clicked')}>
         Submit
       </HxButton>
     </form>
@@ -39,13 +33,13 @@ function MyForm() {
 
 Custom events are mapped to React-style callback props with the `onHx` prefix:
 
-| Web component event | React prop |
-|---|---|
-| `hx-click` | `onHxClick` |
-| `hx-input` | `onHxInput` |
-| `hx-change` | `onHxChange` |
-| `hx-open` | `onHxOpen` |
-| `hx-close` | `onHxClose` |
+| Web component event | React prop   |
+| ------------------- | ------------ |
+| `hx-click`          | `onHxClick`  |
+| `hx-input`          | `onHxInput`  |
+| `hx-change`         | `onHxChange` |
+| `hx-open`           | `onHxOpen`   |
+| `hx-close`          | `onHxClose`  |
 
 The `onHx*` prefix avoids collision with native React synthetic events (`onChange`, `onClick`).
 
@@ -83,8 +77,8 @@ All prop types are derived from CEM (`custom-elements.json`) declarations. Props
 import { HxButton, type HxButtonProps } from '@helixui/react';
 
 const props: HxButtonProps = {
-  variant: 'primary',   // 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'
-  size: 'md',            // 'sm' | 'md' | 'lg'
+  variant: 'primary', // 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'
+  size: 'md', // 'sm' | 'md' | 'lg'
   disabled: false,
   onHxClick: (e) => {},
 };
