@@ -28,7 +28,7 @@ export const HxDatePicker = createComponent({
   elementClass: HelixDatePicker,
   react: React,
   events: {
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxDatePicker',
 });

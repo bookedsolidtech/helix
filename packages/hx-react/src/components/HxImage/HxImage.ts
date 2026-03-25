@@ -30,7 +30,7 @@ export const HxImage = createComponent({
   react: React,
   events: {
     onHxLoad: 'hx-load',
-    onHxError: 'hx-error'
+    onHxError: 'hx-error',
   },
   displayName: 'HxImage',
 });
