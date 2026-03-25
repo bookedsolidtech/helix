@@ -397,4 +397,95 @@ describe('hx-tooltip', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Placement variants ───
+
+  describe('Placement variants', () => {
+    const placements = [
+      'top',
+      'top-start',
+      'top-end',
+      'right',
+      'right-start',
+      'right-end',
+      'bottom',
+      'bottom-start',
+      'bottom-end',
+      'left',
+      'left-start',
+      'left-end',
+    ] as const;
+
+    for (const placement of placements) {
+      it(`placement="${placement}" reflects to attribute`, async () => {
+        const el = await fixture<HelixTooltip>(
+          `<hx-tooltip placement="${placement}"><button>T</button><span slot="content">Tip</span></hx-tooltip>`,
+        );
+        expect(el.placement).toBe(placement);
+        expect(el.getAttribute('placement')).toBe(placement);
+        cleanup();
+      });
+    }
+  });
+
+  // ─── Show/hide delay attributes ───
+
+  describe('show-delay and hide-delay attributes', () => {
+    it('show-delay attribute sets showDelay property', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="750"><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      expect(el.showDelay).toBe(750);
+    });
+
+    it('hide-delay attribute sets hideDelay property', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip hide-delay="250"><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      expect(el.hideDelay).toBe(250);
+    });
+  });
+
+  // ─── ARIA describedby light DOM ───
+
+  describe('Light DOM description element', () => {
+    it('inserts a visually-hidden span into light DOM for aria-describedby', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button id="t">Trigger</button><span slot="content">Tooltip text</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+      // The visually-hidden description span should be appended to the host's light DOM
+      const descSpan = el.querySelector('span:not([slot])') as HTMLElement | null;
+      expect(descSpan).toBeTruthy();
+      expect(descSpan?.textContent).toBe('Tooltip text');
+    });
+
+    it('aria-describedby on trigger resolves to the light DOM span id', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button id="t">Trigger</button><span slot="content">Tip text</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+      const trigger = el.querySelector('#t') as HTMLElement;
+      const describedById = trigger.getAttribute('aria-describedby');
+      expect(describedById).toBeTruthy();
+      // The referenced element must live in document scope (not shadow root)
+      const referencedEl = document.getElementById(describedById!);
+      expect(referencedEl).toBeTruthy();
+      expect(referencedEl?.textContent).toBe('Tip text');
+    });
+  });
+
+  // ─── Escape key when not visible ───
+
+  describe('Escape key guard', () => {
+    it('Escape key when tooltip is hidden does not cause errors', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      // Tooltip is not visible — Escape should be a no-op
+      expect(() => {
+        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      }).not.toThrow();
+    });
+  });
 });
