@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Standalone Twig template for rendering an hx-card web component.
+ *
+ * Available variables:
+ * - variant: Card variant (default, featured, compact). Default: default.
+ * - elevation: Card elevation (flat, raised, elevated). Default: raised.
+ * - image_url: URL for the card header image.
+ * - image_alt: Alt text for the card image.
+ * - heading: Card heading text.
+ * - body: Card body content (safe markup allowed).
+ * - footer: Footer slot content (safe markup allowed).
+ * - url: If set, makes the card heading a link.
+ * - attributes: Drupal attributes object for additional HTML attributes.
+ *
+ * Usage:
+ * @code
+ *   {% include '@mytheme/templates/hx-card.html.twig' with {
+ *     variant: 'featured',
+ *     elevation: 'raised',
+ *     image_url: file_url(node.field_image.entity.uri.value),
+ *     image_alt: node.field_image.alt,
+ *     heading: node.label,
+ *     body: node.field_body.value|striptags|truncate(200),
+ *     url: path('entity.node.canonical', {'node': node.id}),
+ *   } %}
+ * @endcode
+ */
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-text') }}
+{% if image_url %}
+  {{ attach_library('helixui/hx-image') }}
+{% endif %}
+
+<hx-card
+  variant="{{ variant|default('default') }}"
+  elevation="{{ elevation|default('raised') }}"
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% if image_url %}
+    <hx-image
+      slot="image"
+      src="{{ image_url }}"
+      alt="{{ image_alt|default('') }}"
+      loading="lazy"
+    ></hx-image>
+  {% endif %}
+
+  {% if heading %}
+    <hx-text slot="heading" variant="heading-sm">
+      {% if url %}
+        <a href="{{ url }}">{{ heading }}</a>
+      {% else %}
+        {{ heading }}
+      {% endif %}
+    </hx-text>
+  {% endif %}
+
+  {% if body %}
+    <div>{{ body }}</div>
+  {% endif %}
+
+  {% if footer %}
+    <div slot="footer">{{ footer }}</div>
+  {% endif %}
+</hx-card>

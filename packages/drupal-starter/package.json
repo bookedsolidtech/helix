@@ -20,9 +20,12 @@
   ],
   "files": [
     "components",
+    "css",
     "js",
+    "templates",
     "helixui.info.yml",
     "helixui.libraries.yml",
+    "helixui.module",
     "helix-sdc.manifest.yml",
     "README.md",
     "ARCHITECTURE.md"
