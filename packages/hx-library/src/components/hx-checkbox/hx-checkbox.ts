@@ -5,6 +5,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
@@ -44,18 +45,8 @@ const _nextCheckboxId = createIdCounter('hx-checkbox');
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
 @customElement('hx-checkbox')
-export class HelixCheckbox extends HelixElement {
+export class HelixCheckbox extends mixinDelegatesAria(HelixElement) {
   static override styles = [tokenStyles, helixCheckboxStyles];
-
-  // P0-02: observe aria-label on host to forward to inner input
-  static override get observedAttributes(): string[] {
-    return [...(super.observedAttributes ?? []), 'aria-label'];
-  }
-
-  override attributeChangedCallback(name: string, old: string | null, next: string | null): void {
-    super.attributeChangedCallback(name, old, next);
-    if (name === 'aria-label') this.requestUpdate();
-  }
 
   // ─── Form Association ───
 
@@ -330,8 +321,7 @@ export class HelixCheckbox extends HelixElement {
         .filter(Boolean)
         .join(' ') || undefined;
 
-    // P0-02: forward aria-label from host to inner input
-    const hostAriaLabel = this.getAttribute('aria-label') ?? undefined;
+    const hostAriaLabel = this.ariaLabel ?? undefined;
 
     return html`
       <div class=${classMap(containerClasses)}>
