@@ -59,6 +59,7 @@ export class HelixCheckbox extends HelixElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static override formAssociated = true;
 
   // ─── Properties ───
