@@ -560,9 +560,9 @@ export class HelixDrawer extends LitElement {
 
     return html`
       <div part="header" class="drawer-header">
-        <p part="title" id=${this._titleId} class="drawer-title">
+        <h2 part="title" id=${this._titleId} class="drawer-title">
           <slot name="label" @slotchange=${this._handleLabelSlotChange}></slot>
-        </p>
+        </h2>
         <div class="drawer-header-actions">
           ${this._hasHeaderActionsSlot
             ? html`<slot

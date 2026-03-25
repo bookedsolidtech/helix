@@ -634,19 +634,13 @@ export class HelixFileUpload extends LitElement {
         ${this._renderFileList()}
         ${hasError
           ? html`
-              <div
-                part="error"
-                class="field__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
+              <div part="error" class="field__error" id=${this._errorId} role="alert">
                 ${this.error}
               </div>
             `
           : nothing}
 
-        <div id=${this._liveId} class="sr-only" aria-live="assertive" aria-atomic="true">
+        <div id=${this._liveId} class="sr-only" aria-live="polite" aria-atomic="true">
           ${this._dragOver ? 'File detected. Release to upload.' : ''}
         </div>
       </div>
