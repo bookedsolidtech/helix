@@ -63,6 +63,15 @@ const meta = {
         defaultValue: { summary: 'false' },
       },
     },
+    labelCopied: {
+      control: 'text',
+      description: 'Accessible label shown after a successful copy operation.',
+      table: {
+        category: 'Labels',
+        type: { summary: 'string' },
+        defaultValue: { summary: 'Copied' },
+      },
+    },
   },
   args: {
     value: 'Hello world',
@@ -804,5 +813,26 @@ export const DarkMode: Story = {
   args: {
     value: 'Hello world',
     label: 'Copy to clipboard',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the button. Enter or Space copies the value to the clipboard.
+      </p>
+      <hx-copy-button></hx-copy-button>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-copy-button');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

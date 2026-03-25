@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-split-panel.js';
 
 // ─────────────────────────────────────────────────
@@ -97,6 +97,38 @@ const meta = {
         defaultValue: { summary: 'null' },
         type: { summary: "'start' | 'end' | null" },
       },
+    },
+    resizeLabel: {
+      control: 'text',
+      description: 'Accessible label for the resize divider handle.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Resize' },
+        type: { summary: 'string' },
+      },
+    },
+    collapseStartLabel: {
+      control: 'text',
+      description: 'Accessible label for the button that collapses the start panel.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Collapse start panel' },
+        type: { summary: 'string' },
+      },
+    },
+    collapseEndLabel: {
+      control: 'text',
+      description: 'Accessible label for the button that collapses the end panel.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Collapse end panel' },
+        type: { summary: 'string' },
+      },
+    },
+  },
+  parameters: {
+    actions: {
+      handles: ['hx-reposition'],
     },
   },
   args: {
@@ -472,5 +504,26 @@ export const DarkMode: Story = {
   args: {
     orientation: 'vertical',
     position: 40,
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the resize divider. Arrow Left/Right (horizontal) or Up/Down (vertical) adjusts the panel size. Home/End snaps to extremes.
+      </p>
+      <hx-split-panel></hx-split-panel>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-split-panel');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

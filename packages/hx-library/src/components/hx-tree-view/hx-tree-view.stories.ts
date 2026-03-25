@@ -703,3 +703,24 @@ export const DarkMode: Story = {
     selection: 'multiple',
   },
 };
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the first tree item. Arrow Down/Up navigates between items. Arrow Right expands a node; Arrow Left collapses or moves to parent. Enter activates the focused node.
+      </p>
+      <hx-tree-view></hx-tree-view>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-tree-view');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
+};

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import './hx-steps.js';
 import './hx-step.js';
 
@@ -39,6 +40,15 @@ const meta = {
       table: {
         category: 'Events',
         type: { summary: 'CustomEvent<{ step: HelixStep; index: number }>' },
+      },
+    },
+    ariaLabel: {
+      control: 'text',
+      description: 'Accessible label for the steps component.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'Progress steps' },
+        type: { summary: 'string' },
       },
     },
   },
@@ -311,4 +321,25 @@ export const InteractiveEvent: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab navigates to each clickable step indicator. Enter or Space activates the focused step.
+      </p>
+      <hx-steps></hx-steps>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-steps');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

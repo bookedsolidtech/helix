@@ -77,6 +77,15 @@ const meta = {
         type: { summary: "'sm' | 'md' | 'lg'" },
       },
     },
+    label: {
+      control: 'text',
+      description: 'Accessible label for the counter, used by assistive technology.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     value: 1284,

@@ -64,6 +64,23 @@ const meta = {
         type: { summary: "'vertical' | 'horizontal'" },
       },
     },
+    label: {
+      control: 'text',
+      description: 'Accessible label for the overflow menu component.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+    labelMenu: {
+      control: 'text',
+      description: 'Accessible label for the trigger button that opens the overflow menu.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'More options' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     placement: 'bottom-end',
