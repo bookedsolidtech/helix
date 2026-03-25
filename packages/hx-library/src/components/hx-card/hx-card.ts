@@ -37,7 +37,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-card')
 export class HelixCard extends LitElement {
-  /** Enable delegatesFocus so :focus on the host works when the inner card div has focus. */
+  /** @internal */
   static override shadowRootOptions = {
     ...LitElement.shadowRootOptions,
     delegatesFocus: true,
@@ -62,20 +62,20 @@ export class HelixCard extends LitElement {
   /**
    * Optional URL. When set, the card becomes interactive (clickable)
    * and navigates to this URL on click.
-   * Uses hx-href to avoid conflicting with the native HTML href attribute.
+   * Uses the hx-href attribute to avoid conflicting with the native HTML href attribute.
    * @attr hx-href
    */
   @property({ type: String, attribute: 'hx-href' })
-  hxHref: string | undefined = undefined;
+  href: string | undefined = undefined;
 
   /**
    * Accessible label for interactive cards. Use this to provide a meaningful
    * description of the card's purpose rather than exposing the raw URL.
    * Only applies when hx-href is set.
-   * @attr hx-aria-label
+   * @attr hx-label
    */
-  @property({ type: String, attribute: 'hx-aria-label' })
-  hxAriaLabel: string | undefined = undefined;
+  @property({ type: String, attribute: 'hx-label' })
+  label: string | undefined = undefined;
 
   // ─── Slot Detection ───
 
@@ -125,7 +125,7 @@ export class HelixCard extends LitElement {
   private _onActionsSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasActions = slot.assignedNodes({ flatten: true }).length > 0;
-    if (this._hasActions && this.hxHref) {
+    if (this._hasActions && this.href) {
       devWarn(
         'hx-card',
         'Using hx-href (interactive card) together with the actions slot is an ARIA anti-pattern: ' +
@@ -139,9 +139,9 @@ export class HelixCard extends LitElement {
     super.updated(changedProperties);
     // WCAG 4.1.2: interactive cards (with hx-href) must have an accessible name
     if (
-      (changedProperties.has('hxHref') || changedProperties.has('hxAriaLabel')) &&
-      this.hxHref &&
-      !this.hxAriaLabel
+      (changedProperties.has('href') || changedProperties.has('label')) &&
+      this.href &&
+      !this.label
     ) {
       devWarn(
         'hx-card',
@@ -154,7 +154,7 @@ export class HelixCard extends LitElement {
 
   /** @internal */
   private _dispatchCardClick(originalEvent: MouseEvent | KeyboardEvent): void {
-    if (!this.hxHref) return;
+    if (!this.href) return;
 
     /**
      * Dispatched when an interactive card is clicked.
@@ -165,7 +165,7 @@ export class HelixCard extends LitElement {
       new CustomEvent<{ href: string; originalEvent: MouseEvent | KeyboardEvent }>('hx-click', {
         bubbles: true,
         composed: true,
-        detail: { href: this.hxHref, originalEvent },
+        detail: { href: this.href, originalEvent },
       }),
     );
   }
@@ -177,7 +177,7 @@ export class HelixCard extends LitElement {
 
   /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
-    if (!this.hxHref) return;
+    if (!this.href) return;
 
     // WCAG 2.1.1 / ARIA APG: role="link" activates on Enter only.
     // Space is reserved for scrolling and must not activate links.
@@ -190,7 +190,7 @@ export class HelixCard extends LitElement {
   // ─── Render ───
 
   override render() {
-    const isInteractive = !!this.hxHref;
+    const isInteractive = !!this.href;
 
     const classes = {
       card: true,
@@ -205,7 +205,7 @@ export class HelixCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive && this.hxAriaLabel ? this.hxAriaLabel : nothing}
+        aria-label=${isInteractive && this.label ? this.label : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >

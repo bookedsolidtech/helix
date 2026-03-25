@@ -27,10 +27,7 @@ import { devWarn } from '../../utils/dev-warn.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
-  /**
-   * ElementInternals instance for ARIA role and label management via the Accessibility Object Model.
-   * @internal
-   */
+  /** @internal */
   private internals: ElementInternals;
 
   /**

@@ -35,7 +35,7 @@ const meta = {
         type: { summary: "'flat' | 'raised' | 'floating'" },
       },
     },
-    hxHref: {
+    href: {
       control: 'text',
       description:
         'Optional URL. When set, the card becomes interactive (clickable) and navigates to this URL on click.',
@@ -49,13 +49,13 @@ const meta = {
   args: {
     variant: 'default',
     elevation: 'flat',
-    hxHref: '',
+    href: '',
   },
   render: (args) => html`
     <hx-card
       variant=${args.variant}
       elevation=${args.elevation}
-      hx-href=${args.hxHref || ''}
+      hx-href=${args.href || ''}
       style="max-width: 400px;"
     >
       <span slot="heading">Patient Overview</span>
@@ -302,7 +302,7 @@ const cardClickHandler = fn();
 
 export const Interactive: Story = {
   args: {
-    hxHref: 'https://ehr.example.com/patient/12345',
+    href: 'https://ehr.example.com/patient/12345',
   },
   render: () => html`
     <hx-card

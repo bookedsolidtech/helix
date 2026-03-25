@@ -442,18 +442,14 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue(null);
     this._syncRadios();
   }
 
-  /**
-   * Called when the form restores state (e.g., back/forward navigation).
-   * @param state - The saved form state value.
-   * @param _mode - The restore mode: `'restore'` or `'autocomplete'`.
-   */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData,
     _mode: 'restore' | 'autocomplete',
@@ -463,7 +459,7 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

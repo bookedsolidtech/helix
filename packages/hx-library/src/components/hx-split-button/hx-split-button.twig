@@ -99,8 +99,8 @@
   variant="{{ _variant }}"
   hx-size="{{ _size }}"
   {% if label %}label="{{ label }}"{% endif %}
-  {% if trigger_label %}trigger-label="{{ trigger_label }}"{% endif %}
-  {% if menu_label %}menu-label="{{ menu_label }}"{% endif %}
+  {% if label_trigger %}label-trigger="{{ label_trigger }}"{% endif %}
+  {% if label_menu %}label-menu="{{ label_menu }}"{% endif %}
   {% if disabled %}disabled{% endif %}
   {% if attributes %}{% for key, val in attributes %}{{ key }}="{{ val }}" {% endfor %}{% endif %}
 >

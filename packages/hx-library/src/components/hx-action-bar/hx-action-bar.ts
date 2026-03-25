@@ -52,7 +52,7 @@ export class HelixActionBar extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: ActionBarSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Visual variant controlling the bar background.

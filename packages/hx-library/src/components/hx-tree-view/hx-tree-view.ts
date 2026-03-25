@@ -68,7 +68,7 @@ export class HelixTreeView extends LitElement {
    * @attr selection
    */
   @property({ type: String, reflect: true })
-  selection: TreeSelection = 'none';
+  selection: 'none' | 'single' | 'multiple' = 'none';
 
   // ─── Internal State ───
 
