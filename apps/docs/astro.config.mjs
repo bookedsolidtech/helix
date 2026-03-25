@@ -704,6 +704,11 @@ export default defineConfig({
               slug: 'extending/style-components-with-css-parts',
               badge: { text: 'Deep Dive', variant: 'tip' },
             },
+            {
+              label: 'Register, Bundle & Publish',
+              slug: 'extending/register-bundle-publish',
+              badge: { text: 'Distribution', variant: 'tip' },
+            },
           ],
         },
         {
