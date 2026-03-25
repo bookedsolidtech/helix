@@ -24,7 +24,7 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 # ── Shared setup anchor ────────────────────────────────────────────────────
 # Reusable setup steps referenced by all jobs
@@ -219,6 +219,68 @@ jobs:
         working-directory: packages/hx-library
       - name: Bundle size report (all components, tree-shaken)
         run: node scripts/bundle-size-report.js
+
+  # ── CEM API Diff ────────────────────────────────────────────────────────
+  # Compares custom-elements.json between base and PR branch.
+  # Posts a PR comment with added/removed/changed public API per component.
+  # Breaking changes (removals, type changes) are flagged with warnings.
+  # Informational only — does not block merge.
+
+  cem-diff:
+    name: CEM API Diff
+    needs: changes
+    if: >
+      github.event_name == 'pull_request' &&
+      needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Generate head CEM
+        run: pnpm --filter=@helixui/library run cem
+      - name: Save head CEM
+        run: |
+          mkdir -p .cache
+          cp packages/hx-library/custom-elements.json .cache/head-cem.json
+      - name: Check out base branch source
+        run: |
+          git checkout "origin/${{ github.base_ref }}" -- packages/hx-library/src/ 2>/dev/null || true
+      - name: Generate base CEM
+        run: pnpm --filter=@helixui/library run cem
+      - name: Run CEM diff
+        run: |
+          mkdir -p .cache
+          node scripts/cem-diff.js \
+            --base packages/hx-library/custom-elements.json \
+            --head .cache/head-cem.json \
+            --output .cache/cem-diff.md
+      - name: Post PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(cat .cache/cem-diff.md)
+          # Delete any previous CEM diff comment before posting a new one
+          PREV=$(gh pr view ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --json comments \
+            --jq '.comments[] | select(.body | startswith("## CEM API Diff")) | .id' \
+            2>/dev/null | head -1 || true)
+          if [ -n "$PREV" ]; then
+            gh api --method DELETE \
+              "/repos/${{ github.repository }}/issues/comments/$PREV" \
+              2>/dev/null || true
+          fi
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "$BODY"
 
   # ── Visual Regression Tests ─────────────────────────────────────────────
 
