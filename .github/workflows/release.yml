@@ -1,0 +1,230 @@
+# ============================================================================
+# Release Pipeline — HELiX Enterprise Healthcare Web Component Library
+# ============================================================================
+# Triggered on push to main. Detects if a version tag was just pushed by the
+# changesets/action (publish.yml) and, if so:
+#   1. Creates a GitHub Release with changelog body + CEM API diff section
+#   2. Notifies the #release-notes Discord channel
+#
+# This workflow is a post-publish companion to publish.yml. It never
+# re-runs tests or publishes to npm — those are handled by publish.yml and
+# the upstream CI pipeline.
+#
+# Required secrets:
+#   DISCORD_BOT_TOKEN — Discord bot token for #release-notes channel posts
+# ============================================================================
+
+name: Release
+
+on:
+  push:
+    tags:
+      - '@helixui/library@*'
+      - '@helixui/tokens@*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  # ── GitHub Release ──────────────────────────────────────────────────────────
+  # Creates a GitHub Release for the published package tag.
+  # Release body = CHANGELOG.md entry for this version + CEM API diff section.
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Only run for library releases (primary publishable package)
+    if: startsWith(github.ref_name, '@helixui/library@')
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      release_url: ${{ steps.create-release.outputs.html_url }}
+      changelog_body: ${{ steps.changelog.outputs.body }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: extract
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#@helixui/library@}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Releasing version: $VERSION"
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Extract changelog entry for this version ─────────────────────────
+      - name: Extract CHANGELOG entry
+        id: changelog
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+          CHANGELOG="packages/hx-library/CHANGELOG.md"
+
+          if [ ! -f "$CHANGELOG" ]; then
+            echo "body=No changelog found." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Extract the section for this version using awk.
+          # Sections are delimited by "## <version>" headings.
+          BODY=$(awk -v ver="$VERSION" '
+            /^## / {
+              if (found) exit
+              if ($0 ~ "## " ver) found=1
+              next
+            }
+            found { print }
+          ' "$CHANGELOG" | sed '/^[[:space:]]*$/d' | head -200)
+
+          if [ -z "$BODY" ]; then
+            BODY="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/packages/hx-library/CHANGELOG.md) for full details."
+          fi
+
+          # Write to a file to avoid quoting issues with multiline content
+          echo "$BODY" > /tmp/changelog-body.md
+          echo "Changelog entry extracted ($(wc -l < /tmp/changelog-body.md) lines)"
+
+      # ── CEM diff between this version and the previous tag ───────────────
+      - name: Generate CEM diff for release notes
+        id: cem-diff
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+
+          # Find the previous @helixui/library tag
+          PREV_TAG=$(git tag --list '@helixui/library@*' \
+            | grep -v "^@helixui/library@${VERSION}$" \
+            | sort -V \
+            | tail -1)
+
+          if [ -z "$PREV_TAG" ]; then
+            echo "No previous tag found — skipping CEM diff"
+            echo "No previous release found — CEM diff unavailable." > /tmp/cem-diff-section.md
+            exit 0
+          fi
+
+          echo "Comparing CEM: $PREV_TAG → @helixui/library@$VERSION"
+
+          # Generate head CEM (already at the tagged commit)
+          pnpm --filter=@helixui/library run cem
+          cp packages/hx-library/custom-elements.json /tmp/cem-head.json
+
+          # Check out previous tag source and generate base CEM
+          git checkout "$PREV_TAG" -- packages/hx-library/src/ 2>/dev/null || true
+          pnpm --filter=@helixui/library run cem || true
+          cp packages/hx-library/custom-elements.json /tmp/cem-base.json
+
+          # Restore head source
+          git checkout HEAD -- packages/hx-library/src/ 2>/dev/null || true
+
+          # Run diff
+          node scripts/cem-diff.js \
+            --base /tmp/cem-base.json \
+            --head /tmp/cem-head.json \
+            --output /tmp/cem-diff-raw.md || true
+
+          # Wrap in a release notes section
+          if [ -f /tmp/cem-diff-raw.md ]; then
+            echo "" > /tmp/cem-diff-section.md
+            echo "---" >> /tmp/cem-diff-section.md
+            echo "" >> /tmp/cem-diff-section.md
+            cat /tmp/cem-diff-raw.md >> /tmp/cem-diff-section.md
+          else
+            echo "CEM diff unavailable." > /tmp/cem-diff-section.md
+          fi
+
+      # ── Assemble full release body ────────────────────────────────────────
+      - name: Assemble release body
+        id: assemble
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+
+          {
+            echo "## @helixui/library v${VERSION}"
+            echo ""
+            cat /tmp/changelog-body.md
+            echo ""
+            cat /tmp/cem-diff-section.md
+            echo ""
+            echo "---"
+            echo ""
+            echo "**Install**"
+            echo ""
+            echo '```sh'
+            echo "npm install @helixui/library@${VERSION}"
+            echo '```'
+            echo ""
+            echo "**CDN**"
+            echo ""
+            echo '```html'
+            echo "<script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@helixui/library@${VERSION}/dist/index.js\"></script>"
+            echo '```'
+          } > /tmp/release-body.md
+
+          echo "Release body assembled ($(wc -l < /tmp/release-body.md) lines)"
+
+      # ── Create GitHub Release ─────────────────────────────────────────────
+      - name: Create GitHub Release
+        id: create-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+          TAG="${{ steps.extract.outputs.tag }}"
+
+          gh release create "$TAG" \
+            --repo "${{ github.repository }}" \
+            --title "@helixui/library v${VERSION}" \
+            --notes-file /tmp/release-body.md \
+            --latest
+
+          RELEASE_URL=$(gh release view "$TAG" \
+            --repo "${{ github.repository }}" \
+            --json url --jq '.url')
+          echo "html_url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+          echo "GitHub Release created: $RELEASE_URL"
+
+  # ── Discord notification ────────────────────────────────────────────────────
+  # Posts release announcement to #release-notes channel.
+
+  discord-notify:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: github-release
+    if: always() && needs.github-release.result == 'success'
+
+    steps:
+      - name: Post to #release-notes
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          RELEASE_CHANNEL_ID: '1478227528412958810'
+          VERSION: ${{ needs.github-release.outputs.version }}
+          RELEASE_URL: ${{ needs.github-release.outputs.release_url }}
+        run: |
+          MESSAGE="**@helixui/library v${VERSION} released**\n\n"
+          MESSAGE+="Install: \`npm install @helixui/library@${VERSION}\`\n"
+          MESSAGE+="Release notes: ${RELEASE_URL}"
+
+          curl -s -X POST \
+            "https://discord.com/api/channels/${RELEASE_CHANNEL_ID}/messages" \
+            -H "Authorization: Bot ${DISCORD_BOT_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"${MESSAGE}\"}" \
+            --fail-with-body

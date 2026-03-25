@@ -1,0 +1,125 @@
+# ============================================================================
+# Canary Pipeline — HELiX Enterprise Healthcare Web Component Library
+# ============================================================================
+# Publishes @helixui/library@next (canary) from the staging branch on every
+# merge to staging. This gives consumers a pre-release channel to test against
+# before the staging→main promotion.
+#
+# Tag format: @helixui/library@<current-version>-next.<run-number>
+# npm dist-tag: next
+#
+# Required secrets:
+#   NPM_TOKEN — npm automation token with publish rights to @helixui scope
+# ============================================================================
+
+name: Canary
+
+on:
+  push:
+    branches: [staging]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  canary:
+    name: Publish Canary (@next)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm turbo run build --filter='@helixui/library' --filter='@helixui/tokens'
+
+      - name: Generate Custom Elements Manifest
+        run: pnpm run cem
+
+      # ── Stamp canary version ──────────────────────────────────────────────
+      # Appends -next.<run-number> to the current version in package.json.
+      # This does NOT commit — the stamped version is publish-only.
+
+      - name: Stamp canary version
+        id: stamp
+        run: |
+          CURRENT=$(node -p "require('./packages/hx-library/package.json').version")
+          CANARY="${CURRENT}-next.${{ github.run_number }}"
+          echo "version=$CANARY" >> "$GITHUB_OUTPUT"
+          echo "Canary version: $CANARY"
+
+          # Update package.json for publish — not committed to git
+          node -e "
+            const fs = require('fs');
+            const p = './packages/hx-library/package.json';
+            const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+            pkg.version = '$CANARY';
+            fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+          # Update tokens package to matching canary version
+          TOKENS_CURRENT=$(node -p "require('./packages/hx-tokens/package.json').version")
+          TOKENS_CANARY="${TOKENS_CURRENT}-next.${{ github.run_number }}"
+          node -e "
+            const fs = require('fs');
+            const p = './packages/hx-tokens/package.json';
+            const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+            pkg.version = '$TOKENS_CANARY';
+            fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+      # ── Publish canary packages ───────────────────────────────────────────
+
+      - name: Publish @helixui/tokens@next
+        run: |
+          pnpm publish \
+            --filter=@helixui/tokens \
+            --tag next \
+            --no-git-checks \
+            --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
+
+      - name: Publish @helixui/library@next
+        run: |
+          pnpm publish \
+            --filter=@helixui/library \
+            --tag next \
+            --no-git-checks \
+            --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
+
+      # ── Summary ──────────────────────────────────────────────────────────
+
+      - name: Print canary summary
+        if: success()
+        run: |
+          VERSION="${{ steps.stamp.outputs.version }}"
+          echo ""
+          echo "Canary published:"
+          echo "  @helixui/library@${VERSION}"
+          echo ""
+          echo "Install canary:"
+          echo "  npm install @helixui/library@next"
+          echo "  npm install @helixui/library@${VERSION}"
