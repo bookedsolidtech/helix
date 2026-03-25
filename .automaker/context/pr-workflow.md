@@ -42,6 +42,8 @@ gh pr edit $PR_NUMBER --add-label "skip-changeset" --repo bookedsolidtech/helix
 
 ## Commit Discipline — One Push Per Review Cycle (MANDATORY)
 
+**The agent-push-protocol.md defines the exact push sequence. Follow it.**
+
 **Do NOT create a PR or push until all work — including formatting — is complete in a single commit.**
 
 CodeRabbit reviews on every push (`auto_incremental_review: true`). Every push triggers a new CR review cycle. Pushing intermediate commits (e.g., code change then a separate format fix) causes:
@@ -53,24 +55,28 @@ CodeRabbit reviews on every push (`auto_incremental_review: true`). Every push t
 ```bash
 # 1. Write all code changes
 # 2. Run format immediately — include in the SAME commit
-npm run format
-git add -A
+pnpm run format
+git add -u
 HUSKY=0 git commit -m "feat: ..."   # ONE commit with code + format together
 
-# 3. Run verify before pushing
-npm run verify
+# 3. Run verify before pushing (MANDATORY — no exceptions)
+pnpm run verify
 
-# 4. Push ONCE — this triggers ONE CodeRabbit review
+# 4. Run smart tests before pushing (MANDATORY when component source changed)
+pnpm run test:smart
+
+# 5. Push ONCE — this triggers ONE CodeRabbit review
 HUSKY=0 git push origin <branch>
 
-# 5. Create PR (triggers auto-merge + CR review)
+# 6. Create PR (triggers auto-merge + CR review)
 gh pr create ...
 gh pr merge <N> --auto --merge --repo bookedsolidtech/helix
 ```
 
 **Remediation cycles follow the same rule:**
 - Fix ALL CodeRabbit feedback in one pass
-- Run `npm run format` and include in the same commit
+- Run `pnpm run format` and include in the same commit
+- Run `pnpm run verify` AND `pnpm run test:smart` after fixing CodeRabbit feedback, before pushing
 - Push ONCE
 - Do NOT push partial fixes then format separately
 
