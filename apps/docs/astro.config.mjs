@@ -655,6 +655,11 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Extending HELiX',
+          collapsed: true,
+          items: [{ label: 'Overview', slug: 'extending/overview' }],
+        },
+        {
           label: 'Framework Integration',
           collapsed: true,
           items: [
