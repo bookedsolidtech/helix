@@ -18,6 +18,7 @@ import { scaffoldTheme } from './tools/scaffold-theme.js';
 import { auditTokens, formatAuditReport } from './tools/audit-tokens.js';
 import { scaffoldComponent } from './tools/scaffold-component.js';
 import { migrateVersion, formatMigrationPlan } from './tools/migrate-version.js';
+import { healthCheck, formatHealthReport } from './tools/health-check.js';
 
 // ─── Input schemas ─────────────────────────────────────────────────────────────
 
@@ -121,6 +122,19 @@ const AuditTokensArgsSchema = z.object({
     .min(1)
     .describe(
       'Path to a CSS file or project root directory to scan for --hx-* custom property declarations.',
+    ),
+});
+
+const HealthCheckArgsSchema = z.object({
+  projectPath: z
+    .string()
+    .min(1)
+    .describe('Absolute or relative path to the consumer project directory to scan'),
+  extensionFile: z
+    .string()
+    .optional()
+    .describe(
+      'Optional path to a TypeScript file extending a HELiX component (for analyze-extension check)',
     ),
 });
 
@@ -363,6 +377,28 @@ const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'healthCheck',
+    description:
+      'Run a full health check on a consumer project. Orchestrates validate-integration, audit-tokens, ' +
+      'and optionally analyze-extension to produce a single report with a numeric score (0-100), ' +
+      'categorized findings (critical/warning/info), and prioritized fix recommendations.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectPath: {
+          type: 'string',
+          description: 'Absolute or relative path to the consumer project directory to scan',
+        },
+        extensionFile: {
+          type: 'string',
+          description:
+            'Optional path to a TypeScript file extending a HELiX component (for analyze-extension check)',
+        },
+      },
+      required: ['projectPath'],
+    },
+  },
+  {
     name: 'migrateVersion',
     description:
       'Generate a migration plan for upgrading a consumer project between two HELiX library versions. ' +
@@ -519,6 +555,17 @@ export function registerTools(server: Server): void {
           if (!parsed.success) return failure(parsed.error.message);
           const report = auditTokens({ path: parsed.data.path });
           return success(formatAuditReport(report));
+        }
+
+        case 'healthCheck': {
+          const parsed = HealthCheckArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const hcOpts =
+            parsed.data.extensionFile !== undefined
+              ? { projectPath: parsed.data.projectPath, extensionFile: parsed.data.extensionFile }
+              : { projectPath: parsed.data.projectPath };
+          const report = healthCheck(hcOpts);
+          return success(formatHealthReport(report));
         }
 
         case 'migrateVersion': {
