@@ -63,7 +63,7 @@ export const helixTreeItemStyles = css`
   /* ─── Disabled State ─── */
 
   :host([disabled]) .item-row {
-    opacity: 0.4;
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
     pointer-events: none;
   }

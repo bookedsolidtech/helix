@@ -35,7 +35,7 @@ export const helixStatusIndicatorStyles = css`
     inset: 0;
     border-radius: 50%;
     background-color: var(--hx-status-indicator-pulse-color, var(--_dot-color));
-    opacity: 0.4;
+    opacity: var(--hx-state-focus-opacity, 0.12); /* intentional: pulse ring start opacity */
     animation: hx-status-pulse var(--hx-status-indicator-pulse-duration, 1.5s) ease-out infinite;
     z-index: 0; /* pulse ring beneath dot within shadow root */
   }
@@ -47,7 +47,7 @@ export const helixStatusIndicatorStyles = css`
   @keyframes hx-status-pulse {
     0% {
       transform: scale(1);
-      opacity: 0.4;
+      opacity: var(--hx-state-focus-opacity, 0.12); /* intentional: pulse ring start opacity */
     }
     100% {
       transform: scale(var(--hx-status-indicator-pulse-scale, 2.5));

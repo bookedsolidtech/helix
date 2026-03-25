@@ -48,7 +48,7 @@ export const helixAvatarStyles = css`
 
   .avatar--lg {
     --hx-avatar-size: var(--hx-size-12, 3rem);
-    --hx-avatar-font-size: var(--hx-font-size-base, 1rem);
+    --hx-avatar-font-size: var(--hx-font-size-md, 1rem);
   }
 
   .avatar--xl {

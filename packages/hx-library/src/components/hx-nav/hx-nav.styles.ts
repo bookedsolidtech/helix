@@ -90,7 +90,7 @@ export const helixNavStyles = css`
 
   .nav__link:hover {
     background-color: var(--hx-nav-link-hover-bg, var(--hx-color-neutral-700, #374151));
-    color: var(--hx-nav-link-hover-color, var(--hx-color-white, #ffffff));
+    color: var(--hx-nav-link-hover-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   .nav__link:focus-visible {
@@ -101,7 +101,7 @@ export const helixNavStyles = css`
 
   .nav__link--active {
     background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #2563eb));
-    color: var(--hx-nav-link-active-color, var(--hx-color-white, #ffffff));
+    color: var(--hx-nav-link-active-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   /* ─── Chevron Icon ─── */

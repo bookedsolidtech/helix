@@ -6,7 +6,7 @@ export const helixTagStyles = css`
   }
 
   :host([disabled]) {
-    opacity: 0.5;
+    opacity: var(--hx-opacity-disabled, 0.5);
     pointer-events: none;
     /* cursor: not-allowed is intentionally omitted — pointer-events: none prevents cursor display */
   }
@@ -23,7 +23,8 @@ export const helixTagStyles = css`
     line-height: var(--hx-line-height-tight, 1.25);
     white-space: nowrap;
     vertical-align: middle;
-    border: 1px solid var(--hx-tag-border-color, var(--hx-color-neutral-200, #e5e7eb));
+    border: var(--hx-border-width-thin, 1px) solid
+      var(--hx-tag-border-color, var(--hx-color-neutral-200, #e5e7eb));
   }
 
   /* ─── Size Variants ─── */
@@ -41,7 +42,7 @@ export const helixTagStyles = css`
   }
 
   .tag--lg {
-    font-size: var(--hx-tag-font-size, var(--hx-font-size-base, 1rem));
+    font-size: var(--hx-tag-font-size, var(--hx-font-size-md, 1rem));
     padding: var(--hx-tag-padding-y, var(--hx-space-1-5, 0.375rem))
       var(--hx-tag-padding-x, var(--hx-space-3, 0.75rem));
   }
@@ -132,13 +133,13 @@ export const helixTagStyles = css`
     margin-inline-start: var(--hx-space-1, 0.25rem);
     cursor: pointer;
     color: inherit;
-    opacity: 0.7;
+    opacity: var(--hx-opacity-75, 0.75);
     border-radius: var(--hx-border-radius-sm, 0.125rem);
     line-height: 0;
   }
 
   .tag__remove-button:hover {
-    opacity: 1;
+    opacity: var(--hx-opacity-100, 1);
   }
 
   .tag__remove-button:focus-visible {
