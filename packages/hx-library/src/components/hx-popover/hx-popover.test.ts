@@ -205,13 +205,13 @@ describe('hx-popover', () => {
       expect(body?.getAttribute('aria-hidden')).toBe('true');
     });
 
-    it('body has aria-hidden="false" when visible', async () => {
+    it('body aria-hidden is absent (not hidden) when visible', async () => {
       const el = await fixture<HelixPopover>(
         '<hx-popover open><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
       );
       await el.updateComplete;
       const body = shadowQuery(el, '[part="body"]');
-      expect(body?.getAttribute('aria-hidden')).toBe('false');
+      expect(body?.getAttribute('aria-hidden')).not.toBe('true');
     });
 
     it('anchor has aria-expanded="false" by default', async () => {

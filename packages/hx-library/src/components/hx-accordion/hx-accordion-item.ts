@@ -161,7 +161,7 @@ export class HelixAccordionItem extends LitElement {
           role="heading"
           aria-level=${this._headingLevel}
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-expanded=${this.expanded ? 'true' : nothing}
+          aria-expanded=${this.expanded ? 'true' : 'false'}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-controls=${`${this._uid}-content`}
           @click=${this._handleSummaryClick}

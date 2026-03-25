@@ -472,9 +472,14 @@ export class HelixRadioGroup extends LitElement {
     };
 
     // Use _errorId only when there is no slotted error content replacing the internal error div
-    const errorDescribedBy = !this._hasErrorSlot && hasError ? this._errorId : nothing;
-    const describedBy =
-      errorDescribedBy !== nothing ? errorDescribedBy : this.helpText ? this._helpTextId : nothing;
+    const hasHelp = !!this.helpText;
+    const describedByIds = [
+      !this._hasErrorSlot && hasError ? this._errorId : null,
+      hasHelp ? this._helpTextId : null,
+    ]
+      .filter(Boolean)
+      .join(' ');
+    const describedBy = describedByIds || nothing;
 
     return html`
       <fieldset

@@ -368,7 +368,7 @@ export class HelixSplitButton extends LitElement {
           class="split-button__trigger"
           ?disabled=${this.disabled}
           aria-haspopup="menu"
-          aria-expanded=${this._open ? 'true' : nothing}
+          aria-expanded=${this._open ? 'true' : 'false'}
           aria-controls=${this._menuId}
           aria-label=${this.triggerLabel}
           type="button"
