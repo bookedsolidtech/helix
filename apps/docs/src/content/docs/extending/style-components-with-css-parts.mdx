@@ -1,0 +1,871 @@
+---
+title: Styling Components with CSS Parts
+description: Complete reference for HELiX CSS ::part() selectors — per-category part catalog, compound selector patterns, integration with CSS custom properties, and real-world styling recipes.
+sidebar:
+  order: 4
+  badge:
+    text: Deep Dive
+    variant: tip
+---
+
+CSS `::part()` selectors are the second extension vector in HELiX after CSS custom properties. They give you direct styling access to named elements inside a component's shadow DOM — without modifying component source, without `shadowRoot.querySelector()`, and without coupling your styles to undocumented internal class names.
+
+This guide covers the complete catalog of exposed parts per component category, compound selector patterns, when to use parts versus tokens, and real-world recipes for the patterns healthcare teams encounter most.
+
+---
+
+## What `::part()` Is and When to Use It
+
+The `::part()` pseudo-element, defined in the [CSS Shadow Parts specification](https://www.w3.org/TR/css-shadow-parts-1/), allows you to pierce a shadow root and style a specific element that the component author has exposed with a `part` attribute.
+
+```css
+/* From outside the shadow DOM: */
+hx-button::part(button) {
+  letter-spacing: 0.06em;
+}
+
+/* Inside hx-button's shadow DOM, the author has written: */
+/* <button part="button" class="button">...</button> */
+```
+
+The `part` attribute is an explicit, versioned API contract. Every part listed in this guide is declared in the Custom Elements Manifest and covered by HELiX's semantic versioning guarantee — they will not be renamed or removed without a major version bump.
+
+### Parts vs CSS Custom Properties: The Decision Rule
+
+Both mechanisms style across the shadow boundary. Choose based on what you are changing:
+
+| Change type                                                  | Use                                       | Why                                                                |
+| ------------------------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------ |
+| Brand color, font family, spacing scale                      | CSS custom property (`--hx-*`)            | One override propagates everywhere via the token cascade           |
+| Component-specific color, border radius                      | Component CSS property (`--hx-button-bg`) | Scoped override, still participates in the cascade                 |
+| Hover gradient, box-shadow animation, text-transform         | `::part()`                                | Properties that cannot be expressed as a single token value        |
+| Layout changes (flexbox direction, grid columns)             | `::part()`                                | Structural properties live outside the token system                |
+| Pseudo-class interaction states (`:hover`, `:focus-visible`) | `::part()` with pseudo-class              | The only mechanism for interaction styling from outside shadow DOM |
+| Adding decorations (`:before`, `:after`)                     | Not possible via `::part()`               | Pseudo-elements cannot be applied to `::part()` targets            |
+
+The practical rule: reach for a CSS custom property first. If no token covers the change, or if you need interaction states tied to shadow-internal element behavior, use `::part()`.
+
+---
+
+## The Part Catalog
+
+All parts listed here are verified against the component source and the Custom Elements Manifest. Each entry shows the part name, the element it targets, and typical styling use cases.
+
+### Buttons and Actions
+
+#### `hx-button`
+
+| Part      | Element                                | Typical use                                               |
+| --------- | -------------------------------------- | --------------------------------------------------------- |
+| `button`  | The native `<button>` or `<a>` element | Background, border, shadow, hover effects, text-transform |
+| `label`   | The label text wrapper `<span>`        | Typography overrides, letter-spacing                      |
+| `prefix`  | The prefix slot container `<span>`     | Icon spacing, sizing                                      |
+| `suffix`  | The suffix slot container `<span>`     | Icon spacing, sizing                                      |
+| `spinner` | The loading spinner SVG                | Spinner size, color                                       |
+
+#### `hx-icon-button`
+
+| Part     | Element                                | Typical use               |
+| -------- | -------------------------------------- | ------------------------- |
+| `button` | The native `<button>` or `<a>` element | Background, border, shape |
+| `icon`   | The icon container `<span>`            | Icon sizing               |
+
+#### `hx-split-button`
+
+| Part      | Element                             | Typical use             |
+| --------- | ----------------------------------- | ----------------------- |
+| `button`  | The primary action button element   | Primary segment styling |
+| `trigger` | The dropdown trigger button element | Trigger segment styling |
+| `menu`    | The dropdown menu panel             | Menu panel appearance   |
+
+#### `hx-toggle-button`
+
+| Part     | Element                   | Typical use              |
+| -------- | ------------------------- | ------------------------ |
+| `button` | The native button element | Toggle button appearance |
+| `label`  | The label text wrapper    | Typography               |
+
+#### `hx-copy-button`
+
+| Part     | Element                      | Typical use       |
+| -------- | ---------------------------- | ----------------- |
+| `button` | The copy-to-clipboard button | Button appearance |
+
+### Form Fields
+
+#### `hx-text-input`
+
+| Part            | Element                                  | Typical use                               |
+| --------------- | ---------------------------------------- | ----------------------------------------- |
+| `field`         | The outer field container `<div>`        | Field layout, spacing                     |
+| `label`         | The `<label>` element                    | Label typography, color, positioning      |
+| `input-wrapper` | Wrapper around prefix, input, and suffix | Border, background, focus ring on wrapper |
+| `input`         | The native `<input>` element             | Input typography, padding, background     |
+| `help-text`     | The help text container                  | Help text styling                         |
+| `error`         | The error message container              | Error state styling                       |
+
+#### `hx-textarea`
+
+| Part               | Element                         | Typical use                     |
+| ------------------ | ------------------------------- | ------------------------------- |
+| `field`            | The outer field container       | Field layout                    |
+| `label`            | The `<label>` element           | Label styling                   |
+| `textarea-wrapper` | The wrapper around the textarea | Border, background              |
+| `textarea`         | The native `<textarea>` element | Textarea appearance, min-height |
+| `counter`          | The character count display     | Counter positioning, typography |
+| `help-text`        | The help text container         | Help text styling               |
+| `error`            | The error message container     | Error state styling             |
+
+#### `hx-number-input`
+
+| Part            | Element                                           | Typical use              |
+| --------------- | ------------------------------------------------- | ------------------------ |
+| `field`         | The outer field container                         | Field layout             |
+| `label`         | The `<label>` element                             | Label styling            |
+| `input-wrapper` | Wrapper around prefix, input, suffix, and stepper | Wrapper appearance       |
+| `input`         | The native `<input>` element                      | Input appearance         |
+| `stepper`       | The stepper button group container                | Stepper layout           |
+| `increment`     | The increment (+) button                          | Increment button styling |
+| `decrement`     | The decrement (-) button                          | Decrement button styling |
+| `help-text`     | The help text container                           | Help text styling        |
+| `error-message` | The error message container                       | Error state styling      |
+
+#### `hx-select`
+
+| Part             | Element                                        | Typical use                 |
+| ---------------- | ---------------------------------------------- | --------------------------- |
+| `field`          | The outer field container                      | Field layout                |
+| `label`          | The `<label>` element                          | Label styling               |
+| `select-wrapper` | The wrapper containing the trigger and listbox | Wrapper appearance          |
+| `trigger`        | The button that opens/closes the dropdown      | Trigger button styling      |
+| `listbox`        | The dropdown panel containing options          | Listbox appearance, z-index |
+| `option`         | Individual option items                        | Option item styling         |
+| `help-text`      | The help text container                        | Help text styling           |
+| `error`          | The error message container                    | Error state styling         |
+
+#### `hx-checkbox`
+
+| Part        | Element                               | Typical use                       |
+| ----------- | ------------------------------------- | --------------------------------- |
+| `field`     | The outer field container             | Field layout                      |
+| `control`   | The wrapper around checkbox and label | Control alignment                 |
+| `checkbox`  | The visual checkbox element           | Checkbox size, border, background |
+| `checkmark` | The SVG checkmark icon                | Checkmark color, size             |
+| `label`     | The label element                     | Label typography                  |
+| `help-text` | The help text container               | Help text styling                 |
+| `error`     | The error message container           | Error styling                     |
+
+#### `hx-radio` (within `hx-radio-group`)
+
+| Part    | Element                 | Typical use                    |
+| ------- | ----------------------- | ------------------------------ |
+| `radio` | The visual radio circle | Radio size, border, fill color |
+| `label` | The label text          | Label typography               |
+
+#### `hx-switch`
+
+| Part        | Element                                        | Typical use                |
+| ----------- | ---------------------------------------------- | -------------------------- |
+| `switch`    | The switch container (track and thumb wrapper) | Overall switch sizing      |
+| `track`     | The track background element                   | Track color, border-radius |
+| `thumb`     | The sliding thumb element                      | Thumb color, size, shadow  |
+| `label`     | The label text element                         | Label typography           |
+| `help-text` | The help text container                        | Help text styling          |
+| `error`     | The error message container                    | Error state styling        |
+
+### Cards and Containers
+
+#### `hx-card`
+
+| Part      | Element                          | Typical use                               |
+| --------- | -------------------------------- | ----------------------------------------- |
+| `card`    | The outer card container `<div>` | Background, border, shadow, border-radius |
+| `image`   | The image slot container         | Image area sizing, overflow               |
+| `heading` | The heading slot container       | Heading area padding, typography          |
+| `body`    | The body slot container          | Body padding, typography                  |
+| `footer`  | The footer slot container        | Footer padding, border                    |
+| `actions` | The actions slot container       | Actions area layout, border               |
+
+#### `hx-dialog`
+
+| Part           | Element                                            | Typical use                           |
+| -------------- | -------------------------------------------------- | ------------------------------------- |
+| `dialog`       | The inner container `<div>` holding dialog content | Dialog dimensions, background         |
+| `backdrop`     | The non-modal backdrop overlay                     | Backdrop color, blur                  |
+| `header`       | The header region                                  | Header padding, border-bottom         |
+| `close-button` | The built-in close button                          | Close button appearance               |
+| `body`         | The scrollable body region                         | Body padding, max-height              |
+| `footer`       | The footer region                                  | Footer padding, border-top, alignment |
+
+#### `hx-drawer`
+
+| Part           | Element                           | Typical use                     |
+| -------------- | --------------------------------- | ------------------------------- |
+| `overlay`      | The full-screen overlay container | Overlay behavior                |
+| `panel`        | The drawer panel itself           | Panel width, background, shadow |
+| `header`       | The header region                 | Header padding, border          |
+| `title`        | The drawer title element          | Title typography                |
+| `close-button` | The built-in close button         | Close button appearance         |
+| `body`         | The scrollable body region        | Body padding                    |
+| `footer`       | The footer region                 | Footer padding, border          |
+
+#### `hx-accordion-item`
+
+| Part      | Element                         | Typical use                        |
+| --------- | ------------------------------- | ---------------------------------- |
+| `item`    | The outer `<details>` element   | Item border, background            |
+| `trigger` | The `<summary>` trigger element | Trigger padding, typography, hover |
+| `content` | The collapsible content area    | Content padding                    |
+| `icon`    | The expand/collapse icon        | Icon color, size                   |
+
+### Navigation
+
+#### `hx-top-nav`
+
+| Part            | Element                               | Typical use                       |
+| --------------- | ------------------------------------- | --------------------------------- |
+| `header`        | The outer `<header>` landmark element | Header background, border, height |
+| `nav`           | The `<nav>` element inside the header | Nav layout                        |
+| `logo`          | The logo slot container               | Logo sizing, spacing              |
+| `menu`          | The primary navigation slot container | Menu alignment                    |
+| `actions`       | The actions slot container            | Actions alignment                 |
+| `mobile-toggle` | The hamburger toggle button           | Toggle button appearance          |
+
+#### `hx-side-nav`
+
+| Part     | Element                           | Typical use              |
+| -------- | --------------------------------- | ------------------------ |
+| `nav`    | The outer `<nav>` element         | Nav width, background    |
+| `header` | The header section                | Header padding           |
+| `body`   | The scrollable body section       | Body scrolling, padding  |
+| `footer` | The footer section                | Footer padding           |
+| `toggle` | The collapse/expand toggle button | Toggle button appearance |
+
+#### `hx-nav-item` (within `hx-side-nav`)
+
+| Part       | Element                      | Typical use                     |
+| ---------- | ---------------------------- | ------------------------------- |
+| `item`     | The outer item container     | Item layout                     |
+| `link`     | The anchor or button element | Link padding, background, color |
+| `icon`     | The icon container           | Icon sizing                     |
+| `label`    | The label container          | Label typography                |
+| `badge`    | The badge container          | Badge positioning               |
+| `children` | The children container       | Nested item indentation         |
+
+#### `hx-tabs`
+
+| Part      | Element                             | Typical use                |
+| --------- | ----------------------------------- | -------------------------- |
+| `tablist` | The tablist container element       | Tab bar background, border |
+| `panels`  | The panel content container element | Panel padding, background  |
+
+#### `hx-tab`
+
+| Part     | Element                           | Typical use                           |
+| -------- | --------------------------------- | ------------------------------------- |
+| `tab`    | The underlying `<button>` element | Tab padding, typography, active state |
+| `prefix` | The prefix slot content container | Icon spacing                          |
+| `suffix` | The suffix slot content container | Badge spacing                         |
+
+### Data Display
+
+#### `hx-data-table`
+
+| Part        | Element                          | Typical use                     |
+| ----------- | -------------------------------- | ------------------------------- |
+| `table`     | The `<table>` element            | Table border-collapse, width    |
+| `thead`     | The `<thead>` element            | Header background               |
+| `tbody`     | The `<tbody>` element            | Body striping                   |
+| `tr`        | Each `<tr>` element              | Row hover, border               |
+| `th`        | Each `<th>` element              | Header cell typography, padding |
+| `td`        | Each `<td>` element              | Body cell padding               |
+| `sort-icon` | The sort indicator icon `<span>` | Sort indicator styling          |
+| `checkbox`  | Each `<input type="checkbox">`   | Row selection checkbox          |
+
+#### `hx-progress-bar`
+
+| Part    | Element                                | Typical use                             |
+| ------- | -------------------------------------- | --------------------------------------- |
+| `track` | The outer track container              | Track height, border-radius, background |
+| `fill`  | The filled portion indicating progress | Fill color, animation                   |
+| `label` | The label slot wrapper                 | Label typography                        |
+
+#### `hx-alert`
+
+| Part           | Element                      | Typical use                             |
+| -------------- | ---------------------------- | --------------------------------------- |
+| `alert`        | The outer alert container    | Alert background, border, border-radius |
+| `icon`         | The icon container           | Icon color, size                        |
+| `title`        | The title/headline container | Title typography                        |
+| `message`      | The message content area     | Message typography                      |
+| `close-button` | The dismiss button           | Close button appearance                 |
+| `actions`      | The actions container        | Actions layout                          |
+
+#### `hx-badge`
+
+| Part            | Element                   | Typical use                      |
+| --------------- | ------------------------- | -------------------------------- |
+| `badge`         | The badge element         | Badge shape, padding, typography |
+| `remove-button` | The remove/dismiss button | Remove button sizing             |
+
+#### `hx-tooltip`
+
+| Part      | Element                       | Typical use                                |
+| --------- | ----------------------------- | ------------------------------------------ |
+| `tooltip` | The tooltip container element | Tooltip background, padding, border-radius |
+| `arrow`   | The arrow indicator element   | Arrow color, size                          |
+
+#### `hx-avatar`
+
+| Part            | Element                     | Typical use                |
+| --------------- | --------------------------- | -------------------------- |
+| `avatar`        | The outer container element | Avatar size, shape         |
+| `image`         | The `<img>` element         | Image object-fit           |
+| `initials`      | The initials text span      | Initials typography, color |
+| `fallback-icon` | The SVG person silhouette   | Fallback icon styling      |
+| `badge`         | The badge slot container    | Badge positioning          |
+
+---
+
+## Compound Selector Patterns
+
+`::part()` composes with other CSS selectors to target interaction states, attribute conditions, and component variants.
+
+### Attribute + Part
+
+Scope a part override to a specific component variant using attribute selectors on the host element:
+
+```css
+/* Only affects danger variant buttons */
+hx-button[variant='danger']::part(button) {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* Only affects disabled text inputs */
+hx-text-input[disabled]::part(input-wrapper) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Only affects compact cards */
+hx-card[variant='compact']::part(body) {
+  padding: var(--hx-space-3);
+}
+```
+
+### Part + Pseudo-class (Interaction States)
+
+Combine `::part()` with pseudo-classes to style hover, focus, and active states:
+
+```css
+/* Hover state on the inner button element */
+hx-button::part(button):hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Focus-visible on the native input — preserves keyboard accessibility */
+hx-text-input::part(input):focus-visible {
+  outline: 3px solid var(--hx-input-focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Active state for tactile feedback */
+hx-button::part(button):active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Tab selection state */
+hx-tab::part(tab):where([aria-selected='true']) {
+  border-bottom: 3px solid var(--hx-color-primary-500);
+}
+```
+
+### Context Selector + Part
+
+Scope part overrides to a page region using a context class on an ancestor:
+
+```css
+/* Clinical vitals panel: larger, bolder badges */
+.patient-vitals-panel hx-badge::part(badge) {
+  font-size: 1rem;
+  font-weight: 700;
+  padding: var(--hx-space-1) var(--hx-space-3);
+}
+
+/* High-contrast mode for ICU displays */
+.high-contrast hx-button::part(button) {
+  border: 2px solid currentColor;
+  font-weight: 700;
+}
+
+/* Compact layout for data-dense views */
+.compact-mode hx-text-input::part(field) {
+  gap: var(--hx-space-1);
+}
+```
+
+### Host State + Part
+
+Use `:focus-within` and `:state()` on the host to reflect internal state externally:
+
+```css
+/* Style the wrapper when the input inside is focused */
+hx-text-input:focus-within::part(input-wrapper) {
+  border-color: var(--hx-color-primary-500);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Style the card when focused (interactive card pattern) */
+hx-card:focus-within::part(card) {
+  outline: 2px solid var(--hx-color-primary-500);
+  outline-offset: 2px;
+}
+```
+
+### `:has()` with Parts
+
+CSS `:has()` cannot reach inside shadow DOM — you cannot write `hx-text-input:has(input:invalid)`. However, `:has()` on the host works when the host reflects the relevant attribute:
+
+```css
+/* Works: hx-text-input reflects [disabled] to the host */
+hx-text-input:has(+ hx-help-text)::part(field) {
+  margin-bottom: 0;
+}
+
+/* The component also reflects error state via error property triggering re-render */
+/* Use the error attribute on the host element instead */
+hx-text-input[error]::part(input-wrapper) {
+  border-color: var(--hx-input-error-color);
+}
+```
+
+See [Limitations and Workarounds](#limitations-and-workarounds) for a full treatment.
+
+---
+
+## CSS Custom Properties and Parts Working Together
+
+The most powerful patterns combine both mechanisms: tokens for the baseline visual system, parts for structural or decorative changes that tokens cannot express.
+
+### Pattern: Token for Color, Part for Structure
+
+```css
+/* Token override: changes the color across all variants */
+hx-button {
+  --hx-button-bg: var(--hx-color-brand-primary);
+}
+
+/* Part override: adds structural decoration the token system cannot */
+hx-button::part(button) {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 0; /* Clinical UI often uses square corners */
+}
+```
+
+### Pattern: Token for Theme, Part for Interaction
+
+```css
+/* Set the base theme via tokens */
+hx-text-input {
+  --hx-input-border-color: var(--hx-color-neutral-400);
+  --hx-input-focus-ring-color: var(--hx-color-brand-primary);
+}
+
+/* Add interaction effects via parts */
+hx-text-input::part(input-wrapper) {
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+hx-text-input:focus-within::part(input-wrapper) {
+  border-color: var(--hx-color-brand-primary);
+  box-shadow: 0 0 0 3px rgba(0, 94, 184, 0.15); /* NHS brand blue focus ring */
+}
+```
+
+### Pattern: Both on the Same Element
+
+```css
+/* Tokens drive the color system */
+hx-card {
+  --hx-card-bg: var(--hx-color-surface-elevated);
+  --hx-card-border-color: transparent;
+}
+
+/* Part adds the shadow (not expressible as a single token) */
+hx-card::part(card) {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 200ms ease;
+}
+
+hx-card:hover::part(card) {
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+}
+```
+
+---
+
+## Real-World Recipes
+
+### Recipe 1: Custom Hover Gradient on `hx-button`
+
+A branded primary button with a gradient background and smooth hover lift — common for call-to-action buttons in patient portals.
+
+```css
+/* Brand gradient button */
+hx-button[variant='primary']::part(button) {
+  background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+  border: none;
+  transition:
+    opacity 200ms ease,
+    transform 150ms ease,
+    box-shadow 200ms ease;
+}
+
+hx-button[variant='primary']::part(button):hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+}
+
+hx-button[variant='primary']::part(button):active {
+  opacity: 1;
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Ensure focus ring remains visible over the gradient */
+hx-button[variant='primary']::part(button):focus-visible {
+  outline: 3px solid #7c3aed;
+  outline-offset: 3px;
+}
+
+/* Loading state: maintain gradient but show spinner clearly */
+hx-button[loading]::part(spinner) {
+  color: rgba(255, 255, 255, 0.9);
+}
+```
+
+**Accessibility note**: The `:focus-visible` rule is required. The default focus ring from the token system may not have sufficient contrast against a dark gradient. Always verify contrast with your specific colors.
+
+### Recipe 2: Elevated Input Focus Pattern
+
+A more pronounced focus treatment for clinical forms where accurate data entry is critical.
+
+```css
+/* Smooth border and shadow transition */
+hx-text-input::part(input-wrapper) {
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+/* Strong focus ring for clinical accuracy */
+hx-text-input:focus-within::part(input-wrapper) {
+  border-color: var(--hx-color-primary-500);
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Error state: override to red focus ring when invalid */
+hx-text-input[error]:focus-within::part(input-wrapper) {
+  border-color: var(--hx-input-error-color);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+/* Required field indicator styling */
+hx-text-input[required]::part(label) {
+  font-weight: 600;
+}
+```
+
+### Recipe 3: Card Hover Elevation for Interactive Cards
+
+Patient summary cards in a list that lift on hover to indicate interactivity.
+
+```css
+/* Base: minimal shadow */
+hx-card[hx-href]::part(card) {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease;
+  cursor: pointer;
+}
+
+/* Hover: elevation lift */
+hx-card[hx-href]:hover::part(card) {
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Focus: visible ring for keyboard navigation */
+hx-card[hx-href]:focus-within::part(card) {
+  outline: 3px solid var(--hx-color-primary-500);
+  outline-offset: 2px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Active: depress on click */
+hx-card[hx-href]:active::part(card) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+```
+
+### Recipe 4: Status-Aware Alert Styling
+
+Enhanced alerts for a medication management interface with custom left-border treatment.
+
+```css
+/* Base: add left border accent for all alerts */
+hx-alert::part(alert) {
+  border-left: 4px solid transparent;
+  border-radius: 0 var(--hx-border-radius-md) var(--hx-border-radius-md) 0;
+}
+
+/* Variant-specific border colors via host attribute */
+hx-alert[variant='info']::part(alert) {
+  border-left-color: var(--hx-color-info-500);
+}
+
+hx-alert[variant='success']::part(alert) {
+  border-left-color: var(--hx-color-success-500);
+}
+
+hx-alert[variant='warning']::part(alert) {
+  border-left-color: var(--hx-color-warning-500);
+}
+
+hx-alert[variant='danger']::part(alert) {
+  border-left-color: var(--hx-color-error-500);
+}
+
+/* Clinical urgency: larger title for critical alerts */
+hx-alert[variant='danger']::part(title) {
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+```
+
+### Recipe 5: Branded Navigation Header
+
+An `hx-top-nav` styled for a healthcare brand with a dark header and logo area.
+
+```css
+/* Dark header background */
+hx-top-nav::part(header) {
+  background: var(--hx-color-neutral-900);
+  border-bottom: 1px solid var(--hx-color-neutral-700);
+  color: var(--hx-color-neutral-0);
+}
+
+/* Logo area: fixed width for visual stability */
+hx-top-nav::part(logo) {
+  min-width: 160px;
+}
+
+/* Mobile toggle: white icon on dark background */
+hx-top-nav::part(mobile-toggle) {
+  color: var(--hx-color-neutral-0);
+}
+hx-top-nav::part(mobile-toggle):hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+```
+
+### Recipe 6: Slotted Content Alongside Parts
+
+`::slotted()` styles projected light DOM content — it works at the component boundary, complementing `::part()` which styles shadow DOM internals.
+
+```css
+/*
+ * ::slotted() applies to elements placed in slots (light DOM).
+ * ::part() applies to elements inside the shadow DOM.
+ * They work at different levels of the DOM tree.
+ */
+
+/* Style slotted heading content in hx-card */
+hx-card::slotted([slot='heading']) {
+  font-size: var(--hx-font-size-lg);
+  font-weight: var(--hx-font-weight-semibold);
+  color: var(--hx-color-neutral-900);
+  margin: 0;
+}
+
+/* Style slotted action buttons */
+hx-card::slotted([slot='actions'] hx-button) {
+  /* Note: this only works one level deep — ::slotted() cannot reach
+     into a nested component's shadow DOM */
+}
+
+/* Combine: style the hx-card part container AND slotted content */
+hx-card::part(heading) {
+  padding-bottom: var(--hx-space-2);
+  border-bottom: 1px solid var(--hx-color-neutral-100);
+}
+
+hx-card::slotted([slot='heading']) {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+```
+
+**Important**: `::slotted()` only selects the top-level slotted element — it cannot select descendants of slotted content. For deeper targeting, pass styles via CSS custom properties on the slotted element.
+
+---
+
+## Limitations and Workarounds
+
+Understanding `::part()` limitations prevents architectural dead-ends before you encounter them.
+
+### Limitation 1: No Descendant Selectors
+
+You cannot write `hx-button::part(button) span` or `hx-button::part(button) > .icon`. The `::part()` pseudo-element matches the part element itself only — no descendants.
+
+**Why**: The shadow boundary is still in effect after `::part()`. You are styling one element, not unlocking the entire shadow subtree.
+
+**Workarounds**:
+
+```css
+/* DOES NOT WORK — no descendant selector after ::part() */
+hx-button::part(button) span {
+  color: red;
+}
+
+/* WORKS — component exposes a separate part for inner elements */
+hx-button::part(label) {
+  color: red;
+}
+
+/* WORKS — if no part exists, request one via a GitHub issue,
+   or use a CSS custom property if the component exposes one */
+hx-button {
+  --hx-button-color: red;
+}
+```
+
+If you find yourself needing to style an element inside a part that has no exposed part of its own, file an issue requesting that the component author expose a new named part.
+
+### Limitation 2: No Pseudo-Elements on Parts
+
+You cannot apply `::before` or `::after` to a `::part()` target. The CSS specification explicitly prohibits this.
+
+```css
+/* DOES NOT WORK */
+hx-button::part(button)::before {
+  content: '→ ';
+}
+
+/* WORKAROUNDS: */
+
+/* Option A: Use the prefix slot for content injection */
+/* HTML: <hx-button><span slot="prefix">→</span>Submit</hx-button> */
+
+/* Option B: Use a CSS custom property if the component supports it */
+
+/* Option C: Wrap in a container and style the container */
+.my-button-wrapper {
+  position: relative;
+}
+.my-button-wrapper::before {
+  content: '→ ';
+  position: absolute;
+  left: -1.5em;
+}
+```
+
+### Limitation 3: `:has()` Cannot Reach Inside Shadow DOM
+
+The CSS `:has()` pseudo-class cannot select based on elements inside a shadow root:
+
+```css
+/* DOES NOT WORK — can't query shadow internals */
+hx-text-input:has(input:invalid)::part(input-wrapper) {
+  border-color: red;
+}
+
+/* WORKS — the component reflects its error state to the host */
+/* Set the error attribute or property on the host element */
+hx-text-input[error]::part(input-wrapper) {
+  border-color: var(--hx-input-error-color);
+}
+
+/* WORKS — use :focus-within which fires on the host */
+hx-text-input:focus-within::part(input-wrapper) {
+  border-color: var(--hx-color-primary-500);
+}
+```
+
+HELiX components reflect relevant states as host attributes (e.g., `[disabled]`, `[required]`, `[error]` via re-render, `[loading]`) specifically to enable this workaround pattern.
+
+### Limitation 4: Dynamic Part Names Are Not Supported
+
+CSS `::part()` requires static, known part names at authoring time. You cannot generate part names dynamically in CSS.
+
+```css
+/* DOES NOT WORK */
+hx-button::part(var(--dynamic-part-name)) {
+}
+```
+
+This is a fundamental constraint of the specification. Design your part selectors statically.
+
+### Limitation 5: `exportparts` Required for Nested Custom Elements
+
+If you build a wrapper component that uses HELiX components internally, the inner component's parts are not automatically reachable from outside your wrapper's shadow DOM.
+
+```typescript
+// my-clinical-button wraps hx-button internally
+// From outside my-clinical-button, ::part(button) does NOT reach
+// hx-button's inner button part
+
+// Solution: use exportparts in the wrapper's template
+// <hx-button exportparts="button, label, prefix, suffix"></hx-button>
+```
+
+When building wrapper components, use `exportparts` to forward the parts you want consumers to be able to style.
+
+---
+
+## Browser Compatibility
+
+CSS Shadow Parts (`::part()`) has broad support across all modern browsers:
+
+| Browser           | Support      | Version |
+| ----------------- | ------------ | ------- |
+| Chrome / Chromium | Full support | 73+     |
+| Edge (Chromium)   | Full support | 79+     |
+| Firefox           | Full support | 72+     |
+| Safari / WebKit   | Full support | 13.1+   |
+| Samsung Internet  | Full support | 10.1+   |
+
+For the HELiX minimum browser baseline (Chrome 90+, Firefox 90+, Safari 14+), `::part()` can be used without any polyfill or fallback.
+
+**Note on `:has()` compatibility**: CSS `:has()` used on the host element (not inside `::part()`) requires Chrome 105+, Firefox 121+, Safari 15.4+. For healthcare deployments targeting older browser versions, test `:has()` selectors with your actual browser matrix before committing to them in production.
+
+---
+
+## References
+
+- [CSS Shadow Parts specification (W3C)](https://www.w3.org/TR/css-shadow-parts-1/)
+- [Using CSS shadow parts (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+- [Custom Elements Manifest — HELiX CEM](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/custom-elements.json)
+- [Extending HELiX Components — Overview](/extending/)
+- [Theming Quick Start — CSS custom properties](/extending/theming-quick-start/)
+- [CSS `:has()` browser support (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/:has)
+- [Using shadow DOM (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM)

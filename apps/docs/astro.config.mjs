@@ -690,6 +690,11 @@ export default defineConfig({
             { label: 'Overview', slug: 'extending' },
             { label: 'Theming Quick Start', slug: 'extending/theming-quick-start' },
             { label: 'PatientCard Example', slug: 'extending/patient-card' },
+            {
+              label: 'Styling with CSS Parts',
+              slug: 'extending/style-components-with-css-parts',
+              badge: { text: 'Deep Dive', variant: 'tip' },
+            },
           ],
         },
         {
