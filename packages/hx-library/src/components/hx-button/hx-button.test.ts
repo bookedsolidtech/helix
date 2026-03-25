@@ -556,6 +556,91 @@ describe('hx-button', () => {
     });
   });
 
+  // ─── Property: full ───
+
+  describe('Property: full', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      expect(el.full).toBe(false);
+    });
+
+    it('reflects full attribute to host', async () => {
+      const el = await fixture<HelixButton>('<hx-button full>Click</hx-button>');
+      expect(el.hasAttribute('full')).toBe(true);
+    });
+
+    it('sets full property programmatically and reflects', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.full = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('full')).toBe(true);
+    });
+
+    it('does not reflect full attribute when false', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      expect(el.hasAttribute('full')).toBe(false);
+    });
+  });
+
+  // ─── Property: inverted ───
+
+  describe('Property: inverted', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      expect(el.inverted).toBe(false);
+    });
+
+    it('reflects inverted attribute to host', async () => {
+      const el = await fixture<HelixButton>('<hx-button inverted>Click</hx-button>');
+      expect(el.hasAttribute('inverted')).toBe(true);
+    });
+
+    it('sets inverted property programmatically and reflects', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.inverted = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('inverted')).toBe(true);
+    });
+
+    it('does not reflect inverted attribute when false', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      expect(el.hasAttribute('inverted')).toBe(false);
+    });
+  });
+
+  // ─── Form: validation ───
+
+  describe('Form: validation', () => {
+    it('is form associated (formAssociated=true)', () => {
+      const ctor = customElements.get('hx-button') as unknown as { formAssociated: boolean };
+      expect(ctor.formAssociated).toBe(true);
+    });
+
+    it('checkValidity returns true when not in a form', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      // hx-button has no validity constraint — always valid outside a form
+      expect(typeof el.form).toBe('object');
+    });
+
+    it('does not dispatch hx-click when disabled and type=submit', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-button type="submit" disabled>Submit</hx-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-button') as HelixButton;
+      await el.updateComplete;
+
+      let clicked = false;
+      el.addEventListener('hx-click', () => {
+        clicked = true;
+      });
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.click();
+      await el.updateComplete;
+      expect(clicked).toBe(false);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

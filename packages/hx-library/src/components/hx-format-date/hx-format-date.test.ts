@@ -357,4 +357,59 @@ describe('hx-format-date', () => {
       expect(violations).toHaveLength(0);
     });
   });
+
+  // ─── Property: timeZone ───
+
+  describe('Property: timeZone', () => {
+    it('defaults to undefined', async () => {
+      const el = await fixture<HxFormatDate>('<hx-format-date></hx-format-date>');
+      expect(el.timeZone).toBeUndefined();
+    });
+
+    it('accepts timeZone attribute', async () => {
+      const el = await fixture<HxFormatDate>(
+        '<hx-format-date date="2024-06-15" time-zone="America/New_York"></hx-format-date>',
+      );
+      expect(el.timeZone).toBe('America/New_York');
+    });
+  });
+
+  // ─── Property: timeZoneName ───
+
+  describe('Property: timeZoneName', () => {
+    it('defaults to undefined', async () => {
+      const el = await fixture<HxFormatDate>('<hx-format-date></hx-format-date>');
+      expect(el.timeZoneName).toBeUndefined();
+    });
+
+    it('accepts timeZoneName attribute', async () => {
+      const el = await fixture<HxFormatDate>(
+        '<hx-format-date date="2024-06-15" time-zone-name="short"></hx-format-date>',
+      );
+      expect(el.timeZoneName).toBe('short');
+    });
+  });
+
+  // ─── Property: hourFormat ───
+
+  describe('Property: hourFormat', () => {
+    it('defaults to "auto"', async () => {
+      const el = await fixture<HxFormatDate>('<hx-format-date></hx-format-date>');
+      expect(el.hourFormat).toBe('auto');
+    });
+
+    it('accepts hourFormat="12"', async () => {
+      const el = await fixture<HxFormatDate>(
+        '<hx-format-date hour-format="12"></hx-format-date>',
+      );
+      expect(el.hourFormat).toBe('12');
+    });
+
+    it('accepts hourFormat="24"', async () => {
+      const el = await fixture<HxFormatDate>(
+        '<hx-format-date hour-format="24"></hx-format-date>',
+      );
+      expect(el.hourFormat).toBe('24');
+    });
+  });
 });

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
+import { fixture, shadowQuery, shadowQueryAll, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixProgressBar } from './hx-progress-bar.js';
 import './index.js';
 
@@ -347,6 +347,52 @@ describe('hx-progress-bar', () => {
         expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── Property: description ───
+
+  describe('Property: description', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar label="Loading"></hx-progress-bar>');
+      expect(el.description).toBe('');
+    });
+
+    it('accepts description attribute', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Loading" description="Uploading patient records"></hx-progress-bar>',
+      );
+      expect(el.description).toBe('Uploading patient records');
+    });
+
+    it('renders sr-only description span with correct text when description is set', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Loading" description="Step 1 of 3"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      // The description span has an ID and class="sr-only" — target it by its unique id prefix
+      const descSpans = shadowQueryAll(el, '.sr-only');
+      const descSpan = descSpans.find((s) => s.textContent?.trim() === 'Step 1 of 3');
+      expect(descSpan).toBeTruthy();
+    });
+
+    it('does not render description sr-only span when description is empty', async () => {
+      const el = await fixture<HelixProgressBar>('<hx-progress-bar label="Loading"></hx-progress-bar>');
+      await el.updateComplete;
+      // Only the aria-live sr-only div exists; the description-specific span should not exist
+      const descSpans = shadowQueryAll(el, '.sr-only');
+      const descTextSpan = descSpans.find((s) => s.tagName === 'SPAN' && s.id.includes('desc'));
+      expect(descTextSpan).toBeUndefined();
+    });
+
+    it('links description via aria-describedby on the track', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Loading" description="Processing"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]');
+      const describedBy = track?.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
     });
   });
 });

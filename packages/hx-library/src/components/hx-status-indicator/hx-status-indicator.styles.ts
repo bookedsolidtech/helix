@@ -65,11 +65,11 @@ export const helixStatusIndicatorStyles = css`
   /* ─── Size Variants ─── */
 
   :host([size='sm']) {
-    --_indicator-size: var(--hx-status-indicator-size-sm, var(--hx-size-2));
+    --_indicator-size: var(--hx-status-indicator-size-sm, var(--hx-space-2, 0.5rem));
   }
 
   :host([size='md']) {
-    --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-size-3));
+    --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-space-3, 0.75rem));
   }
 
   :host([size='lg']) {
@@ -91,7 +91,7 @@ export const helixStatusIndicatorStyles = css`
   }
 
   :host([status='busy']) {
-    --_dot-color: var(--hx-status-indicator-color-busy, var(--hx-color-danger-500));
+    --_dot-color: var(--hx-status-indicator-color-busy, var(--hx-color-error-500));
   }
 
   :host([status='unknown']) {

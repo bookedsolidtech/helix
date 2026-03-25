@@ -592,4 +592,20 @@ describe('hx-switch', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: requiredMessage ───
+
+  describe('Property: requiredMessage', () => {
+    it('defaults to "This field is required."', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Accept terms"></hx-switch>');
+      expect(el.requiredMessage).toBe('This field is required.');
+    });
+
+    it('accepts custom requiredMessage', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Accept terms" required required-message="You must accept terms."></hx-switch>',
+      );
+      expect(el.requiredMessage).toBe('You must accept terms.');
+    });
+  });
 });

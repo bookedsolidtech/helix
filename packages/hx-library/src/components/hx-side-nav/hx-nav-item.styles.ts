@@ -180,7 +180,7 @@ export const helixNavItemStyles = css`
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--hx-transition-fast, 150ms) ease;
-    z-index: var(--hx-z-index-tooltip, 100);
+    z-index: var(--hx-z-index-tooltip, 1600);
     box-shadow: var(--hx-shadow-md, 0 2px 8px rgb(0 0 0 / 0.2));
   }
 

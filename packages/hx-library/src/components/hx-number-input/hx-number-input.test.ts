@@ -1051,5 +1051,63 @@ describe('hx-number-input', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, '[part="increment"]');
       expect(btn?.getAttribute('aria-label')).toBe('Augmenter');
     });
+
+    it('decrementLabel defaults to "Decrement"', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      expect(el.decrementLabel).toBe('Decrement');
+    });
+
+    it('decrement button aria-label reflects custom decrementLabel', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      el.decrementLabel = 'Diminuer';
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="decrement"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Diminuer');
+    });
+  });
+
+  // ─── Property: noStepper ───
+
+  describe('Property: noStepper', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      expect(el.noStepper).toBe(false);
+    });
+
+    it('hides increment/decrement buttons when noStepper=true', async () => {
+      const el = await fixture<HelixNumberInput>(
+        '<hx-number-input label="Qty" no-stepper></hx-number-input>',
+      );
+      await el.updateComplete;
+      const incBtn = shadowQuery(el, '[part="increment"]');
+      const decBtn = shadowQuery(el, '[part="decrement"]');
+      expect(incBtn).toBeNull();
+      expect(decBtn).toBeNull();
+    });
+
+    it('shows increment/decrement buttons by default', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      await el.updateComplete;
+      const incBtn = shadowQuery(el, '[part="increment"]');
+      const decBtn = shadowQuery(el, '[part="decrement"]');
+      expect(incBtn).toBeTruthy();
+      expect(decBtn).toBeTruthy();
+    });
+  });
+
+  // ─── Property: requiredMessage ───
+
+  describe('Property: requiredMessage', () => {
+    it('defaults to "This field is required."', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      expect(el.requiredMessage).toBe('This field is required.');
+    });
+
+    it('accepts custom requiredMessage', async () => {
+      const el = await fixture<HelixNumberInput>(
+        '<hx-number-input label="Qty" required required-message="Enter a quantity."></hx-number-input>',
+      );
+      expect(el.requiredMessage).toBe('Enter a quantity.');
+    });
   });
 });
