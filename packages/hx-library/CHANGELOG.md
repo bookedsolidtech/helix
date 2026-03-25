@@ -1,5 +1,11 @@
 # @helixui/library
 
+## 1.1.2
+
+### Patch Changes
+
+- 23af064: update docs homepage with helixir banner and accurate component stats
+
 ## 1.1.1
 
 ### Patch Changes

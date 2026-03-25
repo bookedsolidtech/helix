@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
@@ -180,9 +180,9 @@ export class HelixTabs extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    if (changedProperties.has('_activePanel')) {
+    if ((changedProperties as Map<PropertyKey, unknown>).has('_activePanel')) {
       this._updateTabsAndPanels();
     }
   }

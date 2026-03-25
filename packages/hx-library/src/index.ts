@@ -96,6 +96,7 @@ export { HelixStatusIndicator, type StatusIndicatorStatus, type StatusIndicatorS
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
 export { HelixStructuredList, HelixStructuredListRow } from './components/hx-structured-list/index.js';
+export { HxStyleScope } from './components/hx-style-scope/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export type { HxSwitch, WcSwitch } from './components/hx-switch/index.js';
 export { HelixTable } from './components/hx-table/index.js';
