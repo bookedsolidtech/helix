@@ -17,6 +17,8 @@ import { validateIntegration } from './tools/validate-integration.js';
 import { scaffoldTheme } from './tools/scaffold-theme.js';
 import { auditTokens, formatAuditReport } from './tools/audit-tokens.js';
 import { scaffoldComponent } from './tools/scaffold-component.js';
+import { generateTests } from './tools/generate-tests.js';
+import { generateDocs } from './tools/generate-docs.js';
 
 // ─── Input schemas ─────────────────────────────────────────────────────────────
 
@@ -120,6 +122,24 @@ const AuditTokensArgsSchema = z.object({
     .min(1)
     .describe(
       'Path to a CSS file or project root directory to scan for --hx-* custom property declarations.',
+    ),
+});
+
+const GenerateTestsArgsSchema = z.object({
+  componentPath: z
+    .string()
+    .min(1)
+    .describe(
+      'Absolute or relative path to the component .ts file, e.g. packages/hx-library/src/components/hx-button/hx-button.ts',
+    ),
+});
+
+const GenerateDocsArgsSchema = z.object({
+  componentPath: z
+    .string()
+    .min(1)
+    .describe(
+      'Absolute or relative path to the component .ts file, e.g. packages/hx-library/src/components/hx-button/hx-button.ts',
     ),
 });
 
@@ -346,6 +366,38 @@ const TOOL_DEFINITIONS = [
       required: ['path'],
     },
   },
+  {
+    name: 'generateTests',
+    description:
+      'Generate a Vitest browser-mode test file for a HELiX component. Reads the CEM manifest (or falls back to TypeScript source parsing) to enumerate public properties, events, slots, and CSS parts, then produces test blocks for: rendering, each property, events, slots, CSS parts, keyboard navigation, and accessibility (axe-core). The generated file is co-located with the component at hx-{name}.test.ts.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        componentPath: {
+          type: 'string',
+          description:
+            'Absolute or relative path to the component .ts file, e.g. packages/hx-library/src/components/hx-button/hx-button.ts',
+        },
+      },
+      required: ['componentPath'],
+    },
+  },
+  {
+    name: 'generateDocs',
+    description:
+      'Generate a Storybook story file and a Drupal Twig template for a HELiX component. Reads the CEM manifest (or falls back to TypeScript source parsing) to enumerate properties, events, slots, CSS parts, and CSS custom properties, then produces: a .stories.ts file with Meta, Default story, per-enum variant stories, boolean state stories, interaction play functions, and a CSS parts demo; plus a .twig template with a parameter documentation header block. Both files are co-located with the component.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        componentPath: {
+          type: 'string',
+          description:
+            'Absolute or relative path to the component .ts file, e.g. packages/hx-library/src/components/hx-button/hx-button.ts',
+        },
+      },
+      required: ['componentPath'],
+    },
+  },
 ] as const;
 
 // ─── Response helpers ──────────────────────────────────────────────────────────
@@ -476,6 +528,47 @@ export function registerTools(server: Server): void {
           if (!parsed.success) return failure(parsed.error.message);
           const report = auditTokens({ path: parsed.data.path });
           return success(formatAuditReport(report));
+        }
+
+        case 'generateTests': {
+          const parsed = GenerateTestsArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const result = generateTests({ componentPath: parsed.data.componentPath });
+          const lines: string[] = [
+            `Generated test file for ${result.tagName} (${result.className})`,
+            `Output path: ${result.testFilePath}`,
+            '',
+            '```typescript',
+            result.testContent,
+            '```',
+            ...(result.warnings.length > 0
+              ? ['', 'Warnings:', ...result.warnings.map((w) => `  ! ${w}`)]
+              : []),
+          ];
+          return success(lines.join('\n'));
+        }
+
+        case 'generateDocs': {
+          const parsed = GenerateDocsArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const result = generateDocs({ componentPath: parsed.data.componentPath });
+          const lines: string[] = [
+            `Generated docs for ${result.tagName} (${result.className})`,
+            `Stories path: ${result.storiesFilePath}`,
+            `Twig path:    ${result.twigFilePath}`,
+            '',
+            '--- stories ---',
+            '',
+            result.storiesContent,
+            '',
+            '--- twig ---',
+            '',
+            result.twigContent,
+            ...(result.warnings.length > 0
+              ? ['', 'Warnings:', ...result.warnings.map((w) => `  ! ${w}`)]
+              : []),
+          ];
+          return success(lines.join('\n'));
         }
 
         default:
