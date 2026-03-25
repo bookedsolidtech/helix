@@ -44,7 +44,7 @@ export const HxRating = createComponent({
   react: React,
   events: {
     onHxChange: 'hx-change',
-    onHxHover: 'hx-hover',
+    onHxHover: 'hx-hover'
   },
   displayName: 'HxRating',
 });
