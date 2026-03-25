@@ -710,6 +710,90 @@ describe('hx-accordion-item', () => {
     });
   });
 
+  // ─── Dynamic Item Add / Remove ───
+
+  describe('Dynamic Item Add / Remove', () => {
+    it('newly appended accordion-item can be expanded', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+
+      const newItem = document.createElement('hx-accordion-item') as HelixAccordionItem;
+      const trigger = document.createElement('span');
+      trigger.slot = 'trigger';
+      trigger.textContent = 'Item 2';
+      newItem.appendChild(trigger);
+      const content = document.createElement('p');
+      content.textContent = 'Content 2';
+      newItem.appendChild(content);
+      el.appendChild(newItem);
+
+      await el.updateComplete;
+      await newItem.updateComplete;
+
+      const summary = shadowQuery<HTMLElement>(newItem, 'summary')!;
+      summary.click();
+      await newItem.updateComplete;
+      expect(newItem.expanded).toBe(true);
+    });
+
+    it('in single mode, expanding a new item collapses the previously expanded item', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+
+      const newItem = document.createElement('hx-accordion-item') as HelixAccordionItem;
+      const trigger = document.createElement('span');
+      trigger.slot = 'trigger';
+      trigger.textContent = 'Item 2';
+      newItem.appendChild(trigger);
+      el.appendChild(newItem);
+
+      await el.updateComplete;
+      await newItem.updateComplete;
+
+      const existingItem = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      const summary = shadowQuery<HTMLElement>(newItem, 'summary')!;
+      summary.click();
+      await newItem.updateComplete;
+      await existingItem.updateComplete;
+
+      expect(newItem.expanded).toBe(true);
+      expect(existingItem.expanded).toBe(false);
+    });
+
+    it('removing all items leaves an empty accordion without errors', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span>
+            <p>Content 1</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      el.removeChild(item);
+      await el.updateComplete;
+
+      const slot = shadowQuery<HTMLSlotElement>(el, 'slot')!;
+      expect(slot.assignedElements().length).toBe(0);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   // See accordion-level comment for aria-allowed-role exclusion rationale.

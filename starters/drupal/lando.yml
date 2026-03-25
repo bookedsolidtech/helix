@@ -1,0 +1,25 @@
+name: helix-drupal
+recipe: drupal10
+config:
+  php: '8.2'
+  webroot: web
+  database: mariadb:10.6
+  drush: true
+  xdebug: false
+
+services:
+  node:
+    type: node:18
+    build:
+      - npm install
+
+tooling:
+  drush:
+    service: appserver
+  phpunit:
+    service: appserver
+    cmd: vendor/bin/phpunit
+
+proxy:
+  appserver:
+    - helix-drupal.lndo.site
