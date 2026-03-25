@@ -34,6 +34,10 @@ export interface HxSelectProps {
   ariaLabel?: string | null;
   /** Controls whether the dropdown listbox is open. */
   open?: boolean;
+  /** Validation message when no option is selected. Override for i18n. */
+  labelRequired?: string;
+  /** Label shown when no options are available. Override for i18n. */
+  labelNoOptions?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */
