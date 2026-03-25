@@ -275,6 +275,16 @@ export class HelixNumberInput extends LitElement {
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
+    if (changedProperties.has('value')) {
+      if (this.value !== null && isNaN(this.value)) {
+        devWarn(
+          'hx-number-input',
+          'Received NaN as value. Resetting to null to prevent "NaN" from rendering in the input.',
+        );
+        this.value = null;
+        return;
+      }
+    }
     if (
       changedProperties.has('value') ||
       changedProperties.has('required') ||
