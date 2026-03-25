@@ -18,6 +18,11 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-alert": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-avatar": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
@@ -28,8 +33,28 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-banner": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-breadcrumb": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-button": {
       "reason": "Coverage below 80% threshold (64% lines, 50% branches). Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-button-group": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-card": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -38,8 +63,18 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-checkbox": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-checkbox-group": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-clinical-status": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -50,6 +85,11 @@
     },
     "hx-combobox": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-container": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -65,6 +105,11 @@
     },
     "hx-date-picker": {
       "reason": "Calendar grid keyboard navigation and locale-specific edge cases require extended test coverage work.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-dialog": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -153,8 +198,18 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-number-input": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-overflow-menu": {
       "reason": "Branches slightly below 80% threshold (79%). Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-pagination": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -198,8 +253,23 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-select": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-side-nav": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-skeleton": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-slider": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -223,8 +293,18 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-stat": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-status-indicator": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-steps": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -243,6 +323,11 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-table": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-tabs": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
@@ -255,6 +340,11 @@
     },
     "hx-text": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-textarea": {
+      "reason": "SSR browser API guards added — coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
