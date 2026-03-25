@@ -80,6 +80,15 @@ export class HelixCounter extends LitElement {
   @property({ type: String, reflect: true, attribute: 'hx-size' })
   size: CounterSize = 'md';
 
+  /**
+   * Accessible label describing the counter's context (e.g. "Total patients", "Active alerts").
+   * WCAG 4.1.2: a numeric value alone is meaningless without context for screen readers.
+   * When provided, the value is applied as aria-label on the counter element.
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
+
   // ─── Internal State ───
 
   /** @internal */
@@ -238,7 +247,13 @@ export class HelixCounter extends LitElement {
     };
 
     return html`
-      <span part="counter" class=${classMap(classes)}> ${this._formatValue()} </span>
+      <span
+        part="counter"
+        class=${classMap(classes)}
+        aria-label=${this.label ? `${this.label}: ${this._formatValue()}` : nothing}
+      >
+        ${this._formatValue()}
+      </span>
       <!--
         WCAG 4.1.2: off-screen live region updated only at animation end.
         Prevents screen readers from announcing every intermediate frame value.
