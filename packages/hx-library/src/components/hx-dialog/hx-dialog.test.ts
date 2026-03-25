@@ -676,4 +676,97 @@ describe('hx-dialog', () => {
       expect(el.labelClose).toBe('Fermer la boîte de dialogue');
     });
   });
+
+  // ─── ARIA label attribute (D10) ───
+
+  describe('ARIA label attribute (D10)', () => {
+    it('renders aria-label on native dialog when no heading is set', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open aria-label="Confirm Action"></hx-dialog>',
+      );
+      await el.updateComplete;
+      const nativeDialog = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      expect(nativeDialog?.getAttribute('aria-label')).toBe('Confirm Action');
+    });
+
+    it('falls back to "Dialog" aria-label when no heading or aria-label is set', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open></hx-dialog>');
+      await el.updateComplete;
+      const nativeDialog = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      expect(nativeDialog?.getAttribute('aria-label')).toBe('Dialog');
+    });
+
+    it('uses aria-labelledby when heading is set, not aria-label', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Patient Notes"></hx-dialog>',
+      );
+      await el.updateComplete;
+      const nativeDialog = shadowQuery<HTMLDialogElement>(el, 'dialog');
+      expect(nativeDialog?.hasAttribute('aria-labelledby')).toBe(true);
+      expect(nativeDialog?.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
+  // ─── Open/close guards ───
+
+  describe('Open/close guards', () => {
+    it('calling show() on an already-open dialog does not fire hx-open twice', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open></hx-dialog>');
+      await el.updateComplete;
+      let count = 0;
+      el.addEventListener('hx-open', () => count++);
+      el.show();
+      await el.updateComplete;
+      // Already open — show() sets open=true but since it's already true,
+      // the `updated` handler only triggers if the property actually changed.
+      expect(count).toBe(0);
+    });
+
+    it('calling close() on a closed dialog does not fire hx-close', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog></hx-dialog>');
+      await el.updateComplete;
+      let count = 0;
+      el.addEventListener('hx-close', () => count++);
+      el.close();
+      await el.updateComplete;
+      expect(count).toBe(0);
+    });
+
+    it('close(returnValue) stores the value and sets open to false', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog open heading="Test"></hx-dialog>');
+      await el.updateComplete;
+      el.close('ok');
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+      expect(el.returnValue).toBe('ok');
+    });
+  });
+
+  // ─── Label-close attribute ───
+
+  describe('label-close attribute', () => {
+    it('label-close attribute sets labelClose property', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog label-close="Dismiss dialog"><p>Content</p></hx-dialog>',
+      );
+      await el.updateComplete;
+      expect(el.labelClose).toBe('Dismiss dialog');
+    });
+  });
+
+  // ─── Variant reflects ───
+
+  describe('variant property reflects', () => {
+    it('variant reflects to attribute', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog variant="alertdialog"></hx-dialog>');
+      await el.updateComplete;
+      expect(el.getAttribute('variant')).toBe('alertdialog');
+    });
+
+    it('default variant is "dialog"', async () => {
+      const el = await fixture<HelixDialog>('<hx-dialog></hx-dialog>');
+      await el.updateComplete;
+      expect(el.variant).toBe('dialog');
+    });
+  });
 });

@@ -258,6 +258,15 @@ export class HelixSlider extends LitElement {
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
+    // Guard: min must be less than max
+    if (changedProperties.has('min') || changedProperties.has('max')) {
+      if (this.min >= this.max) {
+        devWarn(
+          'hx-slider',
+          `Invalid configuration: min (${this.min}) must be less than max (${this.max}). Slider behavior is undefined when min >= max.`,
+        );
+      }
+    }
     // Clamp value to [min, max] after any relevant property change
     if (
       changedProperties.has('value') ||

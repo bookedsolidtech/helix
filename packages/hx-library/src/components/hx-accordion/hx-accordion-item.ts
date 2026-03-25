@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 const chevronIcon = svg`
   <svg
@@ -83,6 +84,32 @@ export class HelixAccordionItem extends LitElement {
    */
   @property({ type: Number })
   level: 1 | 2 | 3 | 4 | 5 | 6 = 3;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (!this.closest('hx-accordion')) {
+      devWarn(
+        'hx-accordion-item',
+        'Used outside hx-accordion. Single-expand coordination will not function.',
+      );
+    }
+  }
+
+  // ─── Slot Handlers ───
+
+  /** @internal */
+  private _handleTriggerSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!hasContent) {
+      devWarn(
+        'hx-accordion-item',
+        'trigger slot is empty — provide a visible label for keyboard and screen reader users.',
+      );
+    }
+  }
 
   // ─── Heading Level Helper ───
 
@@ -167,7 +194,7 @@ export class HelixAccordionItem extends LitElement {
           @click=${this._handleSummaryClick}
           @keydown=${this._handleKeyDown}
         >
-          <slot name="trigger"></slot>
+          <slot name="trigger" @slotchange=${this._handleTriggerSlotChange}></slot>
           <span part="icon" class="icon">${chevronIcon}</span>
         </summary>
         <div class="content-wrapper">

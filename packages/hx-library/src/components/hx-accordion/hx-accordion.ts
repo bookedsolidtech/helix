@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
@@ -43,20 +43,56 @@ export class HelixAccordion extends LitElement {
 
   // ─── Lifecycle ───
 
+  /** @internal */
+  private _mutationObserver: MutationObserver | null = null;
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('hx-expand', this._handleChildExpand);
     this.addEventListener('keydown', this._handleKeyDown);
+    // Re-enforce single mode when reconnected with pre-expanded items
+    this._enforceSingleMode();
+    // Watch for dynamically added accordion items that may violate single-expand
+    this._mutationObserver = new MutationObserver((mutations) => {
+      const hasNewItems = mutations.some((m) =>
+        Array.from(m.addedNodes).some(
+          (n) => n instanceof Element && n.tagName.toLowerCase() === 'hx-accordion-item',
+        ),
+      );
+      if (hasNewItems) {
+        this._enforceSingleMode();
+      }
+    });
+    this._mutationObserver.observe(this, { childList: true });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('hx-expand', this._handleChildExpand);
     this.removeEventListener('keydown', this._handleKeyDown);
+    this._mutationObserver?.disconnect();
+    this._mutationObserver = null;
   }
 
   protected override firstUpdated(): void {
     this._enforceSingleMode();
+  }
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('mode')) {
+      const validModes: string[] = ['single', 'multi'];
+      if (!validModes.includes(this.mode)) {
+        devWarn(
+          'hx-accordion',
+          `Invalid mode "${this.mode}". Expected one of: ${validModes.join(', ')}. Clamping to "single".`,
+        );
+        this.mode = 'single';
+        return;
+      }
+      // When switching from multi to single, enforce single-expand immediately
+      this._enforceSingleMode();
+    }
   }
 
   // ─── Single-expand coordination ───

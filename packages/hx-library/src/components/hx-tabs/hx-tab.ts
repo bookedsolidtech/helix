@@ -2,6 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabStyles } from './hx-tab.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * An individual tab button, designed to be used inside an `<hx-tabs>` container.
@@ -67,6 +68,15 @@ export class HelixTab extends LitElement {
    */
   @property({ type: String, attribute: false })
   controls = '';
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (!this.closest('hx-tabs')) {
+      devWarn('hx-tab', 'hx-tab must be a direct child of hx-tabs to function correctly.');
+    }
+  }
 
   // ─── Slot Visibility ───
 
