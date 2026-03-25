@@ -33,10 +33,7 @@ export interface ComponentTemplateData {
 
 type TemplateValue = string | number | boolean | undefined | null | string[];
 
-export function template(
-  strings: TemplateStringsArray,
-  ...values: TemplateValue[]
-): string {
+export function template(strings: TemplateStringsArray, ...values: TemplateValue[]): string {
   // Build raw string from parts
   let raw = '';
   for (let i = 0; i < strings.length; i++) {
@@ -80,9 +77,7 @@ export function template(
   if (!isFinite(minIndent)) minIndent = 0;
 
   // Strip common indentation
-  const dedented = trimmedLines.map((line) =>
-    line.trim() === '' ? '' : line.slice(minIndent),
-  );
+  const dedented = trimmedLines.map((line) => (line.trim() === '' ? '' : line.slice(minIndent)));
 
   return dedented.join('\n');
 }
@@ -146,9 +141,7 @@ export function generateComponentCss(data: ComponentTemplateData): string {
     .map((p) => `   * @cssprop {*} ${p.name} - ${p.description ?? p.name} (default: ${p.default})`)
     .join('\n');
 
-  const cssVarDefaults = cssProperties
-    .map((p) => `  ${p.name}: ${p.default};`)
-    .join('\n');
+  const cssVarDefaults = cssProperties.map((p) => `  ${p.name}: ${p.default};`).join('\n');
 
   return template`
     import { css } from 'lit';
@@ -171,9 +164,7 @@ export function generateComponentCss(data: ComponentTemplateData): string {
 export function generateComponentTwig(data: ComponentTemplateData): string {
   const { tagName, properties = [], slots = [] } = data;
 
-  const attrs = properties
-    .map((p) => `  ${p.name}="{{ ${p.name} }}"`)
-    .join('\n');
+  const attrs = properties.map((p) => `  ${p.name}="{{ ${p.name} }}"`).join('\n');
 
   const slotContent = slots
     .filter((s) => s.name !== '')

@@ -31,14 +31,10 @@ Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute). 
   /** Accessible name for the table. Exposed via `aria-label` on the `<table>` element.
 Required when the table has columns — a missing label is a WCAG 4.1.2 violation. */
   label?: string;
+  /** Accessible label for the "select all rows" checkbox in the table header. */
+  selectAllLabel?: string;
   /** When true, the header row is sticky (position: sticky; top: 0). */
   stickyHeader?: boolean;
-  /** Accessible label for the "select all rows" checkbox. */
-  labelSelectAll?: string;
-  /** Generates the accessible label for column sort buttons. */
-  labelSortBy?: string | 'desc' | string;
-  /** Generates the accessible label for row selection checkboxes. */
-  labelSelectRow?: string;
   /** Current page (1-based). Set to 0 or leave at default (0) to disable pagination. */
   page?: number;
   /** Number of rows per page. Set to 0 to disable pagination (show all rows). */

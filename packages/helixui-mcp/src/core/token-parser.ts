@@ -54,11 +54,7 @@ function isTokenLeaf(node: TokenNode): node is TokenLeaf {
   return typeof (node as { value?: unknown }).value === 'string';
 }
 
-function flattenNode(
-  node: TokenGroup,
-  pathSoFar: string[],
-  results: TokenEntry[],
-): void {
+function flattenNode(node: TokenGroup, pathSoFar: string[], results: TokenEntry[]): void {
   for (const [key, child] of Object.entries(node)) {
     const currentPath = [...pathSoFar, key];
     if (isTokenLeaf(child)) {
