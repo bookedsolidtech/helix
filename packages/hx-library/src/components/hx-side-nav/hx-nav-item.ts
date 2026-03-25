@@ -87,6 +87,23 @@ export class HelixNavItem extends LitElement {
     }
   }
 
+  // ─── Public API ───
+
+  /**
+   * Delegates focus to the internal link or button element (part="link").
+   * Allows parent components to focus nav items without piercing the Shadow DOM.
+   * WCAG 2.1.1: keyboard navigation must not cross shadow boundaries via
+   * direct shadowRoot queries.
+   */
+  override focus(options?: FocusOptions): void {
+    const inner = this.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+    if (inner) {
+      inner.focus(options);
+    } else {
+      super.focus(options);
+    }
+  }
+
   // ─── Slot Change Handler ───
 
   /** @internal */

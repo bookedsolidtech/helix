@@ -76,6 +76,9 @@ export const helixCodeSnippetStyles = css`
     display: inline-flex;
     align-items: center;
     gap: var(--hx-space-1, 0.25rem);
+    /* WCAG 2.5.5: minimum 44×44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-600, #475569);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -114,6 +117,9 @@ export const helixCodeSnippetStyles = css`
   .code-snippet__expand-button {
     display: block;
     width: 100%;
+    /* WCAG 2.5.5: minimum 44×44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     border: none;
     border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-700, #334155);

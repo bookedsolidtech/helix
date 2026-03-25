@@ -219,7 +219,6 @@ export class HelixImage extends LitElement {
           class="image__container image__container--error"
           style=${styleMap(containerStyles)}
           role="alert"
-          aria-live="polite"
         >
           <slot name="fallback"></slot>
         </figure>
