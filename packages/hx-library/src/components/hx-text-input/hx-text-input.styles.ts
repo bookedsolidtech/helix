@@ -10,6 +10,35 @@ export const helixTextInputStyles = css`
     pointer-events: none;
   }
 
+  /*
+   * Attribute-based focus hooks set by FocusMixin.
+   * :host([focused]) — fires whenever the component or any descendant has focus.
+   * :host([focused-visible]) — fires only for keyboard-initiated focus.
+   * These complement the :focus-within rules on .field__input-wrapper and are
+   * exposed as theming hooks for consumers who target the host element.
+   */
+  :host([focused]) .field__input-wrapper {
+    border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      color-mix(
+        in srgb,
+        var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        transparent
+      );
+  }
+
+  :host([focused-visible]) .field__input-wrapper {
+    border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
+      color-mix(
+        in srgb,
+        var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        transparent
+      );
+  }
+
   * {
     box-sizing: border-box;
   }

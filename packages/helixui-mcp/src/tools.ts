@@ -12,6 +12,8 @@ import {
   generateImport,
   getLibrarySummary,
 } from './handlers.js';
+import { analyzeExtension } from './tools/analyze-extension.js';
+import { validateIntegration } from './tools/validate-integration.js';
 import { scaffoldTheme } from './tools/scaffold-theme.js';
 import { auditTokens, formatAuditReport } from './tools/audit-tokens.js';
 
@@ -58,6 +60,20 @@ const FindTokenArgsSchema = z.object({
 
 const GenerateImportArgsSchema = z.object({
   tagName: TagNameSchema.describe('Component tag name, e.g. hx-button'),
+});
+
+const AnalyzeExtensionArgsSchema = z.object({
+  filePath: z
+    .string()
+    .min(1)
+    .describe('Absolute or relative path to a TypeScript file that extends a HELiX component'),
+});
+
+const ValidateIntegrationArgsSchema = z.object({
+  projectPath: z
+    .string()
+    .min(1)
+    .describe('Absolute or relative path to the consumer project directory to scan'),
 });
 
 const ScaffoldThemeArgsSchema = z.object({
@@ -217,6 +233,37 @@ const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'analyzeExtension',
+    description:
+      'Analyze a TypeScript file that extends a HELiX component and detect common anti-patterns: missing super calls in lifecycle methods, incorrect Shadow DOM usage (this.innerHTML vs slots), properties shadowing parent @property decorators, broken slot forwarding, and direct style manipulation bypassing design tokens.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        filePath: {
+          type: 'string',
+          description:
+            'Absolute or relative path to a TypeScript file that extends a HELiX component',
+        },
+      },
+      required: ['filePath'],
+    },
+  },
+  {
+    name: 'validateIntegration',
+    description:
+      'Scan a consumer project directory for HELiX integration issues: import correctness (barrel vs tree-shakeable), bundler configuration for custom elements, SSR compatibility (unguarded DOM API access), CSP compliance (inline styles, unsafe-eval), and framework-specific issues (React @lit/react wrappers, Vue isCustomElement, Angular CUSTOM_ELEMENTS_SCHEMA, Drupal once() behaviors).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectPath: {
+          type: 'string',
+          description: 'Absolute or relative path to the consumer project directory to scan',
+        },
+      },
+      required: ['projectPath'],
+    },
+  },
+  {
     name: 'scaffoldTheme',
     description:
       'Generate a CSS theme scaffold containing all HELiX semantic design tokens as commented-out custom property overrides, organized by category. Useful for bootstrapping a custom theme.',
@@ -329,6 +376,18 @@ export function registerTools(server: Server): void {
 
         case 'getLibrarySummary': {
           return success(getLibrarySummary());
+        }
+
+        case 'analyzeExtension': {
+          const parsed = AnalyzeExtensionArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          return success(analyzeExtension(parsed.data.filePath));
+        }
+
+        case 'validateIntegration': {
+          const parsed = ValidateIntegrationArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          return success(validateIntegration(parsed.data.projectPath));
         }
 
         case 'scaffoldTheme': {
