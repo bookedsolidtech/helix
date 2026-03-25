@@ -1216,4 +1216,25 @@ describe('hx-data-table', () => {
       }
     });
   });
+
+  // ─── Property: stickyHeader ───
+
+  describe('Property: stickyHeader', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      expect(el.stickyHeader).toBe(false);
+    });
+
+    it('reflects stickyHeader attribute', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table sticky-header></hx-data-table>');
+      expect(el.stickyHeader).toBe(true);
+    });
+
+    it('sets stickyHeader property programmatically', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.stickyHeader = true;
+      await el.updateComplete;
+      expect(el.stickyHeader).toBe(true);
+    });
+  });
 });

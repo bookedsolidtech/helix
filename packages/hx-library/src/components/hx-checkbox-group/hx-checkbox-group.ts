@@ -306,7 +306,7 @@ export class HelixCheckboxGroup extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     const checkboxes = this._getCheckboxes();
     checkboxes.forEach((cb) => {
@@ -316,7 +316,7 @@ export class HelixCheckboxGroup extends LitElement {
     this._updateValidity([]);
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -331,7 +331,7 @@ export class HelixCheckboxGroup extends LitElement {
     this._updateValidity(restoredValues);
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

@@ -56,7 +56,7 @@ export class HelixAlert extends LitElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: AlertVariant = 'info';
+  variant: 'info' | 'success' | 'warning' | 'error' = 'info';
 
   /**
    * Whether the alert can be dismissed by the user.
@@ -132,7 +132,7 @@ export class HelixAlert extends LitElement {
 
   // ─── Private Helpers ───
 
-  /** Returns the default English severity label for the current variant. */
+  /** @internal */
   private _defaultSeverityLabel(): string {
     const labels: Record<string, string> = {
       info: 'Info:',
@@ -143,7 +143,7 @@ export class HelixAlert extends LitElement {
     return labels[this.variant] ?? '';
   }
 
-  /** Returns the effective severity label, using the override if provided. */
+  /** @internal */
   private get _effectiveSeverityLabel(): string {
     return this.severityLabel ?? this._defaultSeverityLabel();
   }

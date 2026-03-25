@@ -5,9 +5,9 @@ export const helixStepsStyles = css`
     display: block;
 
     /* ─── Size defaults (md) ─── */
-    --hx-steps-indicator-size: 2rem;
+    --hx-steps-indicator-size: var(--hx-size-8, 2rem);
     --hx-steps-indicator-font-size: var(--hx-font-size-sm, 0.875rem);
-    --hx-steps-indicator-icon-size: 1rem;
+    --hx-steps-indicator-icon-size: var(--hx-size-4, 1rem);
     --hx-steps-label-font-size: var(--hx-font-size-sm, 0.875rem);
     --hx-steps-description-font-size: var(--hx-font-size-xs, 0.75rem);
 
@@ -36,9 +36,9 @@ export const helixStepsStyles = css`
   /* ─── Size: sm ─── */
 
   :host([size='sm']) {
-    --hx-steps-indicator-size: 1.5rem;
+    --hx-steps-indicator-size: var(--hx-size-6, 1.5rem);
     --hx-steps-indicator-font-size: var(--hx-font-size-xs, 0.75rem);
-    --hx-steps-indicator-icon-size: 0.75rem;
+    --hx-steps-indicator-icon-size: var(--hx-space-3, 0.75rem);
     --hx-steps-label-font-size: var(--hx-font-size-xs, 0.75rem);
     --hx-steps-description-font-size: var(--hx-font-size-xs, 0.75rem);
   }
@@ -46,9 +46,9 @@ export const helixStepsStyles = css`
   /* ─── Size: lg ─── */
 
   :host([size='lg']) {
-    --hx-steps-indicator-size: 2.5rem;
+    --hx-steps-indicator-size: var(--hx-size-10, 2.5rem);
     --hx-steps-indicator-font-size: var(--hx-font-size-md, 1rem);
-    --hx-steps-indicator-icon-size: 1.25rem;
+    --hx-steps-indicator-icon-size: var(--hx-size-5, 1.25rem);
     --hx-steps-label-font-size: var(--hx-font-size-md, 1rem);
     --hx-steps-description-font-size: var(--hx-font-size-sm, 0.875rem);
   }

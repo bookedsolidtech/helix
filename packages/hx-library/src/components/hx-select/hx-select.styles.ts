@@ -153,7 +153,7 @@ export const helixSelectStyles = css`
     top: calc(100% + var(--hx-space-1, 0.25rem));
     left: 0;
     right: 0;
-    z-index: var(--hx-z-index-dropdown, 100);
+    z-index: var(--hx-z-index-dropdown, 1000);
     background-color: var(--hx-select-listbox-bg, var(--hx-color-neutral-0, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));

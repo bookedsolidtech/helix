@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
-import { computePosition, flip, shift, offset, arrow, type Placement } from '@floating-ui/dom';
+import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
 let _tooltipCounter = 0;
@@ -58,7 +58,19 @@ export class HelixTooltip extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: Placement = 'top';
+  placement:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end' = 'top';
 
   /**
    * Delay in milliseconds before the tooltip is shown.

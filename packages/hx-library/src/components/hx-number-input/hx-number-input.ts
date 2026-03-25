@@ -54,6 +54,7 @@ export class HelixNumberInput extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
   /** @internal */
@@ -365,13 +366,13 @@ export class HelixNumberInput extends LitElement {
     this._internals.setValidity({});
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(this.value !== null ? String(this.value) : null);
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -382,7 +383,7 @@ export class HelixNumberInput extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

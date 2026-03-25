@@ -3,6 +3,14 @@ import type { TokenDefinition, TokenEntry } from './types.js';
 
 export type { TokenDefinition, TokenEntry } from './types.js';
 
+// Brand registry — multi-brand theming API
+export {
+  HelixBrandRegistry,
+  HelixBrandRegistryClass,
+  REQUIRED_SEMANTIC_TOKENS,
+} from './brand-registry.js';
+export type { BrandTokenMap, BrandValidationResult } from './types/brand.js';
+
 function isTokenDefinition(obj: unknown): obj is TokenDefinition {
   return typeof obj === 'object' && obj !== null && 'value' in obj;
 }

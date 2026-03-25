@@ -49,7 +49,7 @@ export class HelixSwitch extends LitElement {
 
   // ─── Form Association ───
 
-  /** Enables the element to participate in form submission and validation. */
+  /** @internal */
   static formAssociated = true;
 
   /** ElementInternals instance for form association, validation, and ARIA. */
@@ -188,20 +188,20 @@ export class HelixSwitch extends LitElement {
     }
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     this.checked = false;
     this._internals.setFormValue(null);
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
+  /** @internal */
   formStateRestoreCallback(state: File | string | null, _mode: 'restore' | 'autocomplete'): void {
     if (typeof state === 'string') {
       this.checked = state === this.value;
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

@@ -66,14 +66,14 @@ export class HelixStat extends LitElement {
    * @attr trend
    */
   @property({ type: String, reflect: true })
-  trend: StatTrend = 'neutral';
+  trend: 'up' | 'down' | 'neutral' = 'neutral';
 
   /**
    * Size variant controlling font size.
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: StatSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   // ─── Lifecycle ───
 

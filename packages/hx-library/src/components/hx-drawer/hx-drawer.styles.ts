@@ -21,7 +21,7 @@ export const helixDrawerStyles = css`
   .drawer-overlay {
     position: fixed;
     inset: 0;
-    z-index: var(--hx-z-index-modal, 400);
+    z-index: var(--hx-z-index-modal, 1400);
     display: flex;
     pointer-events: none;
     visibility: hidden;
@@ -43,7 +43,7 @@ export const helixDrawerStyles = css`
     inset: 0;
     background-color: var(--hx-drawer-backdrop-color, var(--hx-color-neutral-900));
     opacity: 0;
-    transition: opacity var(--hx-duration-300, 300ms) var(--hx-ease-out, ease-out);
+    transition: opacity var(--hx-duration-slow, 300ms) var(--hx-easing-out, ease-out);
   }
 
   .drawer-overlay.is-open .drawer-backdrop {
@@ -69,8 +69,8 @@ export const helixDrawerStyles = css`
     outline: none;
     z-index: 1;
     transition:
-      transform var(--hx-duration-300, 300ms) var(--hx-ease-out, ease-out),
-      opacity var(--hx-duration-300, 300ms) var(--hx-ease-out, ease-out);
+      transform var(--hx-duration-slow, 300ms) var(--hx-easing-out, ease-out),
+      opacity var(--hx-duration-slow, 300ms) var(--hx-easing-out, ease-out);
     opacity: 0;
   }
 
@@ -160,7 +160,7 @@ export const helixDrawerStyles = css`
     justify-content: space-between;
     gap: var(--hx-space-4, 1rem);
     padding: var(--hx-drawer-header-padding, var(--hx-space-5, 1.25rem) var(--hx-space-6, 1.5rem));
-    border-bottom: var(--hx-border-width-1, 1px) solid
+    border-bottom: var(--hx-border-width-thin, 1px) solid
       var(--hx-drawer-header-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
   }
@@ -171,7 +171,7 @@ export const helixDrawerStyles = css`
     font-family: var(--hx-font-family-sans);
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
-    line-height: var(--hx-line-height-snug);
+    line-height: var(--hx-line-height-tight);
     color: var(--hx-drawer-title-color, var(--hx-color-neutral-900));
   }
 
@@ -198,7 +198,7 @@ export const helixDrawerStyles = css`
     color: var(--hx-color-neutral-500);
     cursor: pointer;
     flex-shrink: 0;
-    transition: background-color var(--hx-duration-100, 100ms) ease;
+    transition: background-color var(--hx-duration-fast, 100ms) var(--hx-easing-default, ease);
   }
 
   .drawer-close-button:hover {

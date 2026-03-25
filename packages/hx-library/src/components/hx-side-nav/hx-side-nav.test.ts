@@ -387,6 +387,50 @@ describe('hx-side-nav', () => {
         body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       }).not.toThrow();
     });
+
+    it('Home key moves focus to the first nav item', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+          <hx-nav-item href="/c">Item C</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HxNavItem>('hx-nav-item'));
+      // Focus the last item's link
+      const lastLink = items[2].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      lastLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('End key moves focus to the last nav item', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+          <hx-nav-item href="/c">Item C</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HxNavItem>('hx-nav-item'));
+      // Focus the first item's link
+      const firstLink = items[0].shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      firstLink?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      expect(document.activeElement).toBe(items[items.length - 1]);
+    });
   });
 
   // ─── Accessibility ───
