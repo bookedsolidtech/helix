@@ -412,4 +412,128 @@ describe('hx-dropdown', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Placement variants ───
+
+  describe('Placement variants', () => {
+    const placements = [
+      'top',
+      'top-start',
+      'top-end',
+      'bottom',
+      'bottom-start',
+      'bottom-end',
+      'start',
+      'end',
+    ] as const;
+
+    for (const placement of placements) {
+      it(`placement="${placement}" reflects to attribute`, async () => {
+        const el = await fixture<HelixDropdown>(
+          `<hx-dropdown placement="${placement}"><button slot="trigger">T</button><div role="menu" aria-label="Actions">C</div></hx-dropdown>`,
+        );
+        expect(el.placement).toBe(placement);
+        expect(el.getAttribute('placement')).toBe(placement);
+        cleanup();
+      });
+    }
+  });
+
+  // ─── ArrowUp wrapping (P2-01) ───
+
+  describe('ArrowUp wrapping', () => {
+    it('wraps from first item to last item on ArrowUp', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const items = el.querySelectorAll<HTMLElement>('[role="menuitem"]');
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      expect(document.activeElement).toBe(items[items.length - 1]);
+    });
+  });
+
+  // ─── hx-select detail structure ───
+
+  describe('hx-select event detail', () => {
+    it('hx-select detail includes label text', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const item = el.querySelector<HTMLElement>('[data-value="delete"]')!;
+      item.click();
+      const event = await eventPromise;
+
+      expect(event.detail.value).toBe('delete');
+      expect(event.detail.label).toBe('Delete');
+    });
+
+    it('hx-select event bubbles and is composed', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const item = el.querySelector<HTMLElement>('[data-value="edit"]')!;
+      item.click();
+      const event = await eventPromise;
+
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('hx-show event bubbles and is composed', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-show');
+      trigger.click();
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('hx-hide event bubbles and is composed', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-hide');
+      trigger.click();
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+  });
+
+  // ─── Distance property ───
+
+  describe('distance property', () => {
+    it('distance attribute sets property', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown distance="8"><button slot="trigger">T</button><div role="menu" aria-label="Actions">C</div></hx-dropdown>',
+      );
+      expect(el.distance).toBe(8);
+    });
+  });
+
+  // ─── panel role="menu" ───
+
+  describe('Panel ARIA', () => {
+    it('panel has role="menu"', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('role')).toBe('menu');
+    });
+
+    it('panel has aria-label="Menu"', async () => {
+      const el = await fixture<HelixDropdown>(triggerHtml);
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Menu');
+    });
+  });
 });

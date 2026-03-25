@@ -650,6 +650,11 @@ export default defineConfig({
               slug: 'guides/adopted-stylesheets',
             },
             {
+              label: 'Drupal Integration',
+              slug: 'guides/drupal-integration',
+              badge: { text: 'Enterprise', variant: 'tip' },
+            },
+            {
               label: 'Boolean Attributes',
               slug: 'guides/boolean-attributes',
             },
