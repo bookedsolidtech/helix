@@ -1,0 +1,195 @@
+<?php
+
+/**
+ * @file
+ * HELiX UI Drupal module.
+ *
+ * Provides integration hooks for loading HELiX web components on Drupal pages.
+ * This module demonstrates per-page and per-route library attachment patterns.
+ *
+ * Installation:
+ *   1. Place this module in modules/custom/helixui/
+ *   2. Run: drush en helixui
+ *   3. Clear caches: drush cr
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Attaches the HELiX core library (tokens + runtime) to every page.
+ * Individual component libraries are loaded by SDC templates via
+ * attach_library(), so only the core baseline is loaded globally.
+ */
+function helixui_page_attachments(array &$attachments) {
+  // Always load core tokens and runtime.
+  $attachments['#attached']['library'][] = 'helixui/hx-core';
+
+  // Always load Drupal behaviors for interactive components.
+  $attachments['#attached']['library'][] = 'helixui/helixui-behaviors';
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Demonstrates conditional per-route library loading. Uncomment and
+ * customize the examples below to load component bundles only on pages
+ * that use them, reducing unnecessary JS on pages that do not.
+ */
+function helixui_page_attachments_alter(array &$attachments) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  // Example: Load form components only on node add/edit pages.
+  // if (in_array($route_name, ['node.add', 'entity.node.edit_form'])) {
+  //   $attachments['#attached']['library'][] = 'helixui/hx-text-input';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-select';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-textarea';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-checkbox';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-button';
+  // }
+
+  // Example: Load navigation components on every page via the theme layer.
+  // if ($route_name !== 'system.404' && $route_name !== 'system.403') {
+  //   $attachments['#attached']['library'][] = 'helixui/hx-nav';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-breadcrumb';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-drawer';
+  // }
+
+  // Example: Load healthcare-specific components on provider listing pages.
+  // if (str_starts_with($route_name, 'view.providers.')) {
+  //   $attachments['#attached']['library'][] = 'helixui/hx-card';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-avatar';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-badge';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-rating';
+  //   $attachments['#attached']['library'][] = 'helixui/hx-status-indicator';
+  // }
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers the standalone HELiX Twig templates so they can be used
+ * via {% include '@helixui/hx-button' %} in any theme or module template.
+ */
+function helixui_theme($existing, $type, $theme, $path) {
+  return [
+    'hx_button' => [
+      'template' => 'hx-button',
+      'path' => $path . '/templates',
+      'variables' => [
+        'variant' => 'primary',
+        'size' => 'md',
+        'type' => 'button',
+        'href' => NULL,
+        'disabled' => FALSE,
+        'content' => '',
+        'icon_start' => NULL,
+        'icon_end' => NULL,
+      ],
+    ],
+    'hx_card' => [
+      'template' => 'hx-card',
+      'path' => $path . '/templates',
+      'variables' => [
+        'variant' => 'default',
+        'elevation' => 'raised',
+        'image_url' => NULL,
+        'image_alt' => '',
+        'heading' => NULL,
+        'body' => NULL,
+        'footer' => NULL,
+        'url' => NULL,
+      ],
+    ],
+    'hx_text_input' => [
+      'template' => 'hx-text-input',
+      'path' => $path . '/templates',
+      'variables' => [
+        'name' => '',
+        'label' => '',
+        'type' => 'text',
+        'value' => NULL,
+        'placeholder' => NULL,
+        'required' => FALSE,
+        'disabled' => FALSE,
+        'readonly' => FALSE,
+        'error' => NULL,
+        'help_text' => NULL,
+        'pattern' => NULL,
+        'maxlength' => NULL,
+        'autocomplete' => NULL,
+      ],
+    ],
+    'hx_form' => [
+      'template' => 'hx-form',
+      'path' => $path . '/templates',
+      'variables' => [
+        'action' => '',
+        'method' => 'post',
+        'title' => NULL,
+        'description' => NULL,
+        'submit_label' => 'Submit',
+        'form_id' => NULL,
+        'form_build_id' => NULL,
+        'form_token' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_library_info_alter().
+ *
+ * Demonstrates how to swap local library paths for CDN URLs. This is useful
+ * when you want to serve @helixui/library from a CDN instead of local files.
+ *
+ * To enable CDN mode, set the HELIXUI_CDN_URL environment variable or
+ * add $settings['helixui_cdn_url'] to settings.php.
+ */
+function helixui_library_info_alter(array &$libraries, $extension) {
+  if ($extension !== 'helixui') {
+    return;
+  }
+
+  // Check for CDN URL configuration.
+  $cdn_url = getenv('HELIXUI_CDN_URL')
+    ?: \Drupal::service('settings')->get('helixui_cdn_url', '');
+
+  if (empty($cdn_url)) {
+    return;
+  }
+
+  // Rewrite local /libraries/helixui/ paths to CDN URLs.
+  foreach ($libraries as $name => &$library) {
+    if (isset($library['js'])) {
+      $new_js = [];
+      foreach ($library['js'] as $path => $options) {
+        if (str_starts_with($path, '/libraries/helixui/')) {
+          $cdn_path = $cdn_url . str_replace('/libraries/helixui/', '/', $path);
+          $options['type'] = 'external';
+          $new_js[$cdn_path] = $options;
+        } else {
+          $new_js[$path] = $options;
+        }
+      }
+      $library['js'] = $new_js;
+    }
+
+    if (isset($library['css'])) {
+      foreach ($library['css'] as $category => &$css_files) {
+        $new_css = [];
+        foreach ($css_files as $path => $options) {
+          if (str_starts_with($path, '/libraries/helixui/')) {
+            $cdn_path = $cdn_url . str_replace('/libraries/helixui/', '/', $path);
+            $options['type'] = 'external';
+            $new_css[$cdn_path] = $options;
+          } else {
+            $new_css[$path] = $options;
+          }
+        }
+        $css_files = $new_css;
+      }
+    }
+  }
+}
