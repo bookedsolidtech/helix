@@ -249,9 +249,9 @@ export class HelixForm extends LitElement {
   private _getAllValidatableElements(): HTMLElement[] {
     const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
     const wcElements = this.getFormElements().filter(
-      (el) =>
+      (el): el is HTMLElement & { checkValidity: () => boolean } =>
         'checkValidity' in el &&
-        typeof (el as Record<string, unknown>).checkValidity === 'function',
+        typeof (el as { checkValidity: unknown }).checkValidity === 'function',
     );
     return [...native, ...wcElements];
   }

@@ -1,5 +1,12 @@
 # Commit Quality Gates — MANDATORY, NO EXCEPTIONS
 
+## ZERO TOLERANCE: Run verify + test:smart before EVERY push. No exceptions.
+
+Pushing code that fails CI is an automatic failure. There is no "CI handles it" — YOU handle it locally.
+See agent-push-protocol.md for the exact push sequence.
+
+---
+
 ## Commit Message Format — STRICT ENFORCEMENT
 
 Commitlint enforces conventional commits with these rules:
@@ -9,11 +16,11 @@ Commitlint enforces conventional commits with these rules:
 ```
 
 **CRITICAL: Subject must be ALL LOWERCASE — no exceptions.**
-- ✅ `fix(drupal): css injection guard and audit cleanup`
-- ✅ `fix(tests): remove duplicate test blocks`
-- ❌ `fix(drupal): CSS injection guard` — "CSS" is uppercase, FAILS
-- ❌ `fix(tests): Remove duplicate tests` — capital "R", FAILS
-- ❌ `feat: TypeScript strict mode fixes` — capital "T", FAILS
+- `fix(drupal): css injection guard and audit cleanup`
+- `fix(tests): remove duplicate test blocks`
+- `fix(drupal): CSS injection guard` -- "CSS" is uppercase, FAILS
+- `fix(tests): Remove duplicate tests` -- capital "R", FAILS
+- `feat: TypeScript strict mode fixes` -- capital "T", FAILS
 
 **Acronyms, proper nouns, file names — all must be lowercase in the subject:**
 - `css` not `CSS`
@@ -30,24 +37,37 @@ Valid types: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `style`, `perf`
 
 ## Prettier Before Every Commit
 
-Run `npm run format` before EVERY commit. The pre-commit hook is bypassed
-with `core.hooksPath=/dev/null` in this workflow — that means YOU must run
-prettier manually. Unformatted code WILL fail CI.
+Run `pnpm run format` before EVERY commit. The pre-commit hook is bypassed
+with `HUSKY=0` in this workflow — that means YOU must run prettier manually.
+Unformatted code WILL fail CI.
 
 ```bash
-npm run format
+pnpm run format
 git add -u   # re-stage any files prettier changed
-git -c core.hooksPath=/dev/null commit -m "your message"
+HUSKY=0 git commit -m "your message"
 ```
 
-## Full Verify Before Push
+## Full Verify Before Push — MANDATORY
+
+**FAILURE TO RUN THIS BEFORE PUSH IS AN AUTOMATIC FAILURE.**
 
 ```bash
-npm run verify   # lint + format:check + type-check — must be zero failures
+pnpm run verify   # lint + format:check + type-check — must be zero failures
 ```
 
-Note: `npm run verify` covers lint, format:check, and type-check. Targeted component
-tests are run automatically by the pre-push hook (Gate 3.5) — see below.
+This is not optional. This is not "nice to have." If you skip this and CI fails, you have wasted a cycle. Run it. Fix any errors. Then push.
+
+## Smart Tests Before Push — MANDATORY When Component Source Changed
+
+**FAILURE TO RUN THIS BEFORE PUSH IS AN AUTOMATIC FAILURE.**
+
+```bash
+pnpm run test:smart   # diffs against origin/dev, runs only changed component tests
+```
+
+If this fails: FIX THE TESTS. Do not push. Do not skip.
+
+**NEVER run `pnpm run test` or `pnpm run test:library` — these run the full suite (100+ tests, $14+ cost, minutes of blocking). They are forbidden.**
 
 ## Gate 3.5: Targeted Component Tests (pre-push hook, automatic)
 
@@ -71,7 +91,7 @@ the manual command to reproduce.
 cd packages/hx-library && npx vitest run --reporter=verbose src/components/hx-<name>/hx-<name>.test.ts
 ```
 
-**Why this exists:** `npm run verify` (lint + format + type-check) does not run tests.
+**Why this exists:** `pnpm run verify` (lint + format + type-check) does not run tests.
 The hx-slider `@query` + `= null` field initializer bug passed verify but broke CI.
 This gate catches runtime/DOM-level bugs that type-check cannot detect, without
 running the full suite (which takes minutes).
@@ -82,14 +102,14 @@ If you modify ANY `.styles.ts` file or any CSS in a component, you MUST
 update the VRT baselines before pushing or CI will fail:
 
 ```bash
-npm run test:vrt:update
+pnpm run test:vrt:update
 git add -A
-git -c core.hooksPath=/dev/null commit -m "test: update VRT baselines for [component names]"
+HUSKY=0 git commit -m "test: update vrt baselines for [component names]"
 ```
 
-## Pre-Push Checklist (all required)
+## Pre-Push Checklist (ALL required — no exceptions)
 
-- [ ] `npm run format` run and changes re-staged/committed
-- [ ] `npm run verify` — zero failures
-- [ ] If any `.styles.ts` changed: `npm run test:vrt:update` committed
-- [ ] `npm run test:library` — all tests pass
+- [ ] `pnpm run format` run and changes re-staged/committed
+- [ ] `pnpm run verify` — zero failures
+- [ ] If any `.styles.ts` changed: `pnpm run test:vrt:update` committed
+- [ ] `pnpm run test:smart` — passes (when component source changed)
