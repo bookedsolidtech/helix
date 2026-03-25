@@ -131,7 +131,7 @@ export const helixToastStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     color: inherit;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: var(--hx-opacity-75, 0.75);
     transition: opacity var(--hx-transition-fast, 150ms ease);
   }
 

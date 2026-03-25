@@ -69,7 +69,8 @@ export const helixNavItemStyles = css`
   }
 
   .nav-item__link:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -87,7 +88,7 @@ export const helixNavItemStyles = css`
   /* ─── Disabled State ─── */
 
   :host([disabled]) .nav-item__link {
-    opacity: 0.4;
+    opacity: var(--hx-opacity-disabled, 0.5);
     pointer-events: none;
     cursor: not-allowed;
   }

@@ -11,7 +11,7 @@ export const helixTooltipStyles = css`
 
   [part='tooltip'] {
     position: fixed;
-    z-index: var(--hx-tooltip-z-index, 9999);
+    z-index: var(--hx-tooltip-z-index, var(--hx-z-index-tooltip, 1600));
     max-width: var(--hx-tooltip-max-width, 280px);
     padding: var(--hx-tooltip-padding, var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem));
     background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #111827));
@@ -27,8 +27,8 @@ export const helixTooltipStyles = css`
     visibility: hidden;
     opacity: 0;
     transition:
-      opacity var(--hx-tooltip-transition-duration, 0.15s) ease,
-      visibility var(--hx-tooltip-transition-duration, 0.15s) ease;
+      opacity var(--hx-tooltip-transition-duration, var(--hx-transition-fast, 150ms ease)),
+      visibility var(--hx-tooltip-transition-duration, var(--hx-transition-fast, 150ms ease));
     overflow-wrap: break-word;
   }
 

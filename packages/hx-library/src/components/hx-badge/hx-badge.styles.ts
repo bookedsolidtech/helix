@@ -110,8 +110,8 @@ export const helixBadgeStyles = css`
   /* ─── Dot Indicator (empty + pulse) ─── */
 
   .badge--dot {
-    width: var(--hx-badge-dot-size, var(--hx-size-2, 0.5rem));
-    height: var(--hx-badge-dot-size, var(--hx-size-2, 0.5rem));
+    width: var(--hx-badge-dot-size, var(--hx-space-2, 0.5rem));
+    height: var(--hx-badge-dot-size, var(--hx-space-2, 0.5rem));
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
   }
@@ -130,7 +130,7 @@ export const helixBadgeStyles = css`
       box-shadow: 0 0 0 0 var(--hx-badge-pulse-color, currentColor);
     }
     50% {
-      opacity: 0.7;
+      opacity: var(--hx-opacity-75, 0.75);
       box-shadow: 0 0 0 4px transparent;
     }
   }
@@ -158,7 +158,7 @@ export const helixBadgeStyles = css`
     margin-inline-start: var(--hx-space-1, 0.25rem);
     cursor: pointer;
     color: inherit;
-    opacity: 0.7;
+    opacity: var(--hx-opacity-75, 0.75);
     border-radius: var(--hx-border-radius-sm, 0.125rem);
     line-height: 0;
     /* WCAG 2.5.5: minimum 44×44px touch target */
@@ -167,7 +167,7 @@ export const helixBadgeStyles = css`
   }
 
   .badge__remove-button:hover {
-    opacity: 1;
+    opacity: var(--hx-opacity-100, 1);
   }
 
   .badge__remove-button:focus-visible {
