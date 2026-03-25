@@ -638,7 +638,20 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    needs: [changes, secret-scan, lint, format, type-check, test, build, bundle-size, vrt, audit, changeset]
+    needs:
+      [
+        changes,
+        secret-scan,
+        lint,
+        format,
+        type-check,
+        test,
+        build,
+        bundle-size,
+        vrt,
+        audit,
+        changeset,
+      ]
     if: always()
     steps:
       - name: Check all gates
