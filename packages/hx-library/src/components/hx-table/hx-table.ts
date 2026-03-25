@@ -80,6 +80,18 @@ export class HelixTable extends LitElement {
     this._hasCaptionSlot = this.querySelector('[slot="caption"]') !== null;
   }
 
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    // WCAG 4.1.2: warn when neither label nor caption provides an accessible name.
+    // A table without an accessible name cannot be identified by screen reader users.
+    if (!this.label && !this.caption && !this._hasCaptionSlot) {
+      devWarn(
+        'hx-table',
+        'No accessible name provided. Set the `label` or `caption` attribute, or use the `caption` slot, so screen readers can identify this table (WCAG 4.1.2 Name, Role, Value).',
+      );
+    }
+  }
+
   override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('label') && !this.label && changed.get('label') !== undefined) {
       devWarn(

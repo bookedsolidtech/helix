@@ -676,9 +676,12 @@ describe('hx-radio-group', () => {
       `);
       const fieldset = shadowQuery(el, 'fieldset');
       const describedBy = fieldset?.getAttribute('aria-describedby');
-      const errorDiv = shadowQuery(el, '.fieldset__error');
+      // WCAG 1.3.1: the _errorId is on the persistent wrapper div surrounding the error
+      // slot, not on the inner .fieldset__error element, so the ID stays stable whether
+      // error content comes from the slot or the property.
+      const errorWrapper = describedBy ? el.shadowRoot?.getElementById(describedBy) : null;
       expect(describedBy).toBeTruthy();
-      expect(errorDiv?.id).toBe(describedBy);
+      expect(errorWrapper).toBeTruthy();
     });
 
     it('sets aria-describedby to help-text id when help text is present', async () => {

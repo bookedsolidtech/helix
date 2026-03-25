@@ -395,9 +395,18 @@ export class HelixDialog extends LitElement {
       });
     });
 
-    return lightFocusable.filter(
+    const filtered = lightFocusable.filter(
       (el) => !el.hasAttribute('disabled') && el.getAttribute('tabindex') !== '-1',
     );
+
+    // WCAG 2.4.3: if no light DOM focusable elements exist, fall back to the shadow
+    // close button so the dialog always has at least one reachable focus target.
+    if (filtered.length === 0) {
+      const closeBtn = this.shadowRoot?.querySelector<HTMLElement>('.dialog__close-btn');
+      if (closeBtn) filtered.push(closeBtn);
+    }
+
+    return filtered;
   }
 
   /** @internal */
@@ -421,9 +430,17 @@ export class HelixDialog extends LitElement {
     const shadowActive = this.shadowRoot?.activeElement;
     const currentActive = (shadowActive ?? active) as HTMLElement | null;
 
+    // The shadow close button may be the first focusable element when no light DOM
+    // content exists (WCAG 2.1.2). Check both the element reference and shadow root
+    // active element so Shift+Tab wraps correctly across the shadow boundary.
+    const closeBtn = this.shadowRoot?.querySelector<HTMLElement>('.dialog__close-btn');
+
     if (e.shiftKey) {
       // Shift+Tab: if focus is on first, wrap to last
-      if (currentActive === first) {
+      const isOnFirst =
+        currentActive === first ||
+        (closeBtn !== null && shadowActive === closeBtn && first === closeBtn);
+      if (isOnFirst) {
         e.preventDefault();
         last.focus();
       }

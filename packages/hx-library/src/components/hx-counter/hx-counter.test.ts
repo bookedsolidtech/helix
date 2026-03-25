@@ -288,16 +288,27 @@ describe('hx-counter', () => {
   // ─── Accessibility (3) ───
 
   describe('Accessibility', () => {
-    it('has aria-live="polite" on counter element', async () => {
+    it('has aria-live="polite" on the off-screen live region (not on the visible counter)', async () => {
+      // WCAG 4.1.2 fix: aria-live moved from the visible counter span to a hidden live region
+      // so screen readers only announce once at animation end, not on every frame.
       const el = await fixture<HelixCounter>('<hx-counter value="42"></hx-counter>');
       const counter = shadowQuery(el, '[part~="counter"]');
-      expect(counter?.getAttribute('aria-live')).toBe('polite');
+      // Visible counter must NOT carry aria-live (prevents per-frame announcements)
+      expect(counter?.getAttribute('aria-live')).toBeNull();
+      // The off-screen .sr-only span carries aria-live instead
+      const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
+      expect(liveRegion?.getAttribute('aria-live')).toBe('polite');
     });
 
-    it('has aria-atomic="true" on counter element', async () => {
+    it('has aria-atomic="true" on the off-screen live region (not on the visible counter)', async () => {
+      // WCAG 4.1.2 fix: aria-atomic moved from the visible counter span to a hidden live region
       const el = await fixture<HelixCounter>('<hx-counter value="42"></hx-counter>');
       const counter = shadowQuery(el, '[part~="counter"]');
-      expect(counter?.getAttribute('aria-atomic')).toBe('true');
+      // Visible counter must NOT carry aria-atomic
+      expect(counter?.getAttribute('aria-atomic')).toBeNull();
+      // The off-screen .sr-only span carries aria-atomic instead
+      const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
+      expect(liveRegion?.getAttribute('aria-atomic')).toBe('true');
     });
 
     it('has no axe violations in default state', async () => {

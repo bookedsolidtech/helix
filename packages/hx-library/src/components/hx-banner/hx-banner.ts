@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -103,7 +103,31 @@ export class HelixBanner extends LitElement {
   @property({ type: String, attribute: 'close-label' })
   closeLabel = 'Dismiss banner';
 
+  /**
+   * Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:").
+   * When not set, defaults to the English label matching the current variant.
+   * @attr severity-label
+   */
+  @property({ attribute: 'severity-label' })
+  severityLabel: string | undefined;
+
   // ─── Private Helpers ───
+
+  /** Returns the default English severity label for the current variant. */
+  private _defaultSeverityLabel(): string {
+    const labels: Record<string, string> = {
+      info: 'Info:',
+      success: 'Success:',
+      warning: 'Warning:',
+      error: 'Error:',
+    };
+    return labels[this.variant] ?? '';
+  }
+
+  /** Returns the effective severity label, using the override if provided. */
+  private get _effectiveSeverityLabel(): string {
+    return this.severityLabel ?? this._defaultSeverityLabel();
+  }
 
   /** Returns true when the variant requires assertive announcement. */
   /** @internal */
@@ -134,7 +158,7 @@ export class HelixBanner extends LitElement {
     }
   }
 
-  protected override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('variant')) {
       // Keep host ARIA role in sync with variant (assertive vs. polite).
@@ -252,8 +276,13 @@ export class HelixBanner extends LitElement {
 
     const hasAction = this.actionLabel.length > 0 && this.actionHref.length > 0;
 
+    // WCAG 1.4.1: Always render a visually-hidden severity label so the variant
+    // is never conveyed by color alone.
+    const severityLabel = this._effectiveSeverityLabel;
+
     return html`
       <div part="banner" class=${classMap(classes)}>
+        <span class="banner__severity-label">${severityLabel}</span>
         <div part="icon" class="banner__icon">${this._renderDefaultIcon()}</div>
 
         <div part="message" class="banner__message">

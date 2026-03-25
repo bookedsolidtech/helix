@@ -248,10 +248,10 @@ describe('hx-date-picker', () => {
       expect(calendar).toBeNull();
     });
 
-    it('trigger has no aria-expanded when calendar is closed', async () => {
+    it('trigger has aria-expanded="false" when calendar is closed', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       const trigger = getTriggerButton(el);
-      expect(trigger.hasAttribute('aria-expanded')).toBe(false);
+      expect(trigger.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('calendar has role="dialog" and aria-modal="true"', async () => {

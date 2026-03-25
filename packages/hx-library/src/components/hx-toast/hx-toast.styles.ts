@@ -122,6 +122,9 @@ export const helixToastStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    /* WCAG 2.5.5: minimum 44×44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem);
     background: transparent;
     border: none;

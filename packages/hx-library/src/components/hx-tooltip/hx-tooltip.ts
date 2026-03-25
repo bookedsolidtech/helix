@@ -110,6 +110,11 @@ export class HelixTooltip extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('keydown', this._handleKeydown);
+    // Re-run ARIA setup on reconnection (firstUpdated does not re-run).
+    // hasUpdated is true after the first update cycle completes.
+    if (this.hasUpdated) {
+      this._setupTriggerAria();
+    }
   }
 
   override disconnectedCallback(): void {
@@ -226,10 +231,13 @@ export class HelixTooltip extends LitElement {
 
     const arrowData = middlewareData.arrow;
     const basePlacement = placement.split('-')[0] ?? 'top';
-    const staticSide =
-      ({ top: 'bottom', right: 'left', bottom: 'top', left: 'right' } as Record<string, string>)[
-        basePlacement
-      ] ?? 'bottom';
+    const oppositeSide: Record<string, string> = {
+      top: 'bottom',
+      right: 'left',
+      bottom: 'top',
+      left: 'right',
+    };
+    const staticSide = oppositeSide[basePlacement] ?? 'bottom';
 
     // Offset is derived from the arrow element's actual size so that custom
     // --hx-tooltip-arrow-size values position the arrow correctly.

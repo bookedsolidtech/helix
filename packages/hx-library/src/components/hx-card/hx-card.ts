@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -135,7 +135,7 @@ export class HelixCard extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     // WCAG 4.1.2: interactive cards (with hx-href) must have an accessible name
     if (
@@ -179,7 +179,9 @@ export class HelixCard extends LitElement {
   private _handleKeyDown(e: KeyboardEvent): void {
     if (!this.hxHref) return;
 
-    if (e.key === 'Enter' || e.key === ' ') {
+    // WCAG 2.1.1 / ARIA APG: role="link" activates on Enter only.
+    // Space is reserved for scrolling and must not activate links.
+    if (e.key === 'Enter') {
       e.preventDefault();
       this._dispatchCardClick(e);
     }

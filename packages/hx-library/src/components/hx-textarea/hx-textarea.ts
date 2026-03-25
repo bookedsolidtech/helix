@@ -442,13 +442,7 @@ export class HelixTextarea extends LitElement {
     // aria-live="polite" announces counter changes without interrupting the user.
     // The debounced _liveAnnouncement region provides additional context when nearing the limit.
     return html`
-      <div
-        part="counter"
-        class="field__counter"
-        id=${this._counterId}
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div part="counter" class="field__counter" id=${this._counterId} aria-hidden="true">
         ${display}
       </div>
     `;

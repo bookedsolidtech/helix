@@ -188,6 +188,13 @@ export class HelixBadge extends LitElement {
     const hasCount = this.count !== undefined;
     const isDot = !this._hasSlotContent && !hasCount && this.pulse;
 
+    if (isDot && !this.dotLabel) {
+      devWarn(
+        'hx-badge',
+        'Dot badge is missing an accessible label. Set `dotLabel` so screen readers can announce the badge purpose (WCAG 4.1.2).',
+      );
+    }
+
     const classes = {
       badge: true,
       [`badge--${this.variant}`]: true,

@@ -27,15 +27,13 @@ When absent, the close button falls back to "Close alert". */
   /** When true, applies a left border accent stripe instead of a full border.
 Common healthcare/enterprise dashboard pattern for visual distinction of alert types. */
   accent?: boolean;
+  /** Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:").
+When not set, defaults to the English label matching the current variant. */
+  severityLabel?: string | undefined;
   /** CSS selector for the element to return focus to after the alert is dismissed.
 When set, the component will find and focus the matching element after dismissal.
 If not set, focus management is the caller's responsibility via the hx-after-close event. */
   returnFocusTo?: string | null;
-  /** Map of severity variant labels prepended to screen-reader announcements.
-Override to provide localized severity prefixes. */
-  severityLabels?: Partial<Record<string, string>>;
-  /** Accessible label for the dismiss button. Override for localized text. */
-  closeLabel?: string;
 
   // Event callbacks
   /** Dispatched when the user dismisses the alert. */

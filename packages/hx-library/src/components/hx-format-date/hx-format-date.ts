@@ -164,7 +164,9 @@ export class HelixFormatDate extends LitElement {
   /** @internal */
   private _getLocale(): string {
     if (this.lang) return this.lang;
-    return document.documentElement.lang || navigator.language || 'en';
+    const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
+    const navLang = typeof navigator !== 'undefined' ? navigator.language : '';
+    return docLang || navLang || 'en';
   }
 
   /** @internal */
