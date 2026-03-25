@@ -31,6 +31,51 @@ permissions:
 # Reusable setup steps referenced by all jobs
 
 jobs:
+  # ── Secret scanning ─────────────────────────────────────────────────────
+  # Runs FIRST — before any build or test job — to ensure no credentials,
+  # tokens, or secrets are present in the diff or pushed commits.
+  # Agents in worktrees may not have gitleaks installed locally, making this
+  # the primary enforcement layer for the monorepo.
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION="8.21.2"
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Scan PR diff for secrets
+        if: github.event_name == 'pull_request'
+        run: |
+          gitleaks detect \
+            --source . \
+            --config .gitleaks.toml \
+            --log-opts "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" \
+            --redact \
+            --no-git=false \
+            --exit-code 1
+
+      - name: Scan push diff for secrets
+        if: github.event_name == 'push'
+        run: |
+          gitleaks detect \
+            --source . \
+            --config .gitleaks.toml \
+            --log-opts "HEAD~1..HEAD" \
+            --redact \
+            --no-git=false \
+            --exit-code 1
+
   # ── Change detection ───────────────────────────────────────────────────
   # Determines which jobs to run based on changed files.
   # Audit-only PRs (AUDIT.md files) skip Test and VRT.
@@ -75,7 +120,7 @@ jobs:
 
   lint:
     name: Lint
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -91,7 +136,7 @@ jobs:
 
   format:
     name: Format
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -107,7 +152,7 @@ jobs:
 
   type-check:
     name: Type Check
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -128,7 +173,7 @@ jobs:
 
   test:
     name: Test
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -250,7 +295,7 @@ jobs:
 
   build:
     name: Build
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -285,7 +330,7 @@ jobs:
 
   cem-diff:
     name: CEM API Diff
-    needs: changes
+    needs: [changes, secret-scan]
     if: >
       github.event_name == 'pull_request' &&
       needs.changes.outputs.is_audit != 'true'
@@ -346,7 +391,7 @@ jobs:
 
   bundle-size:
     name: Bundle Size
-    needs: [changes, build]
+    needs: [changes, secret-scan, build]
     if: >
       github.event_name == 'pull_request' &&
       needs.changes.outputs.is_audit != 'true'
@@ -437,7 +482,7 @@ jobs:
 
   vrt:
     name: Visual Regression
-    needs: changes
+    needs: [changes, secret-scan]
     if: >
       needs.changes.outputs.source == 'true' &&
       needs.changes.outputs.is_audit != 'true' &&
@@ -528,7 +573,7 @@ jobs:
 
   changeset:
     name: Changeset Required
-    needs: changes
+    needs: [changes, secret-scan]
     if: >
       github.event_name == 'pull_request' &&
       needs.changes.outputs.is_audit != 'true' &&
@@ -569,7 +614,7 @@ jobs:
 
   audit:
     name: Security Audit
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -593,7 +638,7 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    needs: [changes, lint, format, type-check, test, build, bundle-size, vrt, audit, changeset]
+    needs: [changes, secret-scan, lint, format, type-check, test, build, bundle-size, vrt, audit, changeset]
     if: always()
     steps:
       - name: Check all gates
@@ -601,6 +646,7 @@ jobs:
           IS_AUDIT="${{ needs.changes.outputs.is_audit }}"
 
           echo "Audit branch:  $IS_AUDIT"
+          echo "Secret Scan:   ${{ needs.secret-scan.result }}"
           echo "Lint:          ${{ needs.lint.result }}"
           echo "Format:        ${{ needs.format.result }}"
           echo "Type Check:    ${{ needs.type-check.result }}"
@@ -618,14 +664,15 @@ jobs:
 
           FAIL=0
 
-          for gate in lint format type-check build audit; do
+          for gate in secret-scan lint format type-check build audit; do
             result="${{ needs.lint.result }}"
             case "$gate" in
-              lint)       result="${{ needs.lint.result }}" ;;
-              format)     result="${{ needs.format.result }}" ;;
-              type-check) result="${{ needs.type-check.result }}" ;;
-              build)      result="${{ needs.build.result }}" ;;
-              audit)      result="${{ needs.audit.result }}" ;;
+              secret-scan) result="${{ needs.secret-scan.result }}" ;;
+              lint)        result="${{ needs.lint.result }}" ;;
+              format)      result="${{ needs.format.result }}" ;;
+              type-check)  result="${{ needs.type-check.result }}" ;;
+              build)       result="${{ needs.build.result }}" ;;
+              audit)       result="${{ needs.audit.result }}" ;;
             esac
             if [[ "$result" != "success" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"

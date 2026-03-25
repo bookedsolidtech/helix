@@ -30,8 +30,98 @@ permissions:
   id-token: write
 
 jobs:
+  # ── Pre-publish secret scan ─────────────────────────────────────────────
+  # Scans each publishable package tarball for secrets before anything
+  # reaches npm. Uses `pnpm pack` to produce the exact artifact that would
+  # be published, then extracts it and runs gitleaks in no-git mode.
+  # The publish job will not start if this job fails.
+
+  secret-scan:
+    name: Pre-publish Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm turbo run build --filter='!docs'
+
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION="8.21.2"
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Scan publishable package tarballs for secrets
+        run: |
+          SCAN_DIR="$(mktemp -d)"
+          FAIL=0
+
+          for pkg_dir in packages/hx-library packages/hx-tokens; do
+            if [ ! -f "$pkg_dir/package.json" ]; then
+              echo "Skipping $pkg_dir — no package.json"
+              continue
+            fi
+
+            PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name" 2>/dev/null || echo "unknown")
+            echo "Packing $PKG_NAME ($pkg_dir)..."
+
+            TARBALL=$(pnpm pack --pack-destination "$SCAN_DIR" 2>/dev/null \
+              | tail -1)
+            if [ ! -f "$TARBALL" ]; then
+              # pnpm pack writes the filename relative to pack-destination
+              TARBALL=$(ls -t "$SCAN_DIR"/*.tgz 2>/dev/null | head -1)
+            fi
+
+            if [ -z "$TARBALL" ]; then
+              echo "::error::Failed to produce tarball for $PKG_NAME"
+              FAIL=1
+              continue
+            fi
+
+            EXTRACT_DIR="$SCAN_DIR/extract-$(basename "$TARBALL" .tgz)"
+            mkdir -p "$EXTRACT_DIR"
+            tar -xzf "$TARBALL" -C "$EXTRACT_DIR"
+
+            echo "Scanning $PKG_NAME tarball contents..."
+            if ! gitleaks detect \
+              --source "$EXTRACT_DIR" \
+              --config .gitleaks.toml \
+              --no-git \
+              --redact \
+              --exit-code 1; then
+              echo "::error::Secrets detected in $PKG_NAME tarball — publish blocked"
+              FAIL=1
+            else
+              echo "$PKG_NAME — clean"
+            fi
+          done
+
+          if [ "$FAIL" -eq 1 ]; then
+            echo "::error::Pre-publish secret scan failed. Fix detected secrets before publishing."
+            exit 1
+          fi
+
+          echo "All package tarballs passed secret scan."
+        working-directory: .
+
   publish:
     name: Publish to npm
+    needs: secret-scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
