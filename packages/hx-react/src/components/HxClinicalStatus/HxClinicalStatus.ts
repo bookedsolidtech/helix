@@ -31,7 +31,7 @@ export const HxClinicalStatus = createComponent({
   react: React,
   events: {
     onHxDismiss: 'hx-dismiss',
-    onHxAcknowledge: 'hx-acknowledge'
+    onHxAcknowledge: 'hx-acknowledge',
   },
   displayName: 'HxClinicalStatus',
 });
