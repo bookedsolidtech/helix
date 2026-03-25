@@ -208,6 +208,7 @@ export class HelixSelect extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    // Safety net: remove listener if component is removed while dropdown is open
     document.removeEventListener('click', this._handleOutsideClick);
   }
 

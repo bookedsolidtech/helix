@@ -376,8 +376,6 @@ export class HelixDialog extends LitElement {
 
   /** @internal */
   private _getFocusableElements(): HTMLElement[] {
-    const focusableSelectors = FOCUSABLE_SELECTORS;
-
     // Collect focusable elements from slotted light DOM content only.
     // Shadow DOM elements (e.g., the built-in close button) remain accessible via
     // the native <dialog> tab order — including them here would cause focus to land
@@ -389,10 +387,10 @@ export class HelixDialog extends LitElement {
     slots.forEach((slot) => {
       slot.assignedElements({ flatten: true }).forEach((el) => {
         if (el instanceof HTMLElement) {
-          if (el.matches(focusableSelectors)) {
+          if (el.matches(FOCUSABLE_SELECTORS)) {
             lightFocusable.push(el);
           }
-          el.querySelectorAll<HTMLElement>(focusableSelectors).forEach((child) => {
+          el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS).forEach((child) => {
             lightFocusable.push(child);
           });
         }

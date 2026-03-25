@@ -269,6 +269,7 @@ export class HelixCombobox extends LitElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    // Safety net: remove listener if component is removed while dropdown is open
     if (typeof document !== 'undefined') {
       document.removeEventListener('click', this._handleOutsideClick);
     }
