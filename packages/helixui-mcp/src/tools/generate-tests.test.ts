@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { writeFileSync, unlinkSync, existsSync, mkdirSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import { generateTests } from './generate-tests.js';
 import type { Cem } from '../core/cem-reader.js';
 
@@ -105,33 +106,28 @@ const FIXTURE_CEM_NO_EVENTS: Cem = {
 
 // ─── Test setup ───────────────────────────────────────────────────────────────
 
-let tempCemPath: string | null = null;
-let tempComponentDir: string | null = null;
+const createdPaths: string[] = [];
 
 function writeTempCem(data: Cem): string {
-  const filePath = join(tmpdir(), `generate-tests-cem-${Date.now()}.json`);
+  const filePath = join(tmpdir(), `generate-tests-cem-${randomUUID()}.json`);
   writeFileSync(filePath, JSON.stringify(data), 'utf8');
-  tempCemPath = filePath;
+  createdPaths.push(filePath);
   return filePath;
 }
 
 function writeTempComponent(tagName: string, source: string): string {
-  const dir = join(tmpdir(), `generate-tests-component-${Date.now()}`);
+  const dir = join(tmpdir(), `generate-tests-component-${randomUUID()}`);
   mkdirSync(dir, { recursive: true });
-  tempComponentDir = dir;
+  createdPaths.push(dir);
   const filePath = join(dir, `${tagName}.ts`);
   writeFileSync(filePath, source, 'utf8');
   return filePath;
 }
 
 afterEach(() => {
-  if (tempCemPath && existsSync(tempCemPath)) {
-    unlinkSync(tempCemPath);
-    tempCemPath = null;
-  }
-  if (tempComponentDir && existsSync(tempComponentDir)) {
-    rmSync(tempComponentDir, { recursive: true, force: true });
-    tempComponentDir = null;
+  delete process.env['HELIXUI_MCP_CEM_PATH'];
+  for (const p of createdPaths.splice(0)) {
+    if (existsSync(p)) rmSync(p, { recursive: true, force: true });
   }
 });
 
@@ -151,20 +147,19 @@ describe('generateTests', () => {
       expect(result.tagName).toBe('hx-button');
       expect(result.className).toBe('HelixButton');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('testFilePath is co-located with the component', () => {
       const cemPath = writeTempCem(FIXTURE_CEM);
       process.env['HELIXUI_MCP_CEM_PATH'] = cemPath;
       const componentPath = writeTempComponent('hx-button', '');
+      const componentDir = dirname(componentPath);
 
       const result = generateTests({ componentPath });
 
       expect(result.testFilePath).toMatch(/hx-button\.test\.ts$/);
-      expect(result.testFilePath).toContain(tempComponentDir!);
+      expect(result.testFilePath).toContain(componentDir);
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('includes vitest imports', () => {
@@ -180,7 +175,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('expect(');
       expect(result.testContent).toContain('afterEach(cleanup)');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('imports test-utils helpers', () => {
@@ -195,7 +189,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('cleanup');
       expect(result.testContent).toContain('checkA11y');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates Rendering describe block', () => {
@@ -209,7 +202,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('renders with shadow DOM');
       expect(result.testContent).toContain('el.shadowRoot');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates property block for enum-like variant property', () => {
@@ -224,7 +216,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain("'secondary'");
       expect(result.testContent).toContain("'ghost'");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates property block for boolean disabled property', () => {
@@ -237,7 +228,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain("describe('Property: disabled'");
       expect(result.testContent).toContain('toBe(false)');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates Events describe block', () => {
@@ -253,7 +243,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('event.bubbles');
       expect(result.testContent).toContain('event.composed');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates Slots describe block with default and named slots', () => {
@@ -267,7 +256,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('default slot renders');
       expect(result.testContent).toContain('prefix');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates CSS Parts describe block', () => {
@@ -282,7 +270,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('[part~=');
       expect(result.testContent).toContain('shadowQuery');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates Keyboard describe block when click event exists', () => {
@@ -297,7 +284,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('Space');
       expect(result.testContent).toContain('userEvent');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates Accessibility describe block', () => {
@@ -311,7 +297,6 @@ describe('generateTests', () => {
       expect(result.testContent).toContain('checkA11y');
       expect(result.testContent).toContain('violations');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('excludes private fields from generated tests', () => {
@@ -323,7 +308,6 @@ describe('generateTests', () => {
 
       expect(result.testContent).not.toContain('_internal');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('skips Keyboard block when no click or change event exists', () => {
@@ -335,7 +319,6 @@ describe('generateTests', () => {
 
       expect(result.testContent).not.toContain("describe('Keyboard'");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('returns empty warnings when CEM is found and component is in CEM', () => {
@@ -347,7 +330,6 @@ describe('generateTests', () => {
 
       expect(result.warnings).toHaveLength(0);
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
   });
 
@@ -384,7 +366,6 @@ export class HelixWidget extends LitElement {
       expect(result.warnings.length).toBeGreaterThan(0);
       expect(result.warnings[0]).toContain('CEM manifest not found');
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates test content from TS source when CEM is absent', () => {
@@ -396,7 +377,6 @@ export class HelixWidget extends LitElement {
       expect(result.testContent).toContain('hx-widget');
       expect(result.testContent).toContain("describe('Rendering'");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('generates minimal scaffold when component path does not exist', () => {
@@ -410,7 +390,6 @@ export class HelixWidget extends LitElement {
       expect(result.testContent).toContain("describe('Rendering'");
       expect(result.warnings.length).toBeGreaterThan(0);
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
   });
 
@@ -426,7 +405,6 @@ export class HelixWidget extends LitElement {
 
       expect(result.warnings.some((w) => w.includes('not found in CEM'))).toBe(true);
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
   });
 
@@ -442,7 +420,6 @@ export class HelixWidget extends LitElement {
 
       expect(result.testContent).toContain("describe('hx-button'");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('imports component class as type', () => {
@@ -455,7 +432,6 @@ export class HelixWidget extends LitElement {
       expect(result.testContent).toContain("import type { HelixButton }");
       expect(result.testContent).toContain("from './hx-button.js'");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('imports component registration from index.js', () => {
@@ -467,7 +443,6 @@ export class HelixWidget extends LitElement {
 
       expect(result.testContent).toContain("import './index.js'");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
 
     it('includes page import from @vitest/browser/context', () => {
@@ -479,7 +454,6 @@ export class HelixWidget extends LitElement {
 
       expect(result.testContent).toContain("@vitest/browser/context");
 
-      delete process.env['HELIXUI_MCP_CEM_PATH'];
     });
   });
 });
