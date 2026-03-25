@@ -18,9 +18,27 @@ export interface ValidationResult {
 
 // ─── File collection ──────────────────────────────────────────────────────────
 
-const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.svelte']);
+const SOURCE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.vue',
+  '.svelte',
+]);
 const CONFIG_EXTENSIONS = new Set(['.ts', '.js', '.mjs', '.cjs']);
-const IGNORE_DIRS = new Set(['node_modules', '.git', 'dist', 'build', '.cache', 'coverage', '.next', '.nuxt']);
+const IGNORE_DIRS = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  '.cache',
+  'coverage',
+  '.next',
+  '.nuxt',
+]);
 
 function collectFiles(dir: string, extensions: Set<string>, maxDepth = 8, depth = 0): string[] {
   if (depth > maxDepth || !existsSync(dir)) return [];
@@ -79,7 +97,7 @@ function checkImports(projectPath: string, sourceFiles: string[]): ValidationIss
         type: 'barrel-import',
         severity: 'warning',
         message:
-          'Importing from the @helixui/library barrel may prevent tree-shaking. Prefer path imports: import \'@helixui/library/components/hx-button/index.js\'.',
+          "Importing from the @helixui/library barrel may prevent tree-shaking. Prefer path imports: import '@helixui/library/components/hx-button/index.js'.",
         location: `${loc}:${lineNum}`,
       });
     }
@@ -161,13 +179,16 @@ function checkBundlerConfig(projectPath: string): ValidationIssue[] {
           type: 'bundler-ce-handling',
           severity: 'warning',
           message:
-            'Next.js config found without transpilePackages for @helixui. Add transpilePackages: [\'@helixui/library\'] to next.config.* to ensure proper module resolution.',
+            "Next.js config found without transpilePackages for @helixui. Add transpilePackages: ['@helixui/library'] to next.config.* to ensure proper module resolution.",
           location: pattern,
         });
       }
 
       // Check for custom elements schema in Next.js
-      if (!content.includes('experimental') || !content.includes('serverComponentsExternalPackages')) {
+      if (
+        !content.includes('experimental') ||
+        !content.includes('serverComponentsExternalPackages')
+      ) {
         issues.push({
           type: 'ssr-ce-handling',
           severity: 'warning',
@@ -325,7 +346,9 @@ function checkFrameworkIssues(projectPath: string, sourceFiles: string[]): Valid
   const hasReact = 'react' in deps || 'react-dom' in deps;
   const hasVue = 'vue' in deps;
   const hasAngular = '@angular/core' in deps;
-  const hasDrupal = sourceFiles.some((f) => f.endsWith('.behavior.js') || f.endsWith('.behavior.ts'));
+  const hasDrupal = sourceFiles.some(
+    (f) => f.endsWith('.behavior.js') || f.endsWith('.behavior.ts'),
+  );
 
   // ── React ──────────────────────────────────────────────────────────────────
   if (hasReact) {
@@ -387,7 +410,7 @@ function checkFrameworkIssues(projectPath: string, sourceFiles: string[]): Valid
         type: 'framework-vue-custom-element',
         severity: 'error',
         message:
-          'Vue project detected without isCustomElement configuration. Add to vite.config: vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith(\'hx-\') } } }). Without this, Vue will warn about unknown elements and may not bind properties correctly.',
+          "Vue project detected without isCustomElement configuration. Add to vite.config: vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith('hx-') } } }). Without this, Vue will warn about unknown elements and may not bind properties correctly.",
         location: 'vite.config.*',
       });
     }
