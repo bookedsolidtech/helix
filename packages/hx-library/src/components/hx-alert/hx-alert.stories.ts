@@ -78,6 +78,35 @@ const meta = {
         type: { summary: 'string | null' },
       },
     },
+    showIcon: {
+      control: 'boolean',
+      description:
+        'Whether to show the default variant icon. Add the `show-icon` attribute to display the icon.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    severityLabel: {
+      control: 'text',
+      description:
+        'Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:"). Defaults to the English label matching the current variant.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+    returnFocusTo: {
+      control: 'text',
+      description:
+        'CSS selector for the element to return focus to after the alert is dismissed.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'null' },
+        type: { summary: 'string | null' },
+      },
+    },
   },
   args: {
     variant: 'info',

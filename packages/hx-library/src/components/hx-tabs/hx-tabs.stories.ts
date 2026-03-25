@@ -856,3 +856,24 @@ export const DarkMode: Story = {
     orientation: 'vertical',
   },
 };
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the tab list. Arrow Left/Right navigates between tabs. Enter or Space activates the focused tab. Tab moves focus into the active tab panel.
+      </p>
+      <hx-tabs></hx-tabs>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-tabs');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
+};

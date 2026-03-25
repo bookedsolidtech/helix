@@ -104,6 +104,11 @@ const meta = {
       </hx-dropdown>
     </div>
   `,
+  parameters: {
+    actions: {
+      handles: ['hx-show', 'hx-hide', 'hx-select'],
+    },
+  },
 } satisfies Meta;
 
 export default meta;
@@ -407,4 +412,25 @@ export const HealthcareUseCases: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the trigger button. Enter or Space opens the menu. Arrow Down/Up navigates menu items. Enter selects. Escape closes.
+      </p>
+      <hx-dropdown></hx-dropdown>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-dropdown');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

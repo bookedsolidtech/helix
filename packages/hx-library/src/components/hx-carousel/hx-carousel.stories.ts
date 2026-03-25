@@ -90,6 +90,42 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    labelPrevSlide: {
+      control: 'text',
+      description: 'Accessible label for the previous slide button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Previous slide' },
+        type: { summary: 'string' },
+      },
+    },
+    labelNextSlide: {
+      control: 'text',
+      description: 'Accessible label for the next slide button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Next slide' },
+        type: { summary: 'string' },
+      },
+    },
+    labelPauseAutoplay: {
+      control: 'text',
+      description: 'Accessible label for the autoplay pause button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Pause autoplay' },
+        type: { summary: 'string' },
+      },
+    },
+    labelPlayAutoplay: {
+      control: 'text',
+      description: 'Accessible label for the autoplay play button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Play autoplay' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Carousel',
@@ -516,4 +552,25 @@ export const WithSlots: Story = {
       <button slot="next-button" aria-label="Next slide" style="padding: 0.5rem 1rem;">Next</button>
     </hx-carousel>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Use Arrow keys to navigate between slides. Tab moves focus to the next interactive control (previous/next buttons, play/pause).
+      </p>
+      <hx-carousel></hx-carousel>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-carousel');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

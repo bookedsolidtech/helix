@@ -403,3 +403,19 @@ export const DarkMode: Story = {
     alt: 'Anonymous user',
   },
 };
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        This component is presentational. It has no interactive keyboard targets. Screen readers announce the image or initials as described by its alt/label attributes.
+      </p>
+      <hx-avatar></hx-avatar>
+    </div>
+  `,
+};

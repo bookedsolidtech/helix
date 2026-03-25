@@ -82,6 +82,19 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    label: {
+      control: 'text',
+      description: 'Accessible label for the popover, used as aria-label on the popover panel.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+  },
+  parameters: {
+    actions: {
+      handles: ['hx-show', 'hx-after-show', 'hx-hide', 'hx-after-hide'],
+    },
   },
   args: {
     placement: 'bottom',
@@ -368,4 +381,25 @@ export const CSSParts: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the trigger element. Enter or Space opens the popover. Tab continues into the popover content. Escape closes the popover.
+      </p>
+      <hx-popover></hx-popover>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-popover');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

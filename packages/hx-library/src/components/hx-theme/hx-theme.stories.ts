@@ -33,6 +33,26 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    brand: {
+      control: 'text',
+      description:
+        'Brand identifier used to scope theme tokens. Allows multiple brands to coexist on the same page.',
+      table: {
+        category: 'Theme',
+        type: { summary: 'string' },
+      },
+    },
+    motion: {
+      control: { type: 'select' },
+      options: ['auto', 'reduced', 'full'],
+      description:
+        'Motion preference override. "reduced" disables animations; "auto" follows the OS prefers-reduced-motion setting.',
+      table: {
+        category: 'Theme',
+        defaultValue: { summary: 'auto' },
+        type: { summary: "'auto' | 'reduced' | 'full'" },
+      },
+    },
   },
   args: {
     theme: 'light',
@@ -469,6 +489,22 @@ export const DrupalIntegration: Story = {
           </div>
         </hx-theme>
       </div>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        This component is a presentational wrapper providing design tokens. It has no interactive keyboard targets of its own.
+      </p>
+      <hx-theme></hx-theme>
     </div>
   `,
 };

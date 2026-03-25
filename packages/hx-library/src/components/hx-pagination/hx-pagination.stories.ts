@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { fn } from 'storybook/test';
+import { fn, expect, userEvent } from 'storybook/test';
 import './hx-pagination.js';
 
 // ─── Meta ────────────────────────────────────────────────────────────────────
@@ -79,6 +79,51 @@ const meta = {
       table: {
         category: 'Accessibility',
         defaultValue: { summary: 'Pagination' },
+        type: { summary: 'string' },
+      },
+    },
+    labelRowsPerPage: {
+      control: 'text',
+      description: 'Label text for the rows-per-page selector.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Rows per page' },
+        type: { summary: 'string' },
+      },
+    },
+    firstPageLabel: {
+      control: 'text',
+      description: 'Accessible label for the first page button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'First page' },
+        type: { summary: 'string' },
+      },
+    },
+    previousPageLabel: {
+      control: 'text',
+      description: 'Accessible label for the previous page button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Previous page' },
+        type: { summary: 'string' },
+      },
+    },
+    nextPageLabel: {
+      control: 'text',
+      description: 'Accessible label for the next page button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Next page' },
+        type: { summary: 'string' },
+      },
+    },
+    lastPageLabel: {
+      control: 'text',
+      description: 'Accessible label for the last page button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Last page' },
         type: { summary: 'string' },
       },
     },
@@ -377,5 +422,26 @@ export const DarkMode: Story = {
   args: {
     totalPages: 10,
     currentPage: 5,
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab navigates through page number buttons, previous/next buttons, and the rows-per-page select. Enter or Space activates the focused button.
+      </p>
+      <hx-pagination></hx-pagination>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-pagination');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
   },
 };

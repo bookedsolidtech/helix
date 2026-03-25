@@ -51,6 +51,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    labelClose: {
+      control: 'text',
+      description: 'Accessible label for the close button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Close' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     open: false,
@@ -891,4 +900,20 @@ export const DarkMode: Story = {
     closeOnBackdrop: true,
     heading: 'Patient Record',
   },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        When open, focus is trapped inside the dialog. Tab cycles through focusable elements. Escape closes the dialog. The first focusable element receives focus on open.
+      </p>
+      <hx-dialog></hx-dialog>
+    </div>
+  `,
 };
