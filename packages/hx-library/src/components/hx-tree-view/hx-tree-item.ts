@@ -158,6 +158,19 @@ export class HelixTreeItem extends LitElement {
     }
   }
 
+  /**
+   * Set ARIA position metadata from the parent hx-tree-view in a single O(n) pass.
+   * Calling this avoids the O(n^2) ancestor-walk + sibling-iteration in _updateAriaMetadata
+   * when the parent already knows the layout.
+   * @internal
+   */
+  setAriaMetadata(level: number, posInSet: number, setSize: number, selectable: boolean): void {
+    this._level = level;
+    this._posInSet = posInSet;
+    this._setSize = setSize;
+    this._selectable = selectable;
+  }
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {

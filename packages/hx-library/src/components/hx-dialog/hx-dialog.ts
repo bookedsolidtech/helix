@@ -7,6 +7,18 @@ import { helixDialogStyles } from './hx-dialog.styles.js';
 // D21 — deterministic monotonic counter instead of Math.random()
 let _dialogCounter = 0;
 
+// Module-level constant avoids rebuilding the selector string on every _getFocusableElements call
+const FOCUSABLE_SELECTORS = [
+  'a[href]',
+  'area[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+  'details > summary',
+].join(',');
+
 /**
  * A modal and non-modal dialog component built on the native HTML `<dialog>` element.
  * Provides focus trapping, backdrop interaction, keyboard navigation, and full
@@ -363,17 +375,6 @@ export class HelixDialog extends LitElement {
 
   /** @internal */
   private _getFocusableElements(): HTMLElement[] {
-    const focusableSelectors = [
-      'a[href]',
-      'area[href]',
-      'button:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
-      'details > summary',
-    ].join(',');
-
     // Collect focusable elements from slotted light DOM content only.
     // Shadow DOM elements (e.g., the built-in close button) remain accessible via
     // the native <dialog> tab order — including them here would cause focus to land
@@ -385,10 +386,10 @@ export class HelixDialog extends LitElement {
     slots.forEach((slot) => {
       slot.assignedElements({ flatten: true }).forEach((el) => {
         if (el instanceof HTMLElement) {
-          if (el.matches(focusableSelectors)) {
+          if (el.matches(FOCUSABLE_SELECTORS)) {
             lightFocusable.push(el);
           }
-          el.querySelectorAll<HTMLElement>(focusableSelectors).forEach((child) => {
+          el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS).forEach((child) => {
             lightFocusable.push(child);
           });
         }

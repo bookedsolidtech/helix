@@ -204,15 +204,22 @@ export class HelixSelect extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._handleOutsideClick);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    // Safety net: remove listener if component is removed while dropdown is open
     document.removeEventListener('click', this._handleOutsideClick);
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has('open')) {
+      if (this.open) {
+        document.addEventListener('click', this._handleOutsideClick);
+      } else {
+        document.removeEventListener('click', this._handleOutsideClick);
+      }
+    }
     if (changedProperties.has('value')) {
       this._syncNativeSelect();
       this._updateFormValue();

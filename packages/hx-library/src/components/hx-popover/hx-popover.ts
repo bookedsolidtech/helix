@@ -1,7 +1,6 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
-import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
 type PopoverPlacement =
@@ -149,7 +148,6 @@ export class HelixPopover extends LitElement {
     }
     document.removeEventListener('click', this._handleDocumentClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
-    document.removeEventListener('keydown', this._handleFocusTrap);
   }
 
   override firstUpdated(): void {
@@ -217,35 +215,6 @@ export class HelixPopover extends LitElement {
     return result;
   }
 
-  /** Trap Tab/Shift+Tab focus within the popover body when it contains interactive elements. */
-  /** @internal */
-  private _handleFocusTrap = (e: KeyboardEvent): void => {
-    if (e.key !== 'Tab' || !this._visible) return;
-
-    const focusable = this._getFocusableElements();
-    // If no interactive children, keep focus on the body itself — no cycling needed.
-    if (focusable.length === 0) return;
-
-    const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
-    const allFocusable = bodyEl ? [bodyEl, ...focusable] : focusable;
-    if (allFocusable.length === 0) return;
-
-    const first = allFocusable[0] as HTMLElement;
-    const last = allFocusable[allFocusable.length - 1] as HTMLElement;
-
-    if (e.shiftKey) {
-      if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      }
-    } else {
-      if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  };
-
   // ─── Show/Hide ───
 
   /** @internal */
@@ -257,11 +226,10 @@ export class HelixPopover extends LitElement {
     this._visible = true;
     this.open = true;
     this._setAnchorAriaAttributes(true);
-    // P1-03: add Escape listener synchronously before any await so it is registered
-    // by the time the test fires an Escape keydown after a single await el.updateComplete.
+    // P1-03 / HIGH-01: single keydown listener handles both Escape and focus trap.
+    // Registered synchronously before any await so it is in place before the first
+    // await el.updateComplete in tests.
     document.addEventListener('keydown', this._handleDocumentKeydown);
-    // HIGH-01: focus trap listener active while popover is open
-    document.addEventListener('keydown', this._handleFocusTrap);
     await this.updateComplete;
     // hx-after-show fires after Lit has rendered the visible state. Dispatching here
     // (before _updatePosition) ensures it fires in the same microtask as the test's
@@ -288,7 +256,6 @@ export class HelixPopover extends LitElement {
     if (!this._visible) return;
     document.removeEventListener('click', this._handleDocumentClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
-    document.removeEventListener('keydown', this._handleFocusTrap);
     this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
     this._visible = false;
     this.open = false;
@@ -317,6 +284,8 @@ export class HelixPopover extends LitElement {
       : null;
 
     if (!anchorEl || !bodyEl) return;
+
+    const { computePosition, flip, shift, offset, arrow } = await import('@floating-ui/dom');
 
     const middleware = [
       offset({ mainAxis: this.distance, crossAxis: this.skidding }),
@@ -380,15 +349,44 @@ export class HelixPopover extends LitElement {
 
   // ─── Event Handlers ───
 
-  // P1-03 / P0-01: document-level handlers active only while popover is open
+  // P1-03 / P0-01 / HIGH-01: single document-level keydown handler while popover is open.
+  // Handles Escape (close) and Tab (focus trap) in one listener to reduce overhead.
   /**
-   * Closes the popover when the Escape key is pressed while it is open.
+   * Handles Escape to close the popover and Tab/Shift+Tab to trap focus within it.
    * @internal
    */
   private _handleDocumentKeydown = (e: KeyboardEvent): void => {
-    if (e.key === 'Escape' && this._visible) {
+    if (!this._visible) return;
+
+    if (e.key === 'Escape') {
       // HIGH-03: Escape always restores focus to the prior element
       void this._hide(true);
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      // HIGH-01: trap Tab/Shift+Tab focus within the popover body
+      const focusable = this._getFocusableElements();
+      if (focusable.length === 0) return;
+
+      const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;
+      const allFocusable = bodyEl ? [bodyEl, ...focusable] : focusable;
+      if (allFocusable.length === 0) return;
+
+      const first = allFocusable[0] as HTMLElement;
+      const last = allFocusable[allFocusable.length - 1] as HTMLElement;
+
+      if (e.shiftKey) {
+        if (document.activeElement === first || this.shadowRoot?.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last || this.shadowRoot?.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     }
   };
 

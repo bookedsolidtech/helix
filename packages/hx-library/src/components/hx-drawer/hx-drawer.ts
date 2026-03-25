@@ -373,8 +373,19 @@ export class HelixDrawer extends LitElement {
   private _hideBackgroundFromScreenReaders(): void {
     if (this.contained) return;
     this._siblingAriaHiddenElements = [];
+    // Walk the parent chain once to find which body child is an ancestor of this component.
+    // This avoids calling child.contains(this) in a loop (which is O(n * depth)).
+    // Starting from parentElement avoids aliasing `this` to a local variable.
+    let ancestorBodyChild: Element | null = null;
+    let el: Element | null = this.parentElement;
+    while (el && el.parentElement !== document.body) {
+      el = el.parentElement;
+    }
+    if (el && el.parentElement === document.body) {
+      ancestorBodyChild = el;
+    }
     Array.from(document.body.children).forEach((child) => {
-      if (child === this || child.contains(this)) return;
+      if (child === this || child === ancestorBodyChild) return;
       if (!child.hasAttribute('aria-hidden')) {
         child.setAttribute('aria-hidden', 'true');
         this._siblingAriaHiddenElements.push(child);
