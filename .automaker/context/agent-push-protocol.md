@@ -14,26 +14,28 @@ pnpm run format
 git add -u
 ```
 
-### Step 2: Verify (lint + format:check + type-check)
+### Step 2: Preflight (ALL CI gates locally)
 
 ```bash
-pnpm run verify
+pnpm run preflight
 ```
 
 If this fails: **FIX THE ERRORS.** Do not push. Do not skip.
 
-### Step 3: Smart Tests (if component source changed)
+`preflight` runs ALL CI-equivalent gates in order:
+1. Lint
+2. Format check
+3. Type check
+4. Build (excludes docs)
+5. Smart tests + coverage (changed components only)
+6. CEM (if library source changed)
+7. Changeset check (if component source changed)
 
-```bash
-pnpm run test:smart
-```
-
-If this fails: **FIX THE TESTS.** Do not push. Do not skip.
-If no component source files changed, this step is skipped automatically by the command.
+**This replaces the old separate `verify` + `test:smart` steps.**
 
 **NEVER run `pnpm run test` or `pnpm run test:library` — these run the full suite and are forbidden.**
 
-### Step 4: Commit
+### Step 3: Commit
 
 ```bash
 HUSKY=0 git commit -m "type(scope): lowercase message"
@@ -41,7 +43,7 @@ HUSKY=0 git commit -m "type(scope): lowercase message"
 
 Subject must be ALL LOWERCASE. Max 120 chars. See commit-quality-gates.md.
 
-### Step 5: Push ONCE
+### Step 4: Push ONCE
 
 ```bash
 HUSKY=0 git push origin <branch>
@@ -49,7 +51,7 @@ HUSKY=0 git push origin <branch>
 
 ONE push. ONE CodeRabbit review cycle. Never push twice.
 
-### Step 6: Create PR + Auto-Merge
+### Step 5: Create PR + Auto-Merge
 
 ```bash
 PR_URL=$(gh pr create \
@@ -74,8 +76,7 @@ gh pr edit $PR_NUMBER --add-label "skip-changeset" --repo bookedsolidtech/helix
 ## What Happens If You Skip Steps
 
 - **Skip format** -- CI format check fails -- wasted cycle
-- **Skip verify** -- CI lint/type-check fails -- wasted cycle
-- **Skip test:smart** -- CI tests fail -- wasted cycle
+- **Skip preflight** -- CI lint/type-check/build/tests/coverage fail -- wasted cycle
 - **Push twice** -- CodeRabbit reviews twice -- stale CHANGES_REQUESTED blocks merge
 - **Skip changeset** -- Changeset Required check fails -- wasted cycle
 
@@ -83,7 +84,10 @@ gh pr edit $PR_NUMBER --add-label "skip-changeset" --repo bookedsolidtech/helix
 
 ## Changeset Requirement
 
-If your changes touch `packages/hx-library/src/` (anything other than test-only changes), you MUST create a changeset:
+`pnpm run preflight` checks for changesets automatically. If component source was
+modified and no changeset exists, preflight will fail with instructions.
+
+To manually create a changeset:
 
 ```bash
 pnpm exec changeset
@@ -93,6 +97,7 @@ Select the package, bump type, and write a description.
 Commit the `.changeset/*.md` file WITH your code changes (same commit).
 
 **Exception:** Test-only changes (only `*.test.ts` modified) -- add `skip-changeset` label to PR instead.
+To bypass preflight's changeset check: `SKIP_CHANGESET=1 pnpm run preflight`
 
 **CRITICAL:** Use a unique changeset filename. Parallel features with the same changeset filename cause cascading merge conflicts.
 
@@ -104,10 +109,9 @@ The same sequence applies when fixing CodeRabbit feedback:
 
 1. Fix ALL feedback in one pass
 2. `pnpm run format && git add -u`
-3. `pnpm run verify` -- must pass
-4. `pnpm run test:smart` -- must pass (if component source changed)
-5. `HUSKY=0 git commit -m "fix(scope): address coderabbit feedback"`
-6. `HUSKY=0 git push origin <branch>` -- ONE push
+3. `pnpm run preflight` -- must pass
+4. `HUSKY=0 git commit -m "fix(scope): address coderabbit feedback"`
+5. `HUSKY=0 git push origin <branch>` -- ONE push
 
 Do NOT push partial fixes then format separately. That triggers extra review cycles.
 
@@ -115,6 +119,5 @@ Do NOT push partial fixes then format separately. That triggers extra review cyc
 
 ## The One Rule
 
-If `pnpm run verify` fails, you do NOT push. Period.
-If `pnpm run test:smart` fails, you do NOT push. Period.
+If `pnpm run preflight` fails, you do NOT push. Period.
 Fix the errors first. Then push. This is non-negotiable.
