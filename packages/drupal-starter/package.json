@@ -18,6 +18,10 @@
     "healthcare",
     "enterprise"
   ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "files": [
     "components",
     "css",
@@ -35,6 +39,11 @@
   },
   "peerDependencies": {
     "@helixui/library": "^1.0.0"
+  },
+  "devDependencies": {
+    "twig": "^1.17.1",
+    "vitest": "^3.0.0",
+    "yaml": "^2.7.0"
   },
   "publishConfig": {
     "access": "public",
