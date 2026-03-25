@@ -3,6 +3,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // D21 — deterministic monotonic counter instead of Math.random()
 let _dialogCounter = 0;
@@ -113,6 +114,10 @@ export class HelixDialog extends LitElement {
   /** @internal */
   private _cachedFocusableElements: HTMLElement[] = [];
 
+  /** Guards against rapid open/close state changes causing asymmetric scroll lock. */
+  /** @internal */
+  private _isTransitioning = false;
+
   /** The element that had focus when the dialog opened — restored on close (D1). */
   /** @internal */
   private _triggerElement: HTMLElement | null = null;
@@ -212,6 +217,13 @@ export class HelixDialog extends LitElement {
   override firstUpdated(): void {
     // Initialize header slot state without a querySelector in render()
     this._hasHeaderSlot = this.querySelector('[slot="header"]') !== null;
+    // Warn when no accessible heading is available
+    if (!this.heading.trim() && !this._hasHeaderSlot) {
+      devWarn(
+        'hx-dialog',
+        'No heading or header slot provided. Dialog will use a fallback aria-label. Provide a `heading` attribute or populate the `header` slot for a descriptive accessible name.',
+      );
+    }
   }
 
   override disconnectedCallback(): void {
@@ -265,6 +277,8 @@ export class HelixDialog extends LitElement {
   private _openDialog(): void {
     const dialog = this._dialogEl;
     if (!dialog) return;
+    if (this._isTransitioning) return;
+    this._isTransitioning = true;
 
     // D1 — store the element that triggered the dialog open for focus restoration on close
     this._triggerElement = document.activeElement as HTMLElement | null;
@@ -291,6 +305,7 @@ export class HelixDialog extends LitElement {
       // D3 — explicitly move initial focus to the first focusable element inside the dialog
       // (browser's built-in focus delegation cannot reach slotted light DOM through Shadow DOM)
       this._cachedFocusableElements[0]?.focus();
+      this._isTransitioning = false;
     });
 
     this.dispatchEvent(
@@ -305,6 +320,8 @@ export class HelixDialog extends LitElement {
   private _closeDialog(): void {
     const dialog = this._dialogEl;
     if (!dialog) return;
+    if (this._isTransitioning) return;
+    this._isTransitioning = true;
 
     const wasOpen = dialog.open;
     if (dialog.open) {
@@ -327,6 +344,8 @@ export class HelixDialog extends LitElement {
     // D1 — restore focus to the element that opened the dialog (WCAG 2.4.3)
     this._triggerElement?.focus();
     this._triggerElement = null;
+
+    this._isTransitioning = false;
 
     if (wasOpen) {
       this.dispatchEvent(

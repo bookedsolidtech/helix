@@ -1,10 +1,11 @@
-import { LitElement, html, nothing, type TemplateResult } from 'lit';
+import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * A production-grade button component for user interaction. Supports multiple
@@ -153,6 +154,46 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
     this.disabled = disabled;
   }
 
+  // ─── Lifecycle ───
+
+  /** @internal */
+  private static readonly _VALID_VARIANTS = [
+    'primary',
+    'secondary',
+    'tertiary',
+    'danger',
+    'ghost',
+    'outline',
+  ] as const;
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('variant')) {
+      const validVariants: string[] = [...HelixButton._VALID_VARIANTS];
+      if (!validVariants.includes(this.variant)) {
+        devWarn(
+          'hx-button',
+          `Invalid variant "${this.variant}". Expected one of: ${validVariants.join(', ')}. Clamping to "primary".`,
+        );
+        this.variant = 'primary';
+      }
+    }
+  }
+
+  // ─── Slot Handlers ───
+
+  /** @internal */
+  private _handleDefaultSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!hasContent && !this.ariaLabel) {
+      devWarn(
+        'hx-button',
+        'hx-button has no label and no aria-label — button will have no accessible name.',
+      );
+    }
+  }
+
   // ─── Event Handling ───
 
   /** @private */
@@ -229,7 +270,7 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
         <slot name="prefix"></slot>
       </span>
       <span part="label" class="button__label">
-        <slot></slot>
+        <slot @slotchange=${this._handleDefaultSlotChange}></slot>
       </span>
       <span part="suffix" class="button__suffix">
         <slot name="suffix"></slot>
