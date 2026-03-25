@@ -1,0 +1,27 @@
+{
+  "name": "@helixui/wrapper-gen",
+  "version": "0.1.0",
+  "description": "CEM-driven wrapper generator CLI for HELiX web components (React, Vue, Angular, Svelte)",
+  "type": "module",
+  "bin": {
+    "hx-wrapper-gen": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate": "node dist/cli.js --cem ../../packages/hx-library/custom-elements.json --out ../",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "@helixui/library": "workspace:*",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

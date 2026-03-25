@@ -23,6 +23,7 @@
     "lint:fix": "turbo lint --fix",
     "clean": "turbo clean",
     "cem": "turbo cem --filter=@helixui/library",
+    "generate": "turbo generate --filter=@helixui/wrapper-gen",
     "create:component": "tsx scripts/create-component.ts",
     "generate-docs": "tsx scripts/generate-component-docs.ts",
     "preview:docs": "turbo preview --filter=docs",
