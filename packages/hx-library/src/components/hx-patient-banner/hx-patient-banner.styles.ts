@@ -7,35 +7,17 @@ export const helixPatientBannerStyles = css`
 
     /* ─── Private token vars (3-tier cascade) ─── */
     --_bg: var(--hx-patient-banner-bg, var(--hx-color-neutral-50, #f9fafb));
-    --_border-color: var(
-      --hx-patient-banner-border-color,
-      var(--hx-color-neutral-200, #e5e7eb)
-    );
+    --_border-color: var(--hx-patient-banner-border-color, var(--hx-color-neutral-200, #e5e7eb));
     --_padding: var(
       --hx-patient-banner-padding,
       var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem)
     );
     --_gap: var(--hx-patient-banner-gap, var(--hx-space-4, 1rem));
-    --_font-family: var(
-      --hx-patient-banner-font-family,
-      var(--hx-font-family-sans, sans-serif)
-    );
-    --_label-color: var(
-      --hx-patient-banner-label-color,
-      var(--hx-color-neutral-500, #6b7280)
-    );
-    --_label-font-size: var(
-      --hx-patient-banner-label-font-size,
-      var(--hx-font-size-xs, 0.75rem)
-    );
-    --_value-color: var(
-      --hx-patient-banner-value-color,
-      var(--hx-color-neutral-900, #111827)
-    );
-    --_value-font-size: var(
-      --hx-patient-banner-value-font-size,
-      var(--hx-font-size-sm, 0.875rem)
-    );
+    --_font-family: var(--hx-patient-banner-font-family, var(--hx-font-family-sans, sans-serif));
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-500, #6b7280));
+    --_label-font-size: var(--hx-patient-banner-label-font-size, var(--hx-font-size-xs, 0.75rem));
+    --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #111827));
+    --_value-font-size: var(--hx-patient-banner-value-font-size, var(--hx-font-size-sm, 0.875rem));
     --_photo-size: var(--hx-patient-banner-photo-size, var(--hx-space-10, 2.5rem));
   }
 
