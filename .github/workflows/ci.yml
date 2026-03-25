@@ -25,6 +25,7 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  actions: read
 
 # ── Shared setup anchor ────────────────────────────────────────────────────
 # Reusable setup steps referenced by all jobs
@@ -218,7 +219,14 @@ jobs:
         run: pnpm publish --dry-run --no-git-checks
         working-directory: packages/hx-library
       - name: Bundle size report (all components, tree-shaken)
-        run: node scripts/bundle-size-report.js
+        run: node scripts/bundle-size-report.js --save .cache/bundle-size-report.json
+      - name: Upload bundle size artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-size-report
+          path: .cache/bundle-size-report.json
+          retention-days: 30
+          if-no-files-found: warn
 
   # ── CEM API Diff ────────────────────────────────────────────────────────
   # Compares custom-elements.json between base and PR branch.
@@ -281,6 +289,100 @@ jobs:
           gh pr comment ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
             --body "$BODY"
+
+  # ── Bundle Size Diff (PR only) ──────────────────────────────────────────
+  # Downloads the base branch bundle size artifact, compares with the current
+  # branch, posts a PR comment with per-component deltas, and blocks merge on
+  # budget violations. Budgets are configured in bundle-budgets.json.
+
+  bundle-size:
+    name: Bundle Size
+    needs: [changes, build]
+    if: >
+      github.event_name == 'pull_request' &&
+      needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - name: Generate HEAD bundle sizes
+        run: node scripts/bundle-size-report.js --save .cache/bundle-size-head.json
+      - name: Download BASE branch bundle size artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .cache
+          BASE_BRANCH="${{ github.base_ref }}"
+
+          # Find the latest successful CI run on the base branch
+          RUN_ID=$(gh api \
+            "/repos/${{ github.repository }}/actions/workflows/ci.yml/runs" \
+            -f branch="$BASE_BRANCH" \
+            -f status=success \
+            -f per_page=5 \
+            --jq '[.workflow_runs[] | select(.conclusion == "success")] | first | .id' \
+            2>/dev/null || echo "")
+
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
+            echo "No successful CI run found on $BASE_BRANCH — skipping base comparison"
+            exit 0
+          fi
+
+          ARTIFACT_ID=$(gh api \
+            "/repos/${{ github.repository }}/actions/runs/$RUN_ID/artifacts" \
+            --jq '.artifacts[] | select(.name == "bundle-size-report") | .id' \
+            2>/dev/null | head -1 || echo "")
+
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "No bundle-size-report artifact found in run $RUN_ID on $BASE_BRANCH — skipping base comparison"
+            exit 0
+          fi
+
+          echo "Downloading base artifact $ARTIFACT_ID from run $RUN_ID (branch: $BASE_BRANCH)"
+          gh api "/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip" \
+            > .cache/bundle-base.zip
+          unzip -p .cache/bundle-base.zip bundle-size-report.json > .cache/bundle-size-base.json
+          echo "Base artifact downloaded successfully"
+      - name: Generate PR comment
+        run: |
+          BASE_FLAG=""
+          if [ -f ".cache/bundle-size-base.json" ]; then
+            BASE_FLAG="--base .cache/bundle-size-base.json"
+          fi
+          node scripts/bundle-size-report.js \
+            --from-file .cache/bundle-size-head.json \
+            --pr-comment $BASE_FLAG > .cache/pr-comment.md
+      - name: Post PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(cat .cache/pr-comment.md)
+          # Delete any previous bundle size comment before posting
+          PREV=$(gh pr view ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --json comments \
+            --jq '.comments[] | select(.body | startswith("## Bundle Size Report")) | .id' \
+            2>/dev/null | head -1 || true)
+          if [ -n "$PREV" ]; then
+            gh api --method DELETE \
+              "/repos/${{ github.repository }}/issues/comments/$PREV" \
+              2>/dev/null || true
+          fi
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "$BODY"
+      - name: Enforce budget — fail on violations
+        run: |
+          node scripts/bundle-size-report.js \
+            --from-file .cache/bundle-size-head.json \
+            --ci
 
   # ── Visual Regression Tests ─────────────────────────────────────────────
 
@@ -442,21 +544,22 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    needs: [changes, lint, format, type-check, test, build, vrt, audit, changeset]
+    needs: [changes, lint, format, type-check, test, build, bundle-size, vrt, audit, changeset]
     if: always()
     steps:
       - name: Check all gates
         run: |
           IS_AUDIT="${{ needs.changes.outputs.is_audit }}"
 
-          echo "Audit branch: $IS_AUDIT"
-          echo "Lint:       ${{ needs.lint.result }}"
-          echo "Format:     ${{ needs.format.result }}"
-          echo "Type Check: ${{ needs.type-check.result }}"
-          echo "Test:       ${{ needs.test.result }}"
-          echo "Build:      ${{ needs.build.result }}"
-          echo "VRT:        ${{ needs.vrt.result }}"
-          echo "Audit:      ${{ needs.audit.result }}"
+          echo "Audit branch:  $IS_AUDIT"
+          echo "Lint:          ${{ needs.lint.result }}"
+          echo "Format:        ${{ needs.format.result }}"
+          echo "Type Check:    ${{ needs.type-check.result }}"
+          echo "Test:          ${{ needs.test.result }}"
+          echo "Build:         ${{ needs.build.result }}"
+          echo "Bundle Size:   ${{ needs.bundle-size.result }}"
+          echo "VRT:           ${{ needs.vrt.result }}"
+          echo "Audit:         ${{ needs.audit.result }}"
 
           # Audit branches skip all CI — auto-pass
           if [[ "$IS_AUDIT" == "true" ]]; then
@@ -481,14 +584,15 @@ jobs:
             fi
           done
 
-          # Test, VRT, and changeset are allowed to be skipped (no source changes) or
-          # cancelled (concurrency group replaced a running job)
-          for gate in test vrt changeset; do
+          # Test, VRT, changeset, and bundle-size are allowed to be skipped (non-PR / no
+          # source changes) or cancelled (concurrency group replaced a running job)
+          for gate in test vrt changeset bundle-size; do
             result="${{ needs.test.result }}"
             case "$gate" in
-              test)      result="${{ needs.test.result }}" ;;
-              vrt)       result="${{ needs.vrt.result }}" ;;
-              changeset) result="${{ needs.changeset.result }}" ;;
+              test)        result="${{ needs.test.result }}" ;;
+              vrt)         result="${{ needs.vrt.result }}" ;;
+              changeset)   result="${{ needs.changeset.result }}" ;;
+              bundle-size) result="${{ needs.bundle-size.result }}" ;;
             esac
             if [[ "$result" != "success" && "$result" != "skipped" && "$result" != "cancelled" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"

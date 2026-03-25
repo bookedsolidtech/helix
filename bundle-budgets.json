@@ -1,0 +1,19 @@
+{
+  "comment": "Per-component bundle size budgets for @helixui/library (gzipped bytes). Changes require code review.",
+  "standard": 5120,
+  "bundle": 51200,
+  "overrides": {
+    "hx-color-picker": {
+      "budget": 8192,
+      "reason": "Full color math library (HSV/RGB/HSL conversions), pointer-drag, 4 output formats. JS-only baseline: ~4057 gz."
+    },
+    "hx-combobox": {
+      "budget": 8192,
+      "reason": "Full ARIA combobox, multiple selection with chips, keyboard nav, filtering with debounce, ElementInternals form association. JS-only: ~4083 gz."
+    },
+    "hx-date-picker": {
+      "budget": 8192,
+      "reason": "Calendar grid rendering, full keyboard nav, focus trap, date utilities, ElementInternals form association. JS-only: ~4324 gz."
+    }
+  }
+}
