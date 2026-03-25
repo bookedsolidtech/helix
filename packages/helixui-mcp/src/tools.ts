@@ -16,6 +16,7 @@ import { analyzeExtension } from './tools/analyze-extension.js';
 import { validateIntegration } from './tools/validate-integration.js';
 import { scaffoldTheme } from './tools/scaffold-theme.js';
 import { auditTokens, formatAuditReport } from './tools/audit-tokens.js';
+import { scaffoldComponent } from './tools/scaffold-component.js';
 
 // ─── Input schemas ─────────────────────────────────────────────────────────────
 
@@ -88,6 +89,28 @@ const ScaffoldThemeArgsSchema = z.object({
     .optional()
     .describe(
       'Absolute or relative file path to write the generated CSS file. Omit to return the CSS as output only.',
+    ),
+});
+
+const ScaffoldComponentArgsSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .regex(
+      /^[a-z][a-z0-9-]*$/,
+      'Component name must be lowercase alphanumeric with hyphens, starting with a lowercase letter (e.g. "media-card").',
+    )
+    .describe('Component name without hx- prefix, e.g. "media-card"'),
+  extends: z
+    .string()
+    .regex(/^hx-/, 'Base component tag name must start with "hx-"')
+    .optional()
+    .describe('Optional base component tag name to extend, e.g. "hx-card"'),
+  outputDir: z
+    .string()
+    .optional()
+    .describe(
+      'Absolute path to the components directory where hx-{name}/ will be created. Omit to return file contents only.',
     ),
 });
 
@@ -284,6 +307,30 @@ const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'scaffoldComponent',
+    description:
+      'Generate a complete hx-{name}/ component directory: index.ts (re-export), hx-{name}.ts (Lit class with @customElement and 3-tier token styles), hx-{name}.styles.ts (adopted-stylesheets CSS), hx-{name}.test.ts (Vitest browser mode), hx-{name}.stories.ts (Storybook 10.x autodocs), hx-{name}.twig (Drupal template). When extends is provided, reads the CEM manifest to inherit slot/event/CSS-part metadata and generates a class that extends the base component.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Component name without hx- prefix, e.g. "media-card"',
+        },
+        extends: {
+          type: 'string',
+          description: 'Optional base component tag name to extend, e.g. "hx-card"',
+        },
+        outputDir: {
+          type: 'string',
+          description:
+            'Absolute path to the components directory where hx-{name}/ will be created. Omit to return file contents only.',
+        },
+      },
+      required: ['name'],
+    },
+  },
+  {
     name: 'auditTokens',
     description:
       'Audit a CSS file or project directory for --hx-* design token usage. Flags unknown tokens (not in schema), deprecated tokens, and tier violations (component-tier tokens overridden globally instead of via semantic tier).',
@@ -401,6 +448,25 @@ export function registerTools(server: Server): void {
             `Generated theme scaffold with ${result.tokenCount} tokens across ${result.categories.length} categories.`,
             ...(result.outputPath !== undefined ? [`Written to: ${result.outputPath}`, ''] : ['']),
             result.css,
+          ];
+          return success(lines.join('\n'));
+        }
+
+        case 'scaffoldComponent': {
+          const parsed = ScaffoldComponentArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const opts: Parameters<typeof scaffoldComponent>[0] = { name: parsed.data.name };
+          if (parsed.data.extends !== undefined) opts.extends = parsed.data.extends;
+          if (parsed.data.outputDir !== undefined) opts.outputDir = parsed.data.outputDir;
+          const result = scaffoldComponent(opts);
+          const lines: string[] = [
+            `Scaffolded ${result.tagName} (${result.className})`,
+            ...(result.outputDir !== undefined ? [`Written to: ${result.outputDir}`, ''] : ['']),
+            `Generated files (${Object.keys(result.files).length}):`,
+            ...Object.keys(result.files).map((f) => `  ${f}`),
+            ...(result.warnings.length > 0
+              ? ['', 'Warnings:', ...result.warnings.map((w) => `  ⚠ ${w}`)]
+              : []),
           ];
           return success(lines.join('\n'));
         }
