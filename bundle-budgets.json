@@ -14,6 +14,14 @@
     "hx-date-picker": {
       "budget": 8192,
       "reason": "Calendar grid rendering, full keyboard nav, focus trap, date utilities, ElementInternals form association. JS-only: ~4324 gz."
+    },
+    "hx-select": {
+      "budget": 6144,
+      "reason": "ARIA listbox, keyboard nav, multiple selection, ElementInternals form association, floating-ui positioning. JS-only: ~5.18 KB gz."
+    },
+    "hx-time-picker": {
+      "budget": 6144,
+      "reason": "Time parsing/validation, meridiem toggle, keyboard nav, ElementInternals form association. JS-only: ~5.01 KB gz."
     }
   }
 }
