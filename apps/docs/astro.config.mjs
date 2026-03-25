@@ -646,6 +646,10 @@ export default defineConfig({
               ],
             },
             {
+              label: 'Adopted Stylesheets',
+              slug: 'guides/adopted-stylesheets',
+            },
+            {
               label: 'Boolean Attributes',
               slug: 'guides/boolean-attributes',
             },
