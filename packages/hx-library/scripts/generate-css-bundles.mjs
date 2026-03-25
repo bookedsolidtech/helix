@@ -77,10 +77,7 @@ function flattenTokens(obj, prefix = []) {
 
 function generateTokensCSS() {
   // Try the workspace path first, then fall back to relative path
-  const candidatePaths = [
-    TOKENS_JSON,
-    resolve(ROOT, '../hx-tokens/src/tokens.json'),
-  ];
+  const candidatePaths = [TOKENS_JSON, resolve(ROOT, '../hx-tokens/src/tokens.json')];
 
   let tokensPath = null;
   for (const p of candidatePaths) {
@@ -91,7 +88,9 @@ function generateTokensCSS() {
   }
 
   if (!tokensPath) {
-    console.warn(`[css-bundles] Warning: tokens.json not found — generating empty helix-tokens.css`);
+    console.warn(
+      `[css-bundles] Warning: tokens.json not found — generating empty helix-tokens.css`,
+    );
     return '/* helix-tokens.css: tokens.json not found during build */\n';
   }
 
@@ -182,7 +181,9 @@ function run() {
     for (const componentName of members) {
       const css = cssMap.get(componentName);
       if (css === undefined) {
-        console.warn(`[css-bundles] Component "${componentName}" in category "${category}" not found`);
+        console.warn(
+          `[css-bundles] Component "${componentName}" in category "${category}" not found`,
+        );
         continue;
       }
       includedComponents.push(componentName);

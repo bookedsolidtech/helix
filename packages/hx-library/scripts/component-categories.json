@@ -53,13 +53,7 @@
       "hx-top-nav",
       "hx-tree-view"
     ],
-    "layout": [
-      "hx-accordion",
-      "hx-container",
-      "hx-grid",
-      "hx-split-panel",
-      "hx-stack"
-    ],
+    "layout": ["hx-accordion", "hx-container", "hx-grid", "hx-split-panel", "hx-stack"],
     "feedback": [
       "hx-alert",
       "hx-banner",
@@ -70,25 +64,9 @@
       "hx-status-indicator",
       "hx-toast"
     ],
-    "overlay": [
-      "hx-dialog",
-      "hx-drawer",
-      "hx-dropdown",
-      "hx-popover",
-      "hx-popup",
-      "hx-tooltip"
-    ],
-    "data": [
-      "hx-code-snippet",
-      "hx-data-table",
-      "hx-list",
-      "hx-structured-list",
-      "hx-table"
-    ],
-    "media": [
-      "hx-carousel",
-      "hx-prose"
-    ],
+    "overlay": ["hx-dialog", "hx-drawer", "hx-dropdown", "hx-popover", "hx-popup", "hx-tooltip"],
+    "data": ["hx-code-snippet", "hx-data-table", "hx-list", "hx-structured-list", "hx-table"],
+    "media": ["hx-carousel", "hx-prose"],
     "utility": [
       "hx-action-bar",
       "hx-copy-button",

@@ -40,7 +40,11 @@ function check(condition, passMsg, failMsg) {
 }
 
 // Check dist/css/ exists
-check(existsSync(OUT_DIR), 'dist/css/ directory exists', 'dist/css/ directory missing — run pnpm run css:build');
+check(
+  existsSync(OUT_DIR),
+  'dist/css/ directory exists',
+  'dist/css/ directory missing — run pnpm run css:build',
+);
 
 if (!existsSync(OUT_DIR)) {
   process.exit(1);
@@ -57,7 +61,11 @@ const requiredBundles = [
 ];
 
 for (const file of requiredBundles) {
-  check(existsSync(join(OUT_DIR, file)), `${file} exists`, `${file} missing — run pnpm run css:build`);
+  check(
+    existsSync(join(OUT_DIR, file)),
+    `${file} exists`,
+    `${file} missing — run pnpm run css:build`,
+  );
 }
 
 // Check helix-tokens.css has :root declaration
