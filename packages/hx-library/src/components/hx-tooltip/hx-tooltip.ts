@@ -226,10 +226,13 @@ export class HelixTooltip extends LitElement {
 
     const arrowData = middlewareData.arrow;
     const basePlacement = placement.split('-')[0] ?? 'top';
-    const staticSide =
-      ({ top: 'bottom', right: 'left', bottom: 'top', left: 'right' } as Record<string, string>)[
-        basePlacement
-      ] ?? 'bottom';
+    const oppositeSide: Record<string, string> = {
+      top: 'bottom',
+      right: 'left',
+      bottom: 'top',
+      left: 'right',
+    };
+    const staticSide = oppositeSide[basePlacement] ?? 'bottom';
 
     // Offset is derived from the arrow element's actual size so that custom
     // --hx-tooltip-arrow-size values position the arrow correctly.
