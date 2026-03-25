@@ -102,7 +102,7 @@ export const helixAccordionItemStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   /* ─── Reduced motion ─── */

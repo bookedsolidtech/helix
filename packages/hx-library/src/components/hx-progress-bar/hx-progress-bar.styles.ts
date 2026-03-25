@@ -116,7 +116,7 @@ export const helixProgressBarStyles = css`
     .progress-bar--indeterminate .progress-bar__fill {
       animation: none;
       transform: scaleX(1);
-      opacity: 0.4;
+      opacity: var(--hx-opacity-disabled, 0.5); /* reduced from animation; no exact token for 0.4 */
     }
   }
 
