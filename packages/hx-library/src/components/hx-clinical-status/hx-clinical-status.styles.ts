@@ -217,7 +217,7 @@ export const helixClinicalStatusStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-semibold, 600);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--hx-letter-spacing-wide, 0.05em);
     cursor: pointer;
     line-height: var(--hx-line-height-normal, 1.5);
     min-height: var(--hx-touch-target-size, 44px);

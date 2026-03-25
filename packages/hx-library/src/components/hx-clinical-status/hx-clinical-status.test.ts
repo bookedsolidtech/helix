@@ -220,6 +220,14 @@ describe('hx-clinical-status', () => {
       expect(btn).toBeTruthy();
     });
 
+    it('shows acknowledge button for emergent severity', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status severity="emergent" message="Test"></hx-clinical-status>',
+      );
+      const btn = shadowQuery(el, '.clinical-status__acknowledge-button');
+      expect(btn).toBeTruthy();
+    });
+
     it('does not show acknowledge button for info severity', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status severity="info" message="Test"></hx-clinical-status>',
@@ -280,6 +288,14 @@ describe('hx-clinical-status', () => {
         '<hx-clinical-status dismissible message="Test"></hx-clinical-status>',
       );
       const part = shadowQuery(el, '[part="dismiss-button"]');
+      expect(part).toBeTruthy();
+    });
+
+    it('exposes "acknowledge-button" part when acknowledgeable', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status severity="critical" message="Test"></hx-clinical-status>',
+      );
+      const part = shadowQuery(el, '[part="acknowledge-button"]');
       expect(part).toBeTruthy();
     });
   });

@@ -90,6 +90,7 @@ function renderClinicalStatus(args: Record<string, unknown>) {
     <hx-clinical-status
       severity=${args.severity as string}
       message=${args.message as string}
+      icon=${args.icon as string}
       ?dismissible=${args.dismissible as boolean}
       ?persistent=${args.persistent as boolean}
       ?compact=${args.compact as boolean}
@@ -212,6 +213,16 @@ export const AllSeveritiesCompact: Story = {
       ></hx-clinical-status>
     </div>
   `,
+};
+
+/** Persistent status that survives page navigation. */
+export const Persistent: Story = {
+  args: {
+    persistent: true,
+    severity: 'info',
+    message: 'This notification persists across navigation.',
+  },
+  render: renderClinicalStatus,
 };
 
 /** Critical status requiring explicit acknowledgment before dismissal. */

@@ -30,6 +30,7 @@ const nextId = createIdCounter('hx-clinical-status');
  * @csspart message - The message content area.
  * @csspart actions - The actions container (dismiss/acknowledge buttons).
  * @csspart dismiss-button - The dismiss button (only rendered when dismissible).
+ * @csspart acknowledge-button - The acknowledge button (only rendered when acknowledgeable).
  *
  * @cssprop [--hx-clinical-status-bg=var(--hx-color-info-50)] - Background color.
  * @cssprop [--hx-clinical-status-color=var(--hx-color-info-800)] - Text color.
@@ -287,7 +288,11 @@ export class HelixClinicalStatus extends HelixElement {
       <div part="container" class=${classMap(classes)} aria-labelledby=${messageId}>
         <span class="clinical-status__severity-label">${severityLabel}</span>
 
-        <div part="icon" class="clinical-status__icon">${this._renderDefaultIcon()}</div>
+        <div part="icon" class="clinical-status__icon">
+          ${this.icon
+            ? html`<span class="clinical-status__custom-icon">${this.icon}</span>`
+            : this._renderDefaultIcon()}
+        </div>
 
         <div id=${messageId} part="message" class="clinical-status__message">
           ${this.message}
@@ -308,6 +313,7 @@ export class HelixClinicalStatus extends HelixElement {
           ${this._requiresAcknowledgment && !this._acknowledged
             ? html`
                 <button
+                  part="acknowledge-button"
                   class="clinical-status__acknowledge-button"
                   @click=${this._handleAcknowledge}
                 >
