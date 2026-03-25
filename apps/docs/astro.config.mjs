@@ -674,6 +674,15 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Extending Components',
+          collapsed: true,
+          badge: { text: 'New', variant: 'tip' },
+          items: [
+            { label: 'Overview', slug: 'extending' },
+            { label: 'PatientCard Example', slug: 'extending/patient-card' },
+          ],
+        },
+        {
           label: 'Architecture',
           collapsed: true,
           items: [
