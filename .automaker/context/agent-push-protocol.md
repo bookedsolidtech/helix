@@ -121,3 +121,36 @@ Do NOT push partial fixes then format separately. That triggers extra review cyc
 
 If `pnpm run preflight` fails, you do NOT push. Period.
 Fix the errors first. Then push. This is non-negotiable.
+
+---
+
+## Workspace and Dependency Changes
+
+If your changes include:
+- **New packages** (new `package.json` file anywhere in the monorepo)
+- **Dependency changes** (added/removed/updated in any `package.json`)
+- **Lockfile modifications** (any change to `pnpm-lock.yaml`)
+
+You MUST run before pushing:
+```bash
+pnpm install              # Regenerates pnpm-lock.yaml
+pnpm run verify           # Ensure everything still passes
+git add pnpm-lock.yaml    # Stage the updated lockfile
+```
+
+Failure to do this will cause CI to fail at `pnpm install --frozen-lockfile`.
+
+## sideEffects Configuration — CRITICAL
+
+NEVER change `sideEffects` in `packages/hx-library/package.json` to `true`.
+Always use a granular array. `sideEffects: true` breaks coverage detection and tree-shaking.
+
+Correct:
+```json
+"sideEffects": ["./dist/components/*/index.js", "./src/components/*/index.ts", "**/*.css"]
+```
+
+Wrong:
+```json
+"sideEffects": true
+```
