@@ -1,0 +1,55 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Banner
+description: 'Site-wide or page-level announcement banner with variant-based severity styling and optional action link. Use for maintenance notices, system alerts, important health advisories, and scheduled downtime messages.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Semantic severity variant'
+      default: 'info'
+      enum:
+        - info
+        - success
+        - warning
+        - danger
+    position:
+      type: string
+      title: Position
+      description: 'Whether the banner is fixed to the top of the viewport or inline in the document flow'
+      default: 'inline'
+      enum:
+        - inline
+        - fixed
+    heading:
+      type: string
+      title: Heading
+      description: 'Optional heading text displayed before the banner message'
+    action_label:
+      type: string
+      title: Action Label
+      description: 'Label for the built-in action link'
+    action_href:
+      type: string
+      title: Action URL
+      description: 'URL for the built-in action link'
+    dismissible:
+      type: boolean
+      title: Dismissible
+      description: 'Whether the user can dismiss the banner'
+      default: false
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the banner is visible'
+      default: true
+slots:
+  default:
+    title: Message
+    description: 'Banner message content'
+  action:
+    title: Action
+    description: 'Custom action content (overrides the built-in action_label/action_href link)'

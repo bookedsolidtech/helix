@@ -1,0 +1,36 @@
+{#
+/**
+ * @file
+ * Clinical Status SDC — wraps hx-clinical-status for healthcare alert patterns.
+ *
+ * Use in Drupal EHR integration blocks, patient portal notifications, clinical
+ * decision support panels, and care coordination dashboards. The severity prop
+ * maps to clinical urgency levels — use 'critical' for life-safety alerts only.
+ *
+ * HIPAA Note: Do not pass PHI values through Twig variables directly.
+ * Use hx-phi-field inside the default slot for masked identifiers.
+ *
+ * Example: Allergy alert in a patient record display
+ *   {% include 'helixui:hx-clinical-status' with {
+ *     severity: 'high',
+ *     message: 'Penicillin allergy on record',
+ *     icon: 'alert-triangle',
+ *     persistent: true,
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-clinical-status') }}
+
+<hx-clinical-status
+  {% if severity and severity != 'informational' %}severity="{{ severity }}"{% endif %}
+  {% if message %}message="{{ message }}"{% endif %}
+  {% if icon %}icon="{{ icon }}"{% endif %}
+  {% if dismissible %}dismissible{% endif %}
+  {% if persistent %}persistent{% endif %}
+  {% if compact %}compact{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-clinical-status>

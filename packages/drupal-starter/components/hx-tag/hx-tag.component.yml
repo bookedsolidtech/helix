@@ -1,0 +1,54 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Tag
+description: 'Categorization tag for taxonomy terms, filter chips, and content labels. Supports removable state for filter UI patterns. Use in Drupal taxonomy term displays, faceted search, and tag cloud blocks.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Color variant for the tag'
+      default: 'neutral'
+      enum:
+        - neutral
+        - primary
+        - success
+        - warning
+        - danger
+        - info
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the tag'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    pill:
+      type: boolean
+      title: Pill
+      description: 'Whether to use fully rounded pill shape'
+      default: false
+    removable:
+      type: boolean
+      title: Removable
+      description: 'Whether to show a remove button for filter chip patterns'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the tag is disabled (disables remove interaction)'
+      default: false
+slots:
+  default:
+    title: Label
+    description: 'Tag label text'
+  prefix:
+    title: Prefix
+    description: 'Icon or avatar rendered before the label'
+  suffix:
+    title: Suffix
+    description: 'Content rendered after the label'

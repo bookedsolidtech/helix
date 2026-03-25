@@ -1,0 +1,54 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Badge
+description: 'Status badge and count indicator for healthcare data. Use for notification counts, patient status flags, priority levels, and clinical data labels in Drupal content displays.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Color variant conveying semantic meaning'
+      default: 'neutral'
+      enum:
+        - neutral
+        - primary
+        - success
+        - warning
+        - danger
+        - info
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the badge'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    pill:
+      type: boolean
+      title: Pill
+      description: 'Whether to use fully rounded pill shape'
+      default: false
+    pulse:
+      type: boolean
+      title: Pulse
+      description: 'Whether to show a pulsing animation (for live status indicators)'
+      default: false
+    count:
+      type: integer
+      title: Count
+      description: 'Numeric count to display. When set, renders as a count badge.'
+    max:
+      type: integer
+      title: Max Count
+      description: 'Maximum count before displaying as N+. Used with the count prop.'
+slots:
+  default:
+    title: Label
+    description: 'Badge label text or number. When empty with pulse enabled, renders as a dot indicator.'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the badge text'

@@ -1,0 +1,37 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Spinner
+description: 'Animated loading spinner with accessible label. Use for AJAX loading states, content fetching indicators, and form submission feedback in Drupal Views, blocks, and form responses.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the spinner'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+        - xl
+    variant:
+      type: string
+      title: Variant
+      description: 'Color variant for the spinner'
+      default: 'primary'
+      enum:
+        - primary
+        - neutral
+        - inverted
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label announced to screen readers (e.g., "Loading patient records")'
+      default: 'Loading'
+    decorative:
+      type: boolean
+      title: Decorative
+      description: 'When true, hides the spinner from assistive technology (use only when adjacent text already describes the loading state)'
+      default: false

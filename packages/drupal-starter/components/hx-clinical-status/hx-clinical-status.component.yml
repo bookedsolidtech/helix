@@ -1,0 +1,46 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Clinical Status
+description: 'Healthcare-specific clinical alert and status notification with severity levels mapped to clinical contexts (critical, high, moderate, low, informational). Use in patient records, clinical decision support alerts, medication warnings, and care plan notifications.'
+status: experimental
+group: Healthcare
+props:
+  type: object
+  properties:
+    severity:
+      type: string
+      title: Severity
+      description: 'Clinical severity level. Maps to color and ARIA role for appropriate urgency communication.'
+      default: 'informational'
+      enum:
+        - critical
+        - high
+        - moderate
+        - low
+        - informational
+    message:
+      type: string
+      title: Message
+      description: 'Primary clinical status message text'
+    icon:
+      type: string
+      title: Icon
+      description: 'Icon name to display alongside the message'
+    dismissible:
+      type: boolean
+      title: Dismissible
+      description: 'Whether clinical staff can dismiss this status notification'
+      default: false
+    persistent:
+      type: boolean
+      title: Persistent
+      description: 'Whether the status persists until explicitly resolved (prevents accidental dismissal of critical alerts)'
+      default: false
+    compact:
+      type: boolean
+      title: Compact
+      description: 'Whether to use the compact layout (reduced padding for dense clinical displays)'
+      default: false
+slots:
+  default:
+    title: Additional Content
+    description: 'Additional detail content below the primary message (e.g., clinical guidelines, action links)'

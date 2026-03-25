@@ -1,0 +1,30 @@
+{#
+/**
+ * @file
+ * Stat SDC — wraps hx-stat for Drupal dashboard and KPI display patterns.
+ *
+ * Use in custom block templates for healthcare analytics dashboards, patient
+ * census displays, and operational metric panels.
+ *
+ * Example: Patient census stat
+ *   {% include 'helixui:hx-stat' with {
+ *     label: 'Current census',
+ *     value: census_count|string,
+ *     trend: census_trend,
+ *     hx_size: 'lg',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-stat') }}
+
+<hx-stat
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if trend %}trend="{{ trend }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if icon %}
+    <span slot="icon">{{ icon }}</span>
+  {% endif %}
+</hx-stat>
