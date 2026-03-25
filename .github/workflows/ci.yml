@@ -61,7 +61,10 @@ jobs:
               - 'packages/hx-library/src/**/*.ts'
               - 'packages/hx-library/src/**/*.styles.ts'
               - 'packages/hx-library/vite.config.ts'
+              - 'packages/hx-library/vitest.config.ts'
+              - 'packages/hx-library/coverage-config.json'
               - 'packages/hx-library/tsconfig*.json'
+              - 'scripts/check-coverage.mjs'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
@@ -156,7 +159,7 @@ jobs:
           if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
             COMPONENT="${BASH_REMATCH[1]}"
             echo "Audit-fix branch — running tests for: $COMPONENT"
-            pnpm exec vitest run "src/components/$COMPONENT/"
+            pnpm exec vitest run "src/components/$COMPONENT/" --coverage.enabled
           else
             # General PR: extract changed component dirs from git diff
             CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
@@ -169,7 +172,7 @@ jobs:
             fi
             PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
             echo "Running tests for: $PATHS"
-            pnpm exec vitest run $PATHS
+            pnpm exec vitest run $PATHS --coverage.enabled
           fi
         working-directory: packages/hx-library
       - name: Run tests (push — path-filtered by merged changes)
@@ -185,8 +188,10 @@ jobs:
           fi
           PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
           echo "Running tests for: $PATHS"
-          npx vitest run $PATHS
+          npx vitest run $PATHS --coverage.enabled
         working-directory: packages/hx-library
+      - name: Enforce coverage thresholds for changed components
+        run: node scripts/check-coverage.mjs
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -195,6 +200,37 @@ jobs:
           path: packages/hx-library/.cache/test-results.json
           retention-days: 30
           if-no-files-found: warn
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: packages/hx-library/.cache/coverage/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Post coverage summary as PR comment
+        if: github.event_name == 'pull_request' && always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Generate markdown summary (exits 0 regardless of gate — comment is informational)
+          BODY=$(node scripts/check-coverage.mjs --markdown 2>/dev/null || echo "## Coverage Report\n\nCoverage data unavailable for this PR.")
+
+          # Delete any previous coverage comment before posting a new one
+          PREV=$(gh pr view ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --json comments \
+            --jq '.comments[] | select(.body | startswith("## Coverage Report")) | .id' \
+            2>/dev/null | head -1 || true)
+          if [ -n "$PREV" ]; then
+            gh api --method DELETE \
+              "/repos/${{ github.repository }}/issues/comments/$PREV" \
+              2>/dev/null || true
+          fi
+
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "$BODY"
 
   # ── Build + CEM + Bundle size ───────────────────────────────────────────
 
