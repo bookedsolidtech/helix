@@ -12,6 +12,9 @@ export interface HxStructuredListProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
+  /** Accessible label for the list container. Use when multiple structured lists appear
+on the same page so screen readers can distinguish them (WCAG 4.1.2). */
+  label?: string;
   /** Renders a border around the entire list. */
   bordered?: boolean;
   /** Reduces row padding for denser layouts. */

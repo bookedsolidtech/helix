@@ -23,19 +23,19 @@
           if (carousel && typeof carousel.play === 'function') {
             carousel.play(interval);
           }
-        }
+        },
       );
     },
     detach: function (context, settings, trigger) {
       if (trigger === 'unload') {
-        once.remove('helixui-carousel', '.views-carousel[data-autoplay="true"]', context).forEach(
-          function (element) {
+        once
+          .remove('helixui-carousel', '.views-carousel[data-autoplay="true"]', context)
+          .forEach(function (element) {
             var carousel = element.querySelector('hx-carousel');
             if (carousel && typeof carousel.pause === 'function') {
               carousel.pause();
             }
-          }
-        );
+          });
       }
     },
   };
@@ -151,11 +151,11 @@
               window.open(
                 shareUrl,
                 'share',
-                'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top
+                'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top,
               );
             }
           });
-        }
+        },
       );
     },
   };
@@ -189,7 +189,7 @@
               }
             });
           }
-        }
+        },
       );
     },
   };

@@ -14,9 +14,10 @@ import type { HxStructuredListProps } from './types.js';
 export type { HxStructuredListProps };
 
 /**
- * Container for structured key-value data display. Renders as a description
-list for accessible term/definition semantics. Use `hx-structured-list-row`
-as direct children.
+ * Container for structured key-value data display. Renders as a list with
+`role="list"` on the host and `role="listitem"` on each `hx-structured-list-row`,
+preserving the list/listitem relationship across shadow DOM boundaries.
+Use `hx-structured-list-row` as direct children.
  *
  * @example
  * ```tsx

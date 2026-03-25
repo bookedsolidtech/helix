@@ -438,7 +438,8 @@ hx-stat:
 hx-status-indicator:
   version: VERSION
   js:
-    /libraries/helixui/dist/components/hx-status-indicator/index.js: { type: module, minified: true }
+    /libraries/helixui/dist/components/hx-status-indicator/index.js:
+      { type: module, minified: true }
   dependencies:
     - helixui/hx-core
 
