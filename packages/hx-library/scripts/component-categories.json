@@ -1,0 +1,101 @@
+{
+  "$schema": "./component-categories.schema.json",
+  "_comment": "Maps each hx-* component to one or more bundle categories. Update when adding new components.",
+  "categories": {
+    "core": [
+      "hx-avatar",
+      "hx-badge",
+      "hx-button",
+      "hx-button-group",
+      "hx-card",
+      "hx-divider",
+      "hx-icon",
+      "hx-icon-button",
+      "hx-image",
+      "hx-link",
+      "hx-skeleton",
+      "hx-spinner",
+      "hx-tag",
+      "hx-text",
+      "hx-visually-hidden"
+    ],
+    "forms": [
+      "hx-checkbox",
+      "hx-checkbox-group",
+      "hx-color-picker",
+      "hx-combobox",
+      "hx-date-picker",
+      "hx-field",
+      "hx-field-label",
+      "hx-file-upload",
+      "hx-form",
+      "hx-help-text",
+      "hx-number-input",
+      "hx-radio-group",
+      "hx-rating",
+      "hx-select",
+      "hx-slider",
+      "hx-switch",
+      "hx-text-input",
+      "hx-textarea",
+      "hx-time-picker",
+      "hx-toggle-button"
+    ],
+    "navigation": [
+      "hx-breadcrumb",
+      "hx-menu",
+      "hx-nav",
+      "hx-overflow-menu",
+      "hx-pagination",
+      "hx-side-nav",
+      "hx-steps",
+      "hx-tabs",
+      "hx-top-nav",
+      "hx-tree-view"
+    ],
+    "layout": [
+      "hx-accordion",
+      "hx-container",
+      "hx-grid",
+      "hx-split-panel",
+      "hx-stack"
+    ],
+    "feedback": [
+      "hx-alert",
+      "hx-banner",
+      "hx-meter",
+      "hx-progress-bar",
+      "hx-progress-ring",
+      "hx-stat",
+      "hx-status-indicator",
+      "hx-toast"
+    ],
+    "overlay": [
+      "hx-dialog",
+      "hx-drawer",
+      "hx-dropdown",
+      "hx-popover",
+      "hx-popup",
+      "hx-tooltip"
+    ],
+    "data": [
+      "hx-code-snippet",
+      "hx-data-table",
+      "hx-list",
+      "hx-structured-list",
+      "hx-table"
+    ],
+    "media": [
+      "hx-carousel",
+      "hx-prose"
+    ],
+    "utility": [
+      "hx-action-bar",
+      "hx-copy-button",
+      "hx-counter",
+      "hx-format-date",
+      "hx-split-button",
+      "hx-theme"
+    ]
+  }
+}
