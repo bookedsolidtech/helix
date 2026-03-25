@@ -7,7 +7,8 @@ import { helixDialogStyles } from './hx-dialog.styles.js';
 // D21 — deterministic monotonic counter instead of Math.random()
 let _dialogCounter = 0;
 
-// Module-level constant avoids rebuilding the selector string on every _getFocusableElements call
+// Module-level constant avoids rebuilding the selector string on every _getFocusableElements call.
+// Pattern matches hx-drawer's FOCUSABLE_SELECTORS constant at module scope.
 const FOCUSABLE_SELECTORS = [
   'a[href]',
   'area[href]',
@@ -183,8 +184,8 @@ export class HelixDialog extends LitElement {
   description = '';
 
   /** Accessible label for the close button. Override for localized text. */
-  @property({ type: String, attribute: 'close-label' })
-  closeLabel = 'Close dialog';
+  @property({ type: String, attribute: 'label-close' })
+  labelClose = 'Close dialog';
 
   /**
    * Returns the dialog's return value — the string passed to `close(returnValue)`.
@@ -531,7 +532,7 @@ export class HelixDialog extends LitElement {
           part="close-button"
           class="dialog__close-btn"
           type="button"
-          aria-label=${this.closeLabel}
+          aria-label=${this.labelClose}
           @click=${() => this.close()}
         ></button>
       </div>

@@ -67,7 +67,7 @@ export const helixMeterStyles = css`
   }
 
   :host([data-state='danger']) {
-    --_indicator-color: var(--hx-meter-color-danger, var(--hx-color-danger-500, #ef4444));
+    --_indicator-color: var(--hx-meter-color-danger, var(--hx-color-error-500, #dc2626));
   }
 
   /* ─── State Label (WCAG 1.4.1) ─── */
@@ -91,7 +91,7 @@ export const helixMeterStyles = css`
   }
 
   .meter__state-label[data-state='danger'] {
-    color: var(--hx-meter-color-danger, var(--hx-color-danger-700, #b91c1c));
+    color: var(--hx-meter-color-danger, var(--hx-color-error-700, #991b1b));
   }
 
   @media (prefers-reduced-motion: reduce) {

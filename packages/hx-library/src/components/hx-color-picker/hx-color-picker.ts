@@ -312,18 +312,18 @@ export class HelixColorPicker extends LitElement {
     this._updateValidity();
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
 
-  /** Called by the browser when the form is reset. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '#000000';
     this._internals.setFormValue(null);
   }
 
-  /** Called by the browser to restore form state on navigation. */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',

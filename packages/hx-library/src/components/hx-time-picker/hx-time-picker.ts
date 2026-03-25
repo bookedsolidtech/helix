@@ -458,6 +458,7 @@ export class HelixTimePicker extends LitElement {
     }
   }
 
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._inputDisplayValue = '';
@@ -465,6 +466,7 @@ export class HelixTimePicker extends LitElement {
     this._closeListbox();
   }
 
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData,
     _mode: 'restore' | 'autocomplete' = 'restore',
@@ -476,7 +478,7 @@ export class HelixTimePicker extends LitElement {
     this.value = clamped;
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

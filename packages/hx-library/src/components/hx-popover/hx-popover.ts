@@ -3,22 +3,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
-type PopoverPlacement =
-  | 'top'
-  | 'top-start'
-  | 'top-end'
-  | 'right'
-  | 'right-start'
-  | 'right-end'
-  | 'bottom'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'left'
-  | 'left-start'
-  | 'left-end';
-
-type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
-
 let _popoverCounter = 0;
 
 /**
@@ -76,14 +60,26 @@ export class HelixPopover extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: PopoverPlacement = 'bottom';
+  placement:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end' = 'bottom';
 
   /**
    * How the popover is triggered.
    * @attr trigger
    */
   @property({ type: String, reflect: true })
-  trigger: TriggerMode = 'click';
+  trigger: 'click' | 'hover' | 'focus' | 'manual' = 'click';
 
   /**
    * Distance in pixels between the popover and the anchor.
@@ -239,9 +235,15 @@ export class HelixPopover extends LitElement {
     this._visible = true;
     this.open = true;
     this._setAnchorAriaAttributes(true);
+<<<<<<< HEAD
     // P1-03 / HIGH-01: single keydown listener handles both Escape and focus trap.
     // Registered synchronously before any await so it is in place before the first
     // await el.updateComplete in tests.
+=======
+    // P1-03: add keydown listener synchronously before any await so it is registered
+    // by the time the test fires an Escape keydown after a single await el.updateComplete.
+    // HIGH-01: single keydown handler handles both Escape close and Tab focus-trap.
+>>>>>>> origin/dev
     document.addEventListener('keydown', this._handleDocumentKeydown);
     await this.updateComplete;
     // hx-after-show fires after Lit has rendered the visible state. Dispatching here
@@ -369,10 +371,17 @@ export class HelixPopover extends LitElement {
 
   // ─── Event Handlers ───
 
+<<<<<<< HEAD
   // P1-03 / P0-01 / HIGH-01: single document-level keydown handler while popover is open.
   // Handles Escape (close) and Tab (focus trap) in one listener to reduce overhead.
   /**
    * Handles Escape to close the popover and Tab/Shift+Tab to trap focus within it.
+=======
+  // P1-03 / P0-01 / HIGH-01: single document-level keydown handler active only while popover is open.
+  // Handles Escape close and Tab focus-trap to reduce document subscriptions from 3 to 2.
+  /**
+   * Handles Escape key close and Tab focus-trap while the popover is open.
+>>>>>>> origin/dev
    * @internal
    */
   private _handleDocumentKeydown = (e: KeyboardEvent): void => {
@@ -385,8 +394,13 @@ export class HelixPopover extends LitElement {
     }
 
     if (e.key === 'Tab') {
+<<<<<<< HEAD
       // HIGH-01: trap Tab/Shift+Tab focus within the popover body
       const focusable = this._getFocusableElements();
+=======
+      const focusable = this._getFocusableElements();
+      // If no interactive children, keep focus on the body itself — no cycling needed.
+>>>>>>> origin/dev
       if (focusable.length === 0) return;
 
       const bodyEl = this.shadowRoot?.querySelector('[part="body"]') as HTMLElement | null;

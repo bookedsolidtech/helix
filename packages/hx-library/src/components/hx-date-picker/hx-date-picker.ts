@@ -458,12 +458,14 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue(null);
     this._isOpen = false;
   }
 
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -473,7 +475,7 @@ export class HelixDatePicker extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

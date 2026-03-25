@@ -159,7 +159,7 @@ export class HelixCombobox extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  size: HxComboboxSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Whether multiple options can be selected.
@@ -331,14 +331,14 @@ export class HelixCombobox extends LitElement {
     }
   }
 
-  /** Called by the browser when the owning form resets. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._filterText = '';
     this._internals.setFormValue(null);
   }
 
-  /** Called when the browser restores form state (e.g., bfcache navigation). */
+  /** @internal */
   // P1-6: Correct signature per WHATWG spec — includes mode param and all state types
   formStateRestoreCallback(
     state: string | File | FormData | null,
@@ -349,7 +349,7 @@ export class HelixCombobox extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

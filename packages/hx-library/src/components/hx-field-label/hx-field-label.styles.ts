@@ -17,10 +17,7 @@ export const helixFieldLabelStyles = css`
   }
 
   .required-indicator {
-    color: var(
-      --hx-field-label-required-color,
-      var(--hx-color-danger, var(--hx-color-error-text, #b91c1c))
-    );
+    color: var(--hx-field-label-required-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 

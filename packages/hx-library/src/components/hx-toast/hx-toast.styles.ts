@@ -161,7 +161,7 @@ export const helixToastStackStyles = css`
   :host {
     display: block;
     position: fixed;
-    z-index: var(--hx-z-index-toast, 9000);
+    z-index: var(--hx-z-index-toast, 1700);
     pointer-events: none;
   }
 

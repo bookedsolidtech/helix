@@ -683,4 +683,54 @@ describe('hx-slider', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: showValue ───
+
+  describe('Property: showValue', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      expect(el.showValue).toBe(false);
+    });
+
+    it('renders value display element when showValue=true', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume" show-value></hx-slider>');
+      await el.updateComplete;
+      const valueDisplay = shadowQuery(el, '[part="value-display"]');
+      expect(valueDisplay).toBeTruthy();
+    });
+
+    it('does not render value display by default', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      await el.updateComplete;
+      const valueDisplay = shadowQuery(el, '[part="value-display"]');
+      expect(valueDisplay).toBeNull();
+    });
+  });
+
+  // ─── Property: showTicks ───
+
+  describe('Property: showTicks', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      expect(el.showTicks).toBe(false);
+    });
+
+    it('renders tick marks when showTicks=true', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider label="Volume" min="0" max="10" step="1" show-ticks></hx-slider>',
+      );
+      await el.updateComplete;
+      const ticks = shadowQueryAll(el, '[part~="tick"]');
+      expect(ticks.length).toBeGreaterThan(0);
+    });
+
+    it('does not render tick marks by default', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider label="Volume" min="0" max="10" step="1"></hx-slider>',
+      );
+      await el.updateComplete;
+      const ticks = shadowQueryAll(el, '[part~="tick"]');
+      expect(ticks.length).toBe(0);
+    });
+  });
 });

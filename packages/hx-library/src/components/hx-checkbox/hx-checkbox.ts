@@ -5,6 +5,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
@@ -44,7 +45,7 @@ const _nextCheckboxId = createIdCounter('hx-checkbox');
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
 @customElement('hx-checkbox')
-export class HelixCheckbox extends HelixElement {
+export class HelixCheckbox extends FormMixin(HelixElement) {
   static override styles = [tokenStyles, helixCheckboxStyles];
 
   // P0-02: observe aria-label on host to forward to inner input
@@ -59,6 +60,7 @@ export class HelixCheckbox extends HelixElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static override formAssociated = true;
 
   // ─── Properties ───
@@ -170,10 +172,6 @@ export class HelixCheckbox extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
-      this._updateValidity();
-    }
-    if (changedProperties.has('required')) {
-      this._updateValidity();
     }
     // WCAG 4.1.3: Keep _announcedError in sync with the error property.
     // When error changes from one non-empty value to another, clear the live region
@@ -199,32 +197,22 @@ export class HelixCheckbox extends HelixElement {
   // ─── Form Integration ───
 
   /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
+  override get form(): HTMLFormElement | null {
     return this._internals.form;
   }
 
   /** Returns the validation message. */
-  get validationMessage(): string {
+  override get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
   /** Returns the ValidityState object. */
-  get validity(): ValidityState {
+  override get validity(): ValidityState {
     return this._internals.validity;
   }
 
-  /** Checks whether the checkbox satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  protected _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -242,6 +230,7 @@ export class HelixCheckbox extends HelixElement {
     this.checked = false;
     this.indeterminate = false;
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   protected override _onFormStateRestore(
@@ -265,7 +254,7 @@ export class HelixCheckbox extends HelixElement {
     this.checked = !this.checked;
 
     this._internals.setFormValue(this.checked ? this.value : null);
-    this._updateValidity();
+    this._handleInteractionInput();
 
     /**
      * Dispatched when the checkbox is toggled.

@@ -112,17 +112,17 @@ export class HelixSplitButton extends LitElement {
 
   /**
    * Accessible label for the dropdown trigger button. Override for localization.
-   * @attr trigger-label
+   * @attr label-trigger
    */
-  @property({ type: String, attribute: 'trigger-label' })
-  triggerLabel = 'More actions';
+  @property({ type: String, attribute: 'label-trigger' })
+  labelTrigger = 'More actions';
 
   /**
    * Accessible label for the dropdown menu panel. Override for localization.
-   * @attr menu-label
+   * @attr label-menu
    */
-  @property({ type: String, attribute: 'menu-label' })
-  menuLabel = 'Secondary actions';
+  @property({ type: String, attribute: 'label-menu' })
+  labelMenu = 'Secondary actions';
 
   // ─── Unique IDs ───
 
@@ -378,7 +378,7 @@ export class HelixSplitButton extends LitElement {
           aria-haspopup="menu"
           aria-expanded=${this._open ? 'true' : 'false'}
           aria-controls=${this._menuId}
-          aria-label=${this.triggerLabel}
+          aria-label=${this.labelTrigger}
           type="button"
           @click=${this._handleTriggerClick}
           @keydown=${this._handleTriggerKeydown}
@@ -408,7 +408,7 @@ export class HelixSplitButton extends LitElement {
           id=${this._menuId}
           class=${classMap(menuClasses)}
           role="menu"
-          aria-label=${this.menuLabel}
+          aria-label=${this.labelMenu}
           @keydown=${this._handleMenuKeydown}
           @hx-item-select=${this._handleMenuItemSelect}
         >

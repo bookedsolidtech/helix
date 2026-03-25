@@ -1467,4 +1467,45 @@ describe('hx-date-picker', () => {
       expect(day31).toBeTruthy();
     });
   });
+
+  // ─── Property: label overrides (i18n) ───
+
+  describe('Property: label overrides', () => {
+    it('requiredMessage defaults to "This field is required."', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      expect(el.requiredMessage).toBe('This field is required.');
+    });
+
+    it('chooseDateLabel defaults to "Choose a date"', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      expect(el.chooseDateLabel).toBe('Choose a date');
+    });
+
+    it('openCalendarLabel defaults to "Open calendar"', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      expect(el.openCalendarLabel).toBe('Open calendar');
+    });
+
+    it('closeCalendarLabel defaults to "Close calendar"', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      expect(el.closeCalendarLabel).toBe('Close calendar');
+    });
+
+    it('nextMonthLabel defaults to "Next month"', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      expect(el.nextMonthLabel).toBe('Next month');
+    });
+
+    it('previousMonthLabel defaults to "Previous month"', async () => {
+      const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      expect(el.previousMonthLabel).toBe('Previous month');
+    });
+
+    it('uses custom requiredMessage when validation fails', async () => {
+      const el = await fixture<HelixDatePicker>(
+        '<hx-date-picker required required-message="Date obligatoire"></hx-date-picker>',
+      );
+      expect(el.requiredMessage).toBe('Date obligatoire');
+    });
+  });
 });
