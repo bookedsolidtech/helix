@@ -1,0 +1,54 @@
+name: HELiX React Integration Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'starters/react/**'
+  pull_request:
+    paths:
+      - 'starters/react/**'
+  schedule:
+    # Weekly test against latest @helixui/react release
+    - cron: '0 9 * * 1'
+
+jobs:
+  test-vite-starter:
+    name: Vite React Starter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: starters/react/package-lock.json
+      - name: Install dependencies
+        run: npm install
+        working-directory: starters/react
+      - name: Type check
+        run: npm run type-check
+        working-directory: starters/react
+      - name: Build
+        run: npm run build
+        working-directory: starters/react
+
+  test-nextjs-example:
+    name: Next.js App Router Example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: starters/react/examples/nextjs/package-lock.json
+      - name: Install dependencies
+        run: npm install
+        working-directory: starters/react/examples/nextjs
+      - name: Type check
+        run: npm run type-check
+        working-directory: starters/react/examples/nextjs
+      - name: Build
+        run: npm run build
+        working-directory: starters/react/examples/nextjs
