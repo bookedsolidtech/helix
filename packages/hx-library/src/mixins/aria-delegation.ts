@@ -154,13 +154,20 @@ export interface AriadDelegationMixinInterface {
  */
 export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T {
   class AriadDelegationMixin extends Base {
+    // Per-instance guard: tracks which aria attributes are mid-processing so
+    // that the recursive attributeChangedCallback triggered by our own
+    // removeAttribute(name) call does not erroneously clear data-aria-*.
+    #processingAria = new Set<string>();
+
     static get observedAttributes(): string[] {
-      // Walk the prototype chain to get super observedAttributes without relying
-      // on the TypeScript `super` keyword (which is unavailable on statics in
-      // generic mixin classes without `override`).
+      // Reflect.get with `this` as the receiver passes the concrete subclass
+      // (e.g. HelixButton) through to Lit's ReactiveElement getter, so it
+      // returns @property attribute names for that specific class.
+      // TypeScript cannot infer static members on `T`, so we use Reflect.get
+      // rather than `super.observedAttributes` to avoid TS2339.
+      const parent: object = Object.getPrototypeOf(AriadDelegationMixin);
       const superAttrs: string[] =
-        (Object.getPrototypeOf(AriadDelegationMixin) as { observedAttributes?: string[] })
-          .observedAttributes ?? [];
+        (Reflect.get(parent, 'observedAttributes', this) as string[] | undefined) ?? [];
       // Append any ARIA attributes not already in the list.
       const ariaAttrs = ARIA_ATTRIBUTES.filter((a) => !superAttrs.includes(a));
       return [...superAttrs, ...ariaAttrs];
@@ -168,19 +175,27 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
 
     attributeChangedCallback(name: string, old: string | null, next: string | null): void {
       if ((ARIA_ATTRIBUTES as readonly string[]).includes(name)) {
-        // Intercept: remove the aria-* attribute, store as data-aria-*
+        // Guard: if we're already processing this attribute, we're in the
+        // recursive callback triggered by our own removeAttribute(name) below.
+        // Do not process it again — that would clear data-aria-* incorrectly.
+        if (this.#processingAria.has(name)) return;
+
+        // Intercept: store as data-aria-*, do not propagate aria-* to the host.
         if (next !== null) {
-          // Setting data-aria-* does NOT trigger another attributeChangedCallback
-          // because data-aria-* is not in observedAttributes — no infinite loop.
+          // data-aria-* is not in observedAttributes — no recursive loop here.
           this.setAttribute(`data-${name}`, next);
         } else {
           this.removeAttribute(`data-${name}`);
         }
-        // Remove the aria-* attribute from the host so it is absent from the a11y
-        // tree and cannot cause double announcements.
+
+        // Remove the aria-* attribute from the host so it is absent from the
+        // a11y tree and cannot cause double announcements. Guard while doing so.
+        this.#processingAria.add(name);
         if (this.hasAttribute(name)) {
-          this.removeAttribute(name);
+          this.removeAttribute(name); // synchronously re-enters attributeChangedCallback; guard catches it
         }
+        this.#processingAria.delete(name);
+
         // Trigger Lit update so render() re-reads the delegated value.
         this.requestUpdate();
         return;
@@ -225,9 +240,15 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
 }
 
 /**
- * Converts 'aria-label' → 'ariaLabel', 'aria-describedby' → 'ariaDescribedby', etc.
+ * Converts 'aria-label' → 'ariaLabel', 'aria-busy' → 'ariaBusy', etc.
+ * Removes the 'aria-' prefix, capitalizes the first letter of the remainder,
+ * then camelCases any additional hyphen-separated segments.
  */
 function ariaAttrToProp(attr: string): string {
-  // Remove 'aria-' prefix then camelCase the remainder.
-  return attr.replace(/^aria-/, 'aria').replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+  const rest = attr.replace(/^aria-/, '');
+  return (
+    'aria' +
+    rest.charAt(0).toUpperCase() +
+    rest.slice(1).replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())
+  );
 }
