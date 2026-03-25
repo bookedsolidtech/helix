@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeAll } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { html, property } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { fixture, cleanup } from '../test-utils.js';
