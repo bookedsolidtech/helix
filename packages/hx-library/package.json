@@ -51,6 +51,7 @@
     "test": "vitest run",
     "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
     "test:coverage": "vitest run --coverage.enabled",
+    "test:coverage:ci": "vitest run --coverage.enabled && node ../../scripts/check-coverage.mjs",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:batch:1": "vitest run \"hx-accordion/|hx-action-bar/|hx-alert/|hx-avatar/|hx-badge/|hx-breadcrumb/|hx-button/|hx-button-group/|hx-card/|hx-carousel/|hx-checkbox/|hx-checkbox-group/|hx-code-snippet/|hx-color-picker/|hx-combobox/\" --reporter=verbose",
@@ -96,7 +97,7 @@
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@vitest/browser": "^3.0.0",
-    "@vitest/coverage-istanbul": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "axe-core": "^4.11.1",
     "playwright": "^1.50.0",
     "typescript": "^5.7.2",
