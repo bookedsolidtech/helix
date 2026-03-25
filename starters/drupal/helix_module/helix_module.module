@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * @file
+ * HELiX UI Components module.
+ *
+ * Integrates the HELiX enterprise web component library (@helixui/library)
+ * with Drupal 10/11. Provides:
+ *   - CDN asset loading via helix_module/helix library definition
+ *   - Twig theme hooks for hx-* components (helix_button, helix_card, etc.)
+ *   - Preprocess functions that map Drupal form element render arrays to
+ *     HELiX component attributes (hx-text-input, hx-select, hx-checkbox, etc.)
+ *   - Drupal.behaviors bridge for AJAX and custom event wiring
+ *
+ * Components are web standards-based (Lit 3.x, Shadow DOM, CustomEvents) and
+ * require no server-side rendering framework. All content is slot-projected
+ * from Twig for progressive enhancement and SEO visibility.
+ *
+ * @see https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/
+ * @see https://www.drupal.org/docs/develop/theming-drupal/adding-stylesheets-css-and-javascript-js-to-a-drupal-theme
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers Twig theme hooks for all HELiX components. Each hook maps
+ * Drupal render array variables to hx-* custom element attributes.
+ */
+function helix_module_theme(): array {
+  return [
+    'helix_button' => [
+      'variables' => [
+        'label'      => '',
+        'variant'    => 'primary',
+        'size'       => 'md',
+        'disabled'   => FALSE,
+        'type'       => 'button',
+        'href'       => NULL,
+        'target'     => NULL,
+        'name'       => NULL,
+        'value'      => NULL,
+        'aria_label' => NULL,
+        'loading'    => FALSE,
+        'attributes' => [],
+      ],
+      'template' => 'helix-button',
+    ],
+    'helix_card' => [
+      'variables' => [
+        'variant'    => 'default',
+        'elevation'  => 'flat',
+        'heading'    => NULL,
+        'heading_tag'=> 'h3',
+        'body'       => NULL,
+        'footer'     => NULL,
+        'actions'    => NULL,
+        'image'      => NULL,
+        'href'       => NULL,
+        'aria_label' => NULL,
+        'attributes' => [],
+      ],
+      'template' => 'helix-card',
+    ],
+    'helix_form_input' => [
+      'variables' => [
+        'label'       => '',
+        'name'        => '',
+        'value'       => '',
+        'type'        => 'text',
+        'placeholder' => NULL,
+        'required'    => FALSE,
+        'disabled'    => FALSE,
+        'error'       => NULL,
+        'help_text'   => NULL,
+        'attributes'  => [],
+      ],
+      'template' => 'helix-form-input',
+    ],
+    'helix_form_select' => [
+      'variables' => [
+        'label'      => '',
+        'name'       => '',
+        'options'    => [],
+        'selected'   => NULL,
+        'required'   => FALSE,
+        'disabled'   => FALSE,
+        'error'      => NULL,
+        'help_text'  => NULL,
+        'attributes' => [],
+      ],
+      'template' => 'helix-form-select',
+    ],
+    'helix_alert' => [
+      'variables' => [
+        'variant'     => 'info',
+        'message'     => '',
+        'title'       => NULL,
+        'dismissible' => FALSE,
+        'show_icon'   => TRUE,
+        'accent'      => FALSE,
+        'open'        => TRUE,
+        'actions'     => NULL,
+        'attributes'  => [],
+      ],
+      'template' => 'helix-alert',
+    ],
+    'helix_badge' => [
+      'variables' => [
+        'label'     => '',
+        'variant'   => 'primary',
+        'size'      => 'md',
+        'removable' => FALSE,
+        'pill'      => FALSE,
+        'pulse'     => FALSE,
+        'count'     => NULL,
+        'max'       => 99,
+        'attributes'=> [],
+      ],
+      'template' => 'helix-badge',
+    ],
+    'helix_checkbox' => [
+      'variables' => [
+        'label'     => '',
+        'name'      => '',
+        'value'     => 'on',
+        'checked'   => FALSE,
+        'disabled'  => FALSE,
+        'required'  => FALSE,
+        'error'     => NULL,
+        'help_text' => NULL,
+        'size'      => 'md',
+        'aria_label'=> NULL,
+        'attributes'=> [],
+      ],
+      'template' => 'helix-checkbox',
+    ],
+    'helix_radio' => [
+      'variables' => [
+        'label'    => '',
+        'name'     => '',
+        'value'    => '',
+        'checked'  => FALSE,
+        'disabled' => FALSE,
+        'required' => FALSE,
+        'error'    => NULL,
+        'attributes'=> [],
+      ],
+      'template' => 'helix-radio',
+    ],
+    'helix_tooltip' => [
+      'variables' => [
+        'trigger_label' => '',
+        'content'       => '',
+        'placement'     => 'top',
+        'show_delay'    => 300,
+        'hide_delay'    => 100,
+        'trigger_type'  => 'button',
+        'aria_label'    => NULL,
+        'attributes'    => [],
+      ],
+      'template' => 'helix-tooltip',
+    ],
+    'helix_modal' => [
+      'variables' => [
+        'label'        => '',
+        'body_content' => '',
+        'open'         => FALSE,
+        'dismissible'  => TRUE,
+        'modal'        => TRUE,
+        'footer'       => NULL,
+        'dialog_id'    => NULL,
+        'attributes'   => [],
+      ],
+      'template' => 'helix-modal',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Attaches the HELiX CDN library to every page. The library loads the
+ * @helixui/library ES module bundle and the Drupal.behaviors bridge script.
+ *
+ * To use the local npm build instead of CDN, replace 'helix_module/helix'
+ * with 'helix_module/helix-local' and ensure dist/helix-library.js exists.
+ */
+function helix_module_page_attachments(array &$attachments): void {
+  $attachments['#attached']['library'][] = 'helix_module/helix';
+}
+
+// Include preprocess functions and theme helpers.
+require_once __DIR__ . '/helix_module.theme.inc';

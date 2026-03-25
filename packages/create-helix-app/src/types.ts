@@ -46,3 +46,21 @@ export interface ComponentBundleConfig {
   description: string;
   components: string[];
 }
+
+export type DrupalPreset = 'standard' | 'blog' | 'healthcare' | 'intranet';
+
+export interface PresetConfig {
+  id: DrupalPreset;
+  name: string;
+  description: string;
+  sdcList: string[];
+  dependencies: Record<string, string>;
+  templateVars: Record<string, string>;
+  architectureNotes: string;
+}
+
+export interface DrupalOptions {
+  themeName: string;
+  directory: string;
+  preset: DrupalPreset;
+}

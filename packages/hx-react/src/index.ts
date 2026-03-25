@@ -1,22 +1,26 @@
 export { HxAccordionItem, type HxAccordionItemProps } from './components/HxAccordionItem/index.js';
 export { HxAccordion, type HxAccordionProps } from './components/HxAccordion/index.js';
-export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/index.js';
 export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
+export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
+export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/index.js';
 export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
+export { HxButton, type HxButtonProps } from './components/HxButton/index.js';
 export {
   HxBreadcrumbItem,
   type HxBreadcrumbItemProps,
 } from './components/HxBreadcrumbItem/index.js';
 export { HxBreadcrumb, type HxBreadcrumbProps } from './components/HxBreadcrumb/index.js';
-export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
-export { HxButton, type HxButtonProps } from './components/HxButton/index.js';
 export { HxButtonGroup, type HxButtonGroupProps } from './components/HxButtonGroup/index.js';
 export { HxCard, type HxCardProps } from './components/HxCard/index.js';
 export { HxCarouselItem, type HxCarouselItemProps } from './components/HxCarouselItem/index.js';
 export { HxCarousel, type HxCarouselProps } from './components/HxCarousel/index.js';
 export { HxCheckbox, type HxCheckboxProps } from './components/HxCheckbox/index.js';
 export { HxCheckboxGroup, type HxCheckboxGroupProps } from './components/HxCheckboxGroup/index.js';
+export {
+  HxClinicalStatus,
+  type HxClinicalStatusProps,
+} from './components/HxClinicalStatus/index.js';
 export { HxCodeSnippet, type HxCodeSnippetProps } from './components/HxCodeSnippet/index.js';
 export { HxColorPicker, type HxColorPickerProps } from './components/HxColorPicker/index.js';
 export { HxCombobox, type HxComboboxProps } from './components/HxCombobox/index.js';
@@ -68,8 +72,8 @@ export { HxSlider, type HxSliderProps } from './components/HxSlider/index.js';
 export { HxSpinner, type HxSpinnerProps } from './components/HxSpinner/index.js';
 export { HxSplitButton, type HxSplitButtonProps } from './components/HxSplitButton/index.js';
 export { HxSplitPanel, type HxSplitPanelProps } from './components/HxSplitPanel/index.js';
-export { HxStack, type HxStackProps } from './components/HxStack/index.js';
 export { HxStat, type HxStatProps } from './components/HxStat/index.js';
+export { HxStack, type HxStackProps } from './components/HxStack/index.js';
 export {
   HxStatusIndicator,
   type HxStatusIndicatorProps,

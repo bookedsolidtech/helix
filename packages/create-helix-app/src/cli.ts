@@ -4,6 +4,9 @@ import path from 'node:path';
 import { TEMPLATES, COMPONENT_BUNDLES } from './templates.js';
 import { scaffoldProject } from './scaffold.js';
 import type { Framework, ComponentBundle, ProjectOptions } from './types.js';
+import { isValidPreset, PRESETS } from './presets/loader.js';
+import { scaffoldDrupalTheme } from './generators/drupal-theme.js';
+import type { DrupalPreset } from './types.js';
 
 const HELIX_VERSION = '0.1.0';
 
@@ -38,7 +41,96 @@ function banner(): void {
   console.log();
 }
 
+async function runDrupalCLI(presetArg: string | null): Promise<void> {
+  banner();
+
+  p.intro(pc.bgCyan(pc.black(' create-helix-app — Drupal theme ')));
+
+  // Validate preset if provided via flag
+  if (presetArg !== null && !isValidPreset(presetArg)) {
+    console.error(
+      `Invalid preset: "${presetArg}". Valid presets: standard, blog, healthcare, intranet`,
+    );
+    process.exit(1);
+  }
+
+  const themeName = await p.text({
+    message: 'Drupal theme machine name',
+    placeholder: 'my-helix-theme',
+    validate(value) {
+      if (!value) return 'Theme name is required';
+      if (!/^[a-z][a-z0-9_]*$/.test(value))
+        return 'Use only lowercase letters, numbers, and underscores (must start with a letter)';
+      return undefined;
+    },
+  });
+
+  if (p.isCancel(themeName)) {
+    p.cancel('Operation cancelled.');
+    process.exit(0);
+  }
+
+  let preset: DrupalPreset;
+
+  if (presetArg !== null && isValidPreset(presetArg)) {
+    preset = presetArg;
+  } else {
+    const selected = await p.select<DrupalPreset>({
+      message: 'Which Drupal preset?',
+      options: PRESETS.map((pr) => ({
+        value: pr.id,
+        label: pr.name,
+        hint: pr.description,
+      })),
+    });
+
+    if (p.isCancel(selected)) {
+      p.cancel('Operation cancelled.');
+      process.exit(0);
+    }
+
+    preset = selected as DrupalPreset;
+  }
+
+  const themeNameStr = themeName as string;
+  const directory = path.resolve(process.cwd(), themeNameStr);
+
+  const s = p.spinner();
+  s.start('Scaffolding Drupal theme...');
+
+  await scaffoldDrupalTheme({ themeName: themeNameStr, directory, preset });
+
+  s.stop(pc.green('Drupal theme scaffolded'));
+
+  const nextSteps = [
+    `cd ${themeNameStr}`,
+    'npm install',
+    `# Copy theme to: web/themes/custom/${themeNameStr}`,
+    '# Enable in Drupal admin: /admin/appearance',
+  ];
+
+  p.note(nextSteps.join('\n'), 'Next steps');
+
+  console.log();
+  console.log(pc.dim('  Theme:  ') + pc.white(themeNameStr));
+  console.log(pc.dim('  Preset: ') + pc.white(preset));
+  console.log();
+
+  p.outro(pc.green('Done!') + ' ' + pc.dim('Build something beautiful with HELiX + Drupal.'));
+}
+
 export async function runCLI(): Promise<void> {
+  // Parse flags before prompting
+  const args = process.argv.slice(2);
+  const isDrupal = args.includes('--drupal');
+  const presetArgIndex = args.indexOf('--preset');
+  const presetArg = presetArgIndex !== -1 ? (args[presetArgIndex + 1] ?? null) : null;
+
+  if (isDrupal) {
+    await runDrupalCLI(presetArg);
+    return;
+  }
+
   banner();
 
   p.intro(pc.bgCyan(pc.black(' create-helix-app ')));

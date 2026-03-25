@@ -1,0 +1,75 @@
+{#
+  helix-checkbox.html.twig
+  ------------------------
+  Renders a HELiX hx-checkbox component for Drupal checkbox form elements.
+
+  Form association is handled automatically via ElementInternals — the
+  component participates in native HTML form submission. No hidden input or
+  custom behavior is required for standard form submission patterns.
+
+  Note on hx-size: The size attribute is prefixed as `hx-size` to avoid
+  conflicts with the native HTML `size` attribute on form elements.
+
+  Note on htmx: If your project uses htmx, the `hx-*` attribute namespace
+  overlaps. The `hx-size` attribute does not conflict with any current htmx
+  directive, but be aware of this when combining HELiX with htmx.
+
+  Variables:
+    label      (string)  Required. Visible label text for the checkbox.
+    name       (string)  Form field name for submission.
+    value      (string)  Value submitted when checked. Default: 'on'.
+    checked    (bool)    Pre-renders in the checked state.
+    disabled   (bool)    Renders in a disabled state.
+    required   (bool)    Marks the checkbox as required.
+    error      (string)  Error message displayed below the checkbox.
+    help_text  (string)  Help text displayed below the checkbox.
+    size       (string)  sm | md | lg. Default: 'md'. Rendered as hx-size.
+    aria_label (string)  Accessible name override (for custom label patterns).
+    attributes (object)  Additional HTML attributes.
+
+  Usage — consent checkbox:
+    {% include 'helix-checkbox.html.twig' with {
+      label: 'Patient consented to treatment',
+      name: 'consent',
+      value: 'yes',
+      checked: field_consent_value,
+      required: true,
+    } %}
+
+  Usage — with error state:
+    {% include 'helix-checkbox.html.twig' with {
+      label: 'I agree to the terms and conditions',
+      name: 'terms',
+      required: true,
+      error: 'You must accept the terms to continue.',
+    } %}
+
+  Drupal Form API — automatic via preprocess:
+    helix_module_preprocess_checkbox() in helix_module.theme.inc maps
+    Drupal checkbox render arrays to these variables automatically.
+#}
+
+{% set _label     = helix_label     ?? label     ?? '' %}
+{% set _name      = helix_name      ?? name      ?? '' %}
+{% set _value     = helix_value     ?? value     ?? 'on' %}
+{% set _checked   = helix_checked   ?? checked   ?? false %}
+{% set _disabled  = helix_disabled  ?? disabled  ?? false %}
+{% set _required  = helix_required  ?? required  ?? false %}
+{% set _error     = helix_error     ?? error     ?? null %}
+{% set _help_text = helix_help_text ?? help_text ?? null %}
+{% set _size      = helix_size      ?? size      ?? 'md' %}
+{% set _aria_label = helix_aria_label ?? aria_label ?? null %}
+
+<hx-checkbox
+  label="{{ _label }}"
+  {% if _name %}name="{{ _name }}"{% endif %}
+  {% if _value != 'on' %}value="{{ _value }}"{% endif %}
+  {% if _checked %}checked{% endif %}
+  {% if _disabled %}disabled{% endif %}
+  {% if _required %}required{% endif %}
+  {% if _error %}error="{{ _error }}"{% endif %}
+  {% if _help_text %}help-text="{{ _help_text }}"{% endif %}
+  hx-size="{{ _size }}"
+  {% if _aria_label %}aria-label="{{ _aria_label }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+></hx-checkbox>

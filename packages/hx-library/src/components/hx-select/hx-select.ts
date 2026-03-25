@@ -210,6 +210,11 @@ export class HelixSelect extends HelixElement {
     super.disconnectedCallback();
     // Safety net: remove listener if component is removed while dropdown is open
     document.removeEventListener('click', this._handleOutsideClick);
+    // Reset open state to prevent persisted open state on reconnect
+    if (this.open) {
+      this.open = false;
+      this._focusedOptionIndex = -1;
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -357,6 +362,13 @@ export class HelixSelect extends HelixElement {
     }
 
     this._options = parsed;
+
+    if (parsed.length === 0) {
+      devWarn(
+        'hx-select',
+        'hx-select has no options — add <option> or <optgroup> elements as children.',
+      );
+    }
 
     if (this._select) {
       if (this.value) {

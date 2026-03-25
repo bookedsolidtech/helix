@@ -5,6 +5,16 @@ description: Get up and running with HELIX web components in minutes
 
 This guide walks you through creating your first HELIX component and using it in a page.
 
+## Scaffold a New Project (Recommended)
+
+The fastest way to start a new project is with the `@helixui/create` CLI:
+
+```bash
+npx @helixui/create my-app
+```
+
+The interactive TUI will walk you through selecting a framework (React, Vue, Svelte, Angular, Astro, or Vanilla), component bundles, and optional features like TypeScript, ESLint, and design tokens.
+
 ## Start the Dev Environment
 
 ```bash
