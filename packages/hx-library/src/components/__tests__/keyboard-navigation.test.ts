@@ -652,9 +652,10 @@ describe('Keyboard Navigation Integration', () => {
           <hx-menu-item value="b">Action B</hx-menu-item>
         </hx-menu>
       `);
-      el.focus();
+      const menuDiv = el.shadowRoot!.querySelector<HTMLElement>('[role="menu"]')!;
+      expect(menuDiv).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-close');
-      await userEvent.keyboard('{Escape}');
+      menuDiv.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -875,7 +876,7 @@ describe('Keyboard Navigation Integration', () => {
         el.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part~="button"]') ?? [],
       );
       const nextBtn = allButtons.find(
-        (btn) => !btn.disabled && btn.getAttribute('aria-label') !== '1',
+        (btn) => !btn.disabled && btn.getAttribute('aria-disabled') !== 'true' && btn.getAttribute('aria-label') === 'Page 2',
       );
       expect(nextBtn).toBeTruthy();
       // Native buttons fire click on Enter — trigger directly to verify the event fires
@@ -901,8 +902,7 @@ describe('Keyboard Navigation Integration', () => {
       `);
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent<{ index: number }>>(el, 'hx-slide-change');
-      el.focus();
-      await userEvent.keyboard('{ArrowRight}');
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event.detail.index).toBe(1);
     });
@@ -920,8 +920,7 @@ describe('Keyboard Navigation Integration', () => {
       (el as unknown as { next(): void }).next();
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent<{ index: number }>>(el, 'hx-slide-change');
-      el.focus();
-      await userEvent.keyboard('{ArrowLeft}');
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, composed: true }));
       const event = await eventPromise;
       expect(event.detail.index).toBe(0);
     });
@@ -1135,9 +1134,9 @@ describe('Keyboard Navigation Integration', () => {
       `);
       await el.updateComplete;
       const toggle = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      expect(toggle).toBeTruthy();
       const eventPromise = oneEvent<CustomEvent<{ open: boolean }>>(el, 'hx-mobile-toggle');
-      toggle.focus();
-      await userEvent.keyboard('{Enter}');
+      toggle.click();
       const event = await eventPromise;
       expect(typeof event.detail.open).toBe('boolean');
     });

@@ -13,7 +13,7 @@ export interface HxAlertProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** Visual variant of the alert that determines colors and ARIA semantics. */
-  variant?: string;
+  variant?: 'info' | 'success' | 'warning' | 'error';
   /** Whether the alert can be dismissed by the user. */
   dismissible?: boolean;
   /** Optional heading text that provides context for the close button's accessible label.

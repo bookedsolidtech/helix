@@ -37,8 +37,6 @@ Sets the host to `display: block` and the inner element to `width: 100%`. */
   /** When true, flips button colors for placement on dark or gradient backgrounds.
 Forces text to white and adjusts hover/focus ring colors across all variants. */
   inverted?: boolean;
-  /** Accessible label forwarded to the inner button/anchor. Required for icon-only usage. */
-  ariaLabel?: string | null;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
 

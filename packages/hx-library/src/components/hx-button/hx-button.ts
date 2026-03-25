@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 
 /**
@@ -41,7 +42,7 @@ import { helixButtonStyles } from './hx-button.styles.js';
  * @cssprop [--hx-button-inverted-focus-ring-color=rgba(255,255,255,0.5)] - Focus ring color when inverted.
  */
 @customElement('hx-button')
-export class HelixButton extends LitElement {
+export class HelixButton extends mixinDelegatesAria(LitElement) {
   static override styles = [tokenStyles, helixButtonStyles];
 
   // ─── Form Association ───
@@ -139,13 +140,6 @@ export class HelixButton extends LitElement {
    */
   @property({ type: Boolean, reflect: true })
   inverted = false;
-
-  /**
-   * Accessible label forwarded to the inner button/anchor. Required for icon-only usage.
-   * @attr aria-label
-   */
-  @property({ type: String, reflect: true, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
 
   // ─── Form API ───
 

@@ -19,7 +19,7 @@ Provides context to screen readers about the tree's purpose. */
 - `none` — items cannot be selected
 - `single` — only one item can be selected at a time
 - `multiple` — multiple items can be selected */
-  selection?: string;
+  selection?: 'none' | 'single' | 'multiple';
 
   // Event callbacks
   /** Dispatched when a tree item is selected or deselected. */

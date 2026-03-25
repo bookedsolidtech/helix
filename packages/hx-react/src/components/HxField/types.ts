@@ -24,7 +24,7 @@ export interface HxFieldProps {
 interactivity — set disabled on the slotted control directly. */
   disabled?: boolean;
   /** Size variant controlling label and help text font sizes. */
-  hxSize?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
   /** Layout variant. 'column' stacks label above control; 'inline' places them side-by-side. */
   layout?: 'column' | 'inline';
 }
