@@ -1,0 +1,62 @@
+{#
+/**
+ * @file
+ * Standalone Twig template for rendering an hx-text-input web component.
+ *
+ * Available variables:
+ * - name: Input name attribute (required for form submission).
+ * - label: Visible label text.
+ * - type: Input type (text, email, password, tel, url, search). Default: text.
+ * - value: Default value.
+ * - placeholder: Placeholder text.
+ * - required: Whether the field is required.
+ * - disabled: Whether the field is disabled.
+ * - readonly: Whether the field is read-only.
+ * - error: Error message to display.
+ * - help_text: Help text displayed below the input.
+ * - pattern: Validation pattern (regex).
+ * - maxlength: Maximum character length.
+ * - autocomplete: Autocomplete attribute value.
+ * - attributes: Drupal attributes object for additional HTML attributes.
+ *
+ * Usage:
+ * @code
+ *   {% include '@mytheme/templates/hx-text-input.html.twig' with {
+ *     name: 'patient_name',
+ *     label: 'Patient Name',
+ *     required: true,
+ *     autocomplete: 'name',
+ *   } %}
+ * @endcode
+ *
+ * Form API integration:
+ * @code
+ *   {# In a Drupal Form API render array override #}
+ *   {% include '@mytheme/templates/hx-text-input.html.twig' with {
+ *     name: element['#name'],
+ *     label: element['#title'],
+ *     value: element['#value'],
+ *     required: element['#required'],
+ *     error: element['#errors'] ? element['#errors']|render|striptags : null,
+ *   } %}
+ * @endcode
+ */
+#}
+{{ attach_library('helixui/hx-text-input') }}
+
+<hx-text-input
+  name="{{ name }}"
+  label="{{ label }}"
+  type="{{ type|default('text') }}"
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {% if pattern %}pattern="{{ pattern }}"{% endif %}
+  {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+  {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+></hx-text-input>

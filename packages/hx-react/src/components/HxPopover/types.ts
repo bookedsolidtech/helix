@@ -15,9 +15,22 @@ export interface HxPopoverProps {
   /** Whether the popover is open. */
   open?: boolean;
   /** Preferred placement of the popover relative to the anchor. */
-  placement?: string;
+  placement?:
+    | string
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end';
   /** How the popover is triggered. */
-  trigger?: string;
+  trigger?: 'click' | 'hover' | 'focus' | 'manual';
   /** Distance in pixels between the popover and the anchor. */
   distance?: number;
   /** Alignment offset in pixels along the anchor. */

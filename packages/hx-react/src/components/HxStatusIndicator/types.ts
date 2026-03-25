@@ -13,9 +13,9 @@ export interface HxStatusIndicatorProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** The status to display. */
-  status?: string;
+  status?: 'online' | 'offline' | 'away' | 'busy' | 'unknown';
   /** Size of the indicator dot. */
-  size?: string;
+  size?: 'sm' | 'md' | 'lg';
   /** Whether to show an animated pulse ring around the dot.
 Animation is suppressed when prefers-reduced-motion is active. */
   pulse?: boolean;

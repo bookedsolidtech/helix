@@ -12,20 +12,18 @@ export interface HxCardProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
-  /** Enable delegatesFocus so :focus on the host works when the inner card div has focus. */
-  shadowRootOptions?: object;
   /** Visual style variant of the card. */
   variant?: 'default' | 'featured' | 'compact';
   /** Elevation (shadow depth) of the card. */
   elevation?: 'flat' | 'raised' | 'floating';
   /** Optional URL. When set, the card becomes interactive (clickable)
 and navigates to this URL on click.
-Uses hx-href to avoid conflicting with the native HTML href attribute. */
-  hxHref?: string | undefined;
+Uses the hx-href attribute to avoid conflicting with the native HTML href attribute. */
+  href?: string | undefined;
   /** Accessible label for interactive cards. Use this to provide a meaningful
 description of the card's purpose rather than exposing the raw URL.
 Only applies when hx-href is set. */
-  hxAriaLabel?: string | undefined;
+  label?: string | undefined;
 
   // Event callbacks
   /** Dispatched when an interactive card (with hx-href) is clicked. */

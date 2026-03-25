@@ -18,7 +18,7 @@ or any valid CSS size string (e.g. "3rem", "48px") for custom dimensions.
 The type is `SpinnerSize | string` which widens to `string` at the TypeScript
 level — this is intentional to support CSS size overrides. Use `SpinnerSize`
 values for standard sizing; custom strings bypass token-based scaling. */
-  size?: string | string;
+  size?: 'sm' | 'md' | 'lg' | string;
   /** Visual variant of the spinner. */
   variant?: 'default' | 'primary' | 'inverted';
   /** Accessible label announced to screen readers. Defaults to "Loading".

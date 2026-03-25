@@ -13,6 +13,10 @@ export { HelixElement } from './base/index.js';
 export { createIdCounter, resetIdCounter } from './base/index.js';
 export { mergeTokenStyles } from './base/index.js';
 
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+export { FocusMixin } from './mixins/index.js';
+export type { FocusMixinInterface } from './mixins/index.js';
+
 // ─── Controllers ─────────────────────────────────────────────────────────────
 export { HelixAuditController } from './controllers/helix-audit-controller.js';
 export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';

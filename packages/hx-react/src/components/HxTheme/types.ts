@@ -17,10 +17,33 @@ export interface HxThemeProps {
 - `"dark"`: dark-mode semantic overrides applied on top of light primitives
 - `"high-contrast"`: WCAG 7:1+ contrast tokens for low-vision users
 - `"auto"`: follows OS `prefers-color-scheme`; resolves to `"light"` or `"dark"` at runtime */
-  theme?: string;
+  theme?: 'light' | 'dark' | 'high-contrast' | 'auto';
   system?: boolean;
+  /** The registered brand name to apply on top of the base theme.
+When set, brand-specific CSS custom property overrides are merged
+after the base theme tokens in the adopted stylesheet, enabling
+hospital system white-label implementations.
+
+The brand must first be registered via `HelixBrandRegistry.register()`.
+If the brand name is non-empty but not registered, a warning is logged
+and the base theme is applied without brand overrides. */
+  brand?: string;
+  /** Controls motion behavior for all descendant `hx-*` components.
+- `"full"` (default): Full animations. Respects OS `prefers-reduced-motion`.
+- `"reduced"`: Collapses all animation durations to 0ms and easings to linear.
+  Use this for devices where OS accessibility settings cannot be relied on
+  (e.g. healthcare bedside terminals).
+- `"none"`: Same as `"reduced"` — all motion tokens resolve to instant/linear.
+
+When `motion="full"` and the OS reports `prefers-reduced-motion: reduce`,
+the same token overrides are applied automatically. */
+  motion?: string;
   /** Returns the currently active theme name.
 When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
 Otherwise returns the `theme` property value. */
-  effectiveTheme?: string;
+  effectiveTheme?: 'light' | 'dark' | 'high-contrast' | 'auto';
+  /** Returns the resolved motion level after considering the `motion` attribute and OS preference.
+When `motion="full"` and the OS reports `prefers-reduced-motion: reduce`, returns `"reduced"`.
+Otherwise returns `"full"` or `"reduced"` based on the `motion` attribute. */
+  effectiveMotion?: 'full' | 'reduced';
 }

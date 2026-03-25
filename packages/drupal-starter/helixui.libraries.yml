@@ -573,3 +573,30 @@ helixui-behaviors:
   dependencies:
     - core/drupal
     - core/once
+
+helixui-form-behaviors:
+  version: VERSION
+  js:
+    js/helixui-form-behaviors.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - helixui/helixui-behaviors
+
+# --- Theme override CSS ---
+
+helix-theme-overrides:
+  version: VERSION
+  css:
+    theme:
+      css/helix-theme-overrides.css: {}
+  dependencies:
+    - helixui/hx-core
+
+helix-form-layout:
+  version: VERSION
+  css:
+    layout:
+      css/helix-form-layout.css: {}
+  dependencies:
+    - helixui/hx-core

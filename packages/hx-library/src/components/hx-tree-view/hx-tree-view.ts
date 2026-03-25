@@ -79,15 +79,35 @@ export class HelixTreeView extends LitElement {
   /** @internal */
   @state() private _hasVisibleItems = false;
 
+  // ─── Visible items cache ───
+
+  /**
+   * Cached flat list of visible items (depth-first, respects collapsed nodes).
+   * Set to null to invalidate; rebuilt on next access.
+   * @internal
+   */
+  private _cachedVisibleItems: HelixTreeItem[] | null = null;
+
+  /**
+   * Invalidate the visible-items cache. Call after any expand/collapse or structural change.
+   * @internal
+   */
+  private _invalidateVisibleItemsCache(): void {
+    this._cachedVisibleItems = null;
+  }
+
   // ─── Internal Helpers ───
 
   /**
    * Returns a flat ordered list of all visible (not inside a collapsed item) hx-tree-items
-   * in depth-first order.
+   * in depth-first order. Result is cached; invalidated on expand/collapse/slotchange.
    */
   /** @internal */
   private _getVisibleItems(): HelixTreeItem[] {
-    return this._collectVisibleItems(this);
+    if (!this._cachedVisibleItems) {
+      this._cachedVisibleItems = this._collectVisibleItems(this);
+    }
+    return this._cachedVisibleItems;
   }
 
   /** @internal */
@@ -197,6 +217,7 @@ export class HelixTreeView extends LitElement {
         if (!currentItem) break;
         if (currentItem.expanded && currentItem.hasChildItems) {
           currentItem.expanded = false;
+          this._invalidateVisibleItemsCache();
         } else {
           const parentItem = currentItem.parentElement?.closest('hx-tree-item') as
             | HelixTreeItem
@@ -217,6 +238,7 @@ export class HelixTreeView extends LitElement {
         if (currentItem.hasChildItems) {
           if (!currentItem.expanded) {
             currentItem.expanded = true;
+            this._invalidateVisibleItemsCache();
           } else {
             this._focusItem(currentIndex + 1);
           }
@@ -250,13 +272,36 @@ export class HelixTreeView extends LitElement {
   }
 
   /**
+   * Compute and push ARIA position metadata (level, posInSet, setSize, selectable) to all
+   * direct hx-tree-item children of a container in a single O(n) pass.
+   * Each item also recurses for its own children, building the full tree in O(total-items) total.
+   * @internal
+   */
+  private _updateAriaMetadataForContainer(container: Element, level: number): void {
+    const selectable = this.selection === 'single' || this.selection === 'multiple';
+    const children = Array.from(container.children).filter(
+      (c) => c.tagName.toLowerCase() === 'hx-tree-item',
+    ) as HelixTreeItem[];
+    const setSize = children.length;
+    children.forEach((item, index) => {
+      item.setAriaMetadata(level, index + 1, setSize, selectable);
+      // Recurse into child items so the full tree is updated in one traversal
+      this._updateAriaMetadataForContainer(item, level + 1);
+    });
+  }
+
+  /**
    * Initializes the roving tabindex after items are first slotted in.
    * Ensures the active item (index 0 by default) has tabindex="0" from the start,
    * so a Tab into the tree lands directly on the first item without a redirect.
    * Also updates `_hasVisibleItems` so the container tabindex re-renders correctly.
+   * Pushes O(n) ARIA metadata to all items to replace the O(n^2) per-item ancestor walk.
    */
   /** @internal */
   private _handleSlotChange(): void {
+    this._invalidateVisibleItemsCache();
+    // Push ARIA metadata from parent in a single O(n) traversal
+    this._updateAriaMetadataForContainer(this, 1);
     const items = this._getVisibleItems();
     this._hasVisibleItems = items.length > 0;
     if (items.length === 0) return;

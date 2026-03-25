@@ -13,7 +13,7 @@ export interface HxActionBarProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** Size of the action bar — propagated as a data attribute to slotted children. */
-  size?: string;
+  size?: 'sm' | 'md' | 'lg';
   /** Visual variant controlling the bar background. */
   variant?: 'default' | 'outlined' | 'filled';
   /** Position and sticky behavior of the action bar.
