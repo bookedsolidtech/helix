@@ -2,10 +2,10 @@ import { LitElement, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 
 /**
- * Mixin constructor type — accepts any class that extends LitElement.
+ * Mixin constructor type — must use `any[]` args per TypeScript mixin requirements (TS2545).
  * @internal
  */
-type Constructor<T extends LitElement = LitElement> = new (...args: unknown[]) => T;
+type Constructor<T = object> = new (...args: any[]) => T;
 
 /**
  * The public interface added by FocusMixin.
@@ -48,7 +48,7 @@ export interface FocusMixinInterface {
  *
  * @public
  */
-export const FocusMixin = <T extends Constructor>(superClass: T) => {
+export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => {
   class FocusMixinClass extends superClass implements FocusMixinInterface {
     /**
      * True when the component or any of its descendants has focus.
@@ -181,7 +181,5 @@ export const FocusMixin = <T extends Constructor>(superClass: T) => {
     };
   }
 
-  return FocusMixinClass as unknown as T &
-    Constructor<FocusMixinClass> &
-    Constructor<FocusMixinInterface>;
+  return FocusMixinClass as unknown as T & Constructor<FocusMixinInterface>;
 };

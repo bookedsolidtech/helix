@@ -190,7 +190,7 @@ export class HelixTextInput extends FocusMixin(HelixElement) {
    * Declares the inner focusable element for FocusMixin delegation.
    * @internal
    */
-  protected override get _focusableNode(): HTMLElement | null {
+  protected get _focusableNode(): HTMLElement | null {
     return this._input ?? null;
   }
 
