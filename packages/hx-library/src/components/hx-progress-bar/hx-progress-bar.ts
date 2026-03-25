@@ -122,6 +122,7 @@ export class HelixProgressBar extends LitElement {
   }
 
   override updated(changedProps: PropertyValues<this>): void {
+    super.updated(changedProps);
     if ((changedProps.has('value') || changedProps.has('max')) && this._isComplete) {
       this._liveMessage = 'Complete';
       this.dispatchEvent(new CustomEvent<void>('hx-complete', { bubbles: true, composed: true }));

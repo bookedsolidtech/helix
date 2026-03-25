@@ -181,10 +181,7 @@ export class HelixFileUpload extends LitElement {
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    if (
-      (changedProperties as Map<PropertyKey, unknown>).has('_files') ||
-      changedProperties.has('name')
-    ) {
+    if (changedProperties.has('_files' as keyof HelixFileUpload) || changedProperties.has('name')) {
       this._syncFormValue();
     }
   }

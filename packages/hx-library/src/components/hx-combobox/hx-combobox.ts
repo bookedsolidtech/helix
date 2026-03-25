@@ -265,12 +265,16 @@ export class HelixCombobox extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._handleOutsideClick);
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._handleOutsideClick);
+    }
     if (this._debounceTimer !== null) {
       clearTimeout(this._debounceTimer);
     }

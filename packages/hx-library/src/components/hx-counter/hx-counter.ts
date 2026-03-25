@@ -100,6 +100,16 @@ export class HelixCounter extends LitElement {
   private _startValue = 0;
   /** @internal */
   private _prefersReducedMotion = false;
+  /** @internal */
+  private _motionMql: MediaQueryList | null = null;
+  /** @internal */
+  private readonly _handleMotionChange = (e: MediaQueryListEvent): void => {
+    this._prefersReducedMotion = e.matches;
+    if (this._prefersReducedMotion) {
+      this._cancelAnimation();
+      this._displayValue = this.value;
+    }
+  };
 
   // ─── Lifecycle ───
 
@@ -120,7 +130,9 @@ export class HelixCounter extends LitElement {
     }
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this._motionMql = mq;
     this._prefersReducedMotion = mq.matches;
+    mq.addEventListener('change', this._handleMotionChange);
 
     if (this._prefersReducedMotion) {
       this._displayValue = this.value;
@@ -133,6 +145,8 @@ export class HelixCounter extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._cancelAnimation();
+    this._motionMql?.removeEventListener('change', this._handleMotionChange);
+    this._motionMql = null;
   }
 
   override updated(changedProps: PropertyValues<this>): void {

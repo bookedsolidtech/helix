@@ -316,19 +316,18 @@ export class HelixDatePicker extends LitElement {
    * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
    * @internal
    */
-  private _boundHandleOutsideClick: (e: MouseEvent) => void = () => undefined;
+  private readonly _boundHandleOutsideClick = (e: MouseEvent) => this._handleOutsideClick(e);
   /**
    * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
    * @internal
    */
-  private _boundHandleDocumentKeydown: (e: KeyboardEvent) => void = () => undefined;
+  private readonly _boundHandleDocumentKeydown = (e: KeyboardEvent) =>
+    this._handleDocumentKeydown(e);
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._boundHandleOutsideClick = this._handleOutsideClick.bind(this);
-    this._boundHandleDocumentKeydown = this._handleDocumentKeydown.bind(this);
   }
 
   override disconnectedCallback(): void {
