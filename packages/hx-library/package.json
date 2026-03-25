@@ -46,6 +46,7 @@
     "test:component": "vitest run --reporter=verbose",
     "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\"",
     "cem:watch": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" --watch",
+    "generate:drupal-libraries": "node scripts/generate-drupal-libraries.js",
     "lint": "eslint src/",
     "clean": "rm -rf dist custom-elements.json"
   },
