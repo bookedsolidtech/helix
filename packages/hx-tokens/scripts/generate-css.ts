@@ -32,8 +32,8 @@ function flatten(
 const jsonPath = resolve(__dirname, '../src/tokens.json');
 const tokens = JSON.parse(readFileSync(jsonPath, 'utf-8'));
 
-// Separate dark mode tokens from the rest
-const { dark: darkTokens, ...lightTokens } = tokens;
+// Separate dark mode and high-contrast tokens from the rest
+const { dark: darkTokens, 'high-contrast': hcTokens, ...lightTokens } = tokens;
 
 // Generate light mode (all primitive + semantic tokens)
 const lightEntries = flatten(lightTokens);
@@ -41,7 +41,10 @@ const lightEntries = flatten(lightTokens);
 // Generate dark mode overrides
 const darkEntries = darkTokens ? flatten(darkTokens) : [];
 
-// Build the 3 CSS blocks
+// Generate high-contrast overrides
+const hcEntries = hcTokens ? flatten(hcTokens as Record<string, unknown>) : [];
+
+// Build the CSS blocks
 const lines: string[] = [];
 
 // Block 1: :root with all light mode tokens (primitives + semantics)
@@ -73,6 +76,27 @@ if (darkEntries.length > 0) {
   lines.push(``);
 }
 
+if (hcEntries.length > 0) {
+  // Block 4: @media prefers-contrast: more — auto high-contrast mode
+  // Only applies when the user has NOT explicitly set data-hx-contrast="normal"
+  lines.push(`@media (prefers-contrast: more) {`);
+  lines.push(`  :root:not([data-hx-contrast="normal"]) {`);
+  for (const t of hcEntries) {
+    lines.push(`    ${t.name}: ${t.value};`);
+  }
+  lines.push(`  }`);
+  lines.push(`}`);
+  lines.push(``);
+
+  // Block 5: [data-hx-contrast="high"] — manual high-contrast override
+  lines.push(`:root[data-hx-contrast="high"] {`);
+  for (const t of hcEntries) {
+    lines.push(`  ${t.name}: ${t.value};`);
+  }
+  lines.push(`}`);
+  lines.push(``);
+}
+
 const css = lines.join('\n');
 
 const outDir = resolve(__dirname, '../dist');
@@ -80,5 +104,5 @@ mkdirSync(outDir, { recursive: true });
 writeFileSync(resolve(outDir, 'tokens.css'), css, 'utf-8');
 
 console.log(
-  `Generated dist/tokens.css (${lightEntries.length} light tokens, ${darkEntries.length} dark overrides)`,
+  `Generated dist/tokens.css (${lightEntries.length} light tokens, ${darkEntries.length} dark overrides, ${hcEntries.length} high-contrast overrides)`,
 );

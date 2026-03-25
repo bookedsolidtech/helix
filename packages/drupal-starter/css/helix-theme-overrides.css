@@ -1,0 +1,194 @@
+/**
+ * @file
+ * Theme token overrides for HELiX web components.
+ *
+ * This file demonstrates how to map your Drupal theme's design language
+ * to HELiX design tokens using CSS custom properties. HELiX components
+ * use Shadow DOM for encapsulation, but expose --hx-* custom properties
+ * as the theming API. Override these at the :root level to apply your
+ * brand colors, typography, and spacing globally.
+ *
+ * Token hierarchy:
+ *   Primitive tokens (raw values)
+ *     -> Semantic tokens (--hx-color-primary, --hx-spacing-md)
+ *       -> Component tokens (--hx-button-bg, --hx-card-padding)
+ *
+ * Override at the SEMANTIC level for broad changes. Override at the
+ * COMPONENT level for targeted changes to individual components.
+ *
+ * Usage in your theme:
+ *   1. Copy this file to your theme's css/ directory
+ *   2. Update the values to match your brand
+ *   3. Add it to your theme's .libraries.yml:
+ *
+ *      global-styling:
+ *        css:
+ *          theme:
+ *            css/helix-theme-overrides.css: {}
+ *        dependencies:
+ *          - helixui/hx-core
+ */
+
+/* ===========================================================================
+   Semantic Color Tokens
+   Override these to apply your brand palette globally.
+   =========================================================================== */
+
+:root {
+  /* --- Primary palette --- */
+  /* --hx-color-primary: #0057b8; */
+  /* --hx-color-primary-hover: #004a9e; */
+  /* --hx-color-primary-active: #003d85; */
+  /* --hx-color-primary-contrast: #ffffff; */
+
+  /* --- Secondary palette --- */
+  /* --hx-color-secondary: #6c757d; */
+  /* --hx-color-secondary-hover: #5a6268; */
+  /* --hx-color-secondary-contrast: #ffffff; */
+
+  /* --- Danger / destructive actions --- */
+  /* --hx-color-danger: #dc3545; */
+  /* --hx-color-danger-hover: #c82333; */
+  /* --hx-color-danger-contrast: #ffffff; */
+
+  /* --- Success / confirmation --- */
+  /* --hx-color-success: #28a745; */
+  /* --hx-color-success-hover: #218838; */
+  /* --hx-color-success-contrast: #ffffff; */
+
+  /* --- Warning / caution --- */
+  /* --hx-color-warning: #ffc107; */
+  /* --hx-color-warning-hover: #e0a800; */
+  /* --hx-color-warning-contrast: #212529; */
+
+  /* --- Neutral / surface --- */
+  /* --hx-color-surface: #ffffff; */
+  /* --hx-color-surface-alt: #f8f9fa; */
+  /* --hx-color-border: #dee2e6; */
+  /* --hx-color-text: #212529; */
+  /* --hx-color-text-muted: #6c757d; */
+}
+
+/* ===========================================================================
+   Semantic Spacing Tokens
+   =========================================================================== */
+
+:root {
+  /* --hx-spacing-xs: 0.25rem; */
+  /* --hx-spacing-sm: 0.5rem; */
+  /* --hx-spacing-md: 1rem; */
+  /* --hx-spacing-lg: 1.5rem; */
+  /* --hx-spacing-xl: 2rem; */
+  /* --hx-spacing-2xl: 3rem; */
+}
+
+/* ===========================================================================
+   Semantic Typography Tokens
+   =========================================================================== */
+
+:root {
+  /* --hx-font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif; */
+  /* --hx-font-family-heading: 'Merriweather', Georgia, serif; */
+  /* --hx-font-family-mono: 'Fira Code', 'Courier New', monospace; */
+
+  /* --hx-font-size-xs: 0.75rem; */
+  /* --hx-font-size-sm: 0.875rem; */
+  /* --hx-font-size-md: 1rem; */
+  /* --hx-font-size-lg: 1.25rem; */
+  /* --hx-font-size-xl: 1.5rem; */
+
+  /* --hx-font-weight-normal: 400; */
+  /* --hx-font-weight-medium: 500; */
+  /* --hx-font-weight-bold: 700; */
+
+  /* --hx-line-height-tight: 1.25; */
+  /* --hx-line-height-normal: 1.5; */
+  /* --hx-line-height-relaxed: 1.75; */
+}
+
+/* ===========================================================================
+   Semantic Border Radius Tokens
+   =========================================================================== */
+
+:root {
+  /* --hx-radius-sm: 0.25rem; */
+  /* --hx-radius-md: 0.375rem; */
+  /* --hx-radius-lg: 0.5rem; */
+  /* --hx-radius-xl: 0.75rem; */
+  /* --hx-radius-full: 9999px; */
+}
+
+/* ===========================================================================
+   Semantic Shadow Tokens
+   =========================================================================== */
+
+:root {
+  /* --hx-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05); */
+  /* --hx-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  /* --hx-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1); */
+  /* --hx-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15); */
+}
+
+/* ===========================================================================
+   Semantic Focus Tokens (accessibility-critical)
+   Ensure focus indicators meet WCAG 2.1 AA contrast requirements.
+   =========================================================================== */
+
+:root {
+  /* --hx-focus-ring-color: #0057b8; */
+  /* --hx-focus-ring-width: 2px; */
+  /* --hx-focus-ring-offset: 2px; */
+}
+
+/* ===========================================================================
+   Component-Level Overrides (targeted)
+   Use these for per-component customization without affecting the global
+   token values. Each component documents its available tokens.
+   =========================================================================== */
+
+/* --- hx-button --- */
+/* :root { */
+/*   --hx-button-font-family: var(--hx-font-family); */
+/*   --hx-button-border-radius: var(--hx-radius-md); */
+/*   --hx-button-padding-x: var(--hx-spacing-md); */
+/*   --hx-button-padding-y: var(--hx-spacing-sm); */
+/* } */
+
+/* --- hx-card --- */
+/* :root { */
+/*   --hx-card-border-radius: var(--hx-radius-lg); */
+/*   --hx-card-padding: var(--hx-spacing-lg); */
+/*   --hx-card-shadow: var(--hx-shadow-md); */
+/*   --hx-card-border-color: var(--hx-color-border); */
+/* } */
+
+/* --- hx-text-input --- */
+/* :root { */
+/*   --hx-input-border-color: var(--hx-color-border); */
+/*   --hx-input-border-radius: var(--hx-radius-md); */
+/*   --hx-input-focus-border-color: var(--hx-color-primary); */
+/*   --hx-input-error-color: var(--hx-color-danger); */
+/* } */
+
+/* ===========================================================================
+   Dark Mode Example
+   HELiX components respond to token overrides. To support dark mode,
+   override the semantic tokens inside a prefers-color-scheme media query
+   or a data attribute on <html>.
+   =========================================================================== */
+
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     --hx-color-surface: #1a1a2e; */
+/*     --hx-color-surface-alt: #16213e; */
+/*     --hx-color-border: #2d3748; */
+/*     --hx-color-text: #e2e8f0; */
+/*     --hx-color-text-muted: #a0aec0; */
+/*   } */
+/* } */
+
+/* Or use a theme class / data attribute toggled by Drupal: */
+/* html[data-theme="dark"] { */
+/*   --hx-color-surface: #1a1a2e; */
+/*   --hx-color-text: #e2e8f0; */
+/* } */
