@@ -35,8 +35,8 @@ export interface HxOverflowMenuProps {
   icon?: 'vertical' | 'horizontal';
   /** Accessible label for the trigger button. */
   label?: string;
-  /** Accessible label for the menu panel. Reflected as `menu-label`. */
-  menuLabel?: string;
+  /** Accessible label for the menu panel. Reflected as `label-menu`. */
+  labelMenu?: string;
 
   // Event callbacks
   /** Dispatched when the panel opens. */

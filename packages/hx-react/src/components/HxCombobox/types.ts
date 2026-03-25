@@ -29,7 +29,7 @@ export interface HxComboboxProps {
   /** Help text displayed below the combobox for guidance. */
   helpText?: string;
   /** Size variant of the combobox. */
-  size?: string;
+  size?: 'sm' | 'md' | 'lg';
   /** Whether multiple options can be selected. */
   multiple?: boolean;
   /** Whether the combobox shows a clear button when a value is set. */

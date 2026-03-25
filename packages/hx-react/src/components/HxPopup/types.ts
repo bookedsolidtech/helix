@@ -22,7 +22,21 @@ export interface HxPopupProps {
 If not set, the element in the `anchor` slot is used. */
   anchor?: string | Element | null;
   /** Preferred placement of the popup relative to the anchor. */
-  placement?: string;
+  placement?:
+    | string
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto';
   /** Whether the popup is visible. */
   active?: boolean;
   /** Gap in pixels between the popup and the anchor element. */
@@ -33,13 +47,28 @@ If not set, the element in the `anchor` slot is used. */
   arrow?: boolean;
   /** Manual placement of the arrow along the popup edge.
 When not set, floating-ui calculates the optimal position. */
-  arrowPlacement?: string | null;
+  arrowPlacement?: 'start' | 'center' | 'end' | null;
   /** Minimum padding in pixels from the popup edge to the arrow. */
   arrowPadding?: number;
   /** When true, flips the popup to the opposite side to avoid overflow. */
   flip?: boolean;
   /** Fallback placements to try when flipping. Accepts a JSON array string. */
-  flipFallbackPlacements?: string;
+  flipFallbackPlacements?: (
+    | string
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto'
+  )[];
   /** When true, shifts the popup along the axis to remain in the viewport. */
   shift?: boolean;
   /** When true, resizes the popup to fit within the viewport.

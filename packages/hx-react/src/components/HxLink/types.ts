@@ -19,7 +19,7 @@ When set to "_blank", automatically adds rel="noopener noreferrer"
 and shows an external-link indicator. */
   target?: string | undefined;
   /** Visual style variant of the link. */
-  variant?: string;
+  variant?: 'default' | 'subtle' | 'danger';
   /** Whether the link is disabled. Renders a span instead of an anchor.
 The disabled span is keyboard-focusable (tabindex="0") and announces
 as a disabled link to screen readers. */
