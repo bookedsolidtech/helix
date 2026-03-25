@@ -147,6 +147,15 @@ export class HelixCheckbox extends HelixElement {
   /** @internal */
   @state() private _hasErrorSlot = false;
 
+  /**
+   * Deferred copy of this.error used inside the live region. Injected after
+   * the region is visible (via requestAnimationFrame) so screen readers
+   * re-announce the message even if it was set before the region became
+   * visible — see WCAG 4.1.3.
+   * @internal
+   */
+  @state() private _announcedError = '';
+
   // ─── Slot Handlers ───
 
   /** @internal */
@@ -165,6 +174,25 @@ export class HelixCheckbox extends HelixElement {
     }
     if (changedProperties.has('required')) {
       this._updateValidity();
+    }
+    // WCAG 4.1.3: Keep _announcedError in sync with the error property.
+    // When error changes from one non-empty value to another, clear the live region
+    // first then re-inject after a rAF tick so screen readers re-announce the updated
+    // message (clearing content before the region is re-populated triggers a new event).
+    // When transitioning from empty to non-empty (initial display), set directly so
+    // the text is immediately available for synchronous DOM assertions.
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string;
+      if (previousError && this.error) {
+        // Changing from one error message to another: defer to trigger re-announcement.
+        this._announcedError = '';
+        requestAnimationFrame(() => {
+          this._announcedError = this.error;
+        });
+      } else {
+        // Transitioning from empty→error or error→empty: set directly.
+        this._announcedError = this.error;
+      }
     }
   }
 
@@ -369,7 +397,9 @@ export class HelixCheckbox extends HelixElement {
           role="status"
           ?hidden=${!hasError}
         >
-          <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>
+            ${this._announcedError}
+          </slot>
         </div>
 
         ${this.helpText && !hasError

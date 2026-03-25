@@ -1,5 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStyles } from './hx-toast.styles.js';
@@ -53,7 +53,7 @@ export class HelixToast extends LitElement {
    * @attr duration
    */
   @property({ type: Number })
-  duration = 3000;
+  duration = 5000;
 
   /**
    * Whether to show a close button.
@@ -81,6 +81,9 @@ export class HelixToast extends LitElement {
   /** @internal */
   @query('.toast') private _toastEl!: HTMLElement | null;
 
+  /** @internal Tracks whether the action slot has slotted content. */
+  @state() private _hasActionContent = false;
+
   /** @internal */
   private _timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -107,7 +110,7 @@ export class HelixToast extends LitElement {
       if (this.open) {
         this.removeAttribute('aria-hidden');
         this._emitShow();
-        if (this.duration > 0 && !this._reducedMotion) {
+        if (this.duration > 0 && !this._reducedMotion && !this._hasActionContent) {
           this._startTimer();
         }
       } else {
@@ -234,6 +237,15 @@ export class HelixToast extends LitElement {
     this.hide();
   }
 
+  /** @internal */
+  private _handleActionSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasActionContent = slot.assignedNodes({ flatten: true }).length > 0;
+    if (this._hasActionContent && this.open) {
+      this._pauseTimer();
+    }
+  }
+
   // ─── ARIA Helpers ───
 
   /** @internal */
@@ -353,7 +365,7 @@ export class HelixToast extends LitElement {
                 <slot></slot>
               </span>
               <span part="action" class="toast__action">
-                <slot name="action"></slot>
+                <slot name="action" @slotchange=${this._handleActionSlotChange}></slot>
               </span>
               ${this.closable
                 ? html`

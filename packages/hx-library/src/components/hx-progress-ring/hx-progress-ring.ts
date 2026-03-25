@@ -130,10 +130,12 @@ export class HelixProgressRing extends LitElement {
       this.setAttribute('indeterminate', '');
       this.setAttribute('aria-busy', 'true');
       this.removeAttribute('aria-valuenow');
+      this.removeAttribute('aria-valuetext');
     } else {
       this.removeAttribute('indeterminate');
       this.removeAttribute('aria-busy');
       this.setAttribute('aria-valuenow', String(this._clampedValue));
+      this.setAttribute('aria-valuetext', `${this._clampedValue}% complete`);
     }
 
     if (this.label) {

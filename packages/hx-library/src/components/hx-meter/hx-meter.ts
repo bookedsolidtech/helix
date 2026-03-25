@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -159,7 +159,8 @@ export class HelixMeter extends LitElement {
     this._hasSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
-  override updated() {
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
     // Set data-state on host so :host([data-state]) CSS selectors work
     this.dataset['state'] = this._resolveState();
     // Set --_value-ratio for GPU-compositable scaleX() transform on indicator

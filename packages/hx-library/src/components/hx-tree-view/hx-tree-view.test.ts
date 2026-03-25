@@ -32,10 +32,10 @@ describe('hx-tree-view', () => {
       expect(tree?.getAttribute('tabindex')).toBe('0');
     });
 
-    it('sets aria-multiselectable="false" by default', async () => {
+    it('omits aria-multiselectable when selection="none" (default)', async () => {
       const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
-      expect(tree?.getAttribute('aria-multiselectable')).toBe('false');
+      expect(tree?.hasAttribute('aria-multiselectable')).toBe(false);
     });
 
     it('sets aria-multiselectable="true" in multiple selection mode', async () => {

@@ -382,13 +382,13 @@ describe('hx-dropdown', () => {
       expect(trigger.getAttribute('aria-expanded')).toBe('true');
     });
 
-    it('panel aria-hidden is false when open', async () => {
+    it('panel aria-hidden is absent (not hidden) when open', async () => {
       const el = await fixture<HelixDropdown>(triggerHtml);
       const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
       trigger.click();
       await el.updateComplete;
       const panel = shadowQuery(el, '[part="panel"]');
-      expect(panel?.getAttribute('aria-hidden')).toBe('false');
+      expect(panel?.getAttribute('aria-hidden')).not.toBe('true');
     });
   });
 

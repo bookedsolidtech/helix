@@ -167,6 +167,7 @@ export class HelixGridItem extends LitElement {
   span: number | undefined;
 
   override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
     if (changed.has('column') || changed.has('row') || changed.has('span')) {
       this._applyHostGridStyles();
     }

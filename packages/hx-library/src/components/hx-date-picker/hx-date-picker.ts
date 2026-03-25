@@ -316,19 +316,18 @@ export class HelixDatePicker extends LitElement {
    * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
    * @internal
    */
-  private _boundHandleOutsideClick: (e: MouseEvent) => void = () => undefined;
+  private readonly _boundHandleOutsideClick = (e: MouseEvent) => this._handleOutsideClick(e);
   /**
    * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
    * @internal
    */
-  private _boundHandleDocumentKeydown: (e: KeyboardEvent) => void = () => undefined;
+  private readonly _boundHandleDocumentKeydown = (e: KeyboardEvent) =>
+    this._handleDocumentKeydown(e);
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._boundHandleOutsideClick = this._handleOutsideClick.bind(this);
-    this._boundHandleDocumentKeydown = this._handleDocumentKeydown.bind(this);
   }
 
   override disconnectedCallback(): void {
@@ -907,7 +906,7 @@ export class HelixDatePicker extends LitElement {
             role="gridcell"
             data-day=${dayNumber}
             aria-label=${ariaLabel}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${isDisabled ? 'true' : nothing}
             aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
@@ -990,7 +989,7 @@ export class HelixDatePicker extends LitElement {
             type="button"
             aria-label=${this._isOpen ? this.closeCalendarLabel : this.openCalendarLabel}
             aria-haspopup="dialog"
-            aria-expanded=${this._isOpen ? 'true' : nothing}
+            aria-expanded=${this._isOpen ? 'true' : 'false'}
             aria-controls=${this._calendarId}
             ?disabled=${this.disabled}
             @click=${this._toggleCalendar}

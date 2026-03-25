@@ -720,10 +720,10 @@ describe('hx-tabs', () => {
   // ─── Label Property ──────────────────────────────────────────────────────────
 
   describe('Label Property', () => {
-    it('tablist has no aria-label by default', async () => {
+    it('tablist has aria-label="Tabs" by default', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tablist = shadowQuery(el, '[role="tablist"]');
-      expect(tablist?.hasAttribute('aria-label')).toBe(false);
+      expect(tablist?.getAttribute('aria-label')).toBe('Tabs');
     });
 
     it('tablist has aria-label when label is set', async () => {

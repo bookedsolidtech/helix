@@ -112,6 +112,7 @@ export class HelixIcon extends LitElement {
   // ─── Lifecycle ───
 
   override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
     if (changed.has('src') && this.src !== this._fetchedSrc) {
       void this._fetchInlineSvg(this.src);
     }

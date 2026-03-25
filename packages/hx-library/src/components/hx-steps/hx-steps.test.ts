@@ -37,12 +37,14 @@ describe('hx-steps', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('has role="list" on inner base element (not host, to fix shadow DOM ARIA semantics)', async () => {
+    it('has role="list" on inner base element and role="none" on host to prevent dual announcement', async () => {
       const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
       const base = shadowQuery(el, '[part~="base"]');
       expect(base?.getAttribute('role')).toBe('list');
-      // Host must NOT carry role="list" — that would break list semantics across shadow boundaries
-      expect(el.getAttribute('role')).toBeNull();
+      // WCAG 4.1.2 fix: host carries role="none" to suppress its implicit ARIA role
+      // so the consumer's aria-label on the host does not cause dual announcement.
+      // Mirrors the hx-action-bar pattern.
+      expect(el.getAttribute('role')).toBe('none');
     });
 
     it('exposes "base" CSS part', async () => {

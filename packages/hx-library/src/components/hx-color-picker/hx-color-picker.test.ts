@@ -517,10 +517,10 @@ describe('hx-color-picker', () => {
       expect(trigger?.hasAttribute('aria-haspopup')).toBe(false);
     });
 
-    it('trigger aria-expanded is absent when closed', async () => {
+    it('trigger aria-expanded is "false" when closed', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
       const trigger = shadowQuery(el, '[part="trigger"]');
-      expect(trigger?.hasAttribute('aria-expanded')).toBe(false);
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('hue slider has role="slider"', async () => {
