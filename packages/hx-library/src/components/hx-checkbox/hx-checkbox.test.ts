@@ -591,4 +591,20 @@ describe('hx-checkbox', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: requiredMessage ───
+
+  describe('Property: requiredMessage', () => {
+    it('defaults to "This field is required."', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept terms"></hx-checkbox>');
+      expect(el.requiredMessage).toBe('This field is required.');
+    });
+
+    it('accepts custom requiredMessage', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Accept terms" required required-message="You must check this box."></hx-checkbox>',
+      );
+      expect(el.requiredMessage).toBe('You must check this box.');
+    });
+  });
 });

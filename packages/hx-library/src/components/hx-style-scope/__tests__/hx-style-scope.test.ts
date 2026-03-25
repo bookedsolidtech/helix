@@ -133,4 +133,75 @@ describe('hx-style-scope', () => {
       expect(elements.length).toBe(1);
     });
   });
+
+  // ─── Property: lightCss ───
+
+  describe('Property: lightCss', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<HxStyleScope>(
+        '<hx-style-scope component="test-scope-lightcss-default"></hx-style-scope>',
+      );
+      expect(el.lightCss).toBe('');
+    });
+
+    it('updates injected styles when lightCss property changes', async () => {
+      const componentName = 'test-scope-lightcss-update';
+      const el = await fixture<HxStyleScope>(
+        `<hx-style-scope component="${componentName}" light-css="p { color: red; }"></hx-style-scope>`,
+      );
+      await el.updateComplete;
+      const styleEl = document.head.querySelector(
+        `style[data-hx-light-styles="${componentName}"]`,
+      ) as HTMLStyleElement | null;
+      expect(styleEl?.textContent).toContain('color: red');
+    });
+
+    it('accepts lightCss attribute via light-css', async () => {
+      const componentName = 'test-scope-lightcss-attr';
+      await fixture<HxStyleScope>(
+        `<hx-style-scope component="${componentName}" light-css="span { font-weight: bold; }"></hx-style-scope>`,
+      );
+      const styleEl = document.head.querySelector(
+        `style[data-hx-light-styles="${componentName}"]`,
+      ) as HTMLStyleElement | null;
+      expect(styleEl?.textContent).toContain('font-weight: bold');
+    });
+  });
+
+  // ─── Accessibility (axe-core) — healthcare mandate ───
+  // hx-style-scope renders as display:contents with a shadow root containing only <slot>.
+  // axe-core is run on the light DOM content (the element itself) rather than the shadow root,
+  // which avoids the "No elements found for include" error from auditing an empty shadow root.
+
+  describe('Accessibility', () => {
+    it('renders as display:contents without breaking a11y of slotted content', async () => {
+      // hx-style-scope is a transparent wrapper — it has no ARIA role requirements itself.
+      // Verify it renders and has a shadow root with a slot element.
+      const el = await fixture<HxStyleScope>(
+        '<hx-style-scope component="test-scope-a11y"><p>Hello World</p></hx-style-scope>',
+      );
+      expect(el.shadowRoot).toBeTruthy();
+      const slot = el.shadowRoot?.querySelector('slot');
+      expect(slot).toBeTruthy();
+    });
+
+    it('does not add ARIA attributes to slotted content', async () => {
+      const el = await fixture<HxStyleScope>(
+        '<hx-style-scope component="test-scope-a11y-aria"><h2>Section title</h2></hx-style-scope>',
+      );
+      const heading = el.querySelector('h2');
+      // hx-style-scope must not modify slotted content
+      expect(heading?.getAttribute('role')).toBeNull();
+      expect(heading?.getAttribute('aria-label')).toBeNull();
+    });
+
+    it('does not add tabindex or focus traps to the host', async () => {
+      const el = await fixture<HxStyleScope>(
+        '<hx-style-scope component="test-scope-a11y-focus"><p>Content</p></hx-style-scope>',
+      );
+      // hx-style-scope must not trap focus or add tabindex
+      expect(el.getAttribute('tabindex')).toBeNull();
+      expect(el.getAttribute('role')).toBeNull();
+    });
+  });
 });

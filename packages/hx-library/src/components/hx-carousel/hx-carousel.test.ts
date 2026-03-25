@@ -1113,6 +1113,80 @@ describe('hx-carousel', () => {
     });
   });
 
+  // ─── Property: label overrides (i18n) ───
+
+  describe('Property: label overrides', () => {
+    it('labelPrevSlide defaults to "Previous slide"', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.labelPrevSlide).toBe('Previous slide');
+    });
+
+    it('labelNextSlide defaults to "Next slide"', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.labelNextSlide).toBe('Next slide');
+    });
+
+    it('labelPauseAutoplay defaults to "Pause autoplay"', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.labelPauseAutoplay).toBe('Pause autoplay');
+    });
+
+    it('labelPlayAutoplay defaults to "Play autoplay"', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.labelPlayAutoplay).toBe('Play autoplay');
+    });
+
+    it('sets custom labelPrevSlide as aria-label on prev button', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel label-prev-slide="Diapositive précédente">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const prevBtn = shadowQuery(el, '[part="prev-button"]');
+      expect(prevBtn?.getAttribute('aria-label')).toBe('Diapositive précédente');
+    });
+
+    it('sets custom labelNextSlide as aria-label on next button', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel label-next-slide="Diapositive suivante">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const nextBtn = shadowQuery(el, '[part="next-button"]');
+      expect(nextBtn?.getAttribute('aria-label')).toBe('Diapositive suivante');
+    });
+  });
+
+  // ─── Property: mouseDragging ───
+
+  describe('Property: mouseDragging', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      expect(el.mouseDragging).toBe(false);
+    });
+
+    it('accepts mouseDragging attribute', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel mouse-dragging>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      expect(el.mouseDragging).toBe(true);
+    });
+
+    it('sets mouseDragging property programmatically', async () => {
+      const el = await fixture<HelixCarousel>(threeSlides);
+      el.mouseDragging = true;
+      await el.updateComplete;
+      expect(el.mouseDragging).toBe(true);
+    });
+  });
+
   // ─── disconnectedCallback with null _mql ───
 
   describe('disconnectedCallback with null _mql', () => {
