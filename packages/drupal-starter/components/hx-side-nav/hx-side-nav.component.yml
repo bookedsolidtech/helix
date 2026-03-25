@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Side Navigation
+description: 'Collapsible side navigation panel for clinical portals, admin dashboards, and department navigation. Composes hx-side-nav with hx-nav-item children.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the nav landmark'
+      default: 'Main Navigation'
+    collapsed:
+      type: boolean
+      title: Collapsed
+      description: 'Whether the nav is collapsed to icon-only mode'
+      default: false
+slots:
+  header:
+    title: Header
+    description: 'Logo or branding content rendered at the top of the nav'
+  default:
+    title: Nav Items
+    description: 'hx-nav-item elements for each navigation link'
+  footer:
+    title: Footer
+    description: 'User profile or settings content rendered at the bottom'

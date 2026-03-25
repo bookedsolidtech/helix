@@ -1,0 +1,42 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Pagination
+description: 'Page navigation with page numbers, prev/next controls, and ellipsis. Maps to Drupal Views pager. Note: Drupal uses 0-based page index in URLs; add 1 when passing to current_page.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    total_pages:
+      type: integer
+      title: Total Pages
+      description: 'Total number of pages'
+    current_page:
+      type: integer
+      title: Current Page
+      description: 'The currently active page (1-based). For Drupal Views, use pager.current_page + 1.'
+      default: 1
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the nav element'
+      default: 'Pagination'
+    sibling_count:
+      type: integer
+      title: Sibling Count
+      description: 'Number of page buttons shown on each side of the current page'
+      default: 1
+    show_first_last:
+      type: boolean
+      title: Show First/Last
+      description: 'Whether to show First and Last page buttons'
+      default: false
+    show_page_size:
+      type: boolean
+      title: Show Page Size
+      description: 'Whether to show the rows-per-page selector'
+      default: false
+    page_size:
+      type: integer
+      title: Page Size
+      description: 'Number of items per page (shown in the page-size selector)'
+      default: 25

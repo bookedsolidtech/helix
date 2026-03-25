@@ -1,0 +1,5 @@
+/* hx-carousel SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-carousel {
+  display: block;
+}

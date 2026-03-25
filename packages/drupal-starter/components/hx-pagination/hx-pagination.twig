@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Pagination SDC — wraps hx-pagination for Drupal Views pager integration.
+ *
+ * Drupal Views pager uses 0-based page index in the URL (?page=N).
+ * hx-pagination is 1-based, so add 1 to Drupal's pager.current_page.
+ *
+ * To wire pagination to Drupal Views AJAX:
+ *   Drupal.behaviors.hxPagination = {
+ *     attach(context) {
+ *       once('hx-pagination', 'hx-pagination', context).forEach((el) => {
+ *         el.addEventListener('hx-page-change', (e) => {
+ *           const params = new URLSearchParams(location.search);
+ *           params.set('page', e.detail.page - 1);
+ *           history.pushState({}, '', '?' + params.toString());
+ *         });
+ *       });
+ *     },
+ *   };
+ */
+#}
+{{ attach_library('helixui/hx-pagination') }}
+
+<hx-pagination
+  total-pages="{{ total_pages|default(1) }}"
+  current-page="{{ current_page|default(1) }}"
+  {% if label and label != 'Pagination' %}label="{{ label }}"{% endif %}
+  {% if sibling_count and sibling_count != 1 %}sibling-count="{{ sibling_count }}"{% endif %}
+  {% if show_first_last %}show-first-last{% endif %}
+  {% if show_page_size %}show-page-size{% endif %}
+  {% if page_size and page_size != 25 %}page-size="{{ page_size }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-pagination>

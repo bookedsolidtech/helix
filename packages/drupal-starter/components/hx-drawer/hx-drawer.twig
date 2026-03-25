@@ -1,0 +1,45 @@
+{#
+/**
+ * @file
+ * Drawer SDC — wraps hx-drawer for Drupal off-canvas panel integration.
+ *
+ * Wire a trigger button via Drupal behaviors:
+ *   Drupal.behaviors.hxDrawer = {
+ *     attach(context) {
+ *       once('hx-drawer-trigger', '[data-hx-drawer-trigger]', context).forEach((btn) => {
+ *         btn.addEventListener('click', () => {
+ *           const id = btn.getAttribute('data-hx-drawer-trigger');
+ *           const drawer = document.getElementById(id);
+ *           if (drawer) drawer.open = !drawer.open;
+ *         });
+ *       });
+ *     },
+ *   };
+ */
+#}
+{{ attach_library('helixui/hx-drawer') }}
+
+<hx-drawer
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if open %}open{% endif %}
+  {% if placement and placement != 'end' %}placement="{{ placement }}"{% endif %}
+  {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
+  {% if contained %}contained{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if label_slot %}
+    <span slot="label">{{ label_slot }}</span>
+  {% endif %}
+
+  {% if header_actions %}
+    <div slot="header-actions">{{ header_actions }}</div>
+  {% endif %}
+
+  {% if content %}
+    {{ content }}
+  {% endif %}
+
+  {% if footer %}
+    <div slot="footer">{{ footer }}</div>
+  {% endif %}
+</hx-drawer>

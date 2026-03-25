@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Number Input SDC — wraps hx-number-input for Drupal numeric field integration.
+ *
+ * Common healthcare uses: dosage amounts, patient age, vital sign measurements.
+ * Use the suffix slot to display units (mg, mL, kg, etc.) adjacent to the input.
+ */
+#}
+{{ attach_library('helixui/hx-number-input') }}
+
+<hx-number-input
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value is not null and value is not same as '' %}value="{{ value }}"{% endif %}
+  {% if min is not null %}min="{{ min }}"{% endif %}
+  {% if max is not null %}max="{{ max }}"{% endif %}
+  {% if step and step != 1 %}step="{{ step }}"{% endif %}
+  {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if no_stepper %}no-stepper{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if suffix %}
+    <span slot="suffix">{{ suffix }}</span>
+  {% endif %}
+</hx-number-input>

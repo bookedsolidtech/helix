@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * PHI Field SDC — wraps hx-phi-field for HIPAA-compliant data display in Drupal.
+ *
+ * SECURITY: The data prop must only be populated server-side with appropriate
+ * role-based access checks. Ensure the Drupal user has VIEW PHI permission
+ * before rendering the data value. Audit events (hx-phi-access) should be
+ * captured via a Drupal behavior and sent to your audit log endpoint.
+ *
+ * Audit logging behavior:
+ *   Drupal.behaviors.hxPhiAudit = {
+ *     attach(context) {
+ *       once('hx-phi-audit', 'hx-phi-field', context).forEach((field) => {
+ *         field.addEventListener('hx-phi-access', (e) => {
+ *           // POST to Drupal audit endpoint
+ *           navigator.sendBeacon('/api/phi-audit', JSON.stringify(e.detail));
+ *         });
+ *       });
+ *     },
+ *   };
+ */
+#}
+{{ attach_library('helixui/hx-phi-field') }}
+
+<hx-phi-field
+  {% if data %}data="{{ data }}"{% endif %}
+  field-type="{{ field_type|default('ssn') }}"
+  {% if field_id %}field-id="{{ field_id }}"{% endif %}
+  {% if clipboard_timeout is defined and clipboard_timeout != 30000 %}clipboard-timeout="{{ clipboard_timeout }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-phi-field>

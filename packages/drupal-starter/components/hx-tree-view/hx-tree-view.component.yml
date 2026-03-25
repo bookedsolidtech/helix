@@ -1,0 +1,25 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Tree View
+description: 'Hierarchical tree structure with expand/collapse, selection support, and keyboard navigation. For Drupal menu trees, taxonomy hierarchies, and document/folder navigation.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the tree widget'
+    selection:
+      type: string
+      title: Selection
+      description: 'Selection mode for tree items'
+      default: 'none'
+      enum:
+        - none
+        - single
+        - multiple
+slots:
+  default:
+    title: Tree Items
+    description: 'hx-tree-item elements forming the tree hierarchy'

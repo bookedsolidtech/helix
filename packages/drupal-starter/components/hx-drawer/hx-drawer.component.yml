@@ -1,0 +1,50 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Drawer
+description: 'Slide-in panel overlay from any viewport edge with focus trapping and ARIA semantics. For Drupal off-canvas navigation, filter panels, and contextual side panels.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the dialog when the label slot is not used'
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the drawer is open'
+      default: false
+    placement:
+      type: string
+      title: Placement
+      description: 'Which edge of the viewport the drawer slides in from'
+      default: 'end'
+      enum:
+        - start
+        - end
+        - top
+        - bottom
+    size:
+      type: string
+      title: Size
+      description: 'Drawer panel size (sm, md, lg, full, or any CSS length value)'
+      default: 'md'
+    contained:
+      type: boolean
+      title: Contained
+      description: 'Whether the drawer is constrained to its positioned parent'
+      default: false
+slots:
+  label:
+    title: Label
+    description: 'Drawer title text (replaces the label prop for rich heading content)'
+  header_actions:
+    title: Header Actions
+    description: 'Action buttons in the drawer header near the close button'
+  default:
+    title: Body
+    description: 'Drawer body content'
+  footer:
+    title: Footer
+    description: 'Action buttons or footer content'

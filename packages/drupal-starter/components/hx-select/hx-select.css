@@ -1,0 +1,5 @@
+/* hx-select SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-select {
+  display: block;
+}

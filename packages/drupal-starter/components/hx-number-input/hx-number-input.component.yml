@@ -1,0 +1,74 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Number Input
+description: 'Form-associated numeric input with stepper controls, bounds checking, label, error, and help text. For dosage, age, measurements, and other precise numeric healthcare fields.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text'
+    value:
+      type: number
+      title: Value
+      description: 'Current numeric value'
+    min:
+      type: number
+      title: Min
+      description: 'Minimum allowed value'
+    max:
+      type: number
+      title: Max
+      description: 'Maximum allowed value'
+    step:
+      type: number
+      title: Step
+      description: 'Increment/decrement amount'
+      default: 1
+    size:
+      type: string
+      title: Size
+      description: 'Visual size variant'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the input is disabled'
+      default: false
+    readonly:
+      type: boolean
+      title: Read Only
+      description: 'Whether the input is read-only'
+      default: false
+    no_stepper:
+      type: boolean
+      title: No Stepper
+      description: 'Whether to hide the +/- stepper buttons'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text'
+slots:
+  suffix:
+    title: Suffix
+    description: 'Content rendered after the input (e.g., unit label like mg or mL)'

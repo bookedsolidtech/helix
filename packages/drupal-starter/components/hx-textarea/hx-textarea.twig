@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Textarea SDC — wraps hx-textarea for Drupal form integration.
+ *
+ * For Drupal Form API textarea fields, map element['#name'], ['#title'],
+ * ['#value'], ['#rows'], and ['#required'] to the corresponding attributes.
+ */
+#}
+{{ attach_library('helixui/hx-textarea') }}
+
+<hx-textarea
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if rows %}rows="{{ rows }}"{% endif %}
+  {% if resize and resize != 'vertical' %}resize="{{ resize }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+  {% if show_count %}show-count{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-textarea>

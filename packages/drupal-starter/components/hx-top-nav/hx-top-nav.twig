@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Top Navigation SDC — wraps hx-top-nav for Drupal site header integration.
+ *
+ * Use in the site header region. Place the site logo block in the logo slot,
+ * primary menu links in the default slot, and utility links (search, login,
+ * user account) in the actions slot.
+ *
+ * Note: Do NOT wrap default slot content in a <nav> element — hx-top-nav
+ * renders its own nav landmark internally.
+ */
+#}
+{{ attach_library('helixui/hx-top-nav') }}
+
+<hx-top-nav
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if sticky %}sticky{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if logo %}
+    <div slot="logo">{{ logo }}</div>
+  {% endif %}
+
+  {% if content %}
+    {{ content }}
+  {% endif %}
+
+  {% if actions %}
+    <div slot="actions">{{ actions }}</div>
+  {% endif %}
+</hx-top-nav>

@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * File Upload SDC — wraps hx-file-upload for Drupal file field integration.
+ *
+ * For Drupal managed file fields, the component handles client-side file
+ * selection and validation. Server-side processing must be implemented via
+ * a Drupal behavior that listens to the hx-files-selected event and submits
+ * files to the Drupal file upload endpoint.
+ */
+#}
+{{ attach_library('helixui/hx-file-upload') }}
+
+<hx-file-upload
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if accept %}accept="{{ accept }}"{% endif %}
+  {% if max_size %}max-size="{{ max_size }}"{% endif %}
+  {% if max_files %}max-files="{{ max_files }}"{% endif %}
+  {% if multiple %}multiple{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if label_dropzone %}label-dropzone="{{ label_dropzone }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-file-upload>

@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Accordion SDC — wraps hx-accordion for Drupal FAQ and expandable content.
+ *
+ * Render hx-accordion-item elements in the default slot. Each item accepts
+ * a trigger slot for the clickable header and the default slot for panel content.
+ *
+ * Example from a Drupal Views result:
+ *   {% for item in rows %}
+ *     <hx-accordion-item>
+ *       <span slot="trigger">{{ item.question }}</span>
+ *       {{ item.answer }}
+ *     </hx-accordion-item>
+ *   {% endfor %}
+ */
+#}
+{{ attach_library('helixui/hx-accordion') }}
+
+<hx-accordion
+  {% if mode and mode != 'single' %}mode="{{ mode }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-accordion>
