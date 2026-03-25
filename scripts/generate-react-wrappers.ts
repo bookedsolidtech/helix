@@ -7,6 +7,7 @@
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { execSync } from 'child_process';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -406,6 +407,14 @@ function main(): void {
 
   console.log(`\nGenerated ${components.length} components`);
   console.log(`Main index: packages/hx-react/src/index.ts`);
+
+  // Format generated files so they match Prettier output and stay clean in git
+  console.log('\nFormatting generated files with Prettier...');
+  execSync(`prettier --write "${resolve(rootDir, 'packages/hx-react/src')}"`, {
+    cwd: rootDir,
+    stdio: 'inherit',
+  });
+  console.log('Done.');
 }
 
 main();
