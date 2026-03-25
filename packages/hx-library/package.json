@@ -3,7 +3,11 @@
   "version": "1.1.2",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
-  "sideEffects": true,
+  "sideEffects": [
+    "./dist/components/*/index.js",
+    "./src/components/*/index.ts",
+    "**/*.css"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
