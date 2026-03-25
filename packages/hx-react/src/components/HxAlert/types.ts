@@ -20,6 +20,8 @@ export interface HxAlertProps {
 When provided, the close button is announced as "Close [heading] alert".
 When absent, the close button falls back to "Close alert". */
   heading?: string;
+  /** Accessible label for the close button. Override for i18n. */
+  labelClose?: string;
   /** Whether the alert is visible. Add the `open` attribute to show the alert. */
   open?: boolean;
   /** Whether to show the default variant icon. Add `show-icon` attribute to display the icon. */
