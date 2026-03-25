@@ -30,7 +30,7 @@ export const HxTopNav = createComponent({
   elementClass: HelixTopNav,
   react: React,
   events: {
-    onHxMobileToggle: 'hx-mobile-toggle'
+    onHxMobileToggle: 'hx-mobile-toggle',
   },
   displayName: 'HxTopNav',
 });

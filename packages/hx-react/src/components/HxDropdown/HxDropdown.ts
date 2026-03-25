@@ -30,7 +30,7 @@ export const HxDropdown = createComponent({
   events: {
     onHxShow: 'hx-show',
     onHxHide: 'hx-hide',
-    onHxSelect: 'hx-select'
+    onHxSelect: 'hx-select',
   },
   displayName: 'HxDropdown',
 });
