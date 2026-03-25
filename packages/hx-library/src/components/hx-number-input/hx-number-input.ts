@@ -1,4 +1,5 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -258,6 +259,12 @@ export class HelixNumberInput extends LitElement {
 
   override firstUpdated(): void {
     this._defaultValue = this.value;
+    if (!this.label && !this._hasLabelSlot) {
+      devWarn(
+        'hx-number-input',
+        'No accessible label provided. Set the `label` attribute or use the `label` slot so screen readers can identify this input (WCAG 4.1.2).',
+      );
+    }
   }
 
   override disconnectedCallback(): void {
@@ -623,9 +630,6 @@ export class HelixNumberInput extends LitElement {
             )}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
-            aria-valuenow=${ifDefined(this.value !== null ? this.value : undefined)}
-            aria-valuemin=${ifDefined(this.min)}
-            aria-valuemax=${ifDefined(this.max)}
             @input=${this._handleInput}
             @change=${this._handleChange}
             @keydown=${this._handleKeyDown}

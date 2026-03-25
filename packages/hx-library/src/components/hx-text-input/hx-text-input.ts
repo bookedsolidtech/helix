@@ -479,7 +479,7 @@ export class HelixTextInput extends HelixElement {
               <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
             </div>`
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
-        ${(this.helpText || this._hasHelpTextSlot) && !hasError
+        ${this._hasHelpTextSlot
           ? html`
               <div part="help-text" class="field__help-text" id=${this._helpTextId}>
                 <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
@@ -487,7 +487,15 @@ export class HelixTextInput extends HelixElement {
                 </slot>
               </div>
             `
-          : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
+          : this.helpText && !hasError
+            ? html`
+                <div part="help-text" class="field__help-text" id=${this._helpTextId}>
+                  <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}>
+                    ${this.helpText}
+                  </slot>
+                </div>
+              `
+            : html`<slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}></slot>`}
       </div>
     `;
   }

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import {
@@ -42,6 +42,14 @@ export class HelixStructuredList extends LitElement {
   }
 
   /**
+   * Accessible label for the list container. Use when multiple structured lists appear
+   * on the same page so screen readers can distinguish them (WCAG 4.1.2).
+   * @attr label
+   */
+  @property({ type: String })
+  label = '';
+
+  /**
    * Renders a border around the entire list.
    * @attr bordered
    */
@@ -64,7 +72,7 @@ export class HelixStructuredList extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="list">
+      <div part="base" class="list" aria-label=${this.label || nothing}>
         <slot></slot>
       </div>
     `;
