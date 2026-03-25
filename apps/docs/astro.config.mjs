@@ -646,6 +646,10 @@ export default defineConfig({
               ],
             },
             {
+              label: 'Theming',
+              slug: 'guides/theming',
+            },
+            {
               label: 'Adopted Stylesheets',
               slug: 'guides/adopted-stylesheets',
             },
