@@ -1,0 +1,40 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Featured Article
+description: 'Featured article card composing hx-card, hx-text, hx-badge, hx-image, hx-link, and hx-avatar. Displays a prominent article teaser with image, metadata, and author info.'
+status: experimental
+group: 'Hero / Banner'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Article headline.'
+    excerpt:
+      type: string
+      title: Excerpt
+      description: 'Short summary or excerpt of the article.'
+    image_url:
+      type: string
+      title: Image URL
+      description: 'Featured image URL.'
+    image_alt:
+      type: string
+      title: Image Alt Text
+      description: 'Alt text for the featured image.'
+    author_name:
+      type: string
+      title: Author Name
+      description: 'Name of the article author.'
+    date:
+      type: string
+      title: Date
+      description: 'Publication date string.'
+    category:
+      type: string
+      title: Category
+      description: 'Article category label displayed as a badge.'
+    url:
+      type: string
+      title: URL
+      description: 'Link to the full article.'

@@ -191,12 +191,12 @@ describe('hx-field', () => {
     });
   });
 
-  // ─── Property: hxSize (4) ───
+  // ─── Property: size (4) ───
 
-  describe('Property: hxSize', () => {
+  describe('Property: size', () => {
     it('defaults to "md"', async () => {
       const el = await fixture<HelixField>('<hx-field></hx-field>');
-      expect(el.hxSize).toBe('md');
+      expect(el.size).toBe('md');
     });
 
     it('applies field--size-sm class for hx-size="sm"', async () => {

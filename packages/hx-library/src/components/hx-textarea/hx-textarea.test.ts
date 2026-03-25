@@ -611,10 +611,11 @@ describe('hx-textarea', () => {
       expect(counter?.textContent?.trim()).toBe('5');
     });
 
-    it('counter has aria-live="polite"', async () => {
+    it('counter has aria-hidden="true" to prevent double-announcement', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea show-count></hx-textarea>');
       const counter = shadowQuery(el, '[part="counter"]')!;
-      expect(counter.getAttribute('aria-live')).toBe('polite');
+      expect(counter.getAttribute('aria-hidden')).toBe('true');
+      expect(counter.hasAttribute('aria-live')).toBe(false);
     });
 
     it('counter updates when value changes programmatically', async () => {
@@ -804,6 +805,67 @@ describe('hx-textarea', () => {
       const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       expect(textarea.hasAttribute('name')).toBe(false);
+    });
+  });
+
+  // ─── Property: minlength ───
+
+  describe('Property: minlength', () => {
+    it('defaults to undefined', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      expect(el.minlength).toBeUndefined();
+    });
+
+    it('sets minlength attribute on native textarea', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea minlength="5"></hx-textarea>');
+      await el.updateComplete;
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.getAttribute('minlength')).toBe('5');
+    });
+
+    it('accepts minlength property update', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      el.minlength = 10;
+      await el.updateComplete;
+      expect(el.minlength).toBe(10);
+    });
+  });
+
+  // ─── Property: readonly ───
+
+  describe('Property: readonly', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      expect(el.readonly).toBe(false);
+    });
+
+    it('sets readonly on native textarea', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea readonly></hx-textarea>');
+      await el.updateComplete;
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.readOnly).toBe(true);
+    });
+
+    it('does not set readonly by default', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(textarea.readOnly).toBe(false);
+    });
+  });
+
+  // ─── Property: requiredMessage ───
+
+  describe('Property: requiredMessage', () => {
+    it('defaults to "This field is required."', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea></hx-textarea>');
+      expect(el.requiredMessage).toBe('This field is required.');
+    });
+
+    it('accepts custom requiredMessage', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea required required-message="Please provide details."></hx-textarea>',
+      );
+      expect(el.requiredMessage).toBe('Please provide details.');
     });
   });
 });

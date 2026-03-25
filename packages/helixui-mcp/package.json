@@ -1,0 +1,59 @@
+{
+  "name": "@helixui/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the HELiX UI component library — gives Claude Code and Cursor live access to components, tokens, and usage guidance",
+  "type": "module",
+  "bin": {
+    "helixui-mcp": "./build/index.js",
+    "helixui-mcp-cli": "./build/cli.js"
+  },
+  "exports": {
+    ".": "./build/index.js"
+  },
+  "files": [
+    "build",
+    "scripts"
+  ],
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js build/cli.js",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "postinstall": "node scripts/postinstall.cjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/helixui-mcp"
+  },
+  "license": "MIT",
+  "homepage": "https://helix.bookedsolid.tech",
+  "bugs": "https://github.com/bookedsolidtech/helix/issues",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "web-components",
+    "helix",
+    "helixui",
+    "design-system",
+    "claude-code",
+    "cursor"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

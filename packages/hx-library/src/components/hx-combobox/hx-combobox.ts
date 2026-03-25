@@ -159,7 +159,7 @@ export class HelixCombobox extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  size: HxComboboxSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Whether multiple options can be selected.
@@ -265,12 +265,13 @@ export class HelixCombobox extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._handleOutsideClick);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._handleOutsideClick);
+    }
     if (this._debounceTimer !== null) {
       clearTimeout(this._debounceTimer);
     }
@@ -329,14 +330,14 @@ export class HelixCombobox extends LitElement {
     }
   }
 
-  /** Called by the browser when the owning form resets. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._filterText = '';
     this._internals.setFormValue(null);
   }
 
-  /** Called when the browser restores form state (e.g., bfcache navigation). */
+  /** @internal */
   // P1-6: Correct signature per WHATWG spec — includes mode param and all state types
   formStateRestoreCallback(
     state: string | File | FormData | null,
@@ -347,7 +348,7 @@ export class HelixCombobox extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -399,6 +400,9 @@ export class HelixCombobox extends LitElement {
     if (this.disabled || this._open) return;
     this._open = true;
     this._focusedOptionIndex = -1;
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._handleOutsideClick);
+    }
     this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
 
@@ -407,6 +411,9 @@ export class HelixCombobox extends LitElement {
     if (!this._open) return;
     this._open = false;
     this._focusedOptionIndex = -1;
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this._handleOutsideClick);
+    }
     this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
   }
 
@@ -671,7 +678,13 @@ export class HelixCombobox extends LitElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${this.multiple
+              ? isSelected
+                ? 'true'
+                : 'false'
+              : isSelected
+                ? 'true'
+                : nothing}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >

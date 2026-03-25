@@ -1,0 +1,17 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Views List
+description: 'Vertical list layout for Views output with optional dividers between items.'
+status: experimental
+group: 'Views/Lists'
+props:
+  type: object
+  properties:
+    dividers:
+      type: boolean
+      title: Dividers
+      description: 'Show dividers between list items (default: true)'
+      default: true
+slots:
+  items:
+    title: Items
+    description: 'List items (Views rows, teasers, etc.)'

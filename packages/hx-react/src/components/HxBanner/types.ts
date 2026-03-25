@@ -29,6 +29,9 @@ close button's accessible labels. */
   open?: boolean;
   /** Accessible label for the dismiss button. Override for localized text. */
   closeLabel?: string;
+  /** Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:").
+When not set, defaults to the English label matching the current variant. */
+  severityLabel?: string | undefined;
 
   // Event callbacks
   /** Dispatched when the user dismisses the banner. */

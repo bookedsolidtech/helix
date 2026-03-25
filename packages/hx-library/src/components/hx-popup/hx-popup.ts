@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import {
@@ -28,8 +28,6 @@ type PopupPlacement =
   | 'left-start'
   | 'left-end'
   | 'auto';
-
-type ArrowPlacement = 'start' | 'center' | 'end';
 
 // More precise type matching @floating-ui/dom's arrow middleware data structure
 type ArrowData = { x?: number; y?: number; centerOffset: number };
@@ -164,7 +162,20 @@ export class HelixPopup extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: PopupPlacement = 'bottom';
+  placement:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto' = 'bottom';
 
   /**
    * Whether the popup is visible.
@@ -200,7 +211,7 @@ export class HelixPopup extends LitElement {
    * @attr arrow-placement
    */
   @property({ attribute: 'arrow-placement', reflect: true })
-  arrowPlacement: ArrowPlacement | null = null;
+  arrowPlacement: 'start' | 'center' | 'end' | null = null;
 
   /**
    * Minimum padding in pixels from the popup edge to the arrow.
@@ -243,7 +254,21 @@ export class HelixPopup extends LitElement {
       },
     },
   })
-  flipFallbackPlacements: PopupPlacement[] = [];
+  flipFallbackPlacements: (
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto'
+  )[] = [];
 
   /**
    * When true, shifts the popup along the axis to remain in the viewport.
@@ -287,7 +312,7 @@ export class HelixPopup extends LitElement {
     this._stopAutoUpdate();
   }
 
-  override updated(changedProperties: Map<string | symbol, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
     const activeChanged = changedProperties.has('active');

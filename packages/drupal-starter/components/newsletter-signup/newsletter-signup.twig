@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Newsletter Signup SDC — composes hx-text-input, hx-button, hx-text, hx-checkbox.
+ *
+ * Provides an email subscription form with consent checkbox.
+ */
+#}
+{{ attach_library('helixui/hx-text-input') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-checkbox') }}
+
+<div class="newsletter-signup">
+  <div class="newsletter-signup__header">
+    <hx-text variant="heading" size="md">{{ title|default('Subscribe to our newsletter') }}</hx-text>
+    {% if description %}
+      <hx-text variant="body" size="sm">{{ description }}</hx-text>
+    {% endif %}
+  </div>
+  <form
+    class="newsletter-signup__form"
+    action="{{ action }}"
+    method="{{ method|default('post') }}"
+  >
+    <div class="newsletter-signup__input-group">
+      <hx-text-input
+        name="email"
+        type="email"
+        label="{{ email_label|default('Email address') }}"
+        placeholder="{{ email_label|default('Email address') }}"
+        required
+      ></hx-text-input>
+      <hx-button type="submit" variant="primary">
+        {{ button_text|default('Subscribe') }}
+      </hx-button>
+    </div>
+    <hx-checkbox name="consent" required>
+      I agree to receive email communications
+    </hx-checkbox>
+  </form>
+</div>

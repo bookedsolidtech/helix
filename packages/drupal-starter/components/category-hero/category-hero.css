@@ -1,0 +1,50 @@
+.category-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  overflow: hidden;
+  text-align: center;
+}
+
+.category-hero__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.category-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+.category-hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 40rem;
+  padding-block: var(--hx-spacing-2xl, 3rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+  color: var(--hx-color-on-dark, #fff);
+}
+
+.category-hero:not(:has(.category-hero__image)) .category-hero__content {
+  color: inherit;
+}
+
+.category-hero__title {
+  margin-block-end: var(--hx-spacing-sm, 0.5rem);
+}
+
+.category-hero__description {
+  margin-block-end: var(--hx-spacing-md, 1rem);
+}
+
+.category-hero__count {
+  margin-block-start: var(--hx-spacing-sm, 0.5rem);
+}

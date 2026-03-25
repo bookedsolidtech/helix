@@ -1,0 +1,32 @@
+/**
+ * @file
+ * Site Footer SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.site-footer {
+  padding-block: var(--hx-spacing-xl, 2rem);
+  background-color: var(--hx-color-surface-variant, #f5f5f5);
+}
+
+.site-footer__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--hx-spacing-lg, 1.5rem);
+  padding-block-end: var(--hx-spacing-lg, 1.5rem);
+}
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--hx-spacing-md, 1rem);
+  padding-block-start: var(--hx-spacing-md, 1rem);
+}
+
+.site-footer__bottom-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}

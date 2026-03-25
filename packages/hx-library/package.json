@@ -18,7 +18,20 @@
       "import": "./dist/components/*/index.js"
     },
     "./custom-elements.json": "./custom-elements.json",
-    "./fouc.css": "./fouc.css"
+    "./fouc.css": "./fouc.css",
+    "./dist/css/helix-all.css": "./dist/css/helix-all.css",
+    "./dist/css/helix-tokens.css": "./dist/css/helix-tokens.css",
+    "./dist/css/helix-core.css": "./dist/css/helix-core.css",
+    "./dist/css/helix-forms.css": "./dist/css/helix-forms.css",
+    "./dist/css/helix-navigation.css": "./dist/css/helix-navigation.css",
+    "./dist/css/helix-layout.css": "./dist/css/helix-layout.css",
+    "./dist/css/helix-feedback.css": "./dist/css/helix-feedback.css",
+    "./dist/css/helix-overlay.css": "./dist/css/helix-overlay.css",
+    "./dist/css/helix-data.css": "./dist/css/helix-data.css",
+    "./dist/css/helix-media.css": "./dist/css/helix-media.css",
+    "./dist/css/helix-utility.css": "./dist/css/helix-utility.css",
+    "./dist/css/manifest.json": "./dist/css/manifest.json",
+    "./dist/css/index.css": "./dist/css/index.css"
   },
   "files": [
     "dist",
@@ -31,7 +44,9 @@
     "generate:barrel": "node scripts/generate-barrel.js",
     "prepare": "node scripts/generate-barrel.js",
     "prebuild": "node scripts/generate-barrel.js",
-    "build": "vite build && pnpm run cem",
+    "build": "vite build && pnpm run cem && pnpm run css:build",
+    "css:build": "node scripts/generate-css-bundles.mjs",
+    "css:validate": "node scripts/validate-css.mjs",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
@@ -46,6 +61,7 @@
     "test:component": "vitest run --reporter=verbose",
     "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\"",
     "cem:watch": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" --watch",
+    "generate:drupal-libraries": "node scripts/generate-drupal-libraries.js",
     "lint": "eslint src/",
     "clean": "rm -rf dist custom-elements.json"
   },

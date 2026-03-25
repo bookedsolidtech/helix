@@ -2,6 +2,7 @@ import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
 
@@ -187,6 +188,15 @@ export class HelixRadioGroup extends LitElement {
     super.firstUpdated(changedProperties);
     this._syncRadios();
     this._updateValidity();
+    // WCAG 4.1.2: warn when no accessible name is available for the radio group.
+    // The fieldset needs either a label prop (rendered as <legend>) or an aria-label
+    // attribute on the host element so screen readers can identify the group.
+    if (!this.label && !this.getAttribute('aria-label')) {
+      devWarn(
+        'hx-radio-group',
+        'No accessible label provided. Set the `label` attribute or add `aria-label` to the host element. An unlabeled radio group violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      );
+    }
   }
 
   // ─── Radio Management ───
@@ -432,18 +442,14 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue(null);
     this._syncRadios();
   }
 
-  /**
-   * Called when the form restores state (e.g., back/forward navigation).
-   * @param state - The saved form state value.
-   * @param _mode - The restore mode: `'restore'` or `'autocomplete'`.
-   */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData,
     _mode: 'restore' | 'autocomplete',
@@ -453,7 +459,7 @@ export class HelixRadioGroup extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -471,10 +477,13 @@ export class HelixRadioGroup extends LitElement {
       'fieldset--required': this.required,
     };
 
-    // Use _errorId only when there is no slotted error content replacing the internal error div
-    const errorDescribedBy = !this._hasErrorSlot && hasError ? this._errorId : nothing;
-    const describedBy =
-      errorDescribedBy !== nothing ? errorDescribedBy : this.helpText ? this._helpTextId : nothing;
+    // WCAG 1.3.1: _errorId is now on the persistent wrapper div around the error slot,
+    // so it remains valid whether error content comes from the slot or the property.
+    const hasHelp = !!this.helpText;
+    const describedByIds = [hasError ? this._errorId : null, hasHelp ? this._helpTextId : null]
+      .filter(Boolean)
+      .join(' ');
+    const describedBy = describedByIds || nothing;
 
     return html`
       <fieldset
@@ -500,13 +509,15 @@ export class HelixRadioGroup extends LitElement {
           <slot @slotchange=${this._handleSlotChange}></slot>
         </div>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${hasError
-            ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert">
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        <!-- WCAG 1.3.1: wrap slot in a persistent container so _errorId stays stable
+             regardless of whether error content comes from the slot or the property. -->
+        <div id=${this._errorId}>
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>
+            ${hasError
+              ? html`<div part="error" class="fieldset__error" role="alert">${this.error}</div>`
+              : nothing}
+          </slot>
+        </div>
 
         ${this.helpText && !hasError
           ? html`

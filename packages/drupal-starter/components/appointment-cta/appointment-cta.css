@@ -1,0 +1,49 @@
+/* Appointment CTA — layout and spacing only */
+
+.appointment-cta {
+  display: block;
+}
+
+.appointment-cta__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.appointment-cta__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+.appointment-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.appointment-cta__extra {
+  display: block;
+}
+
+/* Banner variant — full width with centered content */
+.appointment-cta--banner .appointment-cta__content {
+  align-items: center;
+  text-align: center;
+}
+
+/* Inline variant — horizontal layout */
+.appointment-cta--inline .appointment-cta__content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.appointment-cta--inline .appointment-cta__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.appointment-cta--inline .appointment-cta__actions {
+  flex-shrink: 0;
+}

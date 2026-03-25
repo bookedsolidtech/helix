@@ -1,0 +1,24 @@
+/**
+ * @file
+ * Related Articles SDC — layout and spacing only.
+ * Component styling is handled by hx-* web components.
+ */
+
+.related-articles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.related-articles__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.related-articles__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  padding-block-start: var(--hx-spacing-xs, 0.25rem);
+}

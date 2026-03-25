@@ -1,0 +1,22 @@
+{#
+  Breadcrumb Navigation SDC
+  Composes: hx-breadcrumb, hx-link
+#}
+{{ attach_library('helixui/hx-breadcrumb') }}
+{{ attach_library('helixui/hx-link') }}
+
+{% set separator = separator|default('/') %}
+
+{% if items is not empty %}
+  <nav{{ attributes.addClass('breadcrumb-nav') }} aria-label="{{ 'Breadcrumb'|t }}">
+    <hx-breadcrumb separator="{{ separator }}">
+      {% for item in items %}
+        {% if not loop.last %}
+          <hx-link href="{{ item.url }}">{{ item.title }}</hx-link>
+        {% else %}
+          <span aria-current="page">{{ item.title }}</span>
+        {% endif %}
+      {% endfor %}
+    </hx-breadcrumb>
+  </nav>
+{% endif %}

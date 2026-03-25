@@ -69,7 +69,7 @@ export class HelixLink extends LitElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: LinkVariant = 'default';
+  variant: 'default' | 'subtle' | 'danger' = 'default';
 
   /**
    * Whether the link is disabled. Renders a span instead of an anchor.
@@ -161,7 +161,6 @@ export class HelixLink extends LitElement {
           part="link"
           class=${classMap(classes)}
           role="link"
-          tabindex="0"
           aria-disabled="true"
           @click=${this._handleClick}
         >

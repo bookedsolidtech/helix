@@ -53,7 +53,7 @@ export class HelixTextarea extends LitElement {
 
   // ─── Form Association ───
 
-  /** Enables the element to participate in form submission and validation. */
+  /** @internal */
   static formAssociated = true;
 
   /** ElementInternals instance for form association, validation, and ARIA. */
@@ -327,13 +327,13 @@ export class HelixTextarea extends LitElement {
     }
   }
 
-  /** Called by the browser when the owning form is reset. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue('');
   }
 
-  /** Called by the browser to restore form state (e.g., back/forward navigation). */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -343,7 +343,7 @@ export class HelixTextarea extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -442,13 +442,7 @@ export class HelixTextarea extends LitElement {
     // aria-live="polite" announces counter changes without interrupting the user.
     // The debounced _liveAnnouncement region provides additional context when nearing the limit.
     return html`
-      <div
-        part="counter"
-        class="field__counter"
-        id=${this._counterId}
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div part="counter" class="field__counter" id=${this._counterId} aria-hidden="true">
         ${display}
       </div>
     `;

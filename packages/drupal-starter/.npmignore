@@ -1,0 +1,5 @@
+tests/
+*.test.ts
+CONTRIBUTING.md
+.changeset/
+node_modules/

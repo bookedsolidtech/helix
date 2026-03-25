@@ -181,10 +181,7 @@ export class HelixFileUpload extends LitElement {
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    if (
-      (changedProperties as Map<PropertyKey, unknown>).has('_files') ||
-      changedProperties.has('name')
-    ) {
+    if (changedProperties.has('_files' as keyof HelixFileUpload) || changedProperties.has('name')) {
       this._syncFormValue();
     }
   }
@@ -216,24 +213,18 @@ export class HelixFileUpload extends LitElement {
     return this._internals.reportValidity();
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     this._files = [];
     this._internals.setFormValue(null);
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
 
-  /**
-   * Called by the browser to restore form state during back/forward navigation
-   * or autocomplete. File objects cannot be persisted across navigation sessions,
-   * so this callback clears the selection to avoid stale UI state.
-   * @param _state - Previously saved form state (not usable for File restoration).
-   * @param mode - 'restore' for back/forward navigation, 'autocomplete' for autofill.
-   */
+  /** @internal */
   formStateRestoreCallback(_state: string | File | FormData, mode: string): void {
     if (mode === 'restore' || mode === 'autocomplete') {
       this._files = [];
@@ -634,19 +625,13 @@ export class HelixFileUpload extends LitElement {
         ${this._renderFileList()}
         ${hasError
           ? html`
-              <div
-                part="error"
-                class="field__error"
-                id=${this._errorId}
-                role="alert"
-                aria-live="polite"
-              >
+              <div part="error" class="field__error" id=${this._errorId} role="alert">
                 ${this.error}
               </div>
             `
           : nothing}
 
-        <div id=${this._liveId} class="sr-only" aria-live="assertive" aria-atomic="true">
+        <div id=${this._liveId} class="sr-only" aria-live="polite" aria-atomic="true">
           ${this._dragOver ? 'File detected. Release to upload.' : ''}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -27,10 +27,7 @@ import { devWarn } from '../../utils/dev-warn.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [tokenStyles, helixButtonGroupStyles];
 
-  /**
-   * ElementInternals instance for ARIA role and label management via the Accessibility Object Model.
-   * @internal
-   */
+  /** @internal */
   private internals: ElementInternals;
 
   /**
@@ -82,7 +79,7 @@ export class HelixButtonGroup extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
     if (changedProperties.has('size')) {
@@ -99,6 +96,11 @@ export class HelixButtonGroup extends LitElement {
     this.style.setProperty('--hx-button-group-size', this.size);
     if (this.label) {
       this.internals.ariaLabel = this.label;
+    } else {
+      devWarn(
+        'hx-button-group',
+        'Missing accessible label. Provide a `label` attribute so screen readers can announce the group purpose (WCAG 4.1.2).',
+      );
     }
   }
 

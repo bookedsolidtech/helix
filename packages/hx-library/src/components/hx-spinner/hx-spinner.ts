@@ -21,6 +21,19 @@ export type SpinnerSize = 'sm' | 'md' | 'lg';
  * When used alongside visible loading text, set `decorative` to suppress
  * duplicate AT announcements.
  *
+ * **WCAG 4.1.2 — `aria-busy` pattern for consumers:**
+ * When this spinner indicates that a region of the page is loading, set
+ * `aria-busy="true"` on the container element that wraps the loading content
+ * and remove it (or set `aria-busy="false"`) once loading completes. This
+ * communicates the loading state to assistive technologies at the region level,
+ * complementing the spinner's own `role="status"` announcement.
+ *
+ * ```html
+ * <section aria-busy="true" aria-label="Patient records">
+ *   <hx-spinner label="Loading patient records"></hx-spinner>
+ * </section>
+ * ```
+ *
  * @summary Circular loading indicator component.
  *
  * @tag hx-spinner
@@ -45,7 +58,7 @@ export class HelixSpinner extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: SpinnerSize | string = 'md';
+  size: 'sm' | 'md' | 'lg' | (string & Record<never, never>) = 'md';
 
   /**
    * Visual variant of the spinner.

@@ -8,6 +8,20 @@
  * Run `npm run generate:barrel` to regenerate.
  */
 
+// ─── Base infrastructure ────────────────────────────────────────────────────
+export { HelixElement } from './base/index.js';
+export { createIdCounter, resetIdCounter } from './base/index.js';
+export { mergeTokenStyles } from './base/index.js';
+
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+export { FocusMixin } from './mixins/index.js';
+export type { FocusMixinInterface } from './mixins/index.js';
+
+// ─── Controllers ─────────────────────────────────────────────────────────────
+export { HelixAuditController } from './controllers/helix-audit-controller.js';
+export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';
+
+// ─── Components ──────────────────────────────────────────────────────────────
 export { HelixAccordion } from './components/hx-accordion/index.js';
 export { HelixAccordionItem } from './components/hx-accordion/index.js';
 export { HelixActionBar } from './components/hx-action-bar/index.js';
@@ -66,6 +80,8 @@ export { HelixNumberInput } from './components/hx-number-input/index.js';
 export { HelixOverflowMenu } from './components/hx-overflow-menu/index.js';
 export { HelixPagination } from './components/hx-pagination/index.js';
 export type { HxPagination } from './components/hx-pagination/index.js';
+export { HelixPhiField } from './components/hx-phi-field/index.js';
+export type { PhiAccessEventDetail } from './components/hx-phi-field/index.js';
 export { HelixPopover } from './components/hx-popover/index.js';
 export { HelixPopup } from './components/hx-popup/index.js';
 export { HelixProgressBar } from './components/hx-progress-bar/index.js';
@@ -90,6 +106,7 @@ export { HelixStatusIndicator, type StatusIndicatorStatus, type StatusIndicatorS
 export { HelixSteps } from './components/hx-steps/index.js';
 export { HelixStep } from './components/hx-steps/index.js';
 export { HelixStructuredList, HelixStructuredListRow } from './components/hx-structured-list/index.js';
+export { HxStyleScope } from './components/hx-style-scope/index.js';
 export { HelixSwitch } from './components/hx-switch/index.js';
 export type { HxSwitch, WcSwitch } from './components/hx-switch/index.js';
 export { HelixTable } from './components/hx-table/index.js';

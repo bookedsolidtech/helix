@@ -1,5 +1,5 @@
-import { LitElement, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStyles } from './hx-toast.styles.js';
@@ -46,14 +46,14 @@ export class HelixToast extends LitElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: ToastVariant = 'default';
+  variant: 'default' | 'success' | 'warning' | 'danger' | 'info' = 'default';
 
   /**
    * Auto-dismiss duration in milliseconds. Set to 0 for persistent toasts.
    * @attr duration
    */
   @property({ type: Number })
-  duration = 3000;
+  duration = 5000;
 
   /**
    * Whether to show a close button.
@@ -71,15 +71,18 @@ export class HelixToast extends LitElement {
 
   /**
    * Accessible label for the close button. Override for localization.
-   * @attr close-label
+   * @attr label-close
    */
-  @property({ attribute: 'close-label' })
-  closeLabel = 'Dismiss notification';
+  @property({ attribute: 'label-close' })
+  labelClose = 'Dismiss notification';
 
   // ─── Private State ───
 
   /** @internal */
   @query('.toast') private _toastEl!: HTMLElement | null;
+
+  /** @internal Tracks whether the action slot has slotted content. */
+  @state() private _hasActionContent = false;
 
   /** @internal */
   private _timer: ReturnType<typeof setTimeout> | null = null;
@@ -101,13 +104,13 @@ export class HelixToast extends LitElement {
 
   // ─── Lifecycle ───
 
-  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('open')) {
       if (this.open) {
         this.removeAttribute('aria-hidden');
         this._emitShow();
-        if (this.duration > 0 && !this._reducedMotion) {
+        if (this.duration > 0 && !this._reducedMotion && !this._hasActionContent) {
           this._startTimer();
         }
       } else {
@@ -234,6 +237,15 @@ export class HelixToast extends LitElement {
     this.hide();
   }
 
+  /** @internal */
+  private _handleActionSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasActionContent = slot.assignedNodes({ flatten: true }).length > 0;
+    if (this._hasActionContent && this.open) {
+      this._pauseTimer();
+    }
+  }
+
   // ─── ARIA Helpers ───
 
   /** @internal */
@@ -353,14 +365,14 @@ export class HelixToast extends LitElement {
                 <slot></slot>
               </span>
               <span part="action" class="toast__action">
-                <slot name="action"></slot>
+                <slot name="action" @slotchange=${this._handleActionSlotChange}></slot>
               </span>
               ${this.closable
                 ? html`
                     <button
                       part="close-button"
                       class="toast__close"
-                      aria-label=${this.closeLabel}
+                      aria-label=${this.labelClose}
                       @click=${this._handleClose}
                     >
                       <svg

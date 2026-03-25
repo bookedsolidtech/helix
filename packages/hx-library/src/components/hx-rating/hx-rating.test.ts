@@ -82,7 +82,10 @@ describe('hx-rating', () => {
         '<hx-rating value="3" max="5" label="Product" readonly></hx-rating>',
       );
       const base = shadowQuery(el, '[part="base"]');
-      expect(base?.getAttribute('aria-label')).toBe('Product: 3 out of 5');
+      // WCAG 4.1.2: readonly aria-label uses label property + labelValueText (default: "X out of Y stars").
+      // The hardcoded 'Rating:' prefix was removed to prevent redundancy when a consumer-provided
+      // label already describes the context (e.g. "Product: 3 out of 5 stars").
+      expect(base?.getAttribute('aria-label')).toBe('Product: 3 out of 5 stars');
     });
 
     it('does not fire hx-change when readonly and clicked', async () => {

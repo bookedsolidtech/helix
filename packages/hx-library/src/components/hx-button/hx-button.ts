@@ -46,6 +46,7 @@ export class HelixButton extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
   /** @internal */
@@ -153,7 +154,7 @@ export class HelixButton extends LitElement {
     return this._internals.form;
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
@@ -263,6 +264,7 @@ export class HelixButton extends LitElement {
           aria-label=${this.ariaLabel ?? nothing}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
+          tabindex=${this.disabled ? '-1' : nothing}
           @click=${this._handleClick}
         >
           ${this._renderInner()}

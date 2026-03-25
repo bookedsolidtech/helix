@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -92,7 +92,7 @@ export class HelixSkeleton extends LitElement {
     this.setAttribute('aria-hidden', 'true');
   }
 
-  override updated(changedProperties: Map<string | symbol, unknown>) {
+  override updated(changedProperties: PropertyValues<this>) {
     super.updated(changedProperties);
     if (changedProperties.has('loaded') && this.loaded) {
       this.dispatchEvent(

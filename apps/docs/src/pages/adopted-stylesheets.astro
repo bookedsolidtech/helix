@@ -1,0 +1,2063 @@
+---
+/**
+ * Adopted Stylesheets Showcase Page
+ *
+ * Demonstrates AdoptedStylesheetsController — the canonical solution
+ * for styling slotted/light-DOM content in HELiX web components.
+ *
+ * Sections:
+ * 1. The Problem — Shadow DOM styles don't reach slotted content
+ * 2. The Solution — AdoptedStylesheetsController in 3 lines
+ * 3. Live Interactive Demos — Before/after comparisons
+ * 4. How It Works — Visual cascade diagram
+ * 5. Framework Examples — Drupal, React, Vue, vanilla JS
+ * 6. Performance — Caching, reference counting, WeakMap IDs
+ * 7. Migration Guide — Fix broken styles in 3 lines
+ * 8. Comparison — vs ::slotted(), global CSS, inline styles, CSS-in-JS
+ */
+import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
+---
+
+<ShowcaseLayout
+  title="AdoptedStylesheetsController"
+  description="One controller that solves Shadow DOM's slotted-content styling gap. The default pattern for every HELiX consumer."
+>
+  <style is:inline>
+    /* ============================================
+       ADOPTED STYLESHEETS SHOWCASE — page styles
+       ============================================ */
+
+    body { overflow-x: hidden; }
+    html { scroll-behavior: smooth; }
+
+    /* ---- Page layout ---- */
+    .as-page {
+      background: var(--surface-0);
+      min-height: 100vh;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+
+    /* ---- Top utility nav ---- */
+    .as-util-nav {
+      position: fixed;
+      bottom: var(--space-6);
+      left: var(--space-6);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .as-util-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--glass-bg-strong);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: 50%;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .as-util-btn:hover {
+      color: var(--text-primary);
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.2);
+    }
+    .as-util-btn:focus-visible {
+      outline: 3px solid var(--wc-accent);
+      outline-offset: 3px;
+    }
+    .as-util-btn--top { opacity: 0; pointer-events: none; transition: all 0.3s ease; }
+    .as-util-btn--top.visible { opacity: 1; pointer-events: auto; }
+
+    /* ---- Section dot nav ---- */
+    .as-section-nav {
+      position: fixed;
+      right: var(--space-6);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .as-nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--glass-border-strong);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 0;
+    }
+    .as-nav-dot.active {
+      background: var(--wc-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+      transform: scale(1.3);
+    }
+    .as-nav-dot:hover { background: var(--text-muted); transform: scale(1.2); }
+    .as-nav-dot-label {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+      background: rgba(10, 10, 20, 0.9);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    .as-nav-dot:hover .as-nav-dot-label { opacity: 1; }
+    .as-nav-dot:focus-visible { outline: 3px solid var(--wc-accent); outline-offset: 3px; }
+
+    /* ---- Shared section base ---- */
+    .as-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 5.5rem 2rem 4rem;
+    }
+    .as-section-inner {
+      max-width: 1100px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ---- Section backgrounds ---- */
+    .as-section--dark { background: var(--surface-0); }
+    .as-section--mid  { background: var(--surface-1); }
+
+    /* ---- Hero gradient overlay ---- */
+    .as-hero {
+      background: linear-gradient(135deg, #050510 0%, #0b0b25 35%, #150a28 65%, #050510 100%);
+    }
+    .as-hero-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .as-hero-orb-1 {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+      top: -200px;
+      right: -100px;
+      pointer-events: none;
+      animation: orb-drift-a 20s ease-in-out infinite alternate;
+    }
+    .as-hero-orb-2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+      bottom: -150px;
+      left: -100px;
+      pointer-events: none;
+      animation: orb-drift-b 25s ease-in-out infinite alternate;
+    }
+
+    @keyframes orb-drift-a {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(-40px, 30px) scale(1.08); }
+    }
+    @keyframes orb-drift-b {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, -30px) scale(1.05); }
+    }
+
+    /* ---- Gradient text ---- */
+    .gradient-text {
+      background: var(--gradient-cyan-purple);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text--green {
+      background: var(--gradient-green-cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text--amber {
+      background: linear-gradient(135deg, var(--wc-amber), var(--wc-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ---- Section header ---- */
+    .as-section-header { text-align: center; margin-bottom: 3rem; }
+    .as-section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0.3rem 1rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 1rem;
+    }
+    .label-red    { background: rgba(239,68,68,0.1);   color: var(--wc-red);    border: 1px solid rgba(239,68,68,0.2); }
+    .label-cyan   { background: rgba(6,182,212,0.1);   color: var(--wc-cyan);   border: 1px solid rgba(6,182,212,0.2); }
+    .label-green  { background: rgba(16,185,129,0.1);  color: var(--wc-green);  border: 1px solid rgba(16,185,129,0.2); }
+    .label-accent { background: rgba(139,92,246,0.1);  color: var(--wc-accent); border: 1px solid rgba(139,92,246,0.2); }
+    .label-amber  { background: rgba(245,158,11,0.1);  color: var(--wc-amber);  border: 1px solid rgba(245,158,11,0.2); }
+    .label-electric { background: rgba(59,130,246,0.1); color: var(--wc-electric); border: 1px solid rgba(59,130,246,0.2); }
+    .label-pink   { background: rgba(236,72,153,0.1);  color: var(--wc-pink);   border: 1px solid rgba(236,72,153,0.2); }
+    .label-teal   { background: rgba(20,184,166,0.1);  color: var(--wc-teal);   border: 1px solid rgba(20,184,166,0.2); }
+
+    .as-section-title {
+      font-size: clamp(1.875rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+    .as-section-desc {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    /* ---- Code block (pre/code) ---- */
+    .as-code {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-6);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 0;
+    }
+    .as-code .c-comment { color: #6c7986; font-style: italic; }
+    .as-code .c-keyword { color: #c792ea; }
+    .as-code .c-string  { color: #c3e88d; }
+    .as-code .c-prop    { color: #82aaff; }
+    .as-code .c-call    { color: #89ddff; }
+    .as-code .c-num     { color: #f78c6c; }
+    .as-code .c-type    { color: #ffcb6b; }
+    .as-code .c-tag     { color: #f07178; }
+    .as-code .c-attr    { color: #c3e88d; }
+    .as-code .c-value   { color: #89ddff; }
+
+    /* ---- Code window chrome ---- */
+    .as-code-window {
+      background: var(--surface-1);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .as-code-window-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.625rem var(--space-4);
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--surface-3);
+    }
+    .as-code-dots { display: flex; gap: 6px; }
+    .as-code-dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-3); }
+    .as-code-dots span:first-child { background: #ef4444; }
+    .as-code-dots span:nth-child(2) { background: #f59e0b; }
+    .as-code-dots span:last-child { background: #10b981; }
+    .as-code-filename {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      letter-spacing: 0.02em;
+    }
+
+    /* ---- Glass card ---- */
+    .as-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+    }
+    .as-card--highlight {
+      background: rgba(6, 182, 212, 0.04);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+    .as-card--danger {
+      background: rgba(239, 68, 68, 0.04);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+    .as-card--success {
+      background: rgba(16, 185, 129, 0.04);
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+    .as-card--warning {
+      background: rgba(245, 158, 11, 0.04);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    /* ---- Two-column grid ---- */
+    .as-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    /* ---- Three-column grid ---- */
+    .as-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    /* ---- Feature list ---- */
+    .as-feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+    .as-feature-item { display: flex; align-items: flex-start; gap: var(--space-3); }
+    .as-feature-icon { font-size: 1rem; margin-top: 2px; flex-shrink: 0; }
+    .as-feature-text { font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.6; }
+    .as-feature-text strong { color: var(--text-primary); font-weight: 600; }
+
+    /* ---- Before/After demo ---- */
+    .as-demo-panel {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .as-demo-panel-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .as-demo-panel-header--bad  { background: rgba(239,68,68,0.12);  color: var(--wc-red);  border-bottom: 1px solid rgba(239,68,68,0.2); }
+    .as-demo-panel-header--good { background: rgba(16,185,129,0.12); color: var(--wc-green); border-bottom: 1px solid rgba(16,185,129,0.2); }
+    .as-demo-panel-body { padding: var(--space-4); }
+
+    /* Live demo: unstyled text sim */
+    .as-live-unstyled {
+      font-family: 'Times New Roman', serif;
+      font-size: 1rem;
+      color: #000;
+      background: #fff;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      border: 1px solid #ccc;
+      line-height: 1.4;
+    }
+    .as-live-unstyled p { margin: 0 0 0.5rem; }
+    .as-live-unstyled p:last-child { margin-bottom: 0; }
+    .as-live-unstyled h3 { font-size: 1.125rem; font-weight: bold; margin: 0 0 0.25rem; }
+
+    /* Live demo: styled text sim */
+    .as-live-styled {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      background: var(--surface-2);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(6,182,212,0.2);
+      line-height: 1.65;
+    }
+    .as-live-styled h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--wc-cyan);
+      margin: 0 0 var(--space-2);
+    }
+    .as-live-styled p { margin: 0 0 var(--space-2); color: var(--text-secondary); }
+    .as-live-styled p:last-child { margin-bottom: 0; }
+    .as-live-styled .as-live-tag {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      background: rgba(16,185,129,0.1);
+      color: var(--wc-green);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+
+    /* ---- Problem callout ---- */
+    .as-problem-callout {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-6);
+      margin-bottom: var(--space-6);
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-start;
+    }
+    .as-problem-callout-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .as-problem-callout-body h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--wc-red);
+      margin: 0 0 var(--space-2);
+    }
+    .as-problem-callout-body p {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    /* ---- Solution callout ---- */
+    .as-solution-callout {
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-6);
+      margin-bottom: var(--space-6);
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-start;
+    }
+    .as-solution-callout-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .as-solution-callout-body h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--wc-green);
+      margin: 0 0 var(--space-2);
+    }
+    .as-solution-callout-body p {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    /* ---- Migration steps ---- */
+    .as-migration-steps { display: flex; flex-direction: column; gap: var(--space-4); }
+    .as-migration-step {
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-start;
+    }
+    .as-migration-step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gradient-cyan-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .as-migration-step-body { flex: 1; }
+    .as-migration-step-body h4 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 var(--space-1);
+    }
+    .as-migration-step-body p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.6;
+    }
+    .as-migration-step-body code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--wc-cyan);
+      background: rgba(6,182,212,0.08);
+      padding: 0.125rem 0.375rem;
+      border-radius: 4px;
+    }
+
+    /* ---- Cascade diagram ---- */
+    .as-cascade {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .as-cascade-node {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-6);
+      position: relative;
+      text-align: center;
+    }
+    .as-cascade-node--document {
+      background: rgba(6,182,212,0.08);
+      border-color: rgba(6,182,212,0.3);
+    }
+    .as-cascade-node--controller {
+      background: rgba(139,92,246,0.08);
+      border-color: rgba(139,92,246,0.3);
+    }
+    .as-cascade-node--shadow {
+      background: rgba(59,130,246,0.08);
+      border-color: rgba(59,130,246,0.3);
+    }
+    .as-cascade-node--slotted {
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.3);
+    }
+    .as-cascade-node-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-1);
+    }
+    .as-cascade-node-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .as-cascade-arrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 40px;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      position: relative;
+    }
+    .as-cascade-arrow::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--wc-cyan), var(--wc-accent));
+      transform: translateX(-50%);
+    }
+    .as-cascade-arrow-icon {
+      background: var(--surface-1);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      position: relative;
+      z-index: 1;
+      border: 1px solid var(--surface-3);
+    }
+
+    /* ---- Framework tab switcher ---- */
+    .as-tabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-6); flex-wrap: wrap; }
+    .as-tab {
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-height: 36px;
+    }
+    .as-tab:hover { color: var(--text-primary); background: var(--glass-bg-strong); }
+    .as-tab.active {
+      color: #fff;
+      background: var(--gradient-cyan-purple);
+      border-color: transparent;
+      box-shadow: 0 2px 12px rgba(6,182,212,0.25);
+    }
+    .as-tab:focus-visible { outline: 3px solid var(--wc-accent); outline-offset: 3px; }
+
+    .as-tab-panel { display: none; }
+    .as-tab-panel.active { display: block; }
+
+    /* ---- Comparison table ---- */
+    .as-compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .as-compare-table thead tr {
+      border-bottom: 2px solid var(--surface-3);
+    }
+    .as-compare-table th {
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .as-compare-table th:first-child { width: 30%; }
+    .as-compare-table td {
+      padding: var(--space-3) var(--space-4);
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--surface-3);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .as-compare-table tr:last-child td { border-bottom: none; }
+    .as-compare-table tr.as-compare-winner td {
+      background: rgba(16,185,129,0.04);
+      color: var(--text-primary);
+    }
+    .as-compare-table tr.as-compare-winner td:first-child {
+      color: var(--wc-green);
+      font-weight: 700;
+    }
+    .as-icon-yes { color: var(--wc-green); }
+    .as-icon-partial { color: var(--wc-amber); }
+    .as-icon-no  { color: var(--wc-red); }
+
+    /* ---- Perf stat badges ---- */
+    .as-perf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    .as-perf-stat {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-4);
+      text-align: center;
+    }
+    .as-perf-stat-value {
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: var(--space-2);
+    }
+    .as-perf-stat-label {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ---- Internal mechanics list ---- */
+    .as-mechanic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    .as-mechanic-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+    }
+    .as-mechanic-card h4 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin: 0 0 var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .as-mechanic-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    /* ---- Hero specific ---- */
+    .as-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.375rem 1rem;
+      background: rgba(6,182,212,0.1);
+      border: 1px solid rgba(6,182,212,0.25);
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--wc-cyan);
+      margin-bottom: var(--space-6);
+    }
+    .as-hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: var(--space-6);
+      text-align: center;
+    }
+    .as-hero-subtitle {
+      font-size: clamp(1.0625rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto var(--space-8);
+      text-align: center;
+      line-height: 1.75;
+    }
+    .as-hero-pills {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-8);
+    }
+    .as-hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.5rem 1.25rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .as-hero-pill i { font-size: 0.875rem; }
+
+    /* ---- CTA button ---- */
+    .as-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.875rem 2rem;
+      background: var(--gradient-cyan-purple);
+      border: none;
+      border-radius: var(--radius-full);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(6,182,212,0.25);
+      min-height: 48px;
+    }
+    .as-cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(6,182,212,0.35);
+    }
+    .as-cta-btn:focus-visible { outline: 3px solid var(--wc-cyan); outline-offset: 4px; }
+
+    .as-ghost-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.875rem 2rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border-strong);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      min-height: 48px;
+    }
+    .as-ghost-btn:hover {
+      color: var(--text-primary);
+      background: var(--glass-bg-strong);
+      transform: translateY(-2px);
+    }
+    .as-ghost-btn:focus-visible { outline: 3px solid var(--wc-accent); outline-offset: 3px; }
+
+    .as-cta-group {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ---- Mouse scroll indicator ---- */
+    .as-scroll-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      margin-top: var(--space-10);
+      animation: fadeInUp 0.8s ease-out 0.8s both;
+    }
+    .as-scroll-mouse {
+      width: 26px;
+      height: 42px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 13px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .as-scroll-wheel {
+      width: 4px;
+      height: 8px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 2px;
+      margin-top: 7px;
+      animation: scroll-wheel 2s ease-in-out infinite;
+    }
+    .as-scroll-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    @keyframes scroll-wheel {
+      0%   { opacity: 1; transform: translateY(0); }
+      50%  { opacity: 0.3; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---- Divider ---- */
+    .as-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--surface-3), transparent);
+      margin: var(--space-8) 0;
+    }
+
+    /* ---- Inline code ---- */
+    .as-inline-code {
+      font-family: var(--font-mono);
+      font-size: 0.875em;
+      color: var(--wc-cyan);
+      background: rgba(6,182,212,0.08);
+      padding: 0.125rem 0.375rem;
+      border-radius: 4px;
+    }
+
+    /* ---- Blockquote callout ---- */
+    .as-callout {
+      border-left: 3px solid var(--wc-cyan);
+      padding: var(--space-3) var(--space-5);
+      background: rgba(6,182,212,0.05);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: var(--space-4) 0;
+    }
+    .as-callout strong { color: var(--wc-cyan); }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 1024px) {
+      .as-section-nav { display: none; }
+    }
+    @media (max-width: 768px) {
+      .as-section { padding: 4rem 1rem 5rem; min-height: auto; }
+      .as-grid-2  { grid-template-columns: 1fr; }
+      .as-grid-3  { grid-template-columns: 1fr; }
+      .as-perf-grid { grid-template-columns: 1fr; }
+      .as-mechanic-grid { grid-template-columns: 1fr; }
+      .as-cta-group { flex-direction: column; align-items: center; }
+      .as-hero-title { font-size: clamp(2rem, 8vw, 3rem); }
+      .as-compare-table { font-size: 0.8125rem; }
+    }
+
+    /* ---- Reduced motion ---- */
+    @media (prefers-reduced-motion: reduce) {
+      .as-hero-orb-1, .as-hero-orb-2 { animation: none !important; }
+      .as-scroll-wheel { animation: none !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+
+  <div class="as-page" id="as-page-top">
+
+    <!-- ================================================
+         SECTION DOT NAV
+         ================================================ -->
+    <nav class="as-section-nav" aria-label="Page sections">
+      <button class="as-nav-dot active" data-target="s-hero" aria-label="Go to Hero">
+        <span class="as-nav-dot-label">Overview</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-problem" aria-label="Go to The Problem">
+        <span class="as-nav-dot-label">The Problem</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-solution" aria-label="Go to The Solution">
+        <span class="as-nav-dot-label">The Solution</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-demos" aria-label="Go to Live Demos">
+        <span class="as-nav-dot-label">Live Demos</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-how" aria-label="Go to How It Works">
+        <span class="as-nav-dot-label">How It Works</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-frameworks" aria-label="Go to Framework Examples">
+        <span class="as-nav-dot-label">Frameworks</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-perf" aria-label="Go to Performance">
+        <span class="as-nav-dot-label">Performance</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-migration" aria-label="Go to Migration Guide">
+        <span class="as-nav-dot-label">Migration</span>
+      </button>
+      <button class="as-nav-dot" data-target="s-compare" aria-label="Go to Comparison">
+        <span class="as-nav-dot-label">Comparison</span>
+      </button>
+    </nav>
+
+    <main id="main-content">
+
+      <!-- ================================================
+           SECTION 0 — HERO
+           ================================================ -->
+      <section class="as-section as-hero" id="s-hero" aria-labelledby="hero-title">
+        <div class="as-hero-grid" aria-hidden="true"></div>
+        <div class="as-hero-orb-1" aria-hidden="true"></div>
+        <div class="as-hero-orb-2" aria-hidden="true"></div>
+        <div class="as-section-inner" style="text-align: center;">
+          <div class="as-hero-badge">
+            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+            <span>Default Pattern — Not Optional</span>
+          </div>
+          <h1 class="as-hero-title" id="hero-title">
+            <span class="gradient-text">AdoptedStylesheets</span><br />
+            Controller
+          </h1>
+          <p class="as-hero-subtitle">
+            The single controller that solves Shadow DOM's hardest styling problem.
+            Slotted content. Light DOM. Drupal Twig. It all gets styled — with zero hacks,
+            one import, and three lines of code.
+          </p>
+          <div class="as-hero-pills" role="list" aria-label="Key features">
+            <div class="as-hero-pill" role="listitem">
+              <i class="fa-solid fa-bolt" style="color: var(--wc-cyan);" aria-hidden="true"></i>
+              <span>One controller</span>
+            </div>
+            <div class="as-hero-pill" role="listitem">
+              <i class="fa-solid fa-recycle" style="color: var(--wc-green);" aria-hidden="true"></i>
+              <span>Automatic deduplication</span>
+            </div>
+            <div class="as-hero-pill" role="listitem">
+              <i class="fa-solid fa-shield-halved" style="color: var(--wc-accent);" aria-hidden="true"></i>
+              <span>Reference counted cleanup</span>
+            </div>
+            <div class="as-hero-pill" role="listitem">
+              <i class="fa-solid fa-puzzle-piece" style="color: var(--wc-amber);" aria-hidden="true"></i>
+              <span>Drupal-ready</span>
+            </div>
+          </div>
+          <div class="as-cta-group">
+            <a class="as-cta-btn" href="#s-migration">
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              Fix Broken Styles Now
+            </a>
+            <a class="as-ghost-btn" href="#s-solution">
+              <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+              See How It Works
+            </a>
+          </div>
+          <div class="as-scroll-hint" aria-hidden="true">
+            <div class="as-scroll-mouse">
+              <div class="as-scroll-wheel"></div>
+            </div>
+            <span class="as-scroll-label">Scroll to explore</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 1 — THE PROBLEM
+           ================================================ -->
+      <section class="as-section as-section--mid" id="s-problem" aria-labelledby="problem-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-red">Section 1</span>
+            <h2 class="as-section-title" id="problem-title">
+              The <span class="gradient-text--amber">Problem</span>
+            </h2>
+            <p class="as-section-desc">
+              Shadow DOM is exceptional at style isolation — so exceptional that styles defined
+              inside a component cannot reach slotted content. That content lives in the
+              <strong>light DOM</strong>, outside the shadow boundary.
+            </p>
+          </header>
+
+          <div class="as-problem-callout" role="alert">
+            <span class="as-problem-callout-icon" aria-hidden="true">&#128274;</span>
+            <div class="as-problem-callout-body">
+              <h3>The trip-planner team lost a full week to this</h3>
+              <p>
+                Upgrading to HELiX, their Drupal Twig templates put rich text content into
+                component slots. The components looked perfect in Storybook. In production,
+                headings had no color, links were bare blue, and paragraphs used browser defaults.
+                Shadow DOM's encapsulation was working exactly as designed — and exactly as a blocker.
+              </p>
+            </div>
+          </div>
+
+          <div class="as-grid-2">
+            <div>
+              <h3 style="font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-4); color: var(--text-primary);">
+                Why styles don't reach slotted content
+              </h3>
+              <ul class="as-feature-list">
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-red);" aria-hidden="true"><i class="fa-solid fa-circle-xmark"></i></span>
+                  <span class="as-feature-text">
+                    <strong>Shadow boundary blocks cascade.</strong> CSS defined in a shadow root
+                    cannot style nodes distributed into a slot — they remain in the host's light DOM.
+                  </span>
+                </li>
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-red);" aria-hidden="true"><i class="fa-solid fa-circle-xmark"></i></span>
+                  <span class="as-feature-text">
+                    <strong><code>::slotted()</code> only covers one level.</strong> It styles direct slotted
+                    children, not their descendants. A <code>&lt;p&gt;</code> inside a slotted
+                    <code>&lt;div&gt;</code> is unreachable.
+                  </span>
+                </li>
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-red);" aria-hidden="true"><i class="fa-solid fa-circle-xmark"></i></span>
+                  <span class="as-feature-text">
+                    <strong>Global CSS is too broad.</strong> Injecting styles at
+                    <code>document</code> level pollutes every page element — not just component slots.
+                  </span>
+                </li>
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-red);" aria-hidden="true"><i class="fa-solid fa-circle-xmark"></i></span>
+                  <span class="as-feature-text">
+                    <strong>Drupal Twig templates output light DOM.</strong> Every field value,
+                    body text, and rich text area lands outside the shadow root, where component styles cannot touch it.
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div class="as-code-window" role="region" aria-label="Code example: broken styling">
+                <div class="as-code-window-header">
+                  <div class="as-code-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <span class="as-code-filename">hx-card.styles.ts — styles that WON'T reach slots</span>
+                </div>
+                <pre class="as-code"><code><span class="c-comment">/* This lives inside Shadow DOM */</span>
+<span class="c-comment">/* It CANNOT style slotted content */</span>
+
+<span class="c-tag">:host</span> {
+  <span class="c-prop">display</span>: <span class="c-value">block</span>;
+  <span class="c-prop">padding</span>: <span class="c-value">1.5rem</span>;
+}
+
+<span class="c-comment">/* Only direct slotted children */</span>
+<span class="c-tag">::slotted(p)</span> {
+  <span class="c-prop">color</span>: <span class="c-value">var(--hx-text-body)</span>; <span class="c-comment">/* OK */</span>
+}
+
+<span class="c-comment">/* BROKEN — descendants unreachable */</span>
+<span class="c-tag">::slotted(div) p</span> {
+  <span class="c-prop">color</span>: <span class="c-value">var(--hx-text-body)</span>; <span class="c-comment">/* ignored */</span>
+}
+<span class="c-tag">::slotted(article) h2</span> {
+  <span class="c-prop">font-size</span>: <span class="c-value">1.5rem</span>; <span class="c-comment">/* ignored */</span>
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 2 — THE SOLUTION
+           ================================================ -->
+      <section class="as-section as-section--dark" id="s-solution" aria-labelledby="solution-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-cyan">Section 2</span>
+            <h2 class="as-section-title" id="solution-title">
+              The <span class="gradient-text">Solution</span>
+            </h2>
+            <p class="as-section-desc">
+              <code class="as-inline-code">AdoptedStylesheetsController</code> injects a
+              <code class="as-inline-code">CSSStyleSheet</code> directly into the
+              <code class="as-inline-code">document.adoptedStyleSheets</code> array when your
+              component connects — scoped, deduplicated, and automatically cleaned up when
+              the last consumer disconnects.
+            </p>
+          </header>
+
+          <div class="as-solution-callout">
+            <span class="as-solution-callout-icon" aria-hidden="true">&#10024;</span>
+            <div class="as-solution-callout-body">
+              <h3>The default pattern — not optional</h3>
+              <p>
+                Adopted stylesheets are the <em>only</em> reliable way to style slotted content
+                from inside a web component. This is not a workaround — it is the spec-compliant,
+                browser-native solution that every HELiX consumer should reach for first.
+              </p>
+            </div>
+          </div>
+
+          <div class="as-grid-2">
+            <div>
+              <div class="as-code-window" role="region" aria-label="Code example: AdoptedStylesheetsController usage">
+                <div class="as-code-window-header">
+                  <div class="as-code-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <span class="as-code-filename">hx-card.ts — 3 lines to fix everything</span>
+                </div>
+                <pre class="as-code"><code><span class="c-keyword">import</span> { <span class="c-type">LitElement</span>, html } <span class="c-keyword">from</span> <span class="c-string">'lit'</span>;
+<span class="c-keyword">import</span> { customElement } <span class="c-keyword">from</span> <span class="c-string">'lit/decorators.js'</span>;
+<span class="c-keyword">import</span> { <span class="c-type">AdoptedStylesheetsController</span> }
+  <span class="c-keyword">from</span> <span class="c-string">'../controllers/adopted-stylesheets.js'</span>; <span class="c-comment">// 1</span>
+
+<span class="c-tag">@customElement</span>(<span class="c-string">'hx-card'</span>)
+<span class="c-keyword">export class</span> <span class="c-type">HxCard</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> {
+
+  <span class="c-comment">// 2 — inject styles into document for slotted content</span>
+  <span class="c-keyword">private</span> _slotStyles = <span class="c-keyword">new</span> <span class="c-type">AdoptedStylesheetsController</span>(
+    <span class="c-call">this</span>,
+    <span class="c-string">`
+      hx-card p   { color: var(--hx-text-body);  }
+      hx-card h2  { color: var(--hx-text-heading);}
+      hx-card a   { color: var(--hx-color-primary);}
+    `</span>           <span class="c-comment">// 3 — CSS targeting the host element in light DOM</span>
+  );
+
+  <span class="c-call">render</span>() {
+    <span class="c-keyword">return</span> html<span class="c-string">`&lt;slot&gt;&lt;/slot&gt;`</span>;
+  }
+}</code></pre>
+              </div>
+            </div>
+            <div>
+              <h3 style="font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-4); color: var(--text-primary);">
+                What happens under the hood
+              </h3>
+              <ul class="as-feature-list">
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-green);" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+                  <span class="as-feature-text">
+                    <strong>hostConnected():</strong> Creates one <code>CSSStyleSheet</code>, calls
+                    <code>replaceSync()</code>, adds it to <code>document.adoptedStyleSheets</code>.
+                    Cached globally — second instance reuses the same sheet.
+                  </span>
+                </li>
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-green);" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+                  <span class="as-feature-text">
+                    <strong>Reference counting:</strong> Each consumer increments a counter keyed
+                    by <code>cssText + rootId</code>. No stylesheet is removed while any consumer is live.
+                  </span>
+                </li>
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-green);" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+                  <span class="as-feature-text">
+                    <strong>hostDisconnected():</strong> Decrements the counter. Removes the stylesheet
+                    from <code>adoptedStyleSheets</code> only when the count reaches zero.
+                  </span>
+                </li>
+                <li class="as-feature-item">
+                  <span class="as-feature-icon" style="color: var(--wc-green);" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+                  <span class="as-feature-text">
+                    <strong>WeakMap root IDs:</strong> Each <code>Document</code> or
+                    <code>ShadowRoot</code> gets a stable numeric ID so reference counts never
+                    bleed across roots.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 3 — LIVE DEMOS
+           ================================================ -->
+      <section class="as-section as-section--mid" id="s-demos" aria-labelledby="demos-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-green">Section 3</span>
+            <h2 class="as-section-title" id="demos-title">
+              Live <span class="gradient-text--green">Interactive Demos</span>
+            </h2>
+            <p class="as-section-desc">
+              Side-by-side comparison of a card component with slotted rich text content —
+              without and with <code class="as-inline-code">AdoptedStylesheetsController</code>.
+            </p>
+          </header>
+
+          <div class="as-grid-2" style="margin-bottom: var(--space-8);">
+            <!-- Before -->
+            <div role="region" aria-label="Before: broken slot styling">
+              <div class="as-demo-panel">
+                <div class="as-demo-panel-header as-demo-panel-header--bad">
+                  <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                  Before — No AdoptedStylesheetsController
+                </div>
+                <div class="as-demo-panel-body">
+                  <p style="font-size: 0.8125rem; color: var(--text-muted); margin: 0 0 var(--space-3);">
+                    Simulates slotted content receiving <em>zero</em> component styles — browser defaults only.
+                  </p>
+                  <div class="as-live-unstyled" role="group" aria-label="Unstyled content example">
+                    <h3>Patient Intake Form</h3>
+                    <p>Complete all required fields before submitting.</p>
+                    <p>
+                      Questions? Contact
+                      <a href="#">Patient Services</a>.
+                    </p>
+                  </div>
+                  <p style="font-size: 0.75rem; color: var(--wc-red); margin: var(--space-3) 0 0; display: flex; align-items: center; gap: var(--space-2);">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    Browser defaults: Times New Roman, black text, blue links — no design tokens applied.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- After -->
+            <div role="region" aria-label="After: styled slot content">
+              <div class="as-demo-panel">
+                <div class="as-demo-panel-header as-demo-panel-header--good">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  After — With AdoptedStylesheetsController
+                </div>
+                <div class="as-demo-panel-body">
+                  <p style="font-size: 0.8125rem; color: var(--text-muted); margin: 0 0 var(--space-3);">
+                    Same markup, same component — design tokens now reach the slotted content.
+                  </p>
+                  <div class="as-live-styled" role="group" aria-label="Styled content example">
+                    <h3>Patient Intake Form</h3>
+                    <p>Complete all required fields before submitting.</p>
+                    <p>
+                      Questions? Contact
+                      <a href="#" style="color: var(--wc-cyan); text-decoration: underline;">Patient Services</a>.
+                      <span class="as-live-tag">Healthcare Ready</span>
+                    </p>
+                  </div>
+                  <p style="font-size: 0.75rem; color: var(--wc-green); margin: var(--space-3) 0 0; display: flex; align-items: center; gap: var(--space-2);">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    Design tokens applied: Inter font, brand cyan, semantic spacing.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive toggle demo -->
+          <div class="as-card" style="text-align: center;" role="region" aria-label="Interactive toggle demo">
+            <h3 style="font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-4); color: var(--text-primary);">
+              Toggle the controller live
+            </h3>
+            <p style="font-size: 0.9375rem; color: var(--text-secondary); margin: 0 0 var(--space-6);">
+              Click the button to toggle <code class="as-inline-code">AdoptedStylesheetsController</code> on and off.
+              Watch the slotted content above update instantly.
+            </p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-4); flex-wrap: wrap;">
+              <button
+                class="as-cta-btn"
+                id="as-toggle-btn"
+                aria-pressed="true"
+                aria-label="Toggle AdoptedStylesheetsController"
+              >
+                <i class="fa-solid fa-toggle-on" aria-hidden="true" id="as-toggle-icon"></i>
+                Controller: ON
+              </button>
+              <div id="as-toggle-status" style="font-size: 0.875rem; color: var(--wc-green); display: flex; align-items: center; gap: var(--space-2);" role="status" aria-live="polite">
+                <i class="fa-solid fa-circle" style="font-size: 0.5rem;" aria-hidden="true"></i>
+                Styles active
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 4 — HOW IT WORKS
+           ================================================ -->
+      <section class="as-section as-section--dark" id="s-how" aria-labelledby="how-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-accent">Section 4</span>
+            <h2 class="as-section-title" id="how-title">
+              How It <span class="gradient-text">Works</span>
+            </h2>
+            <p class="as-section-desc">
+              The controller bridges two worlds: styles that live inside Shadow DOM
+              and content that lives in the light DOM. Here's the full cascade.
+            </p>
+          </header>
+
+          <div class="as-grid-2" style="align-items: center;">
+            <!-- Cascade diagram -->
+            <div role="img" aria-label="Style cascade diagram: Document to Controller to ShadowRoot to Slotted Content">
+              <div class="as-cascade">
+                <div class="as-cascade-node as-cascade-node--document">
+                  <div class="as-cascade-node-label" style="color: var(--wc-cyan);">
+                    <i class="fa-solid fa-file-code" aria-hidden="true"></i> document
+                  </div>
+                  <div class="as-cascade-node-desc">
+                    <code>document.adoptedStyleSheets</code> — where the injected sheet lands.
+                    Available to all light DOM nodes on the page.
+                  </div>
+                </div>
+                <div class="as-cascade-arrow" aria-hidden="true">
+                  <span class="as-cascade-arrow-icon">
+                    <i class="fa-solid fa-arrow-down"></i>
+                  </span>
+                </div>
+                <div class="as-cascade-node as-cascade-node--controller">
+                  <div class="as-cascade-node-label" style="color: var(--wc-accent);">
+                    <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AdoptedStylesheetsController
+                  </div>
+                  <div class="as-cascade-node-desc">
+                    Lit ReactiveController. Injects on <code>hostConnected</code>,
+                    removes on <code>hostDisconnected</code>. Global cache + reference counting.
+                  </div>
+                </div>
+                <div class="as-cascade-arrow" aria-hidden="true">
+                  <span class="as-cascade-arrow-icon">
+                    <i class="fa-solid fa-arrow-down"></i>
+                  </span>
+                </div>
+                <div class="as-cascade-node as-cascade-node--shadow">
+                  <div class="as-cascade-node-label" style="color: var(--wc-electric);">
+                    <i class="fa-solid fa-circle-dot" aria-hidden="true"></i> Shadow Root
+                  </div>
+                  <div class="as-cascade-node-desc">
+                    <code>hx-card</code>'s shadow root. Component styles live here.
+                    Encapsulated — styles don't leak out or in.
+                  </div>
+                </div>
+                <div class="as-cascade-arrow" aria-hidden="true">
+                  <span class="as-cascade-arrow-icon">
+                    <i class="fa-solid fa-arrow-down"></i>
+                  </span>
+                </div>
+                <div class="as-cascade-node as-cascade-node--slotted">
+                  <div class="as-cascade-node-label" style="color: var(--wc-green);">
+                    <i class="fa-solid fa-file-lines" aria-hidden="true"></i> Slotted / Light DOM Content
+                  </div>
+                  <div class="as-cascade-node-desc">
+                    <code>&lt;p&gt;</code>, <code>&lt;h2&gt;</code>, Drupal field values —
+                    now styled by the document-level adopted stylesheet.
+                    No hacks required.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Explanation cards -->
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+              <div class="as-card">
+                <h4 style="font-size: 0.9375rem; font-weight: 700; margin: 0 0 var(--space-2); color: var(--wc-cyan); display: flex; align-items: center; gap: var(--space-2);">
+                  <i class="fa-solid fa-1" aria-hidden="true"></i>
+                  Component connects to DOM
+                </h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0; line-height: 1.65;">
+                  <code>hostConnected()</code> fires. The controller checks
+                  <code>AdoptedStylesheetsController._cache</code> for the CSS string.
+                  If found, reuses the existing <code>CSSStyleSheet</code>. If not, creates and parses one.
+                </p>
+              </div>
+              <div class="as-card">
+                <h4 style="font-size: 0.9375rem; font-weight: 700; margin: 0 0 var(--space-2); color: var(--wc-accent); display: flex; align-items: center; gap: var(--space-2);">
+                  <i class="fa-solid fa-2" aria-hidden="true"></i>
+                  Stylesheet adopted on document
+                </h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0; line-height: 1.65;">
+                  If the sheet isn't already in <code>document.adoptedStyleSheets</code>, it's appended.
+                  A reference count for <code>cssText + rootId</code> is incremented.
+                  Multiple components sharing the same CSS pay zero extra cost.
+                </p>
+              </div>
+              <div class="as-card">
+                <h4 style="font-size: 0.9375rem; font-weight: 700; margin: 0 0 var(--space-2); color: var(--wc-green); display: flex; align-items: center; gap: var(--space-2);">
+                  <i class="fa-solid fa-3" aria-hidden="true"></i>
+                  Component disconnects — cleanup guaranteed
+                </h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0; line-height: 1.65;">
+                  <code>hostDisconnected()</code> decrements the count. Only when count reaches zero
+                  is the sheet removed. 10 cards on a page, remove 9 — styles persist for the last one.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 5 — FRAMEWORK EXAMPLES
+           ================================================ -->
+      <section class="as-section as-section--mid" id="s-frameworks" aria-labelledby="frameworks-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-electric">Section 5</span>
+            <h2 class="as-section-title" id="frameworks-title">
+              Framework <span class="gradient-text">Examples</span>
+            </h2>
+            <p class="as-section-desc">
+              <code class="as-inline-code">AdoptedStylesheetsController</code> works with any
+              framework or no framework — because it is a standard Lit ReactiveController
+              operating on standard browser APIs.
+            </p>
+          </header>
+
+          <div class="as-tabs" role="tablist" aria-label="Framework examples">
+            <button class="as-tab active" role="tab" aria-selected="true" aria-controls="tab-drupal" id="tab-btn-drupal">Drupal / Twig</button>
+            <button class="as-tab" role="tab" aria-selected="false" aria-controls="tab-react" id="tab-btn-react">React</button>
+            <button class="as-tab" role="tab" aria-selected="false" aria-controls="tab-vue" id="tab-btn-vue">Vue</button>
+            <button class="as-tab" role="tab" aria-selected="false" aria-controls="tab-vanilla" id="tab-btn-vanilla">Vanilla JS</button>
+          </div>
+
+          <!-- Drupal -->
+          <div class="as-tab-panel active" id="tab-drupal" role="tabpanel" aria-labelledby="tab-btn-drupal">
+            <div class="as-grid-2">
+              <div>
+                <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 var(--space-3); color: var(--text-primary);">
+                  Twig template — no changes needed
+                </h3>
+                <div class="as-code-window" role="region" aria-label="Drupal Twig template example">
+                  <div class="as-code-window-header">
+                    <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                    <span class="as-code-filename">card.html.twig</span>
+                  </div>
+                  <pre class="as-code"><code><span class="c-comment">{# Drupal field values go straight into the slot #}</span>
+<span class="c-tag">&lt;hx-card&gt;</span>
+  {{ content.field_title }}
+  {{ content.body }}
+  {{ content.field_tags }}
+<span class="c-tag">&lt;/hx-card&gt;</span>
+
+<span class="c-comment">{# The controller in hx-card handles all styling #}</span>
+<span class="c-comment">{# No extra classes, no wrapper divs needed #}</span></code></pre>
+                </div>
+              </div>
+              <div>
+                <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 var(--space-3); color: var(--text-primary);">
+                  HELiX library inclusion
+                </h3>
+                <div class="as-code-window" role="region" aria-label="Drupal libraries.yml example">
+                  <div class="as-code-window-header">
+                    <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                    <span class="as-code-filename">my_theme.libraries.yml</span>
+                  </div>
+                  <pre class="as-code"><code><span class="c-prop">helix-components</span>:
+  <span class="c-prop">js</span>:
+    <span class="c-comment"># Per-component bundle includes the controller</span>
+    <span class="c-attr">dist/components/hx-card/index.js</span>:
+      <span class="c-prop">attributes</span>:
+        <span class="c-prop">type</span>: <span class="c-value">module</span>
+  <span class="c-prop">dependencies</span>:
+    - <span class="c-value">core/drupal</span></code></pre>
+                </div>
+              </div>
+            </div>
+            <div class="as-callout" style="margin-top: var(--space-4);">
+              <strong>Drupal note:</strong> Every HELiX component that uses slots ships with
+              <code>AdoptedStylesheetsController</code> pre-configured. Drupal integrators do
+              not need to write any controller code — it runs automatically when the component
+              mounts.
+            </div>
+          </div>
+
+          <!-- React -->
+          <div class="as-tab-panel" id="tab-react" role="tabpanel" aria-labelledby="tab-btn-react">
+            <div class="as-code-window" role="region" aria-label="React usage example">
+              <div class="as-code-window-header">
+                <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <span class="as-code-filename">PatientCard.tsx</span>
+              </div>
+              <pre class="as-code"><code><span class="c-comment">// React — use HELiX components directly as JSX</span>
+<span class="c-comment">// The controller runs inside the web component automatically</span>
+<span class="c-keyword">import</span> <span class="c-string">'@helixui/library/components/hx-card/index.js'</span>;
+
+<span class="c-keyword">export function</span> <span class="c-call">PatientCard</span>({ patient }: { patient: <span class="c-type">Patient</span> }) {
+  <span class="c-keyword">return</span> (
+    <span class="c-tag">&lt;hx-card&gt;</span>
+      <span class="c-comment">{/* All of this slotted JSX is styled by the controller */}</span>
+      <span class="c-tag">&lt;h2&gt;</span>{patient.name}<span class="c-tag">&lt;/h2&gt;</span>
+      <span class="c-tag">&lt;p&gt;</span>{patient.diagnosis}<span class="c-tag">&lt;/p&gt;</span>
+      <span class="c-tag">&lt;p&gt;&lt;strong&gt;</span>DOB:<span class="c-tag">&lt;/strong&gt;</span> {patient.dob}<span class="c-tag">&lt;/p&gt;</span>
+    <span class="c-tag">&lt;/hx-card&gt;</span>
+  );
+}</code></pre>
+            </div>
+            <div class="as-callout" style="margin-top: var(--space-4);">
+              <strong>React note:</strong> React 19 ships with full custom element support.
+              For React 18, use <code>@lit/react</code> wrappers. Either way, the controller
+              behavior is identical — it runs inside the web component's lifecycle, invisible to React.
+            </div>
+          </div>
+
+          <!-- Vue -->
+          <div class="as-tab-panel" id="tab-vue" role="tabpanel" aria-labelledby="tab-btn-vue">
+            <div class="as-code-window" role="region" aria-label="Vue usage example">
+              <div class="as-code-window-header">
+                <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <span class="as-code-filename">PatientCard.vue</span>
+              </div>
+              <pre class="as-code"><code><span class="c-tag">&lt;script setup lang="ts"&gt;</span>
+<span class="c-keyword">import</span> <span class="c-string">'@helixui/library/components/hx-card/index.js'</span>;
+
+<span class="c-keyword">const</span> { patient } = defineProps<span class="c-type">&lt;{ patient: Patient }&gt;</span>();
+<span class="c-tag">&lt;/script&gt;</span>
+
+<span class="c-tag">&lt;template&gt;</span>
+  <span class="c-comment">&lt;!-- Vue resolves custom elements automatically --&gt;</span>
+  <span class="c-tag">&lt;hx-card&gt;</span>
+    <span class="c-comment">&lt;!-- Controller styles reach all of this --&gt;</span>
+    <span class="c-tag">&lt;h2&gt;</span>{{ patient.name }}<span class="c-tag">&lt;/h2&gt;</span>
+    <span class="c-tag">&lt;p&gt;</span>{{ patient.diagnosis }}<span class="c-tag">&lt;/p&gt;</span>
+    <span class="c-tag">&lt;p&gt;&lt;strong&gt;</span>DOB:<span class="c-tag">&lt;/strong&gt;</span> {{ patient.dob }}<span class="c-tag">&lt;/p&gt;</span>
+  <span class="c-tag">&lt;/hx-card&gt;</span>
+<span class="c-tag">&lt;/template&gt;</span></code></pre>
+            </div>
+            <div class="as-callout" style="margin-top: var(--space-4);">
+              <strong>Vue note:</strong> Add <code>compilerOptions: &#123; isCustomElement: (tag) => tag.startsWith('hx-') &#125;</code>
+              to your Vite config to suppress unknown element warnings.
+              The controller behavior requires no Vue-specific configuration.
+            </div>
+          </div>
+
+          <!-- Vanilla -->
+          <div class="as-tab-panel" id="tab-vanilla" role="tabpanel" aria-labelledby="tab-btn-vanilla">
+            <div class="as-code-window" role="region" aria-label="Vanilla JS usage example">
+              <div class="as-code-window-header">
+                <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <span class="as-code-filename">index.html</span>
+              </div>
+              <pre class="as-code"><code><span class="c-comment">&lt;!-- Load via module script or CDN --&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">type="module"</span>
+  <span class="c-attr">src</span>=<span class="c-string">"https://cdn.helixui.dev/components/hx-card.js"</span>&gt;
+<span class="c-tag">&lt;/script&gt;</span>
+
+<span class="c-comment">&lt;!-- Use in HTML — controller activates on connect --&gt;</span>
+<span class="c-tag">&lt;hx-card&gt;</span>
+  <span class="c-tag">&lt;h2&gt;</span>Patient Summary<span class="c-tag">&lt;/h2&gt;</span>
+  <span class="c-tag">&lt;p&gt;</span>Slotted content styled automatically.<span class="c-tag">&lt;/p&gt;</span>
+  <span class="c-tag">&lt;p&gt;</span>
+    No classes, no JavaScript, no configuration.
+    Just slot your content — HELiX handles the rest.
+  <span class="c-tag">&lt;/p&gt;</span>
+<span class="c-tag">&lt;/hx-card&gt;</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 6 — PERFORMANCE
+           ================================================ -->
+      <section class="as-section as-section--dark" id="s-perf" aria-labelledby="perf-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-amber">Section 6</span>
+            <h2 class="as-section-title" id="perf-title">
+              Performance <span class="gradient-text--amber">Characteristics</span>
+            </h2>
+            <p class="as-section-desc">
+              The controller is engineered for enterprise scale. Every design choice
+              prioritizes minimal overhead at hundreds-to-thousands of component instances.
+            </p>
+          </header>
+
+          <div class="as-perf-grid" role="list" aria-label="Performance statistics">
+            <div class="as-perf-stat" role="listitem">
+              <div class="as-perf-stat-value gradient-text">1×</div>
+              <div class="as-perf-stat-label">CSS parsed per unique string, regardless of instance count</div>
+            </div>
+            <div class="as-perf-stat" role="listitem">
+              <div class="as-perf-stat-value" style="color: var(--wc-green);">0</div>
+              <div class="as-perf-stat-label">Duplicate <code>CSSStyleSheet</code> objects created for identical CSS</div>
+            </div>
+            <div class="as-perf-stat" role="listitem">
+              <div class="as-perf-stat-value" style="color: var(--wc-amber);">O(n)</div>
+              <div class="as-perf-stat-label">Map lookup per connect/disconnect — constant time cache check</div>
+            </div>
+          </div>
+
+          <div class="as-mechanic-grid" role="list" aria-label="Internal mechanics">
+            <div class="as-mechanic-card" role="listitem">
+              <h4 style="color: var(--wc-cyan);">
+                <i class="fa-solid fa-database" aria-hidden="true"></i>
+                Static CSS Cache
+              </h4>
+              <p>
+                <code>AdoptedStylesheetsController._cache</code> is a static
+                <code>Map&lt;string, CSSStyleSheet&gt;</code> keyed by CSS text.
+                The first component to use a given CSS string pays the parse cost.
+                Every subsequent consumer — any component type, any instance count — gets
+                the same object reference. Zero re-parsing.
+              </p>
+            </div>
+            <div class="as-mechanic-card" role="listitem">
+              <h4 style="color: var(--wc-accent);">
+                <i class="fa-solid fa-calculator" aria-hidden="true"></i>
+                Reference Counting
+              </h4>
+              <p>
+                <code>AdoptedStylesheetsController._refCounts</code> is a static
+                <code>Map&lt;string, number&gt;</code>. The key is
+                <code>cssText + "__" + rootId</code>. Incremented on connect,
+                decremented on disconnect. The stylesheet is removed from
+                <code>adoptedStyleSheets</code> only at count zero.
+              </p>
+            </div>
+            <div class="as-mechanic-card" role="listitem">
+              <h4 style="color: var(--wc-green);">
+                <i class="fa-solid fa-link" aria-hidden="true"></i>
+                WeakMap Root IDs
+              </h4>
+              <p>
+                <code>AdoptedStylesheetsController._rootIds</code> is a static
+                <code>WeakMap&lt;Document | ShadowRoot, number&gt;</code>.
+                Each root gets a stable integer ID on first access. This prevents
+                reference counts from bleeding between the document and shadow roots,
+                or between different shadow roots.
+              </p>
+            </div>
+            <div class="as-mechanic-card" role="listitem">
+              <h4 style="color: var(--wc-amber);">
+                <i class="fa-solid fa-shield" aria-hidden="true"></i>
+                Safe Deduplication Check
+              </h4>
+              <p>
+                Before appending a sheet, the controller checks
+                <code>root.adoptedStyleSheets.includes(sheet)</code>.
+                If another instance already added the same sheet to the same root,
+                it is not added again. This handles edge cases where multiple
+                components of the same type connect simultaneously.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 7 — MIGRATION GUIDE
+           ================================================ -->
+      <section class="as-section as-section--mid" id="s-migration" aria-labelledby="migration-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-pink">Section 7</span>
+            <h2 class="as-section-title" id="migration-title">
+              Migration <span class="gradient-text">Guide</span>
+            </h2>
+            <p class="as-section-desc">
+              Already have a HELiX component with broken slot styles? Here is the exact
+              remediation — three lines and you are done.
+            </p>
+          </header>
+
+          <div class="as-problem-callout">
+            <span class="as-problem-callout-icon" aria-hidden="true">&#128680;</span>
+            <div class="as-problem-callout-body">
+              <h3>Symptoms of the missing controller</h3>
+              <p>
+                Slotted content renders with browser default styles (Times New Roman, raw blue links,
+                no spacing). Styles appear correctly in Storybook but break in Drupal or production.
+                <code>::slotted()</code> rules only apply to direct children — nested elements are unstyled.
+              </p>
+            </div>
+          </div>
+
+          <div class="as-grid-2" style="margin-bottom: var(--space-8);">
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 var(--space-4); color: var(--text-primary);">
+                3 steps to fix broken slot styles
+              </h3>
+              <div class="as-migration-steps">
+                <div class="as-migration-step">
+                  <div class="as-migration-step-num">1</div>
+                  <div class="as-migration-step-body">
+                    <h4>Import the controller</h4>
+                    <p>Add the import at the top of your component file.</p>
+                    <code>import &#123; AdoptedStylesheetsController &#125; from '../controllers/adopted-stylesheets.js';</code>
+                  </div>
+                </div>
+                <div class="as-migration-step">
+                  <div class="as-migration-step-num">2</div>
+                  <div class="as-migration-step-body">
+                    <h4>Declare a private controller field</h4>
+                    <p>
+                      Write the CSS that should reach slotted content. Use your component tag name as
+                      the selector scope so styles don't leak globally.
+                    </p>
+                    <code>private _slotStyles = new AdoptedStylesheetsController(this, `hx-card p &#123; ... &#125;`);</code>
+                  </div>
+                </div>
+                <div class="as-migration-step">
+                  <div class="as-migration-step-num">3</div>
+                  <div class="as-migration-step-body">
+                    <h4>Verify and ship</h4>
+                    <p>
+                      Run <code>pnpm run type-check</code> — zero errors expected.
+                      Test in Drupal or your consumer. Slotted content now receives design tokens.
+                    </p>
+                    <code>pnpm run test:smart</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="as-code-window" role="region" aria-label="Migration code example">
+                <div class="as-code-window-header">
+                  <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <span class="as-code-filename">hx-article.ts — before and after</span>
+                </div>
+                <pre class="as-code"><code><span class="c-comment">// ❌ BEFORE — slot styles are broken</span>
+<span class="c-keyword">export class</span> <span class="c-type">HxArticle</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> {
+  <span class="c-keyword">static override</span> styles = css<span class="c-string">`
+    :host { display: block; }
+    /* these never reach slotted content: */
+    ::slotted(p) { color: red; }
+  `</span>;
+
+  <span class="c-call">render</span>() {
+    <span class="c-keyword">return</span> html<span class="c-string">`&lt;slot&gt;&lt;/slot&gt;`</span>;
+  }
+}
+
+<span class="c-comment">// ✅ AFTER — 3 additions, everything styled</span>
+<span class="c-keyword">import</span> { <span class="c-type">AdoptedStylesheetsController</span> }  <span class="c-comment">// +1</span>
+  <span class="c-keyword">from</span> <span class="c-string">'../controllers/adopted-stylesheets.js'</span>;
+
+<span class="c-keyword">export class</span> <span class="c-type">HxArticle</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> {
+  <span class="c-keyword">static override</span> styles = css<span class="c-string">`
+    :host { display: block; }
+  `</span>;
+
+  <span class="c-keyword">private</span> _slotStyles =                       <span class="c-comment">// +2</span>
+    <span class="c-keyword">new</span> <span class="c-type">AdoptedStylesheetsController</span>(<span class="c-call">this</span>, <span class="c-string">`
+      hx-article p   { color: var(--hx-text-body);    }
+      hx-article h2  { color: var(--hx-text-heading); }
+      hx-article a   { color: var(--hx-color-primary);}
+      hx-article ul  { padding-left: 1.5rem;           }
+    `</span>);                                        <span class="c-comment">// +3</span>
+
+  <span class="c-call">render</span>() {
+    <span class="c-keyword">return</span> html<span class="c-string">`&lt;slot&gt;&lt;/slot&gt;`</span>;
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scope guidance -->
+          <div class="as-card as-card--highlight">
+            <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 var(--space-3); color: var(--wc-cyan); display: flex; align-items: center; gap: var(--space-2);">
+              <i class="fa-solid fa-bullseye" aria-hidden="true"></i>
+              Scoping your CSS — the golden rule
+            </h3>
+            <p style="font-size: 0.9375rem; color: var(--text-secondary); margin: 0 0 var(--space-3); line-height: 1.65;">
+              Because the stylesheet is injected into <code>document</code>, it applies to the
+              entire page. Always prefix selectors with your component's tag name to prevent
+              leaking to other elements.
+            </p>
+            <div class="as-grid-2">
+              <div class="as-card as-card--success" style="padding: var(--space-4);">
+                <p style="font-size: 0.8125rem; font-weight: 700; color: var(--wc-green); margin: 0 0 var(--space-2);">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i> Correct — scoped
+                </p>
+                <pre class="as-code" style="font-size: 0.8125rem;"><code>new <span class="c-type">AdoptedStylesheetsController</span>(<span class="c-call">this</span>, <span class="c-string">`
+  hx-card p &#123; color: ...; &#125;
+  hx-card h2 &#123; font-size: ...; &#125;
+`</span>);</code></pre>
+              </div>
+              <div class="as-card as-card--danger" style="padding: var(--space-4);">
+                <p style="font-size: 0.8125rem; font-weight: 700; color: var(--wc-red); margin: 0 0 var(--space-2);">
+                  <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Wrong — unscoped global leak
+                </p>
+                <pre class="as-code" style="font-size: 0.8125rem;"><code>new <span class="c-type">AdoptedStylesheetsController</span>(<span class="c-call">this</span>, <span class="c-string">`
+  p &#123; color: ...; &#125;
+  h2 &#123; font-size: ...; &#125;
+`</span>);</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================
+           SECTION 8 — COMPARISON
+           ================================================ -->
+      <section class="as-section as-section--dark" id="s-compare" aria-labelledby="compare-title">
+        <div class="as-section-inner">
+          <header class="as-section-header">
+            <span class="as-section-label label-teal">Section 8</span>
+            <h2 class="as-section-title" id="compare-title">
+              <span class="gradient-text--green">Why Not</span> Something Else?
+            </h2>
+            <p class="as-section-desc">
+              There are several other approaches teams reach for when Shadow DOM styles don't
+              reach their slotted content. Here's why
+              <code class="as-inline-code">AdoptedStylesheetsController</code> wins every time.
+            </p>
+          </header>
+
+          <div class="as-code-window" role="region" aria-label="Comparison table">
+            <div class="as-code-window-header">
+              <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span class="as-code-filename">Approach comparison — styling slotted content</span>
+            </div>
+            <div style="padding: 0; overflow-x: auto;">
+              <table class="as-compare-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Approach</th>
+                    <th scope="col">Reaches nested slots</th>
+                    <th scope="col">Drupal-safe</th>
+                    <th scope="col">No global leak</th>
+                    <th scope="col">Auto-cleanup</th>
+                    <th scope="col">Deduplication</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="as-compare-winner">
+                    <td>AdoptedStylesheetsController</td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes with scoping"><i class="fa-solid fa-circle-check"></i></span> <small>(with tag prefix)</small></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                  </tr>
+                  <tr>
+                    <td><code>::slotted()</code> selector</td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span> <small>(direct children only)</small></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                  </tr>
+                  <tr>
+                    <td>Global CSS stylesheet</td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span> <small>(styles all elements)</small></td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                  </tr>
+                  <tr>
+                    <td>Inline styles on slot</td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span></td>
+                  </tr>
+                  <tr>
+                    <td>CSS Parts (<code>::part()</code>)</td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span> <small>(shadow DOM internals only)</small></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                  </tr>
+                  <tr>
+                    <td>CSS-in-JS (Emotion, styled-components)</td>
+                    <td><span class="as-icon-yes" aria-label="Yes"><i class="fa-solid fa-circle-check"></i></span></td>
+                    <td><span class="as-icon-no" aria-label="No"><i class="fa-solid fa-circle-xmark"></i></span> <small>(runtime JS dependency)</small></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                    <td><span class="as-icon-partial" aria-label="Partial"><i class="fa-solid fa-circle-half-stroke"></i></span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="as-divider"></div>
+
+          <!-- Final CTA -->
+          <div style="text-align: center;">
+            <h3 style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 var(--space-4);">
+              Ready to fix your slot styles?
+            </h3>
+            <p style="font-size: 1rem; color: var(--text-secondary); margin: 0 0 var(--space-6); line-height: 1.7;">
+              Three lines of code. No breaking changes. Fully spec-compliant.
+              The trip-planner team would have saved a week.
+            </p>
+            <div class="as-cta-group">
+              <a class="as-cta-btn" href="/docs/components/styling/constructable-stylesheets">
+                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                Read the full API docs
+              </a>
+              <a class="as-ghost-btn" href="#s-migration">
+                <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                Back to Migration Guide
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============================================================
+       UTILITY NAV (back to top + home)
+       ============================================================ -->
+  <nav class="as-util-nav" aria-label="Page utilities">
+    <button
+      class="as-util-btn as-util-btn--top"
+      id="as-back-to-top"
+      aria-label="Back to top"
+      title="Back to top"
+    >
+      <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+    </button>
+    <a
+      class="as-util-btn"
+      href="/"
+      aria-label="Back to home"
+      title="Back to home"
+    >
+      <i class="fa-solid fa-house" aria-hidden="true"></i>
+    </a>
+  </nav>
+
+  <script is:inline>
+    (function () {
+      /* ---- Back-to-top button ---- */
+      var topBtn = document.getElementById('as-back-to-top');
+      function checkScroll() {
+        if (window.scrollY > window.innerHeight * 0.4) {
+          topBtn.classList.add('visible');
+        } else {
+          topBtn.classList.remove('visible');
+        }
+      }
+      window.addEventListener('scroll', checkScroll, { passive: true });
+      checkScroll();
+      topBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      /* ---- Section dot nav ---- */
+      var sectionIds = [
+        's-hero', 's-problem', 's-solution', 's-demos',
+        's-how', 's-frameworks', 's-perf', 's-migration', 's-compare'
+      ];
+      var dots = document.querySelectorAll('.as-nav-dot');
+
+      function updateDots() {
+        var scrollY = window.scrollY + window.innerHeight * 0.35;
+        var active = 0;
+        for (var i = 0; i < sectionIds.length; i++) {
+          var el = document.getElementById(sectionIds[i]);
+          if (el && el.offsetTop <= scrollY) {
+            active = i;
+          }
+        }
+        dots.forEach(function (d, idx) {
+          d.classList.toggle('active', idx === active);
+        });
+      }
+
+      window.addEventListener('scroll', updateDots, { passive: true });
+      updateDots();
+
+      dots.forEach(function (dot, idx) {
+        dot.addEventListener('click', function () {
+          var target = document.getElementById(sectionIds[idx]);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+
+      /* ---- Framework tabs ---- */
+      var tabBtns = document.querySelectorAll('.as-tab');
+      var tabPanels = document.querySelectorAll('.as-tab-panel');
+
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('aria-controls');
+          tabBtns.forEach(function (b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          tabPanels.forEach(function (p) {
+            p.classList.remove('active');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+          var panel = document.getElementById(targetId);
+          if (panel) panel.classList.add('active');
+        });
+      });
+
+      /* ---- Controller toggle demo ---- */
+      var toggleBtn = document.getElementById('as-toggle-btn');
+      var toggleIcon = document.getElementById('as-toggle-icon');
+      var toggleStatus = document.getElementById('as-toggle-status');
+      var liveStyled = document.querySelector('.as-live-styled');
+      var isOn = true;
+
+      var originalStyles = {
+        fontFamily: '',
+        color: '',
+        background: '',
+        border: '',
+        borderRadius: '',
+        lineHeight: ''
+      };
+
+      if (toggleBtn && liveStyled) {
+        toggleBtn.addEventListener('click', function () {
+          isOn = !isOn;
+          toggleBtn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+
+          if (isOn) {
+            toggleIcon.className = 'fa-solid fa-toggle-on';
+            toggleBtn.childNodes[toggleBtn.childNodes.length - 1].textContent = ' Controller: ON';
+            toggleStatus.style.color = 'var(--wc-green)';
+            toggleStatus.innerHTML = '<i class="fa-solid fa-circle" style="font-size:0.5rem;" aria-hidden="true"></i> Styles active';
+            liveStyled.style.removeProperty('font-family');
+            liveStyled.style.removeProperty('color');
+            liveStyled.style.removeProperty('background');
+            liveStyled.style.removeProperty('border');
+            liveStyled.style.removeProperty('border-radius');
+            liveStyled.style.removeProperty('line-height');
+          } else {
+            toggleIcon.className = 'fa-solid fa-toggle-off';
+            toggleBtn.childNodes[toggleBtn.childNodes.length - 1].textContent = ' Controller: OFF';
+            toggleStatus.style.color = 'var(--wc-red)';
+            toggleStatus.innerHTML = '<i class="fa-solid fa-circle" style="font-size:0.5rem;" aria-hidden="true"></i> Styles removed';
+            liveStyled.style.fontFamily = "'Times New Roman', serif";
+            liveStyled.style.color = '#000';
+            liveStyled.style.background = '#fff';
+            liveStyled.style.border = '1px solid #ccc';
+            liveStyled.style.borderRadius = '0';
+            liveStyled.style.lineHeight = '1.4';
+          }
+        });
+      }
+    })();
+  </script>
+</ShowcaseLayout>

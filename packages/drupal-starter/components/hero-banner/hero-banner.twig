@@ -1,0 +1,43 @@
+{#
+  Hero Banner SDC
+  Composes: hx-text, hx-image, hx-button
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-button') }}
+
+{% set alignment = alignment|default('center') %}
+{% set overlay = overlay is not same as(false) %}
+
+<section{{ attributes.addClass('hero-banner', 'hero-banner--align-' ~ alignment, overlay ? 'hero-banner--overlay' : '') }}>
+  {% if image_url %}
+    <hx-image
+      src="{{ image_url }}"
+      alt="{{ image_alt|default('') }}"
+      class="hero-banner__image"
+      loading="eager"
+    ></hx-image>
+  {% endif %}
+
+  <div class="hero-banner__content">
+    {% if title %}
+      <hx-text variant="display" tag="h1" class="hero-banner__title">
+        {{ title }}
+      </hx-text>
+    {% endif %}
+
+    {% if subtitle %}
+      <hx-text variant="lead" tag="p" class="hero-banner__subtitle">
+        {{ subtitle }}
+      </hx-text>
+    {% endif %}
+
+    {% if cta_text and cta_url %}
+      <div class="hero-banner__cta">
+        <hx-button variant="primary" href="{{ cta_url }}" size="lg">
+          {{ cta_text }}
+        </hx-button>
+      </div>
+    {% endif %}
+  </div>
+</section>

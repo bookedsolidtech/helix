@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Mobile Drawer
+description: 'Responsive mobile navigation drawer composing hx-drawer and hx-icon-button. Provides an off-canvas panel with configurable position and breakpoint.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    position:
+      type: string
+      title: Position
+      description: 'Which side the drawer opens from.'
+      enum:
+        - left
+        - right
+      default: 'left'
+    breakpoint:
+      type: string
+      title: Breakpoint
+      description: 'CSS media query breakpoint at which the drawer becomes visible. Below this width the drawer is used; above it the drawer is hidden.'
+      default: '768px'
+slots:
+  content:
+    title: Drawer Content
+    description: 'Content rendered inside the drawer panel (typically navigation links).'
+  trigger:
+    title: Custom Trigger
+    description: 'Override the default hamburger menu trigger button.'

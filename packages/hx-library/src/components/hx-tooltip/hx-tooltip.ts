@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
-import { computePosition, flip, shift, offset, arrow, type Placement } from '@floating-ui/dom';
+import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
 let _tooltipCounter = 0;
@@ -58,7 +58,19 @@ export class HelixTooltip extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: Placement = 'top';
+  placement:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end' = 'top';
 
   /**
    * Delay in milliseconds before the tooltip is shown.
@@ -110,6 +122,11 @@ export class HelixTooltip extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('keydown', this._handleKeydown);
+    // Re-run ARIA setup on reconnection (firstUpdated does not re-run).
+    // hasUpdated is true after the first update cycle completes.
+    if (this.hasUpdated) {
+      this._setupTriggerAria();
+    }
   }
 
   override disconnectedCallback(): void {
@@ -226,10 +243,13 @@ export class HelixTooltip extends LitElement {
 
     const arrowData = middlewareData.arrow;
     const basePlacement = placement.split('-')[0] ?? 'top';
-    const staticSide =
-      ({ top: 'bottom', right: 'left', bottom: 'top', left: 'right' } as Record<string, string>)[
-        basePlacement
-      ] ?? 'bottom';
+    const oppositeSide: Record<string, string> = {
+      top: 'bottom',
+      right: 'left',
+      bottom: 'top',
+      left: 'right',
+    };
+    const staticSide = oppositeSide[basePlacement] ?? 'bottom';
 
     // Offset is derived from the arrow element's actual size so that custom
     // --hx-tooltip-arrow-size values position the arrow correctly.

@@ -530,18 +530,18 @@ export class HelixColorPicker extends LitElement {
     this._updateValidity();
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
 
-  /** Called by the browser when the form is reset. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '#000000';
     this._internals.setFormValue(null);
   }
 
-  /** Called by the browser to restore form state on navigation. */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -615,6 +615,14 @@ export class HelixColorPicker extends LitElement {
     if (typeof document !== 'undefined') {
       document.addEventListener('click', this._boundDocumentClick, true);
     }
+    // WCAG 2.4.3: move focus into the panel after it renders so keyboard/AT
+    // users land on the first interactive element rather than staying on the trigger.
+    void this.updateComplete.then(() => {
+      const panel = this.shadowRoot?.querySelector<HTMLElement>('.panel');
+      // Prefer the color value input; fall back to the panel itself (tabindex="-1").
+      const firstFocusable = panel?.querySelector<HTMLElement>('input, button') ?? panel;
+      firstFocusable?.focus();
+    });
   }
 
   /** @internal */
@@ -1100,7 +1108,7 @@ export class HelixColorPicker extends LitElement {
         type="button"
         class="trigger"
         aria-label=${this.labelTrigger(this._inputValue)}
-        aria-expanded=${this._open ? 'true' : nothing}
+        aria-expanded=${this._open ? 'true' : 'false'}
         ?disabled=${this.disabled}
         style=${styleMap({ '--_preview-color': previewColor })}
         @click=${this._handleTriggerClick}

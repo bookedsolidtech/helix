@@ -137,7 +137,7 @@ export const helixBadgeStyles = css`
 
   .badge--pulse {
     animation: hx-badge-pulse var(--hx-badge-pulse-duration, var(--hx-duration-slow, 2s))
-      var(--hx-badge-pulse-easing, var(--hx-ease-in-out, ease-in-out)) infinite;
+      var(--hx-badge-pulse-easing, var(--hx-easing-in-out, ease-in-out)) infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -161,6 +161,9 @@ export const helixBadgeStyles = css`
     opacity: 0.7;
     border-radius: var(--hx-border-radius-sm, 0.125rem);
     line-height: 0;
+    /* WCAG 2.5.5: minimum 44×44px touch target */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .badge__remove-button:hover {
