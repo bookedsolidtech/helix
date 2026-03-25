@@ -13,6 +13,10 @@ export { HelixElement } from './base/index.js';
 export { createIdCounter, resetIdCounter } from './base/index.js';
 export { mergeTokenStyles } from './base/index.js';
 
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+export { FocusMixin } from './mixins/index.js';
+export type { FocusMixinInterface } from './mixins/index.js';
+
 // ─── Components ──────────────────────────────────────────────────────────────
 export { HelixAccordion } from './components/hx-accordion/index.js';
 export { HelixAccordionItem } from './components/hx-accordion/index.js';

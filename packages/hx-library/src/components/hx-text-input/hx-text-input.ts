@@ -5,6 +5,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
@@ -48,7 +49,7 @@ const _nextTextInputId = createIdCounter('hx-text-input');
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
 @customElement('hx-text-input')
-export class HelixTextInput extends HelixElement {
+export class HelixTextInput extends FocusMixin(HelixElement) {
   static override styles = [tokenStyles, helixTextInputStyles];
 
   // ─── Form Association ───
@@ -182,6 +183,16 @@ export class HelixTextInput extends HelixElement {
   /** @internal */
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
+
+  // ─── FocusMixin integration ───
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected override get _focusableNode(): HTMLElement | null {
+    return this._input ?? null;
+  }
 
   // ─── Slot Tracking ───
 
@@ -367,11 +378,6 @@ export class HelixTextInput extends HelixElement {
   }
 
   // ─── Public Methods ───
-
-  /** Moves focus to the input element. */
-  override focus(options?: FocusOptions): void {
-    this._input?.focus(options);
-  }
 
   /** Selects all text in the input. */
   select(): void {
