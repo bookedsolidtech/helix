@@ -67,7 +67,13 @@ export class HelixRadio extends LitElement {
     super.connectedCallback();
     this.setAttribute('role', 'radio');
     this.setAttribute('aria-checked', String(this.checked));
-    this.setAttribute('aria-disabled', String(this.disabled));
+    // WCAG 4.1.2: omit aria-disabled entirely when not disabled. Setting
+    // aria-disabled="false" is verbose and unnecessary — omission is preferred.
+    if (this.disabled) {
+      this.setAttribute('aria-disabled', 'true');
+    } else {
+      this.removeAttribute('aria-disabled');
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -76,7 +82,11 @@ export class HelixRadio extends LitElement {
       this.setAttribute('aria-checked', String(this.checked));
     }
     if (changedProperties.has('disabled')) {
-      this.setAttribute('aria-disabled', String(this.disabled));
+      if (this.disabled) {
+        this.setAttribute('aria-disabled', 'true');
+      } else {
+        this.removeAttribute('aria-disabled');
+      }
     }
   }
 
