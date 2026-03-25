@@ -31,7 +31,7 @@ export const HxNumberInput = createComponent({
   react: React,
   events: {
     onHxChange: 'hx-change',
-    onHxInput: 'hx-input',
+    onHxInput: 'hx-input'
   },
   displayName: 'HxNumberInput',
 });

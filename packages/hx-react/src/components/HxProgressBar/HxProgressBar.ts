@@ -28,7 +28,7 @@ export const HxProgressBar = createComponent({
   elementClass: HelixProgressBar,
   react: React,
   events: {
-    onHxComplete: 'hx-complete',
+    onHxComplete: 'hx-complete'
   },
   displayName: 'HxProgressBar',
 });
