@@ -138,18 +138,8 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-link": {
-      "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-list": {
       "reason": "Skeleton test only — no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-menu": {
-      "reason": "Coverage well below 80% threshold (23% lines, 19% branches). Requires significant test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -160,16 +150,6 @@
     },
     "hx-nav": {
       "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-number-input": {
-      "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-overflow-menu": {
-      "reason": "Branches slightly below 80% threshold (79%). Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
