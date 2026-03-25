@@ -651,4 +651,111 @@ describe('hx-drawer', () => {
       expect(closeBtn?.getAttribute('aria-label')).toBe('Cerrar panel');
     });
   });
+
+  // ─── noFooter property (1) ───
+
+  describe('noFooter property', () => {
+    it('no-footer hides the footer region', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer no-footer><button slot="footer">Submit</button></hx-drawer>',
+      );
+      await el.updateComplete;
+      const footer = shadowQuery(el, '[part="footer"]');
+      // When noFooter is true the footer element is not rendered at all
+      expect(footer).toBeNull();
+    });
+
+    it('footer region renders when no-footer is absent and footer slot has content', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><button slot="footer">Submit</button></hx-drawer>',
+      );
+      await el.updateComplete;
+      const footer = shadowQuery(el, '[part="footer"]');
+      expect(footer).toBeTruthy();
+    });
+  });
+
+  // ─── Size CSS variable ───
+
+  describe('Size CSS variable', () => {
+    it('applies --_drawer-size CSS variable for preset size "sm"', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="sm"></hx-drawer>');
+      await el.updateComplete;
+      const sizeVar = el.style.getPropertyValue('--_drawer-size');
+      expect(sizeVar).toBe('20rem');
+    });
+
+    it('applies --_drawer-size CSS variable for preset size "lg"', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="lg"></hx-drawer>');
+      await el.updateComplete;
+      const sizeVar = el.style.getPropertyValue('--_drawer-size');
+      expect(sizeVar).toBe('40rem');
+    });
+
+    it('applies --_drawer-size CSS variable for preset size "full"', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="full"></hx-drawer>');
+      await el.updateComplete;
+      const sizeVar = el.style.getPropertyValue('--_drawer-size');
+      expect(sizeVar).toBe('100%');
+    });
+
+    it('applies --_drawer-size as raw CSS value for non-preset size', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="25rem"></hx-drawer>');
+      await el.updateComplete;
+      const sizeVar = el.style.getPropertyValue('--_drawer-size');
+      expect(sizeVar).toBe('25rem');
+    });
+  });
+
+  // ─── hx-initial-focus cancelation ───
+
+  describe('hx-initial-focus cancelation', () => {
+    it('canceling hx-initial-focus prevents default focus management', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer><span slot="label">Title</span><button id="first-btn">First</button></hx-drawer>',
+      );
+
+      // Place focus on an external element
+      const externalBtn = document.createElement('button');
+      externalBtn.id = 'external';
+      document.body.appendChild(externalBtn);
+      externalBtn.focus();
+
+      el.addEventListener('hx-initial-focus', (e) => e.preventDefault());
+
+      el.open = true;
+      // Wait for the open sequence to complete (initial-focus fires after updateComplete chain)
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+
+      // Default focus was prevented — external button should still have focus
+      expect(document.activeElement).not.toBe(el.querySelector('#first-btn'));
+
+      externalBtn.remove();
+    });
+  });
+
+  // ─── show/hide idempotency ───
+
+  describe('show/hide idempotency', () => {
+    it('calling show() on an already-open drawer does not fire hx-show again', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await el.updateComplete;
+      let count = 0;
+      el.addEventListener('hx-show', () => count++);
+      el.show();
+      await el.updateComplete;
+      expect(count).toBe(0);
+    });
+
+    it('calling hide() on an already-closed drawer does not fire hx-hide', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      await el.updateComplete;
+      let count = 0;
+      el.addEventListener('hx-hide', () => count++);
+      el.hide();
+      await el.updateComplete;
+      expect(count).toBe(0);
+    });
+  });
 });

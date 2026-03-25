@@ -96,6 +96,8 @@ export class HelixProgressBar extends LitElement {
   @state() private _liveMessage = '';
   /** @internal */
   @state() private _hasLabelSlotContent = false;
+  /** @internal */
+  private _warnedAboutLabel = false;
 
   /** @internal */
   private static _counter = 0;
@@ -110,6 +112,10 @@ export class HelixProgressBar extends LitElement {
   /** @internal */
   private get _percentage(): number {
     if (this._isIndeterminate) return 0;
+    if (this.value !== null && isNaN(this.value)) {
+      devWarn('hx-progress-bar', 'Invalid value: NaN. Defaulting to 0.');
+      return 0;
+    }
     const range = this.max - this.min;
     if (range <= 0) return 0;
     const clamped = Math.max(this.min, Math.min(this.value ?? this.min, this.max));
@@ -140,7 +146,8 @@ export class HelixProgressBar extends LitElement {
       this.style.setProperty('--_value-ratio', String(Math.max(0, Math.min(1, ratio))));
     }
 
-    if (!this.label) {
+    if (!this.label && !this._warnedAboutLabel) {
+      this._warnedAboutLabel = true;
       devWarn(
         'hx-progress-bar',
         'No accessible label provided. Set the `label` attribute or use the label slot. An unlabeled progressbar violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
