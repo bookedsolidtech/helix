@@ -42,6 +42,7 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
   /** @internal */
@@ -173,12 +174,12 @@ export class HelixToggleButton extends LitElement {
     }
   }
 
-  /** Called by the browser when the associated form is reset. */
+  /** @internal */
   formResetCallback(): void {
     this.pressed = false;
   }
 
-  /** Called by the browser when restoring form state (e.g. bfcache). */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -186,7 +187,7 @@ export class HelixToggleButton extends LitElement {
     this.pressed = typeof state === 'string' && state === 'pressed';
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

@@ -1,0 +1,125 @@
+{#
+/**
+ * @file
+ * Example Twig template demonstrating HELiX web components in a Drupal form.
+ *
+ * This template shows how to compose multiple HELiX form components into a
+ * complete form that works with Drupal's form submission pipeline. Web
+ * components participate in native HTML form submission via ElementInternals,
+ * so standard <form> elements work without JavaScript glue code.
+ *
+ * Available variables:
+ * - action: Form action URL.
+ * - method: Form method (get, post). Default: post.
+ * - form_id: Hidden form ID for Drupal CSRF.
+ * - form_build_id: Hidden form build ID.
+ * - form_token: Hidden form token.
+ * - title: Form heading text.
+ * - description: Optional form description.
+ * - submit_label: Submit button label. Default: Submit.
+ * - attributes: Drupal attributes object.
+ *
+ * Usage:
+ * @code
+ *   {% include '@mytheme/templates/hx-form.html.twig' with {
+ *     action: url('entity.webform.canonical', {'webform': 'contact'}),
+ *     title: 'Patient Intake Form',
+ *     description: 'Please fill out all required fields.',
+ *     form_id: form['#id'],
+ *     form_build_id: form['form_build_id']['#value'],
+ *     form_token: form['form_token']['#default_value'],
+ *   } %}
+ * @endcode
+ */
+#}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-text-input') }}
+{{ attach_library('helixui/hx-textarea') }}
+{{ attach_library('helixui/hx-select') }}
+{{ attach_library('helixui/hx-checkbox') }}
+
+<div{{ attributes.addClass('hx-form-wrapper') }}>
+  {% if title %}
+    <hx-text variant="heading" size="lg">{{ title }}</hx-text>
+  {% endif %}
+  {% if description %}
+    <hx-text variant="body" size="md">{{ description }}</hx-text>
+  {% endif %}
+
+  <form action="{{ action }}" method="{{ method|default('post') }}">
+    {# Drupal CSRF tokens — required for form submission #}
+    {% if form_id %}
+      <input type="hidden" name="form_id" value="{{ form_id }}">
+    {% endif %}
+    {% if form_build_id %}
+      <input type="hidden" name="form_build_id" value="{{ form_build_id }}">
+    {% endif %}
+    {% if form_token %}
+      <input type="hidden" name="form_token" value="{{ form_token }}">
+    {% endif %}
+
+    {#
+      Example fields — replace these with your actual form fields.
+      Each hx-* form component sets its name attribute, which maps to
+      Drupal's form element names for server-side processing.
+    #}
+
+    <hx-text-input
+      name="first_name"
+      label="First Name"
+      required
+      autocomplete="given-name"
+    ></hx-text-input>
+
+    <hx-text-input
+      name="last_name"
+      label="Last Name"
+      required
+      autocomplete="family-name"
+    ></hx-text-input>
+
+    <hx-text-input
+      name="email"
+      type="email"
+      label="Email Address"
+      required
+      autocomplete="email"
+    ></hx-text-input>
+
+    <hx-text-input
+      name="phone"
+      type="tel"
+      label="Phone Number"
+      autocomplete="tel"
+    ></hx-text-input>
+
+    <hx-select name="department" label="Department">
+      <option value="">Select a department</option>
+      <option value="primary-care">Primary Care</option>
+      <option value="cardiology">Cardiology</option>
+      <option value="orthopedics">Orthopedics</option>
+      <option value="neurology">Neurology</option>
+    </hx-select>
+
+    <hx-textarea
+      name="message"
+      label="Additional Notes"
+      rows="4"
+    ></hx-textarea>
+
+    <hx-checkbox
+      name="consent"
+      required
+    >I agree to the terms and conditions</hx-checkbox>
+
+    <div class="hx-form-wrapper__actions">
+      <hx-button type="submit" variant="primary">
+        {{ submit_label|default('Submit') }}
+      </hx-button>
+      <hx-button type="reset" variant="ghost">
+        Clear
+      </hx-button>
+    </div>
+  </form>
+</div>

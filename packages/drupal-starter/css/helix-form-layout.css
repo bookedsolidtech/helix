@@ -1,0 +1,37 @@
+/**
+ * @file
+ * Layout styles for HELiX form templates.
+ *
+ * These are light-DOM layout styles only. HELiX components handle their
+ * own visual styling via Shadow DOM. This CSS manages spacing and
+ * arrangement of form fields when using the hx-form template.
+ */
+
+.hx-form-wrapper {
+  max-width: 40rem;
+}
+
+.hx-form-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.hx-form-wrapper__actions {
+  display: flex;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  margin-top: var(--hx-spacing-md, 1rem);
+}
+
+/* Two-column row for side-by-side fields */
+.hx-form-wrapper .contact-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+@media (max-width: 640px) {
+  .hx-form-wrapper .contact-form__row {
+    grid-template-columns: 1fr;
+  }
+}

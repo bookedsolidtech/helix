@@ -1,0 +1,12 @@
+name: 'HELiX UI Drupal Starter'
+description: 'Pre-built composition SDCs using HELiX enterprise web components for Drupal content patterns.'
+type: module
+core_version_requirement: '^10.1 || ^11.0'
+package: 'HELiX UI'
+lifecycle: experimental
+
+dependencies:
+  - drupal:sdc
+
+# SDC component discovery is automatic via the components/ directory.
+# Each SDC composes HELiX web components (hx-*) loaded via helixui.libraries.yml.

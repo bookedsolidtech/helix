@@ -581,6 +581,11 @@ export default defineConfig({
                 { label: 'Best Practices', slug: 'drupal-integration/best-practices' },
                 { label: 'Library System', slug: 'drupal-integration/library-system' },
                 {
+                  label: 'SDC Composition',
+                  slug: 'drupal-integration/sdc',
+                  badge: { text: 'New', variant: 'tip' },
+                },
+                {
                   label: 'Installation',
                   collapsed: true,
                   items: [
@@ -641,6 +646,10 @@ export default defineConfig({
               ],
             },
             {
+              label: 'Adopted Stylesheets',
+              slug: 'guides/adopted-stylesheets',
+            },
+            {
               label: 'Boolean Attributes',
               slug: 'guides/boolean-attributes',
             },
@@ -679,7 +688,13 @@ export default defineConfig({
           badge: { text: 'New', variant: 'tip' },
           items: [
             { label: 'Overview', slug: 'extending' },
+            { label: 'Theming Quick Start', slug: 'extending/theming-quick-start' },
             { label: 'PatientCard Example', slug: 'extending/patient-card' },
+            {
+              label: 'Styling with CSS Parts',
+              slug: 'extending/style-components-with-css-parts',
+              badge: { text: 'Deep Dive', variant: 'tip' },
+            },
           ],
         },
         {

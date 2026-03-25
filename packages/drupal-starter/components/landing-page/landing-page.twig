@@ -1,0 +1,49 @@
+{#
+  Landing Page SDC
+  Composes: hx-text, hx-image, hx-container
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-container') }}
+
+<div{{ attributes.addClass('landing-page') }}>
+  {% if hero_image %}
+    <div class="landing-page__hero">
+      <hx-image
+        src="{{ hero_image }}"
+        alt="{{ hero_alt|default('') }}"
+        loading="eager"
+      ></hx-image>
+
+      {% if title %}
+        <div class="landing-page__hero-overlay">
+          <hx-container>
+            <hx-text variant="heading-2xl">{{ title }}</hx-text>
+          </hx-container>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    {% if title %}
+      <div class="landing-page__header">
+        <hx-container>
+          <hx-text variant="heading-2xl">{{ title }}</hx-text>
+        </hx-container>
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {% if intro %}
+    <div class="landing-page__intro">
+      <hx-container>
+        <hx-text variant="body-lg">{{ intro }}</hx-text>
+      </hx-container>
+    </div>
+  {% endif %}
+
+  {% if sections %}
+    <div class="landing-page__sections">
+      {{ sections }}
+    </div>
+  {% endif %}
+</div>

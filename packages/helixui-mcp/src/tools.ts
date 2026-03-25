@@ -12,6 +12,10 @@ import {
   generateImport,
   getLibrarySummary,
 } from './handlers.js';
+import { analyzeExtension } from './tools/analyze-extension.js';
+import { validateIntegration } from './tools/validate-integration.js';
+import { scaffoldTheme } from './tools/scaffold-theme.js';
+import { auditTokens, formatAuditReport } from './tools/audit-tokens.js';
 
 // ─── Input schemas ─────────────────────────────────────────────────────────────
 
@@ -56,6 +60,44 @@ const FindTokenArgsSchema = z.object({
 
 const GenerateImportArgsSchema = z.object({
   tagName: TagNameSchema.describe('Component tag name, e.g. hx-button'),
+});
+
+const AnalyzeExtensionArgsSchema = z.object({
+  filePath: z
+    .string()
+    .min(1)
+    .describe('Absolute or relative path to a TypeScript file that extends a HELiX component'),
+});
+
+const ValidateIntegrationArgsSchema = z.object({
+  projectPath: z
+    .string()
+    .min(1)
+    .describe('Absolute or relative path to the consumer project directory to scan'),
+});
+
+const ScaffoldThemeArgsSchema = z.object({
+  selector: z
+    .string()
+    .optional()
+    .describe(
+      'CSS scoping selector for the generated theme block (e.g. ".my-theme", ":root"). Defaults to ".hx-theme".',
+    ),
+  outputPath: z
+    .string()
+    .optional()
+    .describe(
+      'Absolute or relative file path to write the generated CSS file. Omit to return the CSS as output only.',
+    ),
+});
+
+const AuditTokensArgsSchema = z.object({
+  path: z
+    .string()
+    .min(1)
+    .describe(
+      'Path to a CSS file or project root directory to scan for --hx-* custom property declarations.',
+    ),
 });
 
 // ─── Tool list ─────────────────────────────────────────────────────────────────
@@ -190,6 +232,73 @@ const TOOL_DEFINITIONS = [
       properties: {},
     },
   },
+  {
+    name: 'analyzeExtension',
+    description:
+      'Analyze a TypeScript file that extends a HELiX component and detect common anti-patterns: missing super calls in lifecycle methods, incorrect Shadow DOM usage (this.innerHTML vs slots), properties shadowing parent @property decorators, broken slot forwarding, and direct style manipulation bypassing design tokens.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        filePath: {
+          type: 'string',
+          description:
+            'Absolute or relative path to a TypeScript file that extends a HELiX component',
+        },
+      },
+      required: ['filePath'],
+    },
+  },
+  {
+    name: 'validateIntegration',
+    description:
+      'Scan a consumer project directory for HELiX integration issues: import correctness (barrel vs tree-shakeable), bundler configuration for custom elements, SSR compatibility (unguarded DOM API access), CSP compliance (inline styles, unsafe-eval), and framework-specific issues (React @lit/react wrappers, Vue isCustomElement, Angular CUSTOM_ELEMENTS_SCHEMA, Drupal once() behaviors).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        projectPath: {
+          type: 'string',
+          description: 'Absolute or relative path to the consumer project directory to scan',
+        },
+      },
+      required: ['projectPath'],
+    },
+  },
+  {
+    name: 'scaffoldTheme',
+    description:
+      'Generate a CSS theme scaffold containing all HELiX semantic design tokens as commented-out custom property overrides, organized by category. Useful for bootstrapping a custom theme.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        selector: {
+          type: 'string',
+          description:
+            'CSS scoping selector for the generated theme block (e.g. ".my-theme", ":root"). Defaults to ".hx-theme".',
+        },
+        outputPath: {
+          type: 'string',
+          description:
+            'Absolute or relative file path to write the generated CSS file. Omit to return the CSS as output only.',
+        },
+      },
+    },
+  },
+  {
+    name: 'auditTokens',
+    description:
+      'Audit a CSS file or project directory for --hx-* design token usage. Flags unknown tokens (not in schema), deprecated tokens, and tier violations (component-tier tokens overridden globally instead of via semantic tier).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        path: {
+          type: 'string',
+          description:
+            'Path to a CSS file or project root directory to scan for --hx-* custom property declarations.',
+        },
+      },
+      required: ['path'],
+    },
+  },
 ] as const;
 
 // ─── Response helpers ──────────────────────────────────────────────────────────
@@ -267,6 +376,40 @@ export function registerTools(server: Server): void {
 
         case 'getLibrarySummary': {
           return success(getLibrarySummary());
+        }
+
+        case 'analyzeExtension': {
+          const parsed = AnalyzeExtensionArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          return success(analyzeExtension(parsed.data.filePath));
+        }
+
+        case 'validateIntegration': {
+          const parsed = ValidateIntegrationArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          return success(validateIntegration(parsed.data.projectPath));
+        }
+
+        case 'scaffoldTheme': {
+          const parsed = ScaffoldThemeArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const themeOpts: Parameters<typeof scaffoldTheme>[0] = {};
+          if (parsed.data.selector !== undefined) themeOpts.selector = parsed.data.selector;
+          if (parsed.data.outputPath !== undefined) themeOpts.outputPath = parsed.data.outputPath;
+          const result = scaffoldTheme(themeOpts);
+          const lines = [
+            `Generated theme scaffold with ${result.tokenCount} tokens across ${result.categories.length} categories.`,
+            ...(result.outputPath !== undefined ? [`Written to: ${result.outputPath}`, ''] : ['']),
+            result.css,
+          ];
+          return success(lines.join('\n'));
+        }
+
+        case 'auditTokens': {
+          const parsed = AuditTokensArgsSchema.safeParse(args);
+          if (!parsed.success) return failure(parsed.error.message);
+          const report = auditTokens({ path: parsed.data.path });
+          return success(formatAuditReport(report));
         }
 
         default:

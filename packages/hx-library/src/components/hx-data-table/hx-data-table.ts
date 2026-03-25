@@ -155,6 +155,14 @@ export class HelixDataTable extends LitElement {
   @state()
   private _selectedRows: Set<number> = new Set();
 
+  /**
+   * Cached flat list of all td/th cells in the shadow DOM.
+   * Invalidated (set to null) whenever rows or columns change so the next keydown
+   * re-queries the DOM and re-caches. Avoids repeated querySelectorAll on every keypress.
+   * @internal
+   */
+  private _cachedCells: HTMLElement[] | null = null;
+
   // ─── Lifecycle ───
 
   override willUpdate(changed: PropertyValues<this>): void {
@@ -203,6 +211,14 @@ export class HelixDataTable extends LitElement {
         'hx-data-table',
         'No accessible name provided. Set the `label` attribute so screen readers can identify this table (WCAG 4.1.2).',
       );
+    }
+  }
+
+  override updated(changed: PropertyValues<this>): void {
+    // Invalidate cell cache when rows or columns change so the next keyboard
+    // navigation re-queries and re-caches the updated DOM.
+    if (changed.has('rows') || changed.has('columns')) {
+      this._cachedCells = null;
     }
   }
 
@@ -278,7 +294,13 @@ export class HelixDataTable extends LitElement {
     const root = this.shadowRoot;
     if (!root) return;
 
-    const cells = Array.from(root.querySelectorAll<HTMLElement>('[part~="td"],[part~="th"]'));
+    // Use cached cell list; re-query only when invalidated by rows/columns change
+    if (!this._cachedCells) {
+      this._cachedCells = Array.from(
+        root.querySelectorAll<HTMLElement>('[part~="td"],[part~="th"]'),
+      );
+    }
+    const cells = this._cachedCells;
 
     // When focus is inside a child element (e.g., the sort <button> inside a <th>),
     // shadowRoot.activeElement returns the child, not the cell. Walk up to find the cell.

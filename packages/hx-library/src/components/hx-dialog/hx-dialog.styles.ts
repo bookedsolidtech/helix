@@ -40,8 +40,8 @@ export const helixDialogStyles = css`
     opacity: 0;
     transform: translateY(var(--hx-space-4, 1rem)) scale(0.97);
     transition:
-      opacity var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out),
-      transform var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out);
+      opacity var(--hx-duration-normal, 200ms) var(--hx-easing-out, ease-out),
+      transform var(--hx-duration-normal, 200ms) var(--hx-easing-out, ease-out);
   }
 
   dialog[open] .dialog {
@@ -64,7 +64,7 @@ export const helixDialogStyles = css`
   dialog::backdrop {
     background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: 0;
-    transition: opacity var(--hx-duration-200, 200ms) var(--hx-ease-out, ease-out);
+    transition: opacity var(--hx-duration-normal, 200ms) var(--hx-easing-out, ease-out);
   }
 
   dialog[open]::backdrop {
@@ -85,7 +85,7 @@ export const helixDialogStyles = css`
     background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
     opacity: var(--hx-dialog-backdrop-opacity, 0.5);
     /* D5 — backdrop z-index must be lower than the dialog element's z-index */
-    z-index: var(--hx-z-index-modal, 100);
+    z-index: var(--hx-z-index-modal, 1400);
   }
 
   /* ─── Header ─── */
@@ -95,7 +95,7 @@ export const helixDialogStyles = css`
     align-items: center;
     justify-content: space-between;
     padding: var(--hx-dialog-header-padding, var(--hx-space-5) var(--hx-space-6));
-    border-bottom: var(--hx-border-width-1) solid
+    border-bottom: var(--hx-border-width-thin) solid
       var(--hx-dialog-header-border-color, var(--hx-color-neutral-200));
     gap: var(--hx-space-4);
     flex-shrink: 0;
@@ -106,7 +106,7 @@ export const helixDialogStyles = css`
     font-family: var(--hx-font-family-sans);
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
-    line-height: var(--hx-line-height-snug);
+    line-height: var(--hx-line-height-tight);
     color: var(--hx-dialog-heading-color, var(--hx-color-neutral-900));
     flex: 1 1 auto;
   }
@@ -133,8 +133,8 @@ export const helixDialogStyles = css`
     font-size: var(--hx-font-size-xl, 1.25rem);
     line-height: var(--hx-line-height-none, 1);
     transition:
-      color var(--hx-duration-100, 100ms) ease,
-      background-color var(--hx-duration-100, 100ms) ease;
+      color var(--hx-duration-fast, 100ms) ease,
+      background-color var(--hx-duration-fast, 100ms) ease;
   }
 
   .dialog__close-btn::before {

@@ -282,7 +282,7 @@ export const helixSplitButtonStyles = css`
       0 2px 4px -2px var(--hx-overlay-black-10, rgba(0, 0, 0, 0.1))
     );
     padding: var(--hx-space-1, 0.25rem);
-    z-index: var(--hx-z-index-dropdown, 200);
+    z-index: var(--hx-z-index-dropdown, 1000);
   }
 
   .split-button__menu--open {

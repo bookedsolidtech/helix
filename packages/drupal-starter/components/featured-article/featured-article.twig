@@ -1,0 +1,61 @@
+{#
+  Featured Article SDC
+  Composes: hx-card, hx-text, hx-badge, hx-image, hx-link, hx-avatar
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-image') }}
+{{ attach_library('helixui/hx-link') }}
+{{ attach_library('helixui/hx-avatar') }}
+
+<article{{ attributes.addClass('featured-article') }}>
+  <hx-card variant="featured" elevation="raised">
+    {% if image_url %}
+      <hx-image
+        slot="image"
+        src="{{ image_url }}"
+        alt="{{ image_alt|default('') }}"
+        loading="lazy"
+      ></hx-image>
+    {% endif %}
+
+    <div slot="header" class="featured-article__header">
+      {% if category %}
+        <hx-badge variant="neutral">{{ category }}</hx-badge>
+      {% endif %}
+    </div>
+
+    <div class="featured-article__body">
+      {% if title %}
+        <hx-text variant="heading" tag="h3">
+          {% if url %}
+            <hx-link href="{{ url }}">{{ title }}</hx-link>
+          {% else %}
+            {{ title }}
+          {% endif %}
+        </hx-text>
+      {% endif %}
+
+      {% if excerpt %}
+        <hx-text variant="body" tag="p" class="featured-article__excerpt">
+          {{ excerpt }}
+        </hx-text>
+      {% endif %}
+    </div>
+
+    <div slot="footer" class="featured-article__footer">
+      <div class="featured-article__author">
+        {% if author_name %}
+          <hx-avatar size="sm" label="{{ author_name }}"></hx-avatar>
+          <hx-text variant="body-xs">{{ author_name }}</hx-text>
+        {% endif %}
+      </div>
+      {% if date %}
+        <hx-text variant="body-xs" class="featured-article__date">
+          <time datetime="{{ date }}">{{ date }}</time>
+        </hx-text>
+      {% endif %}
+    </div>
+  </hx-card>
+</article>

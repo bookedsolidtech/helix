@@ -522,7 +522,7 @@ describe('hx-dialog', () => {
       expect(el.open).toBe(false);
     });
 
-    it('close button aria-label uses closeLabel property (default: "Close dialog")', async () => {
+    it('close button aria-label uses labelClose property (default: "Close dialog")', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog open heading="A11y Test"></hx-dialog>');
       await el.updateComplete;
       const closeBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-button"]');
@@ -666,14 +666,14 @@ describe('hx-dialog', () => {
     it('uses default English label for close button', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog><p>Content</p></hx-dialog>');
       await el.updateComplete;
-      expect(el.closeLabel).toBe('Close dialog');
+      expect(el.labelClose).toBe('Close dialog');
     });
 
-    it('renders custom closeLabel when set via property', async () => {
+    it('renders custom labelClose when set via property', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog><p>Content</p></hx-dialog>');
-      el.closeLabel = 'Fermer la boîte de dialogue';
+      el.labelClose = 'Fermer la boîte de dialogue';
       await el.updateComplete;
-      expect(el.closeLabel).toBe('Fermer la boîte de dialogue');
+      expect(el.labelClose).toBe('Fermer la boîte de dialogue');
     });
   });
 });

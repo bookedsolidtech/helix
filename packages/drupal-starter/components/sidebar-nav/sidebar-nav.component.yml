@@ -1,0 +1,48 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Sidebar Navigation
+description: 'Sidebar navigation composing hx-side-nav, hx-nav, and hx-link web components. Supports nested menu items and optional collapsible behavior.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Heading displayed above the sidebar navigation.'
+    menu_items:
+      type: array
+      title: Menu Items
+      description: 'Array of sidebar navigation items.'
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+            title: Title
+          url:
+            type: string
+            title: URL
+          is_active:
+            type: boolean
+            title: Is Active
+          children:
+            type: array
+            title: Children
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                  title: Title
+                url:
+                  type: string
+                  title: URL
+                is_active:
+                  type: boolean
+                  title: Is Active
+    collapsible:
+      type: boolean
+      title: Collapsible
+      description: 'Whether the sidebar sections can be collapsed.'
+      default: false

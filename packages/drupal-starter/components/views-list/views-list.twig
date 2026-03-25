@@ -1,0 +1,14 @@
+{#
+  Views List SDC
+  Composes: hx-list, hx-divider
+#}
+{{ attach_library('helixui/hx-list') }}
+{{ attach_library('helixui/hx-divider') }}
+
+{% set show_dividers = dividers is not same as(false) %}
+
+<div{{ attributes.addClass('views-list', show_dividers ? 'views-list--dividers') }}>
+  {% if items %}
+    {{ items }}
+  {% endif %}
+</div>

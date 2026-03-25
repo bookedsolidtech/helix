@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Site Header SDC — composes hx-container.
+ *
+ * Provides a top-level header with logo, navigation, and actions slots.
+ * Supports sticky positioning via prop.
+ */
+#}
+{{ attach_library('helixui/hx-container') }}
+
+<header class="site-header{% if sticky is not same as(false) %} site-header--sticky{% endif %}" role="banner">
+  <hx-container>
+    <div class="site-header__inner">
+      {% if logo %}
+        <div class="site-header__logo">
+          {{ logo }}
+        </div>
+      {% endif %}
+      {% if navigation %}
+        <div class="site-header__navigation">
+          {{ navigation }}
+        </div>
+      {% endif %}
+      {% if actions %}
+        <div class="site-header__actions">
+          {{ actions }}
+        </div>
+      {% endif %}
+    </div>
+  </hx-container>
+</header>

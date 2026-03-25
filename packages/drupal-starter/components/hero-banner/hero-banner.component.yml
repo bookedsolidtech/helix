@@ -1,0 +1,46 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Hero Banner
+description: 'Full-width hero banner composing hx-text, hx-image, and hx-button. Supports background image, text overlay, and a call-to-action button with configurable alignment.'
+status: experimental
+group: 'Hero / Banner'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Hero banner headline.'
+    subtitle:
+      type: string
+      title: Subtitle
+      description: 'Supporting text displayed below the title.'
+    image_url:
+      type: string
+      title: Image URL
+      description: 'Background image URL for the hero banner.'
+    image_alt:
+      type: string
+      title: Image Alt Text
+      description: 'Alt text for the hero background image.'
+    cta_text:
+      type: string
+      title: CTA Text
+      description: 'Call-to-action button label.'
+    cta_url:
+      type: string
+      title: CTA URL
+      description: 'Call-to-action button destination URL.'
+    alignment:
+      type: string
+      title: Alignment
+      description: 'Horizontal alignment of the hero content.'
+      enum:
+        - left
+        - center
+        - right
+      default: 'center'
+    overlay:
+      type: boolean
+      title: Overlay
+      description: 'Whether to display a dark overlay on the background image for text readability.'
+      default: true

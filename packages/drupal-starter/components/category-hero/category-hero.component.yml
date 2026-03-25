@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Category Hero
+description: 'Category landing page hero composing hx-text, hx-image, and hx-badge. Displays the category title, description, optional background image, and article count.'
+status: experimental
+group: 'Hero / Banner'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Category name displayed as the hero heading.'
+    description:
+      type: string
+      title: Description
+      description: 'Category description or summary text.'
+    image_url:
+      type: string
+      title: Image URL
+      description: 'Background image URL for the category hero.'
+    image_alt:
+      type: string
+      title: Image Alt Text
+      description: 'Alt text for the category hero image.'
+    article_count:
+      type: integer
+      title: Article Count
+      description: 'Number of articles in this category, displayed as a badge.'

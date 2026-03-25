@@ -704,5 +704,17 @@ describe('hx-nav', () => {
       await el.updateComplete;
       expect(el.labelOpenMenu).toBe('Ouvrir le menu de navigation');
     });
+
+    it('labelCloseMenu defaults to "Close navigation menu"', async () => {
+      const el = await fixture<HelixNav>('<hx-nav label="Main navigation"></hx-nav>');
+      expect(el.labelCloseMenu).toBe('Close navigation menu');
+    });
+
+    it('accepts custom labelCloseMenu', async () => {
+      const el = await fixture<HelixNav>(
+        '<hx-nav label="Main navigation" label-close-menu="Fermer le menu de navigation"></hx-nav>',
+      );
+      expect(el.labelCloseMenu).toBe('Fermer le menu de navigation');
+    });
   });
 });

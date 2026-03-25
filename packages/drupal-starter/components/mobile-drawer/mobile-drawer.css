@@ -1,0 +1,23 @@
+.mobile-drawer {
+  --mobile-drawer-breakpoint: 768px;
+}
+
+@media (min-width: 769px) {
+  .mobile-drawer__trigger {
+    display: none;
+  }
+
+  .mobile-drawer__panel {
+    display: none;
+  }
+}
+
+.mobile-drawer__header {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--hx-spacing-sm, 0.5rem);
+}
+
+.mobile-drawer__content {
+  padding: var(--hx-spacing-md, 1rem);
+}

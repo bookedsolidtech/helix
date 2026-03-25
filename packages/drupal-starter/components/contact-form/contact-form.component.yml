@@ -1,0 +1,33 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Contact Form
+description: 'General-purpose contact form composing hx-text-input, hx-textarea, hx-button, hx-text, and hx-select. Supports custom fields via slot.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Heading text for the contact form'
+      default: 'Contact Us'
+    description:
+      type: string
+      title: Description
+      description: 'Supporting text below the title'
+    action:
+      type: string
+      title: Action
+      description: 'Form action URL for submission'
+    method:
+      type: string
+      title: Method
+      description: 'Form submission method'
+      default: 'post'
+      enum:
+        - get
+        - post
+slots:
+  fields:
+    title: Fields
+    description: 'Additional custom form fields injected into the form body'

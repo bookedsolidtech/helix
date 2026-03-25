@@ -1,0 +1,94 @@
+{#
+  Appointment CTA SDC
+  Composes: hx-card, hx-button, hx-text, hx-icon
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-icon') }}
+
+{% set variant = variant|default('card') %}
+
+<div{{ attributes.addClass('appointment-cta', 'appointment-cta--' ~ variant) }}>
+  {% if variant == 'card' or variant == 'banner' %}
+    <hx-card variant="default" elevation="{{ variant == 'banner' ? 'none' : 'raised' }}">
+      <div class="appointment-cta__content">
+        <div class="appointment-cta__text">
+          <hx-text variant="heading-md">
+            {{ title|default('Schedule an Appointment') }}
+          </hx-text>
+
+          {% if description %}
+            <hx-text variant="body-md">{{ description }}</hx-text>
+          {% endif %}
+        </div>
+
+        <div class="appointment-cta__actions">
+          {% if online_url %}
+            <hx-button variant="primary">
+              <a href="{{ online_url }}">
+                <hx-icon name="calendar" slot="prefix"></hx-icon>
+                {{ online_text|default('Book Online') }}
+              </a>
+            </hx-button>
+          {% endif %}
+
+          {% if phone %}
+            <hx-button variant="secondary">
+              <a href="tel:{{ phone }}">
+                <hx-icon name="phone" slot="prefix"></hx-icon>
+                {{ phone_text|default('Call Us') }}
+              </a>
+            </hx-button>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if extra %}
+        <div slot="footer" class="appointment-cta__extra">
+          {{ extra }}
+        </div>
+      {% endif %}
+    </hx-card>
+
+  {% else %}
+    {# inline variant — no card wrapper #}
+    <div class="appointment-cta__content">
+      <div class="appointment-cta__text">
+        <hx-text variant="heading-sm">
+          {{ title|default('Schedule an Appointment') }}
+        </hx-text>
+
+        {% if description %}
+          <hx-text variant="body-sm">{{ description }}</hx-text>
+        {% endif %}
+      </div>
+
+      <div class="appointment-cta__actions">
+        {% if online_url %}
+          <hx-button variant="primary" size="sm">
+            <a href="{{ online_url }}">
+              <hx-icon name="calendar" slot="prefix"></hx-icon>
+              {{ online_text|default('Book Online') }}
+            </a>
+          </hx-button>
+        {% endif %}
+
+        {% if phone %}
+          <hx-button variant="secondary" size="sm">
+            <a href="tel:{{ phone }}">
+              <hx-icon name="phone" slot="prefix"></hx-icon>
+              {{ phone_text|default('Call Us') }}
+            </a>
+          </hx-button>
+        {% endif %}
+      </div>
+
+      {% if extra %}
+        <div class="appointment-cta__extra">
+          {{ extra }}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

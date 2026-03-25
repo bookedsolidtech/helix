@@ -58,7 +58,7 @@ export class HelixSpinner extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: SpinnerSize | string = 'md';
+  size: 'sm' | 'md' | 'lg' | (string & Record<never, never>) = 'md';
 
   /**
    * Visual variant of the spinner.

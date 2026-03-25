@@ -98,7 +98,7 @@ export class HelixField extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, attribute: 'hx-size', reflect: true })
-  hxSize: 'sm' | 'md' | 'lg' = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
    * Layout variant. 'column' stacks label above control; 'inline' places them side-by-side.
@@ -217,13 +217,13 @@ export class HelixField extends LitElement {
   override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
 
-    // P2-01: Warn on invalid hxSize values
-    if (changedProps.has('hxSize')) {
+    // P2-01: Warn on invalid size values
+    if (changedProps.has('size')) {
       const validSizes = ['sm', 'md', 'lg'];
-      if (!validSizes.includes(this.hxSize)) {
+      if (!validSizes.includes(this.size)) {
         devWarn(
           'hx-field',
-          `Invalid hx-size value: "${this.hxSize}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
+          `Invalid hx-size value: "${this.size}". Expected "sm" | "md" | "lg". Defaulting to "md".`,
         );
       }
     }
@@ -348,9 +348,9 @@ export class HelixField extends LitElement {
       'field--error': hasError,
       'field--disabled': this.disabled,
       'field--required': this.required,
-      'field--size-sm': this.hxSize === 'sm',
-      'field--size-md': this.hxSize === 'md',
-      'field--size-lg': this.hxSize === 'lg',
+      'field--size-sm': this.size === 'sm',
+      'field--size-md': this.size === 'md',
+      'field--size-lg': this.size === 'lg',
       'field--layout-inline': this.layout === 'inline',
     };
 

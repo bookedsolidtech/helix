@@ -1,0 +1,47 @@
+{#
+/**
+ * @file
+ * Standalone Twig template for rendering an hx-button web component.
+ *
+ * Available variables:
+ * - variant: Button variant (primary, secondary, tertiary, danger, ghost). Default: primary.
+ * - size: Button size (sm, md, lg). Default: md.
+ * - disabled: Whether the button is disabled.
+ * - type: Button type attribute (button, submit, reset). Default: button.
+ * - href: If set, renders the button as a link.
+ * - content: The button label text or markup.
+ * - icon_start: Optional icon name to render before the label.
+ * - icon_end: Optional icon name to render after the label.
+ * - attributes: Drupal attributes object for additional HTML attributes.
+ *
+ * Usage in a parent template:
+ * @code
+ *   {% include '@mytheme/templates/hx-button.html.twig' with {
+ *     variant: 'primary',
+ *     size: 'md',
+ *     content: 'Schedule Appointment',
+ *   } %}
+ * @endcode
+ */
+#}
+{{ attach_library('helixui/hx-button') }}
+{% if icon_start or icon_end %}
+  {{ attach_library('helixui/hx-icon') }}
+{% endif %}
+
+<hx-button
+  variant="{{ variant|default('primary') }}"
+  size="{{ size|default('md') }}"
+  {% if type %}type="{{ type }}"{% endif %}
+  {% if href %}href="{{ href }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if attributes %}{{ attributes }}{% endif %}
+>
+  {% if icon_start %}
+    <hx-icon slot="prefix" name="{{ icon_start }}"></hx-icon>
+  {% endif %}
+  {{ content }}
+  {% if icon_end %}
+    <hx-icon slot="suffix" name="{{ icon_end }}"></hx-icon>
+  {% endif %}
+</hx-button>

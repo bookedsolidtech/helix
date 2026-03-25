@@ -93,7 +93,7 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    hxSize: {
+    size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
       description:
@@ -122,7 +122,7 @@ const meta = {
     error: '',
     required: false,
     disabled: false,
-    hxSize: 'md',
+    size: 'md',
     layout: 'column',
   },
   render: (args) => html`
@@ -132,7 +132,7 @@ const meta = {
       error=${args.error}
       ?required=${args.required}
       ?disabled=${args.disabled}
-      hx-size=${args.hxSize}
+      hx-size=${args.size}
       layout=${args.layout}
     >
       <input
@@ -269,7 +269,7 @@ export const SizeSmall: Story = {
   args: {
     label: 'Compact Field Label',
     helpText: 'Small label and help text font size.',
-    hxSize: 'sm',
+    size: 'sm',
   },
 };
 
@@ -278,7 +278,7 @@ export const SizeMedium: Story = {
   args: {
     label: 'Standard Field Label',
     helpText: 'Medium label and help text font size (default).',
-    hxSize: 'md',
+    size: 'md',
   },
 };
 
@@ -287,7 +287,7 @@ export const SizeLarge: Story = {
   args: {
     label: 'Large Field Label',
     helpText: 'Large label and help text font size.',
-    hxSize: 'lg',
+    size: 'lg',
   },
 };
 

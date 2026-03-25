@@ -74,7 +74,15 @@ export class HelixDropdown extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: DropdownPlacement = 'bottom-start';
+  placement:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'start'
+    | 'end' = 'bottom-start';
 
   /**
    * Whether the dropdown is disabled. Prevents opening.

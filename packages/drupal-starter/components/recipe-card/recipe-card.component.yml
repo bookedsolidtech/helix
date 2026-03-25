@@ -1,0 +1,40 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Recipe Card
+description: 'Compact recipe preview card with image, timing metadata, and difficulty badge.'
+status: experimental
+group: 'Node Display'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'The recipe title'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'URL for the recipe image'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the recipe image'
+    prep_time:
+      type: string
+      title: 'Prep Time'
+      description: 'Preparation time display string (e.g. "15 min")'
+    cook_time:
+      type: string
+      title: 'Cook Time'
+      description: 'Cooking time display string (e.g. "30 min")'
+    difficulty:
+      type: string
+      title: Difficulty
+      description: 'Difficulty level (e.g. Easy, Medium, Hard)'
+    url:
+      type: string
+      title: URL
+      description: 'Link target for the recipe'
+slots:
+  actions:
+    title: Actions
+    description: 'Optional action buttons or links'

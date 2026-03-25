@@ -95,6 +95,7 @@ export class HelixIconButton extends LitElement {
 
   // ─── Form Association via ElementInternals ───
 
+  /** @internal */
   static formAssociated = true;
 
   /** @internal */
@@ -111,12 +112,12 @@ export class HelixIconButton extends LitElement {
     return this._internals.form;
   }
 
-  /** Called by the browser when the form is reset. No value to reset. */
+  /** @internal */
   formResetCallback(): void {
     // hx-icon-button does not submit a value; no state to reset.
   }
 
-  /** Called by the browser to restore form state. No value to restore. */
+  /** @internal */
   formStateRestoreCallback(
     _state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -124,7 +125,7 @@ export class HelixIconButton extends LitElement {
     // hx-icon-button does not submit a value; no state to restore.
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

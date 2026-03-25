@@ -1,0 +1,56 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Recipe Full
+description: 'Full recipe display with hero image, timing metadata, ingredients list, step-by-step instructions, and rich content.'
+status: experimental
+group: 'Node Display'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'The recipe title'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'URL for the hero image'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the hero image'
+    prep_time:
+      type: string
+      title: 'Prep Time'
+      description: 'Preparation time display string'
+    cook_time:
+      type: string
+      title: 'Cook Time'
+      description: 'Cooking time display string'
+    servings:
+      type: string
+      title: Servings
+      description: 'Number of servings'
+    difficulty:
+      type: string
+      title: Difficulty
+      description: 'Difficulty level (e.g. Easy, Medium, Hard)'
+    ingredients:
+      type: array
+      title: Ingredients
+      description: 'List of ingredient strings'
+      items:
+        type: string
+    instructions:
+      type: array
+      title: Instructions
+      description: 'Ordered list of instruction steps'
+      items:
+        type: string
+    content:
+      type: string
+      title: Content
+      description: 'Additional rendered HTML content (notes, tips, etc.)'
+slots:
+  sidebar:
+    title: Sidebar
+    description: 'Optional sidebar content (nutrition info, related recipes, etc.)'
