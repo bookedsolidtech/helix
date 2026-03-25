@@ -106,28 +106,28 @@ describe('hx-card', () => {
       expect(card.hasAttribute('aria-label')).toBe(false);
     });
 
-    it('uses hx-aria-label when provided on interactive card', async () => {
+    it('uses hx-label when provided on interactive card', async () => {
       const el = await fixture<HelixCard>(
-        '<hx-card hx-href="/test" hx-aria-label="View patient record">Content</hx-card>',
+        '<hx-card hx-href="/test" hx-label="View patient record">Content</hx-card>',
       );
       const card = shadowQuery(el, '.card')!;
       expect(card.getAttribute('aria-label')).toBe('View patient record');
     });
 
-    it('updates interactive attributes when hxHref changes after initial render', async () => {
+    it('updates interactive attributes when href changes after initial render', async () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       expect(card.hasAttribute('role')).toBe(false);
       expect(card.hasAttribute('tabindex')).toBe(false);
 
-      el.hxHref = '/new-path';
+      el.href = '/new-path';
       await el.updateComplete;
 
       expect(card.getAttribute('role')).toBe('link');
       expect(card.getAttribute('tabindex')).toBe('0');
       expect(card.classList.contains('card--interactive')).toBe(true);
 
-      el.hxHref = undefined;
+      el.href = undefined;
       await el.updateComplete;
 
       expect(card.hasAttribute('role')).toBe(false);
@@ -412,9 +412,9 @@ describe('hx-card', () => {
       expect(violations).toEqual([]);
     });
 
-    it('has no axe violations when interactive with hx-aria-label', async () => {
+    it('has no axe violations when interactive with hx-label', async () => {
       const el = await fixture<HelixCard>(
-        '<hx-card hx-href="https://example.com" hx-aria-label="View patient record"><span slot="heading">Title</span><p>Content</p></hx-card>',
+        '<hx-card hx-href="https://example.com" hx-label="View patient record"><span slot="heading">Title</span><p>Content</p></hx-card>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -434,9 +434,9 @@ describe('hx-card', () => {
     });
 
     // P2-05: axe-core must cover the interactive card + actions slot combination
-    it('has no axe violations — interactive card with hx-aria-label and actions slot', async () => {
+    it('has no axe violations — interactive card with hx-label and actions slot', async () => {
       const el = await fixture<HelixCard>(
-        '<hx-card hx-href="https://example.com" hx-aria-label="View patient record"><span slot="heading">Patient: Jane Doe</span><p>MRN: 885521</p><button slot="actions">View Chart</button></hx-card>',
+        '<hx-card hx-href="https://example.com" hx-label="View patient record"><span slot="heading">Patient: Jane Doe</span><p>MRN: 885521</p><button slot="actions">View Chart</button></hx-card>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);

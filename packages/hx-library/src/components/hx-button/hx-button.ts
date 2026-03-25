@@ -46,6 +46,7 @@ export class HelixButton extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
   /** @internal */
@@ -153,7 +154,7 @@ export class HelixButton extends LitElement {
     return this._internals.form;
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

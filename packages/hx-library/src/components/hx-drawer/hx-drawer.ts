@@ -10,7 +10,6 @@ import { helixDrawerStyles } from './hx-drawer.styles.js';
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 let _hxDrawerIdCounter = 0;
 
-type DrawerPlacement = 'start' | 'end' | 'top' | 'bottom';
 type DrawerSizePreset = 'sm' | 'md' | 'lg' | 'full';
 type DrawerSize = DrawerSizePreset | (string & Record<never, never>);
 
@@ -56,7 +55,7 @@ const FOCUSABLE_SELECTORS = [
  * @csspart panel - The drawer panel itself.
  * @csspart header - The header region containing the title and actions.
  * @csspart title - The drawer title element.
- * @csspart close-btn - The built-in close button.
+ * @csspart close-button - The built-in close button.
  * @csspart body - The scrollable body region.
  * @csspart footer - The footer region.
  *
@@ -168,14 +167,14 @@ export class HelixDrawer extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: DrawerPlacement = 'end';
+  placement: 'start' | 'end' | 'top' | 'bottom' = 'end';
 
   /**
    * The size of the drawer panel. Use 'sm', 'md', 'lg', 'full', or any valid CSS length.
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: DrawerSize = 'md';
+  size: 'sm' | 'md' | 'lg' | 'full' | (string & Record<never, never>) = 'md';
 
   /**
    * When true, the drawer is constrained to its positioned parent instead of the viewport.
@@ -208,8 +207,8 @@ export class HelixDrawer extends LitElement {
   label = '';
 
   /** Accessible label for the built-in close button. Override for localized text. */
-  @property({ type: String, attribute: 'close-label' })
-  closeLabel = 'Close drawer';
+  @property({ type: String, attribute: 'label-close' })
+  labelClose = 'Close drawer';
 
   // ─── Lifecycle ───
 
@@ -561,9 +560,9 @@ export class HelixDrawer extends LitElement {
                 style="display:none"
               ></slot>`}
           <button
-            part="close-btn"
+            part="close-button"
             class="drawer-close-button"
-            aria-label=${this.closeLabel}
+            aria-label=${this.labelClose}
             @click=${() => {
               this.open = false;
             }}

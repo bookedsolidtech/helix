@@ -35,7 +35,13 @@ export class HelixToastStack extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: ToastStackPlacement = 'bottom-end';
+  placement:
+    | 'top-start'
+    | 'top-center'
+    | 'top-end'
+    | 'bottom-start'
+    | 'bottom-center'
+    | 'bottom-end' = 'bottom-end';
 
   /**
    * Maximum number of simultaneously visible toasts. 0 = unlimited.

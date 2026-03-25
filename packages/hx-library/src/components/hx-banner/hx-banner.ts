@@ -54,14 +54,14 @@ export class HelixBanner extends LitElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: BannerVariant = 'info';
+  variant: 'info' | 'success' | 'warning' | 'error' = 'info';
 
   /**
    * CSS positioning behavior. "sticky" keeps the banner in flow; "fixed" pins it to the viewport.
    * @attr position
    */
   @property({ type: String, reflect: true })
-  position: BannerPosition = 'sticky';
+  position: 'sticky' | 'fixed' = 'sticky';
 
   /**
    * Whether the banner can be dismissed by the user.
@@ -100,8 +100,8 @@ export class HelixBanner extends LitElement {
   open = true;
 
   /** Accessible label for the dismiss button. Override for localized text. */
-  @property({ type: String, attribute: 'close-label' })
-  closeLabel = 'Dismiss banner';
+  @property({ type: String, attribute: 'label-close' })
+  labelClose = 'Dismiss banner';
 
   // ─── Private Helpers ───
 
@@ -279,7 +279,7 @@ export class HelixBanner extends LitElement {
               <button
                 part="close-button"
                 class="banner__close-button"
-                aria-label=${this.closeLabel}
+                aria-label=${this.labelClose}
                 @click=${this._handleDismiss}
               >
                 ${this._renderCloseIcon()}

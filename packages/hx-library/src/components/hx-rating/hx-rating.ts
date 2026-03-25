@@ -188,13 +188,13 @@ export class HelixRating extends LitElement {
     }
   }
 
-  /** Called by the browser when the form is reset. */
+  /** @internal */
   formResetCallback(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(String(this._defaultValue));
   }
 
-  /** Called by the browser to restore form state on navigation. */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -208,7 +208,7 @@ export class HelixRating extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

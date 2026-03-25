@@ -44,14 +44,14 @@ describe('hx-carousel', () => {
       expect(shadowQuery(el, '[part="pagination"]')).toBeTruthy();
     });
 
-    it('exposes "prev-btn" CSS part', async () => {
+    it('exposes "prev-button" CSS part', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
-      expect(shadowQuery(el, '[part="prev-btn"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="prev-button"]')).toBeTruthy();
     });
 
-    it('exposes "next-btn" CSS part', async () => {
+    it('exposes "next-button" CSS part', async () => {
       const el = await fixture<HelixCarousel>(threeSlides);
-      expect(shadowQuery(el, '[part="next-btn"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="next-button"]')).toBeTruthy();
     });
   });
 
@@ -730,8 +730,8 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-btn"]');
-      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-btn"]');
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]');
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]');
       expect(prev?.disabled).toBe(true);
       expect(next?.disabled).toBe(true);
     });
@@ -1075,7 +1075,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const prevBtn = shadowQuery(el, '[part="prev-btn"]');
+      const prevBtn = shadowQuery(el, '[part="prev-button"]');
       // Vertical prev uses chevron-up: points="18 15 12 9 6 15"
       const svgInPrev = prevBtn?.querySelector('svg');
       const polyline = svgInPrev?.querySelector('polyline');
@@ -1090,7 +1090,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const nextBtn = shadowQuery(el, '[part="next-btn"]');
+      const nextBtn = shadowQuery(el, '[part="next-button"]');
       // Vertical next uses chevron-down: points="6 9 12 15 18 9"
       const svgInNext = nextBtn?.querySelector('svg');
       const polyline = svgInNext?.querySelector('polyline');
@@ -1105,7 +1105,7 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
-      const prevBtn = shadowQuery(el, '[part="prev-btn"]');
+      const prevBtn = shadowQuery(el, '[part="prev-button"]');
       // Horizontal prev uses chevron-left: points="15 18 9 12 15 6"
       const svgInPrev = prevBtn?.querySelector('svg');
       const polyline = svgInPrev?.querySelector('polyline');

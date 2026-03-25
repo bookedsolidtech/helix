@@ -4,22 +4,6 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
-type PopoverPlacement =
-  | 'top'
-  | 'top-start'
-  | 'top-end'
-  | 'right'
-  | 'right-start'
-  | 'right-end'
-  | 'bottom'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'left'
-  | 'left-start'
-  | 'left-end';
-
-type TriggerMode = 'click' | 'hover' | 'focus' | 'manual';
-
 let _popoverCounter = 0;
 
 /**
@@ -77,14 +61,26 @@ export class HelixPopover extends LitElement {
    * @attr placement
    */
   @property({ type: String, reflect: true })
-  placement: PopoverPlacement = 'bottom';
+  placement:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end' = 'bottom';
 
   /**
    * How the popover is triggered.
    * @attr trigger
    */
   @property({ type: String, reflect: true })
-  trigger: TriggerMode = 'click';
+  trigger: 'click' | 'hover' | 'focus' | 'manual' = 'click';
 
   /**
    * Distance in pixels between the popover and the anchor.

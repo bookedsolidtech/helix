@@ -159,7 +159,7 @@ export class HelixTheme extends LitElement {
    * @attr theme
    */
   @property({ type: String, reflect: true })
-  theme: ThemeName = 'light';
+  theme: 'light' | 'dark' | 'high-contrast' | 'auto' = 'light';
 
   /**
    * @deprecated Use `theme="auto"` instead.
@@ -208,7 +208,7 @@ export class HelixTheme extends LitElement {
    * When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
    * Otherwise returns the `theme` property value.
    */
-  get effectiveTheme(): ThemeName {
+  get effectiveTheme(): 'light' | 'dark' | 'high-contrast' | 'auto' {
     if (this.system || this.theme === 'auto') {
       if (typeof window === 'undefined') return 'light';
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

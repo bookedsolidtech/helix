@@ -58,6 +58,7 @@ export class HelixCheckbox extends LitElement {
 
   // ─── Form Association ───
 
+  /** @internal */
   static formAssociated = true;
 
   /** @internal */
@@ -216,19 +217,19 @@ export class HelixCheckbox extends LitElement {
     }
   }
 
-  /** Called by the form when it resets. */
+  /** @internal */
   formResetCallback(): void {
     this.checked = false;
     this.indeterminate = false;
     this._internals.setFormValue(null);
   }
 
-  /** Called when the form restores state (e.g., back/forward navigation). */
+  /** @internal */
   formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
     this.checked = typeof state === 'string' && state === this.value;
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

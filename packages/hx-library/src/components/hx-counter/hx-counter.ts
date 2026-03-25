@@ -49,7 +49,7 @@ export class HelixCounter extends LitElement {
    * @attr easing
    */
   @property({ type: String })
-  easing: CounterEasing = 'ease-out';
+  easing: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out' = 'ease-out';
 
   /**
    * Number format. 'integer' rounds to the nearest whole number;
@@ -57,7 +57,7 @@ export class HelixCounter extends LitElement {
    * @attr format
    */
   @property({ type: String })
-  format: CounterFormat = 'integer';
+  format: 'integer' | 'decimal' = 'integer';
 
   /**
    * String prepended to the formatted value (e.g., '$').
@@ -78,7 +78,7 @@ export class HelixCounter extends LitElement {
    * @attr hx-size
    */
   @property({ type: String, reflect: true, attribute: 'hx-size' })
-  size: CounterSize = 'md';
+  size: 'sm' | 'md' | 'lg' = 'md';
 
   // ─── Internal State ───
 

@@ -46,7 +46,7 @@ export class HelixToast extends LitElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: ToastVariant = 'default';
+  variant: 'default' | 'success' | 'warning' | 'danger' | 'info' = 'default';
 
   /**
    * Auto-dismiss duration in milliseconds. Set to 0 for persistent toasts.
@@ -71,10 +71,10 @@ export class HelixToast extends LitElement {
 
   /**
    * Accessible label for the close button. Override for localization.
-   * @attr close-label
+   * @attr label-close
    */
-  @property({ attribute: 'close-label' })
-  closeLabel = 'Dismiss notification';
+  @property({ attribute: 'label-close' })
+  labelClose = 'Dismiss notification';
 
   // ─── Private State ───
 
@@ -360,7 +360,7 @@ export class HelixToast extends LitElement {
                     <button
                       part="close-button"
                       class="toast__close"
-                      aria-label=${this.closeLabel}
+                      aria-label=${this.labelClose}
                       @click=${this._handleClose}
                     >
                       <svg

@@ -94,11 +94,11 @@ export class HelixOverflowMenu extends LitElement {
   label = 'More actions';
 
   /**
-   * Accessible label for the menu panel. Reflected as `menu-label`.
-   * @attr menu-label
+   * Accessible label for the menu panel. Reflected as `label-menu`.
+   * @attr label-menu
    */
-  @property({ type: String, reflect: true, attribute: 'menu-label' })
-  menuLabel = 'Actions';
+  @property({ type: String, reflect: true, attribute: 'label-menu' })
+  labelMenu = 'Actions';
 
   /**
    * Tracks whether the overflow menu panel is currently open and visible.
@@ -341,7 +341,7 @@ export class HelixOverflowMenu extends LitElement {
               id=${this._panelId}
               part="panel menu"
               role="menu"
-              aria-label=${this.menuLabel}
+              aria-label=${this.labelMenu}
               class="panel"
               @click=${this._handleSlotClick}
             >

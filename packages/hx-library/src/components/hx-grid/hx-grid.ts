@@ -5,8 +5,6 @@ import { tokenStyles } from '@helixui/tokens/lit';
 import { helixGridStyles, helixGridItemStyles } from './hx-grid.styles.js';
 
 type GapSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-type AlignValue = 'start' | 'center' | 'end' | 'stretch';
-type JustifyValue = 'start' | 'center' | 'end' | 'stretch';
 
 const GAP_TOKENS: Record<GapSize, string> = {
   none: '0',
@@ -49,35 +47,35 @@ export class HelixGrid extends LitElement {
    * @attr gap
    */
   @property({ reflect: true })
-  gap: GapSize = 'md';
+  gap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
   /**
    * Row gap override. When set, takes precedence over `gap` for row spacing.
    * @attr row-gap
    */
   @property({ attribute: 'row-gap', reflect: true })
-  rowGap: GapSize | undefined;
+  rowGap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
 
   /**
    * Column gap override. When set, takes precedence over `gap` for column spacing.
    * @attr column-gap
    */
   @property({ attribute: 'column-gap', reflect: true })
-  columnGap: GapSize | undefined;
+  columnGap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
 
   /**
    * Aligns grid items along the block axis (align-items).
    * @attr align
    */
   @property({ reflect: true })
-  align: AlignValue = 'stretch';
+  align: 'start' | 'center' | 'end' | 'stretch' = 'stretch';
 
   /**
    * Justifies grid items along the inline axis (justify-items).
    * @attr justify
    */
   @property({ reflect: true })
-  justify: JustifyValue = 'stretch';
+  justify: 'start' | 'center' | 'end' | 'stretch' = 'stretch';
 
   /** @internal */
   private _gridTemplateColumns(): string {

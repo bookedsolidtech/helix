@@ -282,13 +282,13 @@ export class HelixSelect extends LitElement {
     }
   }
 
-  /** Called by the browser when the owning form resets. */
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue(null);
   }
 
-  /** Called when the browser restores form state (e.g., bfcache navigation). */
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData,
     _mode: 'restore' | 'autocomplete',
@@ -298,7 +298,7 @@ export class HelixSelect extends LitElement {
     }
   }
 
-  /** Called when a parent fieldset is disabled/enabled. */
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }

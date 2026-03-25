@@ -313,13 +313,13 @@ export class HelixTextInput extends LitElement {
     }
   }
 
-  // Called by the form when it resets
+  /** @internal */
   formResetCallback(): void {
     this.value = '';
     this._internals.setFormValue('');
   }
 
-  // Called when the form restores state (e.g., back/forward navigation)
+  /** @internal */
   formStateRestoreCallback(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
@@ -329,7 +329,7 @@ export class HelixTextInput extends LitElement {
     }
   }
 
-  // Called when a parent fieldset is disabled/enabled
+  /** @internal */
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
