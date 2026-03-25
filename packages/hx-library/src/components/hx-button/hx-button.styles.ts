@@ -235,7 +235,10 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--ghost:hover {
-    --hx-button-bg: var(--hx-button-inverted-ghost-hover-bg, rgba(255, 255, 255, 0.15));
+    --hx-button-bg: var(
+      --hx-button-inverted-ghost-hover-bg,
+      var(--hx-overlay-white-20, rgba(255, 255, 255, 0.2))
+    );
   }
 
   /* Outline inverted — white border */

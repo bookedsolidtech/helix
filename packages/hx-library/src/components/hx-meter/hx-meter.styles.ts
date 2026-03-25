@@ -23,9 +23,9 @@ export const helixMeterStyles = css`
   .meter__track {
     position: relative;
     width: 100%;
-    height: var(--hx-meter-track-height, var(--hx-size-2, 0.5rem));
+    height: var(--hx-meter-track-height, var(--hx-space-2, 0.5rem));
     background-color: var(--hx-meter-track-color, var(--hx-color-neutral-200, #e5e7eb));
-    border-radius: var(--hx-meter-track-radius, var(--hx-radius-full, 9999px));
+    border-radius: var(--hx-meter-track-radius, var(--hx-border-radius-full, 9999px));
     overflow: hidden;
   }
 

@@ -93,11 +93,12 @@ export const helixBannerStyles = css`
   }
 
   .banner__action:hover {
-    opacity: 0.8;
+    opacity: var(--hx-opacity-90, 0.9);
   }
 
   .banner__action:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
@@ -126,18 +127,19 @@ export const helixBannerStyles = css`
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       opacity var(--hx-transition-fast, 150ms ease);
-    opacity: 0.7;
+    opacity: var(--hx-opacity-75, 0.75);
   }
 
   .banner__close-button:hover {
-    opacity: 1;
+    opacity: var(--hx-opacity-100, 1);
     /* color-mix() is supported in Chrome 111+, Firefox 113+, Safari 16.2+.   */
     /* Falls back to transparent (no hover background) in older environments.  */
     background-color: color-mix(in srgb, currentColor 10%, transparent);
   }
 
   .banner__close-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }

@@ -34,7 +34,7 @@ export const helixTableStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     font-weight: var(--hx-font-weight-semibold, 600);
     color: var(--hx-table-header-color, var(--hx-color-neutral-700, #334155));
-    font-size: var(--hx-font-size-base, 1rem);
+    font-size: var(--hx-font-size-md, 1rem);
   }
 
   /* ─── Slotted sub-component styling ─── */

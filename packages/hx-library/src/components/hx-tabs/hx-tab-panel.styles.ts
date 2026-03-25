@@ -15,7 +15,10 @@ export const helixTabPanelStyles = css`
 
   :host(:focus-visible) {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-tabs-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(
+        --hx-tabs-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.125rem);
   }

@@ -74,7 +74,10 @@ export const helixCheckboxStyles = css`
 
   .checkbox__input:focus-visible ~ .checkbox__box {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-checkbox-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(
+        --hx-checkbox-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -200,7 +203,7 @@ export const helixCheckboxStyles = css`
   }
 
   :host([hx-size='lg']) .checkbox__label {
-    font-size: var(--hx-font-size-base, 1rem);
+    font-size: var(--hx-font-size-md, 1rem);
   }
 
   :host([hx-size='lg']) .checkbox__help-text,

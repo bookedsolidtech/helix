@@ -65,11 +65,11 @@ export const helixPhiFieldStyles = css`
   }
 
   .phi-field__toggle:hover {
-    opacity: 0.8;
+    opacity: var(--hx-opacity-90, 0.9);
   }
 
   .phi-field__toggle:active {
-    opacity: 0.6;
+    opacity: var(--hx-opacity-50, 0.5);
   }
 
   .phi-field__toggle svg {

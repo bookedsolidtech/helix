@@ -148,18 +148,19 @@ export const helixAlertStyles = css`
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       opacity var(--hx-transition-fast, 150ms ease);
-    opacity: 0.7;
+    opacity: var(--hx-opacity-75, 0.75);
   }
 
   .alert__close-button:hover {
-    opacity: 1;
+    opacity: var(--hx-opacity-100, 1);
     /* color-mix() is supported in Chrome 111+, Firefox 113+, Safari 16.2+.   */
     /* Falls back to transparent (no hover background) in older environments.  */
     background-color: color-mix(in srgb, currentColor 10%, transparent);
   }
 
   .alert__close-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
