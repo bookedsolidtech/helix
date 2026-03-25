@@ -40,10 +40,11 @@ export default defineConfig({
         maxThreads: 4,
       },
     },
-    // Coverage disabled by default — run `npm run test:coverage` for reports.
+    // Coverage disabled by default — run `pnpm run test:coverage` for reports.
     // Keeps CI fast (~5min instead of ~20min).
+    // Use v8 provider for accurate, fast coverage without instrumentation overhead.
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       enabled: false,
       include: ['src/components/**/*.ts'],
       exclude: [
@@ -52,13 +53,13 @@ export default defineConfig({
         'src/components/**/*.styles.ts',
         'src/components/**/index.ts',
       ],
-      reporter: ['text', 'json-summary'],
+      reporter: ['text', 'json', 'json-summary'],
       reportsDirectory: '.cache/coverage',
       thresholds: {
-        statements: 75,
-        branches: 70,
-        functions: 75,
-        lines: 75,
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
       },
     },
   },
