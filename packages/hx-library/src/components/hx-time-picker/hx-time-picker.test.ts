@@ -157,7 +157,8 @@ describe('hx-time-picker', () => {
     it('dropdown is initially closed', async () => {
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      // listbox is always in the DOM (aria-controls must never dangle); hidden when closed
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
 
     it('opens on input click', async () => {
@@ -188,7 +189,7 @@ describe('hx-time-picker', () => {
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
 
     it('closes on outside click', async () => {
@@ -200,7 +201,7 @@ describe('hx-time-picker', () => {
       document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
 
     it('renders correct time slots based on min/max/step', async () => {
@@ -241,7 +242,7 @@ describe('hx-time-picker', () => {
       option.click();
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
 
     it('ArrowDown moves to next option when open', async () => {
@@ -492,7 +493,7 @@ describe('hx-time-picker', () => {
       input.click();
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -507,7 +508,7 @@ describe('hx-time-picker', () => {
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
 
     it('ArrowDown does not move below the last option', async () => {
@@ -782,7 +783,7 @@ describe('hx-time-picker', () => {
       input.click();
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -987,8 +988,9 @@ describe('hx-time-picker', () => {
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
       await el.updateComplete;
+      // Home key when closed should not open the listbox
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -1139,17 +1141,19 @@ describe('hx-time-picker', () => {
       toggle.click();
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]');
-      expect(listbox).toBeNull();
+      expect(listbox?.hasAttribute('hidden')).toBe(true);
     });
   });
 
   // ─── aria-controls attribute ───
 
   describe('aria-controls attribute', () => {
-    it('input has no aria-controls when listbox is closed', async () => {
+    it('input always has aria-controls pointing to the listbox (prevents dangling reference)', async () => {
+      // The listbox is always in the DOM (hidden when closed) so aria-controls is always set
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-controls')).toBeNull();
+      const listbox = shadowQuery(el, '[role="listbox"]')!;
+      expect(input.getAttribute('aria-controls')).toBe(listbox.id);
     });
 
     it('input has aria-controls matching listbox id when open', async () => {
@@ -1428,14 +1432,16 @@ describe('hx-time-picker', () => {
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
 
-      // Ensure dropdown is closed.
-      expect(shadowQuery(el, '[role="listbox"]')).toBeNull();
+      // Ensure dropdown is closed (listbox is always in DOM, but hidden).
+      const listboxBefore = shadowQuery(el, '[role="listbox"]');
+      expect(listboxBefore?.hasAttribute('hidden')).toBe(true);
 
       input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
 
-      // Dropdown should now be open.
-      expect(shadowQuery(el, '[role="listbox"]')).toBeTruthy();
+      // Dropdown should now be open (hidden attribute removed).
+      const listboxAfter = shadowQuery(el, '[role="listbox"]');
+      expect(listboxAfter?.hasAttribute('hidden')).toBe(false);
     });
   });
 
