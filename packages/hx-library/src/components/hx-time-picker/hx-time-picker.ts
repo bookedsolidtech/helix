@@ -146,6 +146,9 @@ function parseUserInput(raw: string): string | null {
  * @csspart toggle - The clock icon toggle button.
  * @csspart listbox - The dropdown `<ul>` element.
  * @csspart option - Each `<li>` option in the listbox.
+ * @csspart field - The outer field wrapper element.
+ * @csspart error - The error message element.
+ * @csspart help-text - The help text element.
  *
  * @cssprop [--hx-time-picker-bg=var(--hx-color-neutral-0)] - Input background color.
  * @cssprop [--hx-time-picker-color=var(--hx-color-neutral-800)] - Input text color.

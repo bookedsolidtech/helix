@@ -8,12 +8,21 @@
  * by comparing source-extracted @property, @fires, CSS parts, and slots against
  * what is documented in the manifest.
  *
- * Checks performed per component:
- *   1. @property decorators → CEM members (fields)
- *   2. @fires JSDoc tags     → CEM events
- *   3. part="..." in templates → CEM cssParts
- *   4. <slot> elements       → CEM slots (named and default)
- *   5. Class declaration     → CEM declarations
+ * Checks performed per component class:
+ *   1. @property decorators (non-@internal) → CEM members (fields)
+ *   2. @fires JSDoc tags                    → CEM events
+ *   3. part="..." in HTML templates         → CEM cssParts
+ *   4. <slot> elements                      → CEM slots (named and default)
+ *   5. Class declaration                    → CEM declarations
+ *
+ * Design notes:
+ *   - Files with multiple component classes (e.g. hx-grid.ts defining HelixGrid +
+ *     HelixGridItem) are split into per-class sections so each class is validated
+ *     against its own CEM entry.
+ *   - @internal JSDoc tag on a @property block causes the property to be excluded
+ *     from validation (the CEM analyzer also excludes @internal members).
+ *   - part="..." matches are restricted to HTML template context; matches inside
+ *     comment lines and JavaScript querySelector strings are skipped.
  *
  * Usage:
  *   node scripts/validate-cem.mjs              # Run from repo root
@@ -85,7 +94,6 @@ function buildCemIndex(cem) {
       if (decl.tagName) {
         index.set(decl.tagName, decl);
       }
-      // Also index by class name for class-only lookup
       if (decl.name) {
         index.set(decl.name, decl);
       }
@@ -94,38 +102,135 @@ function buildCemIndex(cem) {
   return index;
 }
 
+/**
+ * Split a source file into per-class sections.
+ *
+ * Files may define more than one component class (e.g. hx-grid.ts exports
+ * HelixGrid and HelixGridItem). This function returns an array of objects, one
+ * per class, each containing only the source text from that class boundary to
+ * the start of the next class (or end-of-file). This scopes all extraction
+ * (properties, parts, slots, etc.) to the correct class.
+ *
+ * Returns: Array<{ className, tagName, classSource }>
+ */
+function splitIntoClassSections(fullSource) {
+  // Find all class declarations: export class Helix* extends or export class Hx* extends
+  const classPattern = /export\s+class\s+((?:Helix|Hx)\w+)\s+extends/g;
+  const sections = [];
+  let match;
+
+  while ((match = classPattern.exec(fullSource)) !== null) {
+    sections.push({ className: match[1], start: match.index });
+  }
+
+  if (sections.length === 0) return [];
+
+  return sections.map((section, i) => {
+    const end = i + 1 < sections.length ? sections[i + 1].start : fullSource.length;
+    const classSource = fullSource.slice(section.start, end);
+
+    // Extract the @customElement tag from this section or preceding lines
+    // (the decorator sits just above the class keyword)
+    const sectionWithLeadin = fullSource.slice(
+      // Include up to 200 chars before the class start to catch the @customElement decorator
+      Math.max(0, section.start - 200),
+      end,
+    );
+    const decoratorMatch = /@customElement\s*\(\s*['"]([^'"]+)['"]\s*\)/.exec(sectionWithLeadin);
+    const tagName = decoratorMatch ? decoratorMatch[1] : null;
+
+    return { className: section.className, tagName, classSource };
+  });
+}
+
 // ── Source extraction ─────────────────────────────────────────────────────────
 
 /**
- * Extract property names from @property decorators in TypeScript source.
- * Handles multi-line decorator patterns.
+ * Strip single-line (//) and block (/* ... *\/) comments from source so that
+ * part="..." and other patterns inside comments are not matched.
+ * Also strips template literal content that looks like JavaScript calls
+ * (querySelector('[part="..."]')) to avoid matching JS strings as template parts.
  */
-function extractProperties(source) {
+function stripComments(source) {
+  // Remove block comments
+  let stripped = source.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length));
+  // Remove single-line comments
+  stripped = stripped.replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
+  return stripped;
+}
+
+/**
+ * Returns true if the position in source is inside a JavaScript CSS attribute
+ * selector string, e.g. '[part="trigger"]' passed to querySelector.
+ *
+ * The tell: in HTML templates, part="..." appears as a bare attribute.
+ * In JS, it appears as [part="..."] — the regex match is immediately preceded
+ * by `[` (the CSS attribute selector bracket).
+ */
+function isInsideJsAttributeSelector(source, matchIndex) {
+  const before = source.slice(Math.max(0, matchIndex - 60), matchIndex);
+  // If immediately preceded by [ it's inside a CSS attribute selector string
+  if (/\[$/.test(before)) return true;
+  return false;
+}
+
+/**
+ * Extract property names from @property decorators in a class section.
+ * Excludes properties tagged @internal in the preceding JSDoc comment block.
+ */
+function extractProperties(classSource) {
   const props = new Set();
 
-  // Pattern 1: @property(...) on its own line, property declaration on next line(s)
-  // Matches: @property({ ... })\n  [modifiers] [get|set] propertyName
-  // Handles accessor properties: @property(...)\n  get propName() { ... }
-  const pattern1 =
-    /@property\s*\([^)]*\)\s*\n\s*(?:(?:readonly|public|protected|private|override)\s+)*(?:(get|set)\s+)?(\w+)/g;
-  let match;
-  while ((match = pattern1.exec(source)) !== null) {
-    // match[1] is optional 'get'|'set' accessor keyword, match[2] is the property name
-    const name = match[2];
-    // Skip internal/lifecycle property names and TS keywords
-    if (!name.startsWith('_') && name !== 'override' && name !== 'static') {
-      props.add(name);
-    }
-  }
+  // Split into lines for context-aware processing
+  const lines = classSource.split('\n');
 
-  // Pattern 2: @property on same line as declaration (rare but possible)
-  // e.g., @property({ type: String }) variant: string = 'primary';
-  const pattern2 =
-    /@property\s*\([^)]*\)\s+(?:(?:readonly|public|protected|private)\s+)*(\w+)[?!]?\s*[=:]/g;
-  while ((match = pattern2.exec(source)) !== null) {
-    const name = match[1];
-    if (!name.startsWith('_') && name !== 'override' && name !== 'static') {
-      props.add(name);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Detect @property decorator line
+    if (!/@property\s*\(/.test(line)) continue;
+
+    // Check if the JSDoc block immediately preceding this @property contains @internal.
+    // Strategy: scan backward from the @property line to find the closest */ then /**,
+    // and check if @internal appears between those two markers.
+    const contextAbove = lines.slice(Math.max(0, i - 15), i).join('\n');
+    const closeIdx = contextAbove.lastIndexOf('*/');
+    if (closeIdx !== -1) {
+      const openIdx = contextAbove.lastIndexOf('/**', closeIdx);
+      if (openIdx !== -1) {
+        const jsDocBlock = contextAbove.slice(openIdx, closeIdx + 2);
+        if (/@internal/.test(jsDocBlock)) {
+          // The immediately preceding JSDoc block marks this property @internal — skip it
+          continue;
+        }
+      }
+    }
+
+    // Extract property name from: @property(...) [modifiers] [get|set] propName
+    // Pattern 1: decorator on its own line, declaration on the next line(s)
+    const remainingFromDecorator = lines.slice(i, i + 5).join('\n');
+    const p1 =
+      /@property\s*\([^)]*\)\s*\n\s*(?:(?:readonly|public|protected|private|override)\s+)*(?:(?:get|set)\s+)?(\w+)/.exec(
+        remainingFromDecorator,
+      );
+    if (p1) {
+      const name = p1[1];
+      if (!name.startsWith('_') && name !== 'override' && name !== 'static') {
+        props.add(name);
+      }
+      continue;
+    }
+
+    // Pattern 2: decorator and declaration on the same line
+    const p2 =
+      /@property\s*\([^)]*\)\s+(?:(?:readonly|public|protected|private)\s+)*(\w+)[?!]?\s*[=:]/.exec(
+        line,
+      );
+    if (p2) {
+      const name = p2[1];
+      if (!name.startsWith('_') && name !== 'override' && name !== 'static') {
+        props.add(name);
+      }
     }
   }
 
@@ -134,30 +239,28 @@ function extractProperties(source) {
 
 /**
  * Extract event names from @fires JSDoc tags.
- * Handles both:
- *   @fires hx-click
- *   @fires {CustomEvent} hx-click - Description
  */
-function extractFires(source) {
+function extractFires(classSource) {
   const events = new Set();
-  // Match @fires optionally followed by {Type} then the event name
   const pattern = /@fires\s+(?:\{[^}]*\}\s+)?([\w-]+)/g;
   let match;
-  while ((match = pattern.exec(source)) !== null) {
+  while ((match = pattern.exec(classSource)) !== null) {
     events.add(match[1]);
   }
   return events;
 }
 
 /**
- * Extract CSS part names from part="..." attributes in template literals.
+ * Extract CSS part names from part="..." attributes in HTML template literals.
+ * Skips matches inside comment lines and JS querySelector strings.
  */
-function extractCssParts(source) {
+function extractCssParts(classSource) {
   const parts = new Set();
+  const stripped = stripComments(classSource);
   const pattern = /part="([\w-]+(?:\s+[\w-]+)*)"/g;
   let match;
-  while ((match = pattern.exec(source)) !== null) {
-    // A single element can expose multiple parts (space-separated)
+  while ((match = pattern.exec(stripped)) !== null) {
+    if (isInsideJsAttributeSelector(stripped, match.index)) continue;
     for (const part of match[1].split(/\s+/)) {
       if (part) parts.add(part);
     }
@@ -169,66 +272,33 @@ function extractCssParts(source) {
  * Extract slot names from <slot> elements in template literals.
  * Returns { named: Set<string>, hasDefault: boolean }
  */
-function extractSlots(source) {
+function extractSlots(classSource) {
   const named = new Set();
   let hasDefault = false;
+
+  const stripped = stripComments(classSource);
 
   // Named slots: <slot name="foo">
   const namedPattern = /<slot\b[^>]*\bname="([\w-]+)"/g;
   let match;
-  while ((match = namedPattern.exec(source)) !== null) {
+  while ((match = namedPattern.exec(stripped)) !== null) {
     named.add(match[1]);
   }
 
   // Default (unnamed) slots: <slot> or <slot ...> without name="..."
-  // Look for <slot that does NOT have name= anywhere before the closing > or />
   const defaultPattern = /<slot\b(?![^>]*\bname=)[^>]*>/g;
-  if (defaultPattern.test(source)) {
+  if (defaultPattern.test(stripped)) {
     hasDefault = true;
   }
 
   return { named, hasDefault };
 }
 
-/**
- * Extract the exported class name from a component source file.
- * Matches both Helix* and Hx* class name conventions.
- */
-function extractClassName(source) {
-  const match = /export\s+class\s+((?:Helix|Hx)\w+)\s+extends/.exec(source);
-  return match ? match[1] : null;
-}
-
-/**
- * Extract the @tag annotation if present (used as fallback for tagName lookup).
- */
-function extractTagName(source) {
-  // Try @customElement('hx-...') decorator
-  const decoratorMatch = /@customElement\s*\(\s*['"]([^'"]+)['"]\s*\)/.exec(source);
-  if (decoratorMatch) return decoratorMatch[1];
-
-  // Try @tag JSDoc annotation
-  const tagMatch = /@tag\s+(hx-[\w-]+)/.exec(source);
-  if (tagMatch) return tagMatch[1];
-
-  return null;
-}
-
 // ── Validation ────────────────────────────────────────────────────────────────
 
-function validateFile(filePath, cemIndex) {
-  const relPath = filePath.replace(ROOT + '/', '');
-  const source = readFileSync(filePath, 'utf8');
-
+function validateSection(section, cemIndex, relPath) {
+  const { className, tagName, classSource } = section;
   const errors = [];
-
-  const className = extractClassName(source);
-  if (!className) {
-    // Not a component class file (could be a mixin, utility, etc.) — skip silently
-    return errors;
-  }
-
-  const tagName = extractTagName(source);
 
   // Locate the CEM declaration — prefer tag name lookup, fall back to class name
   const decl = (tagName && cemIndex.get(tagName)) || cemIndex.get(className);
@@ -238,13 +308,12 @@ function validateFile(filePath, cemIndex) {
       file: relPath,
       message: `Class "${className}" (tag: ${tagName ?? 'unknown'}) not found in CEM declarations`,
     });
-    // Cannot validate members/events/parts/slots without the declaration
     return errors;
   }
 
   // ── 1. @property decorators → CEM members ──────────────────────────────
 
-  const sourceProps = extractProperties(source);
+  const sourceProps = extractProperties(classSource);
   const cemMembers = new Set(
     (decl.members ?? []).filter((m) => m.kind === 'field').map((m) => m.name),
   );
@@ -260,7 +329,7 @@ function validateFile(filePath, cemIndex) {
 
   // ── 2. @fires events → CEM events ──────────────────────────────────────
 
-  const sourceEvents = extractFires(source);
+  const sourceEvents = extractFires(classSource);
   const cemEvents = new Set((decl.events ?? []).map((e) => e.name));
 
   for (const event of sourceEvents) {
@@ -274,7 +343,7 @@ function validateFile(filePath, cemIndex) {
 
   // ── 3. CSS parts → CEM cssParts ────────────────────────────────────────
 
-  const sourceParts = extractCssParts(source);
+  const sourceParts = extractCssParts(classSource);
   const cemParts = new Set((decl.cssParts ?? []).map((p) => p.name));
 
   for (const part of sourceParts) {
@@ -288,7 +357,7 @@ function validateFile(filePath, cemIndex) {
 
   // ── 4. <slot> elements → CEM slots ─────────────────────────────────────
 
-  const { named: sourceNamedSlots, hasDefault: sourceHasDefault } = extractSlots(source);
+  const { named: sourceNamedSlots, hasDefault: sourceHasDefault } = extractSlots(classSource);
   const cemSlots = decl.slots ?? [];
   const cemSlotNames = new Set(cemSlots.map((s) => s.name ?? ''));
 
@@ -308,6 +377,20 @@ function validateFile(filePath, cemIndex) {
     });
   }
 
+  return errors;
+}
+
+function validateFile(filePath, cemIndex) {
+  const relPath = filePath.replace(ROOT + '/', '');
+  const fullSource = readFileSync(filePath, 'utf8');
+
+  const sections = splitIntoClassSections(fullSource);
+  if (sections.length === 0) return [];
+
+  const errors = [];
+  for (const section of sections) {
+    errors.push(...validateSection(section, cemIndex, relPath));
+  }
   return errors;
 }
 
@@ -339,11 +422,8 @@ function main() {
       }
       totalErrors += errors.length;
     } else {
-      // Only count files that actually contain a component class
-      const source = readFileSync(file, 'utf8');
-      if (extractClassName(source)) {
-        checkedComponents++;
-      }
+      const fullSource = readFileSync(file, 'utf8');
+      checkedComponents += splitIntoClassSections(fullSource).length;
     }
   }
 
