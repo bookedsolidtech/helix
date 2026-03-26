@@ -1,0 +1,43 @@
+{#
+/**
+ * @file
+ * Button SDC — wraps hx-button for Drupal form and action patterns.
+ *
+ * For Drupal Form API submit buttons, map element['#value'] to the default
+ * slot and set type="submit". Use href to render as an anchor-styled button
+ * for action links and CTAs without JavaScript form submission.
+ *
+ * Example: Form API submit
+ *   {% include 'helixui:hx-button' with {
+ *     type: 'submit',
+ *     variant: 'primary',
+ *     content: 'Save changes',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-button') }}
+
+<hx-button
+  {% if variant and variant != 'primary' %}variant="{{ variant }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if type and type != 'button' %}type="{{ type }}"{% endif %}
+  {% if href %}href="{{ href }}"{% endif %}
+  {% if target %}target="{{ target }}"{% endif %}
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if loading %}loading{% endif %}
+  {% if full %}full{% endif %}
+  {% if inverted %}inverted{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if prefix %}
+    <span slot="prefix">{{ prefix }}</span>
+  {% endif %}
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if suffix %}
+    <span slot="suffix">{{ suffix }}</span>
+  {% endif %}
+</hx-button>

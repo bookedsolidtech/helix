@@ -86,6 +86,12 @@ export class HelixDropdown extends LitElement {
     | 'end' = 'bottom-start';
 
   /**
+   * Accessible label for the dropdown menu panel. Override for i18n.
+   * @attr label
+   */
+  @property() label = 'Menu';
+
+  /**
    * Whether the dropdown is disabled. Prevents opening.
    * @attr disabled
    */
@@ -362,7 +368,7 @@ export class HelixDropdown extends LitElement {
         id=${this._panelId}
         role="menu"
         aria-hidden=${this._panelVisible ? nothing : 'true'}
-        aria-label="Menu"
+        aria-label=${this.label}
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
       >

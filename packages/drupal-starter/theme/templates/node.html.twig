@@ -1,0 +1,89 @@
+{#
+/**
+ * @file
+ * HELiX UI Starter Theme — default node template.
+ *
+ * Renders a node using the helixui:card SDC, mapping Drupal entity field
+ * variables to web component slots and properties.
+ *
+ * Available variables:
+ *
+ * Node-specific:
+ * - node: The full node entity.
+ * - node.label: The node title.
+ * - node.bundle: The content type machine name.
+ * - node.id(): The node ID.
+ * - node.createdTime: Unix timestamp of node creation.
+ * - node.isPublished(): Boolean — node is published.
+ * - author_name: Display name of the content author.
+ * - author_picture: Render array for the author portrait image.
+ * - date: Formatted node created date string.
+ * - url: The canonical URL of this node.
+ * - page: Flag indicating the node is being rendered as a full page (boolean).
+ *   When TRUE the node title should not be rendered — the page template handles it.
+ *
+ * Content fields (render arrays from the node display):
+ * - content: All the rendered field outputs as render arrays.
+ *   - content.body: Node body field.
+ *   - content.field_image: Image field (if present).
+ *   - content.field_tags: Tags field (if present).
+ *
+ * Attributes:
+ * - attributes: Drupal attributes object for the outer wrapper element.
+ * - title_attributes: Drupal attributes for the node title element.
+ * - content_attributes: Drupal attributes for the content wrapper.
+ * - author_attributes: Drupal attributes for the author credit.
+ *
+ * @see https://www.drupal.org/docs/develop/theming-drupal/twig-in-drupal/twig-template-naming-conventions
+ */
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-badge') }}
+{{ attach_library('helixui/hx-avatar') }}
+{{ attach_library('helixui/hx-button') }}
+{% if content.field_image %}
+  {{ attach_library('helixui/hx-image') }}
+{% endif %}
+
+<article{{ attributes.addClass('node', 'node--type-' ~ node.bundle, node.isPublished() ? 'node--published' : 'node--unpublished', page ? 'node--view-mode-full' : 'node--view-mode-teaser') }}>
+
+  {# =========================================================================
+     Full-page node rendering — uses helixui:card SDC for consistent layout.
+
+     When page = TRUE, the title is rendered inside the card heading slot so
+     it appears in the correct document hierarchy. When rendering as a teaser
+     (page = FALSE), the card heading slot contains a linked title.
+     ========================================================================= #}
+  {% include 'helixui:card' with {
+    variant: page ? 'default' : 'outlined',
+    elevation: page ? 'flat' : 'raised',
+    image: content.field_image ? content.field_image|render : null,
+    heading: page
+      ? '<h1' ~ title_attributes ~ '>' ~ node.label ~ '</h1>'
+      : '<a href="' ~ url ~ '" rel="bookmark">' ~ node.label ~ '</a>',
+    content: content.body,
+    footer: author_name ? '<span class="node__meta">' ~ author_name ~ ' &mdash; ' ~ date ~ '</span>' : date,
+  } only %}
+
+  {# =========================================================================
+     Tag / taxonomy term badges below the card, rendered in the light DOM.
+     These sit outside the card component intentionally so they do not
+     interfere with the card's internal slot layout.
+     ========================================================================= #}
+  {% if content.field_tags %}
+    <div class="node__tags">
+      {{ content.field_tags }}
+    </div>
+  {% endif %}
+
+  {# =========================================================================
+     Any additional field output (comments, related items, etc.) not handled
+     by the card SDC above. content.body and content.field_image are consumed
+     by the SDC; everything else falls through here.
+     ========================================================================= #}
+  <div{{ content_attributes.addClass('node__content') }}>
+    {{ content|without('body', 'field_image', 'field_tags') }}
+  </div>
+
+</article>

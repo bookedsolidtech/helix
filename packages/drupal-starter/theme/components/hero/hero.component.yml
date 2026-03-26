@@ -1,0 +1,45 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Hero
+description: 'Full-width hero section composing hx-text, hx-image, and hx-button primitives. Supports background images, text overlay, and a configurable call-to-action. Use for landing page headers, campaign pages, and healthcare service entry points.'
+status: stable
+group: 'Hero / Banner'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Hero headline. Rendered as an h1 — use only once per page.'
+    subtitle:
+      type: string
+      title: Subtitle
+      description: 'Supporting text below the headline.'
+    cta_text:
+      type: string
+      title: 'CTA Text'
+      description: 'Call-to-action button label. Requires cta_url to render.'
+    cta_url:
+      type: string
+      title: 'CTA URL'
+      description: 'Destination URL for the call-to-action button.'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'Background image URL. Rendered as a decorative hx-image behind the text overlay.'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the background image. Use empty string ("") for purely decorative images.'
+    variant:
+      type: string
+      title: Variant
+      description: 'Color scheme variant controlling text and overlay colors.'
+      default: 'primary'
+      enum:
+        - light
+        - dark
+        - primary
+slots:
+  default:
+    title: 'Additional Content'
+    description: 'Optional content rendered below the subtitle and CTA button. Use for trust indicators, statistics, or secondary messaging.'

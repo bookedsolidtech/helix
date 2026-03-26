@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import './hx-combobox.js';
 
 // ─────────────────────────────────────────────────
@@ -120,6 +121,41 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    name: {
+      control: 'text',
+      description: 'Form field name used for form submission.',
+      table: {
+        category: 'Form',
+        type: { summary: 'string' },
+      },
+    },
+    ariaLabel: {
+      control: 'text',
+      description:
+        'Accessible label for the combobox input when no visible label is rendered.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+    labelNoOptions: {
+      control: 'text',
+      description: 'Message shown in the dropdown when no options match the filter.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'No options' },
+        type: { summary: 'string' },
+      },
+    },
+    labelRequired: {
+      control: 'text',
+      description: 'Accessible label suffix appended to the visible label when required.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: '(required)' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Select a fruit',
@@ -134,6 +170,11 @@ const meta = {
     filterDebounce: 0,
     error: '',
     helpText: '',
+  },
+  parameters: {
+    actions: {
+      handles: ['hx-show', 'hx-hide', 'hx-input', 'hx-change', 'hx-clear'],
+    },
   },
 } satisfies Meta;
 
@@ -388,4 +429,25 @@ export const Sizes: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the input. Type to filter options. Arrow Down/Up navigates the dropdown list. Enter selects the focused option. Escape closes the dropdown.
+      </p>
+      <hx-combobox></hx-combobox>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-combobox');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

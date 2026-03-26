@@ -59,6 +59,21 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    enctype: {
+      control: { type: 'select' },
+      options: [
+        'application/x-www-form-urlencoded',
+        'multipart/form-data',
+        'text/plain',
+      ],
+      description:
+        'Encoding type used when submitting the form. Use "multipart/form-data" for file uploads.',
+      table: {
+        category: 'Properties',
+        defaultValue: { summary: 'application/x-www-form-urlencoded' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     action: '',
@@ -1943,4 +1958,20 @@ export const ResetBehavior: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab navigates through all form fields and submit/reset buttons in document order. Enter submits the form when a submit button is focused.
+      </p>
+      <hx-form></hx-form>
+    </div>
+  `,
 };

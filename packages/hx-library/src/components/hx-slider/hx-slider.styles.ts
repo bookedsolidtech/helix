@@ -46,7 +46,7 @@ export const helixSliderStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     font-variant-numeric: tabular-nums;
     min-width: var(--hx-size-8, 2rem);
-    text-align: right;
+    text-align: end;
   }
 
   /* ─── Track Container ─── */
@@ -87,11 +87,11 @@ export const helixSliderStyles = css`
   /* ─── Size: lg ─── */
 
   .slider--lg .slider__track {
-    height: var(--hx-slider-track-height-lg, var(--hx-size-2, 0.5rem));
+    height: var(--hx-slider-track-height-lg, var(--hx-space-2, 0.5rem));
   }
 
   .slider--lg .slider__input {
-    height: var(--hx-slider-track-height-lg, var(--hx-size-2, 0.5rem));
+    height: var(--hx-slider-track-height-lg, var(--hx-space-2, 0.5rem));
   }
 
   /* ─── Fill ─── */
@@ -196,7 +196,10 @@ export const helixSliderStyles = css`
   .slider__input:focus-visible ~ .slider__thumb-visual {
     box-shadow:
       0 0 0 var(--hx-focus-ring-width, 2px)
-        var(--hx-slider-focus-ring-color, var(--hx-focus-ring-color, #2563eb)),
+        var(
+          --hx-slider-focus-ring-color,
+          var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        ),
       var(--hx-slider-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
   }
 
@@ -243,7 +246,7 @@ export const helixSliderStyles = css`
   .slider__ticks {
     position: relative;
     width: 100%;
-    height: var(--hx-size-2, 0.5rem);
+    height: var(--hx-space-2, 0.5rem);
     margin-top: var(--hx-space-1, 0.25rem);
   }
 

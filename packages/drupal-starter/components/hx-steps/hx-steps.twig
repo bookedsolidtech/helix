@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Steps SDC — wraps hx-steps for Drupal multi-step form progress indicators.
+ *
+ * Provide hx-step elements in the default slot. Each hx-step accepts a
+ * status attribute (complete, current, upcoming, error) and an optional
+ * description slot.
+ *
+ * For Drupal multi-step forms, track progress via a form state variable and
+ * pass the current step index to determine the status of each hx-step.
+ */
+#}
+{{ attach_library('helixui/hx-steps') }}
+
+<hx-steps
+  {% if label %}aria-label="{{ label }}"{% endif %}
+  {% if orientation and orientation != 'horizontal' %}orientation="{{ orientation }}"{% endif %}
+  {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-steps>

@@ -1,0 +1,43 @@
+name: 'HELiX UI Starter Theme'
+type: theme
+description: 'Starter theme demonstrating HELiX web component integration with Drupal SDC. Provides full-page templates, SDC wrappers for hx-* components, adopted-stylesheets pattern, and Drupal behaviors integration for healthcare enterprise applications.'
+package: HELiX
+core_version_requirement: '^10 || ^11'
+
+# This theme stands alone — it does not extend Claro, Olivero, or any other
+# contrib theme. All base styles come from @helixui/tokens and component
+# shadow DOM. Light-DOM layout is handled by css/theme.css.
+base theme: false
+
+# Libraries defined in helixui.libraries.yml.
+# global        — tokens CSS + component-initialization.js (always present)
+# adopted-stylesheets — light-DOM complement styles + theme.behaviors.js
+libraries:
+  - helixui/global
+  - helixui/adopted-stylesheets
+
+# Libraries override.
+# The helixui theme replaces standard Drupal status-messages and breadcrumb
+# styles so hx-alert and hx-breadcrumb render without visual conflicts.
+libraries-override:
+  claro/messages: false
+  claro/breadcrumb: false
+  olivero/messages: false
+  olivero/breadcrumb: false
+
+# Page regions.
+regions:
+  header: Header
+  primary_menu: 'Primary menu'
+  secondary_menu: 'Secondary menu'
+  breadcrumb: Breadcrumb
+  highlighted: Highlighted
+  help: Help
+  content: Content
+  sidebar_first: 'First sidebar'
+  sidebar_second: 'Second sidebar'
+  footer: Footer
+
+# SDC component discovery.
+# Drupal 10.1+ automatically discovers SDCs at this path relative to theme root.
+components: components/

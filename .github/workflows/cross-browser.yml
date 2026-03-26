@@ -1,0 +1,117 @@
+# ============================================================================
+# Cross-Browser Test Pipeline — HELiX Enterprise Healthcare Web Component Library
+# ============================================================================
+# Validates component compatibility across Chromium, Firefox, and WebKit.
+# Runs on a weekly schedule and on pushes to main/staging (post-merge validation).
+# Not required for PR merge — the primary CI test gate uses Chromium-only for speed.
+# ============================================================================
+
+name: Cross-Browser Tests
+
+on:
+  # Weekly schedule: every Monday at 06:00 UTC
+  schedule:
+    - cron: '0 6 * * 1'
+  # Manual trigger for on-demand cross-browser validation
+  workflow_dispatch:
+    inputs:
+      components:
+        description: 'Specific components to test (comma-separated, e.g. hx-button,hx-text-input). Leave empty for full suite.'
+        required: false
+        default: ''
+  # Run on pushes to protected branches for post-merge validation
+  push:
+    branches: [main, staging]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  cross-browser:
+    name: Cross-Browser (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (required before tests — @helixui/tokens exports from dist/)
+        run: pnpm turbo run build --filter='!docs' --filter='!@helixui/storybook'
+
+      - name: Install Playwright browser — ${{ matrix.browser }}
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run cross-browser tests — ${{ matrix.browser }}
+        run: |
+          if [ -n "${{ github.event.inputs.components }}" ]; then
+            # Run only specified components
+            IFS=',' read -ra COMPONENTS <<< "${{ github.event.inputs.components }}"
+            PATHS=""
+            for comp in "${COMPONENTS[@]}"; do
+              comp=$(echo "$comp" | xargs)  # trim whitespace
+              PATHS="$PATHS src/components/$comp/"
+            done
+            echo "Running tests for specific components: $PATHS"
+            BROWSER=${{ matrix.browser }} pnpm exec vitest run \
+              --config vitest.config.cross-browser.ts \
+              --browser.instances "[{\"browser\":\"${{ matrix.browser }}\"}]" \
+              $PATHS
+          else
+            echo "Running full test suite on ${{ matrix.browser }}"
+            BROWSER=${{ matrix.browser }} pnpm exec vitest run \
+              --config vitest.config.cross-browser.ts \
+              --browser.instances "[{\"browser\":\"${{ matrix.browser }}\"}]"
+          fi
+        working-directory: packages/hx-library
+
+      - name: Upload test results — ${{ matrix.browser }}
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-browser-results-${{ matrix.browser }}
+          path: packages/hx-library/.cache/test-results-cross-browser.json
+          retention-days: 14
+          if-no-files-found: warn
+
+  cross-browser-summary:
+    name: Cross-Browser Summary
+    runs-on: ubuntu-latest
+    needs: cross-browser
+    if: always()
+    steps:
+      - name: Check cross-browser results
+        run: |
+          CHROMIUM="${{ needs.cross-browser.result }}"
+          echo "Cross-browser test results:"
+          echo "  Chromium: $CHROMIUM"
+          echo "  Firefox:  ${{ needs.cross-browser.result }}"
+          echo "  WebKit:   ${{ needs.cross-browser.result }}"
+
+          if [ "${{ needs.cross-browser.result }}" == "failure" ]; then
+            echo "::error::One or more cross-browser tests failed. Check per-browser artifacts."
+            exit 1
+          fi
+
+          echo "All cross-browser tests passed."

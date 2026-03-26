@@ -1,0 +1,23 @@
+{
+  "name": "@helixui/vue-starter",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vue 3 starter kit demonstrating HELiX web components with typed event handling",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@helixui/library": "^1.1.2",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.2.0",
+    "vue-tsc": "^2.2.4"
+  }
+}

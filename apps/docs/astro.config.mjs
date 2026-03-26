@@ -190,6 +190,11 @@ export default defineConfig({
           items: [
             { label: 'Installation', slug: 'getting-started/installation' },
             { label: 'Quick Start', slug: 'getting-started/quick-start' },
+            {
+              label: 'create-helix CLI',
+              slug: 'getting-started/create-helix',
+              badge: { text: 'New', variant: 'tip' },
+            },
             { label: 'Project Structure', slug: 'getting-started/project-structure' },
             { label: 'Release Policy', slug: 'getting-started/release-policy' },
           ],
@@ -646,6 +651,10 @@ export default defineConfig({
               ],
             },
             {
+              label: 'Theming',
+              slug: 'guides/theming',
+            },
+            {
               label: 'Adopted Stylesheets',
               slug: 'guides/adopted-stylesheets',
             },
@@ -699,6 +708,11 @@ export default defineConfig({
               label: 'Styling with CSS Parts',
               slug: 'extending/style-components-with-css-parts',
               badge: { text: 'Deep Dive', variant: 'tip' },
+            },
+            {
+              label: 'Register, Bundle & Publish',
+              slug: 'extending/register-bundle-publish',
+              badge: { text: 'Distribution', variant: 'tip' },
             },
           ],
         },

@@ -1,0 +1,5 @@
+/* hx-progress-bar SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-progress-bar {
+  display: block;
+}

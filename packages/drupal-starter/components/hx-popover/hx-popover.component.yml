@@ -1,0 +1,58 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Popover
+description: 'Floating content panel anchored to a trigger element with smart positioning. For Drupal contextual menus, rich help content, and inline data panels.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the popover panel'
+      default: 'Popover'
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the popover is open'
+      default: false
+    placement:
+      type: string
+      title: Placement
+      description: 'Preferred position of the popover relative to the trigger'
+      default: 'bottom'
+      enum:
+        - top
+        - top-start
+        - top-end
+        - bottom
+        - bottom-start
+        - bottom-end
+        - left
+        - left-start
+        - left-end
+        - right
+        - right-start
+        - right-end
+    trigger:
+      type: string
+      title: Trigger
+      description: 'How the popover is triggered'
+      default: 'click'
+      enum:
+        - click
+        - hover
+        - focus
+        - manual
+    arrow:
+      type: boolean
+      title: Arrow
+      description: 'Whether to show a directional arrow indicator'
+      default: false
+slots:
+  default:
+    title: Trigger
+    description: 'The trigger element that opens the popover'
+  content:
+    title: Content
+    description: 'The popover panel content'

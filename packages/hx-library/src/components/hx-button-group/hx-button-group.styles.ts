@@ -24,7 +24,7 @@ export const helixButtonGroupStyles = css`
   /* ─── No Double Borders: Horizontal ─── */
 
   .group--horizontal ::slotted(*:not(:first-child)) {
-    margin-left: calc(-1 * var(--hx-border-width-thin, 1px));
+    margin-inline-start: calc(-1 * var(--hx-border-width-thin, 1px));
   }
 
   /* ─── No Double Borders: Vertical ─── */

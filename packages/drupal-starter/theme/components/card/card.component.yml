@@ -1,0 +1,45 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Card
+description: 'Themed content card wrapping the hx-card web component with slots for image, heading, body, footer, and actions. Maps directly to Drupal content teaser display modes and Views row templates.'
+status: stable
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Title
+      description: 'Card heading text. Rendered in the heading slot.'
+    body:
+      type: string
+      title: Body
+      description: 'Card body content (HTML allowed via |raw).'
+    image_url:
+      type: string
+      title: 'Image URL'
+      description: 'Optional image displayed at the top of the card.'
+    image_alt:
+      type: string
+      title: 'Image Alt'
+      description: 'Alt text for the card image.'
+    link_url:
+      type: string
+      title: 'Link URL'
+      description: 'When set, makes the entire card an interactive link. Do not combine with link_text action button.'
+    link_text:
+      type: string
+      title: 'Link Text'
+      description: 'Label for a CTA button in the actions slot. Requires link_url.'
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant forwarded to hx-card.'
+      default: 'default'
+      enum:
+        - default
+        - outlined
+        - filled
+slots:
+  footer:
+    title: Footer
+    description: 'Optional metadata row: author, date, tags, etc.'

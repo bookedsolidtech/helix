@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * Tree View SDC — wraps hx-tree-view for Drupal hierarchical content.
+ *
+ * Common uses: Drupal menu trees, taxonomy term hierarchies, document structures.
+ * Render hx-tree-item elements recursively for nested structures.
+ */
+#}
+{{ attach_library('helixui/hx-tree-view') }}
+
+<hx-tree-view
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if selection and selection != 'none' %}selection="{{ selection }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-tree-view>

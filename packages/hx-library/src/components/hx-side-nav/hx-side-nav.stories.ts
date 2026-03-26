@@ -539,3 +539,24 @@ export const DarkMode: Story = {
     collapsed: true,
   },
 };
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab navigates through sidebar navigation links and expand/collapse toggles. Arrow keys navigate within sub-menus. Enter or Space activates.
+      </p>
+      <hx-side-nav></hx-side-nav>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-side-nav');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
+};

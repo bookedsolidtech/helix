@@ -25,6 +25,8 @@ export interface HxDropdownProps {
     | 'bottom-end'
     | 'start'
     | 'end';
+  /** Accessible label for the dropdown menu panel. Override for i18n. */
+  label?: string;
   /** Whether the dropdown is disabled. Prevents opening. */
   disabled?: boolean;
   /** Gap in pixels between the trigger and the panel. */

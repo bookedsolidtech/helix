@@ -130,6 +130,51 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    helpText: {
+      control: 'text',
+      description: 'Help text displayed below the input for additional guidance.',
+      table: {
+        category: 'Content',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
+    noStepper: {
+      control: 'boolean',
+      description: 'When true, hides the increment/decrement stepper buttons.',
+      table: {
+        category: 'Appearance',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when the required field has no value.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
+    incrementLabel: {
+      control: 'text',
+      description: 'Accessible label for the increment (+) button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Increment' },
+        type: { summary: 'string' },
+      },
+    },
+    decrementLabel: {
+      control: 'text',
+      description: 'Accessible label for the decrement (-) button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Decrement' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Numeric Value',

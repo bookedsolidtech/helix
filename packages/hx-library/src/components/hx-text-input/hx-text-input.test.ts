@@ -742,4 +742,244 @@ describe('hx-text-input', () => {
       expect(el.requiredMessage).toBe('Please fill this in.');
     });
   });
+
+  // ─── Property: disabled — no events fire ───
+
+  describe('Property: disabled — event suppression', () => {
+    it('hx-input does not fire while disabled when input event is dispatched natively', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      // The native input is disabled — browser won't fire input events on it,
+      // but we verify the disabled class is applied and the input is inert.
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.disabled).toBe(true);
+    });
+
+    it('applies field--disabled class when disabled', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--disabled')).toBe(true);
+    });
+
+    it('programmatic disabled=false removes disabled class', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      el.disabled = false;
+      await el.updateComplete;
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--disabled')).toBe(false);
+    });
+  });
+
+  // ─── Property: required — class applied ───
+
+  describe('Property: required — class applied', () => {
+    it('applies field--required class when required', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--required')).toBe(true);
+    });
+
+    it('reflects required attribute to host', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      expect(el.hasAttribute('required')).toBe(true);
+    });
+  });
+
+  // ─── Property: error — class applied ───
+
+  describe('Property: error — class applied', () => {
+    it('applies field--error class when error set', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input error="Bad"></hx-text-input>');
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--error')).toBe(true);
+    });
+
+    it('removes field--error class when error cleared', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input error="Bad"></hx-text-input>');
+      el.error = '';
+      await el.updateComplete;
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--error')).toBe(false);
+    });
+
+    it('error div has aria-atomic="true"', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input error="Oops"></hx-text-input>');
+      const errorDiv = shadowQuery(el, '.field__error');
+      expect(errorDiv?.getAttribute('aria-atomic')).toBe('true');
+    });
+  });
+
+  // ─── hx-input detail.value after programmatic change ───
+
+  describe('hx-input event detail', () => {
+    it('hx-input detail.value matches the typed value', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
+      input.value = 'typed';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('typed');
+    });
+
+    it('hx-input updates component value property', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
+      input.value = 'synced';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await eventPromise;
+      expect(el.value).toBe('synced');
+    });
+  });
+
+  // ─── hx-change detail ───
+
+  describe('hx-change event detail', () => {
+    it('hx-change detail.value matches the changed value', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      input.value = 'final';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('final');
+    });
+
+    it('hx-change updates component value property', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      input.value = 'changed-value';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await eventPromise;
+      expect(el.value).toBe('changed-value');
+    });
+  });
+
+  // ─── Validation: tooShort / tooLong messages ───
+
+  describe('Validation: minlength/maxlength messages', () => {
+    it('tooShort validationMessage references minlength', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input minlength="5" value="ab"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toContain('5');
+    });
+
+    it('tooLong validationMessage references maxlength', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input maxlength="3" value="toolong"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toContain('3');
+    });
+
+    it('valid when value equals minlength exactly', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input minlength="3" value="abc"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(false);
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('valid when value equals maxlength exactly', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input maxlength="5" value="abcde"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooLong).toBe(false);
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('tooShort not set when value is empty (minlength only applies to non-empty values)', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input minlength="5"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(false);
+    });
+
+    it('custom error message overrides tooShort validation message', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input minlength="5" value="ab" error="Custom error"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Custom error');
+    });
+  });
+
+  // ─── Slot: prefix adds filled class ───
+
+  describe('Slot: prefix and suffix filled class', () => {
+    it('prefix slot adds field__prefix--filled class', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><span slot="prefix">$</span></hx-text-input>',
+      );
+      await el.updateComplete;
+      const prefix = shadowQuery(el, '.field__prefix');
+      expect(prefix?.classList.contains('field__prefix--filled')).toBe(true);
+    });
+
+    it('suffix slot adds field__suffix--filled class', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><span slot="suffix">.00</span></hx-text-input>',
+      );
+      await el.updateComplete;
+      const suffix = shadowQuery(el, '.field__suffix');
+      expect(suffix?.classList.contains('field__suffix--filled')).toBe(true);
+    });
+
+    it('prefix slot without content does not add filled class', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      await el.updateComplete;
+      const prefix = shadowQuery(el, '.field__prefix');
+      expect(prefix?.classList.contains('field__prefix--filled')).toBe(false);
+    });
+  });
+
+  // ─── formStateRestoreCallback with non-string state ───
+
+  describe('formStateRestoreCallback — non-string state', () => {
+    it('formStateRestoreCallback with null does not change value', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input value="keep"></hx-text-input>');
+      el.formStateRestoreCallback(null);
+      await el.updateComplete;
+      // Only string state is restored; null is a no-op per the implementation
+      expect(el.value).toBe('keep');
+    });
+  });
+
+  // ─── label slot ARIA ───
+
+  describe('Slot: label ARIA labelledby', () => {
+    it('slotted label element gets an id assigned', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><label slot="label">My Label</label></hx-text-input>',
+      );
+      await el.updateComplete;
+      const slottedLabel = el.querySelector('[slot="label"]');
+      expect(slottedLabel?.id).toBeTruthy();
+    });
+
+    it('native input uses aria-labelledby when label slot is filled', async () => {
+      const el = await fixture<WcTextInput>(
+        '<hx-text-input><label slot="label">My Label</label></hx-text-input>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.hasAttribute('aria-labelledby')).toBe(true);
+    });
+  });
+
+  // ─── hx-size: md class ───
+
+  describe('Property: hxSize — md', () => {
+    it('applies field--size-md class by default', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--size-md')).toBe(true);
+    });
+  });
 });

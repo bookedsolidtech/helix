@@ -1,11 +1,6 @@
 <div align="center">
 
-<!-- Hero Banner -->
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="apps/docs/src/assets/logos/helix-logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="apps/docs/src/assets/logos/helix-logo-light.svg">
-  <img alt="HELiX — Enterprise Healthcare Web Component Library" src="apps/docs/src/assets/logos/helix-logo-light.svg" width="400">
-</picture>
+<img src="docs/assets/social-card.webp" alt="HELiX — Enterprise Web Component Library" width="600">
 
 ### Enterprise Healthcare Web Component Library
 
@@ -19,6 +14,8 @@ A production-ready Web Component library built with Lit 3.x and TypeScript for h
 [![Bundle Size](https://img.shields.io/badge/bundle-%3C50KB%20gzip-success)](packages/hx-library)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](tsconfig.base.json)
 [![WCAG 2.1 AA](https://img.shields.io/badge/WCAG%202.1-AA%20target-blue)](https://www.w3.org/TR/WCAG21/)
+[![Docs](https://img.shields.io/badge/docs-helix.bookedsolid.tech-teal)](https://helix.bookedsolid.tech)
+[![Storybook](https://img.shields.io/badge/storybook-live-ff4785?logo=storybook)](https://helix-storybook.bookedsolid.tech)
 
 [Documentation](https://helix.bookedsolid.tech) · [Storybook](https://helix.bookedsolid.tech/storybook/) · [NPM Package](https://www.npmjs.com/package/@helixui/library) · [Contributing](CONTRIBUTING.md)
 

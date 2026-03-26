@@ -43,7 +43,7 @@ export const helixNavItemStyles = css`
     border: none;
     background: transparent;
     width: calc(100% - var(--hx-space-4, 1rem));
-    text-align: left;
+    text-align: start;
   }
 
   /* Link variant */
@@ -69,7 +69,8 @@ export const helixNavItemStyles = css`
   }
 
   .nav-item__link:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -87,7 +88,7 @@ export const helixNavItemStyles = css`
   /* ─── Disabled State ─── */
 
   :host([disabled]) .nav-item__link {
-    opacity: 0.4;
+    opacity: var(--hx-opacity-disabled, 0.5);
     pointer-events: none;
     cursor: not-allowed;
   }
@@ -116,7 +117,7 @@ export const helixNavItemStyles = css`
   /* ─── Badge ─── */
 
   .nav-item__badge {
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
   }
 
@@ -127,7 +128,7 @@ export const helixNavItemStyles = css`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-left: auto;
+    margin-inline-start: auto;
     width: var(--hx-space-5, 1.25rem);
     height: var(--hx-space-5, 1.25rem);
     transition: transform var(--hx-transition-normal, 300ms) ease;
@@ -161,7 +162,7 @@ export const helixNavItemStyles = css`
     min-height: 0;
     display: flex;
     flex-direction: column;
-    padding-left: var(--hx-space-6, 1.5rem);
+    padding-inline-start: var(--hx-space-6, 1.5rem);
   }
 
   /* ─── Tooltip (collapsed mode) ─── */

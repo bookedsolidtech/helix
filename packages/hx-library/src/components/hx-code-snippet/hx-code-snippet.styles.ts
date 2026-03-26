@@ -87,7 +87,7 @@ export const helixCodeSnippetStyles = css`
     font-family: var(--hx-font-family-sans, sans-serif);
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    line-height: var(--hx-line-height-none, 1);
+    line-height: 1; /* intentional literal: icon/action button needs line-height 1; no token maps to exactly 1 */
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
@@ -103,7 +103,8 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__copy-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -139,7 +140,8 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__expand-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -148,10 +150,10 @@ export const helixCodeSnippetStyles = css`
   .code-snippet__line-number {
     display: inline-block;
     min-width: var(--hx-space-8, 2rem);
-    padding-right: var(--hx-space-3, 0.75rem);
+    padding-inline-end: var(--hx-space-3, 0.75rem);
     color: var(--hx-code-snippet-line-number-color, var(--hx-color-neutral-500, #64748b));
     user-select: none;
-    text-align: right;
+    text-align: end;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -346,14 +346,16 @@ export class HelixSplitPanel extends LitElement {
     super.connectedCallback();
     if (this.positionInPixels !== undefined) {
       // Convert pixel position to percentage after first paint
-      requestAnimationFrame(() => {
-        if (this.positionInPixels !== undefined) {
-          const hostSize = this._getHostSize();
-          if (hostSize > 0) {
-            this._setPosition((this.positionInPixels / hostSize) * 100);
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => {
+          if (this.positionInPixels !== undefined) {
+            const hostSize = this._getHostSize();
+            if (hostSize > 0) {
+              this._setPosition((this.positionInPixels / hostSize) * 100);
+            }
           }
-        }
-      });
+        });
+      }
     }
   }
 

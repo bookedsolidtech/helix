@@ -6,7 +6,7 @@ Drupal starter kit for [HELiX](https://github.com/bookedsolidtech/helix) enterpr
 
 | Directory | Contents |
 |-----------|----------|
-| `components/` | 29 production-ready SDCs (Single Directory Components) |
+| `components/` | 59 production-ready SDCs (Single Directory Components) |
 | `templates/` | Standalone Twig templates for hx-button, hx-card, hx-text-input, hx-form |
 | `js/` | Drupal behaviors for interactive components and form integration |
 | `css/` | Theme token override template and form layout styles |
@@ -235,6 +235,8 @@ All interactive behaviors use the `once()` pattern for safe re-execution during 
 
 ## SDC Categories
 
+### Composition SDCs (content patterns)
+
 | Category | Count | SDCs |
 |----------|-------|------|
 | Node Display | 5 | article-teaser, article-full, recipe-card, recipe-full, landing-page |
@@ -245,6 +247,16 @@ All interactive behaviors use the `once()` pattern for safe re-execution during 
 | Layout | 3 | site-header, site-footer, section-container |
 | Content Blocks | 4 | author-byline, related-articles, share-buttons, tag-cloud |
 | Healthcare | 3 | provider-card, appointment-cta, condition-tag |
+
+### Primitive Component SDCs (direct wrappers)
+
+| Category | Count | SDCs |
+|----------|-------|------|
+| Form Components | 12 | hx-text-input, hx-select, hx-checkbox, hx-radio-group, hx-textarea, hx-date-picker, hx-time-picker, hx-file-upload, hx-number-input, hx-slider, hx-switch, hx-combobox |
+| Navigation | 5 | hx-tabs, hx-side-nav, hx-top-nav, hx-pagination, hx-steps |
+| Data Display | 5 | hx-data-table, hx-tree-view, hx-accordion, hx-list, hx-carousel |
+| Feedback | 6 | hx-alert, hx-toast, hx-dialog, hx-drawer, hx-popover, hx-tooltip |
+| Healthcare | 2 | hx-patient-banner, hx-phi-field |
 
 ## CKEditor 5 Integration
 

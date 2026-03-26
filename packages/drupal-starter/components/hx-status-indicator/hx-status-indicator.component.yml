@@ -1,0 +1,39 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Status Indicator
+description: 'Colored dot indicator for real-time status display. Use in Drupal provider availability listings, system health dashboards, bed management displays, and patient status boards.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    status:
+      type: string
+      title: Status
+      description: 'The semantic status to convey'
+      default: 'neutral'
+      enum:
+        - neutral
+        - online
+        - offline
+        - busy
+        - away
+        - warning
+        - danger
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the indicator dot'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    pulse:
+      type: boolean
+      title: Pulse
+      description: 'Whether to animate the indicator with a pulsing ring (for live/active status)'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label for the status (e.g., "Available", "Offline"). Required for accessibility when no adjacent text describes the status.'

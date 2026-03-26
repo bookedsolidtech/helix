@@ -1,0 +1,127 @@
+{#
+/**
+ * @file
+ * HELiX UI Starter Theme — default page template.
+ *
+ * Full-page template that composes the HELiX site-header SDC, HELiX web
+ * components for structural chrome, and Drupal region variables for content.
+ *
+ * Available variables:
+ *
+ * General utility:
+ * - base_path: The base URL path of the Drupal installation.
+ * - is_front: Flag for front page (boolean).
+ * - logged_in: Flag for authenticated user (boolean).
+ * - root_path: The root path of the current page (string, no leading slash).
+ *
+ * Site identity:
+ * - front_page: The URL of the front page.
+ * - logo: The URL of the site logo.
+ * - site_name: The name of the site.
+ * - site_slogan: The slogan of the site.
+ *
+ * Page regions:
+ * - page.header: Site header (logo, site name).
+ * - page.primary_menu: Primary navigation.
+ * - page.secondary_menu: Secondary navigation.
+ * - page.breadcrumb: Breadcrumb trail.
+ * - page.highlighted: Highlighted region (banners, alerts).
+ * - page.help: Drupal admin help text.
+ * - page.content: Main page content.
+ * - page.sidebar_first: First sidebar.
+ * - page.sidebar_second: Second sidebar.
+ * - page.footer: Footer region.
+ *
+ * @see https://www.drupal.org/docs/develop/theming-drupal/twig-in-drupal/twig-template-naming-conventions
+ */
+#}
+{{ attach_library('helixui/global') }}
+{{ attach_library('helixui/adopted-stylesheets') }}
+{{ attach_library('helixui/light-dom-scoping') }}
+
+<div class="layout-container">
+
+  {# =========================================================================
+     Site header — uses the helixui:site-header SDC which wraps hx-top-nav.
+     Pass Drupal's region variables into the SDC slots using the standard
+     {% include 'namespace:component' with { slots: {...} } %} pattern.
+     ========================================================================= #}
+  {% include 'helixui:site-header' with {
+    site_name: site_name,
+    logo_url: logo,
+    navigation: page.primary_menu,
+    search: page.secondary_menu,
+  } only %}
+
+  {# =========================================================================
+     Highlighted region — alerts, status messages.
+     Use hx-banner for Drupal status/warning/error messages if desired.
+     ========================================================================= #}
+  {% if page.highlighted %}
+    <div class="layout-highlighted hx-region" role="complementary" aria-label="{{ 'Highlighted'|t }}">
+      {{ page.highlighted }}
+    </div>
+  {% endif %}
+
+  {# =========================================================================
+     Help region — admin context help (visible only to admins).
+     ========================================================================= #}
+  {% if page.help %}
+    <div class="layout-help hx-region" role="note">
+      {{ page.help }}
+    </div>
+  {% endif %}
+
+  {# =========================================================================
+     Breadcrumb — uses the hx-breadcrumb component via its Drupal block.
+     The breadcrumb block outputs through page.breadcrumb which contains the
+     rendered hx-breadcrumb SDC from components/breadcrumb-nav/.
+     ========================================================================= #}
+  {% if page.breadcrumb %}
+    <nav class="layout-breadcrumb hx-region" aria-label="{{ 'Breadcrumb'|t }}">
+      {{ page.breadcrumb }}
+    </nav>
+  {% endif %}
+
+  {# =========================================================================
+     Main content area with optional sidebars.
+     CSS grid layout is handled by css/light-dom-scoping.css using the
+     hx-region--with-sidebar modifier classes.
+     ========================================================================= #}
+  <main
+    id="main-content"
+    class="layout-main hx-region{% if page.sidebar_first %} hx-region--has-sidebar-first{% endif %}{% if page.sidebar_second %} hx-region--has-sidebar-second{% endif %}"
+    role="main"
+  >
+    {# Skip-to-content anchor target — must be the first focusable thing in main. #}
+    <a href="#main-content" class="visually-hidden focusable">
+      {{ 'Skip to main content'|t }}
+    </a>
+
+    {% if page.sidebar_first %}
+      <aside class="layout-sidebar-first hx-region__sidebar" role="complementary" aria-label="{{ 'First sidebar'|t }}">
+        {{ page.sidebar_first }}
+      </aside>
+    {% endif %}
+
+    <div class="layout-content hx-region__content">
+      {{ page.content }}
+    </div>
+
+    {% if page.sidebar_second %}
+      <aside class="layout-sidebar-second hx-region__sidebar" role="complementary" aria-label="{{ 'Second sidebar'|t }}">
+        {{ page.sidebar_second }}
+      </aside>
+    {% endif %}
+  </main>
+
+  {# =========================================================================
+     Footer region.
+     ========================================================================= #}
+  {% if page.footer %}
+    <footer class="layout-footer hx-region" role="contentinfo">
+      {{ page.footer }}
+    </footer>
+  {% endif %}
+
+</div>{# /.layout-container #}

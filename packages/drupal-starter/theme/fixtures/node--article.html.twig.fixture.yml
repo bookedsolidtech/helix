@@ -1,0 +1,97 @@
+# fixtures/node--article.html.twig.fixture.yml
+#
+# Fixture data for templates/node.html.twig.
+#
+# Used by Drupal's Storybook integration (Drupal 10.3+ Storybook module)
+# and by any SDC fixture-based testing tooling (e.g. SDC QA in Drupal 11).
+#
+# Each top-level key is a named fixture. The fixture runner passes these values
+# as Twig template variables when rendering the template in isolation.
+#
+# Run fixtures locally:
+#   drush php:script core/scripts/render-sdc-fixture.php \
+#     --theme=helixui \
+#     --fixture=packages/drupal-starter/theme/fixtures/node--article.html.twig.fixture.yml
+#
+# @see https://www.drupal.org/docs/develop/theming-drupal/single-directory-components/using-components-in-drupal
+
+# ---------------------------------------------------------------------------
+# Fixture: default
+# Full article node with all fields populated.
+# ---------------------------------------------------------------------------
+
+default:
+  label: 'Understanding Type 2 Diabetes: A Patient Guide'
+  page: true
+  node:
+    label: 'Understanding Type 2 Diabetes: A Patient Guide'
+    bundle: article
+  url: '/articles/understanding-type-2-diabetes'
+  date: 'March 25, 2026'
+  author_name: 'Dr. Sarah Chen, MD'
+  content:
+    body:
+      '#markup': |
+        <p>Type 2 diabetes is a chronic condition that affects the way your body metabolizes
+        sugar (glucose). With type 2 diabetes, your body either resists the effects of
+        insulin — a hormone that regulates the movement of sugar into your cells — or
+        does not produce enough insulin to maintain a normal glucose level.</p>
+        <p>Type 2 diabetes used to be known as adult-onset diabetes, but today more
+        children are being diagnosed with the disorder, probably due to the rise in
+        childhood obesity. There's no cure for type 2 diabetes, but losing weight,
+        eating well and exercising can help you manage the disease.</p>
+    field_image:
+      '#markup': '<img src="/placeholder/800x400?text=Diabetes+Guide" alt="Doctor reviewing patient chart" loading="lazy" />'
+    field_tags:
+      '#markup': '<span>Diabetes</span><span>Patient Education</span><span>Chronic Disease</span>'
+  attributes: {}
+  title_attributes: {}
+  content_attributes: {}
+
+# ---------------------------------------------------------------------------
+# Fixture: teaser
+# Article rendered in teaser/listing view mode (page = false).
+# ---------------------------------------------------------------------------
+
+teaser:
+  label: 'Heart-Healthy Diet: 10 Foods to Add to Your Plate'
+  page: false
+  node:
+    label: 'Heart-Healthy Diet: 10 Foods to Add to Your Plate'
+    bundle: article
+  url: '/articles/heart-healthy-diet'
+  date: 'March 20, 2026'
+  author_name: 'Nutrition Team'
+  content:
+    body:
+      '#markup': '<p>Eating heart-healthy foods can dramatically reduce your risk of cardiovascular disease. Learn which foods to add to your daily meals.</p>'
+    field_image:
+      '#markup': '<img src="/placeholder/400x250?text=Heart+Healthy" alt="Fresh vegetables on a cutting board" loading="lazy" />'
+    field_tags:
+      '#markup': '<span>Nutrition</span><span>Heart Health</span>'
+  attributes: {}
+  title_attributes: {}
+  content_attributes: {}
+
+# ---------------------------------------------------------------------------
+# Fixture: no-image
+# Article without a field_image — verifies graceful degradation.
+# ---------------------------------------------------------------------------
+
+no-image:
+  label: 'New Visitor Policies Effective April 2026'
+  page: false
+  node:
+    label: 'New Visitor Policies Effective April 2026'
+    bundle: article
+  url: '/news/visitor-policies-april-2026'
+  date: 'March 18, 2026'
+  author_name: 'Patient Services'
+  content:
+    body:
+      '#markup': '<p>Effective April 1, 2026, our visitor policies have been updated. Visitors are now permitted during all hours with valid photo identification.</p>'
+    field_tags:
+      '#markup': '<span>Policies</span><span>Visitors</span>'
+  attributes: {}
+  title_attributes: {}
+  content_attributes: {}

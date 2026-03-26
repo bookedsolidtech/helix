@@ -362,6 +362,7 @@ export class HelixDrawer extends LitElement {
 
   /** @internal */
   private _getAnimationDuration(): number {
+    if (typeof window === 'undefined') return 0;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
     return 300;
   }

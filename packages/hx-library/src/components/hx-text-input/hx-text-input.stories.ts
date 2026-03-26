@@ -161,6 +161,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when the required field has no value.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Patient Name',

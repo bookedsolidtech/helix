@@ -1,0 +1,49 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Checkbox Group
+description: 'Form-associated group of checkboxes with shared label, validation, and help text. Use in Drupal Form API for multi-select fields, preference panels, consent checklists, and symptom selection forms.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The shared form field name prefix for the checkbox group'
+    label:
+      type: string
+      title: Label
+      description: 'Group label text displayed as the fieldset legend'
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether at least one checkbox in the group must be selected'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether all checkboxes in the group are disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Group-level validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Group-level help text displayed below the checkboxes'
+    orientation:
+      type: string
+      title: Orientation
+      description: 'Layout direction for the checkbox items'
+      default: 'vertical'
+      enum:
+        - vertical
+        - horizontal
+slots:
+  default:
+    title: Checkboxes
+    description: 'hx-checkbox elements to render within the group'
+  label:
+    title: Label
+    description: 'Rich HTML group label content (overrides the label prop). Use for labels containing links.'

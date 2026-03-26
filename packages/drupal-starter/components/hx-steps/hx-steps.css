@@ -1,0 +1,5 @@
+/* hx-steps SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-steps {
+  display: block;
+}

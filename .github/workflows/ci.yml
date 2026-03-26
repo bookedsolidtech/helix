@@ -25,11 +25,57 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  actions: read
 
 # ── Shared setup anchor ────────────────────────────────────────────────────
 # Reusable setup steps referenced by all jobs
 
 jobs:
+  # ── Secret scanning ─────────────────────────────────────────────────────
+  # Runs FIRST — before any build or test job — to ensure no credentials,
+  # tokens, or secrets are present in the diff or pushed commits.
+  # Agents in worktrees may not have gitleaks installed locally, making this
+  # the primary enforcement layer for the monorepo.
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION="8.21.2"
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Scan PR diff for secrets
+        if: github.event_name == 'pull_request'
+        run: |
+          gitleaks detect \
+            --source . \
+            --config .gitleaks.toml \
+            --log-opts "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" \
+            --redact \
+            --no-git=false \
+            --exit-code 1
+
+      - name: Scan push diff for secrets
+        if: github.event_name == 'push'
+        run: |
+          gitleaks detect \
+            --source . \
+            --config .gitleaks.toml \
+            --log-opts "HEAD~1..HEAD" \
+            --redact \
+            --no-git=false \
+            --exit-code 1
+
   # ── Change detection ───────────────────────────────────────────────────
   # Determines which jobs to run based on changed files.
   # Audit-only PRs (AUDIT.md files) skip Test and VRT.
@@ -65,6 +111,9 @@ jobs:
               - 'packages/hx-library/coverage-config.json'
               - 'packages/hx-library/tsconfig*.json'
               - 'scripts/check-coverage.mjs'
+              - 'scripts/check-bundle-size.mjs'
+              - 'bundle-budgets.json'
+              - '.bundle-budget.json'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
@@ -74,7 +123,7 @@ jobs:
 
   lint:
     name: Lint
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -90,7 +139,7 @@ jobs:
 
   format:
     name: Format
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -106,7 +155,7 @@ jobs:
 
   type-check:
     name: Type Check
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -127,7 +176,7 @@ jobs:
 
   test:
     name: Test
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -164,8 +213,12 @@ jobs:
             echo "tests_ran=true" >> "$GITHUB_OUTPUT"
           else
             # General PR: extract changed component dirs from git diff
+            # Exclude .stories.ts, .test.ts, and index.ts — they don't affect component coverage
             CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
               | grep 'src/components/hx-' \
+              | grep -v '\.stories\.ts$' \
+              | grep -v '\.test\.ts$' \
+              | grep -v '/index\.ts$' \
               | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
               | sort -u)
             if [ -z "$CHANGED" ]; then
@@ -184,6 +237,9 @@ jobs:
         run: |
           CHANGED=$(git diff --name-only HEAD~1...HEAD \
             | grep 'src/components/hx-' \
+            | grep -v '\.stories\.ts$' \
+            | grep -v '\.test\.ts$' \
+            | grep -v '/index\.ts$' \
             | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
             | sort -u)
           if [ -z "$CHANGED" ]; then
@@ -242,7 +298,7 @@ jobs:
 
   build:
     name: Build
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -260,7 +316,67 @@ jobs:
         run: pnpm publish --dry-run --no-git-checks
         working-directory: packages/hx-library
       - name: Bundle size report (all components, tree-shaken)
-        run: node scripts/bundle-size-report.js
+        run: node scripts/bundle-size-report.js --save .cache/bundle-size-report.json
+      - name: Upload bundle size artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-size-report
+          path: .cache/bundle-size-report.json
+          retention-days: 30
+          if-no-files-found: warn
+
+  # ── Automated A11y Audit (axe-core WCAG 2.1 AA) ─────────────────────────
+  # Builds Storybook, serves it locally, then runs axe-core against every
+  # component's Default story. Fails CI on any critical or serious violation.
+  # Healthcare mandate: zero tolerance — WCAG 2.1 AA, wcag2a + wcag2aa +
+  # best-practice tags. Report uploaded as artifact for triage.
+
+  # NOTE: Currently informational — not blocking Quality Gates until baseline violations are fixed.
+  a11y-audit:
+    name: A11y Audit
+    needs: [changes, secret-scan, build]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - name: Build Storybook
+        run: pnpm run build:storybook
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Serve Storybook and run axe-core audit
+        run: |
+          pnpm exec http-server apps/storybook/dist -p 6006 --silent &
+          SERVER_PID=$!
+          # Wait for server to be ready (up to 30s)
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:6006/index.html | grep -q "200"; then
+              echo "Storybook server ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          node scripts/a11y-audit.js \
+            --storybook-url http://localhost:6006 \
+            --output .cache/a11y-report.json
+          EXIT_CODE=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $EXIT_CODE
+      - name: Upload a11y report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-report
+          path: .cache/a11y-report.json
+          retention-days: 30
+          if-no-files-found: warn
 
   # ── CEM API Diff ────────────────────────────────────────────────────────
   # Compares custom-elements.json between base and PR branch.
@@ -270,7 +386,7 @@ jobs:
 
   cem-diff:
     name: CEM API Diff
-    needs: changes
+    needs: [changes, secret-scan]
     if: >
       github.event_name == 'pull_request' &&
       needs.changes.outputs.is_audit != 'true'
@@ -324,11 +440,105 @@ jobs:
             --repo ${{ github.repository }} \
             --body "$BODY"
 
+  # ── Bundle Size Diff (PR only) ──────────────────────────────────────────
+  # Downloads the base branch bundle size artifact, compares with the current
+  # branch, posts a PR comment with per-component deltas, and blocks merge on
+  # budget violations. Budgets are configured in bundle-budgets.json.
+
+  bundle-size:
+    name: Bundle Size
+    needs: [changes, secret-scan, build]
+    if: >
+      github.event_name == 'pull_request' &&
+      needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - name: Generate HEAD bundle sizes
+        run: node scripts/bundle-size-report.js --save .cache/bundle-size-head.json
+      - name: Download BASE branch bundle size artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .cache
+          BASE_BRANCH="${{ github.base_ref }}"
+
+          # Find the latest successful CI run on the base branch
+          RUN_ID=$(gh api \
+            "/repos/${{ github.repository }}/actions/workflows/ci.yml/runs" \
+            -f branch="$BASE_BRANCH" \
+            -f status=success \
+            -f per_page=5 \
+            --jq '[.workflow_runs[] | select(.conclusion == "success")] | first | .id' \
+            2>/dev/null || echo "")
+
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
+            echo "No successful CI run found on $BASE_BRANCH — skipping base comparison"
+            exit 0
+          fi
+
+          ARTIFACT_ID=$(gh api \
+            "/repos/${{ github.repository }}/actions/runs/$RUN_ID/artifacts" \
+            --jq '.artifacts[] | select(.name == "bundle-size-report") | .id' \
+            2>/dev/null | head -1 || echo "")
+
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "No bundle-size-report artifact found in run $RUN_ID on $BASE_BRANCH — skipping base comparison"
+            exit 0
+          fi
+
+          echo "Downloading base artifact $ARTIFACT_ID from run $RUN_ID (branch: $BASE_BRANCH)"
+          gh api "/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip" \
+            > .cache/bundle-base.zip
+          unzip -p .cache/bundle-base.zip bundle-size-report.json > .cache/bundle-size-base.json
+          echo "Base artifact downloaded successfully"
+      - name: Generate PR comment
+        run: |
+          BASE_FLAG=""
+          if [ -f ".cache/bundle-size-base.json" ]; then
+            BASE_FLAG="--base .cache/bundle-size-base.json"
+          fi
+          node scripts/bundle-size-report.js \
+            --from-file .cache/bundle-size-head.json \
+            --pr-comment $BASE_FLAG > .cache/pr-comment.md
+      - name: Post PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(cat .cache/pr-comment.md)
+          # Delete any previous bundle size comment before posting
+          PREV=$(gh pr view ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --json comments \
+            --jq '.comments[] | select(.body | startswith("## Bundle Size Report")) | .id' \
+            2>/dev/null | head -1 || true)
+          if [ -n "$PREV" ]; then
+            gh api --method DELETE \
+              "/repos/${{ github.repository }}/issues/comments/$PREV" \
+              2>/dev/null || true
+          fi
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "$BODY"
+      - name: Enforce budget — fail on violations
+        run: |
+          node scripts/bundle-size-report.js \
+            --from-file .cache/bundle-size-head.json \
+            --ci
+
   # ── Visual Regression Tests ─────────────────────────────────────────────
 
   vrt:
     name: Visual Regression
-    needs: changes
+    needs: [changes, secret-scan]
     if: >
       needs.changes.outputs.source == 'true' &&
       needs.changes.outputs.is_audit != 'true' &&
@@ -419,7 +629,7 @@ jobs:
 
   changeset:
     name: Changeset Required
-    needs: changes
+    needs: [changes, secret-scan]
     if: >
       github.event_name == 'pull_request' &&
       needs.changes.outputs.is_audit != 'true' &&
@@ -460,7 +670,7 @@ jobs:
 
   audit:
     name: Security Audit
-    needs: changes
+    needs: [changes, secret-scan]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -475,6 +685,62 @@ jobs:
       - name: Security audit
         run: pnpm audit --audit-level=critical
 
+  # ── Storybook Interaction Tests ─────────────────────────────────────────
+  # Runs all 83 component story play functions as Vitest browser mode tests.
+  # Uses @storybook/addon-vitest (Storybook 10 first-class Vitest integration).
+  # Informational until baseline is verified — does not block Quality Gates.
+
+  storybook-tests:
+    name: Storybook Tests
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run Storybook interaction tests
+        run: pnpm run test:storybook
+      - name: Upload Storybook test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-test-results
+          path: apps/storybook/.vitest/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # ── React wrapper tests (informational — not a required gate) ────────────
+  # Runs vitest browser mode tests for @helixui/react wrappers.
+  # Tests render/prop/event/ref forwarding for all generated React components.
+  # continue-on-error keeps this informational until the suite is stabilized.
+  test-react:
+    name: Test React Wrappers
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Run @helixui/react tests
+        run: pnpm run test:react
+        continue-on-error: true
+
   # ── Aggregate gate (for branch protection) ──────────────────────────────
   # This job depends on all checks and is the single required status check
   # in branch protection. This avoids needing to update branch protection
@@ -484,21 +750,42 @@ jobs:
     name: Quality Gates
     runs-on: ubuntu-latest
     timeout-minutes: 1
-    needs: [changes, lint, format, type-check, test, build, vrt, audit, changeset]
+    needs:
+      [
+        changes,
+        secret-scan,
+        lint,
+        format,
+        type-check,
+        test,
+        build,
+        a11y-audit,
+        bundle-size,
+        vrt,
+        audit,
+        changeset,
+        storybook-tests,
+        test-react,
+      ]
     if: always()
     steps:
       - name: Check all gates
         run: |
           IS_AUDIT="${{ needs.changes.outputs.is_audit }}"
 
-          echo "Audit branch: $IS_AUDIT"
-          echo "Lint:       ${{ needs.lint.result }}"
-          echo "Format:     ${{ needs.format.result }}"
-          echo "Type Check: ${{ needs.type-check.result }}"
-          echo "Test:       ${{ needs.test.result }}"
-          echo "Build:      ${{ needs.build.result }}"
-          echo "VRT:        ${{ needs.vrt.result }}"
-          echo "Audit:      ${{ needs.audit.result }}"
+          echo "Audit branch:       $IS_AUDIT"
+          echo "Secret Scan:        ${{ needs.secret-scan.result }}"
+          echo "Lint:               ${{ needs.lint.result }}"
+          echo "Format:             ${{ needs.format.result }}"
+          echo "Type Check:         ${{ needs.type-check.result }}"
+          echo "Test:               ${{ needs.test.result }}"
+          echo "Build:              ${{ needs.build.result }}"
+          echo "A11y Audit:         ${{ needs.a11y-audit.result }}"
+          echo "Bundle Size:        ${{ needs.bundle-size.result }}"
+          echo "VRT:                ${{ needs.vrt.result }}"
+          echo "Audit:              ${{ needs.audit.result }}"
+          echo "Storybook Tests:    ${{ needs.storybook-tests.result }}"
+          echo "React Tests:        ${{ needs.test-react.result }}"
 
           # Audit branches skip all CI — auto-pass
           if [[ "$IS_AUDIT" == "true" ]]; then
@@ -508,14 +795,15 @@ jobs:
 
           FAIL=0
 
-          for gate in lint format type-check build audit; do
+          for gate in secret-scan lint format type-check build audit; do
             result="${{ needs.lint.result }}"
             case "$gate" in
-              lint)       result="${{ needs.lint.result }}" ;;
-              format)     result="${{ needs.format.result }}" ;;
-              type-check) result="${{ needs.type-check.result }}" ;;
-              build)      result="${{ needs.build.result }}" ;;
-              audit)      result="${{ needs.audit.result }}" ;;
+              secret-scan) result="${{ needs.secret-scan.result }}" ;;
+              lint)        result="${{ needs.lint.result }}" ;;
+              format)      result="${{ needs.format.result }}" ;;
+              type-check)  result="${{ needs.type-check.result }}" ;;
+              build)       result="${{ needs.build.result }}" ;;
+              audit)       result="${{ needs.audit.result }}" ;;
             esac
             if [[ "$result" != "success" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
@@ -523,20 +811,36 @@ jobs:
             fi
           done
 
-          # Test, VRT, and changeset are allowed to be skipped (no source changes) or
-          # cancelled (concurrency group replaced a running job)
-          for gate in test vrt changeset; do
+          # Test, VRT, changeset, and bundle-size are allowed to be skipped (non-PR / no
+          # source changes) or cancelled (concurrency group replaced a running job)
+          for gate in test vrt changeset bundle-size; do
             result="${{ needs.test.result }}"
             case "$gate" in
-              test)      result="${{ needs.test.result }}" ;;
-              vrt)       result="${{ needs.vrt.result }}" ;;
-              changeset) result="${{ needs.changeset.result }}" ;;
+              test)        result="${{ needs.test.result }}" ;;
+              vrt)         result="${{ needs.vrt.result }}" ;;
+              changeset)   result="${{ needs.changeset.result }}" ;;
+              bundle-size) result="${{ needs.bundle-size.result }}" ;;
             esac
             if [[ "$result" != "success" && "$result" != "skipped" && "$result" != "cancelled" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
               FAIL=1
             fi
           done
+
+          # A11y audit is informational until baseline violations are resolved
+          if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
+            echo "::warning::A11y audit has violations — see report artifact for details"
+          fi
+
+          # Storybook tests are informational until the new test infrastructure is verified
+          if [[ "${{ needs.storybook-tests.result }}" != "success" && "${{ needs.storybook-tests.result }}" != "skipped" ]]; then
+            echo "::warning::Storybook interaction tests did not pass — see storybook-test-results artifact for details"
+          fi
+
+          # React wrapper tests are informational until the suite is stabilized
+          if [[ "${{ needs.test-react.result }}" != "success" && "${{ needs.test-react.result }}" != "skipped" ]]; then
+            echo "::warning::React wrapper tests did not pass — informational only"
+          fi
 
           if [[ "$FAIL" -eq 1 ]]; then
             echo "::error::One or more quality gates failed"

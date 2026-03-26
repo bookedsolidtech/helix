@@ -90,7 +90,7 @@ export const helixNavStyles = css`
 
   .nav__link:hover {
     background-color: var(--hx-nav-link-hover-bg, var(--hx-color-neutral-700, #374151));
-    color: var(--hx-nav-link-hover-color, var(--hx-color-white, #ffffff));
+    color: var(--hx-nav-link-hover-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   .nav__link:focus-visible {
@@ -101,7 +101,7 @@ export const helixNavStyles = css`
 
   .nav__link--active {
     background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #2563eb));
-    color: var(--hx-nav-link-active-color, var(--hx-color-white, #ffffff));
+    color: var(--hx-nav-link-active-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   /* ─── Chevron Icon ─── */
@@ -142,7 +142,7 @@ export const helixNavStyles = css`
   .nav__submenu .nav__link {
     display: block;
     width: 100%;
-    text-align: left;
+    text-align: start;
     border-radius: 0;
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
   }
@@ -170,7 +170,7 @@ export const helixNavStyles = css`
     border-radius: 0;
     background-color: transparent;
     padding: 0;
-    padding-left: var(--hx-space-4, 1rem);
+    padding-inline-start: var(--hx-space-4, 1rem);
   }
 
   :host([orientation='vertical']) .nav__submenu[hidden] {
@@ -223,7 +223,7 @@ export const helixNavStyles = css`
       position: static;
       box-shadow: none;
       border-radius: 0;
-      padding-left: var(--hx-space-4, 1rem);
+      padding-inline-start: var(--hx-space-4, 1rem);
       background-color: transparent;
     }
 

@@ -1,0 +1,64 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Slider
+description: 'Form-associated range slider with label, tick marks, and value display. Common healthcare uses: pain scale (0-10), satisfaction surveys, risk assessments.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text'
+    value:
+      type: number
+      title: Value
+      description: 'Current numeric value'
+      default: 0
+    min:
+      type: number
+      title: Min
+      description: 'Minimum value'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'Maximum value'
+      default: 100
+    step:
+      type: number
+      title: Step
+      description: 'Stepping interval between values'
+      default: 1
+    size:
+      type: string
+      title: Size
+      description: 'Visual size variant'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the slider is disabled'
+      default: false
+    show_value:
+      type: boolean
+      title: Show Value
+      description: 'Whether to show the current value next to the label'
+      default: false
+    show_ticks:
+      type: boolean
+      title: Show Ticks
+      description: 'Whether to render tick marks at each step interval'
+      default: false
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text'

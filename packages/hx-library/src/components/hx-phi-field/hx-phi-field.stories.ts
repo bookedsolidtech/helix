@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, userEvent, fn } from 'storybook/test';
 import './hx-phi-field.js';
+import '../hx-theme/hx-theme.js';
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
@@ -369,4 +370,41 @@ export const CSSCustomProperties: Story = {
       </div>
     </div>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// DARK MODE
+// ─────────────────────────────────────────────────
+
+export const DarkMode: Story = {
+  name: 'Dark Mode',
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  args: {
+    data: '123-45-6789',
+    fieldType: 'ssn',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the reveal/hide toggle button. Enter or Space toggles the masking of PHI data.
+      </p>
+      <hx-phi-field></hx-phi-field>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-phi-field');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

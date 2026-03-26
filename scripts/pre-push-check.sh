@@ -144,6 +144,25 @@ else
 fi
 fi  # end branch skip for Gate 3.5
 
+# Gate 3.6: React wrapper tests (optional — run when hx-react source changes)
+# Runs vitest browser mode tests for @helixui/react wrappers.
+# Only triggered when packages/hx-react/ source files changed vs base branch.
+# Run manually: pnpm run test:react
+BRANCH_36=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [[ "$BRANCH_36" != "main" && "$BRANCH_36" != "staging" && "$BRANCH_36" != "dev" ]]; then
+  BASE_BRANCH_36=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' \
+    || git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|origin/||' \
+    || echo "dev")
+  ANCESTOR_36=$(git merge-base HEAD "origin/${BASE_BRANCH_36}" 2>/dev/null || echo "")
+  if [ -n "$ANCESTOR_36" ]; then
+    REACT_CHANGED=$(git diff --name-only "$ANCESTOR_36"...HEAD \
+      | grep '^packages/hx-react/src/' || true)
+    if [ -n "$REACT_CHANGED" ]; then
+      echo "React wrapper source changed — run 'pnpm run test:react' to verify wrappers"
+    fi
+  fi
+fi
+
 # Gate 4: Changeset required for component source changes
 # Every push that touches packages/hx-library/src/ must have a .changeset/*.md file.
 # This ensures every component change is versioned — no silent API changes.

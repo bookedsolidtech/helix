@@ -59,7 +59,7 @@ export const helixSelectStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     cursor: pointer;
-    text-align: left;
+    text-align: start;
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -68,11 +68,17 @@ export const helixSelectStyles = css`
 
   .field__trigger:focus,
   .field__trigger:focus-visible {
-    border-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    border-color: var(
+      --hx-select-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+    );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        var(
+            --hx-select-focus-ring-color,
+            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+          )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -123,7 +129,7 @@ export const helixSelectStyles = css`
     left: 2px;
     width: 7px;
     height: 7px;
-    border-right: 1.5px solid currentColor;
+    border-inline-end: 1.5px solid currentColor;
     border-bottom: 1.5px solid currentColor;
     transform: rotate(45deg);
   }
