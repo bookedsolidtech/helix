@@ -121,17 +121,21 @@ export const helixBadgeStyles = css`
     display: none;
   }
 
+  .badge--dot slot[name='prefix'] {
+    display: none;
+  }
+
   /* ─── Pulse Animation ─── */
 
   @keyframes hx-badge-pulse {
     0%,
     100% {
       opacity: 1;
-      box-shadow: 0 0 0 0 var(--hx-badge-pulse-color, currentColor);
+      box-shadow: 0 0 0 2px var(--hx-badge-pulse-color, currentColor);
     }
     50% {
       opacity: var(--hx-opacity-75, 0.75);
-      box-shadow: 0 0 0 4px transparent;
+      box-shadow: 0 0 0 6px transparent;
     }
   }
 

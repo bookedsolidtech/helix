@@ -30,7 +30,7 @@ export const HxNav = createComponent({
   elementClass: HelixNav,
   react: React,
   events: {
-    onHxNavSelect: 'hx-nav-select'
+    onHxNavSelect: 'hx-nav-select',
   },
   displayName: 'HxNav',
 });

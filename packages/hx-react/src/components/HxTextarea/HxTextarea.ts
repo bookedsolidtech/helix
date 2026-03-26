@@ -35,7 +35,7 @@ export const HxTextarea = createComponent({
   react: React,
   events: {
     onHxInput: 'hx-input',
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxTextarea',
 });
