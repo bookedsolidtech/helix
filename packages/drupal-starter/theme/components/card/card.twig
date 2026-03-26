@@ -1,0 +1,89 @@
+{#
+/**
+ * @file
+ * Card SDC — wraps hx-card for theme-level content teaser and listing patterns.
+ *
+ * This theme-level card SDC provides higher-level props (title, body, image_url,
+ * link_url, link_text) compared to the module-level helixui:hx-card SDC which
+ * exposes raw hx-card slot variables. Use this component in node teasers, Views
+ * row templates, and Layout Builder blocks.
+ *
+ * Slot projection pattern:
+ *   - image_url   -> slot="image"  (hx-image element)
+ *   - title       -> slot="heading" (h2/h3/link depending on context)
+ *   - body        -> default slot  (rendered HTML)
+ *   - footer prop -> slot="footer"
+ *   - link_text   -> slot="actions" (hx-button with link_url href)
+ *
+ * Example — Views row template:
+ * @code
+ *   {% include 'helixui:card' with {
+ *     title: row.content['#row'].title,
+ *     body: row.content['#row'].body|striptags|truncate(150),
+ *     image_url: row.content['#row'].field_image,
+ *     image_alt: row.content['#row'].field_image_alt,
+ *     link_url: path('entity.node.canonical', {'node': row.content['#row'].nid}),
+ *     link_text: 'Read more',
+ *     variant: 'outlined',
+ *   } only %}
+ * @endcode
+ */
+#}
+{{ attach_library('helixui/hx-card') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-button') }}
+{% if image_url %}
+  {{ attach_library('helixui/hx-image') }}
+{% endif %}
+
+<hx-card
+  {% if variant and variant != 'default' %}variant="{{ variant }}"{% endif %}
+  {% if link_url and not link_text %}hx-href="{{ link_url }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+
+  {# Image slot — lazy loaded for performance. #}
+  {% if image_url %}
+    <hx-image
+      slot="image"
+      src="{{ image_url }}"
+      alt="{{ image_alt|default('') }}"
+      loading="lazy"
+    ></hx-image>
+  {% endif %}
+
+  {# Heading slot — linked when link_url is set and the whole card is NOT
+     already a link (i.e. when an explicit link_text CTA is present). #}
+  {% if title %}
+    <div slot="heading">
+      <hx-text variant="heading-sm">
+        {% if link_url and link_text %}
+          <a href="{{ link_url }}" rel="bookmark">{{ title }}</a>
+        {% else %}
+          {{ title }}
+        {% endif %}
+      </hx-text>
+    </div>
+  {% endif %}
+
+  {# Default slot — body content. #}
+  {% if body %}
+    <div class="card__body">{{ body|raw }}</div>
+  {% endif %}
+
+  {# Footer slot — metadata: author, date, taxonomy. #}
+  {% if footer %}
+    <div slot="footer" class="card__footer">{{ footer }}</div>
+  {% endif %}
+
+  {# Actions slot — CTA button. Only used when link_text is provided;
+     do NOT combine with a whole-card link (hx-href). #}
+  {% if link_url and link_text %}
+    <div slot="actions">
+      <hx-button variant="secondary" href="{{ link_url }}">
+        {{ link_text }}
+      </hx-button>
+    </div>
+  {% endif %}
+
+</hx-card>

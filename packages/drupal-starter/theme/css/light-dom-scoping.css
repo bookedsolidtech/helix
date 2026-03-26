@@ -1,0 +1,233 @@
+/**
+ * @file
+ * HELiX UI Starter Theme — light-DOM scoping and page-region layout.
+ *
+ * This file provides CSS Grid-based page layout for the Drupal region system.
+ * All layout uses --hx-spacing-* tokens. No hardcoded pixel values.
+ *
+ * Design principle:
+ *   - HELiX components (hx-*) own their internal visual styles via Shadow DOM.
+ *   - The theme owns LAYOUT: how regions relate to each other on the page.
+ *   - This file is the boundary between those two concerns.
+ *
+ * Modifier classes are applied by page.html.twig based on active region variables.
+ */
+
+/* ==========================================================================
+   1. Region utility class — .hx-region
+   Applied to all Drupal region wrapper elements in page.html.twig.
+   Establishes a consistent padding / max-width envelope.
+   ========================================================================== */
+
+.hx-region {
+  width: 100%;
+  max-width: 80rem; /* 1280px — adjust per design system max-width token */
+  margin-inline: auto;
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+}
+
+/* Wide variant — full bleed sections like heroes and banners. */
+.hx-region--wide {
+  max-width: 100%;
+  padding-inline: 0;
+}
+
+/* Narrow variant — forms, single-column reading content. */
+.hx-region--narrow {
+  max-width: 48rem;
+}
+
+/* ==========================================================================
+   2. Page layout grid — main content + sidebars.
+   The grid adjusts based on the modifier classes applied by page.html.twig.
+   ========================================================================== */
+
+.layout-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--hx-spacing-xl, 2rem);
+  padding-block: var(--hx-spacing-xl, 2rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+  max-width: 80rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+/* One sidebar — first sidebar at 16rem, content fills the rest. */
+.layout-main.hx-region--has-sidebar-first {
+  grid-template-columns: 16rem 1fr;
+  grid-template-areas: 'sidebar-first content';
+}
+
+/* One sidebar — second sidebar at 16rem, content fills the rest. */
+.layout-main.hx-region--has-sidebar-second {
+  grid-template-columns: 1fr 16rem;
+  grid-template-areas: 'content sidebar-second';
+}
+
+/* Both sidebars. */
+.layout-main.hx-region--has-sidebar-first.hx-region--has-sidebar-second {
+  grid-template-columns: 14rem 1fr 14rem;
+  grid-template-areas: 'sidebar-first content sidebar-second';
+}
+
+.hx-region__content {
+  grid-area: content;
+  min-width: 0; /* prevent content overflow in grid */
+}
+
+.layout-sidebar-first {
+  grid-area: sidebar-first;
+}
+
+.layout-sidebar-second {
+  grid-area: sidebar-second;
+}
+
+/* Stack on small screens regardless of sidebar configuration. */
+@media (max-width: 768px) {
+  .layout-main,
+  .layout-main.hx-region--has-sidebar-first,
+  .layout-main.hx-region--has-sidebar-second,
+  .layout-main.hx-region--has-sidebar-first.hx-region--has-sidebar-second {
+    grid-template-columns: 1fr;
+    grid-template-areas: none;
+    padding-inline: var(--hx-spacing-md, 1rem);
+  }
+}
+
+/* ==========================================================================
+   3. Highlighted region — full-width top band for alerts and status messages.
+   ========================================================================== */
+
+.layout-highlighted {
+  width: 100%;
+  padding-block: var(--hx-spacing-sm, 0.5rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+  background-color: var(--hx-color-surface-alt, #f9fafb);
+  border-block-end: 1px solid var(--hx-color-border, #e5e7eb);
+}
+
+/* ==========================================================================
+   4. Breadcrumb region.
+   ========================================================================== */
+
+.layout-breadcrumb {
+  padding-block: var(--hx-spacing-sm, 0.5rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
+/* ==========================================================================
+   5. Footer region.
+   ========================================================================== */
+
+.layout-footer {
+  padding-block: var(--hx-spacing-2xl, 3rem);
+  padding-inline: var(--hx-spacing-lg, 1.5rem);
+  background-color: var(--hx-color-text, #111827);
+  color: var(--hx-color-primary-contrast, #ffffff);
+  max-width: 100%;
+}
+
+.layout-footer hx-text {
+  color: inherit;
+}
+
+.layout-footer hx-link {
+  color: inherit;
+}
+
+/* ==========================================================================
+   6. Component grid layout — for Views grid displays, card grids, etc.
+   Apply .hx-component-grid to a Views container or Layout Builder block.
+   ========================================================================== */
+
+.hx-component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--hx-spacing-lg, 1.5rem);
+  width: 100%;
+}
+
+/* Force 2-column on medium screens. */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .hx-component-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Single column on small screens. */
+@media (max-width: 639px) {
+  .hx-component-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   7. Stack layout — vertical list of components with consistent spacing.
+   Use for sidebar navigation blocks, filter groups, action lists.
+   ========================================================================== */
+
+.hx-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hx-spacing-md, 1rem);
+}
+
+.hx-stack--sm {
+  gap: var(--hx-spacing-sm, 0.5rem);
+}
+
+.hx-stack--lg {
+  gap: var(--hx-spacing-xl, 2rem);
+}
+
+/* ==========================================================================
+   8. Drupal block region helper — ensures block wrappers inside regions
+   respect the grid flow without unexpected margin collapses.
+   ========================================================================== */
+
+.block + .block {
+  margin-block-start: var(--hx-spacing-lg, 1.5rem);
+}
+
+/* ==========================================================================
+   9. Sidebar navigation — styles for the .sidebar-nav wrapper that contains
+   an hx-side-nav component. The helixuiSidebarNav behavior handles toggle.
+   ========================================================================== */
+
+.sidebar-nav {
+  width: 100%;
+}
+
+.sidebar-nav hx-side-nav {
+  display: block;
+  width: 100%;
+}
+
+/* ==========================================================================
+   10. Print layout — collapse to single column, hide decorative chrome.
+   ========================================================================== */
+
+@media print {
+  .layout-main,
+  .layout-main.hx-region--has-sidebar-first,
+  .layout-main.hx-region--has-sidebar-second,
+  .layout-main.hx-region--has-sidebar-first.hx-region--has-sidebar-second {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-sidebar-first,
+  .layout-sidebar-second,
+  .site-header,
+  .layout-footer {
+    display: none;
+  }
+
+  .hx-region {
+    max-width: 100%;
+    padding-inline: 0;
+  }
+}

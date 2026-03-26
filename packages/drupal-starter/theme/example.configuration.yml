@@ -1,0 +1,205 @@
+# example.configuration.yml
+#
+# Example Drupal configuration demonstrating HELiX UI Starter Theme settings.
+#
+# This file is NOT imported directly by Drupal — it is a reference document.
+# To apply this configuration:
+#   1. Copy the relevant sections to your config/sync/ directory.
+#   2. Run: drush config:import --partial
+#
+# Sections:
+#   A. Theme settings
+#   B. Block placement
+#   C. Field formatter configuration
+#   D. View mode configuration
+#   E. Image style configuration
+
+# ---------------------------------------------------------------------------
+# A. Theme settings — system.theme and helixui theme settings.
+# ---------------------------------------------------------------------------
+
+# system.theme.yml
+# Set the default theme to helixui.
+---
+system.theme:
+  admin: 'claro'
+  default: 'helixui'
+---
+# helixui.settings.yml
+# Theme-specific settings exposed via Drupal's theme settings form.
+helixui.settings:
+  logo:
+    use_default: false
+    path: 'themes/helixui/logo.svg'
+    url: ''
+  favicon:
+    use_default: true
+    path: ''
+    url: ''
+    mimetype: 'image/vnd.microsoft.icon'
+  # Custom HELiX theme settings (defined in helixui.theme PHP file).
+  helixui_color_primary: '#1a56db'
+  helixui_font_heading: 'Merriweather'
+  helixui_enable_dark_mode_toggle: true
+
+---
+# ---------------------------------------------------------------------------
+# B. Block placement — where Drupal blocks appear in the helixui theme.
+# ---------------------------------------------------------------------------
+
+# block.block.helixui_branding.yml
+# Site branding block in the header region.
+block.block.helixui_branding:
+  id: helixui_branding
+  theme: helixui
+  region: header
+  weight: -10
+  plugin: 'system_branding_block'
+  settings:
+    id: 'system_branding_block'
+    label: 'Site branding'
+    label_display: '0'
+    use_site_logo: true
+    use_site_name: true
+    use_site_slogan: false
+
+---
+# block.block.helixui_primary_menu.yml
+# Primary navigation block in the primary_menu region.
+block.block.helixui_primary_menu:
+  id: helixui_primary_menu
+  theme: helixui
+  region: primary_menu
+  weight: -10
+  plugin: 'system_menu_block:main'
+  settings:
+    id: 'system_menu_block:main'
+    label: 'Main navigation'
+    label_display: '0'
+    level: 1
+    depth: 2
+    expand_all_items: false
+
+---
+# block.block.helixui_breadcrumbs.yml
+# Breadcrumb block in the breadcrumb region.
+block.block.helixui_breadcrumbs:
+  id: helixui_breadcrumbs
+  theme: helixui
+  region: breadcrumb
+  weight: 0
+  plugin: 'system_breadcrumb_block'
+  settings:
+    id: 'system_breadcrumb_block'
+    label: 'Breadcrumbs'
+    label_display: '0'
+
+---
+# block.block.helixui_content.yml
+# Main content block in the content region.
+block.block.helixui_content:
+  id: helixui_content
+  theme: helixui
+  region: content
+  weight: 0
+  plugin: 'system_main_block'
+  settings:
+    id: 'system_main_block'
+    label: 'Main content'
+    label_display: '0'
+
+---
+# block.block.helixui_messages.yml
+# Status messages block in the highlighted region.
+# The helixui theme replaces Drupal messages with hx-alert via Twig override.
+block.block.helixui_messages:
+  id: helixui_messages
+  theme: helixui
+  region: highlighted
+  weight: -10
+  plugin: 'system_messages_block'
+  settings:
+    id: 'system_messages_block'
+    label: 'Status messages'
+    label_display: '0'
+
+---
+# block.block.helixui_footer.yml
+# Footer menu block.
+block.block.helixui_footer:
+  id: helixui_footer
+  theme: helixui
+  region: footer
+  weight: 0
+  plugin: 'system_menu_block:footer'
+  settings:
+    id: 'system_menu_block:footer'
+    label: 'Footer navigation'
+    label_display: '0'
+    level: 1
+    depth: 1
+
+---
+# ---------------------------------------------------------------------------
+# C. Field formatter configuration — hx-card for article teasers.
+# ---------------------------------------------------------------------------
+
+# core.entity_view_display.node.article.teaser.yml
+# Configures the teaser display to use the helixui:card SDC via the
+# "Drupal SDC" field formatter (requires sdc_fields module or similar).
+core.entity_view_display.node.article.teaser:
+  targetEntityType: node
+  bundle: article
+  mode: teaser
+  status: true
+  content:
+    title:
+      type: string
+      weight: 0
+      settings: {}
+      region: content
+    body:
+      type: text_summary_or_trimmed
+      weight: 1
+      settings:
+        trim_length: 200
+      region: content
+    field_image:
+      type: image
+      weight: -1
+      settings:
+        image_style: 'medium'
+        image_link: 'content'
+      region: content
+  hidden:
+    links: true
+    field_tags: true
+
+---
+# ---------------------------------------------------------------------------
+# D. View mode configuration — register 'card' view mode for SDC use.
+# ---------------------------------------------------------------------------
+
+core.entity_view_mode.node.card:
+  targetEntityType: node
+  id: 'node.card'
+  label: 'Card'
+  status: true
+  cache: true
+
+---
+# ---------------------------------------------------------------------------
+# E. Image style — thumbnail optimized for hx-card image slot.
+# ---------------------------------------------------------------------------
+
+image.style.helixui_card:
+  name: helixui_card
+  label: 'HELiX Card Thumbnail'
+  effects:
+    - id: image_scale_and_crop
+      weight: 1
+      data:
+        width: 640
+        height: 360
+        upscale: false
+        anchor: 'center-center'

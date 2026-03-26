@@ -1,0 +1,145 @@
+# fixtures/page.html.twig.fixture.yml
+#
+# Fixture data for templates/page.html.twig.
+#
+# Provides realistic Drupal page variable values for local template testing
+# and SDC fixture-based rendering verification.
+#
+# @see templates/page.html.twig
+
+# ---------------------------------------------------------------------------
+# Fixture: default
+# Standard interior page with header, content, and footer regions populated.
+# ---------------------------------------------------------------------------
+
+default:
+  base_path: '/'
+  front_page: '/'
+  is_front: false
+  logged_in: false
+  root_path: 'articles'
+  site_name: 'HELiX Health System'
+  site_slogan: 'Expert Care, Close to Home'
+  logo: '/themes/helixui/logo.svg'
+  page:
+    header:
+      '#markup': ''
+    primary_menu:
+      '#markup': |
+        <ul>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/patients">Patients</a></li>
+          <li><a href="/news">News</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+    secondary_menu:
+      '#markup': |
+        <form role="search" action="/search" method="get">
+          <label class="visually-hidden" for="search-input">Search</label>
+          <input id="search-input" type="search" name="q" placeholder="Search..." />
+          <button type="submit">Search</button>
+        </form>
+    breadcrumb:
+      '#markup': |
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li><a href="/news">News</a></li>
+          <li aria-current="page">Current Page</li>
+        </ol>
+    highlighted: {}
+    help: {}
+    content:
+      '#markup': '<p>Main page content goes here.</p>'
+    sidebar_first: {}
+    sidebar_second: {}
+    footer:
+      '#markup': |
+        <p>&copy; 2026 HELiX Health System. All rights reserved.</p>
+
+# ---------------------------------------------------------------------------
+# Fixture: front-page
+# Front page with hero region in highlighted and no sidebars.
+# ---------------------------------------------------------------------------
+
+front-page:
+  base_path: '/'
+  front_page: '/'
+  is_front: true
+  logged_in: false
+  root_path: ''
+  site_name: 'HELiX Health System'
+  site_slogan: 'Expert Care, Close to Home'
+  logo: '/themes/helixui/logo.svg'
+  page:
+    header: {}
+    primary_menu:
+      '#markup': |
+        <ul>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/patients">Patients</a></li>
+          <li><a href="/news">News</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+    secondary_menu: {}
+    breadcrumb: {}
+    highlighted:
+      '#markup': |
+        <hx-alert variant="info" closable>
+          Our new patient portal is now live. <a href="/portal">Log in here</a>.
+        </hx-alert>
+    help: {}
+    content:
+      '#markup': '<p>Welcome to HELiX Health System.</p>'
+    sidebar_first: {}
+    sidebar_second: {}
+    footer:
+      '#markup': '<p>&copy; 2026 HELiX Health System.</p>'
+
+# ---------------------------------------------------------------------------
+# Fixture: with-sidebars
+# Interior page demonstrating both sidebar regions populated.
+# ---------------------------------------------------------------------------
+
+with-sidebars:
+  base_path: '/'
+  front_page: '/'
+  is_front: false
+  logged_in: true
+  root_path: 'patient-portal'
+  site_name: 'HELiX Health System'
+  site_slogan: 'Expert Care, Close to Home'
+  logo: '/themes/helixui/logo.svg'
+  page:
+    header: {}
+    primary_menu:
+      '#markup': '<ul><li><a href="/about">About Us</a></li></ul>'
+    secondary_menu: {}
+    breadcrumb:
+      '#markup': '<ol><li><a href="/">Home</a></li><li aria-current="page">Patient Portal</li></ol>'
+    highlighted: {}
+    help: {}
+    content:
+      '#markup': '<p>Patient portal content.</p>'
+    sidebar_first:
+      '#markup': |
+        <nav aria-label="Patient portal navigation">
+          <ul>
+            <li><a href="/portal/appointments">My Appointments</a></li>
+            <li><a href="/portal/records">Medical Records</a></li>
+            <li><a href="/portal/messages">Messages</a></li>
+            <li><a href="/portal/billing">Billing</a></li>
+          </ul>
+        </nav>
+    sidebar_second:
+      '#markup': |
+        <div>
+          <h2>Quick Actions</h2>
+          <ul>
+            <li><a href="/portal/request-appointment">Request Appointment</a></li>
+            <li><a href="/portal/refill">Request Prescription Refill</a></li>
+          </ul>
+        </div>
+    footer:
+      '#markup': '<p>&copy; 2026 HELiX Health System.</p>'
