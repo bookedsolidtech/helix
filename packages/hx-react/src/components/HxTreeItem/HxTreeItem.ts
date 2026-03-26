@@ -29,7 +29,7 @@ export const HxTreeItem = createComponent({
   elementClass: HelixTreeItem,
   react: React,
   events: {
-    onHxTreeItemSelect: 'hx-tree-item-select'
+    onHxTreeItemSelect: 'hx-tree-item-select',
   },
   displayName: 'HxTreeItem',
 });

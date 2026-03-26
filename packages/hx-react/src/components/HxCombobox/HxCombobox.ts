@@ -34,7 +34,7 @@ export const HxCombobox = createComponent({
     onHxHide: 'hx-hide',
     onHxInput: 'hx-input',
     onHxClear: 'hx-clear',
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxCombobox',
 });
