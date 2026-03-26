@@ -505,6 +505,22 @@ describe('hx-phi-field', () => {
       expect(status?.textContent?.trim()).toBe('Protected health information is revealed');
     });
 
+    it('toggle has aria-label using custom label property', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn" label="Social Security Number"></hx-phi-field>',
+      );
+      const toggle = shadowQuery(el, '[part="toggle"]')!;
+      expect(toggle.getAttribute('aria-label')).toBe('Reveal social security number');
+    });
+
+    it('status region uses custom label in announcement', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn" label="SSN"></hx-phi-field>',
+      );
+      const status = shadowQuery(el, '[role="status"]');
+      expect(status?.textContent?.trim()).toBe('SSN is masked');
+    });
+
     it('toggle is a native button element', async () => {
       const el = await fixture<HelixPhiField>(
         '<hx-phi-field data="123-45-6789" field-type="ssn"></hx-phi-field>',
@@ -562,6 +578,50 @@ describe('hx-phi-field', () => {
       );
       const value = shadowQuery(el, '.phi-field__value');
       expect(value?.textContent?.trim()).toBe('**/**/****');
+    });
+
+    it('label defaults to empty string', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn"></hx-phi-field>',
+      );
+      expect(el.label).toBe('');
+    });
+
+    it('disabled defaults to false', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn"></hx-phi-field>',
+      );
+      expect(el.disabled).toBe(false);
+    });
+  });
+
+  // ─── Disabled State ───
+
+  describe('Disabled State', () => {
+    it('toggle button is disabled when disabled attribute is set', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn" disabled></hx-phi-field>',
+      );
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
+      expect(toggle.disabled).toBe(true);
+    });
+
+    it('does not reveal when disabled', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn" disabled></hx-phi-field>',
+      );
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
+      toggle.click();
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value');
+      expect(value?.classList.contains('phi-field__value--masked')).toBe(true);
+    });
+
+    it('reflects disabled attribute on host', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field data="123-45-6789" field-type="ssn" disabled></hx-phi-field>',
+      );
+      expect(el.hasAttribute('disabled')).toBe(true);
     });
   });
 });
