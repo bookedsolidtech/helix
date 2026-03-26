@@ -29,7 +29,7 @@ export const HxTimePicker = createComponent({
   elementClass: HelixTimePicker,
   react: React,
   events: {
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxTimePicker',
 });

@@ -29,7 +29,7 @@ export const HxRadioGroup = createComponent({
   react: React,
   events: {
     onHxChange: 'hx-change',
-    onHxRadioSelect: 'hx-radio-select'
+    onHxRadioSelect: 'hx-radio-select',
   },
   displayName: 'HxRadioGroup',
 });
