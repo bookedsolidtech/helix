@@ -7,15 +7,15 @@ This guide walks you through creating your first HELIX component and using it in
 
 ## Scaffold a New Project (Recommended)
 
-The fastest way to start a new project is with the `create-helix` CLI:
+The fastest way to start a new project is with the `create-helix-app` CLI:
 
 ```bash
-npx create-helix my-app
+npx create-helix-app my-app
 ```
 
 The interactive TUI will walk you through selecting a framework (React/Next.js, Vue/Nuxt, SvelteKit, Angular, Astro, or Vanilla), component bundles, and optional features like TypeScript, ESLint, and design tokens.
 
-See the [create-helix CLI reference](/getting-started/create-helix/) for full documentation including Drupal presets and component bundle selection.
+See the [create-helix-app CLI reference](/getting-started/create-helix/) for full documentation including Drupal presets and component bundle selection.
 
 ## Start the Dev Environment
 

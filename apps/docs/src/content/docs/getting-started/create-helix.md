@@ -1,24 +1,24 @@
 ---
-title: create-helix CLI
-description: Scaffold a new project with HELiX web components using the create-helix CLI
+title: create-helix-app CLI
+description: Scaffold a new project with HELiX web components using the create-helix-app CLI
 ---
 
-`create-helix` is the official scaffolding CLI for HELiX web components. It generates a production-ready project for any supported framework in seconds.
+`create-helix-app` is the official scaffolding CLI for HELiX web components. It generates a production-ready project for any supported framework in seconds.
 
-- **npm:** [npmjs.com/package/create-helix](https://www.npmjs.com/package/create-helix)
+- **npm:** [npmjs.com/package/create-helix-app](https://www.npmjs.com/package/create-helix-app)
 - **GitHub:** [github.com/bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)
 
 ## Quick Start
 
 ```bash
-npx create-helix my-app
+npx create-helix-app my-app
 ```
 
 The interactive TUI prompts you for a framework, component bundles, and optional features (TypeScript, ESLint, design tokens). When done, it outputs a ready-to-run project.
 
 ## Framework Targets
 
-`create-helix` supports all major frontend frameworks and plain HTML:
+`create-helix-app` supports all major frontend frameworks and plain HTML:
 
 | Framework | Description |
 | --------- | ----------- |
@@ -32,12 +32,12 @@ The interactive TUI prompts you for a framework, component bundles, and optional
 Pass `--framework` to skip the prompt:
 
 ```bash
-npx create-helix my-app --framework react
-npx create-helix my-app --framework vue
-npx create-helix my-app --framework svelte
-npx create-helix my-app --framework angular
-npx create-helix my-app --framework astro
-npx create-helix my-app --framework vanilla
+npx create-helix-app my-app --framework react
+npx create-helix-app my-app --framework vue
+npx create-helix-app my-app --framework svelte
+npx create-helix-app my-app --framework angular
+npx create-helix-app my-app --framework astro
+npx create-helix-app my-app --framework vanilla
 ```
 
 ## Component Bundles
@@ -56,7 +56,7 @@ Choose which component groups to include. Each bundle is a curated set of HELiX 
 Bundles can be combined. Select multiple bundles during the interactive prompt or pass `--bundles`:
 
 ```bash
-npx create-helix my-app --bundles core-ui,forms,feedback
+npx create-helix-app my-app --bundles core-ui,forms,feedback
 ```
 
 ## Drupal Preset
@@ -64,7 +64,7 @@ npx create-helix my-app --bundles core-ui,forms,feedback
 For Drupal-first projects, use the `--drupal` flag. This scaffolds a Drupal-optimized project with the `@helixui/drupal-behaviors` package pre-installed, Twig template examples, and a Drupal library definition.
 
 ```bash
-npx create-helix my-drupal-theme --drupal
+npx create-helix-app my-drupal-theme --drupal
 ```
 
 ### Drupal Presets
@@ -73,13 +73,13 @@ Presets apply a curated bundle selection and configuration for specific Drupal u
 
 ```bash
 # Healthcare preset — Core UI + Forms + Feedback bundles, WCAG 2.1 AA config
-npx create-helix my-app --drupal --preset healthcare
+npx create-helix-app my-app --drupal --preset healthcare
 
-# Government preset — Core UI + Navigation + Accessibility-first config
-npx create-helix my-app --drupal --preset government
+# Blog preset — Core UI + Navigation + Content-focused config
+npx create-helix-app my-app --drupal --preset blog
 
-# Commerce preset — Core UI + Data Display + Forms bundles
-npx create-helix my-app --drupal --preset commerce
+# Intranet preset — Core UI + Data Display + Forms bundles
+npx create-helix-app my-app --drupal --preset intranet
 ```
 
 Each preset configures:
@@ -91,14 +91,14 @@ Each preset configures:
 ## All CLI Options
 
 ```bash
-npx create-helix [project-name] [options]
+npx create-helix-app [project-name] [options]
 
 Options:
   --framework <name>    Target framework: react, vue, svelte, angular, astro, vanilla
   --bundles <list>      Comma-separated bundle names: core-ui, forms, navigation,
                         data-display, feedback, layout
   --drupal              Scaffold for Drupal integration (adds drupal-behaviors, Twig stubs)
-  --preset <name>       Drupal preset: healthcare, government, commerce
+  --preset <name>       Drupal preset: standard, blog, healthcare, intranet
   --typescript          Include TypeScript configuration (default: true)
   --no-typescript       Skip TypeScript configuration
   --eslint              Include ESLint configuration (default: true)
@@ -112,13 +112,13 @@ Options:
 
 ## The Booked Solid Ecosystem
 
-`create-helix` is part of the Booked Solid toolchain:
+`create-helix-app` is part of the Booked Solid toolchain:
 
 | Tool | Purpose |
 | ---- | ------- |
 | **helix** (`@helixui/library`) | Enterprise web component library |
 | **helixir** (`@helixui/mcp`) | MCP server for AI-assisted development |
-| **create-helix** | Project scaffolding CLI |
+| **create-helix-app** | Project scaffolding CLI |
 
 ## Next Steps
 
