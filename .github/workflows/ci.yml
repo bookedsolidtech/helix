@@ -109,6 +109,14 @@ jobs:
           else
             echo "is_audit=false" >> "$GITHUB_OUTPUT"
           fi
+
+          # Detect audit batch branches (handled by audit-batch-ci.yml)
+          if [[ "$BRANCH" == audit/deep-quality-batch-* ]]; then
+            echo "is_audit_batch=true" >> "$GITHUB_OUTPUT"
+            echo "Audit BATCH branch detected: $BRANCH — defer to audit-batch-ci.yml"
+          else
+            echo "is_audit_batch=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: dorny/paths-filter@v3
         id: filter
         with:

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Configuration for managing shared files during batch audit execution",
+  "sharedFiles": [
+    {
+      "path": "packages/hx-library/coverage-config.json",
+      "mergeStrategy": "json-deep-merge",
+      "conflictResolution": "union-values",
+      "description": "Coverage thresholds per component — merge all threshold entries"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "mergeStrategy": "manual-review",
+      "conflictResolution": "sequential-apply",
+      "description": "CI workflow — changes must be applied sequentially, never in parallel"
+    },
+    {
+      "path": "packages/hx-library/src/index.ts",
+      "mergeStrategy": "alphabetical-sort",
+      "conflictResolution": "union-exports",
+      "description": "Library barrel file — take union of all exports, sort alphabetically"
+    },
+    {
+      "path": "packages/hx-react/src/index.ts",
+      "mergeStrategy": "alphabetical-sort",
+      "conflictResolution": "union-exports",
+      "description": "React wrapper barrel file — take union of all exports, sort alphabetically"
+    }
+  ],
+  "preCommitChecks": {
+    "enabled": true,
+    "validateJsonSyntax": ["coverage-config.json"],
+    "validateYamlSyntax": ["ci.yml"],
+    "validateTypeScriptSyntax": ["index.ts"],
+    "preventParallelModification": true
+  },
+  "consolidationRules": {
+    "coverageConfig": {
+      "strategy": "Take the UNION of all component entries. For duplicate keys, use the LATEST value (from the most recent agent commit).",
+      "jsonMergePath": "$.components",
+      "deduplication": "last-write-wins"
+    },
+    "ciWorkflow": {
+      "strategy": "Sequential application only. Each agent reads the current state and applies changes on top. Never merge conflicting CI changes.",
+      "requireManualReview": false
+    },
+    "barrelFiles": {
+      "strategy": "Collect all export statements, sort alphabetically, remove duplicates.",
+      "sortOrder": "alphabetical",
+      "deduplication": "remove-exact-duplicates"
+    }
+  }
+}
