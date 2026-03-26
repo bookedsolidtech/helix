@@ -16,6 +16,11 @@ const meta = {
   title: 'Components/Select',
   component: 'hx-select',
   tags: ['autodocs'],
+  parameters: {
+    actions: {
+      handles: ['hx-change'],
+    },
+  },
   argTypes: {
     label: {
       control: 'text',
@@ -725,17 +730,46 @@ export const WithOptgroups: Story = {
       help-text=${args.helpText}
       style="max-width: 400px;"
     >
-      <option value="cardiology">Cardiology (Medical)</option>
-      <option value="neurology">Neurology (Medical)</option>
-      <option value="oncology">Oncology (Medical)</option>
-      <option value="pulmonology">Pulmonology (Medical)</option>
-      <option value="gen-surgery">General Surgery (Surgical)</option>
-      <option value="ortho-surgery">Orthopedic Surgery (Surgical)</option>
-      <option value="neuro-surgery">Neurosurgery (Surgical)</option>
-      <option value="cardiac-surgery">Cardiac Surgery (Surgical)</option>
-      <option value="radiology">Radiology (Diagnostic)</option>
-      <option value="pathology">Pathology (Diagnostic)</option>
-      <option value="lab">Laboratory (Diagnostic)</option>
+      <optgroup label="Medical">
+        <option value="cardiology">Cardiology</option>
+        <option value="neurology">Neurology</option>
+        <option value="oncology">Oncology</option>
+        <option value="pulmonology">Pulmonology</option>
+      </optgroup>
+      <optgroup label="Surgical">
+        <option value="gen-surgery">General Surgery</option>
+        <option value="ortho-surgery">Orthopedic Surgery</option>
+        <option value="neuro-surgery">Neurosurgery</option>
+        <option value="cardiac-surgery">Cardiac Surgery</option>
+      </optgroup>
+      <optgroup label="Diagnostic">
+        <option value="radiology">Radiology</option>
+        <option value="pathology">Pathology</option>
+        <option value="lab">Laboratory</option>
+      </optgroup>
+    </hx-select>
+  `,
+};
+
+export const WithDisabledOptions: Story = {
+  args: {
+    label: 'Transfer Destination',
+    placeholder: 'Select destination unit...',
+    helpText: 'Units marked as unavailable are not accepting transfers at this time.',
+  },
+  render: (args) => html`
+    <hx-select
+      label=${args.label}
+      placeholder=${args.placeholder}
+      help-text=${args.helpText}
+      style="max-width: 400px;"
+    >
+      <option value="icu">Intensive Care Unit</option>
+      <option value="stepdown">Step-Down Unit</option>
+      <option value="medsurg">Medical-Surgical</option>
+      <option value="nicu" disabled>Neonatal ICU (unavailable)</option>
+      <option value="picu" disabled>Pediatric ICU (unavailable)</option>
+      <option value="rehab">Rehabilitation</option>
     </hx-select>
   `,
 };
@@ -1136,18 +1170,18 @@ export const KeyboardNavigation: Story = {
     const host = canvasElement.querySelector('hx-select');
     await expect(host).toBeTruthy();
 
-    const nativeSelect = host!.shadowRoot!.querySelector('select');
-    await expect(nativeSelect).toBeTruthy();
+    const trigger = host!.shadowRoot!.querySelector('[role="combobox"]');
+    await expect(trigger).toBeTruthy();
 
     // Verify the instructional text is present
     await expect(canvas.getByText(/Tab into the select/)).toBeTruthy();
 
-    // Tab to focus the select
+    // Tab to focus the combobox trigger
     await userEvent.tab();
 
-    // The native select should now have focus
+    // The combobox trigger div should now have focus
     const activeEl = host!.shadowRoot!.activeElement;
-    await expect(activeEl).toBe(nativeSelect);
+    await expect(activeEl).toBe(trigger);
   },
 };
 

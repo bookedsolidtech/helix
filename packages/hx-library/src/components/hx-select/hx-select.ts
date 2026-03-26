@@ -66,6 +66,7 @@ interface SelectOption {
  * @cssprop [--hx-select-error-color=var(--hx-color-error-500)] - Error state color.
  * @cssprop [--hx-select-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-select-chevron-color=var(--hx-color-neutral-500)] - Chevron indicator color.
+ * @cssprop [--hx-select-chevron-size=0.5rem] - Chevron indicator size (width/height base unit).
  * @cssprop [--hx-select-listbox-bg=var(--hx-color-neutral-0)] - Listbox panel background color.
  * @cssprop [--hx-select-option-hover-bg=var(--hx-color-primary-50)] - Option hover background color.
  * @cssprop [--hx-select-option-selected-bg=var(--hx-color-primary-100)] - Selected option background color.
