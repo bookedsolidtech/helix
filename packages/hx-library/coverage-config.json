@@ -228,6 +228,11 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-patient-banner": {
+      "reason": "New healthcare component \u2014 tests to be added in dedicated feature",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-phi-field": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
