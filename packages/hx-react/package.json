@@ -26,6 +26,9 @@
     "prebuild": "pnpm run generate",
     "build": "vite build",
     "type-check": "tsc --noEmit",
+    "type-check:test": "tsc --project tsconfig.test.json",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
     "lint": "eslint src/",
     "clean": "rm -rf dist src/components"
   },
