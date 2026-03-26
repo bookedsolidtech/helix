@@ -37,7 +37,7 @@ export const HxSlider = createComponent({
   react: React,
   events: {
     onHxInput: 'hx-input',
-    onHxChange: 'hx-change',
+    onHxChange: 'hx-change'
   },
   displayName: 'HxSlider',
 });
