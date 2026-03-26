@@ -32,7 +32,7 @@ export const HxSteps = createComponent({
   elementClass: HelixSteps,
   react: React,
   events: {
-    onHxStepClick: 'hx-step-click',
+    onHxStepClick: 'hx-step-click'
   },
   displayName: 'HxSteps',
 });
