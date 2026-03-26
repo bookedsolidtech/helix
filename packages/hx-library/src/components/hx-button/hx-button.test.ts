@@ -820,5 +820,84 @@ describe('hx-button', () => {
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
+
+    it('icon-only button with aria-label has no axe violations', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="ghost" aria-label="Close dialog"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></hx-button>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── href mode: combined anchor states ───
+
+  describe('href mode: combined anchor states', () => {
+    it('removes href when both loading and disabled in anchor mode', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" loading disabled>Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      // href should be absent when either loading or disabled
+      expect(anchor.hasAttribute('href')).toBe(false);
+    });
+
+    it('sets aria-disabled on anchor when both loading and disabled', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" loading disabled>Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('sets aria-busy on anchor when both loading and disabled', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" loading disabled>Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-busy')).toBe('true');
+    });
+
+    it('does not set rel when target is "_self"', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" target="_self">Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('rel')).toBe(false);
+    });
+
+    it('does not set rel when target is a named frame', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" target="myFrame">Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('rel')).toBe(false);
+    });
+  });
+
+  // ─── Property: type — form integration ───
+
+  describe('Property: type — form integration', () => {
+    it('does not submit form when loading and type=submit', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-button type="submit" loading>Submit</hx-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-button') as HelixButton;
+      await el.updateComplete;
+
+      let submitted = false;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitted = true;
+      });
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.click();
+      await el.updateComplete;
+      // Native button with type=submit is not disabled but JS click guard blocks hx-click
+      // Loading state prevents the requestSubmit call in _handleClick
+      expect(submitted).toBe(false);
+    });
   });
 });
