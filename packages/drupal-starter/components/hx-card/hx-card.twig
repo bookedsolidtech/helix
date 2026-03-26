@@ -1,0 +1,44 @@
+{#
+/**
+ * @file
+ * Card SDC — wraps hx-card for Drupal content teaser and listing patterns.
+ *
+ * Map Drupal entity fields to card slots for Views row templates, node teasers,
+ * and content listing pages. When linking the entire card, use hx_href and
+ * hx_label instead of placing an anchor in the actions slot.
+ *
+ * Example: Views row for a provider listing
+ *   {% include 'helixui:hx-card' with {
+ *     hx_href: content.field_url|render,
+ *     hx_label: 'View profile for ' ~ content.title|render,
+ *     image: content.field_photo|render,
+ *     heading: '<h3>' ~ content.title|render ~ '</h3>',
+ *     content: content.field_specialty|render,
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-card') }}
+
+<hx-card
+  {% if variant and variant != 'default' %}variant="{{ variant }}"{% endif %}
+  {% if elevation and elevation != 'flat' %}elevation="{{ elevation }}"{% endif %}
+  {% if hx_href %}hx-href="{{ hx_href }}"{% endif %}
+  {% if hx_label %}hx-label="{{ hx_label }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if image %}
+    <div slot="image">{{ image }}</div>
+  {% endif %}
+  {% if heading %}
+    <div slot="heading">{{ heading }}</div>
+  {% endif %}
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if footer %}
+    <div slot="footer">{{ footer }}</div>
+  {% endif %}
+  {% if actions %}
+    <div slot="actions">{{ actions }}</div>
+  {% endif %}
+</hx-card>

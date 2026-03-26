@@ -1,0 +1,35 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Tabs
+description: 'Tabbed content organizer with horizontal/vertical orientations, automatic/manual keyboard activation, and full ARIA tablist semantics. Composes hx-tabs, hx-tab, and hx-tab-panel.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the tablist describing what the tabs represent (e.g., "Patient record sections")'
+    orientation:
+      type: string
+      title: Orientation
+      description: 'Layout orientation of the tab strip'
+      default: 'horizontal'
+      enum:
+        - horizontal
+        - vertical
+    activation:
+      type: string
+      title: Activation
+      description: 'Keyboard navigation activation mode. Automatic activates on focus; manual requires Space or Enter.'
+      default: 'automatic'
+      enum:
+        - automatic
+        - manual
+slots:
+  tabs:
+    title: Tabs
+    description: 'hx-tab elements rendered inside the tablist'
+  default:
+    title: Panels
+    description: 'hx-tab-panel elements corresponding to each tab'

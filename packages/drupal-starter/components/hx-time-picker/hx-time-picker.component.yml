@@ -1,0 +1,57 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Time Picker
+description: 'Form-associated time picker with 12h/24h format support, step intervals, and validation. For Drupal time fields and appointment scheduling workflows.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text'
+    value:
+      type: string
+      title: Value
+      description: 'Current time value in HH:MM format (24h)'
+    min:
+      type: string
+      title: Min Time
+      description: 'Minimum selectable time in HH:MM format'
+      default: '00:00'
+    max:
+      type: string
+      title: Max Time
+      description: 'Maximum selectable time in HH:MM format'
+      default: '23:59'
+    step:
+      type: integer
+      title: Step
+      description: 'Minute interval between selectable times'
+      default: 30
+    format:
+      type: string
+      title: Format
+      description: 'Display format for the time value'
+      default: '12h'
+      enum:
+        - 12h
+        - 24h
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the time picker is disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'

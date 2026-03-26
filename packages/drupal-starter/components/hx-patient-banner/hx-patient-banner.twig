@@ -1,0 +1,57 @@
+{#
+/**
+ * @file
+ * Patient Banner SDC — wraps hx-patient-banner for clinical context display.
+ *
+ * Implements Joint Commission NPSG.01.01.01 two-identifier rule.
+ * Always populate at least 2 of the name, mrn, and dob slots for compliance.
+ * Use hx-phi-field in the mrn and dob slots for HIPAA-compliant masked display.
+ *
+ * Example:
+ *   {% include 'helixui:hx-patient-banner' with {
+ *     patient_id: node.field_mrn.value,
+ *     name: node.title.value,
+ *     mrn: '<hx-phi-field data="' ~ node.field_mrn.value ~ '" field-type="mrn"></hx-phi-field>',
+ *     dob: '<hx-phi-field data="' ~ node.field_dob.value ~ '" field-type="dob"></hx-phi-field>',
+ *     allergies: node.field_allergy_status.value,
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-patient-banner') }}
+{{ attach_library('helixui/hx-phi-field') }}
+
+<hx-patient-banner
+  {% if patient_id %}patient-id="{{ patient_id }}"{% endif %}
+  {% if label_patient and label_patient != 'Patient identification' %}label-patient="{{ label_patient }}"{% endif %}
+  {% if label_name and label_name != 'Patient name' %}label-name="{{ label_name }}"{% endif %}
+  {% if label_mrn and label_mrn != 'MRN' %}label-mrn="{{ label_mrn }}"{% endif %}
+  {% if label_dob and label_dob != 'Date of birth' %}label-dob="{{ label_dob }}"{% endif %}
+  {% if label_allergies and label_allergies != 'Allergies' %}label-allergies="{{ label_allergies }}"{% endif %}
+  {% if label_code_status and label_code_status != 'Code status' %}label-code-status="{{ label_code_status }}"{% endif %}
+  {% if enforce_identifier_rule == false %}enforce-identifier-rule="false"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if photo %}
+    <div slot="photo">{{ photo }}</div>
+  {% endif %}
+
+  {% if name %}
+    <span slot="name">{{ name }}</span>
+  {% endif %}
+
+  {% if mrn %}
+    <span slot="mrn">{{ mrn }}</span>
+  {% endif %}
+
+  {% if dob %}
+    <span slot="dob">{{ dob }}</span>
+  {% endif %}
+
+  {% if allergies %}
+    <span slot="allergies">{{ allergies }}</span>
+  {% endif %}
+
+  {% if code_status %}
+    <span slot="code-status">{{ code_status }}</span>
+  {% endif %}
+</hx-patient-banner>

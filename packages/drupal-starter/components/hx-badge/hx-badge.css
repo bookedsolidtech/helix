@@ -1,0 +1,5 @@
+/* hx-badge SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-badge {
+  display: inline-flex;
+}

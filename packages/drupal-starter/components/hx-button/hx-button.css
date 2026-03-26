@@ -1,0 +1,5 @@
+/* hx-button SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-button {
+  display: inline-block;
+}

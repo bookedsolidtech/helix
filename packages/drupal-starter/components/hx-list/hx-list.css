@@ -1,0 +1,5 @@
+/* hx-list SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-list {
+  display: block;
+}

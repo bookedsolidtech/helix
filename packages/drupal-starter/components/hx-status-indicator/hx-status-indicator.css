@@ -1,0 +1,5 @@
+/* hx-status-indicator SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-status-indicator {
+  display: inline-block;
+}
