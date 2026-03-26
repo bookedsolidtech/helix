@@ -41,6 +41,7 @@ let _hxSliderIdCounter = 0;
  * @csspart label - The label element.
  * @csspart value-display - The element displaying the current numeric value.
  * @csspart tick - Each individual tick mark element.
+ * @csspart help-text - The help text element displayed below the slider.
  *
  * @cssprop [--hx-slider-track-bg=var(--hx-color-neutral-200)] - Track background color.
  * @cssprop [--hx-slider-fill-bg=var(--hx-color-primary-500)] - Fill/progress color.
