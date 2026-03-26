@@ -20,5 +20,9 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
     },
     setupFiles: [path.join(dirname, '.storybook/vitest.setup.ts')],
+    reporters: ['default', 'html'],
+    outputFile: {
+      html: '.vitest/index.html',
+    },
   },
 });

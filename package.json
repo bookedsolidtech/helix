@@ -44,6 +44,8 @@
     "test:drupal-behaviors": "pnpm --filter=@helixui/drupal-behaviors run test",
     "test:drupal-starter": "pnpm --filter=@helixui/drupal-starter run test",
     "test:smart": "bash scripts/test-smart.sh",
+    "test:storybook": "pnpm --filter=@helixui/storybook run test",
+    "audit:story-coverage": "node scripts/audit-story-coverage.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
