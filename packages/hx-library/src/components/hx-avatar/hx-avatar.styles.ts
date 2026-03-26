@@ -110,11 +110,28 @@ export const helixAvatarStyles = css`
   }
 
   /* P1-B: Windows High Contrast Mode — avatar background is stripped by the system,
-     leaving no visual boundary. Add a border so the avatar remains perceivable.
+     leaving no visual boundary. Restore a visible border, explicit foreground, and
+     background so the avatar container, initials, and fallback icon all remain
+     perceivable at any contrast level.
      WCAG 1.4.11 Non-text Contrast (Level AA). */
   @media (forced-colors: active) {
     .avatar {
+      forced-color-adjust: none;
       border: 2px solid ButtonText;
+      background-color: Canvas;
+      color: CanvasText;
+    }
+
+    .avatar__initials {
+      color: CanvasText;
+    }
+
+    .avatar__fallback-icon {
+      color: CanvasText;
+    }
+
+    .avatar__image {
+      forced-color-adjust: auto;
     }
   }
 `;
