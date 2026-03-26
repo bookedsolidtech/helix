@@ -47,6 +47,7 @@
     "a11y-audit": "node scripts/a11y-audit.js",
     "bundle-size": "node scripts/bundle-size-report.js",
     "bundle-size:ci": "node scripts/bundle-size-report.js --ci",
+    "check:bundle": "node scripts/check-bundle-size.mjs",
     "preflight": "bash scripts/preflight.sh",
     "verify": "pnpm run lint && pnpm run format:check && pnpm run type-check",
     "pre-commit-check": "bash scripts/pre-commit-check.sh",
