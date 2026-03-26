@@ -1,7 +1,7 @@
 {
   "name": "@helixui/create",
   "version": "0.1.0",
-  "description": "Scaffold a new project with HELiX web components — TUI-powered CLI",
+  "description": "⚠️ DEPRECATED: This package has moved to create-helix-app. Use: npx create-helix-app",
   "type": "module",
   "bin": {
     "create-helix-app": "./dist/index.js",
