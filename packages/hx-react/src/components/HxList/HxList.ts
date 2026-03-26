@@ -28,7 +28,7 @@ export const HxList = createComponent({
   elementClass: HelixList,
   react: React,
   events: {
-    onHxSelect: 'hx-select',
+    onHxSelect: 'hx-select'
   },
   displayName: 'HxList',
 });
