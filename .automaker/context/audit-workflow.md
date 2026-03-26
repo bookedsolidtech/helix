@@ -126,6 +126,24 @@ feature/audit-wave-1-a11y          ← epic branch (single PR to dev)
 | `tokens` | `design-system-developer` | Hardcoded values, token coverage, cascade |
 | `storybook` | `storybook-specialist` | Story coverage, controls, autodocs |
 
+## Batch Audit Strategy (Phase 3 Enhancement)
+
+For audit waves touching 3+ components, use the **batch audit workflow** instead
+of the epic branch pattern above. See `audit-workflow-batch.md` for full details.
+
+**Key difference:** Instead of an epic branch with child feature branches,
+all fixes go directly on a single batch branch (`audit/deep-quality-batch-YYYYMMDD`)
+with sequential commits. This eliminates CI multiplication and merge conflicts.
+
+**When to use batch vs epic:**
+- **Batch:** 3+ components, shared config file changes, cross-cutting patterns
+- **Epic:** Complex architectural changes requiring isolated feature branches
+
+**Scripts:**
+- `scripts/create-audit-batch-branch.sh` — Initialize batch
+- `scripts/audit-batch-executor.sh` — Sequential execution
+- `scripts/finalize-audit-batch.sh` — Consolidate and prepare PR
+
 ## Anti-Patterns (DO NOT)
 
 - ❌ One branch per component (98 branches = chaos)
@@ -134,3 +152,5 @@ feature/audit-wave-1-a11y          ← epic branch (single PR to dev)
 - ❌ Pushing audit branches remotely before synthesis
 - ❌ Creating board features before the audit report exists
 - ❌ Running audits through auto-mode (audits are read-only intelligence)
+- ❌ Parallel agent execution on batch branches (causes conflicts)
+- ❌ Multiple changesets per batch (use consolidated changeset)

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Rules for consolidating multiple audit changesets into a single entry",
+  "consolidation": {
+    "enabled": true,
+    "strategy": "merge-to-single",
+    "outputDirectory": ".changeset",
+    "filenamePattern": "audit-batch-{date}-{timestamp}.md"
+  },
+  "bumpRules": {
+    "default": "patch",
+    "escalation": {
+      "breakingChange": "major",
+      "newPublicAPI": "minor",
+      "bugFix": "patch",
+      "internalRefactor": "patch",
+      "a11yFix": "patch",
+      "tokenAudit": "patch"
+    }
+  },
+  "packages": {
+    "primary": "@helixui/library",
+    "linked": ["@helixui/tokens"],
+    "ignored": [
+      "@helixui/storybook",
+      "@helixui/admin",
+      "docs",
+      "@helixui/mcp-cem-analyzer",
+      "@helixui/mcp-health-scorer",
+      "@helixui/mcp-typescript-diagnostics",
+      "@helixui/mcp-shared"
+    ]
+  },
+  "descriptionTemplate": {
+    "header": "audit: deep quality batch covering {componentCount} components",
+    "componentEntry": "- {component}: {summary}",
+    "footer": "Batch ID: {batchId}"
+  },
+  "validation": {
+    "requireAtLeastOneComponent": true,
+    "maxComponentsPerChangeset": 100,
+    "preventDuplicateChangesets": true,
+    "cleanupIndividualChangesets": true
+  }
+}
