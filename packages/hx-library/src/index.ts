@@ -82,6 +82,8 @@ export { HelixNumberInput } from './components/hx-number-input/index.js';
 export { HelixOverflowMenu } from './components/hx-overflow-menu/index.js';
 export { HelixPagination } from './components/hx-pagination/index.js';
 export type { HxPagination } from './components/hx-pagination/index.js';
+export { HelixPatientBanner } from './components/hx-patient-banner/index.js';
+export type { PatientIdentifierRuleViolationDetail } from './components/hx-patient-banner/index.js';
 export { HelixPhiField } from './components/hx-phi-field/index.js';
 export type { PhiAccessEventDetail } from './components/hx-phi-field/index.js';
 export { HelixPopover } from './components/hx-popover/index.js';
