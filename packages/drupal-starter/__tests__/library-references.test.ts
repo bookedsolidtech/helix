@@ -10,15 +10,21 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import yaml from 'yaml';
+import { collectTwigFiles } from './helpers/twig-helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PACKAGE_ROOT = resolve(__dirname, '..');
+
+/** Minimum expected number of SDC Twig files under components/. */
+const MIN_SDC_TWIG_FILES = 29;
+/** Minimum expected number of standalone template Twig files under templates/. */
+const MIN_STANDALONE_TEMPLATE_FILES = 4;
 
 const LIBRARIES_YML = resolve(PACKAGE_ROOT, 'helixui.libraries.yml');
 const COMPONENTS_DIR = resolve(PACKAGE_ROOT, 'components');
@@ -33,26 +39,6 @@ function parseLibraryKeys(): Set<string> {
   const content = readFileSync(LIBRARIES_YML, 'utf-8');
   const parsed = yaml.parse(content) as Record<string, unknown>;
   return new Set(Object.keys(parsed));
-}
-
-/**
- * Collect all `.twig` / `.html.twig` files under `dir`, recursively.
- */
-function collectTwigFiles(dir: string): string[] {
-  const results: string[] = [];
-  function walk(current: string): void {
-    for (const entry of readdirSync(current)) {
-      const full = join(current, entry);
-      const stat = statSync(full);
-      if (stat.isDirectory()) {
-        walk(full);
-      } else if (entry.endsWith('.twig')) {
-        results.push(full);
-      }
-    }
-  }
-  walk(dir);
-  return results;
 }
 
 /**
@@ -103,14 +89,14 @@ describe('attach_library() references — all libraries are defined', () => {
     ...collectTwigFiles(TEMPLATES_DIR),
   ];
 
-  it('found at least 29 SDC twig files', () => {
+  it(`found at least ${MIN_SDC_TWIG_FILES} SDC twig files`, () => {
     const sdcFiles = collectTwigFiles(COMPONENTS_DIR);
-    expect(sdcFiles.length).toBeGreaterThanOrEqual(29);
+    expect(sdcFiles.length).toBeGreaterThanOrEqual(MIN_SDC_TWIG_FILES);
   });
 
-  it('found at least 4 standalone template twig files', () => {
+  it(`found at least ${MIN_STANDALONE_TEMPLATE_FILES} standalone template twig files`, () => {
     const templateFiles = collectTwigFiles(TEMPLATES_DIR);
-    expect(templateFiles.length).toBeGreaterThanOrEqual(4);
+    expect(templateFiles.length).toBeGreaterThanOrEqual(MIN_STANDALONE_TEMPLATE_FILES);
   });
 
   // For each twig file, verify every attach_library call resolves.
@@ -120,9 +106,8 @@ describe('attach_library() references — all libraries are defined', () => {
     const refs = extractAttachLibraryCalls(source);
 
     if (refs.length === 0) {
-      // Templates with no attach_library calls pass trivially.
-      it(`${relativePath} — no attach_library calls (ok)`, () => {
-        expect(refs.length).toBe(0);
+      it.skip(`${relativePath} — no attach_library calls (ok)`, () => {
+        // Skipped: no attach_library calls to validate.
       });
       continue;
     }

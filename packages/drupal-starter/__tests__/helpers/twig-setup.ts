@@ -52,6 +52,37 @@ function configureTwig(): void {
 }
 
 /**
+ * Strip Twig comment blocks ({# ... #}) from source, handling nested comments.
+ *
+ * Tracks depth so that nested `{# ... {# ... #} ... #}` constructs are fully
+ * removed rather than leaving trailing `#}` tokens that break parsing.
+ */
+function stripTwigComments(source: string): string {
+  let result = '';
+  let depth = 0;
+  let i = 0;
+
+  while (i < source.length) {
+    if (i + 1 < source.length && source[i] === '{' && source[i + 1] === '#') {
+      depth++;
+      i += 2;
+    } else if (i + 1 < source.length && source[i] === '#' && source[i + 1] === '}') {
+      if (depth > 0) {
+        depth--;
+      }
+      i += 2;
+    } else {
+      if (depth === 0) {
+        result += source[i];
+      }
+      i++;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Build a mock Drupal `attributes` object.
  *
  * In Drupal, `{{ attributes.addClass('foo') }}` is used inline inside an HTML
@@ -99,7 +130,7 @@ export function renderTwig(templatePath: string, vars: Record<string, unknown> =
   // inside a larger {# ... #} doc block), which causes parse errors on
   // templates that contain JSDoc-style inline examples.
   // Stripping them is safe for tests — comments carry no runtime semantics.
-  const source = rawSource.replace(/\{#[\s\S]*?#\}/g, '');
+  const source = stripTwigComments(rawSource);
 
   // Use a unique ID per render call so the same template file can be
   // rendered multiple times in the same process with different variables.

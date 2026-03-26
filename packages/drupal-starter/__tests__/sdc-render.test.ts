@@ -9,21 +9,32 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { makeAttributes, renderSdc, renderTemplate } from './helpers/twig-setup.js';
+import { readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { makeAttributes, renderSdc, renderTemplate, COMPONENTS_DIR } from './helpers/twig-setup.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Assert the output is a non-empty string — basic smoke test. */
+/** Assert the output is a non-empty string containing valid HTML structure. */
 function expectNonEmpty(output: string, name: string): void {
   expect(typeof output, `${name}: output should be a string`).toBe('string');
   expect(output.trim().length, `${name}: output should not be empty`).toBeGreaterThan(0);
+  // Verify at least one properly structured HTML element (opening tag with closing tag or self-closing)
+  const hasHtmlElement = /<[a-z][a-z0-9-]*[\s/>]/i.test(output);
+  expect(hasHtmlElement, `${name}: output should contain at least one HTML element`).toBe(true);
 }
 
-/** Assert the output contains a given hx-* element open tag. */
+/**
+ * Assert the output contains a given hx-* element with both opening and
+ * closing tags (or self-closing form).
+ */
 function expectElement(output: string, tag: string, context: string): void {
-  expect(output, `${context}: expected <${tag}>`).toContain(`<${tag}`);
+  const hasOpenTag = output.includes(`<${tag}`) && new RegExp(`<${tag}[\\s>]`).test(output);
+  const hasCloseTag = output.includes(`</${tag}>`) || new RegExp(`<${tag}[^>]*/>`).test(output);
+  expect(hasOpenTag, `${context}: expected opening <${tag}>`).toBe(true);
+  expect(hasCloseTag, `${context}: expected closing </${tag}> or self-closing <${tag} .../>`).toBe(true);
 }
 
 // ---------------------------------------------------------------------------
@@ -362,75 +373,106 @@ describe('search-form', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Smoke tests for remaining 24 SDCs
+// Smoke tests — dynamically discovered SDCs
 // ---------------------------------------------------------------------------
 
-describe('SDC smoke tests — renders without error', () => {
-  const smoke: Array<[string, Record<string, unknown>]> = [
-    ['article-full', { title: 'Full Article', body: 'Body content.' }],
-    ['author-byline', { name: 'Dr. Smith', role: 'Editor' }],
-    ['breadcrumb-nav', {
-      items: [
-        { url: '/', title: 'Home' },
-        { url: '/articles', title: 'Articles' },
-        { url: '/articles/foo', title: 'Foo' },
-      ],
-    }],
-    ['category-hero', { title: 'Cardiology', category: 'Specialty' }],
-    ['condition-tag', { label: 'Hypertension', url: '/conditions/hypertension' }],
-    ['featured-article', {
-      title: 'Featured Story',
-      url: '/featured',
-      body: 'Story body.',
-    }],
-    ['landing-page', { title: 'Welcome', sections: '' }],
-    ['main-nav', {
-      items: [
-        { url: '/', title: 'Home', children: [] },
-        { url: '/about', title: 'About', children: [] },
-      ],
-    }],
-    ['mobile-drawer', { items: [{ url: '/', title: 'Home' }] }],
-    ['newsletter-signup', { title: 'Stay Updated', action: '/newsletter/subscribe' }],
-    ['recipe-card', {
-      title: 'Heart-Healthy Salad',
-      url: '/recipes/salad',
-    }],
-    ['recipe-full', {
-      title: 'Heart-Healthy Salad',
-      ingredients: ['Spinach', 'Tomatoes'],
-    }],
-    ['related-articles', {
-      title: 'Related Reading',
-      items: [{ url: '/a', title: 'Article A', body: '' }],
-    }],
-    ['section-container', { title: 'Our Services', content: '<p>Services here</p>' }],
-    ['share-buttons', { url: 'https://example.com/article', title: 'My Article' }],
-    ['sidebar-nav', {
-      title: 'Section Nav',
-      items: [{ url: '/page', title: 'Page', active: false }],
-    }],
-    ['site-footer', { columns: '<div>Footer content</div>' }],
-    ['site-header', { logo: '<img src="/logo.png" alt="Logo" />' }],
-    ['tag-cloud', {
-      tags: [
-        { label: 'Cardiology', url: '/tags/cardiology', count: 10 },
-        { label: 'Oncology', url: '/tags/oncology', count: 5 },
-      ],
-    }],
-    ['topic-landing', { title: 'Oncology', description: 'Cancer care services.' }],
-    ['views-carousel', { items: '<div>Slide 1</div><div>Slide 2</div>' }],
-    ['views-grid', { items: '<div>Item 1</div><div>Item 2</div>' }],
-    ['views-list', { items: '<li>Item 1</li><li>Item 2</li>' }],
-    ['appointment-cta', {
-      title: 'Book Your Appointment',
-      cta_text: 'Schedule Now',
-      cta_url: '/book',
-    }],
-  ];
+/** SDCs that have dedicated feature test suites above — excluded from smoke. */
+const FEATURE_TESTED_SDCS = new Set([
+  'article-teaser',
+  'provider-card',
+  'hero-banner',
+  'contact-form',
+  'search-form',
+]);
 
-  for (const [name, vars] of smoke) {
+/**
+ * Default props for SDCs that need specific variables to render without error.
+ * SDCs not listed here are rendered with empty props `{}`.
+ */
+const SMOKE_PROPS: Record<string, Record<string, unknown>> = {
+  'article-full': { title: 'Full Article', body: 'Body content.' },
+  'author-byline': { name: 'Dr. Smith', role: 'Editor' },
+  'breadcrumb-nav': {
+    items: [
+      { url: '/', title: 'Home' },
+      { url: '/articles', title: 'Articles' },
+      { url: '/articles/foo', title: 'Foo' },
+    ],
+  },
+  'category-hero': { title: 'Cardiology', category: 'Specialty' },
+  'condition-tag': { label: 'Hypertension', url: '/conditions/hypertension' },
+  'featured-article': { title: 'Featured Story', url: '/featured', body: 'Story body.' },
+  'landing-page': { title: 'Welcome', sections: '' },
+  'main-nav': {
+    items: [
+      { url: '/', title: 'Home', children: [] },
+      { url: '/about', title: 'About', children: [] },
+    ],
+  },
+  'mobile-drawer': { items: [{ url: '/', title: 'Home' }] },
+  'newsletter-signup': { title: 'Stay Updated', action: '/newsletter/subscribe' },
+  'recipe-card': { title: 'Heart-Healthy Salad', url: '/recipes/salad' },
+  'recipe-full': { title: 'Heart-Healthy Salad', ingredients: ['Spinach', 'Tomatoes'] },
+  'related-articles': {
+    title: 'Related Reading',
+    items: [{ url: '/a', title: 'Article A', body: '' }],
+  },
+  'section-container': { title: 'Our Services', content: '<p>Services here</p>' },
+  'share-buttons': { url: 'https://example.com/article', title: 'My Article' },
+  'sidebar-nav': {
+    title: 'Section Nav',
+    items: [{ url: '/page', title: 'Page', active: false }],
+  },
+  'site-footer': { columns: '<div>Footer content</div>' },
+  'site-header': { logo: '<img src="/logo.png" alt="Logo" />' },
+  'tag-cloud': {
+    tags: [
+      { label: 'Cardiology', url: '/tags/cardiology', count: 10 },
+      { label: 'Oncology', url: '/tags/oncology', count: 5 },
+    ],
+  },
+  'topic-landing': { title: 'Oncology', description: 'Cancer care services.' },
+  'views-carousel': { items: '<div>Slide 1</div><div>Slide 2</div>' },
+  'views-grid': { items: '<div>Item 1</div><div>Item 2</div>' },
+  'views-list': { items: '<li>Item 1</li><li>Item 2</li>' },
+  'appointment-cta': {
+    title: 'Book Your Appointment',
+    cta_text: 'Schedule Now',
+    cta_url: '/book',
+  },
+};
+
+/**
+ * Discover all SDC directories that contain a matching `.twig` template.
+ * Returns component names sorted alphabetically.
+ */
+function discoverSdcComponents(): string[] {
+  const entries = readdirSync(COMPONENTS_DIR);
+  return entries
+    .filter((entry) => {
+      const dir = join(COMPONENTS_DIR, entry);
+      if (!statSync(dir).isDirectory()) return false;
+      try {
+        statSync(join(dir, `${entry}.twig`));
+        return true;
+      } catch {
+        return false;
+      }
+    })
+    .sort();
+}
+
+describe('SDC smoke tests — renders without error', () => {
+  const allSdcs = discoverSdcComponents();
+  const smokeTargets = allSdcs.filter((name) => !FEATURE_TESTED_SDCS.has(name));
+
+  it('discovered SDC components for smoke testing', () => {
+    expect(smokeTargets.length).toBeGreaterThan(0);
+  });
+
+  for (const name of smokeTargets) {
     it(`${name} — renders non-empty output`, () => {
+      const vars = SMOKE_PROPS[name] ?? {};
       const output = renderSdc(name, vars);
       expectNonEmpty(output, name);
     });

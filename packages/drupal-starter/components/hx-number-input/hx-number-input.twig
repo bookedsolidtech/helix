@@ -12,7 +12,7 @@
 <hx-number-input
   {% if name %}name="{{ name }}"{% endif %}
   {% if label %}label="{{ label }}"{% endif %}
-  {% if value is not null and value is not same as '' %}value="{{ value }}"{% endif %}
+  {% if value is not null and value != '' %}value="{{ value }}"{% endif %}
   {% if min is not null %}min="{{ min }}"{% endif %}
   {% if max is not null %}max="{{ max }}"{% endif %}
   {% if step and step != 1 %}step="{{ step }}"{% endif %}

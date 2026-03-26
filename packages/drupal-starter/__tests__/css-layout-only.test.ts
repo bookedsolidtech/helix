@@ -44,7 +44,7 @@ const COMPONENTS_DIR = resolve(PACKAGE_ROOT, 'components');
 
 /** Values that are structural resets — allowed regardless of property. */
 const ALLOWED_VALUE_PATTERNS: RegExp[] = [
-  /^var\(--/,           // CSS custom property reference
+  /^var\(--hx-/,        // HELiX design token reference only
   /^none$/i,            // none (reset)
   /^inherit$/i,         // inherit (cascade structural)
   /^initial$/i,         // initial (reset)
@@ -52,15 +52,22 @@ const ALLOWED_VALUE_PATTERNS: RegExp[] = [
   /^revert$/i,          // revert (reset)
   /^transparent$/i,     // transparent (not a real color value)
   /^currentColor$/i,    // currentColor (inherits from context)
+  /^0$/,                // zero (reset — e.g., border: 0;)
 ];
 
 /**
  * Return true if a CSS value is allowed for a visual property.
- * A value is allowed if it matches any of the allowed value patterns.
+ * A value is allowed if:
+ *   - It exactly matches an allowed pattern (reset keyword, token ref), OR
+ *   - It contains a `var(--hx-` reference (compound values like
+ *     `1px solid var(--hx-color-border, #e0e0e0)` are using tokens).
  */
 function isAllowedValue(value: string): boolean {
   const trimmed = value.trim();
-  return ALLOWED_VALUE_PATTERNS.some((p) => p.test(trimmed));
+  if (ALLOWED_VALUE_PATTERNS.some((p) => p.test(trimmed))) return true;
+  // Compound values that reference a HELiX token are allowed.
+  if (/var\(--hx-/.test(trimmed)) return true;
+  return false;
 }
 
 // ---------------------------------------------------------------------------
@@ -88,8 +95,13 @@ const FORBIDDEN_PROPERTIES: Array<{ name: string; pattern: RegExp }> = [
   { name: 'letter-spacing',   pattern: /^letter-spacing$/ },
   { name: 'text-transform',   pattern: /^text-transform$/ },
   { name: 'text-decoration',  pattern: /^text-decoration$/ },
+  { name: 'font',              pattern: /^font$/ },
+  { name: 'border',            pattern: /^border(-.*)?$/ },
   { name: 'border-color',     pattern: /^border-color$/ },
   { name: 'border-radius',    pattern: /^border-radius$/ },
+  { name: 'background-image', pattern: /^background-image$/ },
+  { name: 'background-position', pattern: /^background-position$/ },
+  { name: 'background-size',  pattern: /^background-size$/ },
   { name: 'box-shadow',       pattern: /^box-shadow$/ },
   { name: 'text-shadow',      pattern: /^text-shadow$/ },
   { name: 'outline',          pattern: /^outline$/ },

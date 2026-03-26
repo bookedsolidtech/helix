@@ -17,6 +17,7 @@ import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import yaml from 'yaml';
+import { collectTwigFiles } from './helpers/twig-helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,32 +66,34 @@ function getManifestComponents(): Set<string> {
 }
 
 /**
- * Collect all `.twig` files under a directory, recursively.
- */
-function collectTwigFiles(dir: string): string[] {
-  const results: string[] = [];
-  function walk(current: string): void {
-    for (const entry of readdirSync(current)) {
-      const full = join(current, entry);
-      const stat = statSync(full);
-      if (stat.isDirectory()) {
-        walk(full);
-      } else if (entry.endsWith('.twig')) {
-        results.push(full);
-      }
-    }
-  }
-  walk(dir);
-  return results;
-}
-
-/**
  * Strip Twig comment blocks ({# ... #}) from source before tag scanning.
  * This prevents tags mentioned in documentation comments from being treated
- * as runtime dependencies.
+ * as runtime dependencies.  Handles nested `{# ... {# ... #} ... #}` blocks
+ * by tracking depth.
  */
 function stripTwigComments(source: string): string {
-  return source.replace(/\{#[\s\S]*?#\}/g, '');
+  let result = '';
+  let depth = 0;
+  let i = 0;
+
+  while (i < source.length) {
+    if (i + 1 < source.length && source[i] === '{' && source[i + 1] === '#') {
+      depth++;
+      i += 2;
+    } else if (i + 1 < source.length && source[i] === '#' && source[i + 1] === '}') {
+      if (depth > 0) {
+        depth--;
+      }
+      i += 2;
+    } else {
+      if (depth === 0) {
+        result += source[i];
+      }
+      i++;
+    }
+  }
+
+  return result;
 }
 
 /**
