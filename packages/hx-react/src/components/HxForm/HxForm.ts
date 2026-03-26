@@ -38,7 +38,7 @@ export const HxForm = createComponent({
   events: {
     onHxSubmit: 'hx-submit',
     onHxInvalid: 'hx-invalid',
-    onHxReset: 'hx-reset'
+    onHxReset: 'hx-reset',
   },
   displayName: 'HxForm',
 });
