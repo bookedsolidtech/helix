@@ -186,7 +186,8 @@ export const helixClinicalStatusStyles = css`
   }
 
   .clinical-status__dismiss-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-focus, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
@@ -231,7 +232,8 @@ export const helixClinicalStatusStyles = css`
   }
 
   .clinical-status__acknowledge-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-focus-ring-color, var(--hx-color-focus, #2563eb));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
