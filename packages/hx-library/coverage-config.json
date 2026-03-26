@@ -1,11 +1,11 @@
 {
   "$schema": "./coverage-config.schema.json",
-  "description": "Per-component coverage exemptions for the HELiX library. Components listed here are exempt from the 80% CI coverage gate. Each exemption must include a remediation target date. New or modified components are NOT eligible for exemption.",
+  "description": "Per-component coverage exemptions for the HELiX library. The target threshold is 95% (raised from 80% as part of the test expansion initiative). Components listed here are exempt from the CI coverage gate during the remediation period. Each exemption must include a remediation target date. New or modified components are NOT eligible for exemption.",
   "threshold": {
-    "lines": 80,
-    "branches": 80,
-    "functions": 80,
-    "statements": 80
+    "lines": 95,
+    "branches": 95,
+    "functions": 95,
+    "statements": 95
   },
   "exemptions": {
     "hx-accordion": {
