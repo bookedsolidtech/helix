@@ -736,9 +736,7 @@ export const IconOnly: Story = {
 export const FullWidth: Story = {
   render: () => html`
     <div style="max-width: 480px;">
-      <hx-button variant="primary" style="display: block; width: 100%;">
-        Complete Registration
-      </hx-button>
+      <hx-button variant="primary" full>Complete Registration</hx-button>
     </div>
   `,
 };

@@ -262,4 +262,38 @@ export const helixButtonStyles = css`
   .button__label {
     flex: 1 1 auto;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .button {
+      /* Ensure button outline is visible in Windows High Contrast mode.
+         ButtonText/ButtonFace are system colors recognized by the browser. */
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 2px solid ButtonText;
+    }
+
+    .button:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .button[disabled] {
+      background-color: ButtonFace;
+      color: GrayText;
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    .button--loading .button__spinner {
+      /* Ensure spinner is visible in HCM */
+      forced-color-adjust: auto;
+    }
+  }
 `;
