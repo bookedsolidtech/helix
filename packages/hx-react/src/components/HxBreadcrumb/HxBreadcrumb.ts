@@ -14,7 +14,7 @@ import type { HxBreadcrumbProps } from './types.js';
 export type { HxBreadcrumbProps };
 
 /**
- * Breadcrumb navigation component with automatic truncation and JSON-LD structured data.
+ * Hierarchical page path navigation showing current location in site structure.
  *
  * @example
  * ```tsx

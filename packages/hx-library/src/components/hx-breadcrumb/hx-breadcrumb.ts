@@ -3,6 +3,14 @@ import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
+/** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
+interface JsonLdListItem {
+  '@type': string;
+  position: number;
+  name: string;
+  item?: string;
+}
+
 /**
  * Hierarchical page path navigation showing current location in site structure.
  *
@@ -28,15 +36,6 @@ import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
  * @cssprop [--hx-breadcrumb-text-color=var(--hx-color-neutral-700)] - Current page text color.
  * @cssprop [--hx-breadcrumb-item-max-width] - Max-width for item text truncation (e.g. `12rem`).
  */
-/** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
-interface JsonLdListItem {
-  '@type': string;
-  position: number;
-  name: string;
-  item?: string;
-}
-
-/** Breadcrumb navigation component with automatic truncation and JSON-LD structured data. @tag hx-breadcrumb */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
   static override styles = [tokenStyles, helixBreadcrumbStyles];

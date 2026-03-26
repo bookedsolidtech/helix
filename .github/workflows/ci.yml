@@ -311,7 +311,9 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
-      - run: pnpm run cem
+      - name: Generate and validate CEM
+        run: pnpm run cem
+        working-directory: packages/hx-library
       - name: Validate package exports (pnpm publish --dry-run)
         run: pnpm publish --dry-run --no-git-checks
         working-directory: packages/hx-library
