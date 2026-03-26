@@ -321,6 +321,226 @@ describe('hx-avatar', () => {
     });
   });
 
+  // ─── Property: label (aria-label in non-image states) ───
+
+  describe('Property: label (aria-label in non-image states)', () => {
+    it('uses label as aria-label in fallback icon mode', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar label="Dr. Jane Doe"></hx-avatar>');
+      await el.updateComplete;
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('Dr. Jane Doe');
+    });
+
+    it('uses label as aria-label in initials mode', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar initials="JD" label="Dr. Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('Dr. Jane Doe');
+    });
+
+    it('uses initials as aria-label when label is absent in initials mode', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar initials="JD"></hx-avatar>');
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('JD');
+    });
+
+    it('uses "Avatar" as aria-label when no label, no initials, no src', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
+      await el.updateComplete;
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('Avatar');
+    });
+
+    it('uses alt as aria-label in image mode when src is provided', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png" alt="Dr. Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('Dr. Jane Doe');
+    });
+
+    it('uses label as aria-label in image mode when alt is absent', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png" label="Dr. Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('Dr. Jane Doe');
+    });
+  });
+
+  // ─── Property: src with and without alt (devWarn) ───
+
+  describe('Property: src without alt (devWarn)', () => {
+    it('warns when src is provided without alt', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar src="https://example.com/avatar.png"></hx-avatar>',
+        );
+        await el.updateComplete;
+        expect(warnSpy).toHaveBeenCalledWith(
+          expect.stringContaining('"alt" attribute is required when "src" is provided'),
+        );
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when src is provided with alt', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar src="https://example.com/avatar.png" alt="Dr. Jane Doe"></hx-avatar>',
+        );
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('"alt" attribute is required when "src" is provided'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+  });
+
+  // ─── Invalid size/shape: safe class fallback ───
+
+  describe('Invalid size/shape: safe class fallback', () => {
+    it('uses "md" class for invalid size value', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar hx-size="huge"></hx-avatar>');
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--md')).toBe(true);
+    });
+
+    it('uses "circle" class for invalid shape value', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar shape="diamond"></hx-avatar>');
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--circle')).toBe(true);
+    });
+
+    it('warns when invalid size is provided', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>('<hx-avatar hx-size="huge"></hx-avatar>');
+        await el.updateComplete;
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid hx-size="huge"'));
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('warns when invalid shape is provided', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>('<hx-avatar shape="diamond"></hx-avatar>');
+        await el.updateComplete;
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid shape="diamond"'));
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+  });
+
+  // ─── Badge slot visibility state ───
+
+  describe('Badge slot visibility state', () => {
+    it('badge span has avatar__badge--hidden class when no badge content', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, '[part="badge"]');
+      expect(badge?.classList.contains('avatar__badge--hidden')).toBe(true);
+    });
+
+    it('badge span does not have avatar__badge--hidden class when badge is slotted', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar initials="JD" label="John Doe"><span slot="badge" aria-label="Online"></span></hx-avatar>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const badge = shadowQuery(el, '[part="badge"]');
+      expect(badge?.classList.contains('avatar__badge--hidden')).toBe(false);
+    });
+  });
+
+  // ─── Fallback chain: initials whitespace treated as empty ───
+
+  describe('Fallback chain: initials whitespace', () => {
+    it('shows fallback icon when initials is whitespace-only', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar initials="   "></hx-avatar>');
+      await el.updateComplete;
+      await el.updateComplete;
+      const icon = shadowQuery(el, '[part="fallback-icon"]');
+      expect(icon).toBeTruthy();
+      const initials = shadowQuery(el, '[part="initials"]');
+      expect(initials).toBeNull();
+    });
+  });
+
+  // ─── Slot: default slot suppresses role and aria-label ───
+
+  describe('Slot: default slot suppresses role', () => {
+    it('avatar div has no role when default slot has element content', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar><span>Custom</span></hx-avatar>');
+      await el.updateComplete;
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.hasAttribute('role')).toBe(false);
+    });
+
+    it('avatar div has no aria-label when default slot has element content', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar label="Should be suppressed"><span>Custom</span></hx-avatar>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
+  // ─── CSS Part: image ───
+
+  describe('CSS Part: image', () => {
+    it('exposes "image" part on img element when src is provided', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png" alt="Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const img = shadowQuery(el, '[part="image"]');
+      expect(img).toBeTruthy();
+      expect(img?.getAttribute('part')).toBe('image');
+    });
+
+    it('image has aria-hidden="true" (decorative — accessible name is on container)', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png" alt="Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const img = shadowQuery(el, '[part="image"]');
+      expect(img?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('image has loading="lazy"', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png" alt="Jane Doe"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const img = shadowQuery(el, '[part="image"]') as HTMLImageElement;
+      expect(img?.getAttribute('loading')).toBe('lazy');
+    });
+  });
+
   // ─── Console warnings (P2-A, P2-C) ───
 
   describe('Console warnings', () => {

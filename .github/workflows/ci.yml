@@ -685,6 +685,62 @@ jobs:
       - name: Security audit
         run: pnpm audit --audit-level=critical
 
+  # ── Storybook Interaction Tests ─────────────────────────────────────────
+  # Runs all 83 component story play functions as Vitest browser mode tests.
+  # Uses @storybook/addon-vitest (Storybook 10 first-class Vitest integration).
+  # Informational until baseline is verified — does not block Quality Gates.
+
+  storybook-tests:
+    name: Storybook Tests
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run Storybook interaction tests
+        run: pnpm run test:storybook
+      - name: Upload Storybook test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-test-results
+          path: apps/storybook/.vitest/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # ── React wrapper tests (informational — not a required gate) ────────────
+  # Runs vitest browser mode tests for @helixui/react wrappers.
+  # Tests render/prop/event/ref forwarding for all generated React components.
+  # continue-on-error keeps this informational until the suite is stabilized.
+  test-react:
+    name: Test React Wrappers
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Run @helixui/react tests
+        run: pnpm run test:react
+        continue-on-error: true
+
   # ── Aggregate gate (for branch protection) ──────────────────────────────
   # This job depends on all checks and is the single required status check
   # in branch protection. This avoids needing to update branch protection
@@ -708,6 +764,8 @@ jobs:
         vrt,
         audit,
         changeset,
+        storybook-tests,
+        test-react,
       ]
     if: always()
     steps:
@@ -715,17 +773,19 @@ jobs:
         run: |
           IS_AUDIT="${{ needs.changes.outputs.is_audit }}"
 
-          echo "Audit branch:  $IS_AUDIT"
-          echo "Secret Scan:   ${{ needs.secret-scan.result }}"
-          echo "Lint:          ${{ needs.lint.result }}"
-          echo "Format:        ${{ needs.format.result }}"
-          echo "Type Check:    ${{ needs.type-check.result }}"
-          echo "Test:          ${{ needs.test.result }}"
-          echo "Build:         ${{ needs.build.result }}"
-          echo "A11y Audit:    ${{ needs.a11y-audit.result }}"
-          echo "Bundle Size:   ${{ needs.bundle-size.result }}"
-          echo "VRT:           ${{ needs.vrt.result }}"
-          echo "Audit:         ${{ needs.audit.result }}"
+          echo "Audit branch:       $IS_AUDIT"
+          echo "Secret Scan:        ${{ needs.secret-scan.result }}"
+          echo "Lint:               ${{ needs.lint.result }}"
+          echo "Format:             ${{ needs.format.result }}"
+          echo "Type Check:         ${{ needs.type-check.result }}"
+          echo "Test:               ${{ needs.test.result }}"
+          echo "Build:              ${{ needs.build.result }}"
+          echo "A11y Audit:         ${{ needs.a11y-audit.result }}"
+          echo "Bundle Size:        ${{ needs.bundle-size.result }}"
+          echo "VRT:                ${{ needs.vrt.result }}"
+          echo "Audit:              ${{ needs.audit.result }}"
+          echo "Storybook Tests:    ${{ needs.storybook-tests.result }}"
+          echo "React Tests:        ${{ needs.test-react.result }}"
 
           # Audit branches skip all CI — auto-pass
           if [[ "$IS_AUDIT" == "true" ]]; then
@@ -770,6 +830,16 @@ jobs:
           # A11y audit is informational until baseline violations are resolved
           if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
             echo "::warning::A11y audit has violations — see report artifact for details"
+          fi
+
+          # Storybook tests are informational until the new test infrastructure is verified
+          if [[ "${{ needs.storybook-tests.result }}" != "success" && "${{ needs.storybook-tests.result }}" != "skipped" ]]; then
+            echo "::warning::Storybook interaction tests did not pass — see storybook-test-results artifact for details"
+          fi
+
+          # React wrapper tests are informational until the suite is stabilized
+          if [[ "${{ needs.test-react.result }}" != "success" && "${{ needs.test-react.result }}" != "skipped" ]]; then
+            echo "::warning::React wrapper tests did not pass — informational only"
           fi
 
           if [[ "$FAIL" -eq 1 ]]; then

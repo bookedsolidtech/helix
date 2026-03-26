@@ -1,11 +1,11 @@
 {
   "$schema": "./coverage-config.schema.json",
-  "description": "Per-component coverage exemptions for the HELiX library. Components listed here are exempt from the 80% CI coverage gate. Each exemption must include a remediation target date. New or modified components are NOT eligible for exemption.",
+  "description": "Per-component coverage exemptions for the HELiX library. The target threshold is 95% (raised from 80% as part of the test expansion initiative). Components listed here are exempt from the CI coverage gate during the remediation period. Each exemption must include a remediation target date. New or modified components are NOT eligible for exemption.",
   "threshold": {
-    "lines": 80,
-    "branches": 80,
-    "functions": 80,
-    "statements": 80
+    "lines": 95,
+    "branches": 95,
+    "functions": 95,
+    "statements": 95
   },
   "exemptions": {
     "hx-accordion": {
@@ -188,8 +188,18 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
+    "hx-link": {
+      "reason": "No test file yet \u2014 component has 0% coverage. Requires test creation.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
     "hx-list": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-menu": {
+      "reason": "No test file yet \u2014 component has 0% coverage. Requires test creation.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -200,6 +210,16 @@
     },
     "hx-nav": {
       "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-number-input": {
+      "reason": "No test file yet \u2014 component has 0% coverage. Requires test creation.",
+      "remediationDate": "2026-06-30",
+      "issue": "https://github.com/bookedsolidtech/helix/issues"
+    },
+    "hx-overflow-menu": {
+      "reason": "No test file yet \u2014 component has 0% coverage. Requires test creation.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },

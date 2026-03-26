@@ -190,6 +190,11 @@ export default defineConfig({
           items: [
             { label: 'Installation', slug: 'getting-started/installation' },
             { label: 'Quick Start', slug: 'getting-started/quick-start' },
+            {
+              label: 'create-helix CLI',
+              slug: 'getting-started/create-helix',
+              badge: { text: 'New', variant: 'tip' },
+            },
             { label: 'Project Structure', slug: 'getting-started/project-structure' },
             { label: 'Release Policy', slug: 'getting-started/release-policy' },
           ],
