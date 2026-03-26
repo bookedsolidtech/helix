@@ -41,6 +41,7 @@
     "test:batch:4": "pnpm --filter=@helixui/library run test:batch:4",
     "test:batch:5": "pnpm --filter=@helixui/library run test:batch:5",
     "test:component": "pnpm --filter=@helixui/library run test:component --",
+    "test:drupal-behaviors": "pnpm --filter=@helixui/drupal-behaviors run test",
     "test:smart": "bash scripts/test-smart.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
