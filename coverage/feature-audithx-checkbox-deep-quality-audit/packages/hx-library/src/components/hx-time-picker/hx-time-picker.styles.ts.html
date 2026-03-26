@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>
+      Code coverage report for
+      feature-audithx-checkbox-deep-quality-audit/packages/hx-library/src/components/hx-time-picker/hx-time-picker.styles.ts
+    </title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+      .coverage-summary .sorter {
+        background-image: url(../../../../../../sort-arrow-sprite.png);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="pad1">
+        <h1>
+          <a href="../../../../../../index.html">All files</a> /
+          <a href="index.html"
+            >feature-audithx-checkbox-deep-quality-audit/packages/hx-library/src/components/hx-time-picker</a
+          >
+          hx-time-picker.styles.ts
+        </h1>
+        <div class="clearfix">
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Statements</span>
+            <span class="fraction">0/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">100% </span>
+            <span class="quiet">Branches</span>
+            <span class="fraction">1/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">100% </span>
+            <span class="quiet">Functions</span>
+            <span class="fraction">1/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Lines</span>
+            <span class="fraction">0/1</span>
+          </div>
+        </div>
+        <p class="quiet">
+          Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>,
+          <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+          <div class="quiet">
+            Filter:
+            <input type="search" id="fileSearch" />
+          </div>
+        </template>
+      </div>
+      <div class="status-line low"></div>
+      <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { css } from 'lit';
+&nbsp;
+// prettier-ignore
+<span class="cstat-no" title="statement not covered" >export const helixTimePickerStyles = css`:host{display:block;position:relative}:host([disabled]){opacity:var(--hx-opacity-disabled, .5);pointer-events:none}*{box-sizing:border-box}.field{display:flex;flex-direction:column;gap:var(--hx-space-1, .25rem);font-family:var(--hx-time-picker-font-family, var(--hx-font-family-sans, sans-serif))}.field__label{display:flex;align-items:baseline;gap:var(--hx-space-1, .25rem);font-size:var(--hx-font-size-sm, .875rem);font-weight:var(--hx-font-weight-medium, 500);color:var(--hx-time-picker-label-color, var(--hx-color-neutral-700));line-height:var(--hx-line-height-normal, 1.5)}.field__required-marker{color:var(--hx-time-picker-error-color, var(--hx-color-error-text, #b91c1c));font-weight:var(--hx-font-weight-bold, 700)}.field__combobox{position:relative;display:flex;align-items:center;border:var(--hx-border-width-thin, 1px) solid var(--hx-time-picker-border-color, var(--hx-color-neutral-300));border-radius:var(--hx-time-picker-border-radius, var(--hx-border-radius-md, .375rem));background-color:var(--hx-time-picker-bg, var(--hx-color-neutral-0));transition:border-color var(--hx-transition-fast, .15s ease),box-shadow var(--hx-transition-fast, .15s ease);overflow:visible}.field__combobox:focus-within{border-color:var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color));box-shadow:0 0 0 var(--hx-focus-ring-width, 2px) color-mix(in srgb,var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color)) calc(var(--hx-focus-ring-opacity, .25) * 100%),transparent)}.field--error .field__combobox{border-color:var(--hx-time-picker-error-color, var(--hx-color-error-500))}.field--error .field__combobox:focus-within{border-color:var(--hx-time-picker-error-color, var(--hx-color-error-500));box-shadow:0 0 0 var(--hx-focus-ring-width, 2px) color-mix(in srgb,var(--hx-time-picker-error-color, var(--hx-color-error-500)) calc(var(--hx-focus-ring-opacity, .25) * 100%),transparent)}.field__input{flex:1;border:none;outline:none;background:transparent;padding:var(--hx-space-2, .5rem) var(--hx-space-3, .75rem);font-family:inherit;font-size:var(--hx-font-size-md, 1rem);color:var(--hx-time-picker-color, var(--hx-color-neutral-800));line-height:var(--hx-line-height-normal, 1.5);min-height:var(--hx-size-10, 2.5rem);width:100%;cursor:text}.field__input::placeholder{color:var(--hx-color-neutral-400)}.field__input:disabled{cursor:not-allowed}.field__toggle{display:flex;align-items:center;justify-content:center;border:none;background:transparent;padding:0 var(--hx-space-3, .75rem);color:var(--hx-time-picker-chevron-color, var(--hx-color-neutral-500));cursor:pointer;height:100%;min-height:var(--hx-size-10, 2.5rem);flex-shrink:0;border-inline-start:var(--hx-border-width-thin, 1px) solid var(--hx-time-picker-border-color, var(--hx-color-neutral-300))}.field__toggle:focus-visible{outline:var(--hx-focus-ring-width, 2px) solid var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color));outline-offset:-2px;border-radius:0 var(--hx-time-picker-border-radius, var(--hx-border-radius-md, .375rem))}.field__listbox{position:absolute;top:calc(100% + var(--hx-space-1, .25rem));inset-inline-start:0;inset-inline-end:0;z-index:var(--hx-z-index-dropdown, 1000);background-color:var(--hx-time-picker-listbox-bg, var(--hx-color-neutral-0));border:var(--hx-border-width-thin, 1px) solid var(--hx-time-picker-border-color, var(--hx-color-neutral-300));border-radius:var(--hx-time-picker-border-radius, var(--hx-border-radius-md, .375rem));box-shadow:var( --hx-time-picker-listbox-shadow, 0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900) 12%, transparent) );max-height:var(--hx-time-picker-listbox-max-height, 16rem);overflow-y:auto;padding:var(--hx-space-1, .25rem) 0;list-style:none;margin:0}@media(prefers-reduced-motion:no-preference){.field__listbox{animation:hx-listbox-enter var(--hx-transition-fast, .15s ease) forwards}}@keyframes hx-listbox-enter{0%{opacity:0;transform:translateY(-.25rem)}to{opacity:1;transform:translateY(0)}}.field__option{display:flex;align-items:center;padding:var(--hx-space-2, .5rem) var(--hx-space-3, .75rem);font-size:var(--hx-font-size-md, 1rem);font-family:inherit;color:var(--hx-time-picker-option-color, var(--hx-color-neutral-800));cursor:pointer;transition:background-color var(--hx-transition-fast, .15s ease);line-height:var(--hx-line-height-normal, 1.5)}.field__option:hover,.field__option--active{background-color:var(--hx-time-picker-option-hover-bg, var(--hx-color-primary-50));color:var(--hx-time-picker-option-hover-color, var(--hx-color-primary-700))}.field__option--selected{background-color:var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100));color:var(--hx-time-picker-option-selected-color, var(--hx-color-primary-800));font-weight:var(--hx-font-weight-medium, 500)}.field__option--selected.field__option--active{background-color:var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100))}@media(prefers-reduced-motion:reduce){.field__combobox,.field__option{transition:none}}.field__help-text,.field__error{font-size:var(--hx-font-size-xs, .75rem);line-height:var(--hx-line-height-normal, 1.5)}.field__help-text{color:var(--hx-color-neutral-500)}.field__error{color:var(--hx-time-picker-error-color, var(--hx-color-error-text, #b91c1c))}`;</span>
+&nbsp;</pre></td></tr></table></pre>
+
+      <div class="push"></div>
+      <!-- for sticky footer -->
+    </div>
+    <!-- /wrapper -->
+    <div class="footer quiet pad2 space-top1 center small">
+      Code coverage generated by
+      <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+      at 2026-03-26T20:46:54.292Z
+    </div>
+    <script src="../../../../../../prettify.js"></script>
+    <script>
+      window.onload = function () {
+        prettyPrint();
+      };
+    </script>
+    <script src="../../../../../../sorter.js"></script>
+    <script src="../../../../../../block-navigation.js"></script>
+  </body>
+</html>
