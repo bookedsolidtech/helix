@@ -328,8 +328,8 @@ jobs:
   # ── Automated A11y Audit (axe-core WCAG 2.1 AA) ─────────────────────────
   # Builds Storybook, serves it locally, then runs axe-core against every
   # component's Default story. Fails CI on any critical or serious violation.
-  # Healthcare mandate: zero tolerance — WCAG 2.1 AA, wcag2a + wcag2aa +
-  # best-practice tags. Report uploaded as artifact for triage.
+  # Healthcare mandate: critical/serious violations block merge — WCAG 2.1 AA,
+  # wcag2a + wcag2aa + best-practice tags. Report uploaded as artifact for triage.
 
   a11y-audit:
     name: A11y Audit
@@ -826,7 +826,7 @@ jobs:
             fi
           done
 
-          # A11y audit is a blocking gate — WCAG 2.1 AA, zero tolerance (healthcare mandate)
+          # A11y audit is a blocking gate — WCAG 2.1 AA, critical/serious violations fail CI (healthcare mandate)
           if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
             echo "::error::Gate 'a11y-audit' did not succeed: ${{ needs.a11y-audit.result }}"
             FAIL=1

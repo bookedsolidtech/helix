@@ -87,7 +87,7 @@ export const helixNavItemStyles = css`
   }
 
   :host([active]) .nav-item__link:hover {
-    /* neutral-50 (#f8fafc) on primary-700 (#1e40af) = 8.05:1 — WCAG AA ✓ */
+    /* neutral-50 (#f8fafc) on primary-700 (#1e40af) = 8.34:1 — WCAG AA ✓ */
     background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #1e40af));
   }
 
