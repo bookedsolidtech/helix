@@ -573,10 +573,51 @@ export const DisabledNoEvent: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     label: 'Settings',
     variant: 'ghost',
     size: 'md',
   },
+};
+
+// ─────────────────────────────────────────────────
+// 10. ANTI-PATTERN: Missing label (a11y violation)
+// ─────────────────────────────────────────────────
+
+/**
+ * DO NOT USE THIS PATTERN IN PRODUCTION.
+ *
+ * An `hx-icon-button` without a `label` property renders nothing and emits a
+ * console warning. Icon-only buttons MUST have an accessible name so that
+ * screen reader users understand the button's purpose.
+ *
+ * **Correct:** `<hx-icon-button label="Delete record">...</hx-icon-button>`
+ * **Wrong:**   `<hx-icon-button>...</hx-icon-button>` ← renders nothing, warns
+ */
+export const MissingLabelAntiPattern: Story = {
+  name: 'Anti-Pattern: Missing Label (a11y violation)',
+  tags: ['!autodocs'],
+  render: () => html`
+    <div
+      style="padding: 1rem; border: 2px dashed var(--hx-color-error-400, #f87171); border-radius: 0.5rem; background: var(--hx-color-error-50, #fef2f2);"
+    >
+      <p
+        style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-error-700, #b91c1c); font-weight: 600;"
+      >
+        ⚠ Anti-Pattern: No label provided — component renders nothing and emits a console warning.
+      </p>
+      <p style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-700, #374151);">
+        Open DevTools → Console to see the warning from <code>hx-icon-button</code>.
+      </p>
+      <!-- This renders nothing because label is missing: -->
+      <hx-icon-button variant="ghost">${gearIcon}</hx-icon-button>
+      <p style="margin: 0.75rem 0 0; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);">
+        (Nothing rendered above — the component suppresses output when label is absent.)
+      </p>
+    </div>
+  `,
 };
