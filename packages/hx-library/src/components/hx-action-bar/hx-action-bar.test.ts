@@ -344,6 +344,88 @@ describe('hx-action-bar', () => {
       expect(document.activeElement).toBe(btn3);
     });
 
+    it('preserves active item when a new button is dynamically added', async () => {
+      const el = await fixture<HelixActionBar>(
+        `<hx-action-bar>
+          <button slot="start" id="btn1">A</button>
+          <button slot="start" id="btn2">B</button>
+        </hx-action-bar>`,
+      );
+      await el.updateComplete;
+
+      const btn1 = el.querySelector<HTMLButtonElement>('#btn1');
+      expect(btn1?.getAttribute('tabindex')).toBe('0');
+
+      const btn3 = document.createElement('button');
+      btn3.id = 'btn3';
+      btn3.textContent = 'C';
+      btn3.setAttribute('slot', 'start');
+      el.appendChild(btn3);
+
+      await el.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const btn2 = el.querySelector<HTMLButtonElement>('#btn2');
+      expect(btn1?.getAttribute('tabindex')).toBe('0');
+      expect(btn2?.getAttribute('tabindex')).toBe('-1');
+      expect(btn3.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('reassigns tabindex="0" to first remaining item when active button is removed', async () => {
+      const el = await fixture<HelixActionBar>(
+        `<hx-action-bar>
+          <button slot="start" id="btn1">A</button>
+          <button slot="start" id="btn2">B</button>
+          <button slot="start" id="btn3">C</button>
+        </hx-action-bar>`,
+      );
+      await el.updateComplete;
+
+      const btn1 = el.querySelector<HTMLButtonElement>('#btn1');
+      const btn2 = el.querySelector<HTMLButtonElement>('#btn2');
+      const btn3 = el.querySelector<HTMLButtonElement>('#btn3');
+
+      expect(btn1?.getAttribute('tabindex')).toBe('0');
+
+      btn1?.remove();
+
+      await el.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(btn2?.getAttribute('tabindex')).toBe('0');
+      expect(btn3?.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('toolbar remains keyboard accessible after dynamic slot changes', async () => {
+      const el = await fixture<HelixActionBar>(
+        `<hx-action-bar>
+          <button slot="start" id="btn1">A</button>
+        </hx-action-bar>`,
+      );
+      await el.updateComplete;
+
+      const btn2 = document.createElement('button');
+      btn2.id = 'btn2';
+      btn2.textContent = 'B';
+      btn2.setAttribute('slot', 'end');
+      el.appendChild(btn2);
+
+      await el.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const tabbableItems = Array.from(el.querySelectorAll('button')).filter(
+        (b) => b.getAttribute('tabindex') === '0',
+      );
+      expect(tabbableItems.length).toBe(1);
+
+      const btn1 = el.querySelector<HTMLButtonElement>('#btn1');
+      btn1?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+
+      expect(document.activeElement).toBe(btn2);
+    });
+
     it('disconnectedCallback removes keydown listener', async () => {
       const el = await fixture<HelixActionBar>(
         `<hx-action-bar>
