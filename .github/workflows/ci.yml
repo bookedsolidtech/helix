@@ -685,6 +685,30 @@ jobs:
       - name: Security audit
         run: pnpm audit --audit-level=critical
 
+  # ── React wrapper tests (informational — not a required gate) ────────────
+  # Runs vitest browser mode tests for @helixui/react wrappers.
+  # Tests render/prop/event/ref forwarding for all generated React components.
+  # continue-on-error keeps this informational until the suite is stabilized.
+  test-react:
+    name: Test React Wrappers
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Run @helixui/react tests
+        run: pnpm run test:react
+        continue-on-error: true
+
   # ── Aggregate gate (for branch protection) ──────────────────────────────
   # This job depends on all checks and is the single required status check
   # in branch protection. This avoids needing to update branch protection
