@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -17,7 +17,11 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
 
 /**
  * A colored dot/badge indicating system or entity health status.
- * Purely visual — no slots. Supports an animated pulse ring.
+ * Supports an animated pulse ring and an optional visible text label.
+ *
+ * Status is conveyed through color AND an `aria-label` on the host element.
+ * When `show-label` is set, a visible text label is rendered inside the component,
+ * ensuring status is not communicated by color alone (WCAG 1.4.1 — Use of Color).
  *
  * Uses `role="img"` with an auto-generated `aria-label` (e.g. "Status: Online").
  * When used decoratively alongside visible text that conveys the same status information
@@ -37,6 +41,7 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  *
  * @csspart base - The dot element.
  * @csspart pulse-ring - The animated pulse ring element.
+ * @csspart label - The visible status label text element (visible when show-label is set).
  *
  * @cssprop [--hx-status-indicator-color-online] - Override color for the "online" status dot.
  * @cssprop [--hx-status-indicator-color-offline] - Override color for the "offline" status dot.
@@ -49,6 +54,8 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * @cssprop [--hx-status-indicator-pulse-duration] - Override pulse animation duration.
  * @cssprop [--hx-status-indicator-pulse-scale] - Override pulse animation max scale.
  * @cssprop [--hx-status-indicator-pulse-color] - Override pulse ring color independently from dot color.
+ * @cssprop [--hx-status-indicator-label-color] - Override label text color.
+ * @cssprop [--hx-status-indicator-label-font-size] - Override label font size.
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends LitElement {
@@ -87,11 +94,25 @@ export class HelixStatusIndicator extends LitElement {
   @property({ type: String })
   label = '';
 
+  /**
+   * When true, renders a visible text label next to the dot conveying the status.
+   * Use this to satisfy WCAG 1.4.1 (Use of Color) when the indicator is not
+   * accompanied by other visible text that conveys the same status information.
+   * @attr show-label
+   */
+  @property({ type: Boolean, reflect: true, attribute: 'show-label' })
+  showLabel = false;
+
   /** @internal */
   private _getLabel(): string {
     if (this.label) return this.label;
     const statusText = STATUS_LABELS[this.status] ?? 'Unknown';
     return `Status: ${statusText}`;
+  }
+
+  /** @internal */
+  private _getStatusText(): string {
+    return STATUS_LABELS[this.status] ?? 'Unknown';
   }
 
   // ─── Lifecycle ───
@@ -128,6 +149,13 @@ export class HelixStatusIndicator extends LitElement {
         <div class="indicator__pulse-ring" part="pulse-ring"></div>
         <div class="indicator__dot" part="base"></div>
       </div>
+      ${this.showLabel
+        ? html`<span class="indicator__label" part="label">${this._getStatusText()}</span>`
+        : nothing}
+      <!-- aria-live region announces dynamic status changes to screen readers -->
+      <span class="indicator__live-region" aria-live="polite" aria-atomic="true"
+        >${this._getLabel()}</span
+      >
     `;
   }
 }

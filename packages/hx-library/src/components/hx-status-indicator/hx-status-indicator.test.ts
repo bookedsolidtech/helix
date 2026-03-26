@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixStatusIndicator } from './hx-status-indicator.js';
+import type { HelixStatusIndicator, StatusIndicatorStatus } from './hx-status-indicator.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -25,6 +25,12 @@ describe('hx-status-indicator', () => {
       const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
       const ring = shadowQuery(el, '[part~="pulse-ring"]');
       expect(ring).toBeTruthy();
+    });
+
+    it('does not render label element by default', async () => {
+      const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label).toBeNull();
     });
   });
 
@@ -69,6 +75,13 @@ describe('hx-status-indicator', () => {
         '<hx-status-indicator status="busy"></hx-status-indicator>',
       );
       expect(el.status).toBe('busy');
+    });
+
+    it('accepts "unknown" status', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="unknown"></hx-status-indicator>',
+      );
+      expect(el.status).toBe('unknown');
     });
   });
 
@@ -168,6 +181,66 @@ describe('hx-status-indicator', () => {
     });
   });
 
+  // ─── Property: show-label ───
+
+  describe('Property: show-label', () => {
+    it('defaults to showLabel=false', async () => {
+      const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
+      expect(el.showLabel).toBe(false);
+    });
+
+    it('reflects show-label attr to host when true', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator show-label></hx-status-indicator>',
+      );
+      expect(el.hasAttribute('show-label')).toBe(true);
+    });
+
+    it('renders visible label when show-label is set', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online" show-label></hx-status-indicator>',
+      );
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label).toBeTruthy();
+      expect(label?.textContent?.trim()).toBe('Online');
+    });
+
+    it('renders correct label text for each status when show-label is set', async () => {
+      const cases: Array<[string, string]> = [
+        ['online', 'Online'],
+        ['offline', 'Offline'],
+        ['away', 'Away'],
+        ['busy', 'Busy'],
+        ['unknown', 'Unknown'],
+      ];
+      for (const [status, expectedText] of cases) {
+        const el = await fixture<HelixStatusIndicator>(
+          `<hx-status-indicator status="${status}" show-label></hx-status-indicator>`,
+        );
+        const label = shadowQuery(el, '[part~="label"]');
+        expect(label?.textContent?.trim()).toBe(expectedText);
+      }
+    });
+
+    it('does not render label element when show-label is absent', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online"></hx-status-indicator>',
+      );
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label).toBeNull();
+    });
+
+    it('updates label text when status changes with show-label active', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online" show-label></hx-status-indicator>',
+      );
+      el.status = 'offline';
+      await el.updateComplete;
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label?.textContent?.trim()).toBe('Offline');
+    });
+  });
+
   // ─── ARIA ───
 
   describe('ARIA', () => {
@@ -231,6 +304,36 @@ describe('hx-status-indicator', () => {
       await el.updateComplete;
       expect(el.getAttribute('aria-label')).toBe('Status: Online');
     });
+
+    it('has an aria-live="polite" region in shadow DOM for screen reader announcements', async () => {
+      const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
+      expect(liveRegion).toBeTruthy();
+    });
+
+    it('aria-live region has aria-atomic="true"', async () => {
+      const el = await fixture<HelixStatusIndicator>('<hx-status-indicator></hx-status-indicator>');
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
+      expect(liveRegion?.getAttribute('aria-atomic')).toBe('true');
+    });
+
+    it('aria-live region text reflects current label', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online"></hx-status-indicator>',
+      );
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
+      expect(liveRegion?.textContent?.trim()).toBe('Status: Online');
+    });
+
+    it('aria-live region updates when status changes', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online"></hx-status-indicator>',
+      );
+      el.status = 'offline';
+      await el.updateComplete;
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]');
+      expect(liveRegion?.textContent?.trim()).toBe('Status: Offline');
+    });
   });
 
   // ─── Dynamic Updates ───
@@ -243,6 +346,24 @@ describe('hx-status-indicator', () => {
       el.status = 'offline';
       await el.updateComplete;
       expect(el.getAttribute('aria-label')).toBe('Status: Offline');
+    });
+
+    it('updates aria-label through all status values', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online"></hx-status-indicator>',
+      );
+      const statuses: Array<[StatusIndicatorStatus, string]> = [
+        ['offline', 'Status: Offline'],
+        ['away', 'Status: Away'],
+        ['busy', 'Status: Busy'],
+        ['unknown', 'Status: Unknown'],
+        ['online', 'Status: Online'],
+      ];
+      for (const [status, expectedLabel] of statuses) {
+        el.status = status;
+        await el.updateComplete;
+        expect(el.getAttribute('aria-label')).toBe(expectedLabel);
+      }
     });
   });
 
@@ -304,6 +425,15 @@ describe('hx-status-indicator', () => {
     it('has no axe violations with custom label', async () => {
       const el = await fixture<HelixStatusIndicator>(
         '<hx-status-indicator label="Server is online"></hx-status-indicator>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with show-label enabled', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online" show-label></hx-status-indicator>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
