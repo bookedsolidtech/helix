@@ -32,7 +32,7 @@ export const HxToast = createComponent({
   events: {
     onHxShow: 'hx-show',
     onHxHide: 'hx-hide',
-    onHxAfterHide: 'hx-after-hide',
+    onHxAfterHide: 'hx-after-hide'
   },
   displayName: 'HxToast',
 });
