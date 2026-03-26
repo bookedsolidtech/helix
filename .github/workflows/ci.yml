@@ -93,7 +93,17 @@ jobs:
         id: check-audit
         run: |
           BRANCH="${{ github.head_ref || github.ref_name }}"
-          if [[ "$BRANCH" == *"deep-audit"* ]] || [[ "$BRANCH" == *"audit/"* ]]; then
+          # Per-component audit branches are banned — audits must use the batch
+          # workflow defined in .automaker/context/audit-workflow.md.
+          # Catches: feature/audithx-{component}-*, feature/audit-hx-{component}-*
+          if [[ "$BRANCH" == *"audithx-"* ]] || [[ "$BRANCH" =~ ^feature/audit-hx-[a-z] ]]; then
+            echo "::error::Per-component audit branch detected: $BRANCH"
+            echo "::error::Audit workflow violation — individual component branches are banned."
+            echo "::error::Use the batch audit workflow: audit/audit-wave-N-{type} with grouped fixes."
+            echo "::error::See .automaker/context/audit-workflow.md for the correct 4-phase process."
+            echo "is_audit=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          elif [[ "$BRANCH" == *"deep-audit"* ]] || [[ "$BRANCH" == *"audit/"* ]]; then
             echo "is_audit=true" >> "$GITHUB_OUTPUT"
             echo "Audit branch detected: $BRANCH — skipping CI"
           else
@@ -701,7 +711,7 @@ jobs:
 
   storybook-tests:
     name: Storybook Tests
-    needs: [changes, secret-scan]
+    needs: [changes, secret-scan, build]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -713,6 +723,8 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - name: Build library and generate CEM
+        run: pnpm turbo run build --filter='!docs' && pnpm run cem
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Storybook interaction tests
