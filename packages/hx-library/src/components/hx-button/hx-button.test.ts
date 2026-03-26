@@ -519,8 +519,7 @@ describe('hx-button', () => {
   describe('Form Association', () => {
     it('value appears in FormData when type=submit with name and value set', async () => {
       const form = document.createElement('form');
-      form.innerHTML =
-        '<hx-button type="submit" name="action" value="confirm">Submit</hx-button>';
+      form.innerHTML = '<hx-button type="submit" name="action" value="confirm">Submit</hx-button>';
       document.getElementById('test-fixture-container')!.appendChild(form);
       const el = form.querySelector('hx-button') as HelixButton;
       await el.updateComplete;
@@ -638,6 +637,114 @@ describe('hx-button', () => {
       btn.click();
       await el.updateComplete;
       expect(clicked).toBe(false);
+    });
+  });
+
+  // ─── Lifecycle: updated (variant clamping) ───
+
+  describe('Lifecycle: updated (variant clamping)', () => {
+    it('clamps invalid variant back to "primary"', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.variant = 'invalid-variant' as 'primary';
+      await el.updateComplete;
+      expect(el.variant).toBe('primary');
+    });
+
+    it('clamps invalid variant and applies primary class', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.variant = 'invalid-variant' as 'primary';
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--primary')).toBe(true);
+    });
+  });
+
+  // ─── Slot handler: empty button without aria-label ───
+
+  describe('Slot handler: empty button without aria-label', () => {
+    it('does not throw when button has no label and no aria-label', async () => {
+      // Exercises _handleDefaultSlotChange devWarn path — must not throw
+      let threw = false;
+      try {
+        const el = await fixture<HelixButton>('<hx-button></hx-button>');
+        await el.updateComplete;
+        expect(el).toBeTruthy();
+      } catch {
+        threw = true;
+      }
+      expect(threw).toBe(false);
+    });
+  });
+
+  // ─── href mode: disabled tabindex ───
+
+  describe('href mode: disabled tabindex', () => {
+    it('sets tabindex="-1" on anchor when disabled', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" disabled>Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('does not set tabindex on anchor when not disabled', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com">Link</hx-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('tabindex')).toBe(false);
+    });
+  });
+
+  // ─── Programmatic property changes ───
+
+  describe('Programmatic property changes', () => {
+    it('sets aria-busy="true" after programmatic loading=true', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.loading = true;
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.getAttribute('aria-busy')).toBe('true');
+    });
+
+    it('removes aria-busy after loading transitions back to false', async () => {
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
+      el.loading = false;
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.hasAttribute('aria-busy')).toBe(false);
+    });
+
+    it('sets disabled after programmatic disabled=true', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.disabled = true;
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.disabled).toBe(true);
+    });
+
+    it('removes disabled after programmatic disabled=false', async () => {
+      const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
+      el.disabled = false;
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.disabled).toBe(false);
+    });
+
+    it('shows spinner after programmatic loading=true', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.loading = true;
+      await el.updateComplete;
+      const spinner = shadowQuery(el, '[part="spinner"]');
+      expect(spinner).toBeTruthy();
+    });
+
+    it('hides spinner after programmatic loading=false', async () => {
+      const el = await fixture<HelixButton>('<hx-button loading>Click</hx-button>');
+      el.loading = false;
+      await el.updateComplete;
+      const spinner = shadowQuery(el, '[part="spinner"]');
+      expect(spinner).toBeNull();
     });
   });
 

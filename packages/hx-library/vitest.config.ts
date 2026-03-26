@@ -53,7 +53,7 @@ export default defineConfig({
         'src/components/**/*.styles.ts',
         'src/components/**/index.ts',
       ],
-      reporter: ['text', 'json', 'json-summary'],
+      reporter: ['text', 'json', 'json-summary', 'html'],
       reportsDirectory: '.cache/coverage',
       // Thresholds intentionally omitted — enforcement is handled per-component
       // by scripts/check-coverage.mjs. Global Vitest thresholds fail on partial
