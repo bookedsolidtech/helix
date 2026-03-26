@@ -91,6 +91,7 @@ const meta = {
   render: (args) => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
       <hx-overflow-menu
+        role="menu"
         placement=${args.placement}
         hx-size=${args.size}
         ?disabled=${args.disabled}
@@ -150,7 +151,7 @@ export const HorizontalIcon: Story = {
   },
   render: (args) => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu icon=${args.icon} placement=${args.placement} hx-size=${args.size}>
+      <hx-overflow-menu role="menu" icon=${args.icon} placement=${args.placement} hx-size=${args.size}>
         <button role="menuitem">View details</button>
         <button role="menuitem">Assign</button>
         <button role="menuitem">Export</button>
@@ -169,7 +170,7 @@ export const VerticalIcon: Story = {
   },
   render: (args) => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu icon=${args.icon} placement=${args.placement} hx-size=${args.size}>
+      <hx-overflow-menu role="menu" icon=${args.icon} placement=${args.placement} hx-size=${args.size}>
         <button role="menuitem">View details</button>
         <button role="menuitem">Assign</button>
         <button role="menuitem">Export</button>
@@ -226,7 +227,7 @@ export const Disabled: Story = {
 export const SelectEvent: Story = {
   render: () => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
+      <hx-overflow-menu role="menu">
         <button role="menuitem" data-value="edit">Edit</button>
         <button role="menuitem" data-value="delete">Delete</button>
       </hx-overflow-menu>
@@ -264,7 +265,7 @@ export const SelectEvent: Story = {
 export const FewItems: Story = {
   render: () => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
+      <hx-overflow-menu role="menu">
         <button role="menuitem">Edit</button>
         <button role="menuitem">Delete</button>
       </hx-overflow-menu>
@@ -279,7 +280,7 @@ export const FewItems: Story = {
 export const ManyItems: Story = {
   render: () => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
+      <hx-overflow-menu role="menu">
         <button role="menuitem">View details</button>
         <button role="menuitem">Edit</button>
         <button role="menuitem">Duplicate</button>
@@ -316,7 +317,7 @@ export const PatientRowActions: Story = {
           <td style="padding: 0.75rem 1rem; color: #111827;">Jane Doe</td>
           <td style="padding: 0.75rem 1rem; color: #6b7280;">Cardiology</td>
           <td style="padding: 0.5rem 1rem; text-align: right;">
-            <hx-overflow-menu hx-size="sm" placement="bottom-end">
+            <hx-overflow-menu role="menu" hx-size="sm" placement="bottom-end">
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
@@ -328,7 +329,7 @@ export const PatientRowActions: Story = {
           <td style="padding: 0.75rem 1rem; color: #111827;">John Smith</td>
           <td style="padding: 0.75rem 1rem; color: #6b7280;">Neurology</td>
           <td style="padding: 0.5rem 1rem; text-align: right;">
-            <hx-overflow-menu hx-size="sm" placement="bottom-end">
+            <hx-overflow-menu role="menu" hx-size="sm" placement="bottom-end">
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
@@ -348,7 +349,7 @@ export const PatientRowActions: Story = {
 export const WithIconItems: Story = {
   render: () => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
+      <hx-overflow-menu role="menu">
         <button role="menuitem" style="display: flex; align-items: center; gap: 0.5rem;">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -431,7 +432,7 @@ export const WithIconItems: Story = {
 export const KeyboardEscape: Story = {
   render: () => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu>
+      <hx-overflow-menu role="menu">
         <button role="menuitem">Edit</button>
         <button role="menuitem">Delete</button>
       </hx-overflow-menu>

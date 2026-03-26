@@ -75,7 +75,7 @@ const meta = {
         distance=${args.distance}
       >
         <button slot="trigger" type="button">Open Menu</button>
-        <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
+        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
           <li
             data-value="edit"
             role="menuitem"
@@ -124,7 +124,7 @@ export const Default: Story = {
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown>
         <button slot="trigger" type="button">Open Menu</button>
-        <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
+        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
           <li
             data-value="edit"
             role="menuitem"
@@ -189,7 +189,7 @@ export const IconTrigger: Story = {
         >
           ⋯
         </button>
-        <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
+        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
           <li
             data-value="view"
             role="menuitem"
@@ -238,7 +238,7 @@ export const CustomTrigger: Story = {
         >
           Patient Actions ▾
         </a>
-        <ul style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 180px;">
+        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 180px;">
           <li
             data-value="schedule"
             role="menuitem"
@@ -287,7 +287,7 @@ export const Disabled: Story = {
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown disabled>
         <button slot="trigger" type="button" disabled>Disabled Menu</button>
-        <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
+        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
           <li
             data-value="action"
             role="menuitem"
@@ -321,7 +321,7 @@ export const Placements: Story = {
         (p) => html`
           <hx-dropdown placement=${p}>
             <button slot="trigger" type="button">${p}</button>
-            <ul style="margin: 0; padding: 0.25rem 0; list-style: none;">
+            <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
               <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">
                 Option A
               </li>
@@ -361,7 +361,7 @@ export const HealthcareUseCases: Story = {
           >
             Actions ▾
           </button>
-          <ul style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;">
+          <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;">
             <li
               data-value="schedule"
               role="menuitem"
