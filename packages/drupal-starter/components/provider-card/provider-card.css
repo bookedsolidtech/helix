@@ -17,7 +17,7 @@
 }
 
 .provider-card__credentials {
-  opacity: 0.8;
+  opacity: var(--hx-opacity-muted, 0.8);
 }
 
 .provider-card__body {

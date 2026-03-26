@@ -83,9 +83,9 @@ describe('helixui.libraries.yml — file is parseable', () => {
     expect(keys.size).toBeGreaterThan(0);
   });
 
-  it('contains hx-core', () => {
+  it('contains core', () => {
     const keys = parseLibraryKeys();
-    expect(keys.has('hx-core')).toBe(true);
+    expect(keys.has('core')).toBe(true);
   });
 
   it('contains hx-button', () => {

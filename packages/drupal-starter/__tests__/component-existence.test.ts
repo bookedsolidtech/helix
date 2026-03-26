@@ -85,14 +85,25 @@ function collectTwigFiles(dir: string): string[] {
 }
 
 /**
+ * Strip Twig comment blocks ({# ... #}) from source before tag scanning.
+ * This prevents tags mentioned in documentation comments from being treated
+ * as runtime dependencies.
+ */
+function stripTwigComments(source: string): string {
+  return source.replace(/\{#[\s\S]*?#\}/g, '');
+}
+
+/**
  * Extract all `<hx-*` tag names from Twig source.
  * Returns only the custom element tag names (e.g. `hx-button`, `hx-card`).
+ * Twig comments are stripped first so example tags in docs are not flagged.
  */
 function extractHxTags(source: string): Set<string> {
+  const stripped = stripTwigComments(source);
   const pattern = /<(hx-[a-z-]+)[\s/>]/g;
   const tags = new Set<string>();
   let match: RegExpExecArray | null;
-  while ((match = pattern.exec(source)) !== null) {
+  while ((match = pattern.exec(stripped)) !== null) {
     tags.add(match[1]);
   }
   return tags;
