@@ -1339,7 +1339,7 @@ export const AccentVariant: Story = {
  * presenting action details — common in clinical workflow notifications where
  * the title conveys urgency and the body provides instructional content.
  */
-export const WithTitle: Story = {
+export const WithTitleSlot: Story = {
   name: 'With Title Slot',
   render: () => html`
     <div
