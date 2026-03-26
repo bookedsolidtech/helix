@@ -121,6 +121,11 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "pnpm": {
+    "overrides": {
+      "locutus": ">=3.0.14"
+    }
+  },
   "packageManager": "pnpm@9.15.9",
   "customElements": ".worktrees/feature-healthba-hx-carousel-document-25/packages/hx-library/custom-elements.json"
 }

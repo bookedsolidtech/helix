@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  locutus: '>=3.0.14'
+
 importers:
 
   .:
