@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>
+      Code coverage report for
+      feature-audithx-checkbox-deep-quality-audit/packages/hx-library/src/components/hx-date-picker/hx-date-picker.styles.ts
+    </title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+      .coverage-summary .sorter {
+        background-image: url(../../../../../../sort-arrow-sprite.png);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="pad1">
+        <h1>
+          <a href="../../../../../../index.html">All files</a> /
+          <a href="index.html"
+            >feature-audithx-checkbox-deep-quality-audit/packages/hx-library/src/components/hx-date-picker</a
+          >
+          hx-date-picker.styles.ts
+        </h1>
+        <div class="clearfix">
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Statements</span>
+            <span class="fraction">0/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">100% </span>
+            <span class="quiet">Branches</span>
+            <span class="fraction">1/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">100% </span>
+            <span class="quiet">Functions</span>
+            <span class="fraction">1/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Lines</span>
+            <span class="fraction">0/1</span>
+          </div>
+        </div>
+        <p class="quiet">
+          Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>,
+          <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+          <div class="quiet">
+            Filter:
+            <input type="search" id="fileSearch" />
+          </div>
+        </template>
+      </div>
+      <div class="status-line low"></div>
+      <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { css } from 'lit';
+&nbsp;
+// prettier-ignore
+<span class="cstat-no" title="statement not covered" >export const helixDatePickerStyles = css`:host{display:block;position:relative}:host([disabled]){opacity:var(--hx-opacity-disabled, .5);pointer-events:none}*{box-sizing:border-box}.field{display:flex;flex-direction:column;gap:var(--hx-space-1, .25rem);font-family:var(--hx-date-picker-font-family, var(--hx-font-family-sans, sans-serif));position:relative}.field__label-wrapper{display:contents}.field__label{display:flex;align-items:baseline;gap:var(--hx-space-1, .25rem);font-size:var(--hx-font-size-sm, .875rem);font-weight:var(--hx-font-weight-medium, 500);color:var(--hx-date-picker-label-color, var(--hx-color-neutral-700, #343a40));line-height:var(--hx-line-height-normal, 1.5)}.field__required-marker{color:var(--hx-date-picker-error-color, var(--hx-color-error-text, #b91c1c));font-weight:var(--hx-font-weight-bold, 700)}.field__input-wrapper{display:flex;align-items:stretch;border:var(--hx-border-width-thin, 1px) solid var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #ced4da));border-radius:var(--hx-date-picker-border-radius, var(--hx-border-radius-md, .375rem));background-color:var(--hx-date-picker-bg, var(--hx-color-neutral-0, #ffffff));transition:border-color var(--hx-transition-fast, .15s ease),box-shadow var(--hx-transition-fast, .15s ease);overflow:hidden}.field__input-wrapper:focus-within{border-color:var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa)));box-shadow:0 0 0 var(--hx-focus-ring-width, 2px) color-mix(in srgb,var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))) calc(var(--hx-focus-ring-opacity, .25) * 100%),transparent)}.field--error .field__input-wrapper{border-color:var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545))}.field--error .field__input-wrapper:focus-within{border-color:var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545));box-shadow:0 0 0 var(--hx-focus-ring-width, 2px) color-mix(in srgb,var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545)) calc(var(--hx-focus-ring-opacity, .25) * 100%),transparent)}.field__input{flex:1;border:none;outline:none;background:transparent;padding:var(--hx-space-2, .5rem) var(--hx-space-3, .75rem);font-family:inherit;font-size:var(--hx-font-size-md, 1rem);color:var(--hx-date-picker-color, var(--hx-color-neutral-800, #212529));line-height:var(--hx-line-height-normal, 1.5);min-height:var(--hx-size-10, 2.5rem);width:100%;cursor:default}.field__input::placeholder{color:var(--hx-color-neutral-400, #adb5bd)}.field__input:disabled{cursor:not-allowed}.field__trigger{display:flex;align-items:center;justify-content:center;padding:0 var(--hx-space-3, .75rem);border:none;border-left:var(--hx-border-width-thin, 1px) solid var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #ced4da));background:transparent;color:var(--hx-date-picker-trigger-color, var(--hx-color-neutral-500, #6c757d));cursor:pointer;flex-shrink:0;transition:color var(--hx-transition-fast, .15s ease);outline:none}.field__trigger:focus-visible{color:var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa)));background-color:color-mix(in srgb,var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))) 8%,transparent)}.field__trigger:hover:not(:disabled){color:var(--hx-date-picker-trigger-hover-color, var(--hx-color-neutral-700, #343a40));background-color:color-mix(in srgb,var(--hx-color-neutral-900, #212529) 4%,transparent)}.field__trigger:disabled{cursor:not-allowed}.calendar{position:absolute;top:calc(100% + var(--hx-space-1, .25rem));left:0;z-index:var(--hx-z-index-dropdown, 1000);min-width:var(--hx-date-picker-calendar-min-width, 18rem);background-color:var(--hx-date-picker-calendar-bg, var(--hx-color-neutral-0, #ffffff));border:var(--hx-border-width-thin, 1px) solid var(--hx-date-picker-calendar-border-color, var(--hx-color-neutral-200, #e9ecef));border-radius:var(--hx-date-picker-calendar-border-radius, var(--hx-border-radius-lg, .5rem));box-shadow:var( --hx-date-picker-calendar-shadow, 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1) );padding:var(--hx-space-3, .75rem);outline:none}@media(prefers-reduced-motion:no-preference){.calendar{animation:calendar-appear var(--hx-transition-fast, .15s ease) forwards}}@keyframes calendar-appear{0%{opacity:0;transform:translateY(-.25rem)}to{opacity:1;transform:translateY(0)}}.calendar__nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--hx-space-3, .75rem)}:is(.calendar__nav-btn,.calendar__day,.calendar__day-cell,.calendar__weekday){display:flex;align-items:center;justify-content:center}:is(.calendar__nav-btn,.calendar__day){width:var(--hx-touch-target-min, 2.75rem);height:var(--hx-touch-target-min, 2.75rem);border:none;border-radius:var(--hx-border-radius-sm, .25rem);background:transparent;cursor:pointer;outline:none;transition:background-color var(--hx-transition-fast, .15s ease),color var(--hx-transition-fast, .15s ease)}.calendar__nav-btn{color:var(--hx-color-neutral-600, #495057);font-size:var(--hx-font-size-lg, 1.125rem);line-height:1}.calendar__nav-btn:hover{background-color:var(--hx-color-neutral-100, #f8f9fa);color:var(--hx-color-neutral-900, #212529)}:is(.calendar__nav-btn,.calendar__day):focus-visible{box-shadow:0 0 0 var(--hx-focus-ring-width, 2px) var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa)));z-index:1}.calendar__nav-btn:disabled{opacity:var(--hx-opacity-disabled, .4);cursor:not-allowed;pointer-events:none}.calendar__month-label{font-size:var(--hx-font-size-sm, .875rem);font-weight:var(--hx-font-weight-semibold, 600);color:var(--hx-color-neutral-800, #212529);flex:1;text-align:center}.calendar__grid{display:flex;flex-direction:column;gap:var(--hx-space-1, .25rem)}.calendar__row{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--hx-space-1, .25rem)}.calendar__weekday{height:var(--hx-size-8, 2rem);font-size:var(--hx-font-size-xs, .75rem);font-weight:var(--hx-font-weight-semibold, 600);color:var(--hx-color-neutral-500, #6c757d);text-transform:uppercase;letter-spacing:.05em}.calendar__day{color:var(--hx-color-neutral-800, #212529);font-size:var(--hx-font-size-sm, .875rem);font-family:inherit;position:relative}.calendar__day:hover:not(.calendar__day--disabled):not(.calendar__day--selected){background-color:var(--hx-color-neutral-100, #f8f9fa);color:var(--hx-color-neutral-900, #212529)}.calendar__day--selected{background-color:var(--hx-date-picker-selected-bg, var(--hx-color-primary-500, #2563eb));color:var(--hx-date-picker-selected-color, var(--hx-color-neutral-0, #ffffff));font-weight:var(--hx-font-weight-semibold, 600)}.calendar__day--selected:hover{background-color:var(--hx-date-picker-selected-hover-bg, var(--hx-color-primary-600, #1d4ed8))}.calendar__day--today:not(.calendar__day--selected){font-weight:var(--hx-font-weight-bold, 700);color:var(--hx-date-picker-today-color, var(--hx-color-primary-600, #1d4ed8))}.calendar__day--today:not(.calendar__day--selected):after{content:"";position:absolute;bottom:.2rem;left:50%;transform:translate(-50%);width:.25rem;height:.25rem;border-radius:50%;background-color:currentColor}.calendar__day--disabled{opacity:var(--hx-opacity-disabled, .4);cursor:not-allowed;pointer-events:none}.calendar__live-region{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.field__help-text,.field__error{font-size:var(--hx-font-size-xs, .75rem);line-height:var(--hx-line-height-normal, 1.5)}.field__help-text{color:var(--hx-color-neutral-500, #6c757d)}.field__error{color:var(--hx-date-picker-error-color, var(--hx-color-error-text, #b91c1c))}@media(prefers-reduced-motion:reduce){.field__input-wrapper,.field__trigger,.calendar__nav-btn,.calendar__day{transition:none}}@media(forced-colors:active){.field__input-wrapper{border:1px solid ButtonText}.field__input-wrapper:focus-within{outline:2px solid Highlight;outline-offset:1px;box-shadow:none}:is(.calendar__day:focus-visible,.calendar__nav-btn:focus-visible){outline:2px solid Highlight;box-shadow:none}.calendar__day--selected{background-color:Highlight;color:HighlightText;border:1px solid Highlight}.calendar__day--today:not(.calendar__day--selected){border:2px solid LinkText}.calendar__day--today:not(.calendar__day--selected):after{display:none}.calendar__day--disabled{color:GrayText}.field--error .field__input-wrapper{border-color:LinkText}}`;</span>
+&nbsp;</pre></td></tr></table></pre>
+
+      <div class="push"></div>
+      <!-- for sticky footer -->
+    </div>
+    <!-- /wrapper -->
+    <div class="footer quiet pad2 space-top1 center small">
+      Code coverage generated by
+      <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+      at 2026-03-26T20:46:54.292Z
+    </div>
+    <script src="../../../../../../prettify.js"></script>
+    <script>
+      window.onload = function () {
+        prettyPrint();
+      };
+    </script>
+    <script src="../../../../../../sorter.js"></script>
+    <script src="../../../../../../block-navigation.js"></script>
+  </body>
+</html>

@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>
+      Code coverage report for
+      feature-audithx-checkbox-deep-quality-audit/packages/helixui-mcp/src/breaking-changes-manifest.ts
+    </title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+      .coverage-summary .sorter {
+        background-image: url(../../../../sort-arrow-sprite.png);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="pad1">
+        <h1>
+          <a href="../../../../index.html">All files</a> /
+          <a href="index.html"
+            >feature-audithx-checkbox-deep-quality-audit/packages/helixui-mcp/src</a
+          >
+          breaking-changes-manifest.ts
+        </h1>
+        <div class="clearfix">
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Statements</span>
+            <span class="fraction">0/124</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">100% </span>
+            <span class="quiet">Branches</span>
+            <span class="fraction">1/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">100% </span>
+            <span class="quiet">Functions</span>
+            <span class="fraction">1/1</span>
+          </div>
+
+          <div class="fl pad1y space-right2">
+            <span class="strong">0% </span>
+            <span class="quiet">Lines</span>
+            <span class="fraction">0/124</span>
+          </div>
+        </div>
+        <p class="quiet">
+          Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>,
+          <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+          <div class="quiet">
+            Filter:
+            <input type="search" id="fileSearch" />
+          </div>
+        </template>
+      </div>
+      <div class="status-line low"></div>
+      <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Bundled breaking-changes manifest for @helixui/mcp.
+ *
+ * This manifest is generated from changesets during each HELiX release and
+ * bundled into the package. The migrate-version MCP tool reads this manifest
+ * to produce version-specific migration plans for consumer projects.
+ *
+ * Schema version: 1
+ */
+&nbsp;
+// ─── Types ────────────────────────────────────────────────────────────────────
+&nbsp;
+export type BreakingChangeType =
+  | 'renamed-property'
+  | 'renamed-event'
+  | 'renamed-slot'
+  | 'renamed-csspart'
+  | 'renamed-token'
+  | 'renamed-import'
+  | 'removed-property'
+  | 'behavior-change';
+&nbsp;
+export interface BreakingChange {
+  /** Unique ID for this breaking change. */
+  id: string;
+  /** The library version that introduced this breaking change. */
+  version: string;
+  /** Category of the breaking change. */
+  type: BreakingChangeType;
+  /** The component this change applies to, or undefined for package-level changes. */
+  component?: string;
+  /** Human-readable explanation of what changed and why. */
+  description: string;
+  /** Code example showing the old (pre-migration) usage. */
+  before: string;
+  /** Code example showing the new (post-migration) usage. */
+  after: string;
+  /**
+   * Regular expression pattern (as a string) to search for affected code.
+   * Used to locate occurrences in consumer project files.
+   */
+  searchPattern: string;
+  /** Regex flags for the search pattern (default: 'g'). */
+  searchFlags?: string;
+  /**
+   * Replacement string to apply when searchPattern matches.
+   * Supports $1, $2, etc. back-references from searchPattern capture groups.
+   * Undefined for changes that cannot be automatically migrated.
+   */
+  replacePattern?: string;
+  /**
+   * File extensions to include in the scan (without the leading dot).
+   * e.g. ['ts', 'tsx', 'js', 'jsx', 'html', 'twig']
+   */
+  fileExtensions: string[];
+}
+&nbsp;
+export interface BreakingChangesManifest {
+  schemaVersion: '1';
+  generatedAt: string;
+  changes: BreakingChange[];
+}
+&nbsp;
+// ─── Manifest data ─────────────────────────────────────────────────────────────
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const BREAKING_CHANGES_MANIFEST: BreakingChangesManifest = {</span>
+<span class="cstat-no" title="statement not covered" >  schemaVersion: '1',</span>
+<span class="cstat-no" title="statement not covered" >  generatedAt: '2026-03-01T00:00:00.000Z',</span>
+<span class="cstat-no" title="statement not covered" >  changes: [</span>
+    // ── v0.2.0 breaking changes ───────────────────────────────────────────────
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-token-color-accent-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-token',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'The early prototype token --hx-color-accent was consolidated into the primary color ' +</span>
+        'palette as --hx-color-primary-500 during the 0.2.0 design token audit. Consumers ' +
+        'overriding this token must update their CSS to use the new name.',
+<span class="cstat-no" title="statement not covered" >      before: '/* Before */\n:root {\n  --hx-color-accent: #2563eb;\n}',</span>
+<span class="cstat-no" title="statement not covered" >      after: '/* After */\n:root {\n  --hx-color-primary-500: #2563eb;\n}',</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '--hx-color-accent',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: '--hx-color-primary-500',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['css', 'scss', 'sass', 'less', 'html', 'twig', 'ts', 'js'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-button-event-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-event',</span>
+<span class="cstat-no" title="statement not covered" >      component: 'hx-button',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        "hx-button's custom click event was renamed from 'hx-button-click' to 'hx-click' " +</span>
+        'to align with the short-form hx- event prefix convention adopted across all ' +
+        'components in 0.2.0. Update all addEventListener calls and framework event bindings.',
+<span class="cstat-no" title="statement not covered" >      before:</span>
+<span class="cstat-no" title="statement not covered" >        "// Before\nbutton.addEventListener('hx-button-click', handler);\n\n" +</span>
+        '// Twig\n{# @listen hx-button-click #}',
+<span class="cstat-no" title="statement not covered" >      after:</span>
+<span class="cstat-no" title="statement not covered" >        "// After\nbutton.addEventListener('hx-click', handler);\n\n" +</span>
+        '// Twig\n{# @listen hx-click #}',
+<span class="cstat-no" title="statement not covered" >      searchPattern: "'hx-button-click'",</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: "'hx-click'",</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['ts', 'tsx', 'js', 'jsx', 'mjs', 'html', 'twig', 'vue', 'svelte'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-button-event-renamed-dquote',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-event',</span>
+<span class="cstat-no" title="statement not covered" >      component: 'hx-button',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'Companion pattern for the hx-button-click → hx-click rename covering double-quoted ' +</span>
+        'string usages (HTML attribute bindings, template literals with double quotes).',
+<span class="cstat-no" title="statement not covered" >      before: 'button.addEventListener("hx-button-click", handler);',</span>
+<span class="cstat-no" title="statement not covered" >      after: 'button.addEventListener("hx-click", handler);',</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '"hx-button-click"',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: '"hx-click"',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['ts', 'tsx', 'js', 'jsx', 'mjs', 'html', 'twig', 'vue', 'svelte'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-text-input-helper-text-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-property',</span>
+<span class="cstat-no" title="statement not covered" >      component: 'hx-text-input',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        "hx-text-input's 'helper-text' attribute was shortened to 'hint' in 0.2.0 to match " +</span>
+        'the terse naming convention used by hx-select, hx-checkbox, and hx-radio. ' +
+        "Update all HTML templates and TypeScript code that sets the 'helper-text' attribute.",
+<span class="cstat-no" title="statement not covered" >      before: '&lt;hx-text-input helper-text="Enter your full name"&gt;&lt;/hx-text-input&gt;',</span>
+<span class="cstat-no" title="statement not covered" >      after: '&lt;hx-text-input hint="Enter your full name"&gt;&lt;/hx-text-input&gt;',</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '\\bhelper-text=',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: 'hint=',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['html', 'twig', 'tsx', 'jsx', 'vue', 'svelte'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-text-input-helper-text-prop-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-property',</span>
+<span class="cstat-no" title="statement not covered" >      component: 'hx-text-input',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'TypeScript property access companion for the helperText → hint rename on hx-text-input. ' +</span>
+        'Covers camelCase property access and assignment in TypeScript/JavaScript.',
+<span class="cstat-no" title="statement not covered" >      before:</span>
+<span class="cstat-no" title="statement not covered" >        "// Before\nconst input = document.querySelector('hx-text-input');\ninput.helperText = 'Enter your name';",</span>
+<span class="cstat-no" title="statement not covered" >      after:</span>
+<span class="cstat-no" title="statement not covered" >        "// After\nconst input = document.querySelector('hx-text-input');\ninput.hint = 'Enter your name';",</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '\\.helperText\\b',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: '.hint',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['ts', 'tsx', 'js', 'jsx', 'mjs'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-card-header-action-slot-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-slot',</span>
+<span class="cstat-no" title="statement not covered" >      component: 'hx-card',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        "hx-card's 'header-action' slot was renamed to 'header-trailing' in 0.2.0 to establish " +</span>
+        'a consistent spatial naming convention (leading/trailing) across all card-family ' +
+        "components. Update all slot='header-action' usages in templates.",
+<span class="cstat-no" title="statement not covered" >      before: '&lt;hx-card&gt;\n  &lt;button slot="header-action"&gt;Edit&lt;/button&gt;\n&lt;/hx-card&gt;',</span>
+<span class="cstat-no" title="statement not covered" >      after: '&lt;hx-card&gt;\n  &lt;button slot="header-trailing"&gt;Edit&lt;/button&gt;\n&lt;/hx-card&gt;',</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: 'slot=["\']header-action["\']',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: 'slot="header-trailing"',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['html', 'twig', 'tsx', 'jsx', 'vue', 'svelte', 'ts', 'js'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-import-path-updated',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-import',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'The deep import path for components changed in 0.2.0 when the library was restructured ' +</span>
+        "to support tree-shaking. The old path '@helixui/library/src/components' is no longer " +
+        "valid. Use the published path '@helixui/library/components' instead.",
+<span class="cstat-no" title="statement not covered" >      before: "import '@helixui/library/src/components/hx-button/index.js';",</span>
+<span class="cstat-no" title="statement not covered" >      after: "import '@helixui/library/components/hx-button/index.js';",</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '@helixui/library/src/components',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: '@helixui/library/components',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.2.0-token-spacing-base-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.2.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-token',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        'The --hx-spacing-base token was renamed to --hx-spacing-md during the 0.2.0 token ' +</span>
+        'audit to align with the t-shirt sizing scale (xs/sm/md/lg/xl). Update all CSS that ' +
+        'references --hx-spacing-base.',
+<span class="cstat-no" title="statement not covered" >      before: 'padding: var(--hx-spacing-base);',</span>
+<span class="cstat-no" title="statement not covered" >      after: 'padding: var(--hx-spacing-md);',</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '--hx-spacing-base',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: '--hx-spacing-md',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['css', 'scss', 'sass', 'less', 'html', 'twig', 'ts', 'js'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+&nbsp;
+    // ── v0.3.0 breaking changes (placeholder for future releases) ─────────────
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    {</span>
+<span class="cstat-no" title="statement not covered" >      id: 'v0.3.0-button-size-attr-renamed',</span>
+<span class="cstat-no" title="statement not covered" >      version: '0.3.0',</span>
+<span class="cstat-no" title="statement not covered" >      type: 'renamed-property',</span>
+<span class="cstat-no" title="statement not covered" >      component: 'hx-button',</span>
+<span class="cstat-no" title="statement not covered" >      description:</span>
+<span class="cstat-no" title="statement not covered" >        "hx-button's 'hx-size' attribute was shortened to 'size' in 0.3.0 since the 'hx-' " +</span>
+        'prefix on attribute names was removed from all components that had adopted it as a ' +
+        'workaround for attribute name collisions. The property name was always just `size`.',
+<span class="cstat-no" title="statement not covered" >      before: '&lt;hx-button hx-size="lg"&gt;Submit&lt;/hx-button&gt;',</span>
+<span class="cstat-no" title="statement not covered" >      after: '&lt;hx-button size="lg"&gt;Submit&lt;/hx-button&gt;',</span>
+<span class="cstat-no" title="statement not covered" >      searchPattern: '\\bhx-size=',</span>
+<span class="cstat-no" title="statement not covered" >      replacePattern: 'size=',</span>
+<span class="cstat-no" title="statement not covered" >      fileExtensions: ['html', 'twig', 'tsx', 'jsx', 'vue', 'svelte'],</span>
+<span class="cstat-no" title="statement not covered" >    },</span>
+<span class="cstat-no" title="statement not covered" >  ],</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;</pre></td></tr></table></pre>
+
+      <div class="push"></div>
+      <!-- for sticky footer -->
+    </div>
+    <!-- /wrapper -->
+    <div class="footer quiet pad2 space-top1 center small">
+      Code coverage generated by
+      <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+      at 2026-03-26T20:46:54.292Z
+    </div>
+    <script src="../../../../prettify.js"></script>
+    <script>
+      window.onload = function () {
+        prettyPrint();
+      };
+    </script>
+    <script src="../../../../sorter.js"></script>
+    <script src="../../../../block-navigation.js"></script>
+  </body>
+</html>

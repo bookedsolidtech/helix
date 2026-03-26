@@ -42,7 +42,7 @@ export { HelixCarouselItem } from './components/hx-carousel/index.js';
 export { HelixCheckbox } from './components/hx-checkbox/index.js';
 export { HelixCheckboxGroup } from './components/hx-checkbox-group/index.js';
 export { HelixClinicalStatus } from './components/hx-clinical-status/index.js';
-export type { ClinicalSeverity } from './components/hx-clinical-status/index.js';
+export type { ClinicalSeverity, HxClinicalStatus } from './components/hx-clinical-status/index.js';
 export { HelixCodeSnippet } from './components/hx-code-snippet/index.js';
 export { HelixColorPicker } from './components/hx-color-picker/index.js';
 export { HelixCombobox, type ComboboxOption, type HxComboboxSize } from './components/hx-combobox/index.js';
