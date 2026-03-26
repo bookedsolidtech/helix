@@ -311,7 +311,9 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
-      - run: pnpm run cem
+      - name: Generate and validate CEM
+        run: pnpm run cem
+        working-directory: packages/hx-library
       - name: Validate package exports (pnpm publish --dry-run)
         run: pnpm publish --dry-run --no-git-checks
         working-directory: packages/hx-library
@@ -328,10 +330,9 @@ jobs:
   # ── Automated A11y Audit (axe-core WCAG 2.1 AA) ─────────────────────────
   # Builds Storybook, serves it locally, then runs axe-core against every
   # component's Default story. Fails CI on any critical or serious violation.
-  # Healthcare mandate: zero tolerance — WCAG 2.1 AA, wcag2a + wcag2aa +
-  # best-practice tags. Report uploaded as artifact for triage.
+  # Healthcare mandate: critical/serious violations block merge — WCAG 2.1 AA,
+  # wcag2a + wcag2aa + best-practice tags. Report uploaded as artifact for triage.
 
-  # NOTE: Currently informational — not blocking Quality Gates until baseline violations are fixed.
   a11y-audit:
     name: A11y Audit
     needs: [changes, secret-scan, build]

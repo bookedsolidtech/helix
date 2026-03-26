@@ -56,6 +56,7 @@ const FOCUSABLE_SELECTORS = [
  * @csspart header - The header region containing the title and actions.
  * @csspart title - The drawer title element.
  * @csspart close-button - The built-in close button.
+ * @csspart close-btn - The visually-hidden close button rendered when noHeader is true.
  * @csspart body - The scrollable body region.
  * @csspart footer - The footer region.
  *

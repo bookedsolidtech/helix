@@ -217,7 +217,7 @@ export class HelixBadge extends LitElement {
         ${variantLabel
           ? html`<span class="badge__variant-label">${variantLabel}: </span>`
           : nothing}
-        <slot name="prefix"></slot>
+        ${isDot ? nothing : html`<slot name="prefix"></slot>`}
         ${hasCount ? this._countDisplay : html`<slot @slotchange=${this._handleSlotChange}></slot>`}
         ${this.removable
           ? html`<button

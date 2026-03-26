@@ -49,6 +49,11 @@ let _comboboxIdCounter = 0;
  * @csspart trigger - The input wrapper element acting as the combobox trigger.
  * @csspart clear-button - The button that clears the current value.
  * @csspart loading-indicator - The loading spinner shown during async operations.
+ * @csspart field - The outer field wrapper element.
+ * @csspart label - The label element.
+ * @csspart option - An individual option item in the listbox.
+ * @csspart error - The error message element.
+ * @csspart help-text - The help text element.
  *
  * @cssprop [--hx-combobox-bg=var(--hx-color-neutral-0)] - Input background color.
  * @cssprop [--hx-combobox-color=var(--hx-color-neutral-800)] - Input text color.
