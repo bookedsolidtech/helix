@@ -1,0 +1,59 @@
+{#
+/**
+ * @file
+ * HELiX UI Starter Theme — default block template.
+ *
+ * Renders a Drupal block with optional hx-card chrome. Blocks without a label
+ * render their content directly. Blocks with a label wrap content in a
+ * labeled section for semantic structure.
+ *
+ * Available variables:
+ *
+ * Block-specific:
+ * - plugin_id: The ID of the block plugin.
+ * - label: The configured label, if any.
+ * - configuration: Full block configuration array.
+ * - block_html_id: The unique HTML ID for the block wrapper element.
+ * - in_preview: Whether the block is rendering inside Layout Builder preview.
+ *
+ * Object properties:
+ * - content: The block body content (render array).
+ * - attributes: HTML attributes for the block wrapper element.
+ * - title_attributes: HTML attributes for the block title element.
+ * - content_attributes: HTML attributes for the block content wrapper.
+ *
+ * @see https://www.drupal.org/docs/develop/theming-drupal/twig-in-drupal/twig-template-naming-conventions
+ */
+#}
+{% set classes = [
+  'block',
+  'block-' ~ configuration.provider|clean_class,
+  'block-' ~ plugin_id|clean_class,
+] %}
+
+<div{{ attributes.addClass(classes) }}>
+
+  {# =========================================================================
+     Block title — only rendered when label is set and label_display is not
+     hidden. Rendered as hx-text for consistent typography scaling.
+     ========================================================================= #}
+  {% if label %}
+    {{ attach_library('helixui/hx-text') }}
+    <hx-text variant="heading-sm" tag="h2"{{ title_attributes }}>
+      {{ label }}
+    </hx-text>
+  {% endif %}
+
+  {# =========================================================================
+     Block content.
+
+     Navigation blocks (primary_menu, secondary_menu) pass their output
+     directly — the site-header SDC slot renders them inside hx-top-nav.
+
+     All other blocks render inside the content_attributes wrapper.
+     ========================================================================= #}
+  <div{{ content_attributes }}>
+    {{ content }}
+  </div>
+
+</div>

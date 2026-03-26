@@ -1,0 +1,147 @@
+/**
+ * @file
+ * HELiX UI Starter Theme — adopted-stylesheets light-DOM complement.
+ *
+ * WHAT ARE ADOPTED STYLESHEETS?
+ * ============================================================
+ * The Constructable Stylesheets API (document.adoptedStyleSheets) allows
+ * JavaScript to create CSSStyleSheet objects and attach them directly to a
+ * Document or ShadowRoot without going through the <link>/<style> pipeline.
+ *
+ * @helixui/adopted-stylesheets (@helixui/library package) exposes:
+ *
+ *   import { adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
+ *   const sheet = new CSSStyleSheet();
+ *   sheet.replaceSync('... css ...');
+ *   adoptStyles(document, sheet);
+ *
+ * WHY IS THIS RELEVANT TO DRUPAL?
+ * ============================================================
+ * HELiX components live inside Shadow DOM. Normal Drupal CSS never reaches
+ * inside a shadow root — it stops at the shadow boundary. However, there are
+ * styles that need to co-ordinate between the light DOM and the shadow DOM:
+ *
+ *   1. Focus rings — the :focus-visible outline on hx-* elements shows in the
+ *      light DOM (on the custom element tag itself). This CSS controls that ring.
+ *
+ *   2. Form field reset — Drupal's base.css adds margins and resets to input
+ *      elements. These don't reach into shadow DOM, so hx-text-input shadow
+ *      parts are unaffected. But wrapper divs that Drupal Form API wraps around
+ *      hx-* elements DO need reset.
+ *
+ *   3. Adjacent element spacing — when hx-button follows hx-text-input in the
+ *      light DOM, a gap between the two needs to be set on the light DOM
+ *      wrapper, not inside either component.
+ *
+ * The JS behavior in js/theme.behaviors.js (helixuiAdoptedStylesheets) uses
+ * the adoptStyles() API to inject additional sheets into each hx-* shadow root
+ * at runtime for scenarios that require it.
+ *
+ * This CSS file handles the LIGHT DOM side of that bridge.
+ */
+
+/* ==========================================================================
+   1. Light-DOM wrappers around HELiX form components.
+   Drupal Form API wraps fields in .form-item / .js-form-item divs.
+   These resets ensure those wrapper margins don't interfere with hx-*
+   component spacing.
+   ========================================================================== */
+
+.form-item:has(hx-text-input),
+.form-item:has(hx-textarea),
+.form-item:has(hx-select),
+.form-item:has(hx-checkbox),
+.form-item:has(hx-radio-group),
+.form-item:has(hx-switch) {
+  /* Remove Drupal Form API's default margin — let the component handle spacing. */
+  margin-block: 0;
+}
+
+.form-item:has(hx-text-input) > label,
+.form-item:has(hx-textarea) > label,
+.form-item:has(hx-select) > label {
+  /* HELiX form components manage their own internal label via the label prop.
+     If Drupal also renders a <label> in the wrapper, hide it to avoid duplication. */
+  display: none;
+}
+
+/* ==========================================================================
+   2. Focus ring styles — light DOM :focus-visible on hx-* elements.
+   Shadow DOM focus styles are inside each component. This ensures the outer
+   custom element tag shows a consistent ring matching --hx-focus-ring-*.
+   ========================================================================== */
+
+hx-button:focus-visible,
+hx-icon-button:focus-visible,
+hx-link:focus-visible {
+  outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #1a56db);
+  outline-offset: var(--hx-focus-ring-offset, 2px);
+  border-radius: var(--hx-radius-md, 0.375rem);
+}
+
+/* ==========================================================================
+   3. Adjacent component spacing — gap between stacked hx-* elements in
+   the light DOM. The components themselves do not add external margin
+   (that would break composability). The light DOM context sets it.
+   ========================================================================== */
+
+hx-text + hx-button,
+hx-text-input + hx-button,
+hx-textarea + hx-button,
+hx-select + hx-button {
+  margin-block-start: var(--hx-spacing-md, 1rem);
+}
+
+hx-text-input + hx-text-input,
+hx-text-input + hx-textarea,
+hx-text-input + hx-select,
+hx-textarea + hx-text-input {
+  margin-block-start: var(--hx-spacing-md, 1rem);
+}
+
+/* ==========================================================================
+   4. Drupal status messages — reset default margin/padding so hx-alert
+   renders without extra whitespace when replacing .messages elements.
+   ========================================================================== */
+
+hx-alert {
+  display: block;
+  margin-block: var(--hx-spacing-sm, 0.5rem);
+}
+
+hx-banner {
+  display: block;
+}
+
+/* ==========================================================================
+   5. Inline flex pattern for icon + label combinations in the light DOM.
+   hx-icon alongside hx-text (e.g. in breadcrumb separators or stat displays).
+   ========================================================================== */
+
+.hx-inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hx-spacing-xs, 0.25rem);
+}
+
+/* ==========================================================================
+   6. Button group layout — when multiple hx-button elements are siblings
+   in a div.form-actions or similar Drupal wrapper.
+   ========================================================================== */
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hx-spacing-sm, 0.5rem);
+  margin-block-start: var(--hx-spacing-md, 1rem);
+}
+
+/* ==========================================================================
+   7. Pagination integration — hx-pagination in Views exposed forms.
+   ========================================================================== */
+
+hx-pagination {
+  display: flex;
+  justify-content: center;
+  margin-block-start: var(--hx-spacing-xl, 2rem);
+}

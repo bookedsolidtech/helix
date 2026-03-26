@@ -1,0 +1,103 @@
+{#
+/**
+ * @file
+ * Site Header SDC — composes hx-top-nav, hx-nav, hx-text.
+ *
+ * Renders the global site header. The primary navigation is projected into
+ * hx-top-nav via the nav slot. The mobile drawer toggle is managed by the
+ * helixuiMobileDrawer Drupal behavior in js/theme.behaviors.js.
+ *
+ * Asset loading note:
+ * The global library (helixui/global) is already attached by page.html.twig.
+ * Individual component libraries are attached here for explicit SDC-level
+ * dependency declaration.
+ */
+#}
+{{ attach_library('helixui/hx-top-nav') }}
+{{ attach_library('helixui/hx-nav') }}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-button') }}
+{{ attach_library('helixui/hx-drawer') }}
+{{ attach_library('helixui/hx-icon-button') }}
+
+<header class="site-header" role="banner">
+  <hx-top-nav class="site-header__top-nav">
+
+    {# Logo slot — image or site name text link. #}
+    <a slot="logo" href="{{ front_page|default('/') }}" rel="home" class="site-header__logo-link" aria-label="{{ site_name|default('Home') }}">
+      {% if logo_url %}
+        <img
+          src="{{ logo_url }}"
+          alt="{{ site_name|default('') }}"
+          class="site-header__logo-img"
+          loading="eager"
+          width="160"
+          height="40"
+        />
+      {% else %}
+        <hx-text variant="heading-sm" class="site-header__site-name">
+          {{ site_name }}
+        </hx-text>
+      {% endif %}
+    </a>
+
+    {# Navigation slot — primary menu. Rendered from Drupal menu blocks
+       whose output typically contains <ul>/<li>/<a> elements. The hx-top-nav
+       component slots this content into its nav area. #}
+    {% if navigation %}
+      <nav slot="nav" aria-label="{{ 'Main navigation'|t }}">
+        {{ navigation }}
+      </nav>
+    {% endif %}
+
+    {# Utility slot — search block or secondary menu. #}
+    {% if search %}
+      <div slot="actions" class="site-header__utility">
+        {{ search }}
+      </div>
+    {% endif %}
+
+    {# Mobile drawer toggle — the helixuiMobileDrawer behavior attaches the
+       click handler via Drupal.behaviors so it respects AJAX reloads. #}
+    <hx-icon-button
+      slot="actions"
+      label="{{ 'Open navigation'|t }}"
+      class="site-header__mobile-toggle mobile-drawer__trigger"
+      aria-controls="mobile-nav-drawer"
+      aria-expanded="false"
+    >
+      <span aria-hidden="true">&#9776;</span>
+    </hx-icon-button>
+
+  </hx-top-nav>
+
+  {# Mobile drawer — hidden by default; toggled by helixuiMobileDrawer behavior. #}
+  <div class="mobile-drawer" data-mobile-nav>
+    <hx-drawer
+      id="mobile-nav-drawer"
+      placement="start"
+      label="{{ 'Site navigation'|t }}"
+    >
+      {% if logo_url %}
+        <a href="{{ front_page|default('/') }}" rel="home" class="mobile-drawer__logo">
+          <img src="{{ logo_url }}" alt="{{ site_name|default('') }}" loading="lazy" width="120" height="30" />
+        </a>
+      {% endif %}
+
+      {% if navigation %}
+        <nav aria-label="{{ 'Mobile navigation'|t }}">
+          {{ navigation }}
+        </nav>
+      {% endif %}
+
+      <hx-icon-button
+        class="mobile-drawer__close"
+        label="{{ 'Close navigation'|t }}"
+        aria-controls="mobile-nav-drawer"
+      >
+        <span aria-hidden="true">&times;</span>
+      </hx-icon-button>
+    </hx-drawer>
+  </div>
+
+</header>
