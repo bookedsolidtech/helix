@@ -1,8 +1,45 @@
 import { css } from 'lit';
 
 export const helixSelectStyles = css`
+  /* ─── 3-tier token cascade: component → semantic → hardcoded fallback ─── */
   :host {
     display: block;
+
+    /* Background & foreground */
+    --_bg: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
+    --_color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
+    --_placeholder-color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
+
+    /* Label */
+    --_label-color: var(--hx-select-label-color, var(--hx-color-neutral-700, #343a40));
+
+    /* Border */
+    --_border-color: var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
+    --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
+
+    /* Focus ring */
+    --_focus-ring-color: var(
+      --hx-select-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+    );
+
+    /* Error */
+    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+
+    /* Chevron */
+    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #6c757d));
+    --_chevron-size: var(--hx-select-chevron-size, 0.5rem);
+
+    /* Listbox */
+    --_listbox-bg: var(--hx-select-listbox-bg, var(--hx-color-neutral-0, #ffffff));
+    --_option-hover-bg: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    --_option-selected-bg: var(
+      --hx-select-option-selected-bg,
+      var(--hx-color-primary-100, #dbeafe)
+    );
+
+    /* Typography */
+    --_font-family: var(--hx-select-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   :host([disabled]) {
@@ -18,7 +55,7 @@ export const helixSelectStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-select-font-family, var(--hx-font-family-sans, sans-serif));
+    font-family: var(--_font-family);
     position: relative;
   }
 
@@ -28,7 +65,7 @@ export const helixSelectStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-select-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--_label-color);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -49,11 +86,10 @@ export const helixSelectStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     width: 100%;
     min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
-    border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
+    border: var(--hx-border-width-thin, 1px) solid var(--_border-color);
+    border-radius: var(--_border-radius);
+    background-color: var(--_bg);
+    color: var(--_color);
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -68,18 +104,11 @@ export const helixSelectStyles = css`
 
   .field__trigger:focus,
   .field__trigger:focus-visible {
-    border-color: var(
-      --hx-select-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
-    );
+    border-color: var(--_focus-ring-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(
-            --hx-select-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
-          )
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_focus-ring-color) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -109,15 +138,15 @@ export const helixSelectStyles = css`
   }
 
   .field__trigger--placeholder .field__trigger-value {
-    color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
+    color: var(--_placeholder-color);
   }
 
   .field__chevron {
     flex-shrink: 0;
-    width: 12px;
-    height: 8px;
+    width: calc(var(--_chevron-size) * 1.5);
+    height: var(--_chevron-size);
     position: relative;
-    color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--_chevron-color);
     pointer-events: none;
     transition: transform var(--hx-transition-fast, 150ms ease);
   }
@@ -126,11 +155,11 @@ export const helixSelectStyles = css`
     content: '';
     position: absolute;
     top: 0;
-    left: 2px;
-    width: 7px;
-    height: 7px;
-    border-inline-end: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
+    left: var(--hx-space-px, 2px);
+    width: var(--_chevron-size);
+    height: var(--_chevron-size);
+    border-inline-end: var(--hx-border-width-thin, 1.5px) solid currentColor;
+    border-bottom: var(--hx-border-width-thin, 1.5px) solid currentColor;
     transform: rotate(45deg);
   }
 
@@ -139,17 +168,16 @@ export const helixSelectStyles = css`
   }
 
   .field--error .field__trigger {
-    border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+    border-color: var(--_error-color);
   }
 
   .field--error .field__trigger:focus,
   .field--error .field__trigger:focus-visible {
-    border-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+    border-color: var(--_error-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-select-error-color, var(--hx-color-error-500, #dc3545))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_error-color) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -160,10 +188,9 @@ export const helixSelectStyles = css`
     left: 0;
     right: 0;
     z-index: var(--hx-z-index-dropdown, 1000);
-    background-color: var(--hx-select-listbox-bg, var(--hx-color-neutral-0, #ffffff));
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
-    border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
+    background-color: var(--_listbox-bg);
+    border: var(--hx-border-width-thin, 1px) solid var(--_border-color);
+    border-radius: var(--_border-radius);
     box-shadow: var(
       --hx-select-listbox-shadow,
       0 4px 16px var(--hx-overlay-neutral-12, rgba(13, 17, 23, 0.12))
@@ -190,7 +217,7 @@ export const helixSelectStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
+    color: var(--_color);
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
@@ -198,23 +225,23 @@ export const helixSelectStyles = css`
   }
 
   .field__option:hover {
-    background-color: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    background-color: var(--_option-hover-bg);
   }
 
   .field__option--selected {
-    background-color: var(--hx-select-option-selected-bg, var(--hx-color-primary-100, #dbeafe));
+    background-color: var(--_option-selected-bg);
     font-weight: var(--hx-font-weight-medium, 500);
   }
 
   .field__option--focused {
-    background-color: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    background-color: var(--_option-hover-bg);
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(--_focus-ring-color, var(--hx-color-primary-500));
     outline-offset: var(--hx-select-option-focus-ring-offset, -2px);
   }
 
   .field__option--focused.field__option--selected {
-    background-color: var(--hx-select-option-selected-bg, var(--hx-color-primary-100, #dbeafe));
+    background-color: var(--_option-selected-bg);
   }
 
   .field__option--disabled {
@@ -233,7 +260,7 @@ export const helixSelectStyles = css`
   .field__no-options {
     padding: var(--hx-space-3, 0.75rem);
     text-align: center;
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--_placeholder-color);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
