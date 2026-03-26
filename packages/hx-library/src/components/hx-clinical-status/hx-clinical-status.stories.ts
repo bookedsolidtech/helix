@@ -265,11 +265,20 @@ export const DarkMode: Story = {
 export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
-    <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        When dismissible, Tab focuses the dismiss/acknowledge button. Enter or Space activates it.
+    <div style="padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
+        Tab focuses the dismiss button (dismissible) or acknowledge button (critical/emergent). Enter
+        or Space activates it.
       </p>
-      <hx-clinical-status></hx-clinical-status>
+      <hx-clinical-status
+        severity="warning"
+        message="Blood pressure slightly elevated — monitor closely."
+        dismissible
+      ></hx-clinical-status>
+      <hx-clinical-status
+        severity="critical"
+        message="Abnormal lab values detected. Acknowledgment required before proceeding."
+      ></hx-clinical-status>
     </div>
   `,
 };

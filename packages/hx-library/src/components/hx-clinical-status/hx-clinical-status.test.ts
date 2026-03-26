@@ -209,7 +209,30 @@ describe('hx-clinical-status', () => {
     });
   });
 
-  // ─── Acknowledge Behavior (2) ───
+  // ─── Property: icon (2) ───
+
+  describe('Property: icon', () => {
+    it('renders default SVG icon when icon prop is empty', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status message="Test"></hx-clinical-status>',
+      );
+      const iconContainer = shadowQuery(el, '[part="icon"]');
+      const svg = iconContainer?.querySelector('svg');
+      expect(svg).toBeTruthy();
+    });
+
+    it('renders custom icon span when icon prop is set', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status icon="custom-icon" message="Test"></hx-clinical-status>',
+      );
+      const iconContainer = shadowQuery(el, '[part="icon"]');
+      const span = iconContainer?.querySelector('.clinical-status__custom-icon');
+      expect(span).toBeTruthy();
+      expect(span?.textContent).toBe('custom-icon');
+    });
+  });
+
+  // ─── Acknowledge Behavior (4) ───
 
   describe('Acknowledge behavior', () => {
     it('shows acknowledge button for critical severity', async () => {
@@ -234,6 +257,40 @@ describe('hx-clinical-status', () => {
       );
       const btn = shadowQuery(el, '.clinical-status__acknowledge-button');
       expect(btn).toBeNull();
+    });
+
+    it('does not show acknowledge button for warning severity', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status severity="warning" message="Test"></hx-clinical-status>',
+      );
+      const btn = shadowQuery(el, '.clinical-status__acknowledge-button');
+      expect(btn).toBeNull();
+    });
+
+    it('hides acknowledge button after it is clicked', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status severity="critical" message="Test"></hx-clinical-status>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '.clinical-status__acknowledge-button');
+      expect(btn).toBeTruthy();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-acknowledge');
+      btn?.click();
+      await eventPromise;
+      await el.updateComplete;
+      const btnAfter = shadowQuery(el, '.clinical-status__acknowledge-button');
+      expect(btnAfter).toBeNull();
+    });
+
+    it('hx-acknowledge event detail includes severity and persistent', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status severity="emergent" message="Test"></hx-clinical-status>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '.clinical-status__acknowledge-button');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-acknowledge');
+      btn?.click();
+      const event = await eventPromise;
+      expect(event.detail.severity).toBe('emergent');
+      expect(typeof event.detail.persistent).toBe('boolean');
     });
   });
 
@@ -347,6 +404,26 @@ describe('hx-clinical-status', () => {
       );
       const btn = shadowQuery<HTMLButtonElement>(el, '.clinical-status__dismiss-button');
       expect(btn?.getAttribute('aria-label')).toBe('Dismiss clinical status');
+    });
+
+    it('container has aria-labelledby pointing to message element', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status message="Test"></hx-clinical-status>',
+      );
+      const container = shadowQuery(el, '[part="container"]');
+      const messageEl = shadowQuery(el, '[part="message"]');
+      const labelledBy = container?.getAttribute('aria-labelledby');
+      expect(labelledBy).toBeTruthy();
+      expect(messageEl?.id).toBe(labelledBy);
+    });
+
+    it('severity label is visually hidden but present for screen readers', async () => {
+      const el = await fixture<HxClinicalStatus>(
+        '<hx-clinical-status severity="warning" message="Test"></hx-clinical-status>',
+      );
+      const label = shadowQuery(el, '.clinical-status__severity-label');
+      expect(label).toBeTruthy();
+      expect(label?.textContent).toContain('Warning');
     });
   });
 
