@@ -63,11 +63,6 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-checkbox": {
-      "reason": "SSR browser API guards added \u2014 coverage below threshold. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-checkbox-group": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",

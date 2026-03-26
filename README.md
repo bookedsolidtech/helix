@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/social-card.webp" alt="HELiX — Enterprise Web Component Library" width="600">
+<img src="docs/assets/social-card.png" alt="HELiX — Enterprise Web Component Library" width="600">
 
 ### Enterprise Healthcare Web Component Library
 
