@@ -25,6 +25,9 @@
     "README.md",
     "USAGE.md"
   ],
+  "scripts": {
+    "test": "vitest run"
+  },
   "peerDependencies": {
     "@helixui/library": "^1.0.0"
   },
