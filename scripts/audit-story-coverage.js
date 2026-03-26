@@ -52,8 +52,7 @@ async function analyzeStoryFile(filePath) {
   const playFunctions = (content.match(/^\s+play:/gm) ?? []).length;
 
   // Check for storybook/test import (interaction test indicator)
-  const hasInteractionImport =
-    content.includes("from 'storybook/test'") || content.includes('from "@storybook/test"');
+  const hasInteractionImport = /from\s+['"](?:storybook\/test|@storybook\/test)['"]/.test(content);
 
   return { storyExports, playFunctions, hasInteractionImport };
 }
@@ -210,6 +209,14 @@ async function main() {
   console.log(`Total play functions:        ${totalPlay}`);
   console.log(`\nReport written to: ${OUTPUT_PATH}`);
 
+  const incomplete = results.filter(
+    (r) => r.status !== 'COMPLETE' && r.status !== 'MISSING',
+  ).length;
+  if (incomplete > 0) {
+    console.log(
+      `\n⚠️  ${incomplete} component(s) have incomplete interaction tests (NO_PLAY or PARTIAL)`,
+    );
+  }
   if (missing > 0) {
     console.log(`\n⚠️  ${missing} component(s) missing story files`);
     process.exit(1);
