@@ -30,6 +30,7 @@
     "dev:admin": "turbo dev --filter=@helixui/admin",
     "build:admin": "turbo build --filter=@helixui/admin",
     "test": "turbo test",
+    "test:mcp": "pnpm --filter=@helixui/mcp run test",
     "test:library": "turbo test --filter=@helixui/library",
     "test:cross-browser": "pnpm --filter=@helixui/library run test:cross-browser",
     "test:vrt": "playwright test",
