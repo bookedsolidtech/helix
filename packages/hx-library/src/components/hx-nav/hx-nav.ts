@@ -137,6 +137,7 @@ export class HelixNav extends LitElement {
     ) {
       return href;
     }
+    if (typeof window === 'undefined') return href;
     try {
       const url = new URL(href, window.location.href);
       if (url.protocol === 'http:' || url.protocol === 'https:') {
@@ -297,7 +298,9 @@ export class HelixNav extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener('click', this._boundOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this._boundOutsideClick);
+    }
   }
 
   override disconnectedCallback(): void {
