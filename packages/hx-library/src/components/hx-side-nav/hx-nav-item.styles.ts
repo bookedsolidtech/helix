@@ -3,7 +3,11 @@ import { css } from 'lit';
 export const helixNavItemStyles = css`
   :host {
     display: block;
-    background-color: var(--hx-nav-item-host-bg, var(--hx-color-neutral-900, #111827));
+    /* The host background must be a concrete color so that axe-core can
+       resolve text contrast ratios for shadow-DOM content correctly.
+       WCAG 2.1 AA: neutral-300 (#cbd5e1) on neutral-900 (#0f172a) = 12.02:1. */
+    background-color: var(--hx-nav-item-host-bg, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-nav-item-color, var(--hx-color-neutral-300, #cbd5e1));
   }
 
   * {
@@ -26,7 +30,7 @@ export const helixNavItemStyles = css`
     padding: var(--hx-nav-item-padding, var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem));
     min-height: var(--hx-space-10, 2.5rem);
     text-decoration: none;
-    color: var(--hx-nav-item-color, var(--hx-color-neutral-300, #d1d5db));
+    color: var(--hx-nav-item-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     margin: 0 var(--hx-space-2, 0.5rem);
     transition:
@@ -56,7 +60,7 @@ export const helixNavItemStyles = css`
       --hx-nav-item-hover-bg,
       var(--hx-overlay-white-8, rgba(255, 255, 255, 0.08))
     ); /* fallback for browsers without color-mix() */
-    color: var(--hx-nav-item-hover-color, var(--hx-color-neutral-100, #f3f4f6));
+    color: var(--hx-nav-item-hover-color, var(--hx-color-neutral-100, #f1f5f9));
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
@@ -77,12 +81,14 @@ export const helixNavItemStyles = css`
   /* ─── Active State ─── */
 
   :host([active]) .nav-item__link {
-    background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #2563eb));
-    color: var(--hx-nav-item-active-color, var(--hx-color-neutral-50, #f9fafb));
+    /* neutral-50 (#f8fafc) on primary-600 (#1d4ed8) = 6.41:1 — WCAG AA ✓ */
+    background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #1d4ed8));
+    color: var(--hx-nav-item-active-color, var(--hx-color-neutral-50, #f8fafc));
   }
 
   :host([active]) .nav-item__link:hover {
-    background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #1d4ed8));
+    /* neutral-50 (#f8fafc) on primary-700 (#1e40af) = 8.05:1 — WCAG AA ✓ */
+    background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #1e40af));
   }
 
   /* ─── Disabled State ─── */
@@ -172,8 +178,9 @@ export const helixNavItemStyles = css`
     left: calc(100% + var(--hx-space-2, 0.5rem));
     top: 50%;
     transform: translateY(-50%);
-    background-color: var(--hx-color-neutral-800, #1f2937);
-    color: var(--hx-color-neutral-100, #f3f4f6);
+    /* neutral-100 (#f1f5f9) on neutral-800 (#1e293b) = 13.35:1 — WCAG AA ✓ */
+    background-color: var(--hx-color-neutral-800, #1e293b);
+    color: var(--hx-color-neutral-100, #f1f5f9);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-size: var(--hx-font-size-xs, 0.75rem);
