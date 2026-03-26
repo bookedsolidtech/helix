@@ -1,15 +1,15 @@
 export { HxAccordionItem, type HxAccordionItemProps } from './components/HxAccordionItem/index.js';
 export { HxAccordion, type HxAccordionProps } from './components/HxAccordion/index.js';
-export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/index.js';
-export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
+export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
+export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
+export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
 export {
   HxBreadcrumbItem,
   type HxBreadcrumbItemProps,
 } from './components/HxBreadcrumbItem/index.js';
 export { HxBreadcrumb, type HxBreadcrumbProps } from './components/HxBreadcrumb/index.js';
-export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
 export { HxButton, type HxButtonProps } from './components/HxButton/index.js';
 export { HxCard, type HxCardProps } from './components/HxCard/index.js';
 export { HxButtonGroup, type HxButtonGroupProps } from './components/HxButtonGroup/index.js';
