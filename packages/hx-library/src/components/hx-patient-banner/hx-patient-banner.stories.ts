@@ -202,16 +202,16 @@ export const WithPhoto: Story = {
           width: 2.5rem;
           height: 2.5rem;
           border-radius: 50%;
-          background: #d1d5db;
+          background: var(--hx-color-neutral-300, #d1d5db);
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #374151;
+          color: var(--hx-color-neutral-700, #374151);
           font-family: sans-serif;
         "
-        aria-label="Patient photo placeholder"
+        aria-label="Patient photo placeholder — Margaret Kim"
         role="img"
       >
         MK
@@ -251,16 +251,16 @@ export const AllFields: Story = {
           width: 2.5rem;
           height: 2.5rem;
           border-radius: 50%;
-          background: #bfdbfe;
+          background: var(--hx-color-primary-100, #bfdbfe);
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #1e40af;
+          color: var(--hx-color-primary-800, #1e40af);
           font-family: sans-serif;
         "
-        aria-label="Patient photo placeholder"
+        aria-label="Patient photo placeholder — David Lee"
         role="img"
       >
         DL
@@ -278,7 +278,7 @@ export const AllFields: Story = {
         data="07/04/1965"
         field-id="all-fields-dob"
       ></hx-phi-field>
-      <span slot="allergies" style="color: #dc2626; font-weight: 600;">PCN, Sulfa</span>
+      <span slot="allergies" style="color: var(--hx-color-error-600, #dc2626); font-weight: 600;" aria-label="Allergies: PCN, Sulfa — high alert">PCN, Sulfa</span>
       <span slot="code-status">Full code</span>
     </hx-patient-banner>
   `,
