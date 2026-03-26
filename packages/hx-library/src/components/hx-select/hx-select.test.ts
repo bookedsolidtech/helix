@@ -890,4 +890,395 @@ describe('hx-select', () => {
       expect((assigned[0] as HTMLElement).textContent).toBe('Select your country');
     });
   });
+
+  // ─── Dropdown: display value ───
+
+  describe('Dropdown: display value in trigger', () => {
+    it('shows placeholder text in trigger when no value selected', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select placeholder="Choose one"><option value="a">A</option></hx-select>',
+      );
+      await el.updateComplete;
+      const triggerValue = shadowQuery(el, '.field__trigger-value');
+      expect(triggerValue?.textContent?.trim()).toBe('Choose one');
+    });
+
+    it('shows selected option label in trigger after selection', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select>
+          <option value="a">Alpha</option>
+          <option value="b">Beta</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      el.open = true;
+      await el.updateComplete;
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      options[0]!.click();
+      await el.updateComplete;
+      const triggerValue = shadowQuery(el, '.field__trigger-value');
+      expect(triggerValue?.textContent?.trim()).toBe('Alpha');
+    });
+
+    it('trigger has placeholder class when no value selected', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select placeholder="Pick..."><option value="x">X</option></hx-select>',
+      );
+      await el.updateComplete;
+      const trigger = shadowQuery(el, '.field__trigger');
+      expect(trigger?.classList.contains('field__trigger--placeholder')).toBe(true);
+    });
+
+    it('trigger loses placeholder class after selection', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select placeholder="Pick...">
+          <option value="x">X</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      el.open = true;
+      await el.updateComplete;
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      options[0]!.click();
+      await el.updateComplete;
+      const trigger = shadowQuery(el, '.field__trigger');
+      expect(trigger?.classList.contains('field__trigger--placeholder')).toBe(false);
+    });
+  });
+
+  // ─── Dropdown: field--open class ───
+
+  describe('Dropdown: field--open class', () => {
+    it('field--open class added when open=true', async () => {
+      const el = await fixture<WcSelect>('<hx-select><option value="a">A</option></hx-select>');
+      await el.updateComplete;
+      el.open = true;
+      await el.updateComplete;
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--open')).toBe(true);
+    });
+
+    it('field--open class removed when closed', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select open><option value="a">A</option></hx-select>',
+      );
+      await el.updateComplete;
+      el.open = false;
+      await el.updateComplete;
+      const field = shadowQuery(el, '.field');
+      expect(field?.classList.contains('field--open')).toBe(false);
+    });
+  });
+
+  // ─── Disabled option in listbox ───
+
+  describe('Disabled option in listbox', () => {
+    it('clicking a disabled option does not change value', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select>
+          <option value="a">A</option>
+          <option value="b" disabled>B (disabled)</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      el.open = true;
+      await el.updateComplete;
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      options[1]!.click();
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('disabled option has aria-disabled="true"', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">A</option>
+          <option value="b" disabled>B</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      expect(options[1]!.getAttribute('aria-disabled')).toBe('true');
+    });
+  });
+
+  // ─── No options: empty state ───
+
+  describe('Empty options state', () => {
+    it('shows labelNoOptions when no options provided', async () => {
+      const el = await fixture<WcSelect>('<hx-select open></hx-select>');
+      await el.updateComplete;
+      const noOptions = shadowQuery(el, '.field__no-options');
+      expect(noOptions).toBeTruthy();
+      expect(noOptions?.textContent?.trim()).toBe('No options found');
+    });
+
+    it('custom labelNoOptions message is rendered', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select open label-no-options="Aucune option disponible"></hx-select>',
+      );
+      await el.updateComplete;
+      const noOptions = shadowQuery(el, '.field__no-options');
+      expect(noOptions?.textContent?.trim()).toBe('Aucune option disponible');
+    });
+  });
+
+  // ─── selected option highlighted in listbox ───
+
+  describe('Listbox: selected option highlighted', () => {
+    it('currently selected option has aria-selected="true"', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open value="b">
+          <option value="a">A</option>
+          <option value="b">B</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      expect(options[1]!.getAttribute('aria-selected')).toBe('true');
+    });
+
+    it('non-selected option does not have aria-selected', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open value="b">
+          <option value="a">A</option>
+          <option value="b">B</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
+      expect(options[0]!.hasAttribute('aria-selected')).toBe(false);
+    });
+  });
+
+  // ─── Trigger: aria-expanded and combobox role ───
+
+  describe('Trigger ARIA attributes', () => {
+    it('trigger has role="combobox"', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const trigger = shadowQuery(el, '[role="combobox"]');
+      expect(trigger).toBeTruthy();
+    });
+
+    it('trigger aria-expanded is "false" when closed', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('trigger aria-expanded is "true" when open', async () => {
+      const el = await fixture<WcSelect>('<hx-select open></hx-select>');
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('trigger has aria-haspopup="listbox"', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('aria-haspopup')).toBe('listbox');
+    });
+
+    it('trigger has aria-disabled="true" when disabled', async () => {
+      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('trigger tabindex is -1 when disabled', async () => {
+      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('trigger tabindex is 0 when enabled', async () => {
+      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('tabindex')).toBe('0');
+    });
+  });
+
+  // ─── Keyboard: Tab closes dropdown ───
+
+  describe('Keyboard: Tab closes dropdown', () => {
+    it('Tab key closes the dropdown', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">A</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── Keyboard: typeahead ───
+
+  describe('Keyboard: typeahead', () => {
+    it('typing a character jumps to the first matching option', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">Alpha</option>
+          <option value="b">Beta</option>
+          <option value="c">Charlie</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'b', bubbles: true }),
+      );
+      await el.updateComplete;
+      const activeDescendant = trigger.getAttribute('aria-activedescendant');
+      expect(activeDescendant).toBeTruthy();
+      // Option index 1 (Beta) should be focused
+      const referencedEl = el.shadowRoot!.getElementById(activeDescendant!);
+      expect(referencedEl?.textContent?.trim()).toBe('Beta');
+    });
+  });
+
+  // ─── Keyboard: Enter/Space when closed opens dropdown ───
+
+  describe('Keyboard: Enter/Space opens closed dropdown', () => {
+    it('Enter key opens closed dropdown', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select>
+          <option value="a">A</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+
+    it('Space key opens closed dropdown', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select>
+          <option value="a">A</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+    });
+  });
+
+  // ─── Keyboard: ArrowDown wraps around ───
+
+  describe('Keyboard: ArrowDown wraps to first option', () => {
+    it('ArrowDown from last option wraps to first', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">A</option>
+          <option value="b">B</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      // Move to last option (index 1) via End key
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      // ArrowDown from last wraps to first
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      const activeDescendant = trigger.getAttribute('aria-activedescendant');
+      expect(activeDescendant).toContain('-0');
+    });
+  });
+
+  // ─── Keyboard: ArrowUp wraps around ───
+
+  describe('Keyboard: ArrowUp wraps to last option', () => {
+    it('ArrowUp from first option wraps to last when open', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">A</option>
+          <option value="b">B</option>
+          <option value="c">C</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      // Move to first option
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      // ArrowUp from first wraps to last
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      await el.updateComplete;
+      const activeDescendant = trigger.getAttribute('aria-activedescendant');
+      expect(activeDescendant).toContain('-2');
+    });
+  });
+
+  // ─── disconnectedCallback cleanup ───
+
+  describe('Lifecycle: disconnectedCallback', () => {
+    it('sets open=false when disconnected while open', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">A</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+      el.remove();
+      // After removal, open state should be reset
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── i18n: labelRequired ───
+
+  describe('Property: labelRequired', () => {
+    it('defaults to "Please select an option."', async () => {
+      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      expect(el.labelRequired).toBe('Please select an option.');
+    });
+
+    it('uses custom labelRequired as validation message when required + empty', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select required label-required="Veuillez choisir une option."></hx-select>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Veuillez choisir une option.');
+    });
+  });
+
+  // ─── error slot activates error state ───
+
+  describe('Slot: error slot activates error state', () => {
+    it('slotted error sets aria-invalid on native select', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select label="Country"><span slot="error">Custom error</span></hx-select>',
+      );
+      await el.updateComplete;
+      const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
+      expect(select.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('slotted error sets aria-invalid on combobox trigger', async () => {
+      const el = await fixture<WcSelect>(
+        '<hx-select label="Country"><span slot="error">Custom error</span></hx-select>',
+      );
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
 });
