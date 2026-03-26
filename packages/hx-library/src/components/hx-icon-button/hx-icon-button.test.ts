@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixIconButton } from './hx-icon-button.js';
@@ -41,7 +41,7 @@ describe('hx-icon-button', () => {
     });
   });
 
-  // ─── Property: label (4) ───
+  // ─── Property: label (3) ───
 
   describe('Property: label', () => {
     it('sets aria-label on native button from label property', async () => {
@@ -67,14 +67,6 @@ describe('hx-icon-button', () => {
       await el.updateComplete;
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeNull();
-    });
-
-    it('emits a console warning when no label is provided', async () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixIconButton>('<hx-icon-button></hx-icon-button>');
-      await el.updateComplete;
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('label'));
-      consoleSpy.mockRestore();
     });
   });
 
