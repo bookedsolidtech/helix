@@ -331,7 +331,6 @@ jobs:
   # Healthcare mandate: zero tolerance — WCAG 2.1 AA, wcag2a + wcag2aa +
   # best-practice tags. Report uploaded as artifact for triage.
 
-  # NOTE: Currently informational — not blocking Quality Gates until baseline violations are fixed.
   a11y-audit:
     name: A11y Audit
     needs: [changes, secret-scan, build]
@@ -827,9 +826,10 @@ jobs:
             fi
           done
 
-          # A11y audit is informational until baseline violations are resolved
+          # A11y audit is a blocking gate — WCAG 2.1 AA, zero tolerance (healthcare mandate)
           if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
-            echo "::warning::A11y audit has violations — see report artifact for details"
+            echo "::error::Gate 'a11y-audit' did not succeed: ${{ needs.a11y-audit.result }}"
+            FAIL=1
           fi
 
           # Storybook tests are informational until the new test infrastructure is verified
