@@ -361,6 +361,12 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.15)(@vitest/browser@3.2.4)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/drupal-behaviors:
+    dependencies:
+      '@helixui/library':
+        specifier: ^1.0.0
+        version: 1.1.2(@floating-ui/dom@1.7.6)
+
   packages/drupal-starter:
     dependencies:
       '@helixui/library':
