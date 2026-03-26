@@ -196,8 +196,10 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
 
   // ─── Event Handling ───
 
-  /** @private */
-  /** @internal */
+  /**
+   * @private
+   * @internal
+   */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled || this.loading) {
       e.preventDefault();
@@ -230,8 +232,10 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
 
   // ─── Render Helpers ───
 
-  /** @private */
-  /** @internal */
+  /**
+   * @private
+   * @internal
+   */
   private _renderSpinner(): TemplateResult {
     return html`
       <svg
@@ -261,8 +265,10 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
     `;
   }
 
-  /** @private */
-  /** @internal */
+  /**
+   * @private
+   * @internal
+   */
   private _renderInner(): TemplateResult {
     return html`
       ${this.loading ? this._renderSpinner() : nothing}
