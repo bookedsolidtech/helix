@@ -95,6 +95,9 @@ export const helixPatientBannerStyles = css`
   :host([aria-invalid='true']) .banner {
     border-bottom-color: var(--hx-color-error-400, #f87171);
     background-color: var(--hx-color-error-50, #fef2f2);
+    /* Darken label color to maintain 4.5:1 contrast on error-50 background */
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-700, #374151));
+    position: relative;
   }
 
   :host([aria-invalid='true']) .banner::before {
@@ -107,17 +110,5 @@ export const helixPatientBannerStyles = css`
     width: var(--hx-border-width-thick, 4px);
     background-color: var(--hx-color-error-500, #ef4444);
     border-radius: 0;
-  }
-
-  :host([aria-invalid='true']) {
-    position: relative;
-  }
-
-  /* ─── Reduced Motion ─── */
-
-  @media (prefers-reduced-motion: reduce) {
-    .banner {
-      transition: none;
-    }
   }
 `;
