@@ -984,12 +984,13 @@ describe('hx-select', () => {
       `);
       await el.updateComplete;
       await el.updateComplete;
+      const valueBefore = el.value;
       el.open = true;
       await el.updateComplete;
       const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
       options[1]!.click();
       await el.updateComplete;
-      expect(el.value).toBe('');
+      expect(el.value).toBe(valueBefore);
     });
 
     it('disabled option has aria-disabled="true"', async () => {
