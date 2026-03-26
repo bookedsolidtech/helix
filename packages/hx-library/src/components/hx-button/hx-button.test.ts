@@ -654,6 +654,8 @@ describe('hx-button', () => {
       const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       el.variant = 'invalid-variant' as 'primary';
       await el.updateComplete;
+      // Clamping in updated() triggers a second render cycle
+      await el.updateComplete;
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--primary')).toBe(true);
     });

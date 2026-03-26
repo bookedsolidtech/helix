@@ -103,7 +103,7 @@ const meta = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 // ─────────────────────────────────────────────────
 // 1. DEFAULT — Two identifiers (satisfies NPSG.01.01.01)
@@ -111,8 +111,17 @@ type Story = StoryObj;
 
 /** Basic banner with name and MRN slots populated. Satisfies the Joint Commission two-identifier rule. */
 export const Default: Story = {
-  render: () => html`
-    <hx-patient-banner patient-id="PT-000001">
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <span slot="name">Jane Smith</span>
       <span slot="mrn">MRN-123456</span>
     </hx-patient-banner>
@@ -133,8 +142,17 @@ export const Default: Story = {
 
 /** Banner using hx-phi-field for masked HIPAA-compliant display of MRN and date of birth. Both identifiers are masked by default; click the eye icon to reveal. */
 export const WithPhiFields: Story = {
-  render: () => html`
-    <hx-patient-banner patient-id="PT-000002">
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <span slot="name">Robert Johnson</span>
       <hx-phi-field
         slot="mrn"
@@ -167,8 +185,17 @@ export const WithPhiFields: Story = {
 
 /** Banner with an avatar placeholder in the photo slot. In production, supply a patient photo or hx-avatar element. */
 export const WithPhoto: Story = {
-  render: () => html`
-    <hx-patient-banner patient-id="PT-000003">
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <div
         slot="photo"
         style="
@@ -207,8 +234,17 @@ export const WithPhoto: Story = {
 
 /** Kitchen sink: all six slots populated. Demonstrates full patient context with photo, identifiers, allergies, and code status. */
 export const AllFields: Story = {
-  render: () => html`
-    <hx-patient-banner patient-id="PT-000004">
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <div
         slot="photo"
         style="
@@ -264,7 +300,7 @@ export const AllFields: Story = {
 
 /** Only the name slot is populated (1 of 2 required identifiers). With enforce-identifier-rule enabled, the component fires hx-identifier-rule-violation and sets aria-invalid="true". This story demonstrates the Joint Commission NPSG.01.01.01 enforcement. */
 export const IdentifierRuleViolation: Story = {
-  render: () => html`
+  render: (args) => html`
     <div style="font-family: sans-serif;">
       <p
         style="
@@ -282,7 +318,16 @@ export const IdentifierRuleViolation: Story = {
       >
         Waiting for identifier rule violation event...
       </p>
-      <hx-patient-banner patient-id="PT-000005" enforce-identifier-rule>
+      <hx-patient-banner
+        patient-id=${args.patientId}
+        label-patient=${args.labelPatient}
+        label-name=${args.labelName}
+        label-mrn=${args.labelMrn}
+        label-dob=${args.labelDob}
+        label-allergies=${args.labelAllergies}
+        label-code-status=${args.labelCodeStatus}
+        .enforceIdentifierRule=${args.enforceIdentifierRule}
+      >
         <span slot="name">Patricia Moore</span>
       </hx-patient-banner>
     </div>
@@ -295,19 +340,18 @@ export const IdentifierRuleViolation: Story = {
     banner!.addEventListener('hx-identifier-rule-violation', violationSpy);
 
     // Trigger a re-check by toggling enforceIdentifierRule
-    // The component checks on slotchange + property change; dispatch a slot re-check via property toggle
     (banner as HTMLElement & { enforceIdentifierRule: boolean }).enforceIdentifierRule = false;
     (banner as HTMLElement & { enforceIdentifierRule: boolean }).enforceIdentifierRule = true;
+    await (banner as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
 
-    // Verify aria-invalid is set
-    await expect(banner?.getAttribute('aria-invalid')).toBe('true');
+    await expect(violationSpy).toHaveBeenCalled();
 
+    const detail = (violationSpy.mock.calls[0][0] as CustomEvent).detail as {
+      populatedIdentifiers: number;
+      requiredIdentifiers: number;
+    };
     const notice = canvasElement.querySelector('#violation-notice');
-    if (notice && violationSpy.mock.calls.length > 0) {
-      const detail = (violationSpy.mock.calls[0][0] as CustomEvent).detail as {
-        populatedIdentifiers: number;
-        requiredIdentifiers: number;
-      };
+    if (notice) {
       notice.textContent = `NPSG violation: ${detail.populatedIdentifiers} of ${detail.requiredIdentifiers} required identifiers present.`;
     }
 
@@ -321,8 +365,20 @@ export const IdentifierRuleViolation: Story = {
 
 /** enforce-identifier-rule attribute is absent. Only name is populated but no hx-identifier-rule-violation fires and aria-invalid is not set. Useful for non-clinical contexts where the two-identifier rule does not apply. */
 export const RuleEnforcementDisabled: Story = {
-  render: () => html`
-    <hx-patient-banner patient-id="PT-000006" .enforceIdentifierRule=${false}>
+  args: {
+    enforceIdentifierRule: false,
+  },
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <span slot="name">Samuel Torres</span>
     </hx-patient-banner>
   `,
@@ -351,27 +407,36 @@ export const RuleEnforcementDisabled: Story = {
 
 /** Demonstrates all label-* properties overridden. Useful for internationalisation or facility-specific terminology (e.g. "Chart #" instead of "MRN"). */
 export const CustomLabels: Story = {
-  render: () => html`
+  args: {
+    labelPatient: 'Identificación del paciente',
+    labelName: 'Nombre del paciente',
+    labelMrn: 'N.° de historia clínica',
+    labelDob: 'Fecha de nacimiento',
+    labelAllergies: 'Alergias',
+    labelCodeStatus: 'Estado del código',
+  },
+  render: (args) => html`
     <hx-patient-banner
-      patient-id="PT-000007"
-      label-patient="Identificación del paciente"
-      label-name="Nombre del paciente"
-      label-mrn="N.° de historia clínica"
-      label-dob="Fecha de nacimiento"
-      label-allergies="Alergias"
-      label-code-status="Estado del código"
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
     >
       <span slot="name">María García</span>
       <span slot="mrn">HC-987654</span>
       <span slot="dob">12/05/1980</span>
     </hx-patient-banner>
   `,
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const banner = canvasElement.querySelector('hx-patient-banner');
     await expect(banner).toBeTruthy();
-    await expect(banner?.getAttribute('aria-label')).toBe('Identificación del paciente');
-    await expect(banner?.labelName).toBe('Nombre del paciente');
-    await expect(banner?.labelMrn).toBe('N.° de historia clínica');
+    await expect(banner?.getAttribute('aria-label')).toBe(args.labelPatient);
+    await expect(banner?.labelName).toBe(args.labelName);
+    await expect(banner?.labelMrn).toBe(args.labelMrn);
   },
 };
 
@@ -382,12 +447,24 @@ export const CustomLabels: Story = {
 /** Verifies the hx-identifier-rule-violation event payload shape: populatedIdentifiers, requiredIdentifiers, and patientId. */
 export const IdentifierRuleEventPayload: Story = {
   name: 'Compliance — Identifier Rule Event Payload',
-  render: () => html`
-    <hx-patient-banner patient-id="PT-AUDIT-001" enforce-identifier-rule>
+  args: {
+    patientId: 'PT-AUDIT-001',
+  },
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <span slot="name">Test Patient</span>
     </hx-patient-banner>
   `,
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, args }) => {
     const banner = canvasElement.querySelector('hx-patient-banner');
     await expect(banner).toBeTruthy();
 
@@ -397,15 +474,16 @@ export const IdentifierRuleEventPayload: Story = {
     // Toggle enforcement to trigger a fresh event
     (banner as HTMLElement & { enforceIdentifierRule: boolean }).enforceIdentifierRule = false;
     (banner as HTMLElement & { enforceIdentifierRule: boolean }).enforceIdentifierRule = true;
+    await (banner as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
 
-    if (violationSpy.mock.calls.length > 0) {
-      const event = violationSpy.mock.calls[0][0] as CustomEvent;
-      await expect(event.bubbles).toBe(true);
-      await expect(event.composed).toBe(true);
-      await expect(event.detail.populatedIdentifiers).toBe(1);
-      await expect(event.detail.requiredIdentifiers).toBe(2);
-      await expect(event.detail.patientId).toBe('PT-AUDIT-001');
-    }
+    await expect(violationSpy).toHaveBeenCalled();
+
+    const event = violationSpy.mock.calls[0][0] as CustomEvent;
+    await expect(event.bubbles).toBe(true);
+    await expect(event.composed).toBe(true);
+    await expect(event.detail.populatedIdentifiers).toBe(1);
+    await expect(event.detail.requiredIdentifiers).toBe(2);
+    await expect(event.detail.patientId).toBe(args.patientId);
 
     banner!.removeEventListener('hx-identifier-rule-violation', violationSpy);
   },
@@ -421,8 +499,17 @@ export const DarkMode: Story = {
     (story) =>
       html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
   ],
-  render: () => html`
-    <hx-patient-banner patient-id="PT-DARK-001">
+  render: (args) => html`
+    <hx-patient-banner
+      patient-id=${args.patientId}
+      label-patient=${args.labelPatient}
+      label-name=${args.labelName}
+      label-mrn=${args.labelMrn}
+      label-dob=${args.labelDob}
+      label-allergies=${args.labelAllergies}
+      label-code-status=${args.labelCodeStatus}
+      .enforceIdentifierRule=${args.enforceIdentifierRule}
+    >
       <span slot="name">Eleanor Voss</span>
       <hx-phi-field
         slot="mrn"

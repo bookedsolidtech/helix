@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, cleanup, shadowQuery, shadowQueryAll, oneEvent } from '../../test-utils.js';
+import { fixture, cleanup, shadowQuery, shadowQueryAll, oneEvent, checkA11y } from '../../test-utils.js';
 import type { HelixPatientBanner } from './hx-patient-banner.js';
 import './hx-patient-banner.js';
 
@@ -462,6 +462,27 @@ describe('hx-patient-banner', () => {
         '<hx-patient-banner enforce-identifier-rule="false"></hx-patient-banner>',
       );
       expect(el.enforceIdentifierRule).toBe(false);
+    });
+  });
+
+  // ─── Accessibility: WCAG audit ───
+
+  describe('Accessibility: WCAG audit', () => {
+    it('has no accessibility violations when identifier rule is satisfied', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span><span slot="mrn">MRN-001</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no accessibility violations in error state (aria-invalid)', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      await Promise.resolve();
+      expect(el.getAttribute('aria-invalid')).toBe('true');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
     });
   });
 });
