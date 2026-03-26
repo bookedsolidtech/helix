@@ -22,4 +22,8 @@ Animation is suppressed when prefers-reduced-motion is active. */
   /** Accessible label for the indicator. Defaults to "Status: {Status}".
 Set aria-hidden="true" on the host when status is conveyed by adjacent text. */
   label?: string;
+  /** When true, renders a visible text label next to the dot conveying the status.
+Use this to satisfy WCAG 1.4.1 (Use of Color) when the indicator is not
+accompanied by other visible text that conveys the same status information. */
+  showLabel?: boolean;
 }

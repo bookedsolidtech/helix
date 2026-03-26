@@ -5,9 +5,12 @@ export const helixStatusIndicatorStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: var(--hx-space-2, 0.5rem);
     position: relative;
     flex-shrink: 0;
     --_dot-color: var(--hx-status-indicator-color-default, var(--hx-color-neutral-300, #ced4da));
+    /* Default size (md) — always defined so .indicator never collapses to 0x0 */
+    --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-space-3, 0.75rem));
   }
 
   .indicator {
@@ -62,18 +65,44 @@ export const helixStatusIndicatorStyles = css`
     }
   }
 
+  /* ─── Visible label (part="label") ─── */
+
+  .indicator__label {
+    font-size: var(
+      --hx-status-indicator-label-font-size,
+      var(--hx-font-size-sm, var(--hx-text-sm, 0.875rem))
+    );
+    color: var(--hx-status-indicator-label-color, var(--hx-color-neutral-700, #374151));
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* ─── aria-live announcement region (visually hidden) ─── */
+
+  .indicator__live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Size Variants ─── */
 
-  :host([size='sm']) {
+  :host([hx-size='sm']) {
     --_indicator-size: var(--hx-status-indicator-size-sm, var(--hx-space-2, 0.5rem));
   }
 
-  :host([size='md']) {
+  :host([hx-size='md']) {
     --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-space-3, 0.75rem));
   }
 
-  :host([size='lg']) {
-    --_indicator-size: var(--hx-status-indicator-size-lg, var(--hx-size-4));
+  :host([hx-size='lg']) {
+    --_indicator-size: var(--hx-status-indicator-size-lg, var(--hx-space-4, 1rem));
   }
 
   /* ─── Status Colors ─── */

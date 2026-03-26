@@ -93,7 +93,17 @@ jobs:
         id: check-audit
         run: |
           BRANCH="${{ github.head_ref || github.ref_name }}"
-          if [[ "$BRANCH" == *"deep-audit"* ]] || [[ "$BRANCH" == *"audit/"* ]]; then
+          # Per-component audit branches are banned — audits must use the batch
+          # workflow defined in .automaker/context/audit-workflow.md.
+          # Catches: feature/audithx-{component}-*, feature/audit-hx-{component}-*
+          if [[ "$BRANCH" == *"audithx-"* ]] || [[ "$BRANCH" =~ ^feature/audit-hx-[a-z] ]]; then
+            echo "::error::Per-component audit branch detected: $BRANCH"
+            echo "::error::Audit workflow violation — individual component branches are banned."
+            echo "::error::Use the batch audit workflow: audit/audit-wave-N-{type} with grouped fixes."
+            echo "::error::See .automaker/context/audit-workflow.md for the correct 4-phase process."
+            echo "is_audit=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          elif [[ "$BRANCH" == *"deep-audit"* ]] || [[ "$BRANCH" == *"audit/"* ]]; then
             echo "is_audit=true" >> "$GITHUB_OUTPUT"
             echo "Audit branch detected: $BRANCH — skipping CI"
           else
@@ -211,6 +221,8 @@ jobs:
             echo "Audit-fix branch — running tests for: $COMPONENT"
             pnpm exec vitest run "src/components/$COMPONENT/" --coverage.enabled
             echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+            # Scope coverage enforcement to only this component (prevents transitive-import false failures)
+            echo "HX_COVERAGE_COMPONENTS=$COMPONENT" >> "$GITHUB_ENV"
           else
             # General PR: extract changed component dirs from git diff
             # Exclude .stories.ts, .test.ts, and index.ts — they don't affect component coverage
@@ -229,6 +241,9 @@ jobs:
             echo "Running tests for: $PATHS"
             pnpm exec vitest run $PATHS --coverage.enabled
             echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+            # Scope coverage enforcement to only explicitly tested components
+            COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
+            echo "HX_COVERAGE_COMPONENTS=$COMPONENTS_CSV" >> "$GITHUB_ENV"
           fi
         working-directory: packages/hx-library
       - name: Run tests (push — path-filtered by merged changes)
@@ -250,6 +265,9 @@ jobs:
           echo "Running tests for: $PATHS"
           npx vitest run $PATHS --coverage.enabled
           echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+          # Scope coverage enforcement to only explicitly tested components
+          COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
+          echo "HX_COVERAGE_COMPONENTS=$COMPONENTS_CSV" >> "$GITHUB_ENV"
         working-directory: packages/hx-library
       - name: Enforce coverage thresholds for changed components
         if: steps.test-pr.outputs.tests_ran == 'true' || steps.test-push.outputs.tests_ran == 'true'
@@ -693,7 +711,7 @@ jobs:
 
   storybook-tests:
     name: Storybook Tests
-    needs: [changes, secret-scan]
+    needs: [changes, secret-scan, build]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -705,6 +723,8 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - name: Build library and generate CEM
+        run: pnpm turbo run build --filter='!docs' && pnpm run cem
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Storybook interaction tests

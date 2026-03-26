@@ -50,18 +50,30 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    showLabel: {
+      control: 'boolean',
+      description:
+        'When true, renders a visible text label next to the dot. Satisfies WCAG 1.4.1 (Use of Color) when the indicator is not accompanied by other visible status text.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     status: 'online',
     size: 'md',
     pulse: false,
     label: '',
+    showLabel: false,
   },
   render: (args) => html`
     <hx-status-indicator
       status=${args.status}
       size=${args.size}
       ?pulse=${args.pulse}
+      ?show-label=${args.showLabel}
       label=${args.label ?? ''}
     ></hx-status-indicator>
   `,
@@ -126,6 +138,40 @@ export const PulseBusy: Story = {
 export const CustomLabel: Story = {
   name: 'Custom Accessible Label',
   args: { status: 'online', label: 'EHR System is online' },
+};
+
+export const ShowLabelDemo: Story = {
+  name: 'Show Label (WCAG 1.4.1)',
+  args: { status: 'online', showLabel: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When `show-label` is set, a visible text label is rendered next to the dot. Use this when the indicator is standalone (not accompanied by other text conveying the same status) to satisfy WCAG 1.4.1 — Use of Color.',
+      },
+    },
+  },
+};
+
+export const AllStatusesWithLabel: Story = {
+  name: 'All Statuses With Visible Label',
+  render: () => html`
+    <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+      <hx-status-indicator status="online" size="md" show-label></hx-status-indicator>
+      <hx-status-indicator status="offline" size="md" show-label></hx-status-indicator>
+      <hx-status-indicator status="away" size="md" show-label></hx-status-indicator>
+      <hx-status-indicator status="busy" size="md" show-label></hx-status-indicator>
+      <hx-status-indicator status="unknown" size="md" show-label></hx-status-indicator>
+    </div>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'All status types with visible labels rendered via `show-label`. This satisfies WCAG 1.4.1 (Use of Color) by ensuring status is not conveyed by color alone.',
+      },
+    },
+  },
 };
 
 // ─────────────────────────────────────────────────

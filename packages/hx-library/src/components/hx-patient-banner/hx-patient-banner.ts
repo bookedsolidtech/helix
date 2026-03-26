@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
@@ -27,6 +27,7 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  * @csspart field - An individual field container (applied to all field wrappers).
  * @csspart field-label - The field label element.
  * @csspart field-value - The field value slot wrapper.
+ * @csspart violation-message - The visually-hidden identifier rule violation status message.
  *
  * @fires {CustomEvent<PatientIdentifierRuleViolationDetail>} hx-identifier-rule-violation - Fired when fewer than 2 identifier slots are populated and enforce-identifier-rule is true.
  *
@@ -40,6 +41,7 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  * @cssprop [--hx-patient-banner-value-color=var(--hx-color-neutral-900,#111827)] - Field value color.
  * @cssprop [--hx-patient-banner-value-font-size=var(--hx-font-size-sm,0.875rem)] - Field value font size.
  * @cssprop [--hx-patient-banner-photo-size=var(--hx-space-10,2.5rem)] - Photo area size.
+ * @cssprop [--hx-patient-banner-photo-bg=var(--hx-color-neutral-200,#e5e7eb)] - Photo area background color when empty.
  */
 @customElement('hx-patient-banner')
 export class HelixPatientBanner extends LitElement {
@@ -114,12 +116,21 @@ export class HelixPatientBanner extends LitElement {
 
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _identifierCount: number = 0;
+
+  /** @internal */
+  @state() private _isViolating: boolean = false;
 
   // ─── Slot Queries ───
 
+  /** @internal */
   @query('slot[name="name"]') private _nameSlot!: HTMLSlotElement;
+
+  /** @internal */
   @query('slot[name="mrn"]') private _mrnSlot!: HTMLSlotElement;
+
+  /** @internal */
   @query('slot[name="dob"]') private _dobSlot!: HTMLSlotElement;
 
   // ─── Lifecycle ───
@@ -162,6 +173,7 @@ export class HelixPatientBanner extends LitElement {
     this._identifierCount = count;
 
     if (this.enforceIdentifierRule && count < 2) {
+      this._isViolating = true;
       this.setAttribute('aria-invalid', 'true');
       this.dispatchEvent(
         new CustomEvent<PatientIdentifierRuleViolationDetail>('hx-identifier-rule-violation', {
@@ -175,6 +187,7 @@ export class HelixPatientBanner extends LitElement {
         }),
       );
     } else {
+      this._isViolating = false;
       this.removeAttribute('aria-invalid');
     }
   }
@@ -188,9 +201,13 @@ export class HelixPatientBanner extends LitElement {
   // ─── Render ───
 
   override render() {
+    const violationMessage = this._isViolating
+      ? `Warning: patient identification incomplete. ${this._identifierCount} of 2 required identifiers present.`
+      : nothing;
+
     return html`
       <div part="banner" class="banner">
-        <div part="photo-area" class="banner__photo-area">
+        <div part="photo-area" class="banner__photo-area" aria-hidden="true">
           <slot name="photo"></slot>
         </div>
 
@@ -231,6 +248,17 @@ export class HelixPatientBanner extends LitElement {
           </div>
         </div>
       </div>
+
+      ${violationMessage !== nothing
+        ? html`<div
+            part="violation-message"
+            class="violation-message"
+            role="alert"
+            aria-live="assertive"
+          >
+            ${violationMessage}
+          </div>`
+        : nothing}
     `;
   }
 }

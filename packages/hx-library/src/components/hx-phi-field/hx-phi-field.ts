@@ -16,13 +16,14 @@ import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
  * @csspart value - The value display span (masked or revealed).
  * @csspart toggle - The reveal/hide toggle button.
  *
- * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide, and clipboard auto-clear.
+ * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide, and clipboard-clear actions.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#111827)] - Value text color.
  * @cssprop [--hx-phi-field-masked-color=var(--hx-color-neutral-500,#6b7280)] - Masked value text color.
  * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#2563eb)] - Toggle button color.
  * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#2563eb))] - Focus ring color.
+ * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
  */
 @customElement('hx-phi-field')
 export class HelixPhiField extends LitElement {
@@ -59,10 +60,28 @@ export class HelixPhiField extends LitElement {
   @property({ type: Number, attribute: 'clipboard-timeout' })
   clipboardTimeout: number = 30000;
 
+  /**
+   * Accessible label describing the PHI field. Used as a prefix in screen reader
+   * announcements (e.g., "Social Security Number is masked").
+   * @attr label
+   */
+  @property({ type: String })
+  label: string = '';
+
+  /**
+   * When set, disables all interaction with the field and prevents reveal.
+   * @attr disabled
+   * @reflect
+   */
+  @property({ type: Boolean, reflect: true })
+  disabled: boolean = false;
+
   // ─── Internal State ───
 
+  /** @internal */
   @state() private _masked = true;
 
+  /** @internal */
   private _clipboardTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ─── Lifecycle ───
@@ -80,6 +99,7 @@ export class HelixPhiField extends LitElement {
 
   // ─── Private Helpers ───
 
+  /** @internal */
   private _cancelClipboardTimer(): void {
     if (this._clipboardTimer !== null) {
       clearTimeout(this._clipboardTimer);
@@ -87,6 +107,7 @@ export class HelixPhiField extends LitElement {
     }
   }
 
+  /** @internal */
   private _scheduleClipboardClear(): void {
     this._cancelClipboardTimer();
     this._clipboardTimer = setTimeout(() => {
@@ -94,6 +115,7 @@ export class HelixPhiField extends LitElement {
     }, this.clipboardTimeout);
   }
 
+  /** @internal */
   private _clearClipboard(): void {
     this._clipboardTimer = null;
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -107,7 +129,7 @@ export class HelixPhiField extends LitElement {
         composed: true,
         detail: {
           fieldId: this.fieldId || this.id || '',
-          action: 'hide',
+          action: 'clipboard-clear',
           timestamp: new Date().toISOString(),
           fieldType: this.fieldType,
         },
@@ -116,6 +138,7 @@ export class HelixPhiField extends LitElement {
     this._masked = true;
   }
 
+  /** @internal */
   private _getMaskedValue(): string {
     if (!this.data) return '';
 
@@ -171,7 +194,10 @@ export class HelixPhiField extends LitElement {
 
   // ─── Event Handlers ───
 
+  /** @internal */
   private _handleToggle(): void {
+    if (this.disabled) return;
+
     // Dispatch BEFORE toggling state so action reflects the upcoming state
     this.dispatchEvent(
       new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
@@ -197,12 +223,14 @@ export class HelixPhiField extends LitElement {
     }
   }
 
+  /** @internal */
   private _handleCopy(e: ClipboardEvent): void {
     if (this._masked) {
       e.preventDefault();
     }
   }
 
+  /** @internal */
   private _handlePaste(e: ClipboardEvent): void {
     if (this._masked) {
       e.preventDefault();
@@ -211,6 +239,7 @@ export class HelixPhiField extends LitElement {
 
   // ─── Render Helpers ───
 
+  /** @internal */
   private _renderEyeIcon(): TemplateResult {
     return html`
       <svg
@@ -229,6 +258,7 @@ export class HelixPhiField extends LitElement {
     `;
   }
 
+  /** @internal */
   private _renderEyeOffIcon(): TemplateResult {
     return html`
       <svg
@@ -251,8 +281,19 @@ export class HelixPhiField extends LitElement {
   // ─── Render ───
 
   override render() {
+    const fieldLabel = this.label || 'Protected health information';
+    const maskedLabel = `${fieldLabel} is masked`;
+    const revealedLabel = `${fieldLabel} is revealed`;
+    const revealActionLabel = `Reveal ${fieldLabel.toLowerCase()}`;
+    const hideActionLabel = `Hide ${fieldLabel.toLowerCase()}`;
+
     return html`
-      <div part="container" class="phi-field" @copy=${this._handleCopy} @paste=${this._handlePaste}>
+      <div
+        part="container"
+        class="phi-field${this.disabled ? ' phi-field--disabled' : ''}"
+        @copy=${this._handleCopy}
+        @paste=${this._handlePaste}
+      >
         ${this._masked
           ? html`<span part="value" class="phi-field__value phi-field__value--masked"
               >${this._getMaskedValue()}</span
@@ -261,17 +302,14 @@ export class HelixPhiField extends LitElement {
               >${this.data}</span
             >`}
         <span role="status" aria-live="polite" aria-atomic="true" class="phi-field__status">
-          ${this._masked
-            ? 'Protected health information is masked'
-            : 'Protected health information is revealed'}
+          ${this._masked ? maskedLabel : revealedLabel}
         </span>
         <button
           part="toggle"
           class="phi-field__toggle"
           type="button"
-          aria-label=${this._masked
-            ? 'Reveal protected health information'
-            : 'Hide protected health information'}
+          ?disabled=${this.disabled}
+          aria-label=${this._masked ? revealActionLabel : hideActionLabel}
           aria-pressed=${String(!this._masked)}
           @click=${this._handleToggle}
         >
@@ -284,7 +322,8 @@ export class HelixPhiField extends LitElement {
 
 export interface PhiAccessEventDetail {
   fieldId: string;
-  action: 'reveal' | 'hide';
+  /** The action that triggered the audit event. */
+  action: 'reveal' | 'hide' | 'clipboard-clear';
   timestamp: string;
   fieldType: 'ssn' | 'mrn' | 'dob' | 'insurance';
 }
