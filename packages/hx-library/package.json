@@ -62,7 +62,7 @@
     "test:batch:4": "vitest run \"hx-prose/|hx-radio-group/|hx-rating/|hx-select/|hx-side-nav/|hx-skeleton/|hx-slider/|hx-spinner/|hx-split-button/|hx-split-panel/|hx-stack/|hx-status-indicator/|hx-steps/|hx-structured-list/\" --reporter=verbose",
     "test:batch:5": "vitest run \"hx-switch/|hx-tabs/|hx-tag/|hx-text/|hx-text-input/|hx-textarea/|hx-theme/|hx-time-picker/|hx-toast/|hx-toggle-button/|hx-tooltip/|hx-top-nav/|hx-tree-view/|hx-visually-hidden/\" --reporter=verbose",
     "test:component": "vitest run --reporter=verbose",
-    "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\"",
+    "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" && node ../../scripts/validate-cem.mjs",
     "cem:watch": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" --watch",
     "build:cdn": "node scripts/build-cdn.mjs",
     "generate:drupal-libraries": "node scripts/generate-drupal-libraries.js",
