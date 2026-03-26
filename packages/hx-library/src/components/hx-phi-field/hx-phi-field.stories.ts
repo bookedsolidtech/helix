@@ -49,12 +49,33 @@ const meta = {
         type: { summary: 'number' },
       },
     },
+    label: {
+      control: 'text',
+      description:
+        'Accessible label describing the PHI field. Used in screen reader announcements.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'When set, disables all interaction with the field and prevents reveal.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     data: '123-45-6789',
     fieldType: 'ssn',
     fieldId: 'patient-ssn',
     clipboardTimeout: 30000,
+    label: 'Social Security Number',
+    disabled: false,
   },
   render: (args) => html`
     <hx-phi-field
@@ -62,6 +83,8 @@ const meta = {
       field-type=${args.fieldType}
       field-id=${args.fieldId}
       clipboard-timeout=${args.clipboardTimeout}
+      label=${args.label || ''}
+      ?disabled=${args.disabled}
     ></hx-phi-field>
   `,
 } satisfies Meta;
@@ -370,6 +393,26 @@ export const CSSCustomProperties: Story = {
       </div>
     </div>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// DISABLED STATE
+// ─────────────────────────────────────────────────
+
+export const Disabled: Story = {
+  name: 'Disabled',
+  args: {
+    data: '123-45-6789',
+    fieldType: 'ssn',
+    label: 'Social Security Number',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    const field = canvasElement.querySelector('hx-phi-field');
+    await expect(field).toBeTruthy();
+    const toggle = field!.shadowRoot!.querySelector('[part="toggle"]') as HTMLButtonElement;
+    await expect(toggle.disabled).toBe(true);
+  },
 };
 
 // ─────────────────────────────────────────────────
