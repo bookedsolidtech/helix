@@ -67,7 +67,19 @@ export class HelixDataTable extends LitElement {
    * Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).
    * @attr columns
    */
-  @property({ type: Array })
+  @property({
+    type: Array,
+    converter: {
+      fromAttribute(value: string | null) {
+        if (!value) return [];
+        try {
+          return JSON.parse(value);
+        } catch {
+          return [];
+        }
+      },
+    },
+  })
   columns: HxDataTableColumn[] = [];
 
   /**
@@ -75,7 +87,19 @@ export class HelixDataTable extends LitElement {
    * Can be set as a JS array or a JSON string (e.g., from a Drupal Twig attribute).
    * @attr rows
    */
-  @property({ type: Array })
+  @property({
+    type: Array,
+    converter: {
+      fromAttribute(value: string | null) {
+        if (!value) return [];
+        try {
+          return JSON.parse(value);
+        } catch {
+          return [];
+        }
+      },
+    },
+  })
   rows: Record<string, unknown>[] = [];
 
   /**

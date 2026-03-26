@@ -96,9 +96,11 @@ export class HelixPhiField extends LitElement {
 
   private _clearClipboard(): void {
     this._clipboardTimer = null;
-    navigator.clipboard.writeText('').catch(() => {
-      // Clipboard clear failure is non-fatal — silently ignore
-    });
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator?.clipboard?.writeText('').catch(() => {
+        // Clipboard clear failure is non-fatal — silently ignore
+      });
+    }
     this.dispatchEvent(
       new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
         bubbles: true,
