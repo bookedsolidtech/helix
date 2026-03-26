@@ -982,4 +982,91 @@ describe('hx-text-input', () => {
       expect(field?.classList.contains('field--size-md')).toBe(true);
     });
   });
+
+  // ─── FormMixin: dirty / touched / pristine (6) ───
+
+  describe('FormMixin: dirty / touched / pristine', () => {
+    it('pristine is true before any user interaction', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.pristine).toBe(true);
+      expect(el.dirty).toBe(false);
+    });
+
+    it('dirty becomes true after input event', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = 'x';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.dirty).toBe(true);
+      expect(el.pristine).toBe(false);
+    });
+
+    it('touched becomes true after change event', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = 'y';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.touched).toBe(true);
+    });
+
+    it('touched is false before any blur/change', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.touched).toBe(false);
+    });
+
+    it('formResetCallback resets dirty to false', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = 'x';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.dirty).toBe(true);
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.dirty).toBe(false);
+      expect(el.pristine).toBe(true);
+    });
+
+    it('formResetCallback resets touched to false', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = 'y';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.touched).toBe(true);
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.touched).toBe(false);
+    });
+  });
+
+  // ─── Property: readonly — no events ───
+
+  describe('Property: readonly — input still fires events', () => {
+    it('readonly input still dispatches hx-input (readonly is not disabled)', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input readonly></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
+      input.value = 'r';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('r');
+    });
+  });
+
+  // ─── hx-change detail syncs component value ───
+
+  describe('hx-change syncs value and fires composed event', () => {
+    it('hx-change detail.value updates component.value', async () => {
+      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      input.value = 'sync-test';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      await eventPromise;
+      expect(el.value).toBe('sync-test');
+    });
+  });
 });
