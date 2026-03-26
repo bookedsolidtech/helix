@@ -129,14 +129,17 @@ function splitIntoClassSections(fullSource) {
     const end = i + 1 < sections.length ? sections[i + 1].start : fullSource.length;
     const classSource = fullSource.slice(section.start, end);
 
-    // Extract the @customElement tag from this section or preceding lines
-    // (the decorator sits just above the class keyword)
-    const sectionWithLeadin = fullSource.slice(
-      // Include up to 200 chars before the class start to catch the @customElement decorator
-      Math.max(0, section.start - 200),
-      end,
-    );
-    const decoratorMatch = /@customElement\s*\(\s*['"]([^'"]+)['"]\s*\)/.exec(sectionWithLeadin);
+    // Extract the @customElement tag from the source preceding this class.
+    // The decorator sits just above the class keyword, but may be arbitrarily
+    // far from the class start (e.g. separated by JSDoc blocks). Search all
+    // source text before the class and take the last match.
+    const prefix = fullSource.slice(0, section.start);
+    const decoratorPattern = /@customElement\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+    let decoratorMatch = null;
+    let dm;
+    while ((dm = decoratorPattern.exec(prefix)) !== null) {
+      decoratorMatch = dm;
+    }
     const tagName = decoratorMatch ? decoratorMatch[1] : null;
 
     return { className: section.className, tagName, classSource };
@@ -414,6 +417,10 @@ function main() {
   let checkedComponents = 0;
 
   for (const file of sourceFiles) {
+    const fullSource = readFileSync(file, 'utf8');
+    const sections = splitIntoClassSections(fullSource);
+    checkedComponents += sections.length;
+
     const errors = validateFile(file, cemIndex);
     if (errors.length > 0) {
       for (const err of errors) {
@@ -421,9 +428,6 @@ function main() {
         console.error(`         ${err.message}`);
       }
       totalErrors += errors.length;
-    } else {
-      const fullSource = readFileSync(file, 'utf8');
-      checkedComponents += splitIntoClassSections(fullSource).length;
     }
   }
 
