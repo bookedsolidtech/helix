@@ -30,7 +30,7 @@ export const HxTabs = createComponent({
   elementClass: HelixTabs,
   react: React,
   events: {
-    onHxTabChange: 'hx-tab-change'
+    onHxTabChange: 'hx-tab-change',
   },
   displayName: 'HxTabs',
 });

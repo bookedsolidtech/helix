@@ -30,7 +30,7 @@ export const HxSideNav = createComponent({
   react: React,
   events: {
     onHxCollapse: 'hx-collapse',
-    onHxExpand: 'hx-expand'
+    onHxExpand: 'hx-expand',
   },
   displayName: 'HxSideNav',
 });
