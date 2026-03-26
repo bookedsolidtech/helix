@@ -30,7 +30,7 @@ export const HxSkeleton = createComponent({
   elementClass: HelixSkeleton,
   react: React,
   events: {
-    onHxLoaded: 'hx-loaded',
+    onHxLoaded: 'hx-loaded'
   },
   displayName: 'HxSkeleton',
 });
