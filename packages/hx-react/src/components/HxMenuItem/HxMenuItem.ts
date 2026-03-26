@@ -31,7 +31,7 @@ export const HxMenuItem = createComponent({
   react: React,
   events: {
     onHxItemSelect: 'hx-item-select',
-    onHxItemSubmenuOpen: 'hx-item-submenu-open'
+    onHxItemSubmenuOpen: 'hx-item-submenu-open',
   },
   displayName: 'HxMenuItem',
 });
