@@ -892,28 +892,259 @@ export const FormInsideDialog: Story = {
   },
 };
 
+// ════════════════════════════════════════════════════════════════════════════
+// 13. DARK MODE — hx-theme dark mode wrapper
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * The dialog rendered inside an `hx-theme` dark mode wrapper.
+ * Demonstrates that CSS custom property token cascading correctly
+ * applies dark-mode semantic colors without any per-component overrides.
+ */
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
-  args: {
-    open: false,
-    modal: true,
-    closeOnBackdrop: true,
-    heading: 'Patient Record',
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  render: () => html`
+    <hx-dialog open modal heading="Patient Record">
+      <p style="margin: 0; font-size: 0.875rem;">
+        Viewing patient record in dark mode. All design tokens cascade correctly through the
+        component's Shadow DOM.
+      </p>
+      <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button
+          style="padding: 0.5rem 1rem; border: 1px solid #374151; border-radius: 0.375rem; background: transparent; cursor: pointer;"
+        >
+          Close
+        </button>
+      </div>
+    </hx-dialog>
+  `,
+  play: async ({ canvasElement }) => {
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(true);
   },
 };
 
-// ─────────────────────────────────────────────────
-// KEYBOARD NAVIGATION
-// ─────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// 14. SCROLLABLE CONTENT — Long body content with scroll containment
+// ════════════════════════════════════════════════════════════════════════════
 
+/**
+ * A dialog with long scrollable body content. The dialog body (`part="body"`) uses
+ * `overflow-y: auto` and `overscroll-behavior: contain` so that scrolling inside
+ * the dialog does not propagate to the page behind it.
+ *
+ * This pattern is common in healthcare EHRs for viewing:
+ * - Long medication histories
+ * - Full clinical notes or discharge summaries
+ * - Lab result time-series data
+ * - HIPAA consent documents requiring full read-through
+ */
+export const ScrollableContent: Story = {
+  render: () => html`
+    <hx-dialog open modal heading="Patient Medication History">
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        ${[
+          { date: '2026-01-15', med: 'Metformin 500mg', freq: 'BID', status: 'Active' },
+          { date: '2026-01-10', med: 'Lisinopril 10mg', freq: 'QD', status: 'Active' },
+          { date: '2025-12-20', med: 'Atorvastatin 40mg', freq: 'QD', status: 'Active' },
+          { date: '2025-11-05', med: 'Amlodipine 5mg', freq: 'QD', status: 'Active' },
+          { date: '2025-10-18', med: 'Omeprazole 20mg', freq: 'QD', status: 'Discontinued' },
+          { date: '2025-09-01', med: 'Amoxicillin 500mg', freq: 'TID', status: 'Completed' },
+          { date: '2025-08-14', med: 'Prednisone 10mg', freq: 'QD', status: 'Completed' },
+          { date: '2025-07-22', med: 'Hydrochlorothiazide 25mg', freq: 'QD', status: 'Discontinued' },
+          { date: '2025-06-30', med: 'Gabapentin 300mg', freq: 'TID', status: 'Completed' },
+          { date: '2025-05-11', med: 'Levothyroxine 50mcg', freq: 'QD', status: 'Active' },
+          { date: '2025-04-03', med: 'Sertraline 50mg', freq: 'QD', status: 'Active' },
+          { date: '2025-03-17', med: 'Aspirin 81mg', freq: 'QD', status: 'Active' },
+        ].map(
+          (item) => html`
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem;"
+            >
+              <div>
+                <div style="font-weight: 600; color: #111827;">${item.med}</div>
+                <div style="color: #6b7280; margin-top: 0.125rem;">${item.freq} — started ${item.date}</div>
+              </div>
+              <span
+                style="
+                  padding: 0.125rem 0.5rem;
+                  border-radius: 9999px;
+                  font-size: 0.75rem;
+                  font-weight: 600;
+                  background: ${item.status === 'Active' ? '#d1fae5' : item.status === 'Discontinued' ? '#fee2e2' : '#e5e7eb'};
+                  color: ${item.status === 'Active' ? '#065f46' : item.status === 'Discontinued' ? '#991b1b' : '#374151'};
+                "
+              >
+                ${item.status}
+              </span>
+            </div>
+          `,
+        )}
+      </div>
+      <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button
+          style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
+        >
+          Export PDF
+        </button>
+        <button
+          style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #ffffff; cursor: pointer; font-weight: 600;"
+        >
+          Close
+        </button>
+      </div>
+    </hx-dialog>
+  `,
+  play: async ({ canvasElement }) => {
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(true);
+    await expect(dialog?.getAttribute('heading')).toBe('Patient Medication History');
+
+    const bodyPart = dialog?.shadowRoot?.querySelector('[part="body"]');
+    await expect(bodyPart).toBeTruthy();
+
+    const footerSlot = canvasElement.querySelector('[slot="footer"]');
+    await expect(footerSlot).toBeTruthy();
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 15. KEYBOARD NAVIGATION — Focus trap and keyboard interaction demo
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates the focus trap and keyboard navigation behavior of the modal dialog.
+ *
+ * - **Tab** cycles forward through all focusable elements inside the dialog.
+ * - **Shift+Tab** cycles backward.
+ * - **Escape** closes the dialog and returns focus to the trigger button.
+ * - On open, focus automatically moves to the first focusable element (Patient Name input).
+ *
+ * This implements WCAG 2.1 Success Criteria:
+ * - **2.1.2 No Keyboard Trap** (AA) — focus escapes via Escape key
+ * - **2.4.3 Focus Order** (AA) — focus moves logically through dialog content
+ * - **3.2.2 On Input** (A) — dialog state changes are predictable and reversible
+ */
 export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
-    <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        When open, focus is trapped inside the dialog. Tab cycles through focusable elements. Escape closes the dialog. The first focusable element receives focus on open.
-      </p>
-      <hx-dialog></hx-dialog>
+    <div>
+      <button
+        id="kb-open-btn"
+        style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #ffffff; cursor: pointer; font-weight: 600;"
+        @click=${() => {
+          (
+            document.getElementById('kb-nav-dialog') as HTMLElement & {
+              showModal: () => void;
+            }
+          )?.showModal();
+        }}
+      >
+        Open Dialog (Tab to cycle, Escape to close)
+      </button>
+
+      <hx-dialog id="kb-nav-dialog" heading="Appointment Scheduling" close-on-backdrop>
+        <p style="margin: 0 0 1rem; font-size: 0.875rem; color: #374151;">
+          Tab through the fields below. Shift+Tab moves backward. Escape closes and returns focus
+          to the trigger button above.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <label
+            style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem; font-weight: 600;"
+          >
+            Patient Name
+            <input
+              id="kb-input-name"
+              type="text"
+              placeholder="Last, First Middle"
+              style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 400;"
+            />
+          </label>
+          <label
+            style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem; font-weight: 600;"
+          >
+            Appointment Date
+            <input
+              id="kb-input-date"
+              type="date"
+              style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 400;"
+            />
+          </label>
+          <label
+            style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.875rem; font-weight: 600;"
+          >
+            Provider
+            <select
+              id="kb-select-provider"
+              style="padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 400;"
+            >
+              <option value="">Select provider…</option>
+              <option value="smith">Dr. Smith — Internal Medicine</option>
+              <option value="jones">Dr. Jones — Cardiology</option>
+            </select>
+          </label>
+        </div>
+        <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button
+            id="kb-cancel-btn"
+            type="button"
+            style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #ffffff; cursor: pointer;"
+            @click=${(e: Event) => {
+              (
+                (e.target as HTMLElement).closest('hx-dialog') as HTMLElement & {
+                  close: () => void;
+                }
+              )?.close();
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            id="kb-confirm-btn"
+            type="button"
+            style="padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; background: #2563eb; color: #ffffff; cursor: pointer; font-weight: 600;"
+          >
+            Book Appointment
+          </button>
+        </div>
+      </hx-dialog>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const triggerBtn = canvasElement.querySelector<HTMLButtonElement>('#kb-open-btn');
+    await expect(triggerBtn).toBeTruthy();
+
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(false);
+
+    if (!triggerBtn) throw new Error('Missing #kb-open-btn');
+    triggerBtn.click();
+
+    await dialog?.updateComplete;
+    await expect(dialog?.hasAttribute('open')).toBe(true);
+
+    // Verify the dialog has focusable elements inside
+    const nameInput = canvasElement.querySelector('#kb-input-name');
+    const dateInput = canvasElement.querySelector('#kb-input-date');
+    const cancelBtn = canvasElement.querySelector('#kb-cancel-btn');
+    const confirmBtn = canvasElement.querySelector('#kb-confirm-btn');
+
+    await expect(nameInput).toBeTruthy();
+    await expect(dateInput).toBeTruthy();
+    await expect(cancelBtn).toBeTruthy();
+    await expect(confirmBtn).toBeTruthy();
+
+    // Verify aria-modal is set on the native dialog (WCAG 2.1 focus trap signal)
+    const nativeDialog = dialog?.shadowRoot?.querySelector('dialog');
+    await expect(nativeDialog?.getAttribute('aria-modal')).toBe('true');
+
+    // Verify aria-labelledby points to the heading (WCAG 2.5.3 label in name)
+    await expect(nativeDialog?.hasAttribute('aria-labelledby')).toBe(true);
+  },
 };
