@@ -211,6 +211,8 @@ jobs:
             echo "Audit-fix branch — running tests for: $COMPONENT"
             pnpm exec vitest run "src/components/$COMPONENT/" --coverage.enabled
             echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+            # Scope coverage enforcement to only this component (prevents transitive-import false failures)
+            echo "HX_COVERAGE_COMPONENTS=$COMPONENT" >> "$GITHUB_ENV"
           else
             # General PR: extract changed component dirs from git diff
             # Exclude .stories.ts, .test.ts, and index.ts — they don't affect component coverage
@@ -229,6 +231,9 @@ jobs:
             echo "Running tests for: $PATHS"
             pnpm exec vitest run $PATHS --coverage.enabled
             echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+            # Scope coverage enforcement to only explicitly tested components
+            COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
+            echo "HX_COVERAGE_COMPONENTS=$COMPONENTS_CSV" >> "$GITHUB_ENV"
           fi
         working-directory: packages/hx-library
       - name: Run tests (push — path-filtered by merged changes)
@@ -250,6 +255,9 @@ jobs:
           echo "Running tests for: $PATHS"
           npx vitest run $PATHS --coverage.enabled
           echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+          # Scope coverage enforcement to only explicitly tested components
+          COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
+          echo "HX_COVERAGE_COMPONENTS=$COMPONENTS_CSV" >> "$GITHUB_ENV"
         working-directory: packages/hx-library
       - name: Enforce coverage thresholds for changed components
         if: steps.test-pr.outputs.tests_ran == 'true' || steps.test-push.outputs.tests_ran == 'true'
