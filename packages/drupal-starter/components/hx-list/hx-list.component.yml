@@ -1,0 +1,32 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: List
+description: 'Styled list component with plain, bulleted, numbered, description, and interactive variants. For Drupal field lists, search result lists, and menu-style interactive lists.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual variant controlling list style'
+      default: 'plain'
+      enum:
+        - plain
+        - bulleted
+        - numbered
+        - description
+        - interactive
+    divided:
+      type: boolean
+      title: Divided
+      description: 'Whether to show dividers between list items'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the list'
+slots:
+  default:
+    title: Items
+    description: 'hx-list-item elements for each list entry'

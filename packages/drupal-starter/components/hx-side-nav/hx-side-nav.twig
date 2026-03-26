@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Side Navigation SDC — wraps hx-side-nav for Drupal menu block integration.
+ *
+ * Render Drupal menu items as hx-nav-item elements in the default slot.
+ * For Drupal main navigation blocks, override the block template and use this
+ * SDC to gain the collapse/expand behavior and icon-only mode.
+ */
+#}
+{{ attach_library('helixui/hx-side-nav') }}
+
+<hx-side-nav
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if collapsed %}collapsed{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if header %}
+    <div slot="header">{{ header }}</div>
+  {% endif %}
+
+  {% if content %}
+    {{ content }}
+  {% endif %}
+
+  {% if footer %}
+    <div slot="footer">{{ footer }}</div>
+  {% endif %}
+</hx-side-nav>

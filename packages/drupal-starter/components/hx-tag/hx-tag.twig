@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Tag SDC — wraps hx-tag for Drupal taxonomy and filter chip patterns.
+ *
+ * Use in taxonomy term field formatters, faceted search interfaces, and
+ * content categorization displays. For removable filter chips, attach a
+ * Drupal behavior listening for the hx-remove event to update exposed filters.
+ *
+ * Example: Taxonomy terms
+ *   {% for term in node.field_tags %}
+ *     {% include 'helixui:hx-tag' with {
+ *       variant: 'primary',
+ *       content: term.name,
+ *     } %}
+ *   {% endfor %}
+ */
+#}
+{{ attach_library('helixui/hx-tag') }}
+
+<hx-tag
+  {% if variant and variant != 'neutral' %}variant="{{ variant }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if pill %}pill{% endif %}
+  {% if removable %}removable{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if prefix %}
+    <span slot="prefix">{{ prefix }}</span>
+  {% endif %}
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if suffix %}
+    <span slot="suffix">{{ suffix }}</span>
+  {% endif %}
+</hx-tag>

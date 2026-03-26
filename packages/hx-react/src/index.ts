@@ -1,10 +1,9 @@
 export { HxAccordionItem, type HxAccordionItemProps } from './components/HxAccordionItem/index.js';
 export { HxAccordion, type HxAccordionProps } from './components/HxAccordion/index.js';
+export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/index.js';
-export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
 export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
 export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
-export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export {
   HxBreadcrumbItem,
   type HxBreadcrumbItemProps,
@@ -13,6 +12,7 @@ export { HxBreadcrumb, type HxBreadcrumbProps } from './components/HxBreadcrumb/
 export { HxButton, type HxButtonProps } from './components/HxButton/index.js';
 export { HxButtonGroup, type HxButtonGroupProps } from './components/HxButtonGroup/index.js';
 export { HxCard, type HxCardProps } from './components/HxCard/index.js';
+export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
 export { HxCarouselItem, type HxCarouselItemProps } from './components/HxCarouselItem/index.js';
 export { HxCarousel, type HxCarouselProps } from './components/HxCarousel/index.js';
 export { HxCheckbox, type HxCheckboxProps } from './components/HxCheckbox/index.js';
@@ -81,7 +81,6 @@ export {
 } from './components/HxStatusIndicator/index.js';
 export { HxStep, type HxStepProps } from './components/HxStep/index.js';
 export { HxSteps, type HxStepsProps } from './components/HxSteps/index.js';
-export { HxStyleScope, type HxStyleScopeProps } from './components/HxStyleScope/index.js';
 export {
   HxStructuredList,
   type HxStructuredListProps,
@@ -90,6 +89,7 @@ export {
   HxStructuredListRow,
   type HxStructuredListRowProps,
 } from './components/HxStructuredListRow/index.js';
+export { HxStyleScope, type HxStyleScopeProps } from './components/HxStyleScope/index.js';
 export { HxSwitch, type HxSwitchProps } from './components/HxSwitch/index.js';
 export { HxTable, type HxTableProps } from './components/HxTable/index.js';
 export { HxTbody, type HxTbodyProps } from './components/HxTbody/index.js';

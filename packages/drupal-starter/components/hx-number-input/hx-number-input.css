@@ -1,0 +1,5 @@
+/* hx-number-input SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-number-input {
+  display: block;
+}

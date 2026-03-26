@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Slider SDC — wraps hx-slider for Drupal range field integration.
+ *
+ * Common healthcare uses: pain scale (0-10), satisfaction ratings (0-5),
+ * dosage titration controls. Use show_value for patient-facing pain assessments.
+ */
+#}
+{{ attach_library('helixui/hx-slider') }}
+
+<hx-slider
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value is not null and value is not same as '' %}value="{{ value }}"{% endif %}
+  {% if min is not null and min != 0 %}min="{{ min }}"{% endif %}
+  {% if max is not null and max != 100 %}max="{{ max }}"{% endif %}
+  {% if step and step != 1 %}step="{{ step }}"{% endif %}
+  {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if show_value %}show-value{% endif %}
+  {% if show_ticks %}show-ticks{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-slider>

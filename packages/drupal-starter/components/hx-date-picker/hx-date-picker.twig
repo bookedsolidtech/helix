@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Date Picker SDC — wraps hx-date-picker for Drupal date field integration.
+ *
+ * Values are ISO 8601 date strings (YYYY-MM-DD). For Drupal date fields,
+ * map element['#value']['date'] or a formatted date string to the value prop.
+ */
+#}
+{{ attach_library('helixui/hx-date-picker') }}
+
+<hx-date-picker
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if min %}min="{{ min }}"{% endif %}
+  {% if max %}max="{{ max }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-date-picker>

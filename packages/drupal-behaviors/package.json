@@ -1,0 +1,35 @@
+{
+  "name": "@helixui/drupal-behaviors",
+  "version": "0.1.0",
+  "description": "Drupal behaviors for all interactive HELiX web components using the once() pattern",
+  "license": "MIT",
+  "author": "BookedSolid Technologies",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/drupal-behaviors"
+  },
+  "keywords": [
+    "drupal",
+    "behaviors",
+    "web-components",
+    "helix",
+    "once",
+    "ajax",
+    "bigpipe",
+    "healthcare"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "README.md",
+    "USAGE.md"
+  ],
+  "peerDependencies": {
+    "@helixui/library": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

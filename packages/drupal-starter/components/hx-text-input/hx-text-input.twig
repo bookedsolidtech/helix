@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Text Input SDC — wraps hx-text-input for Drupal form integration.
+ *
+ * Integrates with Drupal Form API via ElementInternals form association.
+ * For Form API template overrides, map element['#name'], ['#title'], ['#value'],
+ * ['#required'], and ['#errors'] to the corresponding attributes.
+ */
+#}
+{{ attach_library('helixui/hx-text-input') }}
+
+<hx-text-input
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if type %}type="{{ type }}"{% endif %}
+  {% if size and size != 'md' %}size="{{ size }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if readonly %}readonly{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if prefix %}
+    <span slot="prefix">{{ prefix }}</span>
+  {% endif %}
+  {% if suffix %}
+    <span slot="suffix">{{ suffix }}</span>
+  {% endif %}
+</hx-text-input>

@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Data Table SDC — wraps hx-data-table for Drupal Views table integration.
+ *
+ * Pass columns and rows as JSON strings from Drupal (use twig_json_encode or
+ * the json filter). For Drupal Views, serialize the view result in a
+ * preprocess hook and pass to this component.
+ *
+ * Listen to hx-sort to update Views sort parameters, and hx-select for
+ * bulk operation integration.
+ */
+#}
+{{ attach_library('helixui/hx-data-table') }}
+
+<div{{ attributes ? attributes.addClass('hx-data-table-wrapper') }}>
+  <hx-data-table
+    {% if label %}label="{{ label }}"{% endif %}
+    {% if columns %}columns='{{ columns }}'{% endif %}
+    {% if rows %}rows='{{ rows }}'{% endif %}
+    {% if selectable %}selectable{% endif %}
+    {% if loading %}loading{% endif %}
+    {% if sort_key %}sort-key="{{ sort_key }}"{% endif %}
+    {% if sort_direction and sort_direction != 'asc' %}sort-direction="{{ sort_direction }}"{% endif %}
+    {% if empty_label and empty_label != 'No data' %}empty-label="{{ empty_label }}"{% endif %}
+  >
+    {% if toolbar %}
+      <div slot="toolbar">{{ toolbar }}</div>
+    {% endif %}
+    {% if empty %}
+      <div slot="empty">{{ empty }}</div>
+    {% endif %}
+  </hx-data-table>
+</div>

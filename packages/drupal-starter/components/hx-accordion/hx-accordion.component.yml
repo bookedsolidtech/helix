@@ -1,0 +1,20 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Accordion
+description: 'Collapsible content sections with single or multi-expand modes. For Drupal FAQ displays, clinical guidelines, service listings, and structured reference content.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    mode:
+      type: string
+      title: Mode
+      description: 'Expansion mode. Single collapses others when one expands; multi allows multiple open simultaneously.'
+      default: 'single'
+      enum:
+        - single
+        - multi
+slots:
+  default:
+    title: Accordion Items
+    description: 'hx-accordion-item elements. Each accepts a trigger slot for the header and default slot for the panel content.'

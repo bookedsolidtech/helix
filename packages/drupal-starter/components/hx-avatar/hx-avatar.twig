@@ -1,0 +1,36 @@
+{#
+/**
+ * @file
+ * Avatar SDC — wraps hx-avatar for Drupal user and provider profile displays.
+ *
+ * Use in provider card teasers, user account menus, author bylines, and
+ * patient banner contexts. Set initials as a fallback when no photo is available.
+ *
+ * Example: Provider card avatar
+ *   {% include 'helixui:hx-avatar' with {
+ *     src: content.field_photo.0['#item'].uri.value|file_url,
+ *     alt: '',
+ *     label: content.title|render,
+ *     initials: provider.initials,
+ *     hx_size: 'lg',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-avatar') }}
+
+<hx-avatar
+  {% if src %}src="{{ src }}"{% endif %}
+  {% if alt is not null %}alt="{{ alt }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if initials %}initials="{{ initials }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if shape and shape != 'circle' %}shape="{{ shape }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if badge %}
+    <span slot="badge">{{ badge }}</span>
+  {% endif %}
+</hx-avatar>

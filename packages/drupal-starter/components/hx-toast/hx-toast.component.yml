@@ -1,0 +1,41 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Toast
+description: 'Transient notification toast with auto-dismiss, variants, and ARIA live region semantics. For Drupal AJAX success/error notifications and save confirmations.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant'
+      default: 'default'
+      enum:
+        - default
+        - success
+        - warning
+        - danger
+        - info
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the toast is currently visible'
+      default: false
+    duration:
+      type: integer
+      title: Duration
+      description: 'Auto-dismiss duration in milliseconds. Set to 0 for persistent toasts.'
+      default: 5000
+    closable:
+      type: boolean
+      title: Closable
+      description: 'Whether to show a close button'
+      default: false
+slots:
+  default:
+    title: Message
+    description: 'The notification message content'
+  action:
+    title: Action
+    description: 'Optional action button rendered after the message'

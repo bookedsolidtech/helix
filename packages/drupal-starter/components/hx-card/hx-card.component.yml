@@ -1,0 +1,50 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Card
+description: 'Content card with optional image, heading, body, footer, and action slots. Supports interactive (linked) and static variants. Use in Drupal Views row templates, content teasers, provider listings, and healthcare resource cards.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant'
+      default: 'default'
+      enum:
+        - default
+        - outlined
+        - filled
+    elevation:
+      type: string
+      title: Elevation
+      description: 'Shadow/elevation level'
+      default: 'flat'
+      enum:
+        - flat
+        - raised
+        - overlay
+    hx_href:
+      type: string
+      title: Link URL
+      description: 'When set, the entire card becomes an interactive link pointing to this URL. Do not combine with action slot buttons.'
+    hx_label:
+      type: string
+      title: Link Label
+      description: 'Accessible label for the card link when hx_href is set (e.g., "Read more about Patient Guide")'
+slots:
+  image:
+    title: Image
+    description: 'Optional image or media at the top of the card (e.g., img, video, hx-image)'
+  heading:
+    title: Heading
+    description: 'Card heading text. Use a semantic heading element (h2, h3, etc.) for correct document outline.'
+  default:
+    title: Body
+    description: 'Card body content'
+  footer:
+    title: Footer
+    description: 'Optional metadata or secondary content below the body'
+  actions:
+    title: Actions
+    description: 'Action buttons. Do not combine with hx_href — interactive card plus focusable actions is an ARIA anti-pattern.'

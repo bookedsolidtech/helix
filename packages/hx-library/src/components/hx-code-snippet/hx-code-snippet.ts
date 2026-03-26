@@ -159,7 +159,7 @@ export class HelixCodeSnippet extends LitElement {
   private _handleCopy(): void {
     const text = this._codeText;
 
-    navigator.clipboard.writeText(text).catch(() => {
+    navigator?.clipboard?.writeText(text).catch(() => {
       // Clipboard API unavailable (non-HTTPS environments such as Drupal staging) — emit event only.
       // Note: navigator.clipboard requires a secure context (HTTPS or localhost).
       // On HTTP, the copy event still fires but the clipboard is not populated.

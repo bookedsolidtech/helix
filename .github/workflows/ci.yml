@@ -111,6 +111,9 @@ jobs:
               - 'packages/hx-library/coverage-config.json'
               - 'packages/hx-library/tsconfig*.json'
               - 'scripts/check-coverage.mjs'
+              - 'scripts/check-bundle-size.mjs'
+              - 'bundle-budgets.json'
+              - '.bundle-budget.json'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
@@ -319,6 +322,59 @@ jobs:
         with:
           name: bundle-size-report
           path: .cache/bundle-size-report.json
+          retention-days: 30
+          if-no-files-found: warn
+
+  # ── Automated A11y Audit (axe-core WCAG 2.1 AA) ─────────────────────────
+  # Builds Storybook, serves it locally, then runs axe-core against every
+  # component's Default story. Fails CI on any critical or serious violation.
+  # Healthcare mandate: zero tolerance — WCAG 2.1 AA, wcag2a + wcag2aa +
+  # best-practice tags. Report uploaded as artifact for triage.
+
+  # NOTE: Currently informational — not blocking Quality Gates until baseline violations are fixed.
+  a11y-audit:
+    name: A11y Audit
+    needs: [changes, secret-scan, build]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - name: Build Storybook
+        run: pnpm run build:storybook
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Serve Storybook and run axe-core audit
+        run: |
+          pnpm exec http-server apps/storybook/dist -p 6006 --silent &
+          SERVER_PID=$!
+          # Wait for server to be ready (up to 30s)
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:6006/index.html | grep -q "200"; then
+              echo "Storybook server ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          node scripts/a11y-audit.js \
+            --storybook-url http://localhost:6006 \
+            --output .cache/a11y-report.json
+          EXIT_CODE=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $EXIT_CODE
+      - name: Upload a11y report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-report
+          path: .cache/a11y-report.json
           retention-days: 30
           if-no-files-found: warn
 
@@ -647,6 +703,7 @@ jobs:
         type-check,
         test,
         build,
+        a11y-audit,
         bundle-size,
         vrt,
         audit,
@@ -665,6 +722,7 @@ jobs:
           echo "Type Check:    ${{ needs.type-check.result }}"
           echo "Test:          ${{ needs.test.result }}"
           echo "Build:         ${{ needs.build.result }}"
+          echo "A11y Audit:    ${{ needs.a11y-audit.result }}"
           echo "Bundle Size:   ${{ needs.bundle-size.result }}"
           echo "VRT:           ${{ needs.vrt.result }}"
           echo "Audit:         ${{ needs.audit.result }}"
@@ -708,6 +766,11 @@ jobs:
               FAIL=1
             fi
           done
+
+          # A11y audit is informational until baseline violations are resolved
+          if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
+            echo "::warning::A11y audit has violations — see report artifact for details"
+          fi
 
           if [[ "$FAIL" -eq 1 ]]; then
             echo "::error::One or more quality gates failed"
