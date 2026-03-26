@@ -4,6 +4,13 @@ export const helixSideNavStyles = css`
   :host {
     display: block;
     height: 100%;
+    /* Mirror the nav background and text on the host so slotted light-DOM
+       content (header, footer slots) inherits the correct dark surface color.
+       Without this, axe-core cannot resolve the background for slotted nodes
+       and evaluates their text against the page white background, producing
+       false-positive color-contrast violations (WCAG 2.1 AA). */
+    background-color: var(--hx-side-nav-bg, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-side-nav-color, var(--hx-color-neutral-100, #f1f5f9));
   }
 
   * {
@@ -17,12 +24,12 @@ export const helixSideNavStyles = css`
     flex-direction: column;
     height: 100%;
     width: var(--hx-side-nav-width, 16rem);
-    background-color: var(--hx-side-nav-bg, var(--hx-color-neutral-900, #111827));
-    color: var(--hx-side-nav-color, var(--hx-color-neutral-100, #f3f4f6));
+    background-color: var(--hx-side-nav-bg, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-side-nav-color, var(--hx-color-neutral-100, #f1f5f9));
     transition: width var(--hx-transition-normal, 300ms) ease;
     overflow: hidden;
     border-inline-end: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #374151));
+      var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #334155));
   }
 
   /* ─── Collapsed State ─── */
@@ -40,7 +47,7 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #374151));
+      var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #334155));
     overflow: hidden;
   }
 
@@ -67,7 +74,7 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #374151));
+      var(--hx-side-nav-border-color, var(--hx-color-neutral-700, #334155));
     overflow: hidden;
   }
 
@@ -90,7 +97,7 @@ export const helixSideNavStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-side-nav-toggle-color, var(--hx-color-neutral-400, #9ca3af));
+    color: var(--hx-side-nav-toggle-color, var(--hx-color-neutral-400, #94a3b8));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms) ease,
@@ -102,7 +109,7 @@ export const helixSideNavStyles = css`
       --hx-overlay-white-10,
       rgba(255, 255, 255, 0.1)
     ); /* fallback for browsers without color-mix() */
-    color: var(--hx-color-neutral-100, #f3f4f6);
+    color: var(--hx-color-neutral-100, #f1f5f9);
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
