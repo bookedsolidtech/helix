@@ -41,18 +41,14 @@ function configureTwig(): void {
   Twig.extendFilter('t', (value: string) => value);
 
   // `url_encode` filter — encode a string for use in a URL.
-  Twig.extendFilter('url_encode', (value: string) =>
-    encodeURIComponent(String(value ?? '')),
-  );
+  Twig.extendFilter('url_encode', (value: string) => encodeURIComponent(String(value ?? '')));
 
   // `render` filter — in Drupal this renders a render array. In tests,
   // just return the value as-is (it will be a string in test context).
   Twig.extendFilter('render', (value: unknown) => String(value ?? ''));
 
   // `striptags` filter — strip HTML tags from a string.
-  Twig.extendFilter('striptags', (value: string) =>
-    String(value ?? '').replace(/<[^>]*>/g, ''),
-  );
+  Twig.extendFilter('striptags', (value: string) => String(value ?? '').replace(/<[^>]*>/g, ''));
 }
 
 /**
@@ -93,10 +89,7 @@ let _renderCounter = 0;
  * @param vars         - Template variables (props, slots, etc.).
  * @returns Rendered HTML string.
  */
-export function renderTwig(
-  templatePath: string,
-  vars: Record<string, unknown> = {},
-): string {
+export function renderTwig(templatePath: string, vars: Record<string, unknown> = {}): string {
   configureTwig();
 
   const rawSource = readFileSync(templatePath, 'utf-8');
@@ -130,10 +123,7 @@ export function renderTwig(
  * @param name - SDC name, e.g. `'article-teaser'`.
  * @param vars - Template variables.
  */
-export function renderSdc(
-  name: string,
-  vars: Record<string, unknown> = {},
-): string {
+export function renderSdc(name: string, vars: Record<string, unknown> = {}): string {
   const path = resolve(COMPONENTS_DIR, name, `${name}.twig`);
   return renderTwig(path, vars);
 }
@@ -144,10 +134,7 @@ export function renderSdc(
  * @param name - Template name, e.g. `'hx-button'`.
  * @param vars - Template variables.
  */
-export function renderTemplate(
-  name: string,
-  vars: Record<string, unknown> = {},
-): string {
+export function renderTemplate(name: string, vars: Record<string, unknown> = {}): string {
   const path = resolve(TEMPLATES_DIR, `${name}.html.twig`);
   return renderTwig(path, vars);
 }
