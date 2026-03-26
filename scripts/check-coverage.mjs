@@ -13,6 +13,15 @@
  *   node scripts/check-coverage.mjs --markdown   # Markdown summary for PR comment
  *   node scripts/check-coverage.mjs --json       # JSON output
  *
+ * Scoped enforcement (prevents false failures from transitive imports):
+ *   HX_COVERAGE_COMPONENTS=hx-button,hx-badge node scripts/check-coverage.mjs
+ *
+ *   When HX_COVERAGE_COMPONENTS is set, only the listed components are subject to the
+ *   coverage gate. All other components found in the coverage data (e.g., those loaded
+ *   transitively during focused component tests) are silently skipped. This prevents
+ *   0%-coverage failures on components that were loaded as barrel-import side-effects
+ *   but were not explicitly under test.
+ *
  * Exit codes:
  *   0 — all non-exempt components meet threshold
  *   1 — one or more non-exempt components below threshold
@@ -34,6 +43,18 @@ const THRESHOLD = 80;
 const args = process.argv.slice(2);
 const isMarkdown = args.includes('--markdown');
 const isJSON = args.includes('--json');
+
+// When set, only enforce thresholds for the listed components (comma-separated).
+// All other components in the coverage data are treated as transitive-only and skipped.
+// This prevents false failures when vitest instruments barrel-imported files that were
+// not explicitly under test (e.g. hx-checkbox loaded transitively while testing hx-patient-banner).
+const HX_COVERAGE_COMPONENTS = process.env.HX_COVERAGE_COMPONENTS
+  ? new Set(
+      process.env.HX_COVERAGE_COMPONENTS.split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    )
+  : null; // null = no scoping, check all components
 
 // ── Load coverage config (exemptions) ──────────────────────────────────────
 
@@ -181,8 +202,21 @@ function main() {
   const passing = [];
   const failing = [];
   const exempt = [];
+  const transitive = []; // components skipped because they were not explicitly under test
+
+  if (HX_COVERAGE_COMPONENTS) {
+    console.log(
+      `Scoped enforcement: checking only [${[...HX_COVERAGE_COMPONENTS].join(', ')}] — other components in coverage data are transitive imports and will be skipped.\n`,
+    );
+  }
 
   for (const [name, metrics] of [...components.entries()].sort()) {
+    // If scoped enforcement is active, skip components not in the explicit test list
+    if (HX_COVERAGE_COMPONENTS && !HX_COVERAGE_COMPONENTS.has(name)) {
+      transitive.push({ name, metrics });
+      continue;
+    }
+
     const isExempt = Boolean(exemptions[name]);
     const belowThreshold =
       metrics.lines < threshold.lines ||
@@ -316,8 +350,9 @@ function main() {
 
   console.log(`PASS — ${passing.length} component(s) meeting threshold`);
   console.log('');
+  const transitiveNote = transitive.length > 0 ? `, ${transitive.length} transitive-skip` : '';
   console.log(
-    `Summary: ${passing.length} passing, ${failing.length} failing, ${exempt.length} exempt (${components.size} total)\n`,
+    `Summary: ${passing.length} passing, ${failing.length} failing, ${exempt.length} exempt${transitiveNote} (${components.size} total)\n`,
   );
 
   if (failing.length > 0) {
