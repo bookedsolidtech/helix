@@ -6,8 +6,9 @@
 #   2. Format (Prettier)
 #   3. Type check (TypeScript strict, zero errors)
 #   4. Test (Vitest browser mode + Playwright Chromium)
-#   5. Build + CEM + Bundle size (Vite library mode via Turborepo)
-#   6. VRT (Visual regression via Storybook)
+#   5. Test Admin (Vitest node mode for admin app)
+#   6. Build + CEM + Bundle size (Vite library mode via Turborepo)
+#   7. VRT (Visual regression via Storybook)
 # ============================================================================
 
 name: CI
@@ -86,6 +87,7 @@ jobs:
     timeout-minutes: 2
     outputs:
       source: ${{ steps.filter.outputs.source }}
+      admin: ${{ steps.filter.outputs.admin }}
       is_audit: ${{ steps.check-audit.outputs.is_audit }}
     steps:
       - uses: actions/checkout@v4
@@ -118,6 +120,11 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
               - '.github/workflows/**'
+            admin:
+              - 'apps/admin/src/**/*.ts'
+              - 'apps/admin/src/**/*.tsx'
+              - 'apps/admin/vitest.config.ts'
+              - 'apps/admin/package.json'
 
   # ── Fast checks (no build needed, <30s each) ────────────────────────────
 
@@ -293,6 +300,35 @@ jobs:
           gh pr comment ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
             --body "$BODY"
+
+  # ── Admin App Tests ──────────────────────────────────────────────────────
+  # Runs Vitest in node environment for the admin dashboard app.
+  # Triggered when apps/admin/src/** or config files change.
+
+  test-admin:
+    name: Test Admin
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.admin == 'true' && needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Run admin tests with coverage
+        run: pnpm --filter @helixui/admin run test:admin
+      - name: Upload admin coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-coverage-report
+          path: apps/admin/coverage/
+          retention-days: 14
+          if-no-files-found: warn
 
   # ── Build + CEM + Bundle size ───────────────────────────────────────────
 
@@ -702,6 +738,7 @@ jobs:
         format,
         type-check,
         test,
+        test-admin,
         build,
         a11y-audit,
         bundle-size,
@@ -721,6 +758,7 @@ jobs:
           echo "Format:        ${{ needs.format.result }}"
           echo "Type Check:    ${{ needs.type-check.result }}"
           echo "Test:          ${{ needs.test.result }}"
+          echo "Test Admin:    ${{ needs.test-admin.result }}"
           echo "Build:         ${{ needs.build.result }}"
           echo "A11y Audit:    ${{ needs.a11y-audit.result }}"
           echo "Bundle Size:   ${{ needs.bundle-size.result }}"
@@ -751,12 +789,13 @@ jobs:
             fi
           done
 
-          # Test, VRT, changeset, and bundle-size are allowed to be skipped (non-PR / no
-          # source changes) or cancelled (concurrency group replaced a running job)
-          for gate in test vrt changeset bundle-size; do
+          # Test, test-admin, VRT, changeset, and bundle-size are allowed to be skipped
+          # (non-PR / no source changes) or cancelled (concurrency group replaced a running job)
+          for gate in test test-admin vrt changeset bundle-size; do
             result="${{ needs.test.result }}"
             case "$gate" in
               test)        result="${{ needs.test.result }}" ;;
+              test-admin)  result="${{ needs.test-admin.result }}" ;;
               vrt)         result="${{ needs.vrt.result }}" ;;
               changeset)   result="${{ needs.changeset.result }}" ;;
               bundle-size) result="${{ needs.bundle-size.result }}" ;;
