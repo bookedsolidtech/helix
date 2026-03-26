@@ -168,7 +168,7 @@ export class HelixCopyButton extends LitElement {
 
   /** @internal */
   private async _copyToClipboard(): Promise<void> {
-    await navigator.clipboard.writeText(this.value);
+    await navigator?.clipboard?.writeText(this.value);
   }
 
   // ─── Event Handling ───
