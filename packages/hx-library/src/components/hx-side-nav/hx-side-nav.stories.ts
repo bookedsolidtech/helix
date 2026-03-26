@@ -122,7 +122,7 @@ export const Default: Story = {
           style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.875rem; overflow: hidden;"
         >
           <div
-            style="width: 2rem; height: 2rem; border-radius: 50%; background: #374151; flex-shrink: 0;"
+            style="width: 2rem; height: 2rem; border-radius: 50%; background: #334155; flex-shrink: 0;"
           ></div>
           <span style="white-space: nowrap;">Dr. Jane Smith</span>
         </div>
@@ -412,6 +412,7 @@ export const WithSectionedNavigation: Story = {
         </div>
 
         <!-- Clinical section label -->
+        <!-- neutral-400 (#94a3b8) on neutral-900 (#0f172a) = 6.96:1 — WCAG AA ✓ -->
         <div
           style="padding: 0.5rem 1rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;"
         >
@@ -463,6 +464,7 @@ export const WithSectionedNavigation: Story = {
         <div style="margin: 0.5rem 1rem; border-top: 1px solid #374151;"></div>
 
         <!-- Administration section label -->
+        <!-- neutral-400 (#94a3b8) on neutral-900 (#0f172a) = 6.96:1 — WCAG AA ✓ -->
         <div
           style="padding: 0.25rem 1rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;"
         >
@@ -521,7 +523,7 @@ export const WithSectionedNavigation: Story = {
           style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.875rem; overflow: hidden;"
         >
           <div
-            style="width: 2rem; height: 2rem; border-radius: 50%; background: #374151; flex-shrink: 0;"
+            style="width: 2rem; height: 2rem; border-radius: 50%; background: #334155; flex-shrink: 0;"
           ></div>
           <span style="white-space: nowrap;">Dr. Jane Smith</span>
         </div>
