@@ -32,7 +32,7 @@ export const HxPatientBanner = createComponent({
   elementClass: HelixPatientBanner,
   react: React,
   events: {
-    onHxIdentifierRuleViolation: 'hx-identifier-rule-violation',
+    onHxIdentifierRuleViolation: 'hx-identifier-rule-violation'
   },
   displayName: 'HxPatientBanner',
 });
