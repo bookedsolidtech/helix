@@ -21,8 +21,13 @@ export interface HxPhiFieldProps {
   /** Milliseconds after clipboard write before the clipboard is automatically cleared.
 Defaults to 30000 (30 seconds). */
   clipboardTimeout?: number;
+  /** Accessible label describing the PHI field. Used as a prefix in screen reader
+announcements (e.g., "Social Security Number is masked"). */
+  label?: string;
+  /** When set, disables all interaction with the field and prevents reveal. */
+  disabled?: boolean;
 
   // Event callbacks
-  /** Fired on reveal, hide, and clipboard auto-clear. */
+  /** Fired on reveal, hide, and clipboard-clear actions. */
   onHxPhiAccess?: (event: Event) => void;
 }

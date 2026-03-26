@@ -57,6 +57,21 @@ describe('hx-patient-banner', () => {
       const values = shadowQueryAll(el, '[part~="field-value"]');
       expect(values.length).toBeGreaterThanOrEqual(5);
     });
+
+    it('exposes "violation-message" CSS part when identifier rule is violated', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      await Promise.resolve();
+      expect(shadowQuery(el, '[part~="violation-message"]')).toBeTruthy();
+    });
+
+    it('does NOT render "violation-message" part when identifier rule is satisfied', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span><span slot="mrn">MRN-001</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(shadowQuery(el, '[part~="violation-message"]')).toBeNull();
+    });
   });
 
   // ─── Accessibility: ARIA attributes ───
@@ -79,6 +94,33 @@ describe('hx-patient-banner', () => {
       el.labelPatient = 'Updated patient label';
       await el.updateComplete;
       expect(el.getAttribute('aria-label')).toBe('Updated patient label');
+    });
+
+    it('has aria-hidden="true" on photo-area to keep decorative region from polluting screen reader tree', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      const photoArea = shadowQuery(el, '[part~="photo-area"]');
+      expect(photoArea?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('renders violation-message with role="alert" when identifier rule is violated', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      await Promise.resolve();
+      const msg = shadowQuery(el, '[part~="violation-message"]');
+      expect(msg?.getAttribute('role')).toBe('alert');
+    });
+
+    it('renders violation-message with aria-live="assertive" when identifier rule is violated', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      await Promise.resolve();
+      const msg = shadowQuery(el, '[part~="violation-message"]');
+      expect(msg?.getAttribute('aria-live')).toBe('assertive');
+    });
+
+    it('violation-message text contains identifier count information', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      await Promise.resolve();
+      const msg = shadowQuery(el, '[part~="violation-message"]');
+      expect(msg?.textContent).toContain('0 of 2');
     });
   });
 

@@ -78,6 +78,18 @@ export const helixPhiFieldStyles = css`
     pointer-events: none;
   }
 
+  /* ─── Disabled State ─── */
+
+  :host([disabled]) {
+    opacity: var(--hx-phi-field-disabled-opacity, var(--hx-opacity-50, 0.5));
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .phi-field--disabled .phi-field__toggle {
+    cursor: not-allowed;
+  }
+
   /* ─── Reduced Motion ─── */
 
   @media (prefers-reduced-motion: reduce) {

@@ -19,6 +19,7 @@ export const helixPatientBannerStyles = css`
     --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #111827));
     --_value-font-size: var(--hx-patient-banner-value-font-size, var(--hx-font-size-sm, 0.875rem));
     --_photo-size: var(--hx-patient-banner-photo-size, var(--hx-space-10, 2.5rem));
+    --_photo-bg: var(--hx-patient-banner-photo-bg, var(--hx-color-neutral-200, #e5e7eb));
   }
 
   * {
@@ -36,6 +37,7 @@ export const helixPatientBannerStyles = css`
     border-bottom: var(--hx-border-width-thin, 1px) solid var(--_border-color);
     font-family: var(--_font-family);
     width: 100%;
+    position: relative;
   }
 
   /* ─── Photo Area ─── */
@@ -44,12 +46,15 @@ export const helixPatientBannerStyles = css`
     flex-shrink: 0;
     width: var(--_photo-size);
     height: var(--_photo-size);
+    /* Minimum 44x44px touch target for interactive photo content. */
+    min-width: 44px;
+    min-height: 44px;
     border-radius: var(--hx-border-radius-full, 9999px);
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--hx-color-neutral-200, #e5e7eb);
+    background-color: var(--_photo-bg);
   }
 
   /* ─── Fields Grid ─── */
@@ -95,9 +100,8 @@ export const helixPatientBannerStyles = css`
   :host([aria-invalid='true']) .banner {
     border-bottom-color: var(--hx-color-error-400, #f87171);
     background-color: var(--hx-color-error-50, #fef2f2);
-    /* Darken label color to maintain 4.5:1 contrast on error-50 background */
+    /* Darken label color to maintain 4.5:1 contrast on error-50 background. */
     --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-700, #374151));
-    position: relative;
   }
 
   :host([aria-invalid='true']) .banner::before {
@@ -110,5 +114,29 @@ export const helixPatientBannerStyles = css`
     width: var(--hx-border-width-thick, 4px);
     background-color: var(--hx-color-error-500, #ef4444);
     border-radius: 0;
+  }
+
+  /* ─── Visually-hidden violation live region ─── */
+  /* Announces identifier rule violations to screen readers without visible text. */
+
+  .violation-message {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* ─── Motion reduction ─── */
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
   }
 `;
