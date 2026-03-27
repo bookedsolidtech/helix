@@ -112,16 +112,23 @@ pagination.addEventListener('hx-page-size-change', (e) => {
 
 ## Properties
 
-| Property        | Attribute         | Type      | Default        | Description                                                                                      |
-| --------------- | ----------------- | --------- | -------------- | ------------------------------------------------------------------------------------------------ |
-| `totalPages`    | `total-pages`     | `number`  | `1`            | Total number of pages. Reflects to attribute.                                                    |
-| `currentPage`   | `current-page`    | `number`  | `1`            | The currently active page (1-based).                                                             |
-| `siblingCount`  | `sibling-count`   | `number`  | `1`            | Number of page buttons shown on each side of the current page. Reflects to attribute.            |
-| `boundaryCount` | `boundary-count`  | `number`  | `1`            | Number of pages always shown at the start and end of the list. Reflects to attribute.            |
-| `showFirstLast` | `show-first-last` | `boolean` | `false`        | Whether to show First (`«`) and Last (`»`) page jump buttons. Reflects to attribute.             |
-| `label`         | `label`           | `string`  | `'Pagination'` | Accessible label applied as `aria-label` on the `<nav>` element. Reflects to attribute.          |
-| `pageSize`      | `page-size`       | `number`  | `25`           | Number of items per page. Used by the page-size selector when `show-page-size` is set. Reflects. |
-| `showPageSize`  | `show-page-size`  | `boolean` | `false`        | Whether to render the "Rows per page" `<select>` UI. Reflects to attribute.                      |
+| Property            | Attribute             | Type                                         | Default            | Description                                                                                                                    |
+| ------------------- | --------------------- | -------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `totalPages`        | `total-pages`         | `number`                                     | `1`                | Total number of pages. Reflects to attribute.                                                                                  |
+| `currentPage`       | `current-page`        | `number`                                     | `1`                | The currently active page (1-based).                                                                                           |
+| `siblingCount`      | `sibling-count`       | `number`                                     | `1`                | Number of page buttons shown on each side of the current page. Reflects to attribute.                                          |
+| `boundaryCount`     | `boundary-count`      | `number`                                     | `1`                | Number of pages always shown at the start and end of the list. Reflects to attribute.                                          |
+| `showFirstLast`     | `show-first-last`     | `boolean`                                    | `false`            | Whether to show First (`«`) and Last (`»`) page jump buttons. Reflects to attribute.                                           |
+| `label`             | `label`               | `string`                                     | `'Pagination'`     | Accessible label applied as `aria-label` on the `<nav>` element. Reflects to attribute.                                        |
+| `pageSize`          | `page-size`           | `number`                                     | `25`               | Number of items per page. Used by the page-size selector when `show-page-size` is set. Reflects.                               |
+| `showPageSize`      | `show-page-size`      | `boolean`                                    | `false`            | Whether to render the "Rows per page" `<select>` UI. Reflects to attribute.                                                    |
+| `labelRowsPerPage`  | `label-rows-per-page` | `string`                                     | `'Rows per page:'` | Label text for the rows-per-page selector. Override for i18n.                                                                  |
+| `firstPageLabel`    | `first-page-label`    | `string`                                     | `'First page'`     | Accessible label for the First page (`«`) navigation button. Override for i18n.                                                |
+| `previousPageLabel` | `previous-page-label` | `string`                                     | `'Previous page'`  | Accessible label for the Previous page (`‹`) navigation button. Override for i18n.                                             |
+| `nextPageLabel`     | `next-page-label`     | `string`                                     | `'Next page'`      | Accessible label for the Next page (`›`) navigation button. Override for i18n.                                                 |
+| `lastPageLabel`     | `last-page-label`     | `string`                                     | `'Last page'`      | Accessible label for the Last page (`»`) navigation button. Override for i18n.                                                 |
+| `labelPageMessage`  | —                     | `(current: number, total: number) => string` | `'Page N of N'`    | Function returning the `aria-live` announcement after each navigation. Override for i18n. Not configurable via HTML attribute. |
+| `labelPageButton`   | —                     | `(page: number) => string`                   | `'Page N'`         | Function returning the `aria-label` for each page button. Override for i18n. Not configurable via HTML attribute.              |
 
 ## Events
 
