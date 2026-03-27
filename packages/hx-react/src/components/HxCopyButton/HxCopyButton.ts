@@ -39,7 +39,7 @@ export const HxCopyButton = createComponent({
   react: React,
   events: {
     onHxCopyError: 'hx-copy-error',
-    onHxCopy: 'hx-copy',
+    onHxCopy: 'hx-copy'
   },
   displayName: 'HxCopyButton',
 });

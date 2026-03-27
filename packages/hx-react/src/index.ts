@@ -5,10 +5,7 @@ export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/ind
 export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
 export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
 export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
-export {
-  HxBreadcrumbItem,
-  type HxBreadcrumbItemProps,
-} from './components/HxBreadcrumbItem/index.js';
+export { HxBreadcrumbItem, type HxBreadcrumbItemProps } from './components/HxBreadcrumbItem/index.js';
 export { HxBreadcrumb, type HxBreadcrumbProps } from './components/HxBreadcrumb/index.js';
 export { HxButton, type HxButtonProps } from './components/HxButton/index.js';
 export { HxCard, type HxCardProps } from './components/HxCard/index.js';
@@ -17,10 +14,7 @@ export { HxCarousel, type HxCarouselProps } from './components/HxCarousel/index.
 export { HxCheckbox, type HxCheckboxProps } from './components/HxCheckbox/index.js';
 export { HxButtonGroup, type HxButtonGroupProps } from './components/HxButtonGroup/index.js';
 export { HxCheckboxGroup, type HxCheckboxGroupProps } from './components/HxCheckboxGroup/index.js';
-export {
-  HxClinicalStatus,
-  type HxClinicalStatusProps,
-} from './components/HxClinicalStatus/index.js';
+export { HxClinicalStatus, type HxClinicalStatusProps } from './components/HxClinicalStatus/index.js';
 export { HxCodeSnippet, type HxCodeSnippetProps } from './components/HxCodeSnippet/index.js';
 export { HxCombobox, type HxComboboxProps } from './components/HxCombobox/index.js';
 export { HxColorPicker, type HxColorPickerProps } from './components/HxColorPicker/index.js';
@@ -75,18 +69,9 @@ export { HxSideNav, type HxSideNavProps } from './components/HxSideNav/index.js'
 export { HxSplitPanel, type HxSplitPanelProps } from './components/HxSplitPanel/index.js';
 export { HxStat, type HxStatProps } from './components/HxStat/index.js';
 export { HxStack, type HxStackProps } from './components/HxStack/index.js';
-export {
-  HxStatusIndicator,
-  type HxStatusIndicatorProps,
-} from './components/HxStatusIndicator/index.js';
-export {
-  HxStructuredList,
-  type HxStructuredListProps,
-} from './components/HxStructuredList/index.js';
-export {
-  HxStructuredListRow,
-  type HxStructuredListRowProps,
-} from './components/HxStructuredListRow/index.js';
+export { HxStatusIndicator, type HxStatusIndicatorProps } from './components/HxStatusIndicator/index.js';
+export { HxStructuredList, type HxStructuredListProps } from './components/HxStructuredList/index.js';
+export { HxStructuredListRow, type HxStructuredListRowProps } from './components/HxStructuredListRow/index.js';
 export { HxStyleScope, type HxStyleScopeProps } from './components/HxStyleScope/index.js';
 export { HxStep, type HxStepProps } from './components/HxStep/index.js';
 export { HxSteps, type HxStepsProps } from './components/HxSteps/index.js';
@@ -114,7 +99,4 @@ export { HxTopNav, type HxTopNavProps } from './components/HxTopNav/index.js';
 export { HxTimePicker, type HxTimePickerProps } from './components/HxTimePicker/index.js';
 export { HxTreeItem, type HxTreeItemProps } from './components/HxTreeItem/index.js';
 export { HxTreeView, type HxTreeViewProps } from './components/HxTreeView/index.js';
-export {
-  HxVisuallyHidden,
-  type HxVisuallyHiddenProps,
-} from './components/HxVisuallyHidden/index.js';
+export { HxVisuallyHidden, type HxVisuallyHiddenProps } from './components/HxVisuallyHidden/index.js';
