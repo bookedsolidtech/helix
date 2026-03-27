@@ -13,6 +13,12 @@ on:
   pull_request:
     branches: [dev]
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
 
 concurrency:
   group: audit-batch-${{ github.head_ref }}

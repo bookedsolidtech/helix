@@ -35,23 +35,26 @@ HELIX uses a **three-tier design token system** with CSS custom properties. Toke
 | **Border**         | radius + width       | `--hx-border-radius-md`     | Border radii and widths              |
 | **Shadow**         | 7                    | `--hx-shadow-lg`            | Box shadows for elevation            |
 | **Duration**       | 6                    | `--hx-duration-fast`        | Animation/transition durations       |
-| **Easing**         | 5                    | `--hx-easing-default`       | Timing functions                     |
+| **Easing**         | 7                    | `--hx-easing-default`       | Timing functions                     |
 | **Transition**     | 3                    | `--hx-transition-normal`    | Shorthand transitions                |
-| **Focus**          | 5                    | `--hx-focus-ring-width`     | Focus ring styling                   |
+| **Focus**          | 6                    | `--hx-focus-ring-width`     | Focus ring styling                   |
 | **Z-Index**        | 9                    | `--hx-z-index-modal`        | Stacking layers                      |
 | **Opacity**        | 10                   | `--hx-opacity-disabled`     | Transparency levels                  |
-| **Size**           | 12                   | `--hx-size-touch-target`    | Fixed dimensions                     |
-| **Container**      | 5                    | `--hx-container-lg`         | Layout widths                        |
+| **Size**           | 16                   | `--hx-size-touch-target`    | Fixed dimensions                     |
+| **Container**      | 6                    | `--hx-container-lg`         | Layout widths                        |
 | **Breakpoint**     | 5                    | `--hx-breakpoint-md`        | Responsive breakpoints               |
 
 ## Theme Support
 
-HELIX ships with two themes:
+HELIX ships with three built-in themes:
 
 1. **Light** -- Default theme for standard usage
 2. **Dark** -- Dark mode with adjusted contrast, surfaces, and shadows
+3. **High Contrast** -- Accessibility mode for users who require enhanced contrast ratios
 
-Themes are applied via `data-theme="dark"` on the document root or automatically via `@media (prefers-color-scheme: dark)`.
+Themes are applied via attributes on the document root or automatically via media queries:
+- Dark: `data-theme="dark"` or `@media (prefers-color-scheme: dark)`
+- High Contrast: `data-hx-contrast="high"` or `@media (prefers-contrast: more)`
 
 ## Build Pipeline
 
@@ -60,6 +63,8 @@ Tokens are defined in `tokens.json` and processed by `generate-css.ts` to output
 - `:root` CSS with all light-mode tokens
 - `@media (prefers-color-scheme: dark)` overrides
 - `[data-theme="dark"]` manual override block
+- `@media (prefers-contrast: more)` high-contrast overrides
+- `[data-hx-contrast="high"]` manual high-contrast block
 - Lit `CSSResult` for shadow DOM consumption
 
 ## Next Steps

@@ -88,17 +88,17 @@ describe('contrast-checker', () => {
     });
 
     it('calculates correct ratio for primary-500 on white', () => {
-      // #2563EB (primary-500) on white should be around 4.56:1
+      // #2563EB (primary-500) on white = 5.17:1 per WCAG 2.1 spec
       const ratio = getContrastRatio('#2563EB', '#FFFFFF');
-      expect(ratio).toBeGreaterThan(4);
-      expect(ratio).toBeLessThan(5);
+      expect(ratio).toBeGreaterThan(5);
+      expect(ratio).toBeLessThan(5.5);
     });
 
     it('calculates correct ratio for error-600 on white', () => {
-      // #B91C1C (error-600) on white — documented as 5.08:1
+      // #B91C1C (error-600) on white = 6.47:1 per WCAG 2.1 spec
       const ratio = getContrastRatio('#B91C1C', '#FFFFFF');
-      expect(ratio).toBeGreaterThan(5);
-      expect(ratio).toBeLessThan(5.5);
+      expect(ratio).toBeGreaterThan(6);
+      expect(ratio).toBeLessThan(7);
     });
   });
 

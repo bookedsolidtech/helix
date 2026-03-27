@@ -19,20 +19,20 @@ HELIX follows a **layered architecture** designed for enterprise content organiz
 │  Three-Tier Design Tokens (W3C DTCG)        │
 ├─────────────────────────────────────────────┤
 │           Integration Layer                 │
-│  Drupal TWIG + Behaviors + CDN              │
+│  Drupal Twig + Behaviors + CDN              │
 └─────────────────────────────────────────────┘
 ```
 
 ## Key Architectural Decisions
 
-1. **Lit 3.x over React/Vue** - Framework-agnostic Web Components for CMS integration
-2. **Three-tier tokens** - Global, Alias, Component tiers for maximum flexibility
-3. **Dual documentation** - Storybook for playground, Starlight for guides
-4. **Turborepo monorepo** - Efficient builds with intelligent caching
-5. **WCAG 2.1 AA baseline** - Accessibility compliance as a first-class requirement
+1. **Lit 3.x over React/Vue** — Framework-agnostic Web Components for CMS integration
+2. **Three-tier tokens** — Primitive, Semantic, Component tiers for maximum flexibility
+3. **Dual documentation** — Storybook for playground, Starlight for guides
+4. **Turborepo + pnpm monorepo** — Efficient builds with intelligent caching
+5. **WCAG 2.1 AA baseline** — Accessibility compliance as a first-class requirement
 
 ## Next Steps
 
-- [Monorepo Structure](/architecture/monorepo/) - How the monorepo is organized
-- [Build Pipeline](/architecture/build-pipeline/) - Turborepo build orchestration
-- [Testing Strategy](/architecture/testing/) - Enterprise testing approach
+- [Monorepo Structure](/architecture/monorepo/) — How the monorepo is organized
+- [Build Pipeline](/architecture/build-pipeline/) — Turborepo build orchestration
+- [Testing Strategy](/architecture/testing/) — Enterprise testing approach

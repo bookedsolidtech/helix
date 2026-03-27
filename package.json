@@ -46,6 +46,7 @@
     "test:drupal-starter": "pnpm --filter=@helixui/drupal-starter run test",
     "test:tokens": "pnpm --filter=@helixui/tokens run test",
     "test:smart": "bash scripts/test-smart.sh",
+    "test:batch": "bash scripts/test-batch.sh",
     "test:storybook": "pnpm --filter=@helixui/storybook run test",
     "audit:story-coverage": "node scripts/audit-story-coverage.js",
     "format": "prettier --write .",

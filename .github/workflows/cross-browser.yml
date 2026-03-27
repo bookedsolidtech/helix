@@ -22,6 +22,12 @@ on:
   # Run on pushes to protected branches for post-merge validation
   push:
     branches: [main, staging]
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

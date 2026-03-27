@@ -209,7 +209,7 @@ declare global {
   status="critical"
   severity="high"
   mrn="MRN-00123456"
-  hx-aria-label="Navigate to patient James Martin's chart"
+  hx-label="Navigate to patient James Martin's chart"
   hx-href="/patients/MRN-00123456"
 >
   <img slot="image" src="/photos/patient-thumb.jpg" alt="" />
