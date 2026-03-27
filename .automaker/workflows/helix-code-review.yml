@@ -1,0 +1,34 @@
+name: helix-code-review
+description: Deep code quality review using the 3-tier review chain
+phases:
+  - state: INTAKE
+    enabled: true
+  - state: PLAN
+    enabled: false
+  - state: EXECUTE
+    enabled: true
+  - state: REVIEW
+    enabled: false
+  - state: MERGE
+    enabled: false
+  - state: DEPLOY
+    enabled: false
+agent:
+  role: chief-code-reviewer
+  model: opus
+  promptFile: .automaker/prompts/code-review.md
+  tools:
+    - Read
+    - Grep
+    - Glob
+execution:
+  useWorktrees: false
+  gitWorkflow:
+    autoCommit: false
+    autoPush: false
+    autoCreatePR: false
+  outputDir: .automaker/audits
+  terminalStatus: done
+match:
+  categories: [code-review]
+  keywords: [review, code-quality, dead-code]
