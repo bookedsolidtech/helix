@@ -52,21 +52,21 @@ Use `hx-prose` when wrapping:
 
 <ComponentDemo title="Typography Scale">
   <div style="display: grid; gap: 1.5rem;">
-    <hx-prose size="sm">
+    <hx-prose hx-size="sm">
       <h3>Small Prose</h3>
       <p>
         Compact typography for dense interfaces like sidebars and footnotes. Uses a reduced font
         size and tighter line height.
       </p>
     </hx-prose>
-    <hx-prose size="base">
+    <hx-prose hx-size="base">
       <h3>Base Prose</h3>
       <p>
         Default typography scale for standard body content. Balanced readability for the majority of
         content areas.
       </p>
     </hx-prose>
-    <hx-prose size="lg">
+    <hx-prose hx-size="lg">
       <h3>Large Prose</h3>
       <p>
         Expanded typography for featured content and landing pages. Generous sizing for maximum
@@ -173,7 +173,7 @@ Minimal HTML snippet — no build tool required:
 With size and max-width:
 
 ```html
-<hx-prose size="lg" max-width="72ch">
+<hx-prose hx-size="lg" max-width="72ch">
   <h1>Clinical Protocol Overview</h1>
   <p>This document outlines the standard operating procedures for the ICU.</p>
 </hx-prose>
@@ -183,7 +183,7 @@ With size and max-width:
 
 | Property   | Attribute   | Type                     | Default  | Description                                                                                                                 |
 | ---------- | ----------- | ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `size`     | `size`      | `'sm' \| 'base' \| 'lg'` | `'base'` | Typography scale for the prose content. Sets `--hx-prose-font-size` to the corresponding size token.                        |
+| `size`     | `hx-size`   | `'sm' \| 'base' \| 'lg'` | `'base'` | Typography scale for the prose content. Sets `--hx-prose-font-size` to the corresponding size token.                        |
 | `maxWidth` | `max-width` | `string`                 | `''`     | Maximum content width. Accepts any valid CSS width value (`'640px'`, `'80ch'`, `'100%'`). Overrides `--hx-prose-max-width`. |
 
 ## Events
@@ -258,7 +258,7 @@ This is intentional: Light DOM rendering ensures CMS-injected content (Drupal CK
 With size variant for a callout block:
 
 ```twig
-<hx-prose size="sm">
+<hx-prose hx-size="sm">
   {{ content.field_sidebar_text }}
 </hx-prose>
 ```
@@ -327,18 +327,18 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
     <hr style="margin: 2rem 0;" />
 
     <h2>Small Size — Sidebar or Footnote</h2>
-    <hx-prose size="sm" max-width="480px">
+    <hx-prose hx-size="sm" max-width="480px">
       <h3>Reference Notes</h3>
       <p>
         These compact notes provide supplemental context for clinical staff. Font size is reduced to
-        <code>0.875rem</code> via the <code>size="sm"</code> attribute.
+        <code>0.875rem</code> via the <code>hx-size="sm"</code> attribute.
       </p>
     </hx-prose>
 
     <hr style="margin: 2rem 0;" />
 
     <h2>Large Size — Featured Content</h2>
-    <hx-prose size="lg" max-width="720px">
+    <hx-prose hx-size="lg" max-width="720px">
       <h1>Annual Health Report</h1>
       <p class="lead">
         This report summarizes key health metrics for the 2025 fiscal year across all participating

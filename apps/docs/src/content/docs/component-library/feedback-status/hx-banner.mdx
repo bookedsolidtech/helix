@@ -88,16 +88,17 @@ import '@helixui/library/components/hx-banner';
 
 ## Properties
 
-| Property      | Attribute      | Type                                          | Default            | Description                                                                                |
-| ------------- | -------------- | --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| `variant`     | `variant`      | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'`           | Visual variant that determines colors and ARIA semantics.                                  |
-| `position`    | `position`     | `'sticky' \| 'fixed'`                         | `'sticky'`         | CSS positioning behavior. `sticky` keeps the banner in flow; `fixed` pins to the viewport. |
-| `heading`     | `heading`      | `string`                                      | `''`               | Heading text, used in accessible labels for the action link and close button.              |
-| `dismissible` | `dismissible`  | `boolean`                                     | `false`            | Whether the banner can be dismissed by the user.                                           |
-| `open`        | `open`         | `boolean`                                     | `true`             | Whether the banner is visible. Defaults to `true`.                                         |
-| `actionLabel` | `action-label` | `string`                                      | `''`               | Label text for the optional action link. Requires `action-href` to render.                 |
-| `actionHref`  | `action-href`  | `string`                                      | `''`               | URL for the optional action link. Requires `action-label` to render.                       |
-| `closeLabel`  | `close-label`  | `string`                                      | `'Dismiss banner'` | Accessible label for the dismiss button. Override for localized text.                      |
+| Property        | Attribute        | Type                                          | Default            | Description                                                                                                                        |
+| --------------- | ---------------- | --------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`       | `variant`        | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'`           | Visual variant that determines colors and ARIA semantics.                                                                          |
+| `position`      | `position`       | `'sticky' \| 'fixed'`                         | `'sticky'`         | CSS positioning behavior. `sticky` keeps the banner in flow; `fixed` pins to the viewport.                                         |
+| `heading`       | `heading`        | `string`                                      | `''`               | Heading text, used in accessible labels for the action link and close button.                                                      |
+| `dismissible`   | `dismissible`    | `boolean`                                     | `false`            | Whether the banner can be dismissed by the user.                                                                                   |
+| `open`          | `open`           | `boolean`                                     | `true`             | Whether the banner is visible. Defaults to `true`.                                                                                 |
+| `actionLabel`   | `action-label`   | `string`                                      | `''`               | Label text for the optional action link. Requires `action-href` to render.                                                         |
+| `actionHref`    | `action-href`    | `string`                                      | `''`               | URL for the optional action link. Requires `action-label` to render.                                                               |
+| `labelClose`    | `label-close`    | `string`                                      | `'Dismiss banner'` | Accessible label for the dismiss button. Override for localized text.                                                              |
+| `severityLabel` | `severity-label` | `string \| undefined`                         | `undefined`        | Override for the severity prefix announced to screen readers (e.g., `"Info:"`, `"Error:"`). Defaults to English label for variant. |
 
 ## Events
 
@@ -140,13 +141,13 @@ import '@helixui/library/components/hx-banner';
 
 ## Accessibility
 
-| Topic         | Details                                                                                                                                                                               |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA role     | `role="region"` with `aria-label` derived from the `heading` property. The `error` and `warning` variants use `aria-live="assertive"`; `info` and `success` use `aria-live="polite"`. |
-| Keyboard      | `Tab` navigates to the action link and dismiss button. `Enter` or `Space` activates them.                                                                                             |
-| Screen reader | Content changes are announced via the ARIA live region. The dismiss button label is set from `close-label`.                                                                           |
-| Focus         | Focus is not moved on banner appearance; users are notified via the live region.                                                                                                      |
-| WCAG          | Meets WCAG 2.1 AA. Error and warning banners use `assertive` announcements for urgent healthcare alerts.                                                                              |
+| Topic         | Details                                                                                                                                                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role     | Applied to the host element. `role="alert"` (assertive) for `error` and `warning` variants; `role="status"` (polite) for `info` and `success` variants. `aria-live` is not set explicitly to prevent double-announcement in JAWS. |
+| Keyboard      | `Tab` navigates to the action link and dismiss button. `Enter` or `Space` activates them.                                                                                                                                         |
+| Screen reader | Content changes are announced via the ARIA live region. The dismiss button label is set from `label-close`.                                                                                                                       |
+| Focus         | Focus is not moved on banner appearance; users are notified via the live region.                                                                                                                                                  |
+| WCAG          | Meets WCAG 2.1 AA. Error and warning banners use `assertive` announcements for urgent healthcare alerts.                                                                                                                          |
 
 ## Drupal Integration
 

@@ -42,9 +42,9 @@ Small, medium, and large badge sizes.
 
 <ComponentDemo title="Sizes">
   <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-    <hx-badge size="sm">Small</hx-badge>
-    <hx-badge size="md">Medium</hx-badge>
-    <hx-badge size="lg">Large</hx-badge>
+    <hx-badge hx-size="sm">Small</hx-badge>
+    <hx-badge hx-size="md">Medium</hx-badge>
+    <hx-badge hx-size="lg">Large</hx-badge>
   </div>
 </ComponentDemo>
 
@@ -155,7 +155,7 @@ Minimal HTML snippet — no build tool required:
 | Property      | Attribute      | Type                                                                                   | Default     | Description                                                                                                             |
 | ------------- | -------------- | -------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `variant`     | `variant`      | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'error' \| 'neutral' \| 'info'` | `'primary'` | Visual style variant that determines badge color scheme.                                                                |
-| `size`        | `size`         | `'sm' \| 'md' \| 'lg'`                                                                 | `'md'`      | Controls font size and padding.                                                                                         |
+| `size`        | `hx-size`      | `'sm' \| 'md' \| 'lg'`                                                                 | `'md'`      | Controls font size and padding.                                                                                         |
 | `pill`        | `pill`         | `boolean`                                                                              | `false`     | Applies fully rounded (pill) border-radius styling.                                                                     |
 | `pulse`       | `pulse`        | `boolean`                                                                              | `false`     | Enables an animated pulse effect. When set with no slot content, renders as a dot indicator.                            |
 | `removable`   | `removable`    | `boolean`                                                                              | `false`     | Renders a dismiss button inside the badge.                                                                              |
@@ -224,7 +224,7 @@ Use the component in a Twig template after registering the library:
 {# my-module/templates/my-template.html.twig #}
 <hx-badge
   variant="{{ variant|default('primary') }}"
-  size="{{ size|default('md') }}"
+  hx-size="{{ size|default('md') }}"
   {% if pill %}pill{% endif %}
   {% if pulse %}pulse{% endif %}
   {% if removable %}
