@@ -99,12 +99,13 @@ The last `hx-breadcrumb-item` in the default slot is automatically treated as th
 
 ### hx-breadcrumb
 
-| Property    | Attribute   | Type      | Default        | Description                                                                                                                                                                                |
-| ----------- | ----------- | --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `label`     | `label`     | `string`  | `'Breadcrumb'` | Accessible label for the `nav` landmark. Passed directly to `aria-label`. Override when multiple breadcrumbs appear on the same page.                                                      |
-| `separator` | `separator` | `string`  | `'/'`          | Separator character rendered between items. Sets the `--hx-breadcrumb-separator-content` CSS custom property. NOTE: When overriding via CSS directly, the value must be quoted: `">"`.     |
-| `maxItems`  | `max-items` | `number`  | `0`            | Maximum visible items before collapsing middle items with an ellipsis. `0` shows all items. The ellipsis button is keyboard-accessible; activating it restores the full trail.             |
-| `jsonLd`    | `json-ld`   | `boolean` | `false`        | When true, injects a JSON-LD `BreadcrumbList` script into `document.head` for SEO. **Not recommended in Drupal** — use the Twig structured-data template instead (see Drupal Integration). |
+| Property        | Attribute        | Type      | Default                       | Description                                                                                                                                                                                |
+| --------------- | ---------------- | --------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`         | `label`          | `string`  | `'Breadcrumb'`                | Accessible label for the `nav` landmark. Passed directly to `aria-label`. Override when multiple breadcrumbs appear on the same page.                                                      |
+| `separator`     | `separator`      | `string`  | `'/'`                         | Separator character rendered between items. Sets the `--hx-breadcrumb-separator-content` CSS custom property. NOTE: When overriding via CSS directly, the value must be quoted: `">"`.     |
+| `maxItems`      | `max-items`      | `number`  | `0`                           | Maximum visible items before collapsing middle items with an ellipsis. `0` shows all items. The ellipsis button is keyboard-accessible; activating it restores the full trail.             |
+| `jsonLd`        | `json-ld`        | `boolean` | `false`                       | When true, injects a JSON-LD `BreadcrumbList` script into `document.head` for SEO. **Not recommended in Drupal** — use the Twig structured-data template instead (see Drupal Integration). |
+| `labelEllipsis` | `label-ellipsis` | `string`  | `'Show all breadcrumb items'` | Accessible label for the ellipsis expand button shown when middle items are collapsed via `max-items`. Override for non-English locales.                                                   |
 
 ### hx-breadcrumb-item
 

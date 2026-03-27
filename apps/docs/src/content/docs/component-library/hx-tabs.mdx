@@ -19,7 +19,7 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 - **`hx-tab`** — An individual tab trigger placed in the `tab` named slot. Renders as a `<button role="tab">`.
 - **`hx-tab-panel`** — A content panel associated with a tab via matching `panel`/`name` attributes.
 
-The component fully implements the [WAI-ARIA Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) with roving `tabindex`, `aria-selected`, `aria-controls`/`aria-labelledby` cross-linking, and both automatic and manual keyboard activation modes.
+The component fully implements the [WAI-ARIA Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) with roving `tabindex`, `aria-selected`, `aria-controls`, and both automatic and manual keyboard activation modes.
 
 **Use `hx-tabs` when:** users need to switch between a fixed set of related views without leaving the page — patient chart sections, record detail views, settings categories, or dashboard panes.
 
@@ -307,23 +307,23 @@ document.querySelector('hx-tabs').addEventListener('hx-tab-change', (e) => {
 
 `hx-tabs` implements the [WAI-ARIA Tabs Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) (APG). All ARIA roles, states, and properties are managed automatically by the container.
 
-| Topic                 | Details                                                                                                                                                        |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA roles            | `role="tablist"` on the tablist container; `role="tab"` on each `<button>` inside `<hx-tab>`; `role="tabpanel"` on each `<hx-tab-panel>` host.                 |
-| `aria-selected`       | Set to `'true'` on the active tab's inner button; `'false'` on all others.                                                                                     |
-| `aria-controls`       | Set on the `role="tab"` button to reference the `id` of the corresponding `<hx-tab-panel>`.                                                                    |
-| `aria-labelledby`     | Set on each `<hx-tab-panel>` to reference the `id` of its corresponding `<hx-tab>`, providing an accessible panel label.                                       |
-| `aria-orientation`    | Set to `'horizontal'` or `'vertical'` on the tablist to communicate layout direction to screen readers.                                                        |
-| `aria-label`          | Set on the tablist via the `label` attribute. Always provide a meaningful label (e.g., `"Patient record sections"`).                                           |
-| `aria-disabled`       | Set to `'true'` on the inner button of disabled tabs. The disabled tab remains visually present and announced to screen readers.                               |
-| Roving tabindex       | Only the active tab receives `tabindex="0"`; all others are `tabindex="-1"`. Arrow keys move focus between tabs without leaving the tablist.                   |
-| Keyboard — tabs       | `ArrowRight` / `ArrowLeft` (horizontal) or `ArrowDown` / `ArrowUp` (vertical) move focus; `Home` jumps to first tab; `End` jumps to last tab.                  |
-| Keyboard — activation | In `automatic` mode (default), arrow-key focus immediately activates the tab. In `manual` mode, press `Enter` or `Space` to activate the focused tab.          |
-| Keyboard — panels     | `Tab` moves focus into the active panel; `Shift+Tab` returns focus to the active tab.                                                                          |
-| Hidden panels         | Inactive panels have `hidden` set and `tabindex="-1"`, removing them from the accessibility tree and tab order until activated.                                |
-| Focus ring            | Both tabs and focused panels display a visible focus ring meeting WCAG 2.1 AA minimum contrast. Customizable via `--hx-tabs-focus-ring-color`.                 |
-| Reduced motion        | CSS transitions on tab button state changes are suppressed when `prefers-reduced-motion: reduce` is set.                                                       |
-| WCAG                  | Meets WCAG 2.1 AA. Focus indicators are visible; color is not the sole conveyor of active state (font weight and indicator border also communicate selection). |
+| Topic                 | Details                                                                                                                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA roles            | `role="tablist"` on the tablist container; `role="tab"` on each `<button>` inside `<hx-tab>`; `role="tabpanel"` on each `<hx-tab-panel>` host.                                                                                       |
+| `aria-selected`       | Set to `'true'` on the active tab's inner button; `'false'` on all others.                                                                                                                                                           |
+| `aria-controls`       | Set on the `role="tab"` button to reference the `id` of the corresponding `<hx-tab-panel>`.                                                                                                                                          |
+| `aria-label`          | Set on each `<hx-tab-panel>` using the label text of its corresponding `<hx-tab>`. Used instead of `aria-labelledby` because the tab and panel live in different shadow DOM trees, making cross-boundary `id` references unreliable. |
+| `aria-orientation`    | Set to `'horizontal'` or `'vertical'` on the tablist to communicate layout direction to screen readers.                                                                                                                              |
+| `aria-label`          | Set on the tablist via the `label` attribute. Always provide a meaningful label (e.g., `"Patient record sections"`).                                                                                                                 |
+| `aria-disabled`       | Set to `'true'` on the inner button of disabled tabs. The disabled tab remains visually present and announced to screen readers.                                                                                                     |
+| Roving tabindex       | Only the active tab receives `tabindex="0"`; all others are `tabindex="-1"`. Arrow keys move focus between tabs without leaving the tablist.                                                                                         |
+| Keyboard — tabs       | `ArrowRight` / `ArrowLeft` (horizontal) or `ArrowDown` / `ArrowUp` (vertical) move focus; `Home` jumps to first tab; `End` jumps to last tab.                                                                                        |
+| Keyboard — activation | In `automatic` mode (default), arrow-key focus immediately activates the tab. In `manual` mode, press `Enter` or `Space` to activate the focused tab.                                                                                |
+| Keyboard — panels     | `Tab` moves focus into the active panel; `Shift+Tab` returns focus to the active tab.                                                                                                                                                |
+| Hidden panels         | Inactive panels have `hidden` set and `tabindex="-1"`, removing them from the accessibility tree and tab order until activated.                                                                                                      |
+| Focus ring            | Both tabs and focused panels display a visible focus ring meeting WCAG 2.1 AA minimum contrast. Customizable via `--hx-tabs-focus-ring-color`.                                                                                       |
+| Reduced motion        | CSS transitions on tab button state changes are suppressed when `prefers-reduced-motion: reduce` is set.                                                                                                                             |
+| WCAG                  | Meets WCAG 2.1 AA. Focus indicators are visible; color is not the sole conveyor of active state (font weight and indicator border also communicate selection).                                                                       |
 
 ### Healthcare A11y Notes
 

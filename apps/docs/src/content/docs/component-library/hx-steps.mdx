@@ -209,10 +209,11 @@ steps[2].disabled = true;
 
 ### hx-steps
 
-| Property      | Attribute     | Type                         | Default        | Description                                                                                                       |
-| ------------- | ------------- | ---------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the steps. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute. |
-| `size`        | `size`        | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size variant. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute.                  |
+| Property      | Attribute     | Type                         | Default        | Description                                                                                                                                                                                                                 |
+| ------------- | ------------- | ---------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the steps. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute.                                                                                                           |
+| `size`        | `hx-size`     | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size variant. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute. Use the `hx-size` attribute in HTML; the legacy `size` attribute is accepted for backward compatibility but is deprecated. |
+| `ariaLabel`   | `aria-label`  | `string \| null`             | `null`         | Accessible label for the steps list. Always provide a descriptive value that names the workflow (e.g., `"Checkout progress"`). Forwarded to the inner `role="list"` element.                                                |
 
 ### hx-step
 

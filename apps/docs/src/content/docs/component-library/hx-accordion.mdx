@@ -130,10 +130,11 @@ import '@helixui/library/components/hx-accordion';
 
 ### hx-accordion-item
 
-| Property   | Attribute  | Type      | Default | Description                                       |
-| ---------- | ---------- | --------- | ------- | ------------------------------------------------- |
-| `expanded` | `expanded` | `boolean` | `false` | Whether this item is currently expanded (open).   |
-| `disabled` | `disabled` | `boolean` | `false` | Prevents the item from being toggled by the user. |
+| Property   | Attribute  | Type                         | Default | Description                                                                                                                                                                         |
+| ---------- | ---------- | ---------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expanded` | `expanded` | `boolean`                    | `false` | Whether this item is currently expanded (open).                                                                                                                                     |
+| `disabled` | `disabled` | `boolean`                    | `false` | Prevents the item from being toggled by the user.                                                                                                                                   |
+| `level`    | `level`    | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `3`     | Heading level for the accordion trigger. Controls `aria-level` and the wrapping heading element (`<h1>`–`<h6>`). Match the surrounding document outline for correct ARIA structure. |
 
 ## Events
 
