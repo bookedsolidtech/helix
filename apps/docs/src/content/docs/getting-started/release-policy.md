@@ -52,10 +52,45 @@ Breaking changes are never introduced without advance notice. The process is:
 
 ### Changelog
 
-Every release includes a changelog generated via [changesets](https://github.com/changesets/changesets). Changelogs are published:
+Every release includes a changelog generated via [changesets](https://github.com/changesets/changesets). Each PR that modifies a published package must include a changeset file describing the change type and summary. Changelogs are published:
 
 - In the GitHub release notes
 - In each package's `CHANGELOG.md`
+
+## Release Process
+
+HELiX uses a **three-branch promotion pipeline** to ensure changes are validated at each stage before reaching consumers.
+
+```
+feature/* → dev → staging → main
+```
+
+| Stage             | Branch    | Purpose                                               |
+| ----------------- | --------- | ----------------------------------------------------- |
+| Development       | `dev`     | Active integration; all feature PRs target this branch |
+| Staging           | `staging` | Pre-release validation; promotion from `dev`          |
+| Production        | `main`    | Published releases; promotion from `staging`          |
+
+### How Releases Ship
+
+1. **Feature work** lands on `dev` via PR. Each PR requires a changeset file (`.changeset/*.md`) declaring the bump type and change description.
+2. **Promotion to staging** — `dev` is merged to `staging`. CI validates the full build and test suite.
+3. **Promotion to main** — `staging` is merged to `main`. The CI publish pipeline detects changeset files, bumps `package.json` versions, updates `CHANGELOG.md`, and publishes packages to npm under the `@helixui` scope.
+4. **GitHub Release** — A tagged release is created automatically with the generated changelog.
+
+### Changeset Requirements
+
+Every PR that modifies a published package (`@helixui/library`, `@helixui/tokens`, etc.) must include a changeset:
+
+```bash
+pnpm exec changeset
+```
+
+Test-only changes (only `*.test.ts` files modified) are exempt — add the `skip-changeset` label to the PR instead.
+
+### Linked Package Versions
+
+`@helixui/library` and `@helixui/tokens` are **linked** — they always publish at the same version number. Bumping one automatically bumps the other.
 
 ## Support Policy
 
