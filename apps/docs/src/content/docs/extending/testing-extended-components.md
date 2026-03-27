@@ -443,9 +443,9 @@ describe('PatientCard — accessibility (axe-core WCAG 2.1 AA)', () => {
     expect(violations).toEqual([]);
   });
 
-  it('has no violations when interactive (hx-href + hx-aria-label)', async () => {
+  it('has no violations when interactive (hx-href + hx-label)', async () => {
     const el = await fixture<PatientCard>(
-      '<org-patient-card hx-href="/chart/001" hx-aria-label="View chart for James Martin">' +
+      '<org-patient-card hx-href="/chart/001" hx-label="View chart for James Martin">' +
         '<h2 slot="heading">James Martin</h2>' +
         '<p>Room 412</p>' +
         '</org-patient-card>',
@@ -885,9 +885,9 @@ describe('PatientCard', () => {
       expect(violations).toEqual([]);
     });
 
-    it('has no violations when interactive with hx-aria-label', async () => {
+    it('has no violations when interactive with hx-label', async () => {
       const el = await fixture<PatientCard>(
-        '<org-patient-card hx-href="/patients/MRN-001" hx-aria-label="View chart for James Martin">' +
+        '<org-patient-card hx-href="/patients/MRN-001" hx-label="View chart for James Martin">' +
           '<h2 slot="heading">James Martin</h2>' +
           '<p>Room 412</p>' +
           '</org-patient-card>',
