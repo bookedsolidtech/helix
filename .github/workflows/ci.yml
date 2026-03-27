@@ -15,8 +15,20 @@ name: CI
 on:
   push:
     branches: [main, dev, staging, 'changeset-release/**']
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
   pull_request:
     branches: [main, dev, staging]
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

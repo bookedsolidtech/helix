@@ -60,8 +60,8 @@ export class HelixCard extends LitElement {
 
   variant: 'default' | 'featured' | 'compact' = 'default';
   elevation: 'flat' | 'raised' | 'floating' = 'flat';
-  hxHref: string | undefined;
-  hxAriaLabel: string | undefined;
+  href: string | undefined;   // attribute: 'hx-href'
+  label: string | undefined;  // attribute: 'hx-label' — accessible name for interactive cards
 
   override render(): TemplateResult { /* ... */ }
 }
@@ -124,7 +124,7 @@ static override styles = [
   ...HelixCard.styles,
   css`
     :host([status='critical']) {
-      --org-patient-card-status-color: var(--hx-color-danger-600, #dc2626);
+      --org-patient-card-status-color: var(--hx-color-error-600, #b91c1c);
     }
 
     :host([status='stable']) {
@@ -375,7 +375,7 @@ Once registered, use the element like any other custom element:
   status="critical"
   severity="high"
   mrn="MRN-00123456"
-  hx-aria-label="Navigate to patient James Martin's chart"
+  hx-label="Navigate to patient James Martin's chart"
   hx-href="/patients/MRN-00123456"
 >
   <img slot="image" src="/photos/patient-thumb.jpg" alt="" />

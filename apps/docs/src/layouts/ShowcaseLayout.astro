@@ -7,6 +7,9 @@
  *
  * Imports the 4 shared CSS files so Astro bundles them automatically.
  * Includes the shared SiteNavbar for consistent navigation across all pages.
+ *
+ * Design system: periodic table aesthetic — teal accents, sharp 4px radius,
+ * glassmorphic cards, grid-line backgrounds, Geist variable font.
  */
 interface Props {
   title: string;
@@ -29,6 +32,9 @@ import SiteNavbar from '../components/SiteNavbar.astro';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} | HELIX</title>
     <meta name="description" content={description} />
+    <!-- Geist variable font (aligns with main docs design system) -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <!-- Inter + JetBrains Mono fallbacks via Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

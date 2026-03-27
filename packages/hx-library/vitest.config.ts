@@ -28,18 +28,12 @@ export default defineConfig({
       'src/mixins/**/*.test.ts',
       'src/__tests__/**/*.test.ts',
     ],
-    exclude: ['.worktrees/**', 'node_modules/**'],
+    exclude: ['.worktrees/**', 'node_modules/**', '**/__screenshots__/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results.json' },
     testTimeout: 30000,
+    teardownTimeout: 5000,
     globals: true,
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        minThreads: 2,
-        maxThreads: 4,
-      },
-    },
     // Coverage disabled by default — run `pnpm run test:coverage` for reports.
     // Keeps CI fast (~5min instead of ~20min).
     // Use v8 provider for accurate, fast coverage without instrumentation overhead.

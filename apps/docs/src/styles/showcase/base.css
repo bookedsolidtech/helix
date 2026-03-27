@@ -1,6 +1,26 @@
 /* ============================================
-   Showcase Base — reset, body, typography, links
+   Showcase Base — font-faces, reset, body, typography, links
+   Aligned with periodic table design system (custom.css)
    ============================================ */
+
+/* --- Geist Variable Font (matches custom.css) --- */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/geist@1.7.0/dist/fonts/geist-sans/Geist-Variable.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/geist@1.7.0/dist/fonts/geist-mono/GeistMono-Variable.woff2')
+    format('woff2');
+}
 
 *,
 *::before,
@@ -39,11 +59,11 @@ pre {
 }
 
 a {
-  color: var(--wc-accent);
+  color: var(--wc-teal);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: hsl(var(--wc-accent-h), var(--wc-accent-s), 75%);
+  color: hsl(var(--wc-accent-h), var(--wc-accent-s), 65%);
 }

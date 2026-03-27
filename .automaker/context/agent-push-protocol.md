@@ -3,6 +3,8 @@
 Every agent push MUST follow this exact sequence. No shortcuts. No exceptions.
 Pushing code that fails CI is a wasted cycle and an unacceptable failure.
 
+**CODE DOES NOT LEAVE THIS MACHINE UNTIL IT PASSES THE LOCAL DOCKER CI GATE.**
+
 ---
 
 ## The Push Sequence
@@ -14,13 +16,13 @@ pnpm run format
 git add -u
 ```
 
-### Step 2: Preflight (ALL CI gates locally)
+### Step 2: Preflight (fast local gates)
 
 ```bash
 pnpm run preflight
 ```
 
-If this fails: **FIX THE ERRORS.** Do not push. Do not skip.
+If this fails: **FIX THE ERRORS.** Do not proceed to Step 3.
 
 `preflight` runs ALL CI-equivalent gates in order:
 1. Lint
@@ -31,11 +33,26 @@ If this fails: **FIX THE ERRORS.** Do not push. Do not skip.
 6. CEM (if library source changed)
 7. Changeset check (if component source changed)
 
-**This replaces the old separate `verify` + `test:smart` steps.**
-
 **NEVER run `pnpm run test` or `pnpm run test:library` — these run the full suite and are forbidden.**
 
-### Step 3: Commit
+### Step 3: Docker CI Gate (MANDATORY)
+
+```bash
+./scripts/act-ci.sh
+```
+
+This runs the FULL quality gates inside Docker containers — the exact same
+environment as GitHub Actions CI. If it passes here, it WILL pass on GitHub.
+
+**If act fails: FIX THE ERRORS. Do not push. Do not skip. This is non-negotiable.**
+
+If Docker is not running, start it. If `act` is not installed, stop — you cannot push.
+
+**Why both preflight AND act?** Preflight is fast (~30s) and catches 90% of issues.
+Act is thorough (~4min) and guarantees CI parity. Preflight first saves time on
+obvious failures. Act second ensures nothing slips through.
+
+### Step 4: Commit
 
 ```bash
 HUSKY=0 git commit -m "type(scope): lowercase message"
@@ -43,7 +60,7 @@ HUSKY=0 git commit -m "type(scope): lowercase message"
 
 Subject must be ALL LOWERCASE. Max 120 chars. See commit-quality-gates.md.
 
-### Step 4: Push ONCE
+### Step 5: Push ONCE
 
 ```bash
 HUSKY=0 git push origin <branch>

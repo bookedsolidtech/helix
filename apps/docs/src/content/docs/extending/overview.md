@@ -51,16 +51,16 @@ The library is deliberately thin on convention. Convention lives in the token sy
 
 HELiX components expose `--hx-*` CSS custom properties at two levels:
 
-- **Semantic tokens** (`--hx-color-primary`, `--hx-spacing-md`) — affect the entire library at once
+- **Semantic tokens** (`--hx-color-primary-500`, `--hx-space-4`) — affect the entire library at once
 - **Component tokens** (`--hx-button-bg`, `--hx-card-padding`) — scope to a single component
 
 Override at the root for global theming:
 
 ```css
 :root {
-  --hx-color-primary: #005eb8;      /* NHS Blue — affects all components */
-  --hx-color-error: #d0021b;        /* Clinical alert red */
-  --hx-border-radius-md: 2px;       /* Tighter corners for clinical UI */
+  --hx-color-primary-500: #005eb8;   /* NHS Blue — affects all components */
+  --hx-color-error-500: #d0021b;     /* Clinical alert red */
+  --hx-border-radius-md: 2px;        /* Tighter corners for clinical UI */
 }
 ```
 
@@ -68,7 +68,7 @@ Override at the component level for targeted customization:
 
 ```css
 hx-button[variant="danger"] {
-  --hx-button-bg: var(--hx-color-error);
+  --hx-button-bg: var(--hx-color-error-500);
   --hx-button-color: #ffffff;
 }
 ```
@@ -119,7 +119,7 @@ hx-button[disabled]::part(button) {
 
 /* Focus ring customization */
 hx-text-input:focus-within::part(input) {
-  outline: 3px solid var(--hx-color-focus);
+  outline: 3px solid var(--hx-color-focus-ring);
   outline-offset: 2px;
 }
 ```
@@ -231,7 +231,7 @@ Does the change affect only visual appearance?
 ├─ YES → Does it apply globally (all instances)?
 │         │
 │         ├─ YES → Override a semantic token at :root
-│         │        (--hx-color-primary, --hx-spacing-md)
+│         │        (--hx-color-primary-500, --hx-space-4)
 │         │
 │         └─ NO → Does it apply to a specific component?
 │                  │
@@ -259,7 +259,7 @@ Does the change affect only visual appearance?
 
 | Goal | Vector | Stability | Example |
 | --- | --- | --- | --- |
-| Brand color theming | CSS custom property (semantic) | **Stable** | `--hx-color-primary: #005eb8` |
+| Brand color theming | CSS custom property (primitive) | **Stable** | `--hx-color-primary-500: #005eb8` |
 | Component-specific style | CSS custom property (component) | **Stable** | `--hx-button-bg: navy` |
 | Style an internal DOM element | `::part()` selector | **Stable** | `hx-button::part(button)` |
 | Inject content into a component | Slot | **Stable** | `<span slot="header">` |

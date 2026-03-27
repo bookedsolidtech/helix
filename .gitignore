@@ -135,5 +135,9 @@ apps/admin/comprehensive-debug.md
 apps/admin/debug-scorer.mjs
 apps/mcp-servers/*/TEST_COVERAGE_REPORT.md
 
+# nektos/act local CI
+.act-secrets
+.act-results.json
+
 # Temp directory
 delete-me-HELiX/
