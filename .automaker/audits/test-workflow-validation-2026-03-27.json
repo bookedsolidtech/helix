@@ -1,0 +1,107 @@
+{
+  "auditType": "quick-quality-check",
+  "date": "2026-03-27",
+  "agent": "ava",
+  "model": "claude-sonnet",
+  "component": "hx-card",
+  "componentPath": "packages/hx-library/src/components/hx-card/",
+  "summary": {
+    "overallStatus": "PASS",
+    "totalFindings": 1,
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0,
+    "info": 3
+  },
+  "checks": {
+    "typescriptStrictCompliance": {
+      "status": "PASS",
+      "findings": [],
+      "notes": [
+        "No `any` types used anywhere in source",
+        "No `@ts-ignore` or `@ts-expect-error` annotations",
+        "All private methods properly typed with explicit parameter and return types",
+        "HTMLElementTagNameMap declared for global element registry",
+        "PropertyValues<this> generic used correctly in `updated()` lifecycle"
+      ]
+    },
+    "designTokenUsage": {
+      "status": "PASS",
+      "findings": [],
+      "notes": [
+        "All visual properties use --hx-card-* component tokens with semantic fallbacks",
+        "Proper 3-tier cascade: component token → semantic token → hardcoded last-resort fallback",
+        "No bare hardcoded values (all hardcoded values are inside var() fallback chains)",
+        "Follows private custom property pattern for internal consumption (--_ not used here, but component tokens are used directly which is acceptable)",
+        "@cssprop JSDoc documents all 7 CSS custom properties",
+        "prefers-reduced-motion CSS media query present and correct"
+      ]
+    },
+    "accessibilityBasics": {
+      "status": "PASS_WITH_FINDINGS",
+      "findings": [
+        {
+          "severity": "medium",
+          "wcagCriteria": "4.1.2",
+          "title": "devWarn references wrong attribute name",
+          "description": "The `updated()` lifecycle devWarn message instructs consumers to set `hx-aria-label` (line 148 of hx-card.ts) but the actual attribute is `hx-label` (defined on line 77 with `attribute: 'hx-label'`). This misleads consumers who read the warning.",
+          "file": "packages/hx-library/src/components/hx-card/hx-card.ts",
+          "line": 148,
+          "fix": "Change `hx-aria-label` to `hx-label` in the devWarn message: `Set \\`hx-label\\` to describe the card\\'s destination or purpose`"
+        }
+      ],
+      "notes": [
+        "delegatesFocus: true correctly set for interactive card pattern",
+        "role='link' applied when hx-href is set, removed when href is cleared",
+        "tabindex='0' applied dynamically — correct",
+        "aria-label wired to hx-label property when interactive",
+        "Enter key activates, Space key correctly excluded (ARIA APG: links use Enter only)",
+        "focus-visible outline uses --hx-focus-ring-* tokens",
+        "Anti-pattern guard for hx-href + actions slot combination",
+        "axe-core tests cover: default state, interactive, hx-label, all variants, interactive+actions"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "HC-001",
+      "component": "hx-card",
+      "severity": "medium",
+      "category": "accessibility",
+      "wcagCriteria": "4.1.2",
+      "title": "devWarn references non-existent attribute `hx-aria-label`",
+      "description": "In hx-card.ts line 148, the devWarn message tells consumers to set `hx-aria-label` to provide an accessible name for interactive cards. However, the component's actual accessible label attribute is `hx-label` (defined at line 77 with `attribute: 'hx-label'`). A developer who follows the warning instruction will set `hx-aria-label` which will be ignored by the component, leaving the interactive card without an accessible name and violating WCAG 4.1.2.",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.ts",
+      "line": 148,
+      "currentCode": "\"Interactive card (hx-href is set) is missing an accessible name. Set `hx-aria-label` to describe the card's destination or purpose (WCAG 4.1.2).\"",
+      "fix": "Change `hx-aria-label` to `hx-label` in the devWarn string: \"Interactive card (hx-href is set) is missing an accessible name. Set `hx-label` to describe the card's destination or purpose (WCAG 4.1.2).\""
+    }
+  ],
+  "infoItems": [
+    {
+      "id": "HC-INFO-001",
+      "title": "Horizontal layout variant not implemented",
+      "description": "The test file documents a known gap: no `orientation` or `layout` property exists. The test explicitly documents this as 'known gap — not yet implemented'. This is an accepted limitation, not a defect.",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.test.ts",
+      "line": 588
+    },
+    {
+      "id": "HC-INFO-002",
+      "title": "Shadow fallback hex values in var() chains",
+      "description": "The styles file uses hardcoded hex fallbacks inside var() chains (e.g., `var(--hx-color-neutral-0, #ffffff)`). Per project patterns, these last-resort fallbacks are acceptable to prevent rendering with no value if tokens are missing. This matches the project convention.",
+      "file": "packages/hx-library/src/components/hx-card/hx-card.styles.ts"
+    },
+    {
+      "id": "HC-INFO-003",
+      "title": "Excellent test coverage",
+      "description": "The test file has comprehensive coverage: 40+ test cases across rendering, all public properties, all slots, CSS parts, events (bubbles+composed), keyboard interaction (Enter/Space), axe-core a11y checks for all variants, dynamic property updates, and documented known gaps. Coverage appears to exceed the 80% threshold."
+    }
+  ],
+  "workflowValidation": {
+    "noWorktreeCreated": "CONFIRMED — This audit ran in the existing worktree without creating a new branch or worktree",
+    "readOnlyToolsUsed": ["Read", "Grep", "Glob", "Bash (mkdir only)"],
+    "outputDirectory": ".automaker/audits/",
+    "featureTermination": "DONE"
+  }
+}
