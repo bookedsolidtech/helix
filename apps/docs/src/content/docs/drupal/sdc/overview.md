@@ -41,7 +41,7 @@ The correct approach: write a single `article-teaser` SDC that expresses the edi
 
 Each SDC lives in a self-contained directory:
 
-```
+```text
 web/themes/custom/mytheme/components/
 └── article-teaser/
     ├── article-teaser.component.yml   # Schema, props, slots, metadata
@@ -112,7 +112,7 @@ libraryOverrides:
 
   {# Drupal image formatter output projected into the image slot #}
   {% if image %}
-    <div slot="media">
+    <div slot="image">
       {{- image -}}
     </div>
   {% endif %}
@@ -129,7 +129,7 @@ libraryOverrides:
 
   {# Author meta #}
   {% if author_name %}
-    <div slot="meta" class="article-teaser__author">
+    <div slot="footer" class="article-teaser__author">
       {% if author_image_url %}
         <hx-avatar
           src="{{ author_image_url|escape }}"

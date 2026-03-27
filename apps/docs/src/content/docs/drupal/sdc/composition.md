@@ -30,7 +30,7 @@ Before building, map each content type's fields to component primitives:
 
 ### File structure
 
-```
+```text
 components/article-teaser/
 ├── article-teaser.component.yml
 ├── article-teaser.twig
@@ -108,12 +108,12 @@ libraryOverrides:
 
   {#
    * Drupal media image output — this is already rendered HTML from the
-   * image formatter. Projecting it into slot="media" inside hx-card.
+   * image formatter. Projecting it into slot="image" inside hx-card.
    * The |raw filter is safe here because this is Drupal-rendered content,
    * not user-submitted text. Never use |raw on user-generated content.
    #}
   {% if image %}
-    <div slot="media">
+    <div slot="image">
       {{- image|raw -}}
     </div>
   {% endif %}
@@ -130,7 +130,7 @@ libraryOverrides:
 
   {# Author/date metadata #}
   {% if author_name %}
-    <div slot="meta" class="article-teaser__byline">
+    <div slot="footer" class="article-teaser__byline">
       {% if author_image_url %}
         <hx-avatar
           src="{{ author_image_url|escape }}"
@@ -211,7 +211,7 @@ A staff profile for a clinical directory page using `hx-card`, `hx-badge`, and `
 
 ### File structure
 
-```
+```text
 components/staff-profile/
 ├── staff-profile.component.yml
 ├── staff-profile.twig
@@ -275,7 +275,7 @@ libraryOverrides:
 {# components/staff-profile/staff-profile.twig #}
 <hx-card variant="outlined" class="staff-profile">
 
-  <div slot="media" class="staff-profile__photo">
+  <div slot="image" class="staff-profile__photo">
     {% if photo_url %}
       <hx-avatar
         src="{{ photo_url|escape }}"
@@ -295,7 +295,7 @@ libraryOverrides:
     <span class="staff-profile__role">{{ role|escape }}</span>
   </div>
 
-  <div slot="meta">
+  <div slot="footer">
     {% if department %}
       <hx-badge variant="default">{{ department|escape }}</hx-badge>
     {% endif %}
@@ -390,9 +390,9 @@ Pass the rendered content array, not a URL:
 ```
 
 ```twig
-{# In the SDC template — project rendered image into the media slot #}
+{# In the SDC template — project rendered image into the image slot #}
 {% if image %}
-  <div slot="media">
+  <div slot="image">
     {{- image|raw -}}
   </div>
 {% endif %}

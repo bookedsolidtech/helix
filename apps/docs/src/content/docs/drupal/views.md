@@ -13,7 +13,7 @@ Drupal Views generates lists of content via database queries and renders them th
 
 Views provides template suggestions in specificity order:
 
-```
+```text
 views-view-unformatted--[view-id]--[display-id].html.twig   (most specific)
 views-view-unformatted--[view-id].html.twig
 views-view-unformatted.html.twig                             (base template)
@@ -21,7 +21,7 @@ views-view-unformatted.html.twig                             (base template)
 
 For rows:
 
-```
+```text
 views-view-fields--[view-id]--[display-id].html.twig
 views-view-fields--[view-id].html.twig
 views-view-fields.html.twig

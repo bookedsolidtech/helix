@@ -190,9 +190,9 @@ HELiX components handle their own internal rendering inside Shadow DOM. The secu
 | Surface | Risk | Defense |
 |---|---|---|
 | Slot text content | Script injection | Twig auto-escaping (default) |
-| Slot HTML content | Tag injection | `check_markup()` or `|escape` per-item |
+| Slot HTML content | Tag injection | `check_markup()` or `\|escape` per-item |
 | Attribute string values | Attribute breakout | Twig auto-escaping (default) |
-| Attribute URL values | `javascript:` injection | `UrlHelper::isValid()` + `|escape` |
+| Attribute URL values | `javascript:` injection | `UrlHelper::isValid()` + `\|escape` |
 | Attribute boolean values | Incorrect state | Use `{% if %}` conditionals, not user input |
 
 ---
@@ -201,7 +201,7 @@ HELiX components handle their own internal rendering inside Shadow DOM. The secu
 
 When loading HELiX components from jsDelivr, your CSP `script-src` must include the CDN origin:
 
-```
+```text
 Content-Security-Policy: script-src 'self' https://cdn.jsdelivr.net;
 ```
 

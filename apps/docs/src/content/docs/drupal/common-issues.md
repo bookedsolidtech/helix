@@ -34,7 +34,7 @@ helix-button:
 
 Full bundle alternative:
 
-```
+```text
 https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js
 ```
 

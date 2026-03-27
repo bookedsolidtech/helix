@@ -369,10 +369,10 @@ When using a local npm build rather than CDN, use Vite's dynamic import with chu
           if (!customElements.get(tag)) {
             switch (tag) {
               case 'hx-card':
-                await import(/* webpackChunkName: "hx-card" */ '@helixui/library/components/hx-card');
+                await import('@helixui/library/components/hx-card');
                 break;
               case 'hx-accordion':
-                await import(/* webpackChunkName: "hx-accordion" */ '@helixui/library/components/hx-accordion');
+                await import('@helixui/library/components/hx-accordion');
                 break;
               // Add cases as needed
             }

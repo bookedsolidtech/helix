@@ -13,7 +13,7 @@ Drupal's AJAX framework replaces DOM regions without full page reloads. HELiX we
 
 When Drupal AJAX replaces a DOM region, it calls `Drupal.attachBehaviors(newContext, drupalSettings)` on the replaced subtree. All registered behaviors have their `attach()` method called with the new DOM node as `context`.
 
-```
+```text
 User interaction → AJAX request → Server response
     ↓
 Drupal processes AJAX commands (HtmlCommand, ReplaceCommand, etc.)
@@ -159,24 +159,25 @@ Custom AJAX commands let you update component properties or call component metho
 
 ```php
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\InvokeCommand;
 
 public function ajaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
   $response = new AjaxResponse();
 
-  // Set an hx-alert's message property directly
-  $response->addCommand([
-    'command' => 'helixSetProperty',
-    'selector' => '#status-alert',
-    'property' => 'variant',
-    'value' => 'success',
-  ]);
+  // Set an hx-alert's variant property via InvokeCommand.
+  // InvokeCommand calls a jQuery/DOM method — here we use setAttribute
+  // to set component properties from the server.
+  $response->addCommand(new InvokeCommand(
+    '#status-alert',
+    'setAttribute',
+    ['variant', 'success'],
+  ));
 
-  $response->addCommand([
-    'command' => 'helixSetProperty',
-    'selector' => '#status-alert',
-    'property' => 'message',
-    'value' => 'Form submitted successfully.',
-  ]);
+  $response->addCommand(new InvokeCommand(
+    '#status-alert',
+    'setAttribute',
+    ['message', 'Form submitted successfully.'],
+  ));
 
   return $response;
 }
@@ -277,12 +278,11 @@ If only the data inside a component needs to change (not the component structure
 
 ```php
 // Update the card's heading text without replacing the entire card
-$response->addCommand([
-  'command' => 'helixSetProperty',
-  'selector' => '#patient-card',
-  'property' => 'heading',
-  'value' => $updated_patient_name,
-]);
+$response->addCommand(new InvokeCommand(
+  '#patient-card',
+  'setAttribute',
+  ['heading', $updated_patient_name],
+));
 ```
 
 ---

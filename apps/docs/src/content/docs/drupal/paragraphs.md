@@ -90,7 +90,7 @@ cp web/modules/contrib/paragraphs/templates/paragraph.html.twig \
   {# Heading #}
   {% if content.field_card_heading[0] %}
     <span slot="heading">
-      {{- content.field_card_heading[0]['#context']['value']|escape -}}
+      {{- content.field_card_heading -}}
     </span>
   {% endif %}
 
@@ -135,21 +135,21 @@ A hero banner uses a full-bleed image with overlay text. The pattern differs fro
 {{ attach_library('mytheme/helix-button') }}
 {{ attach_library('mytheme/helix-text') }}
 
-{% set bg_url = content.field_hero_image[0]['#media'].field_media_image.entity.fileuri.value|file_url %}
+{% set bg_url = paragraph.field_hero_image.entity.field_media_image.entity.uri.value|file_url %}
 
 <section
   class="hero-banner"
   style="--hero-bg: url('{{ bg_url|escape }}')"
-  aria-label="{{ content.field_hero_headline[0]['#context']['value']|escape }}"
+  aria-label="{{ paragraph.field_hero_headline.value|escape }}"
 >
   <div class="hero-banner__content">
     <hx-text tag="h1" variant="display">
-      {{ content.field_hero_headline[0]['#context']['value']|escape }}
+      {{ paragraph.field_hero_headline.value|escape }}
     </hx-text>
 
     {% if content.field_hero_subheadline[0] %}
       <hx-text tag="p" variant="lead">
-        {{ content.field_hero_subheadline[0]['#context']['value']|escape }}
+        {{ paragraph.field_hero_subheadline.value|escape }}
       </hx-text>
     {% endif %}
 
@@ -227,7 +227,7 @@ Fields:
 {# No library needed — parent loads helix-accordion #}
 <hx-accordion-item>
   <span slot="heading">
-    {{- content.field_item_heading[0]['#context']['value']|escape -}}
+    {{- content.field_item_heading -}}
   </span>
   <div>
     {{- content.field_item_body -}}
@@ -331,8 +331,8 @@ class HelixCardBehavior extends ParagraphsBehaviorBase {
 In the Paragraph template:
 
 ```twig
-{% set variant = paragraph.getBehaviorSetting('helix_card_behavior', 'card_variant', 'default') %}
-<hx-card variant="{{ variant|escape }}">
+{# card_variant is provided by mytheme_preprocess_paragraph__content_card() — see below #}
+<hx-card variant="{{ card_variant|default('default')|escape }}">
 ```
 
 ---

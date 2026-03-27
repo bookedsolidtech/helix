@@ -15,7 +15,7 @@ This guide walks through the complete anatomy of a FormElement plugin using `hel
 
 Drupal discovers FormElement plugins by scanning `src/Element/` directories in enabled modules. The `@FormElement` annotation registers the plugin ID.
 
-```
+```text
 @FormElement("helix_text_input")
     ↓
 Plugin discovery (cache)
