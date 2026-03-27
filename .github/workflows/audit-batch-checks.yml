@@ -1,0 +1,98 @@
+# ============================================================================
+# Audit Batch Checks — Lightweight validation for batch branch pushes
+# ============================================================================
+# Runs on direct pushes to audit/deep-quality-batch-* branches (not PRs).
+# Provides fast feedback during batch execution without full CI overhead.
+#
+# This workflow validates:
+#   - JSON syntax for shared config files
+#   - Commit message conventions
+#   - Batch metadata integrity
+# ============================================================================
+
+name: Audit Batch Checks
+
+on:
+  push:
+    branches:
+      - 'audit/deep-quality-batch-*'
+
+concurrency:
+  group: audit-batch-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-batch:
+    name: Validate Batch State
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract batch date
+        id: batch
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          DATE=$(echo "$BRANCH" | grep -oE '[0-9]{8}$')
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "Batch date: $DATE"
+
+      - name: Validate metadata JSON
+        run: |
+          DATE="${{ steps.batch.outputs.date }}"
+          METADATA=".automaker/audits/batch-${DATE}-metadata.json"
+          if [ -f "$METADATA" ]; then
+            node -e "JSON.parse(require('fs').readFileSync('$METADATA','utf-8')); console.log('✅ Metadata JSON is valid')"
+          else
+            echo "⚠️ No metadata file found (may not be created yet)"
+          fi
+
+      - name: Validate coverage-config.json
+        run: |
+          CONFIG="packages/hx-library/coverage-config.json"
+          if [ -f "$CONFIG" ]; then
+            node -e "JSON.parse(require('fs').readFileSync('$CONFIG','utf-8')); console.log('✅ coverage-config.json is valid')"
+          else
+            echo "ℹ️ coverage-config.json not found"
+          fi
+
+      - name: Check commit message conventions
+        run: |
+          # Get the latest commit message
+          MSG=$(git log -1 --format="%s")
+          echo "Latest commit: $MSG"
+
+          # Verify lowercase subject
+          if echo "$MSG" | grep -qP '^[a-z]'; then
+            echo "✅ Commit subject starts lowercase"
+          else
+            echo "⚠️ Commit subject should start lowercase: $MSG"
+          fi
+
+          # Verify max length
+          LEN=${#MSG}
+          if [ $LEN -le 120 ]; then
+            echo "✅ Commit subject length OK ($LEN chars)"
+          else
+            echo "⚠️ Commit subject too long ($LEN > 120 chars)"
+          fi
+
+      - name: Batch progress summary
+        run: |
+          DATE="${{ steps.batch.outputs.date }}"
+          METADATA=".automaker/audits/batch-${DATE}-metadata.json"
+          if [ -f "$METADATA" ]; then
+            node -e "
+              const m = JSON.parse(require('fs').readFileSync('$METADATA', 'utf-8'));
+              console.log('Batch: ' + m.batchId);
+              console.log('Status: ' + m.status);
+              console.log('Completed: ' + m.components.completed.length + '/' + m.components.total);
+              console.log('Queued: ' + m.components.queued.length);
+              if (m.components.in_progress) {
+                console.log('In progress: ' + m.components.in_progress);
+              }
+            "
+          fi

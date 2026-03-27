@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Template for audit batch metadata tracking. Copy and fill for each batch.",
+  "batchId": "batch-YYYYMMDD",
+  "branch": "audit/deep-quality-batch-YYYYMMDD",
+  "baseBranch": "dev",
+  "baseCommit": "",
+  "status": "initialized",
+  "auditType": "deep-quality",
+  "createdAt": "",
+  "updatedAt": "",
+  "completedAt": null,
+  "components": {
+    "total": 0,
+    "list": [],
+    "queued": [],
+    "in_progress": null,
+    "completed": [],
+    "skipped": [],
+    "failed": []
+  },
+  "commits": [],
+  "changeset": {
+    "consolidated": false,
+    "filename": null,
+    "bumpType": "patch",
+    "scope": "@helixui/library"
+  },
+  "pr": {
+    "number": null,
+    "url": null,
+    "status": null,
+    "autoMergeEnabled": false
+  },
+  "timing": {
+    "startedAt": null,
+    "completedAt": null,
+    "totalDurationMinutes": null,
+    "perComponent": {}
+  },
+  "ci": {
+    "runId": null,
+    "status": null,
+    "url": null,
+    "jobCount": null
+  }
+}
