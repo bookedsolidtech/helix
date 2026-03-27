@@ -74,15 +74,16 @@ import '@helixui/library/components/hx-counter';
 
 ## Properties
 
-| Property   | Attribute  | Type                                                   | Default      | Description                                                                                      |
-| ---------- | ---------- | ------------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------ |
-| `value`    | `value`    | `number`                                               | `0`          | The target numeric value to count to.                                                            |
-| `duration` | `duration` | `number`                                               | `1000`       | Animation duration in milliseconds.                                                              |
-| `easing`   | `easing`   | `'linear' \| 'ease-in' \| 'ease-out' \| 'ease-in-out'` | `'ease-out'` | Easing function applied to the animation progress.                                               |
-| `format`   | `format`   | `'integer' \| 'decimal'`                               | `'integer'`  | Number format. `integer` rounds to the nearest whole number; `decimal` shows two decimal places. |
-| `prefix`   | `prefix`   | `string`                                               | `''`         | String prepended to the formatted value (e.g., `$`).                                             |
-| `suffix`   | `suffix`   | `string`                                               | `''`         | String appended to the formatted value (e.g., `%`).                                              |
-| `size`     | `hx-size`  | `'sm' \| 'md' \| 'lg'`                                 | `'md'`       | Size variant controlling font size.                                                              |
+| Property   | Attribute  | Type                                                   | Default      | Description                                                                                                                                               |
+| ---------- | ---------- | ------------------------------------------------------ | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`    | `value`    | `number`                                               | `0`          | The target numeric value to count to.                                                                                                                     |
+| `duration` | `duration` | `number`                                               | `1000`       | Animation duration in milliseconds.                                                                                                                       |
+| `easing`   | `easing`   | `'linear' \| 'ease-in' \| 'ease-out' \| 'ease-in-out'` | `'ease-out'` | Easing function applied to the animation progress.                                                                                                        |
+| `format`   | `format`   | `'integer' \| 'decimal'`                               | `'integer'`  | Number format. `integer` rounds to the nearest whole number; `decimal` shows two decimal places.                                                          |
+| `prefix`   | `prefix`   | `string`                                               | `''`         | String prepended to the formatted value (e.g., `$`).                                                                                                      |
+| `suffix`   | `suffix`   | `string`                                               | `''`         | String appended to the formatted value (e.g., `%`).                                                                                                       |
+| `size`     | `hx-size`  | `'sm' \| 'md' \| 'lg'`                                 | `'md'`       | Size variant controlling font size.                                                                                                                       |
+| `label`    | `label`    | `string`                                               | `''`         | Accessible label describing the counter's context (e.g., `"Total patients"`). When provided, applied as `aria-label` on the counter element (WCAG 4.1.2). |
 
 ## Events
 
