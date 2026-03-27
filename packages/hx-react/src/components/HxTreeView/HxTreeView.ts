@@ -43,7 +43,7 @@ export const HxTreeView = createComponent({
   elementClass: HelixTreeView,
   react: React,
   events: {
-    onHxSelect: 'hx-select'
+    onHxSelect: 'hx-select',
   },
   displayName: 'HxTreeView',
 });

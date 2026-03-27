@@ -33,7 +33,7 @@ export const HxSwitch = createComponent({
   elementClass: HelixSwitch,
   react: React,
   events: {
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxSwitch',
 });

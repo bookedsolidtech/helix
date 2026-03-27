@@ -30,7 +30,7 @@ export const HxMenu = createComponent({
   react: React,
   events: {
     onHxClose: 'hx-close',
-    onHxSelect: 'hx-select'
+    onHxSelect: 'hx-select',
   },
   displayName: 'HxMenu',
 });
