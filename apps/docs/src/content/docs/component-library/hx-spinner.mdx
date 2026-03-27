@@ -34,15 +34,15 @@ The component announces its loading state to assistive technology users via `rol
 <ComponentDemo title="Size Variants">
   <div style="display: flex; gap: 1.5rem; align-items: center;">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-spinner size="sm" label="Loading small"></hx-spinner>
+      <hx-spinner hx-size="sm" label="Loading small"></hx-spinner>
       <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-spinner size="md" label="Loading medium"></hx-spinner>
+      <hx-spinner hx-size="md" label="Loading medium"></hx-spinner>
       <span style="font-size: 0.75rem; color: #6b7280;">md (default)</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-spinner size="lg" label="Loading large"></hx-spinner>
+      <hx-spinner hx-size="lg" label="Loading large"></hx-spinner>
       <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
     </div>
   </div>
@@ -71,7 +71,7 @@ The component announces its loading state to assistive technology users via `rol
 
 <ComponentDemo title="Decorative Spinner">
   <div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
-    <hx-spinner size="sm" variant="primary" decorative></hx-spinner>
+    <hx-spinner hx-size="sm" variant="primary" decorative></hx-spinner>
     <span style="color: #374151; font-size: 0.875rem;">Saving patient record...</span>
   </div>
 </ComponentDemo>
@@ -85,7 +85,7 @@ The component announces its loading state to assistive technology users via `rol
       <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Loading clinical data...</p>
     </div>
     <div style="position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center;">
-      <hx-spinner size="lg" variant="primary" label="Loading patient chart"></hx-spinner>
+      <hx-spinner hx-size="lg" variant="primary" label="Loading patient chart"></hx-spinner>
     </div>
   </div>
 </ComponentDemo>
@@ -113,7 +113,7 @@ Minimal HTML snippet — no build tool required:
 
 <!-- Decorative: suppress AT announcements when visible text is present -->
 <div style="display: flex; align-items: center; gap: 0.75rem;">
-  <hx-spinner size="sm" variant="primary" decorative></hx-spinner>
+  <hx-spinner hx-size="sm" variant="primary" decorative></hx-spinner>
   <span>Saving record...</span>
 </div>
 ```
@@ -137,7 +137,7 @@ spinner.decorative = true;
 
 | Property     | Attribute    | Type                                   | Default     | Description                                                                                                                                                                               |
 | ------------ | ------------ | -------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `size`       | `size`       | `'sm' \| 'md' \| 'lg' \| string`       | `'md'`      | Size of the spinner. Use token values for standard sizing, or any valid CSS size string (e.g. `"3rem"`, `"48px"`) for custom sizes. Reflects to attribute.                                |
+| `size`       | `hx-size`    | `'sm' \| 'md' \| 'lg' \| string`       | `'md'`      | Size of the spinner. Use token values for standard sizing, or any valid CSS size string (e.g. `"3rem"`, `"48px"`) for custom sizes. Reflects to attribute.                                |
 | `variant`    | `variant`    | `'default' \| 'primary' \| 'inverted'` | `'default'` | Visual color variant. Use `inverted` on dark or colored backgrounds. Reflects to attribute.                                                                                               |
 | `label`      | `label`      | `string`                               | `'Loading'` | Accessible label announced to screen readers via `aria-label`. Reflects to attribute. An empty string suppresses `aria-label` (WCAG guard against empty names).                           |
 | `decorative` | `decorative` | `boolean`                              | `false`     | When true, sets `role="presentation"` and removes `aria-label`. Use when the spinner appears alongside visible loading text to prevent duplicate AT announcements. Reflects to attribute. |
@@ -239,7 +239,7 @@ Use the component in a Twig template after registering the library. A pre-built 
 
 {# Standalone — announces to screen readers #}
 <hx-spinner
-  size="{{ size|default('md') }}"
+  hx-size="{{ size|default('md') }}"
   variant="{{ variant|default('default') }}"
   label="{{ label|default('Loading') }}"
 ></hx-spinner>
@@ -247,7 +247,7 @@ Use the component in a Twig template after registering the library. A pre-built 
 {# Decorative — use when adjacent visible text describes the loading state #}
 <div style="display: flex; align-items: center; gap: 0.75rem;">
   <hx-spinner
-    size="sm"
+    hx-size="sm"
     variant="primary"
     decorative
   ></hx-spinner>
@@ -306,7 +306,7 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
       <h2>Fetching patient records</h2>
       <hx-spinner
         id="records-spinner"
-        size="md"
+        hx-size="md"
         variant="primary"
         label="Loading patient records"
       ></hx-spinner>
@@ -317,7 +317,7 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
       <div
         style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;"
       >
-        <hx-spinner id="save-spinner" size="sm" variant="primary" decorative></hx-spinner>
+        <hx-spinner id="save-spinner" hx-size="sm" variant="primary" decorative></hx-spinner>
         <span style="font-size: 0.875rem; color: #374151;">Saving medication schedule...</span>
       </div>
     </section>
@@ -337,7 +337,7 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
         hidden
         style="position: absolute; inset: 0; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center;"
       >
-        <hx-spinner size="lg" variant="primary" label="Refreshing lab results"></hx-spinner>
+        <hx-spinner hx-size="lg" variant="primary" label="Refreshing lab results"></hx-spinner>
       </div>
     </section>
 

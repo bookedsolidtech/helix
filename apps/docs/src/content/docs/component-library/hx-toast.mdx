@@ -164,10 +164,10 @@ toast({ message: 'Critical alert.', variant: 'danger', duration: 0 });
 | Property     | Attribute     | Type                                                        | Default                  | Description                                                           |
 | ------------ | ------------- | ----------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------- |
 | `variant`    | `variant`     | `'default' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'default'`              | Visual style variant. Reflects as attribute.                          |
-| `duration`   | `duration`    | `number`                                                    | `3000`                   | Auto-dismiss delay in milliseconds. Set to `0` for persistent toasts. |
+| `duration`   | `duration`    | `number`                                                    | `5000`                   | Auto-dismiss delay in milliseconds. Set to `0` for persistent toasts. |
 | `closable`   | `closable`    | `boolean`                                                   | `false`                  | Shows a dismiss button. Reflects as attribute.                        |
 | `open`       | `open`        | `boolean`                                                   | `false`                  | Whether the toast is visible. Reflects as attribute.                  |
-| `closeLabel` | `close-label` | `string`                                                    | `'Dismiss notification'` | Accessible label for the dismiss button. Override for localization.   |
+| `labelClose` | `label-close` | `string`                                                    | `'Dismiss notification'` | Accessible label for the dismiss button. Override for localization.   |
 
 ### Methods
 
@@ -189,7 +189,7 @@ toast({ message: 'Critical alert.', variant: 'danger', duration: 0 });
 | ----------- | --------------------- | -------------- | ---------------------------------------------- |
 | `message`   | `string`              | —              | The notification message text. Required.       |
 | `variant`   | `ToastVariant`        | `'default'`    | Visual variant.                                |
-| `duration`  | `number`              | `3000`         | Auto-dismiss delay in ms. `0` = persistent.    |
+| `duration`  | `number`              | `5000`         | Auto-dismiss delay in ms. `0` = persistent.    |
 | `placement` | `ToastStackPlacement` | `'bottom-end'` | Placement of the auto-created stack container. |
 
 ## Events
@@ -261,7 +261,7 @@ toast.addEventListener('hx-after-hide', () => toast.remove());
 | Role                  | `role="status"` for all non-danger variants; `role="alert"` for `variant="danger"` to trigger immediate screen reader announcement.        |
 | `aria-atomic`         | Always `"true"` — the entire toast message is read as a single unit.                                                                       |
 | `aria-hidden` on host | Host element is `aria-hidden="true"` when closed; attribute is removed when open, preventing screen readers from announcing hidden toasts. |
-| Close button label    | Dismiss button includes `aria-label` (default: `"Dismiss notification"`). Override with `close-label` attribute for localization.          |
+| Close button label    | Dismiss button includes `aria-label` (default: `"Dismiss notification"`). Override with `label-close` attribute for localization.          |
 | SVG icon hidden       | The close button SVG carries `aria-hidden="true"` — the button label is the accessible name.                                               |
 | Timer pause on hover  | Auto-dismiss timer pauses on `mouseenter` and resumes on `mouseleave` (WCAG 2.2.1 — Timing Adjustable).                                    |
 | Timer pause on focus  | Timer also pauses on `focusin` within the toast and resumes on `focusout`, ensuring keyboard users have time to read and interact.         |
@@ -288,7 +288,7 @@ When focus enters the toast, the auto-dismiss timer pauses automatically. It res
   variant="{{ variant|default('default') }}"
   {% if closable %}closable{% endif %}
   {% if duration is defined %}duration="{{ duration }}"{% endif %}
-  {% if close_label %}close-label="{{ close_label }}"{% endif %}
+  {% if close_label %}label-close="{{ close_label }}"{% endif %}
 >
   {% if icon %}
     <span slot="icon">{{ icon }}</span>
@@ -309,7 +309,7 @@ Use `hx-toast-stack` for fixed-position stacking:
       open
       variant="{{ notification.variant|default('default') }}"
       {% if notification.closable %}closable{% endif %}
-      duration="{{ notification.duration|default(3000) }}"
+      duration="{{ notification.duration|default(5000) }}"
     >
       {{ notification.message }}
     </hx-toast>

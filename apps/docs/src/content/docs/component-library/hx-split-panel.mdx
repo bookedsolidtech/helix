@@ -288,17 +288,20 @@ import '@helixui/library/components/hx-split-panel';
 
 ## Properties
 
-| Property           | Attribute            | Type                         | Default        | Description                                                                                                                    |
-| ------------------ | -------------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `position`         | `position`           | `number`                     | `50`           | Position of the divider as a percentage (0–100) of the start panel. Reflects to attribute.                                     |
-| `positionInPixels` | `position-in-pixels` | `number \| undefined`        | `undefined`    | Position of the divider in pixels. Converted to percentage after first paint. Overrides `position` on initial render.          |
-| `orientation`      | `orientation`        | `'horizontal' \| 'vertical'` | `'horizontal'` | Orientation of the split. Reflects to attribute.                                                                               |
-| `min`              | `min`                | `number`                     | `0`            | Minimum position as a percentage. Prevents full collapse of start panel. Reflects to attribute.                                |
-| `max`              | `max`                | `number`                     | `100`          | Maximum position as a percentage. Prevents full expansion of start panel. Reflects to attribute.                               |
-| `snap`             | `snap`               | `number[]`                   | `[]`           | Snap points as an array of percentages. Divider snaps within a 5% threshold. Accepts JSON string in HTML: `snap="[25,50,75]"`. |
-| `disabled`         | `disabled`           | `boolean`                    | `false`        | When true, the divider cannot be dragged. Reflects to attribute.                                                               |
-| `collapsible`      | `collapsible`        | `boolean`                    | `false`        | When true, collapse/expand buttons appear on the divider. Reflects to attribute.                                               |
-| `collapsed`        | `collapsed`          | `'start' \| 'end' \| null`   | `null`         | Which panel is collapsed. Set to `'start'` or `'end'` to collapse programmatically. Reflects to attribute.                     |
+| Property             | Attribute              | Type                         | Default                  | Description                                                                                                                                              |
+| -------------------- | ---------------------- | ---------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `position`           | `position`             | `number`                     | `50`                     | Position of the divider as a percentage (0–100) of the start panel. Reflects to attribute.                                                               |
+| `positionInPixels`   | `position-in-pixels`   | `number \| undefined`        | `undefined`              | Position of the divider in pixels. Converted to percentage after first paint. Overrides `position` on initial render.                                    |
+| `orientation`        | `orientation`          | `'horizontal' \| 'vertical'` | `'horizontal'`           | Orientation of the split. Reflects to attribute.                                                                                                         |
+| `min`                | `min`                  | `number`                     | `0`                      | Minimum position as a percentage. Prevents full collapse of start panel. Reflects to attribute.                                                          |
+| `max`                | `max`                  | `number`                     | `100`                    | Maximum position as a percentage. Prevents full expansion of start panel. Reflects to attribute.                                                         |
+| `snap`               | `snap`                 | `number[]`                   | `[]`                     | Snap points as an array of percentages. Divider snaps within a 5% threshold. Accepts JSON string in HTML: `snap="[25,50,75]"`.                           |
+| `disabled`           | `disabled`             | `boolean`                    | `false`                  | When true, the divider cannot be dragged. Reflects to attribute.                                                                                         |
+| `collapsible`        | `collapsible`          | `boolean`                    | `false`                  | When true, collapse/expand buttons appear on the divider. Reflects to attribute.                                                                         |
+| `collapsed`          | `collapsed`            | `'start' \| 'end' \| null`   | `null`                   | Which panel is collapsed. Set to `'start'` or `'end'` to collapse programmatically. Reflects to attribute.                                               |
+| `resizeLabel`        | `resize-label`         | `string`                     | `'Resize panels'`        | Accessible label for the divider handle. Announced to screen readers as the element's accessible name. Override for localization. Reflects to attribute. |
+| `collapseStartLabel` | `collapse-start-label` | `string`                     | `'Collapse start panel'` | Accessible label for the collapse-start button when `collapsible` is set. Override for localization. Reflects to attribute.                              |
+| `collapseEndLabel`   | `collapse-end-label`   | `string`                     | `'Collapse end panel'`   | Accessible label for the collapse-end button when `collapsible` is set. Override for localization. Reflects to attribute.                                |
 
 ## Events
 
