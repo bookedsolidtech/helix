@@ -1,0 +1,251 @@
+---
+title: 'hx-data-table'
+description: Enterprise data table with sorting, row selection, keyboard navigation, and responsive scroll.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-data-table" section="summary" />
+
+## Overview
+
+`hx-data-table` is a feature-rich data table component built for enterprise healthcare applications. It provides built-in column sorting, row selection with checkboxes, a loading skeleton state, an empty state, client-side pagination, sticky headers, and full keyboard navigation using the `role="grid"` composite widget pattern.
+
+**Use `hx-data-table` when:** you need interactive data management — patient lists, lab result queues, appointment schedules — where users sort columns, select rows for batch actions, or navigate large datasets.
+
+**Use `hx-table` instead when:** you only need styled tabular markup without interactive behaviors.
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-data-table';
+```
+
+## Basic Usage
+
+`columns` and `rows` accept JSON strings or JavaScript arrays. In HTML attributes, pass a JSON string:
+
+```html
+<hx-data-table id="patient-table" label="Patient list" selectable></hx-data-table>
+
+<script>
+  const table = document.getElementById('patient-table');
+  table.columns = [
+    { key: 'name', label: 'Patient', sortable: true },
+    { key: 'dob', label: 'Date of Birth' },
+    { key: 'status', label: 'Status', sortable: true },
+  ];
+  table.rows = [
+    { name: 'John Smith', dob: '1982-04-15', status: 'Active' },
+    { name: 'Maria Garcia', dob: '1975-09-22', status: 'Pending' },
+    { name: 'Robert Lee', dob: '1990-01-08', status: 'Active' },
+  ];
+</script>
+```
+
+## Properties
+
+| Property         | Attribute          | Type                        | Default             | Description                                                                                        |
+| ---------------- | ------------------ | --------------------------- | ------------------- | -------------------------------------------------------------------------------------------------- |
+| `columns`        | `columns`          | `HxDataTableColumn[]`       | `[]`                | Column definitions. Each item: `{ key, label, sortable?, width? }`. Accepts a JSON string in HTML. |
+| `rows`           | `rows`             | `Record<string, unknown>[]` | `[]`                | Row data. Each item is a plain object keyed by column `key` values. Accepts a JSON string in HTML. |
+| `selectable`     | `selectable`       | `boolean`                   | `false`             | When true, renders a checkbox column for row selection.                                            |
+| `sortKey`        | `sort-key`         | `string`                    | `''`                | The column `key` currently used for sorting.                                                       |
+| `sortDirection`  | `sort-direction`   | `'asc' \| 'desc'`           | `'asc'`             | Current sort direction.                                                                            |
+| `loading`        | `loading`          | `boolean`                   | `false`             | When true, renders a loading skeleton and sets `aria-busy="true"` on the table.                    |
+| `emptyLabel`     | `empty-label`      | `string`                    | `'No data'`         | Text shown in the default empty state when `rows` is empty and not loading.                        |
+| `label`          | `label`            | `string`                    | `''`                | **Required for accessibility.** Exposed as `aria-label` on the `<table>` element (WCAG 4.1.2).     |
+| `selectAllLabel` | `select-all-label` | `string`                    | `'Select all rows'` | Accessible label for the "select all" header checkbox. Override for i18n.                          |
+| `stickyHeader`   | `sticky-header`    | `boolean`                   | `false`             | When true, the header row stays fixed while the table body scrolls.                                |
+| `page`           | `page`             | `number`                    | `1`                 | Current page (1-based). Requires `pageSize > 0` to activate client-side pagination.                |
+| `pageSize`       | `page-size`        | `number`                    | `0`                 | Number of rows per page. Set to `0` to disable pagination (show all rows).                         |
+
+### Column Definition (`HxDataTableColumn`)
+
+| Field      | Type      | Required | Description                                                       |
+| ---------- | --------- | -------- | ----------------------------------------------------------------- |
+| `key`      | `string`  | Yes      | Object key used to read cell values from `rows`.                  |
+| `label`    | `string`  | Yes      | Column header text.                                               |
+| `sortable` | `boolean` | No       | When true, the column header becomes a sort button.               |
+| `width`    | `string`  | No       | CSS width value applied to the column (e.g., `"120px"`, `"20%"`). |
+
+## Events
+
+| Event          | Detail                                            | Description                                                         |
+| -------------- | ------------------------------------------------- | ------------------------------------------------------------------- |
+| `hx-sort`      | `{ key: string, direction: 'asc' \| 'desc' }`     | Dispatched when a sortable column header is clicked.                |
+| `hx-select`    | `{ selectedRows: Record<string, unknown>[] }`     | Dispatched when row selection changes (checkbox or Space key).      |
+| `hx-row-click` | `{ row: Record<string, unknown>, index: number }` | Dispatched when a data row is clicked or activated via Enter/Space. |
+
+## CSS Custom Properties
+
+| Property                          | Default                       | Description                                                |
+| --------------------------------- | ----------------------------- | ---------------------------------------------------------- |
+| `--hx-data-table-header-bg`       | `var(--hx-color-neutral-50)`  | Header row background color.                               |
+| `--hx-data-table-header-color`    | `var(--hx-color-neutral-700)` | Header row text color.                                     |
+| `--hx-data-table-cell-color`      | `var(--hx-color-neutral-900)` | Cell text color.                                           |
+| `--hx-data-table-border-color`    | `var(--hx-color-neutral-200)` | Row border color.                                          |
+| `--hx-data-table-row-hover-bg`    | `var(--hx-color-neutral-50)`  | Row hover background.                                      |
+| `--hx-data-table-row-selected-bg` | `var(--hx-color-primary-50)`  | Selected row background.                                   |
+| `--hx-data-table-empty-color`     | `var(--hx-color-neutral-600)` | Empty state text color.                                    |
+| `--hx-data-table-min-width`       | `600px`                       | Minimum table width before horizontal scrolling activates. |
+
+## CSS Parts
+
+| Part        | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `table`     | The `<table>` element.                               |
+| `thead`     | The `<thead>` element.                               |
+| `tbody`     | The `<tbody>` element.                               |
+| `tr`        | Each `<tr>` element.                                 |
+| `th`        | Each `<th>` element.                                 |
+| `td`        | Each `<td>` element.                                 |
+| `sort-icon` | The sort indicator `<span>` inside sortable headers. |
+| `checkbox`  | Each `<input type="checkbox">` element.              |
+
+## Slots
+
+| Slot      | Description                                                                 |
+| --------- | --------------------------------------------------------------------------- |
+| `toolbar` | Content rendered above the table (e.g., search input, bulk action buttons). |
+| `empty`   | Custom empty-state content rendered when `rows` is empty and not loading.   |
+| `loading` | Custom loading content rendered when `loading` is true.                     |
+
+## Accessibility
+
+| Topic           | Details                                                                                                                                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `role="grid"`   | The table uses `role="grid"` which declares an interactive composite widget to assistive technology. The `label` property provides its accessible name (WCAG 4.1.2).                                                        |
+| `aria-label`    | **Always provide a `label`** — a data table without an accessible name cannot be identified by screen reader users. A console warning is emitted when `label` is absent and columns are set.                                |
+| `aria-sort`     | Sortable column `<th>` elements carry `aria-sort="ascending"` or `aria-sort="descending"` on the active sort column, and `aria-sort="none"` on others.                                                                      |
+| `aria-busy`     | Set to `"true"` on the table while `loading` is true, signalling to AT that content is being fetched.                                                                                                                       |
+| `aria-selected` | Data row `<tr>` elements carry `aria-selected` when `selectable` is enabled.                                                                                                                                                |
+| Keyboard        | Arrow keys navigate between cells. `Home` / `End` jump to the first/last cell in the current row. `Space` on a data cell toggles that row's selection (when `selectable`). `Enter` / `Space` on a row fires `hx-row-click`. |
+| Select all      | The header checkbox `aria-label` is set from `selectAllLabel`. It shows an indeterminate state when some (but not all) rows are selected.                                                                                   |
+
+## Drupal Integration
+
+In Twig, pass `columns` and `rows` as JSON strings:
+
+```twig
+{# my-module/templates/patient-data-table.html.twig #}
+<hx-data-table
+  label="{{ table_label }}"
+  columns="{{ columns_json }}"
+  rows="{{ rows_json }}"
+  {% if selectable %}selectable{% endif %}
+  {% if sticky_header %}sticky-header{% endif %}
+  empty-label="{{ empty_label|default('No records found') }}"
+></hx-data-table>
+```
+
+In your preprocess function:
+
+```php
+function my_module_preprocess_my_template(&$variables) {
+  $variables['columns_json'] = json_encode([
+    ['key' => 'name', 'label' => 'Patient', 'sortable' => true],
+    ['key' => 'dob', 'label' => 'Date of Birth'],
+    ['key' => 'status', 'label' => 'Status', 'sortable' => true],
+  ]);
+  $variables['rows_json'] = json_encode($rows);
+}
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-data-table example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-data-table
+      id="appointments-table"
+      label="Patient appointment schedule"
+      selectable
+      sticky-header
+    ></hx-data-table>
+
+    <script>
+      const table = document.getElementById('appointments-table');
+
+      table.columns = [
+        { key: 'patient', label: 'Patient', sortable: true },
+        { key: 'date', label: 'Date', sortable: true, width: '140px' },
+        { key: 'provider', label: 'Provider', sortable: true },
+        { key: 'department', label: 'Department' },
+        { key: 'status', label: 'Status', sortable: true, width: '120px' },
+      ];
+
+      table.rows = [
+        {
+          patient: 'John Smith',
+          date: '2026-03-24',
+          provider: 'Dr. Chen',
+          department: 'Cardiology',
+          status: 'Confirmed',
+        },
+        {
+          patient: 'Maria Garcia',
+          date: '2026-03-24',
+          provider: 'Dr. Patel',
+          department: 'Internal Medicine',
+          status: 'Pending',
+        },
+        {
+          patient: 'Robert Lee',
+          date: '2026-03-25',
+          provider: 'Dr. Chen',
+          department: 'Cardiology',
+          status: 'Confirmed',
+        },
+        {
+          patient: 'Susan Wong',
+          date: '2026-03-25',
+          provider: 'Dr. Rivera',
+          department: 'Neurology',
+          status: 'Cancelled',
+        },
+      ];
+
+      table.addEventListener('hx-sort', (e) => {
+        console.log('Sort by:', e.detail.key, e.detail.direction);
+        // Perform server-side sort and update table.rows here
+      });
+
+      table.addEventListener('hx-select', (e) => {
+        console.log('Selected rows:', e.detail.selectedRows.length);
+      });
+
+      table.addEventListener('hx-row-click', (e) => {
+        console.log('Row clicked:', e.detail.row.patient);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-data-table" section="api" />
