@@ -655,6 +655,10 @@ export default defineConfig({
               label: 'Best Practices',
               slug: 'guides/best-practices',
             },
+            {
+              label: 'Custom Workflows',
+              slug: 'guides/custom-workflows',
+            },
           ],
         },
         {
