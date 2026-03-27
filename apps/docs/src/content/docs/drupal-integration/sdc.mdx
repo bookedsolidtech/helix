@@ -366,7 +366,7 @@ Add client-side behavior only when required. The `once()` API prevents double-in
    Or use the scaffolding CLI:
 
    ```bash
-   npx create-helix-app --drupal --preset healthcare
+   npx create-helix --drupal --preset healthcare
    ```
 
    The `--preset healthcare` flag scaffolds the subset of SDCs appropriate for healthcare content patterns: patient profiles, clinical article teasers, department cards, appointment CTAs, and alert banners.
@@ -485,20 +485,20 @@ The following table lists the composition SDCs available in `@helixui/drupal-sta
 
 ## Site-Type Presets
 
-The `create-helix-app` scaffolding CLI generates a starter theme with the SDC subset appropriate for your site type.
+The `create-helix` scaffolding CLI generates a starter theme with the SDC subset appropriate for your site type.
 
 ```bash
 # Healthcare system portal
-npx create-helix-app --drupal --preset healthcare
+npx create-helix --drupal --preset healthcare
 
 # News/media organization
-npx create-helix-app --drupal --preset editorial
+npx create-helix --drupal --preset editorial
 
 # Corporate marketing site
-npx create-helix-app --drupal --preset marketing
+npx create-helix --drupal --preset marketing
 
 # Government/public sector
-npx create-helix-app --drupal --preset government
+npx create-helix --drupal --preset government
 ```
 
 <Tabs>
@@ -560,7 +560,7 @@ Total: 16 SDCs | Loads: 15 HELiX components
 
 ### What the scaffold generates
 
-Running `create-helix-app --drupal --preset healthcare` produces:
+Running `create-helix --drupal --preset healthcare` produces:
 
 ```
 web/themes/custom/mytheme/
