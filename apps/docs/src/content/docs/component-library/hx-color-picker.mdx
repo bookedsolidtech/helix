@@ -109,6 +109,7 @@ import '@helixui/library/components/hx-color-picker';
 | `disabled`     | `disabled`      | `boolean`                          | `false`     | Prevents all interaction and dims the control.                                          |
 | `name`         | `name`          | `string`                           | `''`        | Form field name for form participation via `ElementInternals`.                          |
 | `inline`       | `inline`        | `boolean`                          | `false`     | When true, renders the picker panel inline instead of in a popover.                     |
+| `required`     | `required`      | `boolean`                          | `false`     | When true, a color value must be selected for form validity.                            |
 
 ## Events
 
@@ -152,7 +153,7 @@ import '@helixui/library/components/hx-color-picker';
 
 | Topic                          | Details                                                                                                                                                                                       |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA role                      | Trigger: native `button` with `aria-haspopup="dialog"` and `aria-expanded`. Panel: `role="dialog"` with `aria-label="Color picker"` and `aria-modal="true"`.                                  |
+| ARIA role                      | Trigger: native `button` with `aria-haspopup="dialog"` and `aria-expanded`. Panel: `role="group"` with `aria-label="Color picker"`.                                                           |
 | Gradient grid                  | `role="slider"` with `tabindex="0"`, `aria-label="Color gradient"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` announcing both saturation and value percentages. |
 | Hue slider                     | `role="slider"` with `aria-label="Hue"`, `aria-valuemin="0"`, `aria-valuemax="360"`, and `aria-valuetext` announcing the degree value (e.g. `"180°"`).                                        |
 | Opacity slider                 | `role="slider"` with `aria-label="Opacity"`, `aria-valuemin="0"`, `aria-valuemax="100"`, and `aria-valuetext` announcing the percentage (e.g. `"75%"`).                                       |

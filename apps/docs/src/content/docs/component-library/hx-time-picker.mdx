@@ -210,11 +210,11 @@ import '@helixui/library/components/hx-time-picker';
 
 ## Slots
 
-| Slot    | Description                                                                                          |
-| ------- | ---------------------------------------------------------------------------------------------------- |
-| `label` | Custom label content. Overrides the rendered label element. Use for Drupal Form API rendered labels. |
-| `help`  | Help text displayed below the field.                                                                 |
-| `error` | Custom error content. Overrides the `error` property. Use for Drupal Form API rendered errors.       |
+| Slot        | Description                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------------------- |
+| `label`     | Custom label content. Overrides the rendered label element. Use for Drupal Form API rendered labels. |
+| `help-text` | Help text displayed below the field.                                                                 |
+| `error`     | Custom error content. Overrides the `error` property. Use for Drupal Form API rendered errors.       |
 
 ## Accessibility
 
@@ -272,7 +272,7 @@ For Drupal Form API integration where the label and error are rendered server-si
     <div slot="error">{{ errors }}</div>
   {% endif %}
   {% if description %}
-    <div slot="help">{{ description }}</div>
+    <div slot="help-text">{{ description }}</div>
   {% endif %}
 </hx-time-picker>
 ```
