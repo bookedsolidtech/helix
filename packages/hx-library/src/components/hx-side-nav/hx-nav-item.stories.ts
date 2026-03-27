@@ -59,7 +59,7 @@ const meta = {
     expanded: false,
   },
   render: (args) => html`
-    <div style="background: #111827; padding: 0.5rem; width: 220px;">
+    <div style="background: #111827; color: #cbd5e1; padding: 0.5rem; width: 220px;">
       <hx-nav-item
         href=${args.href}
         ?active=${args.active}
