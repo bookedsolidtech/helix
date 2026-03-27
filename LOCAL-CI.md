@@ -561,21 +561,23 @@ exit $EXIT_CODE
 4. **Playwright cache** — Creates architecture-specific cache directories (`~/.cache/ms-playwright-amd64` vs `~/.cache/ms-playwright-arm64`) and volume-mounts them into the container. This avoids re-downloading Chromium on every test run.
 5. **Results file** — Writes `.act-results.json` with status, timing, and timestamp for programmatic consumption.
 
-### `scripts/test-batch.sh` — Batched Test Runner
+### `scripts/test-batch.sh` — Sequential Test Runner (v2)
 
-Used when `--batch` flag is passed. Discovers all test files, splits them into groups, and runs each group sequentially:
+Used when `--batch` flag is passed. Runs ALL 85+ test files through a **single Chromium instance** with sequential file execution — no browser restarts between files.
 
 ```bash
 # Usage:
-./scripts/test-batch.sh                      # Run all tests in batches of 10
-BATCH_SIZE=5 ./scripts/test-batch.sh         # Run in batches of 5
-./scripts/test-batch.sh --dry-run            # Show batches without running
-./scripts/test-batch.sh --batch-size 3       # Explicit batch size flag
+./scripts/test-batch.sh              # Run all tests sequentially (one Chromium)
+./scripts/test-batch.sh --dry-run    # Show test files without running
 ```
 
-The script discovers all `*.test.ts` files under `packages/hx-library/src/components/`, splits them into groups of `BATCH_SIZE` (default 10), and runs `vitest` for each batch. If any batch fails, the script reports which batches failed and exits non-zero.
+The key is vitest's `--no-file-parallelism` flag, which forces all test files to run one at a time through a single browser instance. Each file gets an isolated page context (preventing `customElements.define()` collisions), but the Chromium process stays alive throughout.
 
-This exists because Docker Desktop's VirtioFS storage driver crashes when Chromium and Vitest hammer disk I/O with 80+ test files simultaneously. Running in batches of 10 keeps memory and I/O within Docker's limits.
+**v1 (replaced):** Split files into batches of 10, launched a new vitest process per batch. Each process started Chromium, ran tests, tore down. 9 batches = 9 Chromium startups = ~90s of pure overhead.
+
+**v2 (current):** One vitest process, one Chromium startup, 85 files sequential, one teardown. Saves 60-105 seconds per full run while maintaining the same I/O profile that avoids VirtioFS crashes.
+
+The vitest config also removes dead `pool: 'threads'` and `poolOptions` settings — browser mode ignores the threads/forks pool entirely and manages its own execution through the Playwright browser provider.
 
 ---
 
