@@ -200,7 +200,7 @@ describe('scoreComponent — grade: all analyzers return null (untested)', () =>
 describe('scoreComponent — grade: high scores across critical dimensions', () => {
   beforeEach(resetAllMocks);
 
-  it('achieves grade A when all critical dimensions score ≥80', () => {
+  it('achieves grade A when all critical dimensions score ≥80', async () => {
     vi.mocked(analyzeJsDoc).mockReturnValue({ coveragePercent: 95, documented: 10, total: 10, items: [] });
     vi.mocked(getTestResultsForComponent).mockReturnValue({ passRate: 100, total: 50, passed: 50, failed: 0, skipped: 0 });
     vi.mocked(getCoverageForComponent).mockReturnValue({ lineCoverage: 90, statementCoverage: 90, functionCoverage: 90, branchCoverage: 85 });
