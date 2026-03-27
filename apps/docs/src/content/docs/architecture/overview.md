@@ -31,10 +31,6 @@ HELIX follows a **layered architecture** designed for enterprise content organiz
 4. **Turborepo monorepo** - Efficient builds with intelligent caching
 5. **WCAG 2.1 AA baseline** - Accessibility compliance as a first-class requirement
 
-## Detailed Documentation
-
-For the complete architecture specification (55,000+ words), see the [Pre-Planning Architecture document](/pre-planning/architecture/).
-
 ## Next Steps
 
 - [Monorepo Structure](/architecture/monorepo/) - How the monorepo is organized

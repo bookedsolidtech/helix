@@ -110,5 +110,3 @@ To add VRT coverage for a new component or variant:
 | Accessibility     | 100% axe-core pass     |
 | Visual regression | All component variants |
 | Integration       | Critical user flows    |
-
-See the [Pre-Planning Component Architecture](/pre-planning/components/) for detailed testing patterns.

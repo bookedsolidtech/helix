@@ -43,4 +43,4 @@ For the full retrospective, see the [Architecture decisions](/architecture/overv
 
 ## Where This Led
 
-Phase 0 proved the stack. Everything that came after — all 87 components — is built on the patterns we established here. The [Planning & Discovery](/pre-planning/overview/) documents capture the comprehensive build plan that followed.
+Phase 0 proved the stack. Everything that came after — all 87 components — is built on the patterns we established here.

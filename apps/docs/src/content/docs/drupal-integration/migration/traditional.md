@@ -1812,9 +1812,4 @@ Migrating from traditional Drupal theming to HELIX web components is a multi-mon
 - **[Drupal Behaviors](/drupal-integration/behaviors/)** — JavaScript lifecycle integration
 - **[Troubleshooting](/drupal-integration/troubleshooting/)** — Common migration issues
 
-For architecture decisions and rationale:
-
-- **[Architecture: Integration Strategy](/guides/drupal-integration-architecture/)** — ADR-001: Hybrid property/slot pattern
-- **[Architecture: Loading Strategy](/guides/drupal-component-loading-strategy/)** — ADR-002: Per-component libraries
-
 **Questions?** Review the [Troubleshooting Guide](/drupal-integration/troubleshooting/) or reach out to the HELIX team.

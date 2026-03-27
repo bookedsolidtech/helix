@@ -43,6 +43,3 @@ helix (root)
 }
 ```
 
-## Detailed Architecture
-
-See the [Pre-Planning Architecture document](/pre-planning/architecture/) for the full monorepo design specification.

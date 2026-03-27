@@ -63,5 +63,3 @@ The API is documented via **Custom Elements Manifest** (CEM), which serves as th
 # Regenerate CEM from JSDoc annotations
 npm run cem
 ```
-
-See the [Pre-Planning: Component Architecture](/pre-planning/components/) for the complete API specification.

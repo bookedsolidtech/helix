@@ -47,5 +47,3 @@ The CI/CD pipeline runs on every PR and merge to `dev`:
 - Accessibility audits (axe-core)
 - Documentation build verification
 - npm pack dry-run (verifies publishable output)
-
-See the [Pre-Planning Architecture document](/pre-planning/architecture/) for the complete pipeline design.
