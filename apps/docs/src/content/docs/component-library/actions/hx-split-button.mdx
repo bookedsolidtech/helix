@@ -1,0 +1,265 @@
+---
+title: 'hx-split-button'
+description: Primary action button with attached dropdown menu for secondary actions.
+---
+
+import ComponentLoader from '../../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-split-button" section="summary" />
+
+## Overview
+
+`hx-split-button` combines a primary action button with an attached dropdown menu for secondary actions. It implements the ARIA menu button pattern for full keyboard and screen reader support.
+
+The component consists of two buttons: the **primary button** (triggers `hx-click`) and the **dropdown trigger button** (opens the menu). Menu items are `hx-menu-item` elements placed in the `menu` slot.
+
+**Use `hx-split-button` when:** there is one clear primary action plus a set of related secondary actions that don't need to be visible at all times.
+
+## Live Demo
+
+### Default
+
+<ComponentDemo title="Default">
+  <hx-split-button label="Save">
+    <hx-menu-item slot="menu" value="save-draft">
+      Save as Draft
+    </hx-menu-item>
+    <hx-menu-item slot="menu" value="save-copy">
+      Save a Copy
+    </hx-menu-item>
+    <hx-menu-item slot="menu" value="export">
+      Export
+    </hx-menu-item>
+  </hx-split-button>
+</ComponentDemo>
+
+### Variants
+
+<ComponentDemo title="Variants">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-split-button label="Primary" variant="primary">
+      <hx-menu-item slot="menu" value="a">
+        Option A
+      </hx-menu-item>
+    </hx-split-button>
+    <hx-split-button label="Secondary" variant="secondary">
+      <hx-menu-item slot="menu" value="a">
+        Option A
+      </hx-menu-item>
+    </hx-split-button>
+    <hx-split-button label="Danger" variant="danger">
+      <hx-menu-item slot="menu" value="a">
+        Option A
+      </hx-menu-item>
+    </hx-split-button>
+  </div>
+</ComponentDemo>
+
+### Sizes
+
+<ComponentDemo title="Sizes">
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+    <hx-split-button label="Small" hx-size="sm">
+      <hx-menu-item slot="menu" value="a">
+        Option A
+      </hx-menu-item>
+    </hx-split-button>
+    <hx-split-button label="Medium" hx-size="md">
+      <hx-menu-item slot="menu" value="a">
+        Option A
+      </hx-menu-item>
+    </hx-split-button>
+    <hx-split-button label="Large" hx-size="lg">
+      <hx-menu-item slot="menu" value="a">
+        Option A
+      </hx-menu-item>
+    </hx-split-button>
+  </div>
+</ComponentDemo>
+
+### Disabled
+
+<ComponentDemo title="Disabled">
+  <hx-split-button label="Save" disabled>
+    <hx-menu-item slot="menu" value="a">
+      Option A
+    </hx-menu-item>
+  </hx-split-button>
+</ComponentDemo>
+
+## Installation
+
+```bash
+# Full library
+npm install @helixui/library
+
+# Or import only this component (tree-shaking friendly)
+import '@helixui/library/components/hx-split-button';
+```
+
+## Basic Usage
+
+```html
+<hx-split-button label="Save">
+  <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+  <hx-menu-item slot="menu" value="save-copy">Save a Copy</hx-menu-item>
+  <hx-menu-item slot="menu" value="export">Export</hx-menu-item>
+</hx-split-button>
+```
+
+## Properties
+
+| Property       | Attribute       | Type                                                                         | Default               | Description                                                                   |
+| -------------- | --------------- | ---------------------------------------------------------------------------- | --------------------- | ----------------------------------------------------------------------------- |
+| `variant`      | `variant`       | `'primary' \| 'secondary' \| 'tertiary' \| 'danger' \| 'ghost' \| 'outline'` | `'primary'`           | Visual style variant of the split button.                                     |
+| `size`         | `hx-size`       | `'sm' \| 'md' \| 'lg'`                                                       | `'md'`                | Size of the split button.                                                     |
+| `disabled`     | `disabled`      | `boolean`                                                                    | `false`               | Disables both the primary button and the dropdown trigger.                    |
+| `label`        | `label`         | `string \| undefined`                                                        | `undefined`           | Primary button label text. When set, overrides the default slot content.      |
+| `ariaLabel`    | `aria-label`    | `string`                                                                     | `''`                  | Accessible label for the primary action button. Required for icon-only usage. |
+| `labelTrigger` | `label-trigger` | `string`                                                                     | `'More actions'`      | Accessible label for the dropdown trigger button. Override for localization.  |
+| `labelMenu`    | `label-menu`    | `string`                                                                     | `'Secondary actions'` | Accessible label for the dropdown menu panel. Override for localization.      |
+
+## Events
+
+| Event       | Detail Type                        | Description                                                        |
+| ----------- | ---------------------------------- | ------------------------------------------------------------------ |
+| `hx-click`  | `{ originalEvent: MouseEvent }`    | Dispatched when the primary button is clicked and is not disabled. |
+| `hx-select` | `{ value: string; label: string }` | Dispatched when a menu item is selected from the dropdown.         |
+
+## CSS Custom Properties
+
+| Property                               | Default                          | Description                                                 |
+| -------------------------------------- | -------------------------------- | ----------------------------------------------------------- |
+| `--hx-split-button-menu-max-height`    | `18rem`                          | Maximum height of the dropdown menu panel before scrolling. |
+| `--hx-split-button-bg`                 | `var(--hx-color-primary-500)`    | Background color for both buttons.                          |
+| `--hx-split-button-color`              | `var(--hx-color-neutral-0)`      | Text/icon color for both buttons.                           |
+| `--hx-split-button-border-color`       | `transparent`                    | Border color.                                               |
+| `--hx-split-button-border-radius`      | `var(--hx-border-radius-md)`     | Border radius.                                              |
+| `--hx-split-button-divider-color`      | `var(--hx-color-primary-400)`    | Color of the divider between primary and trigger.           |
+| `--hx-split-button-font-family`        | `var(--hx-font-family-sans)`     | Font family.                                                |
+| `--hx-split-button-font-weight`        | `var(--hx-font-weight-semibold)` | Font weight.                                                |
+| `--hx-split-button-focus-ring-color`   | `var(--hx-focus-ring-color)`     | Focus ring color.                                           |
+| `--hx-split-button-menu-bg`            | `var(--hx-color-neutral-0)`      | Dropdown menu background.                                   |
+| `--hx-split-button-menu-border-color`  | `var(--hx-color-neutral-200)`    | Dropdown menu border color.                                 |
+| `--hx-split-button-menu-border-radius` | `var(--hx-border-radius-md)`     | Dropdown menu border radius.                                |
+| `--hx-split-button-menu-shadow`        | _(theme default)_                | Dropdown menu box shadow.                                   |
+
+## CSS Parts
+
+| Part      | Description                          |
+| --------- | ------------------------------------ |
+| `button`  | The primary action button element.   |
+| `trigger` | The dropdown trigger button element. |
+| `menu`    | The dropdown menu panel element.     |
+
+## Slots
+
+| Slot        | Description                                             |
+| ----------- | ------------------------------------------------------- |
+| _(default)_ | Primary button label text.                              |
+| `menu`      | `hx-menu-item` children rendered in the dropdown panel. |
+
+## Keyboard Interaction
+
+| Key         | Behavior                                                         |
+| ----------- | ---------------------------------------------------------------- |
+| `Tab`       | Moves focus between the primary button and the trigger button.   |
+| `ArrowDown` | Opens the dropdown menu and focuses the first enabled menu item. |
+| `ArrowUp`   | Moves focus to the previous menu item; wraps to last from first. |
+| `ArrowDown` | Moves focus to the next menu item; wraps to first from last.     |
+| `Home`      | Moves focus to the first menu item.                              |
+| `End`       | Moves focus to the last menu item.                               |
+| `Escape`    | Closes the menu and returns focus to the trigger button.         |
+| `Tab`       | Closes the menu (focus moves to next focusable element in page). |
+
+## Accessibility
+
+| Topic           | Details                                                                      |
+| --------------- | ---------------------------------------------------------------------------- |
+| ARIA role       | Primary button: native `button`. Trigger button: `aria-haspopup="menu"`.     |
+| `aria-expanded` | Set on the trigger button; reflects whether the dropdown is open.            |
+| `aria-controls` | Trigger button is wired to the menu panel via a stable unique ID.            |
+| Menu panel      | Has `role="menu"` and `aria-label` from `labelMenu`.                         |
+| Outside click   | Clicking outside the component closes the menu.                              |
+| WCAG            | Implements the ARIA Menu Button pattern (WAI-ARIA Authoring Practices 3.15). |
+
+## Drupal Integration
+
+```twig
+{# my-module/templates/split-button.html.twig #}
+<hx-split-button
+  label="{{ primary_label }}"
+  variant="{{ variant|default('primary') }}"
+  hx-size="{{ size|default('md') }}"
+  {% if disabled %}disabled{% endif %}
+>
+  {% for item in menu_items %}
+    <hx-menu-item slot="menu" value="{{ item.value }}">{{ item.label }}</hx-menu-item>
+  {% endfor %}
+</hx-split-button>
+```
+
+Load the library in your module's `.libraries.yml`:
+
+```yaml
+helix-components:
+  js:
+    /libraries/helix/helix.min.js: { minified: true }
+```
+
+Listen for events in Drupal behaviors:
+
+```javascript
+Drupal.behaviors.helixSplitButton = {
+  attach(context) {
+    once('helixSplitButton', 'hx-split-button', context).forEach((el) => {
+      el.addEventListener('hx-click', (e) => {
+        console.log('Primary action clicked:', e.detail.originalEvent);
+      });
+      el.addEventListener('hx-select', (e) => {
+        console.log('Menu item selected:', e.detail.value, e.detail.label);
+      });
+    });
+  },
+};
+```
+
+## Standalone HTML Example
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hx-split-button example</title>
+    <!-- @helixui/library is a private package — install via npm workspace, not CDN -->
+    <!-- In your project: import '@helixui/library'; in your bundler entry point -->
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem;">
+    <hx-split-button label="Save" id="save-split">
+      <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+      <hx-menu-item slot="menu" value="save-copy">Save a Copy</hx-menu-item>
+      <hx-menu-item slot="menu" value="export">Export as PDF</hx-menu-item>
+    </hx-split-button>
+
+    <script>
+      const btn = document.getElementById('save-split');
+      btn.addEventListener('hx-click', () => {
+        console.log('Primary save action triggered');
+      });
+      btn.addEventListener('hx-select', (e) => {
+        console.log('Selected:', e.detail.value, e.detail.label);
+      });
+    </script>
+  </body>
+</html>
+```
+
+## API Reference
+
+<ComponentDoc tagName="hx-split-button" section="api" />
