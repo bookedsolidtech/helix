@@ -561,23 +561,34 @@ exit $EXIT_CODE
 4. **Playwright cache** — Creates architecture-specific cache directories (`~/.cache/ms-playwright-amd64` vs `~/.cache/ms-playwright-arm64`) and volume-mounts them into the container. This avoids re-downloading Chromium on every test run.
 5. **Results file** — Writes `.act-results.json` with status, timing, and timestamp for programmatic consumption.
 
-### `scripts/test-batch.sh` — Sequential Test Runner (v2)
+### `scripts/test-batch.sh` — Sequential Test Runner (v3)
 
-Used when `--batch` flag is passed. Runs ALL 85+ test files through a **single Chromium instance** with sequential file execution — no browser restarts between files.
+Used when `--batch` flag is passed or run standalone. Runs ALL 85+ test files through a **single Chromium instance** with sequential file execution — no browser restarts between files.
 
 ```bash
 # Usage:
 ./scripts/test-batch.sh              # Run all tests sequentially (one Chromium)
 ./scripts/test-batch.sh --dry-run    # Show test files without running
+./scripts/test-batch.sh --verbose    # Stream all vitest output to terminal
 ```
 
 The key is vitest's `--no-file-parallelism` flag, which forces all test files to run one at a time through a single browser instance. Each file gets an isolated page context (preventing `customElements.define()` collisions), but the Chromium process stays alive throughout.
 
+**Important: `--no-file-parallelism` is a Docker Desktop / local workaround only.** GitHub Actions VMs have real ext4 filesystems and benefit from vitest's default parallel file execution. Do NOT apply this flag to GitHub CI workflows — it would slow them down significantly.
+
 **v1 (replaced):** Split files into batches of 10, launched a new vitest process per batch. Each process started Chromium, ran tests, tore down. 9 batches = 9 Chromium startups = ~90s of pure overhead.
 
-**v2 (current):** One vitest process, one Chromium startup, 85 files sequential, one teardown. Saves 60-105 seconds per full run while maintaining the same I/O profile that avoids VirtioFS crashes.
+**v2 (replaced):** Single vitest process, but used `vitest | tee $LOG &` which gave `$!` the PID of `tee`, not vitest. The kill signal in the watchdog never reached vitest, causing the process to hang indefinitely.
 
-The vitest config also removes dead `pool: 'threads'` and `poolOptions` settings — browser mode ignores the threads/forks pool entirely and manages its own execution through the Playwright browser provider.
+**v3 (current):** One vitest process writing directly to a log file (`vitest > $LOGFILE 2>&1 &`), one Chromium startup, 85 files sequential. Includes a **stale-output watchdog** that detects the Vitest 3.x browser mode teardown hang (vitest hangs indefinitely after all tests complete during Chromium teardown). When no new output is written for 15 seconds after at least 30 seconds of runtime, the watchdog force-kills vitest and determines pass/fail from the raw test output (counting `✓` and `×` markers).
+
+**Verified benchmark:** 85 test files, 5069 tests, 0 failures, 44 seconds (Apple M1 Max, native execution).
+
+**Vitest 3.x teardown hang:** This is a known issue with vitest browser mode — after all tests pass, vitest never exits because the Chromium browser teardown gets stuck. `--forceExit` does not exist in vitest (that's a Jest flag). `teardownTimeout` doesn't apply to browser teardown. The only reliable workaround is the stale-output watchdog.
+
+**Dead config removed:** The vitest config also removes `pool: 'threads'` and `poolOptions` settings — browser mode ignores the threads/forks pool entirely and manages its own execution through the Playwright browser provider.
+
+**`__screenshots__` exclude:** Playwright stores VRT snapshots in directories named like test files (e.g., `hx-grid/__screenshots__/hx-grid.test.ts/` — a directory, not a file). Vitest's glob pattern `src/components/**/*.test.ts` matched these directories, causing hangs. Fixed by adding `'**/__screenshots__/**'` to the vitest exclude config.
 
 ---
 
@@ -1066,6 +1077,30 @@ Add a pre-push gate, either via:
 
 ---
 
+## GitHub CI Applicability
+
+### What Applies to GitHub CI
+
+| Optimization | Local Only | GitHub CI |
+|---|---|---|
+| `--no-file-parallelism` | Yes — Docker Desktop VirtioFS workaround | **No** — GitHub VMs have real ext4, default parallelism is faster |
+| `__screenshots__` exclude in vitest config | **Yes** — prevents vitest from matching snapshot directories | **Yes** — same glob issue exists everywhere |
+| Dead `pool: 'threads'` removal | **Yes** — cleans up dead config | **Yes** — harmless but accurate |
+| `teardownTimeout: 5000` | **Yes** — good practice | **Yes** — good practice (doesn't fix the hang but limits other teardown stalls) |
+| Stale-output watchdog (`test-batch.sh`) | Yes — local full-suite runs only | **No** — GitHub CI uses vitest directly with default parallelism |
+| Contrast-checker test fixes | **Yes** — correct assertions | **Yes** — these were wrong everywhere |
+| Popover hover delay increase (350ms) | **Yes** — sequential execution needs more margin | **Yes** — parallel execution may also be tight on CI runners |
+
+### What NOT to Do on GitHub CI
+
+1. **Do NOT add `--no-file-parallelism` to GitHub CI workflows.** GitHub Actions VMs have native ext4 filesystems. Parallel file execution is faster and more reliable there. The `--no-file-parallelism` flag exists solely to work around Docker Desktop's VirtioFS storage driver instability under heavy concurrent I/O.
+
+2. **Do NOT use `test-batch.sh` in GitHub CI.** The stale-output watchdog and force-kill logic are workarounds for the vitest teardown hang in local environments. On GitHub CI, vitest typically exits cleanly (the hang is more prevalent with Docker Desktop's virtualized filesystem).
+
+3. **Do NOT remove default parallelism from CI.** The full test suite (85 files, 5069 tests) runs in ~44s locally with sequential execution. On GitHub CI with parallel execution, it runs even faster because multiple browser contexts execute simultaneously.
+
+---
+
 ## Reference
 
 ### Files
@@ -1077,7 +1112,7 @@ Add a pre-push gate, either via:
 | `.github/workflows/act-ci.yml` | Local CI workflow (mirrors production CI) |
 | `.github/workflows/ci.yml` | Production CI workflow (runs on GitHub) |
 | `scripts/act-ci.sh` | Wrapper script with flag parsing, cleanup, timing |
-| `scripts/test-batch.sh` | Batched test runner (groups of N components) |
+| `scripts/test-batch.sh` | Sequential test runner (v3) with vitest hang watchdog |
 | `scripts/pre-push-check.sh` | Git pre-push hook (fast local checks) |
 | `.act-results.json` | Output: status, timing, timestamp (gitignored) |
 | `.act-secrets` | Secrets file for act (gitignored) |
