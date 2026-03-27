@@ -3,13 +3,50 @@ title: Installation
 description: How to install and set up the HELIX enterprise web component library
 ---
 
+## Install via npm
+
+```bash
+npm install @helixui/library @helixui/tokens
+```
+
+Or with pnpm:
+
+```bash
+pnpm add @helixui/library @helixui/tokens
+```
+
+Current versions:
+
+| Package             | Version |
+| ------------------- | ------- |
+| `@helixui/library`  | 1.1.2   |
+| `@helixui/tokens`   | 0.3.4   |
+
+## CDN (No Build Step)
+
+Load HELiX directly in any HTML page via unpkg or jsDelivr:
+
+```html
+<!-- All components (recommended for prototyping) -->
+<script type="module" src="https://unpkg.com/@helixui/library@1.1.2/dist/index.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@helixui/library@1.1.2/dist/css/helix-all.css">
+```
+
+jsDelivr alternative:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/css/helix-all.css">
+```
+
 ## Prerequisites
 
 - **Node.js** 20.x or later (LTS recommended)
-- **npm** 10.x or later
-- **Git** 2.x or later
+- **pnpm** 9.x or later (the monorepo uses pnpm workspaces)
 
-## Quick Install
+## Contributing / Monorepo Setup
+
+If you are contributing to HELiX itself:
 
 ```bash
 # Clone the repository
@@ -19,22 +56,23 @@ cd helix
 # Use the correct Node version
 nvm use
 
-# Install all dependencies (workspace-aware)
-npm install
+# Install all dependencies (pnpm workspace-aware)
+pnpm install
 
 # Start the documentation dev server
-turbo run dev --filter=docs
+pnpm turbo run dev --filter=docs
 ```
 
 ## Monorepo Structure
 
-HELIX uses **Turborepo** with **npm workspaces** for build orchestration:
+HELIX uses **Turborepo** with **pnpm workspaces** for build orchestration:
 
 | Package               | Description                       | Status |
 | --------------------- | --------------------------------- | ------ |
 | `apps/docs`           | Astro/Starlight documentation hub | Active |
 | `apps/storybook`      | Storybook component playground    | Active |
-| `packages/hx-library` | Lit 3.x component library         | Active |
+| `packages/hx-library` | Lit 3.x component library (`@helixui/library`) | Active |
+| `packages/hx-tokens`  | Design tokens (`@helixui/tokens`) | Active |
 
 ## Next Steps
 
