@@ -81,7 +81,7 @@ export const Default: Story = {
     label: 'Breadcrumb',
   },
   render: (args) => html`
-    <hx-breadcrumb separator=${args.separator} label=${args.label}>
+    <hx-breadcrumb separator=${args.separator} label=${args.label} role="list">
       <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
       <hx-breadcrumb-item href="/department">Department</hx-breadcrumb-item>
       <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
