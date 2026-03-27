@@ -1,0 +1,151 @@
+# ============================================================================
+# Local CI — Quality gates for nektos/act
+# ============================================================================
+# Mirrors the core quality gates from ci.yml but avoids GitHub-specific actions
+# (dorny/paths-filter, pnpm/action-setup, actions/setup-node) that break in act
+# due to PATH corruption and missing API context.
+#
+# Optimized for speed with --bind mode (zero-copy mount from host):
+#   - node_modules already exists → pnpm install is a 2s no-op
+#   - Playwright browsers cached via volume mount → skip download
+#   - --reuse keeps containers warm between runs
+#
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list]
+# Jobs: lint, format, type-check, build, test, quality-gates
+# ============================================================================
+
+name: Local CI
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Run ESLint
+        run: pnpm run lint
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm run format:check
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Run TypeScript strict check
+        run: pnpm turbo run type-check --filter='!docs'
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Build all packages
+        run: pnpm turbo run build --filter='!docs'
+      - name: Generate and validate CEM
+        run: pnpm run cem
+        working-directory: packages/hx-library
+      - name: Validate package exports
+        run: pnpm publish --dry-run --no-git-checks || echo "dry-run publish check skipped (may fail locally if version already published)"
+        working-directory: packages/hx-library
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build library
+        run: pnpm turbo run build --filter='!docs' --filter='!@helixui/admin' --filter='!@helixui/storybook'
+      - name: Run tests
+        run: |
+          if [ "${ACT_BATCH_TESTS}" = "true" ]; then
+            echo "Running batched tests (all components, ${BATCH_SIZE:-10} at a time)..."
+            bash scripts/test-batch.sh
+          elif [ "${ACT_FULL_TESTS}" = "true" ]; then
+            echo "Running full test suite..."
+            pnpm run test:library
+          else
+            echo "Running smart tests (changed components only)..."
+            pnpm run test:smart
+          fi
+
+  # ── Aggregate gate ──────────────────────────────────────────────────────
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    needs: [lint, format, type-check, build, test]
+    if: always()
+    steps:
+      - name: Check all gates
+        run: |
+          echo "Lint:       ${{ needs.lint.result }}"
+          echo "Format:     ${{ needs.format.result }}"
+          echo "Type Check: ${{ needs.type-check.result }}"
+          echo "Build:      ${{ needs.build.result }}"
+          echo "Test:       ${{ needs.test.result }}"
+
+          FAIL=0
+          for gate in lint format type-check build test; do
+            case "$gate" in
+              lint)       result="${{ needs.lint.result }}" ;;
+              format)     result="${{ needs.format.result }}" ;;
+              type-check) result="${{ needs.type-check.result }}" ;;
+              build)      result="${{ needs.build.result }}" ;;
+              test)       result="${{ needs.test.result }}" ;;
+            esac
+            if [[ "$result" != "success" ]]; then
+              echo "FAILED: $gate ($result)"
+              FAIL=1
+            fi
+          done
+
+          if [[ "$FAIL" -eq 1 ]]; then
+            echo ""
+            echo "One or more quality gates failed"
+            exit 1
+          fi
+
+          echo ""
+          echo "All quality gates passed!"

@@ -9,9 +9,21 @@ name: CI Matrix
 
 on:
   push:
-    branches: [main, 'changeset-release/**']
+    branches: [main, dev, staging, 'changeset-release/**']
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
   pull_request:
-    branches: [main]
+    branches: [main, dev]
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
