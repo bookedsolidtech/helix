@@ -58,6 +58,3 @@ HELIX components work naturally in Drupal TWIG templates. This guide covers comm
 </hx-card>
 ```
 
-## Detailed Guide
-
-See the [Pre-Planning: Drupal Integration Guide](/pre-planning/drupal-guide/) for comprehensive TWIG patterns.
