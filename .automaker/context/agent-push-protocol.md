@@ -16,7 +16,7 @@ pnpm run format
 git add -u
 ```
 
-### Step 2: Preflight (fast local gates)
+### Step 2: Preflight (8 gates including Docker CI)
 
 ```bash
 pnpm run preflight
@@ -32,27 +32,17 @@ If this fails: **FIX THE ERRORS.** Do not proceed to Step 3.
 5. Smart tests + coverage (changed components only)
 6. CEM (if library source changed)
 7. Changeset check (if component source changed)
+8. Docker CI via act (full GitHub Actions parity)
+
+Gate 8 runs the quality gates inside Docker containers — the exact same
+environment as GitHub Actions CI. If it passes here, it WILL pass on GitHub.
+
+If Docker is not running, start it. If `act` is not installed, use `SKIP_ACT=1 pnpm run preflight`
+to skip Gate 8 only (all other gates still run). This should be rare — Docker CI is the final guarantee.
 
 **NEVER run `pnpm run test` or `pnpm run test:library` — these run the full suite and are forbidden.**
 
-### Step 3: Docker CI Gate (MANDATORY)
-
-```bash
-./scripts/act-ci.sh
-```
-
-This runs the FULL quality gates inside Docker containers — the exact same
-environment as GitHub Actions CI. If it passes here, it WILL pass on GitHub.
-
-**If act fails: FIX THE ERRORS. Do not push. Do not skip. This is non-negotiable.**
-
-If Docker is not running, start it. If `act` is not installed, stop — you cannot push.
-
-**Why both preflight AND act?** Preflight is fast (~30s) and catches 90% of issues.
-Act is thorough (~4min) and guarantees CI parity. Preflight first saves time on
-obvious failures. Act second ensures nothing slips through.
-
-### Step 4: Commit
+### Step 3: Commit
 
 ```bash
 HUSKY=0 git commit -m "type(scope): lowercase message"
@@ -60,7 +50,7 @@ HUSKY=0 git commit -m "type(scope): lowercase message"
 
 Subject must be ALL LOWERCASE. Max 120 chars. See commit-quality-gates.md.
 
-### Step 5: Push ONCE
+### Step 4: Push ONCE
 
 ```bash
 HUSKY=0 git push origin <branch>
@@ -93,7 +83,7 @@ gh pr edit $PR_NUMBER --add-label "skip-changeset" --repo bookedsolidtech/helix
 ## What Happens If You Skip Steps
 
 - **Skip format** -- CI format check fails -- wasted cycle
-- **Skip preflight** -- CI lint/type-check/build/tests/coverage fail -- wasted cycle
+- **Skip preflight** -- CI lint/type-check/build/tests/coverage/Docker CI fail -- wasted cycle
 - **Push twice** -- CodeRabbit reviews twice -- stale CHANGES_REQUESTED blocks merge
 - **Skip changeset** -- Changeset Required check fails -- wasted cycle
 

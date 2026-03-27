@@ -1,6 +1,6 @@
 ---
 title: Phase 0 Overview
-description: How we validated the HELIX architecture before committing to 87 components
+description: How we validated the HELIX architecture before committing to 81 components
 ---
 
 > **Status**: Complete
@@ -43,4 +43,4 @@ For the full retrospective, see the [Architecture decisions](/architecture/overv
 
 ## Where This Led
 
-Phase 0 proved the stack. Everything that came after — all 87 components — is built on the patterns we established here.
+Phase 0 proved the stack. Everything that came after — all 81 components — is built on the patterns we established here.

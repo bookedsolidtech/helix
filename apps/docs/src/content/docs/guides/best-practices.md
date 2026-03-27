@@ -232,7 +232,7 @@ await import('@helixui/library/components/hx-button');
 Only import the components you use. Barrel imports load every component:
 
 ```javascript
-// Wrong: loads all 77 components
+// Wrong: loads all 81 components
 import '@helixui/library';
 
 // Correct: loads only what you need

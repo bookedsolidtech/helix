@@ -13,10 +13,12 @@
 #   5. Smart tests + coverage (changed components only)
 #   6. CEM (custom-elements.json, if library source changed)
 #   7. Changeset check (if component source changed)
+#   8. Docker CI (act — full CI pipeline in Docker containers)
 #
 # Usage:
 #   pnpm run preflight
 #   SKIP_CHANGESET=1 pnpm run preflight   # bypass changeset gate (infra-only changes)
+#   SKIP_ACT=1 pnpm run preflight         # bypass Docker CI gate
 # ==============================================================================
 
 set -euo pipefail
@@ -59,35 +61,35 @@ fi
 
 # ── Gate 1: Lint ─────────────────────────────────────────────────────────────
 
-echo "▶ [1/7] Lint"
+echo "▶ [1/8] Lint"
 pnpm run lint
 echo "  ✓ Lint passed"
 echo ""
 
 # ── Gate 2: Format check ─────────────────────────────────────────────────────
 
-echo "▶ [2/7] Format check"
+echo "▶ [2/8] Format check"
 pnpm run format:check
 echo "  ✓ Format passed"
 echo ""
 
 # ── Gate 3: Type check ───────────────────────────────────────────────────────
 
-echo "▶ [3/7] Type check"
+echo "▶ [3/8] Type check"
 pnpm run type-check
 echo "  ✓ Type check passed"
 echo ""
 
 # ── Gate 4: Build ────────────────────────────────────────────────────────────
 
-echo "▶ [4/7] Build"
+echo "▶ [4/8] Build"
 pnpm turbo run build --filter='!docs'
 echo "  ✓ Build passed"
 echo ""
 
 # ── Gate 5: Smart tests + coverage ───────────────────────────────────────────
 
-echo "▶ [5/7] Smart tests + coverage"
+echo "▶ [5/8] Smart tests + coverage"
 
 if [ -z "$CHANGED_COMPONENT_SOURCES" ]; then
   echo "  ✓ No component source changes — tests skipped"
@@ -122,7 +124,7 @@ fi
 
 # ── Gate 6: CEM ──────────────────────────────────────────────────────────────
 
-echo "▶ [6/7] CEM"
+echo "▶ [6/8] CEM"
 if [ -n "$LIBRARY_SOURCE_CHANGED" ]; then
   pnpm run cem
   echo "  ✓ CEM generated"
@@ -133,7 +135,7 @@ echo ""
 
 # ── Gate 7: Changeset ────────────────────────────────────────────────────────
 
-echo "▶ [7/7] Changeset"
+echo "▶ [7/8] Changeset"
 
 if [ "${SKIP_CHANGESET:-0}" = "1" ]; then
   echo "  ✓ SKIP_CHANGESET=1 — bypassed"
@@ -159,6 +161,28 @@ elif [ -n "$COMMON_ANCESTOR" ] && [ -n "$CHANGED_COMPONENT_SOURCES" ]; then
   echo "  ✓ Changeset found: $CHANGESET_ADDED"
 else
   echo "  ✓ No component source changes — changeset not required"
+fi
+echo ""
+
+# ── Gate 8: Docker CI (act) ─────────────────────────────────────────────────
+
+echo "▶ [8/8] Docker CI (act)"
+
+if [ "${SKIP_ACT:-0}" = "1" ]; then
+  echo "  ⚠ SKIP_ACT=1 — Docker CI gate bypassed"
+elif ! command -v act &>/dev/null || ! docker info &>/dev/null 2>&1; then
+  echo "  ⚠ WARNING: Docker CI gate skipped — Docker not running or act not installed"
+  echo "    CI may fail on push. Install: brew install act && open -a Docker"
+else
+  echo "  Running full CI in Docker (this takes ~4 minutes)..."
+  if ./scripts/act-ci.sh; then
+    echo "  ✓ Docker CI passed"
+  else
+    echo ""
+    echo "  ✗ DOCKER CI FAILED — do NOT push."
+    echo "    Fix the errors above and re-run: pnpm run preflight"
+    exit 1
+  fi
 fi
 echo ""
 
