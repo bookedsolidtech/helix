@@ -148,7 +148,11 @@ import '@helixui/library/components/hx-menu';
 
 ## Properties
 
-`hx-menu` has no declarative properties. Use `aria-label` or `aria-labelledby` to provide an accessible name.
+| Property | Attribute | Type     | Default | Description                                                                                                            |
+| -------- | --------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `label`  | `label`   | `string` | `''`    | Accessible label rendered as `aria-label` on the inner `role="menu"` element. A console warning is emitted if not set. |
+
+## Methods
 
 | Method         | Signature    | Description                                    |
 | -------------- | ------------ | ---------------------------------------------- |
@@ -199,15 +203,15 @@ import '@helixui/library/components/hx-menu';
 
 ## Accessibility
 
-| Topic           | Details                                                                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ARIA role       | `role="menu"` on the inner container. Conforms to WAI-ARIA APG Menu pattern.                                                                     |
-| Accessible name | Supply `aria-label` or `aria-labelledby` on `<hx-menu>` to name the menu for screen readers.                                                     |
-| Keyboard        | Full Arrow / Home / End / Enter / Space / Escape / typeahead per WAI-ARIA APG.                                                                   |
-| Screen reader   | Item selection is announced by role (`menuitem`, `menuitemcheckbox`, `menuitemradio`). `aria-checked` state changes are announced automatically. |
-| Focus           | `focusFirst()` and `focusLast()` are available for programmatic focus on menu open.                                                              |
-| Disabled items  | Disabled items are excluded from keyboard navigation entirely.                                                                                   |
-| Loading items   | Loading items are excluded from keyboard navigation; `aria-busy="true"` is set on the item.                                                      |
+| Topic           | Details                                                                                                                                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ARIA role       | `role="menu"` on the inner container. Conforms to WAI-ARIA APG Menu pattern.                                                                                                               |
+| Accessible name | Set the `label` property (or `label` attribute) on `<hx-menu>`. This populates `aria-label` on the inner `role="menu"` element. A dev warning is emitted at runtime if `label` is omitted. |
+| Keyboard        | Full Arrow / Home / End / Enter / Space / Escape / typeahead per WAI-ARIA APG.                                                                                                             |
+| Screen reader   | Item selection is announced by role (`menuitem`, `menuitemcheckbox`, `menuitemradio`). `aria-checked` state changes are announced automatically.                                           |
+| Focus           | `focusFirst()` and `focusLast()` are available for programmatic focus on menu open.                                                                                                        |
+| Disabled items  | Disabled items are excluded from keyboard navigation entirely.                                                                                                                             |
+| Loading items   | Loading items are excluded from keyboard navigation; `aria-busy="true"` is set on the item.                                                                                                |
 
 ## Drupal Integration
 

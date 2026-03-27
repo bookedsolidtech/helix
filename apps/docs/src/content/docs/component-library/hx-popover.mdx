@@ -159,7 +159,8 @@ import '@helixui/library/components/hx-popover';
 
 | Topic            | Details                                                                          |
 | ---------------- | -------------------------------------------------------------------------------- |
-| ARIA role        | `role="region"` on the popover body with `aria-label`.                           |
+| ARIA role        | `role="dialog"` on the popover body with `aria-label`.                           |
+| `aria-haspopup`  | Set to `"dialog"` on the anchor element when the popover is registered.          |
 | `aria-expanded`  | Set on the anchor element, tracks open/close state.                              |
 | `aria-hidden`    | Body has `aria-hidden="true"` when closed, `"false"` when open.                  |
 | `inert`          | Body is marked `inert` when hidden, preventing tab focus into invisible content. |

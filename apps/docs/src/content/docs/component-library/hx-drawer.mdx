@@ -281,15 +281,16 @@ import '@helixui/library/components/hx-drawer';
 
 ## Properties
 
-| Property    | Attribute   | Type                                       | Default | Description                                                                                 |
-| ----------- | ----------- | ------------------------------------------ | ------- | ------------------------------------------------------------------------------------------- |
-| `open`      | `open`      | `boolean`                                  | `false` | Controls whether the drawer is open. Reflects to the host element attribute.                |
-| `placement` | `placement` | `'start' \| 'end' \| 'top' \| 'bottom'`    | `'end'` | Which viewport edge the drawer slides in from.                                              |
-| `size`      | `size`      | `'sm' \| 'md' \| 'lg' \| 'full' \| string` | `'md'`  | Panel width (or height for top/bottom). Accepts preset keys or any valid CSS length string. |
-| `contained` | `contained` | `boolean`                                  | `false` | When true, the drawer is scoped to its positioned parent rather than the viewport.          |
-| `noHeader`  | `no-header` | `boolean`                                  | `false` | When true, hides the entire header region (title, header-actions, close button).            |
-| `noFooter`  | `no-footer` | `boolean`                                  | `false` | When true, hides the footer slot region.                                                    |
-| `label`     | `label`     | `string`                                   | `''`    | Accessible label string for `aria-label` when the `label` slot is not used.                 |
+| Property     | Attribute     | Type                                       | Default          | Description                                                                                                           |
+| ------------ | ------------- | ------------------------------------------ | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `open`       | `open`        | `boolean`                                  | `false`          | Controls whether the drawer is open. Reflects to the host element attribute.                                          |
+| `placement`  | `placement`   | `'start' \| 'end' \| 'top' \| 'bottom'`    | `'end'`          | Which viewport edge the drawer slides in from.                                                                        |
+| `size`       | `hx-size`     | `'sm' \| 'md' \| 'lg' \| 'full' \| string` | `'md'`           | Panel width (or height for top/bottom). Accepts preset keys or any valid CSS length string.                           |
+| `contained`  | `contained`   | `boolean`                                  | `false`          | When true, the drawer is scoped to its positioned parent rather than the viewport.                                    |
+| `noHeader`   | `no-header`   | `boolean`                                  | `false`          | When true, hides the entire header region (title, header-actions, close button).                                      |
+| `noFooter`   | `no-footer`   | `boolean`                                  | `false`          | When true, hides the footer slot region.                                                                              |
+| `label`      | `label`       | `string`                                   | `''`             | Accessible label string for `aria-label` when the `label` slot is not used.                                           |
+| `labelClose` | `label-close` | `string`                                   | `'Close drawer'` | Accessible label for the built-in close button (`aria-label`). Override to localise or provide context-specific text. |
 
 ## Events
 
