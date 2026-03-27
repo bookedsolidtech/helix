@@ -30,7 +30,7 @@ Use `hx-nav` when you need a full navigation structure with multiple items, subm
 
 ### With Submenus
 
-Items that have `children` render as dropdown triggers with `aria-haspopup="menu"`.
+Items that have `children` render as expandable dropdown triggers with `aria-expanded`.
 
 <ComponentDemo title="Navigation with Submenus">
   <hx-nav
@@ -107,11 +107,13 @@ nav.items = [
 
 ## Properties
 
-| Property      | Attribute     | Type                         | Default             | Description                                                                                                   |
-| ------------- | ------------- | ---------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `items`       | `items`       | `NavItem[]`                  | `[]`                | Navigation items array. Each item may have `label`, `href`, `current`, and `children`.                        |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'`      | Layout orientation. `horizontal` renders a top menu bar; `vertical` renders a sidebar. Reflects to attribute. |
-| `label`       | `label`       | `string`                     | `'Main navigation'` | Accessible label applied as `aria-label` on the `<nav>` element.                                              |
+| Property         | Attribute          | Type                         | Default                   | Description                                                                                                   |
+| ---------------- | ------------------ | ---------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `items`          | `items`            | `NavItem[]`                  | `[]`                      | Navigation items array. Each item may have `label`, `href`, `current`, and `children`.                        |
+| `orientation`    | `orientation`      | `'horizontal' \| 'vertical'` | `'horizontal'`            | Layout orientation. `horizontal` renders a top menu bar; `vertical` renders a sidebar. Reflects to attribute. |
+| `label`          | `label`            | `string`                     | `'Main navigation'`       | Accessible label applied as `aria-label` on the `<nav>` element.                                              |
+| `labelOpenMenu`  | `label-open-menu`  | `string`                     | `'Open navigation menu'`  | Accessible label for the hamburger toggle button when the mobile menu is closed.                              |
+| `labelCloseMenu` | `label-close-menu` | `string`                     | `'Close navigation menu'` | Accessible label for the hamburger toggle button when the mobile menu is open.                                |
 
 ### NavItem Interface
 
@@ -179,7 +181,6 @@ interface NavItem {
 | `aria-label`    | Applied to `<nav>` from the `label` property (default: `"Main navigation"`). Required for unique landmark identification when multiple `<nav>` elements exist on a page. |
 | `aria-current`  | Set to `"page"` on the active item's `<a>` link when `current: true` in the item data.                                                                                   |
 | `aria-expanded` | Applied to submenu trigger `<button>` elements. Updates to `"true"` when the submenu is open.                                                                            |
-| `aria-haspopup` | Set to `"menu"` on `<button>` elements that control a submenu.                                                                                                           |
 | `aria-controls` | The mobile toggle button sets `aria-controls="nav-list"`, linked to the `<ul id="nav-list">`.                                                                            |
 | Focus ring      | All interactive elements expose a visible `:focus-visible` outline using `--hx-focus-ring-color`.                                                                        |
 | Screen reader   | SVG icons (hamburger, chevron) carry `aria-hidden="true"` so they are not read aloud.                                                                                    |
