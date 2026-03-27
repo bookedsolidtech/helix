@@ -169,8 +169,10 @@ if [[ "$VERBOSE" == false ]]; then
 fi
 
 # ── Determine pass/fail ──────────────────────────────────────────────────────
-PASSED_TESTS=$(grep -c "^[[:space:]]*✓" "$LOGFILE" 2>/dev/null || echo 0)
-FAILED_TESTS=$(grep -c "^[[:space:]]*×" "$LOGFILE" 2>/dev/null || echo 0)
+PASSED_TESTS=$(grep -c "^[[:space:]]*✓" "$LOGFILE" 2>/dev/null || true)
+PASSED_TESTS=${PASSED_TESTS:-0}
+FAILED_TESTS=$(grep -c "^[[:space:]]*×" "$LOGFILE" 2>/dev/null || true)
+FAILED_TESTS=${FAILED_TESTS:-0}
 FILES_RUN=$(grep "\.test\.ts" "$LOGFILE" | sed 's/.*src\//src\//' | sed 's/ >.*//' | sort -u | wc -l | tr -d ' ')
 
 # Check for vitest summary
