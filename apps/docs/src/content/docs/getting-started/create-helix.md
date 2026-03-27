@@ -1,128 +1,226 @@
 ---
-title: create-helix-app CLI
-description: Scaffold a new project with HELiX web components using the create-helix-app CLI
+title: create-helix CLI
+description: Scaffold a new project with HELiX web components using the create-helix CLI
 ---
 
-`create-helix-app` is the official scaffolding CLI for HELiX web components. It generates a production-ready project for any supported framework in seconds.
+`create-helix` is the official scaffolding CLI for HELiX web components. It generates a production-ready project for any supported framework in seconds.
 
-- **npm:** [npmjs.com/package/create-helix-app](https://www.npmjs.com/package/create-helix-app)
+- **npm:** [npmjs.com/package/create-helix](https://www.npmjs.com/package/create-helix)
 - **GitHub:** [github.com/bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)
+
+## Requirements
+
+- Node.js >= 20.0.0
 
 ## Quick Start
 
 ```bash
-npx create-helix-app my-app
+npx create-helix
+# or
+npm create helix
 ```
 
-The interactive TUI prompts you for a framework, component bundles, and optional features (TypeScript, ESLint, design tokens). When done, it outputs a ready-to-run project.
+The interactive TUI prompts you for a framework, component bundles, and optional features (TypeScript, ESLint, design tokens, dark mode). When done, it outputs a ready-to-run project.
 
-## Framework Targets
+## Framework Templates
 
-`create-helix-app` supports all major frontend frameworks and plain HTML:
-
-| Framework | Description |
-| --------- | ----------- |
-| **React / Next.js** | React 18 + Next.js 14 app with `@helixui/react` wrapper package |
-| **Vue / Nuxt** | Vue 3 + Nuxt 3 with SSR-safe component loading |
-| **SvelteKit** | SvelteKit with server-side rendering support |
-| **Angular** | Angular 17+ with `CUSTOM_ELEMENTS_SCHEMA` pre-configured |
-| **Astro** | Astro 5 with island hydration for interactive components |
-| **Vanilla** | Plain HTML/JS with CDN or npm import — no build step required |
-
-Pass `--framework` to skip the prompt:
+`create-helix` supports 15 framework targets. Pass `--template` to skip the prompt:
 
 ```bash
-npx create-helix-app my-app --framework react
-npx create-helix-app my-app --framework vue
-npx create-helix-app my-app --framework svelte
-npx create-helix-app my-app --framework angular
-npx create-helix-app my-app --framework astro
-npx create-helix-app my-app --framework vanilla
+npx create-helix --template react-next
+npx create-helix --template react-vite
+npx create-helix --template remix
+npx create-helix --template vue-nuxt
+npx create-helix --template vue-vite
+npx create-helix --template svelte-kit
+npx create-helix --template angular
+npx create-helix --template astro
+npx create-helix --template vanilla
+npx create-helix --template solid-vite
+npx create-helix --template qwik-vite
+npx create-helix --template lit-vite
+npx create-helix --template preact-vite
+npx create-helix --template stencil
+npx create-helix --template ember
 ```
+
+| Template ID | Name | Description |
+| ----------- | ---- | ----------- |
+| `react-next` | React + Next.js 15 | App Router, SSR-ready, full HELiX integration — **recommended for new projects** |
+| `react-vite` | React + Vite | Lightning fast dev, SPA-first, HELiX with `@lit/react` |
+| `remix` | React Router (Remix) | Full-stack React with SSR, nested routes |
+| `vue-nuxt` | Vue + Nuxt 4 | Full-stack Vue with SSR, native web component support |
+| `vue-vite` | Vue + Vite | Lightweight Vue 3 SPA with native web component binding |
+| `svelte-kit` | SvelteKit | Svelte 5 + SvelteKit, native custom element support |
+| `angular` | Angular 18 | Enterprise Angular with `CUSTOM_ELEMENTS_SCHEMA` pre-configured |
+| `astro` | Astro | Content-first with islands architecture, zero JS by default |
+| `vanilla` | Vanilla (HTML + CDN) | No framework, no build step — just HTML and HELiX via CDN |
+| `solid-vite` | Solid.js + Vite | Fine-grained reactive SPA with native web component support |
+| `qwik-vite` | Qwik + Vite | Resumable framework with zero hydration |
+| `lit-vite` | Lit + Vite | Lightweight web components with Google Lit and Vite |
+| `preact-vite` | Preact + Vite | Fast 3kB React alternative with native web component support |
+| `stencil` | Stencil | Compiler for standards-based web components with lazy-loading |
+| `ember` | Ember.js | Convention-driven full-stack framework |
 
 ## Component Bundles
 
 Choose which component groups to include. Each bundle is a curated set of HELiX components optimized for tree-shaking:
 
-| Bundle | Components included |
-| ------ | ------------------- |
-| **Core UI** | `hx-button`, `hx-card`, `hx-text`, `hx-icon`, `hx-badge`, `hx-divider` |
-| **Forms** | `hx-text-input`, `hx-select`, `hx-checkbox`, `hx-radio`, `hx-switch`, `hx-textarea`, `hx-field` |
-| **Navigation** | `hx-nav`, `hx-tabs`, `hx-breadcrumb`, `hx-pagination`, `hx-side-nav`, `hx-accordion` |
-| **Data Display** | `hx-table`, `hx-list`, `hx-tag`, `hx-carousel`, `hx-code-snippet` |
-| **Feedback** | `hx-alert`, `hx-toast`, `hx-spinner`, `hx-progress-bar`, `hx-skeleton` |
-| **Layout** | `hx-grid`, `hx-stack`, `hx-container`, `hx-split-panel` |
+| Bundle ID | Name | Components |
+| --------- | ---- | ---------- |
+| `all` | All Components | 98 components — the full HELiX library |
+| `core` | Core UI | button, card, badge, text, icon, avatar, divider, chip, tooltip, popover |
+| `forms` | Form Components | text-input, select, checkbox, radio, switch, textarea, field, combobox, date-picker |
+| `navigation` | Navigation | nav, sidebar, tabs, breadcrumb, pagination, menu, tree-view |
+| `data-display` | Data Display | data-table, stat, progress-bar, meter, counter, structured-list, rating |
+| `feedback` | Feedback & Overlays | alert, toast, dialog, drawer, banner, skeleton, spinner |
+| `layout` | Layout | grid, stack, split-panel, accordion, carousel, container, scroll-area |
 
 Bundles can be combined. Select multiple bundles during the interactive prompt or pass `--bundles`:
 
 ```bash
-npx create-helix-app my-app --bundles core-ui,forms,feedback
+npx create-helix --bundles core,forms,feedback
+npx create-helix --bundles all
 ```
 
-## Drupal Preset
+## Drupal Theme Scaffolding
 
-For Drupal-first projects, use the `--drupal` flag. This scaffolds a Drupal-optimized project with the `@helixui/drupal-behaviors` package pre-installed, Twig template examples, and a Drupal library definition.
+For Drupal-first projects, use the `--drupal` flag. This scaffolds a complete Drupal theme directory with:
+
+- Theme info and libraries YAML files
+- Single Directory Components (SDCs) with Twig templates
+- HELiX component CDN integration via `helixui.libraries.yml`
+- Drupal behaviors using the `once()` pattern
+- `composer.json` and `package.json`
 
 ```bash
-npx create-helix-app my-drupal-theme --drupal
+npx create-helix --drupal
 ```
 
 ### Drupal Presets
 
-Presets apply a curated bundle selection and configuration for specific Drupal use cases:
+Presets apply a curated SDC set and configuration for specific Drupal use cases:
 
 ```bash
-# Healthcare preset — Core UI + Forms + Feedback bundles, WCAG 2.1 AA config
-npx create-helix-app my-app --drupal --preset healthcare
+# Standard preset — Core Drupal SDCs for general-purpose themes
+npx create-helix --drupal --preset standard
 
-# Blog preset — Core UI + Navigation + Content-focused config
-npx create-helix-app my-app --drupal --preset blog
+# Blog preset — Standard + blog-specific content components
+npx create-helix --drupal --preset blog
 
-# Intranet preset — Core UI + Data Display + Forms bundles
-npx create-helix-app my-app --drupal --preset intranet
+# Healthcare preset — Blog + healthcare-specific components (HIPAA-aware)
+npx create-helix --drupal --preset healthcare
+
+# Intranet preset — Standard + employee portal components
+npx create-helix --drupal --preset intranet
+
+# Ecommerce preset — Ecommerce-optimized component set
+npx create-helix --drupal --preset ecommerce
 ```
 
-Each preset configures:
-- Component bundle selection
-- Design token defaults
-- Drupal library structure (`hx-library.libraries.yml`)
-- Twig template stubs for common page patterns
+| Preset | Description | SDC Count |
+| ------ | ----------- | --------- |
+| `standard` | Core Drupal SDCs for general-purpose themes | 7 |
+| `blog` | Standard + blog-specific content components | 12 |
+| `healthcare` | Blog + healthcare-specific components (HIPAA-aware) | 16 |
+| `intranet` | Standard + employee portal components | 11 |
+| `ecommerce` | Ecommerce-optimized component set | — |
+
+## Subcommands
+
+`create-helix` includes several utility subcommands:
+
+```bash
+# List all available framework templates
+npx create-helix list
+
+# Show details for a specific template
+npx create-helix info react-next
+
+# Run the environment diagnostics tool
+npx create-helix doctor
+
+# Upgrade an existing project's HELiX dependencies
+npx create-helix upgrade
+
+# View or set CLI configuration
+npx create-helix config
+npx create-helix config <key>
+```
 
 ## All CLI Options
 
-```bash
-npx create-helix-app [project-name] [options]
+```
+create-helix [project-name] [options]
+create-helix list
+create-helix info <template>
+create-helix doctor
+create-helix upgrade
+create-helix config [key]
 
-Options:
-  --framework <name>    Target framework: react, vue, svelte, angular, astro, vanilla
-  --bundles <list>      Comma-separated bundle names: core-ui, forms, navigation,
+Scaffold Options:
+  --template <id>       Framework template ID (see table above)
+  --bundles <list>      Comma-separated bundle IDs: all, core, forms, navigation,
                         data-display, feedback, layout
-  --drupal              Scaffold for Drupal integration (adds drupal-behaviors, Twig stubs)
-  --preset <name>       Drupal preset: standard, blog, healthcare, intranet
-  --typescript          Include TypeScript configuration (default: true)
+  --output-dir, -o      Output directory (defaults to project name)
+  --drupal              Scaffold a Drupal theme instead of a framework project
+  --preset <name>       Drupal preset: standard, blog, healthcare, intranet, ecommerce
+  --profile <name>      Load a saved configuration profile
+
+Feature Toggles (all default to enabled):
+  --typescript          Include TypeScript configuration
   --no-typescript       Skip TypeScript configuration
-  --eslint              Include ESLint configuration (default: true)
+  --eslint              Include ESLint configuration
   --no-eslint           Skip ESLint configuration
-  --tokens              Include design token customization scaffold (default: true)
+  --tokens              Include design token scaffold
   --no-tokens           Skip design token scaffold
-  -y, --yes             Skip all prompts and use defaults
-  --help                Show help
-  --version             Show version
+  --dark-mode           Include dark mode support
+  --no-dark-mode        Skip dark mode support
+
+Behavior Flags:
+  --dry-run             Preview files that would be generated without writing them
+  --force               Overwrite an existing directory
+  --no-install          Skip running the package manager install step
+  --no-config           Skip loading the .helixrc config file
+  --skip-audit          Skip the dependency security audit
+  --offline             Run in offline mode (skip network checks and version lookups)
+  --verbose             Enable verbose logging output
+  --quiet, -q           Suppress all non-error output
+  --json                Output machine-readable JSON (for CI/scripting)
+
+Meta:
+  --version, -v         Show version number
+  --help, -h            Show help
+```
+
+## Post-Scaffold Steps
+
+After scaffolding, `cd` into your project and start the dev server:
+
+```bash
+# Framework projects
+cd my-app
+npm install   # or pnpm install / yarn
+npm run dev
+
+# Drupal theme
+cd my-helix-theme
+# Add the theme directory to your Drupal installation's themes/ directory
 ```
 
 ## The Booked Solid Ecosystem
 
-`create-helix-app` is part of the Booked Solid toolchain:
+`create-helix` is part of the Booked Solid toolchain:
 
 | Tool | Purpose |
 | ---- | ------- |
 | **helix** (`@helixui/library`) | Enterprise web component library |
 | **helixir** (`@helixui/mcp`) | MCP server for AI-assisted development |
-| **create-helix-app** | Project scaffolding CLI |
+| **create-helix** | Project scaffolding CLI |
 
 ## Next Steps
 
 - [Installation](/getting-started/installation/) — Manual installation and monorepo setup
-- [Component Library](/component-library/overview/) — Browse all 77 components
+- [Component Library](/component-library/overview/) — Browse all 98 components
 - [Design Tokens](/design-tokens/overview/) — Customize the token system
 - [Drupal Integration](/drupal-integration/overview/) — In-depth Drupal guide
