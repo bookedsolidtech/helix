@@ -18,11 +18,13 @@ HELiX uses [nektos/act](https://github.com/nektos/act) to run GitHub Actions wor
 Before running `act`, you need:
 
 1. **Docker Desktop** — running and healthy
+
    ```bash
    docker info   # must succeed with no errors
    ```
 
 2. **act** — install via Homebrew
+
    ```bash
    brew install act
    ```
@@ -79,14 +81,14 @@ This runs the `act-ci.yml` workflow — a lightweight mirror of the production `
 
 ## Available Flags
 
-| Flag | Description |
-|------|-------------|
-| `--job <name>` | Run a specific job instead of all gates |
-| `--list` | Print available job names and exit |
-| `--native` | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
-| `--full` | Run the complete test suite instead of smart tests (changed components only) |
-| `--batch` | Run all tests in batches of 10 to avoid Docker OOM |
-| `--clean` | Remove all stale `act-*` containers before running |
+| Flag           | Description                                                                   |
+| -------------- | ----------------------------------------------------------------------------- |
+| `--job <name>` | Run a specific job instead of all gates                                       |
+| `--list`       | Print available job names and exit                                            |
+| `--native`     | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
+| `--full`       | Run the complete test suite instead of smart tests (changed components only)  |
+| `--batch`      | Run all tests in batches of 10 to avoid Docker OOM                            |
+| `--clean`      | Remove all stale `act-*` containers before running                            |
 
 ---
 
@@ -94,14 +96,14 @@ This runs the `act-ci.yml` workflow — a lightweight mirror of the production `
 
 The `act-ci.yml` workflow runs these jobs:
 
-| Job | What it checks | Approximate time |
-|-----|----------------|-----------------|
-| `lint` | ESLint strict | ~12s (warm) |
-| `format` | Prettier check | ~10s (warm) |
-| `type-check` | TypeScript strict — no `any` | ~15s (warm) |
-| `build` | Full library build + CEM validation | ~90s |
-| `test` | Vitest browser tests (Playwright/Chromium) | ~120s |
-| `quality-gates` | Aggregate — ALL above must pass | ~1s |
+| Job             | What it checks                             | Approximate time |
+| --------------- | ------------------------------------------ | ---------------- |
+| `lint`          | ESLint strict                              | ~12s (warm)      |
+| `format`        | Prettier check                             | ~10s (warm)      |
+| `type-check`    | TypeScript strict — no `any`               | ~15s (warm)      |
+| `build`         | Full library build + CEM validation        | ~90s             |
+| `test`          | Vitest browser tests (Playwright/Chromium) | ~120s            |
+| `quality-gates` | Aggregate — ALL above must pass            | ~1s              |
 
 Jobs that need Playwright browsers will use a cached volume mount on repeat runs — first run downloads browsers, subsequent runs reuse the cache.
 
