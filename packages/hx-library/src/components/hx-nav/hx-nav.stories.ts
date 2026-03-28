@@ -329,14 +329,23 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        Tab enters the navigation. Arrow keys navigate between top-level items. Enter or Space expands submenus. Escape closes open submenus.
+        Tab enters the navigation. Arrow keys navigate between top-level items. Enter or Space
+        expands submenus. Escape closes open submenus.
       </p>
-      <hx-nav></hx-nav>
+      <hx-nav
+        .items=${sampleItems}
+        label="Main navigation"
+        orientation="horizontal"
+      ></hx-nav>
     </div>
   `,
-    play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-nav');
     await expect(el).toBeTruthy();
+    // Verify nav items are rendered in the shadow DOM
+    const navItems = el!.shadowRoot!.querySelectorAll('[part="item"]');
+    await expect(navItems.length).toBe(sampleItems.length);
+    // Tab into the navigation
     await userEvent.tab();
   },
 };

@@ -1,0 +1,212 @@
+---
+title: 'Local CI with act'
+description: 'Run GitHub Actions CI locally using nektos/act before pushing to GitHub.'
+sidebar:
+  order: 10
+---
+
+# Local CI with act
+
+HELiX uses [nektos/act](https://github.com/nektos/act) to run GitHub Actions workflows locally inside Docker containers. This lets you verify your changes pass every quality gate **before** pushing to GitHub — eliminating wasted remote CI cycles.
+
+**This is a mandatory quality gate.** Code does not push to GitHub until `act` passes.
+
+---
+
+## Prerequisites
+
+Before running `act`, you need:
+
+1. **Docker Desktop** — running and healthy
+
+   ```bash
+   docker info   # must succeed with no errors
+   ```
+
+2. **act** — install via Homebrew
+
+   ```bash
+   brew install act
+   ```
+
+3. **`.actrc`** — already checked into the repo root. Contains performance flags (`--bind`, `--reuse`, `--pull=false`).
+
+---
+
+## Quick Start
+
+Run all quality gates locally:
+
+```bash
+./scripts/act-ci.sh
+```
+
+This runs the `act-ci.yml` workflow — a lightweight mirror of the production `ci.yml` that avoids GitHub-specific actions incompatible with local Docker.
+
+**Total time: ~4 minutes** (jobs run in parallel where possible).
+
+---
+
+## Available Commands
+
+### Run all gates
+
+```bash
+./scripts/act-ci.sh
+```
+
+### Run a specific job
+
+```bash
+./scripts/act-ci.sh --job lint
+./scripts/act-ci.sh --job format
+./scripts/act-ci.sh --job type-check
+./scripts/act-ci.sh --job build
+./scripts/act-ci.sh --job test
+```
+
+### List available jobs
+
+```bash
+./scripts/act-ci.sh --list
+```
+
+### Clean stale containers before running
+
+```bash
+./scripts/act-ci.sh --clean
+```
+
+---
+
+## Available Flags
+
+| Flag           | Description                                                                   |
+| -------------- | ----------------------------------------------------------------------------- |
+| `--job <name>` | Run a specific job instead of all gates                                       |
+| `--list`       | Print available job names and exit                                            |
+| `--native`     | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
+| `--full`       | Run the complete test suite instead of smart tests (changed components only)  |
+| `--batch`      | Run all tests in batches of 10 to avoid Docker OOM                            |
+| `--clean`      | Remove all stale `act-*` containers before running                            |
+
+---
+
+## CI Jobs
+
+The `act-ci.yml` workflow runs these jobs:
+
+| Job             | What it checks                             | Approximate time |
+| --------------- | ------------------------------------------ | ---------------- |
+| `lint`          | ESLint strict                              | ~12s (warm)      |
+| `format`        | Prettier check                             | ~10s (warm)      |
+| `type-check`    | TypeScript strict — no `any`               | ~15s (warm)      |
+| `build`         | Full library build + CEM validation        | ~90s             |
+| `test`          | Vitest browser tests (Playwright/Chromium) | ~120s            |
+| `quality-gates` | Aggregate — ALL above must pass            | ~1s              |
+
+Jobs that need Playwright browsers will use a cached volume mount on repeat runs — first run downloads browsers, subsequent runs reuse the cache.
+
+---
+
+## Apple Silicon (M1/M2/M3)
+
+By default, act runs `linux/amd64` containers via Rosetta 2 emulation. This uses 2–3× more memory than native.
+
+**Recommended setup for Apple Silicon:**
+
+```bash
+# Native ARM64 containers — no Rosetta overhead
+./scripts/act-ci.sh --native
+
+# Best combo for full test runs (avoids OOM)
+./scripts/act-ci.sh --native --batch
+```
+
+**When to use each flag:**
+
+- `--native` — faster, less memory for all runs
+- `--batch` — runs tests in groups of 10 to avoid Docker OOM on large test suites
+- `--full` — runs every test (slow; use only when you need complete coverage locally)
+
+---
+
+## Troubleshooting
+
+### `act` not found
+
+```bash
+brew install act
+```
+
+### Docker not running
+
+Start Docker Desktop, then verify:
+
+```bash
+docker info
+```
+
+### Container startup fails / image not found
+
+act pulls images on first run. Ensure you have network access and `~/.actrc` contains `--pull=false` only after the initial pull. Remove `--pull=false` from `.actrc` temporarily to force a fresh pull:
+
+```bash
+act pull_request -W .github/workflows/act-ci.yml --pull=always
+```
+
+### Tests OOM / Docker kills containers
+
+Reduce memory pressure with `--native` (skips Rosetta overhead) and `--batch` (limits concurrent tests):
+
+```bash
+./scripts/act-ci.sh --native --batch
+```
+
+Also increase Docker Desktop memory in **Settings → Resources → Memory** (recommend 8 GB+).
+
+### Stale containers blocking re-runs
+
+```bash
+./scripts/act-ci.sh --clean
+```
+
+Or manually:
+
+```bash
+docker ps -aq --filter "name=act-" | xargs docker rm -f
+```
+
+### Playwright browsers re-downloading every run
+
+act mounts a host-side Playwright cache at `~/.cache/ms-playwright-{arch}`. Verify the directory exists:
+
+```bash
+ls ~/.cache/ms-playwright-amd64   # default
+ls ~/.cache/ms-playwright-arm64   # with --native
+```
+
+If the directory is missing, act creates it automatically on the next run and Playwright downloads browsers once.
+
+### `quality-gates` fails with a passing job name
+
+The aggregate gate requires **all** jobs to succeed. Check the output for the specific failing job name and re-run it in isolation:
+
+```bash
+./scripts/act-ci.sh --job <failing-job>
+```
+
+---
+
+## How It Fits in the Push Workflow
+
+act is the final gate before every `git push`:
+
+```
+pnpm run format        # fix formatting
+pnpm run preflight     # fast local gates (~30s)
+./scripts/act-ci.sh    # full Docker CI gate (~4min)
+git push               # only after act passes
+```
+
+If `act` fails, **fix the errors before pushing**. Do not skip this gate. See [Agent Push Protocol](/contributing/agent-push-protocol) for the complete push sequence.

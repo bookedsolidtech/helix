@@ -66,6 +66,14 @@ export class HelixSteps extends LitElement {
       devWarn('hx-steps', 'The "size" attribute is deprecated. Use "hx-size" instead.');
       this.size = legacySize as 'sm' | 'md' | 'lg';
     }
+    // STEPS-002: WCAG 2.1 SC 4.1.2 — the inner list must have an accessible name.
+    // Warn developers when aria-label is missing so the list is not anonymous.
+    if (!this.ariaLabel) {
+      devWarn(
+        'hx-steps',
+        'An "aria-label" attribute is required to provide an accessible name for the steps list (WCAG 2.1 SC 4.1.2).',
+      );
+    }
     // WCAG 4.1.2: suppress the host element's implicit ARIA role so only the
     // inner div[role="list"] is announced. Mirrors the hx-action-bar pattern.
     // Without this, the consumer's aria-label attribute on the host causes dual
