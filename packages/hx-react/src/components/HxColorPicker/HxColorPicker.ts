@@ -30,7 +30,7 @@ export const HxColorPicker = createComponent({
   react: React,
   events: {
     onHxInput: 'hx-input',
-    onHxChange: 'hx-change',
+    onHxChange: 'hx-change'
   },
   displayName: 'HxColorPicker',
 });

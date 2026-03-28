@@ -202,7 +202,7 @@ pnpm run dev:admin              # Admin Dashboard on port 3159
 
 ```bash
 pnpm run preflight              # MANDATORY before push: 8 gates including Docker CI
-pnpm run verify                 # Quick check: lint + format:check + type-check (~30s)
+pnpm run verify                 # Quality check: lint + format:check + type-check + build (~60s)
 pnpm run build                  # Build everything (Turborepo)
 pnpm run type-check             # TypeScript strict
 pnpm run test                   # Vitest browser mode (112 tests)
@@ -297,7 +297,7 @@ pnpm run preflight          # confirm clean — must be zero failures before pus
 
 **Why this matters:** Git hooks are bypassed in the automated workflow (`HUSKY=0`, `--no-verify`). `preflight` is the only guarantee of code quality before CI. A PR that fails CI wastes agent cycles and blocks other work. This is not optional.
 
-**Quick alternative:** `pnpm run verify` runs only lint + format + type-check (fast, ~30s). Use for rapid iteration, but ALWAYS run full `pnpm run preflight` before the final push.
+**Quick alternative:** `pnpm run verify` runs lint + format:check + type-check + build (~60s). Use for rapid iteration, but ALWAYS run full `pnpm run preflight` before the final push.
 
 ---
 
