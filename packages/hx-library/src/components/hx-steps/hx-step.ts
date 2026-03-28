@@ -1,5 +1,5 @@
 import { LitElement, html, type PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixStepStyles } from './hx-step.styles.js';
 
@@ -95,6 +95,10 @@ export class HelixStep extends LitElement {
   @property({ type: Number })
   index = 0;
 
+  /** Text for the aria-live region, updated when status transitions to complete or error. */
+  /** @internal */
+  @state() private _liveMessage = '';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -118,6 +122,18 @@ export class HelixStep extends LitElement {
         this.setAttribute('aria-current', 'step');
       } else {
         this.removeAttribute('aria-current');
+      }
+      // STEPS-003: announce status transitions to screen readers via aria-live region.
+      // Only announce on transitions (not initial render) by checking the previous value.
+      const prev = changedProperties.get('status');
+      if (prev !== undefined) {
+        if (this.status === 'complete') {
+          this._liveMessage = 'Complete';
+        } else if (this.status === 'error') {
+          this._liveMessage = 'Error';
+        } else {
+          this._liveMessage = '';
+        }
       }
     }
     if (changedProperties.has('disabled')) {
@@ -217,7 +233,7 @@ export class HelixStep extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="step" role="button" @click=${this._handleClick}>
+      <div part="base" class="step" @click=${this._handleClick}>
         <div class="step__track">
           <div part="indicator" class="step__indicator">${this._renderIndicatorContent()}</div>
           <div part="connector" class="step__connector" aria-hidden="true"></div>
@@ -231,6 +247,7 @@ export class HelixStep extends LitElement {
           </div>
         </div>
       </div>
+      <div aria-live="polite" aria-atomic="true" class="sr-only">${this._liveMessage}</div>
     `;
   }
 }
