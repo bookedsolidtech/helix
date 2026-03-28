@@ -201,7 +201,8 @@ pnpm run dev:admin              # Admin Dashboard on port 3159
 ### Build & Quality
 
 ```bash
-pnpm run verify                 # MANDATORY before push: lint + format:check + type-check
+pnpm run preflight              # MANDATORY before push: 8 gates including Docker CI
+pnpm run verify                 # Quick check: lint + format:check + type-check (~30s)
 pnpm run build                  # Build everything (Turborepo)
 pnpm run type-check             # TypeScript strict
 pnpm run test                   # Vitest browser mode (112 tests)
@@ -276,23 +277,27 @@ All agents: `.claude/agents/engineering/`
 
 ## Pre-Push Quality Gate — MANDATORY, NO EXCEPTIONS
 
-**Run `pnpm run verify` before every `git push`. Zero failures required.**
+**Run `pnpm run preflight` before every `git push`. Zero failures required.**
 
 ```bash
-pnpm run verify   # runs: lint + format:check + type-check
+pnpm run preflight   # runs 8 gates: lint, format, type-check, build, tests, CEM, changeset, Docker CI
 ```
 
-Do NOT push if `pnpm run verify` fails. Fix the issue first, then re-run.
+`preflight` mirrors the full GitHub Actions CI pipeline locally. Gate 8 runs `./scripts/act-ci.sh` inside Docker — the exact same environment as GitHub CI. If it passes locally, it WILL pass on GitHub.
+
+Do NOT push if `pnpm run preflight` fails. Fix the issue first, then re-run.
 
 Auto-fix helpers:
 
 ```bash
 pnpm exec eslint --fix .    # auto-fix lint errors
-pnpm run format        # auto-fix formatting
-pnpm run verify        # confirm clean — must be zero failures before push
+pnpm run format             # auto-fix formatting
+pnpm run preflight          # confirm clean — must be zero failures before push
 ```
 
-**Why this matters:** Git hooks are bypassed in the automated workflow (`HUSKY=0`, `--no-verify`). The only guarantee of code quality before CI is running `pnpm run verify` manually before every push. A PR that fails CI wastes agent cycles and blocks other work. This is not optional.
+**Why this matters:** Git hooks are bypassed in the automated workflow (`HUSKY=0`, `--no-verify`). `preflight` is the only guarantee of code quality before CI. A PR that fails CI wastes agent cycles and blocks other work. This is not optional.
+
+**Quick alternative:** `pnpm run verify` runs only lint + format + type-check (fast, ~30s). Use for rapid iteration, but ALWAYS run full `pnpm run preflight` before the final push.
 
 ---
 
@@ -315,7 +320,7 @@ Code flows through three branches: `feature/* → dev → staging → main`.
 
 ## Git Rules
 
-- `pnpm run verify` must pass before every `git push` (runs lint + format:check + type-check)
+- `pnpm run preflight` must pass before every `git push` (runs 8 gates including Docker CI)
 - Never use `--no-verify`
 - Never use `git reset --hard` or `git push --force` without explicit permission
 - Commit messages: concise, imperative ("Add hx-select component", not "Added")

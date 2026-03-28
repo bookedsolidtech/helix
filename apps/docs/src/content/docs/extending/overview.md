@@ -15,7 +15,7 @@ LitElement (Lit 3.x)
 ├── HxCard
 ├── HxTextInput
 ├── HxDialog
-└── ... (77 components total)
+└── ... (81 components total)
 ```
 
 **Why this matters for extension:**

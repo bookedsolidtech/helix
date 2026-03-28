@@ -1174,3 +1174,55 @@ export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
   args: { sticky: true },
 };
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: (args) => html`
+    <hx-top-nav ?sticky=${args.sticky} label=${args.label}>
+      <a
+        slot="logo"
+        href="/"
+        style="font-weight: 700; color: inherit; text-decoration: none; font-size: 1.125rem;"
+        >HealthSystem</a
+      >
+      <div style="display: contents;">
+        <a
+          href="/dashboard"
+          aria-current="page"
+          style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem; font-weight: 600;"
+          >Dashboard</a
+        >
+        <a href="/patients" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Patients</a
+        >
+        <a href="/schedule" style="color: inherit; text-decoration: none; padding: 0.5rem 0.75rem;"
+          >Schedule</a
+        >
+      </div>
+      <div slot="actions" style="display: flex; align-items: center; gap: 0.5rem;">
+        <button
+          type="button"
+          style="background: none; border: none; cursor: pointer; color: inherit; padding: 0.5rem;"
+          aria-label="User profile"
+        >
+          Profile
+        </button>
+      </div>
+    </hx-top-nav>
+  `,
+  play: async ({ canvasElement }) => {
+    const nav = canvasElement.querySelector('hx-top-nav');
+    await expect(nav).toBeTruthy();
+    // Verify the nav structure is present
+    const shadow = nav?.shadowRoot;
+    await expect(shadow?.querySelector('[part="nav"]')).toBeTruthy();
+    await expect(shadow?.querySelector('[part="menu"]')).toBeTruthy();
+    // Tab through the navigation: logo link → first nav link → ...
+    await userEvent.tab();
+    await userEvent.tab();
+  },
+};
