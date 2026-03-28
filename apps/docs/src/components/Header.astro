@@ -349,6 +349,17 @@ const currentPath = Astro.url.pathname;
     height: 100%;
   }
 
+  /* ==========================================
+     GLASSMORPHISM NAV BAR
+     ========================================== */
+  :global(header.header) {
+    background: rgba(7, 17, 26, 0.82) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(0, 212, 200, 0.12) !important;
+    box-shadow: 0 1px 24px rgba(0, 212, 200, 0.06);
+  }
+
   .title-wrapper {
     overflow: clip;
     padding: 0.25rem;

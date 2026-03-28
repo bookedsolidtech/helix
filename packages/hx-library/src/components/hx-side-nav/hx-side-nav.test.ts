@@ -96,6 +96,12 @@ describe('hx-side-nav', () => {
       await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
       expect(el.collapsed).toBe(true);
     });
+
+    it('toggle button does not have aria-controls (shadow DOM boundary violation)', async () => {
+      const el = await fixture<HxSideNav>('<hx-side-nav></hx-side-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '.side-nav__toggle');
+      expect(btn?.hasAttribute('aria-controls')).toBe(false);
+    });
   });
 
   // ─── Events ───
@@ -386,6 +392,82 @@ describe('hx-side-nav', () => {
       expect(() => {
         body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       }).not.toThrow();
+    });
+
+    it('ArrowRight expands a collapsed item that has children', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item>
+            Parent
+            <hx-nav-item slot="children" href="/child">Child</hx-nav-item>
+          </hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const parentItem = el.querySelector<HxNavItem>('hx-nav-item:not([slot])');
+      expect(parentItem?.expanded).toBe(false);
+
+      // Focus the parent item's internal button
+      const btn = parentItem?.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      btn?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      await (parentItem as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+
+      expect(parentItem?.expanded).toBe(true);
+    });
+
+    it('ArrowLeft collapses an expanded item that has children', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item expanded>
+            Parent
+            <hx-nav-item slot="children" href="/child">Child</hx-nav-item>
+          </hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const parentItem = el.querySelector<HxNavItem>('hx-nav-item:not([slot])');
+      expect(parentItem?.expanded).toBe(true);
+
+      const btn = parentItem?.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      btn?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      await (parentItem as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+
+      expect(parentItem?.expanded).toBe(false);
+    });
+
+    it('ArrowDown traverses into expanded child items', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item expanded>
+            Parent
+            <hx-nav-item slot="children" href="/child">Child</hx-nav-item>
+          </hx-nav-item>
+          <hx-nav-item href="/other">Other</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const parentItem = el.querySelector<HxNavItem>('hx-nav-item:not([slot])')!;
+      const parentBtn = parentItem.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      parentBtn?.focus();
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      // Focus should have moved into the child item (slot="children")
+      const childItem = el.querySelector<HxNavItem>('[slot="children"]')!;
+      expect(document.activeElement).toBe(childItem);
     });
 
     it('Home key moves focus to the first nav item', async () => {
@@ -752,6 +834,31 @@ describe('hx-nav-item', () => {
       );
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
+    });
+
+    it('each hx-nav-item instance gets a unique tooltip ID', async () => {
+      const nav = await fixture<HxSideNav>(
+        `<hx-side-nav collapsed>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+          <hx-nav-item href="/b">Item B</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (nav as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+
+      const items = Array.from(nav.querySelectorAll<HxNavItem>('hx-nav-item'));
+      await Promise.all(
+        items.map((item) => (item as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete),
+      );
+
+      // Each item should render a tooltip in collapsed mode; IDs must differ
+      const tooltipA = items[0].shadowRoot?.querySelector('[role="tooltip"]');
+      const tooltipB = items[1].shadowRoot?.querySelector('[role="tooltip"]');
+
+      expect(tooltipA).toBeTruthy();
+      expect(tooltipB).toBeTruthy();
+      expect(tooltipA?.id).not.toBe('');
+      expect(tooltipB?.id).not.toBe('');
+      expect(tooltipA?.id).not.toBe(tooltipB?.id);
     });
   });
 });

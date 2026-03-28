@@ -659,6 +659,10 @@ export default defineConfig({
               label: 'Custom Workflows',
               slug: 'guides/custom-workflows',
             },
+            {
+              label: 'Local CI with act',
+              slug: 'guides/local-ci',
+            },
           ],
         },
         {

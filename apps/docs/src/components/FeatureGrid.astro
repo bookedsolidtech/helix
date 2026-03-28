@@ -19,6 +19,10 @@ interface Feature {
   tags: string[];
   href?: string;
   cta?: string;
+  /** Periodic table element number (atomic-number style badge) */
+  elementNumber: string;
+  /** Periodic table element symbol (2-letter) */
+  elementSymbol: string;
 }
 
 const features: Feature[] = [
@@ -31,6 +35,8 @@ const features: Feature[] = [
     tags: ['WCAG AAA', 'Accessibility', 'Compliance'],
     href: '/healthcare-accessibility/',
     cta: 'View Accessibility Strategy',
+    elementNumber: '01',
+    elementSymbol: 'Ac',
   },
   {
     icon: 'fa-solid fa-scale-balanced',
@@ -41,6 +47,8 @@ const features: Feature[] = [
     tags: ['ADRs', 'Light DOM', 'CSS Strategy'],
     href: '/helix-adrs/',
     cta: 'View Architecture Decisions',
+    elementNumber: '02',
+    elementSymbol: 'Ar',
   },
   {
     icon: 'fa-solid fa-building',
@@ -51,6 +59,8 @@ const features: Feature[] = [
     tags: ['TypeScript', 'Custom Elements Manifest', 'W3C DTCG'],
     href: '/enterprise-architecture/',
     cta: 'View Enterprise Strategy',
+    elementNumber: '03',
+    elementSymbol: 'En',
   },
   {
     icon: 'fa-solid fa-rocket',
@@ -61,6 +71,8 @@ const features: Feature[] = [
     tags: ['Lit 3.x', 'Storybook 10.x', 'Vitest (planned)'],
     href: '/tech-stack/',
     cta: 'Explore the Stack',
+    elementNumber: '04',
+    elementSymbol: 'Cs',
   },
 ];
 ---
@@ -85,6 +97,11 @@ const features: Feature[] = [
             class={`feature-card scroll-reveal scroll-reveal-delay-${i + 1}${feature.href ? ' feature-card-linked' : ''}`}
             {...linkProps}
           >
+            {/* Periodic element badge (top-right corner) */}
+            <span class="feature-element-badge" aria-hidden="true">
+              <span class="feb-number">{feature.elementNumber}</span>
+              <span class="feb-symbol">{feature.elementSymbol}</span>
+            </span>
             {feature.cta && (
               <span class="feature-cta-badge">
                 {feature.cta}
@@ -107,3 +124,129 @@ const features: Feature[] = [
     </div>
   </div>
 </section>
+
+<style>
+  /* ================================================================
+     Periodic Table Element-Card Aesthetic
+     Overrides global feature-card styles to use the teal border,
+     4px radius, and glassmorphic background defined by the design
+     direction. Scoped styles have higher specificity than global CSS.
+     ================================================================ */
+
+  .feature-card {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 212, 200, 0.2);
+    background: rgba(0, 212, 200, 0.06);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    position: relative;
+  }
+
+  /* Fallback for browsers without backdrop-filter */
+  @supports not (backdrop-filter: blur(8px)) {
+    .feature-card {
+      background: rgba(10, 22, 22, 0.85);
+    }
+  }
+
+  .feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 24px rgba(0, 212, 200, 0.2),
+      0 0 0 1px rgba(0, 212, 200, 0.35);
+    border-color: rgba(0, 212, 200, 0.4);
+    background: rgba(0, 212, 200, 0.09);
+  }
+
+  /* Disable the conic-gradient rotating border shimmer — periodic style
+     uses a clean static border instead */
+  .feature-card::before {
+    display: none;
+  }
+
+  /* Icon wrappers — teal accent borders, 4px radius */
+  .feature-icon-wrapper {
+    border-radius: 4px;
+  }
+
+  .feature-icon-wrapper.icon-accessibility {
+    border-color: rgba(0, 212, 200, 0.2);
+  }
+
+  .feature-icon-wrapper.icon-drupal {
+    border-color: rgba(0, 212, 200, 0.2);
+  }
+
+  .feature-icon-wrapper.icon-enterprise {
+    border-color: rgba(0, 212, 200, 0.2);
+  }
+
+  .feature-icon-wrapper.icon-tech {
+    border-color: rgba(0, 212, 200, 0.2);
+  }
+
+  /* Periodic element badge — top-right corner, atomic-number style */
+  .feature-element-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.0625rem;
+    pointer-events: none;
+  }
+
+  .feb-number {
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: rgba(0, 212, 200, 0.5);
+    font-family: var(--font-mono, monospace);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .feb-symbol {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: rgba(0, 212, 200, 0.35);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .feature-card:hover .feb-number,
+  .feature-card:hover .feb-symbol {
+    color: rgba(0, 212, 200, 0.7);
+  }
+
+  /* Feature tags — teal accent on periodic cards */
+  .feature-tag {
+    border-radius: 4px;
+    border-color: rgba(0, 212, 200, 0.15);
+    background: rgba(0, 212, 200, 0.05);
+  }
+
+  /* Section label — teal accent */
+  .section-label {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 212, 200, 0.12),
+      rgba(20, 184, 166, 0.1)
+    );
+    border-color: rgba(0, 212, 200, 0.25);
+    color: #00d4c8;
+  }
+
+  /* Responsive: single column on mobile */
+  @media (max-width: 768px) {
+    .feature-card {
+      border-radius: 4px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feature-card {
+      transition: none;
+    }
+  }
+</style>
