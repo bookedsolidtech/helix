@@ -68,7 +68,7 @@ Choose which component groups to include. Each bundle is a curated set of HELiX 
 
 | Bundle ID | Name | Components |
 | --------- | ---- | ---------- |
-| `all` | All Components | 81 components — the full HELiX library |
+| `all` | All Components | All components — the full HELiX library |
 | `core` | Core UI | button, card, badge, text, icon, avatar, divider, chip, tooltip, popover |
 | `forms` | Form Components | text-input, select, checkbox, radio, switch, textarea, field, combobox, date-picker |
 | `navigation` | Navigation | nav, sidebar, tabs, breadcrumb, pagination, menu, tree-view |
@@ -221,6 +221,6 @@ cd my-helix-theme
 ## Next Steps
 
 - [Installation](/getting-started/installation/) — Manual installation and monorepo setup
-- [Component Library](/component-library/overview/) — Browse all 81 components
+- [Component Library](/component-library/overview/) — Browse all components
 - [Design Tokens](/design-tokens/overview/) — Customize the token system
 - [Drupal Integration](/drupal-integration/overview/) — In-depth Drupal guide
