@@ -13,7 +13,20 @@ export interface HxOverflowMenuProps {
   /** Inline styles */
   style?: React.CSSProperties;
   /** Preferred placement of the floating panel relative to the trigger. */
-  placement?: string | 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end';
+  placement?:
+    | string
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end';
   /** Size of the trigger button. */
   size?: 'sm' | 'md' | 'lg';
   /** Whether the trigger button is disabled. */

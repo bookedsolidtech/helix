@@ -31,7 +31,7 @@ export const HxSplitButton = createComponent({
   react: React,
   events: {
     onHxClick: 'hx-click',
-    onHxSelect: 'hx-select'
+    onHxSelect: 'hx-select',
   },
   displayName: 'HxSplitButton',
 });
