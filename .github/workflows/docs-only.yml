@@ -1,0 +1,35 @@
+# ============================================================================
+# Docs-Only CI — HELiX Enterprise Healthcare Web Component Library
+# ============================================================================
+# Fires when a PR contains ONLY .md file changes. Both ci.yml and ci-matrix.yml
+# ignore **/*.md, so docs-only PRs never trigger CI — meaning the required
+# "Quality Gates" status check never appears and auto-merge is permanently
+# blocked.
+#
+# This workflow creates a passing "Quality Gates" check for .md-only PRs so
+# auto-merge can proceed without running the full CI suite.
+# ============================================================================
+
+name: Docs Only
+
+on:
+  pull_request:
+    branches: [main, dev, staging]
+    paths:
+      - '**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Docs-only PR — skip full CI
+        run: echo "Docs-only PR — skipping full CI"
