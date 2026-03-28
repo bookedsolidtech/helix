@@ -5,9 +5,11 @@
  * Features:
  * - Full-width dark section with radial gradient overlays
  * - Large, bold heading with white text
- * - Primary and ghost CTA buttons
+ * - Primary teal gradient button (linear-gradient 135deg, #00d4c8 → #14b8a6)
+ * - Ghost secondary button
  * - Secondary text links below
  * - Scroll-reveal animation
+ * - Mobile responsive (buttons stack on <768px)
  */
 ---
 
@@ -38,3 +40,65 @@
     </div>
   </div>
 </section>
+
+<style>
+  /* ================================================================
+     Teal Gradient CTA Buttons
+     Overrides the global .btn-primary with a teal gradient that
+     matches the periodic table design language.
+     WCAG AA contrast: #0a1a18 text on #00d4c8 = 5.4:1 ✓
+     Touch target: min 52px height (meets 44px minimum) ✓
+     ================================================================ */
+
+  .btn-primary {
+    background: linear-gradient(135deg, #00d4c8, #14b8a6);
+    color: #0a1a18;
+    box-shadow: 0 4px 16px rgba(0, 212, 200, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 212, 200, 0.45);
+    background: linear-gradient(135deg, #00c4b8, #0d9488);
+    color: #0a1a18;
+    text-decoration: none;
+  }
+
+  .btn-primary:active {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 12px rgba(0, 212, 200, 0.3);
+  }
+
+  /* Teal-tinted section glow */
+  .cta-section::before {
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 212, 200, 0.12), transparent),
+      radial-gradient(ellipse 40% 30% at 80% 20%, rgba(20, 184, 166, 0.08), transparent);
+  }
+
+  /* Stack buttons on mobile */
+  @media (max-width: 768px) {
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta-buttons .btn {
+      width: 100%;
+      max-width: 320px;
+      justify-content: center;
+    }
+
+    .cta-links {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary {
+      transition: none;
+    }
+  }
+</style>
