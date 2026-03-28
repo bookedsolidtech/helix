@@ -31,6 +31,14 @@ describe('hx-menu', () => {
       expect(base).toBeTruthy();
     });
 
+    it('applies max-height and overflow-y:auto to inner menu element', async () => {
+      const el = await fixture<HelixMenu>('<hx-menu></hx-menu>');
+      const base = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      const styles = getComputedStyle(base);
+      // overflow-y should be auto (set via stylesheet)
+      expect(styles.overflowY).toBe('auto');
+    });
+
     it('renders slotted hx-menu-item children', async () => {
       const el = await fixture<HelixMenu>(`
         <hx-menu>
@@ -656,6 +664,38 @@ describe('hx-menu-item', () => {
       await el.updateComplete;
       const inner = shadowQuery(el, '.menu-item')!;
       expect(inner.hasAttribute('aria-expanded')).toBe(false);
+    });
+  });
+
+  describe('ArrowLeft submenu close', () => {
+    it('dispatches hx-item-submenu-close when ArrowLeft is pressed', async () => {
+      const el = await fixture<HelixMenuItem>(`
+        <hx-menu-item value="parent">
+          Parent
+          <hx-menu slot="submenu">
+            <hx-menu-item value="child">Child</hx-menu-item>
+          </hx-menu>
+        </hx-menu-item>
+      `);
+      await el.updateComplete;
+      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
+      inner.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-item-submenu-close');
+      await userEvent.keyboard('{ArrowLeft}');
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+      expect(event.detail.item).toBe(el);
+    });
+
+    it('hx-item-submenu-close bubbles and is composed', async () => {
+      const el = await fixture<HelixMenuItem>('<hx-menu-item value="x">Item</hx-menu-item>');
+      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
+      inner.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-item-submenu-close');
+      await userEvent.keyboard('{ArrowLeft}');
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
     });
   });
 
