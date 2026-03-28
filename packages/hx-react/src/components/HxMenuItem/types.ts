@@ -29,4 +29,6 @@ export interface HxMenuItemProps {
   onHxItemSelect?: (event: Event) => void;
   /** Dispatched when ArrowRight is pressed on an item with a submenu. */
   onHxItemSubmenuOpen?: (event: Event) => void;
+  /** Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus. */
+  onHxItemSubmenuClose?: (event: Event) => void;
 }
