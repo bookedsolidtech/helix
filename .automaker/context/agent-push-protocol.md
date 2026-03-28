@@ -167,7 +167,7 @@ If your changes include:
 You MUST run before pushing:
 ```bash
 pnpm install              # Regenerates pnpm-lock.yaml
-pnpm run verify           # Ensure everything still passes
+pnpm run verify           # Ensure everything still passes (lint + format:check + type-check + build)
 git add pnpm-lock.yaml    # Stage the updated lockfile
 ```
 
