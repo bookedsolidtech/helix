@@ -356,12 +356,7 @@ export class HelixNav extends LitElement {
   private _renderSubMenu(children: NavItem[], parentIndex: number, parentLabel: string) {
     const isExpanded = this._expandedIndex === parentIndex;
     return html`
-      <ul
-        class="nav__submenu"
-        role="list"
-        aria-label="${parentLabel} submenu"
-        ?hidden=${!isExpanded}
-      >
+      <ul class="nav__submenu" aria-label="${parentLabel} submenu" ?hidden=${!isExpanded}>
         ${children.map(
           (child) => html`
             <li class="nav__submenu-item">
@@ -389,10 +384,11 @@ export class HelixNav extends LitElement {
   private _renderItem(item: NavItem, index: number) {
     const hasChildren = !!item.children?.length;
     const isExpanded = this._expandedIndex === index;
+    const hasCurrentChild = hasChildren && !!item.children?.some((child) => child.current);
 
     const linkClasses = {
       nav__link: true,
-      'nav__link--active': !!item.current,
+      'nav__link--active': !!item.current || hasCurrentChild,
       'nav__link--has-submenu': hasChildren,
       'nav__link--expanded': isExpanded,
     };
@@ -403,6 +399,7 @@ export class HelixNav extends LitElement {
             part="link"
             class=${classMap(linkClasses)}
             aria-expanded=${isExpanded ? 'true' : 'false'}
+            aria-current=${hasCurrentChild ? 'true' : nothing}
             @click=${(e: Event) => this._handleItemClick(item, index, e)}
             @keydown=${(e: KeyboardEvent) => this._handleKeydown(e, index, item)}
           >

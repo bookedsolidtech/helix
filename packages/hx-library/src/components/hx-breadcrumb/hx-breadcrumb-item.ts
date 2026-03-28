@@ -26,6 +26,7 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
  * @cssprop [--hx-breadcrumb-separator-color=var(--hx-color-neutral-400)] - Separator color.
  * @cssprop [--hx-breadcrumb-separator-gap=var(--hx-space-1)] - Horizontal margin around separator.
  * @cssprop [--hx-breadcrumb-item-max-width] - Optional max-width for text truncation.
+ * @cssprop [--hx-breadcrumb-link-focus-ring-color=var(--hx-focus-ring-color, var(--hx-color-primary-500))] - Focus ring color for breadcrumb links.
  */
 @customElement('hx-breadcrumb-item')
 export class HelixBreadcrumbItem extends LitElement {

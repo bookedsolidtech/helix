@@ -1,0 +1,101 @@
+{#
+  helix-nav.html.twig
+  -------------------
+  Renders a HELiX hx-nav component from a Drupal menu tree. Converts the
+  Drupal menu_tree render array into a JSON NavItem array and passes it to
+  the hx-nav `items` attribute.
+
+  hx-nav accepts a single JSON-serialised `items` attribute containing an
+  array of NavItem objects:
+    { label, href?, current?, children?: NavItem[] }
+
+  Drupal menu_tree variables:
+    - items[].title        → NavItem.label
+    - items[].url          → NavItem.href  (via url.toString() or path())
+    - items[].in_active_trail → NavItem.current: true
+    - items[].below        → NavItem.children  (one level deep)
+
+  Variables:
+    items        (array)   Drupal menu_tree items array. Required.
+    orientation  (string)  'horizontal' | 'vertical'. Default: 'horizontal'.
+    label        (string)  Accessible aria-label for the nav landmark.
+                           Default: 'Main navigation'.
+    label_open   (string)  Accessible label for mobile hamburger open button.
+                           Default: 'Open navigation menu'.
+    label_close  (string)  Accessible label for mobile hamburger close button.
+                           Default: 'Close navigation menu'.
+    attributes   (object)  Additional HTML attributes spread onto hx-nav.
+
+  Usage — from menu_tree preprocess (helix_module.theme.inc):
+    function helix_module_preprocess_helix_nav(&$variables) {
+      $variables['items'] = \Drupal::service('menu.link_tree')
+        ->load('main', new MenuTreeParameters());
+    }
+
+  Usage — direct block template include:
+    {% set menu_items = drupal_menu('main') %}
+    {% include 'helix-nav.html.twig' with {
+      items: menu_items['#items'],
+      orientation: 'horizontal',
+      label: 'Main navigation',
+    } %}
+
+  Usage — inside block--system-menu-block.html.twig:
+    {% include 'helix-nav.html.twig' with {
+      items: items,
+      label: 'Site navigation',
+    } %}
+
+  Drupal active trail:
+    Drupal sets `in_active_trail: true` on items that are ancestors of the
+    current page. The leaf item whose URL matches the current path will also
+    have `in_active_trail: true`. This template maps that flag to
+    `current: true` on the NavItem, which drives the active highlight in
+    hx-nav.
+
+  Nested menus:
+    hx-nav supports one level of sub-navigation via the `children` array.
+    Drupal menu trees can be deeper; only the first level of `item.below`
+    is mapped here. For deeper trees, use hx-side-nav instead.
+
+  Performance note:
+    The `items` JSON string is built with Twig's `json_encode` filter. For
+    very large menus, consider building the array server-side in a preprocess
+    hook and passing the pre-encoded string.
+#}
+
+{#-- Build the NavItem JSON array from the Drupal menu tree --#}
+{%- set nav_items = [] -%}
+{%- for item in items|default([]) -%}
+  {#-- Map each top-level Drupal menu item to a NavItem object --#}
+  {%- set nav_item = {
+    label: item.title,
+    href: item.url ? item.url.toString() : '#',
+    current: item.in_active_trail ? true : false,
+  } -%}
+
+  {#-- Map first-level children from item.below --#}
+  {%- if item.below is defined and item.below -%}
+    {%- set children = [] -%}
+    {%- for child in item.below -%}
+      {%- set child_item = {
+        label: child.title,
+        href: child.url ? child.url.toString() : '#',
+        current: child.in_active_trail ? true : false,
+      } -%}
+      {%- set children = children|merge([child_item]) -%}
+    {%- endfor -%}
+    {%- set nav_item = nav_item|merge({ children: children }) -%}
+  {%- endif -%}
+
+  {%- set nav_items = nav_items|merge([nav_item]) -%}
+{%- endfor -%}
+
+<hx-nav
+  orientation="{{ orientation|default('horizontal') }}"
+  label="{{ label|default('Main navigation') }}"
+  label-open-menu="{{ label_open|default('Open navigation menu') }}"
+  label-close-menu="{{ label_close|default('Close navigation menu') }}"
+  items="{{ nav_items|json_encode|e('html_attr') }}"
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+></hx-nav>

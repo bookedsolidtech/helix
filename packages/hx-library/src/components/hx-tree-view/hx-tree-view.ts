@@ -201,12 +201,16 @@ export class HelixTreeView extends LitElement {
     switch (e.key) {
       case 'ArrowDown': {
         e.preventDefault();
+        // Intentional design: wrap-around from last to first item provides
+        // a continuous navigation loop, consistent with the component's
+        // circular keyboard navigation model.
         const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
         this._focusItem(next);
         break;
       }
       case 'ArrowUp': {
         e.preventDefault();
+        // Intentional design: wrap-around from first to last item (see ArrowDown note).
         const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
         this._focusItem(prev);
         break;
@@ -255,7 +259,37 @@ export class HelixTreeView extends LitElement {
         this._focusItem(items.length - 1);
         break;
       }
+      default: {
+        // WAI-ARIA APG typeahead: a printable character moves focus to the next visible
+        // item whose label starts with that character (case-insensitive).
+        if (e.key.length === 1) {
+          e.preventDefault();
+          const matchIndex = this._findTypeaheadMatch(e.key.toLowerCase(), currentIndex);
+          if (matchIndex !== -1) {
+            this._focusItem(matchIndex);
+          }
+        }
+        break;
+      }
     }
+  }
+
+  /**
+   * Finds the next visible item (starting after `currentIndex`, wrapping around) whose
+   * label text begins with the given lowercase character. Returns -1 if no match.
+   * @internal
+   */
+  private _findTypeaheadMatch(char: string, currentIndex: number): number {
+    const items = this._getVisibleItems();
+    if (items.length === 0) return -1;
+    for (let i = 1; i <= items.length; i++) {
+      const index = (currentIndex + i) % items.length;
+      const item = items[index];
+      if (item && item.labelText.toLowerCase().startsWith(char)) {
+        return index;
+      }
+    }
+    return -1;
   }
 
   /** @internal */

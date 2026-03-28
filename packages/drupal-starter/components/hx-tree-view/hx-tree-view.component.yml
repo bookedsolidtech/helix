@@ -19,6 +19,10 @@ props:
         - none
         - single
         - multiple
+    items:
+      type: array
+      title: Items
+      description: 'Array of tree item objects with label, children, expanded, disabled, and selected keys. Used for recursive server-side rendering of unlimited-depth hierarchies.'
 slots:
   default:
     title: Tree Items
