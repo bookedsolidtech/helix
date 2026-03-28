@@ -25,6 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-menu-border-radius=var(--hx-border-radius-md)] - Menu border radius.
  * @cssprop [--hx-menu-shadow] - Menu box shadow.
  * @cssprop [--hx-menu-min-width=10rem] - Minimum menu width.
+ * @cssprop [--hx-menu-max-height=20rem] - Maximum menu height before vertical scroll is activated.
  */
 @customElement('hx-menu')
 export class HelixMenu extends LitElement {

@@ -21,6 +21,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  *
  * @fires {CustomEvent<{item: HelixMenuItem, value: string}>} hx-item-select - Dispatched when the item is activated via click, Enter, or Space.
  * @fires {CustomEvent<{item: HelixMenuItem}>} hx-item-submenu-open - Dispatched when ArrowRight is pressed on an item with a submenu.
+ * @fires {CustomEvent<{item: HelixMenuItem}>} hx-item-submenu-close - Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus.
  *
  * @csspart base - The root item element.
  * @csspart prefix - Prefix slot wrapper.
@@ -166,6 +167,18 @@ export class HelixMenuItem extends LitElement {
       e.preventDefault();
       this.dispatchEvent(
         new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-open', {
+          bubbles: true,
+          composed: true,
+          detail: { item: this },
+        }),
+      );
+      return;
+    }
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      this.dispatchEvent(
+        new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-close', {
           bubbles: true,
           composed: true,
           detail: { item: this },
