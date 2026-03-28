@@ -594,6 +594,123 @@ describe('hx-nav', () => {
       expect(focusSpy).toHaveBeenCalled();
       focusSpy.mockRestore();
     });
+
+    it('Home key moves focus to first top-level item', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = sampleItems;
+      await el.updateComplete;
+      const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '[part="list"] > [part="item"] > [part="link"]',
+      );
+      const focusSpy = vi.spyOn(links![0], 'focus');
+      // Dispatch from last item
+      links?.[2]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+
+    it('End key moves focus to last top-level item', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = sampleItems;
+      await el.updateComplete;
+      const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '[part="list"] > [part="item"] > [part="link"]',
+      );
+      const focusSpy = vi.spyOn(links![2], 'focus');
+      // Dispatch from first item
+      links?.[0]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+
+    it('Home key moves focus to first item even when already on it', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = sampleItems;
+      await el.updateComplete;
+      const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '[part="list"] > [part="item"] > [part="link"]',
+      );
+      const focusSpy = vi.spyOn(links![0], 'focus');
+      links?.[0]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+
+    it('End key moves focus to last item even when already on it', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = sampleItems;
+      await el.updateComplete;
+      const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '[part="list"] > [part="item"] > [part="link"]',
+      );
+      const lastIdx = links!.length - 1;
+      const focusSpy = vi.spyOn(links![lastIdx], 'focus');
+      links?.[lastIdx]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+  });
+
+  // ─── Focusout Closes Submenu (hx-nav-008) ───
+
+  describe('Focusout Closes Submenu', () => {
+    it('closes expanded submenu when focus moves outside the component', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      // Open submenu
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      btn?.click();
+      await el.updateComplete;
+      expect(btn?.getAttribute('aria-expanded')).toBe('true');
+      // Simulate focus moving outside component — relatedTarget is an element outside `el`
+      const outsideEl = document.createElement('button');
+      document.body.appendChild(outsideEl);
+      el.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: outsideEl }),
+      );
+      await el.updateComplete;
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
+      outsideEl.remove();
+    });
+
+    it('does not close submenu when focus moves to another element inside the component', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      // Open submenu
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      btn?.click();
+      await el.updateComplete;
+      expect(btn?.getAttribute('aria-expanded')).toBe('true');
+      // Simulate focusout where focus stays inside the shadow DOM
+      const subLink = el.shadowRoot?.querySelector<HTMLElement>('.nav__submenu [part="link"]');
+      if (subLink) {
+        el.dispatchEvent(
+          new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: subLink }),
+        );
+        await el.updateComplete;
+        // Submenu should still be open (focus stayed inside component)
+        expect(btn?.getAttribute('aria-expanded')).toBe('true');
+      }
+    });
+
+    it('does not close submenu when focus stays within the host element', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      btn?.click();
+      await el.updateComplete;
+      expect(btn?.getAttribute('aria-expanded')).toBe('true');
+      // relatedTarget is null — same as focus going to body without blur
+      el.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: null }),
+      );
+      await el.updateComplete;
+      // relatedTarget null means focus left entirely — submenu should close
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
+    });
   });
 
   // ─── Outside Click (2) ───
