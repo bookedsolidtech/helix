@@ -119,7 +119,7 @@ export const Default: Story = {
         </hx-nav-item>
         <div
           slot="footer"
-          style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.875rem; overflow: hidden;"
+          style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; background-color: #0f172a; font-size: 0.875rem; overflow: hidden;"
         >
           <div
             style="width: 2rem; height: 2rem; border-radius: 50%; background: #334155; flex-shrink: 0;"

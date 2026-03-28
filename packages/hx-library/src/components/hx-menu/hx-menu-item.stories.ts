@@ -65,10 +65,13 @@ const meta = {
     type: 'normal',
     loading: false,
   },
-  // hx-menu-item requires a parent role="menu" for valid ARIA context
+  // hx-menu-item requires a parent role="menu" for valid ARIA context.
+  // role="menuitem" is also set on the host so axe-core can verify aria-required-children
+  // on the parent role="menu" container (the inner menuitem role lives in shadow DOM).
   render: (args) => html`
     <div role="menu" aria-label="Example menu" style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
       <hx-menu-item
+        role="menuitem"
         value=${args.value}
         ?disabled=${args.disabled}
         ?checked=${args.checked}
