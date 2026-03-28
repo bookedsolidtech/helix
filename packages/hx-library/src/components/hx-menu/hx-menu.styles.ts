@@ -19,6 +19,8 @@ export const helixMenuStyles = css`
       0 2px 4px -2px rgb(0 0 0 / 0.1)
     );
     min-width: var(--hx-menu-min-width, 10rem);
+    max-height: var(--hx-menu-max-height, 20rem);
+    overflow-y: auto;
     outline: none;
   }
 `;
