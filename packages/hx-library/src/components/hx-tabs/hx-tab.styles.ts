@@ -74,8 +74,12 @@ export const helixTabStyles = css`
 
   /* ─── Disabled State ─── */
 
-  .tab[aria-disabled='true'] {
+  :host([disabled]) {
     cursor: not-allowed;
+  }
+
+  .tab[aria-disabled='true'] {
+    pointer-events: none;
     color: var(--hx-color-neutral-400, #adb5bd);
   }
 
