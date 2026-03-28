@@ -122,6 +122,12 @@ export class HelixNav extends LitElement {
   private _boundOutsideClick: (e: MouseEvent) => void = this._handleOutsideClick.bind(this);
 
   /**
+   * Stable bound reference to the focusout handler, stored for addEventListener/removeEventListener symmetry.
+   * @internal
+   */
+  private _boundFocusout: (e: FocusEvent) => void = this._handleFocusout.bind(this);
+
+  /**
    * Sanitizes a URL to prevent XSS via javascript: or data: URIs.
    * Only allows http:, https:, relative paths, and fragment-only links.
    */
@@ -226,6 +232,16 @@ export class HelixNav extends LitElement {
         prev?.focus();
         break;
       }
+      case 'Home': {
+        e.preventDefault();
+        itemsArr[0]?.focus();
+        break;
+      }
+      case 'End': {
+        e.preventDefault();
+        itemsArr[itemsArr.length - 1]?.focus();
+        break;
+      }
       case 'Escape': {
         this._expandedIndex = null;
         current?.focus();
@@ -294,6 +310,17 @@ export class HelixNav extends LitElement {
     }
   }
 
+  /**
+   * hx-nav-008: Close expanded submenu when focus moves outside the component.
+   * @internal
+   */
+  private _handleFocusout(e: FocusEvent): void {
+    const relatedTarget = e.relatedTarget as Node | null;
+    if (relatedTarget && this.contains(relatedTarget)) return;
+    if (relatedTarget && this.shadowRoot?.contains(relatedTarget)) return;
+    this._expandedIndex = null;
+  }
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -301,11 +328,13 @@ export class HelixNav extends LitElement {
     if (typeof document !== 'undefined') {
       document.addEventListener('click', this._boundOutsideClick);
     }
+    this.addEventListener('focusout', this._boundFocusout);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._boundOutsideClick);
+    this.removeEventListener('focusout', this._boundFocusout);
   }
 
   // ─── Render Helpers ───

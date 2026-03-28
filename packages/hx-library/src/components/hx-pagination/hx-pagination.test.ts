@@ -498,6 +498,102 @@ describe('hx-pagination', () => {
       await el.updateComplete;
       expect(el.shadowRoot!.activeElement).toBe(buttons[currentIdx]);
     });
+
+    it('Home key moves focus to the first non-disabled button', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      const list = el.shadowRoot!.querySelector('.list')!;
+      const buttons = Array.from(
+        el.shadowRoot!.querySelectorAll<HTMLButtonElement>('button:not([disabled])'),
+      );
+      // Focus a button in the middle
+      const currentIdx = buttons.findIndex((b) => b.getAttribute('aria-label') === 'Page 3');
+      buttons[currentIdx].focus();
+      list.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      expect(el.shadowRoot!.activeElement).toBe(buttons[0]);
+    });
+
+    it('End key moves focus to the last non-disabled button', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="3"></hx-pagination>',
+      );
+      const list = el.shadowRoot!.querySelector('.list')!;
+      const buttons = Array.from(
+        el.shadowRoot!.querySelectorAll<HTMLButtonElement>('button:not([disabled])'),
+      );
+      // Focus a button in the middle
+      const currentIdx = buttons.findIndex((b) => b.getAttribute('aria-label') === 'Page 3');
+      buttons[currentIdx].focus();
+      list.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      expect(el.shadowRoot!.activeElement).toBe(buttons[buttons.length - 1]);
+    });
+
+    it('Home key works even when first button is already focused', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="2"></hx-pagination>',
+      );
+      const list = el.shadowRoot!.querySelector('.list')!;
+      const buttons = Array.from(
+        el.shadowRoot!.querySelectorAll<HTMLButtonElement>('button:not([disabled])'),
+      );
+      buttons[0].focus();
+      list.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      await el.updateComplete;
+      expect(el.shadowRoot!.activeElement).toBe(buttons[0]);
+    });
+
+    it('End key works even when last button is already focused', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="2"></hx-pagination>',
+      );
+      const list = el.shadowRoot!.querySelector('.list')!;
+      const buttons = Array.from(
+        el.shadowRoot!.querySelectorAll<HTMLButtonElement>('button:not([disabled])'),
+      );
+      const last = buttons[buttons.length - 1];
+      last.focus();
+      list.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      expect(el.shadowRoot!.activeElement).toBe(last);
+    });
+
+    it('focus is restored to new current-page button after keyboard-triggered navigation', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="2"></hx-pagination>',
+      );
+      const nextBtn = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        'button[aria-label="Next page"]',
+      )!;
+      nextBtn.click();
+      // Wait for navigation + updateComplete + the post-navigate focus promise
+      await el.updateComplete;
+      await el.updateComplete;
+      const newCurrentBtn = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        'button[data-roving-key="3"]',
+      );
+      expect(newCurrentBtn).toBeTruthy();
+      expect(el.shadowRoot!.activeElement).toBe(newCurrentBtn);
+    });
+
+    it('focus is restored to new current-page button when clicking a page number button', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
+      );
+      const pageBtn = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        'button[aria-label="Page 4"]',
+      )!;
+      pageBtn.click();
+      await el.updateComplete;
+      await el.updateComplete;
+      const newCurrentBtn = el.shadowRoot!.querySelector<HTMLButtonElement>(
+        'button[data-roving-key="4"]',
+      );
+      expect(newCurrentBtn).toBeTruthy();
+      expect(el.shadowRoot!.activeElement).toBe(newCurrentBtn);
+    });
   });
 
   // ─── Edge Cases ───
