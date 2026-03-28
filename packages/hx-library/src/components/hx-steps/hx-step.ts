@@ -95,6 +95,15 @@ export class HelixStep extends LitElement {
   @property({ type: Number })
   index = 0;
 
+  // ─── Internal State ───
+
+  /**
+   * Text for the aria-live region, updated on status transitions.
+   * Non-reactive: computed in willUpdate() to avoid an extra render cycle.
+   * @internal
+   */
+  private _liveMessage = '';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -109,6 +118,24 @@ export class HelixStep extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown);
+  }
+
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has('status')) {
+      // STEPS-003: announce status transitions to screen readers via aria-live region.
+      // Only announce on transitions (not initial render) by checking the previous value.
+      // Using a non-reactive field here avoids scheduling an extra render cycle.
+      const prev = changedProperties.get('status');
+      if (prev !== undefined) {
+        if (this.status === 'complete') {
+          this._liveMessage = 'Complete';
+        } else if (this.status === 'error') {
+          this._liveMessage = 'Error';
+        } else {
+          this._liveMessage = '';
+        }
+      }
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -217,7 +244,7 @@ export class HelixStep extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="step" role="button" @click=${this._handleClick}>
+      <div part="base" class="step" @click=${this._handleClick}>
         <div class="step__track">
           <div part="indicator" class="step__indicator">${this._renderIndicatorContent()}</div>
           <div part="connector" class="step__connector" aria-hidden="true"></div>
@@ -231,6 +258,7 @@ export class HelixStep extends LitElement {
           </div>
         </div>
       </div>
+      <div aria-live="polite" aria-atomic="true" class="sr-only">${this._liveMessage}</div>
     `;
   }
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixSteps } from './hx-steps.js';
@@ -61,6 +61,27 @@ describe('hx-steps', () => {
     it('renders default size=md', async () => {
       const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
       expect(el.size).toBe('md');
+    });
+
+    it('STEPS-002: warns in dev when aria-label is missing', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixSteps>(
+        '<hx-steps><hx-step label="A" status="pending"></hx-step></hx-steps>',
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('aria-label'),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('STEPS-002: does not warn when aria-label is provided', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixSteps>(THREE_STEPS_HTML);
+      const ariaLabelWarning = warnSpy.mock.calls.find((args) =>
+        String(args[0]).includes('aria-label'),
+      );
+      expect(ariaLabelWarning).toBeUndefined();
+      warnSpy.mockRestore();
     });
   });
 
@@ -261,6 +282,18 @@ describe('hx-step', () => {
       expect(connector?.getAttribute('aria-hidden')).toBe('true');
     });
 
+    it('STEPS-001: inner .step div does not have role="button"', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base?.getAttribute('role')).toBeNull();
+    });
+
+    it('STEPS-003: renders an aria-live="polite" region in shadow DOM', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      const live = el.shadowRoot?.querySelector('[aria-live="polite"]');
+      expect(live).toBeTruthy();
+    });
+
     it('displays step number (index + 1) when pending', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
       el.index = 2;
@@ -328,6 +361,31 @@ describe('hx-step', () => {
       const indicator = shadowQuery(el, '[part~="indicator"]');
       const srOnly = indicator?.querySelector('.sr-only');
       expect(srOnly?.textContent).toBe('Error');
+    });
+
+    it('STEPS-003: aria-live region announces "Complete" when status transitions to complete', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="active"></hx-step>');
+      await el.updateComplete;
+      el.status = 'complete';
+      await el.updateComplete;
+      const live = el.shadowRoot?.querySelector('[aria-live="polite"]');
+      expect(live?.textContent?.trim()).toBe('Complete');
+    });
+
+    it('STEPS-003: aria-live region announces "Error" when status transitions to error', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="active"></hx-step>');
+      await el.updateComplete;
+      el.status = 'error';
+      await el.updateComplete;
+      const live = el.shadowRoot?.querySelector('[aria-live="polite"]');
+      expect(live?.textContent?.trim()).toBe('Error');
+    });
+
+    it('STEPS-003: aria-live region is empty on initial render', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="complete"></hx-step>');
+      await el.updateComplete;
+      const live = el.shadowRoot?.querySelector('[aria-live="polite"]');
+      expect(live?.textContent?.trim()).toBe('');
     });
   });
 

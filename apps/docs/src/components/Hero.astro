@@ -58,6 +58,40 @@ const storybookUrl = import.meta.env.NEXT_PUBLIC_HELIX_STORYBOOK_URL ?? 'http://
       </a>
     </div>
 
+    <!-- Periodic element card accents — showcasing key HELiX attributes -->
+    <div class="hero-periodic-elements" aria-label="Key HELiX metrics">
+      <div class="hero-element-card">
+        <span class="hec-number">102</span>
+        <span class="hec-symbol">Hx</span>
+        <span class="hec-name">Components</span>
+        <span class="hec-mass">Production</span>
+      </div>
+      <div class="hero-element-card">
+        <span class="hec-number">100</span>
+        <span class="hec-symbol">Ts</span>
+        <span class="hec-name">TypeScript</span>
+        <span class="hec-mass">Strict</span>
+      </div>
+      <div class="hero-element-card">
+        <span class="hec-number">AA</span>
+        <span class="hec-symbol">Ac</span>
+        <span class="hec-name">Accessible</span>
+        <span class="hec-mass">WCAG 2.1</span>
+      </div>
+      <div class="hero-element-card">
+        <span class="hec-number">3.x</span>
+        <span class="hec-symbol">Li</span>
+        <span class="hec-name">Lit 3.x</span>
+        <span class="hec-mass">Shadow DOM</span>
+      </div>
+      <div class="hero-element-card">
+        <span class="hec-number">CMS</span>
+        <span class="hec-symbol">Dr</span>
+        <span class="hec-name">Drupal</span>
+        <span class="hec-mass">Integrated</span>
+      </div>
+    </div>
+
   </div>
 
   <!-- Scroll indicator (mouse) — clicks scroll to next section -->
@@ -66,6 +100,125 @@ const storybookUrl = import.meta.env.NEXT_PUBLIC_HELIX_STORYBOOK_URL ?? 'http://
     <span class="mouse-scroll-label">Scroll</span>
   </div>
 </section>
+
+<style>
+  /* Periodic element card accent row — hero section */
+  .hero-periodic-elements {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2.5rem;
+    animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s backwards;
+  }
+
+  .hero-element-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    padding: 0.5rem 0.25rem 0.375rem;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 212, 200, 0.3);
+    background: rgba(0, 212, 200, 0.06);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease;
+    cursor: default;
+    position: relative;
+  }
+
+  .hero-element-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 212, 200, 0.25);
+    border-color: rgba(0, 212, 200, 0.55);
+    background: rgba(0, 212, 200, 0.1);
+  }
+
+  /* Fallback for browsers without backdrop-filter */
+  @supports not (backdrop-filter: blur(8px)) {
+    .hero-element-card {
+      background: rgba(10, 20, 20, 0.7);
+    }
+  }
+
+  .hec-number {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    color: rgba(0, 212, 200, 0.85);
+    align-self: flex-start;
+    padding-left: 0.25rem;
+    font-family: var(--font-mono, monospace);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .hec-symbol {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.92);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 0.2rem 0;
+  }
+
+  .hec-name {
+    font-size: 0.5rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+  }
+
+  .hec-mass {
+    font-size: 0.4375rem;
+    color: rgba(0, 212, 200, 0.6);
+    margin-top: 0.125rem;
+    font-family: var(--font-mono, monospace);
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 768px) {
+    .hero-periodic-elements {
+      gap: 0.5rem;
+    }
+
+    .hero-element-card {
+      width: 62px;
+      padding: 0.375rem 0.25rem 0.3rem;
+    }
+
+    .hec-symbol {
+      font-size: 1.375rem;
+    }
+
+    .hec-number {
+      font-size: 0.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-element-card {
+      width: 54px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-element-card {
+      transition: none;
+    }
+
+    .hero-periodic-elements {
+      animation: none;
+    }
+  }
+</style>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
