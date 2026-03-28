@@ -34,6 +34,17 @@ import { helixNavItemStyles } from './hx-nav-item.styles.js';
 export class HelixNavItem extends LitElement {
   static override styles = [tokenStyles, helixNavItemStyles];
 
+  /** @internal — incremented for each instance to guarantee unique tooltip IDs */
+  private static _instanceCounter = 0;
+
+  /** @internal — per-instance tooltip ID */
+  private _tooltipId: string;
+
+  constructor() {
+    super();
+    this._tooltipId = `nav-item-tooltip-${++HelixNavItem._instanceCounter}`;
+  }
+
   // ─── Properties ───
 
   /**
@@ -158,7 +169,7 @@ export class HelixNavItem extends LitElement {
       </span>
       ${this._hasChildren ? this._renderExpandArrow() : nothing}
       ${this._isCollapsed
-        ? html`<span id="nav-item-tooltip" class="nav-item__tooltip" role="tooltip">${label}</span>`
+        ? html`<span id=${this._tooltipId} class="nav-item__tooltip" role="tooltip">${label}</span>`
         : nothing}
     `;
 
@@ -171,7 +182,7 @@ export class HelixNavItem extends LitElement {
             href=${this.href}
             aria-current=${this.active ? 'page' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
-            aria-describedby=${this._isCollapsed ? 'nav-item-tooltip' : nothing}
+            aria-describedby=${this._isCollapsed ? this._tooltipId : nothing}
             tabindex=${this.disabled ? '-1' : '0'}
           >
             ${innerContent}
@@ -181,7 +192,7 @@ export class HelixNavItem extends LitElement {
             class="nav-item__link"
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-expanded=${this._hasChildren ? String(this.expanded) : nothing}
-            aria-describedby=${this._isCollapsed ? 'nav-item-tooltip' : nothing}
+            aria-describedby=${this._isCollapsed ? this._tooltipId : nothing}
             tabindex=${this.disabled ? '-1' : '0'}
             @click=${this._handleToggle}
           >
