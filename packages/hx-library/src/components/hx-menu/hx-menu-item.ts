@@ -48,6 +48,11 @@ export class HelixMenuItem extends LitElement {
     this._rovingTabIndex = value;
   }
 
+  /** Set whether the nested submenu is open. Called by the component managing submenu visibility. */
+  setSubmenuOpen(open: boolean): void {
+    this._submenuOpen = open;
+  }
+
   /**
    * The value associated with this item, emitted in the hx-select event.
    * @attr value
@@ -87,6 +92,10 @@ export class HelixMenuItem extends LitElement {
   /** @internal */
   @state()
   private _hasSubmenu = false;
+
+  /** @internal Tracks whether the nested submenu is currently open. */
+  @state()
+  private _submenuOpen = false;
 
   /** @internal */
   @query('.menu-item') private _menuItemEl!: HTMLElement | null;
@@ -257,7 +266,8 @@ export class HelixMenuItem extends LitElement {
         tabindex=${this.disabled ? '-1' : String(this._rovingTabIndex)}
         aria-disabled=${this.disabled ? 'true' : nothing}
         aria-checked=${hasCheckableRole ? (this.checked ? 'true' : 'false') : nothing}
-        aria-haspopup=${this._hasSubmenu ? 'true' : nothing}
+        aria-haspopup=${this._hasSubmenu ? 'menu' : nothing}
+        aria-expanded=${this._hasSubmenu ? (this._submenuOpen ? 'true' : 'false') : nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}

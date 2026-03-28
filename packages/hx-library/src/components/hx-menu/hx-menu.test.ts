@@ -607,7 +607,7 @@ describe('hx-menu-item', () => {
   });
 
   describe('Submenu', () => {
-    it('sets aria-haspopup="true" when submenu is present', async () => {
+    it('sets aria-haspopup="menu" when submenu is present', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="parent">
           Parent
@@ -618,7 +618,44 @@ describe('hx-menu-item', () => {
       `);
       await el.updateComplete;
       const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-haspopup')).toBe('true');
+      expect(inner.getAttribute('aria-haspopup')).toBe('menu');
+    });
+
+    it('sets aria-expanded="false" by default when submenu is present', async () => {
+      const el = await fixture<HelixMenuItem>(`
+        <hx-menu-item value="parent">
+          Parent
+          <hx-menu slot="submenu">
+            <hx-menu-item value="child">Child</hx-menu-item>
+          </hx-menu>
+        </hx-menu-item>
+      `);
+      await el.updateComplete;
+      const inner = shadowQuery(el, '.menu-item')!;
+      expect(inner.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('sets aria-expanded="true" after setSubmenuOpen(true)', async () => {
+      const el = await fixture<HelixMenuItem>(`
+        <hx-menu-item value="parent">
+          Parent
+          <hx-menu slot="submenu">
+            <hx-menu-item value="child">Child</hx-menu-item>
+          </hx-menu>
+        </hx-menu-item>
+      `);
+      await el.updateComplete;
+      el.setSubmenuOpen(true);
+      await el.updateComplete;
+      const inner = shadowQuery(el, '.menu-item')!;
+      expect(inner.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('does not set aria-expanded when no submenu is present', async () => {
+      const el = await fixture<HelixMenuItem>('<hx-menu-item value="leaf">Leaf</hx-menu-item>');
+      await el.updateComplete;
+      const inner = shadowQuery(el, '.menu-item')!;
+      expect(inner.hasAttribute('aria-expanded')).toBe(false);
     });
   });
 
