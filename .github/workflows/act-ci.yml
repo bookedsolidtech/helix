@@ -85,7 +85,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Setup pnpm
@@ -104,10 +104,10 @@ jobs:
             bash scripts/test-batch.sh
           elif [ "${ACT_FULL_TESTS}" = "true" ]; then
             echo "Running full test suite..."
-            pnpm run test:library
+            bash scripts/test-batch.sh
           else
             echo "Running smart tests (changed components only)..."
-            pnpm run test:smart
+            bash scripts/test-smart.sh
           fi
 
   # ── Full suite test with Node version matrix (mirrors ci-matrix.yml) ───
