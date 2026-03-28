@@ -235,6 +235,56 @@ describe('hx-nav', () => {
   // ─── Submenus (6) ───
 
   describe('Submenus', () => {
+    it('submenu ul does not have an explicit role="list" attribute', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      const submenu = el.shadowRoot?.querySelector('.nav__submenu');
+      expect(submenu?.hasAttribute('role')).toBe(false);
+    });
+
+    it('parent button gets aria-current="true" when a child item is current', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = [
+        {
+          label: 'Patients',
+          children: [
+            { label: 'All Patients', href: '/patients', current: true },
+            { label: 'New Intake', href: '/patients/new' },
+          ],
+        },
+        { label: 'Reports', href: '/reports' },
+      ];
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      expect(btn?.getAttribute('aria-current')).toBe('true');
+    });
+
+    it('parent button gets active class when a child item is current', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = [
+        {
+          label: 'Patients',
+          children: [
+            { label: 'All Patients', href: '/patients', current: true },
+            { label: 'New Intake', href: '/patients/new' },
+          ],
+        },
+        { label: 'Reports', href: '/reports' },
+      ];
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      expect(btn?.classList.contains('nav__link--active')).toBe(true);
+    });
+
+    it('parent button does not get aria-current when no child is current', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      expect(btn?.hasAttribute('aria-current')).toBe(false);
+    });
+
     it('renders button for items with children', async () => {
       const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
       el.items = itemsWithSubmenus;
