@@ -305,8 +305,8 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div>
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        Click the first item to focus, then use Arrow keys to navigate. Press Enter or Space to
-        select. Press Escape to close.
+        Tab focuses the menu. Arrow Down/Up navigates between items. Press Enter or Space to select.
+        Press Escape to close.
       </p>
       <hx-menu>
         <hx-menu-item value="view">View Chart</hx-menu-item>
@@ -317,6 +317,18 @@ export const KeyboardNavigation: Story = {
       </hx-menu>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const menu = canvasElement.querySelector('hx-menu');
+    await expect(menu).toBeTruthy();
+    // Verify menu items are present (4 items + 1 divider)
+    const items = canvasElement.querySelectorAll('hx-menu-item');
+    await expect(items.length).toBe(4);
+    // Tab to focus the menu
+    await userEvent.tab();
+    // Navigate down through items
+    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.keyboard('{ArrowDown}');
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -412,4 +424,13 @@ export const HealthcareContextMenu: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  render: () => html`
+    <hx-menu>
+      <hx-menu-item value="view">View Chart</hx-menu-item>
+      <hx-menu-item value="edit">Edit Record</hx-menu-item>
+      <hx-menu-item value="print">Print Summary</hx-menu-item>
+      <hx-menu-divider></hx-menu-divider>
+      <hx-menu-item value="archive">Archive</hx-menu-item>
+    </hx-menu>
+  `,
 };
