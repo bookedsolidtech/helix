@@ -182,6 +182,34 @@
 /* === CSS Layers for Organization === */
 @layer base, components, utilities;
 
+/* === Scientific Grid-Line Background === */
+body {
+  background-image:
+    repeating-linear-gradient(rgba(0, 212, 200, 0.025) 0px, transparent 1px, transparent 48px),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 212, 200, 0.025) 0px,
+      transparent 1px,
+      transparent 48px
+    );
+  background-size: 48px 48px;
+}
+
+@keyframes scanline-drift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 48px 48px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body {
+    animation: scanline-drift 8s linear infinite;
+  }
+}
+
 /* === Base Typography === */
 @layer base {
   body {
@@ -212,8 +240,11 @@
 
 /* === Starlight Header Enhancements === */
 header.header {
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(7, 17, 26, 0.82) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 212, 200, 0.12) !important;
+  box-shadow: 0 1px 24px rgba(0, 212, 200, 0.06);
 }
 
 /* === Keyframe Animations === */
@@ -666,11 +697,12 @@ body:has(.hero-section) .sl-container > *:first-child {
 
 /* === Header / Navigation Bar === */
 .header {
-  border-bottom: 1px solid var(--sl-color-gray-6) !important;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  background: var(--sl-color-bg-nav) !important;
+  border-bottom: 1px solid rgba(0, 212, 200, 0.12) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(7, 17, 26, 0.82) !important;
   background-image: none !important;
+  box-shadow: 0 1px 24px rgba(0, 212, 200, 0.06);
 }
 
 .site-title {

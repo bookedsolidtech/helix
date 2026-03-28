@@ -4,11 +4,15 @@
  *
  * Features:
  * - Full-bleed dark section with purple/violet gradient accent
- * - Health grade badge grid visual showing A-grade across all 98 components
+ * - Health grade badge grid visual showing A-grade across all 102 components
  * - Key stats: 102/102 A-grade, 99.8 avg score
  * - CTA linking to HELiXiR MCP server docs
  * - Follows DXBanner / GalleryBanner pattern
  * - Scroll-reveal animation + responsive layout
+ *
+ * Health score source: HELiXiR MCP server audit (102 custom elements per CEM;
+ * 82 component directories, some containing multiple elements).
+ * Grade badges styled with 4px radius consistent with periodic table design language.
  */
 ---
 
@@ -232,7 +236,8 @@
     justify-content: center;
     width: 42px;
     height: 42px;
-    border-radius: 8px;
+    /* 4px radius: consistent with periodic table element-card design language */
+    border-radius: 4px;
     background: rgba(139, 92, 246, 0.12);
     border: 1px solid rgba(167, 139, 250, 0.25);
     font-size: 1rem;
@@ -240,11 +245,22 @@
     color: #a78bfa;
     font-family: var(--font-heading);
     animation: fadeInUp 0.4s ease-out calc(var(--delay) + 0.2s) both;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
   .hx-banner-grade-badge:hover {
     background: rgba(139, 92, 246, 0.22);
     border-color: rgba(167, 139, 250, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hx-banner-grade-badge {
+      transition: none;
+    }
   }
   .hx-banner-grade-label {
     font-size: 0.75rem;
