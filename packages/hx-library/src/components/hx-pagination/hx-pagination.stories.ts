@@ -426,22 +426,226 @@ export const DarkMode: Story = {
 };
 
 // ─────────────────────────────────────────────────
+// 14. CUSTOM LABELS (i18n)
+// ─────────────────────────────────────────────────
+
+export const CustomLabels: Story = {
+  name: 'Custom Labels (i18n)',
+  render: () => {
+    // labelPageMessage and labelPageButton are @property({ attribute: false }) — set via JS.
+    const el = document.createElement('hx-pagination');
+    el.setAttribute('total-pages', '10');
+    el.setAttribute('current-page', '5');
+    el.setAttribute('show-first-last', '');
+    el.setAttribute('label', 'Navigation de pagination');
+    el.setAttribute('first-page-label', 'Première page');
+    el.setAttribute('previous-page-label', 'Page précédente');
+    el.setAttribute('next-page-label', 'Page suivante');
+    el.setAttribute('last-page-label', 'Dernière page');
+    el.labelPageMessage = (current, total) => `Page ${current} sur ${total}`;
+    el.labelPageButton = (page) => `Page ${page}`;
+    return html`
+      <div style="padding: 1rem;">
+        <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+          All button labels and announcements can be customised for i18n.
+          <code>labelPageMessage</code> and <code>labelPageButton</code> are function properties
+          (not attributes) — set them directly on the element. String attributes accept plain text
+          for aria-labels.
+        </p>
+        ${el}
+      </div>
+    `;
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 15. CSS CUSTOM PROPERTIES
+// ─────────────────────────────────────────────────
+
+export const CSSCustomProperties: Story = {
+  name: 'CSS Custom Properties',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: #6c757d;">
+          Emerald theme — override active color, border-radius, and button size
+        </p>
+        <hx-pagination
+          total-pages="10"
+          current-page="5"
+          style="
+            --hx-pagination-active-bg: #059669;
+            --hx-pagination-hover-border-color: #059669;
+            --hx-pagination-border-radius: 9999px;
+            --hx-pagination-button-size: 2rem;
+          "
+        ></hx-pagination>
+      </div>
+
+      <div>
+        <p style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: #6c757d;">
+          Compact warm theme — smaller buttons, warm border color
+        </p>
+        <hx-pagination
+          total-pages="10"
+          current-page="3"
+          show-first-last
+          style="
+            --hx-pagination-button-size: 1.75rem;
+            --hx-pagination-bg: #fffbeb;
+            --hx-pagination-border-color: #d97706;
+            --hx-pagination-active-bg: #b45309;
+            --hx-pagination-gap: 0.125rem;
+          "
+        ></hx-pagination>
+      </div>
+
+      <details style="max-width: 640px;">
+        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 0.5rem;">
+          View CSS Custom Properties Reference
+        </summary>
+        <pre
+          style="background: #f8f9fa; padding: 1rem; border-radius: 0.5rem; font-size: 0.8125rem; overflow-x: auto; line-height: 1.6;"
+        >
+hx-pagination {
+  /* Gap between pagination buttons */
+  --hx-pagination-gap: var(--hx-spacing-1, 0.25rem);
+
+  /* Minimum width and height of each button */
+  --hx-pagination-button-size: 2.25rem;
+
+  /* Border color of buttons */
+  --hx-pagination-border-color: var(--hx-color-border, #d1d5db);
+
+  /* Border radius of buttons */
+  --hx-pagination-border-radius: var(--hx-border-radius-md, 0.375rem);
+
+  /* Background color of buttons */
+  --hx-pagination-bg: var(--hx-color-surface, #ffffff);
+
+  /* Text color of buttons */
+  --hx-pagination-color: var(--hx-color-text-primary, #111827);
+
+  /* Hover background */
+  --hx-pagination-hover-bg: var(--hx-color-surface-hover, #f3f4f6);
+
+  /* Hover border color */
+  --hx-pagination-hover-border-color: var(--hx-color-primary, #2563eb);
+
+  /* Active/current page background */
+  --hx-pagination-active-bg: var(--hx-color-primary, #2563eb);
+
+  /* Active/current page text color */
+  --hx-pagination-active-color: var(--hx-color-surface, #ffffff);
+
+  /* Active/current page border color */
+  --hx-pagination-active-border-color: var(--hx-pagination-active-bg);
+
+  /* Ellipsis character color */
+  --hx-pagination-ellipsis-color: var(--hx-color-text-secondary, #6b7280);
+
+  /* Transition duration for hover/focus */
+  --hx-transition-fast: 150ms;
+}</pre
+        >
+      </details>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
 // KEYBOARD NAVIGATION
 // ─────────────────────────────────────────────────
 
 export const KeyboardNavigation: Story = {
-  name: 'Keyboard Navigation',
+  name: 'Test: Keyboard Navigation (ArrowLeft/ArrowRight)',
+  args: {
+    totalPages: 5,
+    currentPage: 3,
+  },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-pagination');
+    await expect(host).toBeTruthy();
+
+    const shadow = host!.shadowRoot!;
+
+    // The current page button (page 3) starts with tabindex=0
+    const currentBtn = shadow.querySelector<HTMLButtonElement>('button[aria-current="page"]');
+    await expect(currentBtn).toBeTruthy();
+    await expect(currentBtn!.getAttribute('tabindex')).toBe('0');
+
+    // Focus the current page button
+    currentBtn!.focus();
+    await expect(shadow.activeElement).toBe(currentBtn);
+
+    // ArrowRight moves focus to the next button
+    const list = shadow.querySelector('.list')!;
+    list.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    await host!.updateComplete;
+
+    const buttons = Array.from(shadow.querySelectorAll<HTMLButtonElement>('button:not([disabled])'));
+    const currentIdx = buttons.findIndex((b) => b.getAttribute('aria-label') === 'Page 3');
+    await expect(shadow.activeElement).toBe(buttons[currentIdx + 1]);
+
+    // ArrowLeft moves focus back to the current page button
+    list.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    await host!.updateComplete;
+    await expect(shadow.activeElement).toBe(buttons[currentIdx]);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// INTERACTION TEST — hx-page-change events
+// ─────────────────────────────────────────────────
+
+const pageChangeHandler = fn();
+const pageSizeChangeHandler = fn();
+
+export const InteractionTest: Story = {
+  name: 'Test: hx-page-change and hx-page-size-change Events',
   render: () => html`
-    <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        Tab navigates through page number buttons, previous/next buttons, and the rows-per-page select. Enter or Space activates the focused button.
-      </p>
-      <hx-pagination></hx-pagination>
-    </div>
+    <hx-pagination
+      total-pages="10"
+      current-page="5"
+      show-page-size
+      page-size="25"
+      @hx-page-change=${pageChangeHandler}
+      @hx-page-size-change=${pageSizeChangeHandler}
+    ></hx-pagination>
   `,
-    play: async ({ canvasElement }) => {
-    const el = canvasElement.querySelector('hx-pagination');
-    await expect(el).toBeTruthy();
-    await userEvent.tab();
+  play: async ({ canvasElement }) => {
+    pageChangeHandler.mockClear();
+    pageSizeChangeHandler.mockClear();
+
+    const host = canvasElement.querySelector('hx-pagination');
+    await expect(host).toBeTruthy();
+
+    const shadow = host!.shadowRoot!;
+
+    // Click the "Next page" button — expect hx-page-change to fire with page 6
+    const nextBtn = shadow.querySelector<HTMLButtonElement>('button[aria-label="Next page"]');
+    await expect(nextBtn).toBeTruthy();
+    await expect(nextBtn!.disabled).toBe(false);
+
+    await userEvent.click(nextBtn!);
+    await expect(pageChangeHandler).toHaveBeenCalledTimes(1);
+    const pageDetail = pageChangeHandler.mock.calls[0]?.[0]?.detail as { page: number };
+    await expect(pageDetail?.page).toBe(6);
+
+    // Click "Previous page" — expect hx-page-change to fire with page 5
+    const prevBtn = shadow.querySelector<HTMLButtonElement>('button[aria-label="Previous page"]');
+    await expect(prevBtn).toBeTruthy();
+    await userEvent.click(prevBtn!);
+    await expect(pageChangeHandler).toHaveBeenCalledTimes(2);
+    const prevDetail = pageChangeHandler.mock.calls[1]?.[0]?.detail as { page: number };
+    await expect(prevDetail?.page).toBe(5);
+
+    // Change the page size select — expect hx-page-size-change to fire
+    const select = shadow.querySelector<HTMLSelectElement>('select');
+    await expect(select).toBeTruthy();
+    await userEvent.selectOptions(select!, '50');
+    await expect(pageSizeChangeHandler).toHaveBeenCalledTimes(1);
+    const sizeDetail = pageSizeChangeHandler.mock.calls[0]?.[0]?.detail as { pageSize: number };
+    await expect(sizeDetail?.pageSize).toBe(50);
   },
 };

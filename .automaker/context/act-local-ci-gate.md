@@ -10,7 +10,7 @@ workflows locally inside Docker containers before any code is pushed to GitHub.
 ## How It Works
 
 ```
-Agent commits → pnpm run preflight (fast) → ./scripts/act-ci.sh (Docker) → push
+Agent commits → pnpm run preflight (8 gates including Docker CI) → push
 ```
 
 The act workflow (`.github/workflows/act-ci.yml`) mirrors the core quality gates
@@ -47,7 +47,14 @@ actions that don't work in local Docker.
 
 ## For Agents
 
-Before every `git push`, run `./scripts/act-ci.sh`. If it fails, fix the issue
-and re-run. Do NOT push code that fails the local Docker CI gate.
+Before every `git push`, run `pnpm run preflight` (which includes act as Gate 8).
+If it fails, fix the issue and re-run. Do NOT push code that fails any gate.
+
+act-ci.sh can still be run standalone for debugging:
+```bash
+./scripts/act-ci.sh --job test   # Run a specific job in isolation
+```
+
+To skip the Docker CI gate when Docker is unavailable: `SKIP_ACT=1 pnpm run preflight`
 
 This is not a suggestion. This is a hard gate. See `agent-push-protocol.md`.

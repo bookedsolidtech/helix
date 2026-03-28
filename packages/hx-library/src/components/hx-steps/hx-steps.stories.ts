@@ -321,6 +321,17 @@ export const InteractiveEvent: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  args: {
+    orientation: 'horizontal',
+    size: 'md',
+  },
+  render: (args) => html`
+    <hx-steps orientation=${args['orientation']} size=${args['size']}>
+      <hx-step label="Account" status="complete" description="Create your account"></hx-step>
+      <hx-step label="Profile" status="active" description="Set up your profile"></hx-step>
+      <hx-step label="Review" status="pending" description="Review and confirm"></hx-step>
+    </hx-steps>
+  `,
 };
 
 // ─────────────────────────────────────────────────
@@ -334,12 +345,20 @@ export const KeyboardNavigation: Story = {
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
         Tab navigates to each clickable step indicator. Enter or Space activates the focused step.
       </p>
-      <hx-steps></hx-steps>
+      <hx-steps orientation="horizontal">
+        <hx-step label="Account" status="complete" description="Create your account"></hx-step>
+        <hx-step label="Profile" status="active" description="Set up your profile"></hx-step>
+        <hx-step label="Review" status="pending" description="Review and confirm"></hx-step>
+      </hx-steps>
     </div>
   `,
-    play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-steps');
     await expect(el).toBeTruthy();
+    // Verify step children are present
+    const steps = canvasElement.querySelectorAll('hx-step');
+    await expect(steps.length).toBe(3);
+    // Tab to focus the first step indicator
     await userEvent.tab();
   },
 };

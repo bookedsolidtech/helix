@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { expect, userEvent } from 'storybook/test';
 import './hx-breadcrumb.js';
 import './hx-breadcrumb-item.js';
 import { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
@@ -300,6 +301,13 @@ export const DarkMode: Story = {
     separator: '/',
     label: 'Breadcrumb',
   },
+  render: (args) => html`
+    <hx-breadcrumb separator=${args.separator} label=${args.label}>
+      <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/department">Department</hx-breadcrumb-item>
+      <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+    </hx-breadcrumb>
+  `,
 };
 
 // ─────────────────────────────────────────────────
@@ -311,9 +319,25 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
-        This component is presentational. It exposes no interactive keyboard targets of its own.
-        Screen readers will encounter it in the reading order and announce its content.
+        Tab moves focus through each breadcrumb link. The ellipsis button (shown when max-items
+        collapses middle items) is also focusable — press Enter or Space to expand the full path.
       </p>
+      <hx-breadcrumb separator="/" label="Breadcrumb" max-items="3">
+        <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
+        <hx-breadcrumb-item href="/department">Department</hx-breadcrumb-item>
+        <hx-breadcrumb-item href="/department/division">Division</hx-breadcrumb-item>
+        <hx-breadcrumb-item href="/department/division/patient">Patient</hx-breadcrumb-item>
+        <hx-breadcrumb-item>Lab Results</hx-breadcrumb-item>
+      </hx-breadcrumb>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const bc = canvasElement.querySelector('hx-breadcrumb');
+    await expect(bc).toBeTruthy();
+    // Verify breadcrumb items with links are present
+    const items = canvasElement.querySelectorAll('hx-breadcrumb-item');
+    await expect(items.length).toBe(5);
+    // Tab into the breadcrumb — first focusable element is the Home link
+    await userEvent.tab();
+  },
 };

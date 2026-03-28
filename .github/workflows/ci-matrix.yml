@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22]
+        node-version: [20, 22, 24]
         os: [ubuntu-latest]
 
     steps:
@@ -84,6 +84,11 @@ jobs:
       # ---- Tests ----
 
       - name: Test
+        env:
+          # Increase Node heap to prevent esbuild IPC pipe (EPIPE) crashes under
+          # full-suite load on CI runners, particularly on Node 22+ where V8 heap
+          # sizing changed and GC pressure can kill esbuild child processes.
+          NODE_OPTIONS: --max-old-space-size=4096
         run: |
           # Promotion PRs (staging→main): tests already verified on staging — skip
           if [[ "${{ github.head_ref }}" == "staging" && "${{ github.base_ref }}" == "main" ]]; then

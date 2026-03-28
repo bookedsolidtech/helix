@@ -540,6 +540,20 @@ export const DarkMode: Story = {
   args: {
     collapsed: true,
   },
+  render: (args) => html`
+    <div style="height: 400px; display: flex;">
+      <hx-side-nav ?collapsed=${args.collapsed} label=${args.label} style="height: 100%;">
+        <div slot="header" style="font-weight: bold; font-size: 1.125rem; color: white;">H</div>
+        <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+        <hx-nav-item href="/patients" active>Patients</hx-nav-item>
+        <hx-nav-item href="/reports">Reports</hx-nav-item>
+        <hx-nav-item href="/settings">Settings</hx-nav-item>
+      </hx-side-nav>
+      <div style="flex: 1; padding: 2rem; background: #1e293b;">
+        <h1 style="margin: 0; font-size: 1.5rem; color: white;">Page Content</h1>
+      </div>
+    </div>
+  `,
 };
 
 // ─────────────────────────────────────────────────
@@ -549,16 +563,31 @@ export const DarkMode: Story = {
 export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
-    <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        Tab navigates through sidebar navigation links and expand/collapse toggles. Arrow keys navigate within sub-menus. Enter or Space activates.
-      </p>
-      <hx-side-nav></hx-side-nav>
+    <div style="height: 400px; display: flex;">
+      <hx-side-nav label="Main Navigation" style="height: 100%;">
+        <div slot="header" style="font-weight: bold; font-size: 1.125rem; color: white;">
+          HelixUI
+        </div>
+        <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+        <hx-nav-item href="/patients" active>Patients</hx-nav-item>
+        <hx-nav-item href="/reports">Reports</hx-nav-item>
+        <hx-nav-item href="/settings">Settings</hx-nav-item>
+      </hx-side-nav>
+      <div style="flex: 1; padding: 2rem; background: #f9fafb; font-family: sans-serif;">
+        <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+          Tab navigates through sidebar links and the collapse toggle. Enter activates. Arrow keys
+          navigate within expanded sub-menus.
+        </p>
+      </div>
     </div>
   `,
-    play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-side-nav');
     await expect(el).toBeTruthy();
+    // Verify nav items are present
+    const navItems = canvasElement.querySelectorAll('hx-nav-item');
+    await expect(navItems.length).toBe(4);
+    // Tab into the side nav
     await userEvent.tab();
   },
 };

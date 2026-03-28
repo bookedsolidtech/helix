@@ -702,6 +702,18 @@ export const DarkMode: Story = {
     label: 'Select diagnosis codes',
     selection: 'multiple',
   },
+  render: (args) => html`
+    <hx-tree-view label=${args['label']} selection=${args['selection']}>
+      <hx-tree-item expanded>
+        Documents
+        <hx-tree-item slot="children">Reports</hx-tree-item>
+        <hx-tree-item slot="children">Invoices</hx-tree-item>
+        <hx-tree-item slot="children">Contracts</hx-tree-item>
+      </hx-tree-item>
+      <hx-tree-item>Downloads</hx-tree-item>
+      <hx-tree-item>Pictures</hx-tree-item>
+    </hx-tree-view>
+  `,
 };
 
 // ─────────────────────────────────────────────────
@@ -713,14 +725,28 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        Tab focuses the first tree item. Arrow Down/Up navigates between items. Arrow Right expands a node; Arrow Left collapses or moves to parent. Enter activates the focused node.
+        Tab focuses the first tree item. Arrow Down/Up navigates between items. Arrow Right expands
+        a node; Arrow Left collapses or moves to parent. Enter activates the focused node.
       </p>
-      <hx-tree-view></hx-tree-view>
+      <hx-tree-view label="Navigation tree" selection="single">
+        <hx-tree-item expanded>
+          Documents
+          <hx-tree-item slot="children">Reports</hx-tree-item>
+          <hx-tree-item slot="children">Invoices</hx-tree-item>
+        </hx-tree-item>
+        <hx-tree-item>Downloads</hx-tree-item>
+        <hx-tree-item>Pictures</hx-tree-item>
+      </hx-tree-view>
     </div>
   `,
-    play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-tree-view');
     await expect(el).toBeTruthy();
+    // Verify tree items are present
+    const items = canvasElement.querySelectorAll('hx-tree-item');
+    await expect(items.length).toBeGreaterThan(0);
+    // Tab to focus the tree, then navigate with Arrow Down
     await userEvent.tab();
+    await userEvent.keyboard('{ArrowDown}');
   },
 };

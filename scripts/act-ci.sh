@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 # scripts/act-ci.sh — Run CI locally via nektos/act
-# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--native] [--full] [--batch] [--clean]
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list] [--native] [--full] [--matrix] [--batch] [--clean] [--help]
 #
 # Runs .github/workflows/act-ci.yml — a lightweight mirror of ci.yml that
 # avoids GitHub-specific actions (dorny/paths-filter, pnpm/action-setup,
 # actions/setup-node) which break in act due to PATH issues and missing
 # API context.
 #
-# Available jobs: lint, format, type-check, build, test, quality-gates
+# Available jobs: lint, format, type-check, build, test, test-full, quality-gates
 # Flags:
 #   --job <name>  Run a specific job only
 #   --list        List available jobs
+#   --help        Show this help message
 #   --fast        Run the consolidated single-job workflow (fastest)
 #   --clean       Remove all stale act containers before running
 #   --native      Use linux/arm64 native architecture (no Rosetta emulation)
-#   --full        Run full test suite instead of smart tests (changed only)
+#   --full        Run full test suite on current Node (triggers test-full job)
+#   --matrix      Run full test suite on Node 20/22/24 matrix (CI Matrix parity)
 #   --batch       Run all tests in batches (default 10 at a time, avoids Docker OOM)
 #
 # Performance notes:
@@ -26,6 +28,7 @@
 #   Default mode runs linux/amd64 via Rosetta 2, which uses 2-3x more memory.
 #   Use --native for linux/arm64 containers (no emulation overhead).
 #   Use --full to run the complete test suite (default is smart/changed only).
+#   Use --matrix for full CI Matrix parity (Node 20/22/24).
 #   Use --batch to run all tests in small batches (avoids OOM, slower but reliable).
 #   Best combo: ./scripts/act-ci.sh --native --batch
 set -euo pipefail
@@ -62,10 +65,25 @@ JOB_ARGS=""
 DO_CLEAN=false
 USE_NATIVE=false
 USE_FULL=false
+USE_MATRIX=false
 USE_BATCH=false
+
+show_help() {
+  sed -n '3,33p' "${BASH_SOURCE[0]}" | sed 's/^# //' | sed 's/^#//'
+  echo ""
+  echo "Examples:"
+  echo "  ./scripts/act-ci.sh                    # Smart tests, current Node"
+  echo "  ./scripts/act-ci.sh --full             # Full test suite, current Node"
+  echo "  ./scripts/act-ci.sh --matrix           # Full test suite, Node 20/22/24"
+  echo "  ./scripts/act-ci.sh --native --matrix  # Matrix tests, ARM64 (no Rosetta)"
+  exit 0
+}
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      show_help
+      ;;
     --list)
       act -W "$WORKFLOW" --list
       exit 0
@@ -83,6 +101,11 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --full)
+      USE_FULL=true
+      shift
+      ;;
+    --matrix)
+      USE_MATRIX=true
       USE_FULL=true
       shift
       ;;
@@ -126,9 +149,12 @@ mkdir -p "$PW_CACHE_DIR"
 if [[ "$USE_BATCH" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_BATCH_TESTS=true"
   TEST_MODE="batched (all components, ${BATCH_SIZE:-10} at a time)"
+elif [[ "$USE_MATRIX" == true ]]; then
+  ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
+  TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
 elif [[ "$USE_FULL" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
-  TEST_MODE="full suite"
+  TEST_MODE="full suite (current Node)"
 else
   TEST_MODE="smart (changed only)"
 fi

@@ -32,6 +32,7 @@ export const HxMenuItem = createComponent({
   events: {
     onHxItemSelect: 'hx-item-select',
     onHxItemSubmenuOpen: 'hx-item-submenu-open',
+    onHxItemSubmenuClose: 'hx-item-submenu-close',
   },
   displayName: 'HxMenuItem',
 });
