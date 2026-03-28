@@ -455,7 +455,7 @@ describe('hx-tabs', () => {
       expect(tabs[1].selected).toBe(false);
     });
 
-    it('disabled tab is skipped during ArrowRight keyboard navigation', async () => {
+    it('ArrowRight moves focus to a disabled tab without activating it (ARIA APG)', async () => {
       const el = await fixture<HelixTabs>(`
         <hx-tabs>
           <hx-tab slot="tab" panel="one">One</hx-tab>
@@ -471,8 +471,76 @@ describe('hx-tabs', () => {
       assertEl(btnOne, 'button').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
-      // tab two is disabled so focus/activation jumps to tab three
+      // Disabled tab two receives focus but is NOT activated — tab one stays selected
+      expect(tabs[0].selected).toBe(true);
+      expect(tabs[1].selected).toBe(false);
+      expect(document.activeElement).toBe(tabs[1]);
+    });
+
+    it('ArrowRight past a disabled tab continues to the next enabled tab', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
+          <hx-tab slot="tab" panel="three">Three</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+          <hx-tab-panel name="three">Panel Three</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      // Focus disabled tab two, then press ArrowRight
+      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
+      assertEl(btnTwo, 'button').focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+      // Tab three is enabled so it gets focus and activated
       expect(tabs[2].selected).toBe(true);
+    });
+
+    it('Space key on a disabled tab does not activate it', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      let eventFired = false;
+      el.addEventListener('hx-tab-change', () => {
+        eventFired = true;
+      });
+      // Focus disabled tab two
+      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
+      assertEl(btnTwo, 'button').focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(eventFired).toBe(false);
+      expect(tabs[0].selected).toBe(true);
+    });
+
+    it('Enter key on a disabled tab does not activate it', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      let eventFired = false;
+      el.addEventListener('hx-tab-change', () => {
+        eventFired = true;
+      });
+      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
+      assertEl(btnTwo, 'button').focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(eventFired).toBe(false);
+      expect(tabs[0].selected).toBe(true);
     });
 
     it('disabled tab reflects disabled attribute', async () => {
@@ -794,6 +862,45 @@ describe('hx-tabs', () => {
       el.selectedIndex = 99;
       await el.updateComplete;
       expect(el.selectedIndex).toBe(0);
+    });
+
+    it('selected-index HTML attribute activates the tab at that index on initialisation', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs selected-index="2">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two">Two</hx-tab>
+          <hx-tab slot="tab" panel="three">Three</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+          <hx-tab-panel name="three">Panel Three</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      expect(tabs[2].selected).toBe(true);
+      expect(tabs[0].selected).toBe(false);
+    });
+
+    it('selected-index HTML attribute is ignored when the target tab is disabled', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs selected-index="1">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      // Disabled tab cannot be activated — falls through to first enabled tab
+      expect(tabs[0].selected).toBe(true);
+      expect(tabs[1].selected).toBe(false);
+    });
+
+    it('dynamically setting selected-index attribute activates the corresponding tab', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      el.setAttribute('selected-index', '1');
+      await el.updateComplete;
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      expect(tabs[1].selected).toBe(true);
     });
   });
 

@@ -34,23 +34,23 @@ The component uses `role="img"` with an auto-generated `aria-label` (e.g. `"Stat
 <ComponentDemo title="All Status Values">
   <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="online" size="md"></hx-status-indicator>
+      <hx-status-indicator status="online" hx-size="md"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">online</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="offline" size="md"></hx-status-indicator>
+      <hx-status-indicator status="offline" hx-size="md"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">offline</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="away" size="md"></hx-status-indicator>
+      <hx-status-indicator status="away" hx-size="md"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">away</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="busy" size="md"></hx-status-indicator>
+      <hx-status-indicator status="busy" hx-size="md"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">busy</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="unknown" size="md"></hx-status-indicator>
+      <hx-status-indicator status="unknown" hx-size="md"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">unknown</span>
     </div>
   </div>
@@ -61,15 +61,15 @@ The component uses `role="img"` with an auto-generated `aria-label` (e.g. `"Stat
 <ComponentDemo title="Size Variants">
   <div style="display: flex; gap: 1.5rem; align-items: center;">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="online" size="sm"></hx-status-indicator>
+      <hx-status-indicator status="online" hx-size="sm"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="online" size="md"></hx-status-indicator>
+      <hx-status-indicator status="online" hx-size="md"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">md (default)</span>
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="online" size="lg"></hx-status-indicator>
+      <hx-status-indicator status="online" hx-size="lg"></hx-status-indicator>
       <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
     </div>
   </div>
@@ -79,9 +79,9 @@ The component uses `role="img"` with an auto-generated `aria-label` (e.g. `"Stat
 
 <ComponentDemo title="Pulse Animation">
   <div style="display: flex; gap: 1.5rem; align-items: center; padding: 1rem;">
-    <hx-status-indicator status="online" size="md" pulse></hx-status-indicator>
-    <hx-status-indicator status="busy" size="md" pulse></hx-status-indicator>
-    <hx-status-indicator status="away" size="md" pulse></hx-status-indicator>
+    <hx-status-indicator status="online" hx-size="md" pulse></hx-status-indicator>
+    <hx-status-indicator status="busy" hx-size="md" pulse></hx-status-indicator>
+    <hx-status-indicator status="away" hx-size="md" pulse></hx-status-indicator>
   </div>
 </ComponentDemo>
 
@@ -89,7 +89,7 @@ The component uses `role="img"` with an auto-generated `aria-label` (e.g. `"Stat
 
 <ComponentDemo title="Decorative Usage">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
-    <hx-status-indicator status="online" size="sm" aria-hidden="true"></hx-status-indicator>
+    <hx-status-indicator status="online" hx-size="sm" aria-hidden="true"></hx-status-indicator>
     <span>Provider is available</span>
   </div>
 </ComponentDemo>
@@ -99,19 +99,19 @@ The component uses `role="img"` with an auto-generated `aria-label` (e.g. `"Stat
 <ComponentDemo title="System Health Dashboard">
   <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-width: 320px;">
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="online" size="sm" pulse></hx-status-indicator>
+      <hx-status-indicator status="online" hx-size="sm" pulse></hx-status-indicator>
       <span style="font-size: 0.875rem;">EHR System — Online</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="away" size="sm"></hx-status-indicator>
+      <hx-status-indicator status="away" hx-size="sm"></hx-status-indicator>
       <span style="font-size: 0.875rem;">Lab Interface — Degraded</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="offline" size="sm"></hx-status-indicator>
+      <hx-status-indicator status="offline" hx-size="sm"></hx-status-indicator>
       <span style="font-size: 0.875rem;">Imaging System — Offline</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <hx-status-indicator status="busy" size="sm" pulse></hx-status-indicator>
+      <hx-status-indicator status="busy" hx-size="sm" pulse></hx-status-indicator>
       <span style="font-size: 0.875rem;">Claims Processing — Busy</span>
     </div>
   </div>
@@ -142,8 +142,8 @@ Minimal HTML snippet — no build tool required:
 <hx-status-indicator status="busy"></hx-status-indicator>
 
 <!-- Size variants -->
-<hx-status-indicator status="online" size="sm"></hx-status-indicator>
-<hx-status-indicator status="online" size="lg"></hx-status-indicator>
+<hx-status-indicator status="online" hx-size="sm"></hx-status-indicator>
+<hx-status-indicator status="online" hx-size="lg"></hx-status-indicator>
 
 <!-- Pulse animation (suppressed by prefers-reduced-motion) -->
 <hx-status-indicator status="online" pulse></hx-status-indicator>
@@ -153,7 +153,7 @@ Minimal HTML snippet — no build tool required:
 
 <!-- Decorative: suppress AT announcement when visible text conveys the same status -->
 <div style="display: flex; align-items: center; gap: 0.5rem;">
-  <hx-status-indicator status="online" size="sm" aria-hidden="true"></hx-status-indicator>
+  <hx-status-indicator status="online" hx-size="sm" aria-hidden="true"></hx-status-indicator>
   <span>Provider is available</span>
 </div>
 ```
@@ -178,12 +178,13 @@ indicator.label = 'Payment processor is busy';
 
 ## Properties
 
-| Property | Attribute | Type                                                     | Default     | Description                                                                                                                                                                                            |
-| -------- | --------- | -------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `status` | `status`  | `'online' \| 'offline' \| 'away' \| 'busy' \| 'unknown'` | `'unknown'` | The operational status to display. Controls dot color. Reflects to attribute.                                                                                                                          |
-| `size`   | `size`    | `'sm' \| 'md' \| 'lg'`                                   | `'md'`      | Size of the indicator dot. Maps to design tokens. Reflects to attribute.                                                                                                                               |
-| `pulse`  | `pulse`   | `boolean`                                                | `false`     | When true, shows an animated pulse ring around the dot. Suppressed automatically when `prefers-reduced-motion: reduce` is active. In Twig, render as a bare attribute: `pulse`. Reflects to attribute. |
-| `label`  | `label`   | `string`                                                 | `''`        | Custom accessible label. When empty, defaults to `"Status: {Status}"` (e.g. `"Status: Online"`). Set `aria-hidden="true"` on the host when status is conveyed by adjacent visible text instead.        |
+| Property    | Attribute    | Type                                                     | Default     | Description                                                                                                                                                                                                      |
+| ----------- | ------------ | -------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `status`    | `status`     | `'online' \| 'offline' \| 'away' \| 'busy' \| 'unknown'` | `'unknown'` | The operational status to display. Controls dot color. Reflects to attribute.                                                                                                                                    |
+| `size`      | `hx-size`    | `'sm' \| 'md' \| 'lg'`                                   | `'md'`      | Size of the indicator dot. Maps to design tokens. Reflects to attribute.                                                                                                                                         |
+| `pulse`     | `pulse`      | `boolean`                                                | `false`     | When true, shows an animated pulse ring around the dot. Suppressed automatically when `prefers-reduced-motion: reduce` is active. In Twig, render as a bare attribute: `pulse`. Reflects to attribute.           |
+| `label`     | `label`      | `string`                                                 | `''`        | Custom accessible label. When empty, defaults to `"Status: {Status}"` (e.g. `"Status: Online"`). Set `aria-hidden="true"` on the host when status is conveyed by adjacent visible text instead.                  |
+| `showLabel` | `show-label` | `boolean`                                                | `false`     | When true, renders a visible text label next to the dot conveying the status. Use to satisfy WCAG 1.4.1 when not accompanied by other visible text conveying the same status information. Reflects to attribute. |
 
 ## Events
 
@@ -195,19 +196,21 @@ indicator.label = 'Payment processor is busy';
 
 ## CSS Custom Properties
 
-| Property                               | Default                       | Description                                       |
-| -------------------------------------- | ----------------------------- | ------------------------------------------------- |
-| `--hx-status-indicator-color-online`   | `var(--hx-color-success-500)` | Dot color for the `online` status.                |
-| `--hx-status-indicator-color-offline`  | `var(--hx-color-neutral-400)` | Dot color for the `offline` status.               |
-| `--hx-status-indicator-color-away`     | `var(--hx-color-warning-500)` | Dot color for the `away` status.                  |
-| `--hx-status-indicator-color-busy`     | `var(--hx-color-danger-500)`  | Dot color for the `busy` status.                  |
-| `--hx-status-indicator-color-unknown`  | `var(--hx-color-neutral-300)` | Dot color for the `unknown` status.               |
-| `--hx-status-indicator-size-sm`        | `var(--hx-size-2)`            | Dot diameter for the `sm` size variant.           |
-| `--hx-status-indicator-size-md`        | `var(--hx-size-3)`            | Dot diameter for the `md` size variant.           |
-| `--hx-status-indicator-size-lg`        | `var(--hx-size-4)`            | Dot diameter for the `lg` size variant.           |
-| `--hx-status-indicator-pulse-duration` | `1.5s`                        | Duration of the pulse ring animation cycle.       |
-| `--hx-status-indicator-pulse-scale`    | `2.5`                         | Maximum scale of the pulse ring at animation end. |
-| `--hx-status-indicator-pulse-color`    | _(inherits dot color)_        | Pulse ring color, independent from the dot color. |
+| Property                                | Default                       | Description                                       |
+| --------------------------------------- | ----------------------------- | ------------------------------------------------- |
+| `--hx-status-indicator-color-online`    | `var(--hx-color-success-500)` | Dot color for the `online` status.                |
+| `--hx-status-indicator-color-offline`   | `var(--hx-color-neutral-400)` | Dot color for the `offline` status.               |
+| `--hx-status-indicator-color-away`      | `var(--hx-color-warning-500)` | Dot color for the `away` status.                  |
+| `--hx-status-indicator-color-busy`      | `var(--hx-color-danger-500)`  | Dot color for the `busy` status.                  |
+| `--hx-status-indicator-color-unknown`   | `var(--hx-color-neutral-300)` | Dot color for the `unknown` status.               |
+| `--hx-status-indicator-size-sm`         | `var(--hx-size-2)`            | Dot diameter for the `sm` size variant.           |
+| `--hx-status-indicator-size-md`         | `var(--hx-size-3)`            | Dot diameter for the `md` size variant.           |
+| `--hx-status-indicator-size-lg`         | `var(--hx-size-4)`            | Dot diameter for the `lg` size variant.           |
+| `--hx-status-indicator-pulse-duration`  | `1.5s`                        | Duration of the pulse ring animation cycle.       |
+| `--hx-status-indicator-pulse-scale`     | `2.5`                         | Maximum scale of the pulse ring at animation end. |
+| `--hx-status-indicator-pulse-color`     | _(inherits dot color)_        | Pulse ring color, independent from the dot color. |
+| `--hx-status-indicator-label-color`     | `var(--hx-color-neutral-700)` | Text color for the visible status label.          |
+| `--hx-status-indicator-label-font-size` | `var(--hx-font-size-sm)`      | Font size for the visible status label.           |
 
 Override at the semantic token level to theme all instances, or at the component level to style a single instance:
 
@@ -231,10 +234,11 @@ hx-status-indicator.alert-ring {
 
 ## CSS Parts
 
-| Part         | Description                                     |
-| ------------ | ----------------------------------------------- |
-| `base`       | The dot element (`<div>` rendered as a circle). |
-| `pulse-ring` | The animated pulse ring element (`<div>`).      |
+| Part         | Description                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| `base`       | The dot element (`<div>` rendered as a circle).                                          |
+| `pulse-ring` | The animated pulse ring element (`<div>`).                                               |
+| `label`      | The visible status label text element (`<span>`). Only present when `show-label` is set. |
 
 Use CSS parts to style internals that CSS custom properties do not expose:
 
@@ -287,7 +291,7 @@ Always ensure status is communicated semantically — either via the component's
 
 <!-- Correct: decorative dot when visible text already describes status -->
 <div style="display: flex; align-items: center; gap: 0.5rem;">
-  <hx-status-indicator status="online" size="sm" aria-hidden="true"></hx-status-indicator>
+  <hx-status-indicator status="online" hx-size="sm" aria-hidden="true"></hx-status-indicator>
   <span>Provider is available</span>
 </div>
 
@@ -305,13 +309,13 @@ Use the component in a Twig template after registering the library.
 {# Standalone — announces status to screen readers #}
 <hx-status-indicator
   status="{{ status|default('unknown') }}"
-  size="{{ size|default('md') }}"
+  hx-size="{{ size|default('md') }}"
 ></hx-status-indicator>
 
 {# With pulse — use bare attribute (value is ignored) #}
 <hx-status-indicator
   status="{{ status|default('online') }}"
-  size="{{ size|default('sm') }}"
+  hx-size="{{ size|default('sm') }}"
   {% if pulse %}pulse{% endif %}
 ></hx-status-indicator>
 
@@ -319,7 +323,7 @@ Use the component in a Twig template after registering the library.
 <div style="display: flex; align-items: center; gap: 0.5rem;">
   <hx-status-indicator
     status="{{ status|default('online') }}"
-    size="sm"
+    hx-size="sm"
     aria-hidden="true"
   ></hx-status-indicator>
   <span>{{ status_label }}</span>
@@ -375,23 +379,23 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
       <h2 style="margin: 0 0 1rem;">Status Values</h2>
       <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="online" size="md"></hx-status-indicator>
+          <hx-status-indicator status="online" hx-size="md"></hx-status-indicator>
           <small>online</small>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="offline" size="md"></hx-status-indicator>
+          <hx-status-indicator status="offline" hx-size="md"></hx-status-indicator>
           <small>offline</small>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="away" size="md"></hx-status-indicator>
+          <hx-status-indicator status="away" hx-size="md"></hx-status-indicator>
           <small>away</small>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="busy" size="md"></hx-status-indicator>
+          <hx-status-indicator status="busy" hx-size="md"></hx-status-indicator>
           <small>busy</small>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="unknown" size="md"></hx-status-indicator>
+          <hx-status-indicator status="unknown" hx-size="md"></hx-status-indicator>
           <small>unknown</small>
         </div>
       </div>
@@ -407,21 +411,21 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
           <hx-status-indicator
             id="ehr-status"
             status="online"
-            size="sm"
+            hx-size="sm"
             pulse
           ></hx-status-indicator>
           <span style="font-size: 0.875rem;">EHR System — Online</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="away" size="sm"></hx-status-indicator>
+          <hx-status-indicator status="away" hx-size="sm"></hx-status-indicator>
           <span style="font-size: 0.875rem;">Lab Interface — Degraded</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="offline" size="sm"></hx-status-indicator>
+          <hx-status-indicator status="offline" hx-size="sm"></hx-status-indicator>
           <span style="font-size: 0.875rem;">Imaging System — Offline</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <hx-status-indicator status="busy" size="sm" pulse></hx-status-indicator>
+          <hx-status-indicator status="busy" hx-size="sm" pulse></hx-status-indicator>
           <span style="font-size: 0.875rem;">Claims Processing — Busy</span>
         </div>
       </div>
@@ -434,7 +438,7 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
         <hx-status-indicator
           id="dynamic-indicator"
           status="unknown"
-          size="lg"
+          hx-size="lg"
         ></hx-status-indicator>
         <span id="dynamic-label" style="font-size: 0.875rem; color: #6b7280;"
           >No status selected</span

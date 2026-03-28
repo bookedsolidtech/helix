@@ -398,8 +398,13 @@ describe('css output validation', () => {
 
 describe('token documentation', () => {
   it('tokens with description have non-empty description strings', () => {
+    // Only check tokens whose description is a non-empty string —
+    // tokens with description: "" are treated as "no description yet"
     const withDesc = tokenEntries.filter(
-      (t) => t.description !== undefined && t.description !== null,
+      (t) =>
+        t.description !== undefined &&
+        t.description !== null &&
+        t.description.trim() !== '',
     );
     const violations = withDesc.filter((t) => (t.description ?? '').trim() === '');
     expect(

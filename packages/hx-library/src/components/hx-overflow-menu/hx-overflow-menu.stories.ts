@@ -100,7 +100,7 @@ const meta = {
         <button role="menuitem">Edit record</button>
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
-        <button role="menuitem" style="color: #dc2626;">Delete</button>
+        <button role="menuitem" style="color: #b91c1c;">Delete</button>
       </hx-overflow-menu>
     </div>
   `,

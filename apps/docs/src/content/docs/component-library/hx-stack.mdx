@@ -171,7 +171,7 @@ stack.justify = 'center';
 | `align`     | `align`     | `'start' \| 'center' \| 'end' \| 'stretch' \| 'baseline'`           | `'stretch'`  | Cross-axis alignment (`align-items`). Reflects to attribute.                                 |
 | `justify`   | `justify`   | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | `'start'`    | Main-axis distribution (`justify-content`). Reflects to attribute.                           |
 | `wrap`      | `wrap`      | `boolean`                                                           | `false`      | When true, children wrap onto multiple lines (`flex-wrap: wrap`). Reflects to attribute.     |
-| `inline`    | `inline`    | `boolean`                                                           | `false`      | When true, renders as `display: inline-block` rather than `block`. Reflects to attribute.    |
+| `inline`    | `inline`    | `boolean`                                                           | `false`      | When true, renders as `display: inline-flex` rather than `flex`. Reflects to attribute.      |
 
 ## Events
 
@@ -185,19 +185,19 @@ stack.justify = 'center';
 
 `hx-stack` consumes spacing tokens from the global token system. Override these tokens at the `:root` level to adjust spacing across all stack instances, or at the host level to adjust a single instance.
 
-| Property          | Default   | Description                               |
-| ----------------- | --------- | ----------------------------------------- |
-| `--hx-spacing-xs` | `0.25rem` | Gap token used when `gap="xs"`.           |
-| `--hx-spacing-sm` | `0.5rem`  | Gap token used when `gap="sm"`.           |
-| `--hx-spacing-md` | `1rem`    | Gap token used when `gap="md"` (default). |
-| `--hx-spacing-lg` | `1.5rem`  | Gap token used when `gap="lg"`.           |
-| `--hx-spacing-xl` | `2rem`    | Gap token used when `gap="xl"`.           |
+| Property       | Default   | Description                               |
+| -------------- | --------- | ----------------------------------------- |
+| `--hx-space-1` | `0.25rem` | Gap token used when `gap="xs"`.           |
+| `--hx-space-2` | `0.5rem`  | Gap token used when `gap="sm"`.           |
+| `--hx-space-4` | `1rem`    | Gap token used when `gap="md"` (default). |
+| `--hx-space-6` | `1.5rem`  | Gap token used when `gap="lg"`.           |
+| `--hx-space-8` | `2rem`    | Gap token used when `gap="xl"`.           |
 
 Override the global token scale for your theme:
 
 ```css
 :root {
-  --hx-spacing-md: 1.25rem; /* tighten or loosen default gap globally */
+  --hx-space-4: 1.25rem; /* tighten or loosen default gap globally */
 }
 ```
 

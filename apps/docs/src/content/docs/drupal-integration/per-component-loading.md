@@ -1301,12 +1301,11 @@ This is not a compromise. This is the correct architecture for enterprise health
 
 **Next Steps**:
 
-1. Review [ADR-002: Drupal Component Loading Strategy](/guides/drupal-component-loading-strategy) for the architectural rationale
-2. Implement runtime library definition (Step 1)
-3. Add 5-10 most-used components as individual libraries (Step 2)
-4. Create one convenience group for testing (Step 3)
-5. Migrate one content type to per-component loading (Step 4)
-6. Measure payload reduction
-7. Expand to all components
+1. Implement runtime library definition (Step 1)
+2. Add 5-10 most-used components as individual libraries (Step 2)
+3. Create one convenience group for testing (Step 3)
+4. Migrate one content type to per-component loading (Step 4)
+5. Measure payload reduction
+6. Expand to all components
 
 The path from monolithic to per-component is incremental. Start small, measure wins, scale up.

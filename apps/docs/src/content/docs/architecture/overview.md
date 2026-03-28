@@ -31,23 +31,6 @@ HELIX follows a **layered architecture** designed for enterprise content organiz
 4. **Turborepo + pnpm monorepo** — Efficient builds with intelligent caching
 5. **WCAG 2.1 AA baseline** — Accessibility compliance as a first-class requirement
 
-## Monorepo at a Glance
-
-The repository is managed with **pnpm workspaces** and **Turborepo**. Key packages:
-
-| Package | Purpose |
-| --- | --- |
-| `packages/hx-library` | Core Lit 3.x web component source |
-| `packages/hx-tokens` | Design token definitions (W3C DTCG) |
-| `packages/hx-react` | Auto-generated React wrappers (CEM-driven) |
-| `packages/drupal-starter` | Drupal SDC scaffold and Twig templates |
-| `packages/drupal-behaviors` | Drupal-specific JS behaviors |
-| `packages/helixui-mcp` | MCP server for AI-assisted development |
-| `apps/docs` | Astro/Starlight documentation site |
-| `apps/storybook` | Storybook 10.x component playground |
-| `apps/admin` | Internal admin application |
-| `apps/mcp-servers/*` | Specialized MCP server applications |
-
 ## Next Steps
 
 - [Monorepo Structure](/architecture/monorepo/) — How the monorepo is organized
