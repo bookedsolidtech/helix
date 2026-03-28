@@ -1,0 +1,133 @@
+{#
+  helix-side-nav.html.twig
+  ------------------------
+  Renders a HELiX hx-side-nav component from a Drupal sidebar menu block.
+  Maps Drupal menu_tree items to hx-nav-item elements with proper active
+  trail support and optional nested sub-navigation.
+
+  hx-side-nav is a collapsible left-side panel that accepts slotted
+  hx-nav-item children. Each hx-nav-item supports:
+    - href      → link destination
+    - active    → boolean, marks current/active page (maps from in_active_trail)
+    - expanded  → boolean, expands inline sub-navigation on load
+    - disabled  → boolean, prevents interaction
+
+  hx-nav-item slots:
+    - default      → item label text
+    - icon         → SVG or icon element displayed before the label
+    - badge        → notification count or status badge
+    - children     → nested hx-nav-item elements for sub-navigation
+
+  hx-side-nav slots:
+    - default      → hx-nav-item elements
+    - header       → logo, site name, or branding content
+    - footer       → user profile, avatar, or settings link
+
+  Variables:
+    items         (array)   Drupal menu_tree items array. Required.
+    collapsed     (bool)    Initial collapsed state (icon-only). Default: false.
+    label         (string)  Accessible aria-label for the nav landmark.
+                            Default: 'Main Navigation'.
+    header        (string)  Optional HTML content for the header slot (logo/brand).
+    footer        (string)  Optional HTML content for the footer slot (user profile).
+    attributes    (object)  Additional HTML attributes spread onto hx-side-nav.
+
+  Active trail:
+    Drupal sets `in_active_trail: true` on items that are ancestors of the
+    current page. This template maps that to the `active` attribute on
+    hx-nav-item, which drives the active highlight styling. For parent items
+    with active children, `expanded: true` is also set so the sub-menu opens
+    automatically on page load.
+
+  Usage — inside block--system-menu-block--sidebar.html.twig:
+    {% include 'helix-side-nav.html.twig' with {
+      items: items,
+      label: 'Sidebar navigation',
+      header: '<span>My App</span>',
+    } %}
+
+  Usage — with user profile footer:
+    {% include 'helix-side-nav.html.twig' with {
+      items: items,
+      label: 'Clinical navigation',
+      header: '<img src="/logo.svg" alt="HelixUI" style="height: 2rem;">',
+      footer: '<div style="display: flex; gap: 0.5rem; align-items: center;">
+                 <img src="' ~ user_picture ~ '" alt="" style="width: 2rem; height: 2rem; border-radius: 50%;">
+                 <span>' ~ user_name ~ '</span>
+               </div>',
+    } %}
+
+  Usage — initially collapsed (icon-only mode):
+    {% include 'helix-side-nav.html.twig' with {
+      items: items,
+      collapsed: true,
+    } %}
+
+  Nested menus:
+    Place child items in the `children` slot on the parent hx-nav-item.
+    The parent item must not have an `href` when it has children — it will
+    render as a toggle button rather than an anchor. Set `expanded: true`
+    when a child item is in the active trail so the sub-menu opens on load.
+
+  Events:
+    hx-collapse  — fires when nav collapses to icon-only (detail: { collapsed: true })
+    hx-expand    — fires when nav expands to full width   (detail: { collapsed: false })
+    Listen in a Drupal behavior to persist collapsed state to localStorage:
+      once('hx-side-nav-state', 'hx-side-nav', context).forEach(function (el) {
+        el.addEventListener('hx-collapse', () => localStorage.setItem('sideNavCollapsed', '1'));
+        el.addEventListener('hx-expand',   () => localStorage.removeItem('sideNavCollapsed'));
+      });
+#}
+
+<hx-side-nav
+  label="{{ label|default('Main Navigation') }}"
+  {% if collapsed %}collapsed{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {#-- Header slot: logo, wordmark, or site branding --#}
+  {% if header is defined and header %}
+    <div slot="header">{{ header|raw }}</div>
+  {% endif %}
+
+  {#-- Navigation items: map Drupal menu_tree items to hx-nav-item elements --#}
+  {% for item in items|default([]) %}
+    {%- set has_children = item.below is defined and item.below -%}
+    {%- set is_active = item.in_active_trail is defined and item.in_active_trail -%}
+    {#-- Expand parent automatically when a child is in the active trail --#}
+    {%- set child_is_active = false -%}
+    {%- if has_children -%}
+      {%- for child in item.below -%}
+        {%- if child.in_active_trail is defined and child.in_active_trail -%}
+          {%- set child_is_active = true -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    <hx-nav-item
+      {% if not has_children and item.url %}href="{{ item.url.toString() }}"{% endif %}
+      {% if is_active and not has_children %}active{% endif %}
+      {% if has_children and child_is_active %}expanded{% endif %}
+      {% if item.is_disabled is defined and item.is_disabled %}disabled{% endif %}
+    >
+      {#-- Label text --#}
+      {{ item.title }}
+
+      {#-- Nested children: one level of sub-navigation --#}
+      {% if has_children %}
+        {% for child in item.below %}
+          <hx-nav-item
+            slot="children"
+            {% if child.url %}href="{{ child.url.toString() }}"{% endif %}
+            {% if child.in_active_trail is defined and child.in_active_trail %}active{% endif %}
+            {% if child.is_disabled is defined and child.is_disabled %}disabled{% endif %}
+          >{{ child.title }}</hx-nav-item>
+        {% endfor %}
+      {% endif %}
+    </hx-nav-item>
+  {% endfor %}
+
+  {#-- Footer slot: user profile, settings link, or avatar --#}
+  {% if footer is defined and footer %}
+    <div slot="footer">{{ footer|raw }}</div>
+  {% endif %}
+</hx-side-nav>
