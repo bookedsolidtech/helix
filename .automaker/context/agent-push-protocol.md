@@ -32,15 +32,23 @@ If this fails: **FIX THE ERRORS.** Do not proceed to Step 3.
 5. Smart tests + coverage (changed components only)
 6. CEM (if library source changed)
 7. Changeset check (if component source changed)
-8. Docker CI via act (full GitHub Actions parity)
+8. Full test suite (all components — catches CI Matrix failures locally)
+9. Docker CI via act (full GitHub Actions parity)
 
-Gate 8 runs the quality gates inside Docker containers — the exact same
+Gate 8 runs the FULL test suite (not just changed components). This is the
+critical gate that catches cross-component regressions that CI Matrix (Node
+20/22/24) would catch. The vitest hang watchdog from test-batch.sh is
+integrated to prevent timeouts.
+
+Gate 9 runs the quality gates inside Docker containers — the exact same
 environment as GitHub Actions CI. If it passes here, it WILL pass on GitHub.
 
 If Docker is not running, start it. If `act` is not installed, use `SKIP_ACT=1 pnpm run preflight`
-to skip Gate 8 only (all other gates still run). This should be rare — Docker CI is the final guarantee.
+to skip Gate 9 only (all other gates still run). This should be rare — Docker CI is the final guarantee.
 
-**NEVER run `pnpm run test` or `pnpm run test:library` — these run the full suite and are forbidden.**
+**`pnpm run test:smart` is for development iteration ONLY.** It tests only changed
+components and does NOT provide CI Matrix parity. Preflight Gate 8 runs the full
+suite to close this gap. Never rely on `test:smart` alone before pushing.
 
 ### Step 3: Commit
 
@@ -121,6 +129,24 @@ The same sequence applies when fixing CodeRabbit feedback:
 5. `HUSKY=0 git push origin <branch>` -- ONE push
 
 Do NOT push partial fixes then format separately. That triggers extra review cycles.
+
+---
+
+## CI Matrix Parity (Node 20/22/24)
+
+CI runs the full test suite on Node 20, 22, and 24. Preflight Gate 8 runs
+the full suite on your current Node version. For complete CI Matrix parity
+(all three Node versions), use the act-ci matrix flag:
+
+```bash
+./scripts/act-ci.sh --matrix
+```
+
+This runs the full test suite in Docker on Node 20, 22, and 24 — exactly
+what CI Matrix does. Use this when:
+- Debugging CI Matrix failures that pass locally
+- Before pushing changes to Node-version-sensitive code (e.g., API changes)
+- When preflight passes but CI Matrix fails
 
 ---
 
