@@ -21,6 +21,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  *
  * @fires {CustomEvent<{item: HelixMenuItem, value: string}>} hx-item-select - Dispatched when the item is activated via click, Enter, or Space.
  * @fires {CustomEvent<{item: HelixMenuItem}>} hx-item-submenu-open - Dispatched when ArrowRight is pressed on an item with a submenu.
+ * @fires {CustomEvent<{item: HelixMenuItem}>} hx-item-submenu-close - Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus.
  *
  * @csspart base - The root item element.
  * @csspart prefix - Prefix slot wrapper.
@@ -46,6 +47,11 @@ export class HelixMenuItem extends LitElement {
   /** @internal Set the roving tabindex value. Called by parent hx-menu. */
   setRovingTabIndex(value: number): void {
     this._rovingTabIndex = value;
+  }
+
+  /** Set whether the nested submenu is open. Called by the component managing submenu visibility. */
+  setSubmenuOpen(open: boolean): void {
+    this._submenuOpen = open;
   }
 
   /**
@@ -87,6 +93,10 @@ export class HelixMenuItem extends LitElement {
   /** @internal */
   @state()
   private _hasSubmenu = false;
+
+  /** @internal Tracks whether the nested submenu is currently open. */
+  @state()
+  private _submenuOpen = false;
 
   /** @internal */
   @query('.menu-item') private _menuItemEl!: HTMLElement | null;
@@ -166,6 +176,18 @@ export class HelixMenuItem extends LitElement {
       e.preventDefault();
       this.dispatchEvent(
         new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-open', {
+          bubbles: true,
+          composed: true,
+          detail: { item: this },
+        }),
+      );
+      return;
+    }
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      this.dispatchEvent(
+        new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-close', {
           bubbles: true,
           composed: true,
           detail: { item: this },
@@ -257,7 +279,8 @@ export class HelixMenuItem extends LitElement {
         tabindex=${this.disabled ? '-1' : String(this._rovingTabIndex)}
         aria-disabled=${this.disabled ? 'true' : nothing}
         aria-checked=${hasCheckableRole ? (this.checked ? 'true' : 'false') : nothing}
-        aria-haspopup=${this._hasSubmenu ? 'true' : nothing}
+        aria-haspopup=${this._hasSubmenu ? 'menu' : nothing}
+        aria-expanded=${this._hasSubmenu ? (this._submenuOpen ? 'true' : 'false') : nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
