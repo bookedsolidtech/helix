@@ -39,6 +39,8 @@ paths = [
     '''\.changeset/''',
     # Agent context files — security policy docs with example patterns, not real secrets
     '''\.automaker/context/''',
+    # Next.js build cache — auto-generated preview mode keys, not real secrets
+    '''\.next/''',
 ]
 
 regexes = [
@@ -46,4 +48,8 @@ regexes = [
     '''\$\{\{\s*secrets\.[A-Z0-9_]+\s*\}\}''',
     # CSS custom properties (--hx-*) — design tokens, not secrets
     '''--hx-[a-zA-Z0-9-]+''',
+    # Documentation example placeholder keys — not real secrets
+    '''sk_live_abcd1234''',
+    # Next.js auto-generated preview mode keys — deterministic, not secret
+    '''previewMode(?:Signing|Encryption)Key''',
 ]
