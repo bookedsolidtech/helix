@@ -1,6 +1,6 @@
 {
   "name": "@helixui/drupal-starter",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Pre-built composition SDCs for Drupal using HELiX web components",
   "type": "module",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "ARCHITECTURE.md"
   ],
   "peerDependencies": {
-    "@helixui/library": "^1.0.0"
+    "@helixui/library": "^2.0.0"
   },
   "devDependencies": {
     "twig": "^2.0.0",

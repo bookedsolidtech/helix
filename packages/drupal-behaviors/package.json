@@ -1,6 +1,6 @@
 {
   "name": "@helixui/drupal-behaviors",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Drupal behaviors for all interactive HELiX web components using the once() pattern",
   "license": "MIT",
   "author": "BookedSolid Technologies",
@@ -29,7 +29,7 @@
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@helixui/library": "^1.0.0"
+    "@helixui/library": "^2.0.0"
   },
   "publishConfig": {
     "access": "public",
