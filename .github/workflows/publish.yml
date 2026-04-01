@@ -150,7 +150,7 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: pnpm run changeset:publish
-          version: pnpm run changeset:version && pnpm install --no-frozen-lockfile
+          version: bash -c 'pnpm run changeset:version && pnpm install --no-frozen-lockfile'
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
