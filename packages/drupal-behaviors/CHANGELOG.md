@@ -1,11 +1,23 @@
-# @helixui/react
+# @helixui/drupal-behaviors
 
-## 1.1.1
+## 1.0.0
 
 ### Patch Changes
 
-- e00e680: fix: remediate react wrapper test suite CI issues
-- e0adb4e: add ssr browser api guards, fix event composition, complete fouc coverage, and fix drupal cdn path
+- de9ccbe: fix(hx-menu): repair drupal behavior hx-close integration, add max-height overflow scroll, add arrowleft submenu close event
+  - Rewrite `hx-menu.behavior.js` to listen for the `hx-close` event dispatched by
+    hx-menu instead of the no-op `menu.open = false` setter. Removes the redundant
+    Escape keydown listener (hx-menu already fires hx-close on Escape). Adds optional
+    trigger button `aria-expanded` toggle and focus-return on close.
+  - Add `max-height: var(--hx-menu-max-height, 20rem)` and `overflow-y: auto` to the
+    `.menu` rule in `hx-menu.styles.ts` so tall menus scroll instead of overflowing
+    the viewport.
+  - Add `@cssprop [--hx-menu-max-height=20rem]` doc annotation to `hx-menu.ts`.
+  - Add `ArrowLeft` handler in `hx-menu-item._handleKeyDown` that dispatches
+    `hx-item-submenu-close` (bubbles, composed) per the APG menu pattern.
+  - Add `@fires hx-item-submenu-close` doc annotation to `hx-menu-item.ts`.
+  - Add tests for max-height CSS, ArrowLeft event dispatch, and event properties.
+
 - Updated dependencies [7641ef1]
 - Updated dependencies [3bbe6a5]
 - Updated dependencies [448c908]
@@ -75,18 +87,3 @@
 - Updated dependencies [acb6076]
 - Updated dependencies [1b587d2]
   - @helixui/library@2.0.0
-
-## 1.1.0
-
-### Minor Changes
-
-- 54c2705: Add `@helixui/react` package with auto-generated React wrappers for all 98 HELiX web components.
-
-  Wrappers are generated from `custom-elements.json` via `scripts/generate-react-wrappers.ts` using `@lit/react` `createComponent()`. Each wrapper includes `'use client'` for Next.js 15 App Router compatibility, full TypeScript prop types derived from CEM declarations, and React-style event callbacks (`onHxClick`, `onHxInput`, `onHxChange`, etc.).
-
-  Tree-shakeable: each component is a separate entry point so importing `HxButton` does not bundle all 98 components.
-
-### Patch Changes
-
-- Updated dependencies [23af064]
-  - @helixui/library@1.1.2
