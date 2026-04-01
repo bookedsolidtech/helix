@@ -9,8 +9,6 @@ sidebar:
 
 `@helixui/react` provides auto-generated React wrapper components for every HELiX component. Each wrapper replaces `ref`-based `addEventListener` boilerplate with idiomatic React callback props (`onHxClick`, `onHxChange`, etc.) and ships full TypeScript types.
 
-> **Status:** In development. This documentation is ready to publish when the package ships. The API described here matches the feature specification.
-
 ## Why Use the Wrapper Package?
 
 React's synthetic event system does not forward custom DOM events. Without wrappers, listening to an `hx-click` event requires this:
@@ -78,7 +76,7 @@ Every wrapper uses the PascalCase version of the tag name:
 | `hx-text-input` | `HxTextInput` |
 | `hx-card` | `HxCard` |
 | `hx-dialog` | `HxDialog` |
-| `hx-text-input` | `HxTextInput` |
+| `hx-badge` | `HxBadge` |
 
 ## Typed Event Callbacks
 
@@ -136,7 +134,7 @@ Pass a `ref` to get the underlying `HTMLElement`. Use this to call imperative me
 
 ```tsx
 import { useRef } from 'react';
-import { HxDialog } from '@helixui/react';
+import { HxButton, HxDialog } from '@helixui/react';
 
 function ConfirmDialog() {
   const dialogRef = useRef<HTMLElement & { show: () => void; hide: () => void }>(null);
