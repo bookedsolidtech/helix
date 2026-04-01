@@ -1,0 +1,35 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Breadcrumb
+description: 'Breadcrumb navigation with automatic truncation, customizable separator, and optional JSON-LD structured data output. Composes hx-breadcrumb-item elements for each crumb. Use in Drupal breadcrumb blocks and page templates.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the nav element (e.g., "Breadcrumb")'
+      default: 'Breadcrumb'
+    separator:
+      type: string
+      title: Separator
+      description: 'Character or string used as the visual separator between crumbs'
+      default: '/'
+    max_items:
+      type: integer
+      title: Max Items
+      description: 'Maximum number of crumbs to show before truncating with an ellipsis. 0 disables truncation.'
+      default: 0
+    json_ld:
+      type: boolean
+      title: JSON-LD
+      description: 'Whether to output BreadcrumbList JSON-LD structured data for SEO'
+      default: false
+slots:
+  default:
+    title: Items
+    description: 'hx-breadcrumb-item elements. The last item is treated as the current page (aria-current="page").'
+  separator:
+    title: Separator
+    description: 'Custom separator element. Its text content overrides the separator prop.'

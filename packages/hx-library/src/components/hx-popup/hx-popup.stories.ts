@@ -164,6 +164,11 @@ const meta = {
       </hx-popup>
     </div>
   `,
+  parameters: {
+    actions: {
+      handles: ['hx-reposition'],
+    },
+  },
 } satisfies Meta;
 
 export default meta;
@@ -660,4 +665,20 @@ export const CSSParts: Story = {
 
 export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        The popup panel appears based on its trigger mode. Tab navigates through the popup's content when open.
+      </p>
+      <hx-popup></hx-popup>
+    </div>
+  `,
 };

@@ -58,14 +58,20 @@ export const helixTextareaStyles = css`
   }
 
   .field__textarea-wrapper:focus-within {
-    border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    border-color: var(
+      --hx-input-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+    );
     /* Solid fallback for browsers without color-mix() (Chrome < 111, Safari < 16.2) — WCAG 1.4.11 */
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       rgba(37, 99, 235, var(--hx-focus-ring-opacity, 0.25));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        var(
+            --hx-input-focus-ring-color,
+            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+          )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -144,7 +150,7 @@ export const helixTextareaStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-color-neutral-500, #6c757d);
     line-height: var(--hx-line-height-normal, 1.5);
-    text-align: right;
+    text-align: end;
   }
 
   /* --- Visually Hidden (screen reader only) --- */

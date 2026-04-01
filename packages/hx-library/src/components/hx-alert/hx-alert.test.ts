@@ -462,6 +462,172 @@ describe('hx-alert', () => {
     });
   });
 
+  // ─── Property: open aria-hidden ───
+
+  describe('Property: open aria-hidden', () => {
+    it('sets aria-hidden="true" on host when open=false at initial render', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Content</hx-alert>');
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('does not set aria-hidden when open=true at initial render', async () => {
+      const el = await fixture<HxAlert>('<hx-alert open>Content</hx-alert>');
+      expect(el.hasAttribute('aria-hidden')).toBe(false);
+    });
+
+    it('open→close transition sets aria-hidden="true"', async () => {
+      const el = await fixture<HxAlert>('<hx-alert open>Content</hx-alert>');
+      expect(el.hasAttribute('aria-hidden')).toBe(false);
+      el.open = false;
+      await el.updateComplete;
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('close→open transition removes aria-hidden', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Content</hx-alert>');
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+      el.open = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-hidden')).toBe(false);
+    });
+  });
+
+  // ─── Property: heading (close button aria-label) ───
+
+  describe('Property: heading (close button aria-label)', () => {
+    it('close button uses labelClose property as its aria-label', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert dismissible heading="Low blood pressure">Alert</hx-alert>',
+      );
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
+      // The close button uses labelClose, not heading directly.
+      // Default labelClose is "Close alert".
+      expect(closeBtn.getAttribute('aria-label')).toBe('Close alert');
+    });
+
+    it('close button aria-label can be overridden with label-close attribute', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert dismissible label-close="Schließen">Alert</hx-alert>',
+      );
+      const closeBtn = shadowQuery<HTMLButtonElement>(el, '.alert__close-button')!;
+      expect(closeBtn.getAttribute('aria-label')).toBe('Schließen');
+    });
+  });
+
+  // ─── Property: severityLabel ───
+
+  describe('Property: severityLabel', () => {
+    it('uses default severity label matching variant', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="error">Error message</hx-alert>');
+      const label = shadowQuery(el, '.alert__severity-label')!;
+      expect(label.textContent).toBe('Error:');
+    });
+
+    it('uses custom severityLabel when provided', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert variant="error" severity-label="Kritisch:">Error message</hx-alert>',
+      );
+      const label = shadowQuery(el, '.alert__severity-label')!;
+      expect(label.textContent).toBe('Kritisch:');
+    });
+
+    it('default severity label for info variant is "Info:"', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="info">Info message</hx-alert>');
+      const label = shadowQuery(el, '.alert__severity-label')!;
+      expect(label.textContent).toBe('Info:');
+    });
+
+    it('default severity label for success variant is "Success:"', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="success">Success message</hx-alert>');
+      const label = shadowQuery(el, '.alert__severity-label')!;
+      expect(label.textContent).toBe('Success:');
+    });
+
+    it('default severity label for warning variant is "Warning:"', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="warning">Warning message</hx-alert>');
+      const label = shadowQuery(el, '.alert__severity-label')!;
+      expect(label.textContent).toBe('Warning:');
+    });
+  });
+
+  // ─── Slot visibility state ───
+
+  describe('Slot visibility state', () => {
+    it('title container has alert__title--visible class when title is slotted', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert><span slot="title">Title Text</span>Message</hx-alert>',
+      );
+      await el.updateComplete;
+      // Trigger slotchange by forcing update
+      await el.updateComplete;
+      const titleContainer = shadowQuery(el, '[part="title"]');
+      expect(titleContainer).toBeTruthy();
+    });
+
+    it('actions container has alert__actions--visible class when actions are slotted', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert>Message<button slot="actions">Action</button></hx-alert>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const actionsContainer = shadowQuery(el, '[part="actions"]')!;
+      expect(actionsContainer).toBeTruthy();
+    });
+  });
+
+  // ─── disconnectedCallback ───
+
+  describe('disconnectedCallback', () => {
+    it('runs without errors when element is disconnected', async () => {
+      const el = await fixture<HxAlert>('<hx-alert dismissible>Alert</hx-alert>');
+      await el.updateComplete;
+      let threw = false;
+      try {
+        el.remove();
+      } catch {
+        threw = true;
+      }
+      expect(threw).toBe(false);
+    });
+
+    it('runs without errors when element without slot listeners is disconnected', async () => {
+      // Element with no title/actions slots — disconnectedCallback should still be safe
+      const el = await fixture<HxAlert>('<hx-alert>Alert only</hx-alert>');
+      await el.updateComplete;
+      let threw = false;
+      try {
+        el.remove();
+      } catch {
+        threw = true;
+      }
+      expect(threw).toBe(false);
+    });
+  });
+
+  // ─── showIcon: renders icon when true ───
+
+  describe('Property: showIcon renders icon', () => {
+    it('renders icon container when show-icon is set', async () => {
+      const el = await fixture<HxAlert>('<hx-alert show-icon>Test</hx-alert>');
+      const iconPart = shadowQuery(el, '[part="icon"]');
+      expect(iconPart).toBeTruthy();
+    });
+
+    it('does not render icon container when show-icon is absent', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      const iconPart = shadowQuery(el, '[part="icon"]');
+      expect(iconPart).toBeNull();
+    });
+
+    it('programmatic showIcon=true renders icon container', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Test</hx-alert>');
+      el.showIcon = true;
+      await el.updateComplete;
+      const iconPart = shadowQuery(el, '[part="icon"]');
+      expect(iconPart).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
@@ -498,5 +664,4 @@ describe('hx-alert', () => {
       expect(violations).toEqual([]);
     });
   });
-
 });

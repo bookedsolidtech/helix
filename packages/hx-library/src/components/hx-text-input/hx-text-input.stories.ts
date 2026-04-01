@@ -161,6 +161,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when the required field has no value.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Patient Name',
@@ -301,6 +310,15 @@ export const TypeSearch: Story = {
     label: 'Search Records',
     placeholder: 'Search by name, MRN, or DOB',
     type: 'search',
+  },
+};
+
+export const TypeDate: Story = {
+  name: 'Type: Date',
+  args: {
+    label: 'Date of Birth',
+    type: 'date',
+    helpText: 'Select or enter the patient date of birth.',
   },
 };
 
@@ -1267,9 +1285,62 @@ export const SSNMasked: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     label: 'Patient Name',
     placeholder: 'Enter patient full name',
   },
+};
+
+// ─────────────────────────────────────────────────
+// 13. INTERACTION STATE (dirty / touched / pristine)
+// ─────────────────────────────────────────────────
+
+export const InteractionState: Story = {
+  name: 'Interaction State (dirty / touched / pristine)',
+  render: () => {
+    const onDirty = fn();
+    const onTouched = fn();
+
+    return html`
+      <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
+        <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d); margin: 0;">
+          Type in the field, then tab away. Check the browser console for dirty/touched state
+          changes.
+        </p>
+        <hx-text-input
+          id="interaction-demo"
+          label="Interaction State Demo"
+          placeholder="Type something, then tab away"
+          help-text="pristine=true, dirty=false, touched=false initially"
+          @hx-input=${(e: CustomEvent) => {
+            const host = e.currentTarget as HxTextInput;
+            if (host.dirty) onDirty(host.dirty, host.pristine);
+            const help = host.shadowRoot?.querySelector('.field__help-text');
+            if (help) {
+              help.textContent = `dirty=${host.dirty}, touched=${host.touched}, pristine=${host.pristine}`;
+            }
+          }}
+          @hx-change=${(e: CustomEvent) => {
+            const host = e.currentTarget as HxTextInput;
+            onTouched(host.touched);
+            const help = host.shadowRoot?.querySelector('.field__help-text');
+            if (help) {
+              help.textContent = `dirty=${host.dirty}, touched=${host.touched}, pristine=${host.pristine}`;
+            }
+          }}
+        ></hx-text-input>
+      </div>
+    `;
+  },
+};
+
+type HxTextInput = HTMLElement & {
+  dirty: boolean;
+  touched: boolean;
+  pristine: boolean;
+  shadowRoot: ShadowRoot;
 };

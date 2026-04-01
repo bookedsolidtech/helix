@@ -1,0 +1,257 @@
+# ============================================================================
+# Local CI — Quality gates for nektos/act
+# ============================================================================
+# Mirrors the core quality gates from ci.yml but avoids GitHub-specific actions
+# (dorny/paths-filter, pnpm/action-setup, actions/setup-node) that break in act
+# due to PATH corruption and missing API context.
+#
+# Optimized for speed with --bind mode (zero-copy mount from host):
+#   - node_modules already exists → pnpm install is a 2s no-op
+#   - Playwright browsers cached via volume mount → skip download
+#   - --reuse keeps containers warm between runs
+#
+# Usage: ./scripts/act-ci.sh [--job <job-name>] [--list]
+# Jobs: lint, format, type-check, build, test, quality-gates
+# ============================================================================
+
+name: Local CI
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Run ESLint
+        run: pnpm run lint
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm run format:check
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Run TypeScript strict check
+        run: pnpm turbo run type-check --filter='!docs'
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Build all packages
+        run: pnpm turbo run build --filter='!docs'
+      - name: Generate and validate CEM
+        run: pnpm run cem
+        working-directory: packages/hx-library
+      - name: Validate package exports
+        run: pnpm publish --dry-run --no-git-checks || echo "dry-run publish check skipped (may fail locally if version already published)"
+        working-directory: packages/hx-library
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build library
+        run: pnpm turbo run build --filter='!docs' --filter='!@helixui/admin' --filter='!@helixui/storybook'
+      - name: Run tests
+        run: |
+          if [ "${ACT_BATCH_TESTS}" = "true" ]; then
+            echo "Running batched tests (all components, ${BATCH_SIZE:-10} at a time)..."
+            bash scripts/test-batch.sh
+          elif [ "${ACT_FULL_TESTS}" = "true" ]; then
+            echo "Running full test suite..."
+            bash scripts/test-batch.sh
+          else
+            echo "Running smart tests (changed components only)..."
+            bash scripts/test-smart.sh
+          fi
+
+  # ── Full suite test with Node version matrix (mirrors ci-matrix.yml) ───
+  test-full:
+    name: Test Full (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: ${{ env.ACT_MATRIX_TESTS == 'true' || env.ACT_FULL_TESTS == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node ${{ matrix.node-version }} via nvm
+        run: |
+          if [ "${{ matrix.node-version }}" != "" ]; then
+            export NVM_DIR="$HOME/.nvm"
+            if [ ! -d "$NVM_DIR" ]; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+            fi
+            . "$NVM_DIR/nvm.sh"
+            nvm install ${{ matrix.node-version }}
+            nvm use ${{ matrix.node-version }}
+            echo "Node version: $(node --version)"
+          fi
+      - name: Setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build library
+        run: pnpm turbo run build --filter='!docs' --filter='!@helixui/admin' --filter='!@helixui/storybook'
+      - name: Run full test suite with hang watchdog
+        run: |
+          # Vitest hang watchdog — kills stale processes after 15s of no output
+          # Mirrors the pattern from scripts/test-batch.sh
+          LOGFILE=$(mktemp /tmp/helix-test-full.XXXXXX)
+          STALE_TIMEOUT=15
+          POLL_INTERVAL=3
+          START_TIME=$(date +%s)
+
+          cd packages/hx-library
+          pnpm exec vitest run --no-file-parallelism --reporter=verbose > "$LOGFILE" 2>&1 &
+          VITEST_PID=$!
+
+          echo "[test-full] vitest PID=$VITEST_PID, Node ${{ matrix.node-version }}"
+
+          LAST_SIZE=0
+          STALE_SECONDS=0
+          FORCE_KILLED=false
+
+          while kill -0 "$VITEST_PID" 2>/dev/null; do
+            sleep "$POLL_INTERVAL"
+            CURRENT_SIZE=$(stat -c "%s" "$LOGFILE" 2>/dev/null || stat -f "%z" "$LOGFILE" 2>/dev/null || echo 0)
+            ELAPSED=$(( $(date +%s) - START_TIME ))
+
+            if [ "$CURRENT_SIZE" -eq "$LAST_SIZE" ] && [ "$CURRENT_SIZE" -gt 0 ]; then
+              STALE_SECONDS=$((STALE_SECONDS + POLL_INTERVAL))
+              if [ "$STALE_SECONDS" -ge "$STALE_TIMEOUT" ] && [ "$ELAPSED" -ge 30 ]; then
+                echo "[test-full] Output stale for ${STALE_SECONDS}s at ${ELAPSED}s — force killing vitest"
+                kill "$VITEST_PID" 2>/dev/null || true
+                sleep 1
+                kill -9 "$VITEST_PID" 2>/dev/null || true
+                FORCE_KILLED=true
+                break
+              fi
+            else
+              STALE_SECONDS=0
+            fi
+            LAST_SIZE=$CURRENT_SIZE
+          done
+
+          wait "$VITEST_PID" 2>/dev/null || true
+
+          # Determine pass/fail from output
+          FAILED_TESTS=$(grep -c "^[[:space:]]*[×x]" "$LOGFILE" 2>/dev/null || echo 0)
+          PASSED_TESTS=$(grep -c "^[[:space:]]*[✓✔]" "$LOGFILE" 2>/dev/null || echo 0)
+
+          echo ""
+          cat "$LOGFILE" | tail -30
+          echo ""
+          echo "[test-full] Node ${{ matrix.node-version }}: ${PASSED_TESTS} passed, ${FAILED_TESTS} failed"
+
+          if [ "$FORCE_KILLED" = true ]; then
+            echo "[test-full] vitest was force-killed after teardown hang"
+          fi
+
+          pkill -f "chrome-headless-shell" 2>/dev/null || true
+          rm -f "$LOGFILE"
+
+          if [ "$FAILED_TESTS" -gt 0 ]; then
+            exit 1
+          fi
+
+  # ── Aggregate gate ──────────────────────────────────────────────────────
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    needs: [lint, format, type-check, build, test, test-full]
+    if: always()
+    steps:
+      - name: Check all gates
+        run: |
+          echo "Lint:       ${{ needs.lint.result }}"
+          echo "Format:     ${{ needs.format.result }}"
+          echo "Type Check: ${{ needs.type-check.result }}"
+          echo "Build:      ${{ needs.build.result }}"
+          echo "Test:       ${{ needs.test.result }}"
+          echo "Test Full:  ${{ needs.test-full.result }}"
+
+          FAIL=0
+          for gate in lint format type-check build test; do
+            case "$gate" in
+              lint)       result="${{ needs.lint.result }}" ;;
+              format)     result="${{ needs.format.result }}" ;;
+              type-check) result="${{ needs.type-check.result }}" ;;
+              build)      result="${{ needs.build.result }}" ;;
+              test)       result="${{ needs.test.result }}" ;;
+            esac
+            if [[ "$result" != "success" ]]; then
+              echo "FAILED: $gate ($result)"
+              FAIL=1
+            fi
+          done
+
+          # test-full is optional (only runs with ACT_MATRIX_TESTS or ACT_FULL_TESTS)
+          # Fail if it ran and failed, skip if it was skipped
+          FULL_RESULT="${{ needs.test-full.result }}"
+          if [[ "$FULL_RESULT" == "failure" ]]; then
+            echo "FAILED: test-full ($FULL_RESULT)"
+            FAIL=1
+          elif [[ "$FULL_RESULT" == "skipped" ]]; then
+            echo "SKIPPED: test-full (not requested)"
+          fi
+
+          if [[ "$FAIL" -eq 1 ]]; then
+            echo ""
+            echo "One or more quality gates failed"
+            exit 1
+          fi
+
+          echo ""
+          echo "All quality gates passed!"

@@ -1,7 +1,7 @@
 helix:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/helix-library.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -14,7 +14,7 @@ helix:
 helix-local:
   version: 1.1.2
   js:
-    dist/helix-library.js:
+    dist/index.js:
       attributes:
         type: module
     js/helix.behaviors.js:

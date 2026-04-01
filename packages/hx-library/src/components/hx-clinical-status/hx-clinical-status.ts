@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenStyles } from '@helixui/tokens/lit';
@@ -22,8 +22,8 @@ const nextId = createIdCounter('hx-clinical-status');
  *
  * @slot - Default slot for additional message content.
  *
- * @fires {CustomEvent} hx-dismiss - Dispatched when the user dismisses the status.
- * @fires {CustomEvent} hx-acknowledge - Dispatched when the user acknowledges a critical/emergent status.
+ * @fires {CustomEvent<void>} hx-dismiss - Dispatched when the user dismisses the status.
+ * @fires {CustomEvent<{ severity: ClinicalSeverity; persistent: boolean }>} hx-acknowledge - Dispatched when the user acknowledges a critical/emergent status.
  *
  * @csspart container - The outer status container.
  * @csspart icon - The icon container.
@@ -112,10 +112,16 @@ export class HelixClinicalStatus extends HelixElement {
   @state()
   private _acknowledged = false;
 
-  /** SSR-safe unique ID for ARIA relationships. */
+  /**
+   * SSR-safe unique ID for ARIA relationships.
+   * @internal
+   */
   private _componentId = nextId();
 
-  /** @internal Tracks whether `persistent` was explicitly set by the consumer. */
+  /**
+   * Tracks whether `persistent` was explicitly set by the consumer.
+   * @internal
+   */
   private _persistentExplicitlySet = false;
 
   // ─── Private Helpers ───
@@ -168,7 +174,7 @@ export class HelixClinicalStatus extends HelixElement {
     }
   }
 
-  protected override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('severity')) {
       this.setAttribute('role', this._role);
@@ -345,4 +351,5 @@ declare global {
   }
 }
 
-export type { HelixClinicalStatus as HxClinicalStatus };
+/** Canonical type alias for the hx-clinical-status component. */
+export type HxClinicalStatus = HelixClinicalStatus;

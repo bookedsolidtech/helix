@@ -1,0 +1,31 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: PHI Field
+description: 'HIPAA-compliant field for rendering masked Protected Health Information. PHI is masked by default; access events are fired on reveal for audit trail purposes. Never stores unmasked PHI in the DOM.'
+status: experimental
+group: Healthcare
+props:
+  type: object
+  properties:
+    data:
+      type: string
+      title: Data
+      description: 'The Protected Health Information value to display or mask. Do NOT expose raw values in Twig — pass securely from server-side with appropriate access controls.'
+    field_type:
+      type: string
+      title: Field Type
+      description: 'Type of PHI field. Controls the masking pattern applied.'
+      default: 'ssn'
+      enum:
+        - ssn
+        - mrn
+        - dob
+        - insurance
+    field_id:
+      type: string
+      title: Field ID
+      description: 'Identifier used in audit events. Falls back to the element id attribute.'
+    clipboard_timeout:
+      type: integer
+      title: Clipboard Timeout
+      description: 'Milliseconds after clipboard write before auto-clear. Default 30 seconds.'
+      default: 30000

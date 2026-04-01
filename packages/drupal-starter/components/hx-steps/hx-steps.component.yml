@@ -1,0 +1,33 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Steps
+description: 'Multi-step wizard progress indicator with connector lines and status-based styling. For Drupal multi-step forms, patient intake workflows, and clinical onboarding sequences.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label describing the step process (e.g., "Patient intake steps")'
+    orientation:
+      type: string
+      title: Orientation
+      description: 'Layout direction of the step list'
+      default: 'horizontal'
+      enum:
+        - horizontal
+        - vertical
+    size:
+      type: string
+      title: Size
+      description: 'Visual size variant for step indicators'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+slots:
+  default:
+    title: Steps
+    description: 'hx-step elements for each step in the sequence'

@@ -1,0 +1,43 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Tooltip
+description: 'Contextual help text displayed on hover or focus with smart positioning. For Drupal field help text, abbreviation explanations, and inline clinical reference content.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    placement:
+      type: string
+      title: Placement
+      description: 'Preferred position of the tooltip relative to the trigger'
+      default: 'top'
+      enum:
+        - top
+        - top-start
+        - top-end
+        - bottom
+        - bottom-start
+        - bottom-end
+        - left
+        - left-start
+        - left-end
+        - right
+        - right-start
+        - right-end
+    show_delay:
+      type: integer
+      title: Show Delay
+      description: 'Milliseconds to wait before showing the tooltip'
+      default: 300
+    hide_delay:
+      type: integer
+      title: Hide Delay
+      description: 'Milliseconds to wait before hiding the tooltip'
+      default: 100
+slots:
+  default:
+    title: Trigger
+    description: 'The element that triggers the tooltip on hover/focus'
+  content:
+    title: Content
+    description: 'Tooltip content to display'

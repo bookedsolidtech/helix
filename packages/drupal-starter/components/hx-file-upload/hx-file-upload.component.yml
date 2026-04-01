@@ -1,0 +1,49 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: File Upload
+description: 'Drag-and-drop file upload with client-side validation, file list management, and native form association. For Drupal file and image fields.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label for the upload area'
+    accept:
+      type: string
+      title: Accept
+      description: 'Comma-separated list of accepted MIME types or extensions (e.g. image/*,.pdf)'
+    max_size:
+      type: integer
+      title: Max Size
+      description: 'Maximum file size in bytes (0 = unlimited)'
+      default: 0
+    max_files:
+      type: integer
+      title: Max Files
+      description: 'Maximum number of files (0 = unlimited)'
+      default: 0
+    multiple:
+      type: boolean
+      title: Multiple
+      description: 'Whether multiple files can be selected'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the upload area is disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    label_dropzone:
+      type: string
+      title: Dropzone Label
+      description: 'Text displayed in the drag-and-drop zone'
+      default: 'Drag files here or click to browse'

@@ -54,20 +54,20 @@ export const helixCardStyles = css`
 
   .card--compact .card__heading {
     padding-top: var(--hx-space-3, 0.75rem);
-    padding-right: var(--hx-space-3, 0.75rem);
-    padding-left: var(--hx-space-3, 0.75rem);
+    padding-inline-end: var(--hx-space-3, 0.75rem);
+    padding-inline-start: var(--hx-space-3, 0.75rem);
   }
 
   .card--compact .card__footer {
-    padding-right: var(--hx-space-3, 0.75rem);
+    padding-inline-end: var(--hx-space-3, 0.75rem);
     padding-bottom: var(--hx-space-3, 0.75rem);
-    padding-left: var(--hx-space-3, 0.75rem);
+    padding-inline-start: var(--hx-space-3, 0.75rem);
   }
 
   .card--compact .card__actions {
-    padding-right: var(--hx-space-3, 0.75rem);
+    padding-inline-end: var(--hx-space-3, 0.75rem);
     padding-bottom: var(--hx-space-3, 0.75rem);
-    padding-left: var(--hx-space-3, 0.75rem);
+    padding-inline-start: var(--hx-space-3, 0.75rem);
   }
 
   /* ─── Interactive ─── */
@@ -127,9 +127,9 @@ export const helixCardStyles = css`
 
   .card__heading {
     padding-top: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
-    padding-right: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    padding-inline-end: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-bottom: 0;
-    padding-left: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    padding-inline-start: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     font-size: var(--hx-font-size-xl, 1.25rem);
     font-weight: var(--hx-font-weight-semibold, 600);
     line-height: var(--hx-line-height-tight, 1.25);
@@ -145,18 +145,18 @@ export const helixCardStyles = css`
 
   .card__footer {
     padding-top: 0;
-    padding-right: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    padding-inline-end: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-bottom: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
-    padding-left: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    padding-inline-start: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
   }
 
   .card__actions {
     display: flex;
     gap: var(--hx-space-2, 0.5rem);
     padding-top: var(--hx-space-4, 1rem);
-    padding-right: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    padding-inline-end: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-bottom: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
-    padding-left: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
+    padding-inline-start: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-thin, 1px) solid
       var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
     margin-top: auto;

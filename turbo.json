@@ -38,6 +38,10 @@
       "dependsOn": ["^cem"],
       "outputs": ["packages/hx-react/src/components/**"]
     },
+    "generate:drupal-libraries": {
+      "dependsOn": ["cem"],
+      "outputs": ["packages/drupal-starter/helixui.libraries.yml"]
+    },
     "storybook:build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]

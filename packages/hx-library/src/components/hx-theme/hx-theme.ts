@@ -7,6 +7,14 @@ import { mergeBrandTokens } from '../../utils/token-merger.js';
 export type { TokenDefinition, TokenEntry } from '@helixui/tokens';
 
 /**
+ * Controls the spacing density for all descendant `hx-*` components.
+ * - `"comfortable"` (default): Standard spacing tokens.
+ * - `"compact"`: Reduces `--hx-space-*` tokens ~25%. For data-dense clinical dashboards.
+ * - `"spacious"`: Increases `--hx-space-*` tokens ~25%. For touch-optimized bedside tablets.
+ */
+export type DensityMode = 'comfortable' | 'compact' | 'spacious';
+
+/**
  * Controls the motion behavior applied to all descendant `hx-*` components.
  * - `"full"` (default): Full animations. Respects OS `prefers-reduced-motion`.
  * - `"reduced"`: Collapses all animation durations to 0ms and easings to linear.
@@ -71,6 +79,66 @@ const _hcOverrides: Array<[string, string]> = [
     '0 20px 25px -5px rgb(255 255 255 / 0.3), 0 8px 10px -6px rgb(255 255 255 / 0.2)',
   ],
   ['--hx-shadow-2xl', '0 25px 50px -12px rgb(255 255 255 / 0.4)'],
+];
+
+/**
+ * Compact density overrides: ~75% of original --hx-space-* values.
+ * Fixed tokens (--hx-space-0 and --hx-space-px) are intentionally omitted — they stay fixed.
+ * Component height tokens are reduced one step to match the tighter spacing.
+ */
+const _compactDensityOverrides: Array<[string, string]> = [
+  ['--hx-space-1', '0.1875rem'],
+  ['--hx-space-2', '0.375rem'],
+  ['--hx-space-3', '0.5625rem'],
+  ['--hx-space-4', '0.75rem'],
+  ['--hx-space-5', '0.9375rem'],
+  ['--hx-space-6', '1.125rem'],
+  ['--hx-space-7', '1.3125rem'],
+  ['--hx-space-8', '1.5rem'],
+  ['--hx-space-10', '1.875rem'],
+  ['--hx-space-12', '2.25rem'],
+  ['--hx-space-14', '2.625rem'],
+  ['--hx-space-16', '3rem'],
+  ['--hx-space-20', '3.75rem'],
+  ['--hx-space-24', '4.5rem'],
+  ['--hx-space-32', '6rem'],
+  ['--hx-space-40', '7.5rem'],
+  ['--hx-space-48', '9rem'],
+  ['--hx-space-64', '12rem'],
+  // Component heights — one step smaller
+  ['--hx-input-height-sm', '1.75rem'],
+  ['--hx-input-height-md', '2rem'],
+  ['--hx-input-height-lg', '2.25rem'],
+];
+
+/**
+ * Spacious density overrides: ~125% of original --hx-space-* values.
+ * Fixed tokens (--hx-space-0 and --hx-space-px) are intentionally omitted — they stay fixed.
+ * Component height tokens are increased one step to match the looser spacing.
+ */
+const _spaciousDensityOverrides: Array<[string, string]> = [
+  ['--hx-space-1', '0.3125rem'],
+  ['--hx-space-2', '0.625rem'],
+  ['--hx-space-3', '0.9375rem'],
+  ['--hx-space-4', '1.25rem'],
+  ['--hx-space-5', '1.5625rem'],
+  ['--hx-space-6', '1.875rem'],
+  ['--hx-space-7', '2.1875rem'],
+  ['--hx-space-8', '2.5rem'],
+  ['--hx-space-10', '3.125rem'],
+  ['--hx-space-12', '3.75rem'],
+  ['--hx-space-14', '4.375rem'],
+  ['--hx-space-16', '5rem'],
+  ['--hx-space-20', '6.25rem'],
+  ['--hx-space-24', '7.5rem'],
+  ['--hx-space-32', '10rem'],
+  ['--hx-space-40', '12.5rem'],
+  ['--hx-space-48', '15rem'],
+  ['--hx-space-64', '20rem'],
+  // Component heights — one step larger
+  ['--hx-input-height-sm', '2.25rem'],
+  ['--hx-input-height-md', '2.75rem'],
+  ['--hx-input-height-lg', '3.5rem'],
 ];
 
 /**
@@ -177,6 +245,13 @@ function _buildThemeCss(theme: ThemeName): string {
  *   </hx-theme>
  * </hx-theme>
  * ```
+ *
+ * @example Compact density for clinical dashboards:
+ * ```html
+ * <hx-theme theme="dark" density="compact">
+ *   <!-- Clinical dashboard content -->
+ * </hx-theme>
+ * ```
  */
 @customElement('hx-theme')
 export class HelixTheme extends LitElement {
@@ -238,12 +313,24 @@ export class HelixTheme extends LitElement {
   @property({ type: String, reflect: true })
   motion: MotionMode = 'full';
 
+  /**
+   * Controls the spacing density for all descendant `hx-*` components.
+   * - `"comfortable"` (default): Standard spacing tokens.
+   * - `"compact"`: Reduces `--hx-space-*` tokens ~25%. For data-dense clinical dashboards.
+   * - `"spacious"`: Increases `--hx-space-*` tokens ~25%. For touch-optimized bedside tablets.
+   * @attr density
+   */
+  @property({ type: String, reflect: true })
+  density: DensityMode = 'comfortable';
+
   /** @internal */
   private _mediaQuery: MediaQueryList | null = null;
   /** @internal */
   private _mediaHandler: (() => void) | null = null;
   /** @internal */
   private _themeSheet: CSSStyleSheet | null = null;
+  /** @internal */
+  private _densitySheet: CSSStyleSheet | null = null;
   /** @internal — media query for OS prefers-reduced-motion */
   private _motionQuery: MediaQueryList | null = null;
   /** @internal */
@@ -281,6 +368,9 @@ export class HelixTheme extends LitElement {
     }
     if (changed.has('brand')) {
       this._applyEffectiveTheme();
+    }
+    if (changed.has('density')) {
+      this._applyDensity();
     }
   }
 
@@ -323,11 +413,14 @@ export class HelixTheme extends LitElement {
   private _initThemeSheet(): void {
     if (this.shadowRoot) {
       this._themeSheet = new CSSStyleSheet();
+      this._densitySheet = new CSSStyleSheet();
       this.shadowRoot.adoptedStyleSheets = [
         ...this.shadowRoot.adoptedStyleSheets,
         this._themeSheet,
+        this._densitySheet,
       ];
       this._applyEffectiveTheme();
+      this._applyDensity();
     }
   }
 
@@ -402,6 +495,21 @@ export class HelixTheme extends LitElement {
     }
 
     void this._themeSheet.replace(css);
+  }
+
+  /** @internal */
+  private _applyDensity(): void {
+    if (!this._densitySheet) return;
+
+    let css = '';
+    if (this.density === 'compact') {
+      css = `:host {\n${_buildProps(_compactDensityOverrides)}\n}`;
+    } else if (this.density === 'spacious') {
+      css = `:host {\n${_buildProps(_spaciousDensityOverrides)}\n}`;
+    }
+    // comfortable = no overrides needed (defaults from theme sheet)
+
+    void this._densitySheet.replace(css);
   }
 
   override render() {

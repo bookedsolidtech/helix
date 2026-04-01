@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Spinner SDC — wraps hx-spinner for Drupal loading state patterns.
+ *
+ * Use in Drupal AJAX callbacks, Views with progressive loading, and form
+ * submit buttons during async operations. Always provide a meaningful label
+ * unless the spinner is truly decorative alongside descriptive visible text.
+ *
+ * Example: AJAX loading region
+ *   {% include 'helixui:hx-spinner' with {
+ *     label: 'Loading search results',
+ *     hx_size: 'lg',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-spinner') }}
+
+<hx-spinner
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if variant and variant != 'primary' %}variant="{{ variant }}"{% endif %}
+  {% if label and label != 'Loading' %}label="{{ label }}"{% endif %}
+  {% if decorative %}decorative{% endif %}
+  {{ attributes ? attributes }}
+></hx-spinner>

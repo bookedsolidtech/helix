@@ -141,6 +141,13 @@ export class HelixFileUpload extends LitElement {
   labelUploadProgress: (name: string, progress: number) => string = (name, progress) =>
     `Upload progress for ${name}: ${progress}%`;
 
+  /**
+   * Screen reader announcement when file drag detected. Override for i18n.
+   * @attr label-drag-detected
+   */
+  @property({ attribute: 'label-drag-detected' })
+  labelDragDetected = 'File detected. Release to upload.';
+
   // ─── Internal State ───
 
   /** The list of currently selected file entries, each with a file reference and upload progress. @internal */
@@ -632,7 +639,7 @@ export class HelixFileUpload extends LitElement {
           : nothing}
 
         <div id=${this._liveId} class="sr-only" aria-live="polite" aria-atomic="true">
-          ${this._dragOver ? 'File detected. Release to upload.' : ''}
+          ${this._dragOver ? this.labelDragDetected : ''}
         </div>
       </div>
     `;

@@ -1,0 +1,46 @@
+{#
+/**
+ * @file
+ * Checkbox Group SDC — wraps hx-checkbox-group for Drupal multi-select form fields.
+ *
+ * Use in Drupal Form API for checkboxes element type overrides. Map
+ * element['#options'] to individual hx-checkbox elements in the default slot.
+ * The group manages shared label, validation state, and group-level error display.
+ *
+ * Example: Symptom checklist
+ *   {% set checkboxes %}
+ *     {% for key, option in element['#options'] %}
+ *       <hx-checkbox
+ *         name="{{ element['#name'] }}[{{ key }}]"
+ *         value="{{ key }}"
+ *         {% if key in element['#value'] %}checked{% endif %}
+ *       >{{ option }}</hx-checkbox>
+ *     {% endfor %}
+ *   {% endset %}
+ *   {% include 'helixui:hx-checkbox-group' with {
+ *     label: element['#title'],
+ *     required: element['#required'],
+ *     error: element['#errors'],
+ *     content: checkboxes,
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-checkbox-group') }}
+
+<hx-checkbox-group
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {% if orientation and orientation != 'vertical' %}orientation="{{ orientation }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if label_slot %}
+    <span slot="label">{{ label_slot }}</span>
+  {% endif %}
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-checkbox-group>

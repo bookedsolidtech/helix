@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Toast SDC — wraps hx-toast for Drupal AJAX notification integration.
+ *
+ * Toasts are typically created programmatically via Drupal behaviors in response
+ * to AJAX events. Use this SDC for server-side-rendered toast stacks or when
+ * pre-rendering a toast container.
+ *
+ * To programmatically show toasts via Drupal behaviors:
+ *   const toast = document.createElement('hx-toast');
+ *   toast.variant = 'success';
+ *   toast.textContent = 'Record saved successfully.';
+ *   document.querySelector('.toast-container').append(toast);
+ *   toast.open = true;
+ */
+#}
+{{ attach_library('helixui/hx-toast') }}
+
+<hx-toast
+  variant="{{ variant|default('default') }}"
+  {% if open %}open{% endif %}
+  {% if duration is defined and duration != 5000 %}duration="{{ duration }}"{% endif %}
+  {% if closable %}closable{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+
+  {% if action %}
+    <span slot="action">{{ action }}</span>
+  {% endif %}
+</hx-toast>

@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Alert SDC — wraps hx-alert for Drupal status messages and notifications.
+ *
+ * Map Drupal message types to variants:
+ *   status    -> info or success
+ *   warning   -> warning
+ *   error     -> error
+ *
+ * For Drupal status messages (hook_page_attachments / status-messages.html.twig),
+ * iterate the messages array and render each as an hx-alert.
+ */
+#}
+{{ attach_library('helixui/hx-alert') }}
+
+<hx-alert
+  variant="{{ variant|default('info') }}"
+  {% if heading %}heading="{{ heading }}"{% endif %}
+  {% if dismissible %}dismissible{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if title %}
+    <span slot="title">{{ title }}</span>
+  {% endif %}
+
+  {% if content %}
+    {{ content }}
+  {% endif %}
+
+  {% if actions %}
+    <div slot="actions">{{ actions }}</div>
+  {% endif %}
+</hx-alert>

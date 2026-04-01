@@ -28,18 +28,12 @@ export default defineConfig({
       'src/mixins/**/*.test.ts',
       'src/__tests__/**/*.test.ts',
     ],
-    exclude: ['.worktrees/**', 'node_modules/**'],
+    exclude: ['.worktrees/**', 'node_modules/**', '**/__screenshots__/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results.json' },
     testTimeout: 30000,
+    teardownTimeout: 5000,
     globals: true,
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        minThreads: 2,
-        maxThreads: 4,
-      },
-    },
     // Coverage disabled by default — run `pnpm run test:coverage` for reports.
     // Keeps CI fast (~5min instead of ~20min).
     // Use v8 provider for accurate, fast coverage without instrumentation overhead.
@@ -53,14 +47,11 @@ export default defineConfig({
         'src/components/**/*.styles.ts',
         'src/components/**/index.ts',
       ],
-      reporter: ['text', 'json', 'json-summary'],
+      reporter: ['text', 'json', 'json-summary', 'html'],
       reportsDirectory: '.cache/coverage',
-      thresholds: {
-        statements: 80,
-        branches: 80,
-        functions: 80,
-        lines: 80,
-      },
+      // Thresholds intentionally omitted — enforcement is handled per-component
+      // by scripts/check-coverage.mjs. Global Vitest thresholds fail on partial
+      // (path-filtered) runs where only changed components execute.
     },
   },
 });

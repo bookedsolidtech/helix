@@ -20,7 +20,7 @@
 .category-hero__overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: var(--hx-overlay-bg, rgba(0, 0, 0, 0.45));
   z-index: 1;
 }
 

@@ -20,4 +20,6 @@ export interface HxStatProps {
   trend?: 'up' | 'down' | 'neutral';
   /** Size variant controlling font size. */
   size?: 'sm' | 'md' | 'lg';
+  /** Prefix label for trend indicator. Override for i18n. */
+  labelTrend?: string;
 }

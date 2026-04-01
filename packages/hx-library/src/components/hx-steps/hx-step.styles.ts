@@ -201,7 +201,7 @@ export const helixStepStyles = css`
   }
 
   :host([orientation='vertical']) .step__label-area {
-    text-align: left;
+    text-align: start;
     margin-top: 0;
     padding-bottom: var(--hx-space-4, 1rem);
     padding-inline-start: 0;

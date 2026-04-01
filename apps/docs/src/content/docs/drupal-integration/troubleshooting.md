@@ -83,6 +83,5 @@ Content-Security-Policy: script-src 'self' https://cdn.jsdelivr.net;
 
 ## Getting Help
 
-- Check the [Drupal Integration Guide](/pre-planning/drupal-guide/) for comprehensive documentation
 - Review the [Component API](/components/api/) for correct attribute usage
 - File an issue on [GitHub](https://github.com/bookedsolidtech/helix/issues)

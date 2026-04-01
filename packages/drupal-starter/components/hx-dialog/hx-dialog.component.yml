@@ -1,0 +1,45 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Dialog
+description: 'Accessible modal and non-modal dialog built on the native HTML dialog element. Provides focus trapping, backdrop, and full ARIA labelling for healthcare confirmations and clinical alerts.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    heading:
+      type: string
+      title: Heading
+      description: 'Dialog heading text. Used as the accessible aria-labelledby target.'
+    open:
+      type: boolean
+      title: Open
+      description: 'Whether the dialog is open'
+      default: false
+    modal:
+      type: boolean
+      title: Modal
+      description: 'Whether the dialog renders as a modal with backdrop and focus trap'
+      default: true
+    variant:
+      type: string
+      title: Variant
+      description: 'ARIA role variant. Use alertdialog for urgent clinical alerts.'
+      default: 'dialog'
+      enum:
+        - dialog
+        - alertdialog
+    close_on_backdrop:
+      type: boolean
+      title: Close on Backdrop
+      description: 'Whether clicking the backdrop closes the dialog'
+      default: true
+slots:
+  default:
+    title: Body
+    description: 'Dialog body content'
+  header:
+    title: Header
+    description: 'Custom header content (replaces the built-in heading)'
+  footer:
+    title: Footer
+    description: 'Action buttons or footer content'

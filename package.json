@@ -25,10 +25,13 @@
     "cem": "turbo cem --filter=@helixui/library",
     "create:component": "tsx scripts/create-component.ts",
     "generate-docs": "tsx scripts/generate-component-docs.ts",
+    "generate:drupal-libraries": "tsx scripts/generate-drupal-libraries.ts",
     "preview:docs": "turbo preview --filter=docs",
     "dev:admin": "turbo dev --filter=@helixui/admin",
     "build:admin": "turbo build --filter=@helixui/admin",
     "test": "turbo test",
+    "test:react": "pnpm --filter=@helixui/react run test",
+    "test:mcp": "pnpm --filter=@helixui/mcp run test",
     "test:library": "turbo test --filter=@helixui/library",
     "test:cross-browser": "pnpm --filter=@helixui/library run test:cross-browser",
     "test:vrt": "playwright test",
@@ -39,13 +42,22 @@
     "test:batch:4": "pnpm --filter=@helixui/library run test:batch:4",
     "test:batch:5": "pnpm --filter=@helixui/library run test:batch:5",
     "test:component": "pnpm --filter=@helixui/library run test:component --",
+    "test:drupal-behaviors": "pnpm --filter=@helixui/drupal-behaviors run test",
+    "test:drupal-starter": "pnpm --filter=@helixui/drupal-starter run test",
+    "test:tokens": "pnpm --filter=@helixui/tokens run test",
     "test:smart": "bash scripts/test-smart.sh",
+    "test:batch": "bash scripts/test-batch.sh",
+    "test:storybook": "pnpm --filter=@helixui/storybook run test",
+    "audit:story-coverage": "node scripts/audit-story-coverage.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,html,astro}\"",
+    "a11y-audit": "node scripts/a11y-audit.js",
     "bundle-size": "node scripts/bundle-size-report.js",
     "bundle-size:ci": "node scripts/bundle-size-report.js --ci",
-    "verify": "pnpm run lint && pnpm run format:check && pnpm run type-check",
+    "check:bundle": "node scripts/check-bundle-size.mjs",
+    "preflight": "bash scripts/preflight.sh",
+    "verify": "pnpm run lint && pnpm run format:check && pnpm run type-check && pnpm run build",
     "pre-commit-check": "bash scripts/pre-commit-check.sh",
     "pre-push-check": "bash scripts/pre-push-check.sh",
     "hooks:type-check-strict": "tsx scripts/hooks/type-check-strict.ts",
@@ -88,6 +100,7 @@
     ]
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
@@ -114,7 +127,12 @@
     "typescript-eslint": "^8.0.0"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "^20.0.0 || ^22.0.0 || ^24.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "locutus": ">=3.0.14"
+    }
   },
   "packageManager": "pnpm@9.15.9",
   "customElements": ".worktrees/feature-healthba-hx-carousel-document-25/packages/hx-library/custom-elements.json"

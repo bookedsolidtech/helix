@@ -233,17 +233,12 @@ export class HelixActionBar extends LitElement {
     this._focusableCache = null; // invalidate cache on slot change
     const items = this._getFocusableItems();
     if (!items.length) return;
-    const hasActive = items.some((el) => el.getAttribute('tabindex') === '0');
-    if (!hasActive) {
-      // No item is active yet — make the first item tabbable.
-      items.forEach((el, i) => el.setAttribute('tabindex', i === 0 ? '0' : '-1'));
-    } else {
-      // An item is already active — ensure new items get tabindex="-1"
-      // without disturbing the currently active item.
-      items.forEach((el) => {
-        if (el.getAttribute('tabindex') === null) el.setAttribute('tabindex', '-1');
-      });
-    }
+    // Find the currently active item. If none exists (e.g. first render or active item was
+    // removed), fall back to index 0. Then set ALL items explicitly so newly added items and
+    // items whose tabindex changed externally are always in a correct state.
+    const activeIndex = items.findIndex((el) => el.getAttribute('tabindex') === '0');
+    const targetIndex = activeIndex === -1 ? 0 : activeIndex;
+    items.forEach((el, i) => el.setAttribute('tabindex', i === targetIndex ? '0' : '-1'));
   }
 
   /** @internal */

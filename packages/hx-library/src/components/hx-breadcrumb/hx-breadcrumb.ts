@@ -3,6 +3,14 @@ import { customElement, property } from 'lit/decorators.js';
 import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
+/** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
+interface JsonLdListItem {
+  '@type': string;
+  position: number;
+  name: string;
+  item?: string;
+}
+
 /**
  * Hierarchical page path navigation showing current location in site structure.
  *
@@ -28,15 +36,6 @@ import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
  * @cssprop [--hx-breadcrumb-text-color=var(--hx-color-neutral-700)] - Current page text color.
  * @cssprop [--hx-breadcrumb-item-max-width] - Max-width for item text truncation (e.g. `12rem`).
  */
-/** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
-interface JsonLdListItem {
-  '@type': string;
-  position: number;
-  name: string;
-  item?: string;
-}
-
-/** Breadcrumb navigation component with automatic truncation and JSON-LD structured data. @tag hx-breadcrumb */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
   static override styles = [tokenStyles, helixBreadcrumbStyles];
@@ -45,8 +44,8 @@ export class HelixBreadcrumb extends LitElement {
    * Per-instance counter used to generate stable, deterministic IDs for the
    * injected JSON-LD script tags. Deterministic IDs (vs Math.random()) allow
    * SSR frameworks to match server-rendered script tags during hydration.
+   * @internal
    */
-  /** @internal */
   private static _instanceCounter = 0;
 
   /**
@@ -71,6 +70,12 @@ export class HelixBreadcrumb extends LitElement {
    */
   @property({ type: Number, attribute: 'max-items' })
   maxItems = 0;
+
+  /**
+   * Accessible label for the expand ellipsis button. Override for i18n.
+   * @attr label-ellipsis
+   */
+  @property({ attribute: 'label-ellipsis' }) labelEllipsis = 'Show all breadcrumb items';
 
   /**
    * When true, injects a JSON-LD BreadcrumbList structured data script into the document head.
@@ -104,8 +109,8 @@ export class HelixBreadcrumb extends LitElement {
    * positional current-page detection on each slotchange without incorrectly
    * treating a previously component-set `current` attribute as a consumer-set
    * explicit override.
+   * @internal
    */
-  /** @internal */
   private readonly _managedCurrentItems = new WeakSet<Element>();
 
   /**
@@ -117,14 +122,16 @@ export class HelixBreadcrumb extends LitElement {
    *
    * Uses a static counter (not Math.random()) so IDs are deterministic across
    * server and client renders, enabling SSR hydration matching.
+   * @internal
    */
-  /** @internal */
   private readonly _jsonLdId = `hx-breadcrumb-ld-${++HelixBreadcrumb._instanceCounter}`;
 
   // ─── Item Helpers ───
 
-  /** Returns only real breadcrumb items, excluding the managed ellipsis element. */
-  /** @internal */
+  /**
+   * Returns only real breadcrumb items, excluding the managed ellipsis element.
+   * @internal
+   */
   private _getBreadcrumbItems(slot: HTMLSlotElement): Element[] {
     return slot
       .assignedElements({ flatten: true })
@@ -144,8 +151,8 @@ export class HelixBreadcrumb extends LitElement {
    *
    * This separation allows Drupal to control current-page marking without
    * relying on item order.
+   * @internal
    */
-  /** @internal */
   private _applyItemAttributes(items: Element[]): void {
     // Detect consumer-set 'current' attributes. An item has an explicit consumer
     // current if it has the 'current' attribute AND the component did not set it
@@ -238,7 +245,7 @@ export class HelixBreadcrumb extends LitElement {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.textContent = '…';
-      btn.setAttribute('aria-label', 'Show all breadcrumb items');
+      btn.setAttribute('aria-label', this.labelEllipsis);
       ellipsis.appendChild(btn);
 
       this._ellipsisItem = ellipsis;
@@ -284,8 +291,8 @@ export class HelixBreadcrumb extends LitElement {
   /**
    * Expands a collapsed breadcrumb by resetting maxItems to 0.
    * Called by the ellipsis expand button (click or Enter/Space).
+   * @internal
    */
-  /** @internal */
   private _expandBreadcrumb(): void {
     this.maxItems = 0;
     // updated() will detect the maxItems change and call _removeCollapse.
@@ -295,8 +302,8 @@ export class HelixBreadcrumb extends LitElement {
 
   /**
    * JSON-LD ListItem entry with typed fields to avoid Record<string, unknown>.
+   * @internal
    */
-  /** @internal */
   private _buildListItem(item: Element, position: number): JsonLdListItem {
     const href = (item as HTMLElement).getAttribute('href');
     const name = (item as HTMLElement).textContent?.trim() ?? '';

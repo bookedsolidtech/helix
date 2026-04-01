@@ -20,6 +20,8 @@ export interface HxBreadcrumbProps {
 Set to 0 (default) to show all items. The ellipsis is a keyboard-accessible
 button; activating it expands the full breadcrumb by setting maxItems to 0. */
   maxItems?: number;
+  /** Accessible label for the expand ellipsis button. Override for i18n. */
+  labelEllipsis?: string;
   /** When true, injects a JSON-LD BreadcrumbList structured data script into the document head.
 
 NOTE: Drupal manages `<head>` content via its own render pipeline. Injecting a

@@ -107,14 +107,14 @@ export const helixDataTableStyles = css`
     flex-shrink: 0;
     width: 1em;
     height: 1em;
-    opacity: 0.4;
+    opacity: var(--hx-opacity-25, 0.25); /* sort icon inactive — intentionally subtle */
     transition:
       opacity var(--hx-transition-fast, 150ms ease),
       transform var(--hx-transition-fast, 150ms ease);
   }
 
   .sort-icon--active {
-    opacity: 1;
+    opacity: var(--hx-opacity-100, 1);
     color: var(--hx-color-primary-500, #2563eb);
   }
 
@@ -173,7 +173,10 @@ export const helixDataTableStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .skeleton-cell {
       animation: none;
-      opacity: 0.6;
+      opacity: var(
+        --hx-opacity-50,
+        0.5
+      ); /* reduced from animation; approximate to available token */
     }
 
     .sort-icon {

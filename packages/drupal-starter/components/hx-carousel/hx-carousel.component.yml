@@ -1,0 +1,50 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Carousel
+description: 'Slide-based carousel with autoplay, loop, orientation, and keyboard navigation. Primitive component wrapper. For Views-based carousels use the views-carousel SDC instead.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the carousel region'
+      default: 'Carousel'
+    loop:
+      type: boolean
+      title: Loop
+      description: 'Whether the carousel loops from last to first slide'
+      default: false
+    autoplay:
+      type: boolean
+      title: Autoplay
+      description: 'Whether to automatically advance slides'
+      default: false
+    autoplay_interval:
+      type: integer
+      title: Autoplay Interval
+      description: 'Milliseconds between auto-advancing slides'
+      default: 3000
+    slides_per_page:
+      type: integer
+      title: Slides Per Page
+      description: 'Number of slides visible at once'
+      default: 1
+    orientation:
+      type: string
+      title: Orientation
+      description: 'Scroll direction for the carousel'
+      default: 'horizontal'
+      enum:
+        - horizontal
+        - vertical
+    mouse_dragging:
+      type: boolean
+      title: Mouse Dragging
+      description: 'Whether mouse dragging is enabled'
+      default: false
+slots:
+  default:
+    title: Slides
+    description: 'hx-carousel-item elements for each slide'

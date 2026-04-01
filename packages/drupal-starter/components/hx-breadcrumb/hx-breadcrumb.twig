@@ -1,0 +1,37 @@
+{#
+/**
+ * @file
+ * Breadcrumb SDC — wraps hx-breadcrumb for Drupal page navigation.
+ *
+ * Render hx-breadcrumb-item elements in the default slot. Each item accepts
+ * an href attribute for the link URL. The last item is automatically marked
+ * as aria-current="page" by the component.
+ *
+ * Example from a Drupal breadcrumb block:
+ *   {% set crumbs %}
+ *     {% for crumb in breadcrumb %}
+ *       <hx-breadcrumb-item href="{{ crumb.url }}">{{ crumb.text }}</hx-breadcrumb-item>
+ *     {% endfor %}
+ *     <hx-breadcrumb-item>{{ current_page_title }}</hx-breadcrumb-item>
+ *   {% endset %}
+ *   {% include 'helixui:hx-breadcrumb' with { content: crumbs } %}
+ *
+ * For JSON-LD structured data on public-facing pages, set json_ld: true.
+ */
+#}
+{{ attach_library('helixui/hx-breadcrumb') }}
+
+<hx-breadcrumb
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if separator and separator != '/' %}separator="{{ separator }}"{% endif %}
+  {% if max_items %}max-items="{{ max_items }}"{% endif %}
+  {% if json_ld %}json-ld{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if separator_slot %}
+    <span slot="separator">{{ separator_slot }}</span>
+  {% endif %}
+</hx-breadcrumb>

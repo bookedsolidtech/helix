@@ -119,10 +119,10 @@ export const Default: Story = {
         </hx-nav-item>
         <div
           slot="footer"
-          style="display: flex; align-items: center; gap: 0.5rem; color: #d1d5db; font-size: 0.875rem; overflow: hidden;"
+          style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; background-color: #0f172a; font-size: 0.875rem; overflow: hidden;"
         >
           <div
-            style="width: 2rem; height: 2rem; border-radius: 50%; background: #374151; flex-shrink: 0;"
+            style="width: 2rem; height: 2rem; border-radius: 50%; background: #334155; flex-shrink: 0;"
           ></div>
           <span style="white-space: nowrap;">Dr. Jane Smith</span>
         </div>
@@ -412,8 +412,9 @@ export const WithSectionedNavigation: Story = {
         </div>
 
         <!-- Clinical section label -->
+        <!-- neutral-400 (#94a3b8) on neutral-900 (#0f172a) = 6.96:1 — WCAG AA ✓ -->
         <div
-          style="padding: 0.5rem 1rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="padding: 0.5rem 1rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Clinical
         </div>
@@ -463,8 +464,9 @@ export const WithSectionedNavigation: Story = {
         <div style="margin: 0.5rem 1rem; border-top: 1px solid #374151;"></div>
 
         <!-- Administration section label -->
+        <!-- neutral-400 (#94a3b8) on neutral-900 (#0f172a) = 6.96:1 — WCAG AA ✓ -->
         <div
-          style="padding: 0.25rem 1rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="padding: 0.25rem 1rem 0.25rem; font-size: 0.75rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Administration
         </div>
@@ -518,10 +520,10 @@ export const WithSectionedNavigation: Story = {
 
         <div
           slot="footer"
-          style="display: flex; align-items: center; gap: 0.5rem; color: #d1d5db; font-size: 0.875rem; overflow: hidden;"
+          style="display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.875rem; overflow: hidden;"
         >
           <div
-            style="width: 2rem; height: 2rem; border-radius: 50%; background: #374151; flex-shrink: 0;"
+            style="width: 2rem; height: 2rem; border-radius: 50%; background: #334155; flex-shrink: 0;"
           ></div>
           <span style="white-space: nowrap;">Dr. Jane Smith</span>
         </div>
@@ -537,5 +539,55 @@ export const DarkMode: Story = {
   decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
   args: {
     collapsed: true,
+  },
+  render: (args) => html`
+    <div style="height: 400px; display: flex;">
+      <hx-side-nav ?collapsed=${args.collapsed} label=${args.label} style="height: 100%;">
+        <div slot="header" style="font-weight: bold; font-size: 1.125rem; color: white;">H</div>
+        <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+        <hx-nav-item href="/patients" active>Patients</hx-nav-item>
+        <hx-nav-item href="/reports">Reports</hx-nav-item>
+        <hx-nav-item href="/settings">Settings</hx-nav-item>
+      </hx-side-nav>
+      <div style="flex: 1; padding: 2rem; background: #1e293b;">
+        <h1 style="margin: 0; font-size: 1.5rem; color: white;">Page Content</h1>
+      </div>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="height: 400px; display: flex;">
+      <hx-side-nav label="Main Navigation" style="height: 100%;">
+        <div slot="header" style="font-weight: bold; font-size: 1.125rem; color: white;">
+          HelixUI
+        </div>
+        <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
+        <hx-nav-item href="/patients" active>Patients</hx-nav-item>
+        <hx-nav-item href="/reports">Reports</hx-nav-item>
+        <hx-nav-item href="/settings">Settings</hx-nav-item>
+      </hx-side-nav>
+      <div style="flex: 1; padding: 2rem; background: #f9fafb; font-family: sans-serif;">
+        <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+          Tab navigates through sidebar links and the collapse toggle. Enter activates. Arrow keys
+          navigate within expanded sub-menus.
+        </p>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-side-nav');
+    await expect(el).toBeTruthy();
+    // Verify nav items are present
+    const navItems = canvasElement.querySelectorAll('hx-nav-item');
+    await expect(navItems.length).toBe(4);
+    // Tab into the side nav
+    await userEvent.tab();
   },
 };

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import './hx-clinical-status.js';
+import '../hx-theme/hx-theme.js';
 
 // ─────────────────────────────────────────────────
 // META CONFIGURATION
@@ -75,6 +76,11 @@ const meta = {
     persistent: false,
     compact: false,
     icon: '',
+  },
+  parameters: {
+    actions: {
+      handles: ['hx-dismiss', 'hx-acknowledge'],
+    },
   },
 } satisfies Meta;
 
@@ -232,4 +238,47 @@ export const RequiresAcknowledgment: Story = {
     message: 'Fall risk assessment overdue. Acknowledge to confirm review.',
   },
   render: renderClinicalStatus,
+};
+
+// ─────────────────────────────────────────────────
+// DARK MODE
+// ─────────────────────────────────────────────────
+
+export const DarkMode: Story = {
+  name: 'Dark Mode',
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  args: {
+    severity: 'warning',
+    message: 'Medication reconciliation required before discharge.',
+    dismissible: true,
+  },
+  render: renderClinicalStatus,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
+        Tab focuses the dismiss button (dismissible) or acknowledge button (critical/emergent). Enter
+        or Space activates it.
+      </p>
+      <hx-clinical-status
+        severity="warning"
+        message="Blood pressure slightly elevated — monitor closely."
+        dismissible
+      ></hx-clinical-status>
+      <hx-clinical-status
+        severity="critical"
+        message="Abnormal lab values detected. Acknowledgment required before proceeding."
+      ></hx-clinical-status>
+    </div>
+  `,
 };

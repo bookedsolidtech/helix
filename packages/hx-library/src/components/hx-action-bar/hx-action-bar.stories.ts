@@ -43,6 +43,16 @@ const meta = {
         type: { summary: "'top' | 'bottom' | 'sticky'" },
       },
     },
+    ariaLabel: {
+      control: 'text',
+      description:
+        'Accessible label for the toolbar. Required when multiple toolbars appear on the same page.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'Actions' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     size: 'md',

@@ -38,6 +38,11 @@ and the base theme is applied without brand overrides. */
 When `motion="full"` and the OS reports `prefers-reduced-motion: reduce`,
 the same token overrides are applied automatically. */
   motion?: string;
+  /** Controls the spacing density for all descendant `hx-*` components.
+- `"comfortable"` (default): Standard spacing tokens.
+- `"compact"`: Reduces `--hx-space-*` tokens ~25%. For data-dense clinical dashboards.
+- `"spacious"`: Increases `--hx-space-*` tokens ~25%. For touch-optimized bedside tablets. */
+  density?: string;
   /** Returns the currently active theme name.
 When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
 Otherwise returns the `theme` property value. */

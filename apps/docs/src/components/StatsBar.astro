@@ -24,7 +24,7 @@ interface Stat {
 
 const stats: Stat[] = [
   {
-    value: '98',
+    value: '102',
     label: 'Components Built',
     colorClass: 'stat-value-cyan',
     iconClass: 'fa-solid fa-puzzle-piece',
@@ -35,11 +35,11 @@ const stats: Stat[] = [
   },
   {
     value: 'A',
-    label: 'Health Score (98/98)',
+    label: 'Health Score (102/102)',
     colorClass: 'stat-value-green',
     iconClass: 'fa-solid fa-heart-pulse',
-    description: '98 of 98 components score an A grade via HELiXiR MCP health analysis.',
-    relevance: 'HELiXiR continuously scores every component against CEM completeness, accessibility compliance, token coverage, and test quality. A 97.2 average score across all 98 components means every piece of the library meets the enterprise bar—nothing is hiding a failing grade.',
+    description: '102 of 102 components score an A grade via HELiXiR MCP health analysis.',
+    relevance: 'HELiXiR continuously scores every component against CEM completeness, accessibility compliance, token coverage, and test quality. A 99.8 average score across all 102 components means every piece of the library meets the enterprise bar—nothing is hiding a failing grade.',
     docsUrl: '/helixir/',
     docsLabel: 'HELiXiR Health Docs'
   },
@@ -58,7 +58,7 @@ const stats: Stat[] = [
     label: 'WCAG 2.1',
     colorClass: 'stat-value-pink',
     iconClass: 'fa-solid fa-universal-access',
-    description: 'WCAG 2.1 AA accessibility compliance across all 98 components.',
+    description: 'WCAG 2.1 AA accessibility compliance across all 102 components.',
     relevance: 'HELIX enforces AA compliance as a hard release gate—no component ships without an automated axe-core audit and keyboard navigation verification. Healthcare applications demand zero regressions, so every pull request re-validates the full accessibility surface.',
     docsUrl: '/architecture/accessibility/',
     docsLabel: 'Accessibility Standards'
@@ -193,3 +193,48 @@ const stats: Stat[] = [
     });
   });
 </script>
+
+<style>
+  /* ================================================================
+     Periodic Table Element-Card Aesthetic for StatsBar
+     Applies 4px radius, 1px teal border, 6% teal background to
+     stat cards. Stacks vertically on mobile (<768px).
+     Note: component count is 102 (custom elements in CEM), not 82
+     (component directories). Some directories contain multiple
+     elements (e.g. accordion → hx-accordion + hx-accordion-item).
+     ================================================================ */
+
+  .stat-card {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 212, 200, 0.2);
+    background: rgba(0, 212, 200, 0.06);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 200, 0.42);
+    background: rgba(0, 212, 200, 0.09);
+    box-shadow: 0 8px 24px rgba(0, 212, 200, 0.18);
+  }
+
+  /* Stack stat cards vertically on mobile */
+  @media (max-width: 768px) {
+    .stat-card {
+      flex: 1 1 40%;
+      min-width: 140px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stat-card {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stat-card {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Configuration for sequential audit batch orchestration",
+  "sequentialQueue": {
+    "enabled": true,
+    "maxConcurrentAgents": 1,
+    "timeoutPerComponentMinutes": 30,
+    "zombieDetectionMinutes": 20,
+    "maxRetriesPerComponent": 1
+  },
+  "batchBranch": {
+    "prefix": "audit/deep-quality-batch-",
+    "dateFormat": "YYYYMMDD",
+    "baseBranch": "dev"
+  },
+  "commitConventions": {
+    "prefix": "audit",
+    "format": "audit({component}): {description}",
+    "maxSubjectLength": 120,
+    "requireLowercase": true
+  },
+  "sharedFiles": {
+    "conflictProne": [
+      "packages/hx-library/coverage-config.json",
+      ".github/workflows/ci.yml",
+      "packages/hx-library/src/index.ts",
+      "packages/hx-react/src/index.ts"
+    ],
+    "consolidationStrategy": "sequential-atomic"
+  },
+  "changeset": {
+    "consolidate": true,
+    "bumpType": "patch",
+    "scope": "@helixui/library",
+    "filenamePrefix": "audit-batch-"
+  },
+  "pr": {
+    "baseBranch": "dev",
+    "labels": ["audit-batch", "deep-quality", "infra"],
+    "autoMerge": true,
+    "titleFormat": "audit: deep quality batch {date} ({count} components)"
+  },
+  "monitoring": {
+    "discordChannels": {
+      "progress": "dev-helix",
+      "alerts": "dev-alerts",
+      "lifecycle": "agent-logs"
+    },
+    "checkpointInterval": "per-component"
+  },
+  "ciOptimization": {
+    "skipTestsForAuditBranches": true,
+    "smartTestScope": "changed-components-only",
+    "singleCIRun": true
+  }
+}

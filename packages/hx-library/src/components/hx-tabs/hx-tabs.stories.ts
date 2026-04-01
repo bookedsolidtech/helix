@@ -855,4 +855,62 @@ export const DarkMode: Story = {
   args: {
     orientation: 'vertical',
   },
+  render: (args) => html`
+    <hx-tabs orientation=${args.orientation}>
+      <hx-tab slot="tab" panel="dm-overview">Overview</hx-tab>
+      <hx-tab slot="tab" panel="dm-details">Details</hx-tab>
+      <hx-tab slot="tab" panel="dm-history">History</hx-tab>
+      <hx-tab-panel name="dm-overview">
+        <p>Overview panel content.</p>
+      </hx-tab-panel>
+      <hx-tab-panel name="dm-details">
+        <p>Details panel content.</p>
+      </hx-tab-panel>
+      <hx-tab-panel name="dm-history">
+        <p>History panel content.</p>
+      </hx-tab-panel>
+    </hx-tabs>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the tab list. Arrow Left/Right navigates between tabs. Enter or Space activates
+        the focused tab. Tab moves focus into the active tab panel.
+      </p>
+      <hx-tabs>
+        <hx-tab slot="tab" panel="kb-overview">Overview</hx-tab>
+        <hx-tab slot="tab" panel="kb-details">Details</hx-tab>
+        <hx-tab slot="tab" panel="kb-history">History</hx-tab>
+        <hx-tab-panel name="kb-overview">
+          <p>Overview content — patient demographics and status summary.</p>
+        </hx-tab-panel>
+        <hx-tab-panel name="kb-details">
+          <p>Details content — extended record information and attributes.</p>
+        </hx-tab-panel>
+        <hx-tab-panel name="kb-history">
+          <p>History content — past visits and audit trail.</p>
+        </hx-tab-panel>
+      </hx-tabs>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    await new Promise((r) => setTimeout(r, 50));
+    const el = canvasElement.querySelector('hx-tabs');
+    await expect(el).toBeTruthy();
+    const tabs = canvasElement.querySelectorAll('hx-tab');
+    await expect(tabs.length).toBe(3);
+    // First tab should be selected by default
+    await expect(tabs[0].hasAttribute('selected')).toBeTruthy();
+    // Tab into the tab list, then Arrow Right to move to next tab
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}');
+  },
 };

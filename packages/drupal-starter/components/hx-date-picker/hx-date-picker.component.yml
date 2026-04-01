@@ -1,0 +1,46 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Date Picker
+description: 'Form-associated date picker with calendar popover, keyboard navigation, and validation. Accepts ISO 8601 date values for Drupal date field integration.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text'
+    value:
+      type: string
+      title: Value
+      description: 'Current date value in ISO 8601 format (e.g. 2026-03-25)'
+    min:
+      type: string
+      title: Min Date
+      description: 'Minimum selectable date as ISO 8601 string'
+    max:
+      type: string
+      title: Max Date
+      description: 'Maximum selectable date as ISO 8601 string'
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the date picker is disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text'

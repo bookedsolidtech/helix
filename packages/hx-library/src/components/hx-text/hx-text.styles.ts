@@ -23,21 +23,21 @@ export const helixTextStyles = css`
 
   .text--body {
     --hx-text-font-size: var(--hx-font-size-md, 1rem);
-    --hx-text-font-weight: var(--hx-font-weight-regular, 400);
+    --hx-text-font-weight: var(--hx-font-weight-normal, 400);
     --hx-text-line-height: var(--hx-line-height-normal, 1.5);
     --hx-text-letter-spacing: var(--hx-letter-spacing-normal, 0);
   }
 
   .text--body-sm {
     --hx-text-font-size: var(--hx-font-size-sm, 0.875rem);
-    --hx-text-font-weight: var(--hx-font-weight-regular, 400);
+    --hx-text-font-weight: var(--hx-font-weight-normal, 400);
     --hx-text-line-height: var(--hx-line-height-normal, 1.5);
     --hx-text-letter-spacing: var(--hx-letter-spacing-normal, 0);
   }
 
   .text--body-lg {
     --hx-text-font-size: var(--hx-font-size-lg, 1.125rem);
-    --hx-text-font-weight: var(--hx-font-weight-regular, 400);
+    --hx-text-font-weight: var(--hx-font-weight-normal, 400);
     --hx-text-line-height: var(--hx-line-height-normal, 1.5);
     --hx-text-letter-spacing: var(--hx-letter-spacing-normal, 0);
   }
@@ -58,14 +58,14 @@ export const helixTextStyles = css`
 
   .text--caption {
     --hx-text-font-size: var(--hx-font-size-xs, 0.75rem);
-    --hx-text-font-weight: var(--hx-font-weight-regular, 400);
+    --hx-text-font-weight: var(--hx-font-weight-normal, 400);
     --hx-text-line-height: var(--hx-line-height-normal, 1.5);
     --hx-text-letter-spacing: var(--hx-letter-spacing-normal, 0);
   }
 
   .text--code {
     --hx-text-font-size: var(--hx-font-size-sm, 0.875rem);
-    --hx-text-font-weight: var(--hx-font-weight-regular, 400);
+    --hx-text-font-weight: var(--hx-font-weight-normal, 400);
     --hx-text-line-height: var(--hx-line-height-normal, 1.5);
     --hx-text-letter-spacing: var(--hx-letter-spacing-normal, 0);
     font-family: var(--hx-font-family-mono, monospace);
@@ -112,7 +112,7 @@ export const helixTextStyles = css`
   /* ─── Weight Overrides ─── */
 
   .text--weight-regular {
-    --hx-text-font-weight: var(--hx-font-weight-regular, 400);
+    --hx-text-font-weight: var(--hx-font-weight-normal, 400);
   }
 
   .text--weight-medium {

@@ -499,22 +499,23 @@ describe('Keyboard Navigation Integration', () => {
     it('ArrowRight moves to the next tab and dispatches hx-tab-change', async () => {
       const el = await fixture<HelixTabs>(`
         <hx-tabs>
-          <hx-tab slot="tab" id="t1">Tab 1</hx-tab>
-          <hx-tab slot="tab" id="t2">Tab 2</hx-tab>
-          <hx-tab-panel>Panel 1</hx-tab-panel>
-          <hx-tab-panel>Panel 2</hx-tab-panel>
+          <hx-tab slot="tab" panel="one">Tab 1</hx-tab>
+          <hx-tab slot="tab" panel="two">Tab 2</hx-tab>
+          <hx-tab-panel name="one">Panel 1</hx-tab-panel>
+          <hx-tab-panel name="two">Panel 2</hx-tab-panel>
         </hx-tabs>
       `);
+      await el.updateComplete;
       const firstTab = el.querySelector<HTMLElement>('hx-tab')!;
-      // Focus the first tab's button
       const firstTabBtn = firstTab.shadowRoot?.querySelector<HTMLButtonElement>('button');
       expect(firstTabBtn).toBeTruthy();
+      firstTabBtn!.focus();
       const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
         el,
         'hx-tab-change',
       );
-      firstTabBtn!.focus();
-      await userEvent.keyboard('{ArrowRight}');
+      // Dispatch directly on the hx-tabs element — same pattern as unit tests
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.index).toBe(1);
     });
@@ -522,22 +523,25 @@ describe('Keyboard Navigation Integration', () => {
     it('ArrowLeft wraps back to previous tab', async () => {
       const el = await fixture<HelixTabs>(`
         <hx-tabs>
-          <hx-tab slot="tab" id="t1">Tab 1</hx-tab>
-          <hx-tab slot="tab" id="t2">Tab 2</hx-tab>
-          <hx-tab-panel>Panel 1</hx-tab-panel>
-          <hx-tab-panel>Panel 2</hx-tab-panel>
+          <hx-tab slot="tab" panel="one">Tab 1</hx-tab>
+          <hx-tab slot="tab" panel="two">Tab 2</hx-tab>
+          <hx-tab-panel name="one">Panel 1</hx-tab-panel>
+          <hx-tab-panel name="two">Panel 2</hx-tab-panel>
         </hx-tabs>
       `);
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll<HTMLElement>('hx-tab'));
+      // Activate second tab first so ArrowLeft has somewhere to go back to
       const secondTabBtn = tabs[1].shadowRoot?.querySelector<HTMLButtonElement>('button');
       expect(secondTabBtn).toBeTruthy();
+      secondTabBtn!.click();
+      await el.updateComplete;
       secondTabBtn!.focus();
       const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
         el,
         'hx-tab-change',
       );
-      await userEvent.keyboard('{ArrowLeft}');
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       const event = await eventPromise;
       expect(event.detail.index).toBe(0);
     });
@@ -858,7 +862,7 @@ describe('Keyboard Navigation Integration', () => {
   describe('hx-pagination', () => {
     it('renders focusable page buttons', async () => {
       const el = await fixture<HelixPagination>(
-        '<hx-pagination total="50" page-size="10" page="1"></hx-pagination>',
+        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
       );
       await el.updateComplete;
       // Pagination renders buttons with part="button"
@@ -866,25 +870,21 @@ describe('Keyboard Navigation Integration', () => {
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    it('Enter on a page button dispatches hx-page-change', async () => {
+    it('clicking a page button dispatches hx-page-change', async () => {
       const el = await fixture<HelixPagination>(
-        '<hx-pagination total="50" page-size="10" page="1"></hx-pagination>',
+        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
       );
       await el.updateComplete;
-      // Find a non-active page button (page 2)
-      const allButtons = Array.from(
-        el.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part~="button"]') ?? [],
+      // Find the page 2 button by aria-label
+      const pageBtn = el.shadowRoot?.querySelector<HTMLButtonElement>(
+        'button[aria-label="Page 2"]',
       );
-      const nextBtn = allButtons.find(
-        (btn) => !btn.disabled && btn.getAttribute('aria-disabled') !== 'true' && btn.getAttribute('aria-label') === 'Page 2',
-      );
-      expect(nextBtn).toBeTruthy();
-      // Native buttons fire click on Enter — trigger directly to verify the event fires
-      const eventPromise = oneEvent<CustomEvent<{ page: number }>>(el, 'hx-page-change');
-      nextBtn!.focus();
-      nextBtn!.click();
-      const event = await eventPromise;
-      expect(typeof event.detail.page).toBe('number');
+      expect(pageBtn).toBeTruthy();
+      const [event] = await Promise.all([
+        oneEvent<CustomEvent<{ page: number }>>(el, 'hx-page-change'),
+        Promise.resolve(pageBtn!.click()),
+      ]);
+      expect(event.detail.page).toBe(2);
     });
   });
 

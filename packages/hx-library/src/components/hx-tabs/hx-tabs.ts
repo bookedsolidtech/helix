@@ -93,12 +93,45 @@ export class HelixTabs extends LitElement {
   private _cachedPanels: HelixTabPanel[] | null = null;
   /** @internal */
   private _observer: MutationObserver | null = null;
+  /**
+   * Stores a requested tab index from the `selected-index` attribute before the component
+   * has finished its first update (e.g. server-rendered Drupal pages).
+   * @internal
+   */
+  private _pendingIndex: number | null = null;
+
+  // ─── Attribute Observation ───
+
+  static override get observedAttributes(): string[] {
+    return [...(super.observedAttributes ?? []), 'selected-index'];
+  }
+
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value);
+    if (name === 'selected-index' && value !== null && old !== value) {
+      const index = parseInt(value, 10);
+      if (!isNaN(index) && index >= 0) {
+        if (this.hasUpdated) {
+          // Already initialised — apply immediately
+          const tab = this._getTabs()[index];
+          if (tab && !tab.disabled) {
+            this._activateTab(tab, false);
+          }
+        } else {
+          // Store for application in firstUpdated
+          this._pendingIndex = index;
+        }
+      }
+    }
+  }
 
   // ─── Public API ───
 
   /**
    * Gets or sets the zero-based index of the currently selected tab.
    * Setting this programmatically activates the tab at the given index.
+   * Can also be set via the `selected-index` HTML attribute for server-side
+   * pre-selection (e.g. Drupal Twig templates).
    */
   get selectedIndex(): number {
     return this._getTabs().findIndex((tab) => tab.panel === this._activePanel);
@@ -143,15 +176,17 @@ export class HelixTabs extends LitElement {
     this.addEventListener('hx-tab-select', this._handleTabSelect);
     this.addEventListener('keydown', this._handleKeydown);
     // Watch for panel/name attribute changes on child tabs and panels
-    this._observer = new MutationObserver(() => {
-      this._cachedTabs = null;
-      this._cachedPanels = null;
-      this._syncTabsAndPanels();
-    });
-    this._observer.observe(this, {
-      subtree: false,
-      attributeFilter: ['panel', 'name'],
-    });
+    if (typeof MutationObserver !== 'undefined') {
+      this._observer = new MutationObserver(() => {
+        this._cachedTabs = null;
+        this._cachedPanels = null;
+        this._syncTabsAndPanels();
+      });
+      this._observer.observe(this, {
+        subtree: false,
+        attributeFilter: ['panel', 'name'],
+      });
+    }
   }
 
   override disconnectedCallback(): void {
@@ -171,6 +206,17 @@ export class HelixTabs extends LitElement {
     }
 
     this._syncTabsAndPanels();
+
+    // Apply a pending selected-index (set via HTML attribute before upgrade, e.g. Drupal Twig)
+    if (this._pendingIndex !== null) {
+      const pendingTab = this._getTabs()[this._pendingIndex];
+      this._pendingIndex = null;
+      if (pendingTab && !pendingTab.disabled) {
+        this._activateTab(pendingTab, false);
+        return;
+      }
+    }
+
     // Activate the first enabled tab if none is selected
     if (!this._activePanel) {
       const firstEnabled = this._getEnabledTabs()[0];
@@ -354,8 +400,10 @@ export class HelixTabs extends LitElement {
 
   /** @internal */
   private _handleKeydown = (e: KeyboardEvent): void => {
-    const enabledTabs = this._getEnabledTabs();
-    if (enabledTabs.length === 0) {
+    // Use ALL tabs (including disabled) so keyboard users can discover disabled tabs
+    // per ARIA APG tab pattern — disabled tabs receive focus but are not activated.
+    const allTabs = this._getTabs();
+    if (allTabs.length === 0) {
       return;
     }
 
@@ -370,10 +418,11 @@ export class HelixTabs extends LitElement {
 
     // Determine focused tab — when a button inside shadow DOM is focused,
     // document.activeElement returns the shadow host (hx-tab), not the inner button.
-    const focusedTab = enabledTabs.find((tab) => tab === document.activeElement);
+    const focusedTab = allTabs.find((tab) => tab === document.activeElement);
 
     if (e.key === ' ' || e.key === 'Enter') {
-      if (focusedTab) {
+      // Only activate if the focused tab is not disabled
+      if (focusedTab && !focusedTab.disabled) {
         e.preventDefault();
         this._activateTab(focusedTab);
         focusedTab.shadowRoot?.querySelector('button')?.focus();
@@ -383,11 +432,11 @@ export class HelixTabs extends LitElement {
 
     e.preventDefault();
 
-    let currentIndex = focusedTab ? enabledTabs.indexOf(focusedTab) : -1;
+    let currentIndex = focusedTab ? allTabs.indexOf(focusedTab) : -1;
     // Fall back to the active tab's index if nothing is focused yet
     if (currentIndex === -1) {
-      const activeTab = enabledTabs.find((tab) => tab.panel === this._activePanel);
-      currentIndex = activeTab ? enabledTabs.indexOf(activeTab) : 0;
+      const activeTab = allTabs.find((tab) => tab.panel === this._activePanel);
+      currentIndex = activeTab ? allTabs.indexOf(activeTab) : 0;
     }
 
     let nextIndex: number;
@@ -395,15 +444,15 @@ export class HelixTabs extends LitElement {
     if (e.key === 'Home') {
       nextIndex = 0;
     } else if (e.key === 'End') {
-      nextIndex = enabledTabs.length - 1;
+      nextIndex = allTabs.length - 1;
     } else if (e.key === nextKey) {
-      nextIndex = (currentIndex + 1) % enabledTabs.length;
+      nextIndex = (currentIndex + 1) % allTabs.length;
     } else {
       // prevKey
-      nextIndex = currentIndex <= 0 ? enabledTabs.length - 1 : currentIndex - 1;
+      nextIndex = currentIndex <= 0 ? allTabs.length - 1 : currentIndex - 1;
     }
 
-    const targetTab = enabledTabs[nextIndex];
+    const targetTab = allTabs[nextIndex];
     if (!targetTab) {
       return;
     }
@@ -411,7 +460,8 @@ export class HelixTabs extends LitElement {
     // Focus the tab button inside the shadow root
     targetTab.shadowRoot?.querySelector('button')?.focus();
 
-    if (this.activation === 'automatic') {
+    // Only activate in automatic mode if the target tab is not disabled
+    if (this.activation === 'automatic' && !targetTab.disabled) {
       this._activateTab(targetTab);
     }
   };

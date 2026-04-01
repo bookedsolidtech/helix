@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Badge SDC — wraps hx-badge for Drupal content labels and status indicators.
+ *
+ * Use for taxonomy term labels, priority flags, notification counts, and
+ * clinical status tags. The variant prop conveys semantic meaning through color.
+ *
+ * Example: Taxonomy term badge
+ *   {% for term in node.field_conditions %}
+ *     {% include 'helixui:hx-badge' with {
+ *       variant: 'info',
+ *       content: term.name,
+ *     } %}
+ *   {% endfor %}
+ */
+#}
+{{ attach_library('helixui/hx-badge') }}
+
+<hx-badge
+  {% if variant and variant != 'neutral' %}variant="{{ variant }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if pill %}pill{% endif %}
+  {% if pulse %}pulse{% endif %}
+  {% if count is not null %}count="{{ count }}"{% endif %}
+  {% if max %}max="{{ max }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if prefix %}
+    <span slot="prefix">{{ prefix }}</span>
+  {% endif %}
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-badge>

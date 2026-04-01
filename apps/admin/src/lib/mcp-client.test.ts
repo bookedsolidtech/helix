@@ -41,6 +41,10 @@ describe('mcp-client — exports', () => {
 describe('createMcpSession — binary check', () => {
   it('returns null when binary is missing (if applicable)', async () => {
     // This test is meaningful if the binary doesn't exist
+    // In CI, skip live spawn — binary presence is irrelevant without a running project
+    if (process.env.CI) {
+      return;
+    }
     if (existsSync(WC_TOOLS_BINARY)) {
       // Binary exists — session creation should succeed
       const session = await createMcpSession();
@@ -55,7 +59,7 @@ describe('createMcpSession — binary check', () => {
 
 // ── Live server integration tests ───────────────────────────────────────
 
-const serverAvailable = existsSync(WC_TOOLS_BINARY);
+const serverAvailable = existsSync(WC_TOOLS_BINARY) && !process.env.CI;
 
 describe.skipIf(!serverAvailable)('mcp-client — live session', () => {
   it('creates a session and calls a tool', async () => {

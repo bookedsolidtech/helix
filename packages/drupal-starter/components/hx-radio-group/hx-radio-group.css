@@ -1,0 +1,5 @@
+/* hx-radio-group SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-radio-group {
+  display: block;
+}

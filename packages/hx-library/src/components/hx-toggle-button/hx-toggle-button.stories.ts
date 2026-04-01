@@ -79,6 +79,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    required: {
+      control: 'boolean',
+      description: 'Whether the toggle button is required for form submission.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     pressed: false,

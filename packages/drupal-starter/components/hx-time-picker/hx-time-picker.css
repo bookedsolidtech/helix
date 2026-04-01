@@ -1,0 +1,5 @@
+/* hx-time-picker SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-time-picker {
+  display: block;
+}

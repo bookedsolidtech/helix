@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Status Indicator SDC — wraps hx-status-indicator for Drupal availability displays.
+ *
+ * Use in provider directory listings to show availability, in system health
+ * dashboards for service status, and in patient-facing scheduling to indicate
+ * provider online/offline state. Always provide a label for accessibility when
+ * the status is not described by adjacent visible text.
+ *
+ * Example: Provider availability in a listing
+ *   {% include 'helixui:hx-status-indicator' with {
+ *     status: provider.availability_status,
+ *     label: provider.availability_label,
+ *     pulse: provider.is_live,
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-status-indicator') }}
+
+<hx-status-indicator
+  {% if status and status != 'neutral' %}status="{{ status }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if pulse %}pulse{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-status-indicator>

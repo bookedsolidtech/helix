@@ -17,7 +17,7 @@ export const helixDialogStyles = css`
     overflow: visible;
     /* D5 — ensure native dialog element renders above the non-modal backdrop sibling */
     position: relative;
-    z-index: calc(var(--hx-z-index-modal, 100) + 1);
+    z-index: calc(var(--hx-z-index-modal, 1400) + 1);
   }
 
   /* ─── Dialog container ─── */
@@ -30,7 +30,7 @@ export const helixDialogStyles = css`
     color: var(--hx-dialog-color, var(--hx-color-neutral-900));
     border-radius: var(--hx-dialog-border-radius, var(--hx-border-radius-lg));
     box-shadow: var(--hx-dialog-shadow, var(--hx-shadow-xl));
-    width: var(--hx-dialog-width, var(--hx-size-128, 32rem));
+    width: var(--hx-dialog-width, var(--hx-container-narrow, 32rem));
     max-width: calc(100vw - var(--hx-space-8, 2rem));
     max-height: calc(100vh - var(--hx-space-8, 2rem));
     overflow: hidden;
@@ -124,14 +124,14 @@ export const helixDialogStyles = css`
     width: var(--hx-touch-target-min, 2.75rem);
     height: var(--hx-touch-target-min, 2.75rem);
     padding: 0;
-    margin-left: auto;
+    margin-inline-start: auto;
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     color: var(--hx-color-neutral-500, #6b7280);
     font-size: var(--hx-font-size-xl, 1.25rem);
-    line-height: var(--hx-line-height-none, 1);
+    line-height: 1; /* intentional literal: icon button needs line-height 1; no token maps to exactly 1 */
     transition:
       color var(--hx-duration-fast, 100ms) ease,
       background-color var(--hx-duration-fast, 100ms) ease;
@@ -142,8 +142,8 @@ export const helixDialogStyles = css`
   }
 
   .dialog__close-btn:hover {
-    color: var(--hx-color-neutral-900, #111827);
-    background-color: var(--hx-color-neutral-100, #f3f4f6);
+    color: var(--hx-color-neutral-900);
+    background-color: var(--hx-color-neutral-100);
   }
 
   .dialog__close-btn:focus-visible {
@@ -172,7 +172,7 @@ export const helixDialogStyles = css`
     justify-content: flex-end;
     gap: var(--hx-space-3);
     padding: var(--hx-dialog-footer-padding, var(--hx-space-4) var(--hx-space-6));
-    border-top: var(--hx-border-width-1) solid
+    border-top: var(--hx-border-width-thin) solid
       var(--hx-dialog-footer-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
   }

@@ -112,6 +112,15 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    valueText: {
+      control: 'text',
+      description:
+        'Human-readable text description of the current value for assistive technology.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Volume',

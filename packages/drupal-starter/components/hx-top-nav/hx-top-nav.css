@@ -1,0 +1,5 @@
+/* hx-top-nav SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-top-nav {
+  display: block;
+}

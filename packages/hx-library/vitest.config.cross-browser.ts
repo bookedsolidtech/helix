@@ -4,10 +4,17 @@ import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-// Cross-browser config for release validation.
-// Run via: npm run test:cross-browser
-// Includes Chromium, Firefox, and WebKit (Safari) instances.
-// Default `npm run test` uses Chromium-only for speed.
+/**
+ * Cross-browser test configuration for Vitest browser mode.
+ *
+ * Runs the full test suite across Chromium, Firefox, and WebKit to validate
+ * cross-browser compatibility of all components. This config is used by:
+ *   - `pnpm run test:cross-browser` (local)
+ *   - The `cross-browser` CI job in .github/workflows/cross-browser.yml
+ *
+ * The primary CI test gate uses vitest.config.ts (Chromium-only) for speed.
+ * This config provides periodic cross-browser validation against Firefox and WebKit.
+ */
 export default defineConfig({
   server: {
     fs: {
@@ -21,23 +28,36 @@ export default defineConfig({
       enabled: true,
       provider: 'playwright',
       headless: true,
+      viewport: { width: 1280, height: 720 },
+      // Run all three browser engines for cross-browser validation.
       instances: [{ browser: 'chromium' }, { browser: 'firefox' }, { browser: 'webkit' }],
     },
-    include: ['src/components/**/*.test.ts'],
+    include: [
+      'src/components/**/*.test.ts',
+      'src/base/**/*.test.ts',
+      'src/utilities/**/*.test.ts',
+      'src/utils/**/*.test.ts',
+      'src/mixins/**/*.test.ts',
+      'src/__tests__/**/*.test.ts',
+    ],
     exclude: ['.worktrees/**', 'node_modules/**'],
     reporters: ['verbose', 'json'],
     outputFile: { json: '.cache/test-results-cross-browser.json' },
-    testTimeout: 30000,
+    // Extended timeout: Firefox/WebKit may be slower for certain DOM operations.
+    testTimeout: 45000,
     globals: true,
     pool: 'threads',
     poolOptions: {
       threads: {
-        minThreads: 2,
-        maxThreads: 4,
+        // Reduce thread count — 3 browsers × N threads can exhaust CI runner resources.
+        minThreads: 1,
+        maxThreads: 2,
       },
     },
+    // Coverage disabled — collect coverage separately via pnpm run test:coverage.
+    // Cross-browser runs focus on compatibility, not coverage measurement.
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       enabled: false,
       include: ['src/components/**/*.ts'],
       exclude: [
@@ -46,14 +66,9 @@ export default defineConfig({
         'src/components/**/*.styles.ts',
         'src/components/**/index.ts',
       ],
-      reporter: ['text', 'json-summary'],
+      reporter: ['text', 'json', 'json-summary'],
       reportsDirectory: '.cache/coverage',
-      thresholds: {
-        statements: 75,
-        branches: 70,
-        functions: 75,
-        lines: 75,
-      },
+      // Thresholds intentionally omitted — enforcement via scripts/check-coverage.mjs.
     },
   },
 });

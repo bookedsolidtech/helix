@@ -205,21 +205,25 @@ describe('hx-container', () => {
 
     it('.container__inner uses auto horizontal margins for centering', async () => {
       // getComputedStyle resolves 'auto' to px, so read from the adopted CSS stylesheet
-      // directly — the only reliable way to assert that margin-left: auto is declared.
+      // directly — the only reliable way to assert that margin-inline is declared as auto.
       const el = await fixture<HelixContainer>('<hx-container>Content</hx-container>');
       const sheets = [...(el.shadowRoot?.adoptedStyleSheets ?? [])];
-      let marginLeftIsAuto = false;
+      let marginInlineStartIsAuto = false;
+      let marginInlineEndIsAuto = false;
       for (const sheet of sheets) {
         for (const rule of [...sheet.cssRules]) {
           if (rule instanceof CSSStyleRule && rule.selectorText === '.container__inner') {
-            if (rule.style.marginLeft === 'auto') {
-              marginLeftIsAuto = true;
-              break;
+            if (rule.style.marginInlineStart === 'auto') {
+              marginInlineStartIsAuto = true;
+            }
+            if (rule.style.marginInlineEnd === 'auto') {
+              marginInlineEndIsAuto = true;
             }
           }
         }
       }
-      expect(marginLeftIsAuto).toBe(true);
+      expect(marginInlineStartIsAuto).toBe(true);
+      expect(marginInlineEndIsAuto).toBe(true);
     });
 
     it('width="full" inner has no max-width constraint', async () => {

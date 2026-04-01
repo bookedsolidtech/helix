@@ -1,0 +1,49 @@
+title = "HELiX Gitleaks Configuration"
+
+# Extend with all 150+ default provider rules
+[extend]
+useDefault = true
+
+# ── Custom rules ────────────────────────────────────────────────────────────
+
+[[rules]]
+id = "helix-vercel-token"
+description = "HELiX Vercel Token (vcp_ prefix)"
+regex = '''vcp_[a-zA-Z0-9]{20,}'''
+tags = ["vercel", "token", "helix"]
+
+[[rules]]
+id = "discord-bot-token"
+description = "Discord Bot Token"
+# Format: base64(user_id).base64(timestamp).hmac — user IDs starting with ~147x encode to MTQ3OD+
+regex = '''(?:Bot\s+)?[MN][a-zA-Z0-9_-]{23,25}\.[a-zA-Z0-9_-]{6}\.[a-zA-Z0-9_-]{27,38}'''
+tags = ["discord", "token"]
+
+[[rules]]
+id = "helix-env-var-secret"
+description = "HELiX environment variable with inline secret"
+regex = '''(?i)(?:HELIX|HX)_[A-Z_]*(?:TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL)[^\S\r\n]*=[^\S\r\n]*['"]?[a-zA-Z0-9+/\-_.]{20,}['"]?'''
+tags = ["env", "helix"]
+
+# ── Global allowlist ────────────────────────────────────────────────────────
+
+[allowlist]
+description = "Paths and patterns that are safe to ignore"
+
+paths = [
+    # Third-party code and lockfiles — not our secrets
+    '''node_modules''',
+    '''pnpm-lock\.yaml''',
+    # Changelogs and changeset files contain no live secrets
+    '''CHANGELOG\.md''',
+    '''\.changeset/''',
+    # Agent context files — security policy docs with example patterns, not real secrets
+    '''\.automaker/context/''',
+]
+
+regexes = [
+    # GitHub Actions secret interpolation — not a real secret value
+    '''\$\{\{\s*secrets\.[A-Z0-9_]+\s*\}\}''',
+    # CSS custom properties (--hx-*) — design tokens, not secrets
+    '''--hx-[a-zA-Z0-9-]+''',
+]

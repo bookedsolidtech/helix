@@ -5,7 +5,8 @@
   "type": "module",
   "bin": {
     "helixui-mcp": "./build/index.js",
-    "helixui-mcp-cli": "./build/cli.js"
+    "helixui-mcp-cli": "./build/cli.js",
+    "helixui": "./build/cli.js"
   },
   "exports": {
     ".": "./build/index.js"

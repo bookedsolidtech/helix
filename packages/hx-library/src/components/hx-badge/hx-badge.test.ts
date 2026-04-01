@@ -213,6 +213,19 @@ describe('hx-badge', () => {
       const badge = shadowQuery(el, 'span')!;
       expect(badge.classList.contains('badge--dot')).toBe(false);
     });
+
+    it('does not render prefix slot in dot mode', async () => {
+      const el = await fixture<WcBadge>(
+        '<hx-badge pulse><span slot="prefix" class="icon">★</span></hx-badge>',
+      );
+      await el.updateComplete;
+      // dot mode: empty default slot + pulse = isDot true
+      const badge = shadowQuery(el, 'span')!;
+      expect(badge.classList.contains('badge--dot')).toBe(true);
+      // prefix slot must not be rendered in dot mode
+      const prefixSlot = shadowQuery(el, 'slot[name="prefix"]');
+      expect(prefixSlot).toBeNull();
+    });
   });
 
   // ─── Slots (2) ───

@@ -1,0 +1,5 @@
+/* hx-popover SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-popover {
+  display: inline-block;
+}

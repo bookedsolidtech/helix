@@ -38,7 +38,10 @@ export const helixToggleButtonStyles = css`
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-toggle-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(
+        --hx-toggle-button-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

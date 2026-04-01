@@ -1,0 +1,5 @@
+/* hx-side-nav SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-side-nav {
+  display: block;
+}

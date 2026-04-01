@@ -66,6 +66,7 @@ interface SelectOption {
  * @cssprop [--hx-select-error-color=var(--hx-color-error-500)] - Error state color.
  * @cssprop [--hx-select-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-select-chevron-color=var(--hx-color-neutral-500)] - Chevron indicator color.
+ * @cssprop [--hx-select-chevron-size=0.5rem] - Chevron indicator size (width/height base unit).
  * @cssprop [--hx-select-listbox-bg=var(--hx-color-neutral-0)] - Listbox panel background color.
  * @cssprop [--hx-select-option-hover-bg=var(--hx-color-primary-50)] - Option hover background color.
  * @cssprop [--hx-select-option-selected-bg=var(--hx-color-primary-100)] - Selected option background color.
@@ -171,6 +172,18 @@ export class HelixSelect extends HelixElement {
    */
   @property({ type: Boolean, reflect: true })
   open = false;
+
+  /**
+   * Validation message when no option is selected. Override for i18n.
+   * @attr label-required
+   */
+  @property({ attribute: 'label-required' }) labelRequired = 'Please select an option.';
+
+  /**
+   * Label shown when no options are available. Override for i18n.
+   * @attr label-no-options
+   */
+  @property({ attribute: 'label-no-options' }) labelNoOptions = 'No options found';
 
   // ─── Internal State ───
 
@@ -278,7 +291,7 @@ export class HelixSelect extends HelixElement {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
-        this.error || 'Please select an option.',
+        this.error || this.labelRequired,
         this._trigger ?? this._select,
       );
     } else {
@@ -568,7 +581,7 @@ export class HelixSelect extends HelixElement {
   /** @internal */
   private _renderOptions() {
     if (this._options.length === 0) {
-      return html`<div class="field__no-options">No options found</div>`;
+      return html`<div class="field__no-options">${this.labelNoOptions}</div>`;
     }
 
     return repeat(

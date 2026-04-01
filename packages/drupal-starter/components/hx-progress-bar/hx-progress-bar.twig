@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Progress Bar SDC — wraps hx-progress-bar for Drupal step and upload patterns.
+ *
+ * Use in multi-step form flows to indicate completion progress, file upload
+ * responses to show transfer progress, and onboarding wizards. For unknown
+ * duration operations, set indeterminate to true.
+ *
+ * Example: Multi-step form progress
+ *   {% include 'helixui:hx-progress-bar' with {
+ *     value: current_step,
+ *     max: total_steps,
+ *     label: 'Registration progress',
+ *     description: current_step ~ ' of ' ~ total_steps ~ ' steps completed',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-progress-bar') }}
+
+<hx-progress-bar
+  {% if value is not null %}value="{{ value }}"{% endif %}
+  {% if min and min != 0 %}min="{{ min }}"{% endif %}
+  {% if max and max != 100 %}max="{{ max }}"{% endif %}
+  {% if indeterminate %}indeterminate{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if description %}description="{{ description }}"{% endif %}
+  {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
+  {% if variant and variant != 'primary' %}variant="{{ variant }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if label_slot %}
+    <span slot="label">{{ label_slot }}</span>
+  {% endif %}
+</hx-progress-bar>

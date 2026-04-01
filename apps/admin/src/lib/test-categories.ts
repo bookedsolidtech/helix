@@ -67,7 +67,7 @@ export function classifyTest(suite: string): TestCategory {
   if (
     s.includes('accessibility') ||
     s.includes('axe-core') ||
-    s.includes('aria') ||
+    /\baria\b/.test(s) ||
     s === 'roving tabindex'
   ) {
     return 'accessibility';

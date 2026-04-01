@@ -1,0 +1,46 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Select
+description: 'Form-associated custom select component with label, error, and help text. Options are provided as slotted native <option> elements for Drupal Form API compatibility.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label for the select field'
+    value:
+      type: string
+      title: Value
+      description: 'Currently selected option value'
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text when no option is selected'
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the select is disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text displayed below the select'
+slots:
+  options:
+    title: Options
+    description: 'Native <option> and <optgroup> elements for the select'

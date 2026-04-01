@@ -1,0 +1,6 @@
+{
+  "comment": "Per-component bundle size budgets for @helixui/library (gzipped bytes, measured from dist/). Override per-component with the overrides map. Changes require code review.",
+  "perComponent": 5120,
+  "total": 51200,
+  "overrides": {}
+}

@@ -13,7 +13,7 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 ## Overview
 
-`hx-alert` is a feedback component for communicating status messages, warnings, and errors to users. It supports four semantic variants (`info`, `success`, `warning`, `error`) that drive both visual styling and ARIA live region semantics. Critical alerts (`error`, `warning`) use `role="alert"` for assertive announcement; informational alerts (`info`, `success`) use `role="status"` for polite announcement.
+`hx-alert` is a feedback component for communicating status messages, warnings, and errors to users. It supports four semantic variants (`info`, `success`, `warning`, `error`) that drive both visual styling and ARIA live region semantics. Critical alerts (`error`) use `role="alert"` for assertive announcement; other alerts (`info`, `success`, `warning`) use `role="status"` for polite announcement.
 
 **Use `hx-alert` when:** you need to surface system feedback — form validation errors, operation results, session warnings, or patient safety notices — in a way that is visually distinctive and reliably announced by screen readers.
 
@@ -102,22 +102,19 @@ The `accent` attribute replaces the full border with a left-side accent stripe �
   </div>
 </ComponentDemo>
 
-### Without Icon
+### With Icon
 
-The `showIcon` property defaults to `true`. To hide the icon, set the property on the element instance via JavaScript:
+The `showIcon` property defaults to `false`. To display the default variant icon, set the `show-icon` attribute:
+
+```html
+<hx-alert variant="info" show-icon>Alert with default variant icon.</hx-alert>
+```
+
+Or set the property via JavaScript:
 
 ```javascript
 const alert = document.querySelector('hx-alert');
-alert.showIcon = false;
-```
-
-Or use the HTML attribute `show-icon` (without a value, following boolean attribute semantics):
-
-```html
-<hx-alert variant="info">Standard alert with icon (default).</hx-alert>
-<hx-alert variant="info" show-icon
-  >Alert with icon hidden (attribute present but false by default).</hx-alert
->
+alert.showIcon = true;
 ```
 
 Note: The HTML attribute `show-icon` is presence-based, not value-based. `show-icon="false"` still renders the icon because the attribute is present. See the [Boolean Attributes guide](/guides/boolean-attributes) for correct usage patterns and framework-specific workarounds.
@@ -145,14 +142,17 @@ import '@helixui/library/components/hx-alert';
 
 ## Properties
 
-| Property        | Attribute         | Type                                          | Default  | Description                                                                                                                        |
-| --------------- | ----------------- | --------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `variant`       | `variant`         | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | Visual variant that determines colors and ARIA role (`alert` for error/warning, `status` for info/success).                        |
-| `dismissible`   | `dismissible`     | `boolean`                                     | `false`  | Renders a close button that hides the alert when clicked.                                                                          |
-| `open`          | `open`            | `boolean`                                     | `true`   | Controls alert visibility. Set to `false` to hide without removing from DOM.                                                       |
-| `showIcon`      | `show-icon`       | `boolean`                                     | `true`   | Whether to render the default variant icon container.                                                                              |
-| `accent`        | `accent`          | `boolean`                                     | `false`  | Applies a left border accent stripe instead of a full border.                                                                      |
-| `returnFocusTo` | `return-focus-to` | `string \| null`                              | `null`   | CSS selector for the element to return focus to after the alert is dismissed. If unset, callers manage focus via `hx-after-close`. |
+| Property        | Attribute         | Type                                          | Default         | Description                                                                                                                        |
+| --------------- | ----------------- | --------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`       | `variant`         | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'`        | Visual variant that determines colors and ARIA role (`alert` for `error`; `status` for `info`, `success`, `warning`).              |
+| `dismissible`   | `dismissible`     | `boolean`                                     | `false`         | Renders a close button that hides the alert when clicked.                                                                          |
+| `open`          | `open`            | `boolean`                                     | `false`         | Controls alert visibility. Set to `true` to show the alert.                                                                        |
+| `showIcon`      | `show-icon`       | `boolean`                                     | `false`         | Whether to render the default variant icon container.                                                                              |
+| `accent`        | `accent`          | `boolean`                                     | `false`         | Applies a left border accent stripe instead of a full border.                                                                      |
+| `heading`       | `heading`         | `string`                                      | `''`            | Optional heading text rendered above the message body.                                                                             |
+| `labelClose`    | `label-close`     | `string`                                      | `'Close alert'` | Accessible label for the dismiss button. Override for localization.                                                                |
+| `severityLabel` | `severity-label`  | `string \| undefined`                         | `undefined`     | Override for the severity prefix announced to screen readers (e.g., `"Info:"`, `"Error:"`). Defaults to English label for variant. |
+| `returnFocusTo` | `return-focus-to` | `string \| null`                              | `null`          | CSS selector for the element to return focus to after the alert is dismissed. If unset, callers manage focus via `hx-after-close`. |
 
 ## Events
 
@@ -250,19 +250,19 @@ hx-alert::part(close-button) {
 
 `hx-alert` implements the [WAI-ARIA Live Region](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) and [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) patterns.
 
-| Topic                    | Details                                                                                                                                                                                            |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA role                | Applied to the host element (not shadow DOM interior) for reliable AT support across JAWS+Chrome and VoiceOver+Safari. `role="alert"` for `error`/`warning`; `role="status"` for `info`/`success`. |
-| Live region              | `role="alert"` implies `aria-live="assertive"`; `role="status"` implies `aria-live="polite"`. `aria-live` is not set explicitly to prevent double-announcement in JAWS.                            |
-| `aria-hidden`            | Set to `"true"` on the host when `open=false`, ensuring hidden alerts are excluded from the accessibility tree.                                                                                    |
-| Dynamic role             | When `variant` changes at runtime, the host `role` attribute updates synchronously to reflect the new semantic urgency.                                                                            |
-| Close button             | The dismiss button uses `aria-label="Close"` and is a native `<button>` element, providing keyboard activation (Enter/Space) and focus management without custom handlers.                         |
-| Touch target             | The close button enforces a minimum 44px touch target (`--hx-touch-target-size`) per WCAG 2.5.8 and Apple HIG / Google Material guidelines.                                                        |
-| Focus management         | After dismiss, focus is returned to the element matching `return-focus-to` (if set). Otherwise, callers should manage focus via the `hx-after-close` event.                                        |
-| SVG icons                | All built-in icons have `aria-hidden="true"` — they are purely decorative; the role and text content convey meaning.                                                                               |
-| Color contrast           | All variant color combinations meet WCAG 2.1 AA minimum contrast ratio (4.5:1 for text).                                                                                                           |
-| `prefers-reduced-motion` | No transitions are applied to the alert itself. If animations are added by consumers, they should respect the media query.                                                                         |
-| WCAG                     | Meets WCAG 2.1 AA. Live region announcements, keyboard operability, focus management, and color contrast all verified.                                                                             |
+| Topic                    | Details                                                                                                                                                                                                  |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA role                | Applied to the host element (not shadow DOM interior) for reliable AT support across JAWS+Chrome and VoiceOver+Safari. `role="alert"` for `error`; `role="status"` for `info`, `success`, and `warning`. |
+| Live region              | `role="alert"` implies `aria-live="assertive"`; `role="status"` implies `aria-live="polite"`. `aria-live` is not set explicitly to prevent double-announcement in JAWS.                                  |
+| `aria-hidden`            | Set to `"true"` on the host when `open=false`, ensuring hidden alerts are excluded from the accessibility tree.                                                                                          |
+| Dynamic role             | When `variant` changes at runtime, the host `role` attribute updates synchronously to reflect the new semantic urgency.                                                                                  |
+| Close button             | The dismiss button uses `aria-label="Close"` and is a native `<button>` element, providing keyboard activation (Enter/Space) and focus management without custom handlers.                               |
+| Touch target             | The close button enforces a minimum 44px touch target (`--hx-touch-target-size`) per WCAG 2.5.8 and Apple HIG / Google Material guidelines.                                                              |
+| Focus management         | After dismiss, focus is returned to the element matching `return-focus-to` (if set). Otherwise, callers should manage focus via the `hx-after-close` event.                                              |
+| SVG icons                | All built-in icons have `aria-hidden="true"` — they are purely decorative; the role and text content convey meaning.                                                                                     |
+| Color contrast           | All variant color combinations meet WCAG 2.1 AA minimum contrast ratio (4.5:1 for text).                                                                                                                 |
+| `prefers-reduced-motion` | No transitions are applied to the alert itself. If animations are added by consumers, they should respect the media query.                                                                               |
+| WCAG                     | Meets WCAG 2.1 AA. Live region announcements, keyboard operability, focus management, and color contrast all verified.                                                                                   |
 
 ## Design Tokens
 

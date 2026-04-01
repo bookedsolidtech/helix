@@ -27,7 +27,7 @@ export const helixSplitButtonStyles = css`
     justify-content: center;
     gap: var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-split-button-border-color, transparent);
-    border-right: none;
+    border-inline-end: none;
     border-radius: var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem)) 0 0
       var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-split-button-bg, var(--hx-color-primary-500, #2563eb));
@@ -50,7 +50,10 @@ export const helixSplitButtonStyles = css`
 
   .split-button__primary:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-split-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(
+        --hx-split-button-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     z-index: 1;
     position: relative;
@@ -76,7 +79,7 @@ export const helixSplitButtonStyles = css`
     justify-content: center;
     flex-shrink: 0;
     border: var(--hx-border-width-thin, 1px) solid var(--hx-split-button-border-color, transparent);
-    border-left: var(--hx-border-width-thin, 1px) solid
+    border-inline-start: var(--hx-border-width-thin, 1px) solid
       var(--hx-split-button-divider-color, var(--hx-color-primary-400, #3b82f6));
     border-radius: 0 var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem))
       var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem)) 0;
@@ -92,7 +95,10 @@ export const helixSplitButtonStyles = css`
 
   .split-button__trigger:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-split-button-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+      var(
+        --hx-split-button-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     z-index: 1;
     position: relative;

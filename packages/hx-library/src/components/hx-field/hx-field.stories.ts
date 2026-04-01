@@ -1161,3 +1161,19 @@ export const DarkMode: Story = {
     label: 'Email Address',
   },
 };
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        This component is a layout wrapper. Its slotted form elements receive focus in document order.
+      </p>
+      <hx-field></hx-field>
+    </div>
+  `,
+};

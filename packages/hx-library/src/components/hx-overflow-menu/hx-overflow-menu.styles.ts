@@ -101,7 +101,7 @@ export const helixOverflowMenuStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     background: none;
     border: none;
-    text-align: left;
+    text-align: start;
     font-size: var(--hx-font-size-sm, 0.875rem);
     color: var(--hx-color-neutral-900, #111827);
     cursor: pointer;

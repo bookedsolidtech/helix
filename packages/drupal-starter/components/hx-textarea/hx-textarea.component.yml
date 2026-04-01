@@ -1,0 +1,71 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Textarea
+description: 'Form-associated multi-line text area with label, character count, resize control, and validation. Wraps hx-textarea for Drupal Form API long-text fields.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text'
+    value:
+      type: string
+      title: Value
+      description: 'Pre-populated textarea content'
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text when empty'
+    rows:
+      type: integer
+      title: Rows
+      description: 'Number of visible text rows'
+      default: 4
+    resize:
+      type: string
+      title: Resize
+      description: 'Controls resize behavior'
+      default: 'vertical'
+      enum:
+        - none
+        - vertical
+        - both
+        - auto
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the textarea is disabled'
+      default: false
+    readonly:
+      type: boolean
+      title: Read Only
+      description: 'Whether the textarea is read-only'
+      default: false
+    maxlength:
+      type: integer
+      title: Max Length
+      description: 'Maximum number of characters allowed'
+    show_count:
+      type: boolean
+      title: Show Count
+      description: 'Whether to show a character count'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text'

@@ -78,6 +78,35 @@ const meta = {
         type: { summary: 'string | null' },
       },
     },
+    showIcon: {
+      control: 'boolean',
+      description:
+        'Whether to show the default variant icon. Add the `show-icon` attribute to display the icon.',
+      table: {
+        category: 'Visual',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
+    severityLabel: {
+      control: 'text',
+      description:
+        'Override for the severity prefix announced to screen readers (e.g., "Info:", "Error:"). Defaults to the English label matching the current variant.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+    returnFocusTo: {
+      control: 'text',
+      description:
+        'CSS selector for the element to return focus to after the alert is dismissed.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'null' },
+        type: { summary: 'string | null' },
+      },
+    },
   },
   args: {
     variant: 'info',
@@ -342,6 +371,98 @@ export const WithActions: Story = {
 
     const actionsPart = alert?.shadowRoot?.querySelector('[part="actions"]');
     await expect(actionsPart).toBeTruthy();
+  },
+};
+
+/** Applies a left border accent stripe instead of a full border. Common healthcare/enterprise dashboard pattern. */
+export const WithAccent: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
+      <hx-alert variant="info" accent>
+        <strong>Info:</strong> Your session will expire in 15 minutes. Save all open patient records.
+      </hx-alert>
+      <hx-alert variant="success" accent>
+        <strong>Success:</strong> Patient discharge summary has been finalized and sent to the referring physician.
+      </hx-alert>
+      <hx-alert variant="warning" accent>
+        <strong>Warning:</strong> This patient has a documented allergy to Penicillin. Review before prescribing beta-lactam antibiotics.
+      </hx-alert>
+      <hx-alert variant="error" accent>
+        <strong>Error:</strong> Unable to retrieve patient records from the Health Information Exchange. Please try again or contact IT support.
+      </hx-alert>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const alerts = canvasElement.querySelectorAll('hx-alert');
+    await expect(alerts.length).toBe(4);
+    for (const alert of Array.from(alerts)) {
+      await expect(alert.hasAttribute('accent')).toBe(true);
+    }
+  },
+};
+
+/** Uses the title slot to add a headline above the alert message. */
+export const WithTitle: Story = {
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
+      <hx-alert variant="warning">
+        <span slot="title">Allergy Warning</span>
+        Patient has a documented allergy to Penicillin. Review before prescribing beta-lactam antibiotics.
+      </hx-alert>
+      <hx-alert variant="error" dismissible>
+        <span slot="title">Lab Order Failed</span>
+        Unable to submit lab order. The laboratory information system is currently unavailable.
+      </hx-alert>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const alerts = canvasElement.querySelectorAll('hx-alert');
+    const titleSlot1 = alerts[0].querySelector('[slot="title"]');
+    await expect(titleSlot1).toBeTruthy();
+    await expect(titleSlot1?.textContent).toBe('Allergy Warning');
+    const titleSlot2 = alerts[1].querySelector('[slot="title"]');
+    await expect(titleSlot2).toBeTruthy();
+    const titlePart = alerts[0].shadowRoot?.querySelector('[part="title"]');
+    await expect(titlePart).toBeTruthy();
+  },
+};
+
+/** Demonstrates returnFocusTo: focus returns to the trigger button after the alert is dismissed. */
+export const ReturnFocusBehavior: Story = {
+  render: () => html`
+    <div style="max-width: 600px; display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem);">
+      <button
+        id="focus-target"
+        style="
+          padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
+          border: 1px solid var(--hx-color-primary-500, #3b82f6);
+          border-radius: var(--hx-border-radius-sm, 0.25rem);
+          background: var(--hx-color-primary-500, #3b82f6);
+          color: var(--hx-color-text-on-primary, #fff);
+          cursor: pointer;
+          font-size: var(--hx-font-size-sm, 0.875rem);
+        "
+      >
+        Show Alert
+      </button>
+      <hx-alert variant="info" dismissible return-focus-to="#focus-target">
+        Dismiss this alert and focus will return to the button above.
+      </hx-alert>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const alert = canvasElement.querySelector('hx-alert')!;
+    await expect(alert.returnFocusTo).toBe('#focus-target');
+
+    const closeBtn = alert.shadowRoot?.querySelector('[part="close-button"]') as HTMLButtonElement;
+    await expect(closeBtn).toBeTruthy();
+
+    closeBtn.click();
+    await alert.updateComplete;
+
+    await expect(alert.open).toBe(false);
+    const focusTarget = canvasElement.querySelector('#focus-target') as HTMLElement;
+    await expect(focusTarget).toBeTruthy();
   },
 };
 
@@ -815,6 +936,12 @@ export const CSSParts: Story = {
         box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
       }
 
+      .parts-demo hx-alert::part(title) {
+        font-weight: 700;
+        font-size: var(--hx-font-size-md, 0.9375rem);
+        color: #1e3a8a;
+      }
+
       .parts-demo hx-alert::part(icon) {
         background: #dbeafe;
         border-radius: 50%;
@@ -845,6 +972,7 @@ export const CSSParts: Story = {
           All parts styled externally via ::part()
         </p>
         <hx-alert variant="info" dismissible>
+          <span slot="title">Patient Safety Notice</span>
           This alert has all 6 CSS parts styled externally:
           <code>::part(alert)</code>, <code>::part(title)</code>, <code>::part(icon)</code>,
           <code>::part(message)</code>, <code>::part(close-button)</code>, and
@@ -899,6 +1027,12 @@ export const CSSParts: Story = {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
+hx-alert::part(title) {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: #1e3a8a;
+}
+
 hx-alert::part(icon) {
   background: #dbeafe;
   border-radius: 50%;
@@ -928,8 +1062,8 @@ hx-alert::part(actions) {
     const alert = canvasElement.querySelector('hx-alert');
     await expect(alert).toBeTruthy();
 
-    // Verify all 5 parts are present
-    const parts = ['alert', 'icon', 'message', 'close-button', 'actions'];
+    // Verify all 6 parts are present
+    const parts = ['alert', 'title', 'icon', 'message', 'close-button', 'actions'];
     for (const partName of parts) {
       const part = alert?.shadowRoot?.querySelector(`[part="${partName}"]`);
       await expect(part).toBeTruthy();
@@ -1205,7 +1339,7 @@ export const AccentVariant: Story = {
  * presenting action details — common in clinical workflow notifications where
  * the title conveys urgency and the body provides instructional content.
  */
-export const WithTitle: Story = {
+export const WithTitleSlot: Story = {
   name: 'With Title Slot',
   render: () => html`
     <div

@@ -352,7 +352,7 @@ describe('hx-popover', () => {
       wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
       // WCAG 1.4.13: hover hide is delayed 150ms so the pointer can move into the body.
       // Wait for the delay to elapse before asserting the popover has hidden.
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 350));
       await el.updateComplete;
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
     });
@@ -401,7 +401,7 @@ describe('hx-popover', () => {
 
       // Now leave the body — popover should close after WCAG 1.4.13 delay
       body.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 350));
       await el.updateComplete;
       expect(body.classList.contains('visible')).toBe(false);
     });

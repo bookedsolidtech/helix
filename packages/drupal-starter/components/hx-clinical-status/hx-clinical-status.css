@@ -1,0 +1,5 @@
+/* hx-clinical-status SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-clinical-status {
+  display: block;
+}

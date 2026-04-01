@@ -79,14 +79,14 @@ All child checkboxes inherit `disabled` from the group.
 
 ### With Help Text
 
-Group-level help text via the `help` slot.
+Group-level help text via the `help-text` slot.
 
 <ComponentDemo title="With Help Text">
   <hx-checkbox-group label="Appointment reminders" name="reminders">
     <hx-checkbox value="24h" label="24 hours before"></hx-checkbox>
     <hx-checkbox value="1h" label="1 hour before"></hx-checkbox>
     <hx-checkbox value="15m" label="15 minutes before"></hx-checkbox>
-    <span slot="help">You will receive reminders for each selected interval.</span>
+    <span slot="help-text">You will receive reminders for each selected interval.</span>
   </hx-checkbox-group>
 </ComponentDemo>
 
@@ -155,7 +155,7 @@ Minimal HTML snippet — no build tool required:
 | _(default)_ | `<hx-checkbox>` elements. The group manages name, disabled state, and form value for these. |
 | `label`     | Rich HTML group label. Overrides the `label` property when used.                            |
 | `error`     | Custom error content. Overrides the `error` property when used.                             |
-| `help`      | Group-level help text rendered below the checkbox list.                                     |
+| `help-text` | Group-level help text rendered below the checkbox list.                                     |
 
 ## Accessibility
 
@@ -225,7 +225,7 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
         <hx-checkbox value="email" label="Email" checked></hx-checkbox>
         <hx-checkbox value="sms" label="SMS"></hx-checkbox>
         <hx-checkbox value="push" label="Push notification"></hx-checkbox>
-        <span slot="help">Select all channels you want to receive alerts on.</span>
+        <span slot="help-text">Select all channels you want to receive alerts on.</span>
       </hx-checkbox-group>
 
       <br />

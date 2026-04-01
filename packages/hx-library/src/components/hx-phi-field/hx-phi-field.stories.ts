@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { expect, userEvent, fn } from 'storybook/test';
 import './hx-phi-field.js';
+import '../hx-theme/hx-theme.js';
 
 // ─────────────────────────────────────────────────
 // Meta Configuration
@@ -48,12 +49,33 @@ const meta = {
         type: { summary: 'number' },
       },
     },
+    label: {
+      control: 'text',
+      description:
+        'Accessible label describing the PHI field. Used in screen reader announcements.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'When set, disables all interaction with the field and prevents reveal.',
+      table: {
+        category: 'State',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
   },
   args: {
     data: '123-45-6789',
     fieldType: 'ssn',
     fieldId: 'patient-ssn',
     clipboardTimeout: 30000,
+    label: 'Social Security Number',
+    disabled: false,
   },
   render: (args) => html`
     <hx-phi-field
@@ -61,6 +83,8 @@ const meta = {
       field-type=${args.fieldType}
       field-id=${args.fieldId}
       clipboard-timeout=${args.clipboardTimeout}
+      label=${args.label || ''}
+      ?disabled=${args.disabled}
     ></hx-phi-field>
   `,
 } satisfies Meta;
@@ -369,4 +393,61 @@ export const CSSCustomProperties: Story = {
       </div>
     </div>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// DISABLED STATE
+// ─────────────────────────────────────────────────
+
+export const Disabled: Story = {
+  name: 'Disabled',
+  args: {
+    data: '123-45-6789',
+    fieldType: 'ssn',
+    label: 'Social Security Number',
+    disabled: true,
+  },
+  play: async ({ canvasElement }) => {
+    const field = canvasElement.querySelector('hx-phi-field');
+    await expect(field).toBeTruthy();
+    const toggle = field!.shadowRoot!.querySelector('[part="toggle"]') as HTMLButtonElement;
+    await expect(toggle.disabled).toBe(true);
+  },
+};
+
+// ─────────────────────────────────────────────────
+// DARK MODE
+// ─────────────────────────────────────────────────
+
+export const DarkMode: Story = {
+  name: 'Dark Mode',
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  args: {
+    data: '123-45-6789',
+    fieldType: 'ssn',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab focuses the reveal/hide toggle button. Enter or Space toggles the masking of PHI data.
+      </p>
+      <hx-phi-field></hx-phi-field>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-phi-field');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

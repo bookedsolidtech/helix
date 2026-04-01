@@ -1,0 +1,58 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Progress Bar
+description: 'Accessible progress indicator with determinate and indeterminate modes. Use for multi-step form flows, file upload progress, onboarding completion, and healthcare questionnaire completion tracking.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    value:
+      type: number
+      title: Value
+      description: 'Current progress value between min and max'
+    min:
+      type: number
+      title: Min
+      description: 'Minimum progress value'
+      default: 0
+    max:
+      type: number
+      title: Max
+      description: 'Maximum progress value'
+      default: 100
+    indeterminate:
+      type: boolean
+      title: Indeterminate
+      description: 'Whether to show an indeterminate animation (unknown progress duration)'
+      default: false
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text rendered above the progress bar'
+    description:
+      type: string
+      title: Description
+      description: 'Supplementary text below the bar (e.g., "3 of 8 steps completed")'
+    hx_size:
+      type: string
+      title: Size
+      description: 'Track height size variant'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    variant:
+      type: string
+      title: Variant
+      description: 'Color variant for the progress track fill'
+      default: 'primary'
+      enum:
+        - primary
+        - success
+        - warning
+        - danger
+slots:
+  label:
+    title: Label
+    description: 'Custom label content rendered above the progress bar (overrides the label prop)'

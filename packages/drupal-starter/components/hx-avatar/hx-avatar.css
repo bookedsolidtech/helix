@@ -1,0 +1,5 @@
+/* hx-avatar SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-avatar {
+  display: inline-block;
+}

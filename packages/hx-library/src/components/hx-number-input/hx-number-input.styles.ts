@@ -158,7 +158,7 @@ export const helixNumberInputStyles = css`
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    border-left: var(--hx-border-width-thin) solid
+    border-inline-start: var(--hx-border-width-thin) solid
       var(--hx-number-input-border-color, var(--hx-color-neutral-300));
   }
 

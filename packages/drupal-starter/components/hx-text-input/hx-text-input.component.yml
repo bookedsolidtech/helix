@@ -1,0 +1,75 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Text Input
+description: 'Form-associated text input with label, placeholder, validation, and help text. Wraps hx-text-input for use in Drupal Form API templates and custom forms.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name used for submission'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text for the input'
+    value:
+      type: string
+      title: Value
+      description: 'Pre-populated input value'
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text shown when the input is empty'
+    type:
+      type: string
+      title: Type
+      description: 'HTML input type (text, email, password, tel, url, search)'
+      default: 'text'
+      enum:
+        - text
+        - email
+        - password
+        - tel
+        - url
+        - search
+    size:
+      type: string
+      title: Size
+      description: 'Visual size variant'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the input is disabled'
+      default: false
+    readonly:
+      type: boolean
+      title: Read Only
+      description: 'Whether the input is read-only'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message to display below the input'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text displayed below the input'
+slots:
+  prefix:
+    title: Prefix
+    description: 'Content rendered before the input (e.g., icon)'
+  suffix:
+    title: Suffix
+    description: 'Content rendered after the input (e.g., icon or button)'

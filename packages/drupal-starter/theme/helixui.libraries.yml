@@ -1,0 +1,101 @@
+# helixui.libraries.yml
+#
+# Drupal 10/11 asset library definitions for the HELiX UI Starter Theme.
+#
+# These libraries complement the module-level libraries defined in
+# packages/drupal-starter/helixui.libraries.yml, which registers individual
+# hx-* component assets from the @helixui/library dist.
+#
+# This file registers theme-owned assets: theme.css, adopted-stylesheets.css,
+# light-dom-scoping.css, and the JavaScript behaviors files.
+#
+# Twig usage:
+#   {{ attach_library('helixui/global') }}
+#   {{ attach_library('helixui/adopted-stylesheets') }}
+#   {{ attach_library('helixui/icons') }}
+#   {{ attach_library('helixui/tokens') }}
+#
+# Note: individual hx-* component libraries (helixui/hx-button, etc.) are
+# declared in the companion module library file, not here. SDC templates load
+# those via attach_library() calls inside each .twig file.
+
+# ---------------------------------------------------------------------------
+# global
+# Main theme stylesheet and component initialization script.
+# Attach to every page via the theme info.yml libraries key.
+# ---------------------------------------------------------------------------
+
+global:
+  version: VERSION
+  css:
+    theme:
+      css/theme.css: {}
+  js:
+    js/component-initialization.js: { attributes: { type: module } }
+  dependencies:
+    - core/drupal
+
+# ---------------------------------------------------------------------------
+# adopted-stylesheets
+# Light-DOM complement styles and Drupal behaviors.
+# Attach to every page via the theme info.yml libraries key.
+# ---------------------------------------------------------------------------
+
+adopted-stylesheets:
+  version: VERSION
+  css:
+    theme:
+      css/adopted-stylesheets.css: {}
+  js:
+    js/theme.behaviors.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+# ---------------------------------------------------------------------------
+# light-dom-scoping
+# CSS grid page-region layout using --hx-spacing-* tokens.
+# Attach per-template or globally as needed.
+# ---------------------------------------------------------------------------
+
+light-dom-scoping:
+  version: VERSION
+  css:
+    layout:
+      css/light-dom-scoping.css: {}
+  dependencies:
+    - helixui/global
+
+# ---------------------------------------------------------------------------
+# icons
+# HELiX icon sprite. Reference the @helixui/library dist once published to
+# a CDN or copied to web/libraries/helixui/.
+#
+# CDN path (replace VERSION with the installed @helixui/library semver):
+#   https://cdn.jsdelivr.net/npm/@helixui/library@VERSION/dist/icons/sprite.svg
+#
+# Local Drupal libraries path (after `npm run copy-assets`):
+#   /libraries/helixui/dist/icons/sprite.svg
+# ---------------------------------------------------------------------------
+
+icons:
+  version: VERSION
+  js:
+    /libraries/helixui/dist/components/hx-icon/index.js:
+      { attributes: { type: module }, minified: true }
+  dependencies:
+    - helixui/core
+
+# ---------------------------------------------------------------------------
+# tokens
+# CSS custom property definitions from @helixui/tokens.
+# Provides the --hx-* semantic token layer consumed by all hx-* components.
+# This is already included via helixui/core (helix-tokens.css); declare here
+# if you want to load tokens independently of the full component runtime.
+# ---------------------------------------------------------------------------
+
+tokens:
+  version: VERSION
+  css:
+    theme:
+      /libraries/helixui/dist/css/helix-tokens.css: { minified: true }

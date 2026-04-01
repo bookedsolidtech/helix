@@ -1,0 +1,37 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Alert
+description: 'Feedback alert for status messages with variant-based styling and ARIA live regions. Critical for Drupal status messages, form errors, and patient safety notifications.'
+status: experimental
+group: Feedback
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual variant determining colors and ARIA semantics'
+      default: 'info'
+      enum:
+        - info
+        - success
+        - warning
+        - error
+    heading:
+      type: string
+      title: Heading
+      description: 'Optional heading text. Also provides context for the close button accessible label.'
+    dismissible:
+      type: boolean
+      title: Dismissible
+      description: 'Whether the alert can be dismissed by the user'
+      default: false
+slots:
+  default:
+    title: Message
+    description: 'Alert message content'
+  title:
+    title: Title
+    description: 'Optional title/headline for the alert (alternative to the heading prop)'
+  actions:
+    title: Actions
+    description: 'Action buttons rendered within the alert'

@@ -24,7 +24,7 @@ export const helixTreeItemStyles = css`
     gap: var(--hx-tree-item-gap, var(--hx-space-2, 0.5rem));
     padding: var(--hx-tree-item-padding-y, var(--hx-space-1, 0.25rem))
       var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem));
-    padding-left: calc(
+    padding-inline-start: calc(
       var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem)) + var(--_indent-level, 0) *
         var(--hx-tree-indent-size, 1.5rem)
     );
@@ -63,7 +63,7 @@ export const helixTreeItemStyles = css`
   /* ─── Disabled State ─── */
 
   :host([disabled]) .item-row {
-    opacity: 0.4;
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
     pointer-events: none;
   }

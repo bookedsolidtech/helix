@@ -34,6 +34,16 @@ const meta = {
         type: { summary: "'sm' | 'md' | 'lg'" },
       },
     },
+    label: {
+      control: 'text',
+      description:
+        'Accessible label for the button group. Strongly recommended for WCAG 2.1 AA compliance.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: '' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     orientation: 'horizontal',

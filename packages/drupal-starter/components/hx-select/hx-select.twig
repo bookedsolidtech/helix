@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Select SDC — wraps hx-select for Drupal form integration.
+ *
+ * Options must be slotted as native <option> elements. For Drupal Form API
+ * select fields, render options from element['#options'] inside the default slot.
+ */
+#}
+{{ attach_library('helixui/hx-select') }}
+
+<hx-select
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if options %}
+    {{ options }}
+  {% endif %}
+</hx-select>

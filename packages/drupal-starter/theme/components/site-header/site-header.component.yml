@@ -1,0 +1,23 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Site Header'
+description: 'Global site header composing hx-top-nav with logo, site name, primary navigation, and search. Placed in the header region of the page template. Supports mobile-responsive navigation via hx-drawer.'
+status: stable
+group: Layout
+props:
+  type: object
+  properties:
+    site_name:
+      type: string
+      title: 'Site Name'
+      description: 'The name of the site, linked to the front page.'
+    logo_url:
+      type: string
+      title: 'Logo URL'
+      description: 'Absolute URL for the site logo image. Falls back to site_name text if not provided.'
+slots:
+  navigation:
+    title: Navigation
+    description: 'Primary navigation menu. Rendered from page.primary_menu — typically a Drupal menu block outputting anchor elements.'
+  search:
+    title: Search
+    description: 'Search block or secondary menu. Rendered in the header utility bar alongside the logo.'

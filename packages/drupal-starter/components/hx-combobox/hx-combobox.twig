@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Combobox SDC — wraps hx-combobox for Drupal autocomplete field integration.
+ *
+ * For Drupal entity reference fields, render hx-option elements in the options
+ * slot. For server-filtered autocomplete, listen to the hx-filter event and
+ * update options dynamically via a Drupal behavior. Use loading prop to indicate
+ * server requests are in progress.
+ */
+#}
+{{ attach_library('helixui/hx-combobox') }}
+
+<hx-combobox
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+  {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
+  {% if multiple %}multiple{% endif %}
+  {% if clearable %}clearable{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if options %}
+    {{ options }}
+  {% endif %}
+</hx-combobox>

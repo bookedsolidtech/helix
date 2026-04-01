@@ -20,6 +20,9 @@ export interface HxTreeItemProps {
   disabled?: boolean;
   /** Whether this item has slotted children. */
   hasChildItems?: boolean;
+  /** The text content of the item's label slot, used for typeahead keyboard navigation.
+Returns an empty string until the label slot has been assigned. */
+  labelText?: string;
 
   // Event callbacks
   /** Dispatched when this item is clicked or activated via keyboard. */

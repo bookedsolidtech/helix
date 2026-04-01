@@ -1,0 +1,54 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Data Table
+description: 'Enterprise data table with sorting, row selection, loading states, and keyboard navigation. For Drupal Views table displays, patient lists, and clinical data grids.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the table. Required for WCAG 4.1.2 compliance.'
+    columns:
+      type: string
+      title: Columns
+      description: 'JSON string of column definitions: [{key, label, sortable?, width?}]'
+    rows:
+      type: string
+      title: Rows
+      description: 'JSON string of row data objects keyed by column key values'
+    selectable:
+      type: boolean
+      title: Selectable
+      description: 'Whether to show a checkbox column for row selection'
+      default: false
+    loading:
+      type: boolean
+      title: Loading
+      description: 'Whether to show the loading skeleton'
+      default: false
+    sort_key:
+      type: string
+      title: Sort Key
+      description: 'Column key currently used for sorting'
+    sort_direction:
+      type: string
+      title: Sort Direction
+      description: 'Current sort direction'
+      default: 'asc'
+      enum:
+        - asc
+        - desc
+    empty_label:
+      type: string
+      title: Empty Label
+      description: 'Text shown when the table has no rows'
+      default: 'No data'
+slots:
+  toolbar:
+    title: Toolbar
+    description: 'Content rendered above the table (search, bulk actions, filters)'
+  empty:
+    title: Empty State
+    description: 'Custom empty-state content when rows is empty and not loading'

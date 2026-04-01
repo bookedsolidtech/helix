@@ -1,0 +1,5 @@
+/* hx-checkbox SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-checkbox {
+  display: block;
+}

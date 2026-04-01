@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "React wrappers for HELiX web components",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": true,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -22,10 +22,13 @@
     "README.md"
   ],
   "scripts": {
-    "generate": "tsx ../../scripts/generate-react-wrappers.ts",
+    "generate": "tsx ../../scripts/generate-react-wrappers.ts && prettier --write src/",
     "prebuild": "pnpm run generate",
     "build": "vite build",
     "type-check": "tsc --noEmit",
+    "type-check:test": "tsc --project tsconfig.test.json",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
     "lint": "eslint src/",
     "clean": "rm -rf dist src/components"
   },
@@ -43,5 +46,8 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,0 +1,5 @@
+/* hx-alert SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-alert {
+  display: block;
+}

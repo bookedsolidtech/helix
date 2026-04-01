@@ -765,8 +765,6 @@ Ready to integrate HELIX with your Drupal site?
 
 ### Architectural Deep Dives
 
-- [Integration Architecture (ADR-001)](/guides/drupal-integration-architecture/) - Hybrid property/slot pattern rationale
-- [Loading Strategy (ADR-002)](/guides/drupal-component-loading-strategy/) - Per-component vs bundle analysis
 - [Best Practices](/drupal-integration/best-practices/) - Patterns, anti-patterns, and real-world examples
 
 ### Troubleshooting

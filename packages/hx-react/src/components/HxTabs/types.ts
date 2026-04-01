@@ -22,7 +22,9 @@ In `manual` mode, focus moves independently; Space or Enter activates. */
 Provide a brief description of what the tabs represent (e.g., "Patient record sections"). */
   label?: string;
   /** Gets or sets the zero-based index of the currently selected tab.
-Setting this programmatically activates the tab at the given index. */
+Setting this programmatically activates the tab at the given index.
+Can also be set via the `selected-index` HTML attribute for server-side
+pre-selection (e.g. Drupal Twig templates). */
   selectedIndex?: number;
 
   // Event callbacks

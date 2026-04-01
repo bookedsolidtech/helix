@@ -1,0 +1,673 @@
+---
+title: Theming HELiX Components
+description: A complete guide to theming HELiX components — from the 3-tier token cascade to global themes, scoped overrides, CSS parts, dark mode, brand customization, and Drupal integration.
+sidebar:
+  order: 3
+---
+
+HELiX components are styled entirely through CSS custom properties. No class names to override, no `!important` battles, no Shadow DOM piercing required. Override the right token at the right tier, and every component updates automatically.
+
+---
+
+## Token Architecture
+
+HELiX uses a **three-tier token cascade** that flows from raw values down to per-component properties:
+
+```
+Primitive Tokens   raw values — scale steps, palette ramps
+        ↓
+Semantic Tokens    purpose-driven — --hx-color-primary, --hx-spacing-md
+        ↓
+Component Tokens   scoped — --hx-button-bg, --hx-card-padding
+```
+
+Inside every component's styles, there is a private fallback chain:
+
+```css
+/* Inside hx-button shadow DOM */
+:host {
+  --_bg: var(--hx-button-bg, var(--hx-color-primary));
+}
+```
+
+`--hx-button-bg` is the component token (easily overridden per-element). It falls back to `--hx-color-primary`, which is the semantic token. Override at either tier depending on how broadly you want the change to apply.
+
+### Which tier to override?
+
+| Goal                    | Override tier | Example                             |
+| ----------------------- | ------------- | ----------------------------------- |
+| Brand-wide color change | Semantic      | `--hx-color-primary`                |
+| One component's look    | Component     | `--hx-button-bg`                    |
+| Full palette swap       | Primitive     | `--hx-color-blue-500` (+ full ramp) |
+| Dark mode surfaces      | Semantic      | `--hx-color-surface-default`        |
+
+**Do:**
+
+- Override semantic tokens for brand-wide themes
+- Override component tokens for targeted, per-component changes
+- Reference semantic tokens in component token overrides so the cascade stays intact
+
+**Don't:**
+
+- Override primitive tokens from consuming applications — change the primitive ramp when you need to shift a hue, not individual stops
+- Use `!important` — it breaks every downstream override
+- Hardcode raw values in component token overrides (use token references instead)
+
+---
+
+## Global Theming
+
+Apply your brand to every HELiX component by overriding semantic tokens on `:root`:
+
+```css
+/* your-brand-theme.css */
+
+:root {
+  /* Primary action color — buttons, focus rings, links, selected states */
+  --hx-color-primary: #0066cc;
+  --hx-color-primary-hover: #0052a3;
+  --hx-color-primary-active: #003d7a;
+  --hx-color-on-primary: #ffffff;
+
+  /* Secondary actions */
+  --hx-color-secondary: #6b7280;
+  --hx-color-on-secondary: #ffffff;
+
+  /* Surface layers */
+  --hx-color-surface-default: #ffffff;
+  --hx-color-surface-raised: #f9fafb;
+  --hx-color-surface-sunken: #f3f4f6;
+
+  /* Text */
+  --hx-color-text-primary: #111827;
+  --hx-color-text-secondary: #374151;
+  --hx-color-text-muted: #6b7280;
+  --hx-color-text-inverse: #ffffff;
+
+  /* Borders */
+  --hx-color-border-default: #d1d5db;
+  --hx-color-border-subtle: #e5e7eb;
+  --hx-color-border-focus: #0066cc;
+
+  /* Status */
+  --hx-color-error: #dc2626;
+  --hx-color-warning: #d97706;
+  --hx-color-success: #16a34a;
+  --hx-color-info: #0284c7;
+
+  /* Typography */
+  --hx-font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --hx-font-size-md: 1rem;
+  --hx-line-height-normal: 1.5;
+
+  /* Shape */
+  --hx-radius-sm: 0.25rem;
+  --hx-radius-md: 0.375rem;
+  --hx-radius-lg: 0.5rem;
+  --hx-radius-full: 9999px;
+
+  /* Spacing */
+  --hx-spacing-xs: 0.25rem;
+  --hx-spacing-sm: 0.5rem;
+  --hx-spacing-md: 1rem;
+  --hx-spacing-lg: 1.5rem;
+  --hx-spacing-xl: 2rem;
+}
+```
+
+Load your theme after the HELiX token stylesheet:
+
+```html
+<link rel="stylesheet" href="https://cdn.helixui.dev/tokens/latest/tokens.css" />
+<link rel="stylesheet" href="/your-brand-theme.css" />
+```
+
+**Before** (HELiX defaults — blue primary, neutral surfaces): All buttons, links, focus rings, and selection states use the default `--hx-color-primary`.
+
+**After** (your brand tokens applied): Every component that draws from `--hx-color-primary` updates automatically — `hx-button`, `hx-checkbox`, `hx-radio`, `hx-switch`, `hx-tabs`, `hx-badge`, `hx-alert`, `hx-progress-bar`, focus rings on all interactive elements.
+
+---
+
+## Scoped Theming
+
+CSS custom properties cascade through the DOM. Any token set on a parent element flows into all descendant HELiX components — including those with Shadow DOM — because custom properties are inherited by default.
+
+### Using `data-theme` attributes
+
+```html
+<body>
+  <!-- Default theme -->
+  <hx-button>Brand button</hx-button>
+
+  <!-- Clinical theme — scoped to this section -->
+  <section data-theme="clinical">
+    <hx-button>Clinical button</hx-button>
+    <hx-card>
+      <hx-text-input label="Patient ID" />
+    </hx-card>
+  </section>
+</body>
+```
+
+```css
+[data-theme='clinical'] {
+  --hx-color-primary: #1a7f64;
+  --hx-color-primary-hover: #148f72;
+  --hx-color-on-primary: #ffffff;
+  --hx-color-surface-default: #f8f9fa;
+  --hx-font-family-sans: 'Source Sans Pro', sans-serif;
+  --hx-radius-md: 2px;
+  --hx-shadow-sm: none;
+}
+```
+
+### Using `hx-theme`
+
+HELiX ships an `hx-theme` utility component that applies a named theme to its subtree without requiring CSS class or data attribute management:
+
+```html
+<hx-theme name="clinical">
+  <hx-button>Clinical button</hx-button>
+  <hx-card>Patient information</hx-card>
+</hx-theme>
+```
+
+`hx-theme` renders as a `display: contents` wrapper that adds the named attribute and hosts the scoped token overrides. See the [hx-theme component docs](/component-library/hx-theme/) for available built-in theme names and how to register custom themes.
+
+### Scope to CSS classes
+
+```css
+.portal-section {
+  --hx-color-primary: #1a7f64;
+}
+
+.admin-section {
+  --hx-color-primary: #7c3aed;
+}
+```
+
+```html
+<div class="portal-section">
+  <hx-button>Portal button</hx-button>
+</div>
+
+<div class="admin-section">
+  <hx-button>Admin button</hx-button>
+</div>
+```
+
+---
+
+## Per-Component Overrides
+
+Override component-level tokens on the element directly (or with a CSS selector) to customize a single component without affecting any others.
+
+```css
+/* Override only hx-button */
+hx-button {
+  --hx-button-bg: var(--hx-color-secondary);
+  --hx-button-color: var(--hx-color-on-secondary);
+  --hx-button-border-radius: 0;
+  --hx-button-padding-x: var(--hx-spacing-lg);
+}
+
+/* Per-instance override with inline style */
+/* <hx-button style="--hx-button-bg: navy;">Special</hx-button> */
+```
+
+**Token reference table — most commonly overridden component tokens:**
+
+| Component       | Token                           | Controls           |
+| --------------- | ------------------------------- | ------------------ |
+| `hx-button`     | `--hx-button-bg`                | Background color   |
+| `hx-button`     | `--hx-button-color`             | Text color         |
+| `hx-button`     | `--hx-button-border-radius`     | Corner radius      |
+| `hx-button`     | `--hx-button-padding-x`         | Horizontal padding |
+| `hx-button`     | `--hx-button-padding-y`         | Vertical padding   |
+| `hx-card`       | `--hx-card-bg`                  | Background color   |
+| `hx-card`       | `--hx-card-padding`             | Inner padding      |
+| `hx-card`       | `--hx-card-border-radius`       | Corner radius      |
+| `hx-card`       | `--hx-card-shadow`              | Box shadow         |
+| `hx-text-input` | `--hx-text-input-bg`            | Input background   |
+| `hx-text-input` | `--hx-text-input-border-color`  | Border color       |
+| `hx-text-input` | `--hx-text-input-border-radius` | Corner radius      |
+| `hx-text-input` | `--hx-text-input-focus-ring`    | Focus ring style   |
+| `hx-badge`      | `--hx-badge-bg`                 | Background color   |
+| `hx-badge`      | `--hx-badge-color`              | Text color         |
+
+**Finding a component's tokens:** Every component lists its CSS custom properties in the Storybook docs panel under "CSS Custom Properties." You can also inspect the source's JSDoc for `@cssprop` annotations.
+
+**Do:**
+
+```css
+/* Reference a semantic token so the cascade stays intact */
+hx-button {
+  --hx-button-bg: var(--hx-color-secondary);
+}
+```
+
+**Don't:**
+
+```css
+/* Hardcoded value — won't update in dark mode or when the theme changes */
+hx-button {
+  --hx-button-bg: #6b7280;
+}
+```
+
+---
+
+## CSS Parts
+
+HELiX components expose internal elements via `::part()` for styling that cannot be achieved through CSS custom properties alone — things like letter spacing, text-transform, or box-decoration-break.
+
+```css
+/* Style the internal button element of hx-button */
+hx-button::part(button) {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Style the input element inside hx-text-input */
+hx-text-input::part(input) {
+  font-family: 'Courier New', monospace;
+}
+
+/* Style the surface of hx-card */
+hx-card::part(base) {
+  outline: 2px dashed var(--hx-color-border-default);
+}
+```
+
+**Common CSS parts by component:**
+
+| Component       | Part     | Element                         |
+| --------------- | -------- | ------------------------------- |
+| `hx-button`     | `button` | The `<button>` or `<a>` element |
+| `hx-button`     | `prefix` | Prefix slot wrapper             |
+| `hx-button`     | `suffix` | Suffix slot wrapper             |
+| `hx-card`       | `base`   | Root surface element            |
+| `hx-card`       | `header` | Header region                   |
+| `hx-card`       | `body`   | Body region                     |
+| `hx-card`       | `footer` | Footer region                   |
+| `hx-text-input` | `base`   | Outer wrapper                   |
+| `hx-text-input` | `input`  | The `<input>` element           |
+| `hx-text-input` | `label`  | The `<label>` element           |
+| `hx-badge`      | `base`   | Badge container                 |
+
+Find the full list for each component in Storybook under the "CSS Parts" tab.
+
+**Do:**
+
+```css
+/* Use ::part() for styling exposed surface properties */
+hx-button::part(button) {
+  border-radius: 0;
+  letter-spacing: 0.05em;
+}
+```
+
+**Don't:**
+
+```css
+/* Don't use ::part() to override layout or structure */
+hx-button::part(button) {
+  display: grid; /* unexpected layout side effects */
+  position: absolute; /* breaks stacking context */
+}
+```
+
+**Don't attempt to target unexposed internals:**
+
+```css
+/* This does nothing — shadow DOM is encapsulated */
+hx-button button {
+  background: red;
+}
+
+/* Use the CSS custom property API instead */
+hx-button {
+  --hx-button-bg: red;
+}
+```
+
+---
+
+## Dark Mode
+
+HELiX dark mode is controlled via a `data-theme="dark"` attribute on `<html>` (or any ancestor element) and automatically activates based on `prefers-color-scheme: dark` unless overridden.
+
+### System preference (automatic)
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --hx-color-surface-default: #111827;
+    --hx-color-surface-raised: #1f2937;
+    --hx-color-surface-sunken: #0d1117;
+    --hx-color-text-primary: #f9fafb;
+    --hx-color-text-secondary: #d1d5db;
+    --hx-color-text-muted: #9ca3af;
+    --hx-color-border-default: #374151;
+    --hx-color-border-subtle: #1f2937;
+    /* Keep primary legible on dark backgrounds */
+    --hx-color-primary: #60a5fa;
+  }
+}
+```
+
+### Manual toggle
+
+```css
+/* Light mode explicit */
+:root[data-theme='light'] {
+  --hx-color-surface-default: #ffffff;
+  --hx-color-text-primary: #111827;
+}
+
+/* Dark mode explicit */
+:root[data-theme='dark'] {
+  --hx-color-surface-default: #111827;
+  --hx-color-text-primary: #f9fafb;
+  --hx-color-border-default: #374151;
+  /* Lighten primary for dark background contrast */
+  --hx-color-primary: #60a5fa;
+}
+```
+
+```js
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('hx-theme', theme);
+}
+
+// Restore on load — prevents flash of wrong theme
+const saved = localStorage.getItem('hx-theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (saved) {
+  setTheme(saved);
+} else if (prefersDark) {
+  setTheme('dark');
+}
+
+// Toggle button example
+document.querySelector('#theme-toggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+```
+
+**Before** (light mode): White surfaces, dark text, blue primary.
+
+**After** (dark mode active): Near-black surfaces, light text, lightened primary for contrast.
+
+> **Contrast check:** After applying custom dark colors, verify ratios with DevTools accessibility inspector or axe. HELiX components will not re-validate your custom values — that responsibility belongs to the consuming team.
+
+---
+
+## Brand Customization
+
+A complete example switching HELiX from its default blue palette to a purple/violet brand:
+
+```css
+/* violet-brand-theme.css */
+
+:root {
+  /* Primary ramp */
+  --hx-color-primary: #7c3aed;
+  --hx-color-primary-hover: #6d28d9;
+  --hx-color-primary-active: #5b21b6;
+  --hx-color-on-primary: #ffffff;
+
+  /* Secondary */
+  --hx-color-secondary: #ec4899;
+  --hx-color-on-secondary: #ffffff;
+
+  /* Accent (for highlights, tags, badges) */
+  --hx-color-accent: #f59e0b;
+  --hx-color-on-accent: #000000;
+
+  /* Focus ring matches primary */
+  --hx-color-border-focus: #7c3aed;
+
+  /* Brand typography */
+  --hx-font-family-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+
+  /* Rounded corners for a friendly feel */
+  --hx-radius-sm: 0.5rem;
+  --hx-radius-md: 0.75rem;
+  --hx-radius-lg: 1rem;
+  --hx-radius-full: 9999px;
+
+  /* Subtle shadows */
+  --hx-shadow-sm: 0 1px 3px rgba(124, 58, 237, 0.1);
+  --hx-shadow-md: 0 4px 6px rgba(124, 58, 237, 0.15);
+}
+
+/* Dark mode variant */
+:root[data-theme='dark'] {
+  --hx-color-primary: #a78bfa;
+  --hx-color-primary-hover: #8b5cf6;
+  --hx-color-border-focus: #a78bfa;
+  --hx-color-surface-default: #1e1b4b;
+  --hx-color-surface-raised: #312e81;
+  --hx-color-text-primary: #f5f3ff;
+}
+```
+
+**Token reference — primary/secondary/accent:**
+
+| Token                       | Purpose                                              |
+| --------------------------- | ---------------------------------------------------- |
+| `--hx-color-primary`        | Main interactive color — buttons, links, focus rings |
+| `--hx-color-primary-hover`  | Hover state of primary elements                      |
+| `--hx-color-primary-active` | Active/pressed state                                 |
+| `--hx-color-on-primary`     | Text/icon color on primary surfaces                  |
+| `--hx-color-secondary`      | Secondary actions and highlights                     |
+| `--hx-color-on-secondary`   | Text on secondary surfaces                           |
+| `--hx-color-accent`         | Decorative highlights, badges, tags                  |
+| `--hx-color-on-accent`      | Text on accent surfaces                              |
+
+---
+
+## Healthcare Theme Example
+
+Healthcare applications have mandatory contrast requirements (WCAG 2.1 AA minimum). This theme applies calming clinical blues with high-contrast overrides suitable for patient-facing and clinician interfaces.
+
+```css
+/* healthcare-theme.css */
+
+:root {
+  /* Clinical blues — calming, trustworthy */
+  --hx-color-primary: #1d4ed8; /* 4.6:1 on white */
+  --hx-color-primary-hover: #1e40af; /* 5.8:1 on white */
+  --hx-color-primary-active: #1e3a8a;
+  --hx-color-on-primary: #ffffff;
+
+  /* Accessible error — avoids pure red for colorblindness users */
+  --hx-color-error: #b91c1c; /* 5.9:1 on white */
+  --hx-color-on-error: #ffffff;
+
+  /* Amber warning — avoids yellow/green confusion */
+  --hx-color-warning: #b45309; /* 4.6:1 on white */
+
+  /* Teal success — distinct from error green */
+  --hx-color-success: #0f766e; /* 5.1:1 on white */
+
+  /* High-contrast text */
+  --hx-color-text-primary: #111827; /* 16:1 on white */
+  --hx-color-text-secondary: #1f2937; /* 13:1 on white */
+  --hx-color-text-muted: #4b5563; /* 7:1 on white — minimum AA */
+
+  /* 3px focus ring for motor-impaired users */
+  --hx-focus-ring-width: 3px;
+  --hx-focus-ring-offset: 2px;
+  --hx-color-border-focus: #1d4ed8;
+
+  /* Touch targets: 44x44px minimum (WCAG 2.5.5) */
+  --hx-size-touch-target: 2.75rem;
+
+  /* Neutral shape — utilitarian, not decorative */
+  --hx-radius-sm: 2px;
+  --hx-radius-md: 4px;
+  --hx-radius-lg: 6px;
+}
+
+/* Enforce touch target minimums on interactive components */
+hx-button,
+hx-checkbox,
+hx-radio,
+hx-switch {
+  min-height: var(--hx-size-touch-target);
+}
+
+/* Motion sensitivity — critical for patients with vestibular disorders */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High-contrast mode support */
+@media (forced-colors: active) {
+  hx-button::part(button) {
+    border: 2px solid ButtonText;
+  }
+}
+```
+
+**Accessibility requirements checklist for healthcare:**
+
+| Requirement           | Token to set                                       | Minimum                   |
+| --------------------- | -------------------------------------------------- | ------------------------- |
+| Normal text contrast  | `--hx-color-text-primary` on surface               | 4.5:1                     |
+| Large text contrast   | `--hx-color-text-secondary` on surface             | 3:1                       |
+| UI component contrast | `--hx-color-border-default` on surface             | 3:1                       |
+| Focus ring visibility | `--hx-color-border-focus`, `--hx-focus-ring-width` | Visible at 200% zoom      |
+| Touch targets         | `--hx-size-touch-target`                           | 44×44px                   |
+| Error states          | `--hx-color-error`                                 | Never rely on color alone |
+
+> Run axe or Lighthouse after applying any custom theme. HELiX components meet WCAG 2.1 AA with the default tokens — custom overrides are your team's responsibility to validate.
+
+---
+
+## Drupal Integration
+
+Apply HELiX design tokens in a Drupal theme through the library system.
+
+### Defining a theme library
+
+In `mytheme.libraries.yml`:
+
+```yaml
+# Global HELiX tokens — attach to every page
+helix-tokens:
+  css:
+    base:
+      css/helix-tokens.css: {}
+  dependencies:
+    - core/drupalSettings
+
+# Brand theme overrides — loaded after tokens
+helix-brand:
+  css:
+    theme:
+      css/brand-theme.css: {}
+  dependencies:
+    - mytheme/helix-tokens
+
+# Component scripts — attach per-region, not globally
+helix-components:
+  js:
+    js/helix-components.js: { scope: footer, minified: false }
+  dependencies:
+    - mytheme/helix-tokens
+```
+
+### Attaching libraries in templates
+
+Attach the token and theme libraries globally in `html.html.twig`:
+
+```twig
+{{ attach_library('mytheme/helix-tokens') }}
+{{ attach_library('mytheme/helix-brand') }}
+```
+
+Or attach conditionally in block or node templates:
+
+```twig
+{# Only on the clinical portal block #}
+{% if block.id == 'clinical_portal' %}
+  {{ attach_library('mytheme/helix-clinical') }}
+{% endif %}
+```
+
+### Global CSS structure
+
+```
+mytheme/
+  css/
+    helix-tokens.css    — Base HELiX token overrides (primitives, semantics)
+    brand-theme.css     — Brand color, typography, spacing overrides
+    dark-mode.css       — Dark mode token overrides
+    clinical-theme.css  — Scoped clinical/high-contrast overrides
+```
+
+**`css/brand-theme.css`:**
+
+```css
+/* Drupal brand theme — loaded after HELiX defaults */
+
+:root {
+  --hx-color-primary: #0066cc;
+  --hx-font-family-sans: 'Source Sans Pro', sans-serif;
+  --hx-radius-md: 0.25rem;
+}
+```
+
+### Applying scoped themes via Drupal fields
+
+Use a Drupal field or block template to output a `data-theme` attribute:
+
+```twig
+{# paragraph--hero.html.twig #}
+<div{{ attributes.setAttribute('data-theme', paragraph.field_theme.value) }}>
+  {{ content }}
+</div>
+```
+
+```css
+/* mytheme/css/scoped-themes.css */
+
+[data-theme='dark-hero'] {
+  --hx-color-surface-default: #111827;
+  --hx-color-text-primary: #f9fafb;
+  --hx-color-primary: #60a5fa;
+}
+```
+
+**Do's and don'ts for Drupal:**
+
+| Do                                                                    | Don't                                                                         |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Load token overrides as a `base` CSS file in `mytheme.libraries.yml`  | Inline token overrides in Twig templates (duplicates per-page)                |
+| Scope dark or alternate themes via `data-theme` on a wrapper          | Override component shadow DOM with `.mytheme hx-button button` (doesn't work) |
+| Use `mytheme/helix-tokens` as a dependency for all helix libraries    | Load HELiX JS before token CSS is available                                   |
+| Let `hx-theme` handle scoped theming in Twig when using the component | Use `!important` to force Drupal's default styles onto components             |
+
+---
+
+## Quick Reference
+
+| Scenario                                      | Approach                                                                |
+| --------------------------------------------- | ----------------------------------------------------------------------- |
+| Apply brand colors everywhere                 | Override semantic tokens on `:root`                                     |
+| Clinical section with different palette       | Scope via `data-theme` or `hx-theme` on wrapper                         |
+| One button looks different                    | Set component token on the element — `--hx-button-bg`                   |
+| Change the internal border radius of an input | `hx-text-input::part(input) { border-radius: … }`                       |
+| Dark mode via system preference               | `@media (prefers-color-scheme: dark)` block                             |
+| Dark mode via toggle button                   | `document.documentElement.setAttribute('data-theme', 'dark')`           |
+| Load brand theme in Drupal                    | Define a library in `mytheme.libraries.yml`, attach in `html.html.twig` |
+
+For practical brand recipes (compact mode, custom fonts, full dark theme), see the [Theming Recipes](/guides/theming-recipes/) guide.

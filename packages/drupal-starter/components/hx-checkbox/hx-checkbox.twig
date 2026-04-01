@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Checkbox SDC — wraps hx-checkbox for Drupal form integration.
+ *
+ * For Drupal Form API checkbox fields, map element['#name'], ['#title'],
+ * ['#return_value'], ['#checked'], and ['#required'] to the corresponding attributes.
+ * The default slot accepts rich HTML for consent checkboxes with linked terms.
+ */
+#}
+{{ attach_library('helixui/hx-checkbox') }}
+
+<hx-checkbox
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if checked %}checked{% endif %}
+  {% if indeterminate %}indeterminate{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% elseif label %}
+    {{ label }}
+  {% endif %}
+</hx-checkbox>

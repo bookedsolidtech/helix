@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Tooltip SDC — wraps hx-tooltip for Drupal contextual help integration.
+ *
+ * Place the trigger element in the default slot and tooltip text in the
+ * content slot. Common uses: field labels with description icons, clinical
+ * abbreviations (ICD codes, dosage units), and form field guidance.
+ *
+ * Example:
+ *   {% include 'helixui:hx-tooltip' with {
+ *     trigger: '<hx-icon-button label="Help"></hx-icon-button>',
+ *     tooltip_content: 'Enter the patient MRN as shown on the wristband.',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-tooltip') }}
+
+<hx-tooltip
+  {% if placement and placement != 'top' %}placement="{{ placement }}"{% endif %}
+  {% if show_delay is defined and show_delay != 300 %}show-delay="{{ show_delay }}"{% endif %}
+  {% if hide_delay is defined and hide_delay != 100 %}hide-delay="{{ hide_delay }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if tooltip_content %}
+    <span slot="content">{{ tooltip_content }}</span>
+  {% endif %}
+</hx-tooltip>

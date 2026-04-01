@@ -53,6 +53,32 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    ariaLabel: {
+      control: 'text',
+      description: 'Accessible label for the split button group.',
+      table: {
+        category: 'Accessibility',
+        type: { summary: 'string' },
+      },
+    },
+    labelTrigger: {
+      control: 'text',
+      description: 'Accessible label for the dropdown trigger (chevron) button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'More options' },
+        type: { summary: 'string' },
+      },
+    },
+    labelMenu: {
+      control: 'text',
+      description: 'Accessible label for the dropdown menu panel.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Options' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     variant: 'primary',

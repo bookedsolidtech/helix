@@ -1,0 +1,5 @@
+/* hx-text-input SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-text-input {
+  display: block;
+}

@@ -1,0 +1,85 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Button
+description: 'Versatile button component with variant, size, loading state, and optional link behavior. Participates in native forms via ElementInternals. Use in Drupal Form API templates, action links, and CTA patterns.'
+status: experimental
+group: Actions
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'Visual style variant'
+      default: 'primary'
+      enum:
+        - primary
+        - secondary
+        - tertiary
+        - danger
+        - success
+        - ghost
+        - link
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the button'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    type:
+      type: string
+      title: Type
+      description: 'Native button type for form behavior'
+      default: 'button'
+      enum:
+        - button
+        - submit
+        - reset
+    href:
+      type: string
+      title: Href
+      description: 'When set, renders the button as an anchor element navigating to this URL'
+    target:
+      type: string
+      title: Target
+      description: 'Link target (e.g., _blank). Only used when href is set.'
+    name:
+      type: string
+      title: Name
+      description: 'Form field name for submit buttons'
+    value:
+      type: string
+      title: Value
+      description: 'Form field value for submit buttons'
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the button is disabled'
+      default: false
+    loading:
+      type: boolean
+      title: Loading
+      description: 'Whether the button shows a loading state (disables interaction)'
+      default: false
+    full:
+      type: boolean
+      title: Full Width
+      description: 'Whether the button stretches to fill its container'
+      default: false
+    inverted:
+      type: boolean
+      title: Inverted
+      description: 'Whether to use the inverted (dark background) color scheme'
+      default: false
+slots:
+  default:
+    title: Label
+    description: 'Button label text or content'
+  prefix:
+    title: Prefix
+    description: 'Icon or content rendered before the label'
+  suffix:
+    title: Suffix
+    description: 'Icon or content rendered after the label'

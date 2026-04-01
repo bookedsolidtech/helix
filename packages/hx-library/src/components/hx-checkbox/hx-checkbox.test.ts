@@ -607,4 +607,209 @@ describe('hx-checkbox', () => {
       expect(el.requiredMessage).toBe('You must check this box.');
     });
   });
+
+  // ─── Property: name ───
+
+  describe('Property: name', () => {
+    it('sets name attr on native input', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox name="consent"></hx-checkbox>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('name')).toBe('consent');
+    });
+
+    it('omits name attr when name is empty', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.hasAttribute('name')).toBe(false);
+    });
+  });
+
+  // ─── Property: value — FormData ───
+
+  describe('Property: value — FormData submission', () => {
+    it('submits custom value when checked', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-checkbox name="agree" value="yes" checked></hx-checkbox>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      await el.updateComplete;
+      const data = new FormData(form);
+      expect(data.get('agree')).toBe('yes');
+      form.remove();
+    });
+
+    it('form value changes after toggle', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox value="accepted"></hx-checkbox>');
+      expect(el.checked).toBe(false);
+      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      control.click();
+      await el.updateComplete;
+      expect(el.checked).toBe(true);
+    });
+  });
+
+  // ─── Checked state toggling ───
+
+  describe('Checked state toggling', () => {
+    it('toggles from checked to unchecked on second click', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox checked></hx-checkbox>');
+      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      control.click();
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+    });
+
+    it('hx-change detail.checked is false when unchecking', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox checked></hx-checkbox>');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      control.click();
+      const event = await eventPromise;
+      expect(event.detail.checked).toBe(false);
+    });
+
+    it('reflects checked=false attribute on host after unchecking', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox checked></hx-checkbox>');
+      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      control.click();
+      await el.updateComplete;
+      expect(el.hasAttribute('checked')).toBe(false);
+    });
+  });
+
+  // ─── Space key: disabled does not toggle ───
+
+  describe('Keyboard: disabled', () => {
+    it('Space key does NOT toggle when disabled', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox disabled></hx-checkbox>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+    });
+  });
+
+  // ─── Indeterminate + FormData ───
+
+  describe('Indeterminate state — form value', () => {
+    it('indeterminate checkbox submits null (not checked) to FormData', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-checkbox name="choice" value="yes"></hx-checkbox>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      el.indeterminate = true;
+      await el.updateComplete;
+      const data = new FormData(form);
+      // Indeterminate is neither checked nor unchecked — value not submitted
+      expect(data.get('choice')).toBeNull();
+      form.remove();
+    });
+  });
+
+  // ─── error property: updated live-region behaviour ───
+
+  describe('Error live region', () => {
+    it('_announcedError matches error on initial set (empty→error transition)', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Accept" error="This is required"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const errorDiv = shadowQuery(el, '.checkbox__error')!;
+      // The announced error is set synchronously on empty→error transition
+      expect(errorDiv.textContent?.trim()).toBe('This is required');
+    });
+
+    it('error div is hidden when no error', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      const errorDiv = shadowQuery(el, '.checkbox__error')!;
+      expect(errorDiv.hasAttribute('hidden')).toBe(true);
+    });
+
+    it('error div is visible when error is set', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Accept" error="Required"></hx-checkbox>',
+      );
+      const errorDiv = shadowQuery(el, '.checkbox__error')!;
+      expect(errorDiv.hasAttribute('hidden')).toBe(false);
+    });
+  });
+
+  // ─── CSS class: checkbox--required ───
+
+  describe('CSS class: checkbox--required', () => {
+    it('applies checkbox--required class when required', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox required></hx-checkbox>');
+      const container = shadowQuery(el, '.checkbox');
+      expect(container?.classList.contains('checkbox--required')).toBe(true);
+    });
+  });
+
+  // ─── CSS class: checkbox--error ───
+
+  describe('CSS class: checkbox--error', () => {
+    it('applies checkbox--error class when error is set', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox error="Oops"></hx-checkbox>',
+      );
+      const container = shadowQuery(el, '.checkbox');
+      expect(container?.classList.contains('checkbox--error')).toBe(true);
+    });
+  });
+
+  // ─── help-text part ───
+
+  describe('CSS Parts: help-text', () => {
+    it('help-text part exposed when helpText set', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox help-text="Some guidance"></hx-checkbox>',
+      );
+      const helpPart = shadowQuery(el, '[part="help-text"]');
+      expect(helpPart).toBeTruthy();
+    });
+  });
+
+  // ─── hx-size md default ───
+
+  describe('Property: hxSize — md default', () => {
+    it('applies checkbox--md class by default', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
+      const container = shadowQuery(el, '.checkbox');
+      expect(container?.classList.contains('checkbox--md')).toBe(true);
+    });
+  });
+
+  // ─── formResetCallback also clears indeterminate ───
+
+  describe('formResetCallback clears indeterminate', () => {
+    it('formResetCallback resets indeterminate to false', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
+      el.indeterminate = true;
+      await el.updateComplete;
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.indeterminate).toBe(false);
+    });
+  });
+
+  // ─── error slot activates error state ───
+
+  describe('Slot: error activates error state', () => {
+    it('slotted error activates checkbox--error class', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox><span slot="error">Slotted error</span></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.checkbox');
+      expect(container?.classList.contains('checkbox--error')).toBe(true);
+    });
+
+    it('slotted error sets aria-invalid on native input', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox><span slot="error">Slotted error</span></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
 });

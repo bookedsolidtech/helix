@@ -176,6 +176,60 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when a required field has no value.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
+    chooseDateLabel: {
+      control: 'text',
+      description: 'Accessible label for the date input field.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Choose date' },
+        type: { summary: 'string' },
+      },
+    },
+    openCalendarLabel: {
+      control: 'text',
+      description: 'Accessible label for the button that opens the calendar popover.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Open calendar' },
+        type: { summary: 'string' },
+      },
+    },
+    closeCalendarLabel: {
+      control: 'text',
+      description: 'Accessible label for the button that closes the calendar popover.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Close calendar' },
+        type: { summary: 'string' },
+      },
+    },
+    previousMonthLabel: {
+      control: 'text',
+      description: 'Accessible label for the previous month navigation button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Previous month' },
+        type: { summary: 'string' },
+      },
+    },
+    nextMonthLabel: {
+      control: 'text',
+      description: 'Accessible label for the next month navigation button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Next month' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Select Date',

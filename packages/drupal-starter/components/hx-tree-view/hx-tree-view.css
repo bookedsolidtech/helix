@@ -1,0 +1,5 @@
+/* hx-tree-view SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-tree-view {
+  display: block;
+}

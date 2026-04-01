@@ -159,6 +159,19 @@ export class HelixPagination extends LitElement {
   @property({ attribute: 'last-page-label' })
   lastPageLabel = 'Last page';
 
+  /**
+   * Function to format the page navigation announcement. Override for i18n.
+   */
+  @property({ attribute: false })
+  labelPageMessage: (current: number, total: number) => string = (current, total) =>
+    `Page ${current} of ${total}`;
+
+  /**
+   * Function to format page button aria-labels. Override for i18n.
+   */
+  @property({ attribute: false })
+  labelPageButton: (page: number) => string = (page) => `Page ${page}`;
+
   /** Tracks the roving tabindex target. Null means default to currentPage. */
   /** @internal */
   @state() private _rovingKey: number | string | null = null;
@@ -233,7 +246,7 @@ export class HelixPagination extends LitElement {
 
     this.currentPage = clamped;
     this._rovingKey = null; // reset so focus follows the new current page
-    this._liveMessage = `Page ${clamped} of ${this.totalPages}`;
+    this._liveMessage = this.labelPageMessage(clamped, this.totalPages);
     this.dispatchEvent(
       new CustomEvent<{ page: number }>('hx-page-change', {
         detail: { page: clamped },
@@ -241,6 +254,14 @@ export class HelixPagination extends LitElement {
         composed: true,
       }),
     );
+
+    // PAGINATION-005: restore focus to the new current-page button after render
+    void this.updateComplete.then(() => {
+      const btn = this.shadowRoot?.querySelector<HTMLButtonElement>(
+        `button[data-roving-key="${clamped}"]`,
+      );
+      btn?.focus();
+    });
   }
 
   /** @internal */
@@ -275,7 +296,8 @@ export class HelixPagination extends LitElement {
 
   /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End')
+      return;
     e.preventDefault();
 
     const list = this.shadowRoot?.querySelector('.list');
@@ -286,12 +308,19 @@ export class HelixPagination extends LitElement {
     const focused = this.shadowRoot?.activeElement as HTMLButtonElement | null;
     const currentIdx = focused ? buttons.indexOf(focused) : 0;
 
-    const nextIdx =
-      e.key === 'ArrowLeft'
-        ? Math.max(0, currentIdx - 1)
-        : Math.min(buttons.length - 1, currentIdx + 1);
+    let nextIdx: number;
+    if (e.key === 'Home') {
+      nextIdx = 0;
+    } else if (e.key === 'End') {
+      nextIdx = buttons.length - 1;
+    } else {
+      nextIdx =
+        e.key === 'ArrowLeft'
+          ? Math.max(0, currentIdx - 1)
+          : Math.min(buttons.length - 1, currentIdx + 1);
+    }
 
-    if (nextIdx !== currentIdx) {
+    if (nextIdx !== currentIdx || e.key === 'Home' || e.key === 'End') {
       const nextBtn = buttons[nextIdx];
       if (!nextBtn) return;
       const key = nextBtn.dataset['rovingKey'];
@@ -396,7 +425,7 @@ export class HelixPagination extends LitElement {
                       tabindex=${rovingKey === page ? 0 : -1}
                       data-roving-key=${page}
                       aria-current=${isCurrent ? 'page' : nothing}
-                      aria-label=${`Page ${page}`}
+                      aria-label=${this.labelPageButton(page)}
                       @click=${() => this._navigate(page)}
                     >
                       ${page}

@@ -45,10 +45,10 @@ export const helixContainerStyles = css`
   /* ─── Inner Container ─── */
 
   .container__inner {
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--hx-container-gutter, var(--hx-space-6, 1.5rem));
-    padding-right: var(--hx-container-gutter, var(--hx-space-6, 1.5rem));
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    padding-inline-start: var(--hx-container-gutter, var(--hx-space-6, 1.5rem));
+    padding-inline-end: var(--hx-container-gutter, var(--hx-space-6, 1.5rem));
     box-sizing: border-box;
     width: 100%;
   }

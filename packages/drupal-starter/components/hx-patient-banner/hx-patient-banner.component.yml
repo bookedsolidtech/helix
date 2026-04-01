@@ -1,0 +1,66 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Patient Banner
+description: 'Patient identification banner implementing Joint Commission NPSG.01.01.01 two-identifier rule. Renders as a landmark region with named slots for identification fields. Use hx-phi-field for HIPAA-compliant display of masked identifiers.'
+status: experimental
+group: Healthcare
+props:
+  type: object
+  properties:
+    patient_id:
+      type: string
+      title: Patient ID
+      description: 'Optional patient ID used as context in identifier rule violation audit events'
+    label_patient:
+      type: string
+      title: Patient Label
+      description: 'Accessible aria-label for the banner landmark region'
+      default: 'Patient identification'
+    label_name:
+      type: string
+      title: Name Label
+      description: 'Visible label for the patient name field'
+      default: 'Patient name'
+    label_mrn:
+      type: string
+      title: MRN Label
+      description: 'Visible label for the medical record number field'
+      default: 'MRN'
+    label_dob:
+      type: string
+      title: DOB Label
+      description: 'Visible label for the date of birth field'
+      default: 'Date of birth'
+    label_allergies:
+      type: string
+      title: Allergies Label
+      description: 'Visible label for the allergies field'
+      default: 'Allergies'
+    label_code_status:
+      type: string
+      title: Code Status Label
+      description: 'Visible label for the code status field'
+      default: 'Code status'
+    enforce_identifier_rule:
+      type: boolean
+      title: Enforce Identifier Rule
+      description: 'Whether to enforce the Joint Commission two-identifier rule and fire violation events when fewer than 2 identifier slots are populated'
+      default: true
+slots:
+  photo:
+    title: Photo
+    description: 'Optional patient photo. Use hx-avatar or an img element.'
+  name:
+    title: Name
+    description: 'Patient name field content. Plain text or hx-phi-field.'
+  mrn:
+    title: MRN
+    description: 'Medical record number field content. Use hx-phi-field for HIPAA compliance.'
+  dob:
+    title: Date of Birth
+    description: 'Date of birth field content. Use hx-phi-field for HIPAA compliance.'
+  allergies:
+    title: Allergies
+    description: 'Allergy status or flag content'
+  code_status:
+    title: Code Status
+    description: 'Code status content (e.g., Full Code, DNR, DNI)'

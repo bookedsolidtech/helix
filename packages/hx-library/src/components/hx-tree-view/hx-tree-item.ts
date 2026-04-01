@@ -121,6 +121,14 @@ export class HelixTreeItem extends LitElement {
   }
 
   /**
+   * The text content of the item's label slot, used for typeahead keyboard navigation.
+   * Returns an empty string until the label slot has been assigned.
+   */
+  get labelText(): string {
+    return this._labelText;
+  }
+
+  /**
    * Recompute all cached ARIA metadata in a single DOM pass.
    * Called on connect, slotchange, and whenever structural context may change.
    * @internal
@@ -339,6 +347,7 @@ export class HelixTreeItem extends LitElement {
           class=${classMap({ children: true, 'children--expanded': this.expanded })}
           role="group"
           aria-label=${this._labelText ? `${this._labelText} children` : 'children'}
+          aria-hidden=${!this.expanded || nothing}
         >
           <div class="children-inner">
             <slot name="children" @slotchange=${this._handleChildrenSlotChange}></slot>

@@ -1,0 +1,11 @@
+/* hx-data-table SDC — layout wrapper only; visual styles live in the component shadow DOM */
+
+.hx-data-table-wrapper {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+hx-data-table {
+  display: block;
+}

@@ -15,7 +15,11 @@ export type { HxStatusIndicatorProps };
 
 /**
  * A colored dot/badge indicating system or entity health status.
-Purely visual — no slots. Supports an animated pulse ring.
+Supports an animated pulse ring and an optional visible text label.
+
+Status is conveyed through color AND an `aria-label` on the host element.
+When `show-label` is set, a visible text label is rendered inside the component,
+ensuring status is not communicated by color alone (WCAG 1.4.1 — Use of Color).
 
 Uses `role="img"` with an auto-generated `aria-label` (e.g. "Status: Online").
 When used decoratively alongside visible text that conveys the same status information

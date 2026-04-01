@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Popover SDC — wraps hx-popover for Drupal contextual panel integration.
+ *
+ * Place the trigger element (button, icon-button, link) in the default slot
+ * and the panel content in the content slot. Common uses: contextual menus,
+ * rich help panels, clinical reference data panels.
+ */
+#}
+{{ attach_library('helixui/hx-popover') }}
+
+<hx-popover
+  {% if label and label != 'Popover' %}label="{{ label }}"{% endif %}
+  {% if open %}open{% endif %}
+  {% if placement and placement != 'bottom' %}placement="{{ placement }}"{% endif %}
+  {% if trigger and trigger != 'click' %}trigger="{{ trigger }}"{% endif %}
+  {% if arrow %}arrow{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if panel_content %}
+    <div slot="content">{{ panel_content }}</div>
+  {% endif %}
+</hx-popover>

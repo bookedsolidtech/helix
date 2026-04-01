@@ -1,0 +1,5 @@
+/* hx-toast SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-toast {
+  display: block;
+}

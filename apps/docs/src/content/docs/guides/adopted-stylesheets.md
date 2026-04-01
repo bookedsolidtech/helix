@@ -393,8 +393,7 @@ const cardSheet = createStyleSheet(`
 adoptStyles(document, buttonSheet, cardSheet);
 ```
 
-When building for Drupal with per-component loading (see
-[ADR-002: Drupal Component Loading Strategy](/guides/drupal-component-loading-strategy)),
+When building for Drupal with per-component loading,
 each component can adopt its own stylesheet in its Drupal behavior:
 
 ```js
@@ -449,7 +448,7 @@ if (typeof window !== 'undefined') {
 them unconditionally in isomorphic code without guards.
 
 For more SSR patterns across Next.js, Astro, and Nuxt, see the
-[SSR & Hydration Guide](/integration/ssr).
+[SSR Considerations guide](/components/performance/ssr).
 
 ---
 

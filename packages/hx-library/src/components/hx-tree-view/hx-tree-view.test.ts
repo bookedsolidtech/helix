@@ -595,6 +595,119 @@ describe('hx-tree-view', () => {
       expect(fired).toBe(false);
     });
 
+    it('typeahead moves focus to next visible item starting with typed character', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nav test">
+          <hx-tree-item>Apple</hx-tree-item>
+          <hx-tree-item>Banana</hx-tree-item>
+          <hx-tree-item>Cherry</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      // Wait for slotchange label text to settle
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+      await items[2]!.updateComplete;
+
+      items[0]!.focus();
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true }));
+      await el.updateComplete;
+
+      const bananaRow = items[1]!.shadowRoot?.querySelector('.item-row');
+      expect(
+        document.activeElement === items[1] || bananaRow === items[1]!.shadowRoot?.activeElement,
+      ).toBe(true);
+    });
+
+    it('typeahead is case-insensitive', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nav test">
+          <hx-tree-item>Apple</hx-tree-item>
+          <hx-tree-item>Cherry</hx-tree-item>
+          <hx-tree-item>Date</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      await items[0]!.updateComplete;
+      await items[2]!.updateComplete;
+
+      items[0]!.focus();
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      // Uppercase 'D' should still match 'Date'
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'D', bubbles: true }));
+      await el.updateComplete;
+
+      const dateRow = items[2]!.shadowRoot?.querySelector('.item-row');
+      expect(
+        document.activeElement === items[2] || dateRow === items[2]!.shadowRoot?.activeElement,
+      ).toBe(true);
+    });
+
+    it('typeahead wraps around to find a match before current index', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nav test">
+          <hx-tree-item>Apple</hx-tree-item>
+          <hx-tree-item>Banana</hx-tree-item>
+          <hx-tree-item>Cherry</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+      await items[2]!.updateComplete;
+
+      // Focus the last item, then type 'a' which should wrap to 'Apple'
+      items[2]!.focus();
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      await el.updateComplete;
+
+      const appleRow = items[0]!.shadowRoot?.querySelector('.item-row');
+      expect(
+        document.activeElement === items[0] || appleRow === items[0]!.shadowRoot?.activeElement,
+      ).toBe(true);
+    });
+
+    it('typeahead does nothing when no item matches', async () => {
+      const el = await fixture<WcTreeView>(
+        `<hx-tree-view label="Nav test">
+          <hx-tree-item>Apple</hx-tree-item>
+          <hx-tree-item>Banana</hx-tree-item>
+        </hx-tree-view>`,
+      );
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+
+      items[0]!.focus();
+      await el.updateComplete;
+
+      const tree = shadowQuery<HTMLElement>(el, '.tree')!;
+      // 'z' matches nothing — focus should stay on item 0
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', bubbles: true }));
+      await el.updateComplete;
+
+      const appleRow = items[0]!.shadowRoot?.querySelector('.item-row');
+      expect(
+        document.activeElement === items[0] || appleRow === items[0]!.shadowRoot?.activeElement,
+      ).toBe(true);
+    });
+
     it('disabled item does not expand on keyboard ArrowRight', async () => {
       const el = await fixture<WcTreeView>(
         `<hx-tree-view label="Test">
@@ -861,6 +974,52 @@ describe('hx-tree-item', () => {
       const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const children = shadowQuery(el, '[role="group"]');
       expect(children).toBeTruthy();
+    });
+
+    it('collapsed children group has aria-hidden="true" to hide from assistive technology', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await el.updateComplete;
+      expect(el.expanded).toBe(false);
+      const group = shadowQuery(el, '[role="group"]');
+      expect(group?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('expanded children group does not have aria-hidden', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item expanded>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await el.updateComplete;
+      expect(el.expanded).toBe(true);
+      const group = shadowQuery(el, '[role="group"]');
+      expect(group?.getAttribute('aria-hidden')).toBeNull();
+    });
+
+    it('aria-hidden updates when item is expanded programmatically', async () => {
+      const el = await fixture<WcTreeItem>(
+        `<hx-tree-item>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>`,
+      );
+      await el.updateComplete;
+      const group = shadowQuery(el, '[role="group"]');
+      expect(group?.getAttribute('aria-hidden')).toBe('true');
+
+      el.expanded = true;
+      await el.updateComplete;
+      expect(group?.getAttribute('aria-hidden')).toBeNull();
+
+      el.expanded = false;
+      await el.updateComplete;
+      expect(group?.getAttribute('aria-hidden')).toBe('true');
     });
   });
 

@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Time Picker SDC — wraps hx-time-picker for Drupal time field integration.
+ *
+ * Values are HH:MM strings in 24-hour format. The component handles 12h/24h
+ * display formatting. Use in appointment scheduling, office hours, and clinical
+ * time entry forms.
+ */
+#}
+{{ attach_library('helixui/hx-time-picker') }}
+
+<hx-time-picker
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if min and min != '00:00' %}min="{{ min }}"{% endif %}
+  {% if max and max != '23:59' %}max="{{ max }}"{% endif %}
+  {% if step and step != 30 %}step="{{ step }}"{% endif %}
+  {% if format and format != '12h' %}format="{{ format }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-time-picker>

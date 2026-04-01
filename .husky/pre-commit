@@ -1,5 +1,46 @@
-# Run lint-staged for formatting and linting
-pnpm exec lint-staged
+#!/usr/bin/env sh
 
-# Run comprehensive pre-commit quality checks
-bash "$(dirname "$0")/../scripts/pre-commit-check.sh"
+# ── Resolve main repo root (handles git worktrees) ───────────────────────────
+# In a worktree, --git-common-dir returns an absolute path to the main .git dir.
+# In the main repo, it returns the relative string ".git".
+GIT_COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null)
+case "$GIT_COMMON_DIR" in
+  /*)
+    # Absolute path → we are inside a worktree; main root is one level up
+    MAIN_ROOT="$(dirname "$GIT_COMMON_DIR")"
+    ;;
+  *)
+    MAIN_ROOT="$(git rev-parse --show-toplevel)"
+    ;;
+esac
+
+# ── Secret scanning with gitleaks ────────────────────────────────────────────
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --config "$MAIN_ROOT/.gitleaks.toml" --redact
+  GITLEAKS_EXIT=$?
+  if [ $GITLEAKS_EXIT -ne 0 ]; then
+    echo ""
+    echo "  gitleaks: secret(s) detected in staged files — commit blocked."
+    echo "  Revoke any exposed credentials immediately, then remove from staged files."
+    echo ""
+    exit 1
+  fi
+else
+  # Fallback: gitleaks not installed — block obvious .env* file staging
+  STAGED_ENV=$(git diff --cached --name-only | grep -E '(^|/)\.env[^/]*$' || true)
+  if [ -n "$STAGED_ENV" ]; then
+    echo ""
+    echo "  pre-commit: refusing to commit .env* files:"
+    echo "  $STAGED_ENV"
+    echo ""
+    echo "  Install gitleaks for full secret scanning: brew install gitleaks"
+    echo ""
+    exit 1
+  fi
+fi
+
+# ── Run lint-staged ───────────────────────────────────────────────────────────
+cd "$MAIN_ROOT" && pnpm exec lint-staged
+
+# ── Run comprehensive pre-commit quality checks ───────────────────────────────
+bash "$MAIN_ROOT/.husky/../scripts/pre-commit-check.sh"

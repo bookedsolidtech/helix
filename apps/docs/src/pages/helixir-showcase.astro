@@ -8,7 +8,7 @@
  * Sections:
  * 1. Hero - "HELiXiR — AI-Powered Component Intelligence"
  * 2. What is HELiXiR - MCP server role and purpose
- * 3. Health Scoring System - 7-dimension scoring explained
+ * 3. Health Scoring System - 11-dimension enterprise scoring explained
  * 4. Claude Code Integration - AI-assisted development workflows
  * 5. Live Health Metrics - Component health scores
  * 6. CEM Analysis - Custom Elements Manifest intelligence
@@ -256,9 +256,9 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             <div class="hx-card-icon icon-cyan" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
             <div class="hx-card-title">Health Scoring Engine</div>
             <div class="hx-card-desc">
-              Seven-dimension health scoring for every component. Completeness, accessibility,
-              testing, documentation, token coverage, performance, and Storybook coverage
-              scored and tracked over time.
+              Eleven-dimension enterprise health scoring for every component — from CEM
+              completeness and accessibility to API surface quality, event architecture,
+              and naming consistency — scored via <code style="font-size:0.8125rem;">score_component</code>.
             </div>
           </div>
 
@@ -280,11 +280,11 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
       <div class="hx-section-inner">
         <div class="hx-section-header scroll-reveal">
           <span class="hx-section-label">Quality Measurement</span>
-          <h2 class="hx-section-title">7-Dimension Health Scoring</h2>
+          <h2 class="hx-section-title">11-Dimension Health Scoring</h2>
           <p class="hx-section-description">
-            Every component in the HELIX library is scored across seven quality dimensions.
-            No component ships below the minimum threshold. Health scores are computed from
-            the Custom Elements Manifest and source code analysis.
+            Every component in the HELIX library is scored across eleven quality dimensions
+            via the <code style="font-size:0.875rem;color:var(--helixir-green);background:rgba(16,185,129,0.08);padding:0.1em 0.4em;border-radius:4px;">score_component</code> MCP tool with <code style="font-size:0.875rem;color:var(--helixir-green);background:rgba(16,185,129,0.08);padding:0.1em 0.4em;border-radius:4px;">multiDimensional: true</code>.
+            Health scores are computed from the Custom Elements Manifest and source code analysis.
           </p>
         </div>
 
@@ -293,12 +293,12 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
             <div class="hx-dimension-header">
               <div class="hx-dimension-name">
                 <i class="fa-solid fa-file-code" aria-hidden="true" style="color:var(--helixir-green);"></i>
-                Completeness
+                CEM Completeness
               </div>
-              <div class="hx-dimension-score">Dimension 1</div>
+              <div class="hx-dimension-score">Weight 15</div>
             </div>
-            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:88%;"></div></div>
-            <div class="hx-dimension-desc">Measures whether the component has all required elements: JSDoc annotations, CEM-registered properties, events, slots, and CSS custom properties documented.</div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:95%;"></div></div>
+            <div class="hx-dimension-desc">Documentation and declaration coverage: JSDoc summary, property descriptions, event types and descriptions, CSS parts, and slot documentation all present in the Custom Elements Manifest.</div>
           </div>
 
           <div class="hx-dimension scroll-reveal scroll-reveal-delay-2">
@@ -307,70 +307,118 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                 <i class="fa-solid fa-universal-access" aria-hidden="true" style="color:var(--helixir-cyan);"></i>
                 Accessibility
               </div>
-              <div class="hx-dimension-score">Dimension 2</div>
+              <div class="hx-dimension-score">Weight 10</div>
             </div>
             <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:92%;"></div></div>
-            <div class="hx-dimension-desc">WCAG 2.1 AA compliance indicators: ARIA role presence, keyboard navigation support, focus management patterns, and screen reader compatibility markers.</div>
+            <div class="hx-dimension-desc">ARIA roles, a11y attributes, keyboard event handlers, focus management patterns, and label support — evaluated against WCAG 2.1 AA criteria from the CEM and source analysis.</div>
           </div>
 
           <div class="hx-dimension scroll-reveal scroll-reveal-delay-3">
             <div class="hx-dimension-header">
               <div class="hx-dimension-name">
-                <i class="fa-solid fa-vial" aria-hidden="true" style="color:var(--wc-accent);"></i>
-                Testing
+                <i class="fa-solid fa-code" aria-hidden="true" style="color:var(--wc-accent);"></i>
+                Type Coverage
               </div>
-              <div class="hx-dimension-score">Dimension 3</div>
+              <div class="hx-dimension-score">Weight 10</div>
             </div>
             <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:93%;"></div></div>
-            <div class="hx-dimension-desc">Coverage percentage, number of test cases, presence of property tests, event dispatch tests, slot projection tests, and accessibility assertion tests.</div>
+            <div class="hx-dimension-desc">TypeScript type completeness: all properties, methods, and events have explicit type declarations. No <code style="font-size:0.75rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--wc-accent);">any</code> types, full generics where applicable.</div>
           </div>
 
           <div class="hx-dimension scroll-reveal scroll-reveal-delay-4">
             <div class="hx-dimension-header">
               <div class="hx-dimension-name">
-                <i class="fa-solid fa-book-open" aria-hidden="true" style="color:var(--wc-amber);"></i>
-                Documentation
+                <i class="fa-solid fa-layer-group" aria-hidden="true" style="color:var(--wc-amber);"></i>
+                API Surface Quality
               </div>
-              <div class="hx-dimension-score">Dimension 4</div>
+              <div class="hx-dimension-score">Weight 10</div>
             </div>
-            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:85%;"></div></div>
-            <div class="hx-dimension-desc">JSDoc quality for the component class and all public members, summary present, param and return documentation, usage examples in comments.</div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:91%;"></div></div>
+            <div class="hx-dimension-desc">Property and method naming consistency, coherent public API design, appropriate use of attributes vs properties, and alignment with established library patterns.</div>
           </div>
 
           <div class="hx-dimension scroll-reveal scroll-reveal-delay-5">
             <div class="hx-dimension-header">
               <div class="hx-dimension-name">
-                <i class="fa-solid fa-palette" aria-hidden="true" style="color:var(--helixir-teal);"></i>
-                Token Coverage
+                <i class="fa-solid fa-arrows-rotate" aria-hidden="true" style="color:var(--helixir-teal);"></i>
+                CEM&#8209;Source Fidelity
               </div>
-              <div class="hx-dimension-score">Dimension 5</div>
+              <div class="hx-dimension-score">Weight 10</div>
             </div>
-            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:90%;"></div></div>
-            <div class="hx-dimension-desc">Ratio of design token usage to hardcoded values. Components using only <code style="font-size:0.75rem;background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-teal);">--hx-*</code> tokens score highest. Zero hardcoded colors or spacing required.</div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:94%;"></div></div>
+            <div class="hx-dimension-desc">Detects divergence between the Custom Elements Manifest and actual source code. Catches stale CEM, undocumented properties, and API drift between versions.</div>
           </div>
 
           <div class="hx-dimension scroll-reveal scroll-reveal-delay-6">
             <div class="hx-dimension-header">
               <div class="hx-dimension-name">
-                <i class="fa-solid fa-gauge-high" aria-hidden="true" style="color:var(--wc-pink);"></i>
-                Performance
+                <i class="fa-solid fa-vial" aria-hidden="true" style="color:var(--wc-pink);"></i>
+                Test Coverage
               </div>
-              <div class="hx-dimension-score">Dimension 6</div>
+              <div class="hx-dimension-score">Weight 10</div>
             </div>
-            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:95%;"></div></div>
-            <div class="hx-dimension-desc">Estimated bundle size (min+gz), render complexity indicators, use of Lit directives for efficient DOM updates, avoidance of forced synchronous layout patterns.</div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:90%;"></div></div>
+            <div class="hx-dimension-desc">Test suite depth: coverage percentage, property tests, event dispatch tests, slot projection tests, keyboard interaction tests, and accessibility assertion tests.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-bolt" aria-hidden="true" style="color:var(--helixir-green);"></i>
+                Event Architecture
+              </div>
+              <div class="hx-dimension-score">Weight 5</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:88%;"></div></div>
+            <div class="hx-dimension-desc">Event naming consistency (hx- prefix), correct <code style="font-size:0.75rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-green);">bubbles</code> and <code style="font-size:0.75rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-green);">composed</code> settings, and meaningful event detail types documented in the CEM.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-palette" aria-hidden="true" style="color:var(--helixir-cyan);"></i>
+                CSS Architecture
+              </div>
+              <div class="hx-dimension-score">Weight 5</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:89%;"></div></div>
+            <div class="hx-dimension-desc">CSS custom property coverage (<code style="font-size:0.75rem;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-cyan);">--hx-*</code> tokens), CSS parts documented, proper Shadow DOM scoping, and no hardcoded visual values.</div>
           </div>
 
           <div class="hx-dimension scroll-reveal">
             <div class="hx-dimension-header">
               <div class="hx-dimension-name">
                 <i class="fa-solid fa-book" aria-hidden="true" style="color:var(--wc-electric);"></i>
-                Storybook Coverage
+                Story Coverage
               </div>
-              <div class="hx-dimension-score">Dimension 7</div>
+              <div class="hx-dimension-score">Weight 5</div>
             </div>
-            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:82%;"></div></div>
-            <div class="hx-dimension-desc">Whether a story file exists, number of story variants, presence of controls for all public properties, and interaction test coverage in Storybook.</div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:85%;"></div></div>
+            <div class="hx-dimension-desc">Storybook story file exists, number of story variants, controls for all public properties via CEM autodocs, and interaction test coverage in Storybook.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-puzzle-piece" aria-hidden="true" style="color:var(--wc-amber);"></i>
+                Slot Architecture
+              </div>
+              <div class="hx-dimension-score">Weight 5</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:90%;"></div></div>
+            <div class="hx-dimension-desc">Slot documentation completeness, type constraints on slotted content, appropriate use of default vs named slots, and coherent slot design matching component purpose.</div>
+          </div>
+
+          <div class="hx-dimension scroll-reveal">
+            <div class="hx-dimension-header">
+              <div class="hx-dimension-name">
+                <i class="fa-solid fa-tag" aria-hidden="true" style="color:var(--helixir-teal);"></i>
+                Naming Consistency
+              </div>
+              <div class="hx-dimension-score">Weight 5</div>
+            </div>
+            <div class="hx-dimension-bar"><div class="hx-dimension-fill" style="width:92%;"></div></div>
+            <div class="hx-dimension-desc">Library-wide naming convention adherence: <code style="font-size:0.75rem;background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-teal);">hx-</code> tag prefix, <code style="font-size:0.75rem;background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.2);padding:0.1em 0.4em;border-radius:4px;color:var(--helixir-teal);">Hx</code> class prefix, consistent variant naming, and event naming patterns.</div>
           </div>
         </div>
       </div>
@@ -491,11 +539,11 @@ and what dimensions need improvement?"</span>
 
         <div class="hx-stats scroll-reveal scroll-reveal-delay-1">
           <div class="hx-stat">
-            <div class="hx-stat-value" style="background:linear-gradient(135deg,#10b981,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">77</div>
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#10b981,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">81</div>
             <div class="hx-stat-label">Components Tracked</div>
           </div>
           <div class="hx-stat">
-            <div class="hx-stat-value" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">7</div>
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">11</div>
             <div class="hx-stat-label">Health Dimensions</div>
           </div>
           <div class="hx-stat">
@@ -503,7 +551,7 @@ and what dimensions need improvement?"</span>
             <div class="hx-stat-label">Min Score Gate</div>
           </div>
           <div class="hx-stat">
-            <div class="hx-stat-value" style="background:linear-gradient(135deg,#f59e0b,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">30+</div>
+            <div class="hx-stat-value" style="background:linear-gradient(135deg,#f59e0b,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">16</div>
             <div class="hx-stat-label">MCP Tools Available</div>
           </div>
         </div>
@@ -587,7 +635,7 @@ and what dimensions need improvement?"</span>
           <span class="hx-section-label">Developer Toolbox</span>
           <h2 class="hx-section-title">Available MCP Tools</h2>
           <p class="hx-section-description">
-            HELiXiR exposes over 30 structured tools to Claude Code. These tools cover
+            HELiXiR exposes structured tools to Claude Code. These tools cover
             every aspect of the component lifecycle from discovery to scoring to generation.
           </p>
         </div>
@@ -597,7 +645,7 @@ and what dimensions need improvement?"</span>
             <div class="hx-tool-icon"><i class="fa-solid fa-chart-bar" aria-hidden="true"></i></div>
             <div>
               <div class="hx-tool-name">score_component</div>
-              <div class="hx-tool-desc">Compute the full 7-dimension health score for a specific component. Returns dimension breakdown, overall score, and improvement recommendations.</div>
+              <div class="hx-tool-desc">Compute the full 11-dimension enterprise health score for a specific component. Use <code style="font-size:0.75rem;">multiDimensional: true</code> for the complete dimension breakdown, tier gates, confidence levels, and improvement recommendations.</div>
             </div>
           </div>
 

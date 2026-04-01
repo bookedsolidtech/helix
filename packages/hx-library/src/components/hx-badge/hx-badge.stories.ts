@@ -417,9 +417,16 @@ export const RemovableWithCount: Story = {
       await expect(btn).toBeTruthy();
     }
 
+    // Verify prefix labels appear alongside counts (light DOM check)
+    const firstBadge = badges[0];
+    const firstLabel = firstBadge.querySelector('[slot="prefix"]');
+    await expect(firstLabel?.textContent?.trim()).toBe('ICU');
+
     // Last badge: count=107, max=99 → "99+"
     const lastBadge = badges[4];
-    const span = lastBadge.shadowRoot?.querySelector('span');
+    const lastLabel = lastBadge.querySelector('[slot="prefix"]');
+    await expect(lastLabel?.textContent?.trim()).toBe('Discharged');
+    const span = lastBadge.shadowRoot?.querySelector('[part="badge"]');
     await expect(span?.textContent?.trim()).toBe('99+');
   },
 };

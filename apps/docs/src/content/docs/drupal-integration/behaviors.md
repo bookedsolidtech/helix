@@ -66,7 +66,3 @@ HELIX components work with Drupal AJAX automatically because:
 ## BigPipe Streaming
 
 No special handling is needed. Components register via `customElements.define()` and upgrade as they enter the DOM through BigPipe streaming.
-
-## Detailed Guide
-
-See the [Pre-Planning: Drupal Integration Guide](/pre-planning/drupal-guide/) for advanced Behaviors patterns.

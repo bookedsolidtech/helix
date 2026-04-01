@@ -447,6 +447,138 @@ describe('hx-card', () => {
     });
   });
 
+  // ─── Property: variant and elevation reflect to host ───
+
+  describe('Property: variant and elevation reflect to host', () => {
+    it('reflects variant attribute to host', async () => {
+      const el = await fixture<HelixCard>('<hx-card variant="featured">Content</hx-card>');
+      expect(el.getAttribute('variant')).toBe('featured');
+    });
+
+    it('reflects elevation attribute to host', async () => {
+      const el = await fixture<HelixCard>('<hx-card elevation="raised">Content</hx-card>');
+      expect(el.getAttribute('elevation')).toBe('raised');
+    });
+
+    it('programmatic variant change reflects to host and applies class', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      el.variant = 'compact';
+      await el.updateComplete;
+      expect(el.getAttribute('variant')).toBe('compact');
+      const card = shadowQuery(el, '.card')!;
+      expect(card.classList.contains('card--compact')).toBe(true);
+    });
+
+    it('programmatic elevation change reflects to host and applies class', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      el.elevation = 'floating';
+      await el.updateComplete;
+      expect(el.getAttribute('elevation')).toBe('floating');
+      const card = shadowQuery(el, '.card')!;
+      expect(card.classList.contains('card--floating')).toBe(true);
+    });
+  });
+
+  // ─── hx-click event: bubbles and composed ───
+
+  describe('hx-click event properties', () => {
+    it('hx-click bubbles and is composed', async () => {
+      const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
+      const card = shadowQuery(el, '.card')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      card.click();
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('Enter key hx-click detail contains originalEvent as KeyboardEvent', async () => {
+      const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
+      const card = shadowQuery(el, '.card')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.originalEvent).toBeInstanceOf(KeyboardEvent);
+    });
+  });
+
+  // ─── Slot: image shows container when filled ───
+
+  describe('Slot: image shows container when filled', () => {
+    it('image container is visible when image is slotted', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card><img slot="image" src="test.jpg" alt="test" />Body</hx-card>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const imageDiv = shadowQuery(el, '.card__image')!;
+      expect(imageDiv.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('heading container is visible when heading is slotted', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card><span slot="heading">Title</span>Body</hx-card>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const headingDiv = shadowQuery(el, '.card__heading')!;
+      expect(headingDiv.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('footer container is visible when footer is slotted', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card><span slot="footer">Footer</span>Body</hx-card>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const footerDiv = shadowQuery(el, '.card__footer')!;
+      expect(footerDiv.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('actions container is visible when actions are slotted', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card><button slot="actions">Action</button>Body</hx-card>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const actionsDiv = shadowQuery(el, '.card__actions')!;
+      expect(actionsDiv.hasAttribute('hidden')).toBe(false);
+    });
+  });
+
+  // ─── delegatesFocus shadowRootOptions ───
+
+  describe('delegatesFocus shadowRootOptions', () => {
+    it('shadowRoot has delegatesFocus=true', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      expect(el.shadowRoot?.delegatesFocus).toBe(true);
+    });
+  });
+
+  // ─── Property defaults ───
+
+  describe('Property defaults', () => {
+    it('variant defaults to "default"', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      expect(el.variant).toBe('default');
+    });
+
+    it('elevation defaults to "flat"', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      expect(el.elevation).toBe('flat');
+    });
+
+    it('href defaults to undefined', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      expect(el.href).toBeUndefined();
+    });
+
+    it('label defaults to undefined', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      expect(el.label).toBeUndefined();
+    });
+  });
+
   // ─── Horizontal Layout (known gap) ───
 
   describe('Horizontal layout (known gap)', () => {

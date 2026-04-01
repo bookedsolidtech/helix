@@ -71,6 +71,20 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    labelClose: {
+      control: 'text',
+      description: 'Accessible label for the close button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Close' },
+        type: { summary: 'string' },
+      },
+    },
+  },
+  parameters: {
+    actions: {
+      handles: ['hx-show', 'hx-after-show', 'hx-hide', 'hx-after-hide', 'hx-initial-focus'],
+    },
   },
   args: {
     open: false,
@@ -309,4 +323,20 @@ export const DarkMode: Story = {
     placement: 'end',
     size: 'md',
   },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        When open, focus is trapped inside the drawer. Tab cycles through focusable elements. Escape closes the drawer.
+      </p>
+      <hx-drawer></hx-drawer>
+    </div>
+  `,
 };

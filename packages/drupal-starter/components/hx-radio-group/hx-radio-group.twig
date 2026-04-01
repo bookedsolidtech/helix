@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Radio Group SDC — wraps hx-radio-group and hx-radio children.
+ *
+ * For Drupal Form API radios, iterate element['#options'] and render each
+ * as an <hx-radio> element inside the default slot of hx-radio-group.
+ *
+ * Example from a Drupal radios element template:
+ *   <hx-radio-group name="{{ element['#name'] }}" label="{{ element['#title'] }}">
+ *     {% for value, option_label in element['#options'] %}
+ *       <hx-radio value="{{ value }}"
+ *         {% if element['#value'] == value %}checked{% endif %}
+ *       >{{ option_label }}</hx-radio>
+ *     {% endfor %}
+ *   </hx-radio-group>
+ */
+#}
+{{ attach_library('helixui/hx-radio-group') }}
+
+<hx-radio-group
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value %}value="{{ value }}"{% endif %}
+  {% if orientation and orientation != 'vertical' %}orientation="{{ orientation }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-radio-group>

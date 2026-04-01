@@ -1,0 +1,79 @@
+{#
+/**
+ * @file
+ * Hero SDC — composes hx-text, hx-image, hx-button.
+ *
+ * Renders a full-width hero section with optional background image, headline,
+ * subtitle, and call-to-action button.
+ *
+ * Example — Drupal node display:
+ * @code
+ *   {% include 'helixui:hero' with {
+ *     title: node.label,
+ *     subtitle: content.field_subtitle|render,
+ *     cta_text: 'Book an Appointment',
+ *     cta_url: path('entity.node.canonical', {'node': node.id}),
+ *     image_url: file_url(node.field_hero_image.entity.uri.value),
+ *     image_alt: '',
+ *     variant: 'dark',
+ *   } only %}
+ * @endcode
+ */
+#}
+{{ attach_library('helixui/hx-text') }}
+{{ attach_library('helixui/hx-button') }}
+{% if image_url %}
+  {{ attach_library('helixui/hx-image') }}
+{% endif %}
+
+{% set variant = variant|default('primary') %}
+
+<section{{ attributes.addClass('hero', 'hero--variant-' ~ variant) }}>
+
+  {# Background image — decorative, rendered behind content via CSS position. #}
+  {% if image_url %}
+    <hx-image
+      src="{{ image_url }}"
+      alt="{{ image_alt|default('') }}"
+      class="hero__background-image"
+      loading="eager"
+    ></hx-image>
+  {% endif %}
+
+  <div class="hero__content">
+
+    {% if title %}
+      <hx-text variant="display" tag="h1" class="hero__title">
+        {{ title }}
+      </hx-text>
+    {% endif %}
+
+    {% if subtitle %}
+      <hx-text variant="lead" tag="p" class="hero__subtitle">
+        {{ subtitle }}
+      </hx-text>
+    {% endif %}
+
+    {% if cta_text and cta_url %}
+      <div class="hero__cta">
+        <hx-button
+          variant="{{ variant == 'dark' ? 'primary' : 'primary' }}"
+          href="{{ cta_url }}"
+          size="lg"
+          {% if variant == 'dark' %}inverted{% endif %}
+        >
+          {{ cta_text }}
+        </hx-button>
+      </div>
+    {% endif %}
+
+    {# Default slot: trust indicators, stats, secondary messaging. #}
+    {% if content %}
+      <div class="hero__supplemental">
+        {{ content }}
+      </div>
+    {% endif %}
+
+  </div>
+
+</section>

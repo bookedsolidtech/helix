@@ -93,6 +93,41 @@ The dark theme overrides tokens in these categories:
 | `body`             | Background and text color follow surface/text            |
 | `shadow`           | Shadows increase opacity for visibility on dark surfaces |
 
+## High Contrast Theme
+
+HELIX ships a third built-in theme for users who require enhanced contrast (Windows High Contrast Mode, accessibility settings). It activates automatically via the system preference or manually via an attribute.
+
+### Method 1: Manual attribute
+
+Apply `data-hx-contrast="high"` to the document root:
+
+```html
+<html data-hx-contrast="high"></html>
+```
+
+### Method 2: System preference
+
+Automatic activation via `prefers-contrast: more`. This applies unless the user has opted out:
+
+```css
+@media (prefers-contrast: more) {
+  :root:not([data-hx-contrast="normal"]) {
+    /* high-contrast overrides */
+  }
+}
+```
+
+### High Contrast Override Categories
+
+| Category | What changes |
+| --- | --- |
+| `color.primary` | Primary ramp shifted to higher-contrast values |
+| `color.secondary` | Secondary ramp with improved luminance |
+| `color.error` | Error colors with AAA-level contrast ratios |
+| `color.warning` | Warning tones with improved contrast |
+| `color.success` | Success colors with enhanced visibility |
+| `color.error-text` | WCAG AAA compliant error text (10.07:1 on `#000`) |
+
 ## Theme Toggle Implementation
 
 ```js
@@ -100,6 +135,12 @@ function toggleTheme() {
   const html = document.documentElement;
   const current = html.getAttribute('data-theme');
   html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+}
+
+function toggleContrast() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-hx-contrast');
+  html.setAttribute('data-hx-contrast', current === 'high' ? 'normal' : 'high');
 }
 ```
 

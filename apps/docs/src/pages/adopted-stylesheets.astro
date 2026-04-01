@@ -1068,23 +1068,23 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                 <pre class="as-code"><code><span class="c-comment">/* This lives inside Shadow DOM */</span>
 <span class="c-comment">/* It CANNOT style slotted content */</span>
 
-<span class="c-tag">:host</span> {
+<span class="c-tag">:host</span> &#123;
   <span class="c-prop">display</span>: <span class="c-value">block</span>;
   <span class="c-prop">padding</span>: <span class="c-value">1.5rem</span>;
-}
+&#125;
 
 <span class="c-comment">/* Only direct slotted children */</span>
-<span class="c-tag">::slotted(p)</span> {
+<span class="c-tag">::slotted(p)</span> &#123;
   <span class="c-prop">color</span>: <span class="c-value">var(--hx-text-body)</span>; <span class="c-comment">/* OK */</span>
-}
+&#125;
 
 <span class="c-comment">/* BROKEN — descendants unreachable */</span>
-<span class="c-tag">::slotted(div) p</span> {
+<span class="c-tag">::slotted(div) p</span> &#123;
   <span class="c-prop">color</span>: <span class="c-value">var(--hx-text-body)</span>; <span class="c-comment">/* ignored */</span>
-}
-<span class="c-tag">::slotted(article) h2</span> {
+&#125;
+<span class="c-tag">::slotted(article) h2</span> &#123;
   <span class="c-prop">font-size</span>: <span class="c-value">1.5rem</span>; <span class="c-comment">/* ignored */</span>
-}</code></pre>
+&#125;</code></pre>
               </div>
             </div>
           </div>
@@ -1131,28 +1131,28 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                   </div>
                   <span class="as-code-filename">hx-card.ts — 3 lines to fix everything</span>
                 </div>
-                <pre class="as-code"><code><span class="c-keyword">import</span> { <span class="c-type">LitElement</span>, html } <span class="c-keyword">from</span> <span class="c-string">'lit'</span>;
-<span class="c-keyword">import</span> { customElement } <span class="c-keyword">from</span> <span class="c-string">'lit/decorators.js'</span>;
-<span class="c-keyword">import</span> { <span class="c-type">AdoptedStylesheetsController</span> }
+                <pre class="as-code"><code><span class="c-keyword">import</span> &#123; <span class="c-type">LitElement</span>, html &#125; <span class="c-keyword">from</span> <span class="c-string">'lit'</span>;
+<span class="c-keyword">import</span> &#123; customElement &#125; <span class="c-keyword">from</span> <span class="c-string">'lit/decorators.js'</span>;
+<span class="c-keyword">import</span> &#123; <span class="c-type">AdoptedStylesheetsController</span> &#125;
   <span class="c-keyword">from</span> <span class="c-string">'../controllers/adopted-stylesheets.js'</span>; <span class="c-comment">// 1</span>
 
 <span class="c-tag">@customElement</span>(<span class="c-string">'hx-card'</span>)
-<span class="c-keyword">export class</span> <span class="c-type">HxCard</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> {
+<span class="c-keyword">export class</span> <span class="c-type">HxCard</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> &#123;
 
   <span class="c-comment">// 2 — inject styles into document for slotted content</span>
   <span class="c-keyword">private</span> _slotStyles = <span class="c-keyword">new</span> <span class="c-type">AdoptedStylesheetsController</span>(
     <span class="c-call">this</span>,
-    <span class="c-string">`
-      hx-card p   { color: var(--hx-text-body);  }
-      hx-card h2  { color: var(--hx-text-heading);}
-      hx-card a   { color: var(--hx-color-primary);}
-    `</span>           <span class="c-comment">// 3 — CSS targeting the host element in light DOM</span>
+    <span class="c-string">&#96;
+      hx-card p   &#123; color: var(--hx-text-body);  &#125;
+      hx-card h2  &#123; color: var(--hx-text-heading);&#125;
+      hx-card a   &#123; color: var(--hx-color-primary);&#125;
+    &#96;</span>           <span class="c-comment">// 3 — CSS targeting the host element in light DOM</span>
   );
 
-  <span class="c-call">render</span>() {
-    <span class="c-keyword">return</span> html<span class="c-string">`&lt;slot&gt;&lt;/slot&gt;`</span>;
-  }
-}</code></pre>
+  <span class="c-call">render</span>() &#123;
+    <span class="c-keyword">return</span> html<span class="c-string">&#96;&lt;slot&gt;&lt;/slot&gt;&#96;</span>;
+  &#125;
+&#125;</code></pre>
               </div>
             </div>
             <div>
@@ -1446,15 +1446,15 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                     <div class="as-code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
                     <span class="as-code-filename">card.html.twig</span>
                   </div>
-                  <pre class="as-code"><code><span class="c-comment">{# Drupal field values go straight into the slot #}</span>
+                  <pre class="as-code"><code><span class="c-comment">&#123;# Drupal field values go straight into the slot #&#125;</span>
 <span class="c-tag">&lt;hx-card&gt;</span>
-  {{ content.field_title }}
-  {{ content.body }}
-  {{ content.field_tags }}
+  &#123;&#123; content.field_title &#125;&#125;
+  &#123;&#123; content.body &#125;&#125;
+  &#123;&#123; content.field_tags &#125;&#125;
 <span class="c-tag">&lt;/hx-card&gt;</span>
 
-<span class="c-comment">{# The controller in hx-card handles all styling #}</span>
-<span class="c-comment">{# No extra classes, no wrapper divs needed #}</span></code></pre>
+<span class="c-comment">&#123;# The controller in hx-card handles all styling #&#125;</span>
+<span class="c-comment">&#123;# No extra classes, no wrapper divs needed #&#125;</span></code></pre>
                 </div>
               </div>
               <div>
@@ -1496,16 +1496,16 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
 <span class="c-comment">// The controller runs inside the web component automatically</span>
 <span class="c-keyword">import</span> <span class="c-string">'@helixui/library/components/hx-card/index.js'</span>;
 
-<span class="c-keyword">export function</span> <span class="c-call">PatientCard</span>({ patient }: { patient: <span class="c-type">Patient</span> }) {
+<span class="c-keyword">export function</span> <span class="c-call">PatientCard</span>(&#123; patient &#125;: &#123; patient: <span class="c-type">Patient</span> &#125;) &#123;
   <span class="c-keyword">return</span> (
     <span class="c-tag">&lt;hx-card&gt;</span>
-      <span class="c-comment">{/* All of this slotted JSX is styled by the controller */}</span>
-      <span class="c-tag">&lt;h2&gt;</span>{patient.name}<span class="c-tag">&lt;/h2&gt;</span>
-      <span class="c-tag">&lt;p&gt;</span>{patient.diagnosis}<span class="c-tag">&lt;/p&gt;</span>
-      <span class="c-tag">&lt;p&gt;&lt;strong&gt;</span>DOB:<span class="c-tag">&lt;/strong&gt;</span> {patient.dob}<span class="c-tag">&lt;/p&gt;</span>
+      <span class="c-comment">&#123;/* All of this slotted JSX is styled by the controller */&#125;</span>
+      <span class="c-tag">&lt;h2&gt;</span>&#123;patient.name&#125;<span class="c-tag">&lt;/h2&gt;</span>
+      <span class="c-tag">&lt;p&gt;</span>&#123;patient.diagnosis&#125;<span class="c-tag">&lt;/p&gt;</span>
+      <span class="c-tag">&lt;p&gt;&lt;strong&gt;</span>DOB:<span class="c-tag">&lt;/strong&gt;</span> &#123;patient.dob&#125;<span class="c-tag">&lt;/p&gt;</span>
     <span class="c-tag">&lt;/hx-card&gt;</span>
   );
-}</code></pre>
+&#125;</code></pre>
             </div>
             <div class="as-callout" style="margin-top: var(--space-4);">
               <strong>React note:</strong> React 19 ships with full custom element support.
@@ -1524,16 +1524,16 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
               <pre class="as-code"><code><span class="c-tag">&lt;script setup lang="ts"&gt;</span>
 <span class="c-keyword">import</span> <span class="c-string">'@helixui/library/components/hx-card/index.js'</span>;
 
-<span class="c-keyword">const</span> { patient } = defineProps<span class="c-type">&lt;{ patient: Patient }&gt;</span>();
+<span class="c-keyword">const</span> &#123; patient &#125; = defineProps<span class="c-type">&lt;&#123; patient: Patient &#125;&gt;</span>();
 <span class="c-tag">&lt;/script&gt;</span>
 
 <span class="c-tag">&lt;template&gt;</span>
   <span class="c-comment">&lt;!-- Vue resolves custom elements automatically --&gt;</span>
   <span class="c-tag">&lt;hx-card&gt;</span>
     <span class="c-comment">&lt;!-- Controller styles reach all of this --&gt;</span>
-    <span class="c-tag">&lt;h2&gt;</span>{{ patient.name }}<span class="c-tag">&lt;/h2&gt;</span>
-    <span class="c-tag">&lt;p&gt;</span>{{ patient.diagnosis }}<span class="c-tag">&lt;/p&gt;</span>
-    <span class="c-tag">&lt;p&gt;&lt;strong&gt;</span>DOB:<span class="c-tag">&lt;/strong&gt;</span> {{ patient.dob }}<span class="c-tag">&lt;/p&gt;</span>
+    <span class="c-tag">&lt;h2&gt;</span>&#123;&#123; patient.name &#125;&#125;<span class="c-tag">&lt;/h2&gt;</span>
+    <span class="c-tag">&lt;p&gt;</span>&#123;&#123; patient.diagnosis &#125;&#125;<span class="c-tag">&lt;/p&gt;</span>
+    <span class="c-tag">&lt;p&gt;&lt;strong&gt;</span>DOB:<span class="c-tag">&lt;/strong&gt;</span> &#123;&#123; patient.dob &#125;&#125;<span class="c-tag">&lt;/p&gt;</span>
   <span class="c-tag">&lt;/hx-card&gt;</span>
 <span class="c-tag">&lt;/template&gt;</span></code></pre>
             </div>
@@ -1731,39 +1731,39 @@ import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
                   <span class="as-code-filename">hx-article.ts — before and after</span>
                 </div>
                 <pre class="as-code"><code><span class="c-comment">// ❌ BEFORE — slot styles are broken</span>
-<span class="c-keyword">export class</span> <span class="c-type">HxArticle</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> {
-  <span class="c-keyword">static override</span> styles = css<span class="c-string">`
-    :host { display: block; }
+<span class="c-keyword">export class</span> <span class="c-type">HxArticle</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> &#123;
+  <span class="c-keyword">static override</span> styles = css<span class="c-string">&#96;
+    :host &#123; display: block; &#125;
     /* these never reach slotted content: */
-    ::slotted(p) { color: red; }
-  `</span>;
+    ::slotted(p) &#123; color: red; &#125;
+  &#96;</span>;
 
-  <span class="c-call">render</span>() {
-    <span class="c-keyword">return</span> html<span class="c-string">`&lt;slot&gt;&lt;/slot&gt;`</span>;
-  }
-}
+  <span class="c-call">render</span>() &#123;
+    <span class="c-keyword">return</span> html<span class="c-string">&#96;&lt;slot&gt;&lt;/slot&gt;&#96;</span>;
+  &#125;
+&#125;
 
 <span class="c-comment">// ✅ AFTER — 3 additions, everything styled</span>
-<span class="c-keyword">import</span> { <span class="c-type">AdoptedStylesheetsController</span> }  <span class="c-comment">// +1</span>
+<span class="c-keyword">import</span> &#123; <span class="c-type">AdoptedStylesheetsController</span> &#125;  <span class="c-comment">// +1</span>
   <span class="c-keyword">from</span> <span class="c-string">'../controllers/adopted-stylesheets.js'</span>;
 
-<span class="c-keyword">export class</span> <span class="c-type">HxArticle</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> {
-  <span class="c-keyword">static override</span> styles = css<span class="c-string">`
-    :host { display: block; }
-  `</span>;
+<span class="c-keyword">export class</span> <span class="c-type">HxArticle</span> <span class="c-keyword">extends</span> <span class="c-type">LitElement</span> &#123;
+  <span class="c-keyword">static override</span> styles = css<span class="c-string">&#96;
+    :host &#123; display: block; &#125;
+  &#96;</span>;
 
   <span class="c-keyword">private</span> _slotStyles =                       <span class="c-comment">// +2</span>
-    <span class="c-keyword">new</span> <span class="c-type">AdoptedStylesheetsController</span>(<span class="c-call">this</span>, <span class="c-string">`
-      hx-article p   { color: var(--hx-text-body);    }
-      hx-article h2  { color: var(--hx-text-heading); }
-      hx-article a   { color: var(--hx-color-primary);}
-      hx-article ul  { padding-left: 1.5rem;           }
-    `</span>);                                        <span class="c-comment">// +3</span>
+    <span class="c-keyword">new</span> <span class="c-type">AdoptedStylesheetsController</span>(<span class="c-call">this</span>, <span class="c-string">&#96;
+      hx-article p   &#123; color: var(--hx-text-body);    &#125;
+      hx-article h2  &#123; color: var(--hx-text-heading); &#125;
+      hx-article a   &#123; color: var(--hx-color-primary);&#125;
+      hx-article ul  &#123; padding-left: 1.5rem;           &#125;
+    &#96;</span>);                                        <span class="c-comment">// +3</span>
 
-  <span class="c-call">render</span>() {
-    <span class="c-keyword">return</span> html<span class="c-string">`&lt;slot&gt;&lt;/slot&gt;`</span>;
-  }
-}</code></pre>
+  <span class="c-call">render</span>() &#123;
+    <span class="c-keyword">return</span> html<span class="c-string">&#96;&lt;slot&gt;&lt;/slot&gt;&#96;</span>;
+  &#125;
+&#125;</code></pre>
               </div>
             </div>
           </div>

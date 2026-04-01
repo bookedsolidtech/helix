@@ -1,0 +1,40 @@
+{#
+/**
+ * @file
+ * Banner SDC — wraps hx-banner for Drupal site-wide announcement patterns.
+ *
+ * Use in page.html.twig above the main content region for system notices,
+ * maintenance windows, or critical health advisories. The banner can be
+ * shown/hidden via Drupal state management by toggling the open attribute.
+ *
+ * Example: Maintenance notice in page.html.twig
+ *   {% if maintenance_message %}
+ *     {% include 'helixui:hx-banner' with {
+ *       variant: 'warning',
+ *       heading: 'Scheduled maintenance',
+ *       content: maintenance_message,
+ *       dismissible: true,
+ *       open: true,
+ *     } %}
+ *   {% endif %}
+ */
+#}
+{{ attach_library('helixui/hx-banner') }}
+
+<hx-banner
+  variant="{{ variant|default('info') }}"
+  {% if position and position != 'inline' %}position="{{ position }}"{% endif %}
+  {% if heading %}heading="{{ heading }}"{% endif %}
+  {% if action_label %}action-label="{{ action_label }}"{% endif %}
+  {% if action_href %}action-href="{{ action_href }}"{% endif %}
+  {% if dismissible %}dismissible{% endif %}
+  {% if open is defined and not open %}open="false"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+  {% if action %}
+    <div slot="action">{{ action }}</div>
+  {% endif %}
+</hx-banner>

@@ -1,0 +1,43 @@
+{#
+/**
+ * @file
+ * Dialog SDC — wraps hx-dialog for Drupal modal integration.
+ *
+ * Use data-hx-dialog-trigger on buttons to wire open/close via Drupal behaviors:
+ *   Drupal.behaviors.hxDialog = {
+ *     attach(context) {
+ *       once('hx-dialog-trigger', '[data-hx-dialog-trigger]', context).forEach((btn) => {
+ *         btn.addEventListener('click', () => {
+ *           const id = btn.getAttribute('data-hx-dialog-trigger');
+ *           document.getElementById(id)?.showModal();
+ *         });
+ *       });
+ *     },
+ *   };
+ *
+ * Use variant="alertdialog" for drug interaction warnings, critical lab alerts,
+ * and any dialog requiring immediate clinical attention.
+ */
+#}
+{{ attach_library('helixui/hx-dialog') }}
+
+<hx-dialog
+  {% if heading %}heading="{{ heading }}"{% endif %}
+  {% if open %}open{% endif %}
+  {% if not modal %}modal="false"{% endif %}
+  {% if variant and variant != 'dialog' %}variant="{{ variant }}"{% endif %}
+  {% if close_on_backdrop == false %}close-on-backdrop="false"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if header %}
+    <div slot="header">{{ header }}</div>
+  {% endif %}
+
+  {% if content %}
+    {{ content }}
+  {% endif %}
+
+  {% if footer %}
+    <div slot="footer">{{ footer }}</div>
+  {% endif %}
+</hx-dialog>

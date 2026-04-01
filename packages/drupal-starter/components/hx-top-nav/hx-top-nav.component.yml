@@ -1,0 +1,28 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Top Navigation
+description: 'Site-level navigation bar with logo, nav items, and actions area. Supports sticky positioning and responsive hamburger menu. Wraps hx-top-nav for Drupal header blocks.'
+status: experimental
+group: Navigation
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Accessible aria-label for the site navigation landmark'
+      default: 'Site Navigation'
+    sticky:
+      type: boolean
+      title: Sticky
+      description: 'Whether the navigation bar sticks to the top of the viewport on scroll'
+      default: false
+slots:
+  logo:
+    title: Logo
+    description: 'Brand area rendered on the left side (logo, site name)'
+  default:
+    title: Navigation Items
+    description: 'Primary navigation links. Use a div or bare links — not a nav element.'
+  actions:
+    title: Actions
+    description: 'Utility area on the right side (search, user menu, notifications)'

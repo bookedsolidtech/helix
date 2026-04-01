@@ -67,7 +67,7 @@ export const helixDrawerStyles = css`
     box-shadow: var(--hx-drawer-shadow, var(--hx-shadow-xl));
     overflow: hidden;
     outline: none;
-    z-index: 1;
+    z-index: 1; /* local stacking context: panel above backdrop within overlay container */
     transition:
       transform var(--hx-duration-slow, 300ms) var(--hx-easing-out, ease-out),
       opacity var(--hx-duration-slow, 300ms) var(--hx-easing-out, ease-out);
@@ -258,7 +258,7 @@ export const helixDrawerStyles = css`
     justify-content: flex-end;
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-drawer-footer-padding, var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem));
-    border-top: var(--hx-border-width-1, 1px) solid
+    border-top: var(--hx-border-width-thin, 1px) solid
       var(--hx-drawer-footer-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
   }

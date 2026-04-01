@@ -1,0 +1,37 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Stat
+description: 'Key metric display with value, label, and optional trend indicator. Use in Drupal dashboard blocks, healthcare KPI panels, patient summary statistics, and analytics widgets.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      description: 'Descriptive label for the metric (e.g., "Active patients", "Appointments today")'
+    value:
+      type: string
+      title: Value
+      description: 'The primary metric value displayed prominently (e.g., "1,247", "98.6°F", "72 bpm")'
+    trend:
+      type: string
+      title: Trend
+      description: 'Trend direction for the metric'
+      enum:
+        - up
+        - down
+        - neutral
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the stat display'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+slots:
+  icon:
+    title: Icon
+    description: 'Optional icon displayed alongside the stat value (e.g., hx-icon)'

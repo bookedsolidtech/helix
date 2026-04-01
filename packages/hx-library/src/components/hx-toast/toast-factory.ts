@@ -26,6 +26,7 @@ export interface ToastOptions {
  * toast({ message: 'Patient record saved.', variant: 'success' });
  */
 export function toast(options: ToastOptions): HelixToast {
+  if (typeof document === 'undefined') throw new Error('toast() requires a browser environment');
   const placement = options.placement ?? 'bottom-end';
 
   // Find or create a dedicated stack for this placement

@@ -15,10 +15,10 @@ Next.js 15 App Router introduces unique challenges for web components: Server Co
 npm install @helixui/library
 ```
 
-If you want React wrapper components with full prop typing (optional), also install `@lit/react`:
+If you want React wrapper components with full prop typing (optional), also install `@helixui/react`:
 
 ```bash
-npm install @lit/react
+npm install @helixui/react
 ```
 
 ## The `'use client'` Boundary
@@ -223,45 +223,30 @@ declare global {
 }
 ```
 
-### Using `@lit/react` wrappers for full typing (optional)
+### Using `@helixui/react` wrappers for full typing (recommended)
 
-`@lit/react` generates React wrapper components with full prop types and event forwarding. This eliminates the need for `ref`-based event listeners:
+`@helixui/react` provides auto-generated React wrapper components for every HELiX component. Each wrapper exposes typed `onHx*` callback props and eliminates `ref`-based event listeners:
 
-```tsx
-// lib/helix-react.ts
-'use client';
-
-import { createComponent } from '@lit/react';
-import React from 'react';
-import { HxButton } from '@helixui/library';
-
-export const HxButtonReact = createComponent({
-  tagName: 'hx-button',
-  elementClass: HxButton,
-  react: React,
-  events: {
-    onHxClick: 'hx-click',
-    onHxFocus: 'hx-focus',
-    onHxBlur: 'hx-blur',
-  },
-});
+```bash
+npm install @helixui/react
 ```
 
-Usage in a Client Component:
-
 ```tsx
+// components/action-bar.tsx
 'use client';
 
-import { HxButtonReact } from '@/lib/helix-react';
+import { HxButton } from '@helixui/react';
 
 export function ActionBar() {
   return (
-    <HxButtonReact variant="primary" onHxClick={() => console.log('clicked')}>
+    <HxButton variant="primary" onHxClick={() => console.log('clicked')}>
       Confirm
-    </HxButtonReact>
+    </HxButton>
   );
 }
 ```
+
+See the [React Wrappers guide](/framework-integration/react-wrappers) for the full API including typed event callbacks, ref forwarding, slots, and the complete component list.
 
 ## Form Handling with React Server Actions
 

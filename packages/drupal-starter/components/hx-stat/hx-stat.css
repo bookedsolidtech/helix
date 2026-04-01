@@ -1,0 +1,5 @@
+/* hx-stat SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-stat {
+  display: block;
+}

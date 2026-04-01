@@ -36,6 +36,8 @@ Also used as the accessible label for the dropzone. */
   labelFileList?: string;
   /** Generates upload progress description for screen readers. */
   labelUploadProgress?: string;
+  /** Screen reader announcement when file drag detected. Override for i18n. */
+  labelDragDetected?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */

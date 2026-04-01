@@ -107,17 +107,41 @@ export class HelixSideNav extends LitElement {
    */
   /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
-    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') return;
+    const validKeys = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Home', 'End'];
+    if (!validKeys.includes(e.key)) return;
 
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
     if (!slot) return;
 
-    const navItems = slot
+    const topLevelItems = slot
       .assignedElements({ flatten: true })
       .filter(
         (el): el is HTMLElement =>
           el.tagName.toLowerCase() === 'hx-nav-item' && !el.hasAttribute('disabled'),
       );
+
+    if (topLevelItems.length === 0) return;
+
+    // Build a flattened list of navigable items: direct children plus visible
+    // child items from expanded parent items (per ARIA APG tree pattern).
+    const navItems: HTMLElement[] = [];
+    for (const item of topLevelItems) {
+      navItems.push(item);
+      // If this item is expanded, include its non-disabled children
+      if (item.hasAttribute('expanded')) {
+        const childrenSlot =
+          item.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="children"]');
+        if (childrenSlot) {
+          const childItems = childrenSlot
+            .assignedElements({ flatten: true })
+            .filter(
+              (el): el is HTMLElement =>
+                el.tagName.toLowerCase() === 'hx-nav-item' && !el.hasAttribute('disabled'),
+            );
+          navItems.push(...childItems);
+        }
+      }
+    }
 
     if (navItems.length === 0) return;
 
@@ -135,6 +159,56 @@ export class HelixSideNav extends LitElement {
         currentIndex = i;
         break;
       }
+    }
+
+    // Handle ArrowRight/ArrowLeft for expand/collapse (ARIA APG tree pattern)
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const currentItem = currentIndex >= 0 ? navItems[currentIndex] : null;
+      if (!currentItem) return;
+
+      if (e.key === 'ArrowRight') {
+        // If the item has children and is collapsed, expand it
+        if (
+          currentItem.hasAttribute('expanded') === false &&
+          currentItem.querySelector('[slot="children"]')
+        ) {
+          currentItem.setAttribute('expanded', '');
+          (currentItem as HTMLElement & { expanded?: boolean }).expanded = true;
+        } else if (currentItem.hasAttribute('expanded')) {
+          // Already expanded: move focus to first child item
+          const childrenSlot =
+            currentItem.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="children"]');
+          if (childrenSlot) {
+            const firstChild = childrenSlot
+              .assignedElements({ flatten: true })
+              .find(
+                (el): el is HTMLElement =>
+                  el.tagName.toLowerCase() === 'hx-nav-item' && !el.hasAttribute('disabled'),
+              );
+            if (firstChild) {
+              firstChild.focus();
+              return;
+            }
+          }
+        }
+      } else {
+        // ArrowLeft: if expanded, collapse; if collapsed or non-expandable, find parent
+        if (currentItem.hasAttribute('expanded')) {
+          currentItem.removeAttribute('expanded');
+          (currentItem as HTMLElement & { expanded?: boolean }).expanded = false;
+        } else {
+          // Move focus to parent item if this item is a child in another item's slot
+          const parentNavItem =
+            currentItem.closest<HTMLElement>('hx-nav-item:not(:scope)') ??
+            currentItem.parentElement?.closest<HTMLElement>('hx-nav-item') ??
+            null;
+          if (parentNavItem && !parentNavItem.hasAttribute('disabled')) {
+            parentNavItem.focus();
+          }
+        }
+      }
+      return;
     }
 
     e.preventDefault();

@@ -108,6 +108,13 @@ export class HelixCopyButton extends LitElement {
   @property({ type: String, attribute: 'label-copied' })
   labelCopied = 'Copied';
 
+  /**
+   * Accessible label announced when copy fails. Override for i18n.
+   * @attr label-error
+   */
+  @property({ type: String, attribute: 'label-error' })
+  labelError = 'Copy failed';
+
   // ─── Private State ───
 
   /** True while the success feedback window is active. */
@@ -161,7 +168,7 @@ export class HelixCopyButton extends LitElement {
 
   /** @internal */
   private async _copyToClipboard(): Promise<void> {
-    await navigator.clipboard.writeText(this.value);
+    await navigator?.clipboard?.writeText(this.value);
   }
 
   // ─── Event Handling ───
@@ -181,7 +188,7 @@ export class HelixCopyButton extends LitElement {
       await this._copyToClipboard();
     } catch (error: unknown) {
       // Clipboard write failed — notify consumers and announce failure.
-      this._announcement = 'Copy failed';
+      this._announcement = this.labelError;
 
       /**
        * Dispatched when the clipboard write fails (permission denied, iframe

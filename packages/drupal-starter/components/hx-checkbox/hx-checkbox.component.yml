@@ -1,0 +1,53 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Checkbox
+description: 'Form-associated checkbox with label, validation, and help text. Supports checked, indeterminate, and disabled states for Drupal Form API integration.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text for the checkbox'
+    value:
+      type: string
+      title: Value
+      description: 'Value submitted when checked'
+      default: 'on'
+    checked:
+      type: boolean
+      title: Checked
+      description: 'Whether the checkbox is checked'
+      default: false
+    indeterminate:
+      type: boolean
+      title: Indeterminate
+      description: 'Whether the checkbox is in an indeterminate state'
+      default: false
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the checkbox is disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text displayed below the checkbox'
+slots:
+  default:
+    title: Label Content
+    description: 'Custom label content (overrides the label prop). Supports rich HTML for consent labels.'

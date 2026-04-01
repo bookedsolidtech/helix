@@ -1,0 +1,65 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Combobox
+description: 'Searchable select with filterable options, multi-select support, and remote data loading. For Drupal autocomplete fields, entity reference fields, and taxonomy term selection.'
+status: experimental
+group: Forms
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: Name
+      description: 'The form field name'
+    label:
+      type: string
+      title: Label
+      description: 'Visible label text'
+    value:
+      type: string
+      title: Value
+      description: 'Currently selected value(s). Comma-separated for multiple'
+    placeholder:
+      type: string
+      title: Placeholder
+      description: 'Placeholder text when no option is selected'
+    size:
+      type: string
+      title: Size
+      description: 'Visual size variant'
+      default: 'md'
+      enum:
+        - sm
+        - md
+        - lg
+    multiple:
+      type: boolean
+      title: Multiple
+      description: 'Whether multiple values can be selected'
+      default: false
+    clearable:
+      type: boolean
+      title: Clearable
+      description: 'Whether to show a clear button to reset selection'
+      default: false
+    required:
+      type: boolean
+      title: Required
+      description: 'Whether the field is required'
+      default: false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Whether the combobox is disabled'
+      default: false
+    error:
+      type: string
+      title: Error
+      description: 'Validation error message'
+    help_text:
+      type: string
+      title: Help Text
+      description: 'Supporting help text'
+slots:
+  options:
+    title: Options
+    description: 'hx-option elements defining the available choices'

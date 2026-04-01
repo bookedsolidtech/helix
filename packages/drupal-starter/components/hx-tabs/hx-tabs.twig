@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Tabs SDC — composes hx-tabs, hx-tab, and hx-tab-panel.
+ *
+ * Provide hx-tab elements in the tabs slot and matching hx-tab-panel elements
+ * in the default slot. Each hx-tab must have a panel attribute matching its
+ * corresponding hx-tab-panel id.
+ *
+ * Example:
+ *   {% include 'helixui:hx-tabs' with {
+ *     label: 'Patient record sections',
+ *     tabs: '<hx-tab panel="summary">Summary</hx-tab><hx-tab panel="labs">Labs</hx-tab>',
+ *     content: '<hx-tab-panel name="summary">...</hx-tab-panel><hx-tab-panel name="labs">...</hx-tab-panel>',
+ *   } %}
+ */
+#}
+{{ attach_library('helixui/hx-tabs') }}
+
+<hx-tabs
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if orientation and orientation != 'horizontal' %}orientation="{{ orientation }}"{% endif %}
+  {% if activation and activation != 'automatic' %}activation="{{ activation }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if tabs %}
+    {{ tabs }}
+  {% endif %}
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-tabs>

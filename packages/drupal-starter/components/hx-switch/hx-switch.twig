@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Switch SDC — wraps hx-switch for Drupal boolean field integration.
+ *
+ * For Drupal boolean/checkbox fields displayed as toggles, map the field value
+ * to the checked prop and the field name to the name prop.
+ */
+#}
+{{ attach_library('helixui/hx-switch') }}
+
+<hx-switch
+  {% if name %}name="{{ name }}"{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {% if value and value != 'on' %}value="{{ value }}"{% endif %}
+  {% if checked %}checked{% endif %}
+  {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
+  {% if required %}required{% endif %}
+  {% if disabled %}disabled{% endif %}
+  {% if error %}error="{{ error }}"{% endif %}
+  {% if help_text %}help-text="{{ help_text }}"{% endif %}
+  {{ attributes ? attributes }}
+></hx-switch>

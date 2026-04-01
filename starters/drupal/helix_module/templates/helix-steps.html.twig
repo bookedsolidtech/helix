@@ -1,0 +1,146 @@
+{#
+  helix-steps.html.twig
+  ---------------------
+  Renders a HELiX hx-steps multi-step progress indicator from a Drupal
+  webform multistep form or any workflow step data structure.
+
+  The component is composed of a parent <hx-steps> container and one
+  <hx-step> child per step. The parent manages orientation, size, and
+  child index automatically — do NOT set those attributes on hx-step.
+
+  hx-step status values:
+    - pending   → step not yet reached (default)
+    - active    → current step (announces aria-current="step")
+    - complete  → step finished (renders checkmark icon)
+    - error     → step failed or invalid (renders X icon)
+
+  Variables:
+    steps        (array)   Array of step objects. Required. See Step Object below.
+    orientation  (string)  'horizontal' | 'vertical'. Default: 'horizontal'.
+    size         (string)  'sm' | 'md' | 'lg'. Default: 'md'.
+    aria_label   (string)  Accessible label for the step list. Required for WCAG.
+                           Default: 'Progress steps'.
+    attributes   (object)  Additional HTML attributes spread onto hx-steps.
+
+  Step Object properties:
+    label        (string)  Step label text. Required.
+    status       (string)  'pending' | 'active' | 'complete' | 'error'. Required.
+    description  (string)  Optional description shown below the label.
+    disabled     (bool)    When true, step is non-interactive.
+
+  Usage — basic multi-step form:
+    {% include 'helix-steps.html.twig' with {
+      aria_label: 'Registration progress',
+      steps: [
+        { label: 'Account',  status: 'complete', description: 'Account created' },
+        { label: 'Profile',  status: 'active',   description: 'Enter your details' },
+        { label: 'Confirm',  status: 'pending',  description: 'Review and submit' },
+      ],
+    } %}
+
+  Usage — Drupal Webform multistep integration:
+    In a webform preprocess hook (helix_module.theme.inc), map the webform
+    page state to step status values:
+
+      function helix_module_preprocess_helix_steps(&$variables, $hook) {
+        $webform_submission = $variables['webform_submission'];
+        $current_page       = $variables['current_page'];
+        $pages              = $variables['pages'];
+        $completed_pages    = $webform_submission->getData()['_webform_completed_pages'] ?? [];
+
+        $steps = [];
+        foreach ($pages as $page_key => $page) {
+          if (in_array($page_key, $completed_pages)) {
+            $status = 'complete';
+          } elseif ($page_key === $current_page) {
+            $status = 'active';
+          } else {
+            $status = 'pending';
+          }
+          $steps[] = [
+            'label'  => $page['#title'],
+            'status' => $status,
+          ];
+        }
+        $variables['steps']      = $steps;
+        $variables['aria_label'] = t('Form progress');
+      }
+
+    Then in your webform template (webform.html.twig):
+      {% include 'helix-steps.html.twig' with {
+        steps: steps,
+        aria_label: aria_label,
+        orientation: 'horizontal',
+      } %}
+
+  Usage — vertical wizard with error recovery:
+    {% include 'helix-steps.html.twig' with {
+      aria_label: 'Application steps',
+      orientation: 'vertical',
+      size: 'lg',
+      steps: [
+        { label: 'Personal Info',  status: 'complete' },
+        { label: 'Documents',      status: 'error',   description: 'Upload failed — please retry' },
+        { label: 'Review',         status: 'pending', disabled: true },
+        { label: 'Submit',         status: 'pending', disabled: true },
+      ],
+    } %}
+
+  Usage — dynamic step count from Drupal workflow:
+    Map a content moderation workflow or Rules-based state machine to steps.
+    Disabled future steps prevent premature navigation:
+
+      {% set current_state = node.moderation_state.value %}
+      {% set workflow_states = ['draft', 'review', 'approved', 'published'] %}
+      {% set current_index = workflow_states|keys|filter(k => workflow_states[k] == current_state)|first %}
+
+      {% set steps = [] %}
+      {% for i, state in workflow_states %}
+        {% if i < current_index %}
+          {% set step_status = 'complete' %}
+        {% elseif i == current_index %}
+          {% set step_status = 'active' %}
+        {% else %}
+          {% set step_status = 'pending' %}
+        {% endif %}
+        {% set steps = steps|merge([{ label: state|capitalize, status: step_status, disabled: i > current_index }]) %}
+      {% endfor %}
+
+      {% include 'helix-steps.html.twig' with {
+        steps: steps,
+        aria_label: 'Publishing workflow',
+      } %}
+
+  Accessibility:
+    - Always provide a descriptive aria_label on hx-steps (e.g. "Checkout progress").
+    - The component uses role="list" / role="listitem" internally.
+    - Active steps announce aria-current="step" automatically.
+    - Complete steps include visually hidden "Complete" text for screen readers.
+    - Error steps include visually hidden "Error" text for screen readers.
+    - Steps are keyboard-navigable: Tab to focus, Enter or Space to activate.
+
+  Properties managed by hx-steps (do NOT set on individual hx-step):
+    - orientation  → set on <hx-steps>, auto-propagated to children
+    - size         → set on <hx-steps>, auto-propagated to children
+    - index        → auto-assigned by <hx-steps> based on DOM order
+#}
+
+<hx-steps
+  orientation="{{ orientation|default('horizontal') }}"
+  hx-size="{{ size|default('md') }}"
+  aria-label="{{ aria_label|default('Progress steps') }}"
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+>
+  {% for step in steps|default([]) %}
+    <hx-step
+      label="{{ step.label }}"
+      status="{{ step.status|default('pending') }}"
+      {% if step.description is defined and step.description %}
+        description="{{ step.description }}"
+      {% endif %}
+      {% if step.disabled is defined and step.disabled %}
+        disabled
+      {% endif %}
+    ></hx-step>
+  {% endfor %}
+</hx-steps>

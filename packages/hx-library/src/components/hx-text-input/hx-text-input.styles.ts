@@ -18,22 +18,34 @@ export const helixTextInputStyles = css`
    * exposed as theming hooks for consumers who target the host element.
    */
   :host([focused]) .field__input-wrapper {
-    border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    border-color: var(
+      --hx-input-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+    );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        var(
+            --hx-input-focus-ring-color,
+            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+          )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
 
   :host([focused-visible]) .field__input-wrapper {
-    border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    border-color: var(
+      --hx-input-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+    );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        var(
+            --hx-input-focus-ring-color,
+            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+          )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -87,11 +99,17 @@ export const helixTextInputStyles = css`
   }
 
   .field__input-wrapper:focus-within {
-    border-color: var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb));
+    border-color: var(
+      --hx-input-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+    );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #2563eb))
+        var(
+            --hx-input-focus-ring-color,
+            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+          )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );

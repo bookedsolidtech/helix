@@ -1,0 +1,232 @@
+# ============================================================================
+# Audit Batch CI — Single CI run for consolidated audit batches
+# ============================================================================
+# Runs on audit/deep-quality-batch-* branches. Executes the full quality gate
+# suite once for the entire batch rather than per-component.
+#
+# Trigger: PR from audit/deep-quality-batch-* to dev
+# ============================================================================
+
+name: Audit Batch CI
+
+on:
+  pull_request:
+    branches: [dev]
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**/*.md'
+      - '.automaker/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.editorconfig'
+
+concurrency:
+  group: audit-batch-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+jobs:
+  # ── Gate: Only run for audit batch branches ──────────────────────────────
+  detect-batch:
+    name: Detect Audit Batch
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      is_batch: ${{ steps.check.outputs.is_batch }}
+      component_count: ${{ steps.check.outputs.component_count }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check branch pattern
+        id: check
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          if [[ "$BRANCH" == audit/deep-quality-batch-* ]]; then
+            echo "is_batch=true" >> "$GITHUB_OUTPUT"
+            echo "Audit batch branch detected: $BRANCH"
+
+            # Count components from metadata if available
+            DATE=$(echo "$BRANCH" | grep -oE '[0-9]{8}$')
+            METADATA=".automaker/audits/batch-${DATE}-metadata.json"
+            if [ -f "$METADATA" ]; then
+              COUNT=$(node -e "const m=JSON.parse(require('fs').readFileSync('$METADATA','utf-8')); console.log(m.components.total)")
+              echo "component_count=$COUNT" >> "$GITHUB_OUTPUT"
+              echo "Components in batch: $COUNT"
+            else
+              echo "component_count=0" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "is_batch=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Quality gates (same as main CI but scoped to batch) ─────────────────
+
+  lint:
+    name: Lint (Batch)
+    needs: [detect-batch]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+
+  format:
+    name: Format (Batch)
+    needs: [detect-batch]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run format:check
+
+  type-check:
+    name: Type Check (Batch)
+    needs: [detect-batch]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run type-check
+
+  build:
+    name: Build (Batch)
+    needs: [detect-batch]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+
+  test:
+    name: Test (Batch — Changed Components)
+    needs: [detect-batch, build]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      - name: Determine changed components
+        id: changed
+        run: |
+          CHANGED=$(git diff --name-only origin/dev...HEAD -- 'packages/hx-library/src/components/' \
+            | grep -oP 'hx-[a-z-]+' \
+            | sort -u \
+            | tr '\n' ' ')
+          echo "components=$CHANGED" >> "$GITHUB_OUTPUT"
+          echo "Changed components: $CHANGED"
+
+      - name: Run tests for changed components
+        if: steps.changed.outputs.components != ''
+        run: |
+          COMPONENTS="${{ steps.changed.outputs.components }}"
+          TEST_FILES=""
+          for comp in $COMPONENTS; do
+            TEST_FILE="packages/hx-library/src/components/${comp}/${comp}.test.ts"
+            if [ -f "$TEST_FILE" ]; then
+              TEST_FILES="$TEST_FILES $TEST_FILE"
+            fi
+          done
+          if [ -n "$TEST_FILES" ]; then
+            npx vitest run --reporter=verbose $TEST_FILES
+          else
+            echo "No test files found for changed components"
+          fi
+
+  changeset:
+    name: Changeset (Batch)
+    needs: [detect-batch]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for changeset
+        run: |
+          CHANGESET_COUNT=$(git diff --name-only origin/dev...HEAD -- '.changeset/*.md' \
+            | grep -v README.md \
+            | wc -l | tr -d ' ')
+          if [ "$CHANGESET_COUNT" -gt 0 ]; then
+            echo "✅ Found $CHANGESET_COUNT changeset file(s)"
+          else
+            echo "⚠️ No changeset found — checking for skip-changeset label"
+            # The changeset check in the main CI handles label detection
+          fi
+
+  # ── Summary gate ────────────────────────────────────────────────────────
+  quality-gates:
+    name: Quality Gates (Batch)
+    needs: [detect-batch, lint, format, type-check, build, test, changeset]
+    if: always() && needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Check all gates
+        run: |
+          echo "Audit Batch CI Summary"
+          echo "====================="
+          echo "Components: ${{ needs.detect-batch.outputs.component_count }}"
+          echo ""
+          echo "Gates:"
+          echo "  Lint:       ${{ needs.lint.result }}"
+          echo "  Format:     ${{ needs.format.result }}"
+          echo "  Type Check: ${{ needs.type-check.result }}"
+          echo "  Build:      ${{ needs.build.result }}"
+          echo "  Test:       ${{ needs.test.result }}"
+          echo "  Changeset:  ${{ needs.changeset.result }}"
+
+          # Fail if any required gate failed
+          if [[ "${{ needs.lint.result }}" == "failure" ]] || \
+             [[ "${{ needs.format.result }}" == "failure" ]] || \
+             [[ "${{ needs.type-check.result }}" == "failure" ]] || \
+             [[ "${{ needs.build.result }}" == "failure" ]] || \
+             [[ "${{ needs.test.result }}" == "failure" ]]; then
+            echo ""
+            echo "❌ One or more quality gates failed"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ All quality gates passed for audit batch"

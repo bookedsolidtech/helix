@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * List SDC — wraps hx-list for Drupal field list and Views list integration.
+ *
+ * Render hx-list-item elements in the default slot. Common uses:
+ *   - Drupal field lists (multi-value fields)
+ *   - Search result item lists
+ *   - Interactive navigation menus (variant="interactive")
+ *   - Definition/description lists (variant="description")
+ */
+#}
+{{ attach_library('helixui/hx-list') }}
+
+<hx-list
+  {% if variant and variant != 'plain' %}variant="{{ variant }}"{% endif %}
+  {% if divided %}divided{% endif %}
+  {% if label %}label="{{ label }}"{% endif %}
+  {{ attributes ? attributes }}
+>
+  {% if content %}
+    {{ content }}
+  {% endif %}
+</hx-list>

@@ -28,6 +28,8 @@ Web components are framework-agnostic by design, but frameworks differ in:
 | [Next.js 15](/framework-integration/nextjs) | Next.js 15 App Router, SSR, Server Actions |
 | [Vue](/framework-integration/vue) | Vue 3, Nuxt |
 | [Angular](/framework-integration/angular) | Angular 16+ |
+| [Svelte](/framework-integration/svelte) | Svelte 5, SvelteKit |
+| [Astro](/framework-integration/astro) | Astro 5, Starlight |
 | [Plain HTML](/framework-integration/html) | CDN / no-build setup |
 | [Drupal](/framework-integration/drupal) | Drupal CMS / Twig templates |
 

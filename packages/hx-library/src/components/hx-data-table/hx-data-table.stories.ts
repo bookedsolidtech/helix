@@ -62,6 +62,24 @@ const meta = {
       description: 'Stick the header row to the top during scroll.',
       table: { category: 'Layout', defaultValue: { summary: 'false' } },
     },
+    selectAllLabel: {
+      control: 'text',
+      description: 'Accessible label for the select-all checkbox in the header row.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'Select all rows' },
+        type: { summary: 'string' },
+      },
+    },
+    pageSize: {
+      control: { type: 'number', min: 1, max: 100, step: 1 },
+      description: 'Number of rows per page when pagination is active.',
+      table: {
+        category: 'Pagination',
+        defaultValue: { summary: '10' },
+        type: { summary: 'number' },
+      },
+    },
   },
   args: {
     selectable: false,
@@ -406,4 +424,25 @@ export const DarkMode: Story = {
       html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
   ],
   args: { selectable: true },
+};
+
+// ─────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────
+
+export const KeyboardNavigation: Story = {
+  name: 'Keyboard Navigation',
+  render: () => html`
+    <div style="padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+        Tab navigates column header sort buttons and row checkboxes. Enter or Space activates sort on focused column headers. Arrow keys move between cells in interactive mode.
+      </p>
+      <hx-data-table></hx-data-table>
+    </div>
+  `,
+    play: async ({ canvasElement }) => {
+    const el = canvasElement.querySelector('hx-data-table');
+    await expect(el).toBeTruthy();
+    await userEvent.tab();
+  },
 };

@@ -105,6 +105,15 @@ const meta = {
         type: { summary: "'sm' | 'md' | 'lg'" },
       },
     },
+    requiredMessage: {
+      control: 'text',
+      description: 'Custom validation message shown when the required checkbox is not checked.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: 'This field is required.' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     checked: false,

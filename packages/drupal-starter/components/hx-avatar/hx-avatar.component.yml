@@ -1,0 +1,50 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Avatar
+description: 'User or patient avatar with photo, initials fallback, and optional status badge overlay. Use in Drupal user profile displays, provider cards, patient banners, and team member listings.'
+status: experimental
+group: 'Data Display'
+props:
+  type: object
+  properties:
+    src:
+      type: string
+      title: Image URL
+      description: 'URL of the avatar photo. Falls back to initials or icon when not provided or on load error.'
+    alt:
+      type: string
+      title: Alt Text
+      description: 'Alternative text for the avatar image. Use an empty string for decorative avatars.'
+    label:
+      type: string
+      title: Label
+      description: 'Accessible label when no visible text describes the avatar (e.g., "Dr. Jane Smith")'
+    initials:
+      type: string
+      title: Initials
+      description: 'One or two characters to display when no image is available (e.g., "JS")'
+    hx_size:
+      type: string
+      title: Size
+      description: 'Visual size of the avatar'
+      default: 'md'
+      enum:
+        - xs
+        - sm
+        - md
+        - lg
+        - xl
+    shape:
+      type: string
+      title: Shape
+      description: 'Shape of the avatar container'
+      default: 'circle'
+      enum:
+        - circle
+        - square
+slots:
+  default:
+    title: Custom Content
+    description: 'Custom avatar content. Overrides src and initials when slotted content is present.'
+  badge:
+    title: Badge
+    description: 'Status indicator overlay positioned at the bottom-right (e.g., hx-status-indicator)'

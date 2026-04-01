@@ -245,6 +245,14 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    value: {
+      control: 'text',
+      description: 'Form field value submitted via ElementInternals when the button is activated.',
+      table: {
+        category: 'Form',
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Settings',

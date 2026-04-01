@@ -57,6 +57,20 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    labelClose: {
+      control: 'text',
+      description: 'Accessible label for the close button.',
+      table: {
+        category: 'Labels',
+        defaultValue: { summary: 'Close' },
+        type: { summary: 'string' },
+      },
+    },
+  },
+  parameters: {
+    actions: {
+      handles: ['hx-show', 'hx-after-show', 'hx-hide', 'hx-after-hide'],
+    },
   },
   args: {
     variant: 'default',

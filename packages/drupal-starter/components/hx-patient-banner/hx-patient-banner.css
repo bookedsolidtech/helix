@@ -1,0 +1,5 @@
+/* hx-patient-banner SDC — layout only; visual styles live in the component shadow DOM */
+
+hx-patient-banner {
+  display: block;
+}

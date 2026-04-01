@@ -53,17 +53,19 @@ export class HelixAccordion extends LitElement {
     // Re-enforce single mode when reconnected with pre-expanded items
     this._enforceSingleMode();
     // Watch for dynamically added accordion items that may violate single-expand
-    this._mutationObserver = new MutationObserver((mutations) => {
-      const hasNewItems = mutations.some((m) =>
-        Array.from(m.addedNodes).some(
-          (n) => n instanceof Element && n.tagName.toLowerCase() === 'hx-accordion-item',
-        ),
-      );
-      if (hasNewItems) {
-        this._enforceSingleMode();
-      }
-    });
-    this._mutationObserver.observe(this, { childList: true });
+    if (typeof MutationObserver !== 'undefined') {
+      this._mutationObserver = new MutationObserver((mutations) => {
+        const hasNewItems = mutations.some((m) =>
+          Array.from(m.addedNodes).some(
+            (n) => n instanceof Element && n.tagName.toLowerCase() === 'hx-accordion-item',
+          ),
+        );
+        if (hasNewItems) {
+          this._enforceSingleMode();
+        }
+      });
+      this._mutationObserver.observe(this, { childList: true });
+    }
   }
 
   override disconnectedCallback(): void {

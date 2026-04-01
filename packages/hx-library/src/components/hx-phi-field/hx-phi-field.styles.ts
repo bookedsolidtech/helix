@@ -65,17 +65,29 @@ export const helixPhiFieldStyles = css`
   }
 
   .phi-field__toggle:hover {
-    opacity: 0.8;
+    opacity: var(--hx-opacity-90, 0.9);
   }
 
   .phi-field__toggle:active {
-    opacity: 0.6;
+    opacity: var(--hx-opacity-50, 0.5);
   }
 
   .phi-field__toggle svg {
     width: 1em;
     height: 1em;
     pointer-events: none;
+  }
+
+  /* ─── Disabled State ─── */
+
+  :host([disabled]) {
+    opacity: var(--hx-phi-field-disabled-opacity, var(--hx-opacity-50, 0.5));
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .phi-field--disabled .phi-field__toggle {
+    cursor: not-allowed;
   }
 
   /* ─── Reduced Motion ─── */

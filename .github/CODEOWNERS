@@ -76,6 +76,22 @@
 /.husky/ @himerus
 
 # ==============================================================================
+# Security-Sensitive Paths — Agent Guardrails Layer
+# ==============================================================================
+
+# Environment files — must never be committed, changes require human review
+.env* @himerus
+
+# Secret scanning config — any changes could weaken detection
+/.gitleaks.toml @himerus
+
+# Agent automation settings — controls what agents can do autonomously
+/.automaker/settings.json @himerus
+
+# This file itself — prevents unauthorized ownership changes
+/.github/CODEOWNERS @himerus
+
+# ==============================================================================
 # Special Files
 # ==============================================================================
 
