@@ -78,7 +78,7 @@ jobs:
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name" 2>/dev/null || echo "unknown")
             echo "Packing $PKG_NAME ($pkg_dir)..."
 
-            TARBALL=$(pnpm pack --pack-destination "$SCAN_DIR" 2>/dev/null \
+            TARBALL=$(cd "$pkg_dir" && pnpm pack --pack-destination "$SCAN_DIR" 2>/dev/null \
               | tail -1)
             if [ ! -f "$TARBALL" ]; then
               # pnpm pack writes the filename relative to pack-destination
