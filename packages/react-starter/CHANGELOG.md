@@ -1,11 +1,9 @@
-# @helixui/react
+# @helixui/react-starter
 
-## 1.1.1
+## 0.0.1
 
 ### Patch Changes
 
-- e00e680: fix: remediate react wrapper test suite CI issues
-- e0adb4e: add ssr browser api guards, fix event composition, complete fouc coverage, and fix drupal cdn path
 - Updated dependencies [7641ef1]
 - Updated dependencies [3bbe6a5]
 - Updated dependencies [448c908]
@@ -59,6 +57,7 @@
 - Updated dependencies [cf0bc88]
 - Updated dependencies [20d502c]
 - Updated dependencies [af04577]
+- Updated dependencies [e00e680]
 - Updated dependencies [4f5af84]
 - Updated dependencies [c94a209]
 - Updated dependencies [e0adb4e]
@@ -75,18 +74,4 @@
 - Updated dependencies [acb6076]
 - Updated dependencies [1b587d2]
   - @helixui/library@2.0.0
-
-## 1.1.0
-
-### Minor Changes
-
-- 54c2705: Add `@helixui/react` package with auto-generated React wrappers for all 98 HELiX web components.
-
-  Wrappers are generated from `custom-elements.json` via `scripts/generate-react-wrappers.ts` using `@lit/react` `createComponent()`. Each wrapper includes `'use client'` for Next.js 15 App Router compatibility, full TypeScript prop types derived from CEM declarations, and React-style event callbacks (`onHxClick`, `onHxInput`, `onHxChange`, etc.).
-
-  Tree-shakeable: each component is a separate entry point so importing `HxButton` does not bundle all 98 components.
-
-### Patch Changes
-
-- Updated dependencies [23af064]
-  - @helixui/library@1.1.2
+  - @helixui/react@1.1.1

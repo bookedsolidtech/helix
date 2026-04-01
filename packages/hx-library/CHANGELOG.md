@@ -1,5 +1,313 @@
 # @helixui/library
 
+## 2.0.0
+
+### Major Changes
+
+- 8bf2c61: fix(cem): remediate CEM and API surface inconsistencies across 40+ components (WF-06)
+
+  ## Summary
+
+  Comprehensive CEM API surface audit remediation fixing 90 findings across 40+ components.
+
+  ## Breaking Changes
+
+  ### Property Renames
+
+  | Component          | Old Property   | New Property   |
+  | ------------------ | -------------- | -------------- |
+  | `hx-card`          | `hxHref`       | `href`         |
+  | `hx-card`          | `hxAriaLabel`  | `label`        |
+  | `hx-field`         | `hxSize`       | `size`         |
+  | `hx-banner`        | `closeLabel`   | `labelClose`   |
+  | `hx-dialog`        | `closeLabel`   | `labelClose`   |
+  | `hx-drawer`        | `closeLabel`   | `labelClose`   |
+  | `hx-toast`         | `closeLabel`   | `labelClose`   |
+  | `hx-split-button`  | `triggerLabel` | `labelTrigger` |
+  | `hx-split-button`  | `menuLabel`    | `labelMenu`    |
+  | `hx-overflow-menu` | `menuLabel`    | `labelMenu`    |
+
+  ### CSS Part Renames
+
+  | Component     | Old Part    | New Part       |
+  | ------------- | ----------- | -------------- |
+  | `hx-drawer`   | `close-btn` | `close-button` |
+  | `hx-carousel` | `prev-btn`  | `prev-button`  |
+  | `hx-carousel` | `next-btn`  | `next-button`  |
+
+  ## Non-Breaking Fixes
+  - Added `@internal` annotation to `formAssociated` static field across all 18 form-associated components — prevents this browser API marker from appearing in CEM
+  - Added `@internal` annotation to `formDisabledCallback`, `formResetCallback`, and `formStateRestoreCallback` across all form-associated components
+  - Added `@internal` to private fields leaking into CEM: `hx-button-group` (`internals`), `hx-alert` (`_defaultSeverityLabel`, `_effectiveSeverityLabel`), `hx-prose` (`adoptedStyles`), `hx-card` (`shadowRootOptions`)
+  - Expanded type alias unions to literal union types in 19 components so CEM shows actual allowed values instead of opaque type names
+  - Added `NAMING_CONVENTION.md` documenting approved naming standards for the library
+
+### Minor Changes
+
+- 670c553: add automated release pipeline with GitHub Actions workflows for semantic versioning, changeset-driven releases, npm publishing, and GitHub Releases generation
+- 1037809: add css bundle pipeline that extracts component styles into standalone css files for enterprise light-dom consumption
+- abb4de6: add density attribute to hx-theme supporting comfortable (default), compact, and spacious presets. compact reduces spacing tokens ~25% for data-dense clinical dashboards; spacious increases ~25% for touch-optimized bedside tablets. density composes with theme and brand as a separate adoptedStyleSheets layer.
+- 5c4e4c9: Add Drupal behaviors package for enterprise CMS integration
+- 224884e: Add CLI script to generate Drupal libraries.yml from Custom Elements Manifest
+
+  Adds `scripts/generate-drupal-libraries.js` and a `generate:drupal-libraries` npm script to `@helixui/library`. The script reads `custom-elements.json` (CEM) and `package.json` and writes `drupal/helix.libraries.yml` — a valid Drupal asset library definition file containing:
+  - `helix/hx-tokens` — standalone design token CSS library
+  - One entry per component directory (77 components), each with `type: module` JS and a `helix/hx-tokens` dependency
+  - Six category bundles: `core`, `forms`, `navigation`, `data-display`, `feedback`, `layout`
+  - `helix/all` — full library bundle that includes every component
+
+  The base asset path defaults to `/libraries/helix` and is configurable via `--base-path`. The output path defaults to `drupal/helix.libraries.yml` and is configurable via `--output`.
+
+- 727e99f: add HelixAuditController for HIPAA audit trail event capture
+- 917d707: feat(mixins): add FocusMixin for standardized delegated focus management
+
+  Introduces FocusMixin, a Lit 3.x mixin modeled after Lion's FocusMixin and Material Web's mixinDelegatesAria:
+  - `_focusableNode` protected getter for subclasses to declare the inner focusable element
+  - `focused` reflected boolean attribute as a CSS styling hook for `:host([focused])`
+  - `focusedVisible` reflected boolean attribute for keyboard-only focus ring styling
+  - Delegated `focus()` / `blur()` routing to the inner element
+  - Autofocus support after first render via `firstUpdated` lifecycle
+  - Pre-render focus queuing: `focus()` calls before shadow DOM is stamped are replayed on `firstUpdated`
+
+  Applied FocusMixin to `hx-text-input`, replacing the previous manual `this._input?.focus()` pattern.
+
+- 3458dd0: add FormMixin for shared form validation and interaction state tracking across form components
+- d776f72: add HelixElement base class with shared form association, lifecycle callbacks, and ID counter utilities
+
+  Introduces `HelixElement` as the new base class for all HELiX components, extending `LitElement` with:
+  - Lazy `_internals` accessor via private class field — eliminates `attachInternals()` constructor boilerplate across all form-associated components
+  - Form lifecycle hook delegation: `formDisabledCallback`, `formResetCallback`, and `formStateRestoreCallback` delegate to protected `_onFormDisabled`, `_onFormReset`, and `_onFormStateRestore` hook methods for clean subclass overrides
+  - `form`, `validity`, and `validationMessage` convenience getters
+  - `createIdCounter(namespace)` and `resetIdCounter(namespace?)` utilities replacing module-level `let` counters with a shared, testable, SSR-safe ID factory
+  - `mergeTokenStyles(componentStyles, tokenStyles)` helper for combining Lit CSSResult arrays
+
+  Migrates `hx-text-input`, `hx-checkbox`, and `hx-select` to use `HelixElement` as a proof-of-concept migration. All existing public APIs are preserved.
+
+  All utilities are exported from `@helixui/library` and from `@helixui/library/base/index.js` for direct import.
+
+- be9b080: Add high-contrast token layer with WCAG AAA compliant color overrides and contrast validation utility. Tokens activate via `[data-hx-contrast="high"]` attribute or `prefers-contrast: more` media query.
+- dd58277: feat(clinical-status): add hx-clinical-status component for alert fatigue prevention
+- 27e5758: feat: add hx-patient-banner compound component for patient identification
+
+  Implements Joint Commission NPSG.01.01.01 two-identifier rule enforcement with
+  named slots for name, MRN, DOB, allergies, code status, and photo. Integrates
+  with hx-phi-field for HIPAA-compliant masked identifier display. Renders as
+  landmark region with role="banner" for screen reader navigation.
+
+- 184d560: feat(motion): add motion tokens and prefers-reduced-motion support
+
+  Adds `--hx-easing-decelerate` and `--hx-easing-accelerate` design tokens to `@helixui/tokens`.
+
+  Adds a `motion` attribute to `hx-theme` accepting `"full"` (default), `"reduced"`, and `"none"`. When `motion="reduced"` or `"none"`, all duration tokens collapse to `0ms` and all easing tokens resolve to `linear`. When `motion="full"`, the OS `prefers-reduced-motion: reduce` media query is respected automatically — the same token overrides are applied when the OS preference is active.
+
+  Also exports a `MotionMode` type and a `effectiveMotion` getter from `hx-theme`.
+
+  Updated `hx-spinner` and `hx-drawer` to consume easing tokens (`--hx-easing-in-out` and `--hx-easing-default`) rather than hardcoded `ease-in-out` and `ease` values, ensuring the motion token cascade reaches these components.
+
+- 1f8eef7: add multi-brand theming api for hospital system white-label implementations
+  - `HelixBrandRegistry` singleton in `@helixui/tokens` allows consumers to register named brand token sets at application bootstrap
+  - brand registration validates all 22 required semantic tokens (primary and secondary color ramps) at registration time, throwing with a list of missing tokens on failure
+  - `hx-theme` gains a `brand` attribute that merges registered brand tokens on top of the base theme via adoptedStyleSheets replacement
+  - unregistered brands fall back gracefully to the base theme with a `console.warn`
+  - new exports: `HelixBrandRegistry`, `HelixBrandRegistryClass`, `REQUIRED_SEMANTIC_TOKENS`, `BrandTokenMap`, `BrandValidationResult`
+
+- 20d502c: Add hx-phi-field component for HIPAA-compliant PHI display with masking, reveal toggle, audit event emission, and clipboard protection
+- af04577: add light dom style injection patterns for drupal and non-shadow-dom consumers
+
+  introduces `injectLightStyles`, `generateScopedSelectors`, `SheetManager`, and `adoptedStylesheetRegistry` utilities plus the `<hx-style-scope>` wrapper component. enables slotted content in drupal twig templates to receive component typography and spacing styles via scoped `[data-hx-styled]` selectors with single-stylesheet-per-component-type deduplication.
+
+- 1b587d2: WF-10 i18n remediation: RTL CSS logical properties and hardcoded string overrides
+  - Replaced all physical CSS directional properties with logical equivalents across 20 component style files: `margin-left/right` → `margin-inline-start/end`, `padding-left/right` → `padding-inline-start/end`, `border-left/right` → `border-inline-start/end`, `text-align: left/right` → `text-align: start/end`
+  - Added new overridable label properties to 8 components: `labelClose` (hx-alert), `labelError` (hx-copy-button), `labelRequired` + `labelNoOptions` (hx-select), `labelDragDetected` (hx-file-upload), `labelPageMessage` + `labelPageButton` (hx-pagination), `labelTrend` (hx-stat), `labelEllipsis` (hx-breadcrumb), `label` (hx-dropdown)
+  - Fixed character counter in hx-textarea to use grapheme cluster counting (`Array.from()`) for accurate emoji handling
+
+### Patch Changes
+
+- 7641ef1: fix(a11y): remove redundant role="list" from hx-nav submenu, add parent active state when child is current, fix aria-haspopup value to "menu" and add aria-expanded on hx-menu-item submenu triggers
+- 3bbe6a5: fix invalid role="button" on hx-step inner div and add aria-live status announcements
+  - STEPS-001: remove role="button" from the inner .step div — the host element already has role="listitem" and tabindex="0"; the inner div is purely presentational and the duplicate role caused role/focus mismatch for screen readers
+  - STEPS-003: add aria-live="polite" region in hx-step shadow DOM that announces status transitions to "complete" or "error" so screen readers are notified when step status changes programmatically
+  - STEPS-002: add devWarn in hx-steps connectedCallback() when aria-label is null or empty, guiding developers to provide an accessible name for the steps list (WCAG 2.1 SC 4.1.2)
+
+- 448c908: fix(a11y): hx-tabs — aria-disabled keyboard discovery, selected-index attribute reflection, pointer-events
+  - disabled tabs are now keyboard-discoverable via arrow keys per the ARIA APG tab pattern; focus moves to disabled tabs but activation is prevented
+  - space/enter on a focused disabled tab does nothing
+  - added `selected-index` HTML attribute support so server-rendered pages (e.g. drupal twig) can pre-select a tab without javascript
+  - added `pointer-events: none` to disabled tab button to prevent mouse activation; `cursor: not-allowed` moved to `:host([disabled])` so the cursor remains visible
+  - `--hx-opacity-disabled` fallback value `0.5` was already present
+
+- 257cf7d: fix accessibility issues in hx-tree-view: add aria-hidden to collapsed children group and implement typeahead keyboard navigation per wai-aria apg tree view pattern
+- 2d9d739: fix color contrast in hx-nav-item and hx-side-nav to meet WCAG 2.1 AA requirements
+  - Add background-color and color to hx-side-nav :host so slotted light-DOM content inherits the dark surface context; without this axe-core evaluates slotted text against the page white background, producing false-positive color-contrast failures
+  - Correct all CSS fallback hex values in hx-nav-item.styles.ts and hx-side-nav.styles.ts to match actual @helixui/tokens values (previously used old Tailwind palette values)
+  - Fix active-state fallback background from primary-500 (#2563eb) to correct primary-600 (#1d4ed8); active-hover fallback from primary-600 to primary-700 (#1e40af)
+  - Replace section label inline colors in hx-side-nav stories (#6b7280 fails 4.5:1 on dark bg) with neutral-400 (#94a3b8, 6.96:1 on neutral-900)
+  - Update story footer inline color from #d1d5db to neutral-300 (#cbd5e1) to align with component token values
+  - Re-enable a11y-audit as a blocking quality gate in CI (removes informational override added in PR #1261)
+
+  Contrast ratios achieved (all WCAG AA minimum 4.5:1):
+  - Default nav item text: neutral-300 (#cbd5e1) on neutral-900 (#0f172a) = 12.02:1
+  - Active item text: neutral-50 (#f8fafc) on primary-600 (#1d4ed8) = 6.41:1
+  - Active hover text: neutral-50 (#f8fafc) on primary-700 (#1e40af) = 8.34:1
+  - Toggle button: neutral-400 (#94a3b8) on neutral-900 (#0f172a) = 6.96:1
+  - Story section labels: neutral-400 (#94a3b8) on neutral-900 (#0f172a) = 6.96:1
+  - Tooltip: neutral-100 (#f1f5f9) on neutral-800 (#1e293b) = 13.35:1
+
+- 23f5f6f: fix(a11y): remediate remaining wcag 2.1 aa findings (batch b) — checkbox, divider, form, number-input, spinner, step, structured-list, text-input, tooltip
+- 4d85c91: add mixinDelegatesAria to prevent shadow DOM aria double-announcement in hx-button and hx-checkbox
+- bd97a70: audit(hx-select): deep quality audit — tokens, cem, stories
+  - applied 3-tier css token cascade (`--_` private properties) to all style rules for correct override isolation
+  - eliminated hardcoded pixel values on chevron indicator by replacing with `--_chevron-size` token
+  - added `--hx-select-chevron-size` cssprop to cem jsdoc
+  - fixed `keyboardnavigation` storybook play test to assert `role="combobox"` trigger focus (not hidden native select)
+  - added `parameters.actions.handles: ['hx-change']` to meta for event logging in storybook actions panel
+  - fixed `withoptgroups` story to use actual `<optgroup>` elements (was listing flat options without group markup)
+  - added `withdisabledoptions` story demonstrating partially-disabled listbox
+
+- 262083c: audit(hx-status-indicator): deep quality audit — a11y, tokens, css parts, tests, stories
+  - Fixed CSS size variant selectors from `[size]` to `[hx-size]` (broken since hx-size migration)
+  - Added default `--_indicator-size` on `:host` so the dot never collapses to 0×0 when no size is set
+  - Added `show-label` boolean property rendering a visible `part="label"` text element to satisfy WCAG 1.4.1 (Use of Color) when the indicator is not accompanied by adjacent status text
+  - Added `aria-live="polite" aria-atomic="true"` visually-hidden region inside shadow DOM so dynamic status changes are announced to screen readers
+  - Documented new `part="label"` and `--hx-status-indicator-label-color` / `--hx-status-indicator-label-font-size` css custom properties
+  - Added tests: show-label rendering for all statuses, live region presence and dynamic update, all status dynamic label cycle
+  - Added Storybook stories: ShowLabel, AllStatusesWithLabel, showLabel argType control
+
+- 8db97bd: deep quality audit of hx-clinical-status: fix propertyvalues<this> typing, cem @fires types, @internal jsdoc blocks, index.ts hxclinicalstatus type export, css focus token fallback chain, add 7 new tests (icon prop, post-acknowledge state, warning no-acknowledge, event detail shape, aria-labelledby, severity label sr visibility)
+- 5757017: audit(hx-dialog): deep quality audit — a11y, tokens, tests, cem, stories
+- 0d22fe1: ci: add per-component bundle size budget enforcement to quality gates
+
+  Adds `scripts/bundle-size-report.js` that measures gzip size of each component entry point using esbuild. Enforces 5 KB per-component and 50 KB total bundle size budgets. Wired into the `bundle-size` CI job which posts a delta report as a PR comment and blocks merge on budget violations. Per-component overrides are configured in `bundle-budgets.json`.
+
+- 0a74c8c: add vitest v8 coverage threshold enforcement with per-component 80% gate, exempt component config, coverage artifact upload, and PR comment reporting
+- 923e9d1: add coverage exemptions for 21 components with 0% coverage to unblock CI pipeline
+- 2243d3c: generate dist/css/index.css with @import statements for all per-component css files; expose via package exports for drupal asset pipeline consumption
+- 91267a1: chore: remove packages/adopted-stylesheets dead code package
+- fd65331: Add Drupal library YAML generator for HELiX web components
+- 82bd233: add error resilience guards: null checks, devWarn for invalid property values, missing required slots, and unsafe state transitions across 13 components
+- 6ceafc0: feat(hx-pagination): add storybook stories with 12 interactive examples
+- ff7bcfd: fix(a11y): add role="menu" to dropdown and overflow-menu story containers for axe-core compliance
+- 1f3791d: fix(hx-alert): add missing accent, title slot, and returnFocusTo stories; fix css parts demo to cover all 6 parts
+- 3b6017b: fix(hx-badge): resolve three open bugs — prefix slot in dot mode, pulse ring animation, and story label verification
+  - prefix slot no longer rendered in dot mode (template guard + css defense-in-depth), preventing flex-gap overflow artifacts
+  - pulse ring animation now starts at 2px spread so --hx-badge-pulse-color is visually active
+  - RemovableWithCount story play function verifies prefix labels appear alongside counts
+
+- 9c17779: fix(hx-breadcrumb): consolidate @internal jsdoc blocks so cem correctly excludes private members; add missing @cssprop for focus ring color; remove invalid role="list" from default story
+- de9ccbe: fix(hx-menu): repair drupal behavior hx-close integration, add max-height overflow scroll, add arrowleft submenu close event
+  - Rewrite `hx-menu.behavior.js` to listen for the `hx-close` event dispatched by
+    hx-menu instead of the no-op `menu.open = false` setter. Removes the redundant
+    Escape keydown listener (hx-menu already fires hx-close on Escape). Adds optional
+    trigger button `aria-expanded` toggle and focus-return on close.
+  - Add `max-height: var(--hx-menu-max-height, 20rem)` and `overflow-y: auto` to the
+    `.menu` rule in `hx-menu.styles.ts` so tall menus scroll instead of overflowing
+    the viewport.
+  - Add `@cssprop [--hx-menu-max-height=20rem]` doc annotation to `hx-menu.ts`.
+  - Add `ArrowLeft` handler in `hx-menu-item._handleKeyDown` that dispatches
+    `hx-item-submenu-close` (bubbles, composed) per the APG menu pattern.
+  - Add `@fires hx-item-submenu-close` doc annotation to `hx-menu-item.ts`.
+  - Add tests for max-height CSS, ArrowLeft event dispatch, and event properties.
+
+- ba21f3f: fix recursive twig template for hx-tree-view to support unlimited depth
+- 5d9ccf7: fix(storybook): fix empty KeyboardNavigation and DarkMode stories across 9 nav components
+- 984a6f6: fix hx-avatar double render cycle, validation lifecycle, initials warning, and high contrast mode styles
+- 64fd2fc: Deep quality audit of hx-button: a11y improvements, comprehensive tests, token compliance, CEM accuracy, and Storybook stories
+- dad6c71: hx-checkbox: deep quality audit — full a11y compliance (wcag 2.1 aa), design token coverage, form participation via elementinternals, comprehensive vitest tests, and storybook stories for all states
+- dcf7a9c: hx-icon-button: deep quality audit — add devWarn console warning test, anti-pattern story, mandatory label a11y enforcement
+- e0ec673: Deep quality audit of hx-patient-banner: wcag 2.1 aa fixes, design token compliance, expanded test coverage, cem accuracy improvements, and storybook story updates
+- 53ddf75: fix(hx-side-nav): fix duplicate tooltip ids, remove invalid aria-controls, and fix keyboard navigation to support nested items and ArrowRight/ArrowLeft expand/collapse
+- e0df165: deep quality audit for hx-text-input: expanded test coverage for formMixin dirty/touched/pristine interaction state, readonly event propagation, and hx-change value sync; added TypeDate and InteractionState storybook stories
+- 87cdd7e: fix keyboard Home/End key support and focus restoration in hx-pagination; fix Tab focusout and Home/End support in hx-nav
+- 7f80a77: test: expand hx-library test coverage to 95% with cross-browser support
+- 0656b5f: fix(hx-patient-banner): address coderabbit review feedback
+- cf0bc88: deep audit of hx-phi-field: security hardening for phi masking, wcag 2.1 aa accessibility, design token compliance, comprehensive test coverage, and cem documentation
+- 4f5af84: chore: remove packages/create-helix-app from monorepo
+- c94a209: Remove global vitest coverage thresholds that break path-filtered staging→main test runs
+- e0adb4e: add ssr browser api guards, fix event composition, complete fouc coverage, and fix drupal cdn path
+- 281a09e: add storybook interaction testing infrastructure with automated ci verification of play function story tests
+- 181876b: fix design token references: correct z-index fallbacks, rename non-existent duration/easing/color tokens to match tokens.json definitions
+- e89b4b9: fix(a11y): remediate wcag 2.1 aa findings across 40+ components
+
+  Full remediation of the WF-01 accessibility compliance audit. Fixes 117 findings across
+  high, medium, and low severity. Key changes:
+  - aria-expanded now always 'true'/'false' (never absent) on accordion, nav, split-button, code-snippet, color-picker, date-picker
+  - touch targets increased to 44px minimum on overflow-menu, badge, split-panel, toast close, code-snippet buttons
+  - focus management: dialog close button fallback, popover conditional focus, color-picker panel focus on open
+  - hover delay (150ms) added to popover for WCAG 1.4.13 compliance
+  - dropdown panel gets role='menu' and aria-label
+  - radio-group describedBy combines error and help IDs simultaneously
+  - banner adds visually-hidden severity label (no color-only conveying)
+  - banner and alert consistent severity announcement
+  - aria-hidden uses nothing directive instead of string 'false'
+  - disabled anchor/link elements removed from tab order
+  - hx-toast default duration increased to 5000ms; pauses when action slot has content
+  - hx-image warns at development time when informative image lacks alt text
+  - hx-nav mobile toggle and submenu aria-expanded always 'true' or 'false'
+  - hx-steps dual aria-label announcement fixed with role=none on host
+  - hx-data-table clickable rows keyboard-activatable via Enter/Space
+  - hx-side-nav keyboard navigation uses public focus() method instead of shadow DOM piercing
+  - hx-stat value+label wrapped in role=group for screen reader association
+  - hx-counter final-value-only live region (no per-frame announcements)
+  - hx-radio label association via aria-label
+  - hx-structured-list accessible label property added
+  - hx-form error summary receives programmatic focus after validation failure
+  - select/combobox aria-selected per ARIA spec (single-select omits, multi-select explicit)
+  - time-picker always renders listbox for stable aria-controls reference
+  - multiple devWarn additions for missing labels (button-group, table, number-input, divider, badge dot)
+
+- 3c48dba: fix(lit-architecture): remediate critical and high severity Lit 3.x anti-patterns (WF-02 batch 1)
+
+  Fixes 13 critical/high severity findings from the WF-02 Lit architecture audit:
+  - hx-breadcrumb: eliminate event listener memory leak — bound references now created as arrow function class fields instead of re-bound in connectedCallback
+  - hx-combobox: add SSR guard around document.addEventListener/removeEventListener calls
+  - hx-counter: add MediaQueryList change listener for prefers-reduced-motion so runtime preference changes update animation behavior
+  - hx-date-picker: eliminate event listener memory leak — bound handlers converted to readonly arrow function field initializers
+  - hx-dropdown: add missing super.updated(changedProperties) call to prevent lifecycle chain breakage
+  - hx-file-upload: fix fragile changedProperties type cast to use proper keyof typing
+  - hx-format-date: add SSR guards around document.documentElement.lang and navigator.language access
+  - hx-grid: add missing super.updated(changed) call in HelixGridItem to prevent lifecycle chain breakage
+  - hx-icon: add missing super.updated(changed) call to prevent lifecycle chain breakage
+  - hx-meter: add missing super.updated(changedProperties) call to prevent lifecycle chain breakage
+  - hx-progress-bar: add missing super.updated(changedProps) call to prevent lifecycle chain breakage
+  - hx-time-picker: add isConnected guard in outside-click handler for extra safety
+  - hx-tooltip: add reconnection handling in connectedCallback to re-setup light DOM ARIA description element
+
+- 31bab2a: refactor: remediate TypeScript strict findings across 13 components
+
+  Fixes all findings from WF-04 audit:
+  - Replace `PropertyValues` with `PropertyValues<this>` in updated() lifecycle hooks
+  - Add typed CustomEvent generics to all event dispatches (hx-alert, hx-banner, hx-button-group, hx-card, hx-form, hx-popup, hx-skeleton, hx-tabs, hx-toast)
+  - Replace unsafe type assertions with proper null checks in hx-copy-button, hx-popover, hx-tooltip
+  - Zero `any` types, zero non-null assertions introduced
+
+- 9afb9c1: Fix memory leaks, reduce active document listeners, and eliminate static bundle cost from @floating-ui/dom in performance audit remediation (WF-05).
+- 0660768: perf: remediate wf-05 bundle and runtime performance findings across 9 components — dynamic import for @floating-ui/dom in hx-popover, scoped outside-click listeners in hx-combobox and hx-select, extracted color-utils.ts for tree-shaking in hx-color-picker, cached DOM queries and getBoundingClientRect in hx-color-picker drag handlers, cached cell list in hx-data-table keydown, memoized Intl.DateTimeFormat in hx-date-picker, cached visible-items list in hx-tree-view, O(n) parent-driven ARIA metadata in hx-tree-item, optimized body-children scan in hx-drawer, hoisted FOCUSABLE_SELECTORS constant in hx-dialog
+- 52868cd: fix(cem): add @internal to hx-checkbox formAssociated to exclude it from CEM public API surface
+- a6470e9: fix form participation compliance: add missing ElementInternals methods across all 15 form-connected components
+- acb6076: replace hardcoded css values with design token variables across all components
+
+  Audits and remediates design token compliance across all 88 component `.styles.ts` files:
+  - Replaces `--hx-font-weight-regular` (nonexistent) with `--hx-font-weight-normal` in hx-text (6 occurrences)
+  - Replaces `--hx-radius-full` (nonexistent) with `--hx-border-radius-full` in hx-meter
+  - Replaces `--hx-color-white` (nonexistent) with `--hx-color-neutral-0` in hx-nav
+  - Replaces `--hx-border-width-1` (nonexistent) with `--hx-border-width-thin` in hx-dialog and hx-drawer
+  - Replaces `--hx-color-surface-overlay` (semantically incorrect for arrow bg) with `--hx-color-neutral-0` in hx-popup
+  - Fixes wrong z-index modal fallback (100 → 1400) in hx-dialog
+  - Replaces `--hx-size-128` (nonexistent) with `--hx-container-narrow` in hx-dialog
+  - Replaces `--hx-font-size-base` (nonexistent) with `--hx-font-size-md` in hx-avatar, hx-checkbox, hx-table, hx-tag
+  - Replaces `--hx-size-2` (nonexistent) with `--hx-space-2` in hx-badge, hx-meter, hx-slider
+  - Fixes tooltip z-index from hardcoded 9999 to `--hx-z-index-tooltip` (1600) and transition from 0.15s to `--hx-transition-fast`
+  - Fixes focus ring color fallback from hardcoded `#2563eb` to proper token chain `var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))` across 21 components
+  - Replaces hardcoded `opacity: 0.5/0.4/0.7/0.8` with appropriate `--hx-opacity-*` tokens across 14 components
+  - Wraps bare `1px` border declarations in `var(--hx-border-width-thin, 1px)` in hx-pagination, hx-tag
+  - Documents legitimate exception cases (local stacking context z-index 1/2, breakpoints in media queries, line-height 1 for icon buttons)
+
+- Updated dependencies [be9b080]
+- Updated dependencies [184d560]
+- Updated dependencies [1f8eef7]
+- Updated dependencies [03e1beb]
+  - @helixui/tokens@2.0.0
+
 ## 1.1.2
 
 ### Patch Changes

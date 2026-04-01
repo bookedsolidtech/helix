@@ -1,5 +1,31 @@
 # @helixui/tokens
 
+## 2.0.0
+
+### Minor Changes
+
+- be9b080: Add high-contrast token layer with WCAG AAA compliant color overrides and contrast validation utility. Tokens activate via `[data-hx-contrast="high"]` attribute or `prefers-contrast: more` media query.
+- 184d560: feat(motion): add motion tokens and prefers-reduced-motion support
+
+  Adds `--hx-easing-decelerate` and `--hx-easing-accelerate` design tokens to `@helixui/tokens`.
+
+  Adds a `motion` attribute to `hx-theme` accepting `"full"` (default), `"reduced"`, and `"none"`. When `motion="reduced"` or `"none"`, all duration tokens collapse to `0ms` and all easing tokens resolve to `linear`. When `motion="full"`, the OS `prefers-reduced-motion: reduce` media query is respected automatically — the same token overrides are applied when the OS preference is active.
+
+  Also exports a `MotionMode` type and a `effectiveMotion` getter from `hx-theme`.
+
+  Updated `hx-spinner` and `hx-drawer` to consume easing tokens (`--hx-easing-in-out` and `--hx-easing-default`) rather than hardcoded `ease-in-out` and `ease` values, ensuring the motion token cascade reaches these components.
+
+- 1f8eef7: add multi-brand theming api for hospital system white-label implementations
+  - `HelixBrandRegistry` singleton in `@helixui/tokens` allows consumers to register named brand token sets at application bootstrap
+  - brand registration validates all 22 required semantic tokens (primary and secondary color ramps) at registration time, throwing with a list of missing tokens on failure
+  - `hx-theme` gains a `brand` attribute that merges registered brand tokens on top of the base theme via adoptedStyleSheets replacement
+  - unregistered brands fall back gracefully to the base theme with a `console.warn`
+  - new exports: `HelixBrandRegistry`, `HelixBrandRegistryClass`, `REQUIRED_SEMANTIC_TOKENS`, `BrandTokenMap`, `BrandValidationResult`
+
+### Patch Changes
+
+- 03e1beb: test: add design token validation test suite
+
 ## 0.3.4
 
 ### Patch Changes
