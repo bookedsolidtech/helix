@@ -100,11 +100,14 @@ jobs:
               --source "$EXTRACT_DIR" \
               --config .gitleaks.toml \
               --no-git \
-              --redact \
+              --verbose \
               --report-format json \
               --report-path "$SCAN_DIR/report-$(basename "$pkg_dir").json" \
               --exit-code 1; then
               echo "::error::Secrets detected in $PKG_NAME tarball — publish blocked"
+              echo "--- Report contents ---"
+              cat "$SCAN_DIR/report-$(basename "$pkg_dir").json" 2>/dev/null || echo "No report file"
+              echo "--- End report ---"
               FAIL=1
             else
               echo "$PKG_NAME — clean"
