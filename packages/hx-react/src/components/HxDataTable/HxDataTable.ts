@@ -30,7 +30,7 @@ export const HxDataTable = createComponent({
   events: {
     onHxSort: 'hx-sort',
     onHxRowClick: 'hx-row-click',
-    onHxSelect: 'hx-select',
+    onHxSelect: 'hx-select'
   },
   displayName: 'HxDataTable',
 });
