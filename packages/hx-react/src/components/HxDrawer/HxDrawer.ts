@@ -34,7 +34,7 @@ export const HxDrawer = createComponent({
     onHxAfterShow: 'hx-after-show',
     onHxHide: 'hx-hide',
     onHxAfterHide: 'hx-after-hide',
-    onHxInitialFocus: 'hx-initial-focus',
+    onHxInitialFocus: 'hx-initial-focus'
   },
   displayName: 'HxDrawer',
 });
