@@ -354,6 +354,12 @@ export class HelixBreadcrumb extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Expose role="list" on the host element so that axe-core's flat-tree
+    // traversal (used by @axe-core/playwright in CI) sees a valid ARIA list
+    // ancestor for hx-breadcrumb-item[role="listitem"] children. The shadow
+    // DOM <ol> provides the visual/semantic structure; the host role satisfies
+    // the aria-required-parent rule in the composed accessibility tree.
+    this.setAttribute('role', 'list');
     this.addEventListener('click', this._boundEllipsisClick);
     this.addEventListener('keydown', this._boundEllipsisKeydown);
   }
@@ -408,7 +414,7 @@ export class HelixBreadcrumb extends LitElement {
   override render() {
     return html`
       <nav part="nav" aria-label=${this.label}>
-        <ol part="list">
+        <ol part="list" role="presentation">
           <slot @slotchange=${this._handleSlotChange}></slot>
         </ol>
       </nav>
