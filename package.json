@@ -88,6 +88,7 @@
     "changeset": "changeset",
     "changeset:version": "changeset version && pnpm install --no-frozen-lockfile",
     "changeset:publish": "changeset publish",
+    "prepublishOnly": "node scripts/block-local-publish.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
