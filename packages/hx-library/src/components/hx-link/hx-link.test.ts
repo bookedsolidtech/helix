@@ -116,7 +116,7 @@ describe('hx-link', () => {
     });
   });
 
-  // --- Property: disabled (P0-1 fix: tabindex="0") ---
+  // --- Property: disabled ---
 
   describe('Property: disabled', () => {
     it('renders a <span> instead of <a> when disabled', async () => {
@@ -134,10 +134,12 @@ describe('hx-link', () => {
       expect(span.getAttribute('aria-disabled')).toBe('true');
     });
 
-    it('disabled span is keyboard focusable (tabindex="0") — P0-1 fix', async () => {
+    it('disabled span does not set tabindex (relies on aria-disabled for a11y)', async () => {
+      // tabindex="0" was removed per WCAG 2.1.1 remediation — disabled links should not
+      // be in the tab order; aria-disabled announces the state to screen readers instead.
       const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
       const span = shadowQuery(el, 'span')!;
-      expect(span.getAttribute('tabindex')).toBe('0');
+      expect(span.getAttribute('tabindex')).toBeNull();
     });
 
     it('applies link--disabled class', async () => {
