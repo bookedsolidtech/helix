@@ -290,7 +290,7 @@ export class HelixSwitch extends LitElement {
   private _errorId = `${this._switchId}-error`;
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
     const hasLabel = !!this.label || this._hasDefaultSlot;
 
     const containerClasses = {
@@ -303,10 +303,7 @@ export class HelixSwitch extends LitElement {
     };
 
     const describedBy =
-      [
-        hasError || this._hasErrorSlot ? this._errorId : null,
-        this.helpText && !hasError ? this._helpTextId : null,
-      ]
+      [hasError ? this._errorId : null, this.helpText && !hasError ? this._helpTextId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -338,13 +335,18 @@ export class HelixSwitch extends LitElement {
           </label>
         </div>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${hasError
-            ? html`<div part="error" class="switch__error" id=${this._errorId} role="alert">
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        <!--
+          WCAG 1.3.1: wrap the error slot in a persistent container so _errorId stays
+          stable whether error content comes from the .error property or the named slot.
+          aria-describedby on the track button always references this wrapper div.
+        -->
+        <div id=${this._errorId} ?hidden=${!hasError}>
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>
+            ${this.error
+              ? html`<div part="error" class="switch__error" role="alert">${this.error}</div>`
+              : nothing}
+          </slot>
+        </div>
 
         ${this.helpText && !hasError
           ? html`

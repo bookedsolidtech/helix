@@ -491,9 +491,13 @@ describe('hx-switch', () => {
     it('aria-describedby references error ID when error set', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Bad"></hx-switch>');
       const track = shadowQuery(el, '[role="switch"]');
-      const errorDiv = shadowQuery(el, '.switch__error');
+      // The _errorId is on the persistent wrapper div that encloses the error slot,
+      // so aria-describedby stays valid whether error content comes from the
+      // .error property or the named slot (WCAG 1.3.1).
+      const errorWrapper = shadowQuery(el, '[id$="-error"]');
       const describedBy = track?.getAttribute('aria-describedby');
-      expect(describedBy).toContain(errorDiv?.id);
+      expect(describedBy).toBeTruthy();
+      expect(describedBy).toContain(errorWrapper?.id);
     });
 
     it('aria-describedby references help text ID when helpText set', async () => {
@@ -587,6 +591,22 @@ describe('hx-switch', () => {
     it('has no axe violations when disabled', async () => {
       const el = await fixture<HxSwitch>(
         '<hx-switch label="Enable notifications" disabled></hx-switch>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in error state', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Enable notifications" error="This field is required"></hx-switch>',
+      );
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when required', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Enable notifications" required></hx-switch>',
       );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

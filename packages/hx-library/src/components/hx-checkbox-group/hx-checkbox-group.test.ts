@@ -684,5 +684,33 @@ describe('hx-checkbox-group', () => {
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
+
+    it('has no axe violations when disabled', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Notification Settings" name="notifications" disabled>
+          <hx-checkbox value="email" label="Email"></hx-checkbox>
+          <hx-checkbox value="sms" label="SMS"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // WCAG 2.1 SC 1.4.3 exempts inactive UI components from contrast requirements.
+      // The disabled state uses opacity to visually indicate the inactive state, which
+      // axe-core flags as a color-contrast violation — this is a known false positive
+      // for disabled form controls.
+      const { violations } = await checkA11y(el, {
+        rules: { 'color-contrast': { enabled: false } },
+      });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with checked options', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Notification Settings" name="notifications">
+          <hx-checkbox value="email" label="Email" checked></hx-checkbox>
+          <hx-checkbox value="sms" label="SMS"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
   });
 });

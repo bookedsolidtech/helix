@@ -833,6 +833,32 @@ describe('hx-radio-group', () => {
       const { violations } = await checkA11y(el, axeOptions);
       expect(violations).toEqual([]);
     });
+
+    it('has no axe violations when disabled', async () => {
+      const el =
+        await fixture<WcRadioGroup>(`<hx-radio-group label="Color" name="color" disabled>
+        <hx-radio value="red" label="Red"></hx-radio>
+        <hx-radio value="blue" label="Blue"></hx-radio>
+      </hx-radio-group>`);
+      // WCAG 2.1 SC 1.4.3 exempts inactive UI components from contrast requirements.
+      // The disabled state uses opacity to visually indicate the inactive state, which
+      // axe-core flags as a color-contrast violation — this is a known false positive
+      // for disabled form controls.
+      const { violations } = await checkA11y(el, {
+        rules: { ...axeOptions.rules, 'color-contrast': { enabled: false } },
+      });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when required', async () => {
+      const el =
+        await fixture<WcRadioGroup>(`<hx-radio-group label="Color" name="color" required>
+        <hx-radio value="red" label="Red"></hx-radio>
+        <hx-radio value="blue" label="Blue"></hx-radio>
+      </hx-radio-group>`);
+      const { violations } = await checkA11y(el, axeOptions);
+      expect(violations).toEqual([]);
+    });
   });
 
   // ─── Slot projection ───
