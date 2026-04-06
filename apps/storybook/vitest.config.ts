@@ -47,8 +47,16 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
     },
     setupFiles: [path.join(dirname, '.storybook/vitest.setup.ts')],
-    // Prevent OOM on CI runners with limited memory — story tests are
-    // browser-based and cannot be parallelised safely at the file level.
+    // Run story files one at a time to prevent browser OOM crashes.
+    // With 83 story files and the default fileParallelism: true, all files
+    // mount simultaneously in the browser, exhausting memory and causing
+    // "Browser connection was closed" errors. Sequential execution keeps
+    // a single story context active at a time.
     fileParallelism: false,
+    // Give interaction tests enough headroom for async operations
+    // (e.g. stories that use 400ms setTimeout for simulated data loads).
+    testTimeout: 30000,
+    // Allow adequate time for Storybook test teardown between story files.
+    teardownTimeout: 10000,
   },
 });
