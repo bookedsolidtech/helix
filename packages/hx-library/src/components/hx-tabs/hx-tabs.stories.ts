@@ -274,7 +274,7 @@ export const Default: Story = {
     await expect(panels[2].hasAttribute('hidden')).toBeTruthy();
 
     // Click the second tab and verify panel switches
-    await userEvent.click(tabEls[1]);
+    (tabEls[1] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('button')!.click();
     await new Promise((r) => setTimeout(r, 50));
     await expect(panels[0].hasAttribute('hidden')).toBeTruthy();
     await expect(panels[1].hasAttribute('hidden')).toBeFalsy();
@@ -434,9 +434,11 @@ export const ManyTabs: Story = {
     const tabEls = canvasElement.querySelectorAll('hx-tab');
     await expect(tabEls.length).toBe(8);
 
-    // Navigate to the last tab by clicking it
+    // Navigate to the last tab by clicking its shadow button directly
     const lastTab = tabEls[tabEls.length - 1];
-    await userEvent.click(lastTab);
+    const lastTabButton = (lastTab as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('button');
+    await expect(lastTabButton).toBeTruthy();
+    lastTabButton!.click();
     await new Promise((r) => setTimeout(r, 50));
     await expect(lastTab.hasAttribute('selected')).toBeTruthy();
 
@@ -640,7 +642,7 @@ export const Healthcare: Story = {
     await expect(demographicsPanel.hasAttribute('hidden')).toBeFalsy();
 
     // Navigate to Vitals tab
-    await userEvent.click(tabEls[1]);
+    (tabEls[1] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('button')!.click();
     await new Promise((r) => setTimeout(r, 50));
     await expect(tabEls[1].hasAttribute('selected')).toBeTruthy();
     const vitalsPanel = canvasElement.querySelector('hx-tab-panel[name="patient-vitals"]');
@@ -651,7 +653,7 @@ export const Healthcare: Story = {
     // Navigate to Clinical Notes tab
     const notesTab = canvasElement.querySelector('hx-tab[panel="patient-notes"]');
     if (!notesTab) throw new Error('hx-tab[panel="patient-notes"] not found');
-    await userEvent.click(notesTab);
+    (notesTab as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('button')!.click();
     await new Promise((r) => setTimeout(r, 50));
     const notesPanel = canvasElement.querySelector('hx-tab-panel[name="patient-notes"]');
     if (!notesPanel) throw new Error('hx-tab-panel[name="patient-notes"] not found');
@@ -800,7 +802,7 @@ export const InteractionTest: Story = {
     await expect(panels[2].hasAttribute('hidden')).toBeTruthy();
 
     // Click tab 2 — panel 2 should become visible
-    await userEvent.click(tabEls[1]);
+    (tabEls[1] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('button')!.click();
     await new Promise((r) => setTimeout(r, 50));
     await expect(tabEls[1].hasAttribute('selected')).toBeTruthy();
     await expect(tabEls[0].hasAttribute('selected')).toBeFalsy();
@@ -808,7 +810,7 @@ export const InteractionTest: Story = {
     await expect(panel2).not.toHaveAttribute('hidden');
 
     // Click tab 3 — panel 3 should become visible
-    await userEvent.click(tabEls[2]);
+    (tabEls[2] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('button')!.click();
     await new Promise((r) => setTimeout(r, 50));
     await expect(tabEls[2].hasAttribute('selected')).toBeTruthy();
     const panel3 = canvasElement.querySelector('hx-tab-panel[name="tab3"]');

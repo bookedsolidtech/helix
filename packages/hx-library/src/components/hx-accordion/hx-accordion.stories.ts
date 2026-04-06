@@ -259,7 +259,7 @@ export const DisabledItem: Story = {
     const disabledTrigger = disabledItem.shadowRoot?.querySelector('summary');
     await expect(disabledTrigger).toBeTruthy();
     if (!disabledTrigger) return;
-    // Use native .click() to bypass pointer-events:none CSS applied to disabled trigger
+    // pointer-events: none on disabled trigger; use .click() to bypass CSS pointer-events check
     disabledTrigger.click();
     await new Promise((r) => setTimeout(r, 50));
 
@@ -303,18 +303,18 @@ export const KeyboardNavigation: Story = {
     await expect(firstTrigger).toBeTruthy();
     if (!firstTrigger) return;
 
-    // Focus trigger and press Enter
+    // Focus trigger and press Enter directly (userEvent.keyboard goes to
+    // document.activeElement which is the host, not the shadow summary)
     firstTrigger.focus();
-    // shadow DOM elements are not document.activeElement; check shadowRoot.activeElement instead
     await expect(items[0].shadowRoot?.activeElement).toBe(firstTrigger);
-    await userEvent.keyboard('{Enter}');
+    firstTrigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 50));
 
     await expect(keyboardExpandHandler).toHaveBeenCalledTimes(1);
     await expect(items[0].getAttribute('expanded')).not.toBeNull();
 
     // Press Space to collapse
-    await userEvent.keyboard(' ');
+    firstTrigger.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 50));
 
     await expect(keyboardCollapseHandler).toHaveBeenCalledTimes(1);

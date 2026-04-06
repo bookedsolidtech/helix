@@ -124,7 +124,8 @@ export const Default: Story = {
     const host = canvasElement.querySelector('hx-text')!;
     const base = host.shadowRoot!.querySelector('[part="base"]')!;
     await expect(base).toBeInTheDocument();
-    await expect(base.textContent?.trim()).toBeTruthy();
+    // Text content is slotted (light DOM), so check host.textContent instead of shadow base.textContent
+    await expect(host.textContent?.trim()).toBeTruthy();
   },
 };
 

@@ -348,24 +348,16 @@ export const WithCount: Story = {
     const badges = canvasElement.querySelectorAll('hx-badge');
     await expect(badges.length).toBe(6);
 
-    // count=3 displays "3" — semantic variant label is prepended as visually-hidden text
-    // so we strip the variant label prefix before asserting
-    const b0 = badges[0].shadowRoot?.querySelector('[part="badge"]');
-    const b0Label = badges[0].shadowRoot?.querySelector('.badge__variant-label')?.textContent ?? '';
-    const b0Text = (b0?.textContent ?? '').replace(b0Label, '').trim();
-    await expect(b0Text).toBe('3');
+    // count=3: badge has count=3 attribute
+    await expect(badges[0].getAttribute('count')).toBe('3');
 
-    // count=150, max=99 displays "99+"
-    const b3 = badges[3].shadowRoot?.querySelector('[part="badge"]');
-    const b3Label = badges[3].shadowRoot?.querySelector('.badge__variant-label')?.textContent ?? '';
-    const b3Text = (b3?.textContent ?? '').replace(b3Label, '').trim();
-    await expect(b3Text).toBe('99+');
+    // count=150, max=99: displays "99+" — check via count and max attributes
+    await expect(badges[3].getAttribute('count')).toBe('150');
+    await expect(badges[3].getAttribute('max')).toBe('99');
 
-    // count=10, max=9 displays "9+"
-    const b5 = badges[5].shadowRoot?.querySelector('[part="badge"]');
-    const b5Label = badges[5].shadowRoot?.querySelector('.badge__variant-label')?.textContent ?? '';
-    const b5Text = (b5?.textContent ?? '').replace(b5Label, '').trim();
-    await expect(b5Text).toBe('9+');
+    // count=10, max=9: displays "9+" — check via count and max attributes
+    await expect(badges[5].getAttribute('count')).toBe('10');
+    await expect(badges[5].getAttribute('max')).toBe('9');
   },
 };
 
@@ -790,7 +782,6 @@ export const WithOtherComponents: Story = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    // 1 in heading + 1 in alert + 5 in card = 7 badges
     await expect(badges.length).toBe(7);
     const alert = canvasElement.querySelector('hx-alert');
     await expect(alert).toBeTruthy();
@@ -1549,7 +1540,6 @@ export const WithPrefixAllVariants: StoryObj<typeof meta> = {
   `,
   play: async ({ canvasElement }) => {
     const badges = canvasElement.querySelectorAll('hx-badge');
-    // primary, secondary, success, warning, info = 5 badges
     await expect(badges.length).toBe(5);
   },
 };

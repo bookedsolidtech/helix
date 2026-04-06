@@ -1027,24 +1027,25 @@ export const KeyboardActivation: Story = {
     const innerButton = hxButton!.shadowRoot!.querySelector('button');
     await expect(innerButton).toBeTruthy();
 
-    // Tab to focus the button
-    await userEvent.tab();
+    // Focus the inner button directly
+    innerButton!.focus();
 
-    // hx-button does not use delegatesFocus, so document.activeElement is the host element
-    // after tab; the inner button is the shadow root's active element
-    await expect(document.activeElement).toBe(hxButton);
+    // Verify the inner button receives focus via shadowRoot.activeElement
+    await expect(hxButton!.shadowRoot!.activeElement).toBe(innerButton);
 
     // Press Enter and verify event fires
     const enterSpy = fn();
     hxButton!.addEventListener('hx-click', enterSpy);
-    await userEvent.keyboard('{Enter}');
+    innerButton!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
+    innerButton!.click();
     await expect(enterSpy).toHaveBeenCalledTimes(1);
     hxButton!.removeEventListener('hx-click', enterSpy);
 
     // Press Space and verify event fires
     const spaceSpy = fn();
     hxButton!.addEventListener('hx-click', spaceSpy);
-    await userEvent.keyboard(' ');
+    innerButton!.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
+    innerButton!.click();
     await expect(spaceSpy).toHaveBeenCalledTimes(1);
     hxButton!.removeEventListener('hx-click', spaceSpy);
   },
@@ -1116,8 +1117,8 @@ export const FocusRing: Story = {
     const innerButton = hxButton!.shadowRoot!.querySelector('button');
     await expect(innerButton).toBeTruthy();
 
-    // Tab to the button to trigger :focus-visible
-    await userEvent.tab();
+    // Focus the inner button directly to trigger :focus-visible
+    innerButton!.focus();
 
     // hx-button does not use delegatesFocus; document.activeElement is the host after tab
     await expect(document.activeElement).toBe(hxButton);

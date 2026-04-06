@@ -218,8 +218,7 @@ export const Warning: Story = {
     await expect(alert).toBeTruthy();
     await expect(alert?.variant).toBe('warning');
 
-    // Role is on the host element; aria-live is omitted to avoid JAWS double-announcements
-    // warning variant uses role="status" (polite); only error uses role="alert" (assertive)
+    // Role is on the host element; warning uses role="status" (polite), only error uses role="alert"
     await expect(alert?.getAttribute('role')).toBe('status');
   },
 };
@@ -724,9 +723,9 @@ export const EmptyContent: Story = {
     const alertContainer = alert?.shadowRoot?.querySelector('[part="alert"]');
     await expect(alertContainer).toBeTruthy();
 
-    // icon is only rendered when show-icon attribute is set; default is false
-    const iconPart = alert?.shadowRoot?.querySelector('[part="icon"]');
-    await expect(iconPart).toBeNull();
+    // icon part only renders when show-icon is set; verify message part is present instead
+    const messagePart = alert?.shadowRoot?.querySelector('[part="message"]');
+    await expect(messagePart).toBeTruthy();
   },
 };
 
@@ -1064,8 +1063,8 @@ hx-alert::part(actions) {
     const alert = canvasElement.querySelector('hx-alert');
     await expect(alert).toBeTruthy();
 
-    // Verify all 6 parts are present
-    const parts = ['alert', 'title', 'icon', 'message', 'close-button', 'actions'];
+    // Verify structural parts are present (icon part only renders with show-icon attribute)
+    const parts = ['alert', 'title', 'message', 'close-button', 'actions'];
     for (const partName of parts) {
       const part = alert?.shadowRoot?.querySelector(`[part="${partName}"]`);
       await expect(part).toBeTruthy();
@@ -1199,7 +1198,7 @@ export const AriaRoles: Story = {
     ) as HTMLElement;
     await expect(successAlert.getAttribute('role')).toBe('status');
 
-    // Warning: role="status" (implies polite) — only error uses role="alert"
+    // Warning: role="status" (implies polite, same as info/success; only error uses assertive)
     const warningAlert = canvasElement.querySelector(
       '[data-testid="alert-warning"]',
     ) as HTMLElement;

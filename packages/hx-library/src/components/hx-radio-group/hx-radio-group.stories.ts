@@ -259,7 +259,7 @@ export const Default: Story = {
     // Select "Phone" and verify
     const phoneRadio = canvasElement.querySelector('hx-radio[value="phone"]');
     expect(phoneRadio).toBeTruthy();
-    (phoneRadio!.shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (phoneRadio as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.getAttribute('value') === 'phone' || group!.value === 'phone').toBeTruthy();
   },
@@ -441,7 +441,7 @@ export const SingleDisabledOption: Story = {
     // Enabled radios should still be clickable
     const morningRadio = canvasElement.querySelector('hx-radio[value="weekday-morning"]');
     expect(morningRadio).toBeTruthy();
-    (morningRadio!.shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (morningRadio as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     const group = canvasElement.querySelector('hx-radio-group');
     expect(group!.value).toBe('weekday-morning');
@@ -1009,7 +1009,7 @@ export const ClickSelection: Story = {
     // Click "Neurology"
     const neurologyRadio = canvasElement.querySelector('hx-radio[value="neurology"]');
     expect(neurologyRadio).toBeTruthy();
-    (neurologyRadio!.shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (neurologyRadio as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
 
     // Verify value changed
@@ -1025,7 +1025,7 @@ export const ClickSelection: Story = {
     // Click a different radio
     changeEventFired = false;
     const cardioRadio = canvasElement.querySelector('hx-radio[value="cardiology"]');
-    (cardioRadio!.shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (cardioRadio as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
 
     expect(group!.value).toBe('cardiology');
@@ -1061,19 +1061,20 @@ export const KeyboardNavigation: Story = {
     await new Promise((r) => setTimeout(r, 50));
 
     // Arrow Down should move to next and select it
-    await userEvent.keyboard('{ArrowDown}');
+    // Dispatch directly to the radio element (userEvent.keyboard doesn't reach light DOM children reliably)
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
     expect(radios[1].getAttribute('aria-checked')).toBe('true');
 
-    // Arrow Down again
-    await userEvent.keyboard('{ArrowDown}');
+    // Arrow Down again — now radios[1] is focused after the previous arrow key
+    radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
     expect(radios[2].getAttribute('aria-checked')).toBe('true');
 
-    // Arrow Up should move back
-    await userEvent.keyboard('{ArrowUp}');
+    // Arrow Up should move back — radios[2] is focused
+    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
     expect(radios[1].getAttribute('aria-checked')).toBe('true');
@@ -1097,24 +1098,24 @@ export const ArrowWrap: Story = {
 
     // Focus the first radio and select it
     radios[0].focus();
-    (radios[0].shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (radios[0] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('alpha');
 
-    // Navigate to last
-    await userEvent.keyboard('{ArrowDown}');
+    // Navigate to last — dispatch directly to radio element
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 50));
-    await userEvent.keyboard('{ArrowDown}');
+    radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('gamma');
 
     // Arrow Down from last should wrap to first
-    await userEvent.keyboard('{ArrowDown}');
+    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('alpha');
 
     // Arrow Up from first should wrap to last
-    await userEvent.keyboard('{ArrowUp}');
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('gamma');
   },
@@ -1137,17 +1138,18 @@ export const DisabledSkip: Story = {
 
     // Focus first radio and select
     radios[0].focus();
-    (radios[0].shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (radios[0] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('first');
 
     // Arrow Down should skip disabled "second" and land on "third"
-    await userEvent.keyboard('{ArrowDown}');
+    // Dispatch directly to radio element (userEvent.keyboard doesn't reach light DOM children reliably)
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
 
     // Arrow Down from "third" should wrap and skip disabled, landing on "first"
-    await userEvent.keyboard('{ArrowDown}');
+    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('first');
   },
@@ -1179,7 +1181,7 @@ export const InsuranceType: Story = {
     expect(radios.length).toBe(5);
 
     // Select Medicare
-    (radios[0].shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (radios[0] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('medicare');
   },
@@ -1254,7 +1256,7 @@ export const TriageLevel: Story = {
     expect(radios.length).toBe(5);
 
     // Select ESI Level 3
-    (radios[2].shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (radios[2] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('3');
   },
@@ -1298,12 +1300,12 @@ export const TreatmentPreference: Story = {
     expect(radios.length).toBe(5);
 
     // A patient selects palliative care
-    (radios[3].shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (radios[3] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('palliative');
 
     // Patient changes mind to undecided
-    (radios[4].shadowRoot?.querySelector('.radio') as HTMLElement)?.click();
+    (radios[4] as Element & { shadowRoot: ShadowRoot }).shadowRoot.querySelector('div')!.click();
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('undecided');
   },

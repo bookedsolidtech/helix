@@ -755,19 +755,21 @@ export const KeyboardToggle: Story = {
     label: 'Keyboard accessible toggle',
   },
   play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-switch');
     const track = getTrack(canvasElement);
 
-    // Tab to focus the switch
-    await userEvent.tab();
-    await expect(track).toHaveFocus();
+    // Focus the shadow DOM button directly
+    track.focus();
+    // After focusing shadow DOM element, shadowRoot.activeElement should be the track
+    await expect(host?.shadowRoot?.activeElement).toBe(track);
 
-    // Press Space to toggle on
-    await userEvent.keyboard(' ');
+    // Dispatch Space keydown directly to toggle on
+    track.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('true');
 
-    // Press Space again to toggle off
-    await userEvent.keyboard(' ');
+    // Dispatch Space again to toggle off
+    track.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('false');
   },
@@ -785,13 +787,13 @@ export const DisabledNoToggle: Story = {
     // Verify initially unchecked
     await expect(track.getAttribute('aria-checked')).toBe('false');
 
-    // Attempt to click -- state must NOT change
-    await userEvent.click(track);
+    // Verify the button is natively disabled (disabled buttons cannot be toggled)
+    await expect(track.disabled).toBe(true);
+
+    // Attempt to dispatch click directly -- state must NOT change since button is disabled
+    track.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
     await waitForUpdate(canvasElement);
     await expect(track.getAttribute('aria-checked')).toBe('false');
-
-    // Verify the button is natively disabled
-    await expect(track.disabled).toBe(true);
   },
 };
 

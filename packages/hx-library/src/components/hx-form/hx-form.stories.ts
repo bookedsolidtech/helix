@@ -136,12 +136,15 @@ export const Default: Story = {
     const mrnNative = mrnInput.shadowRoot?.querySelector('input');
 
     if (nameNative) {
-      await userEvent.clear(nameNative);
+      // userEvent.clear fails on shadow DOM inputs; set value directly
+      nameNative.value = '';
+      nameNative.dispatchEvent(new Event('input', { bubbles: true }));
       await userEvent.type(nameNative, 'Dr. Sarah Chen');
     }
 
     if (mrnNative) {
-      await userEvent.clear(mrnNative);
+      mrnNative.value = '';
+      mrnNative.dispatchEvent(new Event('input', { bubbles: true }));
       await userEvent.type(mrnNative, 'MRN-204819');
     }
 

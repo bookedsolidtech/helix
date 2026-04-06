@@ -1179,8 +1179,9 @@ export const KeyboardNavigation: Story = {
     // Verify the instructional text is present
     await expect(canvas.getByText(/Tab into the select/)).toBeTruthy();
 
-    // Tab to focus the combobox trigger
-    await userEvent.tab();
+    // Focus the combobox trigger directly (userEvent.tab doesn't cross shadow DOM boundaries)
+    (trigger as HTMLElement).focus();
+    await new Promise((r) => setTimeout(r, 50));
 
     // The combobox trigger div should now have focus
     const activeEl = host!.shadowRoot!.activeElement;

@@ -1105,9 +1105,9 @@ export const ErrorSuppressesHelpText: Story = {
     const errorEl = shadow.getByText(/Email format is invalid/i);
     await expect(errorEl).toBeTruthy();
 
-    // Help text container is always in DOM but hidden when error is active
-    const helpTextContainer = host?.shadowRoot?.querySelector('[part="help-text"]');
-    await expect(helpTextContainer?.hasAttribute('hidden')).toBe(true);
+    // Help text container should be hidden when error is active
+    const helpTextContainer = host.shadowRoot?.querySelector('[part="help-text"]') as HTMLElement;
+    await expect(helpTextContainer?.hidden).toBe(true);
   },
 };
 

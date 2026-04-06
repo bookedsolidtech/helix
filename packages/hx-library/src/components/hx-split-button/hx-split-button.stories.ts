@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, userEvent, fn } from 'storybook/test';
 import './hx-split-button.js';
 import '../hx-menu/hx-menu-item.js';
 
@@ -113,7 +113,6 @@ export const Default: Story = {
     label: 'Save Record',
   },
   play: async ({ canvasElement }) => {
-    const _canvas = within(canvasElement);
     const splitButton = canvasElement.querySelector('hx-split-button');
     await expect(splitButton).toBeTruthy();
 
@@ -293,12 +292,13 @@ export const MenuSelectEvent: Story = {
     // Wait for the menu to open and the first item to be focusable
     await splitButton!.updateComplete;
 
-    // Click the first hx-menu-item (Save as Draft)
+    // Click the first hx-menu-item (Save as Draft) via direct .click() on shadow base div.
+    // hx-menu-item renders a <div part="base">, not a <button>.
     const firstMenuItem = canvasElement.querySelector('hx-menu-item[value="save-draft"]');
     await expect(firstMenuItem).toBeTruthy();
-    const firstItemButton = firstMenuItem!.shadowRoot!.querySelector('button') as HTMLButtonElement;
-    await expect(firstItemButton).toBeTruthy();
-    await userEvent.click(firstItemButton);
+    const firstItemBase = firstMenuItem!.shadowRoot!.querySelector('[part="base"]') as HTMLElement;
+    await expect(firstItemBase).toBeTruthy();
+    firstItemBase.click();
 
     await expect(selectSpy).toHaveBeenCalledTimes(1);
     const callArg = selectSpy.mock.calls[0][0] as CustomEvent<{ value: string; label: string }>;
@@ -508,11 +508,13 @@ export const ExportFormats: Story = {
     await userEvent.click(triggerButton);
     await splitButton!.updateComplete;
 
-    // Select "Export as CSV"
+    // Select "Export as CSV" via direct .click() on shadow base div.
+    // hx-menu-item renders a <div part="base">, not a <button>.
     const csvItem = canvasElement.querySelector('hx-menu-item[value="export-csv"]');
     await expect(csvItem).toBeTruthy();
-    const csvItemButton = csvItem!.shadowRoot!.querySelector('button') as HTMLButtonElement;
-    await userEvent.click(csvItemButton);
+    const csvItemBase = csvItem!.shadowRoot!.querySelector('[part="base"]') as HTMLElement;
+    await expect(csvItemBase).toBeTruthy();
+    csvItemBase.click();
 
     await expect(selectSpy).toHaveBeenCalledTimes(1);
     const callArg = selectSpy.mock.calls[0][0] as CustomEvent<{ value: string; label: string }>;
@@ -602,11 +604,13 @@ export const MenuItemSelectEvent: Story = {
     await userEvent.click(triggerButton);
     await splitButton!.updateComplete;
 
-    // Activate the second menu item (save-publish)
+    // Activate the second menu item (save-publish) via direct .click() on shadow base div.
+    // hx-menu-item renders a <div part="base">, not a <button>.
     const publishItem = canvasElement.querySelector('hx-menu-item[value="save-publish"]');
     await expect(publishItem).toBeTruthy();
-    const publishItemButton = publishItem!.shadowRoot!.querySelector('button') as HTMLButtonElement;
-    await userEvent.click(publishItemButton);
+    const publishItemBase = publishItem!.shadowRoot!.querySelector('[part="base"]') as HTMLElement;
+    await expect(publishItemBase).toBeTruthy();
+    publishItemBase.click();
 
     await expect(selectSpy).toHaveBeenCalledTimes(1);
     const callArg = selectSpy.mock.calls[0][0] as CustomEvent<{ value: string; label: string }>;

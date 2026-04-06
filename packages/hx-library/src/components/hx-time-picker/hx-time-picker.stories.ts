@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import './hx-time-picker.js';
 
 // ─────────────────────────────────────────────────
@@ -624,19 +624,27 @@ export const KeyboardNavigation: Story = {
     input.focus();
     await expect(input).toBeTruthy();
 
-    // Press ArrowDown to open the listbox
-    await userEvent.keyboard('{ArrowDown}');
+    // Dispatch ArrowDown directly to the shadow input to open the listbox.
+    // userEvent.keyboard dispatches to document.activeElement (the host),
+    // not to the shadow DOM input, so we dispatch events directly.
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
 
-    // Press ArrowDown to advance to the next option
-    await userEvent.keyboard('{ArrowDown}');
+    // Dispatch ArrowDown again to advance to the next option
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
 
-    // Press Escape to close
-    await userEvent.keyboard('{Escape}');
+    // Dispatch Escape to close
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }));
 
+    // Wait for Lit reactive update
     const host = canvasElement.querySelector('hx-time-picker')!;
+    await (host as unknown as { updateComplete: Promise<void> }).updateComplete;
+
     const shadow = host.shadowRoot!;
-    const listbox = shadow.querySelector('[role="listbox"]');
-    await expect(listbox).toBeNull();
+    // The listbox is always in the DOM (uses hidden attribute, not conditional rendering).
+    // After Escape, the listbox should have hidden=true.
+    const listbox = shadow.querySelector('[role="listbox"]') as HTMLElement;
+    await expect(listbox).toBeTruthy();
+    await expect(listbox.hidden).toBe(true);
   },
 };
 
@@ -661,10 +669,14 @@ export const EventVerification: Story = {
       changeDetail = e.detail.value;
     }) as EventListener);
 
-    // Open the listbox via ArrowDown, select the first option with Enter
+    // Open the listbox via ArrowDown, select the first option with Enter.
+    // Dispatch directly to the shadow input; userEvent.keyboard goes to
+    // document.activeElement (the host), not the shadow DOM input.
     input.focus();
-    await userEvent.keyboard('{ArrowDown}');
-    await userEvent.keyboard('{Enter}');
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete;
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
+    await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete;
 
     await expect(changeEventFired).toBe(true);
     // Detail value is HH:MM 24-hour format

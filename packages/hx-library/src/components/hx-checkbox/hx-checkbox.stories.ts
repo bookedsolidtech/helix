@@ -175,8 +175,8 @@ export const Default: Story = {
     const canvas = within(canvasElement);
     const { host, control } = getCheckboxParts(canvasElement);
 
-    // Verify component renders with label text
-    await expect(canvas.getByText('I agree to the patient data handling terms')).toBeTruthy();
+    // Verify component renders with label text (label is in shadow DOM, check via property)
+    await expect((host as { label: string }).label).toBe('I agree to the patient data handling terms');
 
     // Initially unchecked
     await expect(host.checked).toBe(false);
@@ -956,26 +956,24 @@ export const KeyboardToggle: Story = {
   },
   play: async ({ canvasElement }) => {
     const { host } = getCheckboxParts(canvasElement);
-    // Get the native checkbox input inside shadow DOM; focus it directly
-    // so keyboard events (Space) are dispatched to the correct element
-    const nativeInput = host.shadowRoot?.querySelector('.checkbox__input') as HTMLInputElement;
-    if (!nativeInput) throw new Error('.checkbox__input not found');
 
-    // Focus the native input directly
-    nativeInput.focus();
+    // Focus the native input inside the shadow DOM directly
+    const nativeInput = host.shadowRoot?.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    await expect(nativeInput).toBeTruthy();
+    nativeInput!.focus();
     await nextFrame();
 
     // Initially unchecked
     await expect(host.checked).toBe(false);
 
-    // Press Space to toggle — fires on the native input which has keyboard focus
-    await userEvent.keyboard(' ');
+    // Dispatch Space keydown directly to the native input to toggle
+    nativeInput!.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
     await nextFrame();
 
     await expect(host.checked).toBe(true);
 
     // Press Space again to uncheck
-    await userEvent.keyboard(' ');
+    nativeInput!.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
     await nextFrame();
 
     await expect(host.checked).toBe(false);

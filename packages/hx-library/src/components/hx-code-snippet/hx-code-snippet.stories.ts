@@ -302,7 +302,7 @@ const j = 10;</hx-code-snippet>
 export const CopyInteraction: Story = {
   name: 'Copy: Interaction Test',
   render: () => html`
-    <hx-code-snippet language="javascript">npm install @helixui/library</hx-code-snippet>
+    <hx-code-snippet language="javascript" copyable>npm install @helixui/library</hx-code-snippet>
   `,
   play: async ({ canvasElement }) => {
     const snippet = canvasElement.querySelector('hx-code-snippet');

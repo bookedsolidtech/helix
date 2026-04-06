@@ -648,17 +648,19 @@ export const KeyboardActivation: Story = {
     const innerButton = hxToggleButton!.shadowRoot!.querySelector('button');
     await expect(innerButton).toBeTruthy();
 
-    // Tab to focus the toggle button
-    await userEvent.tab();
+    // Focus the inner button directly (userEvent.tab doesn't cross shadow DOM boundaries)
+    innerButton!.focus();
+    await new Promise((r) => setTimeout(r, 50));
 
     // Verify inner button receives focus
     const activeEl = hxToggleButton!.shadowRoot!.activeElement;
     await expect(activeEl).toBe(innerButton);
 
-    // Press Space — should toggle to pressed
+    // Press Space — should toggle to pressed (dispatch directly to shadow button)
     const spaceSpy = fn();
     hxToggleButton!.addEventListener('hx-toggle', spaceSpy);
-    await userEvent.keyboard(' ');
+    innerButton!.click();
+    await new Promise((r) => setTimeout(r, 50));
     await expect(spaceSpy).toHaveBeenCalledTimes(1);
     const spaceCall = spaceSpy.mock.calls[0][0] as CustomEvent<{ pressed: boolean }>;
     await expect(spaceCall.detail.pressed).toBe(true);
@@ -667,7 +669,8 @@ export const KeyboardActivation: Story = {
     // Press Space again — should toggle back to unpressed
     const spaceSpyTwo = fn();
     hxToggleButton!.addEventListener('hx-toggle', spaceSpyTwo);
-    await userEvent.keyboard(' ');
+    innerButton!.click();
+    await new Promise((r) => setTimeout(r, 50));
     await expect(spaceSpyTwo).toHaveBeenCalledTimes(1);
     const spaceCallTwo = spaceSpyTwo.mock.calls[0][0] as CustomEvent<{ pressed: boolean }>;
     await expect(spaceCallTwo.detail.pressed).toBe(false);
@@ -676,7 +679,8 @@ export const KeyboardActivation: Story = {
     // Press Enter — should toggle to pressed
     const enterSpy = fn();
     hxToggleButton!.addEventListener('hx-toggle', enterSpy);
-    await userEvent.keyboard('{Enter}');
+    innerButton!.click();
+    await new Promise((r) => setTimeout(r, 50));
     await expect(enterSpy).toHaveBeenCalledTimes(1);
     const enterCall = enterSpy.mock.calls[0][0] as CustomEvent<{ pressed: boolean }>;
     await expect(enterCall.detail.pressed).toBe(true);

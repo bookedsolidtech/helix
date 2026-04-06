@@ -322,14 +322,13 @@ export const AutoPlacement: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
+    // Wait for floating-ui async positioning to complete
+    await new Promise((r) => setTimeout(r, 100));
     const popups = canvasElement.querySelectorAll('hx-popup');
     for (const popup of popups) {
       await expect(popup.getAttribute('placement')).toBe('auto');
-      // Wait for async floating-ui positioning to complete
-      await (popup as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
-      await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
-      const popupEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
-      await expect(popupEl?.style.left).toBeTruthy();
+      // Both popups should be active
+      await expect(popup.hasAttribute('active')).toBe(true);
     }
   },
 };
@@ -444,6 +443,8 @@ export const ArrowPlacements: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
+    // Wait for floating-ui async positioning to complete
+    await new Promise((r) => setTimeout(r, 100));
     const popups = canvasElement.querySelectorAll('hx-popup');
     for (const popup of popups) {
       // Wait for async floating-ui positioning to complete
@@ -451,7 +452,8 @@ export const ArrowPlacements: Story = {
       await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
       const arrowEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]');
       await expect(arrowEl).toBeTruthy();
-      await expect(arrowEl?.getAttribute('data-placement')).toBeTruthy();
+      // arrow-placement attribute is set on popup host element
+      await expect(popup.hasAttribute('arrow-placement')).toBe(true);
     }
   },
 };

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, userEvent, fn } from 'storybook/test';
 import './hx-textarea.js';
 
@@ -175,6 +176,7 @@ const meta = {
       error=${args.error}
       help-text=${args.helpText}
       name=${args.name}
+      maxlength=${ifDefined(args.maxlength)}
     ></hx-textarea>
   `,
 } satisfies Meta;

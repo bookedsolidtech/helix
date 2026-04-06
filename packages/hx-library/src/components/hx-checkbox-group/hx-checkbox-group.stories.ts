@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, userEvent, fn } from 'storybook/test';
 import './hx-checkbox-group.js';
 import '../hx-checkbox/hx-checkbox.js';
 
@@ -272,10 +272,10 @@ export const Default: Story = {
     </hx-checkbox-group>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Verify the group renders with label text
-    await expect(canvas.getByText('Pre-Existing Conditions')).toBeTruthy();
+    // Verify the group renders with the correct label property
+    const groupEl = canvasElement.querySelector('hx-checkbox-group') as HTMLElement & { label: string };
+    await expect(groupEl).toBeTruthy();
+    await expect(groupEl.label).toBe('Pre-Existing Conditions');
 
     // Verify all checkboxes render
     const checkboxes = canvasElement.querySelectorAll('hx-checkbox');
