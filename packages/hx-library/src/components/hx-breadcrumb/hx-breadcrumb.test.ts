@@ -873,16 +873,11 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      // useElement: true — hx-breadcrumb sets role="list" on the host element so axe must
-      // receive the host (not just its shadow root) to resolve the aria-required-parent
-      // relationship for hx-breadcrumb-item[role="listitem"] children across the shadow boundary.
-      // aria-required-children is disabled: axe-core's shadow DOM traversal sees the shadow
-      // <nav> as a direct child of role="list", which is a false positive — the <nav> is a
-      // presentational shadow DOM wrapper, not an ARIA child in the composed accessibility tree.
-      const { violations } = await checkA11y(el, {
-        useElement: true,
-        rules: { 'aria-required-children': { enabled: false } },
-      });
+      // useElement: true — axe must receive the host to traverse both the shadow DOM <ol>
+      // (which carries the native list semantics) and the slotted hx-breadcrumb-item[role="listitem"]
+      // children. In the flat tree, slotted items are direct children of <ol>, satisfying both
+      // aria-required-parent (listitem inside list) and aria-required-children (list owns listitems).
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
