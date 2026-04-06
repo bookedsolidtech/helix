@@ -136,7 +136,7 @@ export const Disabled: Story = {
     const span = hxLink!.shadowRoot!.querySelector('span[role="link"]');
     await expect(span).toBeTruthy();
     await expect(span!.getAttribute('aria-disabled')).toBe('true');
-    await expect(span!.getAttribute('tabindex')).toBe('0');
+    await expect(span!.getAttribute('tabindex')).toBeNull();
 
     const eventSpy = fn();
     hxLink!.addEventListener('hx-click', eventSpy);

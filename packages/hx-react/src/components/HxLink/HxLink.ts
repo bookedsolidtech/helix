@@ -30,7 +30,7 @@ export const HxLink = createComponent({
   elementClass: HelixLink,
   react: React,
   events: {
-    onHxClick: 'hx-click'
+    onHxClick: 'hx-click',
   },
   displayName: 'HxLink',
 });

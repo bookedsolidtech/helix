@@ -325,7 +325,9 @@ export const AutoPlacement: Story = {
     const popups = canvasElement.querySelectorAll('hx-popup');
     for (const popup of popups) {
       await expect(popup.getAttribute('placement')).toBe('auto');
-      // Both popups should have run positioning and have left/top set
+      // Wait for async floating-ui positioning to complete
+      await (popup as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
       const popupEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
       await expect(popupEl?.style.left).toBeTruthy();
     }
@@ -444,6 +446,9 @@ export const ArrowPlacements: Story = {
   play: async ({ canvasElement }) => {
     const popups = canvasElement.querySelectorAll('hx-popup');
     for (const popup of popups) {
+      // Wait for async floating-ui positioning to complete
+      await (popup as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
       const arrowEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]');
       await expect(arrowEl).toBeTruthy();
       await expect(arrowEl?.getAttribute('data-placement')).toBeTruthy();

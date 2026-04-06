@@ -471,10 +471,11 @@ export const ValidationFlow: Story = {
     }
 
     // Step 2: Fill in the required fields
-    const nameInput = canvas.getByLabelText('Patient Name *');
+    // The * required indicator is in an aria-hidden span and excluded from the accessible label
+    const nameInput = canvas.getByLabelText('Patient Name');
     await userEvent.type(nameInput, 'Maria Rodriguez');
 
-    const emailInput = canvas.getByLabelText('Contact Email *');
+    const emailInput = canvas.getByLabelText('Contact Email');
     await userEvent.type(emailInput, 'maria.rodriguez@hospital.org');
 
     // Step 3: Resubmit (should pass validation now)
