@@ -260,6 +260,28 @@ describe('hx-icon-button', () => {
       expect(anchor).toBeTruthy();
       expect(anchor?.getAttribute('aria-disabled')).toBe('true');
     });
+
+    it('sets role="link" on disabled anchor so aria-label is not prohibited (WCAG fix)', async () => {
+      // An <a> without href loses its implicit "link" role; aria-label is prohibited
+      // on a roleless anchor (aria-prohibited-attr rule). Explicit role="link" restores
+      // a valid role so the accessible name is communicated to screen readers.
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit site" href="https://example.com" disabled></hx-icon-button>',
+      );
+      const anchor = shadowQuery(el, 'a');
+      expect(anchor).toBeTruthy();
+      expect(anchor?.getAttribute('role')).toBe('link');
+    });
+
+    it('does not set role on active (non-disabled) anchor', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit site" href="https://example.com"></hx-icon-button>',
+      );
+      const anchor = shadowQuery(el, 'a');
+      expect(anchor).toBeTruthy();
+      // Active anchor with href has implicit "link" role; no explicit role needed
+      expect(anchor?.hasAttribute('role')).toBe(false);
+    });
   });
 
   // ─── Events (4) ───
@@ -534,6 +556,37 @@ describe('hx-icon-button', () => {
         expect(violations, `variant="${variant}" should have no axe violations`).toEqual([]);
         el.remove();
       }
+    });
+
+    it('has no axe violations for all sizes', async () => {
+      const sizes = ['sm', 'md', 'lg'] as const;
+      for (const size of sizes) {
+        const el = await fixture<HelixIconButton>(
+          `<hx-icon-button label="Action button" hx-size="${size}"></hx-icon-button>`,
+        );
+        await page.screenshot();
+        const { violations } = await checkA11y(el);
+        expect(violations, `hx-size="${size}" should have no axe violations`).toEqual([]);
+        el.remove();
+      }
+    });
+
+    it('has no axe violations in href (anchor) mode', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit site" href="https://example.com"></hx-icon-button>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in href mode when disabled', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit site" href="https://example.com" disabled></hx-icon-button>',
+      );
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
     });
   });
 });

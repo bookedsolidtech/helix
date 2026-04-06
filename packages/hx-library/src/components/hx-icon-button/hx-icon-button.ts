@@ -203,11 +203,16 @@ export class HelixIconButton extends LitElement {
       // P1-07 note: aria-disabled IS required on the anchor branch because
       // <a> elements have no native disabled attribute; aria-disabled is the
       // only AT signal available.
+      // WCAG fix: an <a> without href loses its implicit "link" role, making
+      // aria-label prohibited. Adding role="link" explicitly on the disabled
+      // (href-less) anchor restores a valid role that permits aria-label, so
+      // screen readers correctly announce the accessible name.
       return html`
         <a
           part="button"
           class=${classMap(this._classes())}
           href=${ifDefined(this.disabled ? undefined : this.href)}
+          role=${this.disabled ? 'link' : nothing}
           aria-label=${normalizedLabel}
           title=${normalizedLabel}
           aria-disabled=${this.disabled ? 'true' : nothing}

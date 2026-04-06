@@ -699,6 +699,63 @@ describe('hx-split-button', () => {
       const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
       expect(trigger?.getAttribute('aria-haspopup')).toBe('menu');
     });
+
+    it('has no axe violations for all variants', async () => {
+      const variants = ['primary', 'secondary', 'tertiary', 'danger', 'ghost', 'outline'] as const;
+      for (const variant of variants) {
+        const el = await fixture<HelixSplitButton>(`
+          <hx-split-button variant="${variant}">
+            Save Record
+            <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+          </hx-split-button>
+        `);
+        await page.screenshot();
+        const { violations } = await checkA11y(el);
+        expect(violations, `variant="${variant}" should have no axe violations`).toEqual([]);
+        el.remove();
+      }
+    });
+
+    it('has no axe violations for all sizes', async () => {
+      const sizes = ['sm', 'md', 'lg'] as const;
+      for (const size of sizes) {
+        const el = await fixture<HelixSplitButton>(`
+          <hx-split-button hx-size="${size}">
+            Save Record
+            <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+          </hx-split-button>
+        `);
+        await page.screenshot();
+        const { violations } = await checkA11y(el);
+        expect(violations, `hx-size="${size}" should have no axe violations`).toEqual([]);
+        el.remove();
+      }
+    });
+
+    it('has no axe violations when menu is open', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="save-draft">Save as Draft</hx-menu-item>
+          <hx-menu-item slot="menu" value="save-template">Save as Template</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+      await page.screenshot();
+      // useElement: true is required so axe can traverse the full composed tree,
+      // resolving the aria-required-parent relationship for role="menuitem" items
+      // slotted into the shadow DOM menu panel (role="menu").
+      // color-contrast is disabled because the slotted hx-menu-item elements render
+      // inside their own shadow root; the axe engine cannot compute the fully-composed
+      // effective background color for cross-shadow-boundary elements in this runner.
+      const { violations } = await checkA11y(el, {
+        useElement: true,
+        rules: { 'color-contrast': { enabled: false } },
+      });
+      expect(violations).toEqual([]);
+    });
   });
 });
 

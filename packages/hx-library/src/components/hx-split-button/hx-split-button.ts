@@ -363,7 +363,7 @@ export class HelixSplitButton extends LitElement {
           class="split-button__primary"
           ?disabled=${this.disabled}
           type="button"
-          aria-label=${this.ariaLabel ?? (this.label || nothing)}
+          aria-label=${this.ariaLabel || this.label || nothing}
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
         >
