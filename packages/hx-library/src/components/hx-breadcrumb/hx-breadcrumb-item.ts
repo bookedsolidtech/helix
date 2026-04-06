@@ -39,6 +39,12 @@ export class HelixBreadcrumbItem extends LitElement {
     // standalone (outside a list context) creates an invalid ARIA hierarchy
     // because listitem requires a list ancestor.
     //
+    // hx-breadcrumb sets role="list" on its host element so that axe-core's
+    // flat-tree traversal (used by @axe-core/playwright) sees a valid list
+    // ancestor for these listitems. The shadow-DOM <ol> owns the visual
+    // structure; the host role satisfies the ARIA required-parent rule in
+    // the composed/flat accessibility tree.
+    //
     // IMPORTANT: If programmatically creating an ellipsis element, set aria-hidden
     // BEFORE inserting into the DOM. connectedCallback fires on insertion and sets
     // role="listitem"; setting aria-hidden after would momentarily expose an
