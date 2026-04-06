@@ -667,26 +667,57 @@ describe('hx-combobox', () => {
     });
   });
 
-  // ─── Accessibility (3) ───
+  // ─── Accessibility (5) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
       const el = await fixture<HxCombobox>(
         '<hx-combobox label="Fruit" placeholder="Select..."></hx-combobox>',
       );
-      await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
     });
 
     it('has no axe violations when disabled', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox label="Fruit" disabled></hx-combobox>');
-      await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
     });
 
     it('has no axe violations in error state', async () => {
       const el = await fixture<HxCombobox>(
         '<hx-combobox label="Fruit" error="Required"></hx-combobox>',
       );
-      await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in filtered/searching state', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit" placeholder="Search...">
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+          <option slot="option" value="apricot">Apricot</option>
+        </hx-combobox>`,
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.value = 'ap';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with multiple-select enabled', async () => {
+      const el = await fixture<HxCombobox>(
+        `<hx-combobox label="Fruit" multiple>
+          <option slot="option" value="apple">Apple</option>
+          <option slot="option" value="banana">Banana</option>
+        </hx-combobox>`,
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
     });
   });
 
@@ -844,7 +875,11 @@ describe('hx-combobox', () => {
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.dispatchEvent(new Event('focus'));
       await el.updateComplete;
-      await checkA11y(el, { rules: { 'color-contrast': { enabled: false } } });
+      const { violations } = await checkA11y(el, {
+        useElement: true,
+        rules: { 'color-contrast': { enabled: false } },
+      });
+      expect(violations).toEqual([]);
     });
   });
 

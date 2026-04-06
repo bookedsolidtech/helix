@@ -697,20 +697,37 @@ describe('hx-color-picker', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (2) ───
+  // ─── Accessibility (axe-core) (4) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
     it('has no axe violations in inline state', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in inline state with a selected value', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#4a90d9"></hx-color-picker>',
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in inline state with swatches', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      el.swatches = ['#ff0000', '#00ff00', '#0000ff'];
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });

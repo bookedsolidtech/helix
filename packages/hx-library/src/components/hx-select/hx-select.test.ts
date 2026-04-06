@@ -809,7 +809,7 @@ describe('hx-select', () => {
         <option value="us">United States</option>
         <option value="ca">Canada</option>
       </hx-select>`);
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -817,7 +817,7 @@ describe('hx-select', () => {
       const el = await fixture<WcSelect>(`<hx-select label="Country" error="Required">
         <option value="us">United States</option>
       </hx-select>`);
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -825,7 +825,7 @@ describe('hx-select', () => {
       const el = await fixture<WcSelect>(`<hx-select label="Country" disabled>
         <option value="us">United States</option>
       </hx-select>`);
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -835,7 +835,34 @@ describe('hx-select', () => {
         <option value="ca">Canada</option>
       </hx-select>`);
       await el.updateComplete;
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when trigger is focused (closed)', async () => {
+      const el = await fixture<WcSelect>(`<hx-select label="Country" value="us">
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+      </hx-select>`);
+      await el.updateComplete;
+      el.focus();
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with option highlighted via keyboard navigation', async () => {
+      const el = await fixture<WcSelect>(`<hx-select label="Country" open>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+      </hx-select>`);
+      await el.updateComplete;
+      const trigger = el.shadowRoot!.querySelector<HTMLElement>('[role="combobox"]')!;
+      trigger.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });

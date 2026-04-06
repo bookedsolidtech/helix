@@ -456,13 +456,13 @@ describe('hx-rating', () => {
     });
   });
 
-  // ─── Accessibility (axe-core) (4) ───
+  // ─── Accessibility (axe-core) (6) ───
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
       const el = await fixture<HelixRating>('<hx-rating label="Product rating"></hx-rating>');
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -471,7 +471,7 @@ describe('hx-rating', () => {
         '<hx-rating value="3" max="5" label="Product rating"></hx-rating>',
       );
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -480,7 +480,7 @@ describe('hx-rating', () => {
         '<hx-rating value="4" max="5" label="Product rating" readonly></hx-rating>',
       );
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -489,7 +489,28 @@ describe('hx-rating', () => {
         '<hx-rating value="2" label="Product rating" disabled></hx-rating>',
       );
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in half-star precision (slider) state', async () => {
+      const el = await fixture<HelixRating>(
+        '<hx-rating value="2.5" max="5" label="Product rating"></hx-rating>',
+      );
+      el.precision = 0.5;
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations when rating is focused (keyboard navigation)', async () => {
+      const el = await fixture<HelixRating>(
+        '<hx-rating value="3" max="5" label="Product rating"></hx-rating>',
+      );
+      await el.updateComplete;
+      el.focus();
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });
