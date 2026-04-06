@@ -889,10 +889,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el, {
-        useElement: true,
-        rules: { 'aria-required-children': { enabled: false } },
-      });
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -905,10 +902,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el, {
-        useElement: true,
-        rules: { 'aria-required-children': { enabled: false } },
-      });
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -923,10 +917,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el, {
-        useElement: true,
-        rules: { 'aria-required-children': { enabled: false } },
-      });
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });
