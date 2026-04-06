@@ -32,7 +32,7 @@ export const HxSelect = createComponent({
   elementClass: HelixSelect,
   react: React,
   events: {
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxSelect',
 });

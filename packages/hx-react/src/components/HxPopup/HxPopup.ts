@@ -29,7 +29,7 @@ export const HxPopup = createComponent({
   elementClass: HelixPopup,
   react: React,
   events: {
-    onHxReposition: 'hx-reposition'
+    onHxReposition: 'hx-reposition',
   },
   displayName: 'HxPopup',
 });

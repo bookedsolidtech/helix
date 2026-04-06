@@ -29,7 +29,7 @@ export const HxTh = createComponent({
   elementClass: HelixTableHeader,
   react: React,
   events: {
-    onHxSort: 'hx-sort'
+    onHxSort: 'hx-sort',
   },
   displayName: 'HxTh',
 });
