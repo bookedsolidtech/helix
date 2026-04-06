@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, within, fn } from 'storybook/test';
 import './hx-select.js';
 import '../hx-button/hx-button.js';
 import '../hx-text-input/hx-text-input.js';

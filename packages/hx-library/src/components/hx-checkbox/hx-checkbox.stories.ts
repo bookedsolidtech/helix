@@ -172,7 +172,7 @@ export const Default: Story = {
     label: 'I agree to the patient data handling terms',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    within(canvasElement);
     const { host, control } = getCheckboxParts(canvasElement);
 
     // Verify component renders with label text (label is in shadow DOM, check via property)

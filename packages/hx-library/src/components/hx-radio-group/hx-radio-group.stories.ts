@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, userEvent, fn } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import './hx-radio-group.js';
 import './hx-radio.js';
 
