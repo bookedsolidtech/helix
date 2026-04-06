@@ -873,7 +873,10 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      // useElement: true — hx-breadcrumb sets role="list" on the host element so axe must
+      // receive the host (not just its shadow root) to resolve the aria-required-parent
+      // relationship for hx-breadcrumb-item[role="listitem"] children across the shadow boundary.
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -885,7 +888,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -898,7 +901,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -913,7 +916,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });
