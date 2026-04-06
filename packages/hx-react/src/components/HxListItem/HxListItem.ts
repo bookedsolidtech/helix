@@ -28,7 +28,7 @@ export const HxListItem = createComponent({
   elementClass: HelixListItem,
   react: React,
   events: {
-    onHxListItemClick: 'hx-list-item-click',
+    onHxListItemClick: 'hx-list-item-click'
   },
   displayName: 'HxListItem',
 });
