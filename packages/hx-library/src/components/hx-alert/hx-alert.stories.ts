@@ -206,7 +206,7 @@ export const Success: Story = {
   },
 };
 
-/** Warning alert for situations requiring clinician attention. Uses `role="alert"` (implies assertive announcement). */
+/** Warning alert for situations requiring clinician attention. Uses `role="status"` (implies polite announcement). */
 export const Warning: Story = {
   args: {
     variant: 'warning',
@@ -219,7 +219,8 @@ export const Warning: Story = {
     await expect(alert?.variant).toBe('warning');
 
     // Role is on the host element; aria-live is omitted to avoid JAWS double-announcements
-    await expect(alert?.getAttribute('role')).toBe('alert');
+    // warning variant uses role="status" (polite); only error uses role="alert" (assertive)
+    await expect(alert?.getAttribute('role')).toBe('status');
   },
 };
 
@@ -258,7 +259,7 @@ export const Dismissible: Story = {
 
     const closeBtn = alert?.shadowRoot?.querySelector('[part="close-button"]');
     await expect(closeBtn).toBeTruthy();
-    await expect(closeBtn?.getAttribute('aria-label')).toBe('Close');
+    await expect(closeBtn?.getAttribute('aria-label')).toBe('Close alert');
   },
 };
 
@@ -507,16 +508,16 @@ export const AllVariants: Story = {
 export const AllStates: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
-      <hx-alert variant="info">
+      <hx-alert variant="info" open>
         <strong>Default:</strong> Non-dismissible, no actions, default icon.
       </hx-alert>
 
-      <hx-alert variant="success" dismissible>
+      <hx-alert variant="success" dismissible open>
         <strong>Dismissible:</strong> Vitals have been recorded. Click the X to dismiss this
         notification.
       </hx-alert>
 
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         <strong>With actions:</strong> Abnormal lab value detected for BMP panel.
         <button
           slot="actions"
@@ -534,7 +535,7 @@ export const AllStates: Story = {
         </button>
       </hx-alert>
 
-      <hx-alert variant="error">
+      <hx-alert variant="error" open>
         <svg
           slot="icon"
           viewBox="0 0 20 20"
@@ -711,7 +712,7 @@ export const LongContent: Story = {
 export const EmptyContent: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="info"></hx-alert>
+      <hx-alert variant="info" open></hx-alert>
     </div>
   `,
   play: async ({ canvasElement }) => {
@@ -723,8 +724,9 @@ export const EmptyContent: Story = {
     const alertContainer = alert?.shadowRoot?.querySelector('[part="alert"]');
     await expect(alertContainer).toBeTruthy();
 
+    // icon is only rendered when show-icon attribute is set; default is false
     const iconPart = alert?.shadowRoot?.querySelector('[part="icon"]');
-    await expect(iconPart).toBeTruthy();
+    await expect(iconPart).toBeNull();
   },
 };
 
@@ -1075,11 +1077,11 @@ hx-alert::part(actions) {
 // 9. INTERACTION TESTS
 // ─────────────────────────────────────────────────
 
-/** Verifies that clicking the close button hides the alert and fires the `hx-dismiss` event. */
+/** Verifies that clicking the close button hides the alert and fires the `hx-close` event. */
 export const CloseBehavior: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="info" dismissible>
+      <hx-alert variant="info" dismissible open>
         Click the close button to dismiss this medication reminder alert.
       </hx-alert>
     </div>
@@ -1093,12 +1095,12 @@ export const CloseBehavior: Story = {
     let dismissEventDetail: Record<string, unknown> | null = null;
     let afterDismissEventFired = false;
 
-    alert.addEventListener('hx-dismiss', ((e: CustomEvent) => {
+    alert.addEventListener('hx-close', ((e: CustomEvent) => {
       dismissEventFired = true;
       dismissEventDetail = e.detail;
     }) as EventListener);
 
-    alert.addEventListener('hx-after-dismiss', (() => {
+    alert.addEventListener('hx-after-close', (() => {
       afterDismissEventFired = true;
     }) as EventListener);
 
@@ -1114,11 +1116,11 @@ export const CloseBehavior: Story = {
     await expect(alert.open).toBe(false);
     await expect(getComputedStyle(alert).display).toBe('none');
 
-    // Verify hx-dismiss event fired with correct detail
+    // Verify hx-close event fired with correct detail
     await expect(dismissEventFired).toBe(true);
     await expect(dismissEventDetail).toEqual({ reason: 'user' });
 
-    // Verify hx-after-dismiss event fired
+    // Verify hx-after-close event fired
     await expect(afterDismissEventFired).toBe(true);
   },
 };
@@ -1127,7 +1129,7 @@ export const CloseBehavior: Story = {
 export const KeyboardDismiss: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         Use Tab to focus the close button, then press Enter to dismiss this patient safety alert.
       </hx-alert>
     </div>
@@ -1141,7 +1143,7 @@ export const KeyboardDismiss: Story = {
 
     // Set up event listener
     let dismissEventFired = false;
-    alert.addEventListener('hx-dismiss', (() => {
+    alert.addEventListener('hx-close', (() => {
       dismissEventFired = true;
     }) as EventListener);
 
@@ -1163,22 +1165,22 @@ export const KeyboardDismiss: Story = {
 
 /**
  * Verifies that ARIA roles are correctly assigned based on variant:
- * - `role="status"` for info and success (polite announcement)
- * - `role="alert"` for warning and error (assertive announcement)
+ * - `role="status"` for info, success, and warning (polite announcement)
+ * - `role="alert"` for error only (assertive announcement)
  */
 export const AriaRoles: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
-      <hx-alert variant="info" data-testid="alert-info">
+      <hx-alert variant="info" open data-testid="alert-info">
         Info uses role="status" (implicit polite announcement).
       </hx-alert>
-      <hx-alert variant="success" data-testid="alert-success">
+      <hx-alert variant="success" open data-testid="alert-success">
         Success uses role="status" (implicit polite announcement).
       </hx-alert>
-      <hx-alert variant="warning" data-testid="alert-warning">
-        Warning uses role="alert" (implicit assertive announcement).
+      <hx-alert variant="warning" open data-testid="alert-warning">
+        Warning uses role="status" (implicit polite announcement).
       </hx-alert>
-      <hx-alert variant="error" data-testid="alert-error">
+      <hx-alert variant="error" open data-testid="alert-error">
         Error uses role="alert" (implicit assertive announcement).
       </hx-alert>
     </div>
@@ -1197,11 +1199,11 @@ export const AriaRoles: Story = {
     ) as HTMLElement;
     await expect(successAlert.getAttribute('role')).toBe('status');
 
-    // Warning: role="alert" (implies assertive)
+    // Warning: role="status" (implies polite) — only error uses role="alert"
     const warningAlert = canvasElement.querySelector(
       '[data-testid="alert-warning"]',
     ) as HTMLElement;
-    await expect(warningAlert.getAttribute('role')).toBe('alert');
+    await expect(warningAlert.getAttribute('role')).toBe('status');
 
     // Error: role="alert" (implies assertive)
     const errorAlert = canvasElement.querySelector('[data-testid="alert-error"]') as HTMLElement;

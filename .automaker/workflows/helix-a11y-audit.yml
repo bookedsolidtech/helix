@@ -29,6 +29,9 @@ execution:
     autoCreatePR: false
   outputDir: .automaker/audits
   terminalStatus: done
+context:
+  - agent-push-protocol.md
+  - shadow-dom-story-test-patterns.md
 match:
   categories: [a11y-audit, accessibility-audit]
   keywords: [accessibility, wcag, a11y, aria, keyboard]

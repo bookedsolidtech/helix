@@ -259,7 +259,8 @@ export const DisabledItem: Story = {
     const disabledTrigger = disabledItem.shadowRoot?.querySelector('summary');
     await expect(disabledTrigger).toBeTruthy();
     if (!disabledTrigger) return;
-    await userEvent.click(disabledTrigger);
+    // Use native .click() to bypass pointer-events:none CSS applied to disabled trigger
+    disabledTrigger.click();
     await new Promise((r) => setTimeout(r, 50));
 
     // Should remain collapsed
@@ -304,7 +305,8 @@ export const KeyboardNavigation: Story = {
 
     // Focus trigger and press Enter
     firstTrigger.focus();
-    await expect(firstTrigger).toHaveFocus();
+    // shadow DOM elements are not document.activeElement; check shadowRoot.activeElement instead
+    await expect(items[0].shadowRoot?.activeElement).toBe(firstTrigger);
     await userEvent.keyboard('{Enter}');
     await new Promise((r) => setTimeout(r, 50));
 

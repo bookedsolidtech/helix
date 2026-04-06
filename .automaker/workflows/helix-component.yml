@@ -26,6 +26,10 @@ execution:
     autoMergePR: true
     prBaseBranch: dev
   terminalStatus: review
+context:
+  - agent-push-protocol.md
+  - test-verification-workflow.md
+  - shadow-dom-story-test-patterns.md
 match:
   categories: [component, component-impl]
   keywords: [component, hx-]

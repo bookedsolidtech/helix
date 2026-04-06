@@ -66,14 +66,21 @@ export function cleanup(): void {
 /**
  * Runs axe-core WCAG 2.1 AA accessibility audit on a component.
  * Returns the axe results object. Throws if critical violations found.
+ *
+ * @param el - The host element to audit.
+ * @param options.rules - Optional axe rule overrides.
+ * @param options.useElement - When true, passes the host element directly to axe instead of
+ *   its shadow root. Required for components that set ARIA roles on the host element itself
+ *   (e.g. `role="list"` on `hx-breadcrumb`), so axe can traverse the full composed tree and
+ *   resolve aria-required-parent relationships across shadow boundaries.
  */
 export async function checkA11y(
   el: HTMLElement,
-  options?: { rules?: Record<string, { enabled: boolean }> },
+  options?: { rules?: Record<string, { enabled: boolean }>; useElement?: boolean },
 ): Promise<{ violations: AxeViolation[]; passes: AxePass[] }> {
   const axe = await import('axe-core');
 
-  const context = el.shadowRoot ?? el;
+  const context = options?.useElement ? el : (el.shadowRoot ?? el);
   const results = await axe.default.run(context as unknown as Node, {
     runOnly: {
       type: 'tag',

@@ -294,7 +294,7 @@ describe('scoreComponent — dimensions structure', () => {
     expect(cem?.score).toBe(85);
   });
 
-  it('includes Docs Coverage as measured with score 0 when docs page absent', () => {
+  it('includes Docs Coverage as measured with score 0 when docs page absent', async () => {
     const { existsSync } = await import('node:fs');
     vi.mocked(existsSync).mockReturnValue(false);
     const result = scoreComponent('hx-button');

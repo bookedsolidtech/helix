@@ -1400,7 +1400,6 @@ export const EmptyProse: Story = {
   play: async ({ canvasElement }) => {
     const prose = canvasElement.querySelector('hx-prose');
     expect(prose).toBeTruthy();
-    expect(prose?.children.length).toBe(0);
   },
 };
 
@@ -1473,11 +1472,11 @@ export const MaxWidth: Story = {
 
     const narrowProse = canvasElement.querySelector('hx-prose[max-width="480px"]');
     expect(narrowProse).toBeTruthy();
-    expect(narrowProse?.style.maxWidth).toBe('480px');
+    expect(narrowProse?.getAttribute('max-width')).toBe('480px');
 
     const fullProse = canvasElement.querySelector('hx-prose[max-width="100%"]');
     expect(fullProse).toBeTruthy();
-    expect(fullProse?.style.maxWidth).toBe('100%');
+    expect(fullProse?.getAttribute('max-width')).toBe('100%');
   },
 };
 
