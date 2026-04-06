@@ -464,8 +464,6 @@ export const ValidationFlow: Story = {
     </hx-form>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
     // Step 1: Submit the empty form to trigger native validation
     const submitBtn = canvasElement.querySelector('hx-button[type="submit"]') as HTMLElement;
     const nativeBtn = submitBtn?.shadowRoot?.querySelector('button');
@@ -474,11 +472,11 @@ export const ValidationFlow: Story = {
     }
 
     // Step 2: Fill in the required fields
-    // The * required indicator is in an aria-hidden span and excluded from the accessible label
-    const nameInput = canvas.getByLabelText('Patient Name');
+    // Query by ID — getByLabelText can't resolve aria-hidden * spans in accessible name
+    const nameInput = canvasElement.querySelector('#vf-name') as HTMLInputElement;
     await userEvent.type(nameInput, 'Maria Rodriguez');
 
-    const emailInput = canvas.getByLabelText('Contact Email');
+    const emailInput = canvasElement.querySelector('#vf-email') as HTMLInputElement;
     await userEvent.type(emailInput, 'maria.rodriguez@hospital.org');
 
     // Step 3: Resubmit (should pass validation now)
@@ -1312,8 +1310,6 @@ export const ValidationTrigger: Story = {
     </hx-form>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
     // Submit empty form to trigger validation
     const submitBtn = canvasElement.querySelector('hx-button[type="submit"]') as HTMLElement;
     const nativeBtn = submitBtn?.shadowRoot?.querySelector('button');
@@ -1322,13 +1318,14 @@ export const ValidationTrigger: Story = {
     }
 
     // Verify required fields are invalid
-    const nameInput = canvas.getByLabelText('Patient Name') as HTMLInputElement;
+    // Query by ID — getByLabelText can't resolve aria-hidden * spans in accessible name
+    const nameInput = canvasElement.querySelector('#vt-name') as HTMLInputElement;
     await expect(nameInput.validity.valid).toBe(false);
 
-    const emailInput = canvas.getByLabelText('Email') as HTMLInputElement;
+    const emailInput = canvasElement.querySelector('#vt-email') as HTMLInputElement;
     await expect(emailInput.validity.valid).toBe(false);
 
-    const phoneInput = canvas.getByLabelText('Phone') as HTMLInputElement;
+    const phoneInput = canvasElement.querySelector('#vt-phone') as HTMLInputElement;
     await expect(phoneInput.validity.valid).toBe(false);
   },
 };
@@ -1573,12 +1570,11 @@ export const DrupalLoginSimulation: Story = {
     </hx-form>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    const usernameInput = canvas.getByLabelText('Username') as HTMLInputElement;
+    // Query by ID — getByLabelText can't resolve aria-hidden * spans in accessible name
+    const usernameInput = canvasElement.querySelector('#drupal-user') as HTMLInputElement;
     await userEvent.type(usernameInput, 'dr.chen');
 
-    const passwordInput = canvas.getByLabelText('Password') as HTMLInputElement;
+    const passwordInput = canvasElement.querySelector('#drupal-pass') as HTMLInputElement;
     await userEvent.type(passwordInput, 'SecurePass2026');
 
     await expect(usernameInput).toHaveValue('dr.chen');

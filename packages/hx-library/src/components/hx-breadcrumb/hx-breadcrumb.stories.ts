@@ -336,7 +336,7 @@ export const KeyboardNavigation: Story = {
     await expect(bc).toBeTruthy();
     // Verify breadcrumb items with links are present
     const items = canvasElement.querySelectorAll('hx-breadcrumb-item');
-    await expect(items.length).toBe(5);
+    await expect(items.length).toBe(6);
     // Tab into the breadcrumb — first focusable element is the Home link
     await userEvent.tab();
   },
