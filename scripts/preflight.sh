@@ -169,6 +169,52 @@ else
 fi
 echo ""
 
+# ── Gate 7.5: Storybook interaction tests ────────────────────────────────────
+# Runs story interaction tests when any .stories.ts file is changed.
+# This gate exists because test:smart SKIPS story files entirely, and the
+# full test suite (Gate 8) also does not run Storybook tests — they run in a
+# dedicated Storybook Tests CI job. Agents pushed story changes without this
+# check and repeatedly failed CI. This gate closes that gap.
+
+STORY_FILES_CHANGED=""
+if [ -n "$COMMON_ANCESTOR" ]; then
+  STORY_FILES_CHANGED=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
+    | grep -E '\.stories\.ts$' || true)
+fi
+
+echo "▶ [7.5/9] Storybook interaction tests"
+
+if [ -z "$STORY_FILES_CHANGED" ]; then
+  echo "  ✓ No .stories.ts changes — Storybook tests skipped"
+elif [ "${SKIP_STORYBOOK:-0}" = "1" ]; then
+  echo "  ⚠ SKIP_STORYBOOK=1 — Storybook test gate bypassed"
+else
+  echo "  Changed story files detected:"
+  echo "$STORY_FILES_CHANGED" | sed 's/^/    /'
+  echo "  Running Storybook interaction tests (this takes ~3-5 min)..."
+  echo "  (Mirrors the dedicated Storybook Tests CI job exactly)"
+  if pnpm --filter=@helixui/storybook run test; then
+    echo "  ✓ Storybook tests passed"
+  else
+    echo ""
+    echo "  ✗ STORYBOOK TESTS FAILED — do NOT push."
+    echo "    You changed .stories.ts files and the story interaction tests fail."
+    echo "    Fix the story assertions, then re-run: pnpm run preflight"
+    echo ""
+    echo "    Common causes:"
+    echo "      - getByLabelText() can't traverse shadow DOM — use canvas.getByRole() or"
+    echo "        el.shadowRoot.querySelector() patterns instead"
+    echo "      - userEvent.clear()/type() can't focus shadow DOM inputs — interact via"
+    echo "        the host element or test via attribute/property changes"
+    echo "      - querySelector() on canvas returns null — use within(el.shadowRoot) or"
+    echo "        the component's public event API"
+    echo "    To bypass (only for confirmed non-test story-only changes):"
+    echo "      SKIP_STORYBOOK=1 pnpm run preflight"
+    exit 1
+  fi
+fi
+echo ""
+
 # ── Gate 8: Full test suite ──────────────────────────────────────────────────
 # Runs the FULL test suite (all components), not just changed ones.
 # This catches failures that CI Matrix (Node 20/22/24) would catch.

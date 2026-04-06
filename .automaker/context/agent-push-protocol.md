@@ -35,6 +35,12 @@ If this fails: **FIX THE ERRORS.** Do not proceed to Step 3.
 8. Full test suite (all components — catches CI Matrix failures locally)
 9. Docker CI via act (full GitHub Actions parity)
 
+Gate 7.5 runs Storybook interaction tests when ANY `.stories.ts` file is
+changed. `test:smart` SKIPS story files entirely — this is the gate that closes
+that gap. If you change a story file and skip this gate, YOU WILL FAIL CI.
+Story test failures are caught ONLY here and in the dedicated Storybook Tests
+CI job. There is no other local check for them.
+
 Gate 8 runs the FULL test suite (not just changed components). This is the
 critical gate that catches cross-component regressions that CI Matrix (Node
 20/22/24) would catch. The vitest hang watchdog from test-batch.sh is
