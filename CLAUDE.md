@@ -4,6 +4,24 @@ Core guidance for Claude Code when working in this monorepo. **Default behavior:
 
 ---
 
+## ⛔ AGENT PRE-PUSH GATE — ZERO EXCEPTIONS
+
+**Before every `git commit` + `git push`, run:**
+
+```bash
+bash scripts/agent-verify.sh
+```
+
+This runs format → lint → type-check → test:smart in sequence. If any step fails, **fix it, then re-run**. Do NOT push until it exits 0.
+
+**Additional constraints for agents:**
+- **Scope is `packages/hx-library/` only.** Do not touch `packages/hx-react/`, `apps/`, or any package outside your task scope.
+- **Do NOT run `pnpm run generate` in `packages/hx-react/`** — the React wrapper generator corrupts files.
+- **Do NOT run `pnpm install` or modify `package.json`/lockfiles** without explicit instruction.
+- A PR that fails CI immediately is a defect in your execution, not an acceptable first attempt.
+
+---
+
 ## Mission Statement
 
 **HELiX is the foundation that enterprise healthcare organizations build their million-dollar design systems on.** This is not a component library — it is infrastructure. Every line of code, every token, every test exists to serve organizations where software failures can impact patient care.
