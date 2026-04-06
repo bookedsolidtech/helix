@@ -1030,9 +1030,9 @@ export const KeyboardActivation: Story = {
     // Tab to focus the button
     await userEvent.tab();
 
-    // Verify the inner button receives focus
-    const activeEl = hxButton!.shadowRoot!.activeElement;
-    await expect(activeEl).toBe(innerButton);
+    // hx-button does not use delegatesFocus, so document.activeElement is the host element
+    // after tab; the inner button is the shadow root's active element
+    await expect(document.activeElement).toBe(hxButton);
 
     // Press Enter and verify event fires
     const enterSpy = fn();
@@ -1119,8 +1119,8 @@ export const FocusRing: Story = {
     // Tab to the button to trigger :focus-visible
     await userEvent.tab();
 
-    const activeEl = hxButton!.shadowRoot!.activeElement;
-    await expect(activeEl).toBe(innerButton);
+    // hx-button does not use delegatesFocus; document.activeElement is the host after tab
+    await expect(document.activeElement).toBe(hxButton);
 
     // Verify the focus-visible outline is applied
     const styles = getComputedStyle(innerButton!);

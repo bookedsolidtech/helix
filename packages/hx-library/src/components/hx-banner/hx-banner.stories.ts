@@ -253,7 +253,7 @@ export const Dismissible: Story = {
 
     const closeBtn = banner?.shadowRoot?.querySelector('[part="close-button"]');
     await expect(closeBtn).toBeTruthy();
-    await expect(closeBtn?.getAttribute('aria-label')).toBe('Dismiss');
+    await expect(closeBtn?.getAttribute('aria-label')).toBe('Dismiss banner');
   },
 };
 

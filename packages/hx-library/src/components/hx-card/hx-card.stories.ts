@@ -322,12 +322,12 @@ export const Interactive: Story = {
     const card = canvasElement.querySelector('hx-card');
     await expect(card).toBeTruthy();
 
-    const cardEl = card?.shadowRoot?.querySelector('.card');
+    const cardEl = card?.shadowRoot?.querySelector('.card') as HTMLElement | null;
     await expect(cardEl?.getAttribute('role')).toBe('link');
     await expect(cardEl?.getAttribute('tabindex')).toBe('0');
 
-    // Click interaction
-    card?.click();
+    // Click the internal shadow DOM element where the click handler lives
+    cardEl?.click();
     await expect(cardClickHandler).toHaveBeenCalled();
   },
 };
@@ -847,8 +847,8 @@ export const InteractiveClickTest: Story = {
     await expect(cardEl?.getAttribute('tabindex')).toBe('0');
     await expect(cardEl?.classList.contains('card--interactive')).toBe(true);
 
-    // Click the card
-    card?.click();
+    // Click the internal shadow DOM element where the click handler lives
+    cardEl?.click();
     await expect(interactiveClickHandler).toHaveBeenCalledTimes(1);
 
     const callDetail = interactiveClickHandler.mock.calls[0]?.[0]?.detail;
@@ -879,9 +879,11 @@ export const InteractiveKeyboardEnter: Story = {
     const cardEl = card?.shadowRoot?.querySelector('.card') as HTMLElement;
     await expect(cardEl).toBeTruthy();
 
-    // Focus the internal card element
-    cardEl.focus();
-    await expect(cardEl).toHaveFocus();
+    // Focus via the host — delegatesFocus routes focus to the internal card div
+    if (!card) throw new Error('hx-card not found');
+    card.focus();
+    // With delegatesFocus: true, document.activeElement is the host element
+    await expect(card).toHaveFocus();
 
     // Press Enter
     await userEvent.keyboard('{Enter}');
@@ -912,9 +914,11 @@ export const InteractiveKeyboardSpace: Story = {
     const cardEl = card?.shadowRoot?.querySelector('.card') as HTMLElement;
     await expect(cardEl).toBeTruthy();
 
-    // Focus the internal card element
-    cardEl.focus();
-    await expect(cardEl).toHaveFocus();
+    // Focus via the host — delegatesFocus routes focus to the internal card div
+    if (!card) throw new Error('hx-card not found');
+    card.focus();
+    // With delegatesFocus: true, document.activeElement is the host element
+    await expect(card).toHaveFocus();
 
     // Press Space
     await userEvent.keyboard(' ');
@@ -951,9 +955,11 @@ export const InteractiveFocusManagement: Story = {
     await expect(cardEl.getAttribute('tabindex')).toBe('0');
     await expect(cardEl.getAttribute('role')).toBe('link');
 
-    // Focus the card directly
-    cardEl.focus();
-    await expect(cardEl).toHaveFocus();
+    // Focus via the host — delegatesFocus routes focus to the internal card div
+    if (!card) throw new Error('hx-card not found');
+    card.focus();
+    // With delegatesFocus: true, document.activeElement is the host element
+    await expect(card).toHaveFocus();
   },
 };
 

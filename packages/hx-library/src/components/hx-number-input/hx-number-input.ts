@@ -194,7 +194,7 @@ export class HelixNumberInput extends LitElement {
 
   /** @internal */
   @query('.field__input')
-  declare private _input: HTMLInputElement | null;
+  private _input: HTMLInputElement | null = null;
 
   // ─── Internal State ───
 

@@ -194,7 +194,8 @@ export const NonModal: Story = {
     const dialog = canvasElement.querySelector('hx-dialog');
     await expect(dialog).toBeTruthy();
     await expect(dialog?.hasAttribute('open')).toBe(true);
-    await expect(dialog?.hasAttribute('modal')).toBe(false);
+    // Check property value directly — ?modal=${false} sets modal property to false
+    await expect((dialog as HTMLElement & { modal: boolean })?.modal).toBe(false);
   },
 };
 

@@ -184,7 +184,7 @@ export class HelixSlider extends LitElement {
    * @internal
    */
   @query('.slider__input')
-  declare private _input: HTMLInputElement | null;
+  private _input: HTMLInputElement | null = null;
 
   // ─── Unique IDs ───
 
