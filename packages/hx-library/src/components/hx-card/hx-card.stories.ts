@@ -880,7 +880,8 @@ export const InteractiveKeyboardEnter: Story = {
     await expect(cardEl).toBeTruthy();
 
     // Focus via the host — delegatesFocus routes focus to the internal card div
-    card!.focus();
+    if (!card) throw new Error('hx-card not found');
+    card.focus();
     // With delegatesFocus: true, document.activeElement is the host element
     await expect(card).toHaveFocus();
 
@@ -914,7 +915,8 @@ export const InteractiveKeyboardSpace: Story = {
     await expect(cardEl).toBeTruthy();
 
     // Focus via the host — delegatesFocus routes focus to the internal card div
-    card!.focus();
+    if (!card) throw new Error('hx-card not found');
+    card.focus();
     // With delegatesFocus: true, document.activeElement is the host element
     await expect(card).toHaveFocus();
 
@@ -954,7 +956,8 @@ export const InteractiveFocusManagement: Story = {
     await expect(cardEl.getAttribute('role')).toBe('link');
 
     // Focus via the host — delegatesFocus routes focus to the internal card div
-    card!.focus();
+    if (!card) throw new Error('hx-card not found');
+    card.focus();
     // With delegatesFocus: true, document.activeElement is the host element
     await expect(card).toHaveFocus();
   },

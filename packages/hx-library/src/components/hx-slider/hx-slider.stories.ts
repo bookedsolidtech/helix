@@ -194,8 +194,6 @@ export const Default: Story = {
     await expect(input.value).toBe('50');
     await expect(input.getAttribute('aria-valuemin')).toBe('0');
     await expect(input.getAttribute('aria-valuemax')).toBe('100');
-    // aria-valuenow is implicitly derived from the native range input's value property
-    await expect(input.value).toBe('50');
   },
 };
 
