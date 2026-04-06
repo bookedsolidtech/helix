@@ -31,7 +31,7 @@ export const HxPopover = createComponent({
     onHxShow: 'hx-show',
     onHxAfterShow: 'hx-after-show',
     onHxHide: 'hx-hide',
-    onHxAfterHide: 'hx-after-hide'
+    onHxAfterHide: 'hx-after-hide',
   },
   displayName: 'HxPopover',
 });

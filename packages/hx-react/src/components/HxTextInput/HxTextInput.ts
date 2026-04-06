@@ -32,7 +32,7 @@ export const HxTextInput = createComponent({
   react: React,
   events: {
     onHxInput: 'hx-input',
-    onHxChange: 'hx-change'
+    onHxChange: 'hx-change',
   },
   displayName: 'HxTextInput',
 });

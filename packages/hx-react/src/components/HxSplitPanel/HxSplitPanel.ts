@@ -28,7 +28,7 @@ export const HxSplitPanel = createComponent({
   elementClass: HelixSplitPanel,
   react: React,
   events: {
-    onHxReposition: 'hx-reposition'
+    onHxReposition: 'hx-reposition',
   },
   displayName: 'HxSplitPanel',
 });
