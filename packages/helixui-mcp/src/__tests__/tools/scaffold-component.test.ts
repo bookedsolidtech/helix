@@ -102,10 +102,12 @@ describe('scaffoldComponent()', () => {
     expect(content).toContain("'hx-badge'");
   });
 
-  it('component .ts file imports tokenStyles', () => {
+  it('component .ts file does not import tokenStyles', () => {
     const result = scaffoldComponent({ name: 'badge' });
     const content = result.files['hx-badge.ts'] ?? '';
-    expect(content).toContain('tokenStyles');
+    expect(content).not.toContain('tokenStyles');
+    expect(content).not.toContain("from '@helixui/tokens/lit'");
+    expect(content).toContain('static override styles = [');
   });
 
   // ── styles .ts file ──────────────────────────────────────────────────────────

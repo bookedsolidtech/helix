@@ -104,14 +104,12 @@ function generateComponentClass(
   const imports = hasBase
     ? [
         `import { customElement } from 'lit/decorators.js';`,
-        `import { tokenStyles } from '@helixui/tokens/lit';`,
         `import { ${baseClassName} } from '../${baseTag}/index.js';`,
         `import { ${stylesVar} } from './${tagName}.styles.js';`,
       ]
     : [
         `import { LitElement, html } from 'lit';`,
         `import { customElement } from 'lit/decorators.js';`,
-        `import { tokenStyles } from '@helixui/tokens/lit';`,
         `import { ${stylesVar} } from './${tagName}.styles.js';`,
       ];
 
@@ -129,7 +127,7 @@ function generateComponentClass(
     ' */',
     `@customElement('${tagName}')`,
     `export class ${className} extends ${extendsClause} {`,
-    `  static override styles = [tokenStyles, ${stylesVar}];`,
+    `  static override styles = [${stylesVar}];`,
     '',
     '  override render() {',
     renderBody,
