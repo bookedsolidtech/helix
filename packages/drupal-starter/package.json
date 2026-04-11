@@ -1,6 +1,6 @@
 {
   "name": "@helixui/drupal-starter",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Pre-built composition SDCs for Drupal using HELiX web components",
   "type": "module",
   "license": "MIT",

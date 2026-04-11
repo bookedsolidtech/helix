@@ -1,5 +1,55 @@
 # @helixui/library
 
+## 2.1.0
+
+### Minor Changes
+
+- 97d75d9: Adopt design tokens at document level via `document.adoptedStyleSheets`
+
+  Removes redundant per-component `tokenStyles` from all 98 components' `static styles`.
+  Tokens are now adopted once at the document `:root` level, eliminating ~27,000 redundant
+  CSS custom property declarations per page and fixing `hx-theme` cascade override behavior.
+  - New utility: `ensureDocumentTokens()` in `src/utilities/document-token-adoption.ts`
+  - Auto-executes on first import — no consumer API change required
+  - SSR-safe with `typeof document` guard
+  - Multi-bundle safe via `document.__hx_tokens_adopted__` marker
+  - Added to `sideEffects` in package.json to prevent tree-shaking
+  - 16 dedicated tests covering idempotency, marker, CSS content, and preservation
+
+### Patch Changes
+
+- ba9c72d: fix(a11y): resolve aria-required-parent violation in hx-breadcrumb
+
+  Adds `role="list"` to the `hx-breadcrumb` host element and `role="presentation"` to the shadow DOM `<ol>` so axe-core flat-tree traversal sees a valid ARIA list ancestor for `hx-breadcrumb-item[role="listitem"]` children. Previously the `<ol>` lived in shadow DOM while the list items lived in light DOM, so axe-core's `@axe-core/playwright` could not bridge the shadow boundary to establish the required list/listitem parent–child relationship in the composed accessibility tree.
+
+- 56585b5: Address Tier 2 code review findings for adopted stylesheets
+  - Fix TOCTOU race: set idempotency marker before stylesheet adoption
+  - Use `lightTokenCss` from `@helixui/tokens` instead of mapping `tokenEntries` (tree-shaking)
+  - Switch document marker from string property to `Symbol.for('hx-tokens-adopted')`
+  - Add try/catch for graceful degradation if `adoptedStyleSheets` assignment fails
+  - Deprecate `mergeTokenStyles` utility (superseded by document-level token adoption)
+
+- d6d2244: fix(cem): add missing @csspart JSDoc annotations to hx-drawer, hx-slider, hx-time-picker
+
+  Resolves 14 CEM API Diff validation errors caused by CSS parts declared in
+  component templates (`part="..."`) that were not documented in `@csspart` JSDoc
+  blocks, causing the manifest to omit them from `cssParts`.
+
+  Components fixed:
+  - `hx-drawer`: added `@csspart close-btn` (visually-hidden close button rendered when `noHeader` is true)
+  - `hx-slider`: added `@csspart help-text` (help text element below the slider)
+  - `hx-time-picker`: added `@csspart field`, `@csspart error`, `@csspart help-text`
+
+- d887573: fix(test): repair hx-date-picker keyboard navigation async timing
+
+  Fixes 5 failing CI tests in `hx-date-picker.test.ts` across all Node matrix (20/22/24):
+  1. **`openCalendar` helper**: added `rAF + updateComplete` double-await so `_focusActiveDay()` completes its async render cycle before tests interact with the calendar. Previously `_focusedDay` was null when key events fired, causing the component to default to day 1 instead of the fixture's selected day.
+  2. **4 Arrow key focus tests** (`ArrowRight/Left/Down/Up`): now pass because `openCalendar` correctly initialises `_focusedDay` before the key event is dispatched. The existing single-`updateComplete` await after dispatch is sufficient since no `_viewMonth` change occurs.
+  3. **Duplicate `describe('Keyboard Navigation: arrow key month wrapping')` block**: removed the second copy at the end of the file; kept the first block at line ~1162.
+  4. **ArrowRight month-wrap test**: uses single `await el.updateComplete` (not double-await). Microtask ordering guarantees the test resumes before `updated()`'s `_focusActiveDay()` callback fires, capturing `_focusedDay=1` while it's still correct. Adding rAF would allow `_focusActiveDay()` to override it with today's date.
+
+- 3c8937b: fix(hx-number-input, hx-slider): use `declare` on @query fields to prevent instance initializer from shadowing Lit's prototype getter
+
 ## 2.0.0
 
 ### Major Changes
