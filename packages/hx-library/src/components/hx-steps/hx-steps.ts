@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
 import { helixStepsStyles } from './hx-steps.styles.js';
 import type { HelixStep } from './hx-step.js';
@@ -30,7 +30,7 @@ import type { HelixStep } from './hx-step.js';
  */
 @customElement('hx-steps')
 export class HelixSteps extends LitElement {
-  static override styles = [tokenStyles, helixStepsStyles];
+  static override styles = [helixStepsStyles];
 
   // ─── Public Properties ───
 

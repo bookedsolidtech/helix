@@ -1,8 +1,8 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
 import { helixSpinnerStyles } from './hx-spinner.styles.js';
 
@@ -46,7 +46,7 @@ export type SpinnerSize = 'sm' | 'md' | 'lg';
  */
 @customElement('hx-spinner')
 export class HelixSpinner extends LitElement {
-  static override styles = [tokenStyles, helixSpinnerStyles];
+  static override styles = [helixSpinnerStyles];
 
   /**
    * Size of the spinner. Accepts `SpinnerSize` token values ('sm' | 'md' | 'lg'),

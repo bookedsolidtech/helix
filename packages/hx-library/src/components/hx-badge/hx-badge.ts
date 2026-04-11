@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBadgeStyles } from './hx-badge.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -37,7 +37,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-badge')
 export class HelixBadge extends LitElement {
-  static override styles = [tokenStyles, helixBadgeStyles];
+  static override styles = [helixBadgeStyles];
 
   /**
    * Visual style variant of the badge.

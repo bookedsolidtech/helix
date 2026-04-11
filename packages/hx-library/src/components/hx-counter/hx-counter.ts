@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCounterStyles } from './hx-counter.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -28,7 +28,7 @@ export type CounterFormat = 'integer' | 'decimal';
  */
 @customElement('hx-counter')
 export class HelixCounter extends LitElement {
-  static override styles = [tokenStyles, helixCounterStyles];
+  static override styles = [helixCounterStyles];
 
   /**
    * The target numeric value to count to.

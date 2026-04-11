@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabPanelStyles } from './hx-tab-panel.styles.js';
 
 /**
@@ -20,7 +20,7 @@ import { helixTabPanelStyles } from './hx-tab-panel.styles.js';
  */
 @customElement('hx-tab-panel')
 export class HelixTabPanel extends LitElement {
-  static override styles = [tokenStyles, helixTabPanelStyles];
+  static override styles = [helixTabPanelStyles];
 
   // ─── Properties ───
 

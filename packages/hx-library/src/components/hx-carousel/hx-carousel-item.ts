@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCarouselItemStyles } from './hx-carousel-item.styles.js';
 
 /**
@@ -16,7 +16,7 @@ import { helixCarouselItemStyles } from './hx-carousel-item.styles.js';
  */
 @customElement('hx-carousel-item')
 export class HelixCarouselItem extends LitElement {
-  static override styles = [tokenStyles, helixCarouselItemStyles];
+  static override styles = [helixCarouselItemStyles];
 
   /**
    * The 0-based index of this slide within the carousel. Set by hx-carousel.

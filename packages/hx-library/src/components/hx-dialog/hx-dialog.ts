@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -85,7 +85,7 @@ const FOCUSABLE_SELECTORS = [
  */
 @customElement('hx-dialog')
 export class HelixDialog extends LitElement {
-  static override styles = [tokenStyles, helixDialogStyles];
+  static override styles = [helixDialogStyles];
 
   // D10 — observe aria-label attribute without shadowing ARIAMixin.ariaLabel
   static override get observedAttributes(): string[] {

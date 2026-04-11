@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
 import { helixStatusIndicatorStyles } from './hx-status-indicator.styles.js';
 
@@ -59,7 +59,7 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends LitElement {
-  static override styles = [tokenStyles, helixStatusIndicatorStyles];
+  static override styles = [helixStatusIndicatorStyles];
 
   /**
    * The status to display.

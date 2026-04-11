@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCarouselStyles } from './hx-carousel.styles.js';
 import type { HelixCarouselItem } from './hx-carousel-item.js';
 
@@ -111,7 +111,7 @@ const _svgPause = html`<svg
  */
 @customElement('hx-carousel')
 export class HelixCarousel extends LitElement {
-  static override styles = [tokenStyles, helixCarouselStyles];
+  static override styles = [helixCarouselStyles];
 
   /**
    * Accessible label identifying this carousel to assistive technology.

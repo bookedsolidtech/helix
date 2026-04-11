@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSwitchStyles } from './hx-switch.styles.js';
 
 /**
@@ -41,7 +41,7 @@ import { helixSwitchStyles } from './hx-switch.styles.js';
  */
 @customElement('hx-switch')
 export class HelixSwitch extends LitElement {
-  static override styles = [tokenStyles, helixSwitchStyles];
+  static override styles = [helixSwitchStyles];
 
   /** Monotonic counter for deterministic, unique IDs across instances. */
   /** @internal */

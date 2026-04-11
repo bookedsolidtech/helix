@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
 
 /**
@@ -30,7 +30,7 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
  */
 @customElement('hx-breadcrumb-item')
 export class HelixBreadcrumbItem extends LitElement {
-  static override styles = [tokenStyles, helixBreadcrumbItemStyles];
+  static override styles = [helixBreadcrumbItemStyles];
 
   override connectedCallback(): void {
     super.connectedCallback();

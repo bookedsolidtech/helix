@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -29,7 +29,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-menu')
 export class HelixMenu extends LitElement {
-  static override styles = [tokenStyles, helixMenuStyles];
+  static override styles = [helixMenuStyles];
 
   /**
    * Accessible label for the menu. Rendered as `aria-label` on the inner

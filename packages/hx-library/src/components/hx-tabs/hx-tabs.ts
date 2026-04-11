@@ -1,6 +1,6 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
@@ -47,7 +47,7 @@ let _hxTabsIdCounter = 0;
  */
 @customElement('hx-tabs')
 export class HelixTabs extends LitElement {
-  static override styles = [tokenStyles, helixTabsStyles];
+  static override styles = [helixTabsStyles];
 
   // ─── Internal ID ───
 

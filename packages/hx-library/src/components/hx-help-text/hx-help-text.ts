@@ -1,8 +1,8 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixHelpTextStyles } from './hx-help-text.styles.js';
 
 /** Icon SVG for error variant (circle with exclamation mark). */
@@ -89,7 +89,7 @@ const variantIcons = {
  */
 @customElement('hx-help-text')
 export class HelixHelpText extends LitElement {
-  static override styles = [tokenStyles, helixHelpTextStyles];
+  static override styles = [helixHelpTextStyles];
 
   /**
    * Visual variant that determines the text color and icon.

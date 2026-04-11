@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -34,7 +34,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-progress-bar')
 export class HelixProgressBar extends LitElement {
-  static override styles = [tokenStyles, helixProgressBarStyles];
+  static override styles = [helixProgressBarStyles];
 
   /**
    * Current progress value (min–max). Set to null for indeterminate state.

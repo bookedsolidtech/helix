@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
 let _popoverCounter = 0;
@@ -46,7 +46,7 @@ let _popoverCounter = 0;
 
 @customElement('hx-popover')
 export class HelixPopover extends LitElement {
-  static override styles = [tokenStyles, helixPopoverStyles];
+  static override styles = [helixPopoverStyles];
 
   /**
    * Whether the popover is open.

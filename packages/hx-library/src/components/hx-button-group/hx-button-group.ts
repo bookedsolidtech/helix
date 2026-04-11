@@ -1,7 +1,7 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -25,7 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-button-group')
 export class HelixButtonGroup extends LitElement {
-  static override styles = [tokenStyles, helixButtonGroupStyles];
+  static override styles = [helixButtonGroupStyles];
 
   /** @internal */
   private internals: ElementInternals;

@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTableStyles } from './hx-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -27,7 +27,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-table')
 export class HelixTable extends LitElement {
-  static override styles = [tokenStyles, helixTableStyles];
+  static override styles = [helixTableStyles];
 
   // ─── Public Properties ───
 

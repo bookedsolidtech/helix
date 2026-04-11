@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -46,7 +46,7 @@ let _uid = 0;
  */
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends LitElement {
-  static override styles = [tokenStyles, helixCheckboxGroupStyles];
+  static override styles = [helixCheckboxGroupStyles];
 
   // ─── Form Association ───
 

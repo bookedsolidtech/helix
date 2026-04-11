@@ -80,6 +80,14 @@ const output = `/**
  * Run \`npm run generate:barrel\` to regenerate.
  */
 
+// ─── Document-level token adoption ──────────────────────────────────────────
+// Ensures --hx-* design tokens are adopted into document.adoptedStyleSheets
+// once, enabling CSS inheritance through Shadow DOM boundaries.
+import './utilities/document-token-adoption.js';
+
+// ─── Exported API for document-level token adoption ─────────────────────────
+export { ensureDocumentTokens } from './utilities/document-token-adoption.js';
+
 // ─── Base infrastructure ────────────────────────────────────────────────────
 ${baseExports}
 

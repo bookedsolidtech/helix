@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStackStyles } from './hx-toast.styles.js';
 
 export type ToastStackPlacement =
@@ -28,7 +28,7 @@ export type ToastStackPlacement =
  */
 @customElement('hx-toast-stack')
 export class HelixToastStack extends LitElement {
-  static override styles = [tokenStyles, helixToastStackStyles];
+  static override styles = [helixToastStackStyles];
 
   /**
    * Corner of the viewport where toasts appear.

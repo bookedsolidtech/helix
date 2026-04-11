@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, svg } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixLinkStyles } from './hx-link.styles.js';
 
 /**
@@ -46,7 +46,7 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  */
 @customElement('hx-link')
 export class HelixLink extends LitElement {
-  static override styles = [tokenStyles, helixLinkStyles];
+  static override styles = [helixLinkStyles];
 
   /**
    * The URL the link points to.

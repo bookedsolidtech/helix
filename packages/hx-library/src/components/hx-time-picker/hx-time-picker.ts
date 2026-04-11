@@ -1,10 +1,10 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTimePickerStyles } from './hx-time-picker.styles.js';
 
 // ─── Time Slot ───────────────────────────────────────────────────────────────
@@ -170,7 +170,7 @@ function parseUserInput(raw: string): string | null {
  */
 @customElement('hx-time-picker')
 export class HelixTimePicker extends LitElement {
-  static override styles = [tokenStyles, helixTimePickerStyles];
+  static override styles = [helixTimePickerStyles];
 
   // ─── Form Association ───
 

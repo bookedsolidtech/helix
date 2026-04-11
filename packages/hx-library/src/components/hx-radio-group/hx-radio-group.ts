@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
@@ -35,7 +35,7 @@ let _groupCounter = 0;
  */
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends LitElement {
-  static override styles = [tokenStyles, helixRadioGroupStyles];
+  static override styles = [helixRadioGroupStyles];
 
   // ─── Form Association ───
 

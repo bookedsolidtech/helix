@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDividerStyles } from './hx-divider.styles.js';
 
 /**
@@ -26,7 +26,7 @@ import { helixDividerStyles } from './hx-divider.styles.js';
  */
 @customElement('hx-divider')
 export class HelixDivider extends LitElement {
-  static override styles = [tokenStyles, helixDividerStyles];
+  static override styles = [helixDividerStyles];
 
   /**
    * Orientation of the divider.

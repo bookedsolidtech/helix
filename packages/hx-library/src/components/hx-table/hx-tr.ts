@@ -1,4 +1,5 @@
 import { LitElement, html, nothing, css } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 
 /**
