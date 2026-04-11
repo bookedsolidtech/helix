@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { hxStyleScopeStyles } from './hx-style-scope.styles.js';
 import { injectLightStyles } from '../../utilities/injectLightStyles.js';

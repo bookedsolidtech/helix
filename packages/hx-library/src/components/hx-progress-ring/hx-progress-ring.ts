@@ -1,6 +1,6 @@
 import { LitElement, html, svg, TemplateResult, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -25,7 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-progress-ring')
 export class HelixProgressRing extends LitElement {
-  static override styles = [tokenStyles, helixProgressRingStyles];
+  static override styles = [helixProgressRingStyles];
 
   // ─── Public Properties ───
 

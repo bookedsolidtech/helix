@@ -1,6 +1,6 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
@@ -38,7 +38,7 @@ interface JsonLdListItem {
  */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
-  static override styles = [tokenStyles, helixBreadcrumbStyles];
+  static override styles = [helixBreadcrumbStyles];
 
   /**
    * Per-instance counter used to generate stable, deterministic IDs for the

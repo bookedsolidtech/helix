@@ -1,7 +1,7 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixRadioStyles } from './hx-radio.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -29,7 +29,7 @@ let _hxRadioIdCounter = 0;
  */
 @customElement('hx-radio')
 export class HelixRadio extends LitElement {
-  static override styles = [tokenStyles, helixRadioStyles];
+  static override styles = [helixRadioStyles];
 
   // ─── Properties ───
 

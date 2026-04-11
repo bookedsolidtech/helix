@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBannerStyles } from './hx-banner.styles.js';
 
 /** Banner variant determines visual styling and ARIA semantics. */
@@ -45,7 +45,7 @@ export type BannerPosition = 'sticky' | 'fixed';
  */
 @customElement('hx-banner')
 export class HelixBanner extends LitElement {
-  static override styles = [tokenStyles, helixBannerStyles];
+  static override styles = [helixBannerStyles];
 
   // ─── Properties ───
 

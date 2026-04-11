@@ -873,7 +873,11 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      // useElement: true — axe must receive the host to traverse both the shadow DOM <ol>
+      // (which carries the native list semantics) and the slotted hx-breadcrumb-item[role="listitem"]
+      // children. In the flat tree, slotted items are direct children of <ol>, satisfying both
+      // aria-required-parent (listitem inside list) and aria-required-children (list owns listitems).
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -885,7 +889,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -898,7 +902,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -913,7 +917,7 @@ describe('hx-breadcrumb', () => {
       `);
       await el.updateComplete;
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });

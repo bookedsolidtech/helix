@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
 let _instanceCounter = 0;
@@ -50,7 +50,7 @@ let _instanceCounter = 0;
  */
 @customElement('hx-date-picker')
 export class HelixDatePicker extends LitElement {
-  static override styles = [tokenStyles, helixDatePickerStyles];
+  static override styles = [helixDatePickerStyles];
 
   // ─── Form Association ───
 

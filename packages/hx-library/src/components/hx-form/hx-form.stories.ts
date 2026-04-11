@@ -471,10 +471,11 @@ export const ValidationFlow: Story = {
     }
 
     // Step 2: Fill in the required fields
-    const nameInput = canvas.getByLabelText('Patient Name *');
+    // The * required indicator is in an aria-hidden span and excluded from the accessible label
+    const nameInput = canvas.getByLabelText('Patient Name');
     await userEvent.type(nameInput, 'Maria Rodriguez');
 
-    const emailInput = canvas.getByLabelText('Contact Email *');
+    const emailInput = canvas.getByLabelText('Contact Email');
     await userEvent.type(emailInput, 'maria.rodriguez@hospital.org');
 
     // Step 3: Resubmit (should pass validation now)
@@ -1318,13 +1319,13 @@ export const ValidationTrigger: Story = {
     }
 
     // Verify required fields are invalid
-    const nameInput = canvas.getByLabelText('Patient Name *') as HTMLInputElement;
+    const nameInput = canvas.getByLabelText('Patient Name') as HTMLInputElement;
     await expect(nameInput.validity.valid).toBe(false);
 
-    const emailInput = canvas.getByLabelText('Email *') as HTMLInputElement;
+    const emailInput = canvas.getByLabelText('Email') as HTMLInputElement;
     await expect(emailInput.validity.valid).toBe(false);
 
-    const phoneInput = canvas.getByLabelText('Phone *') as HTMLInputElement;
+    const phoneInput = canvas.getByLabelText('Phone') as HTMLInputElement;
     await expect(phoneInput.validity.valid).toBe(false);
   },
 };
@@ -1571,10 +1572,10 @@ export const DrupalLoginSimulation: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const usernameInput = canvas.getByLabelText('Username *') as HTMLInputElement;
+    const usernameInput = canvas.getByLabelText('Username') as HTMLInputElement;
     await userEvent.type(usernameInput, 'dr.chen');
 
-    const passwordInput = canvas.getByLabelText('Password *') as HTMLInputElement;
+    const passwordInput = canvas.getByLabelText('Password') as HTMLInputElement;
     await userEvent.type(passwordInput, 'SecurePass2026');
 
     await expect(usernameInput).toHaveValue('dr.chen');

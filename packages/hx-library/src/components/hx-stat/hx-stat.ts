@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
 import { helixStatStyles } from './hx-stat.styles.js';
 
@@ -45,7 +45,7 @@ export type StatTrend = 'up' | 'down' | 'neutral';
  */
 @customElement('hx-stat')
 export class HelixStat extends LitElement {
-  static override styles = [tokenStyles, helixStatStyles];
+  static override styles = [helixStatStyles];
 
   /**
    * The metric label displayed below the value.

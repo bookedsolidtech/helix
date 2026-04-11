@@ -1,6 +1,6 @@
 import { LitElement, html, type TemplateResult } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
 
 /**
@@ -27,7 +27,7 @@ import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
  */
 @customElement('hx-phi-field')
 export class HelixPhiField extends LitElement {
-  static override styles = [tokenStyles, helixPhiFieldStyles];
+  static override styles = [helixPhiFieldStyles];
 
   // ─── Public Properties ───
 

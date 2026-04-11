@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
 
 /**
@@ -45,7 +45,7 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  */
 @customElement('hx-patient-banner')
 export class HelixPatientBanner extends LitElement {
-  static override styles = [tokenStyles, helixPatientBannerStyles];
+  static override styles = [helixPatientBannerStyles];
 
   // ─── Public Properties ───
 

@@ -126,7 +126,7 @@ export const Default: Story = {
     };
     splitButton!.addEventListener('hx-click', handler);
 
-    await userEvent.click(primaryButton as HTMLElement);
+    (primaryButton as HTMLElement).click();
     await expect(eventFired).toBe(true);
 
     splitButton!.removeEventListener('hx-click', handler);

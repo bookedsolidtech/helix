@@ -270,10 +270,16 @@ export const LineNumbers: Story = {
 export const MaxLines: Story = {
   name: 'Max Lines: Show More/Less',
   render: () => html`
-    <hx-code-snippet language="javascript" max-lines="5">
-      const a = 1; const b = 2; const c = 3; const d = 4; const e = 5; const f = 6; const g = 7;
-      const h = 8; const i = 9; const j = 10;
-    </hx-code-snippet>
+    <hx-code-snippet language="javascript" max-lines="5">const a = 1;
+const b = 2;
+const c = 3;
+const d = 4;
+const e = 5;
+const f = 6;
+const g = 7;
+const h = 8;
+const i = 9;
+const j = 10;</hx-code-snippet>
   `,
   play: async ({ canvasElement }) => {
     const snippet = canvasElement.querySelector('hx-code-snippet');

@@ -955,16 +955,20 @@ export const KeyboardToggle: Story = {
     label: 'Enable two-factor authentication',
   },
   play: async ({ canvasElement }) => {
-    const { host, control: _control } = getCheckboxParts(canvasElement);
+    const { host } = getCheckboxParts(canvasElement);
+    // Get the native checkbox input inside shadow DOM; focus it directly
+    // so keyboard events (Space) are dispatched to the correct element
+    const nativeInput = host.shadowRoot?.querySelector('.checkbox__input') as HTMLInputElement;
+    if (!nativeInput) throw new Error('.checkbox__input not found');
 
-    // Tab to the checkbox control
-    await userEvent.tab();
+    // Focus the native input directly
+    nativeInput.focus();
     await nextFrame();
 
     // Initially unchecked
     await expect(host.checked).toBe(false);
 
-    // Press Space to toggle
+    // Press Space to toggle — fires on the native input which has keyboard focus
     await userEvent.keyboard(' ');
     await nextFrame();
 

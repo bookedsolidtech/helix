@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement } from 'lit/decorators.js';
 import { helixTableSectionBaseStyles } from './hx-table.styles.js';
 

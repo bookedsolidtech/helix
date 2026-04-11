@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixStackStyles } from './hx-stack.styles.js';
 
 /**
@@ -16,7 +16,7 @@ import { helixStackStyles } from './hx-stack.styles.js';
  */
 @customElement('hx-stack')
 export class HelixStack extends LitElement {
-  static override styles = [tokenStyles, helixStackStyles];
+  static override styles = [helixStackStyles];
 
   /**
    * Direction of the stack layout.

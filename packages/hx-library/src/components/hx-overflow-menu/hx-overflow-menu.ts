@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset } from '@floating-ui/dom';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 
@@ -44,7 +44,7 @@ let _counter = 0;
  */
 @customElement('hx-overflow-menu')
 export class HelixOverflowMenu extends LitElement {
-  static override styles = [tokenStyles, helixOverflowMenuStyles];
+  static override styles = [helixOverflowMenuStyles];
 
   /**
    * Preferred placement of the floating panel relative to the trigger.

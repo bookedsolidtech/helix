@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixContainerStyles } from './hx-container.styles.js';
 
 /**
@@ -44,7 +44,7 @@ import { helixContainerStyles } from './hx-container.styles.js';
  */
 @customElement('hx-container')
 export class HelixContainer extends LitElement {
-  static override styles = [tokenStyles, helixContainerStyles];
+  static override styles = [helixContainerStyles];
 
   /**
    * Controls the max-width of the inner content wrapper.

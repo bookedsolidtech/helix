@@ -31,6 +31,7 @@ packages/.mcp-wc/
 **/*.spec.tsx
 
 # Generated/built files — not source code
+**/.vitest/
 apps/admin/public/helix/
 testing/static-html/helix-bundle.js
 testing/static-html/helix-bundle.css

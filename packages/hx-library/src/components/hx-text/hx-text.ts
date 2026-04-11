@@ -1,10 +1,10 @@
 import { LitElement } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTextStyles } from './hx-text.styles.js';
 
 /**
@@ -40,7 +40,7 @@ import { helixTextStyles } from './hx-text.styles.js';
  */
 @customElement('hx-text')
 export class HelixText extends LitElement {
-  static override styles = [tokenStyles, helixTextStyles];
+  static override styles = [helixTextStyles];
 
   /**
    * Typography variant controlling font size, line height, and letter spacing.

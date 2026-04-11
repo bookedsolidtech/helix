@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import {
   helixStructuredListStyles,
   helixStructuredListRowStyles,
@@ -30,7 +30,7 @@ import {
  */
 @customElement('hx-structured-list')
 export class HelixStructuredList extends LitElement {
-  static override styles = [tokenStyles, helixStructuredListStyles];
+  static override styles = [helixStructuredListStyles];
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -101,7 +101,7 @@ export class HelixStructuredList extends LitElement {
  */
 @customElement('hx-structured-list-row')
 export class HelixStructuredListRow extends LitElement {
-  static override styles = [tokenStyles, helixStructuredListRowStyles];
+  static override styles = [helixStructuredListRowStyles];
 
   override connectedCallback(): void {
     super.connectedCallback();

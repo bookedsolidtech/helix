@@ -1,6 +1,6 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { devWarn } from '../../utils/dev-warn.js';
 import {
   computePosition,
@@ -59,7 +59,7 @@ export type DropdownPlacement =
  */
 @customElement('hx-dropdown')
 export class HelixDropdown extends LitElement {
-  static override styles = [tokenStyles, helixDropdownStyles];
+  static override styles = [helixDropdownStyles];
 
   // ─── Public Properties ───
 

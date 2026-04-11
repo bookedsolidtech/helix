@@ -176,6 +176,9 @@ export const Default: Story = {
     const host = canvasElement.querySelector('hx-select');
     await expect(host).toBeTruthy();
 
+    // Wait for slot processing and option cloning to complete
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
+
     const nativeSelect = host!.shadowRoot!.querySelector('select');
     await expect(nativeSelect).toBeTruthy();
 

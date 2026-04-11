@@ -325,7 +325,9 @@ export const AutoPlacement: Story = {
     const popups = canvasElement.querySelectorAll('hx-popup');
     for (const popup of popups) {
       await expect(popup.getAttribute('placement')).toBe('auto');
-      // Both popups should have run positioning and have left/top set
+      // Wait for async floating-ui positioning to complete
+      await (popup as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
+      await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
       const popupEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
       await expect(popupEl?.style.left).toBeTruthy();
     }
@@ -444,6 +446,9 @@ export const ArrowPlacements: Story = {
   play: async ({ canvasElement }) => {
     const popups = canvasElement.querySelectorAll('hx-popup');
     for (const popup of popups) {
+      // Wait for async floating-ui positioning to complete
+      await (popup as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete;
+      await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
       const arrowEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]');
       await expect(arrowEl).toBeTruthy();
       await expect(arrowEl?.getAttribute('data-placement')).toBeTruthy();
@@ -498,9 +503,10 @@ export const FlipBehavior: Story = {
   `,
   play: async ({ canvasElement }) => {
     const popup = canvasElement.querySelector('hx-popup');
-    // Wait for positioning to settle
-    await new Promise((r) => setTimeout(r, 50));
-    const popupEl = popup?.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
+    if (!popup) throw new Error('hx-popup not found');
+    // Wait for async floating-ui positioning to complete
+    await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
+    const popupEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
     // Popup should have been positioned (left/top set by floating-ui)
     await expect(popupEl?.style.left).toBeTruthy();
     await expect(popupEl?.style.top).toBeTruthy();
@@ -527,8 +533,9 @@ export const ShiftBehavior: Story = {
   `,
   play: async ({ canvasElement }) => {
     const popup = canvasElement.querySelector('hx-popup');
-    await new Promise((r) => setTimeout(r, 50));
-    const popupEl = popup?.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
+    if (!popup) throw new Error('hx-popup not found');
+    await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
+    const popupEl = popup.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
     await expect(popupEl?.style.left).toBeTruthy();
     await expect(popupEl?.style.top).toBeTruthy();
   },
@@ -603,8 +610,9 @@ export const AutoSize: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
-    const popup = canvasElement.querySelector('hx-popup') as HTMLElement;
-    await new Promise((r) => setTimeout(r, 100));
+    const popup = canvasElement.querySelector('hx-popup');
+    if (!popup) throw new Error('hx-popup not found');
+    await new Promise<void>((resolve) => popup.addEventListener('hx-reposition', () => resolve(), { once: true }));
     // autoSize sets custom properties on :host
     const height = popup.style.getPropertyValue('--hx-auto-size-available-height');
     await expect(height).toBeTruthy();

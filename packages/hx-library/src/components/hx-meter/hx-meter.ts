@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMeterStyles } from './hx-meter.styles.js';
 
 type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
@@ -37,7 +37,7 @@ type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
  */
 @customElement('hx-meter')
 export class HelixMeter extends LitElement {
-  static override styles = [tokenStyles, helixMeterStyles];
+  static override styles = [helixMeterStyles];
 
   /** @internal */
   private static _counter = 0;

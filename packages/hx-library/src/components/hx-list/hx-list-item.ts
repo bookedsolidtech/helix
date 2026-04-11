@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixListItemStyles } from './hx-list-item.styles.js';
 
 /**
@@ -35,7 +35,7 @@ import { helixListItemStyles } from './hx-list-item.styles.js';
  */
 @customElement('hx-list-item')
 export class HelixListItem extends LitElement {
-  static override styles = [tokenStyles, helixListItemStyles];
+  static override styles = [helixListItemStyles];
 
   /**
    * Whether the item is disabled. Prevents interaction.

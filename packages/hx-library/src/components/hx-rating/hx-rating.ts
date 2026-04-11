@@ -11,8 +11,8 @@
 // decorative click/hover targets with no independent keyboard accessibility obligation.
 
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixRatingStyles } from './hx-rating.styles.js';
 
 // ─── Event Detail Interfaces ───
@@ -76,7 +76,7 @@ export interface HxRatingHoverDetail {
  */
 @customElement('hx-rating')
 export class HelixRating extends LitElement {
-  static override styles = [tokenStyles, helixRatingStyles];
+  static override styles = [helixRatingStyles];
 
   // ─── Form Association ───
 
