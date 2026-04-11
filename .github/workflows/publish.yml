@@ -1,7 +1,7 @@
 # ============================================================================
 # Publish Pipeline — wc-2026 Enterprise Healthcare Web Component Library
 # ============================================================================
-# Triggers on push to main. If unreleased changesets exist, bumps versions
+# Triggers on push to main or manual dispatch. If unreleased changesets exist, bumps versions
 # and publishes to npm directly. Version bump is pushed back via a PR.
 #
 # Tests are NOT re-run here — CI (ci.yml + ci-matrix.yml) already validates
