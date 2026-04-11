@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { html, property } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { fixture, cleanup } from '../test-utils.js';
 import { HelixElement } from './helix-element.js';
 
