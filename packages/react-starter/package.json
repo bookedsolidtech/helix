@@ -1,6 +1,6 @@
 {
   "name": "@helixui/react-starter",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "description": "React starter kit demonstrating HELiX web components with @lit/react wrappers",
