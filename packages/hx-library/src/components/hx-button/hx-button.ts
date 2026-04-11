@@ -1,8 +1,8 @@
 import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -44,7 +44,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(LitElement) {
-  static override styles = [tokenStyles, helixButtonStyles];
+  static override styles = [helixButtonStyles];
 
   // ─── Form Association ───
 

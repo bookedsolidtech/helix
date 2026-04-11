@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
 
 /**
@@ -38,7 +38,7 @@ import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
  */
 @customElement('hx-toggle-button')
 export class HelixToggleButton extends LitElement {
-  static override styles = [tokenStyles, helixToggleButtonStyles];
+  static override styles = [helixToggleButtonStyles];
 
   // ─── Form Association ───
 

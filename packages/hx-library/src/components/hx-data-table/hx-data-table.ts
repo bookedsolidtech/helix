@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -58,7 +58,7 @@ export interface HxDataTableSortState {
  */
 @customElement('hx-data-table')
 export class HelixDataTable extends LitElement {
-  static override styles = [tokenStyles, helixDataTableStyles];
+  static override styles = [helixDataTableStyles];
 
   // ─── Public Properties ───
 

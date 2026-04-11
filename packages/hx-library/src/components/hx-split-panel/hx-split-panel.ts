@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
 
 /**
@@ -44,7 +44,7 @@ import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
  */
 @customElement('hx-split-panel')
 export class HelixSplitPanel extends LitElement {
-  static override styles = [tokenStyles, helixSplitPanelStyles];
+  static override styles = [helixSplitPanelStyles];
 
   /**
    * Position of the divider as a percentage (0–100) of the start panel.

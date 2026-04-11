@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
 
 /**
@@ -16,7 +16,7 @@ import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
  */
 @customElement('hx-menu-divider')
 export class HelixMenuDivider extends LitElement {
-  static override styles = [tokenStyles, helixMenuDividerStyles];
+  static override styles = [helixMenuDividerStyles];
 
   override render() {
     return html`<div

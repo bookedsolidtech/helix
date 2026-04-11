@@ -1,9 +1,9 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
 
 // ─── Internal option model ───
@@ -69,7 +69,7 @@ let _comboboxIdCounter = 0;
  */
 @customElement('hx-combobox')
 export class HelixCombobox extends LitElement {
-  static override styles = [tokenStyles, helixComboboxStyles];
+  static override styles = [helixComboboxStyles];
 
   // ─── Form Association ───
 

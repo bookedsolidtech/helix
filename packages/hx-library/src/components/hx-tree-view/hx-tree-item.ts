@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
 
 /** Detail type for the `hx-tree-item-select` event. */
@@ -40,7 +40,7 @@ export interface HxTreeItemSelectDetail {
  */
 @customElement('hx-tree-item')
 export class HelixTreeItem extends LitElement {
-  static override styles = [tokenStyles, helixTreeItemStyles];
+  static override styles = [helixTreeItemStyles];
 
   // ─── Properties ───
 

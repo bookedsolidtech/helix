@@ -1,10 +1,10 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -50,7 +50,7 @@ let _hxNumberInputIdCounter = 0;
  */
 @customElement('hx-number-input')
 export class HelixNumberInput extends LitElement {
-  static override styles = [tokenStyles, helixNumberInputStyles];
+  static override styles = [helixNumberInputStyles];
 
   // ─── Form Association ───
 

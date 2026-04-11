@@ -1,8 +1,8 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixPaginationStyles } from './hx-pagination.styles.js';
 
 /**
@@ -65,7 +65,7 @@ import { helixPaginationStyles } from './hx-pagination.styles.js';
  */
 @customElement('hx-pagination')
 export class HelixPagination extends LitElement {
-  static override styles = [tokenStyles, helixPaginationStyles];
+  static override styles = [helixPaginationStyles];
 
   /**
    * Total number of pages.

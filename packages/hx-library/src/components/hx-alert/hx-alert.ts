@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAlertStyles } from './hx-alert.styles.js';
 
 /** Alert variant determines visual styling and ARIA semantics. */
@@ -47,7 +47,7 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  */
 @customElement('hx-alert')
 export class HelixAlert extends LitElement {
-  static override styles = [tokenStyles, helixAlertStyles];
+  static override styles = [helixAlertStyles];
 
   // ─── Properties ───
 

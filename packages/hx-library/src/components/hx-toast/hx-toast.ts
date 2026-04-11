@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixToastStyles } from './hx-toast.styles.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
@@ -37,7 +37,7 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  */
 @customElement('hx-toast')
 export class HelixToast extends LitElement {
-  static override styles = [tokenStyles, helixToastStyles];
+  static override styles = [helixToastStyles];
 
   // ─── Public Properties ───
 

@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
 
 /** Minimum allowed value for feedbackDuration (ms). */
@@ -48,7 +48,7 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  */
 @customElement('hx-copy-button')
 export class HelixCopyButton extends LitElement {
-  static override styles = [tokenStyles, helixCopyButtonStyles];
+  static override styles = [helixCopyButtonStyles];
 
   // ─── Public Properties ───
 

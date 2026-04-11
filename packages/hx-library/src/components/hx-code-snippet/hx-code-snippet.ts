@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, TemplateResult } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
 
 /**
@@ -34,7 +34,7 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  */
 @customElement('hx-code-snippet')
 export class HelixCodeSnippet extends LitElement {
-  static override styles = [tokenStyles, helixCodeSnippetStyles];
+  static override styles = [helixCodeSnippetStyles];
 
   // ─── Public Properties ───
 

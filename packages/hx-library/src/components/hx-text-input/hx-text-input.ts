@@ -1,9 +1,9 @@
 import { html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
@@ -52,7 +52,7 @@ const _nextTextInputId = createIdCounter('hx-text-input');
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
-  static override styles = [tokenStyles, helixTextInputStyles];
+  static override styles = [helixTextInputStyles];
 
   // ─── Form Association ───
 

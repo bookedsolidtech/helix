@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTagStyles } from './hx-tag.styles.js';
 
 /**
@@ -43,7 +43,7 @@ import { helixTagStyles } from './hx-tag.styles.js';
  */
 @customElement('hx-tag')
 export class HelixTag extends LitElement {
-  static override styles = [tokenStyles, helixTagStyles];
+  static override styles = [helixTagStyles];
 
   /**
    * Visual style variant of the tag.

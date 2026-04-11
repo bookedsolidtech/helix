@@ -1,9 +1,9 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -45,7 +45,7 @@ interface FileEntry {
  */
 @customElement('hx-file-upload')
 export class HelixFileUpload extends LitElement {
-  static override styles = [tokenStyles, helixFileUploadStyles];
+  static override styles = [helixFileUploadStyles];
 
   // ─── Form Association ───
 

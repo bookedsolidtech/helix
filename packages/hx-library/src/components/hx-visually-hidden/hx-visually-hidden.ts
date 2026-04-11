@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixVisuallyHiddenStyles } from './hx-visually-hidden.styles.js';
 
 /**
@@ -34,7 +34,7 @@ import { helixVisuallyHiddenStyles } from './hx-visually-hidden.styles.js';
  */
 @customElement('hx-visually-hidden')
 export class HelixVisuallyHidden extends LitElement {
-  static override styles = [tokenStyles, helixVisuallyHiddenStyles];
+  static override styles = [helixVisuallyHiddenStyles];
 
   /**
    * When true, the component becomes visible when a focusable child

@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixFieldLabelStyles } from './hx-field-label.styles.js';
 
 /**
@@ -46,7 +46,7 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  */
 @customElement('hx-field-label')
 export class HelixFieldLabel extends LitElement {
-  static override styles = [tokenStyles, helixFieldLabelStyles];
+  static override styles = [helixFieldLabelStyles];
 
   /**
    * The ID of the associated form control. When set, renders a native
