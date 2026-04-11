@@ -3,7 +3,7 @@ title: Styles and CSS
 description: Write scoped component styles using css``, static styles arrays, :host selectors, and HELiX design tokens.
 ---
 
-Lit provides a `css` tagged template literal for writing component-scoped styles. All styles in a `LitElement` are encapsulated in the shadow DOM — they do not leak out to the page and external styles do not leak in. As of `@helixui/library@2.1.0`, HELiX design tokens are adopted at the document level and cascade through Shadow DOM boundaries automatically — no per-component token import is required.
+Lit provides a `css` tagged template literal for writing component-scoped styles. All styles in a `LitElement` are encapsulated in the shadow DOM — they do not leak out to the page and external styles do not leak in. As of `@helixui/library@2.1.1`, HELiX design tokens are adopted at the document level and cascade through Shadow DOM boundaries automatically — no per-component token import is required.
 
 ## The `css` Tagged Template Literal
 

@@ -147,7 +147,7 @@ The standard challenge: a consumer writes `<hx-button aria-label="Close">` but t
 HELiX's `mixinDelegatesAria` solves this by observing ARIA attributes on the host and mirroring them to the designated inner element:
 
 ```typescript
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { mixinDelegatesAria } from '@helixui/library/mixins';
 

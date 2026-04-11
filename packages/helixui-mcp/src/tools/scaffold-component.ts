@@ -116,6 +116,9 @@ function generateComponentClass(
   const extendsClause = hasBase && baseClassName !== undefined ? baseClassName : 'LitElement';
 
   const renderBody = hasBase ? `    return super.render();` : `    return html\`<slot></slot>\`;`;
+  const stylesEntry = hasBase
+    ? `...${extendsClause}.styles, ${stylesVar}`
+    : stylesVar;
 
   return [
     imports.join('\n'),
@@ -127,7 +130,7 @@ function generateComponentClass(
     ' */',
     `@customElement('${tagName}')`,
     `export class ${className} extends ${extendsClause} {`,
-    `  static override styles = [${stylesVar}];`,
+    `  static override styles = [${stylesEntry}];`,
     '',
     '  override render() {',
     renderBody,

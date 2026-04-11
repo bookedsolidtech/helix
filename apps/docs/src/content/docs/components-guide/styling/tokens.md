@@ -37,7 +37,7 @@ Scale values use t-shirt sizes (`xs`, `sm`, `md`, `lg`, `xl`, `2xl`) or numeric 
 
 ## How Tokens Are Made Available
 
-As of `@helixui/library@2.1.0`, design tokens are adopted at the **document level** automatically. When you import anything from `@helixui/library`, the full `--hx-*` token set is added to `document.adoptedStyleSheets` on `:root`. CSS custom properties inherit through Shadow DOM boundaries, so every component can use `var(--hx-*)` without any per-component setup.
+As of `@helixui/library@2.1.1`, design tokens are adopted at the **document level** automatically. When you import anything from `@helixui/library`, the full `--hx-*` token set is added to `document.adoptedStyleSheets` on `:root`. CSS custom properties inherit through Shadow DOM boundaries, so every component can use `var(--hx-*)` without any per-component setup.
 
 ```typescript
 // Tokens cascade automatically — no import needed in your component
@@ -67,7 +67,7 @@ export class HelixCard extends LitElement {
 
 ### Deprecated: `tokenStyles` from `@helixui/tokens/lit`
 
-Prior to `@helixui/library@2.1.0`, components were required to import `tokenStyles` and include it as the first entry in `static override styles`:
+Prior to `@helixui/library@2.1.1`, components were required to import `tokenStyles` and include it as the first entry in `static override styles`:
 
 ```typescript
 // Deprecated — do not use in new components

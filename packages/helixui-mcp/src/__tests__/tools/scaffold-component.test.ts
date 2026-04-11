@@ -204,6 +204,18 @@ describe('scaffoldComponent()', () => {
     }
   });
 
+  it('component .ts file spreads base class styles when extends is set', () => {
+    process.env['HELIXUI_MCP_CEM_PATH'] = '/nonexistent/custom-elements.json';
+
+    try {
+      const result = scaffoldComponent({ name: 'my-button', extends: 'hx-button' });
+      const content = result.files['hx-my-button.ts'] ?? '';
+      expect(content).toContain('...HelixButton.styles');
+    } finally {
+      delete process.env['HELIXUI_MCP_CEM_PATH'];
+    }
+  });
+
   // ── outputDir: write to disk ─────────────────────────────────────────────────
 
   it('writes files to disk when outputDir is provided', () => {

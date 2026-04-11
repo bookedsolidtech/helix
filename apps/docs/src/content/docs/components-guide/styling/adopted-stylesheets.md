@@ -1,9 +1,9 @@
 ---
 title: Adopted Stylesheets in HELiX
-description: Design tokens are adopted at the document level automatically in @helixui/library@2.1.0+. This page explains how the architecture works and how to use @helixui/adopted-stylesheets for application-wide global styles.
+description: Design tokens are adopted at the document level automatically in @helixui/library@2.1.1+. This page explains how the architecture works and how to use @helixui/adopted-stylesheets for application-wide global styles.
 ---
 
-As of `@helixui/library@2.1.0`, the adopted stylesheets pattern is not just recommended — it is the **default architecture**. When you import `@helixui/library`, the full `--hx-*` design token set is added to `document.adoptedStyleSheets` automatically. CSS custom properties inherit through Shadow DOM boundaries, so every component has immediate access to all tokens with no per-component wiring.
+As of `@helixui/library@2.1.1`, the adopted stylesheets pattern is not just recommended — it is the **default architecture**. When you import `@helixui/library`, the full `--hx-*` design token set is added to `document.adoptedStyleSheets` automatically. CSS custom properties inherit through Shadow DOM boundaries, so every component has immediate access to all tokens with no per-component wiring.
 
 `@helixui/adopted-stylesheets` is the **default** mechanism for applying global styles — resets, typography base, focus ring utility, and any application-wide rules — to HELiX component shadow roots. It is not optional: every HELiX application should use it.
 
@@ -99,7 +99,7 @@ The rule of thumb: if a style rule would have gone in your `globals.css` in a no
 
 ## Integration with HELiX Tokens
 
-`@helixui/library@2.1.0` adopts the full `--hx-*` token set at the document level via `document.adoptedStyleSheets`. You do not need to do anything for tokens to be available — they cascade through Shadow DOM automatically from the moment the library is imported.
+`@helixui/library@2.1.1` adopts the full `--hx-*` token set at the document level via `document.adoptedStyleSheets`. You do not need to do anything for tokens to be available — they cascade through Shadow DOM automatically from the moment the library is imported.
 
 The adopted stylesheet is an ideal place to set brand-specific **token overrides** that should apply globally on top of the library defaults:
 

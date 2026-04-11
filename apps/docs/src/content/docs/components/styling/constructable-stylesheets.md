@@ -404,7 +404,7 @@ Constructable Stylesheets enable sophisticated style-sharing patterns that reduc
 
 ### Pattern 1: Document-Level Token Adoption
 
-As of `@helixui/library@2.1.0`, design tokens are adopted at the document level automatically. When the library barrel imports, the full `--hx-*` token set is added to `document.adoptedStyleSheets` on `:root`. CSS custom properties cascade through Shadow DOM boundaries, so every component has access to all tokens with no per-component setup.
+As of `@helixui/library@2.1.1`, design tokens are adopted at the document level automatically. When the library barrel imports, the full `--hx-*` token set is added to `document.adoptedStyleSheets` on `:root`. CSS custom properties cascade through Shadow DOM boundaries, so every component has access to all tokens with no per-component setup.
 
 ```typescript
 // main.ts — tokens are adopted when @helixui/library is imported
@@ -438,7 +438,7 @@ export class HxButton extends LitElement {
 - **Instant updates** — Modifying the document-level token sheet updates every component
 - **Consistency** — All components use the same token values
 
-> **Deprecated pattern:** Prior to `@helixui/library@2.1.0`, each component was required to include `tokenStyles` from `@helixui/tokens/lit` as the first entry in `static override styles`. That import and the `mergeTokenStyles()` utility are still exported for backwards compatibility but should not be used in new code.
+> **Deprecated pattern:** Prior to `@helixui/library@2.1.1`, each component was required to include `tokenStyles` from `@helixui/tokens/lit` as the first entry in `static override styles`. That import and the `mergeTokenStyles()` utility are still exported for backwards compatibility but should not be used in new code.
 
 ### Pattern 2: Component-Specific Stylesheets
 

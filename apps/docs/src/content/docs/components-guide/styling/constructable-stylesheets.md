@@ -123,7 +123,7 @@ Constructable stylesheets are supported in all modern browsers. Lit includes a f
 
 Understanding constructable stylesheets explains several HELiX conventions:
 
-**Why tokens are always available** — As of `@helixui/library@2.1.0`, the `--hx-*` token set is adopted at the document level when the library barrel imports. CSS custom properties inherit through Shadow DOM boundaries, so `var(--hx-*)` works inside any shadow root without any per-component token imports. The old pattern of listing `tokenStyles` first in `static override styles` is deprecated.
+**Why tokens are always available** — As of `@helixui/library@2.1.1`, the `--hx-*` token set is adopted at the document level when the library barrel imports. CSS custom properties inherit through Shadow DOM boundaries, so `var(--hx-*)` works inside any shadow root without any per-component token imports. The old pattern of listing `tokenStyles` first in `static override styles` is deprecated.
 
 **Why `css` strings should not be dynamic** — `CSSResult` deduplication works by object identity. If you construct a new `css` result on every render, Lit cannot deduplicate it. Keep `static override styles` truly static.
 

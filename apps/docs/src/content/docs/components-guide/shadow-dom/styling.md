@@ -42,7 +42,7 @@ HELiX design tokens are all CSS custom properties. Because they are set on `:roo
 }
 ```
 
-Inside the shadow root, these resolve correctly. As of `@helixui/library@2.1.0`, tokens are adopted at the document level automatically — no per-component token import is needed:
+Inside the shadow root, these resolve correctly. As of `@helixui/library@2.1.1`, tokens are adopted at the document level automatically — no per-component token import is needed:
 
 ```typescript
 static override styles = css`
@@ -261,7 +261,7 @@ hx-list::slotted(li.priority) {
 
 ## Adopted Stylesheets
 
-As of `@helixui/library@2.1.0`, the adopted stylesheets pattern is the **default architecture**. Importing `@helixui/library` automatically adds the full `--hx-*` token set to `document.adoptedStyleSheets`. CSS custom properties cascade through Shadow DOM boundaries, so every component immediately has access to all tokens — no per-component `tokenStyles` import or `static override styles` entry is required.
+As of `@helixui/library@2.1.1`, the adopted stylesheets pattern is the **default architecture**. Importing `@helixui/library` automatically adds the full `--hx-*` token set to `document.adoptedStyleSheets`. CSS custom properties cascade through Shadow DOM boundaries, so every component immediately has access to all tokens — no per-component `tokenStyles` import or `static override styles` entry is required.
 
 ```typescript
 import '@helixui/library'; // tokens are adopted at document level on import
