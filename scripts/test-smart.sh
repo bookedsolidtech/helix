@@ -122,6 +122,16 @@ fi
 
 # Extract unique component names
 COMPONENTS=$(echo "$CHANGED" | sed -E 's|packages/hx-library/src/components/(hx-[^/]+)/.*|\1|' | sort -u)
+COMPONENT_COUNT=$(echo "$COMPONENTS" | wc -l | tr -d ' ')
+
+# If more than 20 components changed, run the full suite — vitest can't handle
+# a regex filter with 50+ pipe-separated component names ("No test files found").
+if [ "$COMPONENT_COUNT" -gt 20 ]; then
+  echo "Smart test: $COMPONENT_COUNT components changed — running full suite"
+  run_vitest_with_watchdog pnpm exec vitest run --reporter=verbose
+  exit $?
+fi
+
 PATTERN=$(echo "$COMPONENTS" | tr '\n' '|' | sed 's/|$//')
 
 echo "Smart test: $COMPONENTS"
