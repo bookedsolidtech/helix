@@ -6,6 +6,8 @@
   "sideEffects": [
     "./dist/components/*/index.js",
     "./src/components/*/index.ts",
+    "./dist/utilities/document-token-adoption.js",
+    "./src/utilities/document-token-adoption.ts",
     "**/*.css"
   ],
   "main": "./dist/index.js",
