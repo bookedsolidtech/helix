@@ -1,5 +1,11 @@
 # @helixui/tokens
 
+## 2.1.2
+
+### Patch Changes
+
+- ba1e9bf: docs: update all tokenStyles references for adopted stylesheets architecture; deprecate tokenStyles in @helixui/tokens
+
 ## 2.0.0
 
 ### Minor Changes
