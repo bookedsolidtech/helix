@@ -15,11 +15,9 @@ Lit's `@property()` decorator and TypeScript type annotations serve different pu
 ```typescript
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-badge')
 export class HelixBadge extends LitElement {
-  static override styles = [tokenStyles];
 
   // Both declarations are required:
   // - type: String  → Lit converts attribute → property (no-op for strings)
@@ -52,11 +50,9 @@ Lit's `updated()` and `willUpdate()` lifecycle hooks receive a `PropertyValues<t
 ```typescript
 import { LitElement, html, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-progress')
 export class HelixProgress extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Number })
   value: number = 0;
@@ -111,11 +107,9 @@ Always annotate `render()` with `TemplateResult` or `TemplateResult | typeof not
 ```typescript
 import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   content: string = '';

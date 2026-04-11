@@ -198,11 +198,10 @@ const values = Object.fromEntries(
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-profile-form')
 export class HelixProfileForm extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   @state() private _submitting = false;
   @state() private _submitError = '';

@@ -40,7 +40,6 @@ Pass the detail interface as the generic argument to `CustomEvent`:
 ```typescript
 import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 
 export interface HelixClickDetail {
@@ -49,7 +48,6 @@ export interface HelixClickDetail {
 
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(LitElement) {
-  static override styles = [tokenStyles];
 
   @property({ type: Boolean, reflect: true })
   disabled: boolean = false;

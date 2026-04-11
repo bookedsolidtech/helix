@@ -73,24 +73,24 @@ export const focusRingStyles = css`
 
 ```typescript
 // hx-button.ts
-import { tokenStyles } from '@helixui/tokens/lit';
 import { focusRingStyles } from './shared-styles.js';
 
+// Tokens are adopted at the document level automatically —
+// no tokenStyles import needed.
 @customElement('hx-button')
 export class HelixButton extends LitElement {
-  static override styles = [tokenStyles, focusRingStyles, css`...`];
+  static override styles = [focusRingStyles, css`...`];
 }
 ```
 
 ```typescript
 // hx-input.ts
-import { tokenStyles } from '@helixui/tokens/lit';
 import { focusRingStyles } from './shared-styles.js';
 
 @customElement('hx-input')
 export class HelixInput extends LitElement {
   // focusRingStyles is the same CSSResult object — Lit uses one sheet
-  static override styles = [tokenStyles, focusRingStyles, css`...`];
+  static override styles = [focusRingStyles, css`...`];
 }
 ```
 
@@ -101,10 +101,11 @@ export class HelixInput extends LitElement {
 ```javascript
 // What Lit does internally when an element connects:
 element.shadowRoot.adoptedStyleSheets = [
-  tokenStylesSheet,       // CSSResult from @helixui/tokens/lit
   focusRingStylesSheet,   // CSSResult from shared-styles.ts
   componentStylesSheet,   // CSSResult from this component's css``
 ];
+// Note: token styles are already on document.adoptedStyleSheets and
+// cascade into every shadow root automatically — no per-component entry needed.
 ```
 
 ## Browser Support
@@ -122,7 +123,7 @@ Constructable stylesheets are supported in all modern browsers. Lit includes a f
 
 Understanding constructable stylesheets explains several HELiX conventions:
 
-**Why `tokenStyles` must be first** — `tokenStyles` is a single `CSSResult` from `@helixui/tokens/lit`. When it's listed first, all subsequent rules in the array can reliably reference token custom properties because they're defined on `:root` by that sheet.
+**Why tokens are always available** — As of `@helixui/library@2.1.1`, the `--hx-*` token set is adopted at the document level when the library barrel imports. CSS custom properties inherit through Shadow DOM boundaries, so `var(--hx-*)` works inside any shadow root without any per-component token imports. The old pattern of listing `tokenStyles` first in `static override styles` is deprecated.
 
 **Why `css` strings should not be dynamic** — `CSSResult` deduplication works by object identity. If you construct a new `css` result on every render, Lit cannot deduplicate it. Keep `static override styles` truly static.
 
@@ -131,5 +132,5 @@ Understanding constructable stylesheets explains several HELiX conventions:
 ## Next Steps
 
 - [Adopted Stylesheets in HELiX](/components-guide/styling/adopted-stylesheets/) — the `@helixui/adopted-stylesheets` package for global styles
-- [Design Tokens](/components-guide/styling/tokens/) — how `tokenStyles` fits into the styles array
+- [Design Tokens](/components-guide/styling/tokens/) — how tokens are adopted automatically and how to use `--hx-*` properties
 - [CSS Parts API](/components-guide/styling/css-parts/) — exposing style hooks to consumers

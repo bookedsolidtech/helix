@@ -23,12 +23,11 @@ When you render a native `<input>`, `<select>`, or `<textarea>` inside the shado
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 // Native input — implicit textbox role, no extra role needed
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   override render() {
     return html`<input type="text" />`;
@@ -38,7 +37,7 @@ export class HelixTextInput extends LitElement {
 // Custom checkbox — must explicitly set role
 @customElement('hx-checkbox')
 export class HelixCheckbox extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   @property({ type: Boolean }) checked = false;
 
@@ -148,16 +147,15 @@ The standard challenge: a consumer writes `<hx-button aria-label="Close">` but t
 HELiX's `mixinDelegatesAria` solves this by observing ARIA attributes on the host and mirroring them to the designated inner element:
 
 ```typescript
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
 import { mixinDelegatesAria } from '@helixui/library/mixins';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 const Base = mixinDelegatesAria(LitElement);
 
 @customElement('hx-button')
 export class HelixButton extends Base {
-  static override styles = [tokenStyles, css`:host { display: inline-flex; }`];
+  static override styles = css`:host { display: inline-flex; }`;
 
   @query('button') private _button!: HTMLButtonElement;
 

@@ -918,7 +918,6 @@ export const helixAlertStyles = css`
 import { LitElement, html, nothing, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixAlertStyles } from './hx-alert.styles.js';
 
 type AlertVariant = 'info' | 'success' | 'warning' | 'error';
@@ -933,7 +932,8 @@ type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  */
 @customElement('hx-alert')
 export class HelixAlert extends LitElement {
-  static override styles = [tokenStyles, helixAlertStyles];
+  // Tokens cascade from document.adoptedStyleSheets — no tokenStyles import needed.
+  static override styles = helixAlertStyles;
 
   @property({ type: String, reflect: true })
   variant: AlertVariant = 'info';

@@ -12,12 +12,10 @@ The most basic dark mode implementation responds automatically to the operating 
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-surface')
 export class HelixSurface extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: block;
@@ -50,7 +48,6 @@ When an application needs to toggle dark mode programmatically (a "dark mode" sw
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     :host {
       display: block;
@@ -104,7 +101,6 @@ Components then use the semantic tokens and are dark-aware automatically:
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     :host {
       background: var(--hx-color-surface);
@@ -156,12 +152,10 @@ A complete `hx-badge` component that supports both OS-level and class-based dark
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-badge')
 export class HelixBadge extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: inline-flex;

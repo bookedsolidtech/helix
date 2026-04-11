@@ -26,7 +26,7 @@ Set token overrides on `:root` to change the look of every HELiX component on th
 }
 ```
 
-Because `tokenStyles` injects tokens as CSS custom properties, any CSS rule with higher specificity (including `:root` overrides) will cascade correctly.
+Because `@helixui/library` adopts tokens via `document.adoptedStyleSheets`, any CSS rule with higher specificity (including `:root` overrides) will cascade correctly.
 
 ## Component-Level Theming via Style Props
 
@@ -44,19 +44,16 @@ hx-button.danger {
 Inside the component, those props cascade in over a token fallback:
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    button {
-      background: var(--hx-button-bg, var(--hx-color-primary-500));
-      color: var(--hx-button-color, var(--hx-color-neutral-0));
-    }
+static override styles = css`
+  button {
+    background: var(--hx-button-bg, var(--hx-color-primary-500));
+    color: var(--hx-button-color, var(--hx-color-neutral-0));
+  }
 
-    button:hover {
-      background: var(--hx-button-bg-hover, var(--hx-color-primary-600));
-    }
-  `,
-];
+  button:hover {
+    background: var(--hx-button-bg-hover, var(--hx-color-primary-600));
+  }
+`;
 ```
 
 ## Documenting Style Props with `@cssprop`

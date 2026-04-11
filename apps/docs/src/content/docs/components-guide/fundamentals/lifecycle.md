@@ -28,7 +28,6 @@ The constructor runs when the element class is instantiated. Lit uses it to set 
 ```typescript
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
-  static override styles = [tokenStyles];
 
   // Initialize properties with defaults here (TypeScript field initializers)
   @property({ type: String })
@@ -120,11 +119,9 @@ Called before `render()` on every update. Use it to compute derived state that d
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-progress')
 export class HelixProgress extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Number })
   value = 0;
@@ -173,11 +170,9 @@ Common uses:
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-autofocus-input')
 export class HelixAutofocusInput extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Boolean })
   autofocus = false;
@@ -204,11 +199,9 @@ Called after every render (including the first). The shadow DOM reflects the lat
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-dialog')
 export class HelixDialog extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Boolean, reflect: true })
   open = false;
@@ -265,12 +258,10 @@ Typing it as `PropertyValues<this>` gives TypeScript correct key inference for y
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-timer')
 export class HelixTimer extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: inline-block; }
     `,

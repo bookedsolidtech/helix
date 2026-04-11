@@ -56,7 +56,7 @@ Use **extending** when you need to add reactive properties, override render logi
 ```typescript
 // From packages/hx-library/src/components/hx-card/hx-card.ts
 export class HelixCard extends LitElement {
-  static override styles = [tokenStyles, helixCardStyles];
+  static override styles = helixCardStyles; // tokens cascade from document.adoptedStyleSheets
 
   variant: 'default' | 'featured' | 'compact' = 'default';
   elevation: 'flat' | 'raised' | 'floating' = 'flat';

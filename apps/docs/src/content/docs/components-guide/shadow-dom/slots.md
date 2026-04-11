@@ -42,7 +42,6 @@ A `<slot>` element without a `name` attribute accepts all unassigned light DOM c
 @customElement('hx-callout')
 export class HelixCallout extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: block; }
       .callout {
@@ -71,7 +70,6 @@ Named slots accept only children that specify `slot="name"` on a direct child of
 @customElement('hx-media-card')
 export class HelixMediaCard extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: block; }
       .card { display: grid; grid-template-rows: auto 1fr auto; }
@@ -165,11 +163,9 @@ Or use the `slotchange` event to track slot occupancy (see below).
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-accordion')
 export class HelixAccordion extends LitElement {
-  static override styles = [tokenStyles];
 
   @state()
   private _itemCount = 0;
@@ -209,7 +205,6 @@ import { queryAssignedElements } from 'lit/decorators.js';
 @customElement('hx-toolbar')
 export class HelixToolbar extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: flex; align-items: center; gap: var(--hx-spacing-xs); }
     `,
@@ -272,7 +267,6 @@ To show or hide layout sections based on whether a slot has content:
 @customElement('hx-split-layout')
 export class HelixSplitLayout extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: grid; grid-template-columns: 1fr; }
       :host([has-aside]) { grid-template-columns: 1fr 280px; }

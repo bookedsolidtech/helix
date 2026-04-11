@@ -135,7 +135,6 @@ Once `setValidity()` is wired up, the browser automatically applies `:valid` and
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     :host {
       display: block;

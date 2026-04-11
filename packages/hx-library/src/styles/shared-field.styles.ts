@@ -5,7 +5,7 @@
  * to avoid duplicating identical CSS across multiple style files.
  *
  * Import alongside component-specific styles via CSSResultGroup:
- *   static override styles = [tokenStyles, sharedFieldStyles, helixMyComponentStyles];
+ *   static override styles = [sharedFieldStyles, helixMyComponentStyles];
  */
 import { css } from 'lit';
 

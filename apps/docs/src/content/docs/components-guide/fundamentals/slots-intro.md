@@ -37,12 +37,10 @@ A `<slot>` without a `name` attribute is the default slot. All slotted content t
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-section')
 export class HelixSection extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: block; }
       .section {
@@ -80,7 +78,6 @@ Named slots let a component define multiple content regions. Consumers assign co
 @customElement('hx-panel')
 export class HelixPanel extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: flex; flex-direction: column; }
       .header {
@@ -167,11 +164,9 @@ The `slotchange` event fires on a `<slot>` element when its assigned nodes chang
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-nav')
 export class HelixNav extends LitElement {
-  static override styles = [tokenStyles];
 
   @query('slot')
   private _slot!: HTMLSlotElement;
@@ -201,12 +196,10 @@ The `@queryAssignedElements` decorator is a convenient way to access slotted ele
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, queryAssignedElements } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-button-group')
 export class HelixButtonGroup extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: inline-flex; gap: var(--hx-spacing-xs); }
     `,
@@ -252,7 +245,6 @@ To conditionally render layout based on whether a slot has content:
 ```typescript
 @customElement('hx-card')
 export class HelixCard extends LitElement {
-  static override styles = [tokenStyles];
 
   @queryAssignedElements({ slot: 'footer' })
   private _footerItems!: Array<HTMLElement>;

@@ -1,7 +1,9 @@
 ---
 title: Adopted Stylesheets in HELiX
-description: Use @helixui/adopted-stylesheets as the default pattern for injecting global styles into shadow DOM without duplication.
+description: Design tokens are adopted at the document level automatically in @helixui/library@2.1.1+. This page explains how the architecture works and how to use @helixui/adopted-stylesheets for application-wide global styles.
 ---
+
+As of `@helixui/library@2.1.1`, the adopted stylesheets pattern is not just recommended — it is the **default architecture**. When you import `@helixui/library`, the full `--hx-*` design token set is added to `document.adoptedStyleSheets` automatically. CSS custom properties inherit through Shadow DOM boundaries, so every component has immediate access to all tokens with no per-component wiring.
 
 `@helixui/adopted-stylesheets` is the **default** mechanism for applying global styles — resets, typography base, focus ring utility, and any application-wide rules — to HELiX component shadow roots. It is not optional: every HELiX application should use it.
 
@@ -97,7 +99,9 @@ The rule of thumb: if a style rule would have gone in your `globals.css` in a no
 
 ## Integration with HELiX Tokens
 
-The adopted stylesheet is an ideal place to set any token overrides that should apply globally, separate from what `@helixui/tokens` provides:
+`@helixui/library@2.1.1` adopts the full `--hx-*` token set at the document level via `document.adoptedStyleSheets`. You do not need to do anything for tokens to be available — they cascade through Shadow DOM automatically from the moment the library is imported.
+
+The adopted stylesheet is an ideal place to set brand-specific **token overrides** that should apply globally on top of the library defaults:
 
 ```typescript
 import { defineAdoptedStylesheet } from '@helixui/adopted-stylesheets';
@@ -113,7 +117,7 @@ export const brandOverrides = defineAdoptedStylesheet(css`
 `);
 ```
 
-Because the adopted stylesheet runs inside each shadow root, CSS custom property overrides here correctly override the defaults from `tokenStyles` without needing `:root` or `:host` specificity tricks.
+Because the adopted stylesheet runs inside each shadow root, CSS custom property overrides here correctly override the library defaults without needing `:root` or `:host` specificity tricks.
 
 ## Deduplication Guarantee
 
@@ -122,5 +126,5 @@ Because the adopted stylesheet runs inside each shadow root, CSS custom property
 ## Next Steps
 
 - [Constructable Stylesheets](/components-guide/styling/constructable-stylesheets/) — the browser API powering adopted stylesheets
-- [Design Tokens](/components-guide/styling/tokens/) — how `tokenStyles` and adopted stylesheets work together
+- [Design Tokens](/components-guide/styling/tokens/) — how tokens are adopted automatically and how to use `--hx-*` properties
 - [Theming](/components-guide/styling/theming/) — scoping token overrides to a subtree

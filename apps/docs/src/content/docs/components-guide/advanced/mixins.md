@@ -73,7 +73,6 @@ import { mixinDelegatesAria } from '../../mixins/index.js';
 // Applied directly on LitElement — no other base class needed
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(LitElement) {
-  static override styles = [tokenStyles];
 
   override render() {
     return html`
@@ -107,7 +106,6 @@ import { FocusMixin } from '../../mixins/FocusMixin.js';
 
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(mixinDelegatesAria(LitElement)) {
-  static override styles = [tokenStyles];
 
   @query('input')
   private _inputEl: HTMLInputElement | null = null;

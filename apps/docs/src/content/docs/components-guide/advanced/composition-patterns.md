@@ -74,12 +74,10 @@ Mixin application order matters for the prototype chain. Mixins applied last in 
 ```typescript
 import { LitElement, html, nothing } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 
 @customElement('hx-icon-button')
 export class HelixIconButton extends mixinDelegatesAria(LitElement) {
-  static override styles = [tokenStyles];
 
   override render() {
     return html`
@@ -109,7 +107,6 @@ When a consumer sets `aria-label="Close"` on `<hx-icon-button>`, the mixin inter
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 // Controller for viewport-based lazy rendering
 class IntersectionController {
@@ -139,8 +136,6 @@ class IntersectionController {
 
 @customElement('hx-lazy-image')
 export class HelixLazyImage extends LitElement {
-  static override styles = [tokenStyles];
-
   private _intersection = new IntersectionController(this);
 
   override render() {
@@ -160,8 +155,6 @@ Named slots are the primary mechanism for composing component trees. Rather than
 ```typescript
 @customElement('hx-card')
 export class HelixCard extends LitElement {
-  static override styles = [tokenStyles];
-
   override render() {
     return html`
       <article class="card">

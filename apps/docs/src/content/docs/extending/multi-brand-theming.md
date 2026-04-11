@@ -502,7 +502,7 @@ restoreBrandPreference();
 ```json
 {
   "brand": "harbor-health",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "primitive": {
     "color-primary-50":  "#eff6f8",
     "color-primary-100": "#d0e9ef",
@@ -688,7 +688,7 @@ A single `@helixui/library` instance on a CDN serves all Drupal multisite instal
                     ┌─────────────────────────────────┐
                     │   CDN / Static Asset Server     │
                     │                                 │
-                    │  @helixui/library@2.1.0          │
+                    │  @helixui/library@2.1.1          │
                     │  ├── helix.esm.js               │
                     │  └── helix.css (base tokens)    │
                     └──────────────┬──────────────────┘
@@ -761,7 +761,7 @@ function harbor_health_preprocess_html(array &$variables): void {
     <title>{{ head_title }}</title>
     {{ head }}
     {# HELiX library — loaded from CDN or Drupal library #}
-    <script type="module" src="/cdn/helix/2.1.0/helix.esm.js"></script>
+    <script type="module" src="/cdn/helix/2.1.1/helix.esm.js"></script>
     {# Brand tokens loaded via Drupal library (harbor_health/brand-tokens) #}
   </head>
   <body{{ attributes.setAttribute('data-brand', 'harbor-health') }}>
@@ -932,7 +932,7 @@ done
 ```
 cdn.yourdomain.com/
 ├── helix/
-│   └── 2.1.0/
+│   └── 2.1.1/
 │       ├── helix.esm.js          (shared — all brands)
 │       └── helix.css             (base tokens — all brands)
 │

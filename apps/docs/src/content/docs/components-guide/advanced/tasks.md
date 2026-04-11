@@ -23,7 +23,6 @@ A `Task` is constructed with the host element, a task function, and an `args` fu
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 interface UserProfile {
   id: string;
@@ -34,8 +33,6 @@ interface UserProfile {
 
 @customElement('hx-user-card')
 export class HelixUserCard extends LitElement {
-  static override styles = [tokenStyles];
-
   @property({ type: String })
   userId: string = '';
 
@@ -140,11 +137,9 @@ Caught errors are available as `task.error`. To add retry behavior, expose a met
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-data-table')
 export class HelixDataTable extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   endpoint: string = '';
@@ -206,7 +201,6 @@ import { helixConfigContext, type HelixConfig } from './contexts.js';
 
 @customElement('hx-config-driven-list')
 export class HelixConfigDrivenList extends LitElement {
-  static override styles = [tokenStyles];
 
   @consume({ context: helixConfigContext, subscribe: true })
   helixConfig!: HelixConfig;

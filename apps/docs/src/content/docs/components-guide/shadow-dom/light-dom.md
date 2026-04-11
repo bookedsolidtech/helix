@@ -143,7 +143,6 @@ Most HELiX components use both: shadow DOM for structural chrome, light DOM slot
 @customElement('hx-expandable-section')
 export class HelixExpandableSection extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: block; }
       .header {

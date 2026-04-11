@@ -12,11 +12,9 @@ TypeScript allows class generics on `LitElement` subclasses. The type parameter 
 ```typescript
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-list')
 export class HelixList<T extends { id: string }> extends LitElement {
-  static override styles = [tokenStyles];
 
   // attribute: false — objects cannot be serialized to attributes
   @property({ attribute: false })
@@ -63,7 +61,6 @@ Combine `@property({ attribute: false })` with a generic type for JS-only object
 ```typescript
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 interface SelectOption<T> {
   value: T;
@@ -73,7 +70,6 @@ interface SelectOption<T> {
 
 @customElement('hx-select-list')
 export class HelixSelectList<T> extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ attribute: false })
   options: SelectOption<T>[] = [];
@@ -216,7 +212,6 @@ Add type constraints to generic parameters to guarantee shape:
 // T must have an id and a label — safe to render without renderItem fallback
 @customElement('hx-option-list')
 export class HelixOptionList<T extends { id: string; label: string }> extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ attribute: false })
   items: T[] = [];

@@ -12,11 +12,9 @@ Use the `@` prefix in a Lit template to attach an event listener:
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-counter')
 export class HelixCounter extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Number })
   value = 0;
@@ -173,7 +171,6 @@ When listening to events fired by child components inside your template, use the
 ```typescript
 @customElement('hx-form')
 export class HelixForm extends LitElement {
-  static override styles = [tokenStyles];
 
   private _handleInputChange(event: CustomEvent<{ value: string; name: string }>) {
     this._formData[event.detail.name] = event.detail.value;
@@ -201,7 +198,6 @@ import { eventOptions } from 'lit/decorators.js';
 
 @customElement('hx-scroll-area')
 export class HelixScrollArea extends LitElement {
-  static override styles = [tokenStyles];
 
   // passive: true — cannot call preventDefault(), improves scroll performance
   @eventOptions({ passive: true })
@@ -245,7 +241,6 @@ For events on `window` or `document`, add and remove listeners in `connectedCall
 ```typescript
 @customElement('hx-hotkeys')
 export class HelixHotkeys extends LitElement {
-  static override styles = [tokenStyles];
 
   override connectedCallback() {
     super.connectedCallback();

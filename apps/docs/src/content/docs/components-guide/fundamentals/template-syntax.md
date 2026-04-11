@@ -109,7 +109,6 @@ Prefix the attribute name with `@` to attach an event listener. The value should
 ```typescript
 @customElement('hx-toggle')
 export class HelixToggle extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Boolean, reflect: true })
   checked = false;
@@ -162,11 +161,9 @@ The `ref` directive lets you get a reference to a rendered DOM element. This is 
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ref, createRef, type Ref } from 'lit/directives/ref.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-autoscroll')
 export class HelixAutoscroll extends LitElement {
-  static override styles = [tokenStyles];
 
   private _listRef: Ref<HTMLUListElement> = createRef();
 
@@ -214,7 +211,6 @@ Templates can be composed by returning `html` results from helper methods or by 
 ```typescript
 @customElement('hx-card')
 export class HelixCard extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   title = '';

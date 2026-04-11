@@ -12,11 +12,10 @@ Attach the listener to the shadow root's container element rather than each indi
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-nav')
 export class HelixNav extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   // Single handler on the container — not on each <button>
   private _handleClick(e: MouseEvent) {

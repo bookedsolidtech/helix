@@ -127,11 +127,9 @@ Lit 3.x exports an `isServer` boolean for conditional server vs browser logic:
 ```typescript
 import { LitElement, html, isServer } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-media-player')
 export class HelixMediaPlayer extends LitElement {
-  static override styles = [tokenStyles];
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -209,14 +207,14 @@ HELiX components are authored with SSR compatibility in mind:
 - No browser globals in constructors or static initializers.
 - `connectedCallback` and event listeners are the only places window/document are accessed.
 - `isServer` checks gate any unavoidable browser-only paths.
-- `@helixui/tokens/lit` exports a `CSSResult` — safe in SSR as Lit inlines CSS into DSD `<style>` elements.
+- Component stylesheets are plain `CSSResult` values — they are safe in SSR as Lit inlines them into DSD `<style>` elements.
 
 ```typescript
-// tokenStyles works in SSR — Lit writes it into the <template> shadow root
-static override styles = [tokenStyles, helixButtonStyles];
+// Component styles work in SSR — Lit writes them into the <template> shadow root
+static override styles = helixButtonStyles;
 ```
 
-The one area requiring care is CSS custom property adoption. HELiX uses `@helixui/adopted-stylesheets` for runtime token injection in the browser — ensure this is guarded with `isServer` when running in an SSR context.
+The one area requiring care is document-level token adoption. `@helixui/library` calls `document.adoptedStyleSheets` in the browser — ensure this path is guarded with `isServer` when running in an SSR context. In practice, importing `@helixui/library` in SSR only registers custom elements; the `adoptedStyleSheets` assignment is browser-only.
 
 ## Next Steps
 
