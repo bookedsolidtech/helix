@@ -12,7 +12,7 @@
 #   destructive: delete_*, drop_*, purge_*, remove_*, destroy_*, ban_*, kick_*, revoke_*, truncate_*
 #   write:       everything else (default)
 
-version: "1"
+version: '1'
 
 servers:
   discord-ops:
