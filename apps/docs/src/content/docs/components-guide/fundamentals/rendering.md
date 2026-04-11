@@ -128,7 +128,6 @@ Multiple property changes in the same synchronous block result in a single rende
 ```typescript
 @customElement('hx-form-field')
 export class HelixFormField extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   value = '';
@@ -161,7 +160,6 @@ Call `requestUpdate()` to manually schedule a re-render without changing a react
 ```typescript
 @customElement('hx-mutable-list')
 export class HelixMutableList extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Array })
   items: string[] = [];
@@ -212,12 +210,10 @@ if (!this.isUpdatePending) {
 ```typescript
 import { LitElement, html, css, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-async-card')
 export class HelixAsyncCard extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host { display: block; }
       .skeleton { background: var(--hx-color-neutral-100); }

@@ -71,11 +71,9 @@ get _internals(): ElementInternals {
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
-  static override styles = [tokenStyles];
 
   // Correctly typed as nullable — the element may not exist yet
   @query('input')
@@ -99,11 +97,9 @@ With `strictNullChecks: true`, the TypeScript compiler tracks `null` and `undefi
 ```typescript
 import { LitElement, html, type PropertyValues } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-select')
 export class HelixSelect extends LitElement {
-  static override styles = [tokenStyles];
 
   @query('select')
   private _select: HTMLSelectElement | null = null;
@@ -142,11 +138,9 @@ Without explicit types, event handler parameters default to `any`, which TypeScr
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-file-input')
 export class HelixFileInput extends LitElement {
-  static override styles = [tokenStyles];
 
   // Correctly typed — no implicit any
   private _handleChange(e: Event): void {

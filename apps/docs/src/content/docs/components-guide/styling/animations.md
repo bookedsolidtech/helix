@@ -12,12 +12,10 @@ CSS transitions are the right tool for state changes: hover, focus, active, disa
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-button')
 export class HelixButton extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       button {
         background: var(--hx-color-primary-500);
@@ -94,7 +92,6 @@ Use `@keyframes` for multi-step animations: spinners, skeletons, entrance effect
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -160,11 +157,10 @@ When you need to trigger an animation from JavaScript — for example, after dat
 ```typescript
 import { LitElement, html, css, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-toast')
 export class HelixToast extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   @property({ type: Boolean }) open = false;
 

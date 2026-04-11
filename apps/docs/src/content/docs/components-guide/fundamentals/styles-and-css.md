@@ -3,7 +3,7 @@ title: Styles and CSS
 description: Write scoped component styles using css``, static styles arrays, :host selectors, and HELiX design tokens.
 ---
 
-Lit provides a `css` tagged template literal for writing component-scoped styles. All styles in a `LitElement` are encapsulated in the shadow DOM — they do not leak out to the page and external styles do not leak in. HELiX components always include `tokenStyles` from `@helixui/tokens/lit` to make design tokens available inside the shadow root.
+Lit provides a `css` tagged template literal for writing component-scoped styles. All styles in a `LitElement` are encapsulated in the shadow DOM — they do not leak out to the page and external styles do not leak in. As of `@helixui/library@2.1.0`, HELiX design tokens are adopted at the document level and cascade through Shadow DOM boundaries automatically — no per-component token import is required.
 
 ## The `css` Tagged Template Literal
 
@@ -16,25 +16,23 @@ The `css` tag processes the template at class definition time (not per-instance)
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
+// Design tokens are adopted at the document level by @helixui/library —
+// no tokenStyles import needed. var(--hx-*) works directly.
 @customElement('hx-chip')
 export class HelixChip extends LitElement {
-  static override styles = [
-    tokenStyles,
-    css`
-      :host {
-        display: inline-flex;
-        align-items: center;
-        border-radius: var(--hx-radius-full);
-        padding: var(--hx-spacing-xs) var(--hx-spacing-sm);
-        font-size: var(--hx-font-size-sm);
-        font-family: var(--hx-font-family-base);
-        background: var(--hx-color-neutral-100);
-        color: var(--hx-color-neutral-800);
-      }
-    `,
-  ];
+  static override styles = css`
+    :host {
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--hx-radius-full);
+      padding: var(--hx-spacing-xs) var(--hx-spacing-sm);
+      font-size: var(--hx-font-size-sm);
+      font-family: var(--hx-font-family-base);
+      background: var(--hx-color-neutral-100);
+      color: var(--hx-color-neutral-800);
+    }
+  `;
 }
 ```
 
@@ -42,19 +40,18 @@ export class HelixChip extends LitElement {
 
 `static override styles` is a `CSSResultGroup` — it accepts a single `CSSResult` or an array of `CSSResult` values. The `override` keyword is required because `LitElement` declares `styles` on the base class.
 
-**Rule: `tokenStyles` must always be the first item in the array.**
-
 ```typescript
 static override styles = [
-  tokenStyles,         // 1. HELiX design tokens — always first
-  sharedButtonStyles,  // 2. Shared style modules (optional)
-  css`                 // 3. Component-specific styles
+  sharedButtonStyles,  // 1. Shared style modules (optional)
+  css`                 // 2. Component-specific styles
     :host { display: inline-flex; }
   `,
 ];
 ```
 
-Placing `tokenStyles` first ensures that all subsequent CSS rules can reference `--hx-*` custom properties without them being undefined.
+`--hx-*` tokens are available in all component styles without any explicit import. The library adopts them at the document level, and CSS custom properties cascade through Shadow DOM boundaries automatically.
+
+> **Deprecated:** The old `[tokenStyles, ...]` pattern — where `tokenStyles` from `@helixui/tokens/lit` was required as the first array entry — is no longer needed. `tokenStyles` and `mergeTokenStyles()` are still exported for backwards compatibility but should not appear in new code.
 
 ## Shared Style Modules
 
@@ -97,7 +94,7 @@ import { srOnlyStyles } from '../shared/sr-only-styles.js';
 
 @customElement('hx-button')
 export class HelixButton extends LitElement {
-  static override styles = [tokenStyles, focusStyles, srOnlyStyles, css`...`];
+  static override styles = [focusStyles, srOnlyStyles, css`...`];
 }
 ```
 
@@ -106,39 +103,36 @@ export class HelixButton extends LitElement {
 `:host` targets the custom element itself — the shadow host. This is the correct way to set `display`, `position`, sizing, and host-level layout properties.
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    /* Default host layout */
-    :host {
-      display: block;
-      box-sizing: border-box;
-    }
+static override styles = css`
+  /* Default host layout */
+  :host {
+    display: block;
+    box-sizing: border-box;
+  }
 
-    /* Inline variant */
-    :host([inline]) {
-      display: inline-block;
-    }
+  /* Inline variant */
+  :host([inline]) {
+    display: inline-block;
+  }
 
-    /* Disabled state via reflected attribute */
-    :host([disabled]) {
-      opacity: 0.5;
-      pointer-events: none;
-      cursor: not-allowed;
-    }
+  /* Disabled state via reflected attribute */
+  :host([disabled]) {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 
-    /* Variant-based host styling */
-    :host([variant='primary']) {
-      --_bg: var(--hx-color-primary-500);
-      --_color: var(--hx-color-white);
-    }
+  /* Variant-based host styling */
+  :host([variant='primary']) {
+    --_bg: var(--hx-color-primary-500);
+    --_color: var(--hx-color-white);
+  }
 
-    :host([variant='secondary']) {
-      --_bg: transparent;
-      --_color: var(--hx-color-primary-500);
-    }
-  `,
-];
+  :host([variant='secondary']) {
+    --_bg: transparent;
+    --_color: var(--hx-color-primary-500);
+  }
+`;
 ```
 
 `:host([attr])` rules activate when the attribute is present on the element — which is why `reflect: true` on boolean properties like `disabled` is important.
@@ -149,28 +143,25 @@ CSS custom properties (variables) pierce the shadow boundary. They are the prima
 
 ### Using Token Variables Inside Components
 
-Reference `--hx-*` token variables in your component styles:
+Reference `--hx-*` token variables in your component styles. Tokens are available automatically — no import needed:
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    .button {
-      background: var(--hx-color-primary-500);
-      color: var(--hx-color-white);
-      border-radius: var(--hx-radius-md);
-      padding: var(--hx-spacing-sm) var(--hx-spacing-md);
-      font-family: var(--hx-font-family-base);
-      font-size: var(--hx-font-size-base);
-      font-weight: var(--hx-font-weight-medium);
-      transition: background var(--hx-duration-fast) var(--hx-easing-standard);
-    }
+static override styles = css`
+  .button {
+    background: var(--hx-color-primary-500);
+    color: var(--hx-color-white);
+    border-radius: var(--hx-radius-md);
+    padding: var(--hx-spacing-sm) var(--hx-spacing-md);
+    font-family: var(--hx-font-family-base);
+    font-size: var(--hx-font-size-base);
+    font-weight: var(--hx-font-weight-medium);
+    transition: background var(--hx-duration-fast) var(--hx-easing-standard);
+  }
 
-    .button:hover:not(:disabled) {
-      background: var(--hx-color-primary-600);
-    }
-  `,
-];
+  .button:hover:not(:disabled) {
+    background: var(--hx-color-primary-600);
+  }
+`;
 ```
 
 ### Exposing Component-Level Custom Properties
@@ -178,25 +169,22 @@ static override styles = [
 Define component-specific custom properties that consumers can override:
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    :host {
-      /* Component-level custom properties with token fallbacks */
-      --hx-chip-bg: var(--hx-color-neutral-100);
-      --hx-chip-color: var(--hx-color-neutral-800);
-      --hx-chip-border: var(--hx-color-neutral-300);
-      --hx-chip-radius: var(--hx-radius-full);
-    }
+static override styles = css`
+  :host {
+    /* Component-level custom properties with token fallbacks */
+    --hx-chip-bg: var(--hx-color-neutral-100);
+    --hx-chip-color: var(--hx-color-neutral-800);
+    --hx-chip-border: var(--hx-color-neutral-300);
+    --hx-chip-radius: var(--hx-radius-full);
+  }
 
-    .chip {
-      background: var(--hx-chip-bg);
-      color: var(--hx-chip-color);
-      border: 1px solid var(--hx-chip-border);
-      border-radius: var(--hx-chip-radius);
-    }
-  `,
-];
+  .chip {
+    background: var(--hx-chip-bg);
+    color: var(--hx-chip-color);
+    border: 1px solid var(--hx-chip-border);
+    border-radius: var(--hx-chip-radius);
+  }
+`;
 ```
 
 Consumers can then override these on the element or a containing selector:

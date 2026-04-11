@@ -42,14 +42,12 @@ export class HelixTextInput extends LitElement {
 ```typescript
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
   static override formAssociated = true;
 
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: block;

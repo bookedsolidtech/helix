@@ -40,12 +40,10 @@ Use the `@provide` decorator (or the `ContextProvider` controller) to make a val
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { provide } from '@lit/context';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { themeContext, localeContext } from './contexts.js';
 
 @customElement('hx-design-system-provider')
 export class HelixDesignSystemProvider extends LitElement {
-  static override styles = [tokenStyles];
 
   // The @provide decorator makes this.theme available to all descendants
   // that consume themeContext
@@ -83,12 +81,10 @@ Use the `@consume` decorator to receive a context value from the nearest ancesto
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { themeContext } from './contexts.js';
 
 @customElement('hx-themed-button')
 export class HelixThemedButton extends LitElement {
-  static override styles = [tokenStyles];
 
   // Receives theme from the nearest ancestor hx-design-system-provider
   // The ! (definite assignment) is required because the value arrives after construction

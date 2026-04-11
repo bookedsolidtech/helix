@@ -7,10 +7,10 @@ This guide walks through building a working web component from the ground up usi
 
 ## Prerequisites
 
-Install the required packages:
+Install the required package:
 
 ```bash
-npm install lit @helixui/tokens
+npm install @helixui/library
 ```
 
 ## The Complete Component
@@ -20,26 +20,24 @@ Here is a full, working `hx-greeting` component. The sections below break down e
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-greeting')
 export class HelixGreeting extends LitElement {
-  static override styles = [
-    tokenStyles,
-    css`
-      :host {
-        display: block;
-        padding: var(--hx-spacing-md);
-        font-family: var(--hx-font-family-base);
-      }
+  // Design tokens are adopted at the document level by @helixui/library.
+  // var(--hx-*) works here without any tokenStyles import.
+  static override styles = css`
+    :host {
+      display: block;
+      padding: var(--hx-spacing-md);
+      font-family: var(--hx-font-family-base);
+    }
 
-      .greeting {
-        color: var(--hx-color-primary-500);
-        font-size: var(--hx-font-size-lg);
-        font-weight: var(--hx-font-weight-semibold);
-      }
-    `,
-  ];
+    .greeting {
+      color: var(--hx-color-primary-500);
+      font-size: var(--hx-font-size-lg);
+      font-weight: var(--hx-font-weight-semibold);
+    }
+  `;
 
   @property({ type: String })
   name = 'World';
@@ -65,14 +63,14 @@ declare global {
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 ```
 
 - `LitElement` is the base class all HELiX components extend.
 - `html` is a tagged template literal that produces Lit's efficient template result.
 - `css` is a tagged template literal for component-scoped styles.
 - `customElement` and `property` are decorators that handle registration and reactivity.
-- `tokenStyles` injects all HELiX design tokens as CSS custom properties — always include this first in the styles array.
+
+HELiX design tokens (`--hx-*`) are adopted at the document level when `@helixui/library` is imported. No per-component token import is needed — `var(--hx-*)` works in any HELiX shadow root automatically.
 
 ### The `@customElement` Decorator
 
@@ -90,19 +88,16 @@ HELiX naming conventions:
 ### Static Styles
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    :host {
-      display: block;
-    }
-  `,
-];
+static override styles = css`
+  :host {
+    display: block;
+  }
+`;
 ```
 
-`static override styles` accepts an array of `CSSResult` values. The `override` keyword is required because `LitElement` declares this property on the base class.
+`static override styles` accepts a `CSSResult` or an array of `CSSResult` values. The `override` keyword is required because `LitElement` declares this property on the base class.
 
-`tokenStyles` must always be first so token values are available in subsequent CSS rules. Styles are scoped to the component's shadow DOM — they do not leak out or in.
+Styles are scoped to the component's shadow DOM — they do not leak out or in. Token values (`--hx-*`) are always available because `@helixui/library` adopts them at the document level; CSS custom properties cascade through Shadow DOM boundaries automatically.
 
 ### Reactive Properties
 

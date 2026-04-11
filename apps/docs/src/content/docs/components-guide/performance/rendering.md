@@ -32,7 +32,6 @@ The `repeat` directive uses a key function to associate rendered nodes with thei
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 interface Task {
   id: string;
@@ -42,7 +41,6 @@ interface Task {
 
 @customElement('hx-task-list')
 export class HelixTaskList extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ attribute: false })
   tasks: Task[] = [];
@@ -109,11 +107,9 @@ The `guard` directive takes a list of dependencies and a template factory. It on
 import { guard } from 'lit/directives/guard.js';
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-expensive-chart')
 export class HelixExpensiveChart extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ attribute: false })
   data: number[] = [];
@@ -176,7 +172,6 @@ import { cache } from 'lit/directives/cache.js';
 
 @customElement('hx-view-switcher')
 export class HelixViewSwitcher extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   view: 'list' | 'grid' = 'list';
@@ -202,7 +197,6 @@ Move derived values to `willUpdate()` so they only recompute when relevant prope
 ```typescript
 @customElement('hx-data-summary')
 export class HelixDataSummary extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ attribute: false })
   items: number[] = [];

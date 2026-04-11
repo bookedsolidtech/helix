@@ -43,7 +43,6 @@ Every interactive or visually significant shadow DOM element in HELiX has a `par
 ```typescript
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   label = '';
@@ -157,7 +156,6 @@ When a component contains another shadow DOM component internally, its sub-compo
 ```typescript
 @customElement('hx-combobox')
 export class HelixCombobox extends LitElement {
-  static override styles = [tokenStyles];
 
   override render() {
     return html`

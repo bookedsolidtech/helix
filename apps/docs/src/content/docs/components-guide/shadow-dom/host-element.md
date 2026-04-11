@@ -11,7 +11,6 @@ The shadow host is the custom element itself — `<hx-button>`, `<hx-card>`, etc
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     /* Every custom element is display:inline by default */
     /* Most HELiX block components override to display:block */
@@ -27,7 +26,6 @@ static override styles = [
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     /* Block-level component */
     :host {
@@ -69,7 +67,6 @@ Pass an attribute selector to `:host()` to apply styles conditionally based on t
 @customElement('hx-alert')
 export class HelixAlert extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: flex;
@@ -165,7 +162,6 @@ HELiX convention: reflect all properties that are used in `:host([attr])` CSS se
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     :host {
       --_bg: var(--hx-color-white);
@@ -262,7 +258,6 @@ Set dimensions on `:host`, not on the first internal div:
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     /* Correct: size the host */
     :host {

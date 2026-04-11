@@ -14,11 +14,9 @@ Reactive properties are the foundation of Lit's rendering model. When a reactive
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-badge')
 export class HelixBadge extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   variant: 'default' | 'success' | 'warning' | 'error' = 'default';
@@ -60,11 +58,9 @@ Usage:
 ```typescript
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-disclosure')
 export class HelixDisclosure extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   label = '';
@@ -217,7 +213,6 @@ Object and array properties are compared by reference. Lit has no way to deep-co
 ```typescript
 @customElement('hx-list')
 export class HelixList extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Array })
   items: string[] = [];

@@ -12,11 +12,10 @@ Use the `CustomEvent` constructor and dispatch it with `this.dispatchEvent()`:
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-counter')
 export class HelixCounter extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   @property({ type: Number }) value = 0;
 

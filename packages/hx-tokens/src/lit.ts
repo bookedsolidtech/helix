@@ -1,7 +1,17 @@
 import { css } from 'lit';
 import { tokenEntries, darkTokenEntries, highContrastTokenEntries } from './index.js';
 
-/** Lit CSSResult with all light-mode tokens as :host custom properties (Shadow DOM compatible) */
+/**
+ * Lit CSSResult with all light-mode tokens as `:host` custom properties.
+ *
+ * @deprecated Since `@helixui/library@2.1.0`. Tokens are now adopted at the
+ * document level via `document.adoptedStyleSheets` and cascade through Shadow DOM
+ * via CSS inheritance. You no longer need to include `tokenStyles` in component
+ * `static styles`. This export remains for edge cases (isolated test fixtures,
+ * iframe contexts) but should not be used in production components.
+ *
+ * @see ensureDocumentTokens in `@helixui/library`
+ */
 export const tokenStyles = css([
   `:host {\n${tokenEntries.map((t) => `  ${t.name}: ${t.value};`).join('\n')}\n}`,
 ] as unknown as TemplateStringsArray);

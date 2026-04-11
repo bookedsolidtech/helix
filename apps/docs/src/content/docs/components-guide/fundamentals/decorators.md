@@ -48,7 +48,6 @@ Declares a reactive public property that:
 ```typescript
 @customElement('hx-avatar')
 export class HelixAvatar extends LitElement {
-  static override styles = [tokenStyles];
 
   // String property — attribute name: "src"
   @property({ type: String })
@@ -97,7 +96,6 @@ Declares reactive private state. Like `@property`, it triggers re-renders when t
 ```typescript
 @customElement('hx-password-input')
 export class HelixPasswordInput extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   label = 'Password';
@@ -139,7 +137,6 @@ import { query } from 'lit/decorators.js';
 
 @customElement('hx-search')
 export class HelixSearch extends LitElement {
-  static override styles = [tokenStyles];
 
   // Queries this.shadowRoot.querySelector('input')
   @query('input')
@@ -187,7 +184,6 @@ import { queryAll } from 'lit/decorators.js';
 
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends LitElement {
-  static override styles = [tokenStyles];
 
   @queryAll('input[type="radio"]')
   private _radios!: NodeListOf<HTMLInputElement>;
@@ -220,7 +216,6 @@ import { queryAssignedElements } from 'lit/decorators.js';
 
 @customElement('hx-action-bar')
 export class HelixActionBar extends LitElement {
-  static override styles = [tokenStyles];
 
   // Elements assigned to the default slot
   @queryAssignedElements()
@@ -268,7 +263,6 @@ import { eventOptions } from 'lit/decorators.js';
 
 @customElement('hx-scroll-container')
 export class HelixScrollContainer extends LitElement {
-  static override styles = [tokenStyles];
 
   // Passive listener — improves scroll performance
   @eventOptions({ passive: true })

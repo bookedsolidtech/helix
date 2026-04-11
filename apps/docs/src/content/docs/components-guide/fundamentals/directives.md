@@ -15,11 +15,10 @@ Efficiently applies conditional CSS classes from an object. Keys are class names
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-button')
 export class HelixButton extends LitElement {
-  static override styles = [tokenStyles, css`...`];
+  static override styles = [css`...`];
 
   @property({ type: String })
   variant: 'primary' | 'secondary' | 'ghost' = 'primary';
@@ -65,7 +64,6 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 @customElement('hx-skeleton')
 export class HelixSkeleton extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Number })
   width = 0;
@@ -101,7 +99,6 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   label = '';
@@ -142,7 +139,6 @@ import { live } from 'lit/directives/live.js';
 
 @customElement('hx-controlled-input')
 export class HelixControlledInput extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   value = '';
@@ -188,7 +184,6 @@ interface ListItem {
 
 @customElement('hx-list-box')
 export class HelixListBox extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Array })
   items: ListItem[] = [];
@@ -235,7 +230,6 @@ import { when } from 'lit/directives/when.js';
 
 @customElement('hx-async-content')
 export class HelixAsyncContent extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: Boolean })
   loading = false;
@@ -274,7 +268,6 @@ import { cache } from 'lit/directives/cache.js';
 
 @customElement('hx-tabs')
 export class HelixTabs extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   activeTab = 'overview';

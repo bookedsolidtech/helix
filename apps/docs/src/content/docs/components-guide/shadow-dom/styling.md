@@ -42,19 +42,16 @@ HELiX design tokens are all CSS custom properties. Because they are set on `:roo
 }
 ```
 
-Inside the shadow root, these resolve correctly:
+Inside the shadow root, these resolve correctly. As of `@helixui/library@2.1.0`, tokens are adopted at the document level automatically — no per-component token import is needed:
 
 ```typescript
-static override styles = [
-  tokenStyles, // makes all --hx-* tokens available
-  css`
-    .button {
-      background: var(--hx-color-primary-500); /* resolves to #2563eb */
-      padding: var(--hx-spacing-md);           /* resolves to 1rem */
-      font-family: var(--hx-font-family-base); /* resolves to 'Inter', sans-serif */
-    }
-  `,
-];
+static override styles = css`
+  .button {
+    background: var(--hx-color-primary-500); /* resolves to #2563eb */
+    padding: var(--hx-spacing-md);           /* resolves to 1rem */
+    font-family: var(--hx-font-family-base); /* resolves to 'Inter', sans-serif */
+  }
+`;
 ```
 
 ### Component-Level Token Overrides
@@ -78,23 +75,20 @@ hx-button.cta-button {
 These override values are picked up by the shadow DOM because custom properties cascade and inherit normally:
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    :host {
-      /* Define with token fallback */
-      --hx-button-bg: var(--hx-color-primary-500);
-      --hx-button-bg-hover: var(--hx-color-primary-600);
-    }
+static override styles = css`
+  :host {
+    /* Define with token fallback */
+    --hx-button-bg: var(--hx-color-primary-500);
+    --hx-button-bg-hover: var(--hx-color-primary-600);
+  }
 
-    .button {
-      background: var(--hx-button-bg);
-    }
-    .button:hover {
-      background: var(--hx-button-bg-hover);
-    }
-  `,
-];
+  .button {
+    background: var(--hx-button-bg);
+  }
+  .button:hover {
+    background: var(--hx-button-bg-hover);
+  }
+`;
 ```
 
 ## Inherited CSS Properties
@@ -132,38 +126,35 @@ Non-inherited properties (background, border, padding, margin, etc.) do **not** 
 ```typescript
 @customElement('hx-list')
 export class HelixList extends LitElement {
-  static override styles = [
-    tokenStyles,
-    css`
-      :host {
-        display: block;
-      }
+  static override styles = css`
+    :host {
+      display: block;
+    }
 
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-      /* Style direct slotted children */
-      ::slotted(li) {
-        padding: var(--hx-spacing-xs) var(--hx-spacing-sm);
-        border-bottom: 1px solid var(--hx-color-neutral-100);
-      }
+    /* Style direct slotted children */
+    ::slotted(li) {
+      padding: var(--hx-spacing-xs) var(--hx-spacing-sm);
+      border-bottom: 1px solid var(--hx-color-neutral-100);
+    }
 
-      /* Style a specific type of slotted element */
-      ::slotted(hx-list-item) {
-        display: flex;
-        align-items: center;
-      }
+    /* Style a specific type of slotted element */
+    ::slotted(hx-list-item) {
+      display: flex;
+      align-items: center;
+    }
 
-      /* Style slotted elements with an attribute */
-      ::slotted([selected]) {
-        background: var(--hx-color-primary-50);
-        color: var(--hx-color-primary-700);
-      }
-    `,
-  ];
+    /* Style slotted elements with an attribute */
+    ::slotted([selected]) {
+      background: var(--hx-color-primary-50);
+      color: var(--hx-color-primary-700);
+    }
+  `;
 
   override render() {
     return html`<ul><slot></slot></ul>`;
@@ -270,15 +261,19 @@ hx-list::slotted(li.priority) {
 
 ## Adopted Stylesheets
 
-`@helixui/adopted-stylesheets` applies HELiX token styles using the Constructable Stylesheets API, which makes tokens available inside shadow roots without requiring `tokenStyles` on every component. This is the default pattern in HELiX:
+As of `@helixui/library@2.1.0`, the adopted stylesheets pattern is the **default architecture**. Importing `@helixui/library` automatically adds the full `--hx-*` token set to `document.adoptedStyleSheets`. CSS custom properties cascade through Shadow DOM boundaries, so every component immediately has access to all tokens — no per-component `tokenStyles` import or `static override styles` entry is required.
 
 ```typescript
-import '@helixui/adopted-stylesheets'; // Apply once at app entry point
+import '@helixui/library'; // tokens are adopted at document level on import
 ```
 
-After this, all HELiX shadow roots receive token styles automatically. Even so, HELiX component source always includes `tokenStyles` in `static override styles` as a defense-in-depth fallback.
+For application-wide global styles (resets, typography base, brand overrides), use `@helixui/adopted-stylesheets`:
 
-See [Adopted Stylesheets](/guides/adopted-stylesheets/) for full setup.
+```typescript
+import '@helixui/adopted-stylesheets';
+```
+
+See [Adopted Stylesheets](/components-guide/styling/adopted-stylesheets/) for full setup.
 
 ## Next Steps
 

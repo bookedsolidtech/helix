@@ -51,13 +51,12 @@ export const helixBus = new HelixBus();
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixBus } from '../bus/helix-bus.js';
 
 // Publisher component — emits filter changes
 @customElement('hx-filter-bar')
 export class HelixFilterBar extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   private _applyFilters(filters: Record<string, string>) {
     helixBus.emit('hx-filter-change', { filters });
@@ -80,7 +79,7 @@ export class HelixFilterBar extends LitElement {
 // Subscriber component — reacts to filter changes
 @customElement('hx-data-table')
 export class HelixDataTable extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   @state() private _filters: Record<string, string> = {};
 

@@ -35,29 +35,29 @@ All tokens follow the pattern `--hx-{category}-{scale}`:
 
 Scale values use t-shirt sizes (`xs`, `sm`, `md`, `lg`, `xl`, `2xl`) or numeric steps (`100`–`900`) depending on the category. Color palettes use numeric steps; spacing, typography, border, shadow, and motion use t-shirt sizes.
 
-## Importing Token Styles
+## How Tokens Are Made Available
 
-The `@helixui/tokens` package ships a Lit-compatible export that returns a `CSSResult` containing all tokens as CSS custom properties on `:root`.
+As of `@helixui/library@2.1.0`, design tokens are adopted at the **document level** automatically. When you import anything from `@helixui/library`, the full `--hx-*` token set is added to `document.adoptedStyleSheets` on `:root`. CSS custom properties inherit through Shadow DOM boundaries, so every component can use `var(--hx-*)` without any per-component setup.
 
 ```typescript
+// Tokens cascade automatically — no import needed in your component
+import '@helixui/library'; // or any individual component import
+
+// Your component just uses the tokens
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-card')
 export class HelixCard extends LitElement {
-  static override styles = [
-    tokenStyles,
-    css`
-      :host {
-        display: block;
-        padding: var(--hx-spacing-lg);
-        border-radius: var(--hx-border-radius-md);
-        box-shadow: var(--hx-shadow-sm);
-        font-family: var(--hx-font-family-sans);
-      }
-    `,
-  ];
+  static override styles = css`
+    :host {
+      display: block;
+      padding: var(--hx-spacing-lg);
+      border-radius: var(--hx-border-radius-md);
+      box-shadow: var(--hx-shadow-sm);
+      font-family: var(--hx-font-family-sans);
+    }
+  `;
 
   override render() {
     return html`<slot></slot>`;
@@ -65,52 +65,50 @@ export class HelixCard extends LitElement {
 }
 ```
 
-## Styles Array Order
+### Deprecated: `tokenStyles` from `@helixui/tokens/lit`
 
-`tokenStyles` must always be the **first** entry in the `styles` array. Subsequent `css` blocks can then reference any token with `var()`.
+Prior to `@helixui/library@2.1.0`, components were required to import `tokenStyles` and include it as the first entry in `static override styles`:
 
 ```typescript
-// Correct — tokenStyles first
-static override styles = [tokenStyles, css`...`];
+// Deprecated — do not use in new components
+import { tokenStyles } from '@helixui/tokens/lit';
 
-// Wrong — tokens not yet defined when component CSS runs
-static override styles = [css`...`, tokenStyles];
+static override styles = [tokenStyles, css`...`];
 ```
+
+`tokenStyles` and `mergeTokenStyles()` are still exported for backwards compatibility but should not appear in new component code. Remove them when you audit existing components — they are dead weight now that tokens are adopted at the document level.
 
 ## Using Tokens in Component CSS
 
 Reference tokens with `var(--hx-{token})` anywhere in your component stylesheet:
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    :host {
-      display: block;
-      font-family: var(--hx-font-family-sans);
-      font-size: var(--hx-font-size-base);
-      line-height: var(--hx-line-height-normal);
-    }
+static override styles = css`
+  :host {
+    display: block;
+    font-family: var(--hx-font-family-sans);
+    font-size: var(--hx-font-size-base);
+    line-height: var(--hx-line-height-normal);
+  }
 
-    .title {
-      font-size: var(--hx-font-size-xl);
-      font-weight: var(--hx-font-weight-semibold);
-      color: var(--hx-color-neutral-900);
-    }
+  .title {
+    font-size: var(--hx-font-size-xl);
+    font-weight: var(--hx-font-weight-semibold);
+    color: var(--hx-color-neutral-900);
+  }
 
-    .badge {
-      background: var(--hx-color-primary-500);
-      color: var(--hx-color-primary-50);
-      padding: var(--hx-spacing-xs) var(--hx-spacing-sm);
-      border-radius: var(--hx-border-radius-full);
-    }
+  .badge {
+    background: var(--hx-color-primary-500);
+    color: var(--hx-color-primary-50);
+    padding: var(--hx-spacing-xs) var(--hx-spacing-sm);
+    border-radius: var(--hx-border-radius-full);
+  }
 
-    .divider {
-      border-top: var(--hx-border-width-sm) solid var(--hx-color-neutral-200);
-      margin: var(--hx-spacing-md) 0;
-    }
-  `,
-];
+  .divider {
+    border-top: var(--hx-border-width-sm) solid var(--hx-color-neutral-200);
+    margin: var(--hx-spacing-md) 0;
+  }
+`;
 ```
 
 ## Tokens vs Hard-Coded Values

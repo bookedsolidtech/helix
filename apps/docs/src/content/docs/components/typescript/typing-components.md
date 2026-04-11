@@ -582,11 +582,10 @@ export class HelixButton extends LitElement {
 
 ```typescript
 import { CSSResultGroup } from 'lit';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixButtonStyles } from './hx-button.styles.js';
 
 export class HelixButton extends LitElement {
-  static override styles: CSSResultGroup = [tokenStyles, helixButtonStyles];
+  static override styles: CSSResultGroup = helixButtonStyles;
 }
 ```
 

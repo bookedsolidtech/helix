@@ -78,7 +78,6 @@ The `:invalid` CSS pseudo-class is applied to the host element automatically whe
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     :host {
       display: block;
@@ -172,7 +171,6 @@ For server-side checks (username uniqueness, coupon code validation), run async 
 ```typescript
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-username-input')
 export class HelixUsernameInput extends LitElement {

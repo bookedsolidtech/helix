@@ -26,11 +26,9 @@ For components inside a Lit template, conditionally import when needed:
 ```typescript
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-settings-page')
 export class HelixSettingsPage extends LitElement {
-  static override styles = [tokenStyles];
 
   @state()
   private _showAdvanced: boolean = false;
@@ -94,11 +92,9 @@ Load components only when they scroll into view. This is ideal for components be
 ```typescript
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-lazy-section')
 export class HelixLazySection extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ type: String })
   component: string = '';

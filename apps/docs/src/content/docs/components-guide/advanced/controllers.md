@@ -66,13 +66,10 @@ Usage in a component:
 ```typescript
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { MouseTrackController } from './mouse-track-controller.js';
 
 @customElement('hx-cursor-display')
 export class HelixCursorDisplay extends LitElement {
-  static override styles = [tokenStyles];
-
   private _mouse = new MouseTrackController(this);
 
   override render(): TemplateResult {
@@ -160,19 +157,15 @@ Usage:
 ```typescript
 import { LitElement, html, css, type TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { ResizeController } from './resize-controller.js';
 
 @customElement('hx-responsive-container')
 export class HelixResponsiveContainer extends LitElement {
-  static override styles = [
-    tokenStyles,
-    css`
-      :host { display: block; }
-      .compact { font-size: var(--hx-font-size-sm); }
-      .spacious { font-size: var(--hx-font-size-base); }
-    `,
-  ];
+  static override styles = css`
+    :host { display: block; }
+    .compact { font-size: var(--hx-font-size-sm); }
+    .spacious { font-size: var(--hx-font-size-base); }
+  `;
 
   private _resize = new ResizeController(this);
 
@@ -215,8 +208,6 @@ Controllers compose without conflict. Each registers independently and runs its 
 ```typescript
 @customElement('hx-data-chart')
 export class HelixDataChart extends LitElement {
-  static override styles = [tokenStyles];
-
   // Two independent controllers — no coupling between them
   private _resize = new ResizeController(this);
   private _intersection = new IntersectionController(this, 0.25);

@@ -402,55 +402,28 @@ Constructable Stylesheets are 25× faster than per-component updates, though sli
 
 Constructable Stylesheets enable sophisticated style-sharing patterns that reduce duplication and enforce consistency.
 
-### Pattern 1: Shared Token Stylesheet
+### Pattern 1: Document-Level Token Adoption
 
-HELiX components share a base token stylesheet that defines all design tokens:
+As of `@helixui/library@2.1.0`, design tokens are adopted at the document level automatically. When the library barrel imports, the full `--hx-*` token set is added to `document.adoptedStyleSheets` on `:root`. CSS custom properties cascade through Shadow DOM boundaries, so every component has access to all tokens with no per-component setup.
 
 ```typescript
-// packages/hx-library/src/styles/tokens.ts
-import { css } from 'lit';
+// main.ts — tokens are adopted when @helixui/library is imported
+import '@helixui/library';
 
-export const tokenStyles = css`
-  :host {
-    /* Colors */
-    --hx-color-primary-500: #007878;
-    --hx-color-neutral-0: #ffffff;
-    --hx-color-neutral-800: #212529;
-    --hx-color-error-500: #dc3545;
-
-    /* Spacing */
-    --hx-space-1: 0.25rem;
-    --hx-space-2: 0.5rem;
-    --hx-space-4: 1rem;
-    --hx-space-6: 1.5rem;
-
-    /* Typography */
-    --hx-font-family-sans: system-ui, sans-serif;
-    --hx-font-weight-semibold: 600;
-    --hx-line-height-tight: 1.25;
-
-    /* Borders */
-    --hx-border-radius-md: 0.375rem;
-    --hx-border-radius-lg: 0.5rem;
-
-    /* Transitions */
-    --hx-transition-fast: 150ms ease;
-  }
-`;
+// No tokenStyles needed in component files
 ```
 
-Every component adopts this shared stylesheet:
+Components simply use `var(--hx-*)` directly in their styles:
 
 ```typescript
 // packages/hx-library/src/components/hx-button/hx-button.ts
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '../../styles/tokens.js';
 import { wcButtonStyles } from './hx-button.styles.js';
 
 @customElement('hx-button')
 export class HxButton extends LitElement {
-  static override styles = [tokenStyles, wcButtonStyles];
+  static override styles = wcButtonStyles;
 
   render() {
     return html`<button><slot></slot></button>`;
@@ -460,10 +433,12 @@ export class HxButton extends LitElement {
 
 **Benefits:**
 
-- **Single source of truth** — Tokens defined once, available everywhere
-- **Zero overhead** — `tokenStyles` parsed once, shared across all component types
-- **Instant updates** — Modifying `tokenStyles` updates every component
+- **Single adoption point** — Tokens defined once at the document level, available everywhere
+- **Zero per-component overhead** — No `tokenStyles` in every component's `static override styles`
+- **Instant updates** — Modifying the document-level token sheet updates every component
 - **Consistency** — All components use the same token values
+
+> **Deprecated pattern:** Prior to `@helixui/library@2.1.0`, each component was required to include `tokenStyles` from `@helixui/tokens/lit` as the first entry in `static override styles`. That import and the `mergeTokenStyles()` utility are still exported for backwards compatibility but should not be used in new code.
 
 ### Pattern 2: Component-Specific Stylesheets
 
@@ -528,14 +503,13 @@ export const focusRingStyles = css`
 Components adopt shared utilities:
 
 ```typescript
-import { tokenStyles } from '../../styles/tokens.js';
 import { focusRingStyles } from '../../styles/focus-ring.js';
 import { wcButtonStyles } from './hx-button.styles.js';
 
-static override styles = [tokenStyles, focusRingStyles, wcButtonStyles];
+static override styles = [focusRingStyles, wcButtonStyles];
 ```
 
-**Result:** Focus ring styles defined once, shared across buttons, cards, inputs, and any focusable component. Changes to `focusRingStyles` update all adopting components instantly.
+**Result:** Focus ring styles defined once, shared across buttons, cards, inputs, and any focusable component. Changes to `focusRingStyles` update all adopting components instantly. Token styles are already present via document-level adoption.
 
 ---
 
@@ -755,12 +729,12 @@ Lit components define styles using the static `styles` property:
 ```typescript
 import { LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '../../styles/tokens.js';
 import { wcCardStyles } from './hx-card.styles.js';
 
+// No tokenStyles import — tokens cascade from document.adoptedStyleSheets
 @customElement('hx-card')
 export class HxCard extends LitElement {
-  static override styles = [tokenStyles, wcCardStyles];
+  static override styles = wcCardStyles;
 }
 ```
 
@@ -824,7 +798,7 @@ All public CSS custom properties are documented via JSDoc:
  */
 @customElement('hx-button')
 export class HxButton extends LitElement {
-  static override styles = [tokenStyles, wcButtonStyles];
+  static override styles = wcButtonStyles;
 }
 ```
 

@@ -12,12 +12,10 @@ Add the `part` attribute to any element in the shadow template that consumers ma
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-input')
 export class HelixInput extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: block;

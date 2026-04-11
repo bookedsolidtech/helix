@@ -795,7 +795,7 @@ The CEM is consumed by:
  */
 @customElement('hx-button')
 export class HelixButton extends LitElement {
-  static override styles = [tokenStyles, helixButtonStyles];
+  static override styles = helixButtonStyles;
 
   /**
    * Visual style variant of the button.
@@ -894,7 +894,7 @@ export class HelixButton extends LitElement {
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends LitElement {
-  static override styles = [tokenStyles, helixTextInputStyles];
+  static override styles = helixTextInputStyles;
   static formAssociated = true;
 
   private _internals: ElementInternals;
@@ -1005,7 +1005,7 @@ export class HelixTextInput extends LitElement {
  */
 @customElement('hx-card')
 export class HelixCard extends LitElement {
-  static override styles = [tokenStyles, helixCardStyles];
+  static override styles = helixCardStyles;
 
   /**
    * Visual style variant of the card.

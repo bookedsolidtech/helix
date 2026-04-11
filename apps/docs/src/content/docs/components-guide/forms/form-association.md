@@ -162,14 +162,12 @@ The `mode` argument tells you why the restore is happening:
 ```typescript
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-checkbox')
 export class HelixCheckbox extends LitElement {
   static override formAssociated = true;
 
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: inline-flex;

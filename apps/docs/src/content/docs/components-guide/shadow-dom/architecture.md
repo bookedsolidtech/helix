@@ -104,13 +104,10 @@ Shadow DOM solves it architecturally:
 The reverse is also true: styles inside a shadow root do not leak out and affect the host document.
 
 ```typescript
-static override styles = [
-  tokenStyles,
-  css`
-    /* This rule CANNOT affect anything outside hx-button */
-    p { color: var(--hx-color-text-primary); }
-  `,
-];
+static override styles = css`
+  /* This rule CANNOT affect anything outside hx-button */
+  p { color: var(--hx-color-text-primary); }
+`;
 ```
 
 ## What Does and Does Not Pierce Shadow DOM

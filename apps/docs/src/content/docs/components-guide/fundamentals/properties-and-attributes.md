@@ -91,7 +91,6 @@ With reflection, `:host([disabled])` CSS rules activate when the property is set
 
 ```typescript
 static override styles = [
-  tokenStyles,
   css`
     :host([disabled]) {
       opacity: 0.5;
@@ -176,7 +175,6 @@ const csvConverter = {
 
 @customElement('hx-tag-input')
 export class HelixTagInput extends LitElement {
-  static override styles = [tokenStyles];
 
   @property({ converter: csvConverter, reflect: true })
   tags: string[] = [];

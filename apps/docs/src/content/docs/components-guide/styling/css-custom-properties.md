@@ -14,12 +14,10 @@ The pattern: the component reads `var(--hx-{component}-{property}, fallback)`. C
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-chip')
 export class HelixChip extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: inline-flex;

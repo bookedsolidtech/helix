@@ -42,7 +42,6 @@ Use `implements` to bind the interface to the component class. TypeScript will e
 ```typescript
 import { LitElement, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import type { HelixButtonInterface } from './hx-button.types.js';
 
@@ -51,7 +50,6 @@ export class HelixButton
   extends mixinDelegatesAria(LitElement)
   implements HelixButtonInterface
 {
-  static override styles = [tokenStyles];
 
   @property({ type: String, reflect: true })
   variant: HelixButtonInterface['variant'] = 'primary';

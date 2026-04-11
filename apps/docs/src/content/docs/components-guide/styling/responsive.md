@@ -16,12 +16,10 @@ Establish a containment context on the host element or an internal wrapper:
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-media-card')
 export class HelixMediaCard extends LitElement {
   static override styles = [
-    tokenStyles,
     css`
       :host {
         display: block;
@@ -107,11 +105,10 @@ Sometimes CSS alone is not enough — you may need to conditionally render diffe
 ```typescript
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 
 @customElement('hx-data-table')
 export class HelixDataTable extends LitElement {
-  static override styles = [tokenStyles, css`:host { display: block; }`];
+  static override styles = css`:host { display: block; }`;
 
   @state() private _compact = false;
 
