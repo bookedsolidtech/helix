@@ -22,14 +22,15 @@
  * import '../utilities/document-token-adoption.js';
  * ```
  */
-import { tokenEntries } from '@helixui/tokens';
+import { lightTokenCss } from '@helixui/tokens';
 
-const MARKER = '__hx_tokens_adopted__';
+/** Cross-bundle marker — Symbol.for ensures all copies share the same key */
+const MARKER = Symbol.for('hx-tokens-adopted');
 
 /**
  * Adopts the full set of HELiX design tokens into `document.adoptedStyleSheets`.
  * Safe to call multiple times — only the first invocation has any effect.
- * Uses a document-level marker to survive multiple bundled copies of the library.
+ * Uses a document-level Symbol marker to survive multiple bundled copies of the library.
  *
  * The tokens are declared on `:root` so they participate in CSS inheritance
  * and can be overridden by `hx-theme` (which declares on its `:host`).
@@ -43,15 +44,23 @@ export function ensureDocumentTokens(): void {
     return;
   }
 
-  if ((document as unknown as Record<string, unknown>)[MARKER]) return;
+  if ((document as unknown as Record<symbol, unknown>)[MARKER]) return;
 
-  const cssText = `:root {\n${tokenEntries.map((t) => `  ${t.name}: ${t.value};`).join('\n')}\n}`;
+  // Set marker BEFORE work to prevent TOCTOU race with concurrent calls (B1)
+  (document as unknown as Record<symbol, unknown>)[MARKER] = MARKER;
 
-  const sheet = new CSSStyleSheet();
-  sheet.replaceSync(cssText);
+  try {
+    const cssText = `:root {\n${lightTokenCss}\n}`;
 
-  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
-  (document as unknown as Record<string, unknown>)[MARKER] = true;
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(cssText);
+
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+  } catch (e: unknown) {
+    // Graceful degradation — tokens will cascade via component-level styles
+    // if adopted stylesheets fail (e.g., frozen adoptedStyleSheets array)
+    console.warn('[HELiX] Could not adopt document-level token styles:', e);
+  }
 }
 
 // Auto-execute on module load so that importing this module is sufficient.

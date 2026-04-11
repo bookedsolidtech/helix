@@ -6,10 +6,15 @@ import { tokenEntries } from '@helixui/tokens';
  *
  * IMPORTANT: The module auto-executes `ensureDocumentTokens()` on import,
  * so the first import in each test file will trigger adoption immediately.
- * We import only the named export and reset state between tests.
+ *
+ * NOTE on module caching (N1): Vitest browser mode does not support
+ * `vi.resetModules()`, so the auto-execute path is only tested on
+ * first import. Manual calls via `ensureDocumentTokens()` are tested
+ * explicitly below with marker resets between tests.
  */
 
-const MARKER = '__hx_tokens_adopted__';
+/** Cross-bundle marker — must match the Symbol.for key used in the implementation */
+const MARKER = Symbol.for('hx-tokens-adopted');
 
 /** Snapshot of adoptedStyleSheets length before any test-added sheets */
 let baseAdoptedCount: number;
@@ -19,7 +24,9 @@ let baseAdoptedCount: number;
  * so each test starts with a clean slate.
  */
 function cleanup(): void {
-  (document as unknown as Record<string, unknown>)[MARKER] = undefined;
+  // Delete the symbol-keyed marker
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  delete (document as unknown as Record<symbol, unknown>)[MARKER];
   document.adoptedStyleSheets = [];
 }
 
@@ -90,28 +97,28 @@ describe('document-token-adoption', () => {
   });
 
   describe('document marker', () => {
-    it('sets the marker on document after first call', async () => {
+    it('sets the Symbol marker on document after first call', async () => {
       const ensureDocumentTokens = await getEnsureDocumentTokens();
       ensureDocumentTokens();
 
-      const markerValue = (document as unknown as Record<string, unknown>)[MARKER];
-      expect(markerValue).toBe(true);
+      const markerValue = (document as unknown as Record<symbol, unknown>)[MARKER];
+      expect(markerValue).toBeTruthy();
     });
 
     it('does not set the marker before ensureDocumentTokens is called', () => {
       // After cleanup, marker should be absent
-      const markerValue = (document as unknown as Record<string, unknown>)[MARKER];
+      const markerValue = (document as unknown as Record<symbol, unknown>)[MARKER];
       expect(markerValue).toBeUndefined();
     });
 
-    it('marker persists as true after multiple calls', async () => {
+    it('marker persists as truthy after multiple calls', async () => {
       const ensureDocumentTokens = await getEnsureDocumentTokens();
       ensureDocumentTokens();
       ensureDocumentTokens();
       ensureDocumentTokens();
 
-      const markerValue = (document as unknown as Record<string, unknown>)[MARKER];
-      expect(markerValue).toBe(true);
+      const markerValue = (document as unknown as Record<symbol, unknown>)[MARKER];
+      expect(markerValue).toBeTruthy();
     });
   });
 
@@ -228,7 +235,8 @@ describe('document-token-adoption', () => {
       expect(document.adoptedStyleSheets.length).toBe(baseAdoptedCount + 1);
 
       // Simulate a fresh state (e.g., multiple bundles clearing each other)
-      (document as unknown as Record<string, unknown>)[MARKER] = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete (document as unknown as Record<symbol, unknown>)[MARKER];
       document.adoptedStyleSheets = [];
 
       ensureDocumentTokens();
