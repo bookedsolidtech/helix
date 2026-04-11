@@ -1,5 +1,11 @@
 # @helixui/library
 
+## 2.1.1
+
+### Patch Changes
+
+- 928975d: ci: add workflow_dispatch trigger to publish pipeline
+
 ## 2.1.0
 
 ### Minor Changes
