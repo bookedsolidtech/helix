@@ -102,11 +102,10 @@ describe('document-token-adoption', () => {
       ensureDocumentTokens();
 
       const markerValue = (document as unknown as Record<symbol, unknown>)[MARKER];
-      expect(markerValue).toBeTruthy();
+      expect(markerValue).toBe(MARKER);
     });
 
     it('does not set the marker before ensureDocumentTokens is called', () => {
-      // After cleanup, marker should be absent
       const markerValue = (document as unknown as Record<symbol, unknown>)[MARKER];
       expect(markerValue).toBeUndefined();
     });
@@ -118,7 +117,7 @@ describe('document-token-adoption', () => {
       ensureDocumentTokens();
 
       const markerValue = (document as unknown as Record<symbol, unknown>)[MARKER];
-      expect(markerValue).toBeTruthy();
+      expect(markerValue).toBe(MARKER);
     });
   });
 
@@ -142,10 +141,10 @@ describe('document-token-adoption', () => {
       const sheet = document.adoptedStyleSheets[document.adoptedStyleSheets.length - 1];
       const rootRule = Array.from(sheet.cssRules).find(
         (r) => r instanceof CSSStyleRule && r.selectorText === ':root',
-      ) as CSSStyleRule;
+      );
 
-      expect(rootRule).toBeTruthy();
-      const cssText = rootRule.cssText;
+      expect(rootRule).toBeInstanceOf(CSSStyleRule);
+      const cssText = (rootRule as CSSStyleRule).cssText;
       expect(cssText).toContain('--hx-');
     });
 
@@ -156,8 +155,9 @@ describe('document-token-adoption', () => {
       const sheet = document.adoptedStyleSheets[document.adoptedStyleSheets.length - 1];
       const rootRule = Array.from(sheet.cssRules).find(
         (r) => r instanceof CSSStyleRule && r.selectorText === ':root',
-      ) as CSSStyleRule;
-      const cssText = rootRule.cssText;
+      );
+      expect(rootRule).toBeInstanceOf(CSSStyleRule);
+      const cssText = (rootRule as CSSStyleRule).cssText;
 
       // Verify a sampling of tokens that should exist in any HELiX token set
       const sampleTokenNames = tokenEntries.slice(0, 3).map((t) => t.name);
@@ -175,8 +175,9 @@ describe('document-token-adoption', () => {
       const sheet = document.adoptedStyleSheets[document.adoptedStyleSheets.length - 1];
       const rootRule = Array.from(sheet.cssRules).find(
         (r) => r instanceof CSSStyleRule && r.selectorText === ':root',
-      ) as CSSStyleRule;
-      const cssText = rootRule.cssText;
+      );
+      expect(rootRule).toBeInstanceOf(CSSStyleRule);
+      const cssText = (rootRule as CSSStyleRule).cssText;
 
       // Every token entry name should appear in the stylesheet
       for (const entry of tokenEntries) {

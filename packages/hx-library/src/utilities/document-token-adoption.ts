@@ -44,10 +44,8 @@ export function ensureDocumentTokens(): void {
     return;
   }
 
-  if ((document as unknown as Record<symbol, unknown>)[MARKER]) return;
-
-  // Set marker BEFORE work to prevent TOCTOU race with concurrent calls (B1)
-  (document as unknown as Record<symbol, unknown>)[MARKER] = MARKER;
+  const doc = document as unknown as Record<symbol, unknown>;
+  if (doc[MARKER]) return;
 
   try {
     const cssText = `:root {\n${lightTokenCss}\n}`;
@@ -56,12 +54,10 @@ export function ensureDocumentTokens(): void {
     sheet.replaceSync(cssText);
 
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    doc[MARKER] = MARKER;
   } catch (e: unknown) {
-    // Graceful degradation — tokens will cascade via component-level styles
-    // if adopted stylesheets fail (e.g., frozen adoptedStyleSheets array)
     console.warn('[HELiX] Could not adopt document-level token styles:', e);
   }
 }
 
-// Auto-execute on module load so that importing this module is sufficient.
 ensureDocumentTokens();
