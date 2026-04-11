@@ -1,6 +1,6 @@
 {
   "name": "@helixui/mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for the HELiX UI component library — gives Claude Code and Cursor live access to components, tokens, and usage guidance",
   "type": "module",
   "bin": {
