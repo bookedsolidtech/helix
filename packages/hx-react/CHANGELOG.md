@@ -1,5 +1,12 @@
 # @helixui/react
 
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [ba1e9bf]
+  - @helixui/library@2.1.2
+
 ## 1.1.3
 
 ### Patch Changes
