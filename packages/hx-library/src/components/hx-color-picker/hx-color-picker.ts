@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixColorPickerStyles } from './hx-color-picker.styles.js';
 import {
   type ColorFormat,
@@ -74,7 +74,7 @@ export type { ColorFormat };
  */
 @customElement('hx-color-picker')
 export class HelixColorPicker extends LitElement {
-  static override styles = [tokenStyles, helixColorPickerStyles];
+  static override styles = [helixColorPickerStyles];
 
   /**
    * Declares this element as form-associated so it participates in native form submission.

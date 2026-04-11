@@ -1,8 +1,8 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSkeletonStyles } from './hx-skeleton.styles.js';
 
 /**
@@ -30,7 +30,7 @@ import { helixSkeletonStyles } from './hx-skeleton.styles.js';
  */
 @customElement('hx-skeleton')
 export class HelixSkeleton extends LitElement {
-  static override styles = [tokenStyles, helixSkeletonStyles];
+  static override styles = [helixSkeletonStyles];
 
   /**
    * Shape variant of the skeleton placeholder.

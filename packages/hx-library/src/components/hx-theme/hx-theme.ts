@@ -1,4 +1,5 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';

@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixCardStyles } from './hx-card.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -43,7 +43,7 @@ export class HelixCard extends LitElement {
     delegatesFocus: true,
   };
 
-  static override styles = [tokenStyles, helixCardStyles];
+  static override styles = [helixCardStyles];
 
   /**
    * Visual style variant of the card.

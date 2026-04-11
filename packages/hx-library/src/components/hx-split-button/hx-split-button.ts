@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
@@ -45,7 +45,7 @@ let _hxSplitButtonIdCounter = 0;
  */
 @customElement('hx-split-button')
 export class HelixSplitButton extends LitElement {
-  static override styles = [tokenStyles, helixSplitButtonStyles];
+  static override styles = [helixSplitButtonStyles];
 
   // ─── Internal References ───
 

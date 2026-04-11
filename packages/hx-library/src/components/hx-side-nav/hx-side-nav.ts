@@ -1,6 +1,6 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
 /**
@@ -35,7 +35,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends LitElement {
-  static override styles = [tokenStyles, helixSideNavStyles];
+  static override styles = [helixSideNavStyles];
 
   // ─── Properties ───
 

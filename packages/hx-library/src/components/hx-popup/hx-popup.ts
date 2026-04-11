@@ -1,6 +1,6 @@
 import { LitElement, html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import {
   computePosition,
   flip as flipMiddleware,
@@ -135,7 +135,7 @@ type ArrowData = { x?: number; y?: number; centerOffset: number };
  */
 @customElement('hx-popup')
 export class HelixPopup extends LitElement {
-  static override styles = [tokenStyles, helixPopupStyles];
+  static override styles = [helixPopupStyles];
 
   /** @internal */
   private _anchorSlotEl: Element | null = null;

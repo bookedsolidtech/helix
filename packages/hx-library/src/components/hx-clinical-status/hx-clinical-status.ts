@@ -1,7 +1,7 @@
 import { html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement } from '../../base/index.js';
 import { createIdCounter } from '../../base/index.js';
 import { helixClinicalStatusStyles } from './hx-clinical-status.styles.js';
@@ -48,7 +48,7 @@ const nextId = createIdCounter('hx-clinical-status');
  */
 @customElement('hx-clinical-status')
 export class HelixClinicalStatus extends HelixElement {
-  static override styles = [tokenStyles, helixClinicalStatusStyles];
+  static override styles = [helixClinicalStatusStyles];
 
   // ─── Properties ───
 

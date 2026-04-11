@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -45,7 +45,7 @@ export type ActionBarSize = 'sm' | 'md' | 'lg';
  */
 @customElement('hx-action-bar')
 export class HelixActionBar extends LitElement {
-  static override styles = [tokenStyles, helixActionBarStyles];
+  static override styles = [helixActionBarStyles];
 
   /**
    * Size of the action bar — propagated as a data attribute to slotted children.

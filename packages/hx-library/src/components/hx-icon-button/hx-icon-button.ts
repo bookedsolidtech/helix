@@ -1,8 +1,8 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -32,7 +32,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-icon-button')
 export class HelixIconButton extends LitElement {
-  static override styles = [tokenStyles, helixIconButtonStyles];
+  static override styles = [helixIconButtonStyles];
 
   /**
    * Accessible name for the button. Required. Rendered as `aria-label` and

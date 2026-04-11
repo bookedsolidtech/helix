@@ -1,9 +1,9 @@
 import { html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -74,7 +74,7 @@ interface SelectOption {
  */
 @customElement('hx-select')
 export class HelixSelect extends HelixElement {
-  static override styles = [tokenStyles, helixSelectStyles];
+  static override styles = [helixSelectStyles];
 
   // ─── Form Association ───
 

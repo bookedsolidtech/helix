@@ -1,7 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixIconStyles } from './hx-icon.styles.js';
 
 /**
@@ -30,7 +30,7 @@ import { helixIconStyles } from './hx-icon.styles.js';
  */
 @customElement('hx-icon')
 export class HelixIcon extends LitElement {
-  static override styles = [tokenStyles, helixIconStyles];
+  static override styles = [helixIconStyles];
 
   /**
    * Icon name used as the fragment identifier when referencing a sprite sheet.

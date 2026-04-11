@@ -1,10 +1,10 @@
 import { LitElement, TemplateResult, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixSliderStyles } from './hx-slider.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -58,7 +58,7 @@ let _hxSliderIdCounter = 0;
  */
 @customElement('hx-slider')
 export class HelixSlider extends LitElement {
-  static override styles = [tokenStyles, helixSliderStyles];
+  static override styles = [helixSliderStyles];
 
   // ─── Form Association ───
 

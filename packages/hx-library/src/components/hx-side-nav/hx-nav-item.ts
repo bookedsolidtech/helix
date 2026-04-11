@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
 /**
@@ -32,7 +32,7 @@ import { helixNavItemStyles } from './hx-nav-item.styles.js';
  */
 @customElement('hx-nav-item')
 export class HelixNavItem extends LitElement {
-  static override styles = [tokenStyles, helixNavItemStyles];
+  static override styles = [helixNavItemStyles];
 
   /** @internal — incremented for each instance to guarantee unique tooltip IDs */
   private static _instanceCounter = 0;

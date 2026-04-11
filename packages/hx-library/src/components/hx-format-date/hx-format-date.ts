@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixFormatDateStyles } from './hx-format-date.styles.js';
 
 /**
@@ -18,7 +18,7 @@ import { helixFormatDateStyles } from './hx-format-date.styles.js';
  */
 @customElement('hx-format-date')
 export class HelixFormatDate extends LitElement {
-  static override styles = [tokenStyles, helixFormatDateStyles];
+  static override styles = [helixFormatDateStyles];
 
   // ─── Intl formatter caches (keyed by locale+options fingerprint) ───
   /** @internal */

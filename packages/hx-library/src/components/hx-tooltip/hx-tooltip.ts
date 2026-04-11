@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
@@ -49,7 +49,7 @@ let _tooltipCounter = 0;
 
 @customElement('hx-tooltip')
 export class HelixTooltip extends LitElement {
-  static override styles = [tokenStyles, helixTooltipStyles];
+  static override styles = [helixTooltipStyles];
 
   /**
    * Preferred placement of the tooltip relative to the trigger.

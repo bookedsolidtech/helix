@@ -1,9 +1,9 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
-import { tokenStyles } from '@helixui/tokens/lit';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -49,7 +49,7 @@ let _hxTextareaIdCounter = 0;
  */
 @customElement('hx-textarea')
 export class HelixTextarea extends LitElement {
-  static override styles = [tokenStyles, helixTextareaStyles];
+  static override styles = [helixTextareaStyles];
 
   // ─── Form Association ───
 
