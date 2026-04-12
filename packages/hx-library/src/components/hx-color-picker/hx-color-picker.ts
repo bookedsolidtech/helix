@@ -1,5 +1,6 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
+import { HelixElement } from '../../base/index.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { helixColorPickerStyles } from './hx-color-picker.styles.js';
@@ -73,25 +74,17 @@ export type { ColorFormat };
  * ```
  */
 @customElement('hx-color-picker')
-export class HelixColorPicker extends LitElement {
+export class HelixColorPicker extends HelixElement {
   static override styles = [helixColorPickerStyles];
 
   /**
    * Declares this element as form-associated so it participates in native form submission.
    * @internal
    */
-  static formAssociated = true;
-
-  /**
-   * ElementInternals instance used for form participation and constraint validation.
-   * @internal
-   */
-  private _internals: ElementInternals;
+  static override formAssociated = true;
 
   constructor() {
     super();
-    /** @internal */
-    this._internals = this.attachInternals();
     // P1-1: Store bound references so connectedCallback/disconnectedCallback use the same object
     /** @internal */
     this._boundPointerMove = this._handlePointerMove.bind(this);
@@ -313,18 +306,18 @@ export class HelixColorPicker extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = '#000000';
     this._internals.setFormValue(null);
   }
 
   /** @internal */
-  formStateRestoreCallback(
+  protected override _onFormStateRestore(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
@@ -334,12 +327,12 @@ export class HelixColorPicker extends LitElement {
   }
 
   /** Returns the ValidityState object. */
-  get validity(): ValidityState {
+  override get validity(): ValidityState {
     return this._internals.validity;
   }
 
   /** Returns the current validation message. */
-  get validationMessage(): string {
+  override get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
