@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
+import { page } from '@vitest/browser/context';
 import { fixture, cleanup, shadowQuery, shadowQueryAll, oneEvent, checkA11y } from '../../test-utils.js';
 import type { HelixPatientBanner } from './hx-patient-banner.js';
 import './hx-patient-banner.js';
@@ -523,6 +524,62 @@ describe('hx-patient-banner', () => {
       const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
       await Promise.resolve();
       expect(el.getAttribute('aria-invalid')).toBe('true');
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Accessibility (axe-core) ───
+
+  describe('Accessibility (axe-core)', () => {
+    it('has no axe violations in default state (no slots populated)', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      await el.updateComplete;
+      await Promise.resolve();
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with name + MRN populated (2 identifiers)', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span><span slot="mrn">MRN-12345</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations with all slots populated', async () => {
+      const el = await fixture<HelixPatientBanner>(`
+        <hx-patient-banner patient-id="P98765">
+          <img slot="photo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Patient photo" />
+          <span slot="name">Jane Doe</span>
+          <span slot="mrn">MRN-12345</span>
+          <span slot="dob">01/15/1980</span>
+          <span slot="allergies">Penicillin, Sulfa</span>
+          <span slot="code-status">Full Code</span>
+        </hx-patient-banner>
+      `);
+      await el.updateComplete;
+      await Promise.resolve();
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations in identifier rule violation state (only 1 identifier)', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      // Verify the component is in violation state before running axe
+      expect(el.getAttribute('aria-invalid')).toBe('true');
+      expect(shadowQuery(el, '[part~="violation-message"]')).toBeTruthy();
+      await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });

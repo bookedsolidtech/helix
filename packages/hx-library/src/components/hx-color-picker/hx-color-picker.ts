@@ -218,11 +218,11 @@ export class HelixColorPicker extends HelixElement {
   // ─── Cached element references ───────────────────────────────────────────
 
   /** Cached reference to the gradient grid element. @internal */
-  @query('[part="grid"]') private _gridEl: HTMLElement | null = null;
+  @query('[part="grid"]') private _gridEl!: HTMLElement | null;
   /** Cached reference to the hue slider element. @internal */
-  @query('[part="hue-slider"]') private _hueSliderEl: HTMLElement | null = null;
+  @query('[part="hue-slider"]') private _hueSliderEl!: HTMLElement | null;
   /** Cached reference to the opacity slider element. @internal */
-  @query('[part="opacity-slider"]') private _opacitySliderEl: HTMLElement | null = null;
+  @query('[part="opacity-slider"]') private _opacitySliderEl!: HTMLElement | null;
 
   // ─── Dragging state (not reactive, managed manually) ─────────────────────
 
