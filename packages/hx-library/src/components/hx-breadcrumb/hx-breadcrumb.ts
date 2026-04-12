@@ -354,6 +354,14 @@ export class HelixBreadcrumb extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Expose role="list" on the host element so that axe-core's flat-tree
+    // traversal sees a valid list ancestor for the hx-breadcrumb-item
+    // children that carry role="listitem". The shadow-DOM <ol> owns the
+    // visual list structure, but the composed accessibility tree requires
+    // the ARIA role on the host to satisfy the aria-required-parent rule.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'list');
+    }
     this.addEventListener('click', this._boundEllipsisClick);
     this.addEventListener('keydown', this._boundEllipsisKeydown);
   }
