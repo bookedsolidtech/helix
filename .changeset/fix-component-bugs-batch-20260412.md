@@ -9,7 +9,8 @@ attribute
 fix(hx-badge): strengthen dot-mode CSS guards to prevent prefix slot from
 rendering in dot indicator mode; add slot projection assertions to
 RemovableWithCount story; refactor --hx-badge-pulse-color to use private
---_pulse-color variable so consumers can override via the public custom property
+--hx-badge-pulse-color-internal variable so consumers can override via the public
+custom property
 
 fix(hx-action-bar): **BREAKING** replace ariaLabel property that shadowed native
 HTMLElement.ariaLabel with accessibleLabel property (accessible-label attribute).
