@@ -1,5 +1,13 @@
 # @helixui/react-starter
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [ba1e9bf]
+  - @helixui/library@2.1.2
+  - @helixui/react@1.1.4
+
 ## 0.0.3
 
 ### Patch Changes
