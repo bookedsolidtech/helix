@@ -43,10 +43,10 @@ const meta = {
         type: { summary: "'top' | 'bottom' | 'sticky'" },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description:
-        'Accessible label for the toolbar. Required when multiple toolbars appear on the same page.',
+        'Accessible label for the toolbar. Required when multiple toolbars appear on the same page. Also accepts the standard `aria-label` HTML attribute.',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: 'Actions' },
@@ -58,13 +58,14 @@ const meta = {
     size: 'md',
     variant: 'default',
     position: 'top',
+    accessibleLabel: 'Toolbar',
   },
   render: (args) => html`
     <hx-action-bar
       size=${args.size}
       variant=${args.variant}
       position=${args.position}
-      aria-label="Toolbar"
+      accessible-label=${args.accessibleLabel}
       style="border: 1px dashed var(--hx-color-neutral-200, #e5e7eb);"
     >
       <button
