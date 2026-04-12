@@ -58,13 +58,14 @@ const meta = {
     size: 'md',
     variant: 'default',
     position: 'top',
+    accessibleLabel: 'Toolbar',
   },
   render: (args) => html`
     <hx-action-bar
       size=${args.size}
       variant=${args.variant}
       position=${args.position}
-      aria-label="Toolbar"
+      accessible-label=${args.accessibleLabel}
       style="border: 1px dashed var(--hx-color-neutral-200, #e5e7eb);"
     >
       <button
