@@ -1,8 +1,16 @@
 {
+  "version": "1",
   "entries": {
-    "docs/adopted-stylesheets-documentation:49b72c65c64bd58511d71593e796d8bbd8ec3e1fb872ba3fc1d6f82b739169bc": {
+    "1cacdc106b92190b65942ca9f221d8c90265a7ea4f84fcb6532f7ff064cdc01f": {
+      "sha": "1cacdc106b92190b65942ca9f221d8c90265a7ea4f84fcb6532f7ff064cdc01f",
+      "branch": "",
+      "baseCommit": "",
+      "reviewer": "unknown",
+      "findingsCount": 0,
       "result": "pass",
-      "ts": 1775917326
+      "timestamp": "2026-04-12T14:15:56.745Z",
+      "ttlSeconds": 86400
     }
-  }
+  },
+  "1cacdc106b92190b65942ca9f221d8c90265a7ea4f84fcb6532f7ff064cdc01f": "pass"
 }
