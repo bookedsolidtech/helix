@@ -162,6 +162,7 @@ export class HelixLink extends LitElement {
           class=${classMap(classes)}
           role="link"
           aria-disabled="true"
+          tabindex="0"
           @click=${this._handleClick}
         >
           <slot></slot>
