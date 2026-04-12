@@ -112,18 +112,18 @@ export const helixProgressRingStyles = css`
 
   /* ─── Size Variants ─── */
 
-  :host([size='sm']) .progress-ring {
+  :host([hx-size='sm']) .progress-ring {
     width: var(--hx-size-8, 2rem);
     height: var(--hx-size-8, 2rem);
   }
 
-  :host([size='md']) .progress-ring,
+  :host([hx-size='md']) .progress-ring,
   .progress-ring {
     width: var(--hx-size-12, 3rem);
     height: var(--hx-size-12, 3rem);
   }
 
-  :host([size='lg']) .progress-ring {
+  :host([hx-size='lg']) .progress-ring {
     width: var(--hx-size-16, 4rem);
     height: var(--hx-size-16, 4rem);
   }

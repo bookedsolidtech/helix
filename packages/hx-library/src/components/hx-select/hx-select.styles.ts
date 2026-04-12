@@ -102,7 +102,6 @@ export const helixSelectStyles = css`
     outline: none;
   }
 
-  .field__trigger:focus,
   .field__trigger:focus-visible {
     border-color: var(--_focus-ring-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
@@ -171,7 +170,6 @@ export const helixSelectStyles = css`
     border-color: var(--_error-color);
   }
 
-  .field--error .field__trigger:focus,
   .field--error .field__trigger:focus-visible {
     border-color: var(--_error-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
