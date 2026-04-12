@@ -125,13 +125,13 @@ export class HelixPatientBanner extends LitElement {
   // ─── Slot Queries ───
 
   /** @internal */
-  @query('slot[name="name"]') private _nameSlot!: HTMLSlotElement;
+  @query('slot[name="name"]') private _nameSlot: HTMLSlotElement | null = null;
 
   /** @internal */
-  @query('slot[name="mrn"]') private _mrnSlot!: HTMLSlotElement;
+  @query('slot[name="mrn"]') private _mrnSlot: HTMLSlotElement | null = null;
 
   /** @internal */
-  @query('slot[name="dob"]') private _dobSlot!: HTMLSlotElement;
+  @query('slot[name="dob"]') private _dobSlot: HTMLSlotElement | null = null;
 
   // ─── Lifecycle ───
 

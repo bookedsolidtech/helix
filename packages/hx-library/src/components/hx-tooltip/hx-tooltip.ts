@@ -98,15 +98,15 @@ export class HelixTooltip extends LitElement {
   private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
 
   /** @internal */
-  @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;
+  @query('slot:not([name])') private _defaultSlot: HTMLSlotElement | null = null;
   /** @internal */
-  @query('slot[name="content"]') private _contentSlot!: HTMLSlotElement | null;
+  @query('slot[name="content"]') private _contentSlot: HTMLSlotElement | null = null;
   /** @internal */
-  @query('.trigger-wrapper') private _triggerWrapper!: HTMLElement | null;
+  @query('.trigger-wrapper') private _triggerWrapper: HTMLElement | null = null;
   /** @internal */
-  @query('[part="tooltip"]') private _tooltipEl!: HTMLElement | null;
+  @query('[part="tooltip"]') private _tooltipEl: HTMLElement | null = null;
   /** @internal */
-  @query('[part="arrow"]') private _arrowEl!: HTMLElement | null;
+  @query('[part="arrow"]') private _arrowEl: HTMLElement | null = null;
 
   /**
    * Visually-hidden description element in light DOM.

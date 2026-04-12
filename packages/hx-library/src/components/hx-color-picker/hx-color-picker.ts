@@ -225,11 +225,11 @@ export class HelixColorPicker extends LitElement {
   // ─── Cached element references ───────────────────────────────────────────
 
   /** Cached reference to the gradient grid element. @internal */
-  @query('[part="grid"]') private _gridEl!: HTMLElement | null;
+  @query('[part="grid"]') private _gridEl: HTMLElement | null = null;
   /** Cached reference to the hue slider element. @internal */
-  @query('[part="hue-slider"]') private _hueSliderEl!: HTMLElement | null;
+  @query('[part="hue-slider"]') private _hueSliderEl: HTMLElement | null = null;
   /** Cached reference to the opacity slider element. @internal */
-  @query('[part="opacity-slider"]') private _opacitySliderEl!: HTMLElement | null;
+  @query('[part="opacity-slider"]') private _opacitySliderEl: HTMLElement | null = null;
 
   // ─── Dragging state (not reactive, managed manually) ─────────────────────
 

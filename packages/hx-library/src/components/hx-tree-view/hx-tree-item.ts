@@ -108,7 +108,7 @@ export class HelixTreeItem extends LitElement {
   @state() private _selectable = false;
 
   /** @internal */
-  @query('.item-row') private _itemRowEl!: HTMLElement | null;
+  @query('.item-row') private _itemRowEl: HTMLElement | null = null;
 
   // ─── Computed ARIA ───
 

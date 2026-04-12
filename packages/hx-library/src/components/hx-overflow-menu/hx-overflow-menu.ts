@@ -113,10 +113,10 @@ export class HelixOverflowMenu extends LitElement {
   private readonly _panelId = `hx-overflow-menu-panel-${++_counter}`;
 
   /** @internal */
-  @query('[part~="button"]') private _buttonEl!: HTMLButtonElement | null;
+  @query('[part~="button"]') private _buttonEl: HTMLButtonElement | null = null;
 
   /** @internal */
-  @query('[part~="panel"]') private _panelEl!: HTMLElement | null;
+  @query('[part~="panel"]') private _panelEl: HTMLElement | null = null;
 
   // ─── Lifecycle ───
 
