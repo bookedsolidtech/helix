@@ -43,10 +43,10 @@ const meta = {
         type: { summary: "'top' | 'bottom' | 'sticky'" },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description:
-        'Accessible label for the toolbar. Required when multiple toolbars appear on the same page.',
+        'Accessible label for the toolbar. Required when multiple toolbars appear on the same page. Also accepts the standard `aria-label` HTML attribute.',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: 'Actions' },

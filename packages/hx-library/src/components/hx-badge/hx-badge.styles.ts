@@ -46,43 +46,49 @@ export const helixBadgeStyles = css`
   .badge--primary {
     --hx-badge-bg: var(--hx-color-primary-500, #2563eb);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-primary-500, #2563eb);
+    --_pulse-color: var(--hx-badge-pulse-color, var(--hx-color-primary-500, #2563eb));
   }
 
   .badge--secondary {
     --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6));
     --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #374151));
-    --hx-badge-pulse-color: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6));
+    --_pulse-color: var(
+      --hx-badge-pulse-color,
+      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6))
+    );
   }
 
   .badge--success {
     --hx-badge-bg: var(--hx-color-success-700, #15803d);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-success-700, #15803d);
+    --_pulse-color: var(--hx-badge-pulse-color, var(--hx-color-success-700, #15803d));
   }
 
   .badge--warning {
     --hx-badge-bg: var(--hx-color-warning-500, #eab308);
     --hx-badge-color: var(--hx-color-neutral-900, #1a1a1a);
-    --hx-badge-pulse-color: var(--hx-color-warning-500, #eab308);
+    --_pulse-color: var(--hx-badge-pulse-color, var(--hx-color-warning-500, #eab308));
   }
 
   .badge--error {
     --hx-badge-bg: var(--hx-color-error-500, #dc2626);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
-    --hx-badge-pulse-color: var(--hx-color-error-500, #dc2626);
+    --_pulse-color: var(--hx-badge-pulse-color, var(--hx-color-error-500, #dc2626));
   }
 
   .badge--neutral {
     --hx-badge-bg: var(--hx-color-neutral-200, #e5e7eb);
     --hx-badge-color: var(--hx-color-neutral-700, #374151);
-    --hx-badge-pulse-color: var(--hx-color-neutral-200, #e5e7eb);
+    --_pulse-color: var(--hx-badge-pulse-color, var(--hx-color-neutral-200, #e5e7eb));
   }
 
   .badge--info {
     --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1));
     --hx-badge-color: var(--hx-badge-info-color, var(--hx-color-neutral-0, #ffffff));
-    --hx-badge-pulse-color: var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1));
+    --_pulse-color: var(
+      --hx-badge-pulse-color,
+      var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1))
+    );
   }
 
   /* ─── Semantic Variant Label (WCAG 1.4.1) ─── */
@@ -116,13 +122,11 @@ export const helixBadgeStyles = css`
     border-radius: var(--hx-border-radius-full, 9999px);
   }
 
-  /* Guard: hide prefix slot and slotted content in dot mode to prevent overflow */
-  .badge--dot ::slotted(*) {
-    display: none;
-  }
-
+  /* Guard: hide all inner content in dot mode — the dot is purely visual */
+  .badge--dot ::slotted(*),
+  .badge--dot slot,
   .badge--dot slot[name='prefix'] {
-    display: none;
+    display: none !important;
   }
 
   /* ─── Pulse Animation ─── */
@@ -131,7 +135,7 @@ export const helixBadgeStyles = css`
     0%,
     100% {
       opacity: 1;
-      box-shadow: 0 0 0 2px var(--hx-badge-pulse-color, currentColor);
+      box-shadow: 0 0 0 2px var(--_pulse-color, currentColor);
     }
     50% {
       opacity: var(--hx-opacity-75, 0.75);
