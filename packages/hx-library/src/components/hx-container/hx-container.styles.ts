@@ -11,12 +11,6 @@ export const helixContainerStyles = css`
 
   /* ─── Vertical Padding Variants ─── */
 
-  /* Defensive reset: ensures zero vertical padding even if a future base rule adds it */
-  :host([padding='none']) {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
   :host([padding='sm']) {
     padding-top: var(--hx-space-6, 1.5rem);
     padding-bottom: var(--hx-space-6, 1.5rem);
