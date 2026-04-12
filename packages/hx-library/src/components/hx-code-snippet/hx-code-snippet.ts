@@ -1,5 +1,6 @@
-import { LitElement, html, nothing, TemplateResult } from 'lit';
+import { html, nothing, TemplateResult } from 'lit';
 import '../../utilities/document-token-adoption.js';
+import { HelixElement } from '../../base/index.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
@@ -33,7 +34,7 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  * @cssprop [--hx-code-snippet-padding=var(--hx-space-4,1rem)] - Inner padding (block mode).
  */
 @customElement('hx-code-snippet')
-export class HelixCodeSnippet extends LitElement {
+export class HelixCodeSnippet extends HelixElement {
   static override styles = [helixCodeSnippetStyles];
 
   // ─── Public Properties ───
