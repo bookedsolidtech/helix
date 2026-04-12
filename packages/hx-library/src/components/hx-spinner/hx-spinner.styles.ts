@@ -74,15 +74,15 @@ export const helixSpinnerStyles = css`
 
   /* ─── Size Variants ─── */
 
-  :host([size='sm']) {
+  :host([hx-size='sm']) {
     --_spinner-size: var(--hx-size-4, 1rem);
   }
 
-  :host([size='md']) {
+  :host([hx-size='md']) {
     --_spinner-size: var(--hx-size-6, 1.5rem);
   }
 
-  :host([size='lg']) {
+  :host([hx-size='lg']) {
     --_spinner-size: var(--hx-size-8, 2rem);
   }
 
