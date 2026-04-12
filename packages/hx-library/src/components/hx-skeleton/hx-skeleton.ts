@@ -23,7 +23,7 @@ import { helixSkeletonStyles } from './hx-skeleton.styles.js';
  * @cssprop [--hx-skeleton-text-radius=var(--hx-border-radius-full)] - Border radius for text variant.
  * @cssprop [--hx-skeleton-rect-radius=var(--hx-border-radius-sm)] - Border radius for rect variant.
  * @cssprop [--hx-skeleton-button-radius=var(--hx-border-radius-md)] - Border radius for button variant.
- * @cssprop [--hx-skeleton-circle-radius=50%] - Border radius for circle variant.
+ * @cssprop [--hx-skeleton-border-radius-circle=50%] - Border radius for circle variant.
  *
  * @fires hx-loaded - Dispatched when `loaded` transitions to `true`. Consumers should use
  *   this event to update an external `aria-live` region announcing content availability.
