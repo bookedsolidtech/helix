@@ -108,4 +108,36 @@ export const helixListItemStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced colors (Windows High Contrast / forced-colors mode) ─── */
+
+  @media (forced-colors: active) {
+    /* Selected state: replace background-color with a visible border using system Highlight color */
+    :host([interactive]) .list-item--selected {
+      background-color: transparent;
+      border: 2px solid Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+
+    /* Hover state: use an outline instead of background-color */
+    :host([interactive]) .list-item:hover:not(.list-item--disabled) {
+      background-color: transparent;
+      outline: 1px solid Highlight;
+      outline-offset: -1px;
+    }
+
+    /* Disabled state: use system GrayText color */
+    :host([interactive][disabled]) .list-item,
+    :host([interactive]) .list-item--disabled {
+      color: GrayText;
+    }
+
+    /* Focus ring: ensure visibility in forced-colors mode */
+    :host([interactive]):focus-visible .list-item {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+      forced-color-adjust: none;
+    }
+  }
 `;
