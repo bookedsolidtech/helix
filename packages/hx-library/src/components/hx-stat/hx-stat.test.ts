@@ -182,6 +182,14 @@ describe('hx-stat', () => {
       const el = await fixture<HelixStat>('<hx-stat value="42" trend="up"></hx-stat>');
       expect(shadowQuery(el, '[part~="trend"]')).toBeTruthy();
     });
+
+    it('renders trend element with correct class for forced-colors targeting', async () => {
+      const el = await fixture<HelixStat>('<hx-stat value="42" trend="up"></hx-stat>');
+      await el.updateComplete;
+      const trend = shadowQuery(el, '.stat__trend');
+      expect(trend).toBeTruthy();
+      expect(trend!.classList.contains('stat__trend--up')).toBe(true);
+    });
   });
 
   // ─── Slots (2) ───

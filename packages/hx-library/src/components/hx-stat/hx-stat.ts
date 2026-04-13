@@ -81,6 +81,9 @@ export class HelixStat extends LitElement {
    */
   @property({ attribute: 'label-trend' }) labelTrend = 'Trend';
 
+  /** @internal tracks whether the "unnamed" devWarn has already fired this lifecycle */
+  private _hasWarnedUnnamed = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -96,11 +99,16 @@ export class HelixStat extends LitElement {
 
   override updated(changedProperties: Map<PropertyKey, unknown>): void {
     super.updated(changedProperties);
-    if (!this.value && !this.label) {
+    const identityChanged = changedProperties.has('value') || changedProperties.has('label');
+    if (identityChanged && !this.value && !this.label && !this._hasWarnedUnnamed) {
+      this._hasWarnedUnnamed = true;
       devWarn(
         'hx-stat',
         'Rendering an unnamed hx-stat; provide at least value or label for screen reader accessibility.',
       );
+    }
+    if (this.value || this.label) {
+      this._hasWarnedUnnamed = false;
     }
   }
 
@@ -176,12 +184,14 @@ export class HelixStat extends LitElement {
 
     // Live region text: announces value, label, and trend direction to screen
     // readers when any of those properties change programmatically.
-    const liveText = [
-      this.label && this.value ? `${this.label}: ${this.value}` : this.value || this.label,
-      hasTrend ? `, ${this.labelTrend}: ${this.trend}` : '',
-    ]
-      .filter(Boolean)
-      .join('');
+    const liveParts: string[] = [];
+    const primary =
+      this.label && this.value
+        ? `${this.label}: ${this.value}`
+        : this.value || this.label || '';
+    if (primary) liveParts.push(primary);
+    if (hasTrend) liveParts.push(`${this.labelTrend}: ${this.trend}`);
+    const liveText = liveParts.join(', ');
 
     return html`
       <div

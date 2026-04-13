@@ -121,7 +121,7 @@ export const helixStatStyles = css`
   /* ─── Forced Colors (Windows High Contrast Mode) ─── */
 
   @media (forced-colors: active) {
-    :host {
+    .stat__trend {
       forced-color-adjust: none;
     }
 
