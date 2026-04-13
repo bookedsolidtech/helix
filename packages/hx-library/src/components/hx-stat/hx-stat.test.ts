@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixStat } from './hx-stat.js';
 import './index.js';
@@ -249,6 +249,68 @@ describe('hx-stat', () => {
         expect(violations, `hx-size="${size}" should have no violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── aria-live region (4) ───
+
+  describe('aria-live region', () => {
+    it('renders a visually-hidden live region element', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Users" value="42"></hx-stat>');
+      const live = el.shadowRoot?.querySelector('.stat__live-region');
+      expect(live).toBeTruthy();
+      expect(live?.getAttribute('aria-live')).toBe('polite');
+      expect(live?.getAttribute('aria-atomic')).toBe('true');
+    });
+
+    it('live region contains value and label text', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Patients" value="1,234"></hx-stat>');
+      const live = el.shadowRoot?.querySelector('.stat__live-region');
+      expect(live?.textContent).toContain('1,234');
+      expect(live?.textContent).toContain('Patients');
+    });
+
+    it('live region updates when value changes', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Users" value="10"></hx-stat>');
+      el.value = '999';
+      await el.updateComplete;
+      const live = el.shadowRoot?.querySelector('.stat__live-region');
+      expect(live?.textContent).toContain('999');
+    });
+
+    it('live region includes trend direction when set', async () => {
+      const el = await fixture<HelixStat>(
+        '<hx-stat label="Revenue" value="$5,000" trend="up"></hx-stat>',
+      );
+      const live = el.shadowRoot?.querySelector('.stat__live-region');
+      expect(live?.textContent).toContain('up');
+    });
+  });
+
+  // ─── devWarn for empty state (2) ───
+
+  describe('devWarn for empty state', () => {
+    beforeEach(() => {
+      vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('warns when both value and label are empty', async () => {
+      await fixture<HelixStat>('<hx-stat></hx-stat>');
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('unnamed hx-stat'),
+      );
+    });
+
+    it('does not warn about unnamed stat when value is provided', async () => {
+      await fixture<HelixStat>('<hx-stat value="42"></hx-stat>');
+      const unnamedCalls = (console.warn as ReturnType<typeof vi.spyOn>).mock.calls.filter(
+        (args) => String(args[0]).includes('unnamed hx-stat'),
+      );
+      expect(unnamedCalls).toHaveLength(0);
     });
   });
 });

@@ -94,6 +94,16 @@ export class HelixStat extends LitElement {
     }
   }
 
+  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+    super.updated(changedProperties);
+    if (!this.value && !this.label) {
+      devWarn(
+        'hx-stat',
+        'Rendering an unnamed hx-stat; provide at least value or label for screen reader accessibility.',
+      );
+    }
+  }
+
   // ─── Slot Detection ───
 
   /** @internal */
@@ -164,6 +174,15 @@ export class HelixStat extends LitElement {
         ? `${this.value}: ${this.label}`
         : this.value || this.label || nothing;
 
+    // Live region text: announces value, label, and trend direction to screen
+    // readers when any of those properties change programmatically.
+    const liveText = [
+      this.label && this.value ? `${this.label}: ${this.value}` : this.value || this.label,
+      hasTrend ? `, ${this.labelTrend}: ${this.trend}` : '',
+    ]
+      .filter(Boolean)
+      .join('');
+
     return html`
       <div
         part="container"
@@ -171,6 +190,7 @@ export class HelixStat extends LitElement {
         role="group"
         aria-label=${groupLabel}
       >
+        <span class="stat__live-region" aria-live="polite" aria-atomic="true">${liveText}</span>
         <div part="header" class="stat__header">
           <span part="icon" class="stat__icon" ?hidden=${!this._hasIcon}>
             <slot name="icon" @slotchange=${this._onIconSlotChange}></slot>
