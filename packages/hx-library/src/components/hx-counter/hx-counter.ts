@@ -111,12 +111,20 @@ export class HelixCounter extends LitElement {
   private _prefersReducedMotion = false;
   /** @internal */
   private _motionMql: MediaQueryList | null = null;
+  /**
+   * Normalized easing value after validation. Set once per animation start
+   * to avoid repeated devWarn calls on every requestAnimationFrame tick.
+   * @internal
+   */
+  private _resolvedEasing: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out' = 'ease-out';
   /** @internal */
   private readonly _handleMotionChange = (e: MediaQueryListEvent): void => {
     this._prefersReducedMotion = e.matches;
     if (this._prefersReducedMotion) {
       this._cancelAnimation();
       this._displayValue = this.value;
+      this._announcedValue = this._buildAnnouncement();
+      this.requestUpdate();
     }
   };
 
@@ -190,9 +198,33 @@ export class HelixCounter extends LitElement {
     }
   }
 
+  /**
+   * Validates `this.easing` once per animation start and stores the result in
+   * `_resolvedEasing`. This prevents devWarn from firing on every rAF tick for
+   * an invalid easing value — the warning is emitted at most once per call.
+   * @internal
+   */
+  private _normalizeEasing(): void {
+    const validEasings: Array<'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'> = [
+      'linear',
+      'ease-in',
+      'ease-out',
+      'ease-in-out',
+    ];
+    if (validEasings.includes(this.easing)) {
+      this._resolvedEasing = this.easing;
+    } else {
+      devWarn(
+        'hx-counter',
+        `Unrecognized easing value "${this.easing as string}". Falling back to "ease-out". Valid values: ease-in, ease-out, ease-in-out, linear.`,
+      );
+      this._resolvedEasing = 'ease-out';
+    }
+  }
+
   /** @internal */
   private _applyEasing(t: number): number {
-    switch (this.easing) {
+    switch (this._resolvedEasing) {
       case 'linear':
         return t;
       case 'ease-in':
@@ -201,18 +233,13 @@ export class HelixCounter extends LitElement {
         return t * (2 - t);
       case 'ease-in-out':
         return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-      default:
-        devWarn(
-          'hx-counter',
-          `Unrecognized easing value "${this.easing as string}". Falling back to linear. Valid values: ease-in, ease-out, ease-in-out, linear.`,
-        );
-        return t;
     }
   }
 
   /** @internal */
   private _startAnimation(): void {
     this._cancelAnimation();
+    this._normalizeEasing();
 
     const effectiveDuration =
       this.duration <= 0
