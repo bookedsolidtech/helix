@@ -132,6 +132,14 @@ export class HelixCounter extends LitElement {
       this.size = legacySize as CounterSize;
     }
 
+    // WCAG 4.1.2: a numeric value without context is meaningless to screen readers.
+    if (!this.label) {
+      devWarn(
+        'hx-counter',
+        'hx-counter requires a label for screen reader accessibility (WCAG 4.1.2). Provide the `label` attribute.',
+      );
+    }
+
     // Guard for SSR — window.matchMedia and requestAnimationFrame are unavailable server-side
     if (typeof window === 'undefined') {
       this._displayValue = this.value;
@@ -145,7 +153,7 @@ export class HelixCounter extends LitElement {
 
     if (this._prefersReducedMotion) {
       this._displayValue = this.value;
-      this._announcedValue = this._formatValue();
+      this._announcedValue = this._buildAnnouncement();
     } else {
       this._startAnimation();
     }
@@ -163,7 +171,7 @@ export class HelixCounter extends LitElement {
     if (changedProps.has('value') && changedProps.get('value') !== undefined) {
       if (this._prefersReducedMotion) {
         this._displayValue = this.value;
-        this._announcedValue = this._formatValue();
+        this._announcedValue = this._buildAnnouncement();
       } else {
         this._startValue = this._displayValue;
         this._startTime = null;
@@ -193,6 +201,12 @@ export class HelixCounter extends LitElement {
         return t * (2 - t);
       case 'ease-in-out':
         return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      default:
+        devWarn(
+          'hx-counter',
+          `Unrecognized easing value "${this.easing as string}". Falling back to linear. Valid values: ease-in, ease-out, ease-in-out, linear.`,
+        );
+        return t;
     }
   }
 
@@ -200,13 +214,22 @@ export class HelixCounter extends LitElement {
   private _startAnimation(): void {
     this._cancelAnimation();
 
+    const effectiveDuration =
+      this.duration <= 0
+        ? (devWarn(
+            'hx-counter',
+            `duration must be > 0 (received ${this.duration}). Clamping to 1ms.`,
+          ),
+          1)
+        : this.duration;
+
     const step = (timestamp: number): void => {
       if (this._startTime === null) {
         this._startTime = timestamp;
       }
 
       const elapsed = timestamp - this._startTime;
-      const rawProgress = Math.min(elapsed / this.duration, 1);
+      const rawProgress = Math.min(elapsed / effectiveDuration, 1);
       const easedProgress = this._applyEasing(rawProgress);
 
       this._displayValue = this._startValue + (this.value - this._startValue) * easedProgress;
@@ -219,7 +242,7 @@ export class HelixCounter extends LitElement {
         // WCAG 4.1.2: announce the final value only once, at animation end.
         // _announcedValue feeds the off-screen live region so screen readers
         // hear a single announcement rather than one per animation frame.
-        this._announcedValue = this._formatValue();
+        this._announcedValue = this._buildAnnouncement();
       }
     };
 
@@ -238,6 +261,17 @@ export class HelixCounter extends LitElement {
     return `${this.prefix}${num.toLocaleString()}${this.suffix}`;
   }
 
+  /**
+   * Builds the string announced to screen readers at animation end.
+   * Includes label context when present so users hear "Total patients: 1,284"
+   * rather than a bare number with no semantic context.
+   * @internal
+   */
+  private _buildAnnouncement(): string {
+    const formatted = this._formatValue();
+    return this.label ? `${this.label}: ${formatted}` : formatted;
+  }
+
   // ─── Render ───
 
   override render() {
@@ -249,6 +283,8 @@ export class HelixCounter extends LitElement {
     return html`
       <span
         part="counter"
+        role="status"
+        aria-live="off"
         class=${classMap(classes)}
         aria-label=${this.label ? `${this.label}: ${this._formatValue()}` : nothing}
       >

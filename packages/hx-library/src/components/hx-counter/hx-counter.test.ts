@@ -288,14 +288,15 @@ describe('hx-counter', () => {
   // ─── Accessibility (3) ───
 
   describe('Accessibility', () => {
-    it('has aria-live="polite" on the off-screen live region (not on the visible counter)', async () => {
-      // WCAG 4.1.2 fix: aria-live moved from the visible counter span to a hidden live region
-      // so screen readers only announce once at animation end, not on every frame.
+    it('has aria-live="polite" on the off-screen live region; counter span has aria-live="off"', async () => {
+      // WCAG 4.1.2: role="status" implies aria-live="polite", but the visible counter span
+      // carries aria-live="off" to suppress per-frame announcements during animation.
+      // A separate off-screen live region announces the final value once at animation end.
       const el = await fixture<HelixCounter>('<hx-counter value="42"></hx-counter>');
       const counter = shadowQuery(el, '[part~="counter"]');
-      // Visible counter must NOT carry aria-live (prevents per-frame announcements)
-      expect(counter?.getAttribute('aria-live')).toBeNull();
-      // The off-screen .sr-only span carries aria-live instead
+      // Visible counter carries aria-live="off" to suppress implicit live behavior of role="status"
+      expect(counter?.getAttribute('aria-live')).toBe('off');
+      // The off-screen .sr-only span carries aria-live="polite" for end-of-animation announcements
       const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
       expect(liveRegion?.getAttribute('aria-live')).toBe('polite');
     });
