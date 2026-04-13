@@ -97,4 +97,18 @@ export const helixPhiFieldStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast Mode) ─── */
+
+  @media (forced-colors: active) {
+    .phi-field__toggle {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+
+    .phi-field__toggle:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
 `;

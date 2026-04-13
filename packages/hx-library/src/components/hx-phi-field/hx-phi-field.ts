@@ -2,6 +2,7 @@ import { LitElement, html, type TemplateResult } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 /**
  * HIPAA-compliant field component for rendering masked Protected Health Information (PHI).
@@ -33,9 +34,10 @@ export class HelixPhiField extends LitElement {
 
   /**
    * The Protected Health Information value to display or mask.
-   * @attr data
+   * Must be set via the JavaScript property (`element.data = "..."`) — not as an HTML attribute.
+   * Setting PHI as an HTML attribute exposes it in the DOM and browser caches (HIPAA violation).
    */
-  @property({ type: String })
+  @property({ attribute: false })
   data: string = '';
 
   /**
@@ -90,6 +92,13 @@ export class HelixPhiField extends LitElement {
     super.connectedCallback();
     // Enforce HIPAA compliance: prevent browser autofill on the host element
     this.setAttribute('autocomplete', 'off');
+    // Warn if a developer mistakenly sets PHI via the HTML attribute
+    if (this.hasAttribute('data')) {
+      devWarn(
+        'hx-phi-field',
+        'Setting PHI via the `data` HTML attribute is not supported and may expose sensitive data in the DOM. Use the `data` property (element.data = "...") instead.',
+      );
+    }
   }
 
   override disconnectedCallback(): void {
@@ -295,7 +304,10 @@ export class HelixPhiField extends LitElement {
         @paste=${this._handlePaste}
       >
         ${this._masked
-          ? html`<span part="value" class="phi-field__value phi-field__value--masked"
+          ? html`<span
+              part="value"
+              class="phi-field__value phi-field__value--masked"
+              aria-hidden="true"
               >${this._getMaskedValue()}</span
             >`
           : html`<span part="value" class="phi-field__value phi-field__value--revealed"
