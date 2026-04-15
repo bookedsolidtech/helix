@@ -73,4 +73,20 @@ export const helixBreadcrumbItemStyles = css`
     color: inherit;
     padding: 0;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    [part='link'] {
+      color: LinkText;
+    }
+
+    [part='link']:hover {
+      color: LinkText;
+    }
+
+    .separator {
+      color: CanvasText;
+    }
+  }
 `;

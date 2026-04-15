@@ -34,6 +34,14 @@ export const helixStructuredListStyles = css`
   :host([striped]) ::slotted(hx-structured-list-row:nth-of-type(even)) {
     background: var(--_bg-stripe);
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    :host([bordered]) .list {
+      border-color: CanvasText;
+    }
+  }
 `;
 
 export const helixStructuredListRowStyles = css`
@@ -74,5 +82,13 @@ export const helixStructuredListRowStyles = css`
 
   .row__actions:empty {
     display: none;
+  }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    :host(:not(:last-of-type)) .row {
+      border-bottom-color: CanvasText;
+    }
   }
 `;

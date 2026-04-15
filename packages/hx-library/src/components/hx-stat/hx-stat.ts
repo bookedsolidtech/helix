@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -97,7 +97,7 @@ export class HelixStat extends LitElement {
     }
   }
 
-  override updated(changedProperties: Map<PropertyKey, unknown>): void {
+  override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     const identityChanged = changedProperties.has('value') || changedProperties.has('label');
     const hasValue = this.value.trim().length > 0;

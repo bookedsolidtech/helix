@@ -73,4 +73,12 @@ export const helixIconStyles = css`
     fill: currentColor;
     display: block;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    :host {
+      color: CanvasText;
+    }
+  }
 `;

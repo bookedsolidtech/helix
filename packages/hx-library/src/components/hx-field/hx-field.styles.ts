@@ -119,4 +119,40 @@ export const helixFieldStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .field__label {
+      color: CanvasText;
+    }
+
+    .field__required-marker {
+      color: LinkText;
+    }
+
+    .field--error .field__label {
+      color: LinkText;
+    }
+
+    .field--error .field__control {
+      outline-color: LinkText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .field__label {
+      color: GrayText;
+    }
+
+    .field__help-text {
+      color: GrayText;
+    }
+
+    .field__error {
+      color: LinkText;
+    }
+  }
 `;

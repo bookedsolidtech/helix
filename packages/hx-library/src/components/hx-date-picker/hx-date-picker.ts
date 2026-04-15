@@ -1,11 +1,12 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
-let _instanceCounter = 0;
+const _nextDatePickerId = createIdCounter('hx-date-picker');
 
 /**
  * Date picker component for selecting dates with keyboard-accessible calendar popup.
@@ -49,7 +50,7 @@ let _instanceCounter = 0;
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
 @customElement('hx-date-picker')
-export class HelixDatePicker extends LitElement {
+export class HelixDatePicker extends HelixElement {
   static override styles = [helixDatePickerStyles];
 
   // ─── Form Association ───
@@ -58,19 +59,7 @@ export class HelixDatePicker extends LitElement {
    * Marks this component as form-associated for native form participation.
    * @internal
    */
-  static formAssociated = true;
-
-  /**
-   * ElementInternals instance for form association.
-   * @internal
-   */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -78,14 +67,14 @@ export class HelixDatePicker extends LitElement {
    * The name of the field, used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
    * The current value as an ISO 8601 date string (e.g. 2026-03-04).
    * @attr value
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   value = '';
 
   /**
@@ -276,7 +265,7 @@ export class HelixDatePicker extends LitElement {
    * Unique base ID for this component instance, used to generate all child element IDs.
    * @internal
    */
-  private _id = `hx-date-picker-${++_instanceCounter}`;
+  private _id = _nextDatePickerId();
   /**
    * Unique ID for the text input element, used for label association.
    * @internal
@@ -422,21 +411,6 @@ export class HelixDatePicker extends LitElement {
 
   // ─── Form Integration ───
 
-  /** The form element associated with this component, or null if not in a form. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** The current validation message, or an empty string if the field is valid. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** The current validity state of the field. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
   checkValidity(): boolean {
     return this._internals.checkValidity();
   }
@@ -459,15 +433,15 @@ export class HelixDatePicker extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue(null);
     this._isOpen = false;
   }
 
   /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData | null,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
@@ -476,7 +450,7 @@ export class HelixDatePicker extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

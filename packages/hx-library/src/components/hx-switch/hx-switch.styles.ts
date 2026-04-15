@@ -23,10 +23,14 @@ export const helixSwitchStyles = css`
     font-family: var(--hx-font-family-sans, sans-serif);
   }
 
+  /* WCAG 2.5.5 (healthcare mandate): minimum 44px touch target height.
+     The track itself is smaller visually, but the row must meet the
+     interactive touch target threshold for all size variants. */
   .switch__control-row {
     display: flex;
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   /* --- Track --- */
@@ -167,6 +171,64 @@ export const helixSwitchStyles = css`
     .switch__track,
     .switch__thumb {
       transition: none;
+    }
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .switch__track {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      border: 2px solid ButtonText;
+    }
+
+    .switch__track:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .switch__thumb {
+      background-color: ButtonText;
+      box-shadow: none;
+    }
+
+    .switch--checked .switch__track {
+      background-color: Highlight;
+      border-color: Highlight;
+    }
+
+    .switch--checked .switch__thumb {
+      background-color: HighlightText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .switch__track {
+      border-color: GrayText;
+      background-color: ButtonFace;
+    }
+
+    :host([disabled]) .switch__thumb {
+      background-color: GrayText;
+    }
+
+    :host([disabled]) .switch__label {
+      color: GrayText;
+    }
+
+    .switch__label {
+      color: CanvasText;
+    }
+
+    .switch__help-text {
+      color: GrayText;
+    }
+
+    .switch__error {
+      color: LinkText;
     }
   }
 `;

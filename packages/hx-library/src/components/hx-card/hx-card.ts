@@ -103,6 +103,13 @@ export class HelixCard extends LitElement {
    */
   @state() private _hasActions = false;
 
+  /**
+   * Text content extracted from the heading slot, used as a fallback accessible
+   * name for interactive cards when no explicit `hx-label` is provided.
+   * @internal
+   */
+  @state() private _headingText = '';
+
   /** @internal */
   private _onImageSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
@@ -112,7 +119,12 @@ export class HelixCard extends LitElement {
   /** @internal */
   private _onHeadingSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this._hasHeading = slot.assignedNodes({ flatten: true }).length > 0;
+    const nodes = slot.assignedNodes({ flatten: true });
+    this._hasHeading = nodes.length > 0;
+    this._headingText = nodes
+      .map((n) => n.textContent?.trim() ?? '')
+      .join(' ')
+      .trim();
   }
 
   /** @internal */
@@ -141,11 +153,12 @@ export class HelixCard extends LitElement {
     if (
       (changedProperties.has('href') || changedProperties.has('label')) &&
       this.href &&
-      !this.label
+      !this.label &&
+      !this._headingText
     ) {
       devWarn(
         'hx-card',
-        "Interactive card (hx-href is set) is missing an accessible name. Set `hx-label` to describe the card's destination or purpose (WCAG 4.1.2).",
+        "Interactive card (hx-href is set) is missing an accessible name. Set `hx-label` or provide heading slot content to describe the card's destination or purpose (WCAG 4.1.2).",
       );
     }
   }
@@ -205,7 +218,7 @@ export class HelixCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive && this.label ? this.label : nothing}
+        aria-label=${isInteractive ? this.label || this._headingText || nothing : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >

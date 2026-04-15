@@ -309,4 +309,39 @@ export const helixSplitButtonStyles = css`
       animation: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .split-button__primary,
+    .split-button__trigger {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 2px solid ButtonText;
+    }
+
+    .split-button__primary:focus-visible,
+    .split-button__trigger:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .split-button__primary[disabled],
+    .split-button__trigger[disabled] {
+      background-color: ButtonFace;
+      color: GrayText;
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    .split-button__menu {
+      background-color: Canvas;
+      border: 2px solid CanvasText;
+    }
+  }
 `;

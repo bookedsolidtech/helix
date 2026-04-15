@@ -87,4 +87,12 @@ export const helixDividerStyles = css`
     line-height: var(--hx-line-height-tight, 1.25);
     white-space: nowrap;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .divider__line {
+      background-color: CanvasText;
+    }
+  }
 `;

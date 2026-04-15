@@ -171,6 +171,10 @@ export const helixTextInputStyles = css`
     color: var(--hx-color-neutral-400, #adb5bd);
   }
 
+  .field__input:focus-visible {
+    outline: none; /* wrapper ring handles keyboard focus indication */
+  }
+
   .field__input:disabled {
     cursor: not-allowed;
   }
@@ -212,6 +216,64 @@ export const helixTextInputStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .field__input-wrapper {
       transition: none;
+    }
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .field__input-wrapper {
+      forced-color-adjust: none;
+      background-color: Field;
+      color: FieldText;
+      border: 2px solid ButtonText;
+    }
+
+    .field__input {
+      color: FieldText;
+    }
+
+    .field__input::placeholder {
+      color: GrayText;
+    }
+
+    .field__input-wrapper:focus-within {
+      border-color: Highlight;
+      box-shadow: none;
+    }
+
+    .field__input:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: -3px;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .field__input-wrapper {
+      border-color: GrayText;
+      color: GrayText;
+    }
+
+    :host([disabled]) .field__input {
+      color: GrayText;
+    }
+
+    .field--error .field__input-wrapper {
+      border-color: LinkText;
+    }
+
+    .field__label {
+      color: CanvasText;
+    }
+
+    .field__help-text {
+      color: GrayText;
+    }
+
+    .field__error {
+      color: LinkText;
     }
   }
 `;

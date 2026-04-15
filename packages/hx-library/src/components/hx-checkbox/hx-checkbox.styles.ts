@@ -219,4 +219,70 @@ export const helixCheckboxStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .checkbox__box {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      border: 2px solid ButtonText;
+    }
+
+    .checkbox__input:focus-visible ~ .checkbox__box {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .checkbox--checked .checkbox__box,
+    .checkbox--indeterminate .checkbox__box {
+      background-color: Highlight;
+      border-color: Highlight;
+    }
+
+    .checkbox__icon {
+      stroke: HighlightText;
+    }
+
+    .checkbox--error .checkbox__box {
+      border-color: LinkText;
+    }
+
+    .checkbox--error.checkbox--checked .checkbox__box,
+    .checkbox--error.checkbox--indeterminate .checkbox__box {
+      background-color: LinkText;
+      border-color: LinkText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .checkbox__box {
+      border-color: GrayText;
+      background-color: ButtonFace;
+    }
+
+    :host([disabled]) .checkbox--checked .checkbox__box,
+    :host([disabled]) .checkbox--indeterminate .checkbox__box {
+      background-color: GrayText;
+      border-color: GrayText;
+    }
+
+    :host([disabled]) .checkbox__label {
+      color: GrayText;
+    }
+
+    .checkbox__label {
+      color: CanvasText;
+    }
+
+    .checkbox__help-text {
+      color: GrayText;
+    }
+
+    .checkbox__error {
+      color: LinkText;
+    }
+  }
 `;

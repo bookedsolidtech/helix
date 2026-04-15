@@ -114,4 +114,17 @@ export const helixMeterStyles = css`
     white-space: nowrap;
     border: 0;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .meter__track {
+      border: 1px solid CanvasText;
+    }
+
+    .meter__indicator {
+      forced-color-adjust: none;
+      background-color: Highlight;
+    }
+  }
 `;

@@ -1,15 +1,15 @@
-import { LitElement, TemplateResult, html, nothing, type PropertyValues } from 'lit';
+import { TemplateResult, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSliderStyles } from './hx-slider.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxSliderIdCounter = 0;
+const _nextSliderId = createIdCounter('hx-slider');
 
 /**
  * A range slider component for selecting a numeric value within a min/max boundary.
@@ -57,23 +57,13 @@ let _hxSliderIdCounter = 0;
  * @cssprop [--hx-slider-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-slider')
-export class HelixSlider extends LitElement {
+export class HelixSlider extends HelixElement {
   static override styles = [helixSliderStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** ElementInternals instance for form value, validity, and label association. */
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -81,14 +71,14 @@ export class HelixSlider extends LitElement {
    * The name submitted with the form.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
    * The current numeric value of the slider.
    * @attr value
    */
-  @property({ type: Number })
+  @property({ type: Number, reflect: true })
   value = 0;
 
   /**
@@ -190,13 +180,17 @@ export class HelixSlider extends LitElement {
 
   /** Unique ID for the native range input element. */
   /** @internal */
-  private readonly _sliderId = `hx-slider-${++_hxSliderIdCounter}`;
+  private readonly _sliderId = _nextSliderId();
   /** Unique ID for the label element, derived from _sliderId. */
   /** @internal */
   private readonly _labelId = `${this._sliderId}-label`;
   /** Unique ID for the help text element, derived from _sliderId. */
   /** @internal */
   private readonly _helpId = `${this._sliderId}-help`;
+
+  /** Stored default value for form reset (captured in firstUpdated). */
+  /** @internal */
+  private _defaultValue: number | null = null;
 
   // ─── Computed Values ───
 
@@ -246,6 +240,8 @@ export class HelixSlider extends LitElement {
   }
 
   override firstUpdated(): void {
+    // Capture the initial value for form reset (before any user interaction)
+    this._defaultValue = this.value;
     // Enable fill transition after initial render to suppress animation on mount
     requestAnimationFrame(() => this.setAttribute('data-ready', ''));
     // WCAG 4.1.2: warn when no accessible name is available for the range input
@@ -321,16 +317,17 @@ export class HelixSlider extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
-    const attrValue = this.getAttribute('value');
-    const defaultValue = attrValue !== null ? parseFloat(attrValue) : this.min;
-    const resetTo = this._clamp(!isNaN(defaultValue) ? defaultValue : this.min);
+  protected override _onFormReset(): void {
+    const resetTo = this._clamp(this._defaultValue ?? this.min);
     this.value = resetTo;
     this._internals.setFormValue(String(resetTo));
   }
 
   /** @internal */
-  formStateRestoreCallback(state: string | File | FormData | null, _reason: string): void {
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
     if (typeof state !== 'string' || state === null) return;
     const parsed = parseFloat(state);
     if (!isNaN(parsed)) {
@@ -339,7 +336,7 @@ export class HelixSlider extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

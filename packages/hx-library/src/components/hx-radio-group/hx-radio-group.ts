@@ -1,12 +1,13 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
 
-let _groupCounter = 0;
+const _nextRadioGroupId = createIdCounter('hx-radio-group');
 
 /**
  * A form-associated radio group that manages a set of `<hx-radio>` children.
@@ -34,7 +35,7 @@ let _groupCounter = 0;
  * @cssprop [--hx-radio-group-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  */
 @customElement('hx-radio-group')
-export class HelixRadioGroup extends LitElement {
+export class HelixRadioGroup extends HelixElement {
   static override styles = [helixRadioGroupStyles];
 
   // ─── Form Association ───
@@ -43,19 +44,7 @@ export class HelixRadioGroup extends LitElement {
    * Enables ElementInternals form association for this component.
    * @internal
    */
-  static formAssociated = true;
-
-  /**
-   * Reference to the ElementInternals instance for form participation.
-   * @internal
-   */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -63,14 +52,14 @@ export class HelixRadioGroup extends LitElement {
    * The selected radio's value.
    * @attr value
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   value = '';
 
   /**
    * The name used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -135,7 +124,7 @@ export class HelixRadioGroup extends LitElement {
    * Unique identifier for this radio group instance used in ARIA attributes.
    * @internal
    */
-  private _groupId = `hx-radio-group-${++_groupCounter}`;
+  private _groupId = _nextRadioGroupId();
   /**
    * Unique identifier for the help text element, used in aria-describedby.
    * @internal
@@ -443,15 +432,15 @@ export class HelixRadioGroup extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue(null);
     this._syncRadios();
   }
 
   /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
@@ -460,7 +449,7 @@ export class HelixRadioGroup extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

@@ -207,4 +207,27 @@ export const helixDataTableStyles = css`
     color: var(--hx-data-table-empty-color, var(--hx-color-neutral-600, #475569));
     padding: var(--hx-space-8, 2rem) var(--hx-space-4, 1rem);
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    table {
+      border: 1px solid CanvasText;
+    }
+
+    th,
+    td {
+      border-bottom-color: CanvasText;
+    }
+
+    tbody tr[aria-selected='true'] {
+      outline: 2px solid Highlight;
+    }
+
+    .skeleton-cell {
+      animation: none;
+      border: 1px solid GrayText;
+      background: none;
+    }
+  }
 `;

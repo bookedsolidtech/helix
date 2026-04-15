@@ -119,4 +119,50 @@ export const helixRadioStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .radio__control {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      border: 2px solid ButtonText;
+    }
+
+    :host(:focus-visible) .radio__control {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .radio--checked .radio__control {
+      background-color: Highlight;
+      border-color: Highlight;
+    }
+
+    .radio--checked .radio__dot {
+      background-color: HighlightText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .radio__control {
+      border-color: GrayText;
+      background-color: ButtonFace;
+    }
+
+    :host([disabled]) .radio--checked .radio__control {
+      background-color: GrayText;
+      border-color: GrayText;
+    }
+
+    :host([disabled]) .radio__label {
+      color: GrayText;
+    }
+
+    .radio__label {
+      color: CanvasText;
+    }
+  }
 `;

@@ -133,4 +133,35 @@ export const helixOverflowMenuStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .trigger {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 2px solid ButtonText;
+    }
+
+    .trigger:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .trigger[disabled] {
+      color: GrayText;
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    .panel {
+      background-color: Canvas;
+      border: 2px solid CanvasText;
+    }
+  }
 `;

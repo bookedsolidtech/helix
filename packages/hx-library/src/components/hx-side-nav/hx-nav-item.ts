@@ -1,7 +1,10 @@
 import { LitElement, html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
+
+const _nextNavItemId = createIdCounter('hx-nav-item');
 
 /**
  * A navigation item for use inside hx-side-nav.
@@ -34,16 +37,8 @@ import { helixNavItemStyles } from './hx-nav-item.styles.js';
 export class HelixNavItem extends LitElement {
   static override styles = [helixNavItemStyles];
 
-  /** @internal — incremented for each instance to guarantee unique tooltip IDs */
-  private static _instanceCounter = 0;
-
   /** @internal — per-instance tooltip ID */
-  private _tooltipId: string;
-
-  constructor() {
-    super();
-    this._tooltipId = `nav-item-tooltip-${++HelixNavItem._instanceCounter}`;
-  }
+  private _tooltipId = `${_nextNavItemId()}-tooltip`;
 
   // ─── Properties ───
 

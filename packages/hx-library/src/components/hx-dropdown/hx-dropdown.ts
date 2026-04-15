@@ -9,6 +9,7 @@ import {
   offset,
   type Placement as FloatingPlacement,
 } from '@floating-ui/dom';
+import { createIdCounter } from '../../base/index.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 
 // P2-03: Export so TypeScript consumers can import this type for prop typing.
@@ -21,6 +22,8 @@ export type DropdownPlacement =
   | 'bottom-end'
   | 'start'
   | 'end';
+
+const _nextDropdownId = createIdCounter('hx-dropdown');
 
 /**
  * A dropdown component — a button that opens a floating panel on click.
@@ -122,15 +125,10 @@ export class HelixDropdown extends LitElement {
 
   // P1-02: Unique panel ID for aria-controls.
   /**
-   * Monotonically incrementing counter used to generate unique panel IDs across instances.
-   * @internal
-   */
-  private static _instanceCounter = 0;
-  /**
    * Unique ID assigned to the floating panel element, referenced by `aria-controls` on the trigger.
    * @internal
    */
-  private _panelId = `hx-dropdown-panel-${++HelixDropdown._instanceCounter}`;
+  private _panelId = `${_nextDropdownId()}-panel`;
 
   /**
    * Reference to the floating panel element inside the shadow DOM.
@@ -441,5 +439,10 @@ export class HelixDropdown extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-dropdown': HelixDropdown;
+  }
+  interface HTMLElementEventMap {
+    'hx-show': CustomEvent<void>;
+    'hx-hide': CustomEvent<void>;
+    'hx-select': CustomEvent<{ value: string | null; label: string }>;
   }
 }

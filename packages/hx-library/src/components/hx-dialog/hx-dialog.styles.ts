@@ -190,4 +190,25 @@ export const helixDialogStyles = css`
     white-space: nowrap;
     border: 0;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .dialog {
+      border: 1px solid CanvasText;
+    }
+
+    .dialog__header {
+      border-bottom-color: CanvasText;
+    }
+
+    .dialog__footer {
+      border-top-color: CanvasText;
+    }
+
+    .dialog__close-btn {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
 `;

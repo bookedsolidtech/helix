@@ -24,6 +24,12 @@ export { mergeTokenStyles } from './base/index.js';
 // ─── Mixins ───────────────────────────────────────────────────────────────────
 export { FocusMixin } from './mixins/index.js';
 export type { FocusMixinInterface } from './mixins/index.js';
+export { mixinDelegatesAria } from './mixins/index.js';
+export type {
+  AriaDelegationMixinInterface,
+  AriadDelegationMixinInterface,
+  AriaAttribute,
+} from './mixins/index.js';
 
 // ─── Controllers ─────────────────────────────────────────────────────────────
 export { HelixAuditController } from './controllers/helix-audit-controller.js';

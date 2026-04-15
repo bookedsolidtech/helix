@@ -2,11 +2,11 @@ import { LitElement, html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxSplitButtonIdCounter = 0;
+const _nextSplitButtonId = createIdCounter('hx-split-button');
 
 /**
  * A split button combining a primary action button with an attached dropdown
@@ -130,7 +130,7 @@ export class HelixSplitButton extends LitElement {
    * Stable unique ID for the dropdown menu panel element, used to wire aria-controls on the trigger button.
    * @internal
    */
-  private readonly _menuId = `hx-split-button-menu-${++_hxSplitButtonIdCounter}`;
+  private readonly _menuId = `${_nextSplitButtonId()}-menu`;
 
   // ─── Lifecycle ───
 

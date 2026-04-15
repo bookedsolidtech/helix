@@ -10,9 +10,10 @@
 // slider branch, star spans carry role="presentation" aria-hidden="true" and are purely
 // decorative click/hover targets with no independent keyboard accessibility obligation.
 
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixRatingStyles } from './hx-rating.styles.js';
 
 // ─── Event Detail Interfaces ───
@@ -75,22 +76,13 @@ export interface HxRatingHoverDetail {
  * ```
  */
 @customElement('hx-rating')
-export class HelixRating extends LitElement {
+export class HelixRating extends HelixElement {
   static override styles = [helixRatingStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -133,7 +125,7 @@ export class HelixRating extends LitElement {
    * The name submitted with the form.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -188,14 +180,12 @@ export class HelixRating extends LitElement {
     }
   }
 
-  /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(String(this._defaultValue));
   }
 
-  /** @internal */
-  formStateRestoreCallback(
+  protected override _onFormStateRestore(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
@@ -208,18 +198,17 @@ export class HelixRating extends LitElement {
     }
   }
 
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
   /** Returns the ValidityState object. */
-  get validity(): ValidityState {
+  override get validity(): ValidityState {
     return this._internals.validity;
   }
 
   /** Returns the current validation message. */
-  get validationMessage(): string {
+  override get validationMessage(): string {
     return this._internals.validationMessage;
   }
 

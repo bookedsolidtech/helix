@@ -31,4 +31,16 @@ export const helixPopupStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    [part='popup'] {
+      border: 1px solid CanvasText;
+    }
+
+    [part='arrow'] {
+      border: 1px solid CanvasText;
+    }
+  }
 `;

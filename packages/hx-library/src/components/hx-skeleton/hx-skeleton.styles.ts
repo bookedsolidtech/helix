@@ -82,4 +82,16 @@ export const helixSkeletonStyles = css`
       display: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .skeleton {
+      border: 1px solid GrayText;
+    }
+
+    .skeleton--animated::after {
+      display: none;
+    }
+  }
 `;

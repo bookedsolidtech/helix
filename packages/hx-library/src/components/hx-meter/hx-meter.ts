@@ -2,9 +2,12 @@ import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixMeterStyles } from './hx-meter.styles.js';
 
 type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
+
+const _nextMeterId = createIdCounter('hx-meter');
 
 /**
  * A scalar measurement within a known range — e.g., disk usage, health score,
@@ -40,9 +43,7 @@ export class HelixMeter extends LitElement {
   static override styles = [helixMeterStyles];
 
   /** @internal */
-  private static _counter = 0;
-  /** @internal */
-  private _uid = `hx-meter-${++HelixMeter._counter}`;
+  private _uid = _nextMeterId();
 
   /**
    * Current value of the meter.

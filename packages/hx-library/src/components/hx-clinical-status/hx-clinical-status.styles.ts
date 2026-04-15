@@ -248,4 +248,27 @@ export const helixClinicalStatusStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .clinical-status {
+      border-color: CanvasText;
+      border-inline-start-color: CanvasText;
+    }
+
+    .clinical-status__icon svg {
+      fill: CanvasText;
+    }
+
+    .clinical-status__dismiss-button {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+
+    .clinical-status__acknowledge-button {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+  }
 `;

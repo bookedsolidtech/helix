@@ -213,4 +213,25 @@ export const helixAlertStyles = css`
     --hx-alert-color: var(--hx-color-error-800, #991b1b);
     --hx-alert-icon-color: var(--hx-color-error-500, #ef4444);
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .alert {
+      border-color: CanvasText;
+    }
+
+    .alert--accent {
+      border-inline-start-color: CanvasText;
+    }
+
+    .alert__icon svg {
+      fill: CanvasText;
+    }
+
+    .alert__close-button {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
 `;
