@@ -38,12 +38,12 @@ describe('hx-counter', () => {
 
   describe('Property: value', () => {
     it('defaults to 0', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.value).toBe(0);
     });
 
     it('accepts numeric value attribute', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter value="500"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="500"></hx-counter>');
       expect(el.value).toBe(500);
     });
   });
@@ -94,13 +94,13 @@ describe('hx-counter', () => {
 
   describe('Property: format', () => {
     it('defaults to integer format', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.format).toBe('integer');
     });
 
     it('accepts decimal format', async () => {
       const el = await fixture<HelixCounter>(
-        '<hx-counter format="decimal" value="0"></hx-counter>',
+        '<hx-counter label="Count" format="decimal" value="0"></hx-counter>',
       );
       expect(el.format).toBe('decimal');
     });
@@ -110,14 +110,14 @@ describe('hx-counter', () => {
 
   describe('Property: prefix and suffix', () => {
     it('defaults prefix and suffix to empty string', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.prefix).toBe('');
       expect(el.suffix).toBe('');
     });
 
     it('accepts prefix and suffix attributes', async () => {
       const el = await fixture<HelixCounter>(
-        '<hx-counter prefix="$" suffix="%" value="50"></hx-counter>',
+        '<hx-counter label="Price" prefix="$" suffix="%" value="50"></hx-counter>',
       );
       expect(el.prefix).toBe('$');
       expect(el.suffix).toBe('%');
@@ -128,12 +128,12 @@ describe('hx-counter', () => {
 
   describe('Property: duration', () => {
     it('defaults to 1000ms', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.duration).toBe(1000);
     });
 
     it('accepts custom duration', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter duration="2000"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" duration="2000"></hx-counter>');
       expect(el.duration).toBe(2000);
     });
 
@@ -179,7 +179,7 @@ describe('hx-counter', () => {
 
   describe('Property: easing', () => {
     it('defaults to ease-out', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.easing).toBe('ease-out');
     });
 
@@ -281,7 +281,7 @@ describe('hx-counter', () => {
       });
 
       const el = await fixture<HelixCounter>(
-        '<hx-counter format="integer" value="1000"></hx-counter>',
+        '<hx-counter label="Count" format="integer" value="1000"></hx-counter>',
       );
       await el.updateComplete;
 
@@ -312,7 +312,7 @@ describe('hx-counter', () => {
       });
 
       const el = await fixture<HelixCounter>(
-        '<hx-counter prefix="$" suffix="+" value="99"></hx-counter>',
+        '<hx-counter label="Price" prefix="$" suffix="+" value="99"></hx-counter>',
       );
       await el.updateComplete;
 
@@ -342,7 +342,7 @@ describe('hx-counter', () => {
       });
 
       const el = await fixture<HelixCounter>(
-        '<hx-counter format="decimal" value="42"></hx-counter>',
+        '<hx-counter label="Score" format="decimal" value="42"></hx-counter>',
       );
       await el.updateComplete;
 

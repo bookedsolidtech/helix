@@ -242,14 +242,13 @@ export class HelixCounter extends LitElement {
     this._cancelAnimation();
     this._normalizeEasing();
 
-    const effectiveDuration =
-      this.duration <= 0
-        ? (devWarn(
-            'hx-counter',
-            `duration must be > 0 (received ${this.duration}). Clamping to 1ms.`,
-          ),
-          1)
-        : this.duration;
+    let effectiveDuration: number;
+    if (this.duration <= 0) {
+      devWarn('hx-counter', `duration must be > 0 (received ${this.duration}). Clamping to 1ms.`);
+      effectiveDuration = 1;
+    } else {
+      effectiveDuration = this.duration;
+    }
 
     const step = (timestamp: number): void => {
       if (this._startTime === null) {
@@ -314,15 +313,15 @@ export class HelixCounter extends LitElement {
       [`counter--${this.size}`]: true,
     };
 
+    const trimmedLabel = (this.label || '').trim();
+
     return html`
       <span
         part="counter"
         role="status"
         aria-live="off"
         class=${classMap(classes)}
-        aria-label=${(this.label || '').trim()
-          ? `${(this.label || '').trim()}: ${this._formatValue()}`
-          : nothing}
+        aria-label=${trimmedLabel ? `${trimmedLabel}: ${this._formatValue()}` : nothing}
       >
         ${this._formatValue()}
       </span>
