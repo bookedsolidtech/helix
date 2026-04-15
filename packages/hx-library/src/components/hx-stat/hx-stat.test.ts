@@ -183,12 +183,23 @@ describe('hx-stat', () => {
       expect(shadowQuery(el, '[part~="trend"]')).toBeTruthy();
     });
 
-    it('renders trend element with correct class for forced-colors targeting', async () => {
+    it('stylesheet includes forced-colors media query with distinct trend styles', async () => {
       const el = await fixture<HelixStat>('<hx-stat value="42" trend="up"></hx-stat>');
       await el.updateComplete;
+
+      // Verify the trend element renders with the correct class
       const trend = shadowQuery(el, '.stat__trend');
       expect(trend).toBeTruthy();
-      expect(trend!.classList.contains('stat__trend--up')).toBe(true);
+      expect(trend?.classList.contains('stat__trend--up')).toBe(true);
+
+      // Verify the component's adopted stylesheets contain forced-colors rules
+      const sheets = el.shadowRoot?.adoptedStyleSheets ?? [];
+      const cssText = sheets.map((s) => [...s.cssRules].map((r) => r.cssText).join('\n')).join('\n');
+      expect(cssText).toContain('forced-colors: active');
+
+      // Verify up and down trends map to different border styles in the stylesheet
+      expect(cssText).toContain('.stat__trend--up');
+      expect(cssText).toContain('.stat__trend--down');
     });
   });
 

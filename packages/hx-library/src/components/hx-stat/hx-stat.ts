@@ -100,14 +100,16 @@ export class HelixStat extends LitElement {
   override updated(changedProperties: Map<PropertyKey, unknown>): void {
     super.updated(changedProperties);
     const identityChanged = changedProperties.has('value') || changedProperties.has('label');
-    if (identityChanged && !this.value && !this.label && !this._hasWarnedUnnamed) {
+    const hasValue = this.value.trim().length > 0;
+    const hasLabel = this.label.trim().length > 0;
+    if (identityChanged && !hasValue && !hasLabel && !this._hasWarnedUnnamed) {
       this._hasWarnedUnnamed = true;
       devWarn(
         'hx-stat',
         'Rendering an unnamed hx-stat; provide at least value or label for screen reader accessibility.',
       );
     }
-    if (this.value || this.label) {
+    if (hasValue || hasLabel) {
       this._hasWarnedUnnamed = false;
     }
   }
@@ -186,9 +188,7 @@ export class HelixStat extends LitElement {
     // readers when any of those properties change programmatically.
     const liveParts: string[] = [];
     const primary =
-      this.label && this.value
-        ? `${this.label}: ${this.value}`
-        : this.value || this.label || '';
+      this.label && this.value ? `${this.label}: ${this.value}` : this.value || this.label || '';
     if (primary) liveParts.push(primary);
     if (hasTrend) liveParts.push(`${this.labelTrend}: ${this.trend}`);
     const liveText = liveParts.join(', ');
