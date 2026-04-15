@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
@@ -44,7 +45,7 @@ interface FileEntry {
  * @cssprop [--hx-file-upload-error-color=var(--hx-color-error-500)] - Error state and remove-button hover color.
  */
 @customElement('hx-file-upload')
-export class HelixFileUpload extends LitElement {
+export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
   static override styles = [helixFileUploadStyles];
 
   // ─── Form Association ───
@@ -501,6 +502,31 @@ export class HelixFileUpload extends LitElement {
         detail: { file: removedFile, index },
       }),
     );
+
+    // Restore focus after removal so keyboard users are not stranded.
+    this.updateComplete
+      .then(() => {
+        if (this._files.length === 0) {
+          // List is now empty — return focus to the dropzone.
+          const dropzone = this.shadowRoot?.querySelector<HTMLElement>('[part="dropzone"]');
+          dropzone?.focus();
+        } else {
+          // Focus the remove button at the same position, or the previous one if
+          // the removed item was the last in the list.
+          const removeButtons =
+            this.shadowRoot?.querySelectorAll<HTMLButtonElement>('.file-item__remove');
+          if (removeButtons && removeButtons.length > 0) {
+            const targetIndex = index < this._files.length ? index : this._files.length - 1;
+            const targetButton = removeButtons[targetIndex];
+            if (targetButton) {
+              targetButton.focus();
+            }
+          }
+        }
+      })
+      .catch(() => {
+        // Focus restoration is best-effort; ignore errors.
+      });
   }
 
   // ─── Formatters ───
@@ -603,9 +629,10 @@ export class HelixFileUpload extends LitElement {
           id=${this._dropzoneId}
           role="button"
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-label=${ifDefined(!this.label ? dropzoneLabel : undefined)}
+          aria-label=${ifDefined(!this.label ? (this.ariaLabel ?? dropzoneLabel) : undefined)}
           aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
           aria-disabled=${this.disabled ? 'true' : nothing}
+          aria-invalid=${hasError ? 'true' : nothing}
           aria-describedby=${ifDefined(hasError ? this._errorId : undefined)}
           @click=${this._handleDropzoneClick}
           @keydown=${this._handleDropzoneKeyDown}
