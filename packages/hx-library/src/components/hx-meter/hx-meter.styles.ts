@@ -11,6 +11,13 @@ export const helixMeterStyles = css`
     flex-direction: column;
     gap: var(--hx-space-2, 0.5rem);
     width: 100%;
+    outline: none;
+    border-radius: var(--hx-border-radius-md, 0.375rem);
+  }
+
+  .meter:focus-visible {
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .meter__label {
@@ -92,12 +99,6 @@ export const helixMeterStyles = css`
 
   .meter__state-label[data-state='danger'] {
     color: var(--hx-meter-color-danger, var(--hx-color-error-700, #991b1b));
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .meter__indicator {
-      transition: none;
-    }
   }
 
   /* ─── Native meter hidden (we use custom rendering) ─── */
