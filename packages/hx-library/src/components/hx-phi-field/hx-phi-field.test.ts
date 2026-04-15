@@ -230,8 +230,8 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
       const value = shadowQuery(el, '.phi-field__value');
       expect(value?.classList.contains('phi-field__value--revealed')).toBe(true);
@@ -242,10 +242,10 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
-      toggle.click();
+      toggle?.click();
       await el.updateComplete;
       const value = shadowQuery(el, '.phi-field__value');
       expect(value?.classList.contains('phi-field__value--masked')).toBe(true);
@@ -256,10 +256,10 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       // Reveal then hide
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
-      toggle.click();
+      toggle?.click();
       await el.updateComplete;
       expect(el.shadowRoot?.innerHTML).not.toContain('123-45-6789');
     });
@@ -268,8 +268,8 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
       expect(el.shadowRoot?.innerHTML).toContain('123-45-6789');
     });
@@ -285,8 +285,8 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       const event = await eventPromise;
       expect(event.detail.action).toBe('reveal');
     });
@@ -298,8 +298,8 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       const event = await eventPromise;
       expect(event.detail.fieldId).toBe('ssn-field');
     });
@@ -311,8 +311,8 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       const event = await eventPromise;
       expect(event.detail.fieldType).toBe('ssn');
     });
@@ -324,8 +324,8 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       const event = await eventPromise;
       expect(event.detail.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     });
@@ -337,8 +337,8 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
@@ -348,13 +348,13 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
       // First reveal
-      toggle.click();
+      toggle?.click();
       await el.updateComplete;
       // Then hide — listen for the second event
       const hideEventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      toggle.click();
+      toggle?.click();
       const hideEvent = await hideEventPromise;
       expect(hideEvent.detail.action).toBe('hide');
     });
@@ -366,8 +366,8 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       const event = await eventPromise;
       expect(event.detail.fieldId).toBe('my-ssn');
     });
@@ -380,7 +380,7 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const container = shadowQuery(el, '.phi-field')!;
+      const container = shadowQuery(el, '.phi-field');
       let defaultPrevented = false;
       const copyEvent = new ClipboardEvent('copy', { bubbles: true, cancelable: true });
       Object.defineProperty(copyEvent, 'preventDefault', {
@@ -388,7 +388,7 @@ describe('hx-phi-field', () => {
           defaultPrevented = true;
         },
       });
-      container.dispatchEvent(copyEvent);
+      container?.dispatchEvent(copyEvent);
       expect(defaultPrevented).toBe(true);
     });
 
@@ -396,7 +396,7 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const container = shadowQuery(el, '.phi-field')!;
+      const container = shadowQuery(el, '.phi-field');
       let defaultPrevented = false;
       const pasteEvent = new ClipboardEvent('paste', { bubbles: true, cancelable: true });
       Object.defineProperty(pasteEvent, 'preventDefault', {
@@ -404,7 +404,7 @@ describe('hx-phi-field', () => {
           defaultPrevented = true;
         },
       });
-      container.dispatchEvent(pasteEvent);
+      container?.dispatchEvent(pasteEvent);
       expect(defaultPrevented).toBe(true);
     });
 
@@ -412,10 +412,10 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
-      const container = shadowQuery(el, '.phi-field')!;
+      const container = shadowQuery(el, '.phi-field');
       let defaultPrevented = false;
       const copyEvent = new ClipboardEvent('copy', { bubbles: true, cancelable: true });
       Object.defineProperty(copyEvent, 'preventDefault', {
@@ -423,7 +423,7 @@ describe('hx-phi-field', () => {
           defaultPrevented = true;
         },
       });
-      container.dispatchEvent(copyEvent);
+      container?.dispatchEvent(copyEvent);
       expect(defaultPrevented).toBe(false);
     });
   });
@@ -444,8 +444,8 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -480,36 +480,36 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery(el, '[part="toggle"]')!;
-      expect(toggle.getAttribute('aria-label')).toBe('Reveal protected health information');
+      const toggle = shadowQuery(el, '[part="toggle"]');
+      expect(toggle?.getAttribute('aria-label')).toBe('Reveal protected health information');
     });
 
     it('toggle has aria-label when revealed', async () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
-      expect(toggle.getAttribute('aria-label')).toBe('Hide protected health information');
+      expect(toggle?.getAttribute('aria-label')).toBe('Hide protected health information');
     });
 
     it('toggle aria-pressed is "false" when masked', async () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery(el, '[part="toggle"]')!;
-      expect(toggle.getAttribute('aria-pressed')).toBe('false');
+      const toggle = shadowQuery(el, '[part="toggle"]');
+      expect(toggle?.getAttribute('aria-pressed')).toBe('false');
     });
 
     it('toggle aria-pressed is "true" when revealed', async () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
-      expect(toggle.getAttribute('aria-pressed')).toBe('true');
+      expect(toggle?.getAttribute('aria-pressed')).toBe('true');
     });
 
     it('status region announces masked state', async () => {
@@ -524,8 +524,8 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
       const status = shadowQuery(el, '[role="status"]');
       expect(status?.textContent?.trim()).toBe('Protected health information is revealed');
@@ -537,8 +537,8 @@ describe('hx-phi-field', () => {
       );
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery(el, '[part="toggle"]')!;
-      expect(toggle.getAttribute('aria-label')).toBe('Reveal social security number');
+      const toggle = shadowQuery(el, '[part="toggle"]');
+      expect(toggle?.getAttribute('aria-label')).toBe('Reveal social security number');
     });
 
     it('status region uses custom label in announcement', async () => {
@@ -563,8 +563,8 @@ describe('hx-phi-field', () => {
       const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      expect(toggle.getAttribute('type')).toBe('button');
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      expect(toggle?.getAttribute('type')).toBe('button');
     });
 
     it('masked value span has aria-hidden="true"', async () => {
@@ -644,8 +644,8 @@ describe('hx-phi-field', () => {
       );
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      expect(toggle.disabled).toBe(true);
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      expect(toggle?.disabled).toBe(true);
     });
 
     it('does not reveal when disabled', async () => {
@@ -654,8 +654,8 @@ describe('hx-phi-field', () => {
       );
       el.data = '123-45-6789';
       await el.updateComplete;
-      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]')!;
-      toggle.click();
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
       await el.updateComplete;
       const value = shadowQuery(el, '.phi-field__value');
       expect(value?.classList.contains('phi-field__value--masked')).toBe(true);

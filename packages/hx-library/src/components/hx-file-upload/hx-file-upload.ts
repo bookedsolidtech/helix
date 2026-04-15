@@ -58,7 +58,6 @@ export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
 
   constructor() {
     super();
-    /** @internal */
     this._internals = this.attachInternals();
   }
 
