@@ -1,4 +1,4 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import {
@@ -521,7 +521,7 @@ export class HelixPopup extends LitElement {
       <slot name="anchor" @slotchange=${this._handleAnchorSlotChange}></slot>
       <div part="popup" ?inert=${!this.active}>
         <slot></slot>
-        ${this.arrow ? html`<div part="arrow"></div>` : ''}
+        ${this.arrow ? html`<div part="arrow"></div>` : nothing}
       </div>
     `;
   }
