@@ -543,7 +543,7 @@ export class HelixPopover extends LitElement {
         @mouseleave=${this._handleBodyMouseLeave}
       >
         <slot></slot>
-        ${this.arrow ? html`<div part="arrow"></div>` : ''}
+        ${this.arrow ? html`<div part="arrow"></div>` : nothing}
       </div>
     `;
   }

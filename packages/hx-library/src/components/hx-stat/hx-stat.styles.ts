@@ -106,4 +106,51 @@ export const helixStatStyles = css`
   [hidden] {
     display: none !important;
   }
+
+  /* ─── Visually-hidden live region ─── */
+
+  .stat__live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  /* ─── Forced Colors (Windows High Contrast Mode) ─── */
+
+  @media (forced-colors: active) {
+    .stat__trend {
+      forced-color-adjust: none;
+    }
+
+    .stat__value {
+      color: CanvasText;
+    }
+
+    .stat__label {
+      color: CanvasText;
+    }
+
+    .stat__icon {
+      color: CanvasText;
+    }
+
+    .stat__trend--up {
+      background: Highlight;
+      color: HighlightText;
+      border: 1px solid Highlight;
+    }
+
+    .stat__trend--down {
+      background: ButtonText;
+      color: ButtonFace;
+      border: 1px solid ButtonText;
+    }
+
+    .stat__trend-arrow {
+      color: currentColor;
+    }
+  }
 `;

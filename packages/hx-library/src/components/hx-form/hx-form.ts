@@ -425,13 +425,7 @@ export class HelixForm extends LitElement {
     const errorSummary =
       this._validationErrors.length > 0
         ? html`
-            <div
-              class="hx-form-error-summary"
-              role="alert"
-              aria-live="assertive"
-              aria-atomic="true"
-              tabindex="-1"
-            >
+            <div class="hx-form-error-summary" role="alert" aria-atomic="true" tabindex="-1">
               <ul>
                 ${this._validationErrors.map(
                   (error) => html`<li>${error.message || error.name}</li>`,
