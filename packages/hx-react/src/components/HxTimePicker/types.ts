@@ -32,12 +32,6 @@ export interface HxTimePickerProps {
   error?: string;
   /** Display format for the time input. '12h' shows AM/PM; '24h' is bare HH:MM. */
   format?: '12h' | '24h';
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched when the selected time changes. Detail value is HH:MM (24h). */

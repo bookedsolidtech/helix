@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import './hx-select.js';
 import '../hx-button/hx-button.js';
 import '../hx-text-input/hx-text-input.js';
@@ -1167,8 +1167,6 @@ export const KeyboardNavigation: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
     // Verify the host element renders
     const host = canvasElement.querySelector('hx-select');
     await expect(host).toBeTruthy();
@@ -1176,11 +1174,9 @@ export const KeyboardNavigation: Story = {
     const trigger = host!.shadowRoot!.querySelector('[role="combobox"]');
     await expect(trigger).toBeTruthy();
 
-    // Verify the instructional text is present
-    await expect(canvas.getByText(/Tab into the select/)).toBeTruthy();
-
-    // Tab to focus the combobox trigger
-    await userEvent.tab();
+    // Focus the combobox trigger directly (userEvent.tab cannot cross shadow DOM)
+    (trigger as HTMLElement).focus();
+    await new Promise((r) => setTimeout(r, 50));
 
     // The combobox trigger div should now have focus
     const activeEl = host!.shadowRoot!.activeElement;

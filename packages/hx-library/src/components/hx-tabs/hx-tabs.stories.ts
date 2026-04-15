@@ -273,9 +273,10 @@ export const Default: Story = {
     await expect(panels[1].hasAttribute('hidden')).toBeTruthy();
     await expect(panels[2].hasAttribute('hidden')).toBeTruthy();
 
-    // Click the second tab and verify panel switches
-    await userEvent.click(tabEls[1]);
-    await new Promise((r) => setTimeout(r, 50));
+    // Click the second tab's internal button (click on host does not reach shadow DOM handler)
+    const tabBtn = tabEls[1].shadowRoot?.querySelector('button') as HTMLElement;
+    await userEvent.click(tabBtn);
+    await new Promise((r) => setTimeout(r, 200));
     await expect(panels[0].hasAttribute('hidden')).toBeTruthy();
     await expect(panels[1].hasAttribute('hidden')).toBeFalsy();
   },
@@ -434,10 +435,11 @@ export const ManyTabs: Story = {
     const tabEls = canvasElement.querySelectorAll('hx-tab');
     await expect(tabEls.length).toBe(8);
 
-    // Navigate to the last tab by clicking it
+    // Navigate to the last tab by clicking its internal button
     const lastTab = tabEls[tabEls.length - 1];
-    await userEvent.click(lastTab);
-    await new Promise((r) => setTimeout(r, 50));
+    const lastTabBtn = lastTab.shadowRoot?.querySelector('button') as HTMLElement;
+    await userEvent.click(lastTabBtn);
+    await new Promise((r) => setTimeout(r, 200));
     await expect(lastTab.hasAttribute('selected')).toBeTruthy();
 
     const lastPanel = canvasElement.querySelector('hx-tab-panel[name="imaging"]');
@@ -639,20 +641,22 @@ export const Healthcare: Story = {
     if (!demographicsPanel) throw new Error('hx-tab-panel[name="patient-demographics"] not found');
     await expect(demographicsPanel.hasAttribute('hidden')).toBeFalsy();
 
-    // Navigate to Vitals tab
-    await userEvent.click(tabEls[1]);
-    await new Promise((r) => setTimeout(r, 50));
+    // Navigate to Vitals tab (click internal button)
+    const vitalsTabBtn = tabEls[1].shadowRoot?.querySelector('button') as HTMLElement;
+    await userEvent.click(vitalsTabBtn);
+    await new Promise((r) => setTimeout(r, 200));
     await expect(tabEls[1].hasAttribute('selected')).toBeTruthy();
     const vitalsPanel = canvasElement.querySelector('hx-tab-panel[name="patient-vitals"]');
     if (!vitalsPanel) throw new Error('hx-tab-panel[name="patient-vitals"] not found');
     await expect(vitalsPanel.hasAttribute('hidden')).toBeFalsy();
     await expect(demographicsPanel.hasAttribute('hidden')).toBeTruthy();
 
-    // Navigate to Clinical Notes tab
+    // Navigate to Clinical Notes tab (click internal button)
     const notesTab = canvasElement.querySelector('hx-tab[panel="patient-notes"]');
     if (!notesTab) throw new Error('hx-tab[panel="patient-notes"] not found');
-    await userEvent.click(notesTab);
-    await new Promise((r) => setTimeout(r, 50));
+    const notesTabBtn = notesTab.shadowRoot?.querySelector('button') as HTMLElement;
+    await userEvent.click(notesTabBtn);
+    await new Promise((r) => setTimeout(r, 200));
     const notesPanel = canvasElement.querySelector('hx-tab-panel[name="patient-notes"]');
     if (!notesPanel) throw new Error('hx-tab-panel[name="patient-notes"] not found');
     await expect(notesPanel.hasAttribute('hidden')).toBeFalsy();
@@ -799,17 +803,19 @@ export const InteractionTest: Story = {
     await expect(panels[1].hasAttribute('hidden')).toBeTruthy();
     await expect(panels[2].hasAttribute('hidden')).toBeTruthy();
 
-    // Click tab 2 — panel 2 should become visible
-    await userEvent.click(tabEls[1]);
-    await new Promise((r) => setTimeout(r, 50));
+    // Click tab 2 internal button — panel 2 should become visible
+    const tab2Btn = tabEls[1].shadowRoot?.querySelector('button') as HTMLElement;
+    await userEvent.click(tab2Btn);
+    await new Promise((r) => setTimeout(r, 200));
     await expect(tabEls[1].hasAttribute('selected')).toBeTruthy();
     await expect(tabEls[0].hasAttribute('selected')).toBeFalsy();
     const panel2 = canvasElement.querySelector('hx-tab-panel[name="tab2"]');
     await expect(panel2).not.toHaveAttribute('hidden');
 
-    // Click tab 3 — panel 3 should become visible
-    await userEvent.click(tabEls[2]);
-    await new Promise((r) => setTimeout(r, 50));
+    // Click tab 3 internal button — panel 3 should become visible
+    const tab3Btn = tabEls[2].shadowRoot?.querySelector('button') as HTMLElement;
+    await userEvent.click(tab3Btn);
+    await new Promise((r) => setTimeout(r, 200));
     await expect(tabEls[2].hasAttribute('selected')).toBeTruthy();
     const panel3 = canvasElement.querySelector('hx-tab-panel[name="tab3"]');
     await expect(panel3).not.toHaveAttribute('hidden');

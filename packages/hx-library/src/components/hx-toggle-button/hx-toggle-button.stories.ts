@@ -648,8 +648,8 @@ export const KeyboardActivation: Story = {
     const innerButton = hxToggleButton!.shadowRoot!.querySelector('button');
     await expect(innerButton).toBeTruthy();
 
-    // Tab to focus the toggle button
-    await userEvent.tab();
+    // Focus the inner button directly (userEvent.tab doesn't cross shadow DOM)
+    innerButton!.focus();
 
     // Verify inner button receives focus
     const activeEl = hxToggleButton!.shadowRoot!.activeElement;

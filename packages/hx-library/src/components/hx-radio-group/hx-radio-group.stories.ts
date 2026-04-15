@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, userEvent, fn } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 import './hx-radio-group.js';
 import './hx-radio.js';
 
@@ -1061,19 +1061,19 @@ export const KeyboardNavigation: Story = {
     await new Promise((r) => setTimeout(r, 50));
 
     // Arrow Down should move to next and select it
-    await userEvent.keyboard('{ArrowDown}');
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
     expect(radios[1].getAttribute('aria-checked')).toBe('true');
 
     // Arrow Down again
-    await userEvent.keyboard('{ArrowDown}');
+    radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
     expect(radios[2].getAttribute('aria-checked')).toBe('true');
 
     // Arrow Up should move back
-    await userEvent.keyboard('{ArrowUp}');
+    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
     expect(radios[1].getAttribute('aria-checked')).toBe('true');
@@ -1102,19 +1102,19 @@ export const ArrowWrap: Story = {
     expect(group!.value).toBe('alpha');
 
     // Navigate to last
-    await userEvent.keyboard('{ArrowDown}');
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 50));
-    await userEvent.keyboard('{ArrowDown}');
+    radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('gamma');
 
     // Arrow Down from last should wrap to first
-    await userEvent.keyboard('{ArrowDown}');
+    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('alpha');
 
     // Arrow Up from first should wrap to last
-    await userEvent.keyboard('{ArrowUp}');
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('gamma');
   },
@@ -1142,12 +1142,12 @@ export const DisabledSkip: Story = {
     expect(group!.value).toBe('first');
 
     // Arrow Down should skip disabled "second" and land on "third"
-    await userEvent.keyboard('{ArrowDown}');
+    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
 
     // Arrow Down from "third" should wrap and skip disabled, landing on "first"
-    await userEvent.keyboard('{ArrowDown}');
+    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('first');
   },

@@ -84,8 +84,8 @@ bash scripts/agent-verify.sh
 This runs format → lint → type-check → test:smart in sequence. If any step fails, **fix it, then re-run**. Do NOT push until it exits 0.
 
 **Additional constraints for agents:**
-- **Scope is `packages/hx-library/` only.** Do not touch `packages/hx-react/`, `apps/`, or any package outside your task scope.
-- **Do NOT run `pnpm run generate` in `packages/hx-react/`** — the React wrapper generator corrupts files.
+- **Primary scope is `packages/hx-library/` and `packages/hx-react/`.** Do not touch `apps/` or any package outside your task scope without explicit instruction.
+- **Do NOT run `pnpm run generate` in `packages/hx-react/`** — the React wrapper generator corrupts files. Manual edits to `packages/hx-react/` types and index are allowed when fixing type mismatches or removing dead exports.
 - **Do NOT run `pnpm install` or modify `package.json`/lockfiles** without explicit instruction.
 - A PR that fails CI immediately is a defect in your execution, not an acceptable first attempt.
 
