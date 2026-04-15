@@ -11,7 +11,7 @@
     - hx-href:       Optional URL. When set, the card becomes interactive/clickable.
                      Note: Do NOT use hx-href together with slot="actions". Interactive
                      controls nested inside role="link" violates ARIA spec.
-    - hx-aria-label: Accessible label for interactive cards. Required when hx-href is
+    - hx-label:      Accessible label for interactive cards. Required when hx-href is
                      set — provide a meaningful description of the card's purpose
                      (e.g., "View chart for Margaret Thompson") rather than the raw URL.
 
@@ -37,7 +37,7 @@
   elevation="{{ elevation|default('flat') }}"
   {% if href is defined and href %}
     hx-href="{{ href }}"
-    hx-aria-label="{{ aria_label }}"
+    hx-label="{{ aria_label }}"
   {% endif %}
 >
   {% if image is defined and image %}
