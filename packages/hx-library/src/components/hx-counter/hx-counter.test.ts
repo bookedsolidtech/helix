@@ -10,21 +10,27 @@ describe('hx-counter', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter value="100"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="100"></hx-counter>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders a span with the counter part', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter value="100"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="100"></hx-counter>');
       const counter = shadowQuery(el, '[part~="counter"]');
       expect(counter).toBeTruthy();
       expect(counter?.tagName.toLowerCase()).toBe('span');
     });
 
     it('applies default size=md class', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter value="100"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="100"></hx-counter>');
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--md')).toBe(true);
+    });
+
+    it('sets role="status" on the counter element', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="42"></hx-counter>');
+      const counter = shadowQuery(el, '[part~="counter"]');
+      expect(counter?.getAttribute('role')).toBe('status');
     });
   });
 
@@ -32,12 +38,12 @@ describe('hx-counter', () => {
 
   describe('Property: value', () => {
     it('defaults to 0', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.value).toBe(0);
     });
 
     it('accepts numeric value attribute', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter value="500"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="500"></hx-counter>');
       expect(el.value).toBe(500);
     });
   });
@@ -46,32 +52,38 @@ describe('hx-counter', () => {
 
   describe('Property: size', () => {
     it('applies sm class via hx-size', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter hx-size="sm" value="5"></hx-counter>');
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" hx-size="sm" value="5"></hx-counter>',
+      );
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--sm')).toBe(true);
     });
 
     it('applies md class via hx-size', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter hx-size="md" value="5"></hx-counter>');
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" hx-size="md" value="5"></hx-counter>',
+      );
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--md')).toBe(true);
     });
 
     it('applies lg class via hx-size', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter hx-size="lg" value="5"></hx-counter>');
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" hx-size="lg" value="5"></hx-counter>',
+      );
       const counter = shadowQuery(el, '.counter');
       expect(counter?.classList.contains('counter--lg')).toBe(true);
     });
 
     it('backward compat: legacy size attribute maps to hx-size', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter size="sm" value="5"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" size="sm" value="5"></hx-counter>');
       await el.updateComplete;
       expect(el.size).toBe('sm');
     });
 
     it('hx-size takes precedence over legacy size attribute', async () => {
       const el = await fixture<HelixCounter>(
-        '<hx-counter size="sm" hx-size="lg" value="5"></hx-counter>',
+        '<hx-counter label="Count" size="sm" hx-size="lg" value="5"></hx-counter>',
       );
       await el.updateComplete;
       expect(el.size).toBe('lg');
@@ -82,13 +94,13 @@ describe('hx-counter', () => {
 
   describe('Property: format', () => {
     it('defaults to integer format', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.format).toBe('integer');
     });
 
     it('accepts decimal format', async () => {
       const el = await fixture<HelixCounter>(
-        '<hx-counter format="decimal" value="0"></hx-counter>',
+        '<hx-counter label="Count" format="decimal" value="0"></hx-counter>',
       );
       expect(el.format).toBe('decimal');
     });
@@ -98,14 +110,14 @@ describe('hx-counter', () => {
 
   describe('Property: prefix and suffix', () => {
     it('defaults prefix and suffix to empty string', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.prefix).toBe('');
       expect(el.suffix).toBe('');
     });
 
     it('accepts prefix and suffix attributes', async () => {
       const el = await fixture<HelixCounter>(
-        '<hx-counter prefix="$" suffix="%" value="50"></hx-counter>',
+        '<hx-counter label="Price" prefix="$" suffix="%" value="50"></hx-counter>',
       );
       expect(el.prefix).toBe('$');
       expect(el.suffix).toBe('%');
@@ -116,13 +128,50 @@ describe('hx-counter', () => {
 
   describe('Property: duration', () => {
     it('defaults to 1000ms', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.duration).toBe(1000);
     });
 
     it('accepts custom duration', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter duration="2000"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" duration="2000"></hx-counter>');
       expect(el.duration).toBe(2000);
+    });
+
+    it('clamps duration <= 0 and still completes animation', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" duration="0" value="42"></hx-counter>',
+      );
+
+      // Wait for rAF-based animation to complete (clamped to 1ms, finishes in 1-2 frames)
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      await el.updateComplete;
+
+      const counter = shadowQuery(el, '[part~="counter"]');
+      expect(counter?.textContent?.trim()).toBe('42');
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] duration must be > 0 (received 0). Clamping to 1ms.',
+      );
+
+      vi.restoreAllMocks();
     });
   });
 
@@ -130,18 +179,49 @@ describe('hx-counter', () => {
 
   describe('Property: easing', () => {
     it('defaults to ease-out', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count"></hx-counter>');
       expect(el.easing).toBe('ease-out');
     });
 
     it('accepts all easing values', async () => {
       for (const easing of ['linear', 'ease-in', 'ease-out', 'ease-in-out']) {
         const el = await fixture<HelixCounter>(
-          `<hx-counter easing="${easing}" value="10"></hx-counter>`,
+          `<hx-counter label="Count" easing="${easing}" value="10"></hx-counter>`,
         );
         expect(el.easing).toBe(easing);
         el.remove();
       }
+    });
+
+    it('falls back to linear for invalid easing and emits devWarn', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" easing="bogus" value="50"></hx-counter>',
+      );
+      await el.updateComplete;
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] Unrecognized easing value "bogus". Falling back to "linear". Valid values: ease-in, ease-out, ease-in-out, linear.',
+      );
+
+      vi.restoreAllMocks();
     });
   });
 
@@ -167,7 +247,7 @@ describe('hx-counter', () => {
         return originalMatchMedia(query);
       });
 
-      const el = await fixture<HelixCounter>('<hx-counter value="500"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="500"></hx-counter>');
       await el.updateComplete;
 
       const counter = shadowQuery(el, '[part~="counter"]');
@@ -201,7 +281,7 @@ describe('hx-counter', () => {
       });
 
       const el = await fixture<HelixCounter>(
-        '<hx-counter format="integer" value="1000"></hx-counter>',
+        '<hx-counter label="Count" format="integer" value="1000"></hx-counter>',
       );
       await el.updateComplete;
 
@@ -232,7 +312,7 @@ describe('hx-counter', () => {
       });
 
       const el = await fixture<HelixCounter>(
-        '<hx-counter prefix="$" suffix="+" value="99"></hx-counter>',
+        '<hx-counter label="Price" prefix="$" suffix="+" value="99"></hx-counter>',
       );
       await el.updateComplete;
 
@@ -262,7 +342,7 @@ describe('hx-counter', () => {
       });
 
       const el = await fixture<HelixCounter>(
-        '<hx-counter format="decimal" value="42"></hx-counter>',
+        '<hx-counter label="Score" format="decimal" value="42"></hx-counter>',
       );
       await el.updateComplete;
 
@@ -280,7 +360,7 @@ describe('hx-counter', () => {
 
   describe('CSS Parts', () => {
     it('exposes "counter" part', async () => {
-      const el = await fixture<HelixCounter>('<hx-counter value="10"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="10"></hx-counter>');
       expect(shadowQuery(el, '[part~="counter"]')).toBeTruthy();
     });
   });
@@ -288,21 +368,22 @@ describe('hx-counter', () => {
   // ─── Accessibility (3) ───
 
   describe('Accessibility', () => {
-    it('has aria-live="polite" on the off-screen live region (not on the visible counter)', async () => {
-      // WCAG 4.1.2 fix: aria-live moved from the visible counter span to a hidden live region
-      // so screen readers only announce once at animation end, not on every frame.
-      const el = await fixture<HelixCounter>('<hx-counter value="42"></hx-counter>');
+    it('has aria-live="polite" on the off-screen live region; counter span has aria-live="off"', async () => {
+      // WCAG 4.1.2: role="status" implies aria-live="polite", but the visible counter span
+      // carries aria-live="off" to suppress per-frame announcements during animation.
+      // A separate off-screen live region announces the final value once at animation end.
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="42"></hx-counter>');
       const counter = shadowQuery(el, '[part~="counter"]');
-      // Visible counter must NOT carry aria-live (prevents per-frame announcements)
-      expect(counter?.getAttribute('aria-live')).toBeNull();
-      // The off-screen .sr-only span carries aria-live instead
+      // Visible counter carries aria-live="off" to suppress implicit live behavior of role="status"
+      expect(counter?.getAttribute('aria-live')).toBe('off');
+      // The off-screen .sr-only span carries aria-live="polite" for end-of-animation announcements
       const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
       expect(liveRegion?.getAttribute('aria-live')).toBe('polite');
     });
 
     it('has aria-atomic="true" on the off-screen live region (not on the visible counter)', async () => {
       // WCAG 4.1.2 fix: aria-atomic moved from the visible counter span to a hidden live region
-      const el = await fixture<HelixCounter>('<hx-counter value="42"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="42"></hx-counter>');
       const counter = shadowQuery(el, '[part~="counter"]');
       // Visible counter must NOT carry aria-atomic
       expect(counter?.getAttribute('aria-atomic')).toBeNull();
@@ -311,8 +392,58 @@ describe('hx-counter', () => {
       expect(liveRegion?.getAttribute('aria-atomic')).toBe('true');
     });
 
-    it('has no axe violations in default state', async () => {
+    it('warns in dev mode when no label is provided', async () => {
+      // Intentionally mounts without label to cover the devWarn path (WCAG 4.1.2 enforcement)
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixCounter>('<hx-counter value="100"></hx-counter>');
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] hx-counter requires a label for screen reader accessibility (WCAG 4.1.2). Provide the `label` attribute.',
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('treats whitespace-only label as empty and warns', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixCounter>('<hx-counter label="   " value="100"></hx-counter>');
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] hx-counter requires a label for screen reader accessibility (WCAG 4.1.2). Provide the `label` attribute.',
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('includes label in sr-only announcement when label is set', async () => {
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Total patients" value="1284"></hx-counter>',
+      );
+      await el.updateComplete;
+
+      const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
+      expect(liveRegion?.textContent).toBe('Total patients: 1,284');
+
+      vi.restoreAllMocks();
+    });
+
+    it('has no axe violations in default state', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="100"></hx-counter>');
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
@@ -320,7 +451,7 @@ describe('hx-counter', () => {
     it('has no axe violations across all sizes', async () => {
       for (const size of ['sm', 'md', 'lg']) {
         const el = await fixture<HelixCounter>(
-          `<hx-counter hx-size="${size}" value="42"></hx-counter>`,
+          `<hx-counter label="Count" hx-size="${size}" value="42"></hx-counter>`,
         );
         const { violations } = await checkA11y(el);
         expect(violations, `hx-size="${size}" should have no violations`).toEqual([]);
@@ -334,7 +465,7 @@ describe('hx-counter', () => {
   describe('Lifecycle', () => {
     it('cancels animation on disconnect', async () => {
       const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame');
-      const el = await fixture<HelixCounter>('<hx-counter value="100"></hx-counter>');
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="100"></hx-counter>');
       el.remove();
       // cancelAnimationFrame should have been called during disconnectedCallback
       expect(cancelSpy).toHaveBeenCalled();
