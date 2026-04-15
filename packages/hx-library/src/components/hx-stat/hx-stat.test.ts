@@ -324,6 +324,15 @@ describe('hx-stat', () => {
       );
     });
 
+    it('warns only once across multiple updates (_hasWarnedUnnamed guard)', async () => {
+      const el = await fixture<HelixStat>('<hx-stat></hx-stat>');
+      expect(console.warn).toHaveBeenCalledTimes(1);
+
+      el.requestUpdate();
+      await el.updateComplete;
+      expect(console.warn).toHaveBeenCalledTimes(1);
+    });
+
     it('does not warn about unnamed stat when value is provided', async () => {
       await fixture<HelixStat>('<hx-stat value="42"></hx-stat>');
       const unnamedCalls = (console.warn as ReturnType<typeof vi.spyOn>).mock.calls.filter(
