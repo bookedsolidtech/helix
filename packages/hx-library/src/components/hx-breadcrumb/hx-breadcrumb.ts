@@ -349,13 +349,12 @@ export class HelixBreadcrumb extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    // Expose role="list" on the host so axe-core's flat-tree traversal sees
-    // a valid list ancestor for the slotted hx-breadcrumb-item[role="listitem"]
-    // children. The shadow-DOM <ol> provides the visual list structure, but the
-    // composed accessibility tree requires this role on the host.
-    if (!this.hasAttribute('role')) {
-      this.setAttribute('role', 'list');
-    }
+    // Do NOT set role="list" on the host. The shadow-DOM <nav><ol> provides
+    // both navigation landmark and list semantics. Setting role="list" on
+    // the host conflicts with the <nav> child — axe-core flags
+    // aria-required-children because a list cannot own a navigation landmark.
+    // Slotted items no longer need role="listitem" either; the native <ol>
+    // handles list semantics in the composed accessibility tree.
     this.addEventListener('click', this._boundEllipsisClick);
     this.addEventListener('keydown', this._boundEllipsisKeydown);
   }
