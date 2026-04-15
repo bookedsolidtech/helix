@@ -644,6 +644,14 @@ describe('hx-list-item', () => {
       const base = shadowQuery(el, '[part~="base"]')!;
       expect(base.getAttribute('aria-label')).toBe('Treatment options');
     });
+
+    it('does not set aria-label on interactive list when label is missing', async () => {
+      const el = await fixture<HelixList>('<hx-list variant="interactive"></hx-list>');
+      const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
+      expect(base).toBeTruthy();
+      if (!base) throw new Error('Expected [part~="base"] to exist');
+      expect(base.hasAttribute('aria-label')).toBe(false);
+    });
   });
 
   // ─── Description variant ───

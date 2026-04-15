@@ -257,9 +257,11 @@ describe('hx-phi-field', () => {
       await el.updateComplete;
       // Reveal then hide
       const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
-      toggle?.click();
+      expect(toggle).toBeTruthy();
+      if (!toggle) throw new Error('Expected [part="toggle"] to exist');
+      toggle.click();
       await el.updateComplete;
-      toggle?.click();
+      toggle.click();
       await el.updateComplete;
       expect(el.shadowRoot?.innerHTML).not.toContain('123-45-6789');
     });
@@ -269,7 +271,9 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
       const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
-      toggle?.click();
+      expect(toggle).toBeTruthy();
+      if (!toggle) throw new Error('Expected [part="toggle"] to exist');
+      toggle.click();
       await el.updateComplete;
       expect(el.shadowRoot?.innerHTML).toContain('123-45-6789');
     });
