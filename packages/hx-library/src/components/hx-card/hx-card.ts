@@ -241,7 +241,12 @@ export class HelixCard extends LitElement {
           <slot name="image" @slotchange=${this._onImageSlotChange}></slot>
         </div>
 
-        <div class="card__heading" part="heading" id=${this._headingId} ?hidden=${!this._hasHeading}>
+        <div
+          class="card__heading"
+          part="heading"
+          id=${this._headingId}
+          ?hidden=${!this._hasHeading}
+        >
           <slot name="heading" @slotchange=${this._onHeadingSlotChange}></slot>
         </div>
 
