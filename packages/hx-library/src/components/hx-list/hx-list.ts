@@ -182,7 +182,7 @@ export class HelixList extends LitElement {
         part="base"
         class="list list--${this.variant}"
         role=${isInteractive ? 'listbox' : 'list'}
-        aria-label=${isInteractive ? this.label || 'List' : ifDefined(this.label)}
+        aria-label=${isInteractive ? this.label || nothing : ifDefined(this.label)}
         aria-multiselectable=${isInteractive ? 'false' : nothing}
         @hx-list-item-click=${this._handleItemClick}
       >
