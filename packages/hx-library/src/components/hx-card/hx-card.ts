@@ -2,8 +2,11 @@ import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixCardStyles } from './hx-card.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+
+const _nextCardId = createIdCounter('hx-card');
 
 /**
  * A flexible card component for displaying grouped content.
@@ -109,6 +112,17 @@ export class HelixCard extends LitElement {
    * @internal
    */
   @state() private _headingText = '';
+
+  /**
+   * Unique identifier for this card instance, used in ARIA attributes.
+   * @internal
+   */
+  private _cardId = _nextCardId();
+  /**
+   * Unique identifier for the heading element, used in aria-labelledby.
+   * @internal
+   */
+  private _headingId = `${this._cardId}-heading`;
 
   /** @internal */
   private _onImageSlotChange(e: Event): void {
@@ -218,7 +232,8 @@ export class HelixCard extends LitElement {
         class=${classMap(classes)}
         role=${isInteractive ? 'link' : nothing}
         tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive ? this.label || this._headingText || nothing : nothing}
+        aria-label=${isInteractive && this.label ? this.label : nothing}
+        aria-labelledby=${this._hasHeading && !this.label ? this._headingId : nothing}
         @click=${this._handleClick}
         @keydown=${this._handleKeyDown}
       >
@@ -226,7 +241,7 @@ export class HelixCard extends LitElement {
           <slot name="image" @slotchange=${this._onImageSlotChange}></slot>
         </div>
 
-        <div class="card__heading" part="heading" ?hidden=${!this._hasHeading}>
+        <div class="card__heading" part="heading" id=${this._headingId} ?hidden=${!this._hasHeading}>
           <slot name="heading" @slotchange=${this._onHeadingSlotChange}></slot>
         </div>
 

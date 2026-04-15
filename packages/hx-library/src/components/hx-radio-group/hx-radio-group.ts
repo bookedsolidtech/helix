@@ -469,7 +469,11 @@ export class HelixRadioGroup extends HelixElement {
     // WCAG 1.3.1: _errorId is now on the persistent wrapper div around the error slot,
     // so it remains valid whether error content comes from the slot or the property.
     const hasHelp = !!this.helpText;
-    const describedByIds = [hasError ? this._errorId : null, hasHelp ? this._helpTextId : null]
+    const hasErrorContent = hasError || this._hasErrorSlot;
+    const describedByIds = [
+      hasErrorContent ? this._errorId : null,
+      hasHelp ? this._helpTextId : null,
+    ]
       .filter(Boolean)
       .join(' ');
     const describedBy = describedByIds || nothing;
