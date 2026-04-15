@@ -145,7 +145,7 @@ export class HelixCard extends LitElement {
     ) {
       devWarn(
         'hx-card',
-        "Interactive card (hx-href is set) is missing an accessible name. Set `hx-aria-label` to describe the card's destination or purpose (WCAG 4.1.2).",
+        "Interactive card (hx-href is set) is missing an accessible name. Set `hx-label` to describe the card's destination or purpose (WCAG 4.1.2).",
       );
     }
   }
