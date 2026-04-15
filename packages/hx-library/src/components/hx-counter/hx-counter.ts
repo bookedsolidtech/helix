@@ -141,7 +141,8 @@ export class HelixCounter extends LitElement {
     }
 
     // WCAG 4.1.2: a numeric value without context is meaningless to screen readers.
-    if (!this.label) {
+    // Normalize: whitespace-only labels are treated as empty.
+    if (!(this.label || '').trim()) {
       devWarn(
         'hx-counter',
         'hx-counter requires a label for screen reader accessibility (WCAG 4.1.2). Provide the `label` attribute.',
@@ -216,9 +217,9 @@ export class HelixCounter extends LitElement {
     } else {
       devWarn(
         'hx-counter',
-        `Unrecognized easing value "${this.easing as string}". Falling back to "ease-out". Valid values: ease-in, ease-out, ease-in-out, linear.`,
+        `Unrecognized easing value "${this.easing as string}". Falling back to "linear". Valid values: ease-in, ease-out, ease-in-out, linear.`,
       );
-      this._resolvedEasing = 'ease-out';
+      this._resolvedEasing = 'linear';
     }
   }
 
@@ -295,8 +296,14 @@ export class HelixCounter extends LitElement {
    * @internal
    */
   private _buildAnnouncement(): string {
+    const normalizedLabel = (this.label || '').trim();
+    if (!normalizedLabel) {
+      // No label means the number lacks context — return empty to prevent
+      // announcing a context-free number to screen readers.
+      return '';
+    }
     const formatted = this._formatValue();
-    return this.label ? `${this.label}: ${formatted}` : formatted;
+    return `${normalizedLabel}: ${formatted}`;
   }
 
   // ─── Render ───
@@ -313,7 +320,9 @@ export class HelixCounter extends LitElement {
         role="status"
         aria-live="off"
         class=${classMap(classes)}
-        aria-label=${this.label ? `${this.label}: ${this._formatValue()}` : nothing}
+        aria-label=${(this.label || '').trim()
+          ? `${(this.label || '').trim()}: ${this._formatValue()}`
+          : nothing}
       >
         ${this._formatValue()}
       </span>

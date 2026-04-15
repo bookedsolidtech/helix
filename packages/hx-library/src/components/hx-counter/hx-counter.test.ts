@@ -136,6 +136,43 @@ describe('hx-counter', () => {
       const el = await fixture<HelixCounter>('<hx-counter duration="2000"></hx-counter>');
       expect(el.duration).toBe(2000);
     });
+
+    it('clamps duration <= 0 and still completes animation', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" duration="0" value="42"></hx-counter>',
+      );
+
+      // Wait for rAF-based animation to complete (clamped to 1ms, finishes in 1-2 frames)
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      await el.updateComplete;
+
+      const counter = shadowQuery(el, '[part~="counter"]');
+      expect(counter?.textContent?.trim()).toBe('42');
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] duration must be > 0 (received 0). Clamping to 1ms.',
+      );
+
+      vi.restoreAllMocks();
+    });
   });
 
   // ─── Property: easing (2) ───
@@ -154,6 +191,37 @@ describe('hx-counter', () => {
         expect(el.easing).toBe(easing);
         el.remove();
       }
+    });
+
+    it('falls back to linear for invalid easing and emits devWarn', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" easing="bogus" value="50"></hx-counter>',
+      );
+      await el.updateComplete;
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] Unrecognized easing value "bogus". Falling back to "linear". Valid values: ease-in, ease-out, ease-in-out, linear.',
+      );
+
+      vi.restoreAllMocks();
     });
   });
 
@@ -329,8 +397,49 @@ describe('hx-counter', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixCounter>('<hx-counter value="100"></hx-counter>');
       await el.updateComplete;
-      expect(warnSpy).toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] hx-counter requires a label for screen reader accessibility (WCAG 4.1.2). Provide the `label` attribute.',
+      );
       warnSpy.mockRestore();
+    });
+
+    it('treats whitespace-only label as empty and warns', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixCounter>('<hx-counter label="   " value="100"></hx-counter>');
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[hx-counter] hx-counter requires a label for screen reader accessibility (WCAG 4.1.2). Provide the `label` attribute.',
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('includes label in sr-only announcement when label is set', async () => {
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Total patients" value="1284"></hx-counter>',
+      );
+      await el.updateComplete;
+
+      const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
+      expect(liveRegion?.textContent).toBe('Total patients: 1,284');
+
+      vi.restoreAllMocks();
     });
 
     it('has no axe violations in default state', async () => {
