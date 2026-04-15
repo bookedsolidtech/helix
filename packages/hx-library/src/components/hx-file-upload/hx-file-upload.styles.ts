@@ -162,6 +162,8 @@ export const helixFileUploadStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     padding: var(--hx-space-1, 0.25rem);
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -240,5 +242,51 @@ export const helixFileUploadStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ─── Forced colors (Windows High Contrast / Forced Colors Mode) ─── */
+
+  @media (forced-colors: active) {
+    .dropzone {
+      border: 2px dashed ButtonText;
+      background-color: Canvas;
+      color: ButtonText;
+    }
+
+    .dropzone--drag-over {
+      border: 2px solid Highlight;
+      outline: none;
+      background-color: Canvas;
+    }
+
+    .dropzone--error {
+      border: 2px solid LinkText;
+    }
+
+    .dropzone:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .progress-bar {
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+
+    .file-item__remove:hover {
+      outline: 2px solid Highlight;
+      background-color: transparent;
+      color: ButtonText;
+    }
+
+    .file-item__remove:focus-visible {
+      outline: 2px solid Highlight;
+    }
+
+    :host([disabled]) .dropzone {
+      border-color: GrayText;
+      color: GrayText;
+      opacity: 1;
+    }
   }
 `;
