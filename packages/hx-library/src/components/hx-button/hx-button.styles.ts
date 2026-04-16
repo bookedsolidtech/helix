@@ -142,7 +142,7 @@ export const helixButtonStyles = css`
   }
 
   .button--primary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-500));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-600));
   }
 
   /* ─── Disabled ─── */
