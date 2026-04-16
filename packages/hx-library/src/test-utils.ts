@@ -3,6 +3,8 @@
  * Provides helpers for creating fixtures, querying shadow DOM, and event handling.
  */
 
+export { resetIdCounter } from './base/id-counter.js';
+
 const fixtureContainer = document.createElement('div');
 fixtureContainer.id = 'test-fixture-container';
 document.body.appendChild(fixtureContainer);
