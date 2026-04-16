@@ -57,6 +57,8 @@ export default defineConfig({
     // (e.g. stories that use 400ms setTimeout for simulated data loads).
     testTimeout: 30000,
     // Allow adequate time for Storybook test teardown between story files.
-    teardownTimeout: 10000,
+    // 30s: Chromium WebSocket close races vitest teardown on large suites,
+    // producing spurious exit code 1 even when all tests pass.
+    teardownTimeout: 30000,
   },
 });
