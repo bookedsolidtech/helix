@@ -271,9 +271,9 @@ export class HelixTheme extends HelixElement {
   theme: 'light' | 'dark' | 'high-contrast' | 'auto' = 'light';
 
   /**
-   * @deprecated Use `theme="auto"` instead.
    * When true, auto-detects the preferred color scheme via the
    * `prefers-color-scheme` media query, overriding the `theme` prop.
+   * @deprecated Use `theme="auto"` instead.
    * @attr system
    */
   @property({ type: Boolean, reflect: true })

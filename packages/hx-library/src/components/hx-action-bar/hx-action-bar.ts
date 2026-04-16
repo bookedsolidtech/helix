@@ -75,8 +75,8 @@ export class HelixActionBar extends HelixElement {
   position: 'top' | 'bottom' | 'sticky' = 'top';
 
   /**
-   * @deprecated Use `position="sticky"` instead.
    * When true, the bar sticks to the top of its scroll container.
+   * @deprecated Use `position="sticky"` instead.
    * @attr sticky
    */
   @property({ type: Boolean, reflect: true })
