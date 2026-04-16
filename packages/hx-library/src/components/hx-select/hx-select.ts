@@ -215,10 +215,6 @@ export class HelixSelect extends HelixElement {
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     // Safety net: remove listener if component is removed while dropdown is open
@@ -602,7 +598,7 @@ export class HelixSelect extends HelixElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >
