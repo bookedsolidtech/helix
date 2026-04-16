@@ -342,6 +342,6 @@
       "reason": "Recursive tree rendering and keyboard traversal across deeply nested nodes needs broader coverage.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
+    }
   }
 }
