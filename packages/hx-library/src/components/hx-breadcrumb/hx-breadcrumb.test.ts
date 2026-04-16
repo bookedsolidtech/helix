@@ -367,7 +367,7 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       // The ellipsis must NOT be aria-hidden — it contains a keyboard-accessible button
       expect(ellipsis?.getAttribute('aria-hidden')).toBeNull();
@@ -386,11 +386,11 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeTruthy();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
 
       el.maxItems = 0;
       await el.updateComplete;
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
     });
 
     it('does not collapse when item count equals max-items', async () => {
@@ -402,7 +402,7 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
       const items = Array.from(
         el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
       );
@@ -417,7 +417,7 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
     });
 
     it('expanding via ellipsis button removes collapse state', async () => {
@@ -431,13 +431,13 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeTruthy();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
 
       // Simulate the expand: set maxItems=0 (what the button does)
       el.maxItems = 0;
       await el.updateComplete;
 
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
       const items = Array.from(
         el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
       );
@@ -456,7 +456,7 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
       expect(btn).toBeTruthy();
@@ -466,7 +466,7 @@ describe('hx-breadcrumb', () => {
       await el.updateComplete;
 
       // The _handleEllipsisClick → _expandBreadcrumb → maxItems=0 path must have fired
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
       const items = Array.from(
         el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
       );
@@ -484,7 +484,7 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
       expect(btn).toBeTruthy();
@@ -495,7 +495,7 @@ describe('hx-breadcrumb', () => {
       );
       await el.updateComplete;
 
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
       const items = Array.from(
         el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
       );
@@ -513,7 +513,7 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
-      const ellipsis = el.querySelector('.hx-bc-ellipsis');
+      const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
       expect(btn).toBeTruthy();
@@ -524,7 +524,7 @@ describe('hx-breadcrumb', () => {
       );
       await el.updateComplete;
 
-      expect(el.querySelector('.hx-bc-ellipsis')).toBeNull();
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
       const items = Array.from(
         el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
       );
@@ -980,7 +980,7 @@ describe('hx-breadcrumb', () => {
       el.jsonLd = false;
       await el.updateComplete;
       // After disabling, the script element should be removed from document.head
-      const scriptAfter = document.head.querySelector('script[data-hx-breadcrumb]');
+      const _scriptAfter = document.head.querySelector('script[data-hx-breadcrumb]');
       // Script may be null (removed) or absent (another breadcrumb owns it)
       // Verify the component property updated correctly
       expect(el.jsonLd).toBe(false);

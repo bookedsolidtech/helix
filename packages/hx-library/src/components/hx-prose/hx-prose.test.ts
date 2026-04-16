@@ -269,7 +269,7 @@ describe('hx-prose', () => {
       const el = await fixture<HelixProse>('<hx-prose><p>Content</p></hx-prose>');
       // hx-prose uses light DOM (createRenderRoot returns this), so slot is
       // rendered into the element itself
-      const slot = el.querySelector('slot');
+      const _slot = el.querySelector('slot');
       // In light DOM components, slot may not be present as a DOM element but
       // the children are accessible directly — verify at least one child
       const p = el.querySelector('p');

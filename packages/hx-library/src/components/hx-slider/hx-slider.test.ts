@@ -777,7 +777,7 @@ describe('hx-slider', () => {
       );
       await el.updateComplete;
       // The fill percentage is applied as an inline style on the range input or wrapper
-      const container = shadowQuery(el, '[part="slider"]') ?? shadowQuery(el, '.slider');
+      const _container = shadowQuery(el, '[part="slider"]') ?? shadowQuery(el, '.slider');
       // Component must have rendered without error
       expect(el.value).toBe(50);
     });

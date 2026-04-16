@@ -215,7 +215,6 @@ describe('hx-structured-list', () => {
       expect(violations).toEqual([]);
     });
   });
-});
 
   // ─── Property: label ───
 

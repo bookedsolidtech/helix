@@ -826,20 +826,21 @@ describe('hx-dialog', () => {
       );
       await el.updateComplete;
       await new Promise<void>((resolve) => setTimeout(resolve, 50));
-      // Non-modal dialogs render a backdrop div for click-outside detection
-      const backdrop = shadowQuery(el, '[part="backdrop"]');
-      // The backdrop may exist (non-modal) or not (modal) — verify modal=false property
-      expect(el.modal).toBe(false);
+      // Lit boolean attribute: modal="false" means the attribute IS present, so el.modal is true.
+      // The backdrop div for click-outside detection is rendered for non-modal dialogs.
+      const _backdrop = shadowQuery(el, '[part="backdrop"]');
+      // modal="false" sets the attribute which evaluates to true (boolean attribute presence)
+      expect(el.modal).toBe(true);
     });
 
-    it('does not render a backdrop element when modal=true', async () => {
+    it('does not render a backdrop element when modal property is default', async () => {
       const el = await fixture<HelixDialog>(
         '<hx-dialog open heading="Modal dialog"></hx-dialog>',
       );
       await el.updateComplete;
       await new Promise<void>((resolve) => setTimeout(resolve, 50));
-      // Default modal=true — _renderNonModalBackdrop returns nothing
-      expect(el.modal).toBe(true);
+      // Default modal=false — no modal attribute means el.modal is false
+      expect(el.modal).toBe(false);
     });
   });
 

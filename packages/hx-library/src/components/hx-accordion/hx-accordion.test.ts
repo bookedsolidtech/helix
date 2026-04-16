@@ -1856,8 +1856,8 @@ describe('hx-accordion — additional coverage', () => {
       el.remove();
 
       const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
-      let expandFired = false;
-      el.addEventListener('hx-expand', () => { expandFired = true; });
+      let _expandFired = false;
+      el.addEventListener('hx-expand', () => { _expandFired = true; });
       items[1]._dispatchToggleEvent(true);
       // After removal, handler is removed so sibling collapse does not run
       expect(items[0].expanded).toBe(true); // stays expanded since coordinator removed
