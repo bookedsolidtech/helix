@@ -6,9 +6,9 @@
 # with the actual URL where you have hosted the HELiX CDN build artifacts.
 #
 # Example CDN_URL values:
-#   https://cdn.example.com/helix/1.1.2
-#   https://your-site.example.com/sites/default/files/helix-cdn/1.1.2
-#   /libraries/helix-cdn/1.1.2
+#   https://cdn.example.com/helix/2.1.2
+#   https://your-site.example.com/sites/default/files/helix-cdn/2.1.2
+#   /libraries/helix-cdn/2.1.2
 #
 # Usage in Twig:
 #   {{ attach_library('helix_cdn/all') }}
@@ -25,14 +25,14 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 all:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/helix-1.1.2.min.css:
+      {{CDN_URL}}/helix-2.1.2.min.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/helix-1.1.2.min.js:
+    {{CDN_URL}}/helix-2.1.2.min.js:
       type: external
       attributes:
         type: module
@@ -49,168 +49,168 @@ all:
 # ─────────────────────────────────────────────────────────────────────────────
 
 hx-button:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-button-1.1.2.css:
+      {{CDN_URL}}/components/hx-button-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-button-1.1.2.js:
+    {{CDN_URL}}/components/hx-button-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-card:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-card-1.1.2.css:
+      {{CDN_URL}}/components/hx-card-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-card-1.1.2.js:
+    {{CDN_URL}}/components/hx-card-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-text-input:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-text-input-1.1.2.css:
+      {{CDN_URL}}/components/hx-text-input-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-text-input-1.1.2.js:
+    {{CDN_URL}}/components/hx-text-input-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-alert:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-alert-1.1.2.css:
+      {{CDN_URL}}/components/hx-alert-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-alert-1.1.2.js:
+    {{CDN_URL}}/components/hx-alert-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-dialog:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-dialog-1.1.2.css:
+      {{CDN_URL}}/components/hx-dialog-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-dialog-1.1.2.js:
+    {{CDN_URL}}/components/hx-dialog-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-badge:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-badge-1.1.2.css:
+      {{CDN_URL}}/components/hx-badge-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-badge-1.1.2.js:
+    {{CDN_URL}}/components/hx-badge-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-spinner:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-spinner-1.1.2.css:
+      {{CDN_URL}}/components/hx-spinner-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-spinner-1.1.2.js:
+    {{CDN_URL}}/components/hx-spinner-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-tooltip:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-tooltip-1.1.2.css:
+      {{CDN_URL}}/components/hx-tooltip-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-tooltip-1.1.2.js:
+    {{CDN_URL}}/components/hx-tooltip-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-tabs:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-tabs-1.1.2.css:
+      {{CDN_URL}}/components/hx-tabs-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-tabs-1.1.2.js:
+    {{CDN_URL}}/components/hx-tabs-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-select:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-select-1.1.2.css:
+      {{CDN_URL}}/components/hx-select-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-select-1.1.2.js:
+    {{CDN_URL}}/components/hx-select-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-checkbox:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-checkbox-1.1.2.css:
+      {{CDN_URL}}/components/hx-checkbox-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-checkbox-1.1.2.js:
+    {{CDN_URL}}/components/hx-checkbox-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-status-indicator:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-status-indicator-1.1.2.css:
+      {{CDN_URL}}/components/hx-status-indicator-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-status-indicator-1.1.2.js:
+    {{CDN_URL}}/components/hx-status-indicator-2.1.2.js:
       type: external
       attributes:
         type: module
