@@ -4,6 +4,7 @@
  */
 
 export { resetIdCounter } from './base/id-counter.js';
+export { formFixture, getFormData, resetForm } from './form-test-utils.js';
 
 const fixtureContainer = document.createElement('div');
 fixtureContainer.id = 'test-fixture-container';

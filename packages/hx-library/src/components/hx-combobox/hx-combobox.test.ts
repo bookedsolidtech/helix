@@ -1,5 +1,14 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  oneEvent,
+  cleanup,
+  checkA11y,
+  formFixture,
+  getFormData,
+  resetForm,
+} from '../../test-utils.js';
 import type { HxCombobox } from './hx-combobox.js';
 import './index.js';
 
@@ -1157,6 +1166,117 @@ describe('hx-combobox', () => {
       expect(disabledOption?.querySelector('.field__option-label')?.textContent?.trim()).toBe(
         'Durian',
       );
+    });
+  });
+
+  // ─── Form Integration (ElementInternals lifecycle) ───
+
+  describe('Form Integration (ElementInternals lifecycle)', () => {
+    it('FormData contains the selected value on submit', async () => {
+      const { el, form } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'fruit', value: 'banana' },
+        `<option slot="option" value="apple">Apple</option>
+         <option slot="option" value="banana">Banana</option>
+         <option slot="option" value="cherry">Cherry</option>`,
+      );
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('fruit')).toBe('banana');
+    });
+
+    it('FormData updates when selection changes programmatically', async () => {
+      const { el, form } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'fruit', value: 'apple' },
+        `<option slot="option" value="apple">Apple</option>
+         <option slot="option" value="cherry">Cherry</option>`,
+      );
+      await el.updateComplete;
+      el.value = 'cherry';
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('fruit')).toBe('cherry');
+    });
+
+    it('multi-select: FormData contains comma-separated value for all selections', async () => {
+      const { el, form } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'fruits', multiple: '' },
+        `<option slot="option" value="apple">Apple</option>
+         <option slot="option" value="banana">Banana</option>
+         <option slot="option" value="cherry">Cherry</option>`,
+      );
+      await el.updateComplete;
+      // Programmatically set the multi-value via the comma-separated API
+      el.value = 'apple,cherry';
+      await el.updateComplete;
+      const data = getFormData(form);
+      // hx-combobox uses a single comma-separated string as the FormData value
+      expect(data.get('fruits')).toBe('apple,cherry');
+    });
+
+    it('multi-select: FormData is null/empty after all selections are cleared', async () => {
+      const { el, form } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'fruits', multiple: '', value: 'apple,banana' },
+        `<option slot="option" value="apple">Apple</option>
+         <option slot="option" value="banana">Banana</option>`,
+      );
+      await el.updateComplete;
+      el.value = '';
+      await el.updateComplete;
+      const data = getFormData(form);
+      // _updateFormValue sets null when value is empty — FormData omits null entries
+      expect(data.get('fruits')).toBeNull();
+    });
+
+    it('form.reset() clears selection via formResetCallback', async () => {
+      const { el, form } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'fruit', value: 'banana' },
+        `<option slot="option" value="apple">Apple</option>
+         <option slot="option" value="banana">Banana</option>`,
+      );
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('form.reset() causes FormData to omit the field (null value)', async () => {
+      const { el, form } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'fruit', value: 'apple' },
+        `<option slot="option" value="apple">Apple</option>`,
+      );
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      const data = getFormData(form);
+      // After reset value is '' → _updateFormValue sets null → FormData omits the key
+      expect(data.get('fruit')).toBeNull();
+    });
+
+    it('required field with no selection fails validity (valueMissing)', async () => {
+      const { el } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'required-fruit', required: '' },
+        `<option slot="option" value="apple">Apple</option>`,
+      );
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(false);
+      expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('required field with a selection passes validity', async () => {
+      const { el } = await formFixture<HxCombobox>(
+        'hx-combobox',
+        { name: 'required-fruit', required: '', value: 'apple' },
+        `<option slot="option" value="apple">Apple</option>`,
+      );
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(true);
     });
   });
 });

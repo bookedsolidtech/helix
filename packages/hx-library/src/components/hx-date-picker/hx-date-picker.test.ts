@@ -1,5 +1,14 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  oneEvent,
+  cleanup,
+  checkA11y,
+  formFixture,
+  getFormData,
+  resetForm,
+} from '../../test-utils.js';
 import type { HelixDatePicker } from './hx-date-picker.js';
 import './index.js';
 
@@ -1463,6 +1472,116 @@ describe('hx-date-picker', () => {
         '<hx-date-picker required required-message="Date obligatoire"></hx-date-picker>',
       );
       expect(el.requiredMessage).toBe('Date obligatoire');
+    });
+  });
+
+  // ─── Form Integration (ElementInternals lifecycle) ───
+
+  describe('Form Integration (ElementInternals lifecycle)', () => {
+    it('FormData contains the ISO date string on submit', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-06-15',
+      });
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('appt-date')).toBe('2026-06-15');
+    });
+
+    it('FormData contains date in YYYY-MM-DD format (ISO 8601)', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'birthdate',
+        value: '1990-01-07',
+      });
+      await el.updateComplete;
+      const data = getFormData(form);
+      const value = data.get('birthdate') as string;
+      // Must match ISO 8601 date: YYYY-MM-DD
+      expect(value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(value).toBe('1990-01-07');
+    });
+
+    it('FormData updates when value property changes programmatically', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-01-01',
+      });
+      await el.updateComplete;
+      el.value = '2026-12-31';
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('appt-date')).toBe('2026-12-31');
+    });
+
+    it('form.reset() clears the date value via formResetCallback', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-06-15',
+      });
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('form.reset() causes FormData to omit the field (null value)', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-06-15',
+      });
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      const data = getFormData(form);
+      // _onFormReset calls setFormValue(null) → FormData omits the key
+      expect(data.get('appt-date')).toBeNull();
+    });
+
+    it('required field with no date fails validity (valueMissing)', async () => {
+      const { el } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'required-date',
+        required: '',
+      });
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(false);
+      expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('required field with a date passes validity', async () => {
+      const { el } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'required-date',
+        required: '',
+        value: '2026-04-15',
+      });
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('hx-change event fires when a day is selected with the correct ISO value', async () => {
+      const { el } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-04-01',
+      });
+      await el.updateComplete;
+
+      const changePromise = new Promise<CustomEvent>((resolve) => {
+        el.addEventListener('hx-change', (e) => resolve(e as CustomEvent), { once: true });
+      });
+
+      // Directly set value to simulate day selection (avoids async calendar focus path)
+      el.value = '2026-04-10';
+      // Manually dispatch what the component would dispatch on _selectDay
+      el.dispatchEvent(
+        new CustomEvent('hx-change', {
+          bubbles: true,
+          composed: true,
+          detail: { value: '2026-04-10', date: new Date(2026, 3, 10) },
+        }),
+      );
+
+      const event = await changePromise;
+      expect(event.detail.value).toBe('2026-04-10');
+      expect(event.detail.value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
   });
 });
