@@ -907,9 +907,10 @@ jobs:
             fi
           done
 
-          # A11y audit is informational until baseline violations are resolved
+          # A11y audit is a blocking gate — healthcare WCAG 2.1 AA mandate
           if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
-            echo "::warning::A11y audit has violations — see report artifact for details"
+            echo "::error::A11y audit failed — WCAG 2.1 AA violations detected. See a11y-report artifact."
+            FAIL=1
           fi
 
           # Storybook tests are informational until the new test infrastructure is verified
