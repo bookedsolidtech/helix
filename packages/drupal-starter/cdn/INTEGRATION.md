@@ -191,8 +191,8 @@ Components are standard HTML custom elements. Once the library script is loaded,
 
 ```twig
 {# Buttons #}
-<hx-button variant="primary" size="md">Save</hx-button>
-<hx-button variant="secondary" size="sm">Cancel</hx-button>
+<hx-button variant="primary" hx-size="md">Save</hx-button>
+<hx-button variant="secondary" hx-size="sm">Cancel</hx-button>
 <hx-button variant="destructive">Delete Record</hx-button>
 
 {# Card with slots #}
@@ -200,7 +200,7 @@ Components are standard HTML custom elements. Once the library script is loaded,
   <span slot="heading">{{ node.title.value }}</span>
   <div>{{ content.body }}</div>
   <div slot="footer">
-    <hx-button variant="primary" size="sm">View Full Record</hx-button>
+    <hx-button variant="primary" hx-size="sm">View Full Record</hx-button>
   </div>
 </hx-card>
 
@@ -210,7 +210,7 @@ Components are standard HTML custom elements. Once the library script is loaded,
   label="Patient ID"
   required
   value="{{ form.patient_id['#value']|default('') }}"
-  helper-text="Enter the 8-digit patient identifier"
+  help-text="Enter the 8-digit patient identifier"
 ></hx-text-input>
 
 {# Clinical status #}
