@@ -36,6 +36,29 @@ const FOCUSABLE_SELECTORS = [
  * Supports focus trapping, overlay backdrop, keyboard navigation, and full
  * ARIA labelling for enterprise healthcare accessibility requirements.
  *
+ * ## Architecture Note: Native `<dialog>` Migration
+ *
+ * This component currently uses `role="dialog"` + `aria-modal="true"` on a
+ * `<div>` rather than the native `<dialog>` element. This is intentional for
+ * the current release because:
+ *
+ * 1. **SSR compatibility**: Native `<dialog>` requires `showModal()` to activate
+ *    its modal behavior (focus trapping, backdrop, top-layer). This JavaScript
+ *    call is not available during server-side rendering, which is a primary
+ *    consumption pattern for Drupal/Twig templates.
+ *
+ * 2. **Contained mode**: The `contained` property constrains the drawer to a
+ *    positioned parent. Native `<dialog>` in modal mode renders in the top layer
+ *    and cannot be constrained to a parent element.
+ *
+ * 3. **Animation control**: The current CSS transition approach provides precise
+ *    control over slide-in/slide-out animations. Native `<dialog>` `::backdrop`
+ *    animations have inconsistent cross-browser support.
+ *
+ * Migration to native `<dialog>` is tracked as a future enhancement. When browser
+ * support for `CloseWatcher`, `::backdrop` transitions, and declarative dialog
+ * opening stabilizes, this component will be migrated to native semantics.
+ *
  * @summary Slide-in panel overlay from any viewport edge.
  *
  * @tag hx-drawer
