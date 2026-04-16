@@ -41,10 +41,10 @@
 
 <div{{ attributes.addClass('hx-form-wrapper') }}>
   {% if title %}
-    <hx-text variant="heading" size="lg">{{ title }}</hx-text>
+    <hx-text as="h2" variant="label" weight="bold">{{ title }}</hx-text>
   {% endif %}
   {% if description %}
-    <hx-text variant="body" size="md">{{ description }}</hx-text>
+    <hx-text variant="body">{{ description }}</hx-text>
   {% endif %}
 
   <form action="{{ action }}" method="{{ method|default('post') }}">
