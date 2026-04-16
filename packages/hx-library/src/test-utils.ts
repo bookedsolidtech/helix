@@ -62,15 +62,12 @@ export function oneEvent<T extends Event = Event>(
   timeoutMs = 5000,
 ): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const tag =
-      el instanceof HTMLElement ? `<${el.tagName.toLowerCase()}>` : String(el);
+    const tag = el instanceof HTMLElement ? `<${el.tagName.toLowerCase()}>` : String(el);
 
     const timer = setTimeout(() => {
       el.removeEventListener(eventName, handler as EventListener);
       reject(
-        new Error(
-          `[oneEvent] Timed out after ${timeoutMs}ms waiting for "${eventName}" on ${tag}`,
-        ),
+        new Error(`[oneEvent] Timed out after ${timeoutMs}ms waiting for "${eventName}" on ${tag}`),
       );
     }, timeoutMs);
 

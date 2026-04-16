@@ -50,7 +50,6 @@ const nextId = createIdCounter('hx-clinical-status');
 export class HelixClinicalStatus extends HelixElement {
   static override styles = [helixClinicalStatusStyles];
 
-
   // ─── Properties ───
 
   /**
