@@ -42,6 +42,10 @@ const _nextSwitchId = createIdCounter('hx-switch');
  * @cssprop [--hx-switch-error-color=var(--hx-color-error-500)] - Error message color.
  * @cssprop [--hx-switch-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
+
+/** Detail for the hx-change event dispatched by hx-switch. */
+export interface HxSwitchChangeDetail { checked: boolean; value: string }
+
 @customElement('hx-switch')
 export class HelixSwitch extends HelixElement {
   static override styles = [helixSwitchStyles];

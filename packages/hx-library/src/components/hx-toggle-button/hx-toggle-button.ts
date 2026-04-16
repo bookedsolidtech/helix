@@ -37,6 +37,10 @@ import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
  * @cssprop [--hx-toggle-button-pressed-bg=var(--hx-color-primary-500)] - Background when pressed (variant-specific fallback applies).
  * @cssprop [--hx-toggle-button-pressed-color=var(--hx-color-neutral-0)] - Text color when pressed (variant-specific fallback applies).
  */
+
+/** Detail for the hx-toggle event dispatched by hx-toggle-button. */
+export interface HxToggleDetail { pressed: boolean }
+
 @customElement('hx-toggle-button')
 export class HelixToggleButton extends HelixElement {
   static override styles = [helixToggleButtonStyles];

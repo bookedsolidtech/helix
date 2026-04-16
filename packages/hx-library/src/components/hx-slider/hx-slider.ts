@@ -56,6 +56,10 @@ const _nextSliderId = createIdCounter('hx-slider');
  * @cssprop [--hx-slider-range-label-color=var(--hx-color-neutral-500)] - Range label text color.
  * @cssprop [--hx-slider-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
+
+/** Detail for hx-input and hx-change events dispatched by hx-slider. */
+export interface HxSliderDetail { value: number }
+
 @customElement('hx-slider')
 export class HelixSlider extends HelixElement {
   static override styles = [helixSliderStyles];

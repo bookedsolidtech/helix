@@ -50,6 +50,10 @@ const _nextTextInputId = createIdCounter('hx-text-input');
  * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
+
+/** Detail for hx-input and hx-change events dispatched by hx-text-input. */
+export interface HxTextInputDetail { value: string }
+
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [helixTextInputStyles];

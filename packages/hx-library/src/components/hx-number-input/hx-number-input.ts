@@ -48,6 +48,10 @@ const _nextNumberInputId = createIdCounter('hx-number-input');
  * @cssprop [--hx-number-input-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-number-input-font-family=var(--hx-font-family-sans)] - Font family.
  */
+
+/** Detail for hx-input and hx-change events dispatched by hx-number-input. */
+export interface HxNumberInputDetail { value: number | null }
+
 @customElement('hx-number-input')
 export class HelixNumberInput extends HelixElement {
   static override styles = [helixNumberInputStyles];

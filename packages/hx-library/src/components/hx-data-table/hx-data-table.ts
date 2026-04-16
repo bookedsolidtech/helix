@@ -57,6 +57,13 @@ export interface HxDataTableSortState {
  * @cssprop [--hx-data-table-empty-color=var(--hx-color-neutral-600)] - Empty state text color.
  * @cssprop [--hx-data-table-min-width=600px] - Minimum table width before horizontal scrolling.
  */
+
+/** Detail for the hx-select event dispatched by hx-data-table. */
+export interface HxDataTableSelectDetail { selectedRows: Record<string, unknown>[] }
+
+/** Detail for the hx-row-click event dispatched by hx-data-table. */
+export interface HxDataTableRowClickDetail { row: Record<string, unknown>; index: number }
+
 @customElement('hx-data-table')
 export class HelixDataTable extends HelixElement {
   static override styles = [helixDataTableStyles];

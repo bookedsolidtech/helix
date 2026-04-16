@@ -56,6 +56,10 @@ const _nextAccordionItemId = createIdCounter('hx-accordion-item');
  * @cssprop [--hx-accordion-content-padding=0 var(--hx-space-4) var(--hx-space-4)] - Content padding.
  * @cssprop [--hx-accordion-content-color=var(--hx-color-neutral-600)] - Content text color.
  */
+
+/** Detail for hx-expand and hx-collapse events dispatched by hx-accordion-item. */
+export interface HxAccordionToggleDetail { expanded: boolean; itemId: string }
+
 @customElement('hx-accordion-item')
 export class HelixAccordionItem extends HelixElement {
   static override styles = [helixAccordionItemStyles];

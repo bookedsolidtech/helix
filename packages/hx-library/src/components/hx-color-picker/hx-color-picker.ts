@@ -73,6 +73,10 @@ export type { ColorFormat };
  * ></hx-color-picker>
  * ```
  */
+
+/** Detail for hx-input and hx-change events dispatched by hx-color-picker. */
+export interface HxColorPickerDetail { value: string }
+
 @customElement('hx-color-picker')
 export class HelixColorPicker extends HelixElement {
   static override styles = [helixColorPickerStyles];

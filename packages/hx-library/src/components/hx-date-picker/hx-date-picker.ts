@@ -49,6 +49,10 @@ const _nextDatePickerId = createIdCounter('hx-date-picker');
  * @cssprop [--hx-date-picker-today-color=var(--hx-color-primary-600)] - Today indicator color.
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
+
+/** Detail for the hx-change event dispatched by hx-date-picker. */
+export interface HxDatePickerChangeDetail { value: string; date: Date | null }
+
 @customElement('hx-date-picker')
 export class HelixDatePicker extends HelixElement {
   static override styles = [helixDatePickerStyles];

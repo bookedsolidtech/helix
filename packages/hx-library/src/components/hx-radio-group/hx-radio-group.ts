@@ -34,6 +34,10 @@ const _nextRadioGroupId = createIdCounter('hx-radio-group');
  * @cssprop [--hx-radio-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
  * @cssprop [--hx-radio-group-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  */
+
+/** Detail for the hx-change event dispatched by hx-radio-group. */
+export interface HxRadioGroupChangeDetail { value: string; checked: boolean }
+
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends HelixElement {
   static override styles = [helixRadioGroupStyles];

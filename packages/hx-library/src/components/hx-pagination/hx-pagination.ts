@@ -64,6 +64,13 @@ import { helixPaginationStyles } from './hx-pagination.styles.js';
  * ></hx-pagination>
  * ```
  */
+
+/** Detail for the hx-page-change event dispatched by hx-pagination. */
+export interface HxPageChangeDetail { page: number }
+
+/** Detail for the hx-page-size-change event dispatched by hx-pagination. */
+export interface HxPageSizeChangeDetail { pageSize: number }
+
 @customElement('hx-pagination')
 export class HelixPagination extends HelixElement {
   static override styles = [helixPaginationStyles];

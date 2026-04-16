@@ -45,6 +45,10 @@ const _nextCheckboxId = createIdCounter('hx-checkbox');
  * @cssprop [--hx-checkbox-hover-border-color=var(--hx-checkbox-border-color)] - Border color on hover.
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  */
+
+/** Detail for the hx-change event dispatched by hx-checkbox. */
+export interface HxCheckboxChangeDetail { checked: boolean; value: string }
+
 @customElement('hx-checkbox')
 export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   static override styles = [helixCheckboxStyles];
