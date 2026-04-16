@@ -393,6 +393,8 @@ describe('hx-breadcrumb', () => {
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
 
       el.maxItems = 0;
+      // updated() sets _showEllipsis=false which triggers a second render cycle
+      await el.updateComplete;
       await el.updateComplete;
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
     });
@@ -435,10 +437,13 @@ describe('hx-breadcrumb', () => {
         </hx-breadcrumb>
       `);
       await el.updateComplete;
+      await el.updateComplete;
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
 
       // Simulate the expand: set maxItems=0 (what the button does)
       el.maxItems = 0;
+      // updated() sets _showEllipsis=false which triggers a second render cycle
+      await el.updateComplete;
       await el.updateComplete;
 
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
@@ -468,7 +473,9 @@ describe('hx-breadcrumb', () => {
       expect(btn).toBeTruthy();
 
       // Click the ellipsis button — triggers @click → _expandBreadcrumb → maxItems=0
+      // updated() then sets _showEllipsis=false which requires a second render cycle
       btn.click();
+      await el.updateComplete;
       await el.updateComplete;
 
       // The _expandBreadcrumb → maxItems=0 path must have fired
@@ -499,7 +506,9 @@ describe('hx-breadcrumb', () => {
       expect(btn).toBeTruthy();
 
       // Activate the button (mirrors Enter key activation behavior on native buttons)
+      // updated() sets _showEllipsis=false which triggers a second render cycle
       btn.click();
+      await el.updateComplete;
       await el.updateComplete;
 
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
@@ -529,7 +538,9 @@ describe('hx-breadcrumb', () => {
       expect(btn).toBeTruthy();
 
       // Activate the button (mirrors Space key activation behavior on native buttons)
+      // updated() sets _showEllipsis=false which triggers a second render cycle
       btn.click();
+      await el.updateComplete;
       await el.updateComplete;
 
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();

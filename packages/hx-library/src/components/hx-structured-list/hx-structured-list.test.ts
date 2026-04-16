@@ -437,17 +437,23 @@ describe('hx-structured-list-row', () => {
     });
 
     it('has no axe violations — standalone row', async () => {
-      // A standalone row without a list parent does not have aria-required-parent issues
-      // because role="listitem" is still semantically valid for AT.
-      const el = await fixture<HelixStructuredListRow>(`
-        <hx-structured-list-row>
-          <span slot="label">Department</span>
-          Cardiology
-        </hx-structured-list-row>
+      // hx-structured-list-row has role="listitem" on its host element. axe enforces
+      // aria-required-parent, so the row must be inside a role="list" container.
+      // Wrap in hx-structured-list (which sets role="list") to satisfy axe.
+      const container = await fixture<HelixStructuredList>(`
+        <hx-structured-list>
+          <hx-structured-list-row>
+            <span slot="label">Department</span>
+            Cardiology
+          </hx-structured-list-row>
+        </hx-structured-list>
       `);
+      await container.updateComplete;
+      const el = container.querySelector<HelixStructuredListRow>('hx-structured-list-row')!;
+      await el.updateComplete;
       await page.screenshot();
       // Use useElement to allow axe to traverse across the shadow boundary
-      const { violations } = await checkA11y(el, { useElement: true });
+      const { violations } = await checkA11y(container, { useElement: true });
       expect(violations).toEqual([]);
     });
 

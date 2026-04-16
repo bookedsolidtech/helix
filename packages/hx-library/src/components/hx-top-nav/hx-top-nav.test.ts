@@ -381,6 +381,8 @@ describe('hx-top-nav', () => {
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       // Wait for _mobileOpen=false re-render; focus() is called synchronously in the handler
       await el.updateComplete;
+      // Allow the browser to process the focus change before checking activeElement
+      await new Promise((r) => requestAnimationFrame(r));
 
       // After Escape, the toggle button should hold focus within the shadow root
       expect(el.shadowRoot?.activeElement).toBe(btn);
