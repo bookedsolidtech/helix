@@ -1,0 +1,145 @@
+---
+title: 'hx-patient-banner'
+description: 'Patient identification banner implementing Joint Commission NPSG.01.01.01 two-identifier rule with slot-based field composition and HIPAA-compliant PHI integration.'
+---
+
+import ComponentLoader from '../../../components/ComponentLoader.astro';
+import ComponentDemo from '../../../components/ComponentDemo.astro';
+import ComponentDoc from '../../../components/ComponentDoc.astro';
+
+<ComponentLoader />
+
+<ComponentDoc tagName="hx-patient-banner" section="summary" />
+
+## Overview
+
+`hx-patient-banner` renders a standardized patient identification banner for clinical applications. It implements the Joint Commission National Patient Safety Goal NPSG.01.01.01, which requires at least two patient identifiers to be verified before any clinical interaction.
+
+The component uses named slots for each field (name, MRN, DOB, allergies, code status) and automatically counts populated identifier slots. When fewer than two identifiers are present and `enforce-identifier-rule` is true (the default), the component fires an `hx-identifier-rule-violation` event and sets `aria-invalid="true"`.
+
+**Integration with hx-phi-field:** Slot MRN and DOB fields using `hx-phi-field` for HIPAA-compliant masked display. The `hx-phi-access` events from slotted `hx-phi-field` elements bubble through the banner via `composed: true` without re-dispatch.
+
+## Live Demo
+
+<ComponentDemo title="Complete Patient Banner">
+  <hx-patient-banner patient-id="encounter-12345">
+    <span slot="name">Jane Doe</span>
+    <span slot="mrn">MRN-****-7890</span>
+    <span slot="dob">**/**/1985</span>
+    <span slot="allergies">Penicillin, Sulfa</span>
+    <span slot="code-status">Full Code</span>
+  </hx-patient-banner>
+</ComponentDemo>
+
+<ComponentDemo title="Identifier Rule Violation (single identifier)">
+  <hx-patient-banner patient-id="encounter-67890" enforce-identifier-rule>
+    <span slot="name">John Smith</span>
+  </hx-patient-banner>
+</ComponentDemo>
+
+## Installation
+
+```bash
+npm install @helixui/library
+
+# Or import only this component
+import '@helixui/library/components/hx-patient-banner';
+```
+
+## Basic Usage
+
+```html
+<hx-patient-banner patient-id="encounter-12345">
+  <span slot="name">Jane Doe</span>
+  <hx-phi-field slot="mrn" field-type="mrn" field-id="mrn-field" label="MRN"></hx-phi-field>
+  <hx-phi-field slot="dob" field-type="dob" field-id="dob-field" label="Date of birth"></hx-phi-field>
+  <span slot="allergies">Penicillin</span>
+  <span slot="code-status">Full Code</span>
+</hx-patient-banner>
+
+<script>
+  // Set PHI via JS property
+  document.querySelector('[field-id="mrn-field"]').data = 'MRN-1234-5678';
+  document.querySelector('[field-id="dob-field"]').data = '03/15/1985';
+</script>
+```
+
+## Properties
+
+| Property | Attribute | Type | Default | Description |
+|----------|-----------|------|---------|-------------|
+| `patientId` | `patient-id` | `string` | `''` | Opaque identifier for violation events. Use UUIDs, not PHI. |
+| `enforceIdentifierRule` | `enforce-identifier-rule` | `boolean` | `true` | Enforce NPSG.01.01.01 two-identifier requirement. |
+| `labelPatient` | `label-patient` | `string` | `'Patient identification'` | Accessible label for the banner landmark. |
+| `labelName` | `label-name` | `string` | `'Patient name'` | Visible label for the name field. |
+| `labelMrn` | `label-mrn` | `string` | `'MRN'` | Visible label for the MRN field. |
+| `labelDob` | `label-dob` | `string` | `'Date of birth'` | Visible label for the DOB field. |
+| `labelAllergies` | `label-allergies` | `string` | `'Allergies'` | Visible label for the allergies field. |
+| `labelCodeStatus` | `label-code-status` | `string` | `'Code status'` | Visible label for the code status field. |
+
+## Events
+
+| Event | Detail Type | Description |
+|-------|-------------|-------------|
+| `hx-identifier-rule-violation` | `PatientIdentifierRuleViolationDetail` | Fired when fewer than 2 identifier slots are populated. |
+
+### PatientIdentifierRuleViolationDetail
+
+```ts
+interface PatientIdentifierRuleViolationDetail {
+  populatedIdentifiers: number;    // 0 or 1
+  requiredIdentifiers: number;     // Always 2
+  patientId: string;               // From patient-id attribute
+}
+```
+
+## Slots
+
+| Slot | Description |
+|------|-------------|
+| `photo` | Optional patient photo |
+| `name` | Patient name (counts as identifier) |
+| `mrn` | Medical record number (counts as identifier) |
+| `dob` | Date of birth (counts as identifier) |
+| `allergies` | Allergy status |
+| `code-status` | Code status |
+
+## Security Model
+
+The `hx-identifier-rule-violation` event uses `composed: true` and contains only structural metadata (counts and the `patientId` attribute). Set `patient-id` to an opaque internal identifier (UUID, encounter ID), not a human-readable clinical identifier.
+
+See the `hx-phi-field` documentation for the PHI access audit event security model.
+
+## Accessibility
+
+| Topic | Details |
+|-------|---------|
+| ARIA role | `role="banner"` on host element |
+| Landmark | Accessible name via `label-patient` attribute |
+| Validation | `aria-invalid="true"` when identifier rule is violated |
+| Announcement | Violation message uses `role="alert"` with `aria-live="assertive"` |
+
+## CSS Custom Properties
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `--hx-patient-banner-bg` | `var(--hx-color-neutral-50)` | Banner background |
+| `--hx-patient-banner-border-color` | `var(--hx-color-neutral-200)` | Banner border |
+| `--hx-patient-banner-padding` | `var(--hx-space-3) var(--hx-space-4)` | Banner padding |
+| `--hx-patient-banner-gap` | `var(--hx-space-4)` | Gap between fields |
+
+## CSS Parts
+
+| Part | Description |
+|------|-------------|
+| `banner` | Outer banner container |
+| `photo-area` | Photo slot wrapper |
+| `fields` | Fields grid container |
+| `field` | Individual field container |
+| `field-label` | Field label element |
+| `field-value` | Field value slot wrapper |
+| `violation-message` | Hidden violation status message |
+
+## API Reference
+
+<ComponentDoc tagName="hx-patient-banner" section="api" />
