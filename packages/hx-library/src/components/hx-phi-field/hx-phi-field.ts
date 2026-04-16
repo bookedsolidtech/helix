@@ -11,6 +11,30 @@ import { devWarn } from '../../utils/dev-warn.js';
  * PHI is masked by default and only rendered to the DOM when explicitly revealed. Access
  * events are fired on reveal, hide, and clipboard auto-clear for audit trail purposes.
  *
+ * ## Security Model — Event Composition
+ *
+ * The `hx-phi-access` event is dispatched with `composed: true` so it crosses shadow DOM
+ * boundaries and reaches application-level audit listeners. This is intentional — audit
+ * trail events MUST reach the host application regardless of shadow DOM nesting depth.
+ *
+ * **PHI is never included in event details.** The `PhiAccessEventDetail` payload contains
+ * only audit metadata: `fieldId`, `action`, `timestamp`, and `fieldType`. The actual PHI
+ * value (the `data` property) is deliberately excluded from all dispatched events.
+ *
+ * ### Consumer Responsibilities
+ *
+ * - **Audit logging**: Listen for `hx-phi-access` at the application root to build a
+ *   HIPAA-compliant access audit trail. The `fieldId` and `timestamp` fields correlate
+ *   access events to specific data elements without exposing the data itself.
+ * - **Multi-tenant isolation**: In micro-frontend architectures where multiple patient
+ *   contexts share a document, consumers MUST scope their `hx-phi-access` listeners to
+ *   the appropriate DOM subtree (e.g., listen on a container element rather than
+ *   `document`). Composed events from one patient context will bubble through shared
+ *   ancestors.
+ * - **Do not extend event details with PHI**: When wrapping this component, never add
+ *   the raw `data` value to re-dispatched events. The separation of audit metadata from
+ *   PHI content is a deliberate security boundary.
+ *
  * @summary HIPAA-compliant field for rendering masked Protected Health Information.
  *
  * @tag hx-phi-field
@@ -19,7 +43,9 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart value - The value display span (masked or revealed).
  * @csspart toggle - The reveal/hide toggle button.
  *
- * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide, and clipboard-clear actions.
+ * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide, and
+ *   clipboard-clear actions. Contains audit metadata only — never raw PHI. Dispatched with
+ *   `composed: true` to cross shadow boundaries for application-level audit listeners.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#111827)] - Value text color.
@@ -357,11 +383,24 @@ export class HelixPhiField extends HelixElement {
   }
 }
 
+/**
+ * Audit metadata for PHI access events. This interface intentionally contains
+ * only identifiers and action metadata — never raw PHI values. The separation
+ * of audit trail data from PHI content is a deliberate HIPAA security boundary.
+ *
+ * **Security invariant**: No field in this interface should ever contain the
+ * actual protected health information (SSN digits, MRN value, date of birth,
+ * insurance number). The `fieldId` is a developer-assigned logical identifier,
+ * not the PHI value itself.
+ */
 export interface PhiAccessEventDetail {
+  /** Developer-assigned logical identifier for the field (NOT the PHI value). */
   fieldId: string;
   /** The action that triggered the audit event. */
   action: 'reveal' | 'hide' | 'clipboard-clear';
+  /** ISO 8601 timestamp of the access event. */
   timestamp: string;
+  /** The category of PHI this field contains. */
   fieldType: 'ssn' | 'mrn' | 'dob' | 'insurance';
 }
 
