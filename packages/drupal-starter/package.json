@@ -35,7 +35,7 @@
     "ARCHITECTURE.md"
   ],
   "peerDependencies": {
-    "@helixui/library": "workspace:^"
+    "@helixui/library": "^2.1.2"
   },
   "devDependencies": {
     "twig": "^2.0.0",

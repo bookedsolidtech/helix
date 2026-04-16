@@ -29,7 +29,7 @@
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@helixui/library": "workspace:^"
+    "@helixui/library": "^2.1.2"
   },
   "publishConfig": {
     "access": "public",
