@@ -27,8 +27,7 @@ export const helixToastStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     box-shadow: var(
       --hx-toast-shadow,
-      0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1)
+      var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1))
     );
     opacity: 0;
     transform: translateY(var(--hx-toast-enter-translate, var(--hx-space-2, 0.5rem)));

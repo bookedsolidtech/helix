@@ -128,9 +128,8 @@ export const helixNavStyles = css`
     background-color: var(--hx-nav-submenu-bg, var(--hx-color-neutral-800, #1f2937));
     border-radius: var(--hx-border-radius-md, 0.375rem);
     box-shadow: var(
-      --hx-shadow-md,
-      0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1)
+      --hx-nav-shadow,
+      var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1))
     );
     z-index: var(--hx-z-index-dropdown, 1000);
   }
