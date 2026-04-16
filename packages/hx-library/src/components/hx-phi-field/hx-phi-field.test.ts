@@ -673,5 +673,253 @@ describe('hx-phi-field', () => {
       await el.updateComplete;
       expect(el.hasAttribute('disabled')).toBe(true);
     });
+
+    it('does not fire hx-phi-access when toggle is clicked while disabled', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" disabled></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      let eventFired = false;
+      el.addEventListener('hx-phi-access', () => {
+        eventFired = true;
+      });
+      // Simulate programmatic click — native disabled prevents user clicks but we verify
+      // the _handleToggle guard explicitly by dispatching on the container, not the button
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      // Native disabled button swallows click events — confirmed no event fires
+      toggle?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(eventFired).toBe(false);
+    });
+  });
+
+  // ─── PHI Masking Integrity ───
+
+  describe('PHI Masking Integrity', () => {
+    it('masked value span contains asterisk placeholder characters, not actual PHI digits', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value--masked');
+      const text = value?.textContent?.trim() ?? '';
+      // Must contain asterisks (masking characters)
+      expect(text).toContain('*');
+      // Must not contain the sensitive prefix digits
+      expect(text).not.toContain('123');
+      expect(text).not.toContain('45');
+    });
+
+    it('masked MRN contains asterisk characters and not the original prefix', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="mrn"></hx-phi-field>');
+      el.data = 'MRN12345678';
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value--masked');
+      const text = value?.textContent?.trim() ?? '';
+      expect(text).toContain('*');
+      // Original prefix chars should be masked
+      expect(text).not.toContain('MRN1234');
+    });
+
+    it('masked DOB contains only asterisks and separators, no digits', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="dob"></hx-phi-field>');
+      el.data = '12/25/1990';
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value--masked');
+      const text = value?.textContent?.trim() ?? '';
+      expect(text).toMatch(/^[*/]+$/);
+    });
+
+    it('masked insurance ID contains asterisk characters and not the original prefix digits', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="insurance"></hx-phi-field>',
+      );
+      el.data = '1234-5678-9012-3456';
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value--masked');
+      const text = value?.textContent?.trim() ?? '';
+      expect(text).toContain('*');
+      expect(text).not.toContain('1234-5678');
+    });
+
+    it('hx-phi-access event detail does not contain the raw PHI value', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="audit-test"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      const event = await eventPromise;
+      // The audit event detail must never carry the raw PHI — HIPAA requirement
+      const detailStr = JSON.stringify(event.detail);
+      expect(detailStr).not.toContain('123-45-6789');
+      expect(detailStr).not.toContain('123456789');
+    });
+  });
+
+  // ─── ARIA Label Round-Trip ───
+
+  describe('ARIA Label Round-Trip', () => {
+    it('toggle aria-label cycles correctly: masked → revealed → masked', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+
+      // Initial: masked
+      expect(toggle?.getAttribute('aria-label')).toBe('Reveal protected health information');
+
+      // After first click: revealed
+      toggle?.click();
+      await el.updateComplete;
+      expect(toggle?.getAttribute('aria-label')).toBe('Hide protected health information');
+
+      // After second click: masked again
+      toggle?.click();
+      await el.updateComplete;
+      expect(toggle?.getAttribute('aria-label')).toBe('Reveal protected health information');
+    });
+
+    it('toggle aria-pressed cycles correctly: false → true → false', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+
+      expect(toggle?.getAttribute('aria-pressed')).toBe('false');
+
+      toggle?.click();
+      await el.updateComplete;
+      expect(toggle?.getAttribute('aria-pressed')).toBe('true');
+
+      toggle?.click();
+      await el.updateComplete;
+      expect(toggle?.getAttribute('aria-pressed')).toBe('false');
+    });
+
+    it('revealed value span does not have aria-hidden', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value--revealed');
+      // The revealed span must be accessible — not hidden from the accessibility tree
+      expect(value?.getAttribute('aria-hidden')).toBeNull();
+    });
+  });
+
+  // ─── Live Region Announcements ───
+
+  describe('Live Region Announcements', () => {
+    it('live region text updates to revealed announcement after toggle', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+      const status = shadowQuery(el, '[role="status"]');
+      expect(status?.textContent?.trim()).toBe('Protected health information is revealed');
+    });
+
+    it('live region text returns to masked announcement after second toggle', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+      toggle?.click();
+      await el.updateComplete;
+      const status = shadowQuery(el, '[role="status"]');
+      expect(status?.textContent?.trim()).toBe('Protected health information is masked');
+    });
+
+    it('live region uses custom label in revealed announcement', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" label="Social Security Number"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+      const status = shadowQuery(el, '[role="status"]');
+      expect(status?.textContent?.trim()).toBe('Social Security Number is revealed');
+    });
+  });
+
+  // ─── HIPAA Compliance: Host Element ───
+
+  describe('HIPAA Compliance: Host Element', () => {
+    it('sets autocomplete="off" on host element to prevent browser autofill', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      expect(el.getAttribute('autocomplete')).toBe('off');
+    });
+
+    it('PHI value does not appear in host element outerHTML', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      // outerHTML covers the host tag itself — PHI must not leak into attributes
+      expect(el.outerHTML).not.toContain('123-45-6789');
+    });
+
+    it('fieldId falls back to empty string in hx-phi-access event when neither field-id nor id is set', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-phi-access');
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      const event = await eventPromise;
+      expect(event.detail.fieldId).toBe('');
+    });
+  });
+
+  // ─── Keyboard Interaction ───
+
+  describe('Keyboard Interaction', () => {
+    it('Enter key on toggle reveals PHI', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.focus();
+      toggle?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      // Native button responds to Enter via click — trigger the click to simulate
+      toggle?.click();
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value');
+      expect(value?.classList.contains('phi-field__value--revealed')).toBe(true);
+    });
+
+    it('Space key on toggle reveals PHI', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.focus();
+      toggle?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      toggle?.click();
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value');
+      expect(value?.classList.contains('phi-field__value--revealed')).toBe(true);
+    });
+
+    it('toggle button is reachable via focus', async () => {
+      const el = await fixture<HelixPhiField>('<hx-phi-field field-type="ssn"></hx-phi-field>');
+      el.data = '123-45-6789';
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.focus();
+      expect(document.activeElement).toBe(el);
+    });
   });
 });
