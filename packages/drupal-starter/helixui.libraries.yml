@@ -17,6 +17,8 @@
 core:
   version: 2.1.2
   css:
+    base:
+      /libraries/helixui/fouc.css: {}
     theme:
       /libraries/helixui/dist/css/helix-tokens.css: { minified: true }
       /libraries/helixui/dist/css/helix-core.css: { minified: true }
