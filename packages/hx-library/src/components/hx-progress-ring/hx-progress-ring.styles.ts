@@ -142,4 +142,26 @@ export const helixProgressRingStyles = css`
     color: var(--hx-progress-ring-label-color, var(--hx-color-neutral-900, #0f172a));
     pointer-events: none;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /*
+     * SVG stroke colors are suppressed in forced-colors mode. Use system color
+     * keywords so progress state remains distinguishable.
+     */
+    .progress-ring__track {
+      stroke: GrayText;
+    }
+
+    .progress-ring__indicator {
+      stroke: Highlight;
+    }
+
+    :host([variant='success']) .progress-ring__indicator,
+    :host([variant='warning']) .progress-ring__indicator,
+    :host([variant='danger']) .progress-ring__indicator {
+      stroke: Highlight;
+    }
+  }
 `;

@@ -149,4 +149,37 @@ export const helixTextStyles = css`
   :host([lines]:not([lines='0'])) {
     display: block;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /*
+     * Semantic color variants (danger, success, warning) communicate state via color
+     * alone. In forced-colors mode the browser overrides custom colors, so we must
+     * use system color keywords to preserve the semantic distinction.
+     */
+    .text--color-danger {
+      color: LinkText;
+    }
+
+    .text--color-success {
+      color: CanvasText;
+    }
+
+    .text--color-warning {
+      color: CanvasText;
+    }
+
+    .text--color-disabled {
+      color: GrayText;
+    }
+
+    .text--color-inverse {
+      color: CanvasText;
+    }
+
+    .text--color-subtle {
+      color: CanvasText;
+    }
+  }
 `;

@@ -53,5 +53,12 @@ export const helixCounterStyles = css`
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
-  /* Counter is text-only — forced-color-adjust: auto (default) is sufficient. */
+
+  @media (forced-colors: active) {
+    /* Counter is text-only — forced-color-adjust: auto (default) is sufficient.
+       The browser maps the custom color properties to CanvasText automatically. */
+    .counter {
+      forced-color-adjust: auto;
+    }
+  }
 `;

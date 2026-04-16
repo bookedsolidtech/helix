@@ -50,4 +50,17 @@ export const helixBreadcrumbStyles = css`
   .separator-slot {
     display: none;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  /*
+   * hx-breadcrumb is a nav container. Link colors and separators are handled
+   * by hx-breadcrumb-item's own forced-colors block. No additional overrides needed
+   * at the container level.
+   */
+  @media (forced-colors: active) {
+    :host {
+      forced-color-adjust: auto;
+    }
+  }
 `;

@@ -117,4 +117,18 @@ export const helixActionBarStyles = css`
   ::slotted(*) {
     flex-shrink: 0;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /* Outlined variant: border is already present and will be honored by the browser */
+    .base--outlined {
+      border: 1px solid CanvasText;
+    }
+
+    /* Filled variant: background is suppressed — add border to maintain visual separation */
+    .base--filled {
+      border: 1px solid CanvasText;
+    }
+  }
 `;
