@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
 
 /**
@@ -37,25 +38,16 @@ import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
  * @cssprop [--hx-toggle-button-pressed-color=var(--hx-color-neutral-0)] - Text color when pressed (variant-specific fallback applies).
  */
 @customElement('hx-toggle-button')
-export class HelixToggleButton extends LitElement {
+export class HelixToggleButton extends HelixElement {
   static override styles = [helixToggleButtonStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
+  static override formAssociated = true;
 
   /** @internal */
   @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
 
   // ─── Public Properties ───
 
@@ -119,18 +111,13 @@ export class HelixToggleButton extends LitElement {
 
   // ─── Form API ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
   /** Returns the ValidityState object. */
-  get validity(): ValidityState {
+  override get validity(): ValidityState {
     return this._internals.validity;
   }
 
   /** Returns the current validation message. */
-  get validationMessage(): string {
+  override get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
@@ -174,21 +161,18 @@ export class HelixToggleButton extends LitElement {
     }
   }
 
-  /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.pressed = false;
   }
 
-  /** @internal */
-  formStateRestoreCallback(
+  protected override _onFormStateRestore(
     state: string | File | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     this.pressed = typeof state === 'string' && state === 'pressed';
   }
 
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

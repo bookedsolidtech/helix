@@ -77,4 +77,36 @@ export const helixCheckboxGroupStyles = css`
     color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
     line-height: var(--hx-line-height-normal);
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .fieldset {
+      border: none;
+    }
+
+    .fieldset__legend {
+      color: CanvasText;
+    }
+
+    .fieldset--error .fieldset__legend {
+      color: LinkText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .fieldset__legend {
+      color: GrayText;
+    }
+
+    .fieldset__help-text {
+      color: GrayText;
+    }
+
+    .fieldset__error {
+      color: LinkText;
+    }
+  }
 `;

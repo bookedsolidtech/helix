@@ -2,11 +2,11 @@ import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
-// D21 — deterministic monotonic counter instead of Math.random()
-let _dialogCounter = 0;
+const _nextDialogId = createIdCounter('hx-dialog');
 
 // Module-level constant avoids rebuilding the selector string on every _getFocusableElements call.
 // Pattern matches hx-drawer's FOCUSABLE_SELECTORS constant at module scope.
@@ -129,9 +129,11 @@ export class HelixDialog extends LitElement {
   // ─── Unique IDs for aria-labelledby / aria-describedby ───
 
   /** @internal */
-  private readonly _headingId = `hx-dialog-heading-${++_dialogCounter}`;
+  private readonly _dialogId = _nextDialogId();
   /** @internal */
-  private readonly _descriptionId = `hx-dialog-description-${_dialogCounter}`;
+  private readonly _headingId = `${this._dialogId}-heading`;
+  /** @internal */
+  private readonly _descriptionId = `${this._dialogId}-description`;
 
   // ─── Public Properties ───
 
@@ -620,5 +622,10 @@ export class HelixDialog extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-dialog': HelixDialog;
+  }
+  interface HTMLElementEventMap {
+    'hx-open': CustomEvent<void>;
+    'hx-close': CustomEvent<void>;
+    'hx-cancel': CustomEvent<void>;
   }
 }

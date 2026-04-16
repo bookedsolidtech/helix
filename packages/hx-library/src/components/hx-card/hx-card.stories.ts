@@ -920,9 +920,13 @@ export const InteractiveKeyboardSpace: Story = {
     // With delegatesFocus: true, document.activeElement is the host element
     await expect(card).toHaveFocus();
 
-    // Press Space
-    await userEvent.keyboard(' ');
-    await expect(keyboardSpaceHandler).toHaveBeenCalledTimes(1);
+    // Per WCAG 2.1.1 / ARIA APG, role="link" activates on Enter only.
+    // Space is reserved for scrolling and must NOT activate links.
+    // Verify Space does NOT fire hx-click (the component intentionally ignores it).
+    cardEl.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true, composed: true }));
+    cardEl.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true, composed: true }));
+    await new Promise((r) => setTimeout(r, 50));
+    await expect(keyboardSpaceHandler).toHaveBeenCalledTimes(0);
   },
 };
 

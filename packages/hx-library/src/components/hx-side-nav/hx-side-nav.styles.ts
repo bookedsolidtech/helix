@@ -149,4 +149,25 @@ export const helixSideNavStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .side-nav {
+      border-inline-end-color: CanvasText;
+    }
+
+    .side-nav__header {
+      border-bottom-color: CanvasText;
+    }
+
+    .side-nav__footer {
+      border-top-color: CanvasText;
+    }
+
+    .side-nav__toggle {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
 `;

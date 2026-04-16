@@ -1,14 +1,14 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxFileUploadIdCounter = 0;
+const _nextFileUploadId = createIdCounter('hx-file-upload');
 
 interface FileEntry {
   file: File;
@@ -45,21 +45,13 @@ interface FileEntry {
  * @cssprop [--hx-file-upload-error-color=var(--hx-color-error-500)] - Error state and remove-button hover color.
  */
 @customElement('hx-file-upload')
-export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
+export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixFileUploadStyles];
 
   // ─── Form Association ───
 
   /** Marks this element as form-associated for ElementInternals support. @internal */
-  static formAssociated = true;
-
-  /** Holds the ElementInternals instance used for form value and validity management. @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -67,7 +59,7 @@ export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
    * The form field name used during form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -166,7 +158,7 @@ export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
   // ─── Stable IDs ───
 
   /** @internal */
-  private readonly _baseId = `hx-file-upload-${++_hxFileUploadIdCounter}`;
+  private readonly _baseId = _nextFileUploadId();
   /** @internal */
   private readonly _labelId = `${this._baseId}-label`;
   /** @internal */
@@ -195,21 +187,6 @@ export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
   /** Checks whether the component satisfies its constraints. */
   checkValidity(): boolean {
     return this._internals.checkValidity();
@@ -221,19 +198,22 @@ export class HelixFileUpload extends mixinDelegatesAria(LitElement) {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this._files = [];
     this._internals.setFormValue(null);
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
   /** @internal */
-  formStateRestoreCallback(_state: string | File | FormData, mode: string): void {
-    if (mode === 'restore' || mode === 'autocomplete') {
+  protected override _onFormStateRestore(
+    _state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
+    if (_mode === 'restore' || _mode === 'autocomplete') {
       this._files = [];
       this._internals.setFormValue(null);
     }

@@ -1,13 +1,13 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxTextareaIdCounter = 0;
+const _nextTextareaId = createIdCounter('hx-textarea');
 
 /**
  * A multi-line text area component with label, validation, and form association.
@@ -48,23 +48,13 @@ let _hxTextareaIdCounter = 0;
  * @cssprop [--hx-textarea-min-height=var(--hx-size-20, 5rem)] - Minimum textarea height.
  */
 @customElement('hx-textarea')
-export class HelixTextarea extends LitElement {
+export class HelixTextarea extends HelixElement {
   static override styles = [helixTextareaStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** ElementInternals instance for form association, validation, and ARIA. */
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -121,7 +111,7 @@ export class HelixTextarea extends LitElement {
    * The name of the textarea, used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -328,14 +318,14 @@ export class HelixTextarea extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue('');
   }
 
   /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData | null,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
@@ -344,7 +334,7 @@ export class HelixTextarea extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -424,7 +414,7 @@ export class HelixTextarea extends LitElement {
   // ─── Render ───
 
   /** @internal */
-  private _textareaId = `hx-textarea-${++_hxTextareaIdCounter}`;
+  private _textareaId = _nextTextareaId();
   /** @internal */
   private _helpTextId = `${this._textareaId}-help`;
   /** @internal */
@@ -462,14 +452,13 @@ export class HelixTextarea extends LitElement {
     // P0-02 fix: help text container renders when slot is used OR property is set
     const hasHelpText = (!!this.helpText || this._hasHelpTextSlot) && !hasError;
 
-    // Include counter in aria-describedby so screen readers associate it with the textarea.
-    // The counter also has aria-live="polite" for dynamic updates (WCAG 4.1.3).
+    // Do NOT include the counter in aria-describedby: the counter element has
+    // aria-hidden="true" (it is a visual-only display), and referencing an
+    // aria-hidden element from aria-describedby is a WCAG conflict.
+    // Screen reader users receive character-count announcements via the
+    // debounced aria-live="polite" region (_liveAnnouncement) instead.
     const describedBy =
-      [
-        hasError ? this._errorId : null,
-        hasHelpText ? this._helpTextId : null,
-        this.showCount ? this._counterId : null,
-      ]
+      [hasError ? this._errorId : null, hasHelpText ? this._helpTextId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -541,6 +530,10 @@ export class HelixTextarea extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-textarea': HelixTextarea;
+  }
+  interface HTMLElementEventMap {
+    'hx-input': CustomEvent<{ value: string }>;
+    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

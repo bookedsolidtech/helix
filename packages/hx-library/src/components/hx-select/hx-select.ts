@@ -135,7 +135,7 @@ export class HelixSelect extends HelixElement {
    * The name used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -755,6 +755,9 @@ export class HelixSelect extends HelixElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-select': HelixSelect;
+  }
+  interface HTMLElementEventMap {
+    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

@@ -99,4 +99,30 @@ export const helixMenuItemStyles = css`
       opacity: var(--hx-opacity-muted, 0.6);
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .menu-item {
+      forced-color-adjust: none;
+      color: CanvasText;
+      background-color: Canvas;
+    }
+
+    .menu-item:hover,
+    .menu-item:focus-visible {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    .menu-item:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :host([disabled]) .menu-item {
+      color: GrayText;
+      opacity: 1;
+    }
+  }
 `;

@@ -46,12 +46,6 @@ export interface HxComboboxProps {
   labelRequired?: string;
   /** Generates the accessible label for multi-select chip remove buttons. */
   labelRemoveOption?: string;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched when the listbox opens. */

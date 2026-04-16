@@ -27,9 +27,6 @@ import { devWarn } from '../../utils/dev-warn.js';
 export class HelixButtonGroup extends LitElement {
   static override styles = [helixButtonGroupStyles];
 
-  /** @internal */
-  private internals: ElementInternals;
-
   /**
    * Layout orientation of the button group.
    * @attr orientation
@@ -60,7 +57,7 @@ export class HelixButtonGroup extends LitElement {
   size: 'sm' | 'md' | 'lg' = 'md';
 
   /**
-   * Accessible label for the button group. Sets aria-label via ElementInternals.
+   * Accessible label for the button group. Sets aria-label on the host element.
    * **Strongly recommended** for WCAG 2.1 AA compliance — without it, screen
    * readers announce an unnamed "group". For Drupal/Twig compatibility, prefer
    * applying `aria-label` directly as an HTML attribute instead.
@@ -68,14 +65,6 @@ export class HelixButtonGroup extends LitElement {
    */
   @property({ type: String })
   label: string = '';
-
-  // ─── Constructor ───
-
-  constructor() {
-    super();
-    this.internals = this.attachInternals();
-    this.internals.role = 'group';
-  }
 
   // ─── Lifecycle ───
 
@@ -87,15 +76,20 @@ export class HelixButtonGroup extends LitElement {
     }
 
     if (changedProperties.has('label')) {
-      this.internals.ariaLabel = this.label || null;
+      if (this.label) {
+        this.setAttribute('aria-label', this.label);
+      } else {
+        this.removeAttribute('aria-label');
+      }
     }
   }
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this.setAttribute('role', 'group');
     this.style.setProperty('--hx-button-group-size', this.size);
     if (this.label) {
-      this.internals.ariaLabel = this.label;
+      this.setAttribute('aria-label', this.label);
     } else {
       devWarn(
         'hx-button-group',

@@ -46,4 +46,13 @@ export const helixDropdownStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    [part='panel'] {
+      background-color: Canvas;
+      border: 2px solid CanvasText;
+    }
+  }
 `;

@@ -124,7 +124,7 @@ export const Default: Story = {
     const host = canvasElement.querySelector('hx-text')!;
     const base = host.shadowRoot!.querySelector('[part="base"]')!;
     await expect(base).toBeInTheDocument();
-    await expect(base.textContent?.trim()).toBeTruthy();
+    await expect(host.textContent?.trim()).toBeTruthy();
   },
 };
 

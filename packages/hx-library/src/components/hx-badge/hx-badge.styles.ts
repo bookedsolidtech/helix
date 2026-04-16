@@ -197,4 +197,20 @@ export const helixBadgeStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
     outline-offset: var(--hx-focus-ring-offset, 1px);
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .badge {
+      border: 1px solid CanvasText;
+    }
+
+    .badge--pulse {
+      animation: none;
+    }
+
+    .badge__remove-button {
+      color: ButtonText;
+    }
+  }
 `;

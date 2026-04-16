@@ -203,4 +203,21 @@ export const helixBannerStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .banner {
+      border-bottom-color: CanvasText;
+    }
+
+    .banner__icon svg {
+      fill: CanvasText;
+    }
+
+    .banner__close-button {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
 `;

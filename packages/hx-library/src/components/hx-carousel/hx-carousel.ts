@@ -790,6 +790,8 @@ export class HelixCarousel extends LitElement {
           <div
             class="slide-viewport"
             part="slide-viewport"
+            aria-live="polite"
+            aria-atomic="false"
             @mousedown=${this._handleDragStart}
             @mousemove=${this._handleDragMove}
             @mouseup=${this._handleDragEnd}

@@ -262,4 +262,25 @@ export const helixDrawerStyles = css`
       var(--hx-drawer-footer-border-color, var(--hx-color-neutral-200));
     flex-shrink: 0;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .drawer-panel {
+      border: 1px solid CanvasText;
+    }
+
+    .drawer-header {
+      border-bottom-color: CanvasText;
+    }
+
+    .drawer-footer {
+      border-top-color: CanvasText;
+    }
+
+    .drawer-close-button {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
 `;

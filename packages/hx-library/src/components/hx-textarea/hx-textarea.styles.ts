@@ -117,6 +117,10 @@ export const helixTextareaStyles = css`
     color: var(--hx-color-neutral-400, #adb5bd);
   }
 
+  .field__textarea:focus-visible {
+    outline: none; /* wrapper ring handles keyboard focus indication */
+  }
+
   .field__textarea:disabled {
     cursor: not-allowed;
   }
@@ -179,5 +183,63 @@ export const helixTextareaStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(--hx-input-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal, 1.5);
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .field__textarea-wrapper {
+      forced-color-adjust: none;
+      background-color: Field;
+      color: FieldText;
+      border: 2px solid ButtonText;
+    }
+
+    .field__textarea {
+      color: FieldText;
+    }
+
+    .field__textarea::placeholder {
+      color: GrayText;
+    }
+
+    .field__textarea-wrapper:focus-within {
+      border-color: Highlight;
+      box-shadow: none;
+    }
+
+    .field__textarea:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: -3px;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .field__textarea-wrapper {
+      border-color: GrayText;
+      color: GrayText;
+    }
+
+    :host([disabled]) .field__textarea {
+      color: GrayText;
+    }
+
+    .field--error .field__textarea-wrapper {
+      border-color: LinkText;
+    }
+
+    .field__label {
+      color: CanvasText;
+    }
+
+    .field__help-text {
+      color: GrayText;
+    }
+
+    .field__error {
+      color: LinkText;
+    }
   }
 `;

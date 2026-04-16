@@ -99,4 +99,30 @@ export const helixTabStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .tab {
+      forced-color-adjust: none;
+      color: ButtonText;
+      border-bottom-color: transparent;
+      background-color: ButtonFace;
+    }
+
+    .tab[aria-selected='true'] {
+      color: HighlightText;
+      background-color: Highlight;
+      border-bottom-color: Highlight;
+    }
+
+    .tab:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .tab[aria-disabled='true'] {
+      color: GrayText;
+    }
+  }
 `;

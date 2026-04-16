@@ -116,4 +116,16 @@ export const helixSpinnerStyles = css`
       );
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .spinner__track {
+      stroke: GrayText;
+    }
+
+    .spinner__arc {
+      stroke: CanvasText;
+    }
+  }
 `;

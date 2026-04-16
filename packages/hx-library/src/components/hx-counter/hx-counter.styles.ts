@@ -51,4 +51,7 @@ export const helixCounterStyles = css`
          will see the final value immediately via the component logic */
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+  /* Counter is text-only — forced-color-adjust: auto (default) is sufficient. */
 `;

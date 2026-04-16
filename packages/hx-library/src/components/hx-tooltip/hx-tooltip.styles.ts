@@ -51,4 +51,16 @@ export const helixTooltipStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    [part='tooltip'] {
+      border: 1px solid CanvasText;
+    }
+
+    [part='arrow'] {
+      border: 1px solid CanvasText;
+    }
+  }
 `;

@@ -1,13 +1,13 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
-/** Monotonic counter for stable, SSR-safe IDs. */
-let _uid = 0;
+const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
 
 /**
  * A form-associated checkbox group that manages a set of `<hx-checkbox>` children.
@@ -45,22 +45,13 @@ let _uid = 0;
  * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
  */
 @customElement('hx-checkbox-group')
-export class HelixCheckboxGroup extends LitElement {
+export class HelixCheckboxGroup extends HelixElement {
   static override styles = [helixCheckboxGroupStyles];
 
   // ─── Form Association ───
 
   /** Marks this element as form-associated for ElementInternals support. @internal */
-  static formAssociated = true;
-
-  /** Holds the ElementInternals instance used for form value and validity management. @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -68,7 +59,7 @@ export class HelixCheckboxGroup extends LitElement {
    * The name used for form submission. Passed to child `hx-checkbox` elements.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -132,7 +123,7 @@ export class HelixCheckboxGroup extends LitElement {
   // ─── Internal IDs ───
 
   /** @internal */
-  private _groupId = `hx-checkbox-group-${++_uid}`;
+  private _groupId = _nextCheckboxGroupId();
   /** @internal */
   private _helpTextId = `${this._groupId}-help`;
   /** @internal */
@@ -307,7 +298,7 @@ export class HelixCheckboxGroup extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     const checkboxes = this._getCheckboxes();
     checkboxes.forEach((cb) => {
       cb.checked = false;
@@ -317,8 +308,8 @@ export class HelixCheckboxGroup extends LitElement {
   }
 
   /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData | null,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (!(state instanceof FormData)) return;
@@ -332,7 +323,7 @@ export class HelixCheckboxGroup extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

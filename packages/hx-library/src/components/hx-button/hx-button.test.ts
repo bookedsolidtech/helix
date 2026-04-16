@@ -537,11 +537,11 @@ describe('hx-button', () => {
       form.remove();
     });
 
-    it('does not have formResetCallback (no internal value state to restore)', () => {
-      // hx-button triggers form reset via type="reset" + form.reset() — it does not
-      // implement formResetCallback because it holds no stateful input value.
+    it('has formResetCallback from HelixElement base class (delegates to _onFormReset)', () => {
+      // HelixElement provides formResetCallback on all form-associated components.
+      // hx-button does not override _onFormReset since it holds no stateful value.
       const ctor = customElements.get('hx-button') as { prototype: Record<string, unknown> };
-      expect(typeof ctor.prototype['formResetCallback']).toBe('undefined');
+      expect(typeof ctor.prototype['formResetCallback']).toBe('function');
     });
 
     it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {

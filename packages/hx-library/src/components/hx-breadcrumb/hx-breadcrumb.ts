@@ -1,6 +1,7 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
@@ -10,6 +11,8 @@ interface JsonLdListItem {
   name: string;
   item?: string;
 }
+
+const _nextBreadcrumbId = createIdCounter('hx-breadcrumb');
 
 /**
  * Hierarchical page path navigation showing current location in site structure.
@@ -39,14 +42,6 @@ interface JsonLdListItem {
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends LitElement {
   static override styles = [helixBreadcrumbStyles];
-
-  /**
-   * Per-instance counter used to generate stable, deterministic IDs for the
-   * injected JSON-LD script tags. Deterministic IDs (vs Math.random()) allow
-   * SSR frameworks to match server-rendered script tags during hydration.
-   * @internal
-   */
-  private static _instanceCounter = 0;
 
   /**
    * The separator character displayed between breadcrumb items.
@@ -124,7 +119,7 @@ export class HelixBreadcrumb extends LitElement {
    * server and client renders, enabling SSR hydration matching.
    * @internal
    */
-  private readonly _jsonLdId = `hx-breadcrumb-ld-${++HelixBreadcrumb._instanceCounter}`;
+  private readonly _jsonLdId = `${_nextBreadcrumbId()}-ld`;
 
   // ─── Item Helpers ───
 
@@ -354,14 +349,12 @@ export class HelixBreadcrumb extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    // Expose role="list" on the host element so that axe-core's flat-tree
-    // traversal sees a valid list ancestor for the hx-breadcrumb-item
-    // children that carry role="listitem". The shadow-DOM <ol> owns the
-    // visual list structure, but the composed accessibility tree requires
-    // the ARIA role on the host to satisfy the aria-required-parent rule.
-    if (!this.hasAttribute('role')) {
-      this.setAttribute('role', 'list');
-    }
+    // Do NOT set role="list" on the host. The shadow-DOM <nav><ol> provides
+    // both navigation landmark and list semantics. Setting role="list" on
+    // the host conflicts with the <nav> child — axe-core flags
+    // aria-required-children because a list cannot own a navigation landmark.
+    // Slotted items no longer need role="listitem" either; the native <ol>
+    // handles list semantics in the composed accessibility tree.
     this.addEventListener('click', this._boundEllipsisClick);
     this.addEventListener('keydown', this._boundEllipsisKeydown);
   }

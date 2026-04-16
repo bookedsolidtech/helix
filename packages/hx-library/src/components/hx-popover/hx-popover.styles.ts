@@ -61,4 +61,16 @@ export const helixPopoverStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    [part='body'] {
+      border-color: CanvasText;
+    }
+
+    [part='arrow'] {
+      border-color: CanvasText;
+    }
+  }
 `;

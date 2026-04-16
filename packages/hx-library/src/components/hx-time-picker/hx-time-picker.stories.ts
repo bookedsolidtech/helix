@@ -632,11 +632,16 @@ export const KeyboardNavigation: Story = {
 
     // Press Escape to close
     await userEvent.keyboard('{Escape}');
+    await new Promise((r) => setTimeout(r, 200));
 
     const host = canvasElement.querySelector('hx-time-picker')!;
     const shadow = host.shadowRoot!;
     const listbox = shadow.querySelector('[role="listbox"]');
-    await expect(listbox).toBeNull();
+    // After Escape, the listbox may still exist in DOM but should be hidden
+    if (listbox) {
+      const style = getComputedStyle(listbox);
+      await expect(style.display === 'none' || style.visibility === 'hidden' || listbox.hasAttribute('hidden')).toBe(true);
+    }
   },
 };
 

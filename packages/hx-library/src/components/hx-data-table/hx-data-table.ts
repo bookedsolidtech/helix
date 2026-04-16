@@ -187,6 +187,14 @@ export class HelixDataTable extends LitElement {
    */
   private _cachedCells: HTMLElement[] | null = null;
 
+  /**
+   * Index (within the columns array) of the sortable header that currently holds
+   * roving tabindex focus. -1 means no sortable header has been focused yet;
+   * the first sortable column will receive tabindex="0" by default.
+   * @internal
+   */
+  @state() private _focusedHeaderIndex = -1;
+
   // ─── Lifecycle ───
 
   override willUpdate(changed: PropertyValues<this>): void {
@@ -410,10 +418,82 @@ export class HelixDataTable extends LitElement {
     `;
   }
 
+  /**
+   * Returns the indices (within the columns array) of all sortable columns.
+   * @internal
+   */
+  private get _sortableIndices(): number[] {
+    return this.columns.reduce<number[]>((acc, col, i) => {
+      if (col.sortable) acc.push(i);
+      return acc;
+    }, []);
+  }
+
+  /**
+   * Handles keyboard navigation between sortable column headers using the
+   * roving tabindex pattern (ARIA Grid specification). Supports ArrowLeft/Right
+   * to move between sortable headers, Home/End to jump to first/last, and
+   * Enter/Space to trigger sort on the focused sortable header.
+   * @internal
+   */
+  private _handleHeaderKeydown(e: KeyboardEvent): void {
+    const sortable = this._sortableIndices;
+    if (sortable.length === 0) return;
+
+    // Enter/Space on a sortable header triggers sort
+    if (e.key === 'Enter' || e.key === ' ') {
+      const col = this.columns[this._focusedHeaderIndex];
+      if (col?.sortable) {
+        e.preventDefault();
+        this._handleSort(col.key);
+      }
+      return;
+    }
+
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+
+    // Determine which sortable position is currently focused.
+    // If no sortable header is focused (currentPos === -1), let the
+    // table-level _handleKeydown handle grid navigation instead.
+    const currentPos = sortable.indexOf(this._focusedHeaderIndex);
+    if (currentPos === -1) return;
+    let nextPos: number;
+
+    if (e.key === 'ArrowRight') {
+      nextPos = currentPos === -1 ? 0 : Math.min(currentPos + 1, sortable.length - 1);
+    } else if (e.key === 'ArrowLeft') {
+      nextPos = currentPos <= 0 ? 0 : currentPos - 1;
+    } else if (e.key === 'Home') {
+      nextPos = 0;
+    } else {
+      // End
+      nextPos = sortable.length - 1;
+    }
+
+    const nextIndex = sortable[nextPos];
+    if (nextIndex === undefined) return;
+
+    e.preventDefault();
+    this._focusedHeaderIndex = nextIndex;
+
+    // Focus the <th> element for the target column
+    const headers = this.shadowRoot?.querySelectorAll<HTMLElement>('thead th[data-col-index]');
+    const target = headers?.[nextIndex] ?? null;
+    if (target) {
+      target.focus();
+    }
+  }
+
   /** @internal */
   private _renderHeaderRow() {
+    // Determine which sortable header gets tabindex="0" (roving tabindex).
+    // If _focusedHeaderIndex is -1 (initial), the first sortable column wins.
+    const sortable = this._sortableIndices;
+    const activeIndex =
+      this._focusedHeaderIndex >= 0 ? this._focusedHeaderIndex : (sortable[0] ?? -1);
+
     return html`
-      <tr part="tr">
+      <tr part="tr" @keydown=${this._handleHeaderKeydown}>
         ${this.selectable
           ? html`
               <th part="th" class="col-checkbox" tabindex="0">
@@ -431,10 +511,11 @@ export class HelixDataTable extends LitElement {
             `
           : nothing}
         ${this.columns.map(
-          (col) => html`
+          (col, i) => html`
             <th
               part="th"
-              tabindex="0"
+              data-col-index=${i}
+              tabindex=${col.sortable ? (i === activeIndex ? '0' : '-1') : '-1'}
               style=${col.width ? `width: ${col.width}` : ''}
               aria-sort=${col.sortable
                 ? this.sortKey === col.key
@@ -442,6 +523,11 @@ export class HelixDataTable extends LitElement {
                     ? 'ascending'
                     : 'descending'
                   : 'none'
+                : nothing}
+              @focus=${col.sortable
+                ? () => {
+                    this._focusedHeaderIndex = i;
+                  }
                 : nothing}
             >
               ${col.sortable

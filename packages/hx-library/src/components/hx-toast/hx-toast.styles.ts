@@ -155,6 +155,19 @@ export const helixToastStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .toast {
+      border: 1px solid CanvasText;
+    }
+
+    .toast__close {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+  }
 `;
 
 export const helixToastStackStyles = css`

@@ -31,4 +31,17 @@ export const helixTabPanelStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
     outline: none;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    :host(:focus-visible) {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .panel {
+      color: CanvasText;
+    }
+  }
 `;

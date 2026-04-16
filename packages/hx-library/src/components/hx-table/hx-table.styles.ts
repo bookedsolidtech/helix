@@ -106,6 +106,14 @@ export const helixTableStyles = css`
       transition: none !important;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    table {
+      border: 1px solid CanvasText;
+    }
+  }
 `;
 
 /**

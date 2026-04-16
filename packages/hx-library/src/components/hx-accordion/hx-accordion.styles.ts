@@ -10,4 +10,12 @@ export const helixAccordionStyles = css`
     border-radius: var(--hx-accordion-border-radius, var(--hx-border-radius-md, 0.375rem));
     overflow: hidden;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .accordion {
+      border: 2px solid CanvasText;
+    }
+  }
 `;
