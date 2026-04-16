@@ -54,6 +54,7 @@
     "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
     "test:coverage": "vitest run --coverage.enabled",
     "test:coverage:ci": "vitest run --coverage.enabled && node ../../scripts/check-coverage.mjs",
+    "test:fast": "vitest run --reporter=verbose --bail=5",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:batch:1": "vitest run \"hx-accordion/|hx-action-bar/|hx-alert/|hx-avatar/|hx-badge/|hx-breadcrumb/|hx-button/|hx-button-group/|hx-card/|hx-carousel/|hx-checkbox/|hx-checkbox-group/|hx-code-snippet/|hx-color-picker/|hx-combobox/\" --reporter=verbose",
@@ -65,7 +66,7 @@
     "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" && node ../../scripts/validate-cem.mjs",
     "cem:watch": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" --watch",
     "build:cdn": "node scripts/build-cdn.mjs",
-    "generate:drupal-libraries": "node scripts/generate-drupal-libraries.js",
+    "generate:drupal-libraries": "tsx ../../scripts/generate-drupal-libraries.ts",
     "lint": "eslint src/",
     "clean": "rm -rf dist custom-elements.json"
   },
