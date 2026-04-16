@@ -977,19 +977,23 @@ describe('hx-data-table', () => {
       (el as any).columns = '{not valid json';
       await el.updateComplete;
 
-      // After the bad assignment, columns should fall back to [].
-      expect(Array.isArray(el.columns)).toBe(true);
-      expect(el.columns).toEqual([]);
+      // After the bad assignment, the component renders with zero columns.
+      // The internal resolved state falls back to [] even though the raw
+      // property retains the bad value (no reactive mutation in willUpdate).
+      const ths = el.shadowRoot!.querySelectorAll('th[part~="th"]');
+      expect(ths.length).toBe(0);
     });
 
     it('recovers gracefully from invalid JSON rows attribute', async () => {
       const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (el as any).rows = 'not-valid-json-at-all';
       await el.updateComplete;
 
-      expect(Array.isArray(el.rows)).toBe(true);
-      expect(el.rows).toEqual([]);
+      // The component renders the empty state when rows can't be parsed.
+      const emptyCell = el.shadowRoot!.querySelector('.empty-cell');
+      expect(emptyCell).not.toBeNull();
     });
   });
 
