@@ -41,7 +41,7 @@ export const helixDatePickerStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-date-picker-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-date-picker-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -58,7 +58,7 @@ export const helixDatePickerStyles = css`
     display: flex;
     align-items: stretch;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #ced4da));
+      var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #CBD5E1));
     border-radius: var(--hx-date-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-date-picker-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
@@ -85,15 +85,15 @@ export const helixDatePickerStyles = css`
   }
 
   .field--error .field__input-wrapper {
-    border-color: var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545));
+    border-color: var(--hx-date-picker-error-color, var(--hx-color-error-500, #DC2626));
   }
 
   .field--error .field__input-wrapper:focus-within {
-    border-color: var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545));
+    border-color: var(--hx-date-picker-error-color, var(--hx-color-error-500, #DC2626));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-date-picker-error-color, var(--hx-color-error-500, #dc3545))
+        var(--hx-date-picker-error-color, var(--hx-color-error-500, #DC2626))
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -137,7 +137,7 @@ export const helixDatePickerStyles = css`
     padding: 0 var(--hx-space-3, 0.75rem);
     border: none;
     border-left: var(--hx-border-width-thin, 1px) solid
-      var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #ced4da));
+      var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #CBD5E1));
     background: transparent;
     color: var(--hx-date-picker-trigger-color, var(--hx-color-neutral-500, #6c757d));
     cursor: pointer;
@@ -163,7 +163,7 @@ export const helixDatePickerStyles = css`
   }
 
   .field__trigger:hover:not(:disabled) {
-    color: var(--hx-date-picker-trigger-hover-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-date-picker-trigger-hover-color, var(--hx-color-neutral-700, #334155));
     background-color: color-mix(in srgb, var(--hx-color-neutral-900, #212529) 4%, transparent);
   }
 

@@ -64,7 +64,7 @@ export const helixTopNavStyles = css`
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
-    color: var(--hx-top-nav-toggle-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-top-nav-toggle-color, var(--hx-color-neutral-700, #334155));
     cursor: pointer;
     line-height: 0;
   }

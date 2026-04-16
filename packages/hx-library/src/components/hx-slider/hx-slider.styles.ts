@@ -35,7 +35,7 @@ export const helixSliderStyles = css`
   .slider__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-slider-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

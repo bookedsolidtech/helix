@@ -34,7 +34,7 @@ export const helixRadioGroupStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-radio-group-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-radio-group-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     padding: 0;
     margin-bottom: var(--hx-space-1, 0.25rem);

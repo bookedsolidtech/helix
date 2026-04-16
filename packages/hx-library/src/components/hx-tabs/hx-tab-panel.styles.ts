@@ -27,7 +27,7 @@ export const helixTabPanelStyles = css`
     padding: var(--hx-tabs-panel-padding, var(--hx-space-4, 1rem));
     font-family: var(--hx-font-family-sans, sans-serif);
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-tabs-panel-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-tabs-panel-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     outline: none;
   }

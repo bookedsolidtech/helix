@@ -43,7 +43,7 @@ export const helixSwitchStyles = css`
     border: none;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #ced4da));
+    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #CBD5E1));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;
@@ -139,7 +139,7 @@ export const helixSwitchStyles = css`
   .switch__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: pointer;
     user-select: none;

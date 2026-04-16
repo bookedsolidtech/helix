@@ -11,10 +11,10 @@ export const helixSelectStyles = css`
     --_placeholder-color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
 
     /* Label */
-    --_label-color: var(--hx-select-label-color, var(--hx-color-neutral-700, #343a40));
+    --_label-color: var(--hx-select-label-color, var(--hx-color-neutral-700, #334155));
 
     /* Border */
-    --_border-color: var(--hx-select-border-color, var(--hx-color-neutral-300, #ced4da));
+    --_border-color: var(--hx-select-border-color, var(--hx-color-neutral-300, #CBD5E1));
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */
@@ -24,7 +24,7 @@ export const helixSelectStyles = css`
     );
 
     /* Error */
-    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc3545));
+    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #DC2626));
 
     /* Chevron */
     --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #6c757d));
