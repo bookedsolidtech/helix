@@ -1,6 +1,7 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import {
   helixStructuredListStyles,
   helixStructuredListRowStyles,
@@ -29,7 +30,7 @@ import {
  * @cssprop [--hx-structured-list-condensed-padding-inline=var(--hx-space-3)] - Row inline padding (condensed).
  */
 @customElement('hx-structured-list')
-export class HelixStructuredList extends LitElement {
+export class HelixStructuredList extends HelixElement {
   static override styles = [helixStructuredListStyles];
 
   override connectedCallback(): void {
@@ -100,7 +101,7 @@ export class HelixStructuredList extends LitElement {
  * @cssprop [--hx-structured-list-value-color=var(--hx-color-neutral-900)] - Value text color.
  */
 @customElement('hx-structured-list-row')
-export class HelixStructuredListRow extends LitElement {
+export class HelixStructuredListRow extends HelixElement {
   static override styles = [helixStructuredListRowStyles];
 
   override connectedCallback(): void {

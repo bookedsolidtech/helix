@@ -1,6 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
 import { mergeBrandTokens } from '../../utils/token-merger.js';
@@ -255,7 +256,7 @@ function _buildThemeCss(theme: ThemeName): string {
  * ```
  */
 @customElement('hx-theme')
-export class HelixTheme extends LitElement {
+export class HelixTheme extends HelixElement {
   static override styles = [helixThemeStyles];
 
   /**

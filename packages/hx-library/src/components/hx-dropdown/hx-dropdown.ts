@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement } from '../../base/index.js';
 import {
   computePosition,
   flip,
@@ -61,7 +62,7 @@ const _nextDropdownId = createIdCounter('hx-dropdown');
  * ```
  */
 @customElement('hx-dropdown')
-export class HelixDropdown extends LitElement {
+export class HelixDropdown extends HelixElement {
   static override styles = [helixDropdownStyles];
 
   // ─── Public Properties ───

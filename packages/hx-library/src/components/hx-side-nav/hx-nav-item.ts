@@ -1,7 +1,7 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
 const _nextNavItemId = createIdCounter('hx-nav-item');
@@ -34,7 +34,7 @@ const _nextNavItemId = createIdCounter('hx-nav-item');
  * @cssprop [--hx-nav-item-host-bg=var(--hx-color-neutral-900)] - Component host background color.
  */
 @customElement('hx-nav-item')
-export class HelixNavItem extends LitElement {
+export class HelixNavItem extends HelixElement {
   static override styles = [helixNavItemStyles];
 
   /** @internal — per-instance tooltip ID */

@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixDividerStyles } from './hx-divider.styles.js';
 
 /**
@@ -25,7 +26,7 @@ import { helixDividerStyles } from './hx-divider.styles.js';
  * @cssprop [--hx-divider-label-gap=var(--hx-space-3)] - Gap between lines and label.
  */
 @customElement('hx-divider')
-export class HelixDivider extends LitElement {
+export class HelixDivider extends HelixElement {
   static override styles = [helixDividerStyles];
 
   /**

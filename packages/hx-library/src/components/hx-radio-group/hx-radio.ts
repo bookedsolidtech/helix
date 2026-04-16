@@ -1,8 +1,8 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixRadioStyles } from './hx-radio.styles.js';
 
 const _nextRadioId = createIdCounter('hx-radio');
@@ -28,7 +28,7 @@ const _nextRadioId = createIdCounter('hx-radio');
  * @cssprop [--hx-radio-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  */
 @customElement('hx-radio')
-export class HelixRadio extends LitElement {
+export class HelixRadio extends HelixElement {
   static override styles = [helixRadioStyles];
 
   // ─── Properties ───

@@ -1,6 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
 import './hx-accordion-item.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
@@ -30,7 +31,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * ```
  */
 @customElement('hx-accordion')
-export class HelixAccordion extends LitElement {
+export class HelixAccordion extends HelixElement {
   static override styles = [helixAccordionStyles];
 
   /**

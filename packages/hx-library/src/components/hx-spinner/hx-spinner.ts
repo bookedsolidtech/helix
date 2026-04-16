@@ -1,9 +1,10 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement } from '../../base/index.js';
 import { helixSpinnerStyles } from './hx-spinner.styles.js';
 
 /**
@@ -45,7 +46,7 @@ export type SpinnerSize = 'sm' | 'md' | 'lg';
  * @cssprop [--hx-duration-spinner] - Duration of the rotation animation. Defaults to 750ms.
  */
 @customElement('hx-spinner')
-export class HelixSpinner extends LitElement {
+export class HelixSpinner extends HelixElement {
   static override styles = [helixSpinnerStyles];
 
   /**

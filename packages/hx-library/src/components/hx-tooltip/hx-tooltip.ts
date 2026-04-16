@@ -1,8 +1,8 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
 const _nextTooltipId = createIdCounter('hx-tooltip');
@@ -49,7 +49,7 @@ const _nextTooltipId = createIdCounter('hx-tooltip');
  */
 
 @customElement('hx-tooltip')
-export class HelixTooltip extends LitElement {
+export class HelixTooltip extends HelixElement {
   static override styles = [helixTooltipStyles];
 
   /**

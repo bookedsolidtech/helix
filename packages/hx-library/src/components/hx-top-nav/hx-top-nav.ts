@@ -1,7 +1,8 @@
-import { LitElement, html, svg } from 'lit';
+import { html, svg } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTopNavStyles } from './hx-top-nav.styles.js';
 
 /**
@@ -38,7 +39,7 @@ import { helixTopNavStyles } from './hx-top-nav.styles.js';
  * @cssprop [--hx-top-nav-toggle-color=var(--hx-color-neutral-700)] - Hamburger icon color.
  */
 @customElement('hx-top-nav')
-export class HelixTopNav extends LitElement {
+export class HelixTopNav extends HelixElement {
   static override styles = [helixTopNavStyles];
 
   // ─── Public Properties ───

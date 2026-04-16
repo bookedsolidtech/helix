@@ -1,8 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
@@ -44,7 +44,7 @@ const _nextSplitButtonId = createIdCounter('hx-split-button');
  * @cssprop [--hx-split-button-menu-shadow] - Dropdown menu box shadow.
  */
 @customElement('hx-split-button')
-export class HelixSplitButton extends LitElement {
+export class HelixSplitButton extends HelixElement {
   static override styles = [helixSplitButtonStyles];
 
   // ─── Internal References ───

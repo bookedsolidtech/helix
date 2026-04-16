@@ -1,7 +1,8 @@
-import { LitElement, html, css } from 'lit';
+import { html, css } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 
 /**
  * Semantic table data cell. Must be a child of `hx-tr`.
@@ -17,7 +18,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
  * @cssprop [--hx-table-cell-color=var(--hx-color-neutral-900, #0f172a)] - Cell text color.
  */
 @customElement('hx-td')
-export class HelixTableCell extends LitElement {
+export class HelixTableCell extends HelixElement {
   static override styles = [
     css`
       :host {

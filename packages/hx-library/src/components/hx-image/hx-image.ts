@@ -1,8 +1,9 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixImageStyles } from './hx-image.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -32,7 +33,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @fires hx-error - Dispatched when the image fails to load (including after fallback-src also fails).
  */
 @customElement('hx-image')
-export class HelixImage extends LitElement {
+export class HelixImage extends HelixElement {
   static override styles = [helixImageStyles];
 
   /**

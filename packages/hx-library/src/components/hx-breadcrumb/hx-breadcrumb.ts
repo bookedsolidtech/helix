@@ -1,7 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
@@ -40,7 +40,7 @@ const _nextBreadcrumbId = createIdCounter('hx-breadcrumb');
  * @cssprop [--hx-breadcrumb-item-max-width] - Max-width for item text truncation (e.g. `12rem`).
  */
 @customElement('hx-breadcrumb')
-export class HelixBreadcrumb extends LitElement {
+export class HelixBreadcrumb extends HelixElement {
   static override styles = [helixBreadcrumbStyles];
 
   /**

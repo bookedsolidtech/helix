@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -28,7 +29,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-menu-max-height=20rem] - Maximum menu height before vertical scroll is activated.
  */
 @customElement('hx-menu')
-export class HelixMenu extends LitElement {
+export class HelixMenu extends HelixElement {
   static override styles = [helixMenuStyles];
 
   /**

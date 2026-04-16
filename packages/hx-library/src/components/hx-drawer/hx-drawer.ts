@@ -1,11 +1,11 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { devWarn } from '../../utils/dev-warn.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
 const _nextDrawerId = createIdCounter('hx-drawer');
@@ -75,7 +75,7 @@ const FOCUSABLE_SELECTORS = [
  * @cssprop [--hx-drawer-footer-border-color=var(--hx-color-neutral-200)] - Footer border color.
  */
 @customElement('hx-drawer')
-export class HelixDrawer extends LitElement {
+export class HelixDrawer extends HelixElement {
   static override styles = [helixDrawerStyles];
 
   // ─── Queries ───

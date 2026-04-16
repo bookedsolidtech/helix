@@ -1,6 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
 
 /**
@@ -44,7 +45,7 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  * @cssprop [--hx-patient-banner-photo-bg=var(--hx-color-neutral-200,#e5e7eb)] - Photo area background color when empty.
  */
 @customElement('hx-patient-banner')
-export class HelixPatientBanner extends LitElement {
+export class HelixPatientBanner extends HelixElement {
   static override styles = [helixPatientBannerStyles];
 
   // ─── Public Properties ───

@@ -1,8 +1,9 @@
-import { LitElement, html, nothing, svg } from 'lit';
+import { html, nothing, svg } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { HelixElement } from '../../base/index.js';
 import { helixNavStyles } from './hx-nav.styles.js';
 
 /** A single navigation item, optionally with nested children. */
@@ -53,7 +54,7 @@ type NavOrientation = 'horizontal' | 'vertical';
  * @cssprop [--hx-nav-border-radius=var(--hx-border-radius-sm)] - Item border radius.
  */
 @customElement('hx-nav')
-export class HelixNav extends LitElement {
+export class HelixNav extends HelixElement {
   static override styles = [helixNavStyles];
 
   // ─── Properties ───

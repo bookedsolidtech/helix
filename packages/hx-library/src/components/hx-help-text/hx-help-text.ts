@@ -1,8 +1,9 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { helixHelpTextStyles } from './hx-help-text.styles.js';
 
 /** Icon SVG for error variant (circle with exclamation mark). */
@@ -88,7 +89,7 @@ const variantIcons = {
  * @cssprop [--hx-help-text-icon-gap=0.375rem] - Gap between icon and text.
  */
 @customElement('hx-help-text')
-export class HelixHelpText extends LitElement {
+export class HelixHelpText extends HelixElement {
   static override styles = [helixHelpTextStyles];
 
   /**

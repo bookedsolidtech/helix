@@ -1,8 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -84,7 +84,7 @@ const FOCUSABLE_SELECTORS = [
  * Focus restoration to the trigger element is handled automatically by the component.
  */
 @customElement('hx-dialog')
-export class HelixDialog extends LitElement {
+export class HelixDialog extends HelixElement {
   static override styles = [helixDialogStyles];
 
   // D10 — observe aria-label attribute without shadowing ARIAMixin.ariaLabel

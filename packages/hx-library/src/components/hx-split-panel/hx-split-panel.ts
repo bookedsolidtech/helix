@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
 
 /**
@@ -43,7 +44,7 @@ import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
  * ```
  */
 @customElement('hx-split-panel')
-export class HelixSplitPanel extends LitElement {
+export class HelixSplitPanel extends HelixElement {
   static override styles = [helixSplitPanelStyles];
 
   /**

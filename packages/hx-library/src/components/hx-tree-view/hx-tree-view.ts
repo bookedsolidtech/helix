@@ -1,6 +1,7 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
 import type { HelixTreeItem, HxTreeItemSelectDetail } from './hx-tree-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -47,7 +48,7 @@ export interface HxSelectDetail {
  * @cssprop [--hx-tree-font-family=var(--hx-font-family-sans)] - Tree font family.
  */
 @customElement('hx-tree-view')
-export class HelixTreeView extends LitElement {
+export class HelixTreeView extends HelixElement {
   static override styles = [helixTreeViewStyles];
 
   // ─── Properties ───

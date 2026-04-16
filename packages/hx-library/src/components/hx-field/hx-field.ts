@@ -1,8 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixFieldStyles } from './hx-field.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -53,7 +53,7 @@ function isFormControl(el: Element): el is HTMLElement {
  * @cssprop [--hx-field-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-field')
-export class HelixField extends LitElement {
+export class HelixField extends HelixElement {
   static override styles = [helixFieldStyles];
 
   // ─── Properties ───

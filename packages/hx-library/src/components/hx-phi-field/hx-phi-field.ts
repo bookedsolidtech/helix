@@ -1,6 +1,7 @@
-import { LitElement, html, type TemplateResult } from 'lit';
+import { html, type TemplateResult } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -27,7 +28,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
  */
 @customElement('hx-phi-field')
-export class HelixPhiField extends LitElement {
+export class HelixPhiField extends HelixElement {
   static override styles = [helixPhiFieldStyles];
 
   // ─── Public Properties ───

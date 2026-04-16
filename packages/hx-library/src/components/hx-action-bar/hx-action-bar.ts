@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -45,7 +46,7 @@ export type ActionBarSize = 'sm' | 'md' | 'lg';
  * ```
  */
 @customElement('hx-action-bar')
-export class HelixActionBar extends LitElement {
+export class HelixActionBar extends HelixElement {
   static override styles = [helixActionBarStyles];
 
   /**

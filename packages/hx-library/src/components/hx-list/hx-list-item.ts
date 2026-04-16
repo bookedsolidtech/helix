@@ -1,8 +1,9 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { helixListItemStyles } from './hx-list-item.styles.js';
 
 /**
@@ -34,7 +35,7 @@ import { helixListItemStyles } from './hx-list-item.styles.js';
  * @cssprop [--hx-list-item-description-color=var(--hx-color-neutral-500)] - Description text color.
  */
 @customElement('hx-list-item')
-export class HelixListItem extends LitElement {
+export class HelixListItem extends HelixElement {
   static override styles = [helixListItemStyles];
 
   /**

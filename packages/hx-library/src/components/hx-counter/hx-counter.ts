@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixCounterStyles } from './hx-counter.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -27,7 +28,7 @@ export type CounterFormat = 'integer' | 'decimal';
  * @cssprop [--hx-counter-font-size-lg=var(--hx-font-size-5xl)] - Font size at lg.
  */
 @customElement('hx-counter')
-export class HelixCounter extends LitElement {
+export class HelixCounter extends HelixElement {
   static override styles = [helixCounterStyles];
 
   /**

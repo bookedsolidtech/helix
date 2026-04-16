@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixBadgeStyles } from './hx-badge.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -36,7 +37,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-badge-info-color=var(--hx-color-neutral-0)] - Text color for the info variant.
  */
 @customElement('hx-badge')
-export class HelixBadge extends LitElement {
+export class HelixBadge extends HelixElement {
   static override styles = [helixBadgeStyles];
 
   /**

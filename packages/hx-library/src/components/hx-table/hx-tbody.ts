@@ -1,6 +1,7 @@
-import { LitElement, html, css } from 'lit';
+import { html, css } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 
 /**
  * Semantic table body section. Must be a direct child of `hx-table`.
@@ -15,7 +16,7 @@ import { customElement } from 'lit/decorators.js';
  * @csspart tbody - The `<tbody>` element.
  */
 @customElement('hx-tbody')
-export class HelixTableBody extends LitElement {
+export class HelixTableBody extends HelixElement {
   static override styles = [
     css`
       :host {

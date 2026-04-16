@@ -1,8 +1,9 @@
-import { LitElement, html, nothing, svg } from 'lit';
+import { html, nothing, svg } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { helixLinkStyles } from './hx-link.styles.js';
 
 /**
@@ -45,7 +46,7 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  *   browser privacy restrictions. This is a known platform limitation.
  */
 @customElement('hx-link')
-export class HelixLink extends LitElement {
+export class HelixLink extends HelixElement {
   static override styles = [helixLinkStyles];
 
   /**

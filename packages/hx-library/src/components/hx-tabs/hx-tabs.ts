@@ -1,7 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
@@ -46,7 +46,7 @@ const _nextTabsId = createIdCounter('hx-tabs');
  * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #343a40)] - Panel text color.
  */
 @customElement('hx-tabs')
-export class HelixTabs extends LitElement {
+export class HelixTabs extends HelixElement {
   static override styles = [helixTabsStyles];
 
   // ─── Internal ID ───

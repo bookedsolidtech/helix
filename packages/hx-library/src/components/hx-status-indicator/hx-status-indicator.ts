@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement } from '../../base/index.js';
 import { helixStatusIndicatorStyles } from './hx-status-indicator.styles.js';
 
 export type StatusIndicatorStatus = 'online' | 'offline' | 'away' | 'busy' | 'unknown';
@@ -58,7 +59,7 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * @cssprop [--hx-status-indicator-label-font-size] - Override label font size.
  */
 @customElement('hx-status-indicator')
-export class HelixStatusIndicator extends LitElement {
+export class HelixStatusIndicator extends HelixElement {
   static override styles = [helixStatusIndicatorStyles];
 
   /**

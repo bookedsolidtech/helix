@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement } from '../../base/index.js';
 import { helixStepsStyles } from './hx-steps.styles.js';
 import type { HelixStep } from './hx-step.js';
 
@@ -29,7 +30,7 @@ import type { HelixStep } from './hx-step.js';
  * @cssprop [--hx-steps-description-color=var(--hx-color-neutral-500)] - Step description color.
  */
 @customElement('hx-steps')
-export class HelixSteps extends LitElement {
+export class HelixSteps extends HelixElement {
   static override styles = [helixStepsStyles];
 
   // ─── Public Properties ───

@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { HelixElement } from '../../base/index.js';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -57,7 +58,7 @@ export interface HxDataTableSortState {
  * @cssprop [--hx-data-table-min-width=600px] - Minimum table width before horizontal scrolling.
  */
 @customElement('hx-data-table')
-export class HelixDataTable extends LitElement {
+export class HelixDataTable extends HelixElement {
   static override styles = [helixDataTableStyles];
 
   // ─── Public Properties ───

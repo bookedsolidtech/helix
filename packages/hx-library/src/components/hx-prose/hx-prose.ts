@@ -1,5 +1,6 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { helixProseScopedCss } from './hx-prose.styles.js';
@@ -27,7 +28,7 @@ import { helixProseScopedCss } from './hx-prose.styles.js';
  * @cssprop [--hx-prose-link-color=var(--hx-color-primary)] - Link color.
  */
 @customElement('hx-prose')
-export class HelixProse extends LitElement {
+export class HelixProse extends HelixElement {
   // ─── Light DOM ───
 
   override createRenderRoot(): this {

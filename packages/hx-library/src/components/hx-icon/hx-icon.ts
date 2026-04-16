@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { HelixElement } from '../../base/index.js';
 import { helixIconStyles } from './hx-icon.styles.js';
 
 /**
@@ -29,7 +30,7 @@ import { helixIconStyles } from './hx-icon.styles.js';
  * @cssprop [--hx-icon-color=currentColor] - Icon color.
  */
 @customElement('hx-icon')
-export class HelixIcon extends LitElement {
+export class HelixIcon extends HelixElement {
   static override styles = [helixIconStyles];
 
   /**
