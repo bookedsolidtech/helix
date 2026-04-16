@@ -105,9 +105,11 @@ export class HelixSplitButton extends HelixElement {
   /**
    * Accessible label for the primary action button. Required for icon-only usage
    * or when the button label alone is insufficient context.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
+  @property({ type: String, attribute: 'accessible-label' })
   accessibleLabel = '';
 
   /**

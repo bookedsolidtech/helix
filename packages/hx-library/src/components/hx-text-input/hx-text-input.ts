@@ -128,9 +128,12 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
 
   /**
    * Accessible name for screen readers, if different from the visible label.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element. The value is forwarded to the
+   * internal native input's `aria-label`.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
+  @property({ type: String, attribute: 'accessible-label' })
   accessibleLabel: string | null = null;
 
   /**

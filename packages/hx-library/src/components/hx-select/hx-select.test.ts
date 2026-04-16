@@ -218,7 +218,7 @@ describe('hx-select', () => {
 
   describe('Property: accessibleLabel', () => {
     it('sets aria-label on the combobox trigger (the interactive element)', async () => {
-      const el = await fixture<WcSelect>('<hx-select aria-label="Select country"></hx-select>');
+      const el = await fixture<WcSelect>('<hx-select accessible-label="Select country"></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-label')).toBe('Select country');
     });

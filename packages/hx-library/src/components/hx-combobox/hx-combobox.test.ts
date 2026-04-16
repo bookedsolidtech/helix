@@ -714,7 +714,7 @@ describe('hx-combobox', () => {
   describe('Property: accessibleLabel', () => {
     it('sets aria-label on input when accessibleLabel is set', async () => {
       const el = await fixture<HxCombobox>(
-        '<hx-combobox aria-label="Search fruits"></hx-combobox>',
+        '<hx-combobox accessible-label="Search fruits"></hx-combobox>',
       );
       const input = shadowQuery(el, 'input');
       expect(input?.getAttribute('aria-label')).toBe('Search fruits');

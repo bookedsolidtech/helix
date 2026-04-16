@@ -647,7 +647,7 @@ describe('hx-textarea', () => {
 
   describe('Property: accessibleLabel', () => {
     it('sets aria-label on native textarea', async () => {
-      const el = await fixture<WcTextarea>('<hx-textarea aria-label="Notes field"></hx-textarea>');
+      const el = await fixture<WcTextarea>('<hx-textarea accessible-label="Notes field"></hx-textarea>');
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       expect(textarea.getAttribute('aria-label')).toBe('Notes field');
     });
@@ -700,7 +700,7 @@ describe('hx-textarea', () => {
 
     it('has no axe violations with aria-label (no visible label)', async () => {
       const el = await fixture<WcTextarea>(
-        '<hx-textarea aria-label="Notes field"></hx-textarea>',
+        '<hx-textarea accessible-label="Notes field"></hx-textarea>',
       );
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);

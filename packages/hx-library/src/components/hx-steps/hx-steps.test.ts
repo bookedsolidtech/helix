@@ -10,7 +10,7 @@ afterEach(cleanup);
 // ─── Fixture Helpers ───────────────────────────────────────────────────────────
 
 const THREE_STEPS_HTML = `
-  <hx-steps aria-label="Checkout progress">
+  <hx-steps accessible-label="Checkout progress">
     <hx-step label="Cart" status="complete" description="Items added"></hx-step>
     <hx-step label="Payment" status="active" description="Enter payment info"></hx-step>
     <hx-step label="Confirm" status="pending" description="Review order"></hx-step>
@@ -18,7 +18,7 @@ const THREE_STEPS_HTML = `
 `;
 
 const ALL_STATUSES_HTML = `
-  <hx-steps aria-label="All statuses">
+  <hx-steps accessible-label="All statuses">
     <hx-step label="Complete" status="complete"></hx-step>
     <hx-step label="Active" status="active"></hx-step>
     <hx-step label="Error" status="error"></hx-step>
@@ -574,7 +574,7 @@ describe('hx-step', () => {
   describe('Accessibility (axe-core)', () => {
     it('hx-steps with steps has no axe violations', async () => {
       const el = await fixture<HelixSteps>(
-        `<hx-steps aria-label="Progress steps">
+        `<hx-steps accessible-label="Progress steps">
           <hx-step label="Step one" status="complete"></hx-step>
           <hx-step label="Step two" status="active"></hx-step>
           <hx-step label="Step three" status="pending"></hx-step>
@@ -587,7 +587,7 @@ describe('hx-step', () => {
 
     it('hx-steps vertical has no axe violations', async () => {
       const el = await fixture<HelixSteps>(
-        `<hx-steps aria-label="Vertical progress" orientation="vertical">
+        `<hx-steps accessible-label="Vertical progress" orientation="vertical">
           <hx-step label="Step one" status="complete"></hx-step>
           <hx-step label="Step two" status="active"></hx-step>
           <hx-step label="Step three" status="pending"></hx-step>
@@ -607,7 +607,7 @@ describe('hx-step', () => {
 
     it('hx-step within hx-steps has no axe violations', async () => {
       const el = await fixture<HelixSteps>(
-        '<hx-steps aria-label="Test steps"><hx-step label="A step" status="pending" description="With description"></hx-step></hx-steps>',
+        '<hx-steps accessible-label="Test steps"><hx-step label="A step" status="pending" description="With description"></hx-step></hx-steps>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -621,7 +621,7 @@ describe('hx-step', () => {
 describe('hx-steps — Dynamic orientation / size changes', () => {
   it('changes orientation on children when orientation property is updated', async () => {
     const el = await fixture<HelixSteps>(
-      '<hx-steps aria-label="Dynamic steps"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="active"></hx-step></hx-steps>',
+      '<hx-steps accessible-label="Dynamic steps"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="active"></hx-step></hx-steps>',
     );
     await el.updateComplete;
 

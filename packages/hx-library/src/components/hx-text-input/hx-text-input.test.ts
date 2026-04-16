@@ -256,7 +256,7 @@ describe('hx-text-input', () => {
   describe('Property: ariaLabel', () => {
     it('sets aria-label on native input', async () => {
       const el = await fixture<WcTextInput>(
-        '<hx-text-input aria-label="Search field"></hx-text-input>',
+        '<hx-text-input accessible-label="Search field"></hx-text-input>',
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('aria-label')).toBe('Search field');
