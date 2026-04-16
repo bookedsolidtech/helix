@@ -971,6 +971,76 @@ describe('hx-color-picker', () => {
 
   // ─── Property: label overrides (i18n) ───
 
+  // ─── Additional format switching ───
+
+  describe('Additional format switching coverage', () => {
+    it('cycling to hsv format and back renders a valid color input value', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#ff0000" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+
+      const formatBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('.format-btn');
+
+      // hex → rgb → hsl → hsv
+      formatBtn!.click(); await el.updateComplete; // rgb
+      formatBtn!.click(); await el.updateComplete; // hsl
+      formatBtn!.click(); await el.updateComplete; // hsv
+      expect(el.format).toBe('hsv');
+
+      const colorInput = el.shadowRoot?.querySelector<HTMLInputElement>('.color-input');
+      expect(colorInput?.value).toMatch(/^hsv\(/);
+    });
+
+    it('output value updates when format changes via property', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#ff0000" format="hex"></hx-color-picker>',
+      );
+      await el.updateComplete;
+
+      el.format = 'hsl';
+      await el.updateComplete;
+
+      expect(el.format).toBe('hsl');
+      const colorInput = el.shadowRoot?.querySelector<HTMLInputElement>('.color-input');
+      expect(colorInput?.value).toMatch(/^hsl\(/);
+    });
+
+    it('typing an invalid value into the input does not crash the element', async () => {
+      const el = await fixture<HelixColorPicker>(
+        '<hx-color-picker inline value="#000000" format="hex"></hx-color-picker>',
+      );
+
+      const colorInput = el.shadowRoot?.querySelector<HTMLInputElement>('.color-input');
+      expect(colorInput).toBeTruthy();
+
+      Object.defineProperty(colorInput!, 'value', {
+        writable: true,
+        configurable: true,
+        value: 'not-a-color-at-all',
+      });
+
+      // Should not throw
+      expect(() => {
+        colorInput!.dispatchEvent(new Event('input', { bubbles: true }));
+      }).not.toThrow();
+
+      expect(el.shadowRoot).toBeTruthy();
+    });
+
+    it('swatches container has correct number of buttons after updating swatches twice', async () => {
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      el.swatches = ['#ff0000', '#00ff00'];
+      await el.updateComplete;
+
+      el.swatches = ['#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+      await el.updateComplete;
+
+      const btns = el.shadowRoot?.querySelectorAll('.swatch-btn');
+      expect(btns?.length).toBe(4);
+    });
+  });
+
   describe('Property: label overrides', () => {
     it('labelHue defaults to "Hue"', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker></hx-color-picker>');

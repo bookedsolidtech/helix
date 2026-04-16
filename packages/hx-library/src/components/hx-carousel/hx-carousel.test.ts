@@ -1295,4 +1295,262 @@ describe('hx-carousel', () => {
       expect(fired).toBe(false);
     });
   });
+
+  // ─── Horizontal touch swipe ───
+
+  describe('Touch drag (horizontal orientation)', () => {
+    it('swipe left (negative clientX diff) on horizontal carousel calls next()', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+
+      const touchStart = new TouchEvent('touchstart', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 200, clientY: 100 })],
+      });
+      const touchMove = new TouchEvent('touchmove', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 140, clientY: 100 })],
+      });
+      const touchEnd = new TouchEvent('touchend', {
+        bubbles: true,
+        cancelable: true,
+        changedTouches: [
+          new Touch({ identifier: 1, target: container, clientX: 140, clientY: 100 }),
+        ],
+      });
+
+      container.dispatchEvent(touchStart);
+      container.dispatchEvent(touchMove);
+      container.dispatchEvent(touchEnd);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(1);
+    });
+
+    it('swipe right (positive clientX diff) on horizontal carousel calls previous()', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(2);
+      await el.updateComplete;
+
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+
+      const touchStart = new TouchEvent('touchstart', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 100, clientY: 100 })],
+      });
+      const touchMove = new TouchEvent('touchmove', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 160, clientY: 100 })],
+      });
+      const touchEnd = new TouchEvent('touchend', {
+        bubbles: true,
+        cancelable: true,
+        changedTouches: [
+          new Touch({ identifier: 1, target: container, clientX: 160, clientY: 100 }),
+        ],
+      });
+
+      container.dispatchEvent(touchStart);
+      container.dispatchEvent(touchMove);
+      container.dispatchEvent(touchEnd);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(1);
+    });
+
+    it('small swipe below threshold does not change slide', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+
+      const touchStart = new TouchEvent('touchstart', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 100, clientY: 100 })],
+      });
+      // Move only 10px — below threshold (typically 50px)
+      const touchMove = new TouchEvent('touchmove', {
+        bubbles: true,
+        cancelable: true,
+        touches: [new Touch({ identifier: 1, target: container, clientX: 110, clientY: 100 })],
+      });
+      const touchEnd = new TouchEvent('touchend', {
+        bubbles: true,
+        cancelable: true,
+        changedTouches: [
+          new Touch({ identifier: 1, target: container, clientX: 110, clientY: 100 }),
+        ],
+      });
+
+      container.dispatchEvent(touchStart);
+      container.dispatchEvent(touchMove);
+      container.dispatchEvent(touchEnd);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(0);
+    });
+  });
+
+  // ─── Loop edge cases ───
+
+  describe('Loop edge cases — boundary wrapping', () => {
+    it('loop: keyboard ArrowRight from last slide wraps to first', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(2);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('loop: keyboard ArrowLeft from first slide wraps to last', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(2);
+    });
+
+    it('without loop: next() at last slide does not change index', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(1);
+      await el.updateComplete;
+      const before = el['_currentIndex'];
+
+      el.next();
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(before);
+    });
+
+    it('without loop: previous() at first slide does not change index', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+
+      el.previous();
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(0);
+    });
+  });
+
+  // ─── Autoplay additional coverage ───
+
+  describe('Autoplay: additional coverage', () => {
+    it('autoplay resumes after mouseleave when not focused', async () => {
+      vi.useFakeTimers();
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="1000" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      // Pause via mouseenter
+      el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      expect(el['_autoplayTimer']).toBeNull();
+
+      // Resume via mouseleave
+      el.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      expect(el['_autoplayTimer']).not.toBeNull();
+
+      vi.useRealTimers();
+    });
+
+    it('autoplay does not resume on mouseleave when element still focused', async () => {
+      vi.useFakeTimers();
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="1000" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      // Simulate focus then hover
+      el.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      // Leave hover but stay focused
+      el.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+
+      // Autoplay should remain paused because element is still focused
+      expect(el['_autoplayTimer']).toBeNull();
+
+      vi.useRealTimers();
+    });
+
+    it('autoplay resumes after focusout when not hovered', async () => {
+      vi.useFakeTimers();
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel autoplay autoplay-interval="1000" loop>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      el.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      expect(el['_autoplayTimer']).toBeNull();
+
+      el.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+      expect(el['_autoplayTimer']).not.toBeNull();
+
+      vi.useRealTimers();
+    });
+  });
 });

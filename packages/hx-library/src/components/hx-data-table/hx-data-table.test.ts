@@ -1139,4 +1139,220 @@ describe('hx-data-table', () => {
       expect(el.shadowRoot!.activeElement).toBe(tds[0]);
     });
   });
+
+  // ─── Multi-column sort ───
+
+  describe('Multi-column sort', () => {
+    it('sorting one column then another resets direction to asc for new column', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = ALL_SORTABLE_COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const [nameBtn, statusBtn] = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('.sort-btn');
+
+      // Sort name asc
+      const e1 = oneEvent<CustomEvent>(el, 'hx-sort');
+      nameBtn!.click();
+      const sort1 = await e1;
+      expect(sort1.detail.key).toBe('name');
+      expect(sort1.detail.direction).toBe('asc');
+
+      // Apply the sort
+      el.sortKey = 'name';
+      el.sortDirection = 'asc';
+      await el.updateComplete;
+
+      // Sort status — different column resets to asc
+      const e2 = oneEvent<CustomEvent>(el, 'hx-sort');
+      statusBtn!.click();
+      const sort2 = await e2;
+      expect(sort2.detail.key).toBe('status');
+      expect(sort2.detail.direction).toBe('asc');
+    });
+
+    it('clicking same column twice toggles asc → desc', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = ALL_SORTABLE_COLUMNS;
+      el.rows = ROWS;
+      el.sortKey = 'name';
+      el.sortDirection = 'asc';
+      await el.updateComplete;
+
+      const [nameBtn] = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('.sort-btn');
+      const e = oneEvent<CustomEvent>(el, 'hx-sort');
+      nameBtn!.click();
+      const event = await e;
+      expect(event.detail.key).toBe('name');
+      expect(event.detail.direction).toBe('desc');
+    });
+
+    it('clicking same column three times cycles asc → desc → asc', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = ALL_SORTABLE_COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const [nameBtn] = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('.sort-btn');
+
+      // First click: asc
+      const e1 = oneEvent<CustomEvent>(el, 'hx-sort');
+      nameBtn!.click();
+      const s1 = await e1;
+      expect(s1.detail.direction).toBe('asc');
+      el.sortKey = 'name';
+      el.sortDirection = 'asc';
+      await el.updateComplete;
+
+      // Second click: desc
+      const e2 = oneEvent<CustomEvent>(el, 'hx-sort');
+      nameBtn!.click();
+      const s2 = await e2;
+      expect(s2.detail.direction).toBe('desc');
+      el.sortKey = 'name';
+      el.sortDirection = 'desc';
+      await el.updateComplete;
+
+      // Third click: asc again
+      const e3 = oneEvent<CustomEvent>(el, 'hx-sort');
+      nameBtn!.click();
+      const s3 = await e3;
+      expect(s3.detail.direction).toBe('asc');
+    });
+
+    it('hx-sort event bubbles and is composed', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const sortBtn = el.shadowRoot!.querySelector<HTMLButtonElement>('.sort-btn')!;
+      const e = oneEvent<CustomEvent>(el, 'hx-sort');
+      sortBtn.click();
+      const event = await e;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+  });
+
+  // ─── Row selection events ───
+
+  describe('Row selection events — detail shape', () => {
+    it('hx-select event detail.selectedRows contains the correct row objects', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const checkboxes = el.shadowRoot!.querySelectorAll<HTMLInputElement>(
+        'tbody input[type="checkbox"]',
+      );
+      const e = oneEvent<CustomEvent>(el, 'hx-select');
+      checkboxes[1]!.click();
+      const event = await e;
+
+      expect(event.detail.selectedRows).toHaveLength(1);
+      expect(event.detail.selectedRows[0]).toEqual(ROWS[1]);
+    });
+
+    it('hx-select bubbles and is composed', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const checkboxes = el.shadowRoot!.querySelectorAll<HTMLInputElement>(
+        'tbody input[type="checkbox"]',
+      );
+      const e = oneEvent<CustomEvent>(el, 'hx-select');
+      checkboxes[0]!.click();
+      const event = await e;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('selecting then deselecting same row results in empty selectedRows', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table selectable></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      await el.updateComplete;
+
+      const checkboxes = el.shadowRoot!.querySelectorAll<HTMLInputElement>(
+        'tbody input[type="checkbox"]',
+      );
+
+      // Select
+      const e1 = oneEvent<CustomEvent>(el, 'hx-select');
+      checkboxes[0]!.click();
+      await e1;
+
+      // Deselect
+      const e2 = oneEvent<CustomEvent>(el, 'hx-select');
+      checkboxes[0]!.click();
+      const event = await e2;
+      expect(event.detail.selectedRows).toHaveLength(0);
+    });
+  });
+
+  // ─── Pagination integration ───
+
+  describe('Pagination integration', () => {
+    it('page 1 shows first N rows matching pageSize', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      el.pageSize = 1;
+      el.page = 1;
+      await el.updateComplete;
+
+      const rows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0]!.querySelector('td')?.textContent?.trim()).toBe('Jane Doe');
+    });
+
+    it('page 3 with pageSize=1 shows third row', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      el.pageSize = 1;
+      el.page = 3;
+      await el.updateComplete;
+
+      const rows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0]!.querySelector('td')?.textContent?.trim()).toBe('Emily Chen');
+    });
+
+    it('changing page property re-renders visible rows', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      el.pageSize = 1;
+      el.page = 1;
+      await el.updateComplete;
+
+      expect(
+        el.shadowRoot!.querySelector('tbody td')?.textContent?.trim(),
+      ).toBe('Jane Doe');
+
+      el.page = 2;
+      await el.updateComplete;
+
+      expect(
+        el.shadowRoot!.querySelector('tbody td')?.textContent?.trim(),
+      ).toBe('John Smith');
+    });
+
+    it('out-of-range page shows empty body (no rows)', async () => {
+      const el = await fixture<HelixDataTable>('<hx-data-table></hx-data-table>');
+      el.columns = COLUMNS;
+      el.rows = ROWS;
+      el.pageSize = 2;
+      el.page = 99;
+      await el.updateComplete;
+
+      const rows = el.shadowRoot!.querySelectorAll('tbody tr[part~="tr"]');
+      expect(rows.length).toBe(0);
+    });
+  });
 });
