@@ -31,7 +31,7 @@ export interface HxTextInputProps {
   /** The name of the input, used for form submission. */
   name?: string;
   /** Accessible name for screen readers, if different from the visible label. */
-  ariaLabel?: string | null;
+  accessibleLabel?: string | null;
   /** Whether the input is read-only. */
   readonly?: boolean;
   /** Minimum number of characters allowed. */

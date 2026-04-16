@@ -643,9 +643,9 @@ describe('hx-textarea', () => {
     });
   });
 
-  // --- Property: ariaLabel (1) ---
+  // --- Property: accessibleLabel (1) ---
 
-  describe('Property: ariaLabel', () => {
+  describe('Property: accessibleLabel', () => {
     it('sets aria-label on native textarea', async () => {
       const el = await fixture<WcTextarea>('<hx-textarea aria-label="Notes field"></hx-textarea>');
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;

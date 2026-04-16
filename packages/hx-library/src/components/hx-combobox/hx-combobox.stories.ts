@@ -129,7 +129,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description:
         'Accessible label for the combobox input when no visible label is rendered.',

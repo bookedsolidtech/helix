@@ -131,7 +131,7 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
    * @attr aria-label
    */
   @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  accessibleLabel: string | null = null;
 
   /**
    * Whether the input is read-only.
@@ -453,7 +453,7 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
             maxlength=${ifDefined(this.maxlength)}
             pattern=${ifDefined(this.pattern || undefined)}
             autocomplete=${ifDefined(this.autocomplete || undefined)}
-            aria-label=${ifDefined(this.ariaLabel || undefined)}
+            aria-label=${ifDefined(this.accessibleLabel || undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}

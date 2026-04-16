@@ -164,7 +164,7 @@ export class HelixSelect extends HelixElement {
    * @attr aria-label
    */
   @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  accessibleLabel: string | null = null;
 
   /**
    * Controls whether the dropdown listbox is open.
@@ -684,7 +684,7 @@ export class HelixSelect extends HelixElement {
             aria-required=${this.required ? 'true' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
             @click=${this._toggleDropdown}
             @keydown=${this._handleKeydown}
           >
@@ -700,7 +700,7 @@ export class HelixSelect extends HelixElement {
             role="listbox"
             id=${this._listboxId}
             class="field__listbox"
-            aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}
+            aria-label=${ifDefined(this.label || this.accessibleLabel || undefined)}
             ?hidden=${!this.open}
           >
             <div class="field__options">${this._renderOptions()}</div>
@@ -715,7 +715,7 @@ export class HelixSelect extends HelixElement {
             ?required=${this.required}
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}

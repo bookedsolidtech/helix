@@ -171,7 +171,7 @@ export class HelixTextarea extends HelixElement {
    * @attr aria-label
    */
   @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  accessibleLabel: string | null = null;
 
   // ─── Internal References ───
 
@@ -493,7 +493,7 @@ export class HelixTextarea extends HelixElement {
             minlength=${ifDefined(this.minlength)}
             maxlength=${ifDefined(this.maxlength)}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._textareaId}-slotted-label` : undefined,
             )}

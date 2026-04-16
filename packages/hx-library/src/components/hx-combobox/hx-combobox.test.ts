@@ -700,10 +700,10 @@ describe('hx-combobox', () => {
     });
   });
 
-  // ─── Property: ariaLabel (2) ───
+  // ─── Property: accessibleLabel (2) ───
 
-  describe('Property: ariaLabel', () => {
-    it('sets aria-label on input when ariaLabel is set', async () => {
+  describe('Property: accessibleLabel', () => {
+    it('sets aria-label on input when accessibleLabel is set', async () => {
       const el = await fixture<HxCombobox>(
         '<hx-combobox aria-label="Search fruits"></hx-combobox>',
       );
@@ -711,7 +711,7 @@ describe('hx-combobox', () => {
       expect(input?.getAttribute('aria-label')).toBe('Search fruits');
     });
 
-    it('uses aria-labelledby when label is set and ariaLabel is not', async () => {
+    it('uses aria-labelledby when label is set and accessibleLabel is not', async () => {
       const el = await fixture<HxCombobox>('<hx-combobox label="Fruit"></hx-combobox>');
       const input = shadowQuery(el, 'input');
       expect(input?.getAttribute('aria-labelledby')).toBeTruthy();

@@ -53,7 +53,7 @@ export class HelixSteps extends LitElement {
    * @attr aria-label
    */
   @property({ type: String, attribute: 'aria-label' })
-  ariaLabel: string | null = null;
+  accessibleLabel: string | null = null;
 
   // ─── Lifecycle ───
 
@@ -68,7 +68,7 @@ export class HelixSteps extends LitElement {
     }
     // STEPS-002: WCAG 2.1 SC 4.1.2 — the inner list must have an accessible name.
     // Warn developers when aria-label is missing so the list is not anonymous.
-    if (!this.ariaLabel) {
+    if (!this.accessibleLabel) {
       devWarn(
         'hx-steps',
         'An "aria-label" attribute is required to provide an accessible name for the steps list (WCAG 2.1 SC 4.1.2).',
@@ -153,7 +153,7 @@ export class HelixSteps extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="steps" role="list" aria-label=${this.ariaLabel ?? nothing}>
+      <div part="base" class="steps" role="list" aria-label=${this.accessibleLabel ?? nothing}>
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;

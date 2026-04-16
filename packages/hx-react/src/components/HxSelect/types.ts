@@ -31,7 +31,7 @@ export interface HxSelectProps {
   /** Size variant of the select trigger. */
   size?: 'sm' | 'md' | 'lg';
   /** Accessible name for screen readers, if different from the visible label. */
-  ariaLabel?: string | null;
+  accessibleLabel?: string | null;
   /** Controls whether the dropdown listbox is open. */
   open?: boolean;
   /** Validation message when no option is selected. Override for i18n. */

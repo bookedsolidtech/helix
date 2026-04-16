@@ -214,9 +214,9 @@ describe('hx-select', () => {
     });
   });
 
-  // ─── Property: ariaLabel (2) ───
+  // ─── Property: accessibleLabel (2) ───
 
-  describe('Property: ariaLabel', () => {
+  describe('Property: accessibleLabel', () => {
     it('sets aria-label on the combobox trigger (the interactive element)', async () => {
       const el = await fixture<WcSelect>('<hx-select aria-label="Select country"></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;

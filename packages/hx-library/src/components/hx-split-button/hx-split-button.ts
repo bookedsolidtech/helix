@@ -108,7 +108,7 @@ export class HelixSplitButton extends LitElement {
    * @attr aria-label
    */
   @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel = '';
+  accessibleLabel = '';
 
   /**
    * Accessible label for the dropdown trigger button. Override for localization.
@@ -363,7 +363,7 @@ export class HelixSplitButton extends LitElement {
           class="split-button__primary"
           ?disabled=${this.disabled}
           type="button"
-          aria-label=${this.ariaLabel ?? (this.label || nothing)}
+          aria-label=${this.accessibleLabel ?? (this.label || nothing)}
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
         >

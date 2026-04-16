@@ -189,7 +189,7 @@ export class HelixCombobox extends HelixElement {
    * @attr aria-label
    */
   @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  accessibleLabel: string | null = null;
 
   /**
    * Text shown when no options match the current filter.
@@ -783,8 +783,8 @@ export class HelixCombobox extends HelixElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
-            aria-label=${ifDefined(this.ariaLabel || undefined)}
-            aria-labelledby=${ifDefined(this.label && !this.ariaLabel ? this._labelId : undefined)}
+            aria-label=${ifDefined(this.accessibleLabel || undefined)}
+            aria-labelledby=${ifDefined(this.label && !this.accessibleLabel ? this._labelId : undefined)}
             aria-busy=${this.loading ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
             placeholder=${ifDefined(this.placeholder || undefined)}
@@ -813,7 +813,7 @@ export class HelixCombobox extends HelixElement {
                   part="clear-button"
                   type="button"
                   class="field__clear-button"
-                  aria-label=${`Clear ${this.label || this.ariaLabel || 'selection'}`}
+                  aria-label=${`Clear ${this.label || this.accessibleLabel || 'selection'}`}
                   tabindex="0"
                   @click=${this._handleClear}
                 >
@@ -846,7 +846,7 @@ export class HelixCombobox extends HelixElement {
           role="listbox"
           id=${this._listboxId}
           class="field__listbox"
-          aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}
+          aria-label=${ifDefined(this.label || this.accessibleLabel || undefined)}
           aria-multiselectable=${this.multiple ? 'true' : nothing}
           ?hidden=${!this._open}
         >

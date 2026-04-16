@@ -23,7 +23,7 @@ trigger are disabled when this is true. */
   label?: string | undefined;
   /** Accessible label for the primary action button. Required for icon-only usage
 or when the button label alone is insufficient context. */
-  ariaLabel?: string;
+  accessibleLabel?: string;
   /** Accessible label for the dropdown trigger button. Override for localization. */
   labelTrigger?: string;
   /** Accessible label for the dropdown menu panel. Override for localization. */

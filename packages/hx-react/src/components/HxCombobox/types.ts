@@ -39,7 +39,7 @@ export interface HxComboboxProps {
   /** Debounce delay in milliseconds for the filter input event. */
   filterDebounce?: number;
   /** Accessible name for screen readers, if different from the visible label. */
-  ariaLabel?: string | null;
+  accessibleLabel?: string | null;
   /** Text shown when no options match the current filter. */
   labelNoOptions?: string;
   /** Validation message shown when the field is required but empty. */

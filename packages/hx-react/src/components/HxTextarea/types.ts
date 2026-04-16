@@ -46,7 +46,7 @@ non-editable patient data inline with editable fields. */
   /** Validation message shown when the field is required but empty. */
   requiredMessage?: string;
   /** Accessible name for screen readers, if different from the visible label. */
-  ariaLabel?: string | null;
+  accessibleLabel?: string | null;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */
