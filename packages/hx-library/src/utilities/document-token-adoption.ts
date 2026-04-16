@@ -60,4 +60,9 @@ export function ensureDocumentTokens(): void {
   }
 }
 
-ensureDocumentTokens();
+// Auto-execute on import so bare `import './document-token-adoption.js'` works
+// in browser components. The SSR guard inside ensureDocumentTokens() makes this
+// safe in Node/Deno/SSR environments where `document` is not defined.
+if (typeof document !== 'undefined') {
+  ensureDocumentTokens();
+}
