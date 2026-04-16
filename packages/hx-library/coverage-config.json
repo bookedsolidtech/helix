@@ -78,11 +78,6 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-code-snippet": {
-      "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-color-picker": {
       "reason": "Complex canvas/pointer event interactions are difficult to cover in browser tests without manual gesture simulation. Remediation tracked in GitHub issue.",
       "remediationDate": "2026-06-30",
@@ -95,11 +90,6 @@
     },
     "hx-container": {
       "reason": "SSR browser API guards added \u2014 coverage below threshold. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-copy-button": {
-      "reason": "Coverage below 80% threshold (0% lines). Requires test creation.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -218,11 +208,6 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-overflow-menu": {
-      "reason": "No test file yet \u2014 component has 0% coverage. Requires test creation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-pagination": {
       "reason": "SSR browser API guards added \u2014 coverage below threshold. Requires test expansion.",
       "remediationDate": "2026-06-30",
@@ -265,11 +250,6 @@
     },
     "hx-radio-group": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-rating": {
-      "reason": "Partial coverage (0% lines/statements). Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -380,11 +360,6 @@
     },
     "hx-time-picker": {
       "reason": "Time parsing edge cases and AM/PM toggle interactions need additional test coverage.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-toast": {
-      "reason": "Partial coverage (0% lines, 33% branches/functions). Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
