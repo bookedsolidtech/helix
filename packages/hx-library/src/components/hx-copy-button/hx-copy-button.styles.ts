@@ -52,8 +52,8 @@ export const helixCopyButtonStyles = css`
 
   .button--sm {
     padding: var(--hx-space-1);
-    min-width: var(--hx-size-8);
-    height: var(--hx-size-8);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-sm);
   }
 

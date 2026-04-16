@@ -36,8 +36,8 @@ export const helixPaginationStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--hx-pagination-button-size, 2.25rem);
-    height: var(--hx-pagination-button-size, 2.25rem);
+    min-width: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
+    min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-pagination-border-color, var(--hx-color-neutral-300, #d1d5db));
@@ -87,8 +87,8 @@ export const helixPaginationStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--hx-pagination-button-size, 2.25rem);
-    height: var(--hx-pagination-button-size, 2.25rem);
+    min-width: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
+    min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     color: var(--hx-pagination-ellipsis-color, var(--hx-color-neutral-500, #6b7280));
     font-size: var(--hx-font-size-sm, 0.875rem);
     user-select: none;
@@ -115,7 +115,7 @@ export const helixPaginationStyles = css`
   }
 
   .page-size-select {
-    height: var(--hx-pagination-button-size, 2.25rem);
+    min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-pagination-border-color, var(--hx-color-neutral-300, #d1d5db));

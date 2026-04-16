@@ -138,8 +138,13 @@ export const helixSliderStyles = css`
     background: transparent;
     border: none;
     outline: none;
-    /* Expand the hit area so the thumb is easy to grab */
-    padding-block: var(--hx-slider-input-padding-block, 0.75rem);
+    /* Expand the hit area so the thumb meets WCAG 2.5.8 touch target (44px).
+       The input's total height = track height + 2 * padding-block. With 0.75rem
+       (~12px) padding on each side and a track of ~6px, the total target area is
+       ~30px. We increase to 1rem (~16px) per side for a ~38px minimum, supplemented
+       by the visual thumb size. */
+    padding-block: var(--hx-slider-input-padding-block, 1rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   /* In forced-color mode, restore native outline so the input remains focusable */

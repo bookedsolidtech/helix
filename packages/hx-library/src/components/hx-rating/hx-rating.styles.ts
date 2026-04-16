@@ -37,6 +37,8 @@ export const helixRatingStyles = css`
     cursor: pointer;
     color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #d1d5db));
     line-height: 1;
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     transition: transform var(--hx-transition-fast, 0.15s ease);
   }
 

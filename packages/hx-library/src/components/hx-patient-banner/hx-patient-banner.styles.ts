@@ -46,9 +46,9 @@ export const helixPatientBannerStyles = css`
     flex-shrink: 0;
     width: var(--_photo-size);
     height: var(--_photo-size);
-    /* Minimum 44x44px touch target for interactive photo content. */
-    min-width: 44px;
-    min-height: 44px;
+    /* Minimum touch target for interactive photo content (WCAG 2.5.8). */
+    min-width: var(--hx-touch-target-size, 44px);
+    min-height: var(--hx-touch-target-size, 44px);
     border-radius: var(--hx-border-radius-full, 9999px);
     overflow: hidden;
     display: flex;

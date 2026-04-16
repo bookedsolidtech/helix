@@ -46,9 +46,12 @@ export const helixPhiFieldStyles = css`
   .phi-field__toggle {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     padding: var(--hx-space-1, 0.25rem);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     color: var(--hx-phi-field-toggle-color, var(--hx-color-primary-500, #2563eb));
     cursor: pointer;
     line-height: 1;
