@@ -1,5 +1,76 @@
 # @helixui/library
 
+## 2.1.3
+
+### Patch Changes
+
+- 1ae0509: fix(hx-container): remove redundant padding="none" CSS rule
+
+  fix(hx-skeleton): expose --hx-skeleton-border-radius-circle and
+  --hx-skeleton-shimmer-width custom properties replacing hardcoded values
+
+  fix(hx-breadcrumb): replace hardcoded hex colors in Storybook stories with
+  design token references
+
+- a610bb7: fix(hx-link): add missing tabindex="0" to disabled span — screen readers can
+  now reach disabled links via keyboard navigation and announce the disabled state
+  (P0-1 audit finding)
+- 4401388: fix(ci): move security audit to soft-fail gate (npm retired v1 endpoint)
+- 49fdb6c: fix(hx-alert): consolidate duplicate icon/showIcon Storybook control — the icon
+  argType now correctly binds to the component's showIcon property via show-icon
+  attribute
+
+  fix(hx-badge): strengthen dot-mode CSS guards to prevent prefix slot from
+  rendering in dot indicator mode; refactor --hx-badge-pulse-color to use private
+  --hx-badge-pulse-color-internal variable so consumers can override via the public
+  custom property
+
+  fix(hx-action-bar): replace ariaLabel property that shadowed native
+  HTMLElement.ariaLabel with accessibleLabel property (accessible-label attribute).
+  The standard aria-label HTML attribute continues to work unchanged.
+
+- 196094a: fix(hx-card): correct devWarn attribute reference from "hx-aria-label" to "hx-label"
+- 6d62cc2: fix(hx-counter): add role=status on counter, enforce accessible name, include label in live region, guard invalid easing/duration
+- 9c8720f: fix(hx-file-upload): resolve 5 P0 accessibility blockers — aria-invalid, forced-colors, focus restoration, touch target, and mixinDelegatesAria
+- fce3340: fix(hx-form): remove redundant aria-live on error summary (role="alert" implies it)
+- a0562c4: fix(hx-list): enforce accessible name on interactive listbox, add forced-colors support for selected/hover/disabled states
+- 20d0129: fix(hx-meter): add focus-visible ring styles and remove duplicate prefers-reduced-motion block
+- 700c329: fix(hx-phi-field): hide masked value from screen readers (PHI exposure), prevent PHI in DOM attribute, add forced-colors support
+- d3f1d2a: fix(hx-stat): add aria-live region for dynamic value/trend updates, forced-colors support, and devWarn for empty state
+- 04ddfae: fix(hx-popover, hx-popup): use Lit nothing sentinel instead of empty string for conditional rendering
+- 1fb3e7a: fix: address tier 3 review findings (list label fallback, phi-field token, test assertions, orphan JSDoc)
+- 91e00b4: fix: P1 audit fixes for 3.0.0 release
+  - fix(a11y): use ElementInternals for ARIA role on hx-clinical-status (#1420)
+  - fix(a11y): add role="list" to hx-breadcrumb host element for aria-required-parent
+  - fix(a11y): block keyboard activation on disabled hx-link (#1423)
+  - fix(ts): remove non-null assertions from @query declarations (#1422)
+  - fix(ts): revert @query to definite assignment assertion for Node 22 compat
+  - fix(ts): migrate hx-code-snippet and hx-color-picker to HelixElement base class (#1418)
+  - fix(css): correct hx-size attribute selectors in hx-spinner and hx-progress-ring (#1417)
+  - fix(css): replace :focus with :focus-visible in hx-color-picker and hx-select (#1419)
+  - fix(storybook): add 6 stories for hx-style-scope (#1421)
+  - fix(storybook): correct tree-view async loading story assertion
+  - fix(ci): change act-ci.yml trigger to workflow_dispatch (local-only)
+  - fix(dx): improve test-smart.sh to pass file paths instead of regex filter
+  - fix(ts): fix PropertyValues type in hx-style-scope
+
+- 9a8cafb: Production readiness remediation: HelixElement migration, forced-colors, focus-visible, accessibility fixes
+  - Migrate 14 form components to HelixElement base class (lazy \_internals, form lifecycle hooks)
+  - Fix hx-button-group invalid attachInternals() crash (P0-1)
+  - Fix hx-icon-button LitElement→HelixElement migration (P0-3)
+  - Add forced-colors @media rules to 64 component style files for Windows High Contrast
+  - Add focus-visible styles to form components
+  - Replace ad-hoc ID counters with createIdCounter factory across 22 components
+  - Export mixins from barrel and fix AriadDelegationMixinInterface typo
+  - Fix HelixElement convenience getters (form, validity, validationMessage) lazy init
+  - Add roving tabindex keyboard navigation to hx-data-table sortable headers
+  - Fix hx-textarea counter aria-hidden/aria-describedby conflict
+  - Replace hx-drawer setTimeout with transitionend for animation events
+  - Enforce 44px minimum touch targets on sm size variants
+  - Add PropertyValues<this> generic to lifecycle methods
+
+- 5c36408: Fix Storybook interaction tests for shadow DOM focus and event patterns; remove dead mixinDelegatesAria export; rename ariaLabel to accessibleLabel in React types to stop shadowing native HTMLElement.ariaLabel
+
 ## 2.1.2
 
 ### Patch Changes
