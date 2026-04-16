@@ -62,21 +62,12 @@ run_gate "format:check" "Prettier format check"
 run_gate "lint"         "ESLint"
 run_gate "type-check"   "TypeScript type check"
 run_gate "test:smart"   "Test suite (smart — changed components only)"
-run_gate "build"        "Build"
+# run_gate "build"        "Build"  # Enforced by CI — too heavy for local pre-push (includes storybook build)
 
-# Pack dry-run — validates the publish payload matches what CI would produce
-# Always uses npm pack --dry-run regardless of $PKG_MANAGER: pnpm uses a
-# different flag syntax and this gate mirrors the npm pack --dry-run step in CI.
-if script_exists "build"; then
-  echo "pre-push: running Pack dry-run..."
-  if ! npm pack --dry-run > "$OUT" 2>&1; then
-    echo ""
-    echo "GATE FAILED: Pack dry-run"
-    cat "$OUT"
-    echo ""
-    FAILED="${FAILED} pack"
-  fi
-fi
+# Pack dry-run — enforced by CI, skipped locally (monorepo root packs 2000+ files)
+# if script_exists "build"; then
+#   npm pack --dry-run
+# fi
 
 # Shellcheck — lint all hook and husky shell scripts if shellcheck is installed
 if command -v shellcheck > /dev/null 2>&1; then
