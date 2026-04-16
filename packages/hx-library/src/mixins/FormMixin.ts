@@ -159,8 +159,9 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
      */
     _handleInteractionInput(): void {
       if (!this._dirty) {
+        const prev = this._dirty;
         this._dirty = true;
-        this.requestUpdate();
+        this.requestUpdate('_dirty', prev);
       }
     }
 
@@ -170,8 +171,9 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
      */
     _handleInteractionBlur(): void {
       if (!this._touched) {
+        const prev = this._touched;
         this._touched = true;
-        this.requestUpdate();
+        this.requestUpdate('_touched', prev);
       }
     }
 
@@ -182,9 +184,12 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
      */
     _resetInteractionState(): void {
       if (this._dirty || this._touched) {
+        const prevDirty = this._dirty;
+        const prevTouched = this._touched;
         this._dirty = false;
         this._touched = false;
-        this.requestUpdate();
+        this.requestUpdate('_dirty', prevDirty);
+        this.requestUpdate('_touched', prevTouched);
       }
     }
   }

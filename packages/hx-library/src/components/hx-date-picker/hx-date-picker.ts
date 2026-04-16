@@ -74,7 +74,7 @@ export class HelixDatePicker extends HelixElement {
    * The current value as an ISO 8601 date string (e.g. 2026-03-04).
    * @attr value
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String })
   value = '';
 
   /**

@@ -1,4 +1,5 @@
 import { html, type TemplateResult } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
@@ -323,7 +324,7 @@ export class HelixPhiField extends HelixElement {
     return html`
       <div
         part="container"
-        class="phi-field${this.disabled ? ' phi-field--disabled' : ''}"
+        class=${classMap({ 'phi-field': true, 'phi-field--disabled': this.disabled })}
         @copy=${this._handleCopy}
         @paste=${this._handlePaste}
       >

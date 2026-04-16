@@ -194,7 +194,7 @@ export class HelixDialog extends HelixElement {
    * Text content for the dialog heading. Used as the accessible label via aria-labelledby.
    * @attr heading
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   heading = '';
 
   /**
@@ -241,9 +241,9 @@ export class HelixDialog extends HelixElement {
   }
 
   override firstUpdated(): void {
-    // Initialize header slot state without a querySelector in render()
-    this._hasHeaderSlot = this.querySelector('[slot="header"]') !== null;
-    // Warn when no accessible heading is available
+    // Warn when no accessible heading is available.
+    // _hasHeaderSlot is maintained by the slotchange handler; check it here
+    // on first paint so a missing heading triggers the dev warning immediately.
     if (!this.heading.trim() && !this._hasHeaderSlot) {
       devWarn(
         'hx-dialog',
@@ -332,7 +332,8 @@ export class HelixDialog extends HelixElement {
     }, 200);
 
     // D1 — store the element that triggered the dialog open for focus restoration on close
-    this._triggerElement = document.activeElement as HTMLElement | null;
+    const active = document.activeElement;
+    this._triggerElement = active instanceof HTMLElement ? active : null;
 
     if (this.modal) {
       // showModal() throws if the dialog is already in the DOM as open — guard above
