@@ -84,7 +84,7 @@
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
     "hx-combobox": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
+      "reason": "Substantive test suite added (1282 lines, form integration, keyboard navigation, filtering, ARIA). Exemption retained while coverage % is measured against 95% threshold — remove once CI confirms threshold met.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -214,12 +214,12 @@
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
     "hx-patient-banner": {
-      "reason": "New healthcare component \u2014 tests to be added in dedicated feature",
+      "reason": "86 tests added (30 new) covering edge cases, dynamic slot population, programmatic label changes, identifier rule toggling. Exemption retained while coverage % is measured — remove once CI confirms 95% met.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
     "hx-phi-field": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
+      "reason": "975 lines of substantive HIPAA-grade tests: PHI masking integrity, clipboard protection, ARIA, live regions, FS-029 attribute stripping, keyboard interaction, audit events. Exemption retained while coverage % is measured — remove once CI confirms 95% met.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -344,7 +344,7 @@
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
     "hx-text-input": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
+      "reason": "Substantive test suite (1175 lines) covering rendering, properties, events, keyboard, form integration (formFixture), and accessibility. Exemption retained while coverage % is measured — remove once CI confirms 95% met.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },

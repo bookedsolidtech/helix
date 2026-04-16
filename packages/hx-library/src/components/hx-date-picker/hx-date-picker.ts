@@ -970,6 +970,8 @@ export class HelixDatePicker extends HelixElement {
     // Use the memoized grid — recomputed in willUpdate() only on month/year/locale change.
     const cells = this._dayGrid;
     const selectedDate = this._parseISODate(this.value);
+    // Cache today once per render — avoids 42 new Date() allocations per keyboard navigation event.
+    const today = new Date();
 
     const rows: ReturnType<typeof html>[] = [];
 
@@ -980,7 +982,7 @@ export class HelixDatePicker extends HelixElement {
         }
 
         const isSelected = selectedDate ? this._isSameDay(date, selectedDate) : false;
-        const isToday = this._isToday(date);
+        const isToday = this._isSameDay(date, today);
         const isDisabled = this._isDateDisabled(date);
         const isFocused = this._focusedDay === date.getDate();
         const dayNumber = date.getDate();
@@ -997,18 +999,23 @@ export class HelixDatePicker extends HelixElement {
 
         // data-date carries the ISO string so the delegated grid click handler
         // (_handleGridClick) can identify the clicked day without any closure.
-        return html`<div class="calendar__day-cell">
+        // role="gridcell" belongs on the cell container (ARIA 1.2 grid ownership rules),
+        // not the inner <button>. aria-selected/aria-disabled/aria-current describe
+        // the cell state and live on the gridcell element.
+        return html`<div
+          class="calendar__day-cell"
+          role="gridcell"
+          aria-selected=${isSelected ? 'true' : 'false'}
+          aria-disabled=${isDisabled ? 'true' : nothing}
+          aria-current=${isToday ? 'date' : nothing}
+        >
           <button
             part="day"
             class=${classMap(dayClasses)}
             type="button"
-            role="gridcell"
             data-day=${dayNumber}
             data-date=${iso}
             aria-label=${ariaLabel}
-            aria-selected=${isSelected ? 'true' : 'false'}
-            aria-disabled=${isDisabled ? 'true' : nothing}
-            aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
             ?disabled=${isDisabled}
           >
