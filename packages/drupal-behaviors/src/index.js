@@ -33,7 +33,7 @@
         if (!accordion) return;
 
         if (element.dataset.openFirst === 'true') {
-          var firstPanel = accordion.querySelector('hx-accordion-panel');
+          var firstPanel = accordion.querySelector('hx-accordion-item');
           if (firstPanel) {
             firstPanel.open = true;
           }
