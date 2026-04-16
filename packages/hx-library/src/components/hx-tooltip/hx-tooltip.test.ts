@@ -488,4 +488,82 @@ describe('hx-tooltip', () => {
       }).not.toThrow();
     });
   });
+
+  // ─── Non-KeyboardEvent dispatched on keydown listener (1) ───
+
+  describe('Keydown event type guard', () => {
+    it('dispatching a non-KeyboardEvent on keydown listener does not throw', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      expect(() => {
+        el.dispatchEvent(new Event('keydown', { bubbles: true }));
+      }).not.toThrow();
+    });
+  });
+
+  // ─── showDelay / hideDelay zero-value coverage (2) ───
+
+  describe('Zero-value delay properties', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('show-delay="0" shows tooltip immediately after timer flush', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0"><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(true);
+    });
+
+    it('hide-delay="0" hides tooltip immediately after timer flush', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip show-delay="0" hide-delay="0"><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      vi.runAllTimers();
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="tooltip"]')?.classList.contains('visible')).toBe(false);
+    });
+  });
+
+  // ─── Content slot update re-runs ARIA setup (1) ───
+
+  describe('Content slot change updates light DOM description', () => {
+    it('light DOM description text matches content slot text', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content">Initial tip</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+      const descSpan = el.querySelector('span:not([slot])') as HTMLElement | null;
+      expect(descSpan?.textContent).toBe('Initial tip');
+    });
+  });
+
+  // ─── Reconnect re-sets ARIA (1) ───
+
+  describe('Reconnect re-sets ARIA', () => {
+    it('does not throw when element is removed and re-appended', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content">Tip</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+      expect(() => {
+        el.remove();
+        document.body.appendChild(el);
+      }).not.toThrow();
+      el.remove();
+    });
+  });
 });

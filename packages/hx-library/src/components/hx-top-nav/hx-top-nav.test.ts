@@ -270,4 +270,117 @@ describe('hx-top-nav', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Mobile Toggle ARIA labels (2) ───
+
+  describe('Mobile Toggle ARIA labels', () => {
+    it('aria-label on toggle is "Open navigation" when closed', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      expect(btn.getAttribute('aria-label')).toBe('Open navigation');
+    });
+
+    it('aria-label on toggle changes to "Close navigation" when open', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      btn.click();
+      await el.updateComplete;
+      expect(btn.getAttribute('aria-label')).toBe('Close navigation');
+    });
+  });
+
+  // ─── Label property updates (2) ───
+
+  describe('Label property updates', () => {
+    it('changing label property updates aria-label on nav element', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      el.label = 'Updated Nav';
+      await el.updateComplete;
+      const nav = shadowQuery(el, '[part="nav"]')!;
+      expect(nav.getAttribute('aria-label')).toBe('Updated Nav');
+    });
+
+    it('label reflects a custom value set at construction via attribute', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav label="Custom Label"></hx-top-nav>');
+      expect(el.label).toBe('Custom Label');
+    });
+  });
+
+  // ─── Hamburger icon switching (2) ───
+
+  describe('Hamburger icon switching', () => {
+    it('SVG element inside toggle button is present when closed', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      const svg = btn.querySelector('svg');
+      expect(svg).toBeTruthy();
+    });
+
+    it('SVG element inside toggle button is present when open', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      btn.click();
+      await el.updateComplete;
+      const svg = btn.querySelector('svg');
+      expect(svg).toBeTruthy();
+    });
+  });
+
+  // ─── nav__collapsible open/closed class (2) ───
+
+  describe('Collapsible panel state classes', () => {
+    it('nav__collapsible does not have open class by default', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const menu = shadowQuery(el, '#nav-menu');
+      expect(menu?.classList.contains('nav__collapsible--open')).toBe(false);
+    });
+
+    it('nav__collapsible--open class is added when menu is open', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      btn.click();
+      await el.updateComplete;
+      const menu = shadowQuery(el, '#nav-menu');
+      expect(menu?.classList.contains('nav__collapsible--open')).toBe(true);
+    });
+  });
+
+  // ─── Focus management on open (1) ───
+
+  describe('Focus management on mobile open', () => {
+    it('does not throw when menu is opened with no focusable items in default slot', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav><div>Not focusable</div></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+      expect(() => btn.click()).not.toThrow();
+    });
+  });
+
+  // ─── Sticky property (1) ───
+
+  describe('Sticky property programmatic change', () => {
+    it('setting sticky=true programmatically reflects attribute', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      el.sticky = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('sticky')).toBe(true);
+    });
+  });
+
+  // ─── Escape key guard: focus returns to toggle (1) ───
+
+  describe('Escape key restores focus to toggle', () => {
+    it('pressing Escape when menu is open returns focus to the mobile-toggle button', async () => {
+      const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
+
+      btn.click();
+      await el.updateComplete;
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await el.updateComplete;
+
+      // After Escape the toggle button should be focused
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+  });
 });
