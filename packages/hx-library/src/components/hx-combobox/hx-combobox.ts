@@ -258,10 +258,6 @@ export class HelixCombobox extends HelixElement {
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     // Safety net: remove listener if component is removed while dropdown is open
@@ -683,7 +679,7 @@ export class HelixCombobox extends HelixElement {
   // ─── Main Render ───
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
     const showClear = this.clearable && !!this.value && !this.disabled;
 
     const fieldClasses = {

@@ -144,42 +144,42 @@ export class HelixDatePicker extends HelixElement {
    * Validation message shown when the field is required but empty.
    * @attr required-message
    */
-  @property({ attribute: 'required-message' })
+  @property({ type: String, attribute: 'required-message' })
   requiredMessage = 'This field is required.';
 
   /**
    * Accessible label for the calendar dialog.
    * @attr choose-date-label
    */
-  @property({ attribute: 'choose-date-label' })
+  @property({ type: String, attribute: 'choose-date-label' })
   chooseDateLabel = 'Choose a date';
 
   /**
    * Accessible label for the calendar trigger button when the calendar is closed.
    * @attr open-calendar-label
    */
-  @property({ attribute: 'open-calendar-label' })
+  @property({ type: String, attribute: 'open-calendar-label' })
   openCalendarLabel = 'Open calendar';
 
   /**
    * Accessible label for the calendar trigger button when the calendar is open.
    * @attr close-calendar-label
    */
-  @property({ attribute: 'close-calendar-label' })
+  @property({ type: String, attribute: 'close-calendar-label' })
   closeCalendarLabel = 'Close calendar';
 
   /**
    * Accessible label for the previous month navigation button.
    * @attr previous-month-label
    */
-  @property({ attribute: 'previous-month-label' })
+  @property({ type: String, attribute: 'previous-month-label' })
   previousMonthLabel = 'Previous month';
 
   /**
    * Accessible label for the next month navigation button.
    * @attr next-month-label
    */
-  @property({ attribute: 'next-month-label' })
+  @property({ type: String, attribute: 'next-month-label' })
   nextMonthLabel = 'Next month';
 
   // ─── Internal State ───
@@ -312,12 +312,12 @@ export class HelixDatePicker extends HelixElement {
    * Whether the label slot has any assigned elements, used to switch between slotted and property-based label rendering.
    * @internal
    */
-  private _hasLabelSlot = false;
+  @state() private _hasLabelSlot = false;
   /**
    * Whether the error slot has any assigned elements, used to switch between slotted and property-based error rendering.
    * @internal
    */
-  private _hasErrorSlot = false;
+  @state() private _hasErrorSlot = false;
 
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
@@ -329,14 +329,12 @@ export class HelixDatePicker extends HelixElement {
         slottedLabel.id = `${this._inputId}-slotted-label`;
       }
     }
-    this.requestUpdate();
   }
 
   /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
 
   // ─── Bound Handler References ───
@@ -355,10 +353,6 @@ export class HelixDatePicker extends HelixElement {
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._boundHandleOutsideClick);
@@ -372,7 +366,10 @@ export class HelixDatePicker extends HelixElement {
     // always up-to-date without causing an extra render cycle.
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
-      this._updateValidity();
+      // Guard: _input is null before first render; validity is synced in updated() on first cycle.
+      if (this._input) {
+        this._updateValidity();
+      }
     }
 
     // Recompute the day grid and aria-labels only when the viewed month/year
@@ -404,6 +401,11 @@ export class HelixDatePicker extends HelixElement {
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
+    // Sync validity after first render (when _input is available) and on required/error changes.
+    if (changedProperties.has('value') || changedProperties.has('required') || changedProperties.has('error')) {
+      this._updateValidity();
+    }
+
     if ((changedProperties as Map<PropertyKey, unknown>).has('_isOpen')) {
       if (this._isOpen) {
         // Sync view to the currently selected date when opening.
@@ -415,7 +417,7 @@ export class HelixDatePicker extends HelixElement {
         document.addEventListener('click', this._boundHandleOutsideClick);
         document.addEventListener('keydown', this._boundHandleDocumentKeydown);
         // Focus the calendar after it renders.
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._focusActiveDay();
         });
       } else {
@@ -432,7 +434,7 @@ export class HelixDatePicker extends HelixElement {
       if (this._isOpen) {
         const monthName = this._getMonthName(this._viewMonth);
         this._liveMessage = `${monthName} ${this._viewYear}`;
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._focusActiveDay();
         });
       }
@@ -648,7 +650,7 @@ export class HelixDatePicker extends HelixElement {
   private _closeCalendar(): void {
     this._isOpen = false;
     // Return focus to trigger after calendar closes.
-    this.updateComplete.then(() => {
+    void this.updateComplete.then(() => {
       this._trigger?.focus();
     });
   }
@@ -704,7 +706,7 @@ export class HelixDatePicker extends HelixElement {
 
     if (targetDay !== null) {
       this._focusedDay = targetDay;
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const btn = this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${targetDay}"]`);
         btn?.focus();
       });
@@ -837,7 +839,7 @@ export class HelixDatePicker extends HelixElement {
       const newDay = currentFocused - dayOfWeek;
       if (newDay >= 1) {
         this._focusedDay = newDay;
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${newDay}"]`)?.focus();
         });
       }
@@ -852,7 +854,7 @@ export class HelixDatePicker extends HelixElement {
       const newDay = currentFocused + daysToSaturday;
       if (newDay <= daysInMonth) {
         this._focusedDay = newDay;
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${newDay}"]`)?.focus();
         });
       }
@@ -871,7 +873,7 @@ export class HelixDatePicker extends HelixElement {
       this._prevMonth();
       const prevDaysInMonth = new Date(this._viewYear, this._viewMonth + 1, 0).getDate();
       this._focusedDay = prevDaysInMonth + newDay;
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const day = this._focusedDay;
         this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${day}"]`)?.focus();
       });
@@ -883,7 +885,7 @@ export class HelixDatePicker extends HelixElement {
       const overflow = newDay - daysInMonth;
       this._nextMonth();
       this._focusedDay = overflow;
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const day = this._focusedDay;
         this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${day}"]`)?.focus();
       });
@@ -891,7 +893,7 @@ export class HelixDatePicker extends HelixElement {
     }
 
     this._focusedDay = newDay;
-    this.updateComplete.then(() => {
+    void this.updateComplete.then(() => {
       this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${newDay}"]`)?.focus();
     });
   }

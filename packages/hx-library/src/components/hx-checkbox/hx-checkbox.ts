@@ -23,7 +23,7 @@ const _nextCheckboxId = createIdCounter('hx-checkbox');
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled.
+ * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`.
  *
  * @csspart checkbox - The visual checkbox element.
  * @csspart checkmark - The SVG checkmark icon inside the checkbox.

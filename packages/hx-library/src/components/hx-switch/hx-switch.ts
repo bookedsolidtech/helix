@@ -24,7 +24,7 @@ const _nextSwitchId = createIdCounter('hx-switch');
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the switch is toggled.
+ * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the switch is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`.
  *
  * @csspart switch - The switch container (track + thumb wrapper).
  * @csspart track - The track background element.

@@ -89,10 +89,20 @@ export class HelixPhiField extends HelixElement {
 
   // ─── Lifecycle ───
 
+  /** @internal Bound reference for visibilitychange listener cleanup. */
+  private readonly _boundHandleVisibilityChange = (): void => {
+    if (document.visibilityState === 'hidden') {
+      this._clearClipboard();
+    }
+  };
+
   override connectedCallback(): void {
     super.connectedCallback();
     // Enforce HIPAA compliance: prevent browser autofill on the host element
     this.setAttribute('autocomplete', 'off');
+    // HIPAA: Clear clipboard immediately when tab is hidden (prevents PHI exposure
+    // when setTimeout is throttled in backgrounded tabs on mobile/laptop lid close).
+    document.addEventListener('visibilitychange', this._boundHandleVisibilityChange);
     // FS-029: PHI SSR/attribute exposure prevention.
     // If a developer (or server-rendered HTML) mistakenly sets PHI via the
     // `data` HTML attribute, the raw value is readable in the DOM source before
@@ -117,6 +127,7 @@ export class HelixPhiField extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._cancelClipboardTimer();
+    document.removeEventListener('visibilitychange', this._boundHandleVisibilityChange);
   }
 
   // ─── Private Helpers ───
