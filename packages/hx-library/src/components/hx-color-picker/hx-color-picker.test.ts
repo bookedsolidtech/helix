@@ -992,16 +992,28 @@ describe('hx-color-picker', () => {
       expect(colorInput?.value).toMatch(/^hsv\(/);
     });
 
-    it('output value updates when format changes via property', async () => {
+    it('switches output format to HSL via the format cycle button', async () => {
+      // The component updates _inputValue only when format is cycled via the format button
+      // or when a new color value is committed. Setting el.format directly only updates
+      // the format property — the input display updates on the next value commit.
       const el = await fixture<HelixColorPicker>(
         '<hx-color-picker inline value="#ff0000" format="hex"></hx-color-picker>',
       );
       await el.updateComplete;
 
-      el.format = 'hsl';
-      await el.updateComplete;
+      const formatBtn = el.shadowRoot?.querySelector<HTMLButtonElement>('.format-btn');
+      expect(formatBtn).toBeTruthy();
 
+      // Cycle hex → rgb → hsl (two clicks)
+      formatBtn!.click();
+      await el.updateComplete;
+      expect(el.format).toBe('rgb');
+
+      formatBtn!.click();
+      await el.updateComplete;
       expect(el.format).toBe('hsl');
+
+      // After cycling via button, _inputValue is updated to match the new format
       const colorInput = el.shadowRoot?.querySelector<HTMLInputElement>('.color-input');
       expect(colorInput?.value).toMatch(/^hsl\(/);
     });

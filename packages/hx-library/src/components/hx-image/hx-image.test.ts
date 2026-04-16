@@ -520,10 +520,13 @@ describe('hx-image', () => {
         '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
       );
       el.rounded = true;
+      // Wait for property reflection (String type reflects true → 'true' → re-read as 'true')
+      await el.updateComplete;
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
       const style = container?.getAttribute('style') ?? '';
-      expect(style).toContain('--_radius:var(--hx-border-radius-md');
+      // Accept both 'var(' with or without leading space after the colon
+      expect(style).toMatch(/--_radius:\s*var\(--hx-border-radius-md/);
     });
 
     it('applies theme radius token when rounded="true" string value', async () => {

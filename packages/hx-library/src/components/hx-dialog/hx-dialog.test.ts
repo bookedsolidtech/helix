@@ -328,7 +328,8 @@ describe('hx-dialog', () => {
 
     it('exposes "backdrop" part on non-modal open dialog', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog open></hx-dialog>');
-      el.modal = false;
+      // modal defaults to false; wait for open cycle and template re-render
+      await el.updateComplete;
       await el.updateComplete;
       const part = shadowQuery(el, '[part="backdrop"]');
       expect(part).toBeTruthy();
@@ -565,7 +566,8 @@ describe('hx-dialog', () => {
   describe('Non-Modal Backdrop', () => {
     it('renders a backdrop element for non-modal open dialog', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog open heading="Non-modal"></hx-dialog>');
-      el.modal = false;
+      // modal defaults to false; wait for the open cycle and re-render to complete
+      await el.updateComplete;
       await el.updateComplete;
       const backdrop = shadowQuery(el, '[part="backdrop"]');
       expect(backdrop).toBeTruthy();
@@ -574,13 +576,15 @@ describe('hx-dialog', () => {
     it('does not render a backdrop element for modal dialog', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog open modal heading="Modal"></hx-dialog>');
       await el.updateComplete;
+      await el.updateComplete;
       const backdrop = shadowQuery(el, '[part="backdrop"]');
       expect(backdrop).toBeFalsy();
     });
 
     it('closes non-modal dialog when backdrop is clicked', async () => {
       const el = await fixture<HelixDialog>('<hx-dialog open heading="Backdrop Test"></hx-dialog>');
-      el.modal = false;
+      // modal defaults to false; wait for open cycle and template re-render
+      await el.updateComplete;
       await el.updateComplete;
       const backdrop = shadowQuery<HTMLElement>(el, '[part="backdrop"]');
       expect(backdrop).toBeTruthy();

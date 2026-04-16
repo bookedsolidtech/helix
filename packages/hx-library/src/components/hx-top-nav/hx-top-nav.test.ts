@@ -374,12 +374,15 @@ describe('hx-top-nav', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
 
       btn.click();
+      // Wait for the toggle update and its async focus microtask to settle
+      await el.updateComplete;
       await el.updateComplete;
 
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      // Wait for _mobileOpen=false re-render; focus() is called synchronously in the handler
       await el.updateComplete;
 
-      // After Escape the toggle button should be focused
+      // After Escape, the toggle button should hold focus within the shadow root
       expect(el.shadowRoot?.activeElement).toBe(btn);
     });
   });

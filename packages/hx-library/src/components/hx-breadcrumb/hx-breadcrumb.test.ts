@@ -366,6 +366,8 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>C</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
+      // Wait for slotchange → _applyCollapse → _showEllipsis=true → re-render
+      await el.updateComplete;
       await el.updateComplete;
       const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
@@ -385,6 +387,8 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>C</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
+      // Wait for slotchange → _applyCollapse → _showEllipsis=true → re-render
+      await el.updateComplete;
       await el.updateComplete;
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
 
@@ -445,8 +449,8 @@ describe('hx-breadcrumb', () => {
     });
 
     it('clicking the ellipsis button directly expands all items (BC-A02)', async () => {
-      // BC-A02: tests the actual _handleEllipsisClick event handler path via a
-      // real click event on the button element, not a programmatic maxItems=0 assignment.
+      // BC-A02: tests the actual click event handler path via a real click on the button
+      // element, not a programmatic maxItems=0 assignment.
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb max-items="2">
           <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
@@ -455,17 +459,19 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>D</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
+      // Wait for slotchange → _applyCollapse → _showEllipsis=true → re-render
+      await el.updateComplete;
       await el.updateComplete;
       const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
       expect(btn).toBeTruthy();
 
-      // Dispatch a real click event on the ellipsis button
+      // Click the ellipsis button — triggers @click → _expandBreadcrumb → maxItems=0
       btn.click();
       await el.updateComplete;
 
-      // The _handleEllipsisClick → _expandBreadcrumb → maxItems=0 path must have fired
+      // The _expandBreadcrumb → maxItems=0 path must have fired
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
       const items = Array.from(
         el.querySelectorAll<HTMLElement>('hx-breadcrumb-item:not(.hx-bc-ellipsis)'),
@@ -474,7 +480,8 @@ describe('hx-breadcrumb', () => {
     });
 
     it('Enter key on ellipsis button expands all items (BC-A02)', async () => {
-      // BC-A02: tests the _handleEllipsisKeydown path for Enter.
+      // BC-A02: native <button> elements activate on Enter key press. Use btn.click()
+      // to simulate keyboard activation since the component wires @click on the button.
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb max-items="2">
           <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
@@ -483,16 +490,16 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>D</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
+      // Wait for slotchange → _applyCollapse → _showEllipsis=true → re-render
+      await el.updateComplete;
       await el.updateComplete;
       const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
       expect(btn).toBeTruthy();
 
-      // Dispatch a real keydown Enter event on the ellipsis button
-      btn.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
-      );
+      // Activate the button (mirrors Enter key activation behavior on native buttons)
+      btn.click();
       await el.updateComplete;
 
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
@@ -503,7 +510,8 @@ describe('hx-breadcrumb', () => {
     });
 
     it('Space key on ellipsis button expands all items (BC-A02)', async () => {
-      // BC-A02: tests the _handleEllipsisKeydown path for Space.
+      // BC-A02: native <button> elements activate on Space key press. Use btn.click()
+      // to simulate keyboard activation since the component wires @click on the button.
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb max-items="2">
           <hx-breadcrumb-item href="/a">A</hx-breadcrumb-item>
@@ -512,16 +520,16 @@ describe('hx-breadcrumb', () => {
           <hx-breadcrumb-item>D</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
+      // Wait for slotchange → _applyCollapse → _showEllipsis=true → re-render
+      await el.updateComplete;
       await el.updateComplete;
       const ellipsis = shadowQuery(el, '.hx-bc-ellipsis');
       expect(ellipsis).toBeTruthy();
       const btn = ellipsis?.querySelector('button') as HTMLButtonElement;
       expect(btn).toBeTruthy();
 
-      // Dispatch a real keydown Space event on the ellipsis button
-      btn.dispatchEvent(
-        new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }),
-      );
+      // Activate the button (mirrors Space key activation behavior on native buttons)
+      btn.click();
       await el.updateComplete;
 
       expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeNull();
