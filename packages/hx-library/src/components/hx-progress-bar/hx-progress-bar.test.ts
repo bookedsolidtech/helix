@@ -436,6 +436,8 @@ describe('hx-progress-bar', () => {
       );
       el.value = 100;
       await el.updateComplete;
+      // _liveMessage is @state() set in updated(); await a second cycle for its re-render.
+      await el.updateComplete;
       const liveRegion = shadowQuery(el, '[aria-live="polite"]')!;
       expect(liveRegion.textContent?.trim()).toBe('Complete');
     });
@@ -444,9 +446,12 @@ describe('hx-progress-bar', () => {
       const el = await fixture<HelixProgressBar>(
         '<hx-progress-bar value="100" label="Progress"></hx-progress-bar>',
       );
+      // Initial value=100 triggers _liveMessage='Complete' in updated(); wait for its render.
       await el.updateComplete;
 
       el.value = 80;
+      await el.updateComplete;
+      // _liveMessage='' is set in updated(); await a second cycle for its re-render.
       await el.updateComplete;
       const liveRegion = shadowQuery(el, '[aria-live="polite"]')!;
       expect(liveRegion.textContent?.trim()).toBe('');

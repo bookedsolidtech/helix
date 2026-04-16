@@ -465,7 +465,31 @@ describe('hx-theme', () => {
 
     it('applies brand token overrides when brand is registered', async () => {
       const brandName = 'test-brand-phase3-b5';
-      HelixBrandRegistry.register(brandName, { '--hx-color-primary-500': '#FF0000' });
+      // HelixBrandRegistry.register requires all REQUIRED_SEMANTIC_TOKENS (primary + secondary ramps)
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff0f0',
+        '--hx-color-primary-100': '#ffe0e0',
+        '--hx-color-primary-200': '#ffc0c0',
+        '--hx-color-primary-300': '#ff9090',
+        '--hx-color-primary-400': '#ff5050',
+        '--hx-color-primary-500': '#FF0000',
+        '--hx-color-primary-600': '#cc0000',
+        '--hx-color-primary-700': '#990000',
+        '--hx-color-primary-800': '#660000',
+        '--hx-color-primary-900': '#330000',
+        '--hx-color-primary-950': '#1a0000',
+        '--hx-color-secondary-50': '#f0f0ff',
+        '--hx-color-secondary-100': '#e0e0ff',
+        '--hx-color-secondary-200': '#c0c0ff',
+        '--hx-color-secondary-300': '#9090ff',
+        '--hx-color-secondary-400': '#5050ff',
+        '--hx-color-secondary-500': '#0000ff',
+        '--hx-color-secondary-600': '#0000cc',
+        '--hx-color-secondary-700': '#000099',
+        '--hx-color-secondary-800': '#000066',
+        '--hx-color-secondary-900': '#000033',
+        '--hx-color-secondary-950': '#00001a',
+      });
       const el = await fixture<HelixTheme>(`<hx-theme brand="${brandName}">Content</hx-theme>`);
       await el.updateComplete;
       const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();

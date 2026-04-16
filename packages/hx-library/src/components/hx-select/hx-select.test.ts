@@ -1044,7 +1044,7 @@ describe('hx-select', () => {
       expect(options[1]!.getAttribute('aria-selected')).toBe('true');
     });
 
-    it('non-selected option does not have aria-selected', async () => {
+    it('non-selected option has aria-selected="false"', async () => {
       const el = await fixture<WcSelect>(`
         <hx-select open value="b">
           <option value="a">A</option>
@@ -1054,7 +1054,8 @@ describe('hx-select', () => {
       await el.updateComplete;
       await el.updateComplete;
       const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
-      expect(options[0]!.hasAttribute('aria-selected')).toBe(false);
+      // Component always renders aria-selected as "true" or "false" — never omits the attribute
+      expect(options[0]!.getAttribute('aria-selected')).toBe('false');
     });
   });
 

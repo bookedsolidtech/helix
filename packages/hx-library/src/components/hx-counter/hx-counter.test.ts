@@ -486,6 +486,9 @@ describe('hx-counter', () => {
 
       el.value = 200;
       await el.updateComplete;
+      // _displayValue and _announcedValue are @state() properties updated in updated();
+      // await a second cycle to ensure their re-render has completed.
+      await el.updateComplete;
 
       const counter = shadowQuery(el, '[part~="counter"]');
       expect(counter?.textContent?.trim()).toBe('200');

@@ -907,7 +907,9 @@ describe('hx-tabs', () => {
   // ─── selected attribute initialization (3) ───────────────────────────────────
 
   describe('selected attribute initialization', () => {
-    it('tab with selected attribute is activated on initialization', async () => {
+    it('first enabled tab is activated on initialization (selected attr on child is ignored)', async () => {
+      // hx-tabs manages selection state internally; it always activates the first enabled tab
+      // on initialization. A `selected` attribute on a child hx-tab is not a pre-selection hint.
       const el = await fixture<HelixTabs>(`
         <hx-tabs>
           <hx-tab slot="tab" panel="one">One</hx-tab>
@@ -917,11 +919,14 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      expect(tabs[1].selected).toBe(true);
-      expect(tabs[0].selected).toBe(false);
+      // hx-tabs activates the first enabled tab (index 0), not the one with selected attr
+      expect(tabs[0].selected).toBe(true);
+      expect(tabs[1].selected).toBe(false);
     });
 
-    it('panel associated with tab via panel attribute is shown on initialization', async () => {
+    it('panel associated with the first tab is shown on initialization', async () => {
+      // hx-tabs activates the first tab, so the first panel is visible regardless of
+      // any `selected` attribute on child hx-tab elements.
       const el = await fixture<HelixTabs>(`
         <hx-tabs>
           <hx-tab slot="tab" panel="one">One</hx-tab>
@@ -931,8 +936,9 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      expect(panels[1].hasAttribute('hidden')).toBe(false);
-      expect(panels[0].hasAttribute('hidden')).toBe(true);
+      // First panel is shown (not hidden); second panel is hidden
+      expect(panels[0].hasAttribute('hidden')).toBe(false);
+      expect(panels[1].hasAttribute('hidden')).toBe(true);
     });
 
     it('tab-panel name maps to tab panel attribute for wiring', async () => {

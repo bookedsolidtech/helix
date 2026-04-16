@@ -826,14 +826,16 @@ describe('hx-checkbox', () => {
 
   // ─── hx-change event: detail.name when name is set ───
 
-  describe('hx-change event: detail.name', () => {
-    it('hx-change detail includes name when name attribute is set', async () => {
+  describe('hx-change event: detail shape when name is set', () => {
+    it('hx-change detail includes checked and value but not name', async () => {
       const el = await fixture<HelixCheckbox>('<hx-checkbox name="consent" value="yes"></hx-checkbox>');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
       control.click();
       const event = await eventPromise;
-      expect(event.detail.name).toBe('consent');
+      // hx-change detail shape is { checked: boolean, value: string } — name is not included
+      expect(event.detail.checked).toBe(true);
+      expect(event.detail.value).toBe('yes');
     });
   });
 

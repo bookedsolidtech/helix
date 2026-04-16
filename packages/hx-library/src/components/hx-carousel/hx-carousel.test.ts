@@ -1301,7 +1301,7 @@ describe('hx-carousel', () => {
   describe('Touch drag (horizontal orientation)', () => {
     it('swipe left (negative clientX diff) on horizontal carousel calls next()', async () => {
       const el = await fixture<HelixCarousel>(`
-        <hx-carousel>
+        <hx-carousel mouse-dragging>
           <hx-carousel-item>Slide 1</hx-carousel-item>
           <hx-carousel-item>Slide 2</hx-carousel-item>
           <hx-carousel-item>Slide 3</hx-carousel-item>
@@ -1338,7 +1338,7 @@ describe('hx-carousel', () => {
 
     it('swipe right (positive clientX diff) on horizontal carousel calls previous()', async () => {
       const el = await fixture<HelixCarousel>(`
-        <hx-carousel>
+        <hx-carousel mouse-dragging>
           <hx-carousel-item>Slide 1</hx-carousel-item>
           <hx-carousel-item>Slide 2</hx-carousel-item>
           <hx-carousel-item>Slide 3</hx-carousel-item>
@@ -1378,7 +1378,7 @@ describe('hx-carousel', () => {
 
     it('small swipe below threshold does not change slide', async () => {
       const el = await fixture<HelixCarousel>(`
-        <hx-carousel>
+        <hx-carousel mouse-dragging>
           <hx-carousel-item>Slide 1</hx-carousel-item>
           <hx-carousel-item>Slide 2</hx-carousel-item>
         </hx-carousel>

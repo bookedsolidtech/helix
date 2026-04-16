@@ -818,7 +818,7 @@ describe('hx-file-upload', () => {
       dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
       await el.updateComplete;
 
-      expect(dropzone.classList.contains('dropzone--dragover')).toBe(true);
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(true);
     });
 
     it('removes drag-over class from dropzone on dragleave event', async () => {
@@ -827,11 +827,11 @@ describe('hx-file-upload', () => {
 
       dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
       await el.updateComplete;
-      expect(dropzone.classList.contains('dropzone--dragover')).toBe(true);
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(true);
 
       dropzone.dispatchEvent(new DragEvent('dragleave', { bubbles: true }));
       await el.updateComplete;
-      expect(dropzone.classList.contains('dropzone--dragover')).toBe(false);
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(false);
     });
 
     it('does not add drag-over class when disabled', async () => {
@@ -841,7 +841,7 @@ describe('hx-file-upload', () => {
       dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
       await el.updateComplete;
 
-      expect(dropzone.classList.contains('dropzone--dragover')).toBe(false);
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(false);
     });
 
     it('removes drag-over class on drop event', async () => {
@@ -850,7 +850,7 @@ describe('hx-file-upload', () => {
 
       dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
       await el.updateComplete;
-      expect(dropzone.classList.contains('dropzone--dragover')).toBe(true);
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(true);
 
       // Create a minimal drop event with empty DataTransfer
       const dt = new DataTransfer();
@@ -861,7 +861,7 @@ describe('hx-file-upload', () => {
       });
       dropzone.dispatchEvent(dropEvent);
       await el.updateComplete;
-      expect(dropzone.classList.contains('dropzone--dragover')).toBe(false);
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(false);
     });
   });
 

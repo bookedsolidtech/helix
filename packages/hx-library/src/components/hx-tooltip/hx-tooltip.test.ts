@@ -356,14 +356,18 @@ describe('hx-tooltip', () => {
       );
       await el.updateComplete;
 
-      // Visually-hidden description should exist in light DOM
-      const descSpan = el.querySelector('span:not([slot])');
+      // The visually-hidden description span is appended to document.body (not el),
+      // so we find it via the trigger's aria-describedby attribute.
+      const trigger = el.querySelector('button') as HTMLElement;
+      const descId = trigger.getAttribute('aria-describedby');
+      expect(descId).toBeTruthy();
+      const descSpan = document.getElementById(descId!);
       expect(descSpan).toBeTruthy();
 
       el.remove();
 
-      // The description should have been removed from the DOM
-      expect(descSpan?.parentNode).toBeFalsy();
+      // The description should have been removed from document.body on disconnect
+      expect(document.getElementById(descId!)).toBeNull();
     });
   });
 
@@ -449,13 +453,17 @@ describe('hx-tooltip', () => {
   // ─── ARIA describedby light DOM ───
 
   describe('Light DOM description element', () => {
-    it('inserts a visually-hidden span into light DOM for aria-describedby', async () => {
+    it('inserts a visually-hidden span into document.body for aria-describedby', async () => {
       const el = await fixture<HelixTooltip>(
         '<hx-tooltip><button id="t">Trigger</button><span slot="content">Tooltip text</span></hx-tooltip>',
       );
       await el.updateComplete;
-      // The visually-hidden description span should be appended to the host's light DOM
-      const descSpan = el.querySelector('span:not([slot])') as HTMLElement | null;
+      // The visually-hidden description span is appended to document.body (not the host element),
+      // so the ID resolves across shadow DOM boundaries.
+      const trigger = el.querySelector('#t') as HTMLElement;
+      const descId = trigger.getAttribute('aria-describedby');
+      expect(descId).toBeTruthy();
+      const descSpan = document.getElementById(descId!) as HTMLElement | null;
       expect(descSpan).toBeTruthy();
       expect(descSpan?.textContent).toBe('Tooltip text');
     });
@@ -546,7 +554,10 @@ describe('hx-tooltip', () => {
         '<hx-tooltip><button>T</button><span slot="content">Initial tip</span></hx-tooltip>',
       );
       await el.updateComplete;
-      const descSpan = el.querySelector('span:not([slot])') as HTMLElement | null;
+      // The description span is in document.body, not the host element.
+      const trigger = el.querySelector('button') as HTMLElement;
+      const descId = trigger.getAttribute('aria-describedby');
+      const descSpan = descId ? document.getElementById(descId) : null;
       expect(descSpan?.textContent).toBe('Initial tip');
     });
   });

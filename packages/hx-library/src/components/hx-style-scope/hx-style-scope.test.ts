@@ -251,7 +251,8 @@ describe('hx-style-scope', () => {
     it('has no axe violations in default state', async () => {
       const el = await fixture<HxStyleScope>('<hx-style-scope></hx-style-scope>');
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      // useElement: true so axe traverses the full composed tree including slotted light DOM
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
 
@@ -260,7 +261,8 @@ describe('hx-style-scope', () => {
         '<hx-style-scope component="hx-card"><p>Some healthcare content</p></hx-style-scope>',
       );
       await page.screenshot();
-      const { violations } = await checkA11y(el);
+      // useElement: true so axe traverses the full composed tree including slotted light DOM
+      const { violations } = await checkA11y(el, { useElement: true });
       expect(violations).toEqual([]);
     });
   });
