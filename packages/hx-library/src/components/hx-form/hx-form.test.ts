@@ -609,4 +609,149 @@ describe('hx-form', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Method property (3) ───
+
+  describe('method property', () => {
+    it('method can be set to get', async () => {
+      const el = await fixture<HelixForm>('<hx-form action="/api" method="get"></hx-form>');
+      expect(el.method).toBe('get');
+      const form = el.querySelector('form');
+      expect(form?.getAttribute('method')).toBe('get');
+    });
+
+    it('method can be set to post', async () => {
+      const el = await fixture<HelixForm>('<hx-form action="/api" method="post"></hx-form>');
+      expect(el.method).toBe('post');
+    });
+
+    it('enctype multipart sets enctype attribute on rendered form', async () => {
+      const el = await fixture<HelixForm>(
+        '<hx-form action="/upload" enctype="multipart/form-data"></hx-form>',
+      );
+      const form = el.querySelector('form');
+      expect(form?.getAttribute('enctype')).toBe('multipart/form-data');
+    });
+  });
+
+  // ─── novalidate skips checkValidity on submit (2) ───
+
+  describe('novalidate skips validation on submit', () => {
+    it('novalidate flag bypasses client-side validity check and dispatches hx-submit', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="" novalidate>
+          <form>
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const event = await eventPromise;
+      expect(event).toBeTruthy();
+    });
+
+    it('hx-submit valid flag is true when novalidate bypasses validation', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="" novalidate>
+          <form>
+            <input type="text" name="field" value="" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+  });
+
+  // ─── setFieldError deduplicates by name (2) ───
+
+  describe('setFieldError deduplication', () => {
+    it('setFieldError replaces existing error for same name', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="mrn" />
+        </hx-form>
+      `);
+      el.setFieldError('mrn', 'First error.');
+      el.setFieldError('mrn', 'Updated error.');
+      await el.updateComplete;
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.textContent).toContain('Updated error.');
+      // Should not contain both messages
+      const listItems = Array.from(summary?.querySelectorAll('li') ?? []);
+      const mrnItems = listItems.filter((li) => li.textContent?.includes('error.'));
+      expect(mrnItems).toHaveLength(1);
+    });
+
+    it('clearErrors removes aria-invalid from all named fields', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="mrn" />
+          <input type="text" name="dob" />
+        </hx-form>
+      `);
+      el.setErrors([
+        { name: 'mrn', message: 'MRN error.' },
+        { name: 'dob', message: 'DOB error.' },
+      ]);
+      await el.updateComplete;
+      el.clearErrors();
+      await el.updateComplete;
+      const mrn = el.querySelector<HTMLInputElement>('input[name="mrn"]')!;
+      const dob = el.querySelector<HTMLInputElement>('input[name="dob"]')!;
+      expect(mrn.hasAttribute('aria-invalid')).toBe(false);
+      expect(dob.hasAttribute('aria-invalid')).toBe(false);
+    });
+  });
+
+  // ─── hx-reset clears aria-invalid (1) ───
+
+  describe('hx-reset clears aria-invalid', () => {
+    it('hx-reset removes aria-invalid from all fields', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+          </form>
+        </hx-form>
+      `);
+      const form = el.querySelector('form')!;
+      const input = el.querySelector('input')!;
+      const invalidPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await invalidPromise;
+      await el.updateComplete;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+
+      const resetPromise = oneEvent<CustomEvent>(el, 'hx-reset');
+      form.dispatchEvent(new Event('reset', { bubbles: true }));
+      await resetPromise;
+      await el.updateComplete;
+      expect(input.hasAttribute('aria-invalid')).toBe(false);
+    });
+  });
+
+  // ─── getNativeFormElements includes button (1) ───
+
+  describe('getNativeFormElements', () => {
+    it('getNativeFormElements returns buttons', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <button type="submit">Go</button>
+        </hx-form>
+      `);
+      const elements = el.getNativeFormElements();
+      const buttons = elements.filter((e) => e.tagName.toLowerCase() === 'button');
+      expect(buttons.length).toBe(1);
+    });
+  });
 });

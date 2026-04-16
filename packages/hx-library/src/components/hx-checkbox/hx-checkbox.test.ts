@@ -791,6 +791,62 @@ describe('hx-checkbox', () => {
     });
   });
 
+  // ─── formDisabledCallback propagated to native input ───
+
+  describe('formDisabledCallback: native input state', () => {
+    it('native input is disabled after formDisabledCallback(true)', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.disabled).toBe(true);
+    });
+
+    it('native input is re-enabled after formDisabledCallback(false)', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
+      el.formDisabledCallback(true);
+      await el.updateComplete;
+      el.formDisabledCallback(false);
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.disabled).toBe(false);
+    });
+  });
+
+  // ─── formStateRestoreCallback: non-matching value leaves unchecked ───
+
+  describe('formStateRestoreCallback: value mismatch', () => {
+    it('does not check when restored value does not match component value', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox value="yes"></hx-checkbox>');
+      el.formStateRestoreCallback('no', 'restore');
+      await el.updateComplete;
+      expect(el.checked).toBe(false);
+    });
+  });
+
+  // ─── hx-change event: detail.name when name is set ───
+
+  describe('hx-change event: detail.name', () => {
+    it('hx-change detail includes name when name attribute is set', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox name="consent" value="yes"></hx-checkbox>');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      control.click();
+      const event = await eventPromise;
+      expect(event.detail.name).toBe('consent');
+    });
+  });
+
+  // ─── CSS class: checkbox--disabled ───
+
+  describe('CSS class: checkbox--disabled', () => {
+    it('applies checkbox--disabled class when disabled', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox disabled></hx-checkbox>');
+      const container = shadowQuery(el, '.checkbox');
+      expect(container?.classList.contains('checkbox--disabled')).toBe(true);
+    });
+  });
+
   // ─── error slot activates error state ───
 
   describe('Slot: error activates error state', () => {

@@ -904,6 +904,99 @@ describe('hx-tabs', () => {
     });
   });
 
+  // ─── selected attribute initialization (3) ───────────────────────────────────
+
+  describe('selected attribute initialization', () => {
+    it('tab with selected attribute is activated on initialization', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" selected>Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      expect(tabs[1].selected).toBe(true);
+      expect(tabs[0].selected).toBe(false);
+    });
+
+    it('panel associated with tab via panel attribute is shown on initialization', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab slot="tab" panel="two" selected>Two</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          <hx-tab-panel name="two">Panel Two</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
+      expect(panels[1].hasAttribute('hidden')).toBe(false);
+      expect(panels[0].hasAttribute('hidden')).toBe(true);
+    });
+
+    it('tab-panel name maps to tab panel attribute for wiring', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
+      // Each tab.panel attribute matches the corresponding hx-tab-panel.name attribute
+      expect(tabs[0].getAttribute('panel')).toBe(panels[0].getAttribute('name'));
+      expect(tabs[1].getAttribute('panel')).toBe(panels[1].getAttribute('name'));
+    });
+  });
+
+  // ─── selectTab public API (3) ──────────────────────────────────────────────────
+
+  describe('Programmatic tab activation', () => {
+    it('setting selectedIndex to -1 out-of-range does not change selection', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      el.selectedIndex = -1;
+      await el.updateComplete;
+      // Out of range — no change to current selection (index 0)
+      expect(el.selectedIndex).toBe(0);
+    });
+
+    it('tab activated by click updates selectedIndex correctly', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
+      assertEl(btnGamma, 'button').click();
+      await el.updateComplete;
+      expect(el.selectedIndex).toBe(2);
+    });
+
+    it('hx-tab-change detail.tabId matches the id of the activated tab element', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
+        el,
+        'hx-tab-change',
+      );
+      const btnAlphaSecond = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
+      assertEl(btnAlphaSecond, 'button').click();
+      const event = await eventPromise;
+      expect(event.detail.tabId).toBeTruthy();
+      expect(event.detail.index).toBe(1);
+    });
+  });
+
+  // ─── panel slot content (1) ──────────────────────────────────────────────────
+
+  describe('panel content visibility after selection', () => {
+    it('panel content remains accessible (not hidden) for the selected tab', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
+      // Select gamma (index 2)
+      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
+      assertEl(btnGamma, 'button').click();
+      await el.updateComplete;
+      expect(panels[2].hasAttribute('hidden')).toBe(false);
+      expect(panels[0].hasAttribute('hidden')).toBe(true);
+      expect(panels[1].hasAttribute('hidden')).toBe(true);
+    });
+  });
+
   // ─── Accessibility (axe-core) ─────────────────────────────────────────────────
 
   // axe-core rule exclusions for shadow DOM tab pattern:

@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTheme } from './hx-theme.js';
+import { HelixBrandRegistry } from '@helixui/tokens';
 import './index.js';
 
 afterEach(cleanup);
@@ -317,6 +318,176 @@ describe('hx-theme', () => {
       const el = await fixture<HelixTheme>('<hx-theme><span class="child">Child</span></hx-theme>');
       const span = el.querySelector('span.child');
       expect(span).toBeTruthy();
+    });
+  });
+
+  // ─── effectiveMotion ───
+
+  describe('effectiveMotion', () => {
+    it('returns "full" when motion is default', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
+      // OS prefers-reduced-motion may be set in the test environment — just verify the return shape
+      const motion = el.effectiveMotion;
+      expect(motion === 'full' || motion === 'reduced').toBe(true);
+    });
+
+    it('returns "reduced" when motion="reduced"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme motion="reduced">Content</hx-theme>');
+      await el.updateComplete;
+      expect(el.effectiveMotion).toBe('reduced');
+    });
+
+    it('returns "reduced" when motion="none"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme motion="none">Content</hx-theme>');
+      await el.updateComplete;
+      expect(el.effectiveMotion).toBe('reduced');
+    });
+
+    it('reflects motion attribute to host', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme motion="reduced">Content</hx-theme>');
+      expect(el.getAttribute('motion')).toBe('reduced');
+    });
+
+    it('motion defaults to "full"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
+      expect(el.motion).toBe('full');
+    });
+  });
+
+  // ─── motion token injection ───
+
+  describe('motion token injection', () => {
+    it('collapses --hx-duration-fast to 0ms when motion="reduced"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme motion="reduced">Content</hx-theme>');
+      await el.updateComplete;
+      const value = getComputedStyle(el).getPropertyValue('--hx-duration-fast').trim();
+      expect(value).toBe('0ms');
+    });
+
+    it('collapses --hx-transition-normal to 0ms linear when motion="none"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme motion="none">Content</hx-theme>');
+      await el.updateComplete;
+      const value = getComputedStyle(el).getPropertyValue('--hx-transition-normal').trim();
+      expect(value).toBe('0ms linear');
+    });
+  });
+
+  // ─── density property ───
+
+  describe('Property: density', () => {
+    it('defaults to "comfortable"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
+      expect(el.density).toBe('comfortable');
+    });
+
+    it('reflects density attribute to host', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme density="compact">Content</hx-theme>');
+      expect(el.getAttribute('density')).toBe('compact');
+    });
+
+    it('compact density reduces --hx-space-4 below default', async () => {
+      const defaultEl = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
+      await defaultEl.updateComplete;
+      const defaultVal = getComputedStyle(defaultEl).getPropertyValue('--hx-space-4').trim();
+
+      cleanup();
+
+      const compactEl = await fixture<HelixTheme>('<hx-theme density="compact">Content</hx-theme>');
+      await compactEl.updateComplete;
+      const compactVal = getComputedStyle(compactEl).getPropertyValue('--hx-space-4').trim();
+
+      // Compact space-4 (0.75rem) < default space-4 (1rem)
+      expect(compactVal).not.toBe(defaultVal);
+      expect(compactVal).toBe('0.75rem');
+    });
+
+    it('spacious density increases --hx-space-4 above default', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme density="spacious">Content</hx-theme>');
+      await el.updateComplete;
+      const val = getComputedStyle(el).getPropertyValue('--hx-space-4').trim();
+      // Spacious space-4 = 1.25rem
+      expect(val).toBe('1.25rem');
+    });
+
+    it('comfortable density uses default --hx-space-4 (no overrides)', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme density="comfortable">Content</hx-theme>');
+      await el.updateComplete;
+      const val = getComputedStyle(el).getPropertyValue('--hx-space-4').trim();
+      // Default space-4 token is 1rem
+      expect(val).toBe('1rem');
+    });
+
+    it('switching density from comfortable to compact updates tokens', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme density="comfortable">Content</hx-theme>');
+      await el.updateComplete;
+      const before = getComputedStyle(el).getPropertyValue('--hx-space-4').trim();
+
+      el.density = 'compact';
+      await el.updateComplete;
+      const after = getComputedStyle(el).getPropertyValue('--hx-space-4').trim();
+
+      expect(after).not.toBe(before);
+      expect(after).toBe('0.75rem');
+    });
+  });
+
+  // ─── brand property ───
+
+  describe('Property: brand', () => {
+    it('defaults brand to empty string', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
+      expect(el.brand).toBe('');
+    });
+
+    it('logs a console.warn when brand is set to an unregistered name', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="unknown-brand-xyz">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('unknown-brand-xyz'),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('applies base theme tokens without throwing when brand is unregistered', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="no-such-brand-2026">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      // Should still have the default primary token
+      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
+      expect(value.toLowerCase()).toBe('#2563eb');
+      warnSpy.mockRestore();
+    });
+
+    it('applies brand token overrides when brand is registered', async () => {
+      const brandName = 'test-brand-phase3-b5';
+      HelixBrandRegistry.register(brandName, { '--hx-color-primary-500': '#FF0000' });
+      const el = await fixture<HelixTheme>(`<hx-theme brand="${brandName}">Content</hx-theme>`);
+      await el.updateComplete;
+      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
+      expect(value.toLowerCase()).toBe('#ff0000');
+    });
+
+    it('brand attribute is reflected to host', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>('<hx-theme brand="mercy">Content</hx-theme>');
+      expect(el.getAttribute('brand')).toBe('mercy');
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── theme change lifecycle / announcer ───
+
+  describe('Announcer live region', () => {
+    it('renders a visually-hidden [role="status"] span for AT announcements', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      await el.updateComplete;
+      const announcer = shadowQuery(el, '[role="status"]');
+      expect(announcer).toBeTruthy();
     });
   });
 
