@@ -512,7 +512,8 @@ export class HelixDialog extends HelixElement {
     const active = document.activeElement;
     // Also check shadow root active element
     const shadowActive = this.shadowRoot?.activeElement;
-    const currentActive = (shadowActive ?? active) as HTMLElement | null;
+    const currentActiveEl = shadowActive ?? active;
+    const currentActive = currentActiveEl instanceof HTMLElement ? currentActiveEl : null;
 
     // The shadow close button may be the first focusable element when no light DOM
     // content exists (WCAG 2.1.2). Check both the element reference and shadow root
