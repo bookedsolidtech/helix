@@ -19,7 +19,7 @@
 {{ attach_library('helixui/hx-status-indicator') }}
 
 <hx-status-indicator
-  {% if status and status != 'neutral' %}status="{{ status }}"{% endif %}
+  {% if status and status != 'unknown' %}status="{{ status }}"{% endif %}
   {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
   {% if pulse %}pulse{% endif %}
   {% if label %}label="{{ label }}"{% endif %}
