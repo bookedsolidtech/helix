@@ -38,6 +38,12 @@ const FOCUSABLE_SELECTORS = [
  * @fires {CustomEvent<void>} hx-close - Fired when the dialog closes for any reason.
  * @fires {CustomEvent<void>} hx-cancel - Fired when the dialog is dismissed via Escape key or cancel action.
  *
+ * **Event naming rationale:** hx-dialog intentionally uses `hx-open`/`hx-close`/`hx-cancel`
+ * instead of the `hx-show`/`hx-hide`/`hx-after-show`/`hx-after-hide` pattern used by overlay
+ * components (hx-drawer, hx-popover, hx-tooltip). This aligns with the native `<dialog>`
+ * element's `close` and `cancel` events and communicates that the dialog is a stateful container
+ * (open/closed) rather than a transient visibility toggle (show/hide).
+ *
  * @csspart dialog - The inner container div that holds the dialog content.
  * @csspart backdrop - The non-modal backdrop overlay element.
  * @csspart header - The header region containing the heading and header slot.

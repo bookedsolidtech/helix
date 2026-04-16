@@ -51,6 +51,12 @@ const FOCUSABLE_SELECTORS = [
  * @fires {CustomEvent<void>} hx-after-hide - Fired after the drawer close animation completes.
  * @fires {CustomEvent<void>} hx-initial-focus - Fired when initial focus is set inside the drawer. Cancelable to override focus behavior.
  *
+ * **Event naming rationale:** hx-drawer uses the `hx-show`/`hx-hide`/`hx-after-show`/`hx-after-hide`
+ * pattern shared by all overlay components (hx-popover, hx-tooltip, hx-dropdown). This differs from
+ * hx-dialog's `hx-open`/`hx-close`/`hx-cancel` events, which align with native `<dialog>` semantics.
+ * The distinction is intentional: overlays are transient visibility toggles, while dialog is a stateful
+ * container with cancel semantics.
+ *
  * @csspart overlay - The full-screen overlay container (includes backdrop and panel).
  * @csspart panel - The drawer panel itself.
  * @csspart header - The header region containing the title and actions.
