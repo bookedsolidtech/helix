@@ -52,13 +52,8 @@
     "hx-patient-banner": 10.0
   },
   "component_tiers": {
-    "CRITICAL": [
-      "hx-radio"
-    ],
-    "HIGH": [
-      "hx-data-table",
-      "hx-clinical-status"
-    ],
+    "CRITICAL": ["hx-radio"],
+    "HIGH": ["hx-data-table", "hx-clinical-status"],
     "MEDIUM": [
       "hx-split-button",
       "hx-combobox",
@@ -154,11 +149,7 @@
       "issue": "ariaLabel to accessibleLabel migration",
       "severity": "high",
       "affected_components": 5,
-      "affected_component_names": [
-        "hx-combobox",
-        "hx-split-button",
-        "hx-text-input"
-      ],
+      "affected_component_names": ["hx-combobox", "hx-split-button", "hx-text-input"],
       "fix": "Rename the `ariaLabel` property to `accessibleLabel` with attribute `accessible-label` (matching the hx-action-bar pattern), add backward-compat deprecation warning in the setter, and update the React types in HxSplitButton/types.ts accordingly.",
       "effort": "medium"
     },
@@ -167,11 +158,7 @@
       "issue": "hx-react event callbacks untyped",
       "severity": "high",
       "affected_components": 90,
-      "affected_component_names": [
-        "hx-alert",
-        "hx-select",
-        "hx-text-input"
-      ],
+      "affected_component_names": ["hx-alert", "hx-select", "hx-text-input"],
       "fix": "Change `const labels: Record<string, string>` to `const labels: Record<AlertVariant, string>` so TypeScript enforces all variants are handled and the `?? ''` fallback becomes unnecessary dead code.",
       "effort": "medium"
     },
@@ -180,10 +167,7 @@
       "issue": "Deprecated Wc* type aliases",
       "severity": "medium",
       "affected_components": 12,
-      "affected_component_names": [
-        "hx-switch",
-        "hx-textarea"
-      ],
+      "affected_component_names": ["hx-switch", "hx-textarea"],
       "fix": "Audit and document the intentional `Hx*`/`Wc*` re-exports. If they exist only for backward compat, add `@deprecated` JSDoc. If they are unintentional duplicates, remove them and clean up consumer callsites. Standardize on `Helix*` class names as the public API.",
       "effort": "small"
     },
@@ -192,10 +176,7 @@
       "issue": "Imperative slotchange listeners in hx-alert",
       "severity": "high",
       "affected_components": 1,
-      "affected_component_names": [
-        "hx-alert",
-        "hx-radio-group"
-      ],
+      "affected_component_names": ["hx-alert", "hx-radio-group"],
       "fix": "Convert actionsSlot and titleSlot change tracking to use @slotchange=${this._handleActionsSlotChange} bindings in the template, then use @state() booleans. Remove the imperative addEventListener calls and the corresponding stored handler references.",
       "effort": "small"
     },
@@ -204,10 +185,7 @@
       "issue": "as any casts in test files",
       "severity": "high",
       "affected_components": 2,
-      "affected_component_names": [
-        "hx-clinical-status",
-        "hx-data-table"
-      ],
+      "affected_component_names": ["hx-clinical-status", "hx-data-table"],
       "fix": "Replace `as any` casts in tests with `as unknown as HxDataTable` or use a helper like `setProperty(el, 'columns', ...)` typed with `unknown`. Alternatively define a `TestHxDataTable` interface that widens the property types to `unknown` for invalid-value testing.",
       "effort": "small"
     },
@@ -216,9 +194,7 @@
       "issue": "FormMixin adoption gap",
       "severity": "medium",
       "affected_components": 14,
-      "affected_component_names": [
-        "hx-select"
-      ],
+      "affected_component_names": ["hx-select"],
       "fix": "Systematically adopt FormMixin across all form-associated HelixElement subclasses. The mixin is already well-designed and the HelixElement base class provides the _internals accessor it relies on. Delegate implementation to lit-specialist per component.",
       "effort": "large"
     },
@@ -227,9 +203,7 @@
       "issue": "console.warn instead of devWarn",
       "severity": "high",
       "affected_components": 1,
-      "affected_component_names": [
-        "hx-toggle-button"
-      ],
+      "affected_component_names": ["hx-toggle-button"],
       "fix": "Replace console.warn('[hx-toggle-button] ...') with devWarn('hx-toggle-button', '...') to match the library-wide pattern.",
       "effort": "small"
     },
@@ -238,9 +212,7 @@
       "issue": "hx-radio-group redundant role=radiogroup on fieldset",
       "severity": "high",
       "affected_components": 1,
-      "affected_component_names": [
-        "hx-radio-group"
-      ],
+      "affected_component_names": ["hx-radio-group"],
       "fix": "Remove role='radiogroup' from the <fieldset> element and rely on the native fieldset + legend relationship. If a non-fieldset wrapper is desired, replace with a <div role='radiogroup'> and a separate <legend>/<span> as the accessible label.",
       "effort": "small"
     }
@@ -270,9 +242,7 @@
       "priority": 2,
       "agent_owner": "lit-specialist",
       "task": "Fix hx-radio CRITICAL: extend HelixElement, replace connectedCallback direct setAttribute calls with reactive property bindings in updated(). This is the only CRITICAL-tier component.",
-      "components": [
-        "hx-radio"
-      ],
+      "components": ["hx-radio"],
       "rationale": "Score 1.0 \u2014 only CRITICAL component. Extends LitElement AND uses raw setAttribute for ARIA management, bypassing Lit's reactive system entirely. Direct patient-facing accessibility risk."
     },
     {
@@ -358,31 +328,21 @@
       "priority": 8,
       "agent_owner": "lit-specialist",
       "task": "Fix hx-alert: (1) Convert imperative slotchange listeners in firstUpdated() to @slotchange template bindings. (2) Replace nested Promise.resolve().then() microtask chain with this.updateComplete.then() for announcer injection. (3) Migrate to extend HelixElement (covered by P1 but validate separately).",
-      "components": [
-        "hx-alert"
-      ],
+      "components": ["hx-alert"],
       "rationale": "hx-alert has 3 independent Lit anti-patterns confirmed by both lit-specialist and senior-code-reviewer. Score 6.58 is dragged down by two HIGH-severity lit-patterns findings. Alert is a high-traffic accessibility-critical component."
     },
     {
       "priority": 9,
       "agent_owner": "lit-specialist",
       "task": "Fix hx-toggle-button: replace console.warn with devWarn() utility. Fix hx-time-picker: replace private static _instanceCount with createIdCounter() module-scoped counter. Fix hx-select: remove empty connectedCallback override. Fix hx-radio-group: remove redundant role=radiogroup from fieldset element.",
-      "components": [
-        "hx-toggle-button",
-        "hx-time-picker",
-        "hx-select",
-        "hx-radio-group"
-      ],
+      "components": ["hx-toggle-button", "hx-time-picker", "hx-select", "hx-radio-group"],
       "rationale": "Small-effort targeted fixes for isolated anti-patterns. hx-time-picker ID counter breaks test isolation (resetIdCounter() not supported). hx-radio-group fieldset role override may confuse assistive technologies."
     },
     {
       "priority": 10,
       "agent_owner": "typescript-specialist",
       "task": "Add @deprecated JSDoc markers to all Wc* barrel re-exports in hx-library/src/index.ts. Remove the typo'd AriadDelegationMixinInterface alias from mixins/index.ts. Set removal target at 4.0.0 in CHANGELOG. Add a lint rule to block new Wc* or Ariad* exports.",
-      "components": [
-        "hx-library/src/index.ts",
-        "hx-library/src/mixins/index.ts"
-      ],
+      "components": ["hx-library/src/index.ts", "hx-library/src/mixins/index.ts"],
       "rationale": "9+ deprecated Wc* type aliases have no @deprecated signal for consumers. The AriadDelegationMixinInterface typo is a public API defect. Small-effort cleanup that prevents accumulating permanent maintenance debt."
     }
   ],

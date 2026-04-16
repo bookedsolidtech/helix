@@ -200,12 +200,7 @@
     "hx-popover": 6.0
   },
   "component_tiers_merged": {
-    "CRITICAL": [
-      "hx-code-snippet",
-      "hx-copy-button",
-      "hx-radio",
-      "hx-structured-list"
-    ],
+    "CRITICAL": ["hx-code-snippet", "hx-copy-button", "hx-radio", "hx-structured-list"],
     "HIGH": [
       "hx-banner",
       "hx-clinical-status",
@@ -290,9 +285,7 @@
       "detail": "coverage-config.json declares a 95% threshold but explicitly exempts 76 of ~80 components, making the coverage gate effectively decorative. 0% lines coverage confirmed for hx-overflow-menu, hx-rating, hx-toast, hx-code-snippet, hx-copy-button. 18 form-associated components lack any ElementInternals lifecycle test (setFormValue, formResetCallback, formStateRestoreCallback).",
       "fix": "Remove blanket exemptions on a rolling schedule (max 5 per sprint). Create a shared form-integration test helper exercised from every form-associated component test. Bind exemption removal to qa-engineer-automation feature tickets.",
       "effort": "large",
-      "agents": [
-        "test-architect"
-      ]
+      "agents": ["test-architect"]
     },
     {
       "rank": 2,
@@ -302,9 +295,7 @@
       "detail": "13 undefined CSS custom property references identified by design-system-developer, across 4 categories: (1) overlay-white steps 15, 25, 50, 70 \u2014 3+ components; (2) size scale gaps: size-1, size-1-5, size-3, size-3-5, size-4-5, size-5-5, size-6-5 \u2014 used in hx-switch and hx-slider; (3) space scale gaps: space-0-5, space-1-5 \u2014 8+ components; (4) duration-spinner and opacity-muted \u2014 4 components. Touch-target naming split (--hx-touch-target-min vs --hx-size-touch-target) affects 18+ components. All fall back to hardcoded values \u2014 theming is silently broken for these properties.",
       "fix": "Single tokens.json patch PR adding all missing tokens before 3.0.0 release. See design-system-developer recommendations for exact values. Treat as pre-release blocker.",
       "effort": "small",
-      "agents": [
-        "design-system-developer"
-      ]
+      "agents": ["design-system-developer"]
     },
     {
       "rank": 3,
@@ -314,9 +305,7 @@
       "detail": "hx-patient-banner has no meaningful tests (coverage-config.json: 'tests to be added'). hx-phi-field is skeleton-only. Neither has axe-core checkA11y() calls. In a healthcare context these are patient safety and regulatory compliance gaps \u2014 hx-phi-field controls PHI masking behavior (reveal/mask toggle, live-region announcement, screen-reader accessibility of masked state), and hx-patient-banner is the primary patient identification UI surface.",
       "fix": "Treat as P0 test creation: hx-patient-banner needs slot rendering, DOB/MRN display, allergy alert, PHI redaction mode, and axe-core. hx-phi-field needs masked default, toggle reveal, aria-label on toggle state, live region announcement, and confirmation masked state hides PHI from accessibility tree.",
       "effort": "medium",
-      "agents": [
-        "test-architect"
-      ]
+      "agents": ["test-architect"]
     },
     {
       "rank": 4,
@@ -325,9 +314,7 @@
       "detail": "performance-engineer measured the full Vite dist bundle (all 80+ components + shared chunks) at approximately 295 KB gzip, which is 5.8x the 50 KB budget documented in bundle-budgets.json. Root cause is a metric definition ambiguity: the 50 KB budget applies to the esbuild per-component analysis script output (externalized Lit), not to the Vite dist full-bundle artifact. However, no CI gate enforces either measurement against the Vite output. Additionally, the CDN build strategy (build-cdn.mjs Strategy A) loads all components synchronously \u2014 no lazy-loading infrastructure exists for the Drupal CDN path. This is not purely a documentation gap: consumers using the full CDN bundle are loading 295 KB on every page regardless of which components are used.",
       "fix": "(1) Document which artifact the 50 KB budget applies to and add an automated size-limit check against dist/index.js + shared chunks in CI. (2) Publish Drupal-specific lazy-loading pattern using Strategy B (per-component CDN files) with IntersectionObserver. (3) Provide a withLazyRegistration() helper or lazy entry point for the 4 heaviest overlay components (hx-dialog, hx-drawer, hx-color-picker, hx-date-picker = ~21 KB gzip combined).",
       "effort": "medium",
-      "agents": [
-        "performance-engineer"
-      ]
+      "agents": ["performance-engineer"]
     },
     {
       "rank": 5,
@@ -337,9 +324,7 @@
       "detail": "sideEffects in package.json marks all component index files as side-effectful, blocking tree-shaking for consumers importing from the barrel. document-token-adoption.js executes at module evaluation time via a bare import in src/index.ts, causing document.adoptedStyleSheets mutation as a side effect of any named import from @helixui/library \u2014 including in SSR and test environments. 100 per-component re-imports of document-token-adoption create wide side-effect surface for non-Vite consumer bundlers.",
       "fix": "Narrow sideEffects to ['./dist/utilities/document-token-adoption.js', '**/*.css']. Wrap the bare import in src/index.ts with a typeof document guard or move auto-invocation to a separate entry point.",
       "effort": "small",
-      "agents": [
-        "performance-engineer"
-      ]
+      "agents": ["performance-engineer"]
     },
     {
       "rank": 6,
@@ -349,9 +334,7 @@
       "detail": "18 form-associated components identified (hx-button, hx-checkbox, hx-checkbox-group, hx-color-picker, hx-combobox, hx-date-picker, hx-file-upload, hx-icon-button, hx-number-input, hx-radio-group, hx-rating, hx-select, hx-slider, hx-switch, hx-text-input, hx-textarea, hx-time-picker, hx-toggle-button). None have a comprehensive form integration test exercising the full ElementInternals lifecycle. hx-combobox, hx-date-picker, hx-file-upload are marked critical by test-architect for skeleton-only coverage despite being high-frequency healthcare workflow components.",
       "fix": "Create shared form-integration test helper (real <form> element, submit, verify FormData, reset, verify clearing). Assign to qa-engineer-automation as a batch feature targeting all 18 components.",
       "effort": "large",
-      "agents": [
-        "test-architect"
-      ]
+      "agents": ["test-architect"]
     },
     {
       "rank": 7,
@@ -361,10 +344,7 @@
       "detail": "DISCREPANCY NOTE: accessibility-engineer assessed forced-colors as 'inconsistent across the library' (score: 5/10, severity: high) claiming the majority of components are missing it, citing hx-button, hx-select, hx-combobox, hx-slider, and others. design-system-developer found @media (forced-colors: active) blocks present in all 15 interactive components it audited (hx-button, hx-card, hx-alert, hx-text-input, hx-number-input, hx-select, hx-checkbox, hx-switch, hx-tabs, hx-side-nav, hx-top-nav, hx-slider, hx-toast, hx-dialog) and rated global forced-colors support as 8/10. Root cause of discrepancy: both agents evaluated different component sample sets. The 47 components NOT reviewed by either agent likely have inconsistent coverage. Consensus estimate: ~15 of 80 components confirmed to have forced-colors blocks; the remaining ~65 are unverified. Actual coverage is likely 30-50%, not the 80%+ implied by DSD or the <20% implied by a11y-engineer.",
       "fix": "Conduct a library-wide forced-colors audit covering all 80 components. Each interactive component must: (1) use outline not box-shadow for focus rings (box-shadow ignored in forced-colors mode), (2) use system color keywords (ButtonText, HighlightText, CanvasText), (3) not rely solely on background-color to communicate state.",
       "effort": "large",
-      "agents": [
-        "accessibility-engineer",
-        "design-system-developer"
-      ]
+      "agents": ["accessibility-engineer", "design-system-developer"]
     },
     {
       "rank": 8,
@@ -374,9 +354,7 @@
       "detail": "hx-date-picker has 4 compounding render-performance issues: (1) _getDaysInGrid() allocates 42 Date objects per render with no memoization, called on every @state change including focus events; (2) inline arrow function click handlers in _renderDayGrid() create 42 closures per render; (3) toLocaleDateString() called inline per render for each day aria-label (up to 42 format calls per render); (4) setFormValue and _updateValidity run in updated() (post-paint) instead of willUpdate(). In healthcare appointment scheduling contexts this component is used at high frequency.",
       "fix": "Move grid computation to willUpdate() with changedProperties-gated cache invalidation. Use a delegated click handler at grid level (read data-day from event target). Memoize day aria-labels. Move setFormValue/updateValidity to willUpdate().",
       "effort": "medium",
-      "agents": [
-        "performance-engineer"
-      ]
+      "agents": ["performance-engineer"]
     },
     {
       "rank": 9,
@@ -386,9 +364,7 @@
       "detail": "Multiple components have hardcoded fallback hex values that do not match the corresponding token values in tokens.json: hx-alert info-500 fallback #3b82f6 (token: #0284C7), hx-alert info-800 fallback #1a3a4a (token: #0C4A6E), hx-toast success-600 fallback #16a34a (token: #15803D), hx-toast warning-500 fallback #f59e0b (token: #D97706), hx-badge warning-500 fallback #eab308 (token: #D97706). These cause subtle visual discrepancies when token sheets fail to load (network failure, SSR, test environments).",
       "fix": "Run a systematic audit of all hardcoded fallback values against tokens.json. Add a CI check validating fallback hex values match the parent token definition value. Update the 5 confirmed mismatches immediately.",
       "effort": "small",
-      "agents": [
-        "design-system-developer"
-      ]
+      "agents": ["design-system-developer"]
     },
     {
       "rank": 10,
@@ -398,9 +374,7 @@
       "detail": "hx-color-picker calls explicit requestUpdate() inside _updateGridFromPointer(), _updateHueFromPointer(), and _updateOpacityFromPointer() after assigning to @state fields \u2014 double-scheduling on every pointermove event during drag. Additionally, _hueColor() and _previewColor() are plain methods called in render() that recompute HSV-to-RGB conversion at pointer-move frequency rather than being cached in willUpdate(). hx-counter uses requestUpdate() in an animation loop without confirming that the @state increment alone would schedule updates.",
       "fix": "Remove explicit requestUpdate() calls where @state assignment already schedules updates. Move _hueColor()/_previewColor() computations to willUpdate(). Combine styleMap updates into a single call.",
       "effort": "small",
-      "agents": [
-        "performance-engineer"
-      ]
+      "agents": ["performance-engineer"]
     }
   ],
   "phase4_additions": [
@@ -408,10 +382,7 @@
       "priority": "G2-1",
       "agent_owner": "qa-engineer-automation",
       "task": "Create comprehensive test files for hx-patient-banner and hx-phi-field as absolute P0 healthcare-mandated coverage. hx-patient-banner: slot rendering, DOB/MRN display, allergy alert visibility, PHI redaction mode, axe-core WCAG 2.1 AA. hx-phi-field: masked default state, toggle reveals PHI, aria-label updates on toggle, live region announces state change, masked state does not expose PHI to accessibility tree, axe-core both masked and revealed states.",
-      "components": [
-        "hx-patient-banner",
-        "hx-phi-field"
-      ],
+      "components": ["hx-patient-banner", "hx-phi-field"],
       "rationale": "Both components are zero-tested healthcare-specific UI. PHI masking with no accessibility test is a patient privacy and regulatory risk. Patient banner is the primary patient identification surface \u2014 screen-reader inaccessibility is a clinical safety gap.",
       "priority_basis": "healthcare-mandate"
     },
@@ -463,13 +434,7 @@
       "priority": "G2-4",
       "agent_owner": "performance-engineer",
       "task": "Resolve CDN bundle budget ambiguity: (1) Document in bundle-budgets.json which artifact the 50 KB budget applies to (esbuild analysis script vs Vite dist). (2) Add CI automated size-limit check against dist/index.js + all shared chunks. (3) Publish lazy-loading pattern in Drupal integration docs using Strategy B (per-component CDN files + IntersectionObserver). (4) Implement or document a withLazyRegistration() pattern for hx-dialog, hx-drawer, hx-color-picker, hx-date-picker.",
-      "components": [
-        "library",
-        "hx-dialog",
-        "hx-drawer",
-        "hx-color-picker",
-        "hx-date-picker"
-      ],
+      "components": ["library", "hx-dialog", "hx-drawer", "hx-color-picker", "hx-date-picker"],
       "rationale": "295 KB gzip CDN full bundle with no lazy-loading means every Drupal page loads the full library regardless of component usage. The heaviest 4 components (modal/overlay) are universally off-screen on load and ideal IntersectionObserver candidates.",
       "priority_basis": "performance-gate"
     },
@@ -477,9 +442,7 @@
       "priority": "G2-5",
       "agent_owner": "accessibility-engineer",
       "task": "Conduct a library-wide forced-colors audit covering all 80 components (the 15 confirmed by DSD + the 65 unverified). Produce a component-by-component forced-colors compliance matrix. For each non-compliant component: (1) replace box-shadow focus rings with outline, (2) apply ButtonText/HighlightText/CanvasText system keywords, (3) ensure state (checked, selected, active, error) is not communicated solely via background-color.",
-      "components": [
-        "library-wide"
-      ],
+      "components": ["library-wide"],
       "rationale": "Forced-colors support is a WCAG 2.1 1.4.11 requirement and critical for healthcare users in Windows High Contrast mode. The discrepancy between the two agent assessments (covering different sample sets) leaves ~65 components unverified. The consensus estimate is ~30-50% actual coverage.",
       "priority_basis": "wcag-2.1-aa-mandate"
     },
@@ -487,9 +450,7 @@
       "priority": "G2-6",
       "agent_owner": "performance-engineer",
       "task": "Optimize hx-date-picker render performance: move _getDaysInGrid() to willUpdate() with changedProperties-gated cache invalidation (_viewYear, _viewMonth, value only). Replace 42 inline click closures in _renderDayGrid() with a delegated click handler reading data-day from event target. Memoize day aria-labels. Move setFormValue/updateValidity calls from updated() to willUpdate().",
-      "components": [
-        "hx-date-picker"
-      ],
+      "components": ["hx-date-picker"],
       "rationale": "Four compounding render-performance issues cause up to 42 closure allocations and 42 toLocaleDateString() calls per focus keystroke. This component is used at high frequency in healthcare appointment scheduling.",
       "priority_basis": "performance-healthcare"
     },
@@ -497,9 +458,7 @@
       "priority": "G2-7",
       "agent_owner": "performance-engineer",
       "task": "Fix tree-shaking side-effect surface: (1) Narrow sideEffects in package.json to ['./dist/utilities/document-token-adoption.js', '**/*.css']. (2) Wrap bare import of document-token-adoption in src/index.ts with typeof document guard or move to a separate side-effect entry point.",
-      "components": [
-        "library"
-      ],
+      "components": ["library"],
       "rationale": "Current sideEffects config prevents tree-shaking for any barrel import consumer. The bare document.adoptedStyleSheets mutation at module evaluation time causes issues in SSR and test environments.",
       "priority_basis": "dx-correctness"
     },
