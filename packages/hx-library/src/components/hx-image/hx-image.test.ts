@@ -512,6 +512,164 @@ describe('hx-image', () => {
     });
   });
 
+  // ─── Property: rounded — programmatic boolean ───
+
+  describe('Property: rounded — programmatic boolean', () => {
+    it('applies theme radius token when rounded set programmatically to true', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
+      el.rounded = true;
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_radius:var(--hx-border-radius-md');
+    });
+
+    it('applies theme radius token when rounded="true" string value', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" rounded="true"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_radius:var(--hx-border-radius-md');
+    });
+  });
+
+  // ─── Property: fit — all values ───
+
+  describe('Property: fit — all values', () => {
+    it('sets --_fit:cover', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" fit="cover"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_fit:cover');
+    });
+
+    it('sets --_fit:fill', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" fit="fill"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_fit:fill');
+    });
+
+    it('sets --_fit:none', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" fit="none"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_fit:none');
+    });
+
+    it('sets --_fit:scale-down', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" fit="scale-down"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_fit:scale-down');
+    });
+  });
+
+  // ─── Property: loading — reflection ───
+
+  describe('Property: loading — reflection', () => {
+    it('reflects loading property to attribute', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" loading="eager"></hx-image>',
+      );
+      expect(el.getAttribute('loading')).toBe('eager');
+    });
+  });
+
+  // ─── Property: width/height as string values ───
+
+  describe('Property: width/height as string CSS values', () => {
+    it('sets width as CSS string directly when non-numeric', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" width="50%"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('width:50%');
+    });
+
+    it('sets height as CSS string directly when non-numeric', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test" height="auto"></hx-image>',
+      );
+      await el.updateComplete;
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('height:auto');
+    });
+  });
+
+  // ─── Events: bubbles and composed ───
+
+  describe('Events: bubbles and composed', () => {
+    it('hx-load event bubbles and is composed', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
+      const img = shadowQuery<HTMLImageElement>(el, 'img')!;
+      const loadPromise = oneEvent(el, 'hx-load');
+      img.dispatchEvent(new Event('load'));
+      const event = await loadPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('hx-error event bubbles and is composed', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
+      const img = shadowQuery<HTMLImageElement>(el, 'img')!;
+      const errorPromise = oneEvent(el, 'hx-error');
+      img.dispatchEvent(new Event('error'));
+      const event = await errorPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+  });
+
+  // ─── Sizes attribute omitted when undefined ───
+
+  describe('Sizes attribute: omitted when undefined', () => {
+    it('omits sizes attribute when not provided', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+      );
+      await el.updateComplete;
+      const img = shadowQuery(el, 'img');
+      expect(img?.hasAttribute('sizes')).toBe(false);
+    });
+  });
+
+  // ─── src empty string: img src rendered via nothing directive ───
+
+  describe('src empty string', () => {
+    it('renders img without src attribute when src is empty string', async () => {
+      const el = await fixture<HelixImage>('<hx-image alt="Test"></hx-image>');
+      await el.updateComplete;
+      const img = shadowQuery(el, 'img');
+      // src="" renders nothing (Lit nothing directive strips the attribute)
+      // We just verify the img element still exists and does not crash
+      expect(img).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {

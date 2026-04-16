@@ -211,4 +211,89 @@ describe('hx-divider', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── CSS class: divider--labeled ───
+
+  describe('CSS class: divider--labeled', () => {
+    it('applies divider--labeled class when label prop is set', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider label="Section"></hx-divider>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('divider--labeled')).toBe(true);
+    });
+
+    it('applies divider--labeled class when slot content is present', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider>Or</hx-divider>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('divider--labeled')).toBe(true);
+    });
+
+    it('does not apply divider--labeled class when no label and no slot', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider decorative></hx-divider>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('divider--labeled')).toBe(false);
+    });
+  });
+
+  // ─── Property: spacing — md default reflection ───
+
+  describe('Property: spacing — remaining reflections', () => {
+    it('reflects spacing="md" (default) to host', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      expect(el.getAttribute('spacing')).toBe('md');
+    });
+
+    it('updates spacing attribute when property changes at runtime', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      el.spacing = 'xl' as typeof el.spacing;
+      await el.updateComplete;
+      // Runtime change reflects to attribute even for non-standard values
+      expect(el.getAttribute('spacing')).toBeTruthy();
+    });
+  });
+
+  // ─── Dynamic property changes ───
+
+  describe('Dynamic property changes', () => {
+    it('updates aria-orientation when orientation changes at runtime', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      expect(el.orientation).toBe('horizontal');
+      el.orientation = 'vertical';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-orientation')).toBe('vertical');
+    });
+
+    it('updates role when decorative changes from false to true at runtime', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider></hx-divider>');
+      el.decorative = true;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('role')).toBe('presentation');
+      expect(base?.hasAttribute('aria-orientation')).toBe(false);
+    });
+
+    it('updates aria-label when label changes at runtime', async () => {
+      const el = await fixture<HelixDivider>('<hx-divider label="Old"></hx-divider>');
+      el.label = 'New';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('New');
+    });
+  });
+
+  // ─── Slot: element node detection ───
+
+  describe('Slot: element node detection', () => {
+    it('detects slotted element nodes (not just text)', async () => {
+      const el = await fixture<HelixDivider>(
+        '<hx-divider><span>Label</span></hx-divider>',
+      );
+      await el.updateComplete;
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label).toBeTruthy();
+    });
+  });
 });

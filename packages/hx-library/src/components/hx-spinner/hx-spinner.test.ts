@@ -243,6 +243,66 @@ describe('hx-spinner', () => {
     });
   });
 
+  // ─── Custom size inline style ───
+
+  describe('Custom size inline style', () => {
+    it('applies --_spinner-size style for custom CSS size string', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="3rem"></hx-spinner>');
+      await el.updateComplete;
+      const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
+      expect(base?.style.getPropertyValue('--_spinner-size')).toBe('3rem');
+    });
+
+    it('does NOT apply --_spinner-size for token size "sm"', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="sm"></hx-spinner>');
+      await el.updateComplete;
+      const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
+      expect(base?.style.getPropertyValue('--_spinner-size')).toBe('');
+    });
+
+    it('does NOT apply --_spinner-size for token size "md"', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      await el.updateComplete;
+      const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
+      expect(base?.style.getPropertyValue('--_spinner-size')).toBe('');
+    });
+
+    it('does NOT apply --_spinner-size for token size "lg"', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner hx-size="lg"></hx-spinner>');
+      await el.updateComplete;
+      const base = shadowQuery<HTMLElement>(el, '[part~="base"]');
+      expect(base?.style.getPropertyValue('--_spinner-size')).toBe('');
+    });
+  });
+
+  // ─── Base element structure ───
+
+  describe('Base element structure', () => {
+    it('base element is a <div>', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.tagName.toLowerCase()).toBe('div');
+    });
+
+    it('SVG has focusable="false" attribute', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const svg = shadowQuery(el, 'svg');
+      expect(svg?.getAttribute('focusable')).toBe('false');
+    });
+
+    it('SVG contains a circle.spinner__track element', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const track = shadowQuery(el, '.spinner__track');
+      expect(track).toBeTruthy();
+    });
+
+    it('SVG contains a path.spinner__arc element', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const arc = shadowQuery(el, '.spinner__arc');
+      expect(arc).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

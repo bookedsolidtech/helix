@@ -113,11 +113,6 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-divider": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-drawer": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
@@ -153,27 +148,12 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-grid": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-help-text": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-icon": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-icon-button": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-image": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
@@ -243,11 +223,6 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-prose": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-radio-group": {
       "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
@@ -263,18 +238,8 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-skeleton": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
     "hx-slider": {
       "reason": "SSR browser API guards added \u2014 coverage below threshold. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-spinner": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -285,11 +250,6 @@
     },
     "hx-split-panel": {
       "reason": "Drag-to-resize pointer event coverage requires additional gesture simulation.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    },
-    "hx-stack": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
@@ -383,10 +343,5 @@
       "remediationDate": "2026-06-30",
       "issue": "https://github.com/bookedsolidtech/helix/issues"
     },
-    "hx-visually-hidden": {
-      "reason": "Skeleton test only \u2014 no meaningful coverage. Requires test expansion.",
-      "remediationDate": "2026-06-30",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
-    }
   }
 }
