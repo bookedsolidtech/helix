@@ -2,5 +2,42 @@
   "comment": "Per-component bundle size budgets for @helixui/library (gzipped bytes, measured from dist/). Override per-component with the overrides map. Changes require code review.",
   "perComponent": 5120,
   "total": 51200,
-  "overrides": {}
+  "overrides": {
+    "hx-date-picker": {
+      "budget": 8192,
+      "reason": "Complex widget: calendar grid, date parsing, keyboard navigation, localization. Shared positioning logic is a candidate for extraction."
+    },
+    "hx-color-picker": {
+      "budget": 7168,
+      "reason": "Complex widget: gradient canvas, hue/opacity sliders, format conversion (hex/rgb/hsl), swatch management."
+    },
+    "hx-combobox": {
+      "budget": 7168,
+      "reason": "Complex widget: typeahead filtering, multi-select chip management, keyboard listbox navigation, async loading."
+    },
+    "hx-select": {
+      "budget": 6656,
+      "reason": "Complex widget: custom listbox rendering, keyboard navigation, form participation, grouped options."
+    },
+    "hx-time-picker": {
+      "budget": 6144,
+      "reason": "Complex widget: time parsing, 12/24h format, step intervals, keyboard-navigable listbox."
+    },
+    "hx-tree-view": {
+      "budget": 6144,
+      "reason": "Complex widget: recursive tree rendering, multi-select, keyboard arrow navigation, lazy loading."
+    },
+    "hx-form": {
+      "budget": 6144,
+      "reason": "Form orchestration: ElementInternals aggregation, cross-field validation, FormData construction."
+    },
+    "hx-nav": {
+      "budget": 6144,
+      "reason": "Complex widget: responsive breakpoints, nested submenus, keyboard navigation, mobile collapse."
+    },
+    "hx-file-upload": {
+      "budget": 5888,
+      "reason": "Complex widget: drag-and-drop, file validation, progress tracking, multi-file management."
+    }
+  }
 }

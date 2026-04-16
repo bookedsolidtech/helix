@@ -6,6 +6,8 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
+// PERF: hx-date-picker exceeds 5KB budget (7.98kb gzipped) -- calendar grid, date parsing, keyboard navigation, localization
+
 const _nextDatePickerId = createIdCounter('hx-date-picker');
 
 /**

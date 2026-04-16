@@ -7,6 +7,8 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
 
+// PERF: hx-combobox exceeds 5KB budget (6.87kb gzipped) -- typeahead filtering, multi-select chips, async loading
+
 // ─── Internal option model ───
 
 // P1-7: Exported so TypeScript consumers can type option arrays programmatically

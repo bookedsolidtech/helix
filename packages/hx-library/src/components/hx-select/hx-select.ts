@@ -8,6 +8,8 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
+// PERF: hx-select exceeds 5KB budget (6.31kb gzipped) -- custom listbox, keyboard navigation, grouped options
+
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 const _nextSelectId = createIdCounter('hx-select');
 
