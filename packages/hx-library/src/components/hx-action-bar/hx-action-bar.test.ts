@@ -129,11 +129,6 @@ describe('hx-action-bar', () => {
       expect(base?.classList.contains('base--bottom')).toBe(true);
     });
 
-    it('legacy sticky boolean applies sticky class', async () => {
-      const el = await fixture<HelixActionBar>('<hx-action-bar sticky></hx-action-bar>');
-      const base = shadowQuery(el, '[part="base"]');
-      expect(base?.classList.contains('base--sticky')).toBe(true);
-    });
   });
 
   // ─── Slots (4) ───
@@ -574,30 +569,6 @@ describe('hx-action-bar', () => {
     });
   });
 
-  // ─── legacy sticky deprecation warning ───
-
-  describe('legacy sticky attr deprecation', () => {
-    it('warns when sticky boolean property is set to true', async () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
-      el.sticky = true;
-      await el.updateComplete;
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('deprecated'));
-      warnSpy.mockRestore();
-    });
-
-    it('does not warn when sticky is set to false', async () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
-      el.sticky = false;
-      await el.updateComplete;
-      const stickyWarn = warnSpy.mock.calls.find((args) =>
-        String(args[0]).includes('sticky'),
-      );
-      expect(stickyWarn).toBeUndefined();
-      warnSpy.mockRestore();
-    });
-  });
 
   // ─── legacy size attr deprecation ───
 

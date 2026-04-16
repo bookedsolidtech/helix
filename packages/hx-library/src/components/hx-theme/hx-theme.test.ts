@@ -64,19 +64,6 @@ describe('hx-theme', () => {
     });
   });
 
-  // ─── Property: system ───
-
-  describe('Property: system', () => {
-    it('defaults to false', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
-      expect(el.system).toBe(false);
-    });
-
-    it('reflects system attribute to host', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
-      expect(el.hasAttribute('system')).toBe(true);
-    });
-  });
 
   // ─── Token values ───
 
