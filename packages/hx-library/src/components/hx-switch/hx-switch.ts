@@ -1,9 +1,12 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
+
+const _nextSwitchId = createIdCounter('hx-switch');
 
 /**
  * A toggle switch component for on/off states.
@@ -40,27 +43,13 @@ import { helixSwitchStyles } from './hx-switch.styles.js';
  * @cssprop [--hx-switch-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-switch')
-export class HelixSwitch extends LitElement {
+export class HelixSwitch extends HelixElement {
   static override styles = [helixSwitchStyles];
-
-  /** Monotonic counter for deterministic, unique IDs across instances. */
-  /** @internal */
-  private static _instanceCounter = 0;
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** ElementInternals instance for form association, validation, and ARIA. */
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -89,14 +78,14 @@ export class HelixSwitch extends LitElement {
    * The name of the switch, used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
    * The value submitted when the switch is checked.
    * @attr value
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   value = 'on';
 
   /**
@@ -149,18 +138,13 @@ export class HelixSwitch extends LitElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
   /** Returns the validation message. */
-  get validationMessage(): string {
+  override get validationMessage(): string {
     return this._internals.validationMessage;
   }
 
   /** Returns the ValidityState object. */
-  get validity(): ValidityState {
+  override get validity(): ValidityState {
     return this._internals.validity;
   }
 
@@ -188,21 +172,21 @@ export class HelixSwitch extends LitElement {
     }
   }
 
-  /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.checked = false;
     this._internals.setFormValue(null);
   }
 
-  /** @internal */
-  formStateRestoreCallback(state: File | string | null, _mode: 'restore' | 'autocomplete'): void {
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
+  ): void {
     if (typeof state === 'string') {
       this.checked = state === this.value;
     }
   }
 
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -278,7 +262,7 @@ export class HelixSwitch extends LitElement {
 
   /** Unique ID for this switch instance, used for ARIA associations. */
   /** @internal */
-  private _switchId = `hx-switch-${++HelixSwitch._instanceCounter}`;
+  private _switchId = _nextSwitchId();
   /** ID for the label element, referenced by aria-labelledby. */
   /** @internal */
   private _labelId = `${this._switchId}-label`;
@@ -361,6 +345,9 @@ export class HelixSwitch extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-switch': HelixSwitch;
+  }
+  interface HTMLElementEventMap {
+    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

@@ -126,4 +126,17 @@ export const helixStatusIndicatorStyles = css`
   :host([status='unknown']) {
     --_dot-color: var(--hx-status-indicator-color-unknown, var(--hx-color-neutral-300));
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .indicator__dot {
+      forced-color-adjust: none;
+      border: 2px solid CanvasText;
+    }
+
+    .indicator__pulse-ring {
+      display: none;
+    }
+  }
 `;

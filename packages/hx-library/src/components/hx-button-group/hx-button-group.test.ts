@@ -305,15 +305,13 @@ describe('hx-button-group', () => {
   // ─── Accessibility (5) ───
 
   describe('Accessibility', () => {
-    it('uses ElementInternals for role (no explicit role attribute on host or wrapper)', async () => {
+    it('sets role="group" on the host element', async () => {
       const el = await fixture<HelixButtonGroup>(`
         <hx-button-group>
           <hx-button variant="secondary">Button</hx-button>
         </hx-button-group>
       `);
-      expect(el.getAttribute('role')).toBeNull();
-      const wrapper = shadowQuery(el, '[part="group"]');
-      expect(wrapper?.hasAttribute('role')).toBe(false);
+      expect(el.getAttribute('role')).toBe('group');
     });
 
     it('has no axe violations in default state', async () => {

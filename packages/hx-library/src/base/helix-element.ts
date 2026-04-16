@@ -155,11 +155,10 @@ export class HelixElement extends LitElement {
    * @internal
    */
   get form(): HTMLFormElement | null {
-    const internals = this.#internals;
-    if (!(this.constructor as typeof HelixElement).formAssociated || internals === undefined) {
+    if (!(this.constructor as typeof HelixElement).formAssociated) {
       return null;
     }
-    return internals.form;
+    return this._internals.form;
   }
 
   /**
@@ -172,11 +171,10 @@ export class HelixElement extends LitElement {
    * @internal
    */
   get validity(): ValidityState | null {
-    const internals = this.#internals;
-    if (!(this.constructor as typeof HelixElement).formAssociated || internals === undefined) {
+    if (!(this.constructor as typeof HelixElement).formAssociated) {
       return null;
     }
-    return internals.validity;
+    return this._internals.validity;
   }
 
   /**
@@ -186,10 +184,9 @@ export class HelixElement extends LitElement {
    * @internal
    */
   get validationMessage(): string {
-    const internals = this.#internals;
-    if (!(this.constructor as typeof HelixElement).formAssociated || internals === undefined) {
+    if (!(this.constructor as typeof HelixElement).formAssociated) {
       return '';
     }
-    return internals.validationMessage;
+    return this._internals.validationMessage;
   }
 }

@@ -260,7 +260,7 @@ export const AccessibilityLabel: Story = {
         >
           Always provide <code>aria-label</code> for screen reader context:
         </p>
-        <hx-button-group aria-label="Text formatting">
+        <hx-button-group label="Text formatting">
           <hx-button variant="secondary">Bold</hx-button>
           <hx-button variant="secondary">Italic</hx-button>
           <hx-button variant="secondary">Underline</hx-button>
@@ -282,7 +282,7 @@ export const AccessibilityLabel: Story = {
   play: async ({ canvasElement }) => {
     const groups = canvasElement.querySelectorAll('hx-button-group');
     await expect(groups.length).toBe(2);
-    await expect(groups[0].getAttribute('aria-label')).toBe('Text formatting');
+    await expect(groups[0].getAttribute('label')).toBe('Text formatting');
     await expect(groups[1].getAttribute('label')).toBe('Record actions');
   },
 };

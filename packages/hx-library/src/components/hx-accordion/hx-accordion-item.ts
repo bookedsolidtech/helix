@@ -2,6 +2,7 @@ import { LitElement, html, svg, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -21,6 +22,8 @@ const chevronIcon = svg`
     <polyline points="6 9 12 15 18 9"></polyline>
   </svg>
 `;
+
+const _nextAccordionItemId = createIdCounter('hx-accordion-item');
 
 /**
  * An individual accordion item with collapsible content.
@@ -58,9 +61,7 @@ export class HelixAccordionItem extends LitElement {
   static override styles = [helixAccordionItemStyles];
 
   /** @internal */
-  private static _counter = 0;
-  /** @internal */
-  private _uid = `hx-accordion-item-${++HelixAccordionItem._counter}`;
+  private _uid = _nextAccordionItemId();
 
   /**
    * Whether this item is expanded.

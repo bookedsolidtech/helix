@@ -168,4 +168,18 @@ export const helixSplitPanelStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .divider {
+      background-color: CanvasText;
+    }
+
+    .collapse-btn {
+      border-color: ButtonText;
+      color: ButtonText;
+      background: Canvas;
+    }
+  }
 `;

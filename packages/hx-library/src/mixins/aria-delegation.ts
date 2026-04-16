@@ -71,7 +71,10 @@ type LitElementConstructor = new (...args: any[]) => LitElement;
  * JS property accessors for all intercepted ARIA attributes, reading from
  * `data-aria-*` storage rather than `aria-*` attributes on the host.
  */
-export interface AriadDelegationMixinInterface {
+/** @deprecated Use AriaDelegationMixinInterface instead */
+export type AriadDelegationMixinInterface = AriaDelegationMixinInterface;
+
+export interface AriaDelegationMixinInterface {
   ariaActiveDescendant: string | null;
   ariaAtomic: string | null;
   ariaAutoComplete: string | null;
@@ -153,7 +156,7 @@ export interface AriadDelegationMixinInterface {
  * @returns A new constructor extending Base with ARIA delegation behaviour
  */
 export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T {
-  class AriadDelegationMixin extends Base {
+  class AriaDelegationMixin extends Base {
     // Per-instance guard: tracks which aria attributes are mid-processing so
     // that the recursive attributeChangedCallback triggered by our own
     // removeAttribute(name) call does not erroneously clear data-aria-*.
@@ -165,7 +168,7 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
       // returns @property attribute names for that specific class.
       // TypeScript cannot infer static members on `T`, so we use Reflect.get
       // rather than `super.observedAttributes` to avoid TS2339.
-      const parent: object = Object.getPrototypeOf(AriadDelegationMixin);
+      const parent: object = Object.getPrototypeOf(AriaDelegationMixin);
       const superAttrs: string[] =
         (Reflect.get(parent, 'observedAttributes', this) as string[] | undefined) ?? [];
       // Append any ARIA attributes not already in the list.
@@ -210,7 +213,7 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
     const propName: string = attr === 'role' ? 'role' : ariaAttrToProp(attr);
     const dataAttr = `data-${attr}`;
 
-    Object.defineProperty(AriadDelegationMixin.prototype, propName, {
+    Object.defineProperty(AriaDelegationMixin.prototype, propName, {
       get(this: Element): string | null {
         return this.getAttribute(dataAttr);
       },
@@ -233,10 +236,10 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
     });
   }
 
-  // Cast to T to satisfy the declared return type. The AriadDelegationMixinInterface
+  // Cast to T to satisfy the declared return type. The AriaDelegationMixinInterface
   // instance members are added at runtime via Object.defineProperty above; callers
   // that need the typed accessors should cast the instance or use the interface directly.
-  return AriadDelegationMixin as unknown as T;
+  return AriaDelegationMixin as unknown as T;
 }
 
 /**

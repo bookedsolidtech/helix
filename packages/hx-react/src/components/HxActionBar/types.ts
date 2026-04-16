@@ -24,6 +24,13 @@ export interface HxActionBarProps {
   position?: 'top' | 'bottom' | 'sticky';
   sticky?: boolean;
   /** Accessible label for the toolbar.
-Required when multiple toolbars appear on the same page. */
-  ariaLabel?: string;
+Required when multiple toolbars appear on the same page.
+
+Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+The `accessible-label` attribute takes precedence when both are set.
+
+Previously this was exposed as the `ariaLabel` JS property, which shadowed
+the native `HTMLElement.ariaLabel`. That shadowing is removed; use
+`accessibleLabel` or the HTML attributes instead. */
+  accessibleLabel?: string;
 }

@@ -139,4 +139,24 @@ export const helixPatientBannerStyles = css`
       animation: none !important;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .banner {
+      border-bottom-color: CanvasText;
+    }
+
+    :host([aria-invalid='true']) .banner {
+      border-bottom-color: LinkText;
+    }
+
+    :host([aria-invalid='true']) .banner::before {
+      background-color: LinkText;
+    }
+
+    .banner__photo-area {
+      border: 1px solid CanvasText;
+    }
+  }
 `;

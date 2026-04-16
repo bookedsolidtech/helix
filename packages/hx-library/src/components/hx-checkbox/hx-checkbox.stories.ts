@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, userEvent, fn } from 'storybook/test';
 import './hx-checkbox.js';
 
 // ─────────────────────────────────────────────────
@@ -172,11 +172,11 @@ export const Default: Story = {
     label: 'I agree to the patient data handling terms',
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const { host, control } = getCheckboxParts(canvasElement);
 
-    // Verify component renders with label text
-    await expect(canvas.getByText('I agree to the patient data handling terms')).toBeTruthy();
+    // Verify component renders with label text (label is in shadow DOM)
+    const labelEl = host.shadowRoot?.querySelector('.checkbox__label');
+    await expect(labelEl?.textContent?.trim()).toBe('I agree to the patient data handling terms');
 
     // Initially unchecked
     await expect(host.checked).toBe(false);

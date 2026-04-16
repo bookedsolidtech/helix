@@ -239,4 +239,16 @@ export const helixNavItemStyles = css`
       grid-template-rows: 1fr;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    :host([active]) .nav-item__link {
+      border: 1px solid Highlight;
+    }
+
+    .nav-item__tooltip {
+      border: 1px solid CanvasText;
+    }
+  }
 `;

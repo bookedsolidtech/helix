@@ -30,8 +30,6 @@ Required for icon-only toggle buttons where no visible text is present. */
   label?: string | undefined;
   /** When true, the button must be in the pressed state for the form to be submitted. */
   required?: boolean;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
   /** Returns the ValidityState object. */
   validity?: ValidityState;
   /** Returns the current validation message. */

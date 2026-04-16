@@ -1,0 +1,591 @@
+# HELiX 3.0.0 Readiness Pipeline
+# Structured evaluation and remediation workflow for production-readiness certification.
+# Owner: senior-product-manager-platform
+# Created: 2026-04-15
+# Status: DRAFT
+
+version: '1'
+pipeline_id: helix-3.0.0-readiness
+target_release: '3.0.0'
+component_count: 81
+
+# ---------------------------------------------------------------------------
+# Phase definitions
+# ---------------------------------------------------------------------------
+phases:
+  - id: evaluate
+    name: Evaluate
+    description: >
+      All three groups run their evaluation pass across every component.
+      Each agent writes raw findings to JSONL in data/readiness/raw/.
+    outputs:
+      - data/readiness/raw/{group}-{agent}-findings.jsonl
+    parallelism: intra-group # agents within a group may run in parallel
+
+  - id: synthesize
+    name: Synthesize
+    description: >
+      senior-product-manager-platform merges all raw JSONL into a single
+      scored readiness file per component, then a rollup file.
+    inputs:
+      - data/readiness/raw/*.jsonl
+    outputs:
+      - data/readiness/synthesized/component-scores.jsonl
+      - data/readiness/synthesized/rollup.jsonl
+    owner: senior-product-manager-platform
+
+  - id: report
+    name: Report
+    description: >
+      Generate the Obsidian readiness page and summary dashboards from
+      synthesized JSONL. Post status to Discord #dev channel.
+    inputs:
+      - data/readiness/synthesized/*.jsonl
+    outputs:
+      - docs/readiness/helix-3.0.0-readiness-pipeline.md
+    owner: senior-product-manager-platform
+
+  - id: remediate
+    name: Remediate
+    description: >
+      Specialist agents fix all FAIL and WARN findings. Each fix is a
+      commit on a dedicated remediation branch. Agents are dispatched by
+      the orchestrator based on finding domain.
+    inputs:
+      - data/readiness/synthesized/component-scores.jsonl
+    trigger: any component score < pass_threshold
+    owner: reagent-orchestrator
+
+  - id: re-evaluate
+    name: Re-evaluate
+    description: >
+      Re-run the evaluate phase on remediated components only.
+      Delta JSONL is merged into synthesized scores.
+    inputs:
+      - data/readiness/synthesized/component-scores.jsonl
+    outputs:
+      - data/readiness/synthesized/component-scores.jsonl # updated in place
+    trigger: remediate phase complete
+
+# ---------------------------------------------------------------------------
+# Evaluation groups (3 groups x 5 agents = 15 agents)
+# ---------------------------------------------------------------------------
+groups:
+  # -------------------------------------------------------------------------
+  # GROUP 1 — Code Quality & Architecture
+  # "Is the code right?"
+  # -------------------------------------------------------------------------
+  - id: code-quality
+    name: Code Quality & Architecture
+    agents:
+      - id: lit-specialist
+        focus: >
+          Lit 3.x patterns: reactive properties, lifecycle correctness,
+          Shadow DOM encapsulation, HelixElement base class usage,
+          decorator patterns, update lifecycle, CSS Parts exposure.
+        dimensions:
+          - lit-patterns
+          - shadow-dom-encapsulation
+          - css-parts-api
+
+      - id: typescript-specialist
+        focus: >
+          TypeScript strict compliance: zero 'any', correct generics,
+          ElementInternals typing, event type declarations,
+          public API surface typing, no @ts-ignore or non-null assertions.
+        dimensions:
+          - type-safety
+          - api-surface-typing
+          - strict-compliance
+
+      - id: principal-engineer
+        focus: >
+          Architecture review: component boundaries, composition patterns,
+          dependency graph health, single-responsibility, naming conventions,
+          dead code detection, import hygiene.
+        dimensions:
+          - architecture
+          - composition-patterns
+          - code-hygiene
+
+      - id: code-reviewer
+        focus: >
+          Code style and consistency: naming conventions, file structure
+          compliance (index.ts, .ts, .styles.ts, .stories.ts, .test.ts),
+          documentation completeness (JSDoc on all public members),
+          design token usage (no hardcoded values).
+        dimensions:
+          - code-style
+          - file-structure
+          - documentation
+          - token-usage
+
+      - id: senior-code-reviewer
+        focus: >
+          Deep review: error handling completeness, edge case coverage,
+          defensive coding, event contract correctness (hx-* prefix),
+          CSS custom property naming (--hx-* prefix), slot API design,
+          breaking change risk assessment.
+        dimensions:
+          - error-handling
+          - event-contracts
+          - slot-api-design
+          - breaking-change-risk
+
+  # -------------------------------------------------------------------------
+  # GROUP 2 — User Experience & Interaction
+  # "Does it work for users?"
+  # -------------------------------------------------------------------------
+  - id: user-experience
+    name: User Experience & Interaction
+    agents:
+      - id: accessibility-engineer
+        focus: >
+          WCAG 2.1 AA compliance: ARIA roles, states, properties;
+          keyboard navigation; focus management; screen reader announcements;
+          color contrast; forced-colors/high-contrast mode; reduced-motion;
+          form-associated element internals.
+        dimensions:
+          - aria-compliance
+          - keyboard-navigation
+          - focus-management
+          - forced-colors-support
+
+      - id: storybook-specialist
+        focus: >
+          Storybook 10.x completeness: stories for every variant,
+          argTypes matching CEM, controls for all public properties,
+          interaction tests, proper categorization and autodocs,
+          play functions for interactive states.
+        dimensions:
+          - story-coverage
+          - controls-completeness
+          - interaction-tests
+          - autodocs-accuracy
+
+      - id: qa-engineer-automation
+        focus: >
+          Test coverage and quality: Vitest browser test existence,
+          test coverage percentage, edge case testing, negative testing,
+          async behavior testing, slot/event/property test coverage,
+          test file structure compliance.
+        dimensions:
+          - test-existence
+          - test-coverage-pct
+          - edge-case-coverage
+          - test-quality
+
+      - id: test-architect
+        focus: >
+          Test infrastructure and strategy: test isolation, fixture usage,
+          shadow DOM query patterns, cleanup correctness, flaky test detection,
+          test categorization (unit/integration/visual), missing test categories.
+        dimensions:
+          - test-isolation
+          - test-strategy
+          - flaky-risk
+          - category-coverage
+
+      - id: design-system-developer
+        focus: >
+          Design token integration: semantic token usage, component-level
+          token exposure, theming API completeness, CSS custom property
+          cascade correctness, dark mode support, spacing/typography
+          token compliance.
+        dimensions:
+          - token-integration
+          - theming-api
+          - cascade-correctness
+          - dark-mode-support
+
+  # -------------------------------------------------------------------------
+  # GROUP 3 — Production & Ship Readiness
+  # "Can we ship it?"
+  # -------------------------------------------------------------------------
+  - id: production-readiness
+    name: Production & Ship Readiness
+    agents:
+      - id: performance-engineer
+        focus: >
+          Bundle size analysis: per-component min+gz size (<5KB threshold),
+          total bundle (<50KB), render performance, unnecessary dependencies,
+          lazy loading opportunities, tree-shaking effectiveness.
+        dimensions:
+          - bundle-size
+          - render-performance
+          - tree-shaking
+          - dependency-weight
+
+      - id: drupal-integration-specialist
+        focus: >
+          Drupal/CMS compatibility: Twig template rendering, Drupal behavior
+          attachment, CDN delivery readiness, SSR/hydration compatibility,
+          no-JS graceful degradation, attribute-only configuration
+          (no required JS init).
+        dimensions:
+          - twig-compatibility
+          - drupal-behaviors
+          - cdn-readiness
+          - no-js-fallback
+
+      - id: devops-engineer
+        focus: >
+          Release engineering: CEM accuracy (custom-elements.json matches
+          actual public API), package.json exports correctness, entry point
+          configuration, changeset readiness, version bump classification,
+          CI gate compliance.
+        dimensions:
+          - cem-accuracy
+          - exports-config
+          - changeset-readiness
+          - ci-gate-status
+
+      - id: chief-code-reviewer
+        focus: >
+          Final gate review: cross-cutting concern check, API consistency
+          across the full component surface, naming convention enforcement,
+          public API freeze readiness, backward compatibility verification,
+          semantic versioning correctness.
+        dimensions:
+          - api-consistency
+          - naming-enforcement
+          - api-freeze-readiness
+          - semver-correctness
+
+      - id: staff-software-engineer
+        focus: >
+          DX and infrastructure: monorepo integration health, import/export
+          correctness in index.ts barrel files, Turborepo pipeline correctness,
+          dev server stability, HMR reliability, cross-package dependency
+          correctness.
+        dimensions:
+          - barrel-exports
+          - monorepo-health
+          - dev-experience
+          - cross-package-deps
+
+# ---------------------------------------------------------------------------
+# Scoring rubric
+# ---------------------------------------------------------------------------
+scoring:
+  scale: 0-100
+  thresholds:
+    pass: 80 # >= 80 = PASS (ship-ready)
+    warn: 60 # >= 60 and < 80 = WARN (needs attention, may ship with waiver)
+    fail: 0 # < 60 = FAIL (must remediate before release)
+
+  # How component-level scores are computed
+  aggregation:
+    method: weighted-average
+    weights:
+      # Group 1 — Code Quality (35% total)
+      lit-patterns: 4
+      shadow-dom-encapsulation: 3
+      css-parts-api: 2
+      type-safety: 5
+      api-surface-typing: 3
+      strict-compliance: 3
+      architecture: 4
+      composition-patterns: 3
+      code-hygiene: 2
+      code-style: 2
+      file-structure: 2
+      documentation: 2
+      token-usage: 3
+      error-handling: 3
+      event-contracts: 3
+      slot-api-design: 2
+      breaking-change-risk: 4
+
+      # Group 2 — User Experience (40% total — healthcare a11y premium)
+      aria-compliance: 6
+      keyboard-navigation: 5
+      focus-management: 4
+      forced-colors-support: 3
+      story-coverage: 3
+      controls-completeness: 2
+      interaction-tests: 3
+      autodocs-accuracy: 2
+      test-existence: 4
+      test-coverage-pct: 3
+      edge-case-coverage: 3
+      test-quality: 2
+      test-isolation: 2
+      test-strategy: 2
+      flaky-risk: 2
+      category-coverage: 1
+      token-integration: 3
+      theming-api: 2
+      cascade-correctness: 2
+      dark-mode-support: 1
+
+      # Group 3 — Production Readiness (25% total)
+      bundle-size: 4
+      render-performance: 3
+      tree-shaking: 2
+      dependency-weight: 2
+      twig-compatibility: 3
+      drupal-behaviors: 2
+      cdn-readiness: 2
+      no-js-fallback: 1
+      cem-accuracy: 4
+      exports-config: 3
+      changeset-readiness: 2
+      ci-gate-status: 3
+      api-consistency: 3
+      naming-enforcement: 2
+      api-freeze-readiness: 2
+      semver-correctness: 2
+      barrel-exports: 2
+      monorepo-health: 1
+      dev-experience: 1
+      cross-package-deps: 2
+
+  # Release-level acceptance
+  release_criteria:
+    all_components_pass: true # Every component >= 80
+    no_critical_findings: true # Zero severity=critical findings
+    minimum_average_score: 85 # Portfolio average >= 85
+    maximum_fail_count: 0 # Zero FAIL components allowed
+    maximum_warn_count: 5 # At most 5 WARN components (with waivers)
+
+# ---------------------------------------------------------------------------
+# JSONL schemas
+# ---------------------------------------------------------------------------
+schemas:
+  # Raw finding — one line per finding per component per agent
+  raw_finding:
+    required_fields:
+      - timestamp # ISO 8601
+      - pipeline_id # "helix-3.0.0-readiness"
+      - phase # "evaluate" | "re-evaluate"
+      - group_id # "code-quality" | "user-experience" | "production-readiness"
+      - agent_id # e.g. "lit-specialist"
+      - component # e.g. "hx-button"
+      - dimension # e.g. "lit-patterns"
+      - score # 0-100 integer
+      - severity # "critical" | "major" | "minor" | "info"
+      - status # "pass" | "warn" | "fail"
+      - finding # Human-readable description of the finding
+      - evidence # File path + line number or code snippet reference
+      - remediation # Suggested fix (actionable)
+    optional_fields:
+      - tags # array of strings for cross-cutting concerns
+      - blocking # boolean — blocks release if true
+      - effort_estimate # "trivial" | "small" | "medium" | "large"
+
+  # Synthesized score — one line per component (aggregated across all agents)
+  synthesized_score:
+    required_fields:
+      - timestamp # ISO 8601
+      - pipeline_id # "helix-3.0.0-readiness"
+      - component # e.g. "hx-button"
+      - overall_score # 0-100 weighted average
+      - status # "pass" | "warn" | "fail"
+      - group_scores # object: { "code-quality": N, "user-experience": N, "production-readiness": N }
+      - dimension_scores # object: { "lit-patterns": N, "type-safety": N, ... }
+      - finding_counts # object: { "critical": N, "major": N, "minor": N, "info": N }
+      - blocking_count # integer — number of release-blocking findings
+      - top_issues # array of top 3 findings by severity (summary strings)
+      - pass_dimensions # array of dimension IDs that scored >= 80
+      - fail_dimensions # array of dimension IDs that scored < 60
+    optional_fields:
+      - delta_from_previous # score change from last evaluation run
+      - remediation_owner # agent assigned to fix
+
+  # Rollup — one line for the entire release
+  rollup:
+    required_fields:
+      - timestamp
+      - pipeline_id
+      - total_components
+      - pass_count
+      - warn_count
+      - fail_count
+      - average_score
+      - median_score
+      - lowest_score
+      - lowest_component
+      - highest_score
+      - highest_component
+      - total_findings
+      - critical_findings
+      - blocking_findings
+      - release_decision # "go" | "no-go" | "conditional"
+      - conditions # array of strings (empty if "go")
+
+# ---------------------------------------------------------------------------
+# Execution constraints
+# ---------------------------------------------------------------------------
+execution:
+  # Agents within a group may run in parallel; groups run sequentially
+  # (Group 1 first, then Group 2, then Group 3 — each may reference prior findings)
+  group_ordering: sequential
+  agent_parallelism: within-group
+  max_concurrent_agents: 5
+
+  # Each agent gets 30 minutes per evaluation pass; escalate if exceeded
+  agent_timeout_minutes: 30
+  zombie_check_minutes: 20
+
+  # Output directory (relative to repo root)
+  output_dir: data/readiness
+
+  # Branch strategy
+  evaluation_branch: readiness/helix-3.0.0-eval
+  remediation_branch: readiness/helix-3.0.0-remediate
+
+  # Re-evaluation triggers automatically after remediation commits
+  auto_re_evaluate: true
+  max_re_evaluate_cycles: 3
+
+  # Escalation: if still NO-GO after max cycles, escalate to project owner
+  escalation_owner: jake
+
+# ---------------------------------------------------------------------------
+# Remediation routing — maps dimensions to fixing agents
+# ---------------------------------------------------------------------------
+remediation_routing:
+  lit-patterns: lit-specialist
+  shadow-dom-encapsulation: lit-specialist
+  css-parts-api: lit-specialist
+  type-safety: typescript-specialist
+  api-surface-typing: typescript-specialist
+  strict-compliance: typescript-specialist
+  architecture: principal-engineer
+  composition-patterns: principal-engineer
+  code-hygiene: principal-engineer
+  code-style: code-reviewer
+  file-structure: code-reviewer
+  documentation: code-reviewer
+  token-usage: design-system-developer
+  error-handling: senior-code-reviewer
+  event-contracts: senior-code-reviewer
+  slot-api-design: senior-code-reviewer
+  breaking-change-risk: senior-code-reviewer
+  aria-compliance: accessibility-engineer
+  keyboard-navigation: accessibility-engineer
+  focus-management: accessibility-engineer
+  forced-colors-support: accessibility-engineer
+  story-coverage: storybook-specialist
+  controls-completeness: storybook-specialist
+  interaction-tests: storybook-specialist
+  autodocs-accuracy: storybook-specialist
+  test-existence: qa-engineer-automation
+  test-coverage-pct: qa-engineer-automation
+  edge-case-coverage: qa-engineer-automation
+  test-quality: qa-engineer-automation
+  test-isolation: test-architect
+  test-strategy: test-architect
+  flaky-risk: test-architect
+  category-coverage: test-architect
+  token-integration: design-system-developer
+  theming-api: design-system-developer
+  cascade-correctness: design-system-developer
+  dark-mode-support: design-system-developer
+  bundle-size: performance-engineer
+  render-performance: performance-engineer
+  tree-shaking: performance-engineer
+  dependency-weight: performance-engineer
+  twig-compatibility: drupal-integration-specialist
+  drupal-behaviors: drupal-integration-specialist
+  cdn-readiness: drupal-integration-specialist
+  no-js-fallback: drupal-integration-specialist
+  cem-accuracy: devops-engineer
+  exports-config: devops-engineer
+  changeset-readiness: devops-engineer
+  ci-gate-status: devops-engineer
+  api-consistency: chief-code-reviewer
+  naming-enforcement: chief-code-reviewer
+  api-freeze-readiness: chief-code-reviewer
+  semver-correctness: chief-code-reviewer
+  barrel-exports: staff-software-engineer
+  monorepo-health: staff-software-engineer
+  dev-experience: staff-software-engineer
+  cross-package-deps: staff-software-engineer
+
+# ---------------------------------------------------------------------------
+# Component manifest (81 components evaluated)
+# ---------------------------------------------------------------------------
+components:
+  - hx-accordion
+  - hx-action-bar
+  - hx-alert
+  - hx-avatar
+  - hx-badge
+  - hx-banner
+  - hx-breadcrumb
+  - hx-button
+  - hx-button-group
+  - hx-card
+  - hx-carousel
+  - hx-checkbox
+  - hx-checkbox-group
+  - hx-clinical-status
+  - hx-code-snippet
+  - hx-color-picker
+  - hx-combobox
+  - hx-container
+  - hx-copy-button
+  - hx-counter
+  - hx-data-table
+  - hx-date-picker
+  - hx-dialog
+  - hx-divider
+  - hx-drawer
+  - hx-dropdown
+  - hx-field
+  - hx-field-label
+  - hx-file-upload
+  - hx-form
+  - hx-format-date
+  - hx-grid
+  - hx-help-text
+  - hx-icon
+  - hx-icon-button
+  - hx-image
+  - hx-link
+  - hx-list
+  - hx-menu
+  - hx-meter
+  - hx-nav
+  - hx-number-input
+  - hx-overflow-menu
+  - hx-pagination
+  - hx-patient-banner
+  - hx-phi-field
+  - hx-popover
+  - hx-popup
+  - hx-progress-bar
+  - hx-progress-ring
+  - hx-prose
+  - hx-radio-group
+  - hx-rating
+  - hx-select
+  - hx-side-nav
+  - hx-skeleton
+  - hx-slider
+  - hx-spinner
+  - hx-split-button
+  - hx-split-panel
+  - hx-stack
+  - hx-stat
+  - hx-status-indicator
+  - hx-steps
+  - hx-structured-list
+  - hx-style-scope
+  - hx-switch
+  - hx-table
+  - hx-tabs
+  - hx-tag
+  - hx-text
+  - hx-text-input
+  - hx-textarea
+  - hx-theme
+  - hx-time-picker
+  - hx-toast
+  - hx-toggle-button
+  - hx-tooltip
+  - hx-top-nav
+  - hx-tree-view
+  - hx-visually-hidden

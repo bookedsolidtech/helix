@@ -76,4 +76,16 @@ export const helixTabsStyles = css`
       scroll-behavior: auto;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .tablist {
+      border-bottom-color: CanvasText;
+    }
+
+    :host([orientation='vertical']) .tablist {
+      border-inline-end-color: CanvasText;
+    }
+  }
 `;

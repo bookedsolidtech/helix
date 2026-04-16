@@ -1,8 +1,9 @@
-import { LitElement, html, nothing, type TemplateResult, type PropertyValues } from 'lit';
+import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -43,22 +44,13 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-button-inverted-focus-ring-color=rgba(255,255,255,0.5)] - Focus ring color when inverted.
  */
 @customElement('hx-button')
-export class HelixButton extends mixinDelegatesAria(LitElement) {
+export class HelixButton extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixButtonStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Public Properties ───
 
@@ -144,13 +136,7 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
 
   // ─── Form API ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -332,5 +318,8 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-button': HelixButton;
+  }
+  interface HTMLElementEventMap {
+    'hx-click': CustomEvent<{ originalEvent: MouseEvent }>;
   }
 }

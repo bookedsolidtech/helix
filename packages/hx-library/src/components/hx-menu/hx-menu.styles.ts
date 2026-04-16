@@ -23,4 +23,13 @@ export const helixMenuStyles = css`
     overflow-y: auto;
     outline: none;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .menu {
+      background-color: Canvas;
+      border: 2px solid CanvasText;
+    }
+  }
 `;

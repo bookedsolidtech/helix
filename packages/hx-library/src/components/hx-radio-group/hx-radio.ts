@@ -2,10 +2,10 @@ import { LitElement, html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixRadioStyles } from './hx-radio.styles.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxRadioIdCounter = 0;
+const _nextRadioId = createIdCounter('hx-radio');
 
 /**
  * An individual radio button, designed to be used inside a `<hx-radio-group>`.
@@ -107,7 +107,7 @@ export class HelixRadio extends LitElement {
   // ─── Internal IDs ───
 
   /** @internal */
-  private _inputId = `hx-radio-${++_hxRadioIdCounter}`;
+  private _inputId = _nextRadioId();
 
   // ─── Event Handling ───
 

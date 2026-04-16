@@ -96,4 +96,43 @@ export const helixRatingStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .symbol {
+      forced-color-adjust: none;
+      color: ButtonText;
+    }
+
+    .symbol:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .symbol--full,
+    .symbol--half {
+      color: Highlight;
+    }
+
+    .star-half__empty {
+      color: ButtonText;
+    }
+
+    .base:not(.base--readonly) .symbol:hover {
+      color: Highlight;
+    }
+
+    .symbol--disabled {
+      color: GrayText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .symbol {
+      color: GrayText;
+    }
+  }
 `;

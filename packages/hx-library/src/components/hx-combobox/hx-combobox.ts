@@ -1,6 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -18,8 +19,7 @@ export interface ComboboxOption {
 // P2-13: Exported size type for TypeScript consumers
 export type HxComboboxSize = 'sm' | 'md' | 'lg';
 
-// P2-6: Module-level counter for deterministic, collision-free IDs
-let _comboboxIdCounter = 0;
+const _nextComboboxId = createIdCounter('hx-combobox');
 
 /**
  * A form-associated combobox component combining a text input with a listbox
@@ -68,28 +68,18 @@ let _comboboxIdCounter = 0;
  * @cssprop [--hx-combobox-option-selected-bg=var(--hx-color-primary-100)] - Selected option background.
  */
 @customElement('hx-combobox')
-export class HelixCombobox extends LitElement {
+export class HelixCombobox extends HelixElement {
   static override styles = [helixComboboxStyles];
 
   // ─── Form Association ───
 
   /** Marks this element as form-associated for ElementInternals support. @internal */
-  static formAssociated = true;
-
-  /** Holds the ElementInternals instance used for form value and validity management. @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Stable IDs ───
 
-  // P2-6: Use module-level counter instead of Math.random() to guarantee uniqueness
   /** @internal */
-  private _id = `hx-combobox-${++_comboboxIdCounter}`;
+  private _id = _nextComboboxId();
   /** @internal */
   private _listboxId = `${this._id}-listbox`;
   /** @internal */
@@ -142,7 +132,7 @@ export class HelixCombobox extends LitElement {
    * The name used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -297,21 +287,6 @@ export class HelixCombobox extends LitElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
   /** Checks whether the combobox satisfies its constraints. */
   checkValidity(): boolean {
     return this._internals.checkValidity();
@@ -341,7 +316,7 @@ export class HelixCombobox extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = '';
     this._filterText = '';
     this._internals.setFormValue(null);
@@ -349,9 +324,9 @@ export class HelixCombobox extends LitElement {
 
   /** @internal */
   // P1-6: Correct signature per WHATWG spec — includes mode param and all state types
-  formStateRestoreCallback(
-    state: string | File | FormData | null,
-    _mode?: 'restore' | 'autocomplete',
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
       this.value = state;
@@ -359,7 +334,7 @@ export class HelixCombobox extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -911,6 +886,13 @@ export class HelixCombobox extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-combobox': HelixCombobox;
+  }
+  interface HTMLElementEventMap {
+    'hx-input': CustomEvent<{ value: string }>;
+    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
+    'hx-clear': CustomEvent<void>;
+    'hx-show': CustomEvent<void>;
+    'hx-hide': CustomEvent<void>;
   }
 }
 

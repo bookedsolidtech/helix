@@ -31,8 +31,6 @@ Has no effect when `href` is set. */
   name?: string | undefined;
   /** Value submitted with form data. Only applicable when rendering as a button. */
   value?: string | undefined;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
 
   // Event callbacks
   /** Dispatched when the button is clicked (not disabled). */

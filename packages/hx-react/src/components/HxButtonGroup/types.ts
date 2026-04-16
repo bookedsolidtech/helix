@@ -17,11 +17,9 @@ export interface HxButtonGroupProps {
   /** Size applied to the button group and cascaded to child buttons via
 the --hx-button-group-size CSS custom property. */
   size?: 'sm' | 'md' | 'lg';
-  /** Accessible label for the button group. Sets aria-label via ElementInternals.
+  /** Accessible label for the button group. Sets aria-label on the host element.
 **Strongly recommended** for WCAG 2.1 AA compliance — without it, screen
 readers announce an unnamed "group". For Drupal/Twig compatibility, prefer
 applying `aria-label` directly as an HTML attribute instead. */
   label?: string;
-  internals?: unknown;
-  role?: string;
 }

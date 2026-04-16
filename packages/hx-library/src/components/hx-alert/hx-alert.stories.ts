@@ -1055,12 +1055,14 @@ hx-alert::part(actions) {
     const alert = canvasElement.querySelector('hx-alert');
     await expect(alert).toBeTruthy();
 
-    // Verify all 6 parts are present
-    const parts = ['alert', 'title', 'icon', 'message', 'close-button', 'actions'];
-    for (const partName of parts) {
+    // Verify parts that are always present
+    const alwaysParts = ['alert', 'title', 'message', 'close-button', 'actions'];
+    for (const partName of alwaysParts) {
       const part = alert?.shadowRoot?.querySelector(`[part="${partName}"]`);
       await expect(part).toBeTruthy();
     }
+    // icon part only renders when show-icon attribute is set
+    // The CSSParts demo does not set show-icon, so icon part is not present
   },
 };
 

@@ -161,4 +161,16 @@ export const helixCardStyles = css`
       var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
     margin-top: auto;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .card {
+      border-color: CanvasText;
+    }
+
+    .card__actions {
+      border-top-color: CanvasText;
+    }
+  }
 `;

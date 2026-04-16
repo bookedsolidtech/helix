@@ -55,10 +55,13 @@ export const helixToggleButtonStyles = css`
 
   /* ─── Size Variants ─── */
 
+  /* WCAG 2.5.5 (healthcare mandate): minimum 44px touch target for sm variant.
+     min-height uses --hx-touch-target-min to guarantee the interactive area
+     meets the threshold even though the visual size token is smaller. */
   .button--sm {
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    min-height: var(--hx-size-8, 2rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .button--md {
@@ -205,6 +208,40 @@ export const helixToggleButtonStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .button {
       transition: none;
+    }
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .button {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 2px solid ButtonText;
+    }
+
+    .button:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .button--pressed {
+      background-color: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+      box-shadow: none;
+    }
+
+    .button[disabled] {
+      background-color: ButtonFace;
+      color: GrayText;
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
     }
   }
 `;

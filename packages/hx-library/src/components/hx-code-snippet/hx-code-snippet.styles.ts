@@ -166,6 +166,28 @@ export const helixCodeSnippetStyles = css`
     }
   }
 
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .code-snippet {
+      border: 1px solid CanvasText;
+    }
+
+    .code-snippet--inline {
+      border: 1px solid CanvasText;
+    }
+
+    .code-snippet__copy-button {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    .code-snippet__expand-button {
+      border-top-color: CanvasText;
+      color: ButtonText;
+    }
+  }
+
   /* ─── Screen-reader only ─── */
 
   .sr-only {

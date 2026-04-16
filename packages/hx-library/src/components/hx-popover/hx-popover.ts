@@ -1,9 +1,10 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
-let _popoverCounter = 0;
+const _nextPopoverId = createIdCounter('hx-popover');
 
 /**
  * A popover that displays rich floating content attached to a trigger element.
@@ -29,6 +30,7 @@ let _popoverCounter = 0;
  * @cssprop [--hx-popover-z-index=9999] - Popover z-index.
  * @cssprop [--hx-popover-transition-duration=0.2s] - Show/hide transition duration.
  * @cssprop [--hx-popover-arrow-size=10px] - Size of the arrow indicator.
+ * @cssprop [--hx-popover-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color when the popover body receives focus.
  *
  * @fires {CustomEvent} hx-show - Emitted when the popover begins to show.
  * @fires {CustomEvent} hx-after-show - Emitted after the popover is fully visible.
@@ -125,7 +127,7 @@ export class HelixPopover extends LitElement {
    * Unique ID assigned to the popover body element.
    * @internal
    */
-  private readonly _popoverId = `hx-popover-${++_popoverCounter}`;
+  private readonly _popoverId = _nextPopoverId();
 
   /**
    * Timer ID for the deferred document click listener registration in _show().

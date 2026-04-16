@@ -146,4 +146,16 @@ export const helixTagStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
     outline-offset: var(--hx-focus-ring-offset, 1px);
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .tag {
+      border-color: CanvasText;
+    }
+
+    .tag__remove-button {
+      color: ButtonText;
+    }
+  }
 `;

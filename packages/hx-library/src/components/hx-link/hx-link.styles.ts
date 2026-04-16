@@ -92,6 +92,24 @@ export const helixLinkStyles = css`
     }
   }
 
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .link {
+      forced-color-adjust: none;
+      color: LinkText;
+    }
+
+    .link:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .link--disabled {
+      color: GrayText;
+    }
+  }
+
   /* --- Visually hidden (sr-only) --- */
 
   .sr-only {
