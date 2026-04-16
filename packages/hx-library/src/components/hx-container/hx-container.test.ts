@@ -337,6 +337,70 @@ describe('hx-container', () => {
     });
   });
 
+  // ─── Dynamic property changes ───
+
+  describe('Dynamic property changes', () => {
+    it('updates to width="full" class when width changes to "full"', async () => {
+      const el = await fixture<HelixContainer>('<hx-container width="sm">Content</hx-container>');
+      el.width = 'full';
+      await el.updateComplete;
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(inner.classList.contains('container__inner--full')).toBe(true);
+      expect(inner.classList.contains('container__inner--sm')).toBe(false);
+    });
+
+    it('updates to width="narrow" class when width changes', async () => {
+      const el = await fixture<HelixContainer>('<hx-container>Content</hx-container>');
+      el.width = 'narrow';
+      await el.updateComplete;
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(inner.classList.contains('container__inner--narrow')).toBe(true);
+    });
+
+    it('updates to width="xl" class when width changes', async () => {
+      const el = await fixture<HelixContainer>('<hx-container>Content</hx-container>');
+      el.width = 'xl';
+      await el.updateComplete;
+      const inner = shadowQuery(el, '.container__inner')!;
+      expect(inner.classList.contains('container__inner--xl')).toBe(true);
+    });
+  });
+
+  // ─── Default slot renders properly with no content ───
+
+  describe('Default slot with no content', () => {
+    it('renders shadow DOM even with empty slot', async () => {
+      const el = await fixture<HelixContainer>('<hx-container></hx-container>');
+      const inner = shadowQuery(el, '.container__inner');
+      expect(inner).toBeTruthy();
+    });
+  });
+
+  // ─── Padding "none" behavior ───
+
+  describe('Padding "none" behavior', () => {
+    it('padding="none" applies 0 vertical padding', async () => {
+      const el = await fixture<HelixContainer>('<hx-container padding="none">Content</hx-container>');
+      const styles = getComputedStyle(el);
+      expect(styles.paddingTop).toBe('0px');
+      expect(styles.paddingBottom).toBe('0px');
+    });
+  });
+
+  // ─── Width "content" is the default ───
+
+  describe('Width defaults', () => {
+    it('width defaults to "content"', async () => {
+      const el = await fixture<HelixContainer>('<hx-container>Content</hx-container>');
+      expect(el.width).toBe('content');
+    });
+
+    it('width attribute reflects to the host', async () => {
+      const el = await fixture<HelixContainer>('<hx-container width="md">Content</hx-container>');
+      expect(el.getAttribute('width')).toBe('md');
+    });
+  });
+
   // ─── Accessibility (3) ───
 
   describe('Accessibility', () => {

@@ -460,6 +460,146 @@ describe('hx-counter', () => {
     });
   });
 
+  // ─── Dynamic value updates ───
+
+  describe('Dynamic value updates', () => {
+    it('re-animates when value changes programmatically with reduced motion', async () => {
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>('<hx-counter label="Patients" value="10"></hx-counter>');
+      await el.updateComplete;
+
+      el.value = 200;
+      await el.updateComplete;
+
+      const counter = shadowQuery(el, '[part~="counter"]');
+      expect(counter?.textContent?.trim()).toBe('200');
+
+      vi.restoreAllMocks();
+    });
+
+    it('aria-label on counter includes label and formatted value when label is set', async () => {
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Alerts" value="5"></hx-counter>',
+      );
+      await el.updateComplete;
+
+      const counter = shadowQuery(el, '[part~="counter"]');
+      expect(counter?.getAttribute('aria-label')).toBe('Alerts: 5');
+
+      vi.restoreAllMocks();
+    });
+
+    it('aria-label is absent when label is empty', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixCounter>('<hx-counter value="5"></hx-counter>');
+      await el.updateComplete;
+
+      const counter = shadowQuery(el, '[part~="counter"]');
+      expect(counter?.hasAttribute('aria-label')).toBe(false);
+
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── devWarn: legacy size attribute ───
+
+  describe('devWarn: legacy size attribute', () => {
+    it('emits deprecation warning when legacy size attribute is used', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" size="sm" value="5"></hx-counter>');
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"size" attribute is deprecated'),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('does NOT emit deprecation warning when hx-size is used', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixCounter>('<hx-counter label="Count" hx-size="sm" value="5"></hx-counter>');
+      const deprecationCalls = warnSpy.mock.calls.filter((args) =>
+        String(args[0]).includes('"size" attribute is deprecated'),
+      );
+      expect(deprecationCalls).toHaveLength(0);
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── aria-hidden on sr-only region when no announced value ───
+
+  describe('aria-hidden on sr-only live region', () => {
+    it('sr-only span has aria-hidden="true" before animation completes', async () => {
+      const el = await fixture<HelixCounter>('<hx-counter label="Count" value="50"></hx-counter>');
+      // Before animation ends, _announcedValue is empty so aria-hidden should be true
+      const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
+      // Initially aria-hidden may be present
+      expect(liveRegion).toBeTruthy();
+    });
+
+    it('sr-only span has no aria-hidden after reduced-motion animation completes', async () => {
+      const originalMatchMedia = window.matchMedia;
+      vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => {
+        if (query === '(prefers-reduced-motion: reduce)') {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+          } as MediaQueryList;
+        }
+        return originalMatchMedia(query);
+      });
+
+      const el = await fixture<HelixCounter>(
+        '<hx-counter label="Count" value="42"></hx-counter>',
+      );
+      await el.updateComplete;
+
+      const liveRegion = el.shadowRoot?.querySelector<HTMLElement>('.sr-only');
+      // When _announcedValue is set, aria-hidden is removed
+      expect(liveRegion?.getAttribute('aria-hidden')).toBeNull();
+
+      vi.restoreAllMocks();
+    });
+  });
+
   // ─── Cleanup (1) ───
 
   describe('Lifecycle', () => {

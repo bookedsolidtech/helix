@@ -268,6 +268,77 @@ describe('hx-help-text', () => {
     });
   });
 
+  // ─── Dynamic variant changes (additional paths) ───
+
+  describe('Dynamic variant changes (additional paths)', () => {
+    it('changes from default to warning adds icon and aria-live="polite"', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      el.variant = 'warning';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('aria-live')).toBe('polite');
+      expect(shadowQuery(el, '[part="icon"]')).toBeTruthy();
+    });
+
+    it('changes from default to success adds icon and aria-live="polite"', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text>Help</hx-help-text>');
+      el.variant = 'success';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('changes from warning back to default removes aria-live', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="warning">Warn</hx-help-text>');
+      el.variant = 'default';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.hasAttribute('aria-live')).toBe(false);
+    });
+
+    it('changes from success back to default removes icon', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="success">OK</hx-help-text>');
+      el.variant = 'default';
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="icon"]')).toBeNull();
+    });
+  });
+
+  // ─── Text part always present ───
+
+  describe('Text part always present', () => {
+    it('text part exists on error variant', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="error">Error</hx-help-text>');
+      const text = shadowQuery(el, '[part="text"]');
+      expect(text).toBeTruthy();
+    });
+
+    it('text part exists on warning variant', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="warning">Warn</hx-help-text>');
+      const text = shadowQuery(el, '[part="text"]');
+      expect(text).toBeTruthy();
+    });
+
+    it('text part exists on success variant', async () => {
+      const el = await fixture<WcHelpText>('<hx-help-text variant="success">OK</hx-help-text>');
+      const text = shadowQuery(el, '[part="text"]');
+      expect(text).toBeTruthy();
+    });
+  });
+
+  // ─── Slotted content rendering ───
+
+  describe('Slotted content rendering', () => {
+    it('renders rich HTML in the slot', async () => {
+      const el = await fixture<WcHelpText>(
+        '<hx-help-text><strong>Required</strong> field</hx-help-text>',
+      );
+      const strong = el.querySelector('strong');
+      expect(strong).toBeTruthy();
+      expect(strong?.textContent).toBe('Required');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

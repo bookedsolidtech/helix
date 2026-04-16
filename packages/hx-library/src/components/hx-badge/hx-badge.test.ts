@@ -550,6 +550,127 @@ describe('hx-badge', () => {
     });
   });
 
+  // ─── devWarn: dot badge missing accessible label ───
+
+  describe('devWarn: dot badge missing accessible label', () => {
+    it('emits devWarn when dot mode is active with no dotLabel', async () => {
+      const { vi } = await import('vitest');
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<WcBadge>('<hx-badge pulse></hx-badge>');
+      await new Promise((r) => requestAnimationFrame(r));
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Dot badge is missing an accessible label'),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('does NOT emit devWarn when dotLabel is set in dot mode', async () => {
+      const { vi } = await import('vitest');
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<WcBadge>('<hx-badge pulse dot-label="New messages"></hx-badge>');
+      await new Promise((r) => requestAnimationFrame(r));
+      const dotCalls = warnSpy.mock.calls.filter((args) =>
+        String(args[0]).includes('Dot badge is missing'),
+      );
+      expect(dotCalls).toHaveLength(0);
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── devWarn: legacy size attribute ───
+
+  describe('devWarn: legacy size attribute', () => {
+    it('emits deprecation warning when legacy size attribute is used', async () => {
+      const { vi } = await import('vitest');
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<WcBadge>('<hx-badge size="sm">Tag</hx-badge>');
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"size" attribute is deprecated'),
+      );
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── Semantic variant label (WCAG 1.4.1) ───
+
+  describe('Semantic variant label (WCAG 1.4.1)', () => {
+    it('renders visually-hidden variant label for success variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="success">OK</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeTruthy();
+      expect(labelSpan?.textContent).toContain('Success');
+    });
+
+    it('renders visually-hidden variant label for warning variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="warning">Warn</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeTruthy();
+      expect(labelSpan?.textContent).toContain('Warning');
+    });
+
+    it('renders visually-hidden variant label for error variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="error">Err</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeTruthy();
+      expect(labelSpan?.textContent).toContain('Error');
+    });
+
+    it('renders visually-hidden variant label for info variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="info">Note</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeTruthy();
+      expect(labelSpan?.textContent).toContain('Info');
+    });
+
+    it('does NOT render variant label span for primary variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="primary">New</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeNull();
+    });
+
+    it('does NOT render variant label span for neutral variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="neutral">Tag</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeNull();
+    });
+
+    it('does NOT render variant label span for secondary variant', async () => {
+      const el = await fixture<WcBadge>('<hx-badge variant="secondary">Tag</hx-badge>');
+      await el.updateComplete;
+      const labelSpan = shadowQuery(el, '.badge__variant-label');
+      expect(labelSpan).toBeNull();
+    });
+  });
+
+  // ─── count=0 edge case ───
+
+  describe('count=0 edge case', () => {
+    it('count=0 renders badge--dot as false even without slot content', async () => {
+      const el = await fixture<WcBadge>('<hx-badge count="0" pulse></hx-badge>');
+      await el.updateComplete;
+      const badge = shadowQuery(el, 'span')!;
+      // count=0 is hasCount=true, so isDot is false
+      expect(badge.classList.contains('badge--dot')).toBe(false);
+    });
+  });
+
+  // ─── remove button SVG aria-hidden ───
+
+  describe('remove button SVG aria-hidden', () => {
+    it('remove button SVG has aria-hidden="true"', async () => {
+      const el = await fixture<WcBadge>('<hx-badge removable>Tag</hx-badge>');
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      const svg = btn?.querySelector('svg');
+      expect(svg?.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
+
   // ─── Dynamic count updates (1) ─── [P3-02]
 
   describe('Dynamic count updates', () => {
