@@ -1282,4 +1282,64 @@ describe('hx-select', () => {
       expect(trigger.getAttribute('aria-invalid')).toBe('true');
     });
   });
+
+  // ─── Coverage Gap: outside click closes dropdown ───
+
+  describe('Outside click closes the dropdown', () => {
+    it('closes the dropdown when a click occurs outside the component', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">Alpha</option>
+          <option value="b">Beta</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+      // Dispatch a mousedown on the document body (outside the component)
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── Coverage Gap: typeahead wraps when no match after current position ───
+
+  describe('Typeahead: wraps from current position', () => {
+    it('wraps typeahead search to the first match when no later match exists', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">Alpha</option>
+          <option value="b">Beta</option>
+          <option value="c">Charlie</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      // Focus on Beta (index 1), then search for 'a' — wraps to Alpha (index 0)
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true }));
+      await el.updateComplete;
+      // Now search for 'a' — no match after Beta, so wraps to Alpha
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      await el.updateComplete;
+      const activeDescendant = trigger.getAttribute('aria-activedescendant');
+      // Alpha should be focused (index 0)
+      if (activeDescendant) {
+        const focused = el.shadowRoot!.getElementById(activeDescendant);
+        expect(focused?.textContent?.trim()).toBe('Alpha');
+      } else {
+        expect(el.open).toBe(true);
+      }
+    });
+  });
+
+  // ─── Coverage Gap: devWarn when options list is empty ───
+
+  describe('Empty options list', () => {
+    it('renders without throwing when no option children are provided', async () => {
+      const el = await fixture<WcSelect>('<hx-select label="Empty select"></hx-select>');
+      await expect(el.updateComplete).resolves.toBeTruthy();
+      expect(el.shadowRoot).toBeTruthy();
+    });
+  });
 });

@@ -874,4 +874,107 @@ describe('hx-textarea', () => {
       expect(el.requiredMessage).toBe('Please provide details.');
     });
   });
+
+  // ─── Coverage Gap: rows clamping for invalid values ───
+
+  describe('Property: rows clamping', () => {
+    it('clamps rows to 1 when a value less than 1 is set', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea rows="4"></hx-textarea>');
+      await el.updateComplete;
+      el.rows = 0;
+      await el.updateComplete;
+      // After clamping rows must be at least 1
+      expect(el.rows).toBeGreaterThanOrEqual(1);
+    });
+
+    it('clamps rows to 1 when a negative value is set', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea rows="4"></hx-textarea>');
+      await el.updateComplete;
+      el.rows = -5;
+      await el.updateComplete;
+      expect(el.rows).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  // ─── Coverage Gap: tooShort validity ───
+
+  describe('Validity: tooShort', () => {
+    it('tooShort validity flag is set when value is shorter than minlength', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea minlength="10"></hx-textarea>');
+      el.value = 'short';
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(true);
+    });
+
+    it('tooShort is false when value meets minlength', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea minlength="3"></hx-textarea>');
+      el.value = 'abc';
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(false);
+    });
+  });
+
+  // ─── Coverage Gap: showCount renders counter with maxlength format ───
+
+  describe('Property: showCount with maxlength', () => {
+    it('renders counter in "N / M" format when showCount and maxlength are set', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea show-count maxlength="100" value="Hello"></hx-textarea>',
+      );
+      await el.updateComplete;
+      const counter = el.shadowRoot!.querySelector('[part="counter"]');
+      expect(counter).toBeTruthy();
+      expect(counter!.textContent).toContain('5 / 100');
+    });
+
+    it('renders counter as plain count when showCount is set without maxlength', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea show-count value="Hi"></hx-textarea>',
+      );
+      await el.updateComplete;
+      const counter = el.shadowRoot!.querySelector('[part="counter"]');
+      expect(counter).toBeTruthy();
+      // Without maxlength the counter shows just the character count
+      expect(counter!.textContent).toContain('2');
+      expect(counter!.textContent).not.toContain('/');
+    });
+  });
+
+  // ─── Coverage Gap: resize=auto adjusts height on updated() ───
+
+  describe('Resize auto: height adjustment on value change via property', () => {
+    it('does not throw when value is set programmatically with resize=auto', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea resize="auto"></hx-textarea>');
+      await el.updateComplete;
+      // Setting value programmatically triggers the resize path in updated()
+      el.value = 'Line 1\nLine 2\nLine 3';
+      await expect(el.updateComplete).resolves.toBeTruthy();
+    });
+  });
+
+  // ─── Coverage Gap: disconnectedCallback clears _announceTimer ───
+
+  describe('Lifecycle: disconnectedCallback', () => {
+    it('does not throw when removed from DOM', async () => {
+      const el = await fixture<WcTextarea>(
+        '<hx-textarea show-count maxlength="50"></hx-textarea>',
+      );
+      await el.updateComplete;
+      // Removing should clear the _announceTimer without throwing
+      expect(() => el.remove()).not.toThrow();
+    });
+  });
+
+  // ─── Coverage Gap: _onFormReset resets value ───
+
+  describe('Form lifecycle: _onFormReset clears value', () => {
+    it('resets value to empty string when formResetCallback fires', async () => {
+      const el = await fixture<WcTextarea>('<hx-textarea value="some text"></hx-textarea>');
+      await el.updateComplete;
+      expect(el.value).toBe('some text');
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+  });
 });
