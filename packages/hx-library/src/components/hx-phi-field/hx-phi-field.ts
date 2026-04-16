@@ -92,12 +92,24 @@ export class HelixPhiField extends LitElement {
     super.connectedCallback();
     // Enforce HIPAA compliance: prevent browser autofill on the host element
     this.setAttribute('autocomplete', 'off');
-    // Warn if a developer mistakenly sets PHI via the HTML attribute
+    // FS-029: PHI SSR/attribute exposure prevention.
+    // If a developer (or server-rendered HTML) mistakenly sets PHI via the
+    // `data` HTML attribute, the raw value is readable in the DOM source before
+    // JavaScript initialises — a HIPAA risk on SSR pages. We recover the value
+    // into the JS-only property and then immediately remove the attribute so
+    // that no PHI is ever left exposed in the DOM tree or HTML source.
     if (this.hasAttribute('data')) {
       devWarn(
         'hx-phi-field',
-        'Setting PHI via the `data` HTML attribute is not supported and may expose sensitive data in the DOM. Use the `data` property (element.data = "...") instead.',
+        'Setting PHI via the `data` HTML attribute is not supported and exposes sensitive data in the DOM source. Use the `data` JS property (element.data = "...") instead.',
       );
+      // Rescue the value into the private property so the component still works,
+      // then strip the attribute so the raw PHI is no longer readable in the DOM.
+      const rawValue = this.getAttribute('data');
+      if (rawValue !== null) {
+        this.data = rawValue;
+      }
+      this.removeAttribute('data');
     }
   }
 

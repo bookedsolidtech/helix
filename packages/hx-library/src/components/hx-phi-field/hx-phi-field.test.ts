@@ -883,6 +883,55 @@ describe('hx-phi-field', () => {
     });
   });
 
+  // ─── FS-029: PHI Attribute Stripping ───
+
+  describe('FS-029: PHI Attribute Stripping', () => {
+    it('removes the "data" attribute from the DOM after connectedCallback', async () => {
+      // Simulate the SSR/server-rendered case where raw PHI was set as an HTML attribute
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      // Set the raw PHI as a DOM attribute before the element connects to the document
+      el.setAttribute('data', '123-45-6789');
+      document.body.appendChild(el);
+      await el.updateComplete;
+      // The attribute must be removed so raw PHI is never left in the DOM tree
+      expect(el.hasAttribute('data')).toBe(false);
+      el.remove();
+    });
+
+    it('rescues the PHI value into the JS property when set as a DOM attribute', async () => {
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('data', '123-45-6789');
+      document.body.appendChild(el);
+      await el.updateComplete;
+      // Value must have been rescued so masking still works
+      expect(el.data).toBe('123-45-6789');
+      el.remove();
+    });
+
+    it('masked value is correct after attribute-rescue (masking still functions)', async () => {
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('data', '123-45-6789');
+      document.body.appendChild(el);
+      await el.updateComplete;
+      const value = shadowQuery(el, '.phi-field__value--masked');
+      expect(value?.textContent?.trim()).toBe('***-**-6789');
+      el.remove();
+    });
+
+    it('raw PHI does not appear in outerHTML after connectedCallback strips the attribute', async () => {
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('data', '123-45-6789');
+      document.body.appendChild(el);
+      await el.updateComplete;
+      expect(el.outerHTML).not.toContain('123-45-6789');
+      el.remove();
+    });
+  });
+
   // ─── Keyboard Interaction ───
 
   describe('Keyboard Interaction', () => {
