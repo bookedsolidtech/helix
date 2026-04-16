@@ -210,6 +210,20 @@ export class HelixDatePicker extends HelixElement {
    */
   @state() private _liveMessage = '';
 
+  /**
+   * Cached calendar day grid for the current view month/year.
+   * Recomputed in willUpdate() only when _viewMonth or _viewYear changes.
+   * @internal
+   */
+  private _dayGrid: (Date | null)[] = [];
+
+  /**
+   * Cached aria-label strings for each date in the current grid, keyed by ISO date string.
+   * Recomputed in willUpdate() alongside _dayGrid.
+   * @internal
+   */
+  private _dayAriaLabels: Map<string, string> = new Map();
+
   // ─── Memoized formatters ───
 
   /**
@@ -351,13 +365,44 @@ export class HelixDatePicker extends HelixElement {
     document.removeEventListener('keydown', this._boundHandleDocumentKeydown);
   }
 
-  override updated(changedProperties: PropertyValues<this>): void {
-    super.updated(changedProperties);
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
 
+    // Sync form state before render so the browser form participation is
+    // always up-to-date without causing an extra render cycle.
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
       this._updateValidity();
     }
+
+    // Recompute the day grid and aria-labels only when the viewed month/year
+    // or locale changes — not on every render.
+    const gridChanged =
+      (changedProperties as Map<PropertyKey, unknown>).has('_viewMonth') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_viewYear') ||
+      changedProperties.has('locale') ||
+      this._dayGrid.length === 0;
+
+    if (gridChanged) {
+      this._dayGrid = this._getDaysInGrid();
+      this._dayAriaLabels = new Map(
+        this._dayGrid
+          .filter((d): d is Date => d !== null)
+          .map((d) => [
+            this._toISO(d),
+            d.toLocaleDateString(this.locale, {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }),
+          ]),
+      );
+    }
+  }
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
 
     if ((changedProperties as Map<PropertyKey, unknown>).has('_isOpen')) {
       if (this._isOpen) {
@@ -710,6 +755,23 @@ export class HelixDatePicker extends HelixElement {
     this._closeCalendar();
   }
 
+  /**
+   * Delegated click handler for the calendar day grid.
+   * A single handler on the grid container replaces per-cell closures,
+   * eliminating 42 inline function allocations per render.
+   * @internal
+   */
+  private readonly _handleGridClick = (e: Event): void => {
+    const target = (e.target as Element).closest<HTMLElement>('[data-date]');
+    if (!target) return;
+    const iso = target.dataset['date'];
+    if (!iso) return;
+    const date = this._parseISODate(iso);
+    if (date) {
+      this._selectDay(date);
+    }
+  };
+
   // ─── Calendar Keyboard Navigation ───
 
   /** @internal */
@@ -903,7 +965,8 @@ export class HelixDatePicker extends HelixElement {
 
   /** @internal */
   private _renderDayGrid() {
-    const cells = this._getDaysInGrid();
+    // Use the memoized grid — recomputed in willUpdate() only on month/year/locale change.
+    const cells = this._dayGrid;
     const selectedDate = this._parseISODate(this.value);
 
     const rows: ReturnType<typeof html>[] = [];
@@ -919,13 +982,9 @@ export class HelixDatePicker extends HelixElement {
         const isDisabled = this._isDateDisabled(date);
         const isFocused = this._focusedDay === date.getDate();
         const dayNumber = date.getDate();
-
-        const ariaLabel = date.toLocaleDateString(this.locale, {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        });
+        const iso = this._toISO(date);
+        // Read from the pre-computed aria-label map — no per-render toLocaleDateString calls.
+        const ariaLabel = this._dayAriaLabels.get(iso) ?? iso;
 
         const dayClasses = {
           calendar__day: true,
@@ -934,6 +993,8 @@ export class HelixDatePicker extends HelixElement {
           'calendar__day--disabled': isDisabled,
         };
 
+        // data-date carries the ISO string so the delegated grid click handler
+        // (_handleGridClick) can identify the clicked day without any closure.
         return html`<div class="calendar__day-cell">
           <button
             part="day"
@@ -941,15 +1002,13 @@ export class HelixDatePicker extends HelixElement {
             type="button"
             role="gridcell"
             data-day=${dayNumber}
+            data-date=${iso}
             aria-label=${ariaLabel}
             aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${isDisabled ? 'true' : nothing}
             aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
             ?disabled=${isDisabled}
-            @click=${() => {
-              this._selectDay(date);
-            }}
           >
             ${dayNumber}
           </button>
@@ -1099,7 +1158,13 @@ export class HelixDatePicker extends HelixElement {
                 </div>
 
                 <!-- Day Grid -->
-                <div class="calendar__grid" role="grid" aria-label="${monthName} ${this._viewYear}">
+                <!-- Single delegated click handler on the grid replaces per-cell closures. -->
+                <div
+                  class="calendar__grid"
+                  role="grid"
+                  aria-label="${monthName} ${this._viewYear}"
+                  @click=${this._handleGridClick}
+                >
                   ${this._renderWeekdayHeaders()} ${this._renderDayGrid()}
                 </div>
               </div>
