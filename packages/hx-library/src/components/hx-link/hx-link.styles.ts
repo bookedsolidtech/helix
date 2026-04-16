@@ -74,7 +74,7 @@ export const helixLinkStyles = css`
   .link--disabled {
     color: var(--hx-link-color-disabled, var(--hx-color-neutral-400, #94a3b8));
     text-decoration: none;
-    pointer-events: none;
+    cursor: not-allowed;
   }
 
   /* --- External link icon --- */
@@ -89,6 +89,24 @@ export const helixLinkStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .link {
       transition: none;
+    }
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .link {
+      forced-color-adjust: none;
+      color: LinkText;
+    }
+
+    .link:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .link--disabled {
+      color: GrayText;
     }
   }
 

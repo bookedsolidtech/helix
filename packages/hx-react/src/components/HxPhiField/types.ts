@@ -12,7 +12,9 @@ export interface HxPhiFieldProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
-  /** The Protected Health Information value to display or mask. */
+  /** The Protected Health Information value to display or mask.
+Must be set via the JavaScript property (`element.data = "..."`) — not as an HTML attribute.
+Setting PHI as an HTML attribute exposes it in the DOM and browser caches (HIPAA violation). */
   data?: string;
   /** The type of PHI field. Controls the masking pattern applied. */
   fieldType?: 'ssn' | 'mrn' | 'dob' | 'insurance';

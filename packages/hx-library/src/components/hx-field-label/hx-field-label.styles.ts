@@ -27,6 +27,22 @@ export const helixFieldLabelStyles = css`
     color: var(--hx-color-neutral-500, #6b7280);
   }
 
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .label {
+      color: CanvasText;
+    }
+
+    .required-indicator {
+      color: LinkText;
+    }
+
+    .optional-indicator {
+      color: GrayText;
+    }
+  }
+
   .visually-hidden {
     position: absolute;
     width: 1px;

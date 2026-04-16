@@ -120,4 +120,43 @@ export const helixAccordionItemStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .trigger {
+      forced-color-adjust: none;
+      color: ButtonText;
+      background-color: ButtonFace;
+    }
+
+    .trigger:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    .item {
+      border-bottom-color: CanvasText;
+    }
+
+    :host(:first-child) .item {
+      border-top-color: CanvasText;
+    }
+
+    .item--disabled .trigger {
+      color: GrayText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    .icon {
+      color: ButtonText;
+    }
+
+    .content {
+      color: CanvasText;
+    }
+  }
 `;

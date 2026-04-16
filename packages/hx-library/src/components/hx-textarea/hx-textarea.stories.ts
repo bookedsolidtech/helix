@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, userEvent, fn } from 'storybook/test';
 import './hx-textarea.js';
 
@@ -169,6 +170,7 @@ const meta = {
       value=${args.value}
       rows=${args.rows}
       resize=${args.resize}
+      maxlength=${ifDefined(args.maxlength)}
       ?show-count=${args.showCount}
       ?required=${args.required}
       ?disabled=${args.disabled}

@@ -2,9 +2,10 @@ import { LitElement, html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
+import { createIdCounter } from '../../base/index.js';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
-let _tooltipCounter = 0;
+const _nextTooltipId = createIdCounter('hx-tooltip');
 
 /**
  * A tooltip that displays contextual help text on hover or focus.
@@ -95,7 +96,7 @@ export class HelixTooltip extends LitElement {
   private _hideTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** @internal */
-  private readonly _tooltipId = `hx-tooltip-${++_tooltipCounter}`;
+  private readonly _tooltipId = _nextTooltipId();
 
   /** @internal */
   @query('slot:not([name])') private _defaultSlot!: HTMLSlotElement | null;

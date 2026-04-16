@@ -15,9 +15,25 @@
       "budget": 8192,
       "reason": "Calendar grid rendering, full keyboard nav, focus trap, date utilities, ElementInternals form association. JS-only: ~4324 gz."
     },
+    "hx-file-upload": {
+      "budget": 6144,
+      "reason": "Drag-and-drop file management with progress tracking, mixinDelegatesAria ARIA delegation, focus restoration after file removal, forced-colors support, and WCAG 2.5.5 touch targets. Baseline: ~4.64 KB gz; mandatory a11y fixes add ~1.1 KB."
+    },
+    "hx-number-input": {
+      "budget": 6144,
+      "reason": "Stepper input with increment/decrement buttons, min/max/step validation, keyboard-repeating long-press, ElementInternals form association, forced-colors support. Baseline: ~5.2 KB gz."
+    },
     "hx-select": {
       "budget": 6144,
       "reason": "ARIA listbox, keyboard nav, multiple selection, ElementInternals form association, floating-ui positioning. JS-only: ~5.18 KB gz."
+    },
+    "hx-side-nav": {
+      "budget": 5632,
+      "reason": "Multi-level navigation with expand/collapse state management, keyboard nav, ARIA tree semantics, active-item tracking, and mobile-responsive behavior. Baseline: ~5.01 KB gz."
+    },
+    "hx-slider": {
+      "budget": 5632,
+      "reason": "Range input with value display, dual-handle range mode, ARIA slider semantics, keyboard nav, forced-colors support. Baseline: ~5.04 KB gz."
     },
     "hx-time-picker": {
       "budget": 6144,

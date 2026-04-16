@@ -123,7 +123,7 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
    * The name of the input, used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -509,6 +509,10 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-text-input': HelixTextInput;
+  }
+  interface HTMLElementEventMap {
+    'hx-input': CustomEvent<{ value: string }>;
+    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

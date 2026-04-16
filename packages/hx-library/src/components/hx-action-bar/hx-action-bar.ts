@@ -32,8 +32,9 @@ export type ActionBarSize = 'sm' | 'md' | 'lg';
  * @cssprop [--hx-action-bar-gap=var(--hx-space-2,0.5rem)] - Gap between slotted items.
  * @cssprop [--hx-action-bar-z-index=10] - Z-index when sticky or bottom position.
  *
- * @attr {string} aria-label - Required. Identifies the toolbar to assistive technology.
+ * @attr {string} accessible-label - Identifies the toolbar to assistive technology.
  *   When multiple toolbars appear on the same page, each must have a unique, descriptive label.
+ *   Falls back to the native `aria-label` attribute if not set.
  *
  * @example
  * ```html
@@ -98,10 +99,35 @@ export class HelixActionBar extends LitElement {
   /**
    * Accessible label for the toolbar.
    * Required when multiple toolbars appear on the same page.
-   * @attr aria-label
+   *
+   * Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+   * The `accessible-label` attribute takes precedence when both are set.
+   *
+   * Previously this was exposed as the `ariaLabel` JS property, which shadowed
+   * the native `HTMLElement.ariaLabel`. That shadowing is removed; use
+   * `accessibleLabel` or the HTML attributes instead.
+   *
+   * @attr accessible-label
+   */
+  @property({ attribute: 'accessible-label' })
+  accessibleLabel: string = '';
+
+  /**
+   * Observed mirror of the host's `aria-label` attribute so Lit re-renders
+   * when consumers set `aria-label` (the standard HTML pattern).
+   * @internal
    */
   @property({ attribute: 'aria-label' })
-  ariaLabel: string = 'Actions';
+  private _ariaLabelAttr: string = '';
+
+  /**
+   * Returns the effective label for the toolbar, checking accessible-label first,
+   * then the aria-label attribute, falling back to 'Actions'.
+   * @internal
+   */
+  private get _effectiveLabel(): string {
+    return this.accessibleLabel || this._ariaLabelAttr || 'Actions';
+  }
 
   /** Cached list of focusable items — invalidated on slot change. */
   /** @internal */
@@ -285,7 +311,7 @@ export class HelixActionBar extends LitElement {
       <div
         part="base"
         role="toolbar"
-        aria-label=${this.ariaLabel}
+        aria-label=${this._effectiveLabel}
         aria-orientation="horizontal"
         class="base base--${this.size} base--${this.variant}${positionClass}"
       >

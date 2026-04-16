@@ -132,8 +132,24 @@ if [ "$COMPONENT_COUNT" -gt 20 ]; then
   exit $?
 fi
 
-PATTERN=$(echo "$COMPONENTS" | tr '\n' '|' | sed 's/|$//')
+# Collect test files that actually exist for changed components
+TEST_FILES=""
+for COMP in $COMPONENTS; do
+  TEST_PATH="src/components/${COMP}/${COMP}.test.ts"
+  if [ -f "$REPO_ROOT/packages/hx-library/$TEST_PATH" ]; then
+    TEST_FILES="$TEST_FILES $TEST_PATH"
+  fi
+done
+
+# Trim leading space
+TEST_FILES="${TEST_FILES# }"
+
+if [ -z "$TEST_FILES" ]; then
+  echo "Smart test: no test files found for changed components — skipping"
+  exit 0
+fi
 
 echo "Smart test: $COMPONENTS"
-run_vitest_with_watchdog pnpm exec vitest run "${PATTERN}/" --reporter=verbose
+# shellcheck disable=SC2086
+run_vitest_with_watchdog pnpm exec vitest run $TEST_FILES --reporter=verbose
 exit $?

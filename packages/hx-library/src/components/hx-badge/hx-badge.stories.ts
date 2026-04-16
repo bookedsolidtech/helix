@@ -424,15 +424,33 @@ export const RemovableWithCount: Story = {
       await expect(btn).toBeTruthy();
     }
 
-    // Verify prefix labels appear alongside counts (light DOM check)
+    // Verify prefix labels appear alongside counts
     const firstBadge = badges[0];
     const firstLabel = firstBadge.querySelector('[slot="prefix"]');
     await expect(firstLabel?.textContent?.trim()).toBe('ICU');
+
+    // Verify prefix slot is actually projected in shadow DOM (not silently dropped)
+    const firstPrefixSlot = firstBadge.shadowRoot?.querySelector(
+      'slot[name="prefix"]',
+    ) as HTMLSlotElement | null;
+    await expect(firstPrefixSlot).toBeTruthy();
+    const firstAssigned = firstPrefixSlot?.assignedElements({ flatten: true });
+    await expect(firstAssigned?.length).toBeGreaterThan(0);
+    await expect(firstAssigned?.[0]?.textContent?.trim()).toBe('ICU');
 
     // Last badge: count=107, max=99 → "99+"
     const lastBadge = badges[4];
     const lastLabel = lastBadge.querySelector('[slot="prefix"]');
     await expect(lastLabel?.textContent?.trim()).toBe('Discharged');
+    const lastPrefixSlot = lastBadge.shadowRoot?.querySelector(
+      'slot[name="prefix"]',
+    ) as HTMLSlotElement | null;
+    await expect(lastPrefixSlot).toBeTruthy();
+    const lastAssigned = lastPrefixSlot?.assignedElements({ flatten: true });
+    await expect(lastAssigned?.length).toBeGreaterThan(0);
+    await expect(lastAssigned?.[0]?.textContent?.trim()).toBe('Discharged');
+
+    // Count display is correct
     const span = lastBadge.shadowRoot?.querySelector('[part="badge"]');
     await expect(span?.textContent?.trim()).toBe('99+');
   },

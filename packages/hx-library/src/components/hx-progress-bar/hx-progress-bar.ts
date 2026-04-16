@@ -3,8 +3,11 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+
+const _nextProgressBarId = createIdCounter('hx-progress-bar');
 
 /**
  * A linear progress indicator for determinate and indeterminate states.
@@ -100,9 +103,7 @@ export class HelixProgressBar extends LitElement {
   private _warnedAboutLabel = false;
 
   /** @internal */
-  private static _counter = 0;
-  /** @internal */
-  private _uid = `hx-pb-${++HelixProgressBar._counter}`;
+  private _uid = _nextProgressBarId();
 
   /** @internal */
   private get _isIndeterminate(): boolean {

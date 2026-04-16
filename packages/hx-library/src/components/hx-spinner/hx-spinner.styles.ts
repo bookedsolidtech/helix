@@ -74,15 +74,15 @@ export const helixSpinnerStyles = css`
 
   /* ─── Size Variants ─── */
 
-  :host([size='sm']) {
+  :host([hx-size='sm']) {
     --_spinner-size: var(--hx-size-4, 1rem);
   }
 
-  :host([size='md']) {
+  :host([hx-size='md']) {
     --_spinner-size: var(--hx-size-6, 1.5rem);
   }
 
-  :host([size='lg']) {
+  :host([hx-size='lg']) {
     --_spinner-size: var(--hx-size-8, 2rem);
   }
 
@@ -114,6 +114,18 @@ export const helixSpinnerStyles = css`
         --hx-spinner-track-color,
         color-mix(in srgb, var(--hx-color-neutral-0, #ffffff) 30%, transparent)
       );
+    }
+  }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .spinner__track {
+      stroke: GrayText;
+    }
+
+    .spinner__arc {
+      stroke: CanvasText;
     }
   }
 `;

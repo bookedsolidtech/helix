@@ -182,7 +182,7 @@ export const NonModal: Story = {
       <p style="color: #6b7280; font-size: 0.875rem;">
         Background content remains interactive in non-modal mode.
       </p>
-      <hx-dialog open ?modal=${false} heading="Lab Results Reference">
+      <hx-dialog open .modal=${false} heading="Lab Results Reference">
         <p style="margin: 0; font-size: 0.875rem;">
           Reference range: Hemoglobin A1c — normal below 5.7%, prediabetes 5.7–6.4%, diabetes 6.5%
           and above.

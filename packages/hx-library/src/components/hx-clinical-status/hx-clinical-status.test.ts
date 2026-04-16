@@ -360,42 +360,47 @@ describe('hx-clinical-status', () => {
   // ─── Accessibility (6) ───
 
   describe('Accessibility', () => {
+    // ElementInternals.role is not reflected via the host's `role` IDL property,
+    // so we access the private _elInternals field to verify the ARIA role.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getInternalsRole = (el: HxClinicalStatus) => (el as any)._elInternals?.role;
+
     it('uses role="status" for info severity', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status severity="info" message="Info"></hx-clinical-status>',
       );
-      expect(el.getAttribute('role')).toBe('status');
+      expect(getInternalsRole(el)).toBe('status');
     });
 
     it('uses role="status" for warning severity', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status severity="warning" message="Warning"></hx-clinical-status>',
       );
-      expect(el.getAttribute('role')).toBe('status');
+      expect(getInternalsRole(el)).toBe('status');
     });
 
     it('uses role="alert" for critical severity', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status severity="critical" message="Critical"></hx-clinical-status>',
       );
-      expect(el.getAttribute('role')).toBe('alert');
+      expect(getInternalsRole(el)).toBe('alert');
     });
 
     it('uses role="alert" for emergent severity', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status severity="emergent" message="Emergent"></hx-clinical-status>',
       );
-      expect(el.getAttribute('role')).toBe('alert');
+      expect(getInternalsRole(el)).toBe('alert');
     });
 
     it('updates host role when severity changes', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status severity="info" message="Test"></hx-clinical-status>',
       );
-      expect(el.getAttribute('role')).toBe('status');
+      expect(getInternalsRole(el)).toBe('status');
       el.severity = 'critical';
       await el.updateComplete;
-      expect(el.getAttribute('role')).toBe('alert');
+      expect(getInternalsRole(el)).toBe('alert');
     });
 
     it('dismiss button has aria-label', async () => {

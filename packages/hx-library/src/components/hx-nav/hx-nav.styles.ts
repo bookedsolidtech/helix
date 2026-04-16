@@ -242,4 +242,20 @@ export const helixNavStyles = css`
       animation: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    [part='nav'] {
+      border: 1px solid CanvasText;
+    }
+
+    .nav__link--active {
+      border: 1px solid Highlight;
+    }
+
+    .nav__submenu {
+      border: 1px solid CanvasText;
+    }
+  }
 `;

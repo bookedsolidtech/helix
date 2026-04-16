@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { hxStyleScopeStyles } from './hx-style-scope.styles.js';
@@ -70,7 +70,7 @@ export class HxStyleScope extends LitElement {
     this._applyScope();
   }
 
-  override updated(changed: Map<string, unknown>): void {
+  protected override updated(changed: PropertyValues<this>): void {
     if (changed.has('component') || changed.has('lightCss')) {
       this._applyScope();
     }

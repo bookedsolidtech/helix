@@ -71,7 +71,7 @@ When `hx-href` is set, the card becomes a clickable navigation element. It fires
 
 ### Accessible Labels for Interactive Cards
 
-Always provide `hx-aria-label` when using `hx-href`. The label should describe the card's purpose, not expose the raw URL:
+Always provide `hx-label` when using `hx-href`. The label should describe the card's purpose, not expose the raw URL:
 
 ```twig
 {# Wrong — exposes raw URL to screen readers #}
@@ -80,7 +80,7 @@ Always provide `hx-aria-label` when using `hx-href`. The label should describe t
 {# Correct — meaningful description #}
 <hx-card
   hx-href="/node/1234"
-  hx-aria-label="View chart for Margaret Thompson"
+  hx-label="View chart for Margaret Thompson"
 >
   <h3 slot="heading">Margaret Thompson</h3>
   ...
@@ -91,7 +91,7 @@ Always provide `hx-aria-label` when using `hx-href`. The label should describe t
 {# Drupal field mapping example #}
 <hx-card
   hx-href="{{ node.url }}"
-  hx-aria-label="{{ 'View @title'|t({'@title': node.title}) }}"
+  hx-label="{{ 'View @title'|t({'@title': node.title}) }}"
 >
   <h3 slot="heading">{{ node.title }}</h3>
   {{ node.body.summary }}
@@ -132,7 +132,7 @@ Do NOT use `hx-href` and `slot="actions"` together on the same card. This create
 </hx-card>
 
 {# CORRECT — Use either hx-href OR actions, not both #}
-<hx-card hx-href="/node/1234" hx-aria-label="View Margaret Thompson">
+<hx-card hx-href="/node/1234" hx-label="View Margaret Thompson">
   <h3 slot="heading">Margaret Thompson</h3>
 </hx-card>
 
@@ -163,7 +163,7 @@ Do NOT use `hx-href` and `slot="actions"` together on the same card. This create
 | `variant`       | Yes          | String. `default`, `featured`, or `compact`.                               |
 | `elevation`     | Yes          | String. `flat`, `raised`, or `floating`.                                   |
 | `hx-href`       | Yes          | Custom attribute with `hx-` prefix. Valid HTML. Use `attributes.setAttribute('hx-href', url)` in PHP. |
-| `hx-aria-label` | Yes          | String. Required when `hx-href` is set. Provides meaningful label for AT.  |
+| `hx-label` | Yes          | String. Required when `hx-href` is set. Provides meaningful label for AT.  |
 
 ## Drupal Views Integration
 
@@ -178,7 +178,7 @@ For rendering a Views result as cards:
       variant="default"
       elevation="raised"
       hx-href="{{ patient.url }}"
-      hx-aria-label="{{ 'View chart for @name'|t({'@name': patient.title}) }}"
+      hx-label="{{ 'View chart for @name'|t({'@name': patient.title}) }}"
     >
       <h3 slot="heading">{{ patient.title }}</h3>
       <p>{{ patient.field_summary }}</p>

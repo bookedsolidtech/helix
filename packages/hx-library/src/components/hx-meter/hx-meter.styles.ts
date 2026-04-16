@@ -11,6 +11,13 @@ export const helixMeterStyles = css`
     flex-direction: column;
     gap: var(--hx-space-2, 0.5rem);
     width: 100%;
+    outline: none;
+    border-radius: var(--hx-border-radius-md, 0.375rem);
+  }
+
+  .meter:focus-visible {
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .meter__label {
@@ -94,12 +101,6 @@ export const helixMeterStyles = css`
     color: var(--hx-meter-color-danger, var(--hx-color-error-700, #991b1b));
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .meter__indicator {
-      transition: none;
-    }
-  }
-
   /* ─── Native meter hidden (we use custom rendering) ─── */
 
   .meter__native {
@@ -112,5 +113,18 @@ export const helixMeterStyles = css`
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .meter__track {
+      border: 1px solid CanvasText;
+    }
+
+    .meter__indicator {
+      forced-color-adjust: none;
+      background-color: Highlight;
+    }
   }
 `;

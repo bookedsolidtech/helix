@@ -98,6 +98,13 @@ export class HelixLink extends LitElement {
 
   // --- Event Handling ---
 
+  /** @internal Blocks Enter and Space activation on disabled span. */
+  private _handleDisabledKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+    }
+  }
+
   /** @internal */
   private _handleClick(e: MouseEvent): void {
     if (this.disabled) {
@@ -162,7 +169,9 @@ export class HelixLink extends LitElement {
           class=${classMap(classes)}
           role="link"
           aria-disabled="true"
+          tabindex="0"
           @click=${this._handleClick}
+          @keydown=${this._handleDisabledKeydown}
         >
           <slot></slot>
         </span>

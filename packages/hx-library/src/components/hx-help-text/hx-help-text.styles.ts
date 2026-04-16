@@ -50,4 +50,24 @@ export const helixHelpTextStyles = css`
   .help-text--success {
     --hx-help-text-color: var(--hx-color-success-700, #15803d);
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .help-text {
+      color: GrayText;
+    }
+
+    .help-text--error {
+      color: LinkText;
+    }
+
+    .help-text--warning {
+      color: CanvasText;
+    }
+
+    .help-text--success {
+      color: CanvasText;
+    }
+  }
 `;

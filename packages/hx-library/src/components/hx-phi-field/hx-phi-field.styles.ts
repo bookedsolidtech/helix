@@ -20,7 +20,7 @@ export const helixPhiFieldStyles = css`
     user-select: none;
     -webkit-user-select: none;
     color: var(--hx-phi-field-masked-color, var(--hx-color-neutral-500, #6b7280));
-    letter-spacing: 0.1em;
+    letter-spacing: var(--hx-phi-field-letter-spacing, 0.1em);
   }
 
   .phi-field__value--revealed {
@@ -95,6 +95,20 @@ export const helixPhiFieldStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .phi-field__toggle {
       transition: none;
+    }
+  }
+
+  /* ─── Forced Colors (Windows High Contrast Mode) ─── */
+
+  @media (forced-colors: active) {
+    .phi-field__toggle {
+      border: 1px solid ButtonText;
+      forced-color-adjust: none;
+    }
+
+    .phi-field__toggle:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
     }
   }
 `;

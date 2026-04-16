@@ -5,10 +5,10 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxDrawerIdCounter = 0;
+const _nextDrawerId = createIdCounter('hx-drawer');
 
 type DrawerSizePreset = 'sm' | 'md' | 'lg' | 'full';
 type DrawerSize = DrawerSizePreset | (string & Record<never, never>);
@@ -152,7 +152,7 @@ export class HelixDrawer extends LitElement {
    * Unique ID for the title element, used by aria-labelledby to link the dialog to its label.
    * @internal
    */
-  private readonly _titleId = `hx-drawer-title-${++_hxDrawerIdCounter}`;
+  private readonly _titleId = `${_nextDrawerId()}-title`;
 
   // ─── Public Properties ───
 
@@ -320,13 +320,30 @@ export class HelixDrawer extends LitElement {
         this._cachedFocusableElements = this._getFocusableElements();
         this._setInitialFocus();
 
-        // Dispatch hx-after-show after animation duration
+        // Dispatch hx-after-show when the panel's CSS transition completes.
+        // If prefers-reduced-motion is active (duration === 0) or the element
+        // is missing, fire immediately — transitionend will never fire.
         const duration = this._getAnimationDuration();
-        this._animationTimeout = setTimeout(() => {
+        const panel = this._panelEl;
+        if (duration === 0 || !panel) {
           this.dispatchEvent(
             new CustomEvent<void>('hx-after-show', { bubbles: true, composed: true }),
           );
-        }, duration);
+        } else {
+          const emitAfterShow = () => {
+            if (this._animationTimeout !== null) {
+              clearTimeout(this._animationTimeout);
+              this._animationTimeout = null;
+            }
+            this.dispatchEvent(
+              new CustomEvent<void>('hx-after-show', { bubbles: true, composed: true }),
+            );
+          };
+          panel.addEventListener('transitionend', emitAfterShow, { once: true });
+          // Safety fallback: if transitionend never fires (e.g. transition
+          // cancelled, element removed), ensure the event is still dispatched.
+          this._animationTimeout = setTimeout(emitAfterShow, duration + 50);
+        }
       })
       .catch(console.error);
   }
@@ -354,11 +371,28 @@ export class HelixDrawer extends LitElement {
     }
     this._triggerElement = null;
 
-    // Animation cleanup only — no focus management inside this timeout.
+    // Dispatch hx-after-hide when the panel's CSS transition completes.
+    // If prefers-reduced-motion is active (duration === 0) or the element
+    // is missing, fire immediately — transitionend will never fire.
     const duration = this._getAnimationDuration();
-    this._animationTimeout = setTimeout(() => {
+    const panel = this._panelEl;
+    if (duration === 0 || !panel) {
       this.dispatchEvent(new CustomEvent<void>('hx-after-hide', { bubbles: true, composed: true }));
-    }, duration);
+    } else {
+      const emitAfterHide = () => {
+        if (this._animationTimeout !== null) {
+          clearTimeout(this._animationTimeout);
+          this._animationTimeout = null;
+        }
+        this.dispatchEvent(
+          new CustomEvent<void>('hx-after-hide', { bubbles: true, composed: true }),
+        );
+      };
+      panel.addEventListener('transitionend', emitAfterHide, { once: true });
+      // Safety fallback: if transitionend never fires (e.g. transition
+      // cancelled, element removed), ensure the event is still dispatched.
+      this._animationTimeout = setTimeout(emitAfterHide, duration + 50);
+    }
   }
 
   /** @internal */
@@ -666,5 +700,12 @@ export class HelixDrawer extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-drawer': HelixDrawer;
+  }
+  interface HTMLElementEventMap {
+    'hx-show': CustomEvent<void>;
+    'hx-after-show': CustomEvent<void>;
+    'hx-hide': CustomEvent<void>;
+    'hx-after-hide': CustomEvent<void>;
+    'hx-initial-focus': CustomEvent<void>;
   }
 }

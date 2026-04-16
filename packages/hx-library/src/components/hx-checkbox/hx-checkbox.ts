@@ -88,14 +88,14 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    * The name of the checkbox, used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
    * The value submitted when the checkbox is checked.
    * @attr value
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   value = 'on';
 
   /**
@@ -402,5 +402,8 @@ export type WcCheckbox = HelixCheckbox;
 declare global {
   interface HTMLElementTagNameMap {
     'hx-checkbox': HelixCheckbox;
+  }
+  interface HTMLElementEventMap {
+    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }

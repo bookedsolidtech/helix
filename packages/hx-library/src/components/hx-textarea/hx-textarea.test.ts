@@ -534,17 +534,21 @@ describe('hx-textarea', () => {
       expect(describedBy).toContain(helpDiv.id);
     });
 
-    it('references counter ID when showCount is set', async () => {
+    it('does NOT reference counter ID when showCount is set (counter has aria-hidden)', async () => {
       const el = await fixture<WcTextarea>(
         '<hx-textarea show-count value="hello"></hx-textarea>',
       );
       const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
       const counterDiv = shadowQuery(el, '[part="counter"]')!;
+      // Counter has aria-hidden="true" so it must NOT be in aria-describedby (P2-8 fix)
+      expect(counterDiv.getAttribute('aria-hidden')).toBe('true');
       const describedBy = textarea.getAttribute('aria-describedby');
-      expect(describedBy).toContain(counterDiv.id);
+      if (describedBy) {
+        expect(describedBy).not.toContain(counterDiv.id);
+      }
     });
 
-    it('references both error and counter IDs when both are set', async () => {
+    it('references only error ID when both error and counter are set', async () => {
       const el = await fixture<WcTextarea>(
         '<hx-textarea error="Bad" show-count value="hello"></hx-textarea>',
       );
@@ -552,8 +556,10 @@ describe('hx-textarea', () => {
       const errorDiv = shadowQuery(el, '.field__error')!;
       const counterDiv = shadowQuery(el, '[part="counter"]')!;
       const describedBy = textarea.getAttribute('aria-describedby');
+      // Error should be referenced
       expect(describedBy).toContain(errorDiv.id);
-      expect(describedBy).toContain(counterDiv.id);
+      // Counter has aria-hidden="true" so it must NOT be in aria-describedby (P2-8 fix)
+      expect(describedBy).not.toContain(counterDiv.id);
     });
 
     it('has no aria-describedby when nothing is set', async () => {

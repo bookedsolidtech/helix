@@ -1,6 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
@@ -169,7 +170,7 @@ function parseUserInput(raw: string): string | null {
  * @cssprop [--hx-time-picker-option-selected-color=var(--hx-color-primary-800)] - Selected option text color.
  */
 @customElement('hx-time-picker')
-export class HelixTimePicker extends LitElement {
+export class HelixTimePicker extends HelixElement {
   static override styles = [helixTimePickerStyles];
 
   // ─── Form Association ───
@@ -178,19 +179,7 @@ export class HelixTimePicker extends LitElement {
    * Declares this element as form-associated so it participates in native form submission.
    * @internal
    */
-  static formAssociated = true;
-
-  /**
-   * ElementInternals instance used for form participation and constraint validation.
-   * @internal
-   */
-  private readonly _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -198,7 +187,7 @@ export class HelixTimePicker extends LitElement {
    * The name submitted with the form. Value is always HH:MM (24-hour).
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -423,21 +412,6 @@ export class HelixTimePicker extends LitElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
   /** Checks whether the field satisfies its constraints. */
   checkValidity(): boolean {
     return this._internals.checkValidity();
@@ -462,7 +436,7 @@ export class HelixTimePicker extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = '';
     this._inputDisplayValue = '';
     this._internals.setFormValue(null);
@@ -470,9 +444,9 @@ export class HelixTimePicker extends LitElement {
   }
 
   /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData,
-    _mode: 'restore' | 'autocomplete' = 'restore',
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
+    _mode: 'restore' | 'autocomplete',
   ): void {
     // Only string states are valid for this component; ignore File/FormData
     if (typeof state !== 'string') return;
@@ -482,7 +456,7 @@ export class HelixTimePicker extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

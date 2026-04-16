@@ -1,14 +1,14 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxNumberInputIdCounter = 0;
+const _nextNumberInputId = createIdCounter('hx-number-input');
 
 /**
  * A numeric input component with stepper controls, label, validation, and
@@ -49,22 +49,13 @@ let _hxNumberInputIdCounter = 0;
  * @cssprop [--hx-number-input-font-family=var(--hx-font-family-sans)] - Font family.
  */
 @customElement('hx-number-input')
-export class HelixNumberInput extends LitElement {
+export class HelixNumberInput extends HelixElement {
   static override styles = [helixNumberInputStyles];
 
   // ─── Form Association ───
 
   /** @internal */
-  static formAssociated = true;
-
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
+  static override formAssociated = true;
 
   // ─── Properties ───
 
@@ -72,7 +63,7 @@ export class HelixNumberInput extends LitElement {
    * The name of the input, used for form submission.
    * @attr name
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   name = '';
 
   /**
@@ -81,6 +72,7 @@ export class HelixNumberInput extends LitElement {
    */
   @property({
     type: Number,
+    reflect: true,
     converter: {
       fromAttribute: (attr: string | null): number | null => {
         if (attr === null || attr === '') return null;
@@ -220,7 +212,7 @@ export class HelixNumberInput extends LitElement {
   // ─── Stable IDs ───
 
   /** @internal */
-  private readonly _inputId = `hx-number-input-${++_hxNumberInputIdCounter}`;
+  private readonly _inputId = _nextNumberInputId();
   /** @internal */
   private readonly _helpTextId = `${this._inputId}-help`;
   /** @internal */
@@ -377,14 +369,14 @@ export class HelixNumberInput extends LitElement {
   }
 
   /** @internal */
-  formResetCallback(): void {
+  protected override _onFormReset(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(this.value !== null ? String(this.value) : null);
   }
 
   /** @internal */
-  formStateRestoreCallback(
-    state: string | File | FormData | null,
+  protected override _onFormStateRestore(
+    state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
     if (typeof state === 'string') {
@@ -394,7 +386,7 @@ export class HelixNumberInput extends LitElement {
   }
 
   /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 

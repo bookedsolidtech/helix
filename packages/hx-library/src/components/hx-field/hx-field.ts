@@ -2,13 +2,14 @@ import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixFieldStyles } from './hx-field.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /** Native form control tag names that can receive ARIA attributes. */
 const FORM_CONTROL_TAGS = new Set(['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON']);
 
-let _fieldCounter = 0;
+const _nextFieldId = createIdCounter('hx-field');
 
 /** Returns true if the element is a native form control or a custom element. */
 function isFormControl(el: Element): el is HTMLElement {
@@ -151,7 +152,7 @@ export class HelixField extends LitElement {
    * Unique ID for this field instance, used as a base for all derived accessibility IDs.
    * @internal
    */
-  private _fieldId = `hx-field-${++_fieldCounter}`;
+  private _fieldId = _nextFieldId();
 
   /**
    * ID for the help text element, allowing aria-describedby to reference it.

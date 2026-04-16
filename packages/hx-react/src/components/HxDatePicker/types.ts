@@ -46,12 +46,6 @@ export interface HxDatePickerProps {
   previousMonthLabel?: string;
   /** Accessible label for the next month navigation button. */
   nextMonthLabel?: string;
-  /** The form element associated with this component, or null if not in a form. */
-  form?: HTMLFormElement | null;
-  /** The current validation message, or an empty string if the field is valid. */
-  validationMessage?: string;
-  /** The current validity state of the field. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Emitted when the selected date changes. */

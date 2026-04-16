@@ -294,11 +294,12 @@ export const MenuSelectEvent: Story = {
     await splitButton!.updateComplete;
 
     // Click the first hx-menu-item (Save as Draft)
+    // hx-menu-item uses a div[role="menuitem"], not a button
     const firstMenuItem = canvasElement.querySelector('hx-menu-item[value="save-draft"]');
     await expect(firstMenuItem).toBeTruthy();
-    const firstItemButton = firstMenuItem!.shadowRoot!.querySelector('button') as HTMLButtonElement;
-    await expect(firstItemButton).toBeTruthy();
-    await userEvent.click(firstItemButton);
+    const firstItemEl = firstMenuItem!.shadowRoot!.querySelector('[part="base"]') as HTMLElement;
+    await expect(firstItemEl).toBeTruthy();
+    await userEvent.click(firstItemEl);
 
     await expect(selectSpy).toHaveBeenCalledTimes(1);
     const callArg = selectSpy.mock.calls[0][0] as CustomEvent<{ value: string; label: string }>;
@@ -511,8 +512,9 @@ export const ExportFormats: Story = {
     // Select "Export as CSV"
     const csvItem = canvasElement.querySelector('hx-menu-item[value="export-csv"]');
     await expect(csvItem).toBeTruthy();
-    const csvItemButton = csvItem!.shadowRoot!.querySelector('button') as HTMLButtonElement;
-    await userEvent.click(csvItemButton);
+    // hx-menu-item uses a div[role="menuitem"], not a button
+    const csvItemEl = csvItem!.shadowRoot!.querySelector('[part="base"]') as HTMLElement;
+    await userEvent.click(csvItemEl);
 
     await expect(selectSpy).toHaveBeenCalledTimes(1);
     const callArg = selectSpy.mock.calls[0][0] as CustomEvent<{ value: string; label: string }>;
@@ -605,8 +607,9 @@ export const MenuItemSelectEvent: Story = {
     // Activate the second menu item (save-publish)
     const publishItem = canvasElement.querySelector('hx-menu-item[value="save-publish"]');
     await expect(publishItem).toBeTruthy();
-    const publishItemButton = publishItem!.shadowRoot!.querySelector('button') as HTMLButtonElement;
-    await userEvent.click(publishItemButton);
+    // hx-menu-item uses a div[role="menuitem"], not a button
+    const publishItemEl = publishItem!.shadowRoot!.querySelector('[part="base"]') as HTMLElement;
+    await userEvent.click(publishItemEl);
 
     await expect(selectSpy).toHaveBeenCalledTimes(1);
     const callArg = selectSpy.mock.calls[0][0] as CustomEvent<{ value: string; label: string }>;

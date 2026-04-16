@@ -374,7 +374,7 @@ export const IsolatedRow: Story = {
     await expect(row?.shadowRoot?.querySelector('[part="value"]')).toBeTruthy();
     await expect(row?.shadowRoot?.querySelector('[part="actions"]')).toBeTruthy();
     const actionBtn = row?.querySelector('[slot="actions"]');
-    await expect(actionBtn?.textContent).toBe('Edit');
+    await expect(actionBtn?.textContent?.trim()).toBe('Edit');
   },
 };
 

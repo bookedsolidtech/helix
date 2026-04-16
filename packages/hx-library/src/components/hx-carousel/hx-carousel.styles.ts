@@ -211,4 +211,28 @@ export const helixCarouselStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .nav-btn {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    .play-pause-btn {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    .pagination-dot {
+      border: 1px solid CanvasText;
+    }
+
+    .pagination-item[aria-current='true'] .pagination-dot,
+    .pagination-item.is-active .pagination-dot {
+      background: Highlight;
+      border-color: Highlight;
+    }
+  }
 `;

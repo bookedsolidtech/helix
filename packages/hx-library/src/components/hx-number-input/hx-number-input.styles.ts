@@ -246,4 +246,82 @@ export const helixNumberInputStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .field__input-wrapper {
+      forced-color-adjust: none;
+      background-color: Field;
+      color: FieldText;
+      border: 2px solid ButtonText;
+    }
+
+    .field__input {
+      color: FieldText;
+    }
+
+    .field__input::placeholder {
+      color: GrayText;
+    }
+
+    .field__input-wrapper:focus-within {
+      border-color: Highlight;
+      box-shadow: none;
+    }
+
+    .field__stepper {
+      border-color: ButtonText;
+    }
+
+    .field__stepper-btn {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border-color: ButtonText;
+    }
+
+    .field__stepper-btn:hover:not(:disabled) {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    .field__stepper-btn:focus-visible {
+      outline-color: Highlight;
+    }
+
+    .field__stepper-btn:disabled {
+      color: GrayText;
+      opacity: 1;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .field__input-wrapper {
+      border-color: GrayText;
+      color: GrayText;
+    }
+
+    :host([disabled]) .field__input {
+      color: GrayText;
+    }
+
+    .field--error .field__input-wrapper {
+      border-color: LinkText;
+    }
+
+    .field__label {
+      color: CanvasText;
+    }
+
+    .field__help-text {
+      color: GrayText;
+    }
+
+    .field__error {
+      color: LinkText;
+    }
+  }
 `;

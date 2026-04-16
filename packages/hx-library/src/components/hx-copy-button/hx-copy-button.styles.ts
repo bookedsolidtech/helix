@@ -121,4 +121,32 @@ export const helixCopyButtonStyles = css`
       transition: none;
     }
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .button {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 2px solid ButtonText;
+    }
+
+    .button:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    .button[disabled] {
+      background-color: ButtonFace;
+      color: GrayText;
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    .button--copied {
+      border-color: Highlight;
+      color: Highlight;
+    }
+  }
 `;

@@ -41,12 +41,13 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
-    icon: {
+    showIcon: {
       control: 'boolean',
-      description: 'Whether to show the default variant icon. Set to false to hide the icon.',
+      description:
+        'Whether to show the default variant icon. Add the `show-icon` attribute to display the icon.',
       table: {
         category: 'Visual',
-        defaultValue: { summary: 'true' },
+        defaultValue: { summary: 'false' },
         type: { summary: 'boolean' },
       },
     },
@@ -78,16 +79,6 @@ const meta = {
         type: { summary: 'string | null' },
       },
     },
-    showIcon: {
-      control: 'boolean',
-      description:
-        'Whether to show the default variant icon. Add the `show-icon` attribute to display the icon.',
-      table: {
-        category: 'Visual',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
-      },
-    },
     severityLabel: {
       control: 'text',
       description:
@@ -112,7 +103,7 @@ const meta = {
     variant: 'info',
     dismissible: false,
     open: true,
-    icon: true,
+    showIcon: true,
     accent: false,
     'return-focus-to': '',
     message: 'Your session will expire in 15 minutes. Please save your work.',
@@ -122,7 +113,7 @@ const meta = {
       variant=${args.variant}
       ?dismissible=${args.dismissible}
       ?open=${args.open}
-      ?show-icon=${args.icon}
+      ?show-icon=${args.showIcon}
       ?accent=${args.accent}
       return-focus-to=${ifDefined(args['return-focus-to'] || undefined)}
     >
@@ -1064,12 +1055,14 @@ hx-alert::part(actions) {
     const alert = canvasElement.querySelector('hx-alert');
     await expect(alert).toBeTruthy();
 
-    // Verify all 6 parts are present
-    const parts = ['alert', 'title', 'icon', 'message', 'close-button', 'actions'];
-    for (const partName of parts) {
+    // Verify parts that are always present
+    const alwaysParts = ['alert', 'title', 'message', 'close-button', 'actions'];
+    for (const partName of alwaysParts) {
       const part = alert?.shadowRoot?.querySelector(`[part="${partName}"]`);
       await expect(part).toBeTruthy();
     }
+    // icon part only renders when show-icon attribute is set
+    // The CSSParts demo does not set show-icon, so icon part is not present
   },
 };
 

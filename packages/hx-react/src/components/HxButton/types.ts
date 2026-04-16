@@ -37,8 +37,6 @@ Sets the host to `display: block` and the inner element to `width: 100%`. */
   /** When true, flips button colors for placement on dark or gradient backgrounds.
 Forces text to white and adjusts hover/focus ring colors across all variants. */
   inverted?: boolean;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
 
   // Event callbacks
   /** Dispatched when the button is clicked and is neither disabled nor loading. */

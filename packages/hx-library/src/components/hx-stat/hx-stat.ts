@@ -1,4 +1,4 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -81,6 +81,9 @@ export class HelixStat extends LitElement {
    */
   @property({ attribute: 'label-trend' }) labelTrend = 'Trend';
 
+  /** @internal tracks whether the "unnamed" devWarn has already fired this lifecycle */
+  private _hasWarnedUnnamed = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -91,6 +94,23 @@ export class HelixStat extends LitElement {
     if (legacySize !== null && !this.hasAttribute('hx-size')) {
       devWarn('hx-stat', 'The "size" attribute is deprecated. Use "hx-size" instead.');
       this.size = legacySize as StatSize;
+    }
+  }
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    const identityChanged = changedProperties.has('value') || changedProperties.has('label');
+    const hasValue = this.value.trim().length > 0;
+    const hasLabel = this.label.trim().length > 0;
+    if (identityChanged && !hasValue && !hasLabel && !this._hasWarnedUnnamed) {
+      this._hasWarnedUnnamed = true;
+      devWarn(
+        'hx-stat',
+        'Rendering an unnamed hx-stat; provide at least value or label for screen reader accessibility.',
+      );
+    }
+    if (hasValue || hasLabel) {
+      this._hasWarnedUnnamed = false;
     }
   }
 
@@ -164,6 +184,15 @@ export class HelixStat extends LitElement {
         ? `${this.value}: ${this.label}`
         : this.value || this.label || nothing;
 
+    // Live region text: announces value, label, and trend direction to screen
+    // readers when any of those properties change programmatically.
+    const liveParts: string[] = [];
+    const primary =
+      this.label && this.value ? `${this.label}: ${this.value}` : this.value || this.label || '';
+    if (primary) liveParts.push(primary);
+    if (hasTrend) liveParts.push(`${this.labelTrend}: ${this.trend}`);
+    const liveText = liveParts.join(', ');
+
     return html`
       <div
         part="container"
@@ -171,6 +200,7 @@ export class HelixStat extends LitElement {
         role="group"
         aria-label=${groupLabel}
       >
+        <span class="stat__live-region" aria-live="polite" aria-atomic="true">${liveText}</span>
         <div part="header" class="stat__header">
           <span part="icon" class="stat__icon" ?hidden=${!this._hasIcon}>
             <slot name="icon" @slotchange=${this._onIconSlotChange}></slot>

@@ -10,4 +10,12 @@ export const helixMenuDividerStyles = css`
     background-color: var(--hx-menu-divider-color, var(--hx-color-neutral-200, #e2e8f0));
     margin: var(--hx-space-1, 0.25rem) calc(-1 * var(--hx-space-1, 0.25rem));
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .menu-divider {
+      background-color: GrayText;
+    }
+  }
 `;

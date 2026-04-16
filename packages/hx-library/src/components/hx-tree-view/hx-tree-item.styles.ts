@@ -174,6 +174,14 @@ export const helixTreeItemStyles = css`
     }
   }
 
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    :host([selected]) .item-row {
+      outline: 2px solid Highlight;
+    }
+  }
+
   .children-inner {
     overflow: hidden;
   }

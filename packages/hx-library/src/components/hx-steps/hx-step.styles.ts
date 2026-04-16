@@ -220,4 +220,38 @@ export const helixStepStyles = css`
       transition: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .step__indicator {
+      border-color: CanvasText;
+    }
+
+    :host([status='active']) .step__indicator {
+      border-color: Highlight;
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    :host([status='complete']) .step__indicator {
+      border-color: Highlight;
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    :host([status='error']) .step__indicator {
+      border-color: LinkText;
+      background-color: LinkText;
+      color: HighlightText;
+    }
+
+    .step__connector {
+      background-color: CanvasText;
+    }
+
+    :host([status='complete']) .step__connector {
+      background-color: Highlight;
+    }
+  }
 `;

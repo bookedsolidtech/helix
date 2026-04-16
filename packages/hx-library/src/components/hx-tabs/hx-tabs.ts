@@ -1,13 +1,13 @@
 import { LitElement, html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { createIdCounter } from '../../base/index.js';
 import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
-// Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
-let _hxTabsIdCounter = 0;
+const _nextTabsId = createIdCounter('hx-tabs');
 
 /**
  * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
@@ -52,7 +52,7 @@ export class HelixTabs extends LitElement {
   // ─── Internal ID ───
 
   /** @internal */
-  private _id = `hx-tabs-${++_hxTabsIdCounter}`;
+  private _id = _nextTabsId();
 
   // ─── Properties ───
 
@@ -491,5 +491,8 @@ export class HelixTabs extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-tabs': HelixTabs;
+  }
+  interface HTMLElementEventMap {
+    'hx-tab-change': CustomEvent<{ tabId: string; index: number }>;
   }
 }

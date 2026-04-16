@@ -203,4 +203,25 @@ export const helixTopNavStyles = css`
       animation: none;
     }
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .nav {
+      border-bottom-color: CanvasText;
+    }
+
+    .mobile-toggle {
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+
+    .nav__collapsible {
+      border-top-color: CanvasText;
+    }
+
+    .nav__actions {
+      border-top-color: CanvasText;
+    }
+  }
 `;

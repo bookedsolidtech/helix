@@ -3,9 +3,10 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { computePosition, flip, shift, offset } from '@floating-ui/dom';
+import { createIdCounter } from '../../base/index.js';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 
-let _counter = 0;
+const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
 
 /**
  * An overflow menu (kebab/meatball menu) that reveals hidden actions via a
@@ -110,7 +111,7 @@ export class HelixOverflowMenu extends LitElement {
    * Unique ID for the floating panel element, used to wire aria-controls on the trigger button.
    * @internal
    */
-  private readonly _panelId = `hx-overflow-menu-panel-${++_counter}`;
+  private readonly _panelId = `${_nextOverflowMenuId()}-panel`;
 
   /** @internal */
   @query('[part~="button"]') private _buttonEl!: HTMLButtonElement | null;

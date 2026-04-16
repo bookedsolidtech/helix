@@ -102,7 +102,6 @@ export const helixSelectStyles = css`
     outline: none;
   }
 
-  .field__trigger:focus,
   .field__trigger:focus-visible {
     border-color: var(--_focus-ring-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
@@ -171,7 +170,6 @@ export const helixSelectStyles = css`
     border-color: var(--_error-color);
   }
 
-  .field--error .field__trigger:focus,
   .field--error .field__trigger:focus-visible {
     border-color: var(--_error-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
@@ -293,6 +291,88 @@ export const helixSelectStyles = css`
     .field__chevron,
     .field__option {
       transition: none;
+    }
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .field__trigger {
+      forced-color-adjust: none;
+      background-color: Field;
+      color: FieldText;
+      border: 2px solid ButtonText;
+    }
+
+    .field__trigger:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .field__trigger[aria-disabled='true'] {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    .field__trigger--placeholder .field__trigger-value {
+      color: GrayText;
+    }
+
+    .field__chevron::after {
+      border-color: FieldText;
+    }
+
+    .field__listbox {
+      forced-color-adjust: none;
+      background-color: Canvas;
+      border: 2px solid CanvasText;
+      box-shadow: none;
+    }
+
+    .field__option {
+      color: CanvasText;
+    }
+
+    .field__option:hover {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    .field__option--selected {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    .field__option--focused {
+      outline-color: Highlight;
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    .field__option--disabled {
+      color: GrayText;
+      opacity: 1;
+    }
+
+    .field--error .field__trigger {
+      border-color: LinkText;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    .field__label {
+      color: CanvasText;
+    }
+
+    .field__help-text {
+      color: GrayText;
+    }
+
+    .field__error {
+      color: LinkText;
     }
   }
 `;

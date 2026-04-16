@@ -41,4 +41,12 @@ export const helixImageStyles = css`
   .image__caption--visible {
     display: block;
   }
+
+  /* ─── Forced Colors (Windows High Contrast) ─── */
+
+  @media (forced-colors: active) {
+    .image__container--error {
+      border: 1px solid GrayText;
+    }
+  }
 `;

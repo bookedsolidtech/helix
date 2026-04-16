@@ -1,8 +1,9 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -31,7 +32,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-icon-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  */
 @customElement('hx-icon-button')
-export class HelixIconButton extends LitElement {
+export class HelixIconButton extends HelixElement {
   static override styles = [helixIconButtonStyles];
 
   /**
@@ -93,40 +94,12 @@ export class HelixIconButton extends LitElement {
   @property({ type: String })
   value: string | undefined = undefined;
 
-  // ─── Form Association via ElementInternals ───
+  // ─── Form Association ───
 
-  /** @internal */
-  static formAssociated = true;
+  /** Marks this element as form-associated for ElementInternals support. @internal */
+  static override formAssociated = true;
 
-  /** @internal */
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    /** @internal */
-    this._internals = this.attachInternals();
-  }
-
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** @internal */
-  formResetCallback(): void {
-    // hx-icon-button does not submit a value; no state to reset.
-  }
-
-  /** @internal */
-  formStateRestoreCallback(
-    _state: string | File | FormData | null,
-    _mode: 'restore' | 'autocomplete',
-  ): void {
-    // hx-icon-button does not submit a value; no state to restore.
-  }
-
-  /** @internal */
-  formDisabledCallback(disabled: boolean): void {
+  protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
   }
 
@@ -244,5 +217,8 @@ export class HelixIconButton extends LitElement {
 declare global {
   interface HTMLElementTagNameMap {
     'hx-icon-button': HelixIconButton;
+  }
+  interface HTMLElementEventMap {
+    'hx-click': CustomEvent<{ originalEvent: MouseEvent }>;
   }
 }
