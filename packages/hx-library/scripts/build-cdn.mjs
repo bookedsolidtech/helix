@@ -39,7 +39,7 @@ import {
 } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as esbuild from '/Volumes/Development/booked/helix/node_modules/esbuild/lib/main.js';
+import * as esbuild from 'esbuild';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
