@@ -89,7 +89,6 @@ export class HelixContainer extends HelixElement {
 /** Canonical type alias for the hx-container component. */
 export type HxContainer = HelixContainer;
 
-
 declare global {
   interface HTMLElementTagNameMap {
     'hx-container': HelixContainer;

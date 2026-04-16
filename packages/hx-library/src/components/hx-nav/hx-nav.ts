@@ -489,7 +489,6 @@ export class HelixNav extends HelixElement {
 /** Canonical type alias for the hx-nav component. */
 export type HxNav = HelixNav;
 
-
 declare global {
   interface HTMLElementTagNameMap {
     'hx-nav': HelixNav;

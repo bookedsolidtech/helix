@@ -23,6 +23,11 @@ export type HxComboboxSize = 'sm' | 'md' | 'lg';
 
 const _nextComboboxId = createIdCounter('hx-combobox');
 
+/** Detail for hx-input and hx-change events dispatched by hx-combobox. */
+export interface HxComboboxDetail {
+  value: string;
+}
+
 /**
  * A form-associated combobox component combining a text input with a listbox
  * for autocomplete and typeahead. Supports filtering, free-text entry,
@@ -69,10 +74,6 @@ const _nextComboboxId = createIdCounter('hx-combobox');
  * @cssprop [--hx-combobox-option-hover-bg=var(--hx-color-primary-50)] - Option hover background.
  * @cssprop [--hx-combobox-option-selected-bg=var(--hx-color-primary-100)] - Selected option background.
  */
-
-/** Detail for hx-input and hx-change events dispatched by hx-combobox. */
-export interface HxComboboxDetail { value: string }
-
 @customElement('hx-combobox')
 export class HelixCombobox extends HelixElement {
   static override styles = [helixComboboxStyles];

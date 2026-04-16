@@ -396,4 +396,3 @@ declare global {
 
 /** Canonical type alias for HelixTreeView. Use this when typing hx-tree-view element references. */
 export type HxTreeView = HelixTreeView;
-

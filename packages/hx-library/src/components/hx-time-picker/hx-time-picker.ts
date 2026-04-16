@@ -128,6 +128,11 @@ function parseUserInput(raw: string): string | null {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+/** Detail for the hx-change event dispatched by hx-time-picker. */
+export interface HxTimePickerChangeDetail {
+  value: string;
+}
+
 /**
  * A time-picker component with a combobox pattern: a text input with format
  * masking and a dropdown listbox of pre-generated time slots.
@@ -169,10 +174,6 @@ function parseUserInput(raw: string): string | null {
  * @cssprop [--hx-time-picker-option-selected-bg=var(--hx-color-primary-100)] - Selected option background.
  * @cssprop [--hx-time-picker-option-selected-color=var(--hx-color-primary-800)] - Selected option text color.
  */
-
-/** Detail for the hx-change event dispatched by hx-time-picker. */
-export interface HxTimePickerChangeDetail { value: string }
-
 @customElement('hx-time-picker')
 export class HelixTimePicker extends HelixElement {
   static override styles = [helixTimePickerStyles];

@@ -9,6 +9,11 @@ import { helixTextareaStyles } from './hx-textarea.styles.js';
 
 const _nextTextareaId = createIdCounter('hx-textarea');
 
+/** Detail for hx-input and hx-change events dispatched by hx-textarea. */
+export interface HxTextareaDetail {
+  value: string;
+}
+
 /**
  * A multi-line text area component with label, validation, and form association.
  *
@@ -47,10 +52,6 @@ const _nextTextareaId = createIdCounter('hx-textarea');
  * @cssprop [--hx-input-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-textarea-min-height=var(--hx-size-20, 5rem)] - Minimum textarea height.
  */
-
-/** Detail for hx-input and hx-change events dispatched by hx-textarea. */
-export interface HxTextareaDetail { value: string }
-
 @customElement('hx-textarea')
 export class HelixTextarea extends HelixElement {
   static override styles = [helixTextareaStyles];
@@ -559,4 +560,3 @@ declare global {
 
 /** Canonical type alias for the hx-textarea component. */
 export type HxTextarea = HelixTextarea;
-

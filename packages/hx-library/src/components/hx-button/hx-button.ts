@@ -8,6 +8,11 @@ import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
+/** Detail for the hx-click event dispatched by hx-button. */
+export interface HxButtonClickDetail {
+  originalEvent: MouseEvent;
+}
+
 /**
  * A production-grade button component for user interaction. Supports multiple
  * visual variants, sizes, loading state, prefix/suffix slots, anchor rendering,
@@ -43,10 +48,6 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-button-inverted-ghost-hover-bg=rgba(255,255,255,0.15)] - Ghost hover bg when inverted.
  * @cssprop [--hx-button-inverted-focus-ring-color=rgba(255,255,255,0.5)] - Focus ring color when inverted.
  */
-
-/** Detail for the hx-click event dispatched by hx-button. */
-export interface HxButtonClickDetail { originalEvent: MouseEvent }
-
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixButtonStyles];

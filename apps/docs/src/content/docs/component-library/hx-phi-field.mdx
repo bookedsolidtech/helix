@@ -55,11 +55,7 @@ import '@helixui/library/components/hx-phi-field';
 ## Basic Usage
 
 ```html
-<hx-phi-field
-  field-type="ssn"
-  field-id="patient-ssn"
-  label="Social Security Number"
-></hx-phi-field>
+<hx-phi-field field-type="ssn" field-id="patient-ssn" label="Social Security Number"></hx-phi-field>
 
 <script>
   // PHI MUST be set via JavaScript property — never as an HTML attribute
@@ -70,28 +66,28 @@ import '@helixui/library/components/hx-phi-field';
 
 ## Properties
 
-| Property | Attribute | Type | Default | Description |
-|----------|-----------|------|---------|-------------|
-| `data` | _(none — JS only)_ | `string` | `''` | The PHI value. Must be set via JS property, not HTML attribute. |
-| `fieldType` | `field-type` | `'ssn' \| 'mrn' \| 'dob' \| 'insurance'` | `'ssn'` | Controls the masking pattern applied. |
-| `fieldId` | `field-id` | `string` | `''` | Identifier used in audit events. Falls back to `id` attribute. |
-| `clipboardTimeout` | `clipboard-timeout` | `number` | `30000` | Milliseconds before clipboard auto-clear. |
-| `label` | `label` | `string` | `''` | Accessible label prefix for screen reader announcements. |
-| `disabled` | `disabled` | `boolean` | `false` | Disables all interaction and prevents reveal. |
+| Property           | Attribute           | Type                                     | Default | Description                                                     |
+| ------------------ | ------------------- | ---------------------------------------- | ------- | --------------------------------------------------------------- |
+| `data`             | _(none — JS only)_  | `string`                                 | `''`    | The PHI value. Must be set via JS property, not HTML attribute. |
+| `fieldType`        | `field-type`        | `'ssn' \| 'mrn' \| 'dob' \| 'insurance'` | `'ssn'` | Controls the masking pattern applied.                           |
+| `fieldId`          | `field-id`          | `string`                                 | `''`    | Identifier used in audit events. Falls back to `id` attribute.  |
+| `clipboardTimeout` | `clipboard-timeout` | `number`                                 | `30000` | Milliseconds before clipboard auto-clear.                       |
+| `label`            | `label`             | `string`                                 | `''`    | Accessible label prefix for screen reader announcements.        |
+| `disabled`         | `disabled`          | `boolean`                                | `false` | Disables all interaction and prevents reveal.                   |
 
 ## Events
 
-| Event | Detail Type | Description |
-|-------|-------------|-------------|
+| Event           | Detail Type            | Description                                                                               |
+| --------------- | ---------------------- | ----------------------------------------------------------------------------------------- |
 | `hx-phi-access` | `PhiAccessEventDetail` | Fired on reveal, hide, and clipboard-clear. Contains audit metadata only — never raw PHI. |
 
 ### PhiAccessEventDetail
 
 ```ts
 interface PhiAccessEventDetail {
-  fieldId: string;                              // Developer-assigned identifier (NOT PHI)
+  fieldId: string; // Developer-assigned identifier (NOT PHI)
   action: 'reveal' | 'hide' | 'clipboard-clear';
-  timestamp: string;                            // ISO 8601
+  timestamp: string; // ISO 8601
   fieldType: 'ssn' | 'mrn' | 'dob' | 'insurance';
 }
 ```
@@ -106,29 +102,29 @@ See the [CSP guide](/guides/csp/) for Content Security Policy configuration.
 
 ## Accessibility
 
-| Topic | Details |
-|-------|---------|
-| ARIA role | `role="status"` on mask state announcements (polite) |
-| Keyboard | Toggle button is Tab-focusable; Enter/Space toggles reveal |
-| Screen reader | Announces "is masked" / "is revealed" via live region |
-| Focus | Focus remains on toggle button after interaction |
+| Topic         | Details                                                    |
+| ------------- | ---------------------------------------------------------- |
+| ARIA role     | `role="status"` on mask state announcements (polite)       |
+| Keyboard      | Toggle button is Tab-focusable; Enter/Space toggles reveal |
+| Screen reader | Announces "is masked" / "is revealed" via live region      |
+| Focus         | Focus remains on toggle button after interaction           |
 
 ## CSS Custom Properties
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `--hx-phi-field-font-family` | `var(--hx-font-family-mono)` | Font family for masked value |
-| `--hx-phi-field-value-color` | `var(--hx-color-neutral-900)` | Revealed value text color |
-| `--hx-phi-field-masked-color` | `var(--hx-color-neutral-500)` | Masked value text color |
-| `--hx-phi-field-toggle-color` | `var(--hx-color-primary-500)` | Toggle button color |
+| Property                      | Default                       | Description                  |
+| ----------------------------- | ----------------------------- | ---------------------------- |
+| `--hx-phi-field-font-family`  | `var(--hx-font-family-mono)`  | Font family for masked value |
+| `--hx-phi-field-value-color`  | `var(--hx-color-neutral-900)` | Revealed value text color    |
+| `--hx-phi-field-masked-color` | `var(--hx-color-neutral-500)` | Masked value text color      |
+| `--hx-phi-field-toggle-color` | `var(--hx-color-primary-500)` | Toggle button color          |
 
 ## CSS Parts
 
-| Part | Description |
-|------|-------------|
-| `container` | Outer wrapper element |
-| `value` | Value display span (masked or revealed) |
-| `toggle` | The reveal/hide toggle button |
+| Part        | Description                             |
+| ----------- | --------------------------------------- |
+| `container` | Outer wrapper element                   |
+| `value`     | Value display span (masked or revealed) |
+| `toggle`    | The reveal/hide toggle button           |
 
 ## API Reference
 

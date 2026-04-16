@@ -9,6 +9,11 @@ import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
 
+/** Detail for the hx-change event dispatched by hx-checkbox-group. */
+export interface HxCheckboxGroupChangeDetail {
+  values: string[];
+}
+
 /**
  * A form-associated checkbox group that manages a set of `<hx-checkbox>` children.
  *
@@ -44,10 +49,6 @@ const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
  * ```
  * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
  */
-
-/** Detail for the hx-change event dispatched by hx-checkbox-group. */
-export interface HxCheckboxGroupChangeDetail { values: string[] }
-
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends HelixElement {
   static override styles = [helixCheckboxGroupStyles];

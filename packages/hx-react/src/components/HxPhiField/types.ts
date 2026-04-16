@@ -30,6 +30,6 @@ announcements (e.g., "Social Security Number is masked"). */
   disabled?: boolean;
 
   // Event callbacks
-  /** Fired on reveal, hide, and clipboard-clear actions. */
+  /** Fired on reveal, hide, and clipboard-clear actions. Contains audit metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow boundaries for application-level audit listeners. */
   onHxPhiAccess?: (event: Event) => void;
 }

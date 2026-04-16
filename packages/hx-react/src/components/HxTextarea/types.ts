@@ -45,7 +45,15 @@ non-editable patient data inline with editable fields. */
   showCount?: boolean;
   /** Validation message shown when the field is required but empty. */
   requiredMessage?: string;
-  /** Accessible name for screen readers, if different from the visible label. */
+  /** Accessible name for screen readers, if different from the visible label.
+Uses `accessible-label` attribute instead of `aria-label` to avoid
+ARIAMixin shadowing on the host element.
+
+Note: `mixinDelegatesAria` is not applied to this component because form
+inputs with associated labels delegate accessible naming via `<label>`
+association and `aria-labelledby`, not host-level ARIA delegation. The
+`accessible-label` attribute is a fallback for label-free usage. The value is forwarded to the
+internal native textarea's `aria-label`. */
   accessibleLabel?: string | null;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;

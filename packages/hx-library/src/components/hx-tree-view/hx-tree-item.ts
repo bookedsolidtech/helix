@@ -367,4 +367,3 @@ declare global {
 
 /** Canonical type alias for HelixTreeItem. Use this when typing hx-tree-item element references. */
 export type HxTreeItem = HelixTreeItem;
-

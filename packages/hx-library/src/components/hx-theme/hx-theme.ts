@@ -526,4 +526,3 @@ declare global {
 
 /** Canonical type alias for HelixTheme. Use this when typing hx-theme element references. */
 export type HxTheme = HelixTheme;
-

@@ -126,7 +126,6 @@ export class HelixHelpText extends HelixElement {
 /** Canonical type alias for the hx-help-text component. */
 export type HxHelpText = HelixHelpText;
 
-
 declare global {
   interface HTMLElementTagNameMap {
     'hx-help-text': HelixHelpText;

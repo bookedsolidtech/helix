@@ -9,6 +9,12 @@ import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextTabsId = createIdCounter('hx-tabs');
 
+/** Detail for the hx-tab-change event dispatched by hx-tabs. */
+export interface HxTabChangeDetail {
+  tabId: string;
+  index: number;
+}
+
 /**
  * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
  * Supports horizontal and vertical orientations, automatic and manual activation modes,
@@ -45,10 +51,6 @@ const _nextTabsId = createIdCounter('hx-tabs');
  * @cssprop [--hx-tabs-panel-padding=var(--hx-space-4, 1rem)] - Panel inner padding.
  * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #343a40)] - Panel text color.
  */
-
-/** Detail for the hx-tab-change event dispatched by hx-tabs. */
-export interface HxTabChangeDetail { tabId: string; index: number }
-
 @customElement('hx-tabs')
 export class HelixTabs extends HelixElement {
   static override styles = [helixTabsStyles];

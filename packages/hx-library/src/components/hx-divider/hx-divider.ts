@@ -123,4 +123,3 @@ declare global {
 
 /** Canonical type alias for the hx-divider component. */
 export type HxDivider = HelixDivider;
-

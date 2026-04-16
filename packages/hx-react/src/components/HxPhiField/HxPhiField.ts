@@ -17,6 +17,30 @@ export type { HxPhiFieldProps };
  * HIPAA-compliant field component for rendering masked Protected Health Information (PHI).
 PHI is masked by default and only rendered to the DOM when explicitly revealed. Access
 events are fired on reveal, hide, and clipboard auto-clear for audit trail purposes.
+
+## Security Model — Event Composition
+
+The `hx-phi-access` event is dispatched with `composed: true` so it crosses shadow DOM
+boundaries and reaches application-level audit listeners. This is intentional — audit
+trail events MUST reach the host application regardless of shadow DOM nesting depth.
+
+**PHI is never included in event details.** The `PhiAccessEventDetail` payload contains
+only audit metadata: `fieldId`, `action`, `timestamp`, and `fieldType`. The actual PHI
+value (the `data` property) is deliberately excluded from all dispatched events.
+
+### Consumer Responsibilities
+
+- **Audit logging**: Listen for `hx-phi-access` at the application root to build a
+  HIPAA-compliant access audit trail. The `fieldId` and `timestamp` fields correlate
+  access events to specific data elements without exposing the data itself.
+- **Multi-tenant isolation**: In micro-frontend architectures where multiple patient
+  contexts share a document, consumers MUST scope their `hx-phi-access` listeners to
+  the appropriate DOM subtree (e.g., listen on a container element rather than
+  `document`). Composed events from one patient context will bubble through shared
+  ancestors.
+- **Do not extend event details with PHI**: When wrapping this component, never add
+  the raw `data` value to re-dispatched events. The separation of audit metadata from
+  PHI content is a deliberate security boundary.
  *
  * @example
  * ```tsx

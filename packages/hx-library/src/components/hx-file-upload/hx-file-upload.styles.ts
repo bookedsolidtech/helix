@@ -44,7 +44,7 @@ export const helixFileUploadStyles = css`
     min-height: var(--hx-space-32, 8rem);
     padding: var(--hx-space-6, 1.5rem) var(--hx-space-4, 1rem);
     border: var(--hx-border-width-thin, 1px) dashed
-      var(--hx-file-upload-dropzone-border-color, var(--hx-color-neutral-300, #CBD5E1));
+      var(--hx-file-upload-dropzone-border-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-file-upload-dropzone-border-radius, var(--hx-border-radius-lg, 0.5rem));
     background-color: var(--hx-file-upload-dropzone-bg, var(--hx-color-neutral-50, #f8f9fa));
     cursor: pointer;
@@ -85,7 +85,7 @@ export const helixFileUploadStyles = css`
   }
 
   .dropzone--error {
-    border-color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #DC2626));
+    border-color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #dc2626));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -178,7 +178,7 @@ export const helixFileUploadStyles = css`
 
   .file-item__remove:hover {
     color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #b91c1c));
-    background-color: color-mix(in srgb, var(--hx-color-error-500, #DC2626) 8%, transparent);
+    background-color: color-mix(in srgb, var(--hx-color-error-500, #dc2626) 8%, transparent);
   }
 
   .file-item__remove:focus-visible {

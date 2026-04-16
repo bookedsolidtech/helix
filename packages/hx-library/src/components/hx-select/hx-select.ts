@@ -21,6 +21,11 @@ interface SelectOption {
   disabled: boolean;
 }
 
+/** Detail for the hx-change event dispatched by hx-select. */
+export interface HxSelectChangeDetail {
+  value: string;
+}
+
 /**
  * A form-associated select component with custom styling, label, error, and
  * help text. Options are provided via slotted `<option>` (and `<optgroup>`)
@@ -74,10 +79,6 @@ interface SelectOption {
  * @cssprop [--hx-select-option-selected-bg=var(--hx-color-primary-100)] - Selected option background color.
  * @cssprop [--hx-select-placeholder-color=var(--hx-color-neutral-400)] - Placeholder text color.
  */
-
-/** Detail for the hx-change event dispatched by hx-select. */
-export interface HxSelectChangeDetail { value: string }
-
 @customElement('hx-select')
 export class HelixSelect extends HelixElement {
   static override styles = [helixSelectStyles];

@@ -13,6 +13,11 @@ import { devWarn } from '../../utils/dev-warn.js';
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
 const _nextTextInputId = createIdCounter('hx-text-input');
 
+/** Detail for hx-input and hx-change events dispatched by hx-text-input. */
+export interface HxTextInputDetail {
+  value: string;
+}
+
 /**
  * A text input component with label, validation, and form association.
  * Supports accessible labeling via `label` property, `aria-label` attribute, or the `label` slot.
@@ -50,10 +55,6 @@ const _nextTextInputId = createIdCounter('hx-text-input');
  * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  */
-
-/** Detail for hx-input and hx-change events dispatched by hx-text-input. */
-export interface HxTextInputDetail { value: string }
-
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [helixTextInputStyles];
@@ -538,4 +539,3 @@ declare global {
 
 /** Primary type alias for hx-text-input */
 export type HxTextInput = HelixTextInput;
-

@@ -18,6 +18,11 @@ export type { ColorFormat };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+/** Detail for hx-input and hx-change events dispatched by hx-color-picker. */
+export interface HxColorPickerDetail {
+  value: string;
+}
+
 /**
  * A color picker control with gradient picker, hue/opacity sliders, swatches,
  * and formatted text input. Supports hex, rgb, hsl, and hsv output formats.
@@ -73,10 +78,6 @@ export type { ColorFormat };
  * ></hx-color-picker>
  * ```
  */
-
-/** Detail for hx-input and hx-change events dispatched by hx-color-picker. */
-export interface HxColorPickerDetail { value: string }
-
 @customElement('hx-color-picker')
 export class HelixColorPicker extends HelixElement {
   static override styles = [helixColorPickerStyles];

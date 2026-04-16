@@ -15,6 +15,23 @@ interface FileEntry {
   progress: number;
 }
 
+/** Detail for the hx-upload event dispatched by hx-file-upload. */
+export interface HxFileUploadDetail {
+  files: File[];
+}
+
+/** Detail for the hx-remove event dispatched by hx-file-upload. */
+export interface HxFileRemoveDetail {
+  file: File;
+  index: number;
+}
+
+/** Detail for the hx-error event dispatched by hx-file-upload. */
+export interface HxFileErrorDetail {
+  message: string;
+  files: File[];
+}
+
 /**
  * A drag-and-drop file upload component with client-side validation,
  * file list management, per-file progress, and native form association.
@@ -44,16 +61,6 @@ interface FileEntry {
  * @cssprop [--hx-file-upload-progress-color=var(--hx-color-primary-500)] - Progress bar fill color.
  * @cssprop [--hx-file-upload-error-color=var(--hx-color-error-500)] - Error state and remove-button hover color.
  */
-
-/** Detail for the hx-upload event dispatched by hx-file-upload. */
-export interface HxFileUploadDetail { files: File[] }
-
-/** Detail for the hx-remove event dispatched by hx-file-upload. */
-export interface HxFileRemoveDetail { file: File; index: number }
-
-/** Detail for the hx-error event dispatched by hx-file-upload. */
-export interface HxFileErrorDetail { message: string; files: File[] }
-
 @customElement('hx-file-upload')
 export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixFileUploadStyles];

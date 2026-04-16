@@ -17,8 +17,35 @@ export type { HxPatientBannerProps };
  * Patient identification banner implementing Joint Commission NPSG.01.01.01 two-identifier rule.
 Renders as a landmark region containing named slots for patient identification fields.
 Integrates with hx-phi-field for HIPAA-compliant display of masked identifiers.
-Note: hx-phi-access events fired by slotted hx-phi-field elements bubble through this
-component via composed: true — no re-dispatch is required.
+
+## Security Model — Event Composition
+
+This component dispatches and propagates two categories of composed events:
+
+### `hx-identifier-rule-violation` (dispatched by this component)
+Fired with `composed: true` when the two-identifier rule is violated. The event detail
+contains only structural metadata (`populatedIdentifiers` count, `requiredIdentifiers`
+count) and the `patientId` attribute value. **No raw PHI is included.**
+
+The `patientId` is a developer-provided attribute intended as a correlation key for
+application logic — it should be an opaque internal identifier (e.g., a UUID or
+encounter ID), not a human-readable identifier like an MRN or SSN.
+
+### `hx-phi-access` (bubbles from slotted hx-phi-field children)
+Slotted `hx-phi-field` elements dispatch `hx-phi-access` with `composed: true`. These
+events bubble through this component's shadow DOM via slot projection. This component
+does NOT re-dispatch or modify these events. See `hx-phi-field` documentation for the
+security model of those events.
+
+### Consumer Responsibilities
+
+- **Multi-tenant isolation**: In micro-frontend architectures where multiple patient
+  contexts share a document, scope event listeners to the appropriate DOM subtree.
+  Both `hx-phi-access` and `hx-identifier-rule-violation` use `composed: true` and
+  will bubble through shared ancestors across shadow boundaries.
+- **patientId hygiene**: Set the `patient-id` attribute to an opaque internal
+  identifier, not a human-readable clinical identifier. This value appears in
+  composed events that cross shadow boundaries.
  *
  * @example
  * ```tsx

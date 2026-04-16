@@ -52,7 +52,7 @@ export const helixRadioStyles = css`
     width: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     border: var(--hx-border-width-medium, 2px) solid
-      var(--hx-radio-border-color, var(--hx-color-neutral-300, #CBD5E1));
+      var(--hx-radio-border-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-color-neutral-0, #ffffff);
     transition:

@@ -209,7 +209,6 @@ export class HelixTag extends HelixElement {
 
 export type HxTag = HelixTag;
 
-
 declare global {
   interface HTMLElementTagNameMap {
     'hx-tag': HelixTag;

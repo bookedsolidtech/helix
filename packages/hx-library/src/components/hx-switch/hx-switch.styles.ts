@@ -43,7 +43,7 @@ export const helixSwitchStyles = css`
     border: none;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #CBD5E1));
+    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #cbd5e1));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;

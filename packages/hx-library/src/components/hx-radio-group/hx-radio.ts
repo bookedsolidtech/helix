@@ -170,4 +170,3 @@ declare global {
 
 /** Canonical type alias for the hx-radio component. */
 export type HxRadio = HelixRadio;
-

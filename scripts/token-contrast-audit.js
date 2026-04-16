@@ -41,17 +41,9 @@ const tokensPath = resolve(__dirname, '../packages/hx-tokens/src/tokens.json');
 function hexToRgb(hex) {
   const h = hex.replace(/^#/, '');
   if (h.length === 3) {
-    return [
-      parseInt(h[0] + h[0], 16),
-      parseInt(h[1] + h[1], 16),
-      parseInt(h[2] + h[2], 16),
-    ];
+    return [parseInt(h[0] + h[0], 16), parseInt(h[1] + h[1], 16), parseInt(h[2] + h[2], 16)];
   }
-  return [
-    parseInt(h.slice(0, 2), 16),
-    parseInt(h.slice(2, 4), 16),
-    parseInt(h.slice(4, 6), 16),
-  ];
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
 
 /**
@@ -117,7 +109,16 @@ function generatePairs(colors) {
   const bgTokens = ['neutral-0', 'neutral-50', 'neutral-100', 'neutral-200'];
 
   // Define foreground groups (text colors)
-  const fgGroups = ['primary', 'secondary', 'accent', 'neutral', 'error', 'warning', 'success', 'info'];
+  const fgGroups = [
+    'primary',
+    'secondary',
+    'accent',
+    'neutral',
+    'error',
+    'warning',
+    'success',
+    'info',
+  ];
   const fgShades = ['500', '600', '700', '800', '900', '950'];
 
   // Standard text on light backgrounds
@@ -225,7 +226,20 @@ function main() {
   const passes = results.filter((r) => r.passNormal);
 
   if (jsonOutput) {
-    console.log(JSON.stringify({ level, minRatio, total: results.length, passes: passes.length, failures: failures.length, results }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          level,
+          minRatio,
+          total: results.length,
+          passes: passes.length,
+          failures: failures.length,
+          results,
+        },
+        null,
+        2,
+      ),
+    );
   } else {
     console.log(`\nToken Contrast Audit (WCAG ${level})`);
     console.log(`Minimum ratio: ${minRatio}:1 (normal text), ${minRatioLarge}:1 (large text)`);
@@ -236,19 +250,16 @@ function main() {
       console.log('FAILURES:');
       console.log('-'.repeat(100));
       console.log(
-        'Foreground'.padEnd(45) +
-        'Background'.padEnd(25) +
-        'Ratio'.padEnd(10) +
-        'Status'
+        'Foreground'.padEnd(45) + 'Background'.padEnd(25) + 'Ratio'.padEnd(10) + 'Status',
       );
       console.log('-'.repeat(100));
 
       for (const r of failures) {
         console.log(
           `${r.foreground} (${r.fgHex})`.padEnd(45) +
-          `${r.background} (${r.bgHex})`.padEnd(25) +
-          `${r.ratio}:1`.padEnd(10) +
-          r.status
+            `${r.background} (${r.bgHex})`.padEnd(25) +
+            `${r.ratio}:1`.padEnd(10) +
+            r.status,
         );
       }
       console.log('');

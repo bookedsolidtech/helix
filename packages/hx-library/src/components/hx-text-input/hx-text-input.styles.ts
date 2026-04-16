@@ -89,7 +89,7 @@ export const helixTextInputStyles = css`
     display: flex;
     align-items: center;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-input-border-color, var(--hx-color-neutral-300, #CBD5E1));
+      var(--hx-input-border-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-input-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-input-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
@@ -118,15 +118,15 @@ export const helixTextInputStyles = css`
   /* ─── Error State ─── */
 
   .field--error .field__input-wrapper {
-    border-color: var(--hx-input-error-color, var(--hx-color-error-500, #DC2626));
+    border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc2626));
   }
 
   .field--error .field__input-wrapper:focus-within {
-    border-color: var(--hx-input-error-color, var(--hx-color-error-500, #DC2626));
+    border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc2626));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-input-error-color, var(--hx-color-error-500, #DC2626))
+        var(--hx-input-error-color, var(--hx-color-error-500, #dc2626))
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );

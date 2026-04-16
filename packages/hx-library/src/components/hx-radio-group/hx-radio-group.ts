@@ -9,6 +9,12 @@ import type { HelixRadio } from './hx-radio.js';
 
 const _nextRadioGroupId = createIdCounter('hx-radio-group');
 
+/** Detail for the hx-change event dispatched by hx-radio-group. */
+export interface HxRadioGroupChangeDetail {
+  value: string;
+  checked: boolean;
+}
+
 /**
  * A form-associated radio group that manages a set of `<hx-radio>` children.
  *
@@ -34,10 +40,6 @@ const _nextRadioGroupId = createIdCounter('hx-radio-group');
  * @cssprop [--hx-radio-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
  * @cssprop [--hx-radio-group-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  */
-
-/** Detail for the hx-change event dispatched by hx-radio-group. */
-export interface HxRadioGroupChangeDetail { value: string; checked: boolean }
-
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends HelixElement {
   static override styles = [helixRadioGroupStyles];
@@ -536,4 +538,3 @@ declare global {
 
 /** Canonical type alias for the hx-radio-group component. */
 export type HxRadioGroup = HelixRadioGroup;
-
