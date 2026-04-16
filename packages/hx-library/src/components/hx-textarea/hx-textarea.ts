@@ -527,13 +527,21 @@ export class HelixTextarea extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-textarea.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxTextareaEventMap {
+  'hx-input': CustomEvent<{ value: string }>;
+  'hx-change': CustomEvent<{ value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-textarea': HelixTextarea;
   }
   interface HTMLElementEventMap {
     'hx-input': CustomEvent<{ value: string }>;
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

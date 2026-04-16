@@ -506,13 +506,21 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-text-input.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxTextInputEventMap {
+  'hx-input': CustomEvent<{ value: string }>;
+  'hx-change': CustomEvent<{ value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-text-input': HelixTextInput;
   }
   interface HTMLElementEventMap {
     'hx-input': CustomEvent<{ value: string }>;
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

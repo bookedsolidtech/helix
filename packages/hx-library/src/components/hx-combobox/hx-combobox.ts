@@ -883,13 +883,24 @@ export class HelixCombobox extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-combobox.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxComboboxEventMap {
+  'hx-input': CustomEvent<{ value: string }>;
+  'hx-change': CustomEvent<{ value: string }>;
+  'hx-clear': CustomEvent<void>;
+  'hx-show': CustomEvent<void>;
+  'hx-hide': CustomEvent<void>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-combobox': HelixCombobox;
   }
   interface HTMLElementEventMap {
     'hx-input': CustomEvent<{ value: string }>;
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
     'hx-clear': CustomEvent<void>;
     'hx-show': CustomEvent<void>;
     'hx-hide': CustomEvent<void>;

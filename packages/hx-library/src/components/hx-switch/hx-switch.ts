@@ -342,12 +342,17 @@ export class HelixSwitch extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-switch.
+ * The `hx-change` detail always includes both `checked` and `value` for this component.
+ */
+export interface HxSwitchEventMap {
+  'hx-change': CustomEvent<{ checked: boolean; value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-switch': HelixSwitch;
-  }
-  interface HTMLElementEventMap {
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

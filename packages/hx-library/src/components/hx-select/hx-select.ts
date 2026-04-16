@@ -752,12 +752,17 @@ export class HelixSelect extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-select.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxSelectEventMap {
+  'hx-change': CustomEvent<{ value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-select': HelixSelect;
-  }
-  interface HTMLElementEventMap {
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 

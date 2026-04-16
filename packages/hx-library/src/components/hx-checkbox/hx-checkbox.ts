@@ -399,10 +399,24 @@ export type HxCheckbox = HelixCheckbox;
 /** @deprecated Use {@link HxCheckbox} instead. The `Wc` prefix was a legacy naming convention. */
 export type WcCheckbox = HelixCheckbox;
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-checkbox.
+ * The `hx-change` detail always includes both `checked` and `value` for this component.
+ */
+export interface HxCheckboxEventMap {
+  'hx-change': CustomEvent<{ checked: boolean; value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-checkbox': HelixCheckbox;
   }
+  /**
+   * Global hx-change event type. The detail shape is a union because hx-change is dispatched
+   * by multiple components: form-field components (value only) and toggle components
+   * (checked + value). Use per-component EventMap types (e.g. HxCheckboxEventMap) for
+   * narrowed addEventListener calls.
+   */
   interface HTMLElementEventMap {
     'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
