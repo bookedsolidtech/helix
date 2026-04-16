@@ -61,7 +61,7 @@ run_gate() {
 run_gate "format:check" "Prettier format check"
 run_gate "lint"         "ESLint"
 run_gate "type-check"   "TypeScript type check"
-run_gate "test"         "Test suite"
+run_gate "test:smart"   "Test suite (smart — changed components only)"
 run_gate "build"        "Build"
 
 # Pack dry-run — validates the publish payload matches what CI would produce
