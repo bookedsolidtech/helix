@@ -29,6 +29,20 @@ export const helixBreadcrumbStyles = css`
     display: none;
   }
 
+  /*
+   * Ellipsis ordering when collapsed (FS-014 fix):
+   * The ellipsis <hx-breadcrumb-item> lives in shadow DOM to avoid mutating
+   * the consumer's light DOM. CSS order places it between the first item
+   * (order: 0, default) and the last item (order: 2) in the flex <ol>.
+   */
+  .hx-bc-ellipsis {
+    order: 1;
+  }
+
+  ::slotted([data-bc-last]) {
+    order: 2;
+  }
+
   /* Visually hide the separator slot — used only to read text content.
    * display:none is intentional: the slot contains no interactive or focusable
    * content. If a future change adds focusable elements to this slot, switch to
