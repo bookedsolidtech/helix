@@ -271,7 +271,7 @@ export class HelixDatePicker extends HelixElement {
    * @internal
    */
   @query('.calendar')
-  private _calendar: HTMLElement | undefined;
+  private _calendar: HTMLDialogElement | undefined;
 
   // ─── Unique IDs ───
 
@@ -337,26 +337,10 @@ export class HelixDatePicker extends HelixElement {
     this._hasErrorSlot = slot.assignedElements().length > 0;
   }
 
-  // ─── Bound Handler References ───
-
-  /**
-   * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
-   * @internal
-   */
-  private readonly _boundHandleOutsideClick = (e: MouseEvent) => this._handleOutsideClick(e);
-  /**
-   * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
-   * @internal
-   */
-  private readonly _boundHandleDocumentKeydown = (e: KeyboardEvent) =>
-    this._handleDocumentKeydown(e);
-
   // ─── Lifecycle ───
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._boundHandleOutsideClick);
-    document.removeEventListener('keydown', this._boundHandleDocumentKeydown);
   }
 
   override willUpdate(changedProperties: PropertyValues<this>): void {
@@ -414,15 +398,13 @@ export class HelixDatePicker extends HelixElement {
           this._viewYear = selected.getFullYear();
           this._viewMonth = selected.getMonth();
         }
-        document.addEventListener('click', this._boundHandleOutsideClick);
-        document.addEventListener('keydown', this._boundHandleDocumentKeydown);
-        // Focus the calendar after it renders.
+        // Use showModal() for top-layer positioning + native focus trap + escape key.
         void this.updateComplete.then(() => {
+          this._calendar?.showModal();
           this._focusActiveDay();
         });
       } else {
-        document.removeEventListener('click', this._boundHandleOutsideClick);
-        document.removeEventListener('keydown', this._boundHandleDocumentKeydown);
+        this._calendar?.close();
         this._focusedDay = null;
       }
     }
@@ -441,17 +423,15 @@ export class HelixDatePicker extends HelixElement {
     }
   }
 
-  /** @internal */
-  private _handleOutsideClick(e: MouseEvent): void {
-    const path = e.composedPath();
-    if (!path.includes(this)) {
-      this._closeCalendar();
-    }
+  /** Syncs _isOpen when native dialog cancel event fires (Escape key). */
+  private _handleDialogCancel(e: Event): void {
+    e.preventDefault(); // prevent native close; we handle it ourselves
+    this._closeCalendar();
   }
 
-  /** @internal */
-  private _handleDocumentKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape' && this._isOpen) {
+  /** Closes calendar when clicking outside the dialog content (backdrop click). */
+  private _handleDialogBackdropClick(e: MouseEvent): void {
+    if (e.target === this._calendar) {
       this._closeCalendar();
     }
   }
@@ -785,9 +765,9 @@ export class HelixDatePicker extends HelixElement {
       return;
     }
 
-    // Explicit Escape handler on the calendar container provides a reliable
-    // exit path even when the document-level handler does not fire (e.g. when
-    // the event is stopped by a descendant or the shadow boundary interferes).
+    // Handle Escape here to call _closeCalendar() with focus-restore.
+    // We also have a @cancel handler on the <dialog> for the native cancel
+    // event, but the keydown path ensures consistent focus management.
     if (key === 'Escape') {
       e.stopPropagation();
       this._closeCalendar();
@@ -1120,65 +1100,61 @@ export class HelixDatePicker extends HelixElement {
         </div>
 
         <!-- Calendar Popup -->
-        ${this._isOpen
-          ? html`
-              <div
-                part="calendar"
-                class="calendar"
-                id=${this._calendarId}
-                role="dialog"
-                aria-modal="true"
-                aria-label=${this.chooseDateLabel}
-                @keydown=${this._handleCalendarKeydown}
-              >
-                <!-- Screen reader live region -->
-                <div
-                  id=${this._liveRegionId}
-                  class="calendar__live-region"
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  ${this._liveMessage}
-                </div>
+        <dialog
+          part="calendar"
+          class="calendar"
+          id=${this._calendarId}
+          aria-label=${this.chooseDateLabel}
+          @keydown=${this._handleCalendarKeydown}
+          @cancel=${this._handleDialogCancel}
+          @click=${this._handleDialogBackdropClick}
+        >
+          <!-- Screen reader live region -->
+          <div
+            id=${this._liveRegionId}
+            class="calendar__live-region"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            ${this._liveMessage}
+          </div>
 
-                <!-- Month Navigation -->
-                <div part="month-nav" class="calendar__nav">
-                  <button
-                    class="calendar__nav-btn"
-                    type="button"
-                    aria-label=${this.previousMonthLabel}
-                    ?disabled=${this._isPrevMonthDisabled()}
-                    @click=${this._prevMonth}
-                  >
-                    &#8249;
-                  </button>
-                  <span class="calendar__month-label" aria-hidden="true">
-                    ${monthName} ${this._viewYear}
-                  </span>
-                  <button
-                    class="calendar__nav-btn"
-                    type="button"
-                    aria-label=${this.nextMonthLabel}
-                    ?disabled=${this._isNextMonthDisabled()}
-                    @click=${this._nextMonth}
-                  >
-                    &#8250;
-                  </button>
-                </div>
+          <!-- Month Navigation -->
+          <div part="month-nav" class="calendar__nav">
+            <button
+              class="calendar__nav-btn"
+              type="button"
+              aria-label=${this.previousMonthLabel}
+              ?disabled=${this._isPrevMonthDisabled()}
+              @click=${this._prevMonth}
+            >
+              &#8249;
+            </button>
+            <span class="calendar__month-label" aria-hidden="true">
+              ${monthName} ${this._viewYear}
+            </span>
+            <button
+              class="calendar__nav-btn"
+              type="button"
+              aria-label=${this.nextMonthLabel}
+              ?disabled=${this._isNextMonthDisabled()}
+              @click=${this._nextMonth}
+            >
+              &#8250;
+            </button>
+          </div>
 
-                <!-- Day Grid -->
-                <!-- Single delegated click handler on the grid replaces per-cell closures. -->
-                <div
-                  class="calendar__grid"
-                  role="grid"
-                  aria-label="${monthName} ${this._viewYear}"
-                  @click=${this._handleGridClick}
-                >
-                  ${this._renderWeekdayHeaders()} ${this._renderDayGrid()}
-                </div>
-              </div>
-            `
-          : nothing}
+          <!-- Day Grid -->
+          <!-- Single delegated click handler on the grid replaces per-cell closures. -->
+          <div
+            class="calendar__grid"
+            role="grid"
+            aria-label="${monthName} ${this._viewYear}"
+            @click=${this._handleGridClick}
+          >
+            ${this._renderWeekdayHeaders()} ${this._renderDayGrid()}
+          </div>
+        </dialog>
 
         <!-- Error -->
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>

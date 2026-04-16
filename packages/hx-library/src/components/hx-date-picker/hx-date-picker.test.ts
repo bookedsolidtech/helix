@@ -231,17 +231,19 @@ describe('hx-date-picker', () => {
   // ─── Calendar: Open/Close (4) ─────────────────────────────────────────
 
   describe('Calendar: Open/Close', () => {
-    it('calendar is not in the DOM when closed', async () => {
+    it('calendar dialog is in the DOM but closed when calendar is not open', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar).toBeTruthy();
+      expect(calendar?.open).toBe(false);
     });
 
-    it('calendar appears when trigger button is clicked', async () => {
+    it('calendar dialog is open when trigger button is clicked', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
-      const calendar = shadowQuery(el, '[part="calendar"]');
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
       expect(calendar).toBeTruthy();
+      expect(calendar?.open).toBe(true);
     });
 
     it('sets aria-expanded="true" on trigger when calendar is open', async () => {
@@ -257,8 +259,8 @@ describe('hx-date-picker', () => {
       const trigger = getTriggerButton(el);
       trigger.click();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
 
     it('trigger has aria-expanded="false" when calendar is closed', async () => {
@@ -267,12 +269,11 @@ describe('hx-date-picker', () => {
       expect(trigger.getAttribute('aria-expanded')).toBe('false');
     });
 
-    it('calendar has role="dialog" and aria-modal="true"', async () => {
+    it('calendar is a native <dialog> element (provides role=dialog and modal semantics)', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
       const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar?.getAttribute('role')).toBe('dialog');
-      expect(calendar?.getAttribute('aria-modal')).toBe('true');
+      expect(calendar?.tagName.toLowerCase()).toBe('dialog');
     });
   });
 
@@ -327,8 +328,8 @@ describe('hx-date-picker', () => {
       const day = getFirstEnabledDay(el)!;
       day.click();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
   });
 
@@ -441,11 +442,13 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      );
       await el.updateComplete;
 
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      expect(calendar.open).toBe(false);
     });
 
     it('Enter key on a focused day selects it and fires hx-change', async () => {
@@ -626,8 +629,8 @@ describe('hx-date-picker', () => {
       await openCalendar(el);
       el.formResetCallback();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
   });
 
@@ -695,8 +698,8 @@ describe('hx-date-picker', () => {
       const trigger = getTriggerButton(el);
       trigger.click();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
   });
 
@@ -707,7 +710,13 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
       await openCalendar(el);
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      // _closeCalendar schedules focus-restore via updateComplete.then(...)
+      await new Promise((r) => requestAnimationFrame(r));
       await el.updateComplete;
 
       const trigger = getTriggerButton(el);
@@ -980,7 +989,7 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
 
-      const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
       // Disable every button so querySelectorAll returns zero focusable elements.
       const buttons = Array.from(calendar.querySelectorAll<HTMLButtonElement>('button'));
       buttons.forEach((b) => {
@@ -1001,7 +1010,7 @@ describe('hx-date-picker', () => {
 
       expect(threw).toBe(false);
       // Calendar still open — no navigation side-effect occurred.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      expect(calendar.open).toBe(true);
     });
 
     it('Shift+Tab from first focusable element wraps focus to last focusable element', async () => {
@@ -1068,8 +1077,8 @@ describe('hx-date-picker', () => {
       }
 
       expect(threw).toBe(false);
-      // Calendar renders even though no day can be focused.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      // Calendar is open even though no day can be focused.
+      expect(shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')?.open).toBe(true);
     });
   });
 
@@ -1133,14 +1142,15 @@ describe('hx-date-picker', () => {
 
   describe('Keyboard: ignored when calendar is closed', () => {
     it('arrow keys have no effect when calendar is not open', async () => {
-      // The calendar keydown handler is only bound when _isOpen=true (element renders conditionally).
-      // Dispatching arrow keys on a closed picker should not open the calendar or change state.
+      // The <dialog> is always in the DOM; arrow keys dispatched on the host when _isOpen=false
+      // have no effect because the calendar @keydown handler only fires on the dialog element.
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker value="2026-03-10"></hx-date-picker>',
       );
 
-      // Confirm calendar is closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      // Confirm calendar is closed (dialog present but not open).
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      expect(calendar.open).toBe(false);
 
       // Dispatch several arrow keys on the component host — no calendar listener is attached.
       el.dispatchEvent(
@@ -1152,21 +1162,22 @@ describe('hx-date-picker', () => {
       await el.updateComplete;
 
       // Calendar must still be closed and value unchanged.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
       expect(el.value).toBe('2026-03-10');
     });
 
-    it('document Escape key has no effect when calendar is already closed', async () => {
+    it('Escape dispatched on document has no effect when calendar is already closed', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
 
       // Ensure closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
 
-      // The document keydown handler checks `this._isOpen` before closing — no-op when closed.
+      // Document-level keydown is no longer handled; dispatching on document is a no-op.
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
 
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
     });
   });
 
@@ -1244,7 +1255,7 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
 
-      const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
       // Disable every button so querySelectorAll returns zero focusable elements.
       const buttons = Array.from(calendar.querySelectorAll<HTMLButtonElement>('button'));
       buttons.forEach((b) => {
@@ -1265,7 +1276,7 @@ describe('hx-date-picker', () => {
 
       expect(threw).toBe(false);
       // Calendar still open — no navigation side-effect occurred.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      expect(calendar.open).toBe(true);
     });
 
     it('Shift+Tab from first focusable element wraps focus to last focusable element', async () => {
@@ -1332,8 +1343,8 @@ describe('hx-date-picker', () => {
       }
 
       expect(threw).toBe(false);
-      // Calendar renders even though no day can be focused.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      // Calendar is open even though no day can be focused.
+      expect(shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')?.open).toBe(true);
     });
   });
 
@@ -1397,14 +1408,15 @@ describe('hx-date-picker', () => {
 
   describe('Keyboard: ignored when calendar is closed', () => {
     it('arrow keys have no effect when calendar is not open', async () => {
-      // The calendar keydown handler is only bound when _isOpen=true (element renders conditionally).
-      // Dispatching arrow keys on a closed picker should not open the calendar or change state.
+      // The <dialog> is always in the DOM; arrow keys dispatched on the host when _isOpen=false
+      // have no effect because the calendar @keydown handler only fires on the dialog element.
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker value="2026-03-10"></hx-date-picker>',
       );
 
-      // Confirm calendar is closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      // Confirm calendar is closed (dialog present but not open).
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      expect(calendar.open).toBe(false);
 
       // Dispatch several arrow keys on the component host — no calendar listener is attached.
       el.dispatchEvent(
@@ -1416,21 +1428,22 @@ describe('hx-date-picker', () => {
       await el.updateComplete;
 
       // Calendar must still be closed and value unchanged.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
       expect(el.value).toBe('2026-03-10');
     });
 
-    it('document Escape key has no effect when calendar is already closed', async () => {
+    it('Escape dispatched on document has no effect when calendar is already closed', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
 
       // Ensure closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
 
-      // The document keydown handler checks `this._isOpen` before closing — no-op when closed.
+      // Document-level keydown is no longer handled; dispatching on document is a no-op.
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
 
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
     });
   });
 
