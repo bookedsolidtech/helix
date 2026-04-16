@@ -556,5 +556,3 @@ declare global {
 /** Canonical type alias for the hx-textarea component. */
 export type HxTextarea = HelixTextarea;
 
-/** @deprecated Use {@link HxTextarea} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcTextarea = HelixTextarea;

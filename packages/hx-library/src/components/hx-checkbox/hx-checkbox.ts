@@ -396,8 +396,6 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 /** Canonical type alias for the hx-checkbox component. */
 export type HxCheckbox = HelixCheckbox;
 
-/** @deprecated Use {@link HxCheckbox} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcCheckbox = HelixCheckbox;
 
 /**
  * Per-component event map for type-safe addEventListener on hx-checkbox.

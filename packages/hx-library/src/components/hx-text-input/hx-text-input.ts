@@ -535,5 +535,3 @@ declare global {
 /** Primary type alias for hx-text-input */
 export type HxTextInput = HelixTextInput;
 
-/** @deprecated Use HxTextInput instead */
-export type WcTextInput = HelixTextInput;

@@ -74,28 +74,8 @@ export class HelixActionBar extends HelixElement {
   @property({ type: String, reflect: true })
   position: 'top' | 'bottom' | 'sticky' = 'top';
 
-  /**
-   * When true, the bar sticks to the top of its scroll container.
-   * @deprecated Use `position="sticky"` instead.
-   * @attr sticky
-   */
-  @property({ type: Boolean, reflect: true })
-  get sticky(): boolean {
-    return this._sticky;
-  }
-  set sticky(value: boolean) {
-    if (value) {
-      devWarn(
-        'hx-action-bar',
-        'The `sticky` property is deprecated. Use `position="sticky"` instead.',
-      );
-    }
-    const old = this._sticky;
-    this._sticky = value;
-    this.requestUpdate('sticky', old);
-  }
-  /** @internal */
-  private _sticky = false;
+  // The deprecated `sticky` boolean property has been removed in 3.0.0.
+  // Use `position="sticky"` instead.
 
   /**
    * Accessible label for the toolbar.
@@ -304,7 +284,7 @@ export class HelixActionBar extends HelixElement {
   // ─── Render ───
 
   override render() {
-    const isSticky = this.position === 'sticky' || this.sticky;
+    const isSticky = this.position === 'sticky';
     const isBottom = this.position === 'bottom';
     const positionClass = isSticky ? ' base--sticky' : isBottom ? ' base--bottom' : '';
 

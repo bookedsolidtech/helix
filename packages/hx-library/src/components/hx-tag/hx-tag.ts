@@ -209,8 +209,6 @@ export class HelixTag extends HelixElement {
 
 export type HxTag = HelixTag;
 
-/** @deprecated Use {@link HxTag} instead. The `Wc` prefix was a legacy alias. */
-export type WcTag = HelixTag;
 
 declare global {
   interface HTMLElementTagNameMap {

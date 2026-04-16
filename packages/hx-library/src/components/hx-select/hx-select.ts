@@ -771,5 +771,3 @@ declare global {
 }
 
 export type { HelixSelect as HxSelect };
-/** @deprecated Use HxSelect instead */
-export type { HelixSelect as WcSelect };

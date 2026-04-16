@@ -356,6 +356,4 @@ declare global {
   }
 }
 
-/** @deprecated Use HxSwitch instead. */
-export type WcSwitch = HelixSwitch;
 export type HxSwitch = HelixSwitch;

@@ -489,8 +489,6 @@ export class HelixNav extends HelixElement {
 /** Canonical type alias for the hx-nav component. */
 export type HxNav = HelixNav;
 
-/** @deprecated Use {@link HxNav} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcNav = HelixNav;
 
 declare global {
   interface HTMLElementTagNameMap {
