@@ -72,7 +72,7 @@ export const helixStatusIndicatorStyles = css`
       --hx-status-indicator-label-font-size,
       var(--hx-font-size-sm, var(--hx-text-sm, 0.875rem))
     );
-    color: var(--hx-status-indicator-label-color, var(--hx-color-neutral-700, #374151));
+    color: var(--hx-status-indicator-label-color, var(--hx-color-neutral-700, #334155));
     line-height: 1;
     white-space: nowrap;
   }

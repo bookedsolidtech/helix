@@ -14,8 +14,8 @@ export const helixTooltipStyles = css`
     z-index: var(--hx-tooltip-z-index, var(--hx-z-index-tooltip, 1600));
     max-width: var(--hx-tooltip-max-width, 280px);
     padding: var(--hx-tooltip-padding, var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem));
-    background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #111827));
-    color: var(--hx-tooltip-color, var(--hx-color-neutral-50, #f9fafb));
+    background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-tooltip-color, var(--hx-color-neutral-50, #f8fafc));
     font-family: var(--hx-tooltip-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tooltip-font-size, var(--hx-font-size-xs, 0.75rem));
     line-height: var(--hx-line-height-normal, 1.5);
@@ -41,7 +41,7 @@ export const helixTooltipStyles = css`
     position: absolute;
     width: var(--hx-tooltip-arrow-size, 8px);
     height: var(--hx-tooltip-arrow-size, 8px);
-    background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #111827));
+    background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #0f172a));
     transform: rotate(45deg);
     pointer-events: none;
   }

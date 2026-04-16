@@ -14,6 +14,7 @@ export const helixMenuItemStyles = css`
     display: flex;
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
+    min-height: var(--hx-touch-target-min, 44px);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;

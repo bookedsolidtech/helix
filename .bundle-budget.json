@@ -3,6 +3,10 @@
   "perComponent": 5120,
   "total": 51200,
   "overrides": {
+    "hx-data-table": {
+      "budget": 8192,
+      "reason": "Complex widget: sorting, row selection, keyboard grid navigation, pagination, skeleton loading, roving tabindex headers."
+    },
     "hx-date-picker": {
       "budget": 8192,
       "reason": "Complex widget: calendar grid, date parsing, keyboard navigation, localization. Shared positioning logic is a candidate for extraction."

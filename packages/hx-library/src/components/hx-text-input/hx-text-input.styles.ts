@@ -138,7 +138,7 @@ export const helixTextInputStyles = css`
   .field__suffix {
     display: flex;
     align-items: center;
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-color-neutral-500, #64748b);
     flex-shrink: 0;
   }
 
@@ -161,14 +161,14 @@ export const helixTextInputStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-input-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-input-color, var(--hx-color-neutral-800, #1e293b));
     line-height: var(--hx-line-height-normal, 1.5);
     min-height: var(--hx-size-10, 2.5rem);
     width: 100%;
   }
 
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400, #94a3b8);
   }
 
   .field__input:focus-visible {
@@ -201,7 +201,7 @@ export const helixTextInputStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-color-neutral-500, #64748b);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

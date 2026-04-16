@@ -40,7 +40,7 @@ export const helixListItemStyles = css`
 
   :host([interactive]):focus-visible .list-item {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #2563eb));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #1d4ed8));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -48,7 +48,7 @@ export const helixListItemStyles = css`
 
   .list-item--selected {
     background-color: var(--hx-list-item-bg-selected, var(--hx-color-primary-50, #eff6ff));
-    color: var(--hx-list-item-color-selected, var(--hx-color-primary-700, #1d4ed8));
+    color: var(--hx-list-item-color-selected, var(--hx-color-primary-700, #1e40af));
   }
 
   /* ─── Disabled state ─── */
@@ -71,7 +71,7 @@ export const helixListItemStyles = css`
 
   .list-item__link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #2563eb));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #1d4ed8));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

@@ -42,10 +42,10 @@ export const helixBannerStyles = css`
     align-items: center;
     gap: var(--hx-banner-gap, var(--hx-space-3, 0.75rem));
     padding: var(--hx-banner-padding, var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem));
-    background-color: var(--hx-banner-bg, var(--hx-color-info-50, #e8f4fd));
-    color: var(--hx-banner-color, var(--hx-color-info-800, #1a3a4a));
+    background-color: var(--hx-banner-bg, var(--hx-color-info-50, #f0f9ff));
+    color: var(--hx-banner-color, var(--hx-color-info-800, #0c4a6e));
     border-bottom: var(--hx-banner-border-width, var(--hx-border-width-thin, 1px)) solid
-      var(--hx-banner-border-color, var(--hx-color-info-200, #b3d9ef));
+      var(--hx-banner-border-color, var(--hx-color-info-200, #bae6fd));
     font-family: var(--hx-banner-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -58,7 +58,7 @@ export const helixBannerStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-banner-icon-color, var(--hx-color-info-500, #3b82f6));
+    color: var(--hx-banner-icon-color, var(--hx-color-info-500, #0284c7));
   }
 
   .banner__icon svg {
@@ -80,7 +80,7 @@ export const helixBannerStyles = css`
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-banner-action-color, var(--hx-banner-color, var(--hx-color-info-800, #1a3a4a)));
+    color: var(--hx-banner-action-color, var(--hx-banner-color, var(--hx-color-info-800, #0c4a6e)));
     font-weight: var(--hx-font-weight-semibold, 600);
     text-decoration: underline;
     text-underline-offset: 2px;
@@ -120,7 +120,7 @@ export const helixBannerStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-banner-color, var(--hx-color-info-800, #1a3a4a));
+    color: var(--hx-banner-color, var(--hx-color-info-800, #0c4a6e));
     cursor: pointer;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: 1;
@@ -154,19 +154,19 @@ export const helixBannerStyles = css`
 
   :host([variant='info']) .banner,
   :host(:not([variant])) .banner {
-    --hx-banner-bg: var(--hx-color-info-50, #e8f4fd);
-    --hx-banner-border-color: var(--hx-color-info-200, #b3d9ef);
-    --hx-banner-color: var(--hx-color-info-800, #1a3a4a);
-    --hx-banner-icon-color: var(--hx-color-info-500, #3b82f6);
+    --hx-banner-bg: var(--hx-color-info-50, #f0f9ff);
+    --hx-banner-border-color: var(--hx-color-info-200, #bae6fd);
+    --hx-banner-color: var(--hx-color-info-800, #0c4a6e);
+    --hx-banner-icon-color: var(--hx-color-info-500, #0284c7);
   }
 
   /* ─── Variant: success ─── */
 
   :host([variant='success']) .banner {
-    --hx-banner-bg: var(--hx-color-success-50, #ecfdf5);
-    --hx-banner-border-color: var(--hx-color-success-200, #a7f3d0);
-    --hx-banner-color: var(--hx-color-success-800, #065f46);
-    --hx-banner-icon-color: var(--hx-color-success-500, #10b981);
+    --hx-banner-bg: var(--hx-color-success-50, #f0fdf4);
+    --hx-banner-border-color: var(--hx-color-success-200, #bbf7d0);
+    --hx-banner-color: var(--hx-color-success-800, #14532d);
+    --hx-banner-icon-color: var(--hx-color-success-500, #16a34a);
   }
 
   /* ─── Variant: warning ─── */
@@ -174,8 +174,8 @@ export const helixBannerStyles = css`
   :host([variant='warning']) .banner {
     --hx-banner-bg: var(--hx-color-warning-50, #fffbeb);
     --hx-banner-border-color: var(--hx-color-warning-200, #fde68a);
-    --hx-banner-color: var(--hx-color-warning-800, #92400e);
-    --hx-banner-icon-color: var(--hx-color-warning-500, #f59e0b);
+    --hx-banner-color: var(--hx-color-warning-800, #78350f);
+    --hx-banner-icon-color: var(--hx-color-warning-500, #d97706);
   }
 
   /* ─── Variant: error ─── */
@@ -183,8 +183,8 @@ export const helixBannerStyles = css`
   :host([variant='error']) .banner {
     --hx-banner-bg: var(--hx-color-error-50, #fef2f2);
     --hx-banner-border-color: var(--hx-color-error-200, #fecaca);
-    --hx-banner-color: var(--hx-color-error-800, #991b1b);
-    --hx-banner-icon-color: var(--hx-color-error-500, #ef4444);
+    --hx-banner-color: var(--hx-color-error-800, #7f1d1d);
+    --hx-banner-icon-color: var(--hx-color-error-500, #dc2626);
   }
 
   /* ─── Position: fixed ─── */

@@ -131,7 +131,7 @@ export const helixToggleButtonStyles = css`
    * to give clear visual feedback without introducing a new color.
    */
   .button--primary.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #1d4ed8));
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #1e40af));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
       var(--hx-color-neutral-0, #ffffff)
@@ -157,7 +157,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbeafe));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-primary-700, #1d4ed8)
+      var(--hx-color-primary-700, #1e40af)
     );
     --hx-toggle-button-border-color: var(--hx-color-primary-400, #60a5fa);
     box-shadow: inset 0 0 0 1px var(--hx-color-primary-400, #60a5fa);
@@ -168,7 +168,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbeafe));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-primary-700, #1d4ed8)
+      var(--hx-color-primary-700, #1e40af)
     );
     --hx-toggle-button-border-color: transparent;
   }

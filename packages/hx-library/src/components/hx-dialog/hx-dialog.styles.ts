@@ -129,7 +129,7 @@ export const helixDialogStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
-    color: var(--hx-color-neutral-500, #6b7280);
+    color: var(--hx-color-neutral-500, #64748b);
     font-size: var(--hx-font-size-xl, 1.25rem);
     line-height: 1; /* intentional literal: icon button needs line-height 1; no token maps to exactly 1 */
     transition:

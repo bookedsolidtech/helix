@@ -17,6 +17,7 @@ export const helixTabStyles = css`
     display: inline-flex;
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
+    min-height: var(--hx-touch-target-min, 44px);
     padding: var(--hx-tabs-tab-padding-y, var(--hx-space-2, 0.5rem))
       var(--hx-tabs-tab-padding-x, var(--hx-space-4, 1rem));
     border: none;
@@ -27,7 +28,7 @@ export const helixTabStyles = css`
     font-family: var(--hx-tabs-tab-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tabs-tab-font-size, var(--hx-font-size-md, 1rem));
     font-weight: var(--hx-tabs-tab-font-weight, var(--hx-font-weight-medium, 500));
-    color: var(--hx-tabs-tab-color, var(--hx-color-neutral-600, #495057));
+    color: var(--hx-tabs-tab-color, var(--hx-color-neutral-600, #475569));
     line-height: var(--hx-line-height-tight, 1.25);
     cursor: pointer;
     white-space: nowrap;
@@ -44,8 +45,8 @@ export const helixTabStyles = css`
   /* ─── Hover State ─── */
 
   .tab:not([aria-selected='true']):not([aria-disabled='true']):hover {
-    color: var(--hx-tabs-tab-hover-color, var(--hx-color-neutral-800, #212529));
-    background-color: var(--hx-tabs-tab-hover-bg, var(--hx-color-neutral-50, #f8f9fa));
+    color: var(--hx-tabs-tab-hover-color, var(--hx-color-neutral-800, #1e293b));
+    background-color: var(--hx-tabs-tab-hover-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
   /* ─── Selected State ─── */
@@ -80,7 +81,7 @@ export const helixTabStyles = css`
 
   .tab[aria-disabled='true'] {
     pointer-events: none;
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400, #94a3b8);
   }
 
   /* ─── Prefix / Suffix Slots ─── */

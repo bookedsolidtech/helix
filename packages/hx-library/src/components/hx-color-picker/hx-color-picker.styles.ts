@@ -16,14 +16,14 @@ export const helixColorPickerStyles = css`
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     padding: var(--hx-space-1, 0.25rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #d1d5db);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #cbd5e1);
     border-radius: var(--hx-border-radius-md, 0.375rem);
-    background: var(--hx-color-neutral-0, #fff);
+    background: var(--hx-color-neutral-0, #ffffff);
     cursor: pointer;
     transition: border-color var(--hx-transition-fast, 0.15s ease);
   }
   .trigger:hover:not([disabled]) {
-    border-color: var(--hx-color-primary-500, #3b82f6);
+    border-color: var(--hx-color-primary-500, #2563eb);
   }
   :is(.trigger, .gradient-grid, .slider-track, .swatch-btn, .format-btn):focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
@@ -42,7 +42,7 @@ export const helixColorPickerStyles = css`
   }
   .trigger-label {
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-700, #374151);
+    color: var(--hx-color-neutral-700, #334155);
     font-family: var(--hx-font-family-mono, monospace);
     white-space: nowrap;
   }
@@ -51,8 +51,8 @@ export const helixColorPickerStyles = css`
     z-index: var(--hx-color-picker-z-index, 1000);
     top: calc(100% + 4px);
     left: 0;
-    background: var(--hx-color-neutral-0, #fff);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
+    background: var(--hx-color-neutral-0, #ffffff);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
     box-shadow: 0 8px 24px
       var(--hx-color-picker-panel-shadow, var(--hx-overlay-black-15, rgba(0, 0, 0, 0.15)));
@@ -66,7 +66,7 @@ export const helixColorPickerStyles = css`
   :host([inline]) .panel {
     position: static;
     box-shadow: none;
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
   }
   .gradient-grid {
@@ -94,7 +94,7 @@ export const helixColorPickerStyles = css`
     border-radius: 50%;
     border: none;
     box-shadow:
-      0 0 0 2px var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff)),
+      0 0 0 2px var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #ffffff)),
       0 0 0 3px var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
     transform: translate(-50%, -50%);
     pointer-events: none;
@@ -141,7 +141,7 @@ export const helixColorPickerStyles = css`
     border-radius: 50%;
     border: none;
     box-shadow:
-      0 0 0 2px var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #fff)),
+      0 0 0 2px var(--hx-color-picker-thumb-border, var(--hx-color-neutral-0, #ffffff)),
       0 0 0 3px var(--hx-color-picker-thumb-shadow, var(--hx-overlay-black-30, rgba(0, 0, 0, 0.3)));
     transform: translate(-50%, -50%);
     pointer-events: none;
@@ -179,12 +179,12 @@ export const helixColorPickerStyles = css`
   .format-btn {
     flex-shrink: 0;
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    background: var(--hx-color-neutral-100, #f3f4f6);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #d1d5db);
+    background: var(--hx-color-neutral-100, #f1f5f9);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #cbd5e1);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-600, #4b5563);
+    color: var(--hx-color-neutral-600, #475569);
     text-transform: uppercase;
     font-weight: var(--hx-font-weight-semibold, 600);
     letter-spacing: 0.05em;
@@ -193,12 +193,12 @@ export const helixColorPickerStyles = css`
     flex: 1;
     min-width: 0;
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #d1d5db);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #cbd5e1);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-family: var(--hx-font-family-mono, monospace);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-900, #111827);
-    background: var(--hx-color-neutral-0, #fff);
+    color: var(--hx-color-neutral-900, #0f172a);
+    background: var(--hx-color-neutral-0, #ffffff);
     outline: none;
   }
   .color-input:focus-visible {

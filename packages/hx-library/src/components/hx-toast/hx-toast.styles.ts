@@ -47,22 +47,22 @@ export const helixToastStyles = css`
   /* ─── Variant overrides ─── */
 
   .toast--success {
-    --hx-toast-bg: var(--hx-color-success-600, #16a34a);
+    --hx-toast-bg: var(--hx-color-success-600, #15803d);
     --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .toast--warning {
-    --hx-toast-bg: var(--hx-color-warning-500, #f59e0b);
+    --hx-toast-bg: var(--hx-color-warning-500, #d97706);
     --hx-toast-color: var(--hx-color-neutral-900, #0f172a);
   }
 
   .toast--danger {
-    --hx-toast-bg: var(--hx-color-error-600, #dc2626);
+    --hx-toast-bg: var(--hx-color-error-600, #b91c1c);
     --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .toast--info {
-    --hx-toast-bg: var(--hx-color-primary-600, #2563eb);
+    --hx-toast-bg: var(--hx-color-primary-600, #1d4ed8);
     --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 

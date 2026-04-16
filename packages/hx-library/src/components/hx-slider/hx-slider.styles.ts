@@ -42,7 +42,7 @@ export const helixSliderStyles = css`
   .slider__value-display {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-value-color, var(--hx-color-neutral-600, #6c757d));
+    color: var(--hx-slider-value-color, var(--hx-color-neutral-600, #475569));
     line-height: var(--hx-line-height-normal, 1.5);
     font-variant-numeric: tabular-nums;
     min-width: var(--hx-size-8, 2rem);
@@ -60,7 +60,7 @@ export const helixSliderStyles = css`
     position: relative;
     width: 100%;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-slider-track-bg, var(--hx-color-neutral-200, #e9ecef));
+    background-color: var(--hx-slider-track-bg, var(--hx-color-neutral-200, #e2e8f0));
     overflow: visible;
   }
 
@@ -260,7 +260,7 @@ export const helixSliderStyles = css`
     top: 0;
     width: var(--hx-border-width-thin, 1px);
     height: 100%;
-    background-color: var(--hx-slider-tick-color, var(--hx-color-neutral-400, #adb5bd));
+    background-color: var(--hx-slider-tick-color, var(--hx-color-neutral-400, #94a3b8));
     transform: translateX(-50%);
   }
 
@@ -270,7 +270,7 @@ export const helixSliderStyles = css`
     display: flex;
     justify-content: space-between;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-range-label-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-slider-range-label-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
     margin-top: var(--hx-space-0-5, 0.125rem);
   }
@@ -279,17 +279,17 @@ export const helixSliderStyles = css`
 
   .slider__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-help-text-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-slider-help-text-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   /* ─── Disabled state ─── */
 
   .slider--disabled .slider__fill {
-    background-color: var(--hx-color-neutral-400, #adb5bd);
+    background-color: var(--hx-color-neutral-400, #94a3b8);
   }
 
   .slider--disabled .slider__thumb-visual {
-    border-color: var(--hx-color-neutral-400, #adb5bd);
+    border-color: var(--hx-color-neutral-400, #94a3b8);
   }
 `;

@@ -16,15 +16,15 @@ export const helixTagStyles = css`
     align-items: center;
     gap: var(--hx-space-1, 0.25rem);
     border-radius: var(--hx-tag-border-radius, var(--hx-border-radius-sm, 0.25rem));
-    background-color: var(--hx-tag-bg, var(--hx-color-neutral-100, #f3f4f6));
-    color: var(--hx-tag-color, var(--hx-color-neutral-700, #374151));
+    background-color: var(--hx-tag-bg, var(--hx-color-neutral-100, #f1f5f9));
+    color: var(--hx-tag-color, var(--hx-color-neutral-700, #334155));
     font-family: var(--hx-tag-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-tag-font-weight, var(--hx-font-weight-medium, 500));
     line-height: var(--hx-line-height-tight, 1.25);
     white-space: nowrap;
     vertical-align: middle;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-tag-border-color, var(--hx-color-neutral-200, #e5e7eb));
+      var(--hx-tag-border-color, var(--hx-color-neutral-200, #e2e8f0));
   }
 
   /* ─── Size Variants ─── */
@@ -50,32 +50,32 @@ export const helixTagStyles = css`
   /* ─── Color Variants ─── */
 
   .tag--default {
-    --hx-tag-bg: var(--hx-color-neutral-100, #f3f4f6);
-    --hx-tag-color: var(--hx-color-neutral-700, #374151);
-    --hx-tag-border-color: var(--hx-color-neutral-200, #e5e7eb);
+    --hx-tag-bg: var(--hx-color-neutral-100, #f1f5f9);
+    --hx-tag-color: var(--hx-color-neutral-700, #334155);
+    --hx-tag-border-color: var(--hx-color-neutral-200, #e2e8f0);
   }
 
   .tag--primary {
     --hx-tag-bg: var(--hx-color-primary-50, #eff6ff);
-    --hx-tag-color: var(--hx-color-primary-700, #1d4ed8);
+    --hx-tag-color: var(--hx-color-primary-700, #1e40af);
     --hx-tag-border-color: var(--hx-color-primary-200, #bfdbfe);
   }
 
   .tag--success {
     --hx-tag-bg: var(--hx-color-success-50, #f0fdf4);
-    --hx-tag-color: var(--hx-color-success-700, #15803d);
+    --hx-tag-color: var(--hx-color-success-700, #166534);
     --hx-tag-border-color: var(--hx-color-success-200, #bbf7d0);
   }
 
   .tag--warning {
     --hx-tag-bg: var(--hx-color-warning-50, #fffbeb);
-    --hx-tag-color: var(--hx-color-warning-700, #b45309);
+    --hx-tag-color: var(--hx-color-warning-700, #92400e);
     --hx-tag-border-color: var(--hx-color-warning-200, #fde68a);
   }
 
   .tag--danger {
     --hx-tag-bg: var(--hx-color-error-50, #fef2f2);
-    --hx-tag-color: var(--hx-color-error-700, #b91c1c);
+    --hx-tag-color: var(--hx-color-error-700, #991b1b);
     --hx-tag-border-color: var(--hx-color-error-200, #fecaca);
   }
 

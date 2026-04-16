@@ -29,12 +29,12 @@ export const helixLinkStyles = css`
   }
 
   .link:hover {
-    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #1d4ed8));
+    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #1e40af));
     text-decoration: var(--hx-link-text-decoration-hover, underline);
   }
 
   .link:active {
-    color: var(--hx-link-color-active, var(--hx-color-primary-800, #1e40af));
+    color: var(--hx-link-color-active, var(--hx-color-primary-800, #1e3a8a));
   }
 
   .link:focus-visible {
@@ -55,7 +55,7 @@ export const helixLinkStyles = css`
   }
 
   .link--subtle:hover {
-    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #1d4ed8));
+    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #1e40af));
     text-decoration: underline;
   }
 
@@ -66,7 +66,7 @@ export const helixLinkStyles = css`
   }
 
   .link--danger:hover {
-    color: var(--hx-link-color-danger-hover, var(--hx-color-error-700, #b91c1c));
+    color: var(--hx-link-color-danger-hover, var(--hx-color-error-700, #991b1b));
   }
 
   /* --- Disabled --- */

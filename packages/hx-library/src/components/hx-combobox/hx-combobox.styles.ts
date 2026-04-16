@@ -77,7 +77,7 @@ export const helixComboboxStyles = css`
     display: flex;
     align-items: center;
     padding: 0 var(--hx-space-2, 0.5rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-color-neutral-500, #64748b);
     flex-shrink: 0;
   }
   .field__input {
@@ -90,11 +90,11 @@ export const helixComboboxStyles = css`
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-combobox-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-combobox-color, var(--hx-color-neutral-800, #1e293b));
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
   }
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400, #94a3b8);
   }
   .field__input--sm {
     min-height: var(--hx-input-height-sm, var(--hx-size-8, 2rem));
@@ -113,7 +113,7 @@ export const helixComboboxStyles = css`
     justify-content: center;
     margin-inline-end: var(--hx-space-2, 0.5rem);
     flex-shrink: 0;
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400, #94a3b8);
   }
   .field__clear-button {
     width: 1.25rem;
@@ -167,7 +167,7 @@ export const helixComboboxStyles = css`
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-combobox-listbox-shadow,
-      0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0d1117) 12%, transparent)
+      0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0f172a) 12%, transparent)
     );
     max-height: var(--hx-combobox-listbox-max-height, 16rem);
     overflow: hidden;
@@ -188,7 +188,7 @@ export const helixComboboxStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-combobox-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-combobox-color, var(--hx-color-neutral-800, #1e293b));
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
@@ -224,7 +224,7 @@ export const helixComboboxStyles = css`
   .field__no-options {
     padding: var(--hx-space-3, 0.75rem);
     text-align: center;
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400, #94a3b8);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
   .field__sr-only {
@@ -244,7 +244,7 @@ export const helixComboboxStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__help-text {
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-color-neutral-500, #64748b);
   }
   .field__error {
     color: var(--hx-combobox-error-color, var(--hx-color-error-text, #b91c1c));
@@ -353,7 +353,7 @@ export const helixComboboxStyles = css`
     padding: 0 var(--hx-space-1, 0.25rem) 0 var(--hx-space-2, 0.5rem);
     height: 1.5rem;
     background-color: var(--hx-combobox-chip-bg, var(--hx-color-primary-100, #dbeafe));
-    color: var(--hx-combobox-chip-color, var(--hx-color-primary-800, #1e40af));
+    color: var(--hx-combobox-chip-color, var(--hx-color-primary-800, #1e3a8a));
     border-radius: var(--hx-border-radius-full, 9999px);
     font-size: var(--hx-font-size-sm, 0.875rem);
     white-space: nowrap;

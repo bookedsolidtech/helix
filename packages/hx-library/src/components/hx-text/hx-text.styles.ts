@@ -98,15 +98,15 @@ export const helixTextStyles = css`
   }
 
   .text--color-danger {
-    --hx-text-color: var(--hx-color-error-600, #dc2626);
+    --hx-text-color: var(--hx-color-error-600, #b91c1c);
   }
 
   .text--color-success {
-    --hx-text-color: var(--hx-color-success-600, #16a34a);
+    --hx-text-color: var(--hx-color-success-600, #15803d);
   }
 
   .text--color-warning {
-    --hx-text-color: var(--hx-color-warning-600, #d97706);
+    --hx-text-color: var(--hx-color-warning-600, #b45309);
   }
 
   /* ─── Weight Overrides ─── */

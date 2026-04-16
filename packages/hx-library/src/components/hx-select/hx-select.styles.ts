@@ -7,8 +7,8 @@ export const helixSelectStyles = css`
 
     /* Background & foreground */
     --_bg: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
-    --_color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
-    --_placeholder-color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #adb5bd));
+    --_color: var(--hx-select-color, var(--hx-color-neutral-800, #1e293b));
+    --_placeholder-color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #94a3b8));
 
     /* Label */
     --_label-color: var(--hx-select-label-color, var(--hx-color-neutral-700, #334155));
@@ -27,7 +27,7 @@ export const helixSelectStyles = css`
     --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc2626));
 
     /* Chevron */
-    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #6c757d));
+    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #64748b));
     --_chevron-size: var(--hx-select-chevron-size, 0.5rem);
 
     /* Listbox */
@@ -279,7 +279,7 @@ export const helixSelectStyles = css`
   }
 
   .field__help-text {
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-color-neutral-500, #64748b);
   }
 
   .field__error {

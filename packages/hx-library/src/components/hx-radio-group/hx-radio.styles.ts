@@ -98,7 +98,7 @@ export const helixRadioStyles = css`
   /* ─── Hover State ─── */
 
   .radio:not(.radio--disabled):not(.radio--checked):hover .radio__control {
-    border-color: var(--hx-color-neutral-400, #adb5bd);
+    border-color: var(--hx-color-neutral-400, #94a3b8);
   }
 
   /* ─── Label ─── */

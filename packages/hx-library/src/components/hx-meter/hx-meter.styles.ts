@@ -16,14 +16,14 @@ export const helixMeterStyles = css`
   }
 
   .meter:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #2563eb);
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #60a5fa);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .meter__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-meter-label-color, var(--hx-color-neutral-700, #374151));
+    color: var(--hx-meter-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -31,7 +31,7 @@ export const helixMeterStyles = css`
     position: relative;
     width: 100%;
     height: var(--hx-meter-track-height, var(--hx-space-2, 0.5rem));
-    background-color: var(--hx-meter-track-color, var(--hx-color-neutral-200, #e5e7eb));
+    background-color: var(--hx-meter-track-color, var(--hx-color-neutral-200, #e2e8f0));
     border-radius: var(--hx-meter-track-radius, var(--hx-border-radius-full, 9999px));
     overflow: hidden;
   }
@@ -60,17 +60,17 @@ export const helixMeterStyles = css`
   /* ─── Default (no thresholds configured) ─── */
 
   :host {
-    --_indicator-color: var(--hx-meter-indicator-color, var(--hx-color-primary-500, #3b82f6));
+    --_indicator-color: var(--hx-meter-indicator-color, var(--hx-color-primary-500, #2563eb));
   }
 
   /* ─── Semantic state colors ─── */
 
   :host([data-state='optimum']) {
-    --_indicator-color: var(--hx-meter-color-optimum, var(--hx-color-success-500, #22c55e));
+    --_indicator-color: var(--hx-meter-color-optimum, var(--hx-color-success-500, #16a34a));
   }
 
   :host([data-state='warning']) {
-    --_indicator-color: var(--hx-meter-color-warning, var(--hx-color-warning-500, #f59e0b));
+    --_indicator-color: var(--hx-meter-color-warning, var(--hx-color-warning-500, #d97706));
   }
 
   :host([data-state='danger']) {
@@ -90,11 +90,11 @@ export const helixMeterStyles = css`
   }
 
   .meter__state-label[data-state='optimum'] {
-    color: var(--hx-meter-color-optimum, var(--hx-color-success-700, #15803d));
+    color: var(--hx-meter-color-optimum, var(--hx-color-success-700, #166534));
   }
 
   .meter__state-label[data-state='warning'] {
-    color: var(--hx-meter-color-warning, var(--hx-color-warning-700, #b45309));
+    color: var(--hx-meter-color-warning, var(--hx-color-warning-700, #92400e));
   }
 
   .meter__state-label[data-state='danger'] {

@@ -10,7 +10,7 @@ export const helixCounterStyles = css`
     align-items: baseline;
     font-family: var(--hx-counter-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-counter-font-weight, var(--hx-font-weight-bold, 700));
-    color: var(--hx-counter-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-counter-color, var(--hx-color-neutral-900, #0f172a));
     line-height: var(--hx-line-height-tight, 1.25);
     font-variant-numeric: tabular-nums;
   }

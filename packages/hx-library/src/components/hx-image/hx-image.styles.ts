@@ -20,8 +20,8 @@ export const helixImageStyles = css`
     align-items: center;
     justify-content: center;
     min-height: var(--hx-image-fallback-min-height, 3rem);
-    background-color: var(--hx-color-neutral-100, #f3f4f6);
-    color: var(--hx-color-neutral-500, #6b7280);
+    background-color: var(--hx-color-neutral-100, #f1f5f9);
+    color: var(--hx-color-neutral-500, #64748b);
   }
 
   .image__img {
@@ -34,7 +34,7 @@ export const helixImageStyles = css`
   .image__caption {
     display: none;
     padding: var(--hx-image-caption-padding, 0.5rem 0 0);
-    color: var(--hx-image-caption-color, var(--hx-color-neutral-600, #4b5563));
+    color: var(--hx-image-caption-color, var(--hx-color-neutral-600, #475569));
     font-size: var(--hx-image-caption-font-size, 0.875rem);
   }
 

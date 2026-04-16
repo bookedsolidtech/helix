@@ -166,7 +166,7 @@ export const helixCheckboxStyles = css`
 
   .checkbox__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
     padding-inline-start: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)
