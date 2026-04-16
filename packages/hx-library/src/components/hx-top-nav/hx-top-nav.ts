@@ -131,8 +131,10 @@ export class HelixTopNav extends HelixElement {
           detail: { open: false },
         }),
       );
-      // Return focus to the toggle button
-      this.shadowRoot?.querySelector<HTMLButtonElement>('[part="mobile-toggle"]')?.focus();
+      // Return focus to the toggle button after Lit re-render completes
+      void this.updateComplete.then(() => {
+        this.shadowRoot?.querySelector<HTMLButtonElement>('[part="mobile-toggle"]')?.focus();
+      });
     }
   };
 

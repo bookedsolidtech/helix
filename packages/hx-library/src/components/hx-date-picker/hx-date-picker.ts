@@ -386,7 +386,11 @@ export class HelixDatePicker extends HelixElement {
     super.updated(changedProperties);
 
     // Sync validity after first render (when _input is available) and on required/error changes.
-    if (changedProperties.has('value') || changedProperties.has('required') || changedProperties.has('error')) {
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('required') ||
+      changedProperties.has('error')
+    ) {
       this._updateValidity();
     }
 

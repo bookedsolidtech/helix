@@ -59,10 +59,7 @@ export const helixDatePickerStyles = css`
     align-items: stretch;
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-date-picker-border-color, var(--hx-color-neutral-300, #ced4da));
-    border-radius: var(
-      --hx-date-picker-border-radius,
-      var(--hx-border-radius-md, 0.375rem)
-    );
+    border-radius: var(--hx-date-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-date-picker-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
       border-color var(--hx-transition-fast, 0.15s ease),
@@ -167,11 +164,7 @@ export const helixDatePickerStyles = css`
 
   .field__trigger:hover:not(:disabled) {
     color: var(--hx-date-picker-trigger-hover-color, var(--hx-color-neutral-700, #343a40));
-    background-color: color-mix(
-      in srgb,
-      var(--hx-color-neutral-900, #212529) 4%,
-      transparent
-    );
+    background-color: color-mix(in srgb, var(--hx-color-neutral-900, #212529) 4%, transparent);
   }
 
   .field__trigger:disabled {
@@ -188,20 +181,14 @@ export const helixDatePickerStyles = css`
     left: 0;
     z-index: var(--hx-z-index-dropdown, 1000);
     min-width: var(--hx-date-picker-calendar-min-width, 18rem);
-    background-color: var(
-      --hx-date-picker-calendar-bg,
-      var(--hx-color-neutral-0, #ffffff)
-    );
+    background-color: var(--hx-date-picker-calendar-bg, var(--hx-color-neutral-0, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
-      var(
-        --hx-date-picker-calendar-border-color,
-        var(--hx-color-neutral-200, #e9ecef)
-      );
-    border-radius: var(
-      --hx-date-picker-calendar-border-radius,
-      var(--hx-border-radius-lg, 0.5rem)
+      var(--hx-date-picker-calendar-border-color, var(--hx-color-neutral-200, #e9ecef));
+    border-radius: var(--hx-date-picker-calendar-border-radius, var(--hx-border-radius-lg, 0.5rem));
+    box-shadow: var(
+      --hx-date-picker-calendar-shadow,
+      var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1))
     );
-    box-shadow: var(--hx-date-picker-calendar-shadow, var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)));
     padding: var(--hx-space-3, 0.75rem);
     outline: none;
   }
@@ -330,19 +317,13 @@ export const helixDatePickerStyles = css`
   }
 
   .calendar__day--selected {
-    background-color: var(
-      --hx-date-picker-selected-bg,
-      var(--hx-color-primary-500, #2563eb)
-    );
+    background-color: var(--hx-date-picker-selected-bg, var(--hx-color-primary-500, #2563eb));
     color: var(--hx-date-picker-selected-color, var(--hx-color-neutral-0, #ffffff));
     font-weight: var(--hx-font-weight-semibold, 600);
   }
 
   .calendar__day--selected:hover {
-    background-color: var(
-      --hx-date-picker-selected-hover-bg,
-      var(--hx-color-primary-600, #1d4ed8)
-    );
+    background-color: var(--hx-date-picker-selected-hover-bg, var(--hx-color-primary-600, #1d4ed8));
   }
 
   .calendar__day--today:not(.calendar__day--selected) {

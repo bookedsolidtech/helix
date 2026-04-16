@@ -61,6 +61,8 @@ const baseExports = [
   '// ─── Mixins ───────────────────────────────────────────────────────────────────',
   "export { FocusMixin } from './mixins/index.js';",
   "export type { FocusMixinInterface } from './mixins/index.js';",
+  "export { FormMixin } from './mixins/index.js';",
+  "export type { FormMixinInterface } from './mixins/index.js';",
 ].join('\n');
 
 // Controller exports (manually maintained — add new controllers here)

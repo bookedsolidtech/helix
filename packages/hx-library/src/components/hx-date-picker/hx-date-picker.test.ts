@@ -363,7 +363,13 @@ describe('hx-date-picker', () => {
       // Day 10 of June 2026 is after max=2026-06-05 — must be disabled.
       const dayAfterMax = Array.from(days).find((d) => Number(d.dataset['day']) === 10);
       expect(dayAfterMax).toBeTruthy();
-      expect(dayAfterMax!.getAttribute('aria-disabled')).toBe('true');
+
+      // The component places aria-disabled on the parent gridcell (ARIA 1.2 grid
+      // ownership) and native disabled on the button. Validate both.
+      const gridcell = dayAfterMax!.closest('[role="gridcell"]');
+      expect(gridcell).toBeTruthy();
+      expect(gridcell!.getAttribute('aria-disabled')).toBe('true');
+      expect(dayAfterMax!.disabled).toBe(true);
     });
 
     it('clicking a disabled day does NOT fire hx-change', async () => {

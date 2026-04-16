@@ -780,7 +780,9 @@ export class HelixCombobox extends HelixElement {
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
             aria-label=${ifDefined(this.accessibleLabel || undefined)}
-            aria-labelledby=${ifDefined(this.label && !this.accessibleLabel ? this._labelId : undefined)}
+            aria-labelledby=${ifDefined(
+              this.label && !this.accessibleLabel ? this._labelId : undefined,
+            )}
             aria-busy=${this.loading ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
             placeholder=${ifDefined(this.placeholder || undefined)}
