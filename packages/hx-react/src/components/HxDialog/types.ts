@@ -14,8 +14,10 @@ export interface HxDialogProps {
   style?: React.CSSProperties;
   /** Controls whether the dialog is open. */
   open?: boolean;
-  /** When true, renders as a modal dialog with a backdrop and focus trap.
-When false, renders as a non-modal dialog. */
+  /** When true, dialog renders as a modal with backdrop and focus trap using the native
+`showModal()` API. When false (default), dialog renders as a non-modal overlay using
+the native `show()` API. Defaults to false, consistent with HTML boolean attribute
+semantics (absent = false, present = true). */
   modal?: boolean;
   /** When true, clicking the backdrop closes the dialog. */
   closeOnBackdrop?: boolean;

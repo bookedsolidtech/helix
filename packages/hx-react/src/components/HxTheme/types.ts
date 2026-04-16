@@ -18,6 +18,8 @@ export interface HxThemeProps {
 - `"high-contrast"`: WCAG 7:1+ contrast tokens for low-vision users
 - `"auto"`: follows OS `prefers-color-scheme`; resolves to `"light"` or `"dark"` at runtime */
   theme?: 'light' | 'dark' | 'high-contrast' | 'auto';
+  /** When true, auto-detects the preferred color scheme via the
+`prefers-color-scheme` media query, overriding the `theme` prop. */
   system?: boolean;
   /** The registered brand name to apply on top of the base theme.
 When set, brand-specific CSS custom property overrides are merged
