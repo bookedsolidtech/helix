@@ -50,13 +50,6 @@ const nextId = createIdCounter('hx-clinical-status');
 export class HelixClinicalStatus extends HelixElement {
   static override styles = [helixClinicalStatusStyles];
 
-  /**
-   * ElementInternals instance for setting ARIA role without host attributes.
-   * Using internals prevents consumers from accidentally overriding the role
-   * via a host attribute, which would break critical healthcare alert semantics.
-   * @internal
-   */
-  private readonly _elInternals = this.attachInternals();
 
   // ─── Properties ───
 
@@ -172,7 +165,7 @@ export class HelixClinicalStatus extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._elInternals.role = this._role;
+    this._internals.role = this._role;
   }
 
   override attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
@@ -185,7 +178,7 @@ export class HelixClinicalStatus extends HelixElement {
   protected override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('severity')) {
-      this._elInternals.role = this._role;
+      this._internals.role = this._role;
     }
   }
 
