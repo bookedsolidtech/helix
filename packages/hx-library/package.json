@@ -4,8 +4,9 @@
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
-    "./dist/components/*/index.js",
+    "./dist/components/*/hx-*.js",
     "./dist/utilities/document-token-adoption.js",
+    "./dist/index.js",
     "**/*.css"
   ],
   "main": "./dist/index.js",
