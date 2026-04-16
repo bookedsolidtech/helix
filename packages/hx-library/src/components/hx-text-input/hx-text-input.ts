@@ -131,6 +131,11 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
    * Uses `accessible-label` attribute instead of `aria-label` to avoid
    * ARIAMixin shadowing on the host element. The value is forwarded to the
    * internal native input's `aria-label`.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because form
+   * inputs with associated labels delegate accessible naming via `<label>`
+   * association and `aria-labelledby`, not host-level ARIA delegation. The
+   * `accessible-label` attribute is a fallback for label-free usage.
    * @attr accessible-label
    */
   @property({ type: String, attribute: 'accessible-label' })

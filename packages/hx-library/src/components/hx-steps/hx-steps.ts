@@ -53,6 +53,10 @@ export class HelixSteps extends HelixElement {
    * Accessible label for the list. Forwarded to the inner list element.
    * Uses `accessible-label` attribute instead of `aria-label` to avoid
    * ARIAMixin shadowing on the host element.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because the
+   * `accessible-label` attribute approach avoids the ARIAMixin property conflict
+   * without requiring mixin overhead.
    * @attr accessible-label
    */
   @property({ type: String, attribute: 'accessible-label' })
