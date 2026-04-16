@@ -145,12 +145,14 @@ export class HelixDialog extends LitElement {
   open = false;
 
   /**
-   * When true, renders as a modal dialog with a backdrop and focus trap.
-   * When false, renders as a non-modal dialog.
+   * When true, dialog renders as a modal with backdrop and focus trap using the native
+   * `showModal()` API. When false (default), dialog renders as a non-modal overlay using
+   * the native `show()` API. Defaults to false, consistent with HTML boolean attribute
+   * semantics (absent = false, present = true).
    * @attr modal
    */
   @property({ type: Boolean, reflect: true })
-  modal = true;
+  modal = false;
 
   /**
    * When true, clicking the backdrop closes the dialog.
@@ -336,9 +338,11 @@ export class HelixDialog extends LitElement {
       }
     }
 
-    // D4 — release body scroll lock. Uses shared counter so scroll is only restored
-    // after every open overlay (hx-dialog + hx-drawer) has closed.
-    unlockBodyScroll();
+    // D4 — release body scroll lock only when this dialog was opened as modal.
+    // Non-modal dialogs never call lockBodyScroll(), so the unlock must be symmetric.
+    if (this.modal) {
+      unlockBodyScroll();
+    }
 
     this._removeGlobalListeners();
     this._cachedFocusableElements = [];

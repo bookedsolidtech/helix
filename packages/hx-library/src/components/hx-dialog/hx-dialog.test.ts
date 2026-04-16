@@ -419,7 +419,7 @@ describe('hx-dialog', () => {
 
   describe('Backdrop Click', () => {
     it('closes modal dialog when backdrop area is clicked and closeOnBackdrop is true', async () => {
-      const el = await fixture<HelixDialog>('<hx-dialog open heading="Test"></hx-dialog>');
+      const el = await fixture<HelixDialog>('<hx-dialog open modal heading="Test"></hx-dialog>');
       await el.updateComplete;
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-cancel');
@@ -433,7 +433,7 @@ describe('hx-dialog', () => {
     });
 
     it('does not close dialog when backdrop is clicked and closeOnBackdrop is false', async () => {
-      const el = await fixture<HelixDialog>('<hx-dialog open heading="Test"></hx-dialog>');
+      const el = await fixture<HelixDialog>('<hx-dialog open modal heading="Test"></hx-dialog>');
       el.closeOnBackdrop = false;
       await el.updateComplete;
 
@@ -572,7 +572,7 @@ describe('hx-dialog', () => {
     });
 
     it('does not render a backdrop element for modal dialog', async () => {
-      const el = await fixture<HelixDialog>('<hx-dialog open heading="Modal"></hx-dialog>');
+      const el = await fixture<HelixDialog>('<hx-dialog open modal heading="Modal"></hx-dialog>');
       await el.updateComplete;
       const backdrop = shadowQuery(el, '[part="backdrop"]');
       expect(backdrop).toBeFalsy();
