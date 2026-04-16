@@ -346,7 +346,7 @@ export class HelixTheme extends HelixElement {
   override updated(changed: PropertyValues<this>): void {
     super.updated(changed);
     const autoMode = this.theme === 'auto';
-    if (changed.has('system') || changed.has('theme')) {
+    if (changed.has('theme')) {
       if (autoMode) {
         this._attachMediaQuery();
       } else {
