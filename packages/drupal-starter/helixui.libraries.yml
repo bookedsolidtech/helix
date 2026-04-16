@@ -20,8 +20,9 @@ core:
     theme:
       /libraries/helixui/dist/css/helix-tokens.css: { minified: true }
       /libraries/helixui/dist/css/helix-core.css: { minified: true }
-  js:
-    /libraries/helixui/dist/index.js: { attributes: { type: module }, minified: true }
+  # NOTE: No JS entry here. Each per-component library loads its own JS module
+  # which includes the document-token-adoption side-effect import automatically.
+  # Loading dist/index.js would pull in ALL 81 components — use helixui/all for that.
 
 # ─────────────────────────────────────────────────────────────────
 # Individual component libraries
