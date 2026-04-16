@@ -78,7 +78,7 @@ export const helixCardStyles = css`
 
   .card--interactive:hover {
     box-shadow: var(--hx-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
-    transform: translateY(var(--hx-lift-md, -2px));
+    transform: translateY(var(--hx-transform-lift-md, -2px));
   }
 
   .card--interactive:focus-visible {
