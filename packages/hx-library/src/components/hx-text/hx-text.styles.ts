@@ -9,7 +9,7 @@ export const helixTextStyles = css`
 
   .text {
     display: inline;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-text-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-text-font-size);
     font-weight: var(--hx-text-font-weight);
     line-height: var(--hx-text-line-height);

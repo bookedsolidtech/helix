@@ -78,7 +78,7 @@ export const helixAvatarStyles = css`
   /* ─── Initials ─── */
 
   .avatar__initials {
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-avatar-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-avatar-font-size);
     font-weight: var(--hx-font-weight-semibold, 600);
     line-height: 1;

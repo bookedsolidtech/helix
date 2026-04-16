@@ -23,7 +23,7 @@ export const helixRadioGroupStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-2, 0.5rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-radio-group-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* ─── Legend ─── */

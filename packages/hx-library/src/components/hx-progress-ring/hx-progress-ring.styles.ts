@@ -137,7 +137,7 @@ export const helixProgressRingStyles = css`
     justify-content: center;
     inset: 0;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-progress-ring-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-font-weight-semibold, 600);
     color: var(--hx-progress-ring-label-color, var(--hx-color-neutral-900, #0f172a));
     pointer-events: none;

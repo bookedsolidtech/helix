@@ -31,7 +31,7 @@ export const helixTopNavStyles = css`
     color: var(--hx-top-nav-color, var(--hx-color-neutral-800, #212529));
     border-bottom: var(--hx-border-width-thin, 1px) solid
       var(--hx-top-nav-border-color, var(--hx-color-neutral-200, #dee2e6));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-top-nav-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* ─── Bar row (always visible) ─── */

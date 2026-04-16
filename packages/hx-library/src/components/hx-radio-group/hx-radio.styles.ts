@@ -22,7 +22,7 @@ export const helixRadioStyles = css`
     min-height: var(--hx-touch-target-min, 2.75rem);
     cursor: pointer;
     position: relative;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-radio-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   .radio--disabled {

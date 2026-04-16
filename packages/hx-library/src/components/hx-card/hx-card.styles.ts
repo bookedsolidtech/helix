@@ -17,7 +17,7 @@ export const helixCardStyles = css`
       var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
     border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
     overflow: hidden;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-card-font-family, var(--hx-font-family-sans, sans-serif));
     transition:
       box-shadow var(--hx-transition-normal, 250ms ease),
       transform var(--hx-transition-normal, 250ms ease);

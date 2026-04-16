@@ -18,7 +18,7 @@ export const helixListItemStyles = css`
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-list-item-padding, var(--hx-space-3, 0.75rem));
     color: var(--hx-list-item-color, var(--hx-color-neutral-900, #0f172a));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-list-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: default;

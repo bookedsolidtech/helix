@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const helixTabsStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-tabs-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   * {

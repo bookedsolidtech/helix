@@ -8,7 +8,7 @@ export const helixAccordionItemStyles = css`
   .item {
     border-bottom: var(--hx-border-width-thin, 1px) solid
       var(--hx-accordion-border-color, var(--hx-color-neutral-200, #dee2e6));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-accordion-item-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   :host(:first-child) .item {

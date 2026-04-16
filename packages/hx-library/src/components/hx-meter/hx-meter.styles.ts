@@ -86,7 +86,7 @@ export const helixMeterStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-medium, 500);
     line-height: var(--hx-line-height-tight, 1.25);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-meter-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   .meter__state-label[data-state='optimum'] {

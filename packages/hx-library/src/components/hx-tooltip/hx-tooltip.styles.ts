@@ -16,7 +16,7 @@ export const helixTooltipStyles = css`
     padding: var(--hx-tooltip-padding, var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem));
     background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #111827));
     color: var(--hx-tooltip-color, var(--hx-color-neutral-50, #f9fafb));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-tooltip-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tooltip-font-size, var(--hx-font-size-xs, 0.75rem));
     line-height: var(--hx-line-height-normal, 1.5);
     border-radius: var(--hx-tooltip-border-radius, var(--hx-border-radius-sm, 0.25rem));

@@ -18,7 +18,7 @@ export const helixPopoverStyles = css`
     padding: var(--hx-popover-padding, var(--hx-space-3, 0.75rem));
     background: var(--hx-popover-bg, var(--hx-color-neutral-0, #ffffff));
     color: var(--hx-popover-color, var(--hx-color-neutral-900, #111827));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-popover-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-popover-font-size, var(--hx-font-size-sm, 0.875rem));
     line-height: var(--hx-line-height-normal, 1.5);
     border: 1px solid var(--hx-popover-border-color, var(--hx-color-neutral-200, #e5e7eb));

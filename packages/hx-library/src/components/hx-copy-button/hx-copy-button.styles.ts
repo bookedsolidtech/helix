@@ -29,7 +29,7 @@ export const helixCopyButtonStyles = css`
     user-select: none;
     -webkit-user-select: none;
     flex-shrink: 0;
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-copy-button-font-family, var(--hx-font-family-sans));
     font-weight: var(--hx-font-weight-medium);
     white-space: nowrap;
   }

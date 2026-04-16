@@ -84,7 +84,7 @@ export const helixCodeSnippetStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background-color: var(--hx-color-neutral-800, #1e293b);
     color: var(--hx-color-neutral-200, #e2e8f0);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-code-snippet-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-medium, 500);
     line-height: 1; /* intentional literal: icon/action button needs line-height 1; no token maps to exactly 1 */
@@ -126,7 +126,7 @@ export const helixCodeSnippetStyles = css`
     border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-700, #334155);
     background-color: var(--hx-color-neutral-800, #1e293b);
     color: var(--hx-color-neutral-300, #cbd5e1);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-code-snippet-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
     text-align: center;

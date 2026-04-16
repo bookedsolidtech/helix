@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const helixPaginationStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-pagination-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   .pagination-root {

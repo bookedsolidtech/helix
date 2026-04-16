@@ -22,7 +22,7 @@ export const helixToastStyles = css`
     border-radius: var(--hx-toast-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-toast-bg, var(--hx-color-neutral-900, #0f172a));
     color: var(--hx-toast-color, var(--hx-color-neutral-0, #ffffff));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-toast-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     line-height: var(--hx-line-height-normal, 1.5);
     box-shadow: var(

@@ -103,7 +103,7 @@ export const helixDialogStyles = css`
 
   .dialog__heading {
     margin: 0;
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-dialog-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-tight);

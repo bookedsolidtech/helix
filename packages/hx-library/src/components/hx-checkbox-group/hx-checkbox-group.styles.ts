@@ -23,7 +23,7 @@ export const helixCheckboxGroupStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-2);
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-checkbox-group-font-family, var(--hx-font-family-sans));
   }
 
   /* ─── Legend ─── */

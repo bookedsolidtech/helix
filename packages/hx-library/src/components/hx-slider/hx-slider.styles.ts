@@ -20,7 +20,7 @@ export const helixSliderStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-slider-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* ─── Label Row ─── */

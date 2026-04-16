@@ -19,7 +19,7 @@ export const helixMenuItemStyles = css`
     cursor: pointer;
     color: var(--hx-menu-item-color, var(--hx-color-neutral-900, #0f172a));
     font-size: var(--hx-font-size-sm, 0.875rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-menu-item-font-family, var(--hx-font-family-sans, sans-serif));
     line-height: var(--hx-line-height-tight, 1.25);
     user-select: none;
     -webkit-user-select: none;

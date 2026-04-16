@@ -20,7 +20,7 @@ export const helixSwitchStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-switch-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* WCAG 2.5.5 (healthcare mandate): minimum 44px touch target height.

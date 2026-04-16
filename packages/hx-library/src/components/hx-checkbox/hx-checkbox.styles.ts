@@ -18,7 +18,7 @@ export const helixCheckboxStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-checkbox-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* ─── Control (checkbox + label row) ─── */

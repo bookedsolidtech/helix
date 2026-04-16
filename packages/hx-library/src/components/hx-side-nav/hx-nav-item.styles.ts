@@ -39,7 +39,7 @@ export const helixNavItemStyles = css`
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-nav-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
     line-height: var(--hx-line-height-normal, 1.5);
