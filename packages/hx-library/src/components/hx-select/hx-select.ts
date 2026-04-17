@@ -243,6 +243,7 @@ export class HelixSelect extends FormMixin(HelixElement) {
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('open')) {
       if (this.open) {
         document.addEventListener('click', this._handleOutsideClick);

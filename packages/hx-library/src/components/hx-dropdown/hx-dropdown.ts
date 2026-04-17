@@ -3,13 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
-import {
-  computePosition,
-  flip,
-  shift,
-  offset,
-  type Placement as FloatingPlacement,
-} from '@floating-ui/dom';
+import type { Placement as FloatingPlacement } from '@floating-ui/dom';
 import { createIdCounter } from '../../base/index.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 
@@ -215,6 +209,7 @@ export class HelixDropdown extends HelixElement {
       .replace(/^start$/, 'left')
       .replace(/^end$/, 'right') as FloatingPlacement;
 
+    const { computePosition, flip, shift, offset } = await import('@floating-ui/dom');
     const { x, y } = await computePosition(reference, panel, {
       placement: floatingPlacement,
       strategy: 'fixed',

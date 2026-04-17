@@ -337,30 +337,42 @@ export class HelixSplitPanel extends HelixElement {
   protected override willUpdate(changedProperties: PropertyValues<this>): void {
     super.willUpdate(changedProperties);
 
+    let handled = false;
+
     if (changedProperties.has('collapsed')) {
       const prev = changedProperties.get('collapsed');
 
       if (this.collapsed === 'start') {
-        // Save restore point when transitioning from non-collapsed state (or initial render)
         if (prev === null || prev === undefined)
           this._positionBeforeCollapse = this._resolvedPosition;
         this._resolvedPosition = this._clamp(this._snapToPoint(this.min));
+        handled = true;
       } else if (this.collapsed === 'end') {
         if (prev === null || prev === undefined)
           this._positionBeforeCollapse = this._resolvedPosition;
         this._resolvedPosition = this._clamp(this._snapToPoint(this.max));
+        handled = true;
       } else if (this.collapsed === null && prev !== null && prev !== undefined) {
-        // Only expand when transitioning from an explicitly collapsed state (not first render)
         this._resolvedPosition = this._clamp(this._snapToPoint(this._positionBeforeCollapse));
+        handled = true;
       }
-    } else if (
-      changedProperties.has('position') ||
-      changedProperties.has('min') ||
-      changedProperties.has('max') ||
-      changedProperties.has('snap')
+    }
+
+    if (
+      !handled &&
+      (changedProperties.has('position') ||
+        changedProperties.has('min') ||
+        changedProperties.has('max') ||
+        changedProperties.has('snap'))
     ) {
-      // Derive resolved position from the public property, respecting clamp & snap
       this._resolvedPosition = this._clamp(this._snapToPoint(this.position));
+    }
+  }
+
+  protected override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (this.position !== this._resolvedPosition) {
+      this.position = this._resolvedPosition;
     }
   }
 

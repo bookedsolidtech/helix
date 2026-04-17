@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
+
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
@@ -234,6 +234,7 @@ export class HelixTooltip extends HelixElement {
 
     if (!reference || !tooltipEl || !arrowEl) return;
 
+    const { computePosition, flip, shift, offset, arrow } = await import('@floating-ui/dom');
     const { x, y, placement, middlewareData } = await computePosition(reference, tooltipEl, {
       placement: this.placement,
       strategy: 'fixed',
