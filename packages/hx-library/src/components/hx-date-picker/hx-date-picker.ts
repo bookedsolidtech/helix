@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
@@ -58,7 +59,7 @@ export interface HxDatePickerChangeDetail {
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
 @customElement('hx-date-picker')
-export class HelixDatePicker extends HelixElement {
+export class HelixDatePicker extends FormMixin(HelixElement) {
   static override styles = [helixDatePickerStyles];
 
   // ─── Form Association ───
@@ -358,10 +359,6 @@ export class HelixDatePicker extends HelixElement {
     // always up-to-date without causing an extra render cycle.
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
-      // Guard: _input is null before first render; validity is synced in updated() on first cycle.
-      if (this._input) {
-        this._updateValidity();
-      }
     }
 
     // Recompute the day grid and aria-labels only when the viewed month/year
@@ -393,14 +390,7 @@ export class HelixDatePicker extends HelixElement {
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
-    // Sync validity after first render (when _input is available) and on required/error changes.
-    if (
-      changedProperties.has('value') ||
-      changedProperties.has('required') ||
-      changedProperties.has('error')
-    ) {
-      this._updateValidity();
-    }
+    // FormMixin calls _updateValidity() automatically after updated().
     // Force screen reader re-announcement when error text changes (a11y-v3-005)
     if (changedProperties.has('error') && this.error) {
       const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
@@ -463,16 +453,8 @@ export class HelixDatePicker extends HelixElement {
 
   // ─── Form Integration ───
 
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -489,6 +471,7 @@ export class HelixDatePicker extends HelixElement {
     this.value = '';
     this._internals.setFormValue(null);
     this._isOpen = false;
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -749,7 +732,8 @@ export class HelixDatePicker extends HelixElement {
     const iso = this._toISO(date);
     this.value = iso;
     this._internals.setFormValue(iso);
-    this._updateValidity();
+    this._handleInteractionInput();
+    this._handleInteractionBlur();
 
     this.dispatchEvent(
       new CustomEvent<{ value: string; date: Date }>('hx-change', {

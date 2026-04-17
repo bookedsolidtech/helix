@@ -43,6 +43,14 @@ export interface FormMixinInterface {
    * @internal
    */
   _resetInteractionState(): void;
+
+  /**
+   * Override in the host component to run constraint validation logic.
+   * Called automatically by `updated()`. Use `this._internals.setValidity()`
+   * inside this method.
+   * @internal
+   */
+  _updateValidity(...args: unknown[]): void;
 }
 
 /**
@@ -58,7 +66,7 @@ export interface FormMixinInterface {
  * @example
  * ```ts
  * class HxTextInput extends FormMixin(HelixElement) {
- *   protected override _updateValidity(): void {
+ *   override _updateValidity(): void {
  *     if (this.required && !this.value) {
  *       this._internals.setValidity({ valueMissing: true }, 'Required', this._inputEl);
  *     } else {

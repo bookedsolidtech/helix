@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 
 const _nextTextareaId = createIdCounter('hx-textarea');
@@ -53,7 +54,7 @@ export interface HxTextareaDetail {
  * @cssprop [--hx-textarea-min-height=var(--hx-size-20, 5rem)] - Minimum textarea height.
  */
 @customElement('hx-textarea')
-export class HelixTextarea extends HelixElement {
+export class HelixTextarea extends FormMixin(HelixElement) {
   static override styles = [helixTextareaStyles];
 
   // ─── Form Association ───
@@ -258,14 +259,6 @@ export class HelixTextarea extends HelixElement {
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
     }
-    if (
-      changedProperties.has('value') ||
-      changedProperties.has('required') ||
-      changedProperties.has('minlength') ||
-      changedProperties.has('maxlength')
-    ) {
-      this._updateValidity();
-    }
     // Auto-grow: respond to programmatic value changes
     if (changedProperties.has('value') && this.resize === 'auto' && this._textarea) {
       this._textarea.style.height = 'auto';
@@ -275,33 +268,8 @@ export class HelixTextarea extends HelixElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the textarea satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     const anchor = this._textarea ?? undefined;
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -334,6 +302,7 @@ export class HelixTextarea extends HelixElement {
   protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue('');
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -357,6 +326,7 @@ export class HelixTextarea extends HelixElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
+    this._handleInteractionInput();
     // Note: setFormValue is called in updated() via the value change — no double-call here (P1-06 fix)
 
     // Auto-grow: reset height then set to scrollHeight
@@ -397,7 +367,7 @@ export class HelixTextarea extends HelixElement {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
     this._internals.setFormValue(this.value);
-    this._updateValidity();
+    this._handleInteractionBlur();
 
     /**
      * Dispatched when the textarea loses focus after its value changed.

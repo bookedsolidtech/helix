@@ -298,7 +298,7 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   }
 
   /** @internal */
-  protected _updateValidity(): void {
+  _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },

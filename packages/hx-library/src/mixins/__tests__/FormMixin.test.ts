@@ -31,7 +31,7 @@ class TestFormMixinElement extends FormMixin(HelixElement) {
     />`;
   }
 
-  protected override _updateValidity(): void {
+  override _updateValidity(): void {
     const input = this.shadowRoot?.querySelector<HTMLInputElement>('.native-input');
     if (this.required && !this.value) {
       this._internals.setValidity({ valueMissing: true }, 'This field is required.', input);

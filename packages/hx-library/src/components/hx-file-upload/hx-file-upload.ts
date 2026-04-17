@@ -6,6 +6,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 
 const _nextFileUploadId = createIdCounter('hx-file-upload');
@@ -62,7 +63,7 @@ export interface HxFileErrorDetail {
  * @cssprop [--hx-file-upload-error-color=var(--hx-color-error-500)] - Error state and remove-button hover color.
  */
 @customElement('hx-file-upload')
-export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
+export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement)) {
   static override styles = [helixFileUploadStyles];
 
   // ─── Form Association ───
@@ -217,20 +218,11 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
 
   // ─── Form Integration ───
 
-  /** Checks whether the component satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
   protected override _onFormReset(): void {
     this._files = [];
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -383,6 +375,8 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
       } else {
         this._files = newEntries;
       }
+
+      this._handleInteractionInput();
 
       this.dispatchEvent(
         new CustomEvent<{ files: File[] }>('hx-upload', {

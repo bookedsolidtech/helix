@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -75,7 +76,7 @@ export interface HxComboboxDetail {
  * @cssprop [--hx-combobox-option-selected-bg=var(--hx-color-primary-100)] - Selected option background.
  */
 @customElement('hx-combobox')
-export class HelixCombobox extends HelixElement {
+export class HelixCombobox extends FormMixin(HelixElement) {
   static override styles = [helixComboboxStyles];
 
   // ─── Form Association ───
@@ -292,7 +293,6 @@ export class HelixCombobox extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._updateFormValue();
-      this._updateValidity();
     }
     // Force screen reader re-announcement when error text changes (a11y-v3-005)
     if (changedProperties.has('error') && this.error) {
@@ -311,23 +311,13 @@ export class HelixCombobox extends HelixElement {
 
   // ─── Form Integration ───
 
-  /** Checks whether the combobox satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
   private _updateFormValue(): void {
     this._internals.setFormValue(this.value || null);
   }
 
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -344,6 +334,7 @@ export class HelixCombobox extends HelixElement {
     this.value = '';
     this._filterText = '';
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -420,6 +411,7 @@ export class HelixCombobox extends HelixElement {
     if (!this._open) return;
     this._open = false;
     this._focusedOptionIndex = -1;
+    this._handleInteractionBlur();
     if (typeof document !== 'undefined') {
       document.removeEventListener('click', this._handleOutsideClick);
     }
@@ -579,6 +571,7 @@ export class HelixCombobox extends HelixElement {
       this.value = option.value;
       this._closeDropdown();
     }
+    this._handleInteractionInput();
     this._filterText = '';
     if (this._input) this._input.value = '';
     this._dispatchChange();

@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -80,7 +81,7 @@ export interface HxSelectChangeDetail {
  * @cssprop [--hx-select-placeholder-color=var(--hx-color-neutral-400)] - Placeholder text color.
  */
 @customElement('hx-select')
-export class HelixSelect extends HelixElement {
+export class HelixSelect extends FormMixin(HelixElement) {
   static override styles = [helixSelectStyles];
 
   // ─── Form Association ───
@@ -252,7 +253,6 @@ export class HelixSelect extends HelixElement {
     if (changedProperties.has('value')) {
       this._syncNativeSelect();
       this._updateFormValue();
-      this._updateValidity();
     }
     if (changedProperties.has('size')) {
       const validSizes: string[] = ['sm', 'md', 'lg'];
@@ -280,38 +280,13 @@ export class HelixSelect extends HelixElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the select satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
   private _updateFormValue(): void {
     this._internals.setFormValue(this.value || null);
   }
 
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -328,6 +303,7 @@ export class HelixSelect extends HelixElement {
   protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   protected override _onFormStateRestore(
@@ -555,6 +531,8 @@ export class HelixSelect extends HelixElement {
   private _selectOption(option: SelectOption): void {
     if (option.disabled) return;
     this.value = option.value; // triggers updated() → sync + formValue + validity
+    this._handleInteractionInput();
+    this._handleInteractionBlur();
     this._dispatchChange();
     this.open = false;
     this._focusedOptionIndex = -1;
@@ -576,6 +554,8 @@ export class HelixSelect extends HelixElement {
   /** @internal */
   private _handleNativeChange(e: Event): void {
     this.value = (e.target as HTMLSelectElement).value; // triggers updated()
+    this._handleInteractionInput();
+    this._handleInteractionBlur();
     this._dispatchChange();
   }
 

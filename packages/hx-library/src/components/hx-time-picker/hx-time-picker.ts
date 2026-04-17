@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
@@ -175,7 +176,7 @@ export interface HxTimePickerChangeDetail {
  * @cssprop [--hx-time-picker-option-selected-color=var(--hx-color-primary-800)] - Selected option text color.
  */
 @customElement('hx-time-picker')
-export class HelixTimePicker extends HelixElement {
+export class HelixTimePicker extends FormMixin(HelixElement) {
   static override styles = [helixTimePickerStyles];
 
   // ─── Form Association ───
@@ -407,7 +408,6 @@ export class HelixTimePicker extends HelixElement {
     super.updated(changed);
     if (changed.has('value')) {
       this._internals.setFormValue(this.value || null);
-      this._updateValidity();
     }
     // When the listbox opens, scroll the selected (or active) option into view
     if ((changed as Map<PropertyKey, unknown>).has('_open') && this._open) {
@@ -430,18 +430,8 @@ export class HelixTimePicker extends HelixElement {
 
   // ─── Form Integration ───
 
-  /** Checks whether the field satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -459,6 +449,7 @@ export class HelixTimePicker extends HelixElement {
     this._inputDisplayValue = '';
     this._internals.setFormValue(null);
     this._closeListbox();
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -494,6 +485,7 @@ export class HelixTimePicker extends HelixElement {
     if (!this._open) return;
     this._open = false;
     this._activeIndex = -1;
+    this._handleInteractionBlur();
   }
 
   /** @internal */
@@ -507,6 +499,7 @@ export class HelixTimePicker extends HelixElement {
   private _selectSlot(slot: TimeSlot): void {
     const clamped = clampValue(slot.value, this.min, this.max);
     this.value = clamped;
+    this._handleInteractionInput();
     this._closeListbox();
     this._dispatchChange(clamped);
   }
@@ -595,8 +588,9 @@ export class HelixTimePicker extends HelixElement {
     if (!raw) {
       // User cleared the field
       this.value = '';
+      this._handleInteractionInput();
+      this._handleInteractionBlur();
       this._internals.setFormValue(null);
-      this._updateValidity();
       this._dispatchChange('');
       return;
     }
@@ -605,6 +599,8 @@ export class HelixTimePicker extends HelixElement {
     if (parsed) {
       const clamped = clampValue(parsed, this.min, this.max);
       this.value = clamped;
+      this._handleInteractionInput();
+      this._handleInteractionBlur();
       this._dispatchChange(clamped);
     } else {
       // Revert display to last known good value

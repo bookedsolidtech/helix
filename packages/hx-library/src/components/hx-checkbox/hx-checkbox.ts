@@ -209,7 +209,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   }
 
   /** @internal */
-  protected _updateValidity(): void {
+  _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },

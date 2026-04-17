@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
@@ -49,7 +50,7 @@ export interface HxSwitchChangeDetail {
  * @cssprop [--hx-switch-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-switch')
-export class HelixSwitch extends HelixElement {
+export class HelixSwitch extends FormMixin(HelixElement) {
   static override styles = [helixSwitchStyles];
 
   // ─── Form Association ───
@@ -135,38 +136,14 @@ export class HelixSwitch extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
-      this._updateValidity();
-    }
-    if (changedProperties.has('required')) {
-      this._updateValidity();
     }
   }
 
   // ─── Form Integration ───
 
-  /** Returns the validation message. */
-  override get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  override get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the switch satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** Recalculates and sets the validity state based on required and checked. */
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -181,6 +158,7 @@ export class HelixSwitch extends HelixElement {
   protected override _onFormReset(): void {
     this.checked = false;
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   protected override _onFormStateRestore(
@@ -232,6 +210,7 @@ export class HelixSwitch extends HelixElement {
   private _toggle(): void {
     if (this.disabled) return;
     this.checked = !this.checked;
+    this._handleInteractionInput();
 
     this.dispatchEvent(
       new CustomEvent<{ checked: boolean; value: string }>('hx-change', {

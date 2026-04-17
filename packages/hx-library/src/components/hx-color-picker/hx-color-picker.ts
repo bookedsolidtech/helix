@@ -1,6 +1,7 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { HelixElement } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { helixColorPickerStyles } from './hx-color-picker.styles.js';
@@ -79,7 +80,7 @@ export interface HxColorPickerDetail {
  * ```
  */
 @customElement('hx-color-picker')
-export class HelixColorPicker extends HelixElement {
+export class HelixColorPicker extends FormMixin(HelixElement) {
   static override styles = [helixColorPickerStyles];
 
   /**
@@ -292,9 +293,6 @@ export class HelixColorPicker extends HelixElement {
     if (changedProperties.has('value')) {
       this._syncFromValue();
     }
-    if (changedProperties.has('required')) {
-      this._updateValidity();
-    }
   }
 
   // ─── Sync ────────────────────────────────────────────────────────────────
@@ -307,7 +305,6 @@ export class HelixColorPicker extends HelixElement {
     }
     this._inputValue = formatColor(this._hsv, this.format, this.opacity);
     this._internals.setFormValue(this.value);
-    this._updateValidity();
   }
 
   /** @internal */
@@ -319,6 +316,7 @@ export class HelixColorPicker extends HelixElement {
   protected override _onFormReset(): void {
     this.value = '#000000';
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -331,28 +329,8 @@ export class HelixColorPicker extends HelixElement {
     }
   }
 
-  /** Returns the ValidityState object. */
-  override get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Returns the current validation message. */
-  override get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Checks whether the picker satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -372,6 +350,7 @@ export class HelixColorPicker extends HelixElement {
     this.value = formatted;
     this._inputValue = formatted;
     this._internals.setFormValue(formatted);
+    this._handleInteractionInput();
     const detail = { value: formatted };
     const opts: CustomEventInit<{ value: string }> = {
       bubbles: true,
