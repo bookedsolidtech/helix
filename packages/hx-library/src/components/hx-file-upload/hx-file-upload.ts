@@ -200,6 +200,19 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
     if (changedProperties.has('_files' as keyof HelixFileUpload) || changedProperties.has('name')) {
       this._syncFormValue();
     }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
+    }
   }
 
   // ─── Form Integration ───

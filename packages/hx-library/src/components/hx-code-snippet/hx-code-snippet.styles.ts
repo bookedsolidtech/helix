@@ -65,7 +65,7 @@ export const helixCodeSnippetStyles = css`
     display: block;
     font-family: var(--hx-code-snippet-font-family, var(--hx-font-family-mono, monospace));
     font-size: var(--hx-code-snippet-font-size, var(--hx-font-size-sm, 0.875rem));
-    line-height: var(--hx-line-height-relaxed, 1.625);
+    line-height: var(--hx-line-height-relaxed, 1.75);
     color: var(--hx-code-snippet-color, var(--hx-color-neutral-100, #f1f5f9));
     tab-size: var(--hx-code-snippet-tab-size, 2);
   }

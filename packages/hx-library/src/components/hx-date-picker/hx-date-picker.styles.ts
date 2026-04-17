@@ -62,8 +62,8 @@ export const helixDatePickerStyles = css`
     border-radius: var(--hx-date-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-date-picker-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
-      border-color var(--hx-transition-fast, 0.15s ease),
-      box-shadow var(--hx-transition-fast, 0.15s ease);
+      border-color var(--hx-transition-fast, 150ms ease),
+      box-shadow var(--hx-transition-fast, 150ms ease);
     overflow: hidden;
   }
 
@@ -142,7 +142,7 @@ export const helixDatePickerStyles = css`
     color: var(--hx-date-picker-trigger-color, var(--hx-color-neutral-500, #64748b));
     cursor: pointer;
     flex-shrink: 0;
-    transition: color var(--hx-transition-fast, 0.15s ease);
+    transition: color var(--hx-transition-fast, 150ms ease);
     outline: none;
   }
 
@@ -195,7 +195,7 @@ export const helixDatePickerStyles = css`
 
   @media (prefers-reduced-motion: no-preference) {
     .calendar {
-      animation: calendar-appear var(--hx-transition-fast, 0.15s ease) forwards;
+      animation: calendar-appear var(--hx-transition-fast, 150ms ease) forwards;
     }
   }
 
@@ -237,8 +237,8 @@ export const helixDatePickerStyles = css`
     cursor: pointer;
     outline: none;
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      color var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease);
   }
 
   .calendar__nav-btn {
@@ -262,7 +262,7 @@ export const helixDatePickerStyles = css`
   }
 
   .calendar__nav-btn:disabled {
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
     pointer-events: none;
   }
@@ -344,7 +344,7 @@ export const helixDatePickerStyles = css`
   }
 
   .calendar__day--disabled {
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
     pointer-events: none;
   }

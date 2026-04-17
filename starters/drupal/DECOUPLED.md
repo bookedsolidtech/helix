@@ -28,7 +28,7 @@ to React components that emit `hx-*` element markup.
 ## Installing @helixui/library in Next.js
 
 ```bash
-npm install @helixui/library@1.1.2
+npm install @helixui/library@2.1.2
 ```
 
 Import the library once at the application entry point to register all

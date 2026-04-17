@@ -75,7 +75,7 @@ export const helixTextStyles = css`
     --hx-text-font-size: var(--hx-font-size-xs, 0.75rem);
     --hx-text-font-weight: var(--hx-font-weight-semibold, 600);
     --hx-text-line-height: var(--hx-line-height-tight, 1.25);
-    --hx-text-letter-spacing: var(--hx-letter-spacing-wide, 0.05em);
+    --hx-text-letter-spacing: var(--hx-letter-spacing-wide, 0.025em);
     text-transform: uppercase;
   }
 

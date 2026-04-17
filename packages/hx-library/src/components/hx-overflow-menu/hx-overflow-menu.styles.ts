@@ -8,7 +8,7 @@ export const helixOverflowMenuStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   /* ─── Trigger Button ─── */
@@ -23,8 +23,8 @@ export const helixOverflowMenuStyles = css`
     color: var(--hx-overflow-menu-button-color, var(--hx-color-neutral-600, #475569));
     cursor: pointer;
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      color var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
     padding: 0;
     line-height: 1;

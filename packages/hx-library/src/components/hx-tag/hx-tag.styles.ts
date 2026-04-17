@@ -134,7 +134,7 @@ export const helixTagStyles = css`
     cursor: pointer;
     color: inherit;
     opacity: var(--hx-opacity-75, 0.75);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
     line-height: 0;
   }
 
@@ -144,7 +144,7 @@ export const helixTagStyles = css`
 
   .tag__remove-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
-    outline-offset: var(--hx-focus-ring-offset, 1px);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */

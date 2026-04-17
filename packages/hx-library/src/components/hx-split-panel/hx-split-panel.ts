@@ -1,6 +1,6 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
@@ -155,6 +155,15 @@ export class HelixSplitPanel extends HelixElement {
   collapseEndLabel = 'Collapse end panel';
 
   /**
+   * The resolved (clamped + snapped) position used for rendering and ARIA.
+   * Derived from `position` in `willUpdate` to avoid mutating a reflected
+   * `@property` inside the update lifecycle (which would trigger a re-entrant
+   * update cycle).
+   * @internal
+   */
+  @state() private _resolvedPosition = 50;
+
+  /**
    * Whether the user is currently dragging the divider.
    * @internal
    */
@@ -203,11 +212,12 @@ export class HelixSplitPanel extends HelixElement {
   /** @internal */
   private _setPosition(percent: number): void {
     const clamped = this._clamp(this._snapToPoint(percent));
-    if (clamped === this.position) return;
+    if (clamped === this._resolvedPosition) return;
+    this._resolvedPosition = clamped;
     this.position = clamped;
     this.dispatchEvent(
       new CustomEvent<{ position: number }>('hx-reposition', {
-        detail: { position: this.position },
+        detail: { position: this._resolvedPosition },
         bubbles: true,
         composed: true,
       }),
@@ -232,7 +242,7 @@ export class HelixSplitPanel extends HelixElement {
     divider.setPointerCapture(e.pointerId);
     this._dragging = true;
     this._dragStart = this.orientation === 'horizontal' ? e.clientX : e.clientY;
-    this._positionAtDragStart = this.position;
+    this._positionAtDragStart = this._resolvedPosition;
     // Cache container dimensions once at drag start to avoid forced layout on every pointermove
     this._cachedContainerWidth = this.offsetWidth;
     this._cachedContainerHeight = this.offsetHeight;
@@ -274,20 +284,20 @@ export class HelixSplitPanel extends HelixElement {
       case 'ArrowLeft':
       case 'ArrowUp':
         e.preventDefault();
-        this._setPosition(this.position - 1);
+        this._setPosition(this._resolvedPosition - 1);
         break;
       case 'ArrowRight':
       case 'ArrowDown':
         e.preventDefault();
-        this._setPosition(this.position + 1);
+        this._setPosition(this._resolvedPosition + 1);
         break;
       case 'PageUp':
         e.preventDefault();
-        this._setPosition(this.position + 10);
+        this._setPosition(this._resolvedPosition + 10);
         break;
       case 'PageDown':
         e.preventDefault();
-        this._setPosition(this.position - 10);
+        this._setPosition(this._resolvedPosition - 10);
         break;
       case 'Home':
         e.preventDefault();
@@ -326,20 +336,31 @@ export class HelixSplitPanel extends HelixElement {
 
   protected override willUpdate(changedProperties: PropertyValues<this>): void {
     super.willUpdate(changedProperties);
-    if (!changedProperties.has('collapsed')) return;
 
-    const prev = changedProperties.get('collapsed');
+    if (changedProperties.has('collapsed')) {
+      const prev = changedProperties.get('collapsed');
 
-    if (this.collapsed === 'start') {
-      // Save restore point when transitioning from non-collapsed state (or initial render)
-      if (prev === null || prev === undefined) this._positionBeforeCollapse = this.position;
-      this._setPosition(this.min);
-    } else if (this.collapsed === 'end') {
-      if (prev === null || prev === undefined) this._positionBeforeCollapse = this.position;
-      this._setPosition(this.max);
-    } else if (this.collapsed === null && prev !== null && prev !== undefined) {
-      // Only expand when transitioning from an explicitly collapsed state (not first render)
-      this._setPosition(this._positionBeforeCollapse);
+      if (this.collapsed === 'start') {
+        // Save restore point when transitioning from non-collapsed state (or initial render)
+        if (prev === null || prev === undefined)
+          this._positionBeforeCollapse = this._resolvedPosition;
+        this._resolvedPosition = this._clamp(this._snapToPoint(this.min));
+      } else if (this.collapsed === 'end') {
+        if (prev === null || prev === undefined)
+          this._positionBeforeCollapse = this._resolvedPosition;
+        this._resolvedPosition = this._clamp(this._snapToPoint(this.max));
+      } else if (this.collapsed === null && prev !== null && prev !== undefined) {
+        // Only expand when transitioning from an explicitly collapsed state (not first render)
+        this._resolvedPosition = this._clamp(this._snapToPoint(this._positionBeforeCollapse));
+      }
+    } else if (
+      changedProperties.has('position') ||
+      changedProperties.has('min') ||
+      changedProperties.has('max') ||
+      changedProperties.has('snap')
+    ) {
+      // Derive resolved position from the public property, respecting clamp & snap
+      this._resolvedPosition = this._clamp(this._snapToPoint(this.position));
     }
   }
 
@@ -363,9 +384,9 @@ export class HelixSplitPanel extends HelixElement {
   /** @internal */
   private _startPanelStyleMap(): Record<string, string> {
     if (this.orientation === 'horizontal') {
-      return { width: `${this.position}%` };
+      return { width: `${this._resolvedPosition}%` };
     }
-    return { height: `${this.position}%` };
+    return { height: `${this._resolvedPosition}%` };
   }
 
   override render() {
@@ -380,7 +401,7 @@ export class HelixSplitPanel extends HelixElement {
           role="separator"
           aria-label=${this.resizeLabel}
           aria-orientation=${this.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
-          aria-valuenow=${this.position}
+          aria-valuenow=${this._resolvedPosition}
           aria-valuemin=${this.min}
           aria-valuemax=${this.max}
           aria-disabled=${this.disabled ? 'true' : nothing}

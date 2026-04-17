@@ -9,7 +9,7 @@ export const helixColorPickerStyles = css`
   }
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
   .trigger {
     display: inline-flex;
@@ -20,7 +20,7 @@ export const helixColorPickerStyles = css`
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: var(--hx-color-neutral-0, #ffffff);
     cursor: pointer;
-    transition: border-color var(--hx-transition-fast, 0.15s ease);
+    transition: border-color var(--hx-transition-fast, 150ms ease);
   }
   .trigger:hover:not([disabled]) {
     border-color: var(--hx-color-primary-500, #2563eb);
@@ -162,7 +162,7 @@ export const helixColorPickerStyles = css`
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
-    transition: transform var(--hx-transition-fast, 0.15s ease);
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
   .swatch-btn:hover {
     transform: scale(1.15);

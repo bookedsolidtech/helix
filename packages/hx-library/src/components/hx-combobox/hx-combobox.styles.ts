@@ -40,8 +40,8 @@ export const helixComboboxStyles = css`
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-combobox-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
-      border-color var(--hx-transition-fast, 0.15s ease),
-      box-shadow var(--hx-transition-fast, 0.15s ease);
+      border-color var(--hx-transition-fast, 150ms ease),
+      box-shadow var(--hx-transition-fast, 150ms ease);
   }
   .field__input-wrapper:focus-within {
     border-color: var(
@@ -123,7 +123,7 @@ export const helixComboboxStyles = css`
     cursor: pointer;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    transition: color var(--hx-transition-fast, 0.15s ease);
+    transition: color var(--hx-transition-fast, 150ms ease);
   }
   .field__clear-button:hover {
     color: var(--hx-color-neutral-700, #334155);
@@ -160,7 +160,7 @@ export const helixComboboxStyles = css`
     top: calc(100% + var(--hx-space-1, 0.25rem));
     left: 0;
     right: 0;
-    z-index: var(--hx-z-index-dropdown, 100);
+    z-index: var(--hx-z-index-dropdown, 1000);
     background-color: var(--hx-combobox-listbox-bg, var(--hx-color-neutral-0, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
       var(--hx-combobox-border-color, var(--hx-color-neutral-300, #cbd5e1));
@@ -192,7 +192,7 @@ export const helixComboboxStyles = css`
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    transition: background-color var(--hx-transition-fast, 0.15s ease);
+    transition: background-color var(--hx-transition-fast, 150ms ease);
   }
   .field__option:hover {
     background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
@@ -380,7 +380,7 @@ export const helixComboboxStyles = css`
     opacity: 0.7;
     border-radius: 50%;
     line-height: 1;
-    transition: opacity var(--hx-transition-fast, 0.15s ease);
+    transition: opacity var(--hx-transition-fast, 150ms ease);
   }
   .field__chip-remove:hover {
     opacity: 1;

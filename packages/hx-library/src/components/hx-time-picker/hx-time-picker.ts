@@ -413,6 +413,19 @@ export class HelixTimePicker extends HelixElement {
     if ((changed as Map<PropertyKey, unknown>).has('_open') && this._open) {
       this._scrollActiveOptionIntoView();
     }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changed.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
+    }
   }
 
   // ─── Form Integration ───

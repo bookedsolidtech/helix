@@ -42,6 +42,22 @@
     "hx-file-upload": {
       "budget": 5888,
       "reason": "Complex widget: drag-and-drop, file validation, progress tracking, multi-file management."
+    },
+    "hx-number-input": {
+      "budget": 5632,
+      "reason": "Complex widget: increment/decrement, min/max/step validation, keyboard shortcuts, locale formatting."
+    },
+    "hx-drawer": {
+      "budget": 5632,
+      "reason": "Complex widget: overlay management, focus trapping, animation, responsive behavior."
+    },
+    "hx-carousel": {
+      "budget": 5632,
+      "reason": "Complex widget: slide management, autoplay, keyboard navigation, touch gestures, pagination."
+    },
+    "hx-slider": {
+      "budget": 5632,
+      "reason": "Complex widget: range mode, min/max/step, keyboard navigation, tick marks, tooltips."
     }
   }
 }

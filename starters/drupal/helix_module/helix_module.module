@@ -16,7 +16,7 @@
  * require no server-side rendering framework. All content is slot-projected
  * from Twig for progressive enhancement and SEO visibility.
  *
- * @see https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/
+ * @see https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/
  * @see https://www.drupal.org/docs/develop/theming-drupal/adding-stylesheets-css-and-javascript-js-to-a-drupal-theme
  */
 
@@ -187,7 +187,7 @@ function helix_module_theme(): array {
  * @helixui/library ES module bundle and the Drupal.behaviors bridge script.
  *
  * To use the local npm build instead of CDN, replace 'helix_module/helix'
- * with 'helix_module/helix-local' and ensure dist/helix-library.js exists.
+ * with 'helix_module/helix-local' and ensure dist/index.js exists.
  */
 function helix_module_page_attachments(array &$attachments): void {
   $attachments['#attached']['library'][] = 'helix_module/helix';

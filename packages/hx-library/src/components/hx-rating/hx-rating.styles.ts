@@ -39,14 +39,14 @@ export const helixRatingStyles = css`
     line-height: 1;
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
-    transition: transform var(--hx-transition-fast, 0.15s ease);
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
   .symbol:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
   .symbol--full,

@@ -97,7 +97,7 @@ export const helixTopNavStyles = css`
 
   .nav__collapsible--open {
     display: flex;
-    animation: hx-mobile-nav-open var(--hx-duration-fast, 150ms) ease-out;
+    animation: hx-mobile-nav-open var(--hx-duration-fast, 100ms) ease-out;
   }
 
   /* ─── Menu and actions in collapsible (mobile) ─── */

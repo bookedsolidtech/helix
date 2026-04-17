@@ -9,7 +9,7 @@
  * Components are self-initializing custom elements — this file handles
  * only the Drupal-specific integration layer (AJAX, navigation, forms).
  *
- * @see https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/
+ * @see https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/
  */
 
 (function (Drupal, once) {

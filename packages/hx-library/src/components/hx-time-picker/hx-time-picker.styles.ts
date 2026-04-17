@@ -40,8 +40,8 @@ export const helixTimePickerStyles = css`
     border-radius: var(--hx-time-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-time-picker-bg, var(--hx-color-neutral-0));
     transition:
-      border-color var(--hx-transition-fast, 0.15s ease),
-      box-shadow var(--hx-transition-fast, 0.15s ease);
+      border-color var(--hx-transition-fast, 150ms ease),
+      box-shadow var(--hx-transition-fast, 150ms ease);
     overflow: visible;
   }
   .field__combobox:focus-within {
@@ -130,7 +130,7 @@ export const helixTimePickerStyles = css`
   }
   @media (prefers-reduced-motion: no-preference) {
     .field__listbox {
-      animation: hx-listbox-enter var(--hx-transition-fast, 0.15s ease) forwards;
+      animation: hx-listbox-enter var(--hx-transition-fast, 150ms ease) forwards;
     }
   }
   @keyframes hx-listbox-enter {
@@ -151,7 +151,7 @@ export const helixTimePickerStyles = css`
     font-family: inherit;
     color: var(--hx-time-picker-option-color, var(--hx-color-neutral-800));
     cursor: pointer;
-    transition: background-color var(--hx-transition-fast, 0.15s ease);
+    transition: background-color var(--hx-transition-fast, 150ms ease);
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__option:hover,

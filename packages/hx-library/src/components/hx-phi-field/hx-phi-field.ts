@@ -53,6 +53,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#2563eb)] - Toggle button color.
  * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#2563eb))] - Focus ring color.
  * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
+ * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#f59e0b)] - Color for auto-hide countdown warning (future use).
  */
 @customElement('hx-phi-field')
 export class HelixPhiField extends HelixElement {
@@ -99,6 +100,15 @@ export class HelixPhiField extends HelixElement {
   label: string = '';
 
   /**
+   * Seconds of inactivity after reveal before PHI is automatically re-masked.
+   * Prevents PHI from remaining visible indefinitely when a clinician walks away.
+   * Set to 0 to disable auto-hide. Defaults to 60 seconds.
+   * @attr auto-hide-delay
+   */
+  @property({ type: Number, attribute: 'auto-hide-delay' })
+  autoHideDelay: number = 60;
+
+  /**
    * When set, disables all interaction with the field and prevents reveal.
    * @attr disabled
    * @reflect
@@ -114,6 +124,9 @@ export class HelixPhiField extends HelixElement {
   /** @internal */
   private _clipboardTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /** @internal Timer ID for auto-re-mask after reveal. */
+  private _autoHideTimer: ReturnType<typeof setTimeout> | null = null;
+
   // ─── Lifecycle ───
 
   /** @internal Bound reference for visibilitychange listener cleanup. */
@@ -121,6 +134,11 @@ export class HelixPhiField extends HelixElement {
     if (document.visibilityState === 'hidden') {
       this._clearClipboard();
     }
+  };
+
+  /** @internal Bound reference for interaction-based auto-hide timer reset. */
+  private readonly _boundResetAutoHideTimer = (): void => {
+    this._resetAutoHideTimer();
   };
 
   override connectedCallback(): void {
@@ -154,6 +172,7 @@ export class HelixPhiField extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._cancelClipboardTimer();
+    this._cancelAutoHideTimer();
     document.removeEventListener('visibilitychange', this._boundHandleVisibilityChange);
   }
 
@@ -164,6 +183,78 @@ export class HelixPhiField extends HelixElement {
     if (this._clipboardTimer !== null) {
       clearTimeout(this._clipboardTimer);
       this._clipboardTimer = null;
+    }
+  }
+
+  /** @internal Cancel the auto-hide timer if running. */
+  private _cancelAutoHideTimer(): void {
+    if (this._autoHideTimer !== null) {
+      clearTimeout(this._autoHideTimer);
+      this._autoHideTimer = null;
+    }
+    this._removeAutoHideInteractionListeners();
+  }
+
+  /** @internal Start the auto-hide countdown. Resets if already running. */
+  private _scheduleAutoHide(): void {
+    this._cancelAutoHideTimer();
+    if (this.autoHideDelay <= 0) return;
+
+    this._addAutoHideInteractionListeners();
+    this._autoHideTimer = setTimeout(() => {
+      this._autoHideTimer = null;
+      this._autoHide();
+    }, this.autoHideDelay * 1000);
+  }
+
+  /** @internal Reset the auto-hide timer on user interaction. */
+  private _resetAutoHideTimer(): void {
+    if (this._autoHideTimer === null) return;
+    this._scheduleAutoHide();
+  }
+
+  /** @internal Auto-hide PHI and dispatch audit event. */
+  private _autoHide(): void {
+    if (this._masked) return;
+
+    this._removeAutoHideInteractionListeners();
+    this._cancelClipboardTimer();
+    this._masked = true;
+
+    this.dispatchEvent(
+      new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          fieldId: this.fieldId || this.id || '',
+          action: 'auto-hide',
+          timestamp: new Date().toISOString(),
+          fieldType: this.fieldType,
+        },
+      }),
+    );
+  }
+
+  /** @internal Interaction events that reset the auto-hide timer. */
+  private static readonly _AUTO_HIDE_INTERACTION_EVENTS = [
+    'mouseenter',
+    'mousemove',
+    'focusin',
+    'keydown',
+    'pointerdown',
+  ] as const;
+
+  /** @internal Add interaction listeners to reset auto-hide timer. */
+  private _addAutoHideInteractionListeners(): void {
+    for (const event of HelixPhiField._AUTO_HIDE_INTERACTION_EVENTS) {
+      this.addEventListener(event, this._boundResetAutoHideTimer);
+    }
+  }
+
+  /** @internal Remove interaction listeners. */
+  private _removeAutoHideInteractionListeners(): void {
+    for (const event of HelixPhiField._AUTO_HIDE_INTERACTION_EVENTS) {
+      this.removeEventListener(event, this._boundResetAutoHideTimer);
     }
   }
 
@@ -273,12 +364,14 @@ export class HelixPhiField extends HelixElement {
     );
 
     if (this._masked) {
-      // Revealing: start clipboard clear timer
+      // Revealing: start clipboard clear timer and auto-hide timer
       this._masked = false;
       this._scheduleClipboardClear();
+      this._scheduleAutoHide();
     } else {
-      // Hiding: cancel any pending clipboard clear
+      // Hiding: cancel any pending timers
       this._cancelClipboardTimer();
+      this._cancelAutoHideTimer();
       this._masked = true;
     }
   }
@@ -397,7 +490,7 @@ export interface PhiAccessEventDetail {
   /** Developer-assigned logical identifier for the field (NOT the PHI value). */
   fieldId: string;
   /** The action that triggered the audit event. */
-  action: 'reveal' | 'hide' | 'clipboard-clear';
+  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear';
   /** ISO 8601 timestamp of the access event. */
   timestamp: string;
   /** The category of PHI this field contains. */

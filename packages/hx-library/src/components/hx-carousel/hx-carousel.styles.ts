@@ -47,9 +47,9 @@ export const helixCarouselStyles = css`
     cursor: pointer;
     padding: 0;
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      color var(--hx-transition-fast, 0.15s ease),
-      border-color var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease),
+      border-color var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
   }
 
@@ -65,7 +65,7 @@ export const helixCarouselStyles = css`
   }
 
   .nav-btn[disabled] {
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
   }
 
@@ -92,7 +92,7 @@ export const helixCarouselStyles = css`
     cursor: pointer;
     padding: 0;
     font-size: var(--hx-font-size-sm, 0.875rem);
-    transition: background-color var(--hx-transition-fast, 0.15s ease);
+    transition: background-color var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
   }
 
@@ -162,8 +162,8 @@ export const helixCarouselStyles = css`
     border-radius: var(--hx-border-radius-full, 9999px);
     background: var(--hx-color-neutral-300, #cbd5e1);
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      transform var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      transform var(--hx-transition-fast, 150ms ease);
   }
 
   .pagination-item[aria-current='true'] .pagination-dot,

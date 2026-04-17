@@ -26,6 +26,10 @@ Defaults to 30000 (30 seconds). */
   /** Accessible label describing the PHI field. Used as a prefix in screen reader
 announcements (e.g., "Social Security Number is masked"). */
   label?: string;
+  /** Seconds of inactivity after reveal before PHI is automatically re-masked.
+Prevents PHI from remaining visible indefinitely when a clinician walks away.
+Set to 0 to disable auto-hide. Defaults to 60 seconds. */
+  autoHideDelay?: number;
   /** When set, disables all interaction with the field and prevents reveal. */
   disabled?: boolean;
 

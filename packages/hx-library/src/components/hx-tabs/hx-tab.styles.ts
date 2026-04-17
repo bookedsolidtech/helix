@@ -70,7 +70,7 @@ export const helixTabStyles = css`
         var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
   /* ─── Disabled State ─── */

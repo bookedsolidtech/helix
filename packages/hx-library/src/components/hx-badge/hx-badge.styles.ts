@@ -182,7 +182,7 @@ export const helixBadgeStyles = css`
     cursor: pointer;
     color: inherit;
     opacity: var(--hx-opacity-75, 0.75);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
     line-height: 0;
     /* WCAG 2.5.5: minimum 44×44px touch target */
     min-width: var(--hx-touch-target-min, 2.75rem);
@@ -195,7 +195,7 @@ export const helixBadgeStyles = css`
 
   .badge__remove-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
-    outline-offset: var(--hx-focus-ring-offset, 1px);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */

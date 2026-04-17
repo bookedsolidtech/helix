@@ -240,8 +240,8 @@ the correct HELiX template from the registry.
 
 ## CDN Bundle Reference
 
-Library: `@helixui/library@1.1.2`
-CDN: `https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/`
+Library: `@helixui/library@2.1.2`
+CDN: `https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/`
 
 Custom elements registered by the bundle:
 
