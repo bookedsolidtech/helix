@@ -1,9 +1,9 @@
 export { HxAccordionItem, type HxAccordionItemProps } from './components/HxAccordionItem/index.js';
 export { HxAccordion, type HxAccordionProps } from './components/HxAccordion/index.js';
 export { HxActionBar, type HxActionBarProps } from './components/HxActionBar/index.js';
-export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
-export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
 export { HxAvatar, type HxAvatarProps } from './components/HxAvatar/index.js';
+export { HxBanner, type HxBannerProps } from './components/HxBanner/index.js';
+export { HxBadge, type HxBadgeProps } from './components/HxBadge/index.js';
 export { HxAlert, type HxAlertProps } from './components/HxAlert/index.js';
 export {
   HxBreadcrumbItem,
@@ -22,8 +22,8 @@ export {
   type HxClinicalStatusProps,
 } from './components/HxClinicalStatus/index.js';
 export { HxCodeSnippet, type HxCodeSnippetProps } from './components/HxCodeSnippet/index.js';
-export { HxColorPicker, type HxColorPickerProps } from './components/HxColorPicker/index.js';
 export { HxCombobox, type HxComboboxProps } from './components/HxCombobox/index.js';
+export { HxColorPicker, type HxColorPickerProps } from './components/HxColorPicker/index.js';
 export { HxContainer, type HxContainerProps } from './components/HxContainer/index.js';
 export { HxCopyButton, type HxCopyButtonProps } from './components/HxCopyButton/index.js';
 export { HxCounter, type HxCounterProps } from './components/HxCounter/index.js';
@@ -35,8 +35,8 @@ export { HxDrawer, type HxDrawerProps } from './components/HxDrawer/index.js';
 export { HxDropdown, type HxDropdownProps } from './components/HxDropdown/index.js';
 export { HxField, type HxFieldProps } from './components/HxField/index.js';
 export { HxFieldLabel, type HxFieldLabelProps } from './components/HxFieldLabel/index.js';
-export { HxFileUpload, type HxFileUploadProps } from './components/HxFileUpload/index.js';
 export { HxForm, type HxFormProps } from './components/HxForm/index.js';
+export { HxFileUpload, type HxFileUploadProps } from './components/HxFileUpload/index.js';
 export { HxFormatDate, type HxFormatDateProps } from './components/HxFormatDate/index.js';
 export { HxGrid, type HxGridProps } from './components/HxGrid/index.js';
 export { HxGridItem, type HxGridItemProps } from './components/HxGridItem/index.js';
@@ -55,9 +55,9 @@ export { HxNav, type HxNavProps } from './components/HxNav/index.js';
 export { HxNumberInput, type HxNumberInputProps } from './components/HxNumberInput/index.js';
 export { HxOverflowMenu, type HxOverflowMenuProps } from './components/HxOverflowMenu/index.js';
 export { HxPagination, type HxPaginationProps } from './components/HxPagination/index.js';
-export { HxPopover, type HxPopoverProps } from './components/HxPopover/index.js';
 export { HxPatientBanner, type HxPatientBannerProps } from './components/HxPatientBanner/index.js';
 export { HxPhiField, type HxPhiFieldProps } from './components/HxPhiField/index.js';
+export { HxPopover, type HxPopoverProps } from './components/HxPopover/index.js';
 export { HxPopup, type HxPopupProps } from './components/HxPopup/index.js';
 export { HxProgressBar, type HxProgressBarProps } from './components/HxProgressBar/index.js';
 export { HxProgressRing, type HxProgressRingProps } from './components/HxProgressRing/index.js';
@@ -102,8 +102,8 @@ export { HxTabPanel, type HxTabPanelProps } from './components/HxTabPanel/index.
 export { HxTab, type HxTabProps } from './components/HxTab/index.js';
 export { HxTabs, type HxTabsProps } from './components/HxTabs/index.js';
 export { HxTag, type HxTagProps } from './components/HxTag/index.js';
-export { HxTextInput, type HxTextInputProps } from './components/HxTextInput/index.js';
 export { HxText, type HxTextProps } from './components/HxText/index.js';
+export { HxTextInput, type HxTextInputProps } from './components/HxTextInput/index.js';
 export { HxTextarea, type HxTextareaProps } from './components/HxTextarea/index.js';
 export { HxTheme, type HxThemeProps } from './components/HxTheme/index.js';
 export { HxTimePicker, type HxTimePickerProps } from './components/HxTimePicker/index.js';

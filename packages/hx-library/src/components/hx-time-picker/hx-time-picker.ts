@@ -1,7 +1,7 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { HelixElement } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -126,6 +126,8 @@ function parseUserInput(raw: string): string | null {
 
   return null;
 }
+
+const _nextTimePickerId = createIdCounter('hx-time-picker');
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -299,17 +301,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
-  /**
-   * Monotonically incrementing counter used to generate unique element IDs across instances.
-   * @internal
-   */
-  private static _instanceCount = 0;
-
-  /**
-   * Unique ID for this component instance, used as the input element's `id` attribute.
-   * @internal
-   */
-  private readonly _id = `hx-time-picker-${++HelixTimePicker._instanceCount}`;
+  private readonly _id = _nextTimePickerId();
   /**
    * Unique ID for the listbox element, referenced by `aria-controls` on the combobox input.
    * @internal

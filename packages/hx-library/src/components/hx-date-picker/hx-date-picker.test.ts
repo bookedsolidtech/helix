@@ -269,7 +269,7 @@ describe('hx-date-picker', () => {
       expect(trigger.getAttribute('aria-expanded')).toBe('false');
     });
 
-    it('calendar is a native <dialog> element (provides role=dialog and modal semantics)', async () => {
+    it('calendar is a native <dialog> element (provides role=dialog semantics)', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
       const calendar = shadowQuery(el, '[part="calendar"]');

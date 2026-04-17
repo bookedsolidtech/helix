@@ -350,6 +350,7 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    document.removeEventListener('click', this._handleDocumentClick, true);
   }
 
   override willUpdate(changedProperties: PropertyValues<this>): void {
@@ -413,14 +414,15 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
           this._viewYear = selected.getFullYear();
           this._viewMonth = selected.getMonth();
         }
-        // Use showModal() for top-layer positioning + native focus trap + escape key.
         void this.updateComplete.then(() => {
-          this._calendar?.showModal();
+          this._calendar?.show();
           this._focusActiveDay();
+          document.addEventListener('click', this._handleDocumentClick, true);
         });
       } else {
         this._calendar?.close();
         this._focusedDay = null;
+        document.removeEventListener('click', this._handleDocumentClick, true);
       }
     }
 
@@ -438,18 +440,13 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     }
   }
 
-  /** Syncs _isOpen when native dialog cancel event fires (Escape key). */
-  private _handleDialogCancel(e: Event): void {
-    e.preventDefault(); // prevent native close; we handle it ourselves
-    this._closeCalendar();
-  }
-
-  /** Closes calendar when clicking outside the dialog content (backdrop click). */
-  private _handleDialogBackdropClick(e: MouseEvent): void {
-    if (e.target === this._calendar) {
+  private readonly _handleDocumentClick = (e: MouseEvent): void => {
+    if (!this._isOpen) return;
+    const path = e.composedPath();
+    if (!path.includes(this)) {
       this._closeCalendar();
     }
-  }
+  };
 
   // ─── Form Integration ───
 
@@ -774,9 +771,7 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
       return;
     }
 
-    // Handle Escape here to call _closeCalendar() with focus-restore.
-    // We also have a @cancel handler on the <dialog> for the native cancel
-    // event, but the keydown path ensures consistent focus management.
+    // Handle Escape to call _closeCalendar() with focus-restore.
     if (key === 'Escape') {
       e.stopPropagation();
       this._closeCalendar();
@@ -1115,8 +1110,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
           id=${this._calendarId}
           aria-label=${this.chooseDateLabel}
           @keydown=${this._handleCalendarKeydown}
-          @cancel=${this._handleDialogCancel}
-          @click=${this._handleDialogBackdropClick}
         >
           <!-- Screen reader live region -->
           <div
