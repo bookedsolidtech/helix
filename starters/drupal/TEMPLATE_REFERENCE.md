@@ -19,6 +19,9 @@ canonical component twig files in `packages/hx-library/src/components/`.
 | `helix-radio.html.twig` | `hx-radio` | `helix_radio` | _(no source twig; hx-radio is in hx-radio-group dir)_ |
 | `helix-tooltip.html.twig` | `hx-tooltip` | `helix_tooltip` | `packages/hx-library/src/components/hx-tooltip/hx-tooltip.twig` |
 | `helix-modal.html.twig` | `hx-dialog` | `helix_modal` | _(no source twig — new for Drupal)_ |
+| `helix-nav.html.twig` | `hx-nav` | `helix_nav` | _(no source twig — Drupal menu bridge)_ |
+| `helix-side-nav.html.twig` | `hx-side-nav` | `helix_side_nav` | _(no source twig — Drupal sidebar bridge)_ |
+| `helix-steps.html.twig` | `hx-steps` / `hx-step` | `helix_steps` | _(no source twig — workflow bridge)_ |
 
 ---
 
@@ -58,7 +61,7 @@ Source: `packages/hx-library/src/components/hx-button/hx-button.twig`
 | `actions` | slot `actions` | NOT compatible with `href` |
 | `image` | slot `image` | Object with `src` and `alt` keys |
 | `href` | `hx-href` | Makes card interactive/clickable |
-| `aria_label` | `hx-aria-label` | Required when `href` is set |
+| `aria_label` | `hx-label` | Required when `href` is set |
 | `attributes` | spread | Additional HTML attributes |
 
 Source: `packages/hx-library/src/components/hx-card/hx-card.twig`
@@ -176,6 +179,9 @@ This template handles individual radio elements from Drupal Form API.
 | `disabled` | `disabled` (bool) | Disabled state |
 | `attributes` | spread | Additional HTML attributes |
 
+Note: `name`, `required`, and `error` belong on the parent `<hx-radio-group>`,
+not on individual `<hx-radio>` elements.
+
 Group usage: Wrap multiple `helix-radio.html.twig` includes inside a
 `<hx-radio-group>` element with `name`, `label`, and optionally `required`.
 
@@ -207,7 +213,7 @@ No source twig in the library — this template is Drupal-specific.
 | `label` | `heading` | Required. Dialog heading text |
 | `body_content` | slot default | Dialog body content |
 | `open` | `open` (bool) | Initial open state |
-| `dismissible` | inverted `hide-close-button` | Default: true (close button shown) |
+| `close_on_backdrop` | `close-on-backdrop` | Whether clicking backdrop closes dialog. Default: true |
 | `modal` | `modal` (bool) | Blocks background. Default: true |
 | `footer` | slot `footer` | Action buttons or footer HTML |
 | `dialog_id` | `id` | For data-hx-dialog-trigger wiring |

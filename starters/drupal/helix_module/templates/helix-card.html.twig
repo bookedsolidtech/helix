@@ -54,7 +54,7 @@
   elevation="{{ elevation|default('flat') }}"
   {% if href is defined and href %}
     hx-href="{{ href }}"
-    {% if aria_label %}hx-aria-label="{{ aria_label }}"{% endif %}
+    {% if aria_label %}hx-label="{{ aria_label }}"{% endif %}
   {% endif %}
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
