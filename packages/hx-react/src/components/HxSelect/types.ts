@@ -46,12 +46,6 @@ internal trigger button's `aria-label`. */
   labelRequired?: string;
   /** Label shown when no options are available. Override for i18n. */
   labelNoOptions?: string;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched when the selected option changes. */

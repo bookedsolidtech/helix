@@ -37,12 +37,6 @@ export interface HxSliderProps {
   /** Human-readable text alternative for the current value, announced by screen readers
 instead of the numeric value. For example, on a pain scale: "7 — Moderate-Severe". */
   valueText?: string;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched continuously while the user drags. */

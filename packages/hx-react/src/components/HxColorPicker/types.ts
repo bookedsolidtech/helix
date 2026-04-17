@@ -50,10 +50,6 @@ Useful for compact preset-only color selection UIs. */
   labelPicker?: string;
   /** Generates the accessible label for the trigger button. */
   labelTrigger?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
-  /** Returns the current validation message. */
-  validationMessage?: string;
 
   // Event callbacks
   /** Dispatched while dragging sliders or grid. */

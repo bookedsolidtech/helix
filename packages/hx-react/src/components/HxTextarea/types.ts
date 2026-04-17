@@ -55,12 +55,6 @@ association and `aria-labelledby`, not host-level ARIA delegation. The
 `accessible-label` attribute is a fallback for label-free usage. The value is forwarded to the
 internal native textarea's `aria-label`. */
   accessibleLabel?: string | null;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched on every keystroke as the user types. */
