@@ -91,14 +91,16 @@
       //
       // Usage:
       //   <hx-badge removable data-ajax-remove="/api/badge/dismiss/42">New</hx-badge>
-      once('helix-badge-remove', 'hx-badge[removable][data-ajax-remove]', context).forEach(function (badge) {
-        badge.addEventListener('hx-remove', function () {
-          var ajaxUrl = badge.getAttribute('data-ajax-remove');
-          if (ajaxUrl && Drupal.ajax) {
-            Drupal.ajax({ url: ajaxUrl }).execute();
-          }
-        });
-      });
+      once('helix-badge-remove', 'hx-badge[removable][data-ajax-remove]', context).forEach(
+        function (badge) {
+          badge.addEventListener('hx-remove', function () {
+            var ajaxUrl = badge.getAttribute('data-ajax-remove');
+            if (ajaxUrl && Drupal.ajax) {
+              Drupal.ajax({ url: ajaxUrl }).execute();
+            }
+          });
+        },
+      );
     },
 
     /**
