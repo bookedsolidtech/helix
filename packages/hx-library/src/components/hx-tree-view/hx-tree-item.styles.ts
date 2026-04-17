@@ -178,6 +178,16 @@ export const helixTreeItemStyles = css`
   /* ─── Forced Colors (Windows High Contrast) ─── */
 
   @media (forced-colors: active) {
+    .item-row:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    .expand-btn:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
     :host([selected]) .item-row {
       outline: 2px solid Highlight;
     }

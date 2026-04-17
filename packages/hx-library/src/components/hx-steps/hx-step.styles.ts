@@ -253,5 +253,10 @@ export const helixStepStyles = css`
     :host([status='complete']) .step__connector {
       background-color: Highlight;
     }
+
+    :host(:focus-visible) .step__indicator {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
   }
 `;

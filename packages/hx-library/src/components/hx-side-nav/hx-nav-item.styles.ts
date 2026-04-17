@@ -247,6 +247,11 @@ export const helixNavItemStyles = css`
       border: 1px solid Highlight;
     }
 
+    .nav-item__link:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
     .nav-item__tooltip {
       border: 1px solid CanvasText;
     }
