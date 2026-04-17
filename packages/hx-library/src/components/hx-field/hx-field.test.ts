@@ -110,7 +110,7 @@ describe('hx-field', () => {
 
     it('renders error message container when error is set', async () => {
       const el = await fixture<HelixField>('<hx-field error="This field is required"></hx-field>');
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv).toBeTruthy();
       expect(errorDiv?.textContent?.trim()).toBe('This field is required');
     });
@@ -132,7 +132,7 @@ describe('hx-field', () => {
       const el = await fixture<HelixField>('<hx-field error="Required"></hx-field>');
       el.error = '';
       await el.updateComplete;
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv).toBeNull();
     });
   });
@@ -325,9 +325,9 @@ describe('hx-field', () => {
       expect(helpText).toBeTruthy();
     });
 
-    it('error-message part is present when error is set', async () => {
+    it('error part is present when error is set', async () => {
       const el = await fixture<HelixField>('<hx-field error="Error occurred"></hx-field>');
-      const errorMsg = shadowQuery(el, '[part="error-message"]');
+      const errorMsg = shadowQuery(el, '[part="error"]');
       expect(errorMsg).toBeTruthy();
     });
 
@@ -353,7 +353,7 @@ describe('hx-field', () => {
       const el = await fixture<HelixField>('<hx-field></hx-field>');
       el.error = 'Field is required';
       await el.updateComplete;
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv?.textContent?.trim()).toBe('Field is required');
     });
 

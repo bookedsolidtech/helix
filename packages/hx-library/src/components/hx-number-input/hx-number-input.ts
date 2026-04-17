@@ -40,7 +40,7 @@ export interface HxNumberInputDetail {
  * @csspart input-wrapper - The wrapper around prefix, input, suffix, and stepper.
  * @csspart input - The native input element.
  * @csspart help-text - The help text container.
- * @csspart error-message - The error message container.
+ * @csspart error - The error message container.
  * @csspart stepper - The stepper button group container.
  * @csspart increment - The increment (+) button.
  * @csspart decrement - The decrement (-) button.
@@ -677,7 +677,7 @@ export class HelixNumberInput extends FormMixin(HelixElement) {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div part="error-message" class="field__error" id=${this._errorId} role="alert">
+                <div part="error" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `

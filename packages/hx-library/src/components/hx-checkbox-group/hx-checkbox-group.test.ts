@@ -115,13 +115,13 @@ describe('hx-checkbox-group', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Please select at least one option');
     });
 
-    it('error div has part="error-message"', async () => {
+    it('error div has part="error"', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" error="Required">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv).toBeTruthy();
     });
 
@@ -268,13 +268,13 @@ describe('hx-checkbox-group', () => {
       expect(shadowQuery(el, '[part="help-text"]')).toBeTruthy();
     });
 
-    it('exposes "error-message" CSS part when error is set', async () => {
+    it('exposes "error" CSS part when error is set', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" error="Something went wrong">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      expect(shadowQuery(el, '[part="error-message"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="error"]')).toBeTruthy();
     });
   });
 

@@ -32,7 +32,7 @@ export interface HxCheckboxGroupChangeDetail {
  * @csspart group - The fieldset wrapper.
  * @csspart label - The legend/label.
  * @csspart help-text - The help text container.
- * @csspart error-message - The error message container.
+ * @csspart error - The error message container.
  *
  * @cssprop [--hx-checkbox-group-gap=var(--hx-space-3, 0.75rem)] - Gap between checkbox items.
  * @cssprop [--hx-checkbox-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
@@ -358,7 +358,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
         </div>
 
         ${hasError
-          ? html`<div part="error-message" class="fieldset__error" id=${this._errorId} role="alert">
+          ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert">
               <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
             </div>`
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
