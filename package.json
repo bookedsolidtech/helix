@@ -134,6 +134,5 @@
       "locutus": ">=3.0.14"
     }
   },
-  "packageManager": "pnpm@9.15.9",
-  "customElements": "packages/hx-library/custom-elements.json"
+  "packageManager": "pnpm@9.15.9"
 }
