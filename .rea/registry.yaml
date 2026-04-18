@@ -4,5 +4,5 @@
 # NOTE: rea serve (the MCP gateway) is a stub in 0.1.0. This file is kept
 # for forward-compatibility. Current installs consume rea purely as a
 # policy + hooks layer via .claude/hooks and .husky/commit-msg.
-version: "1"
+version: '1'
 servers: []

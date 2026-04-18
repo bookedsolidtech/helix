@@ -2,10 +2,10 @@
 # Commit this file. Edit autonomy_level and max_autonomy_level as needed.
 # Run 'rea freeze --reason "..."' to halt all agent operations.
 
-version: "1"
-profile: "bst-internal"
-installed_by: "rea@0.1.0"
-installed_at: "2026-04-18T00:00:00Z"
+version: '1'
+profile: 'bst-internal'
+installed_by: 'rea@0.1.0'
+installed_at: '2026-04-18T00:00:00Z'
 
 # Autonomy levels:
 #   L0 — Read-only; every write requires explicit user approval
@@ -31,7 +31,7 @@ blocked_paths:
   - .rea/HALT
 
 # Optional: Discord webhook for halt/promote notifications
-notification_channel: ""
+notification_channel: ''
 
 context_protection:
   delegate_to_subagent:
