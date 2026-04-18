@@ -51,10 +51,9 @@ Swatches must be set via JavaScript because arrays cannot be serialized as HTML 
 
 <ComponentDemo title="With Swatches">
   <hx-color-picker id="demo-swatches" value="#ef4444" format="hex" inline></hx-color-picker>
-  <script>
-    document.getElementById('demo-swatches').swatches = [ '#ef4444', '#f97316', '#eab308',
-    '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', ];
-  </script>
+  <script>{`
+    document.getElementById('demo-swatches').swatches = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'];
+  `}</script>
 </ComponentDemo>
 
 ### Swatches Only
@@ -69,10 +68,9 @@ Use `swatches-only` with swatches to hide the gradient grid and sliders.
     swatches-only
     inline
   ></hx-color-picker>
-  <script>
-    document.getElementById('demo-swatches-only').swatches = [ '#ef4444', '#f97316', '#eab308',
-    '#22c55e', '#3b82f6', '#8b5cf6', ];
-  </script>
+  <script>{`
+    document.getElementById('demo-swatches-only').swatches = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
+  `}</script>
 </ComponentDemo>
 
 ### Disabled

@@ -7,7 +7,7 @@
  * Reads from .claude/issues/issues.json (TrackedIssue[] data source).
  */
 import ShowcaseLayout from '../layouts/ShowcaseLayout.astro';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 interface TrackedIssue {
@@ -49,6 +49,21 @@ interface IssuesIndex {
 
 function loadIssues(): IssuesIndex {
   const issuesPath = join(process.cwd(), '../../.claude/issues/issues.json');
+  if (!existsSync(issuesPath)) {
+    return {
+      version: '0',
+      lastUpdated: new Date(0).toISOString(),
+      stats: {
+        total: 0,
+        bySeverity: {},
+        byStatus: {},
+        byCategory: {},
+        resolvedCount: 0,
+        resolutionRate: 0,
+      },
+      issues: [],
+    };
+  }
   const content = readFileSync(issuesPath, 'utf-8');
   return JSON.parse(content) as IssuesIndex;
 }
