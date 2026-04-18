@@ -65,43 +65,45 @@ export class HelixRadio extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('role', 'radio');
-    this.setAttribute('aria-checked', String(this.checked));
-    // WCAG 4.1.2: expose the label text as aria-label on the host so assistive
-    // technology can associate the visible label with the radio role. The label
-    // span lives inside Shadow DOM and aria-labelledby cannot cross shadow
-    // boundaries, so aria-label on the host is the correct pattern here.
-    if (this.label) {
-      this.setAttribute('aria-label', this.label);
-    }
-    // WCAG 4.1.2: omit aria-disabled entirely when not disabled. Setting
-    // aria-disabled="false" is verbose and unnecessary — omission is preferred.
-    if (this.disabled) {
-      this.setAttribute('aria-disabled', 'true');
-    } else {
-      this.removeAttribute('aria-disabled');
-    }
+    // ARIA role and state are projected to the accessibility tree via
+    // ElementInternals rather than imperative setAttribute calls. This keeps
+    // the host element's attribute surface clean — consumers cannot accidentally
+    // override role/aria-* — and aligns with the standards pattern for
+    // custom elements. See https://wicg.github.io/aom/spec/aria-reflection.html.
+    this._internals.role = 'radio';
+    this._syncAriaState();
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    if (changedProperties.has('checked')) {
-      this.setAttribute('aria-checked', String(this.checked));
+    if (
+      changedProperties.has('checked') ||
+      changedProperties.has('label') ||
+      changedProperties.has('disabled')
+    ) {
+      this._syncAriaState();
     }
-    if (changedProperties.has('label')) {
-      if (this.label) {
-        this.setAttribute('aria-label', this.label);
-      } else {
-        this.removeAttribute('aria-label');
-      }
-    }
-    if (changedProperties.has('disabled')) {
-      if (this.disabled) {
-        this.setAttribute('aria-disabled', 'true');
-      } else {
-        this.removeAttribute('aria-disabled');
-      }
-    }
+  }
+
+  /**
+   * Mirror reactive ARIA state onto ElementInternals. Setting a value to `null`
+   * removes it from the accessibility tree (matching the previous
+   * removeAttribute behavior).
+   *
+   * WCAG 4.1.2: expose the label text as ariaLabel on the host so assistive
+   * technology can associate the visible label with the radio role. The label
+   * span lives inside Shadow DOM and aria-labelledby cannot cross shadow
+   * boundaries, so ariaLabel on the host is the correct pattern here.
+   *
+   * WCAG 4.1.2: omit ariaDisabled entirely when not disabled. Setting
+   * aria-disabled="false" is verbose and unnecessary — omission is preferred.
+   *
+   * @internal
+   */
+  private _syncAriaState(): void {
+    this._internals.ariaChecked = String(this.checked);
+    this._internals.ariaLabel = this.label || null;
+    this._internals.ariaDisabled = this.disabled ? 'true' : null;
   }
 
   // ─── Internal IDs ───
