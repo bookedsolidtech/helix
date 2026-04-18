@@ -6,6 +6,10 @@
  *
  * AUTO-GENERATED — Do not edit manually.
  * Run `npm run generate:barrel` to regenerate.
+ *
+ * Public-API surface is gated by an allowlist in scripts/generate-barrel.js.
+ * Internals (HelixAuditController, resetIdCounter, mixinDelegatesAria, etc.)
+ * are intentionally excluded and must be imported via deep paths if needed.
  */
 
 // ─── Document-level token adoption ──────────────────────────────────────────
@@ -17,19 +21,11 @@ import './utilities/document-token-adoption.js';
 export { ensureDocumentTokens } from './utilities/document-token-adoption.js';
 
 // ─── Base infrastructure ────────────────────────────────────────────────────
-export { HelixElement } from './base/index.js';
-export { createIdCounter, resetIdCounter } from './base/index.js';
-export { mergeTokenStyles } from './base/index.js';
+export { HelixElement, createIdCounter, mergeTokenStyles } from './base/index.js';
 
 // ─── Mixins ───────────────────────────────────────────────────────────────────
-export { FocusMixin } from './mixins/index.js';
-export type { FocusMixinInterface } from './mixins/index.js';
-export { FormMixin } from './mixins/index.js';
-export type { FormMixinInterface } from './mixins/index.js';
-
-// ─── Controllers ─────────────────────────────────────────────────────────────
-export { HelixAuditController } from './controllers/helix-audit-controller.js';
-export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';
+export { FocusMixin, FormMixin } from './mixins/index.js';
+export type { FocusMixinInterface, FormMixinInterface } from './mixins/index.js';
 
 // ─── Components ──────────────────────────────────────────────────────────────
 export { HelixAccordion } from './components/hx-accordion/index.js';
