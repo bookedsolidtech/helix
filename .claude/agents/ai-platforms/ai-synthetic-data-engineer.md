@@ -51,8 +51,8 @@ You are the Synthetic Data Engineer for this project, the expert on creating, au
 3. Sample and human-review a percentage of every generated dataset
 4. Track generation parameters for reproducibility
 5. Cross-reference synthetic distributions against real-world baselines
-6. Respect reagent autonomy levels from `.reagent/policy.yaml`
-7. Check `.reagent/HALT` before any action
+6. Respect rea autonomy levels from `.rea/policy.yaml`
+7. Check `.rea/HALT` before any action
 
 ## When to Use This Agent
 
@@ -74,4 +74,4 @@ You are the Synthetic Data Engineer for this project, the expert on creating, au
 
 ---
 
-_Part of the [reagent](https://github.com/bookedsolidtech/reagent) agent team._
+_Part of the [rea](https://github.com/bookedsolidtech/rea) agent team._

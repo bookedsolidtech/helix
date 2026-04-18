@@ -1,0 +1,41 @@
+# .rea/policy.yaml — managed by @bookedsolid/rea 0.1.0
+# Commit this file. Edit autonomy_level and max_autonomy_level as needed.
+# Run 'rea freeze --reason "..."' to halt all agent operations.
+
+version: "1"
+profile: "bst-internal"
+installed_by: "rea@0.1.0"
+installed_at: "2026-04-18T00:00:00Z"
+
+# Autonomy levels:
+#   L0 — Read-only; every write requires explicit user approval
+#   L1 — Writes allowed to non-blocked paths; destructive operations blocked
+#   L2 — Writes + PR creation allowed; destructive tier blocked
+#   L3 — All writes allowed; advisory on anomalous patterns
+autonomy_level: L1
+max_autonomy_level: L2
+
+# Human must approve any autonomy level increase
+promotion_requires_human_approval: true
+
+# Block AI attribution in commits and PRs.
+# When true, the commit-msg hook rejects commits containing AI attribution
+# markers (Co-Authored-By with AI names, "Generated with [Tool]" footers, etc.).
+block_ai_attribution: true
+
+# Paths hooks and agents must never modify
+blocked_paths:
+  - .env
+  - .env.*
+  - .rea/policy.yaml
+  - .rea/HALT
+
+# Optional: Discord webhook for halt/promote notifications
+notification_channel: ""
+
+context_protection:
+  delegate_to_subagent:
+    - pnpm run preflight
+    - pnpm run test
+    - pnpm run build
+  max_bash_output_lines: 100

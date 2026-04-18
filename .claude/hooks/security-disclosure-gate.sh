@@ -2,7 +2,7 @@
 # security-disclosure-gate.sh — PreToolUse: Bash
 #
 # Intercepts `gh issue create` commands that contain security-sensitive
-# keywords and blocks them. Routing depends on REAGENT_DISCLOSURE_MODE:
+# keywords and blocks them. Routing depends on REA_DISCLOSURE_MODE:
 #
 #   advisory (default) — redirect to GitHub Security Advisories (private)
 #                        Use for public OSS repos
@@ -10,8 +10,8 @@
 #                        Use for permanently private client repos
 #   disabled           — pass through (not recommended)
 #
-# Set REAGENT_DISCLOSURE_MODE in .reagent/policy.yaml (written to settings.json
-# env by reagent init). Defaults to "advisory" when unset.
+# Set REA_DISCLOSURE_MODE in .rea/policy.yaml (written to settings.json
+# env by rea init). Defaults to "advisory" when unset.
 #
 # Triggered by: PreToolUse — Bash tool
 
@@ -23,7 +23,7 @@ source "$(dirname "$0")/_lib/common.sh"
 check_halt
 
 # Read disclosure mode — default to advisory
-DISCLOSURE_MODE="${REAGENT_DISCLOSURE_MODE:-advisory}"
+DISCLOSURE_MODE="${REA_DISCLOSURE_MODE:-advisory}"
 
 # Disabled mode: pass through entirely
 if [[ "$DISCLOSURE_MODE" == "disabled" ]]; then
@@ -66,7 +66,7 @@ SECURITY_PATTERNS=(
   'CVE-'
   'CVSS'
   'GHSA-'
-  # Reagent-specific sensitive terms
+  # Rea-specific sensitive terms
   'hook.bypass'
   'HALT.bypass'
   'redaction.bypass'
@@ -108,7 +108,7 @@ if [[ "$DISCLOSURE_MODE" == "issues" ]]; then
   json_output "block" \
     "SECURITY DISCLOSURE GATE: This issue appears to describe a security finding (matched: '${MATCHED_PATTERN}').
 
-This project is configured for PRIVATE disclosure (REAGENT_DISCLOSURE_MODE=issues).
+This project is configured for PRIVATE disclosure (REA_DISCLOSURE_MODE=issues).
 
 CORRECT PATH for security findings in this private repo:
   Use: gh issue create --label 'security,internal' --title '...' --body '...'
@@ -137,7 +137,7 @@ CORRECT DISCLOSURE PATH:
 The finding will be publicly disclosed AFTER a patch is released (coordinated disclosure).
 
 WHY: Public issues expose vulnerabilities before users can patch. This is enforced by the
-security-disclosure-gate hook (REAGENT_DISCLOSURE_MODE=${DISCLOSURE_MODE}).
+security-disclosure-gate hook (REA_DISCLOSURE_MODE=${DISCLOSURE_MODE}).
 
 If this is NOT a security vulnerability, rephrase the issue to avoid triggering
 security patterns, then retry."

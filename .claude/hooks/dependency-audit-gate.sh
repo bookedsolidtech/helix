@@ -15,16 +15,16 @@ INPUT=$(cat)
 
 # ── 2. Dependency check ──────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi

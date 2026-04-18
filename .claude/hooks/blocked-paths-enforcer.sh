@@ -1,7 +1,7 @@
 #!/bin/bash
 # PreToolUse hook: blocked-paths-enforcer.sh
 # Fires BEFORE every Write or Edit tool call.
-# Reads blocked_paths from .reagent/policy.yaml and blocks matching writes.
+# Reads blocked_paths from .rea/policy.yaml and blocks matching writes.
 #
 # This enforces the policy layer at the hook level — even if an agent ignores
 # the CLAUDE.md rules or skips the orchestrator, the hook will catch it.
@@ -17,16 +17,16 @@ INPUT=$(cat)
 
 # ── 2. Dependency check ──────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
@@ -39,7 +39,7 @@ if [[ -z "$FILE_PATH" ]]; then
 fi
 
 # ── 5. Load blocked_paths from policy ─────────────────────────────────────────
-POLICY_FILE="${REAGENT_ROOT}/.reagent/policy.yaml"
+POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
 
 if [[ ! -f "$POLICY_FILE" ]]; then
   exit 0
@@ -91,18 +91,18 @@ if [[ ${#BLOCKED_PATHS[@]} -eq 0 ]]; then
 fi
 
 # ── 6. Agent-writable allowlist ───────────────────────────────────────────────
-# These paths under .reagent/ must always be writable by agents regardless of
-# what blocked_paths says. Blocking the whole .reagent/ directory in policy
+# These paths under .rea/ must always be writable by agents regardless of
+# what blocked_paths says. Blocking the whole .rea/ directory in policy
 # is a common default, but tasks.jsonl is the PM data store — agents must
 # write there. Settings-protection.sh guards the sensitive files explicitly.
 AGENT_WRITABLE=(
-  '.reagent/tasks.jsonl'
-  '.reagent/audit/'
+  '.rea/tasks.jsonl'
+  '.rea/audit/'
 )
 
 normalize_path() {
   local p="$1"
-  local root="$REAGENT_ROOT"
+  local root="$REA_ROOT"
   if [[ "$p" == "$root"/* ]]; then
     p="${p#$root/}"
   fi
@@ -133,7 +133,7 @@ for blocked in "${BLOCKED_PATHS[@]}"; do
         printf '\n'
         printf '  File: %s\n' "$FILE_PATH"
         printf '  Blocked by: %s\n' "$blocked"
-        printf '  Source: .reagent/policy.yaml → blocked_paths\n'
+        printf '  Source: .rea/policy.yaml → blocked_paths\n'
         printf '\n'
         printf '  This path is protected by policy. To modify it, a human must\n'
         printf '  either update blocked_paths in policy.yaml or edit the file directly.\n'
@@ -153,7 +153,7 @@ for blocked in "${BLOCKED_PATHS[@]}"; do
         printf '\n'
         printf '  File: %s\n' "$FILE_PATH"
         printf '  Blocked by: %s (glob pattern)\n' "$blocked"
-        printf '  Source: .reagent/policy.yaml → blocked_paths\n'
+        printf '  Source: .rea/policy.yaml → blocked_paths\n'
       } >&2
       exit 2
     fi
@@ -167,7 +167,7 @@ for blocked in "${BLOCKED_PATHS[@]}"; do
       printf '\n'
       printf '  File: %s\n' "$FILE_PATH"
       printf '  Blocked by: %s\n' "$blocked"
-      printf '  Source: .reagent/policy.yaml → blocked_paths\n'
+      printf '  Source: .rea/policy.yaml → blocked_paths\n'
     } >&2
     exit 2
   fi

@@ -23,16 +23,16 @@ INPUT=$(cat)
 
 # ── Dependency check ──────────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── HALT check ────────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
@@ -61,7 +61,7 @@ fi
 # Build line-filtered content
 # Strip: shell comment lines (#) and lines where process.env.VAR is the RHS of an assignment
 # NOT stripped: lines that merely mention process.env somewhere (bypass vector if too broad)
-FILTERED_FILE=$(mktemp "${TMPDIR:-/tmp}/reagent-secret-scan-XXXXXX") || {
+FILTERED_FILE=$(mktemp "${TMPDIR:-/tmp}/rea-secret-scan-XXXXXX") || {
   printf 'SECRET-SCAN ERROR: Failed to create temp file — blocking write (fail-secure)\n' >&2
   exit 2
 }
@@ -112,7 +112,7 @@ is_placeholder() {
   return 1
 }
 
-VIOLATIONS_FILE=$(mktemp "${TMPDIR:-/tmp}/reagent-secret-violations-XXXXXX") || {
+VIOLATIONS_FILE=$(mktemp "${TMPDIR:-/tmp}/rea-secret-violations-XXXXXX") || {
   printf 'SECRET-SCAN ERROR: Failed to create violations file — blocking write (fail-secure)\n' >&2
   exit 2
 }

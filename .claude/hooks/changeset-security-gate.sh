@@ -99,7 +99,7 @@ if ! echo "$CONTENT" | head -1 | grep -qE '^---'; then
 Every changeset must start with a frontmatter block specifying which package to bump:
 
 ---
-'@bookedsolid/reagent': patch
+'@bookedsolid/rea': patch
 ---
 
 Brief description of what changed and why (close #N if applicable).
@@ -116,7 +116,7 @@ if ! echo "$FRONTMATTER" | grep -qE "^'.+': (patch|minor|major)"; then
 The frontmatter must include at least one package/bump pair:
 
 ---
-'@bookedsolid/reagent': patch
+'@bookedsolid/rea': patch
 ---
 
 Valid bump types: patch | minor | major"
@@ -131,7 +131,7 @@ if [[ -z "$DESCRIPTION" ]]; then
 Add a meaningful description explaining what changed and why:
 
 ---
-'@bookedsolid/reagent': patch
+'@bookedsolid/rea': patch
 ---
 
 fix(gateway): policy-loader now uses async I/O with 500ms TTL cache

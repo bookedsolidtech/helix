@@ -9,12 +9,12 @@
 #   .claude/settings.local.json — local hook overrides
 #   .claude/hooks/*             — hook scripts themselves
 #   .husky/*                    — git hook scripts
-#   .reagent/policy.yaml        — autonomy/blocking policy
-#   .reagent/HALT               — kill switch file
+#   .rea/policy.yaml        — autonomy/blocking policy
+#   .rea/HALT               — kill switch file
 #
 # NOT protected (operational files agents may legitimately write):
-#   .reagent/review-cache.json  — cache file, writable by CLI and agents
-#   .reagent/tasks.jsonl        — task store, managed by task MCP tools
+#   .rea/review-cache.json  — cache file, writable by CLI and agents
+#   .rea/tasks.jsonl        — task store, managed by task MCP tools
 #
 # Exit codes:
 #   0 = allow (path not protected)
@@ -27,16 +27,16 @@ INPUT=$(cat)
 
 # ── 2. Dependency check ──────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
@@ -52,7 +52,7 @@ fi
 # Convert to relative path from project root for consistent matching
 normalize_path() {
   local p="$1"
-  local root="$REAGENT_ROOT"
+  local root="$REA_ROOT"
 
   # Strip project root prefix if present
   if [[ "$p" == "$root"/* ]]; then
@@ -80,8 +80,8 @@ PROTECTED_PATTERNS=(
   '.claude/settings.local.json'
   '.claude/hooks/'
   '.husky/'
-  '.reagent/policy.yaml'
-  '.reagent/HALT'
+  '.rea/policy.yaml'
+  '.rea/HALT'
 )
 
 for pattern in "${PROTECTED_PATTERNS[@]}"; do
@@ -95,11 +95,11 @@ for pattern in "${PROTECTED_PATTERNS[@]}"; do
       printf '\n'
       printf '  Protected files include hook scripts, settings, policy,\n'
       printf '  and kill switch files. These must be modified by humans\n'
-      printf '  via reagent CLI or direct editing.\n'
+      printf '  via rea CLI or direct editing.\n'
       printf '\n'
-      printf '  Use: reagent init (to update hooks/settings)\n'
-      printf '       reagent freeze/unfreeze (for HALT file)\n'
-      printf '       Edit .reagent/policy.yaml manually\n'
+      printf '  Use: rea init (to update hooks/settings)\n'
+      printf '       rea freeze/unfreeze (for HALT file)\n'
+      printf '       Edit .rea/policy.yaml manually\n'
     } >&2
     exit 2
   fi
@@ -113,7 +113,7 @@ for pattern in "${PROTECTED_PATTERNS[@]}"; do
       printf '  Rule: Files under %s are protected from agent modification.\n' "$pattern"
       printf '\n'
       printf '  These files control the hook safety layer and must be\n'
-      printf '  modified by humans via reagent CLI or direct editing.\n'
+      printf '  modified by humans via rea CLI or direct editing.\n'
     } >&2
     exit 2
   fi

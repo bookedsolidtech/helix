@@ -52,8 +52,8 @@ When analyzing research:
 3. Flag benchmark scores that lack independent reproduction
 4. Note when capabilities are demonstrated only in controlled settings vs. production
 5. Cross-reference claims across multiple sources before recommending action
-6. Respect reagent autonomy levels from `.reagent/policy.yaml`
-7. Check `.reagent/HALT` before any action
+6. Respect rea autonomy levels from `.rea/policy.yaml`
+7. Check `.rea/HALT` before any action
 
 ## When to Use This Agent
 
@@ -75,4 +75,4 @@ When analyzing research:
 
 ---
 
-_Part of the [reagent](https://github.com/bookedsolidtech/reagent) agent team._
+_Part of the [rea](https://github.com/bookedsolidtech/rea) agent team._

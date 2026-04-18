@@ -1,8 +1,8 @@
-Read the task store at `.reagent/tasks.jsonl` and render a clean summary table.
+Read the task store at `.rea/tasks.jsonl` and render a clean summary table.
 
 ## Instructions
 
-1. Read `.reagent/tasks.jsonl` — each line is a JSON event with fields: id, type, title, urgency, phase, assignee, timestamp
+1. Read `.rea/tasks.jsonl` — each line is a JSON event with fields: id, type, title, urgency, phase, assignee, timestamp
 2. Materialize the current state: for each task ID, the latest event determines its status
 3. Group by status: active (created, started, blocked) first, then completed/cancelled
 4. Render as a markdown table with columns: ID | Status | Urgency | Title | Assignee | Phase
