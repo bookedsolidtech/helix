@@ -20,6 +20,7 @@
 
 import { isStyleRegistered, registerStyle } from './lightStyleRegistry.js';
 import { generateScopedSelectors } from './generateScopedSelectors.js';
+import { sanitizeCss } from './sanitizeCss.js';
 
 /**
  * Injects a scoped `<style>` element into `document.head` for light DOM content
@@ -42,7 +43,10 @@ export function injectLightStyles(componentName: string, css: string): void {
 
   if (isStyleRegistered(componentName)) return;
 
-  const scopedCss = generateScopedSelectors(componentName, css);
+  const safeCss = sanitizeCss(css, componentName);
+  if (safeCss === null) return;
+
+  const scopedCss = generateScopedSelectors(componentName, safeCss);
 
   const styleEl = document.createElement('style');
   styleEl.setAttribute('data-hx-light-styles', componentName);

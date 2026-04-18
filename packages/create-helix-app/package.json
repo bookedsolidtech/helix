@@ -1,0 +1,24 @@
+{
+  "name": "create-helix-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CLI scaffolding tool for HELiX applications",
+  "type": "module",
+  "bin": {
+    "create-helix-app": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "echo 'placeholder — build pipeline pending'",
+    "type-check": "echo 'placeholder — type-check pending'",
+    "lint": "echo 'placeholder — lint pending'"
+  },
+  "keywords": [
+    "helix",
+    "scaffolding",
+    "web-components",
+    "cli"
+  ],
+  "license": "MIT"
+}

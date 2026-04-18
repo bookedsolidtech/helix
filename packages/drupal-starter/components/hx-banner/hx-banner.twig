@@ -23,7 +23,7 @@
 
 <hx-banner
   variant="{{ variant|default('info') }}"
-  {% if position and position != 'inline' %}position="{{ position }}"{% endif %}
+  {% if position and position != 'sticky' %}position="{{ position }}"{% endif %}
   {% if heading %}heading="{{ heading }}"{% endif %}
   {% if action_label %}action-label="{{ action_label }}"{% endif %}
   {% if action_href %}action-href="{{ action_href }}"{% endif %}

@@ -4,6 +4,20 @@ import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+// Reporter selection:
+//   - Default (human): verbose + json so developers see per-test progress.
+//   - Terse (CI / agent): dot + json to keep logs compact. Vitest's `verbose`
+//     reporter dumps thousands of `✓` lines which blows through agent context
+//     windows and makes CI log scrolling painful. The json reporter is kept
+//     in both modes so the Admin Dashboard health scorer always has data.
+// Opt-in via VITEST_REPORTER=<name>, CI=1, or AGENT_RUN=1.
+const terse =
+  process.env.VITEST_REPORTER === 'dot' ||
+  process.env.VITEST_REPORTER === 'basic' ||
+  (!process.env.VITEST_REPORTER &&
+    (process.env.CI === '1' || process.env.CI === 'true' || process.env.AGENT_RUN === '1'));
+const reporters: Array<string> = terse ? ['dot', 'json'] : ['verbose', 'json'];
+
 export default defineConfig({
   server: {
     fs: {
@@ -29,7 +43,7 @@ export default defineConfig({
       'src/__tests__/**/*.test.ts',
     ],
     exclude: ['.worktrees/**', 'node_modules/**', '**/__screenshots__/**'],
-    reporters: ['verbose', 'json'],
+    reporters,
     outputFile: { json: '.cache/test-results.json' },
     testTimeout: 30000,
     teardownTimeout: 5000,

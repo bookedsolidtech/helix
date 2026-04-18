@@ -38,10 +38,10 @@ export const helixAlertStyles = css`
     gap: var(--hx-alert-gap, var(--hx-space-3, 0.75rem));
     padding: var(--hx-alert-padding, var(--hx-space-4, 1rem));
     border: var(--hx-alert-border-width, var(--hx-border-width-thin, 1px)) solid
-      var(--hx-alert-border-color, var(--hx-color-info-200, #b3d9ef));
+      var(--hx-alert-border-color, var(--hx-color-info-200, #bae6fd));
     border-radius: var(--hx-alert-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-alert-bg, var(--hx-color-info-50, #e8f4fd));
-    color: var(--hx-alert-color, var(--hx-color-info-800, #1a3a4a));
+    background-color: var(--hx-alert-bg, var(--hx-color-info-50, #f0f9ff));
+    color: var(--hx-alert-color, var(--hx-color-info-800, #0c4a6e));
     font-family: var(--hx-alert-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -54,7 +54,7 @@ export const helixAlertStyles = css`
   .alert--accent {
     border-width: 0;
     border-inline-start: var(--hx-alert-accent-width, 4px) solid
-      var(--hx-alert-border-color, var(--hx-color-info-200, #b3d9ef));
+      var(--hx-alert-border-color, var(--hx-color-info-200, #bae6fd));
     border-radius: 0;
   }
 
@@ -81,7 +81,7 @@ export const helixAlertStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-alert-icon-color, var(--hx-color-info-500, #3b82f6));
+    color: var(--hx-alert-icon-color, var(--hx-color-info-500, #0284c7));
   }
 
   .alert__icon svg {
@@ -141,7 +141,7 @@ export const helixAlertStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-alert-color, var(--hx-color-info-800, #1a3a4a));
+    color: var(--hx-alert-color, var(--hx-color-info-800, #0c4a6e));
     cursor: pointer;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: 1;
@@ -181,19 +181,19 @@ export const helixAlertStyles = css`
 
   :host([variant='info']) .alert,
   :host(:not([variant])) .alert {
-    --hx-alert-bg: var(--hx-color-info-50, #e8f4fd);
-    --hx-alert-border-color: var(--hx-color-info-200, #b3d9ef);
-    --hx-alert-color: var(--hx-color-info-800, #1a3a4a);
-    --hx-alert-icon-color: var(--hx-color-info-500, #3b82f6);
+    --hx-alert-bg: var(--hx-color-info-50, #f0f9ff);
+    --hx-alert-border-color: var(--hx-color-info-200, #bae6fd);
+    --hx-alert-color: var(--hx-color-info-800, #0c4a6e);
+    --hx-alert-icon-color: var(--hx-color-info-500, #0284c7);
   }
 
   /* ─── Variant: success ─── */
 
   :host([variant='success']) .alert {
-    --hx-alert-bg: var(--hx-color-success-50, #ecfdf5);
-    --hx-alert-border-color: var(--hx-color-success-200, #a7f3d0);
-    --hx-alert-color: var(--hx-color-success-800, #065f46);
-    --hx-alert-icon-color: var(--hx-color-success-500, #10b981);
+    --hx-alert-bg: var(--hx-color-success-50, #f0fdf4);
+    --hx-alert-border-color: var(--hx-color-success-200, #bbf7d0);
+    --hx-alert-color: var(--hx-color-success-800, #14532d);
+    --hx-alert-icon-color: var(--hx-color-success-500, #16a34a);
   }
 
   /* ─── Variant: warning ─── */
@@ -201,8 +201,8 @@ export const helixAlertStyles = css`
   :host([variant='warning']) .alert {
     --hx-alert-bg: var(--hx-color-warning-50, #fffbeb);
     --hx-alert-border-color: var(--hx-color-warning-200, #fde68a);
-    --hx-alert-color: var(--hx-color-warning-800, #92400e);
-    --hx-alert-icon-color: var(--hx-color-warning-500, #f59e0b);
+    --hx-alert-color: var(--hx-color-warning-800, #78350f);
+    --hx-alert-icon-color: var(--hx-color-warning-500, #d97706);
   }
 
   /* ─── Variant: error ─── */
@@ -210,8 +210,8 @@ export const helixAlertStyles = css`
   :host([variant='error']) .alert {
     --hx-alert-bg: var(--hx-color-error-50, #fef2f2);
     --hx-alert-border-color: var(--hx-color-error-200, #fecaca);
-    --hx-alert-color: var(--hx-color-error-800, #991b1b);
-    --hx-alert-icon-color: var(--hx-color-error-500, #ef4444);
+    --hx-alert-color: var(--hx-color-error-800, #7f1d1d);
+    --hx-alert-icon-color: var(--hx-color-error-500, #dc2626);
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */

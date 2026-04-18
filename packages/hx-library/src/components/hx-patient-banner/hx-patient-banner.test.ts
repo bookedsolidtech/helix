@@ -583,5 +583,277 @@ describe('hx-patient-banner', () => {
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
+
+    it('has no axe violations with enforce-identifier-rule disabled', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner enforce-identifier-rule="false"><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      await page.screenshot();
+      const { violations } = await checkA11y(el);
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations on host element (role=banner) with all slots populated', async () => {
+      const el = await fixture<HelixPatientBanner>(`
+        <hx-patient-banner patient-id="P11111" label-patient="Jane Doe patient record">
+          <span slot="name">Jane Doe</span>
+          <span slot="mrn">MRN-99999</span>
+          <span slot="dob">03/22/1975</span>
+          <span slot="allergies">NKDA</span>
+          <span slot="code-status">DNR</span>
+        </hx-patient-banner>
+      `);
+      await el.updateComplete;
+      await Promise.resolve();
+      await page.screenshot();
+      // useElement: true so axe traverses from the host (which holds role="banner")
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Edge Cases ───
+
+  describe('Edge Cases', () => {
+    it('renders without error when all optional slots are empty', async () => {
+      let threw = false;
+      try {
+        const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+        await el.updateComplete;
+        expect(el).toBeTruthy();
+      } catch {
+        threw = true;
+      }
+      expect(threw).toBe(false);
+    });
+
+    it('renders a very long patient name without error', async () => {
+      const longName = 'A'.repeat(500);
+      const el = await fixture<HelixPatientBanner>(
+        `<hx-patient-banner><span slot="name">${longName}</span><span slot="mrn">MRN-001</span></hx-patient-banner>`,
+      );
+      await el.updateComplete;
+      const nameSlotted = el.querySelector('[slot="name"]') as HTMLElement;
+      expect(nameSlotted.textContent).toBe(longName);
+    });
+
+    it('renders a very long patient name without identifier rule violation (2 identifiers present)', async () => {
+      const longName = 'B'.repeat(500);
+      let fired = false;
+      const handler = () => {
+        fired = true;
+      };
+      document.addEventListener('hx-identifier-rule-violation', handler);
+      const el = await fixture<HelixPatientBanner>(
+        `<hx-patient-banner><span slot="name">${longName}</span><span slot="mrn">MRN-999</span></hx-patient-banner>`,
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      document.removeEventListener('hx-identifier-rule-violation', handler);
+      expect(fired).toBe(false);
+      expect(el.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('handles missing optional patient-id gracefully (empty string default)', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      expect(el.patientId).toBe('');
+    });
+
+    it('includes empty string patientId in violation event detail when not set', async () => {
+      const eventPromise = oneEvent<CustomEvent>(document, 'hx-identifier-rule-violation');
+      await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      const event = await eventPromise;
+      expect(event.detail.patientId).toBe('');
+    });
+
+    it('renders slot content with special characters in patient name', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">O\'Brien-García, María</span><span slot="mrn">MRN-042</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      const nameSlotted = el.querySelector('[slot="name"]') as HTMLElement;
+      expect(nameSlotted.textContent).toBe("O'Brien-García, María");
+    });
+
+    it('violation-message text shows 1 of 2 when exactly one identifier is present', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      const msg = shadowQuery(el, '[part~="violation-message"]');
+      expect(msg?.textContent).toContain('1 of 2');
+    });
+
+    it('hx-identifier-rule-violation detail has populatedIdentifiers=1 when one identifier present', async () => {
+      let capturedDetail: Record<string, unknown> | null = null;
+      const handler = (e: Event) => {
+        capturedDetail = (e as CustomEvent).detail as Record<string, unknown>;
+      };
+      document.addEventListener('hx-identifier-rule-violation', handler, { once: true });
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      document.removeEventListener('hx-identifier-rule-violation', handler);
+      expect(capturedDetail).not.toBeNull();
+      expect(capturedDetail!['populatedIdentifiers']).toBe(1);
+    });
+  });
+
+  // ─── Programmatic label property changes ───
+
+  describe('Programmatic label property changes', () => {
+    it('updates labelName reactively in shadow DOM', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      el.labelName = 'Full name';
+      await el.updateComplete;
+      const labels = shadowQueryAll<HTMLElement>(el, '[part~="field-label"]');
+      const match = Array.from(labels).find((l) => l.textContent?.trim() === 'Full name');
+      expect(match).toBeTruthy();
+    });
+
+    it('updates labelMrn reactively in shadow DOM', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      el.labelMrn = 'Chart number';
+      await el.updateComplete;
+      const labels = shadowQueryAll<HTMLElement>(el, '[part~="field-label"]');
+      const match = Array.from(labels).find((l) => l.textContent?.trim() === 'Chart number');
+      expect(match).toBeTruthy();
+    });
+
+    it('updates labelDob reactively in shadow DOM', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      el.labelDob = 'Birthday';
+      await el.updateComplete;
+      const labels = shadowQueryAll<HTMLElement>(el, '[part~="field-label"]');
+      const match = Array.from(labels).find((l) => l.textContent?.trim() === 'Birthday');
+      expect(match).toBeTruthy();
+    });
+
+    it('updates labelAllergies reactively in shadow DOM', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      el.labelAllergies = 'Drug sensitivities';
+      await el.updateComplete;
+      const labels = shadowQueryAll<HTMLElement>(el, '[part~="field-label"]');
+      const match = Array.from(labels).find(
+        (l) => l.textContent?.trim() === 'Drug sensitivities',
+      );
+      expect(match).toBeTruthy();
+    });
+
+    it('updates labelCodeStatus reactively in shadow DOM', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      el.labelCodeStatus = 'Resuscitation order';
+      await el.updateComplete;
+      const labels = shadowQueryAll<HTMLElement>(el, '[part~="field-label"]');
+      const match = Array.from(labels).find(
+        (l) => l.textContent?.trim() === 'Resuscitation order',
+      );
+      expect(match).toBeTruthy();
+    });
+  });
+
+  // ─── Programmatic enforceIdentifierRule toggling ───
+
+  describe('Programmatic enforceIdentifierRule toggling', () => {
+    it('fires hx-identifier-rule-violation when enforceIdentifierRule is toggled on at runtime', async () => {
+      // Start with rule disabled and only 1 identifier
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner enforce-identifier-rule="false"><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+
+      // Now enable enforcement — should trigger violation because only 1 identifier is present
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-identifier-rule-violation');
+      el.enforceIdentifierRule = true;
+      await el.updateComplete;
+      const event = await eventPromise;
+      expect(event.detail.populatedIdentifiers).toBe(1);
+    });
+
+    it('removes aria-invalid when enforceIdentifierRule is toggled off', async () => {
+      // Start in violation state
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(el.getAttribute('aria-invalid')).toBe('true');
+
+      // Disable the rule
+      el.enforceIdentifierRule = false;
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('removes violation-message from shadow DOM when enforceIdentifierRule is toggled off', async () => {
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(shadowQuery(el, '[part~="violation-message"]')).toBeTruthy();
+
+      el.enforceIdentifierRule = false;
+      // _checkIdentifierRule mutates @state() which schedules a second render cycle;
+      // wait through both cycles so the template re-renders without the violation block.
+      await el.updateComplete;
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part~="violation-message"]')).toBeNull();
+    });
+
+    it('enforce-identifier-rule reflects to attribute', async () => {
+      const el = await fixture<HelixPatientBanner>('<hx-patient-banner></hx-patient-banner>');
+      // Default is true — should reflect as "true"
+      expect(el.getAttribute('enforce-identifier-rule')).toBe('true');
+    });
+  });
+
+  // ─── Dynamic slot population ───
+
+  describe('Dynamic slot population', () => {
+    it('clears aria-invalid when a second identifier slot is added dynamically', async () => {
+      // Start with one identifier (in violation)
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(el.getAttribute('aria-invalid')).toBe('true');
+
+      // Dynamically add a second identifier
+      const mrnSpan = document.createElement('span');
+      mrnSpan.setAttribute('slot', 'mrn');
+      mrnSpan.textContent = 'MRN-007';
+      el.appendChild(mrnSpan);
+
+      // slotchange fires synchronously; wait for microtasks and Lit update
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(el.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('sets aria-invalid when an identifier slot element is removed dynamically', async () => {
+      // Start satisfied
+      const el = await fixture<HelixPatientBanner>(
+        '<hx-patient-banner><span slot="name">Jane Doe</span><span slot="mrn">MRN-001</span></hx-patient-banner>',
+      );
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(el.hasAttribute('aria-invalid')).toBe(false);
+
+      // Remove one identifier
+      const mrnSpan = el.querySelector('[slot="mrn"]') as HTMLElement;
+      mrnSpan.remove();
+
+      await el.updateComplete;
+      await Promise.resolve();
+      expect(el.getAttribute('aria-invalid')).toBe('true');
+    });
   });
 });

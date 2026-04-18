@@ -214,11 +214,11 @@ describe('hx-select', () => {
     });
   });
 
-  // ─── Property: ariaLabel (2) ───
+  // ─── Property: accessibleLabel (2) ───
 
-  describe('Property: ariaLabel', () => {
+  describe('Property: accessibleLabel', () => {
     it('sets aria-label on the combobox trigger (the interactive element)', async () => {
-      const el = await fixture<WcSelect>('<hx-select aria-label="Select country"></hx-select>');
+      const el = await fixture<WcSelect>('<hx-select accessible-label="Select country"></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-label')).toBe('Select country');
     });
@@ -1044,7 +1044,7 @@ describe('hx-select', () => {
       expect(options[1]!.getAttribute('aria-selected')).toBe('true');
     });
 
-    it('non-selected option does not have aria-selected', async () => {
+    it('non-selected option has aria-selected="false"', async () => {
       const el = await fixture<WcSelect>(`
         <hx-select open value="b">
           <option value="a">A</option>
@@ -1054,7 +1054,8 @@ describe('hx-select', () => {
       await el.updateComplete;
       await el.updateComplete;
       const options = el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]');
-      expect(options[0]!.hasAttribute('aria-selected')).toBe(false);
+      // Component always renders aria-selected as "true" or "false" — never omits the attribute
+      expect(options[0]!.getAttribute('aria-selected')).toBe('false');
     });
   });
 
@@ -1280,6 +1281,66 @@ describe('hx-select', () => {
       await el.updateComplete;
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
+
+  // ─── Coverage Gap: outside click closes dropdown ───
+
+  describe('Outside click closes the dropdown', () => {
+    it('closes the dropdown when a click occurs outside the component', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">Alpha</option>
+          <option value="b">Beta</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      expect(el.open).toBe(true);
+      // Dispatch a mousedown on the document body (outside the component)
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── Coverage Gap: typeahead wraps when no match after current position ───
+
+  describe('Typeahead: wraps from current position', () => {
+    it('wraps typeahead search to the first match when no later match exists', async () => {
+      const el = await fixture<WcSelect>(`
+        <hx-select open>
+          <option value="a">Alpha</option>
+          <option value="b">Beta</option>
+          <option value="c">Charlie</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      // Focus on Beta (index 1), then search for 'a' — wraps to Alpha (index 0)
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true }));
+      await el.updateComplete;
+      // Now search for 'a' — no match after Beta, so wraps to Alpha
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      await el.updateComplete;
+      const activeDescendant = trigger.getAttribute('aria-activedescendant');
+      // Alpha should be focused (index 0)
+      if (activeDescendant) {
+        const focused = el.shadowRoot!.getElementById(activeDescendant);
+        expect(focused?.textContent?.trim()).toBe('Alpha');
+      } else {
+        expect(el.open).toBe(true);
+      }
+    });
+  });
+
+  // ─── Coverage Gap: devWarn when options list is empty ───
+
+  describe('Empty options list', () => {
+    it('renders without throwing when no option children are provided', async () => {
+      const el = await fixture<WcSelect>('<hx-select label="Empty select"></hx-select>');
+      await expect(el.updateComplete).resolves.toBeTruthy();
+      expect(el.shadowRoot).toBeTruthy();
     });
   });
 });

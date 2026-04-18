@@ -42,6 +42,6 @@ export interface HxCheckboxProps {
   validity?: ValidityState;
 
   // Event callbacks
-  /** Dispatched when the checkbox is toggled. */
+  /** Dispatched when the checkbox is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`. */
   onHxChange?: (event: Event) => void;
 }

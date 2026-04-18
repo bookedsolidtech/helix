@@ -835,6 +835,109 @@ describe('hx-radio-group', () => {
     });
   });
 
+  // ─── Keyboard: disabled radios are skipped by ArrowDown ───
+
+  describe('Keyboard: disabled radio skipping', () => {
+    it('ArrowDown skips disabled radios to find next enabled radio', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" value="a">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B" disabled></hx-radio>
+          <hx-radio value="c" label="C"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioA = el.querySelector('hx-radio[value="a"]') as WcRadio;
+      radioA.focus();
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      radioA.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      const event = await eventPromise;
+      // Should skip the disabled "b" and select "c"
+      expect(event.detail.value).toBe('c');
+    });
+  });
+
+  // ─── hx-radio value property (2) ───
+
+  describe('hx-radio: value property', () => {
+    it('hx-radio value is reflected as attribute', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="alpha" label="Alpha"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radio = el.querySelector('hx-radio') as WcRadio;
+      expect(radio.getAttribute('value')).toBe('alpha');
+    });
+
+    it('hx-radio disabled attribute reflects to host', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A" disabled></hx-radio>
+        </hx-radio-group>
+      `);
+      const radio = el.querySelector('hx-radio') as WcRadio;
+      expect(radio.hasAttribute('disabled')).toBe(true);
+    });
+  });
+
+  // ─── hx-change: detail.value when changing selection (2) ───
+
+  describe('hx-change: full detail shape', () => {
+    it('hx-change detail.value matches the newly selected radio value', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" value="a">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+          <hx-radio value="c" label="C"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioC = el.querySelector('hx-radio[value="c"]') as WcRadio;
+      const label = shadowQuery(radioC, '.radio') as HTMLDivElement;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      label.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('c');
+    });
+
+    it('selecting a radio updates value property on the group', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+        </hx-radio-group>
+      `);
+      const radioB = el.querySelector('hx-radio[value="b"]') as WcRadio;
+      const label = shadowQuery(radioB, '.radio') as HTMLDivElement;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      label.click();
+      await eventPromise;
+      await el.updateComplete;
+      expect(el.value).toBe('b');
+    });
+  });
+
+  // ─── reportValidity (2) ───
+
+  describe('reportValidity', () => {
+    it('reportValidity returns false when required and no selection', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" required>
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      expect(el.reportValidity()).toBe(false);
+    });
+
+    it('reportValidity returns true when required and selection is made', async () => {
+      const el = await fixture<WcRadioGroup>(`
+        <hx-radio-group label="Test" required value="a">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      expect(el.reportValidity()).toBe(true);
+    });
+  });
+
   // ─── Slot projection ───
 
   describe('Slot projection', () => {

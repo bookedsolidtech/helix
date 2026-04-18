@@ -62,18 +62,23 @@ The component supports whole and half-star precision, keyboard navigation, hover
 ### In a Form
 
 <ComponentDemo title="Form Participation">
-  <form id="rating-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 320px;">
+  <form
+    id="rating-form"
+    style="display: flex; flex-direction: column; gap: 1rem; max-width: 320px;"
+  >
     <label style="font-weight: 600;">How would you rate your visit?</label>
     <hx-rating name="visit_rating" value="0" max="5" label="Visit rating"></hx-rating>
-    <button type="submit" style="width: fit-content; padding: 0.5rem 1rem;">Submit</button>
+    <button type="submit" style="width: fit-content; padding: 0.5rem 1rem;">
+      Submit
+    </button>
   </form>
-  <script>
+  <script>{`
     document.getElementById('rating-form')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = new FormData(e.target);
       console.log('visit_rating:', data.get('visit_rating'));
     });
-  </script>
+  `}</script>
 </ComponentDemo>
 
 ## Installation

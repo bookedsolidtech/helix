@@ -226,6 +226,72 @@ describe('hx-field-label', () => {
     });
   });
 
+  // ─── Combined required + optional (edge case) ───
+
+  describe('Combined required + optional (edge case)', () => {
+    it('renders both required and optional indicators when both are true', async () => {
+      const el = await fixture<HelixFieldLabel>(
+        '<hx-field-label required optional>Label</hx-field-label>',
+      );
+      await el.updateComplete;
+      const required = shadowQuery(el, '[part="required-indicator"]');
+      const optional = shadowQuery(el, '[part="optional-indicator"]');
+      expect(required).toBeTruthy();
+      expect(optional).toBeTruthy();
+    });
+
+    it('both indicators are absent when both properties are false', async () => {
+      const el = await fixture<HelixFieldLabel>('<hx-field-label>Label</hx-field-label>');
+      expect(shadowQuery(el, '[part="required-indicator"]')).toBeNull();
+      expect(shadowQuery(el, '[part="optional-indicator"]')).toBeNull();
+    });
+  });
+
+  // ─── Slot: default slot content ───
+
+  describe('Slot: default slot rich content', () => {
+    it('renders HTML content in the default slot', async () => {
+      const el = await fixture<HelixFieldLabel>(
+        '<hx-field-label><strong>Patient</strong> Name</hx-field-label>',
+      );
+      const strong = el.querySelector('strong');
+      expect(strong).toBeTruthy();
+      expect(strong?.textContent).toBe('Patient');
+    });
+  });
+
+  // ─── for attribute: label element ───
+
+  describe('for attribute: label element helpers', () => {
+    it('label element has class "label"', async () => {
+      const el = await fixture<HelixFieldLabel>(
+        '<hx-field-label for="some-input">Label</hx-field-label>',
+      );
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('label')).toBe(true);
+    });
+
+    it('span base has class "label" when for is not set', async () => {
+      const el = await fixture<HelixFieldLabel>('<hx-field-label>Label</hx-field-label>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('label')).toBe(true);
+    });
+  });
+
+  // ─── required-indicator default slot fallback ───
+
+  describe('required-indicator default slot fallback', () => {
+    it('shows * as default fallback when no required-indicator slot content is given', async () => {
+      const el = await fixture<HelixFieldLabel>('<hx-field-label required>Label</hx-field-label>');
+      const indicator = shadowQuery(el, '[part="required-indicator"]');
+      const ariaHiddenSpan = indicator?.querySelector('[aria-hidden="true"]');
+      expect(ariaHiddenSpan).toBeTruthy();
+      // the slot fallback renders * inside the aria-hidden span via a named slot
+      const slot = ariaHiddenSpan?.querySelector('slot[name="required-indicator"]') as HTMLSlotElement | null;
+      expect(slot).toBeTruthy();
+    });
+  });
+
   // ─── Accessibility (axe-core) (4) ───
 
   describe('Accessibility (axe-core)', () => {

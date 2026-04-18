@@ -1,6 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
 /**
@@ -34,7 +35,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-neutral-400)] - Toggle button icon color.
  */
 @customElement('hx-side-nav')
-export class HelixSideNav extends LitElement {
+export class HelixSideNav extends HelixElement {
   static override styles = [helixSideNavStyles];
 
   // ─── Properties ───

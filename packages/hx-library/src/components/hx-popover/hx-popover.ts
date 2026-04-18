@@ -1,7 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 
 const _nextPopoverId = createIdCounter('hx-popover');
@@ -47,7 +47,7 @@ const _nextPopoverId = createIdCounter('hx-popover');
  */
 
 @customElement('hx-popover')
-export class HelixPopover extends LitElement {
+export class HelixPopover extends HelixElement {
   static override styles = [helixPopoverStyles];
 
   /**

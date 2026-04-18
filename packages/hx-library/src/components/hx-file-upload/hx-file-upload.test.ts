@@ -807,4 +807,160 @@ describe('hx-file-upload', () => {
       expect(el.labelFileList).toBe('Fichiers sélectionnés');
     });
   });
+
+  // ─── Drag-over / drag-leave visual state ───
+
+  describe('Drag-over / drag-leave visual state', () => {
+    it('adds drag-over class to dropzone on dragover event', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+
+      dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+      await el.updateComplete;
+
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(true);
+    });
+
+    it('removes drag-over class from dropzone on dragleave event', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+
+      dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(true);
+
+      dropzone.dispatchEvent(new DragEvent('dragleave', { bubbles: true }));
+      await el.updateComplete;
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(false);
+    });
+
+    it('does not add drag-over class when disabled', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload disabled></hx-file-upload>');
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+
+      dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+      await el.updateComplete;
+
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(false);
+    });
+
+    it('removes drag-over class on drop event', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload multiple></hx-file-upload>');
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+
+      dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(true);
+
+      // Create a minimal drop event with empty DataTransfer
+      const dt = new DataTransfer();
+      const dropEvent = new DragEvent('drop', {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: dt,
+      });
+      dropzone.dispatchEvent(dropEvent);
+      await el.updateComplete;
+      expect(dropzone.classList.contains('dropzone--drag-over')).toBe(false);
+    });
+  });
+
+  // ─── Drop event file processing ───
+
+  describe('Drop event — file processing', () => {
+    it('drops a valid file and dispatches hx-upload', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload multiple></hx-file-upload>');
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+
+      const file = makeFile('dropped.pdf', 1024, 'application/pdf');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+
+      const eventPromise = oneEvent<CustomEvent<{ files: File[] }>>(el, 'hx-upload');
+      dropzone.dispatchEvent(
+        new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+      const event = await eventPromise;
+      expect(event.detail.files[0]?.name).toBe('dropped.pdf');
+    });
+
+    it('drop when disabled does not process files', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload disabled></hx-file-upload>');
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+
+      const file = makeFile('blocked.pdf', 512, 'application/pdf');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+
+      dropzone.dispatchEvent(
+        new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }),
+      );
+      await el.updateComplete;
+      expect(el.files).toHaveLength(0);
+    });
+  });
+
+  // ─── MIME type validation edge cases ───
+
+  describe('MIME type validation edge cases', () => {
+    it('accepts exact MIME type match', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accept="application/pdf"></hx-file-upload>',
+      );
+      simulateFileInput(el, [makeFile('doc.pdf', 512, 'application/pdf')]);
+      await el.updateComplete;
+      expect(el.files).toHaveLength(1);
+    });
+
+    it('rejects file with non-matching MIME type', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accept="image/png"></hx-file-upload>',
+      );
+      const errorPromise = oneEvent<CustomEvent<{ message: string; files: File[] }>>(
+        el,
+        'hx-error',
+      );
+      simulateFileInput(el, [makeFile('document.pdf', 512, 'application/pdf')]);
+      const event = await errorPromise;
+      expect(event.detail.files).toHaveLength(1);
+    });
+
+    it('hx-error is not dispatched when file passes all validation', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload accept="image/*"></hx-file-upload>');
+      let errorFired = false;
+      el.addEventListener('hx-error', () => {
+        errorFired = true;
+      });
+      simulateFileInput(el, [makeFile('ok.png', 512, 'image/png')]);
+      await el.updateComplete;
+      expect(errorFired).toBe(false);
+      expect(el.files).toHaveLength(1);
+    });
+  });
+
+  // ─── Size limit validation edge cases ───
+
+  describe('Size limit validation edge cases', () => {
+    it('accepts file exactly at the size limit', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload max-size="1024"></hx-file-upload>',
+      );
+      simulateFileInput(el, [makeFile('exact.pdf', 1024, 'application/pdf')]);
+      await el.updateComplete;
+      expect(el.files).toHaveLength(1);
+    });
+
+    it('rejects file one byte over the size limit', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload max-size="1024"></hx-file-upload>',
+      );
+      const errorPromise = oneEvent<CustomEvent<{ message: string; files: File[] }>>(
+        el,
+        'hx-error',
+      );
+      simulateFileInput(el, [makeFile('over.pdf', 1025, 'application/pdf')]);
+      const event = await errorPromise;
+      expect(event.detail.files).toHaveLength(1);
+    });
+  });
 });

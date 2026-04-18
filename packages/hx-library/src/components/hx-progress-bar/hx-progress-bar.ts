@@ -1,9 +1,9 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -36,7 +36,7 @@ const _nextProgressBarId = createIdCounter('hx-progress-bar');
  * @fires {CustomEvent} hx-complete - Emitted when progress reaches 100%.
  */
 @customElement('hx-progress-bar')
-export class HelixProgressBar extends LitElement {
+export class HelixProgressBar extends HelixElement {
   static override styles = [helixProgressBarStyles];
 
   /**

@@ -1,6 +1,7 @@
-import { LitElement, html, svg, TemplateResult, type PropertyValues } from 'lit';
+import { html, svg, TemplateResult, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -24,7 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-progress-ring-label-color=var(--hx-color-neutral-900)] - Center label text color.
  */
 @customElement('hx-progress-ring')
-export class HelixProgressRing extends LitElement {
+export class HelixProgressRing extends HelixElement {
   static override styles = [helixProgressRingStyles];
 
   // ─── Public Properties ───

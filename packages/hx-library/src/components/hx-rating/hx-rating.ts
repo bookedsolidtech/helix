@@ -14,6 +14,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRatingStyles } from './hx-rating.styles.js';
 
 // ─── Event Detail Interfaces ───
@@ -76,7 +77,7 @@ export interface HxRatingHoverDetail {
  * ```
  */
 @customElement('hx-rating')
-export class HelixRating extends HelixElement {
+export class HelixRating extends FormMixin(HelixElement) {
   static override styles = [helixRatingStyles];
 
   // ─── Form Association ───
@@ -172,17 +173,16 @@ export class HelixRating extends HelixElement {
   }
 
   override updated(changedProps: PropertyValues<this>): void {
+    super.updated(changedProps);
     if (changedProps.has('value') || changedProps.has('name')) {
       this._internals.setFormValue(String(this.value));
-    }
-    if (changedProps.has('value') || changedProps.has('required')) {
-      this._updateValidity();
     }
   }
 
   protected override _onFormReset(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(String(this._defaultValue));
+    this._resetInteractionState();
   }
 
   protected override _onFormStateRestore(
@@ -202,28 +202,8 @@ export class HelixRating extends HelixElement {
     this.disabled = disabled;
   }
 
-  /** Returns the ValidityState object. */
-  override get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Returns the current validation message. */
-  override get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Checks whether the rating satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && this.value === 0) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -290,6 +270,7 @@ export class HelixRating extends HelixElement {
     const next = this._clampAndSnap(v);
     this.value = next;
     this._internals.setFormValue(String(next));
+    this._handleInteractionInput();
     this.dispatchEvent(
       new CustomEvent<HxRatingChangeDetail>('hx-change', {
         bubbles: true,

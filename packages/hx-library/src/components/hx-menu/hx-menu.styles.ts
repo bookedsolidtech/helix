@@ -15,8 +15,7 @@ export const helixMenuStyles = css`
     border-radius: var(--hx-menu-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-menu-shadow,
-      0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1)
+      var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1))
     );
     min-width: var(--hx-menu-min-width, 10rem);
     max-height: var(--hx-menu-max-height, 20rem);

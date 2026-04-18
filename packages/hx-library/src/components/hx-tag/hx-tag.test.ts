@@ -413,4 +413,108 @@ describe('hx-tag', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Semantic variant labels (WCAG 1.4.1) ───
+
+  describe('Semantic variant labels', () => {
+    it('renders a visible variant label for success variant', async () => {
+      const el = await fixture<HxTag>('<hx-tag variant="success">Active</hx-tag>');
+      await el.updateComplete;
+      const label = shadowQuery(el, '.tag__variant-label');
+      expect(label).toBeTruthy();
+      expect(label?.textContent).toContain('Success');
+    });
+
+    it('renders a visible variant label for warning variant', async () => {
+      const el = await fixture<HxTag>('<hx-tag variant="warning">Caution</hx-tag>');
+      await el.updateComplete;
+      const label = shadowQuery(el, '.tag__variant-label');
+      expect(label).toBeTruthy();
+      expect(label?.textContent).toContain('Warning');
+    });
+
+    it('renders a visible variant label for danger variant', async () => {
+      const el = await fixture<HxTag>('<hx-tag variant="danger">Critical</hx-tag>');
+      await el.updateComplete;
+      const label = shadowQuery(el, '.tag__variant-label');
+      expect(label).toBeTruthy();
+      expect(label?.textContent).toContain('Danger');
+    });
+
+    it('does not render a variant label for default variant', async () => {
+      const el = await fixture<HxTag>('<hx-tag variant="default">Tag</hx-tag>');
+      await el.updateComplete;
+      const label = shadowQuery(el, '.tag__variant-label');
+      expect(label).toBeNull();
+    });
+
+    it('does not render a variant label for primary variant', async () => {
+      const el = await fixture<HxTag>('<hx-tag variant="primary">Tag</hx-tag>');
+      await el.updateComplete;
+      const label = shadowQuery(el, '.tag__variant-label');
+      expect(label).toBeNull();
+    });
+  });
+
+  // ─── remove button aria-label fallback ───
+
+  describe('Remove button aria-label fallback', () => {
+    it('remove button aria-label falls back to "Remove tag" when slot is empty', async () => {
+      const el = await fixture<HxTag>('<hx-tag removable></hx-tag>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Remove tag');
+    });
+
+    it('remove button aria-label uses only text node content, not element nodes', async () => {
+      const el = await fixture<HxTag>(
+        '<hx-tag removable><span>text via element</span></hx-tag>',
+      );
+      await el.updateComplete;
+      // The span is an element node, not a text node — _defaultSlotText should be empty
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Remove tag');
+    });
+  });
+
+  // ─── hx-remove event suppression on disabled ───
+
+  describe('hx-remove suppression on programmatic _handleRemove', () => {
+    it('_handleRemove guard prevents hx-remove when disabled via property', async () => {
+      const el = await fixture<HxTag>('<hx-tag removable>Tag</hx-tag>');
+      el.disabled = true;
+      await el.updateComplete;
+      let fired = false;
+      el.addEventListener('hx-remove', () => {
+        fired = true;
+      });
+      // Native button is disabled so click is absorbed; also test guard directly
+      const btn = shadowQuery(el, '[part="remove-button"]') as HTMLButtonElement;
+      btn.click();
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── Property: disabled reflects ───
+
+  describe('Property: disabled — reflects', () => {
+    it('reflects disabled attribute when set via property', async () => {
+      const el = await fixture<HxTag>('<hx-tag>Tag</hx-tag>');
+      el.disabled = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('disabled')).toBe(true);
+    });
+  });
+
+  // ─── Slot text extraction with multiple text nodes ───
+
+  describe('Slot: default slot text extraction', () => {
+    it('_defaultSlotText joins multiple text nodes', async () => {
+      const el = await fixture<HxTag>('<hx-tag removable>Hello World</hx-tag>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Remove Hello World');
+    });
+  });
 });

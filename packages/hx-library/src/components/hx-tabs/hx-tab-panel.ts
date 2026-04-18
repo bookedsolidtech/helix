@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTabPanelStyles } from './hx-tab-panel.styles.js';
 
 /**
@@ -19,7 +20,7 @@ import { helixTabPanelStyles } from './hx-tab-panel.styles.js';
  * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #2563eb)] - Focus ring color.
  */
 @customElement('hx-tab-panel')
-export class HelixTabPanel extends LitElement {
+export class HelixTabPanel extends HelixElement {
   static override styles = [helixTabPanelStyles];
 
   // ─── Properties ───

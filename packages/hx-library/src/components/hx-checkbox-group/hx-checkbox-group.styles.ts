@@ -23,7 +23,7 @@ export const helixCheckboxGroupStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-2);
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-checkbox-group-font-family, var(--hx-font-family-sans));
   }
 
   /* ─── Legend ─── */
@@ -41,7 +41,7 @@ export const helixCheckboxGroupStyles = css`
   }
 
   .fieldset__required-marker {
-    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-text, #b91c1c));
     font-weight: var(--hx-font-weight-bold);
   }
 
@@ -61,7 +61,7 @@ export const helixCheckboxGroupStyles = css`
   /* ─── Error State ─── */
 
   .fieldset--error .fieldset__legend {
-    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-text, #b91c1c));
   }
 
   /* ─── Help Text & Error Messages ─── */
@@ -74,7 +74,7 @@ export const helixCheckboxGroupStyles = css`
 
   .fieldset__error {
     font-size: var(--hx-font-size-xs);
-    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-500, #dc3545));
+    color: var(--hx-checkbox-group-error-color, var(--hx-color-error-text, #b91c1c));
     line-height: var(--hx-line-height-normal);
   }
 

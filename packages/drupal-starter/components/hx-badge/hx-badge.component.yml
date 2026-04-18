@@ -10,13 +10,14 @@ props:
       type: string
       title: Variant
       description: 'Color variant conveying semantic meaning'
-      default: 'neutral'
+      default: 'primary'
       enum:
-        - neutral
         - primary
+        - secondary
         - success
         - warning
-        - danger
+        - error
+        - neutral
         - info
     hx_size:
       type: string

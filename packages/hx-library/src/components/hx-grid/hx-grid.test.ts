@@ -201,6 +201,115 @@ describe('hx-grid', () => {
     });
   });
 
+  // ─── Dynamic property updates ───
+
+  describe('Dynamic property updates', () => {
+    it('updates grid-template-columns when columns changes at runtime', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid columns="2"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.gridTemplateColumns).toContain('repeat(2, 1fr)');
+
+      el.columns = 4;
+      await el.updateComplete;
+      expect(base?.style.gridTemplateColumns).toContain('repeat(4, 1fr)');
+    });
+
+    it('updates gap when gap changes at runtime', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid gap="none"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      const gapBefore = base?.style.rowGap;
+      expect(gapBefore).toContain('0');
+
+      el.gap = 'lg';
+      await el.updateComplete;
+      expect(base?.style.rowGap).not.toContain(gapBefore);
+    });
+
+    it('updates align-items when align changes at runtime', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid align="stretch"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.alignItems).toBe('stretch');
+
+      el.align = 'center';
+      await el.updateComplete;
+      expect(base?.style.alignItems).toBe('center');
+    });
+
+    it('updates justify-items when justify changes at runtime', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid justify="stretch"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.justifyItems).toBe('stretch');
+
+      el.justify = 'end';
+      await el.updateComplete;
+      expect(base?.style.justifyItems).toBe('end');
+    });
+  });
+
+  // ─── _resolveGap fallback / all gap values ───
+
+  describe('_resolveGap: all gap token values produce non-empty strings', () => {
+    it('gap="xs" produces a non-empty row-gap style', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid gap="xs"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.rowGap).toBeTruthy();
+    });
+
+    it('gap="sm" produces a non-empty row-gap style', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid gap="sm"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.rowGap).toBeTruthy();
+    });
+
+    it('gap="xl" produces a non-empty row-gap style', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid gap="xl"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.rowGap).toBeTruthy();
+    });
+  });
+
+  // ─── column-gap and row-gap override gap ───
+
+  describe('rowGap and columnGap override base gap', () => {
+    it('row-gap=none overrides gap=lg for row spacing', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid gap="lg" row-gap="none"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.rowGap).toContain('0');
+    });
+
+    it('column-gap=none overrides gap=lg for column spacing', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid gap="lg" column-gap="none"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.columnGap).toContain('0');
+    });
+  });
+
+  // ─── align values ───
+
+  describe('Property: align — all values', () => {
+    it('applies align-items: center', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid align="center"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.alignItems).toBe('center');
+    });
+
+    it('applies align-items: end', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid align="end"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.alignItems).toBe('end');
+    });
+  });
+
+  // ─── justify values ───
+
+  describe('Property: justify — all values', () => {
+    it('applies justify-items: start', async () => {
+      const el = await fixture<HelixGrid>('<hx-grid justify="start"></hx-grid>');
+      const base = shadowQuery<HTMLElement>(el, '[part="base"]');
+      expect(base?.style.justifyItems).toBe('start');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {
@@ -335,6 +444,24 @@ describe('hx-grid-item', () => {
       el.row = undefined;
       await el.updateComplete;
       expect(el.style.gridRow).toBe('');
+    });
+  });
+
+  describe('Default state: no column, row, or span', () => {
+    it('has empty grid-column and grid-row style by default', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item></hx-grid-item>');
+      expect(el.style.gridColumn).toBe('');
+      expect(el.style.gridRow).toBe('');
+    });
+  });
+
+  describe('Clearing column attribute', () => {
+    it('clears grid-column when column is set to undefined', async () => {
+      const el = await fixture<HelixGridItem>('<hx-grid-item column="1 / 3"></hx-grid-item>');
+      expect(el.style.gridColumn).toBe('1 / 3');
+      el.column = undefined;
+      await el.updateComplete;
+      expect(el.style.gridColumn).toBe('');
     });
   });
 

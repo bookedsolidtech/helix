@@ -1,6 +1,7 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
 
 /**
@@ -29,7 +30,7 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
  * @cssprop [--hx-breadcrumb-link-focus-ring-color=var(--hx-focus-ring-color, var(--hx-color-primary-500))] - Focus ring color for breadcrumb links.
  */
 @customElement('hx-breadcrumb-item')
-export class HelixBreadcrumbItem extends LitElement {
+export class HelixBreadcrumbItem extends HelixElement {
   static override styles = [helixBreadcrumbItemStyles];
 
   override connectedCallback(): void {

@@ -1,8 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixFieldStyles } from './hx-field.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -43,7 +43,7 @@ function isFormControl(el: Element): el is HTMLElement {
  * @csspart label - The label element.
  * @csspart control - The wrapper around slotted content.
  * @csspart help-text - The help text container.
- * @csspart error-message - The error message container.
+ * @csspart error - The error message container.
  * @csspart required-indicator - The required asterisk span.
  *
  * @cssprop [--hx-field-label-color=var(--hx-color-neutral-700)] - Label color.
@@ -53,7 +53,7 @@ function isFormControl(el: Element): el is HTMLElement {
  * @cssprop [--hx-field-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-field')
-export class HelixField extends LitElement {
+export class HelixField extends HelixElement {
   static override styles = [helixFieldStyles];
 
   // ─── Properties ───
@@ -390,7 +390,7 @@ export class HelixField extends LitElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div part="error-message" class="field__error" id=${this._errorId} role="alert">
+                <div part="error" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `

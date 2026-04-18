@@ -22,8 +22,8 @@ export {
   type HxClinicalStatusProps,
 } from './components/HxClinicalStatus/index.js';
 export { HxCodeSnippet, type HxCodeSnippetProps } from './components/HxCodeSnippet/index.js';
-export { HxColorPicker, type HxColorPickerProps } from './components/HxColorPicker/index.js';
 export { HxCombobox, type HxComboboxProps } from './components/HxCombobox/index.js';
+export { HxColorPicker, type HxColorPickerProps } from './components/HxColorPicker/index.js';
 export { HxContainer, type HxContainerProps } from './components/HxContainer/index.js';
 export { HxCopyButton, type HxCopyButtonProps } from './components/HxCopyButton/index.js';
 export { HxCounter, type HxCounterProps } from './components/HxCounter/index.js';
@@ -35,15 +35,15 @@ export { HxDrawer, type HxDrawerProps } from './components/HxDrawer/index.js';
 export { HxDropdown, type HxDropdownProps } from './components/HxDropdown/index.js';
 export { HxField, type HxFieldProps } from './components/HxField/index.js';
 export { HxFieldLabel, type HxFieldLabelProps } from './components/HxFieldLabel/index.js';
-export { HxFileUpload, type HxFileUploadProps } from './components/HxFileUpload/index.js';
 export { HxForm, type HxFormProps } from './components/HxForm/index.js';
+export { HxFileUpload, type HxFileUploadProps } from './components/HxFileUpload/index.js';
 export { HxFormatDate, type HxFormatDateProps } from './components/HxFormatDate/index.js';
 export { HxGrid, type HxGridProps } from './components/HxGrid/index.js';
 export { HxGridItem, type HxGridItemProps } from './components/HxGridItem/index.js';
 export { HxHelpText, type HxHelpTextProps } from './components/HxHelpText/index.js';
 export { HxIcon, type HxIconProps } from './components/HxIcon/index.js';
-export { HxImage, type HxImageProps } from './components/HxImage/index.js';
 export { HxIconButton, type HxIconButtonProps } from './components/HxIconButton/index.js';
+export { HxImage, type HxImageProps } from './components/HxImage/index.js';
 export { HxLink, type HxLinkProps } from './components/HxLink/index.js';
 export { HxListItem, type HxListItemProps } from './components/HxListItem/index.js';
 export { HxList, type HxListProps } from './components/HxList/index.js';

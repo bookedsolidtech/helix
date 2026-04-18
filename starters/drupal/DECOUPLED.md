@@ -28,7 +28,7 @@ to React components that emit `hx-*` element markup.
 ## Installing @helixui/library in Next.js
 
 ```bash
-npm install @helixui/library@1.1.2
+npm install @helixui/library@2.1.2
 ```
 
 Import the library once at the application entry point to register all
@@ -79,7 +79,7 @@ declare global {
         variant?: 'default' | 'featured' | 'compact';
         elevation?: 'flat' | 'raised' | 'floating';
         'hx-href'?: string;
-        'hx-aria-label'?: string;
+        'hx-label'?: string;
       };
       'hx-alert': React.DetailedHTMLProps<React.HTMLAttributes<HelixAlert>, HelixAlert> & {
         variant?: 'info' | 'success' | 'warning' | 'error';
@@ -120,7 +120,7 @@ declare global {
         heading?: string;
         open?: boolean;
         modal?: boolean;
-        'hide-close-button'?: boolean;
+        'close-on-backdrop'?: boolean;
       };
       'hx-tooltip': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         placement?: string;
@@ -224,7 +224,7 @@ export function PatientCard({ node, onClick }: PatientCardProps) {
       variant="default"
       elevation="raised"
       hx-href={href}
-      hx-aria-label={`View chart for ${node.title}`}
+      hx-label={`View chart for ${node.title}`}
       // CustomEvent listener via ref in production — simplified here
     >
       {node.field_image && (
@@ -306,7 +306,7 @@ export function InteractiveCard({ href, title, body }: { href: string; title: st
       variant="default"
       elevation="raised"
       hx-href={href}
-      hx-aria-label={`View: ${title}`}
+      hx-label={`View: ${title}`}
     >
       <h3 slot="heading">{title}</h3>
       <p>{body}</p>

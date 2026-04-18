@@ -17,4 +17,13 @@ export const helixCarouselItemStyles = css`
     outline: var(--hx-focus-ring-width) solid var(--hx-focus-ring-color);
     outline-offset: var(--hx-focus-ring-offset);
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    .slide-group:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
 `;

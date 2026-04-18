@@ -12,12 +12,12 @@ export const helixCardStyles = css`
     flex-direction: column;
     gap: var(--hx-card-gap, var(--hx-space-4, 1rem));
     background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-card-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-card-color, var(--hx-color-neutral-800, #1e293b));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #e2e8f0));
     border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
     overflow: hidden;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-card-font-family, var(--hx-font-family-sans, sans-serif));
     transition:
       box-shadow var(--hx-transition-normal, 250ms ease),
       transform var(--hx-transition-normal, 250ms ease);
@@ -78,7 +78,7 @@ export const helixCardStyles = css`
 
   .card--interactive:hover {
     box-shadow: var(--hx-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
-    transform: translateY(var(--hx-lift-md, -2px));
+    transform: translateY(var(--hx-transform-lift-md, -2px));
   }
 
   .card--interactive:focus-visible {
@@ -140,7 +140,7 @@ export const helixCardStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-card-color, var(--hx-color-neutral-600, #495057));
+    color: var(--hx-card-color, var(--hx-color-neutral-600, #475569));
   }
 
   .card__footer {
@@ -158,7 +158,7 @@ export const helixCardStyles = css`
     padding-bottom: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-inline-start: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-card-border-color, var(--hx-color-neutral-200, #dee2e6));
+      var(--hx-card-border-color, var(--hx-color-neutral-200, #e2e8f0));
     margin-top: auto;
   }
 

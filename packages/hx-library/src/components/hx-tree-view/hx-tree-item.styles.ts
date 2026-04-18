@@ -21,8 +21,9 @@ export const helixTreeItemStyles = css`
   .item-row {
     display: flex;
     align-items: center;
+    min-height: var(--hx-touch-target-min, 44px);
     gap: var(--hx-tree-item-gap, var(--hx-space-2, 0.5rem));
-    padding: var(--hx-tree-item-padding-y, var(--hx-space-1, 0.25rem))
+    padding: var(--hx-tree-item-padding-y, var(--hx-space-2, 0.5rem))
       var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem));
     padding-inline-start: calc(
       var(--hx-tree-item-padding-x, var(--hx-space-2, 0.5rem)) + var(--_indent-level, 0) *
@@ -31,7 +32,7 @@ export const helixTreeItemStyles = css`
     border-radius: var(--hx-tree-item-border-radius, var(--hx-border-radius-sm, 0.25rem));
     cursor: pointer;
     outline: none;
-    color: var(--hx-tree-item-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-tree-item-color, var(--hx-color-neutral-900, #0f172a));
     font-family: var(--hx-tree-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tree-item-font-size, var(--hx-font-size-sm, 0.875rem));
     line-height: var(--hx-line-height-normal, 1.5);
@@ -40,7 +41,7 @@ export const helixTreeItemStyles = css`
   }
 
   .item-row:hover {
-    background-color: var(--hx-tree-item-hover-bg, var(--hx-color-neutral-100, #f3f4f6));
+    background-color: var(--hx-tree-item-hover-bg, var(--hx-color-neutral-100, #f1f5f9));
   }
 
   .item-row:focus-visible {
@@ -53,7 +54,7 @@ export const helixTreeItemStyles = css`
 
   :host([selected]) .item-row {
     background-color: var(--hx-tree-item-selected-bg, var(--hx-color-primary-100, #dbeafe));
-    color: var(--hx-tree-item-selected-color, var(--hx-color-primary-800, #1e40af));
+    color: var(--hx-tree-item-selected-color, var(--hx-color-primary-800, #1e3a8a));
   }
 
   :host([selected]) .item-row:hover {
@@ -88,7 +89,7 @@ export const helixTreeItemStyles = css`
     padding: 0;
     border: none;
     background: transparent;
-    color: var(--hx-tree-item-expand-icon-color, var(--hx-color-neutral-500, #6b7280));
+    color: var(--hx-tree-item-expand-icon-color, var(--hx-color-neutral-500, #64748b));
     cursor: pointer;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     transition: transform var(--hx-transition-fast, 150ms ease);
@@ -135,7 +136,7 @@ export const helixTreeItemStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-tree-item-icon-color, var(--hx-color-neutral-500, #6b7280));
+    color: var(--hx-tree-item-icon-color, var(--hx-color-neutral-500, #64748b));
   }
 
   .item-icon:empty {
@@ -177,6 +178,16 @@ export const helixTreeItemStyles = css`
   /* ─── Forced Colors (Windows High Contrast) ─── */
 
   @media (forced-colors: active) {
+    .item-row:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    .expand-btn:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
+
     :host([selected]) .item-row {
       outline: 2px solid Highlight;
     }

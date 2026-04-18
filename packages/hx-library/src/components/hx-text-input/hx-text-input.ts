@@ -13,6 +13,11 @@ import { devWarn } from '../../utils/dev-warn.js';
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
 const _nextTextInputId = createIdCounter('hx-text-input');
 
+/** Detail for hx-input and hx-change events dispatched by hx-text-input. */
+export interface HxTextInputDetail {
+  value: string;
+}
+
 /**
  * A text input component with label, validation, and form association.
  * Supports accessible labeling via `label` property, `aria-label` attribute, or the `label` slot.
@@ -128,10 +133,18 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
 
   /**
    * Accessible name for screen readers, if different from the visible label.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element. The value is forwarded to the
+   * internal native input's `aria-label`.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because form
+   * inputs with associated labels delegate accessible naming via `<label>`
+   * association and `aria-labelledby`, not host-level ARIA delegation. The
+   * `accessible-label` attribute is a fallback for label-free usage.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
 
   /**
    * Whether the input is read-only.
@@ -285,7 +298,7 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   }
 
   /** @internal */
-  protected _updateValidity(): void {
+  _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -453,7 +466,7 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
             maxlength=${ifDefined(this.maxlength)}
             pattern=${ifDefined(this.pattern || undefined)}
             autocomplete=${ifDefined(this.autocomplete || undefined)}
-            aria-label=${ifDefined(this.ariaLabel || undefined)}
+            aria-label=${ifDefined(this.accessibleLabel || undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
             )}
@@ -506,18 +519,23 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-text-input.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxTextInputEventMap {
+  'hx-input': CustomEvent<{ value: string }>;
+  'hx-change': CustomEvent<{ value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-text-input': HelixTextInput;
   }
   interface HTMLElementEventMap {
     'hx-input': CustomEvent<{ value: string }>;
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 
 /** Primary type alias for hx-text-input */
 export type HxTextInput = HelixTextInput;
-
-/** @deprecated Use HxTextInput instead */
-export type WcTextInput = HelixTextInput;

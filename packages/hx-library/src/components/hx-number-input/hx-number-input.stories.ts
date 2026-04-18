@@ -862,7 +862,7 @@ export const CSSParts: Story = {
         font-style: italic;
       }
 
-      .css-parts-demo hx-number-input::part(error-message) {
+      .css-parts-demo hx-number-input::part(error) {
         background: #fff5f5;
         padding: 0.5rem 0.75rem;
         border-radius: 0.25rem;
@@ -877,7 +877,7 @@ export const CSSParts: Story = {
     >
       <div>
         <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">
-          All parts styled: field, label, input-wrapper, input, stepper, help-text, error-message
+          All parts styled: field, label, input-wrapper, input, stepper, help-text, error
         </h4>
         <hx-number-input
           label="Styled via ::part()"
@@ -888,7 +888,7 @@ export const CSSParts: Story = {
 
       <div>
         <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">
-          Error state with ::part(error-message) styling
+          Error state with ::part(error) styling
         </h4>
         <hx-number-input
           label="With Error Part"
@@ -902,7 +902,7 @@ export const CSSParts: Story = {
     docs: {
       description: {
         story:
-          'Demonstrates styling all exposed CSS parts: field, label, input-wrapper, input, stepper, help-text, and error-message.',
+          'Demonstrates styling all exposed CSS parts: field, label, input-wrapper, input, stepper, help-text, and error.',
       },
     },
   },

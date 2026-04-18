@@ -16,7 +16,7 @@
  * require no server-side rendering framework. All content is slot-projected
  * from Twig for progressive enhancement and SEO visibility.
  *
- * @see https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/
+ * @see https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/
  * @see https://www.drupal.org/docs/develop/theming-drupal/adding-stylesheets-css-and-javascript-js-to-a-drupal-theme
  */
 
@@ -140,14 +140,11 @@ function helix_module_theme(): array {
     ],
     'helix_radio' => [
       'variables' => [
-        'label'    => '',
-        'name'     => '',
-        'value'    => '',
-        'checked'  => FALSE,
-        'disabled' => FALSE,
-        'required' => FALSE,
-        'error'    => NULL,
-        'attributes'=> [],
+        'label'      => '',
+        'value'      => '',
+        'checked'    => FALSE,
+        'disabled'   => FALSE,
+        'attributes' => [],
       ],
       'template' => 'helix-radio',
     ],
@@ -166,16 +163,48 @@ function helix_module_theme(): array {
     ],
     'helix_modal' => [
       'variables' => [
-        'label'        => '',
-        'body_content' => '',
-        'open'         => FALSE,
-        'dismissible'  => TRUE,
-        'modal'        => TRUE,
-        'footer'       => NULL,
-        'dialog_id'    => NULL,
-        'attributes'   => [],
+        'label'             => '',
+        'body_content'      => '',
+        'open'              => FALSE,
+        'close_on_backdrop' => TRUE,
+        'modal'             => TRUE,
+        'footer'            => NULL,
+        'dialog_id'         => NULL,
+        'attributes'        => [],
       ],
       'template' => 'helix-modal',
+    ],
+    'helix_nav' => [
+      'variables' => [
+        'items'       => [],
+        'orientation' => 'horizontal',
+        'label'       => 'Main navigation',
+        'label_open'  => 'Open navigation menu',
+        'label_close' => 'Close navigation menu',
+        'attributes'  => [],
+      ],
+      'template' => 'helix-nav',
+    ],
+    'helix_side_nav' => [
+      'variables' => [
+        'items'      => [],
+        'collapsed'  => FALSE,
+        'label'      => 'Main Navigation',
+        'header'     => NULL,
+        'footer'     => NULL,
+        'attributes' => [],
+      ],
+      'template' => 'helix-side-nav',
+    ],
+    'helix_steps' => [
+      'variables' => [
+        'steps'       => [],
+        'orientation' => 'horizontal',
+        'size'        => 'md',
+        'aria_label'  => 'Progress steps',
+        'attributes'  => [],
+      ],
+      'template' => 'helix-steps',
     ],
   ];
 }
@@ -187,7 +216,7 @@ function helix_module_theme(): array {
  * @helixui/library ES module bundle and the Drupal.behaviors bridge script.
  *
  * To use the local npm build instead of CDN, replace 'helix_module/helix'
- * with 'helix_module/helix-local' and ensure dist/helix-library.js exists.
+ * with 'helix_module/helix-local' and ensure dist/index.js exists.
  */
 function helix_module_page_attachments(array &$attachments): void {
   $attachments['#attached']['library'][] = 'helix_module/helix';

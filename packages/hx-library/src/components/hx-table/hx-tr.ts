@@ -1,6 +1,7 @@
-import { LitElement, html, nothing, css } from 'lit';
+import { html, nothing, css } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 
 /**
  * Semantic table row. Must be a child of `hx-thead`, `hx-tbody`, or `hx-tfoot`.
@@ -15,7 +16,7 @@ import { customElement, property } from 'lit/decorators.js';
  * @csspart row - The `<tr>` element.
  */
 @customElement('hx-tr')
-export class HelixTableRow extends LitElement {
+export class HelixTableRow extends HelixElement {
   static override styles = [
     css`
       :host {

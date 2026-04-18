@@ -1,8 +1,9 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { helixBannerStyles } from './hx-banner.styles.js';
 
 /** Banner variant determines visual styling and ARIA semantics. */
@@ -44,7 +45,7 @@ export type BannerPosition = 'sticky' | 'fixed';
  * @cssprop [--hx-touch-target-size=44px] - Minimum touch target size for the close button.
  */
 @customElement('hx-banner')
-export class HelixBanner extends LitElement {
+export class HelixBanner extends HelixElement {
   static override styles = [helixBannerStyles];
 
   // ─── Properties ───

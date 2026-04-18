@@ -57,6 +57,30 @@ Use Twig variable interpolation to set attributes:
 </hx-button>
 ```
 
+### The `hx-size` Attribute Convention
+
+Several HELIX components use `hx-size` instead of the native `size` attribute for
+setting dimensions (e.g., `sm`, `md`, `lg`). This prefix prevents conflicts with the
+native HTML `size` attribute (which has numeric semantics on `<input>` and `<select>`)
+and avoids collisions with htmx's `hx-*` attribute namespace.
+
+**Components that use `hx-size`:** `hx-button`, `hx-icon-button`, `hx-spinner`,
+`hx-avatar`, `hx-badge`, and others.
+
+```twig
+{# Correct — use hx-size, not size #}
+<hx-button variant="primary" hx-size="lg">Submit</hx-button>
+
+{# Wrong — size is NOT the same as hx-size #}
+<hx-button variant="primary" size="lg">Submit</hx-button>
+```
+
+:::caution
+Using `size` instead of `hx-size` will silently fail — the component will render
+at its default size. Always check the component API reference for the correct
+attribute name.
+:::
+
 ### Boolean Attributes in Twig
 
 Follow HELIX's [boolean attribute semantics](/guides/boolean-attributes). Output the attribute name without a value when true; omit it entirely when false:

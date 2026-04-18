@@ -22,8 +22,14 @@ trigger are disabled when this is true. */
   /** Primary button label text. When set, overrides the default slot content. */
   label?: string | undefined;
   /** Accessible label for the primary action button. Required for icon-only usage
-or when the button label alone is insufficient context. */
-  ariaLabel?: string;
+or when the button label alone is insufficient context.
+Uses `accessible-label` attribute instead of `aria-label` to avoid
+ARIAMixin shadowing on the host element.
+
+Note: `mixinDelegatesAria` is not applied to this component because the
+`accessible-label` attribute approach avoids the ARIAMixin property conflict
+without requiring mixin overhead. */
+  accessibleLabel?: string;
   /** Accessible label for the dropdown trigger button. Override for localization. */
   labelTrigger?: string;
   /** Accessible label for the dropdown menu panel. Override for localization. */

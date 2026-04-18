@@ -1233,3 +1233,162 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
     expect(remaining.length).toBe(2);
   });
 });
+
+// ─────────────────────────────────────────────────
+// hx-tree-view — Deep nesting, hx-select event detail, lazy load pattern
+// ─────────────────────────────────────────────────
+
+describe('hx-tree-view — Deep nesting and expand/collapse', () => {
+  it('deeply nested item expand/collapse cycle works without error', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Deep tree" selection="single">
+        <hx-tree-item>
+          Level 1
+          <hx-tree-item slot="children">
+            Level 2
+            <hx-tree-item slot="children">Level 3 A</hx-tree-item>
+            <hx-tree-item slot="children">Level 3 B</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const l1 = el.querySelector<WcTreeItem>('hx-tree-view > hx-tree-item')!;
+    const l2 = l1.querySelector<WcTreeItem>('[slot="children"] > hx-tree-item, hx-tree-item')!;
+
+    // Expand level 1
+    l1.expanded = true;
+    await el.updateComplete;
+    expect(l1.expanded).toBe(true);
+
+    // Expand level 2
+    l2.expanded = true;
+    await el.updateComplete;
+    expect(l2.expanded).toBe(true);
+
+    // Collapse level 1 — subtree should close
+    l1.expanded = false;
+    await el.updateComplete;
+    expect(l1.expanded).toBe(false);
+  });
+
+  it('hx-select event detail contains item and selected=true on selection', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Select test" selection="single">
+        <hx-tree-item>Leaf A</hx-tree-item>
+        <hx-tree-item>Leaf B</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+    const eventPromise = oneEvent<CustomEvent<{ item: WcTreeItem; selected: boolean }>>(
+      el,
+      'hx-select',
+    );
+
+    item.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item },
+      }),
+    );
+
+    const event = await eventPromise;
+    expect(event.detail.item).toBe(item);
+    expect(event.detail.selected).toBe(true);
+  });
+
+  it('hx-select event detail has selected=false when deselecting in multiple mode', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Multi test" selection="multiple">
+        <hx-tree-item>Item X</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+
+    // First select
+    item.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item },
+      }),
+    );
+    await el.updateComplete;
+    expect(item.selected).toBe(true);
+
+    // Second dispatch = deselect
+    const deselectPromise = oneEvent<CustomEvent<{ item: WcTreeItem; selected: boolean }>>(
+      el,
+      'hx-select',
+    );
+    item.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item },
+      }),
+    );
+    const deselect = await deselectPromise;
+    expect(deselect.detail.selected).toBe(false);
+    expect(item.selected).toBe(false);
+  });
+
+  it('lazy load pattern: appending children to an expanded item reveals them', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Lazy" selection="single">
+        <hx-tree-item expanded>Parent</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const parent = el.querySelector<WcTreeItem>('hx-tree-item')!;
+    expect(parent.expanded).toBe(true);
+
+    // Lazy-append a child
+    const child = document.createElement('hx-tree-item') as WcTreeItem;
+    child.setAttribute('slot', 'children');
+    child.textContent = 'Lazy child';
+    parent.appendChild(child);
+
+    await el.updateComplete;
+    await child.updateComplete;
+
+    const children = parent.querySelectorAll('[slot="children"]');
+    expect(children.length).toBe(1);
+  });
+
+  it('querySelectorAll hx-tree-item[selected] returns all selected items in multiple mode', async () => {
+    const el = await fixture<WcTreeView>(
+      `<hx-tree-view label="Multi select" selection="multiple">
+        <hx-tree-item>Item 1</hx-tree-item>
+        <hx-tree-item>Item 2</hx-tree-item>
+        <hx-tree-item>Item 3</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const [i1, i2] = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+
+    [i1!, i2!].forEach((item) => {
+      item.dispatchEvent(
+        new CustomEvent('hx-tree-item-select', {
+          bubbles: true,
+          composed: true,
+          detail: { item },
+        }),
+      );
+    });
+    await el.updateComplete;
+
+    const selected = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item[selected]'));
+    expect(selected.length).toBe(2);
+    expect(selected).toContain(i1);
+    expect(selected).toContain(i2);
+  });
+});

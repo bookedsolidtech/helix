@@ -1,5 +1,14 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  oneEvent,
+  cleanup,
+  checkA11y,
+  formFixture,
+  getFormData,
+  resetForm,
+} from '../../test-utils.js';
 import type { HxTextInput } from './hx-text-input.js';
 import { HelixTextInput } from './hx-text-input.js';
 import './index.js';
@@ -247,7 +256,7 @@ describe('hx-text-input', () => {
   describe('Property: ariaLabel', () => {
     it('sets aria-label on native input', async () => {
       const el = await fixture<WcTextInput>(
-        '<hx-text-input aria-label="Search field"></hx-text-input>',
+        '<hx-text-input accessible-label="Search field"></hx-text-input>',
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('aria-label')).toBe('Search field');
@@ -1067,6 +1076,100 @@ describe('hx-text-input', () => {
       input.dispatchEvent(new Event('change', { bubbles: true }));
       await eventPromise;
       expect(el.value).toBe('sync-test');
+    });
+  });
+
+  // ─── Form Integration (ElementInternals lifecycle) ───
+
+  describe('Form Integration (ElementInternals lifecycle)', () => {
+    it('FormData contains the correct value on submit', async () => {
+      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'username',
+        value: 'jane',
+      });
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('username')).toBe('jane');
+    });
+
+    it('FormData value updates when value property changes before submit', async () => {
+      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'search',
+      });
+      el.value = 'new-value';
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('search')).toBe('new-value');
+    });
+
+    it('FormData reflects value typed via native input event', async () => {
+      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'query',
+      });
+      const nativeInput = shadowQuery<HTMLInputElement>(el, 'input')!;
+      nativeInput.value = 'typed';
+      nativeInput.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('query')).toBe('typed');
+    });
+
+    it('form.reset() clears value via formResetCallback', async () => {
+      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'email',
+        value: 'user@example.com',
+      });
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('FormData is empty string after form.reset()', async () => {
+      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'email',
+        value: 'user@example.com',
+      });
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('email')).toBe('');
+    });
+
+    it('required field with empty value fails validity check (valueMissing)', async () => {
+      const { el } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'required-field',
+        required: '',
+      });
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(false);
+      expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('required field with value passes validity check', async () => {
+      const { el } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'required-field',
+        required: '',
+        value: 'filled',
+      });
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('form.reset() restores pristine and dirty interaction state', async () => {
+      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+        name: 'field',
+      });
+      const nativeInput = shadowQuery<HTMLInputElement>(el, 'input')!;
+      nativeInput.value = 'dirty';
+      nativeInput.dispatchEvent(new Event('input', { bubbles: true }));
+      await el.updateComplete;
+      expect(el.dirty).toBe(true);
+      await resetForm(form);
+      await el.updateComplete;
+      expect(el.dirty).toBe(false);
+      expect(el.pristine).toBe(true);
     });
   });
 });

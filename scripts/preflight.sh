@@ -92,6 +92,25 @@ pnpm turbo run build --filter='!docs'
 echo "  ✓ Build passed"
 echo ""
 
+# ── Gate 4.5: CDN bundle + size budget (FS-019) ──────────────────────────────
+# Builds the CDN artifact pack and enforces per-artifact gz size ceilings
+# defined in .cdn-budget.json. The CDN payload is what Drupal/CDN consumers
+# actually download; this gate catches regressions before they ship.
+
+echo "▶ [4.5/9] CDN bundle + size budget"
+if [ "${SKIP_CDN_SIZE:-0}" = "1" ]; then
+  echo "  ⚠ SKIP_CDN_SIZE=1 — CDN size gate bypassed"
+else
+  pnpm --filter=@helixui/library run build:cdn > /tmp/helix-cdn-build.log 2>&1 || {
+    echo "  ✗ CDN build failed — see /tmp/helix-cdn-build.log"
+    tail -40 /tmp/helix-cdn-build.log
+    exit 1
+  }
+  node scripts/check-cdn-size.mjs
+  echo "  ✓ CDN size budget passed"
+fi
+echo ""
+
 # ── Gate 5: Smart tests + coverage ───────────────────────────────────────────
 
 echo "▶ [5/9] Smart tests + coverage"

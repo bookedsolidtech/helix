@@ -96,7 +96,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description: 'Accessible name for screen readers, if different from the visible label.',
       table: {

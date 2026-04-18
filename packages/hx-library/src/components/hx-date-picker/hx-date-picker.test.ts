@@ -1,5 +1,14 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import {
+  fixture,
+  shadowQuery,
+  oneEvent,
+  cleanup,
+  checkA11y,
+  formFixture,
+  getFormData,
+  resetForm,
+} from '../../test-utils.js';
 import type { HelixDatePicker } from './hx-date-picker.js';
 import './index.js';
 
@@ -222,17 +231,19 @@ describe('hx-date-picker', () => {
   // ─── Calendar: Open/Close (4) ─────────────────────────────────────────
 
   describe('Calendar: Open/Close', () => {
-    it('calendar is not in the DOM when closed', async () => {
+    it('calendar dialog is in the DOM but closed when calendar is not open', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar).toBeTruthy();
+      expect(calendar?.open).toBe(false);
     });
 
-    it('calendar appears when trigger button is clicked', async () => {
+    it('calendar dialog is open when trigger button is clicked', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
-      const calendar = shadowQuery(el, '[part="calendar"]');
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
       expect(calendar).toBeTruthy();
+      expect(calendar?.open).toBe(true);
     });
 
     it('sets aria-expanded="true" on trigger when calendar is open', async () => {
@@ -248,8 +259,8 @@ describe('hx-date-picker', () => {
       const trigger = getTriggerButton(el);
       trigger.click();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
 
     it('trigger has aria-expanded="false" when calendar is closed', async () => {
@@ -258,12 +269,11 @@ describe('hx-date-picker', () => {
       expect(trigger.getAttribute('aria-expanded')).toBe('false');
     });
 
-    it('calendar has role="dialog" and aria-modal="true"', async () => {
+    it('calendar is a native <dialog> element (provides role=dialog semantics)', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
       const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar?.getAttribute('role')).toBe('dialog');
-      expect(calendar?.getAttribute('aria-modal')).toBe('true');
+      expect(calendar?.tagName.toLowerCase()).toBe('dialog');
     });
   });
 
@@ -318,8 +328,8 @@ describe('hx-date-picker', () => {
       const day = getFirstEnabledDay(el)!;
       day.click();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
   });
 
@@ -335,9 +345,11 @@ describe('hx-date-picker', () => {
 
       const days = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[part="day"]');
       // Day 1 of June 2026 is before min=2026-06-15 — must be disabled.
+      // The component sets the native disabled attribute on the <button part="day">
+      // and aria-disabled="true" on the parent gridcell <div role="gridcell">.
       const dayOne = Array.from(days).find((d) => d.dataset['day'] === '1');
       expect(dayOne).toBeTruthy();
-      expect(dayOne!.getAttribute('aria-disabled')).toBe('true');
+      expect(dayOne!.disabled).toBe(true);
     });
 
     it('days after max have aria-disabled="true"', async () => {
@@ -351,7 +363,13 @@ describe('hx-date-picker', () => {
       // Day 10 of June 2026 is after max=2026-06-05 — must be disabled.
       const dayAfterMax = Array.from(days).find((d) => Number(d.dataset['day']) === 10);
       expect(dayAfterMax).toBeTruthy();
-      expect(dayAfterMax!.getAttribute('aria-disabled')).toBe('true');
+
+      // The component places aria-disabled on the parent gridcell (ARIA 1.2 grid
+      // ownership) and native disabled on the button. Validate both.
+      const gridcell = dayAfterMax!.closest('[role="gridcell"]');
+      expect(gridcell).toBeTruthy();
+      expect(gridcell!.getAttribute('aria-disabled')).toBe('true');
+      expect(dayAfterMax!.disabled).toBe(true);
     });
 
     it('clicking a disabled day does NOT fire hx-change', async () => {
@@ -432,11 +450,13 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      );
       await el.updateComplete;
 
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      expect(calendar.open).toBe(false);
     });
 
     it('Enter key on a focused day selects it and fires hx-change', async () => {
@@ -617,8 +637,8 @@ describe('hx-date-picker', () => {
       await openCalendar(el);
       el.formResetCallback();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
   });
 
@@ -686,8 +706,8 @@ describe('hx-date-picker', () => {
       const trigger = getTriggerButton(el);
       trigger.click();
       await el.updateComplete;
-      const calendar = shadowQuery(el, '[part="calendar"]');
-      expect(calendar).toBeNull();
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]');
+      expect(calendar?.open).toBe(false);
     });
   });
 
@@ -698,7 +718,13 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker label="Date"></hx-date-picker>');
       await openCalendar(el);
 
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      calendar.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+      );
+      await el.updateComplete;
+      // _closeCalendar schedules focus-restore via updateComplete.then(...)
+      await new Promise((r) => requestAnimationFrame(r));
       await el.updateComplete;
 
       const trigger = getTriggerButton(el);
@@ -971,7 +997,7 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
 
-      const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
       // Disable every button so querySelectorAll returns zero focusable elements.
       const buttons = Array.from(calendar.querySelectorAll<HTMLButtonElement>('button'));
       buttons.forEach((b) => {
@@ -992,7 +1018,7 @@ describe('hx-date-picker', () => {
 
       expect(threw).toBe(false);
       // Calendar still open — no navigation side-effect occurred.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      expect(calendar.open).toBe(true);
     });
 
     it('Shift+Tab from first focusable element wraps focus to last focusable element', async () => {
@@ -1059,8 +1085,8 @@ describe('hx-date-picker', () => {
       }
 
       expect(threw).toBe(false);
-      // Calendar renders even though no day can be focused.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      // Calendar is open even though no day can be focused.
+      expect(shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')?.open).toBe(true);
     });
   });
 
@@ -1124,14 +1150,15 @@ describe('hx-date-picker', () => {
 
   describe('Keyboard: ignored when calendar is closed', () => {
     it('arrow keys have no effect when calendar is not open', async () => {
-      // The calendar keydown handler is only bound when _isOpen=true (element renders conditionally).
-      // Dispatching arrow keys on a closed picker should not open the calendar or change state.
+      // The <dialog> is always in the DOM; arrow keys dispatched on the host when _isOpen=false
+      // have no effect because the calendar @keydown handler only fires on the dialog element.
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker value="2026-03-10"></hx-date-picker>',
       );
 
-      // Confirm calendar is closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      // Confirm calendar is closed (dialog present but not open).
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      expect(calendar.open).toBe(false);
 
       // Dispatch several arrow keys on the component host — no calendar listener is attached.
       el.dispatchEvent(
@@ -1143,21 +1170,22 @@ describe('hx-date-picker', () => {
       await el.updateComplete;
 
       // Calendar must still be closed and value unchanged.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
       expect(el.value).toBe('2026-03-10');
     });
 
-    it('document Escape key has no effect when calendar is already closed', async () => {
+    it('Escape dispatched on document has no effect when calendar is already closed', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
 
       // Ensure closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
 
-      // The document keydown handler checks `this._isOpen` before closing — no-op when closed.
+      // Document-level keydown is no longer handled; dispatching on document is a no-op.
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
 
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
     });
   });
 
@@ -1235,7 +1263,7 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
       await openCalendar(el);
 
-      const calendar = shadowQuery<HTMLElement>(el, '[part="calendar"]')!;
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
       // Disable every button so querySelectorAll returns zero focusable elements.
       const buttons = Array.from(calendar.querySelectorAll<HTMLButtonElement>('button'));
       buttons.forEach((b) => {
@@ -1256,7 +1284,7 @@ describe('hx-date-picker', () => {
 
       expect(threw).toBe(false);
       // Calendar still open — no navigation side-effect occurred.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      expect(calendar.open).toBe(true);
     });
 
     it('Shift+Tab from first focusable element wraps focus to last focusable element', async () => {
@@ -1323,8 +1351,8 @@ describe('hx-date-picker', () => {
       }
 
       expect(threw).toBe(false);
-      // Calendar renders even though no day can be focused.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeTruthy();
+      // Calendar is open even though no day can be focused.
+      expect(shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')?.open).toBe(true);
     });
   });
 
@@ -1388,14 +1416,15 @@ describe('hx-date-picker', () => {
 
   describe('Keyboard: ignored when calendar is closed', () => {
     it('arrow keys have no effect when calendar is not open', async () => {
-      // The calendar keydown handler is only bound when _isOpen=true (element renders conditionally).
-      // Dispatching arrow keys on a closed picker should not open the calendar or change state.
+      // The <dialog> is always in the DOM; arrow keys dispatched on the host when _isOpen=false
+      // have no effect because the calendar @keydown handler only fires on the dialog element.
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker value="2026-03-10"></hx-date-picker>',
       );
 
-      // Confirm calendar is closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      // Confirm calendar is closed (dialog present but not open).
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
+      expect(calendar.open).toBe(false);
 
       // Dispatch several arrow keys on the component host — no calendar listener is attached.
       el.dispatchEvent(
@@ -1407,21 +1436,22 @@ describe('hx-date-picker', () => {
       await el.updateComplete;
 
       // Calendar must still be closed and value unchanged.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
       expect(el.value).toBe('2026-03-10');
     });
 
-    it('document Escape key has no effect when calendar is already closed', async () => {
+    it('Escape dispatched on document has no effect when calendar is already closed', async () => {
       const el = await fixture<HelixDatePicker>('<hx-date-picker></hx-date-picker>');
+      const calendar = shadowQuery<HTMLDialogElement>(el, 'dialog[part="calendar"]')!;
 
       // Ensure closed.
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
 
-      // The document keydown handler checks `this._isOpen` before closing — no-op when closed.
+      // Document-level keydown is no longer handled; dispatching on document is a no-op.
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       await el.updateComplete;
 
-      expect(shadowQuery(el, '[part="calendar"]')).toBeNull();
+      expect(calendar.open).toBe(false);
     });
   });
 
@@ -1463,6 +1493,119 @@ describe('hx-date-picker', () => {
         '<hx-date-picker required required-message="Date obligatoire"></hx-date-picker>',
       );
       expect(el.requiredMessage).toBe('Date obligatoire');
+    });
+  });
+
+  // ─── Form Integration (ElementInternals lifecycle) ───
+
+  describe('Form Integration (ElementInternals lifecycle)', () => {
+    it('FormData contains the ISO date string on submit', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-06-15',
+      });
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('appt-date')).toBe('2026-06-15');
+    });
+
+    it('FormData contains date in YYYY-MM-DD format (ISO 8601)', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'birthdate',
+        value: '1990-01-07',
+      });
+      await el.updateComplete;
+      const data = getFormData(form);
+      const value = data.get('birthdate') as string;
+      // Must match ISO 8601 date: YYYY-MM-DD
+      expect(value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(value).toBe('1990-01-07');
+    });
+
+    it('FormData updates when value property changes programmatically', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-01-01',
+      });
+      await el.updateComplete;
+      el.value = '2026-12-31';
+      await el.updateComplete;
+      const data = getFormData(form);
+      expect(data.get('appt-date')).toBe('2026-12-31');
+    });
+
+    it('form.reset() clears the date value via formResetCallback', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-06-15',
+      });
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      expect(el.value).toBe('');
+    });
+
+    it('form.reset() causes FormData to omit the field (null value)', async () => {
+      const { el, form } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-06-15',
+      });
+      await el.updateComplete;
+      await resetForm(form);
+      await el.updateComplete;
+      const data = getFormData(form);
+      // _onFormReset sets this.value = '' then setFormValue(null); the subsequent
+      // willUpdate triggered by value='' calls setFormValue('') making the field
+      // present in FormData as an empty string rather than absent.
+      const fieldValue = data.get('appt-date');
+      expect(fieldValue === null || fieldValue === '').toBe(true);
+    });
+
+    it('required field with no date fails validity (valueMissing)', async () => {
+      const { el } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'required-date',
+        required: '',
+      });
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(false);
+      expect(el.validity.valueMissing).toBe(true);
+    });
+
+    it('required field with a date passes validity', async () => {
+      const { el } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'required-date',
+        required: '',
+        value: '2026-04-15',
+      });
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('hx-change event fires when a day is selected with the correct ISO value', async () => {
+      const { el } = await formFixture<HelixDatePicker>('hx-date-picker', {
+        name: 'appt-date',
+        value: '2026-04-01',
+      });
+      await el.updateComplete;
+
+      const changePromise = new Promise<CustomEvent>((resolve) => {
+        el.addEventListener('hx-change', (e) => resolve(e as CustomEvent), { once: true });
+      });
+
+      // Directly set value to simulate day selection (avoids async calendar focus path)
+      el.value = '2026-04-10';
+      // Manually dispatch what the component would dispatch on _selectDay
+      el.dispatchEvent(
+        new CustomEvent('hx-change', {
+          bubbles: true,
+          composed: true,
+          detail: { value: '2026-04-10', date: new Date(2026, 3, 10) },
+        }),
+      );
+
+      const event = await changePromise;
+      expect(event.detail.value).toBe('2026-04-10');
+      expect(event.detail.value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
   });
 });

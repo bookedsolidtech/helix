@@ -1,7 +1,8 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -24,7 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-button-group-size=md] - Size token forwarded to child buttons. Accepts 'sm', 'md', or 'lg'.
  */
 @customElement('hx-button-group')
-export class HelixButtonGroup extends LitElement {
+export class HelixButtonGroup extends HelixElement {
   static override styles = [helixButtonGroupStyles];
 
   /**

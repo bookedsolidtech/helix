@@ -10,14 +10,13 @@ props:
       type: string
       title: Variant
       description: 'Color variant for the tag'
-      default: 'neutral'
+      default: 'default'
       enum:
-        - neutral
+        - default
         - primary
         - success
         - warning
         - danger
-        - info
     hx_size:
       type: string
       title: Size

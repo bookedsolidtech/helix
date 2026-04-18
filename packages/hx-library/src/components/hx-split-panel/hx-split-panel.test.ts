@@ -849,4 +849,130 @@ describe('hx-split-panel', () => {
       expect(divider?.getAttribute('aria-label')).toBe('Redimensionner les panneaux');
     });
   });
+
+  // ─── Pointer drag gesture ───
+
+  describe('Pointer drag gesture — additional coverage', () => {
+    it('pointercancel dispatches without throwing — component ignores it gracefully', async () => {
+      // hx-split-panel has no pointercancel handler; pointercancel is silently ignored.
+      // pointerup is the correct way to stop dragging.
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="50" style="width:400px;"></hx-split-panel>',
+      );
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+      vi.spyOn(divider!, 'setPointerCapture').mockImplementation(() => {});
+
+      divider?.dispatchEvent(
+        new PointerEvent('pointerdown', { clientX: 200, pointerId: 1, bubbles: true }),
+      );
+      // pointercancel has no handler — verify it does not throw
+      expect(() => {
+        divider?.dispatchEvent(
+          new PointerEvent('pointercancel', { pointerId: 1, bubbles: true }),
+        );
+      }).not.toThrow();
+
+      // pointerup correctly stops dragging
+      divider?.dispatchEvent(
+        new PointerEvent('pointerup', { pointerId: 1, bubbles: true }),
+      );
+      const positionAfterStop = el.position;
+      divider?.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 350, pointerId: 1, bubbles: true }),
+      );
+      await el.updateComplete;
+      expect(el.position).toBe(positionAfterStop);
+    });
+
+    it('drag does not fire hx-reposition when position does not change', async () => {
+      const el = document.createElement('hx-split-panel') as HelixSplitPanel;
+      el.position = 50;
+      Object.defineProperty(el, 'offsetWidth', { configurable: true, get: () => 0 });
+      document.body.appendChild(el);
+      await el.updateComplete;
+
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+      vi.spyOn(divider!, 'setPointerCapture').mockImplementation(() => {});
+
+      let fired = false;
+      el.addEventListener('hx-reposition', () => {
+        fired = true;
+      });
+
+      divider?.dispatchEvent(
+        new PointerEvent('pointerdown', { clientX: 200, pointerId: 1, bubbles: true }),
+      );
+      divider?.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 300, pointerId: 1, bubbles: true }),
+      );
+      await el.updateComplete;
+
+      // hostSize=0 guard prevents position change so hx-reposition should not fire
+      expect(fired).toBe(false);
+
+      document.body.removeChild(el);
+    });
+  });
+
+  // ─── Keyboard resize with min/max constraints ───
+
+  describe('Keyboard resize — min/max constraints', () => {
+    it('ArrowLeft stops at min even with multiple presses', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="22" min="20"></hx-split-panel>',
+      );
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+
+      // Press ArrowLeft 10 times — should be clamped to min=20
+      for (let i = 0; i < 10; i++) {
+        divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      }
+      await el.updateComplete;
+      expect(el.position).toBe(20);
+    });
+
+    it('ArrowRight stops at max even with multiple presses', async () => {
+      const el = await fixture<HelixSplitPanel>(
+        '<hx-split-panel position="88" max="90"></hx-split-panel>',
+      );
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+
+      for (let i = 0; i < 10; i++) {
+        divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      }
+      await el.updateComplete;
+      expect(el.position).toBe(90);
+    });
+  });
+
+  // ─── Snap point exact boundary ───
+
+  describe('Snap points — exact boundary behavior', () => {
+    it('position exactly on a snap point stays at that point', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      el.snap = [50];
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+
+      // At the snap point already — one ArrowRight moves to 51 (outside threshold)
+      divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await el.updateComplete;
+      // 49 is within 5% (|49-50|=1 ≤ 5) — should snap back to 50
+      expect(el.position).toBe(50);
+    });
+
+    it('snap with multiple points snaps to nearest one', async () => {
+      const el = await fixture<HelixSplitPanel>('<hx-split-panel position="50"></hx-split-panel>');
+      el.snap = [25, 75];
+
+      const divider = shadowQuery<HTMLElement>(el, '[part="divider"]');
+      // Move towards 75 — 3 steps to 53, within 5% of 50 only
+      // Move 28 steps to 78, outside both snap thresholds
+      // Move 3 steps to 72, within 5% of 75 → snap to 75
+      for (let i = 0; i < 25; i++) {
+        divider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      }
+      await el.updateComplete;
+      expect(el.position).toBe(75);
+    });
+  });
 });

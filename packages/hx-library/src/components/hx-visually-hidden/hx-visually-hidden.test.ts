@@ -199,6 +199,51 @@ describe('hx-visually-hidden', () => {
     });
   });
 
+  // ─── Base element structure ───
+
+  describe('Base element structure', () => {
+    it('renders a <span> as the base element', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>Hidden text</hx-visually-hidden>',
+      );
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.tagName.toLowerCase()).toBe('span');
+    });
+
+    it('base element contains a slot', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden>content</hx-visually-hidden>',
+      );
+      const slot = shadowQuery(el, 'slot');
+      expect(slot).toBeTruthy();
+    });
+
+    it('empty element renders without error', async () => {
+      const el = await fixture<HelixVisuallyHidden>('<hx-visually-hidden></hx-visually-hidden>');
+      expect(el.shadowRoot).toBeTruthy();
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base).toBeTruthy();
+    });
+  });
+
+  // ─── focusable: blur restores hidden state ───
+
+  describe('focusable: blur restores hidden state', () => {
+    it('restores visually-hidden styles after focused child blurs', async () => {
+      const el = await fixture<HelixVisuallyHidden>(
+        '<hx-visually-hidden focusable><a href="#main">Skip</a></hx-visually-hidden>',
+      );
+      const link = el.querySelector('a')!;
+      link.focus();
+      // While focused, should be visible
+      expect(getComputedStyle(el).position).toBe('static');
+      // After blur, styles should restore
+      link.blur();
+      const styles = getComputedStyle(el);
+      expect(styles.position).toBe('absolute');
+    });
+  });
+
   // ─── Accessibility (axe-core) (3) ───
 
   describe('Accessibility (axe-core)', () => {

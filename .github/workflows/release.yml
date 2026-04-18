@@ -70,6 +70,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # ── Build library + CDN artifacts ────────────────────────────────────
+      - name: Build library
+        run: pnpm turbo run build --filter=@helixui/library
+
+      - name: Build CDN artifacts
+        run: pnpm --filter=@helixui/library run build:cdn
+
+      - name: Package CDN tarball
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+          TARBALL="helix-cdn-${VERSION}.tar.gz"
+          tar -czf "/tmp/${TARBALL}" -C packages/hx-library/dist/cdn .
+          echo "CDN tarball: /tmp/${TARBALL} ($(du -sh /tmp/${TARBALL} | cut -f1))"
+          echo "tarball=/tmp/${TARBALL}" >> "$GITHUB_ENV"
+          echo "tarball_name=${TARBALL}" >> "$GITHUB_ENV"
+
       # ── Extract changelog entry for this version ─────────────────────────
       - name: Extract CHANGELOG entry
         id: changelog
@@ -192,7 +208,8 @@ jobs:
             --repo "${{ github.repository }}" \
             --title "@helixui/library v${VERSION}" \
             --notes-file /tmp/release-body.md \
-            --latest
+            --latest \
+            "${{ env.tarball }}#${{ env.tarball_name }}"
 
           RELEASE_URL=$(gh release view "$TAG" \
             --repo "${{ github.repository }}" \

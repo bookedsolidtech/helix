@@ -30,8 +30,16 @@ export interface HxTextInputProps {
   helpText?: string;
   /** The name of the input, used for form submission. */
   name?: string;
-  /** Accessible name for screen readers, if different from the visible label. */
-  ariaLabel?: string | null;
+  /** Accessible name for screen readers, if different from the visible label.
+Uses `accessible-label` attribute instead of `aria-label` to avoid
+ARIAMixin shadowing on the host element. The value is forwarded to the
+internal native input's `aria-label`.
+
+Note: `mixinDelegatesAria` is not applied to this component because form
+inputs with associated labels delegate accessible naming via `<label>`
+association and `aria-labelledby`, not host-level ARIA delegation. The
+`accessible-label` attribute is a fallback for label-free usage. */
+  accessibleLabel?: string | null;
   /** Whether the input is read-only. */
   readonly?: boolean;
   /** Minimum number of characters allowed. */

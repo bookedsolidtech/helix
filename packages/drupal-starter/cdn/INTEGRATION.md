@@ -191,8 +191,8 @@ Components are standard HTML custom elements. Once the library script is loaded,
 
 ```twig
 {# Buttons #}
-<hx-button variant="primary" size="md">Save</hx-button>
-<hx-button variant="secondary" size="sm">Cancel</hx-button>
+<hx-button variant="primary" hx-size="md">Save</hx-button>
+<hx-button variant="secondary" hx-size="sm">Cancel</hx-button>
 <hx-button variant="destructive">Delete Record</hx-button>
 
 {# Card with slots #}
@@ -200,7 +200,7 @@ Components are standard HTML custom elements. Once the library script is loaded,
   <span slot="heading">{{ node.title.value }}</span>
   <div>{{ content.body }}</div>
   <div slot="footer">
-    <hx-button variant="primary" size="sm">View Full Record</hx-button>
+    <hx-button variant="primary" hx-size="sm">View Full Record</hx-button>
   </div>
 </hx-card>
 
@@ -210,7 +210,7 @@ Components are standard HTML custom elements. Once the library script is loaded,
   label="Patient ID"
   required
   value="{{ form.patient_id['#value']|default('') }}"
-  helper-text="Enter the 8-digit patient identifier"
+  help-text="Enter the 8-digit patient identifier"
 ></hx-text-input>
 
 {# Clinical status #}
@@ -353,3 +353,117 @@ The library name in `attach_library()` must match the key in your `libraries.yml
 
 **Script loads but components do not register**
 Verify that `attributes: { type: module }` is set. Without it, Drupal injects the script as a classic script, and ES module syntax causes a syntax error in older processing paths.
+
+---
+
+## Subresource Integrity (SRI)
+
+### Why SRI is required for enterprise healthcare
+
+Enterprise healthcare environments must comply with HIPAA security rules, HITRUST CSF controls, and internal vendor risk policies. These frameworks require that any externally-loaded script or stylesheet cannot be silently modified by a third party — whether through CDN compromise, DNS hijacking, or supply-chain attack. A tampered component script that exfiltrates form data (patient identifiers, clinical inputs) is a reportable breach.
+
+Subresource Integrity solves this at the browser level. When a `<script>` or `<link>` tag includes an `integrity` attribute, the browser computes the hash of the downloaded file and refuses to execute it if the hash does not match. No network-level control can bypass this check.
+
+SRI is not optional for HELiX deployments in regulated environments. It should also be enabled for non-regulated environments — the overhead is zero (a single hash comparison per file load) and the protection is unconditional.
+
+### Where to find SRI hashes after a release
+
+Every CDN build produces two files alongside the component bundles:
+
+```
+dist/cdn/sri-hashes.json          — machine-readable hash map for all files
+dist/cdn/INTEGRATION-snippet.html — ready-to-paste HTML with integrity attributes
+```
+
+`sri-hashes.json` contains an entry for every JS and CSS file in `dist/cdn/`, keyed by relative path:
+
+```json
+{
+  "helix-1.1.2.min.js":  "sha384-<base64-hash>",
+  "helix-1.1.2.min.css": "sha384-<base64-hash>",
+  "helix-core-1.1.2.min.js": "sha384-<base64-hash>",
+  "components/hx-button-1.1.2.js": "sha384-<base64-hash>",
+  "components/hx-button-1.1.2.css": "sha384-<base64-hash>"
+}
+```
+
+The hashes use SHA-384, the algorithm recommended by the W3C SRI specification and required by most healthcare security frameworks.
+
+### Example HTML with integrity attributes
+
+The following snippet is generated automatically at `dist/cdn/INTEGRATION-snippet.html`. The actual hash values are computed from the built files — copy from that file, not from this documentation.
+
+**Strategy A — Full bundle:**
+
+```html
+<!-- HELiX component styles -->
+<link
+  rel="stylesheet"
+  href="https://cdn.example.com/helix/1.1.2/helix-1.1.2.min.css"
+  integrity="sha384-<hash-from-sri-hashes.json>"
+  crossorigin="anonymous"
+>
+
+<!-- HELiX full component bundle -->
+<script
+  type="module"
+  src="https://cdn.example.com/helix/1.1.2/helix-1.1.2.min.js"
+  integrity="sha384-<hash-from-sri-hashes.json>"
+  crossorigin="anonymous"
+></script>
+```
+
+**Strategy B — Split bundle (core + per-component):**
+
+```html
+<!-- HELiX shared core runtime (load first) -->
+<script
+  type="module"
+  src="https://cdn.example.com/helix/1.1.2/helix-core-1.1.2.min.js"
+  integrity="sha384-<hash-from-sri-hashes.json>"
+  crossorigin="anonymous"
+></script>
+
+<!-- Load only the components you need -->
+<script
+  type="module"
+  src="https://cdn.example.com/helix/1.1.2/components/hx-button-1.1.2.js"
+  integrity="sha384-<hash-from-sri-hashes.json>"
+  crossorigin="anonymous"
+></script>
+```
+
+The `crossorigin="anonymous"` attribute is required whenever the file is served from a different origin than the page. It instructs the browser to make a CORS request without credentials, which is the correct mode for CDN assets. Omitting it causes the SRI check to silently fail on cross-origin loads.
+
+### Using SRI hashes in Drupal libraries.yml
+
+Drupal 10.3+ supports the `integrity` attribute on external library entries:
+
+```yaml
+helix-all:
+  version: 1.1.2
+  css:
+    theme:
+      https://cdn.example.com/helix/1.1.2/helix-1.1.2.min.css:
+        type: external
+        minified: true
+        attributes:
+          integrity: "sha384-<hash-from-sri-hashes.json>"
+          crossorigin: anonymous
+  js:
+    https://cdn.example.com/helix/1.1.2/helix-1.1.2.min.js:
+      type: external
+      minified: true
+      attributes:
+        type: module
+        integrity: "sha384-<hash-from-sri-hashes.json>"
+        crossorigin: anonymous
+```
+
+Replace `<hash-from-sri-hashes.json>` with the value from `dist/cdn/sri-hashes.json` for each file. The hash changes with every release — update `libraries.yml` as part of your HELiX upgrade process (see "Upgrading to a new HELiX version" above).
+
+### Hash algorithm
+
+HELiX uses **SHA-384** for all SRI hashes. SHA-384 is the minimum algorithm recommended by OWASP for SRI in regulated environments. SHA-256 is accepted by browsers but provides a weaker collision resistance guarantee. SHA-512 is also accepted and provides stronger guarantees at a marginal size cost — SHA-384 is the chosen balance point for HELiX.
+
+Hashes are generated using the Node.js built-in `node:crypto` module during the CDN build (`pnpm --filter @helixui/library run build:cdn`). No third-party hash tooling is involved.

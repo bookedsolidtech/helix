@@ -22,7 +22,6 @@ export interface HxActionBarProps {
   scroll container equal to the bar height to prevent anchor targets from scrolling behind it
 - `bottom` — sticks to the bottom of the scroll container with iOS safe-area-inset support */
   position?: 'top' | 'bottom' | 'sticky';
-  sticky?: boolean;
   /** Accessible label for the toolbar.
 Required when multiple toolbars appear on the same page.
 

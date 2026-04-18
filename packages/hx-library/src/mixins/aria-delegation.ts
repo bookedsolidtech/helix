@@ -71,8 +71,6 @@ type LitElementConstructor = new (...args: any[]) => LitElement;
  * JS property accessors for all intercepted ARIA attributes, reading from
  * `data-aria-*` storage rather than `aria-*` attributes on the host.
  */
-/** @deprecated Use AriaDelegationMixinInterface instead */
-export type AriadDelegationMixinInterface = AriaDelegationMixinInterface;
 
 export interface AriaDelegationMixinInterface {
   ariaActiveDescendant: string | null;

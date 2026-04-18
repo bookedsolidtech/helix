@@ -69,14 +69,29 @@ describe('hx-radio', () => {
   // ─── ARIA (2) ───
 
   describe('ARIA', () => {
-    it('sets role="radio" on host', async () => {
+    it('projects role="radio" via ElementInternals', async () => {
       const el = await fixture<WcRadio>('<hx-radio value="a" label="A"></hx-radio>');
-      expect(el.getAttribute('role')).toBe('radio');
+      // ARIA state is surfaced to the accessibility tree via ElementInternals,
+      // not via host-attribute mutation, so getAttribute('role') is null.
+      expect(el.getAttribute('role')).toBeNull();
+      expect((el as unknown as { _internals: ElementInternals })._internals.role).toBe('radio');
     });
 
-    it('sets aria-checked matching checked state', async () => {
+    it('projects aria-checked matching checked state via ElementInternals', async () => {
       const el = await fixture<WcRadio>('<hx-radio value="a" label="A" checked></hx-radio>');
-      expect(el.getAttribute('aria-checked')).toBe('true');
+      expect(el.hasAttribute('aria-checked')).toBe(false);
+      expect((el as unknown as { _internals: ElementInternals })._internals.ariaChecked).toBe(
+        'true',
+      );
+    });
+
+    it('updates aria-checked on ElementInternals when checked changes', async () => {
+      const el = await fixture<WcRadio>('<hx-radio value="a" label="A"></hx-radio>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
     });
   });
 
@@ -137,9 +152,19 @@ describe('hx-radio', () => {
   // ─── ARIA: aria-disabled (1) ───
 
   describe('ARIA: aria-disabled', () => {
-    it('sets aria-disabled matching disabled state', async () => {
+    it('projects aria-disabled via ElementInternals when disabled', async () => {
       const el = await fixture<WcRadio>('<hx-radio value="a" label="A" disabled></hx-radio>');
-      expect(el.getAttribute('aria-disabled')).toBe('true');
+      expect(el.hasAttribute('aria-disabled')).toBe(false);
+      expect((el as unknown as { _internals: ElementInternals })._internals.ariaDisabled).toBe(
+        'true',
+      );
+    });
+
+    it('omits aria-disabled via ElementInternals when not disabled', async () => {
+      const el = await fixture<WcRadio>('<hx-radio value="a" label="A"></hx-radio>');
+      expect(
+        (el as unknown as { _internals: ElementInternals })._internals.ariaDisabled,
+      ).toBeNull();
     });
   });
 

@@ -24,7 +24,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
  */
 function helixui_page_attachments(array &$attachments) {
   // Always load core tokens and runtime.
-  $attachments['#attached']['library'][] = 'helixui/hx-core';
+  $attachments['#attached']['library'][] = 'helixui/core';
 
   // Always load Drupal behaviors for interactive components.
   $attachments['#attached']['library'][] = 'helixui/helixui-behaviors';

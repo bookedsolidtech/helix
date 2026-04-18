@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixStackStyles } from './hx-stack.styles.js';
 
 /**
@@ -15,7 +16,7 @@ import { helixStackStyles } from './hx-stack.styles.js';
  * @csspart base - The inner flex container.
  */
 @customElement('hx-stack')
-export class HelixStack extends LitElement {
+export class HelixStack extends HelixElement {
   static override styles = [helixStackStyles];
 
   /**

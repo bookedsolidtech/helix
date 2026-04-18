@@ -8,7 +8,7 @@ export const helixOverflowMenuStyles = css`
 
   :host([disabled]) {
     pointer-events: none;
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
   }
 
   /* ─── Trigger Button ─── */
@@ -20,11 +20,11 @@ export const helixOverflowMenuStyles = css`
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background-color: transparent;
-    color: var(--hx-overflow-menu-button-color, var(--hx-color-neutral-600, #4b5563));
+    color: var(--hx-overflow-menu-button-color, var(--hx-color-neutral-600, #475569));
     cursor: pointer;
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      color var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
     padding: 0;
     line-height: 1;
@@ -40,11 +40,11 @@ export const helixOverflowMenuStyles = css`
   }
 
   .trigger:hover:not([disabled]) {
-    background-color: var(--hx-color-neutral-100, #f3f4f6);
+    background-color: var(--hx-color-neutral-100, #f1f5f9);
   }
 
   .trigger--open {
-    background-color: var(--hx-color-neutral-100, #f3f4f6);
+    background-color: var(--hx-color-neutral-100, #f1f5f9);
   }
 
   /* ─── Size Variants ─── */
@@ -77,8 +77,8 @@ export const helixOverflowMenuStyles = css`
     position: fixed;
     z-index: var(--hx-overflow-menu-panel-z-index, 1000);
     min-width: var(--hx-overflow-menu-panel-min-width, 160px);
-    background: var(--hx-overflow-menu-panel-bg, var(--hx-color-neutral-0, #fff));
-    border: var(--hx-overflow-menu-panel-border, 1px solid var(--hx-color-neutral-200, #e5e7eb));
+    background: var(--hx-overflow-menu-panel-bg, var(--hx-color-neutral-0, #ffffff));
+    border: var(--hx-overflow-menu-panel-border, 1px solid var(--hx-color-neutral-200, #e2e8f0));
     border-radius: var(
       --hx-overflow-menu-panel-border-radius,
       var(--hx-border-radius-md, 0.375rem)
@@ -103,7 +103,7 @@ export const helixOverflowMenuStyles = css`
     border: none;
     text-align: start;
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-900, #111827);
+    color: var(--hx-color-neutral-900, #0f172a);
     cursor: pointer;
     white-space: nowrap;
     box-sizing: border-box;
@@ -112,7 +112,7 @@ export const helixOverflowMenuStyles = css`
   ::slotted([role='menuitem']:hover),
   ::slotted([role='menuitemcheckbox']:hover),
   ::slotted([role='menuitemradio']:hover) {
-    background-color: var(--hx-color-neutral-50, #f9fafb);
+    background-color: var(--hx-color-neutral-50, #f8fafc);
   }
 
   ::slotted([role='menuitem']:focus-visible),

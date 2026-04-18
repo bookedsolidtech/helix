@@ -1,8 +1,8 @@
-import { LitElement, html, svg, nothing } from 'lit';
+import { html, svg, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -24,6 +24,12 @@ const chevronIcon = svg`
 `;
 
 const _nextAccordionItemId = createIdCounter('hx-accordion-item');
+
+/** Detail for hx-expand and hx-collapse events dispatched by hx-accordion-item. */
+export interface HxAccordionToggleDetail {
+  expanded: boolean;
+  itemId: string;
+}
 
 /**
  * An individual accordion item with collapsible content.
@@ -57,7 +63,7 @@ const _nextAccordionItemId = createIdCounter('hx-accordion-item');
  * @cssprop [--hx-accordion-content-color=var(--hx-color-neutral-600)] - Content text color.
  */
 @customElement('hx-accordion-item')
-export class HelixAccordionItem extends LitElement {
+export class HelixAccordionItem extends HelixElement {
   static override styles = [helixAccordionItemStyles];
 
   /** @internal */

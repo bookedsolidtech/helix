@@ -1,8 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCardStyles } from './hx-card.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -39,10 +39,10 @@ const _nextCardId = createIdCounter('hx-card');
  * @cssprop [--hx-card-image-aspect-ratio=16/9] - Aspect ratio for the image slot.
  */
 @customElement('hx-card')
-export class HelixCard extends LitElement {
+export class HelixCard extends HelixElement {
   /** @internal */
   static override shadowRootOptions = {
-    ...LitElement.shadowRootOptions,
+    ...HelixElement.shadowRootOptions,
     delegatesFocus: true,
   };
 

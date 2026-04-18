@@ -52,10 +52,10 @@ export const helixActionBarStyles = css`
   /* ─── Variant: outlined ─── */
 
   .base--outlined {
-    background: var(--hx-action-bar-bg, var(--hx-color-neutral-0, #fff));
+    background: var(--hx-action-bar-bg, var(--hx-color-neutral-0, #ffffff));
     border: var(
       --hx-action-bar-border,
-      var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb)
+      var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0)
     );
     border-radius: var(--hx-border-radius-md, 0.375rem);
   }
@@ -63,7 +63,7 @@ export const helixActionBarStyles = css`
   /* ─── Variant: filled ─── */
 
   .base--filled {
-    background: var(--hx-action-bar-bg, var(--hx-color-neutral-50, #f9fafb));
+    background: var(--hx-action-bar-bg, var(--hx-color-neutral-50, #f8fafc));
     border-radius: var(--hx-border-radius-md, 0.375rem);
   }
 
@@ -116,5 +116,19 @@ export const helixActionBarStyles = css`
 
   ::slotted(*) {
     flex-shrink: 0;
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /* Outlined variant: border is already present and will be honored by the browser */
+    .base--outlined {
+      border: 1px solid CanvasText;
+    }
+
+    /* Filled variant: background is suppressed — add border to maintain visual separation */
+    .base--filled {
+      border: 1px solid CanvasText;
+    }
   }
 `;
