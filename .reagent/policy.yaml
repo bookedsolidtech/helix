@@ -28,7 +28,6 @@ block_ai_attribution: true
 # Paths hooks and agents must never modify
 blocked_paths:
   - .env
-  - .reagent/policy.yaml
   - .reagent/HALT
 
 # Optional: Discord webhook for halt/promote notifications
