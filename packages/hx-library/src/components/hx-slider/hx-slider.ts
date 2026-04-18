@@ -180,7 +180,7 @@ export class HelixSlider extends FormMixin(HelixElement) {
    * @internal
    */
   @query('.slider__input')
-  declare private _input: HTMLInputElement | null;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Unique IDs ───
 

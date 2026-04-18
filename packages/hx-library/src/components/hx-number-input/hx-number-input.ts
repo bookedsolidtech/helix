@@ -192,7 +192,7 @@ export class HelixNumberInput extends FormMixin(HelixElement) {
 
   /** @internal */
   @query('.field__input')
-  declare private _input: HTMLInputElement | null;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Internal State ───
 
