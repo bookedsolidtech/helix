@@ -79,10 +79,10 @@ Attach libraries in Twig with `{{ attach_library('mytheme/helix-accordion') }}` 
 <div data-drupal-accordion data-open-first="true">
   <hx-accordion>
     {% for item in faq_items %}
-      <hx-accordion-panel>
+      <hx-accordion-item>
         <span slot="heading">{{ item.question }}</span>
         {{ item.answer }}
-      </hx-accordion-panel>
+      </hx-accordion-item>
     {% endfor %}
   </hx-accordion>
 </div>
@@ -351,10 +351,10 @@ props:
 >
   <hx-accordion>
     {% for item in items %}
-      <hx-accordion-panel>
+      <hx-accordion-item>
         <span slot="heading">{{ item.heading }}</span>
         {{ item.body }}
-      </hx-accordion-panel>
+      </hx-accordion-item>
     {% endfor %}
   </hx-accordion>
 </div>
