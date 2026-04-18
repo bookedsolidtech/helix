@@ -1,7 +1,7 @@
 #!/bin/sh
 # .husky/commit-msg — optionally BLOCKS commits that contain AI attribution
 #
-# OPT-IN: Only enforces when .reagent/policy.yaml contains:
+# OPT-IN: Only enforces when .rea/policy.yaml contains:
 #   block_ai_attribution: true
 #
 # When disabled (default), this hook does nothing — commits work normally.
@@ -37,10 +37,10 @@ if [ ! -f "$COMMIT_MSG_FILE" ]; then
 fi
 
 # ── Check if attribution blocking is enabled ───────────────────────────────────
-# Look for block_ai_attribution: true in .reagent/policy.yaml
+# Look for block_ai_attribution: true in .rea/policy.yaml
 # If not found or not true, exit 0 (normal commit behavior)
 
-POLICY_FILE=".reagent/policy.yaml"
+POLICY_FILE=".rea/policy.yaml"
 if [ ! -f "$POLICY_FILE" ]; then
   exit 0
 fi
@@ -117,7 +117,7 @@ if [ "$BLOCKED" -eq 1 ]; then
     printf '    - "Add Copilot config"\n'
     printf '\n'
     printf '  Remove the attribution markers and retry your commit.\n'
-    printf '  To disable: set block_ai_attribution: false in .reagent/policy.yaml\n'
+    printf '  To disable: set block_ai_attribution: false in .rea/policy.yaml\n'
     printf '═══════════════════════════════════════════════════════════════════\n'
     printf '\n'
   } >&2

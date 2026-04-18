@@ -54,7 +54,7 @@ phases:
     inputs:
       - data/readiness/synthesized/component-scores.jsonl
     trigger: any component score < pass_threshold
-    owner: reagent-orchestrator
+    owner: rea-orchestrator
 
   - id: re-evaluate
     name: Re-evaluate

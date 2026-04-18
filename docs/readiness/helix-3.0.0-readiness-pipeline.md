@@ -1,8 +1,8 @@
 # HELiX 3.0.0 Readiness Pipeline
 
 > **Status:** DRAFT | **Owner:** senior-product-manager-platform | **Created:** 2026-04-15
-> **Pipeline definition:** `.reagent/readiness-pipeline.yaml`
-> **JSONL schema examples:** `.reagent/readiness-schema.jsonl.example`
+> **Pipeline definition:** `data/readiness/readiness-pipeline.yaml`
+> **JSONL schema examples:** `data/readiness/readiness-schema.jsonl.example`
 
 ---
 
@@ -141,7 +141,7 @@ Each component receives a **weighted average** across all 57 dimensions. Weights
 - **Type safety** is the highest-weighted code quality dimension (weight: 5)
 - **Bundle size** and **CEM accuracy** are the highest-weighted production dimensions (weight: 4 each)
 
-Full weight table is in `.reagent/readiness-pipeline.yaml` under `scoring.aggregation.weights`.
+Full weight table is in `data/readiness/readiness-pipeline.yaml` under `scoring.aggregation.weights`.
 
 ### Release Acceptance Criteria
 
@@ -248,7 +248,7 @@ data/readiness/
 }
 ```
 
-See `.reagent/readiness-schema.jsonl.example` for full examples of all three record types.
+See `data/readiness/readiness-schema.jsonl.example` for full examples of all three record types.
 
 ---
 

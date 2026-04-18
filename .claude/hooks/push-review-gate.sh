@@ -15,16 +15,16 @@ INPUT=$(cat)
 
 # ── 2. Dependency check ──────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
@@ -42,7 +42,7 @@ if ! printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+push'; then
 fi
 
 # ── 5. Check if quality gates are enabled ─────────────────────────────────────
-POLICY_FILE="${REAGENT_ROOT}/.reagent/policy.yaml"
+POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
 if [[ -f "$POLICY_FILE" ]]; then
   if grep -qE 'push_review:[[:space:]]*false' "$POLICY_FILE" 2>/dev/null; then
     exit 0
@@ -50,7 +50,7 @@ if [[ -f "$POLICY_FILE" ]]; then
 fi
 
 # ── 6. Determine target branch ───────────────────────────────────────────────
-CURRENT_BRANCH=$(cd "$REAGENT_ROOT" && git branch --show-current 2>/dev/null || echo "")
+CURRENT_BRANCH=$(cd "$REA_ROOT" && git branch --show-current 2>/dev/null || echo "")
 TARGET_BRANCH="main"
 
 # Try to extract target from push command (git push origin <branch>)
@@ -60,14 +60,14 @@ if [[ -n "$PUSH_TARGET" ]]; then
 fi
 
 # ── 7. Get diff against target ───────────────────────────────────────────────
-MERGE_BASE=$(cd "$REAGENT_ROOT" && git merge-base "$TARGET_BRANCH" HEAD 2>/dev/null || echo "")
+MERGE_BASE=$(cd "$REA_ROOT" && git merge-base "$TARGET_BRANCH" HEAD 2>/dev/null || echo "")
 
 if [[ -z "$MERGE_BASE" ]]; then
   # Can't determine merge base — fail-open
   exit 0
 fi
 
-DIFF_FULL=$(cd "$REAGENT_ROOT" && git diff "$MERGE_BASE"...HEAD 2>/dev/null || echo "")
+DIFF_FULL=$(cd "$REA_ROOT" && git diff "$MERGE_BASE"...HEAD 2>/dev/null || echo "")
 
 if [[ -z "$DIFF_FULL" ]]; then
   # No diff — nothing to review
@@ -79,23 +79,23 @@ LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null ||
 # ── 8. Check review cache ────────────────────────────────────────────────────
 PUSH_SHA=$(printf '%s' "$DIFF_FULL" | shasum -a 256 | cut -d' ' -f1 2>/dev/null || echo "")
 
-# Resolve reagent CLI (node_modules/.bin first, dist fallback)
-REAGENT_CLI_ARGS=()
-if [[ -f "${REAGENT_ROOT}/node_modules/.bin/reagent" ]]; then
-  REAGENT_CLI_ARGS=(node "${REAGENT_ROOT}/node_modules/.bin/reagent")
-elif [[ -f "${REAGENT_ROOT}/dist/cli/index.js" ]]; then
-  REAGENT_CLI_ARGS=(node "${REAGENT_ROOT}/dist/cli/index.js")
+# Resolve rea CLI (node_modules/.bin first, dist fallback)
+REA_CLI_ARGS=()
+if [[ -f "${REA_ROOT}/node_modules/.bin/rea" ]]; then
+  REA_CLI_ARGS=(node "${REA_ROOT}/node_modules/.bin/rea")
+elif [[ -f "${REA_ROOT}/dist/cli/index.js" ]]; then
+  REA_CLI_ARGS=(node "${REA_ROOT}/dist/cli/index.js")
 fi
 
-if [[ -n "$PUSH_SHA" ]] && [[ ${#REAGENT_CLI_ARGS[@]} -gt 0 ]]; then
-  CACHE_RESULT=$("${REAGENT_CLI_ARGS[@]}" cache check "$PUSH_SHA" --branch "$CURRENT_BRANCH" --base "$TARGET_BRANCH" 2>/dev/null || echo '{"hit":false}')
+if [[ -n "$PUSH_SHA" ]] && [[ ${#REA_CLI_ARGS[@]} -gt 0 ]]; then
+  CACHE_RESULT=$("${REA_CLI_ARGS[@]}" cache check "$PUSH_SHA" --branch "$CURRENT_BRANCH" --base "$TARGET_BRANCH" 2>/dev/null || echo '{"hit":false}')
   if printf '%s' "$CACHE_RESULT" | jq -e '.hit == true' >/dev/null 2>&1; then
     # Review was already approved — notify and allow the push through
-    DISCORD_LIB="${REAGENT_ROOT}/hooks/_lib/discord.sh"
+    DISCORD_LIB="${REA_ROOT}/hooks/_lib/discord.sh"
     if [ -f "$DISCORD_LIB" ]; then
       # shellcheck source=/dev/null
       source "$DISCORD_LIB"
-      discord_notify "dev" "Push passed quality gates on \`${CURRENT_BRANCH}\` -- $(cd "$REAGENT_ROOT" && git log -1 --oneline 2>/dev/null)" "green"
+      discord_notify "dev" "Push passed quality gates on \`${CURRENT_BRANCH}\` -- $(cd "$REA_ROOT" && git log -1 --oneline 2>/dev/null)" "green"
     fi
     exit 0
   fi
@@ -114,7 +114,7 @@ FILE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -c '^\+\+\+ ' 2>/dev/null || echo "
   printf '  1. Spawn a code-reviewer agent to review: git diff %s...HEAD\n' "$MERGE_BASE"
   printf '  2. Spawn a security-engineer agent for security review\n'
   printf '  3. After both pass, cache the result:\n'
-  printf '     reagent cache set %s pass --branch %s --base %s\n' "$PUSH_SHA" "$CURRENT_BRANCH" "$TARGET_BRANCH"
+  printf '     rea cache set %s pass --branch %s --base %s\n' "$PUSH_SHA" "$CURRENT_BRANCH" "$TARGET_BRANCH"
   printf '\n'
 } >&2
 exit 2

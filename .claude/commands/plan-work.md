@@ -2,7 +2,7 @@ Invoke the product-owner agent to plan and propose tasks for a goal.
 
 ## Instructions
 
-1. First, read `.reagent/tasks.jsonl` to understand the current backlog
+1. First, read `.rea/tasks.jsonl` to understand the current backlog
 2. Ask the user what they want to accomplish (if not already provided as an argument)
 3. Spawn the `product-owner` agent to:
    - Review existing tasks to avoid duplication

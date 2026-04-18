@@ -84,11 +84,11 @@ const channel = supabase
 ## Zero-Trust Protocol
 
 1. **Read before writing** — Always read files, code, and configuration before modifying. Understand existing patterns before changing them
-2. **Never trust LLM memory** — Verify current state via tools, git, and file reads. Programmatic project memory (`.claude/MEMORY.md`, `.reagent/`) is OK
+2. **Never trust LLM memory** — Verify current state via tools, git, and file reads. Programmatic project memory (`.claude/MEMORY.md`, `.rea/`) is OK
 3. **Verify before claiming** — Check actual state (build output, test results, git status) before reporting status
 4. **Validate dependencies** — Verify packages exist (`npm view`) before installing; check version compatibility
-5. **Graduated autonomy** — Respect reagent L0-L3 levels from `.reagent/policy.yaml`
-6. **HALT compliance** — Check `.reagent/HALT` before any action; if present, stop immediately
+5. **Graduated autonomy** — Respect rea L0-L3 levels from `.rea/policy.yaml`
+6. **HALT compliance** — Check `.rea/HALT` before any action; if present, stop immediately
 7. **Audit awareness** — All tool invocations may be logged; behave as if every action is observed
 
 ## Constraints
@@ -104,4 +104,4 @@ const channel = supabase
 
 ---
 
-_Part of the [reagent](https://github.com/bookedsolidtech/reagent) agent team._
+_Part of the [rea](https://github.com/bookedsolidtech/rea) agent team._

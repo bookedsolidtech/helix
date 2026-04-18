@@ -20,16 +20,16 @@ INPUT=$(cat)
 
 # ── 2. Dependency check ───────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── 3. HALT check ─────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
@@ -53,8 +53,8 @@ truncate_cmd() {
 }
 
 # ── 6. Violation accumulators ──────────────────────────────────────────────────
-HIGH_FILE=$(mktemp "${TMPDIR:-/tmp}/reagent-bash-high-XXXXXX")
-MEDIUM_FILE=$(mktemp "${TMPDIR:-/tmp}/reagent-bash-medium-XXXXXX")
+HIGH_FILE=$(mktemp "${TMPDIR:-/tmp}/rea-bash-high-XXXXXX")
+MEDIUM_FILE=$(mktemp "${TMPDIR:-/tmp}/rea-bash-medium-XXXXXX")
 
 cleanup_violations() {
   rm -f "$HIGH_FILE" "$MEDIUM_FILE"
@@ -245,11 +245,11 @@ if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+-c[[:space:]]+core\.hookspath'
     "Alt: Fix the underlying hook issue. Do not bypass the hooks directory."
 fi
 
-# H15: REAGENT_BYPASS env var — attempted escape hatch
-if printf '%s' "$CMD" | grep -qiE '(^|[[:space:];]|&&|\|\|)REAGENT_BYPASS[[:space:]]*='; then
+# H15: REA_BYPASS env var — attempted escape hatch
+if printf '%s' "$CMD" | grep -qiE '(^|[[:space:];]|&&|\|\|)REA_BYPASS[[:space:]]*='; then
   add_high \
-    "REAGENT_BYPASS env var — unauthorized bypass attempt" \
-    "Setting REAGENT_BYPASS is not a supported escape mechanism and indicates a bypass attempt." \
+    "REA_BYPASS env var — unauthorized bypass attempt" \
+    "Setting REA_BYPASS is not a supported escape mechanism and indicates a bypass attempt." \
     "Alt: If you need to override a gate, request human escalation."
 fi
 
@@ -262,9 +262,9 @@ if printf '%s' "$CMD" | grep -qiE '(alias|function)[[:space:]]+[a-zA-Z_]+.*(--(n
 fi
 
 # H17: context_protection — block commands that should be delegated to subagents
-# Reads context_protection.delegate_to_subagent from .reagent/policy.yaml.
+# Reads context_protection.delegate_to_subagent from .rea/policy.yaml.
 # These commands produce excessive output that exhausts coordinator context windows.
-POLICY_FILE="${REAGENT_ROOT}/.reagent/policy.yaml"
+POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
 if [[ -f "$POLICY_FILE" ]]; then
   DELEGATE_PATTERNS=()
   IN_DELEGATE_BLOCK=0
@@ -298,7 +298,7 @@ if [[ -f "$POLICY_FILE" ]]; then
         "Context protection — command must run in a subagent" \
         "This command produces excessive output that will exhaust the coordinator context window. Delegate it to a subagent instead of running it directly." \
         "Alt: Use the Agent tool to delegate: Agent(subagent_type: 'qa-engineer-automation', prompt: 'Run $pattern and report pass/fail summary only.')" \
-        "Alt: The context_protection policy in .reagent/policy.yaml lists commands that must be delegated."
+        "Alt: The context_protection policy in .rea/policy.yaml lists commands that must be delegated."
       break
     fi
   done

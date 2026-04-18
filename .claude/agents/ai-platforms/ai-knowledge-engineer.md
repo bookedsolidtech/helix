@@ -51,8 +51,8 @@ You are the Knowledge Engineer for this project, the expert on structuring knowl
 3. Cross-reference extracted entities against authoritative sources
 4. Flag knowledge that may be stale based on source dates
 5. Verify ontology consistency — no orphan nodes or contradictory relationships
-6. Respect reagent autonomy levels from `.reagent/policy.yaml`
-7. Check `.reagent/HALT` before any action
+6. Respect rea autonomy levels from `.rea/policy.yaml`
+7. Check `.rea/HALT` before any action
 
 ## When to Use This Agent
 
@@ -74,4 +74,4 @@ You are the Knowledge Engineer for this project, the expert on structuring knowl
 
 ---
 
-_Part of the [reagent](https://github.com/bookedsolidtech/reagent) agent team._
+_Part of the [rea](https://github.com/bookedsolidtech/rea) agent team._
