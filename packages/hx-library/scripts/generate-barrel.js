@@ -117,7 +117,11 @@ function scanModuleExports(sourcePath) {
   const values = new Set();
   const types = new Set();
 
-  const stripAlias = (name) => name.split(/\s+as\s+/).pop()?.trim() ?? name;
+  const stripAlias = (name) =>
+    name
+      .split(/\s+as\s+/)
+      .pop()
+      ?.trim() ?? name;
 
   // Re-exports with or without a `from '...'` clause.
   const reexportPattern = /export\s+(type\s+)?\{([^}]+)\}\s*(?:from\s*['"][^'"]+['"])?\s*;?/g;
@@ -171,12 +175,16 @@ for (const [spec, allow] of Object.entries(PUBLIC_API)) {
   // Detect allowlist entries that no longer exist in source (typos, deletions).
   for (const name of allow.values) {
     if (!availableValues.has(name)) {
-      warnings.push(`[allowlist] ${spec}: value "${name}" is in PUBLIC_API but not exported by source.`);
+      warnings.push(
+        `[allowlist] ${spec}: value "${name}" is in PUBLIC_API but not exported by source.`,
+      );
     }
   }
   for (const name of allow.types) {
     if (!availableTypes.has(name)) {
-      warnings.push(`[allowlist] ${spec}: type "${name}" is in PUBLIC_API but not exported by source.`);
+      warnings.push(
+        `[allowlist] ${spec}: type "${name}" is in PUBLIC_API but not exported by source.`,
+      );
     }
   }
 
@@ -185,10 +193,14 @@ for (const [spec, allow] of Object.entries(PUBLIC_API)) {
   const droppedValues = [...availableValues].filter((n) => !allow.values.includes(n));
   const droppedTypes = [...availableTypes].filter((n) => !allow.types.includes(n));
   for (const name of droppedValues) {
-    warnings.push(`[gated] ${spec}: value "${name}" is exported from source but NOT in PUBLIC_API (dropped from barrel).`);
+    warnings.push(
+      `[gated] ${spec}: value "${name}" is exported from source but NOT in PUBLIC_API (dropped from barrel).`,
+    );
   }
   for (const name of droppedTypes) {
-    warnings.push(`[gated] ${spec}: type "${name}" is exported from source but NOT in PUBLIC_API (dropped from barrel).`);
+    warnings.push(
+      `[gated] ${spec}: type "${name}" is exported from source but NOT in PUBLIC_API (dropped from barrel).`,
+    );
   }
 
   const lines = [];
@@ -255,7 +267,9 @@ const componentCount = exportLines.length;
 console.log(`Generated src/index.ts with ${componentCount} component export lines.`);
 
 if (warnings.length > 0) {
-  console.log(`\nPublic-API allowlist report (${warnings.length} notice${warnings.length === 1 ? '' : 's'}):`);
+  console.log(
+    `\nPublic-API allowlist report (${warnings.length} notice${warnings.length === 1 ? '' : 's'}):`,
+  );
   for (const warning of warnings) {
     console.log(`  ${warning}`);
   }
