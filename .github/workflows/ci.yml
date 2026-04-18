@@ -142,8 +142,11 @@ jobs:
               - 'packages/hx-library/tsconfig*.json'
               - 'scripts/check-coverage.mjs'
               - 'scripts/check-bundle-size.mjs'
+              - 'scripts/check-cdn-size.mjs'
               - 'bundle-budgets.json'
               - '.bundle-budget.json'
+              - '.cdn-budget.json'
+              - 'packages/hx-library/scripts/build-cdn.mjs'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
@@ -380,6 +383,27 @@ jobs:
         with:
           name: bundle-size-report
           path: .cache/bundle-size-report.json
+          retention-days: 30
+          if-no-files-found: warn
+      # ── CDN bundle + size budget (FS-019) ───────────────────────────────
+      # The CDN payload is what Drupal/CDN consumers download. Budget is
+      # per-artifact and enforced via .cdn-budget.json. Gate fails on any
+      # artifact exceeding its ceiling.
+      - name: Build CDN artifacts
+        run: pnpm --filter=@helixui/library run build:cdn
+      - name: Enforce CDN size budget
+        run: node scripts/check-cdn-size.mjs
+      - name: Save CDN size report
+        if: always()
+        run: |
+          mkdir -p .cache
+          node scripts/check-cdn-size.mjs --json > .cache/cdn-size-report.json 2>/dev/null || true
+      - name: Upload CDN size artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdn-size-report
+          path: .cache/cdn-size-report.json
           retention-days: 30
           if-no-files-found: warn
 
