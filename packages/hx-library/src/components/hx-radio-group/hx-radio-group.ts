@@ -4,10 +4,17 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import type { HelixRadio } from './hx-radio.js';
 
 const _nextRadioGroupId = createIdCounter('hx-radio-group');
+
+/** Detail for the hx-change event dispatched by hx-radio-group. */
+export interface HxRadioGroupChangeDetail {
+  value: string;
+  checked: boolean;
+}
 
 /**
  * A form-associated radio group that manages a set of `<hx-radio>` children.
@@ -35,7 +42,7 @@ const _nextRadioGroupId = createIdCounter('hx-radio-group');
  * @cssprop [--hx-radio-group-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  */
 @customElement('hx-radio-group')
-export class HelixRadioGroup extends HelixElement {
+export class HelixRadioGroup extends FormMixin(HelixElement) {
   static override styles = [helixRadioGroupStyles];
 
   // ─── Form Association ───
@@ -166,17 +173,28 @@ export class HelixRadioGroup extends HelixElement {
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value || null);
       this._syncRadios();
-      this._updateValidity();
     }
     if (changedProperties.has('disabled')) {
       this._syncRadios();
+    }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
     }
   }
 
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
     this._syncRadios();
-    this._updateValidity();
     // WCAG 4.1.2: warn when no accessible name is available for the radio group.
     // The fieldset needs either a label prop (rendered as <legend>) or an aria-label
     // attribute on the host element so screen readers can identify the group.
@@ -280,6 +298,7 @@ export class HelixRadioGroup extends HelixElement {
     }
 
     this.value = newValue;
+    this._handleInteractionInput();
     // Reactive update in updated() will call setFormValue, _syncRadios, _updateValidity
 
     /**
@@ -376,50 +395,10 @@ export class HelixRadioGroup extends HelixElement {
   // ─── Form Integration ───
 
   /**
-   * Returns the associated form element, if any.
-   * @returns The associated `HTMLFormElement`, or `null` if not in a form.
-   */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /**
-   * Returns the validation message.
-   * @returns The current validation message string.
-   */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /**
-   * Returns the ValidityState object.
-   * @returns The `ValidityState` representing the current validity of the element.
-   */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /**
-   * Checks whether the group satisfies its constraints.
-   * @returns `true` if the group is valid, `false` otherwise.
-   */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /**
-   * Reports validity and shows the browser's constraint validation UI.
-   * @returns `true` if the group is valid, `false` otherwise.
-   */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
-  /**
    * Updates the ElementInternals validity state based on the required constraint and current value.
    * @internal
    */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -436,6 +415,7 @@ export class HelixRadioGroup extends HelixElement {
     this.value = '';
     this._internals.setFormValue(null);
     this._syncRadios();
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -532,6 +512,3 @@ declare global {
 
 /** Canonical type alias for the hx-radio-group component. */
 export type HxRadioGroup = HelixRadioGroup;
-
-/** @deprecated Use {@link HxRadioGroup} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcRadioGroup = HelixRadioGroup;

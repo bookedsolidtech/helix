@@ -39,7 +39,7 @@ export const helixNavItemStyles = css`
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-nav-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -245,6 +245,11 @@ export const helixNavItemStyles = css`
   @media (forced-colors: active) {
     :host([active]) .nav-item__link {
       border: 1px solid Highlight;
+    }
+
+    .nav-item__link:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
     }
 
     .nav-item__tooltip {

@@ -8,6 +8,11 @@ import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
+/** Detail for the hx-click event dispatched by hx-button. */
+export interface HxButtonClickDetail {
+  originalEvent: MouseEvent;
+}
+
 /**
  * A production-grade button component for user interaction. Supports multiple
  * visual variants, sizes, loading state, prefix/suffix slots, anchor rendering,

@@ -63,7 +63,7 @@ export const helixStepStyles = css`
     color: var(--hx-color-neutral-500);
     font-size: var(--hx-steps-indicator-font-size, var(--hx-font-size-sm));
     font-weight: var(--hx-font-weight-semibold);
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       border-color var(--hx-transition-fast, 150ms ease),
@@ -101,7 +101,7 @@ export const helixStepStyles = css`
   }
 
   .step__label {
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-steps-label-font-size, var(--hx-font-size-sm));
     font-weight: var(--hx-font-weight-medium);
     color: var(--hx-steps-label-color, var(--hx-color-neutral-600));
@@ -109,7 +109,7 @@ export const helixStepStyles = css`
   }
 
   .step__description {
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-steps-description-font-size, var(--hx-font-size-xs));
     color: var(--hx-steps-description-color, var(--hx-color-neutral-500));
     margin-top: var(--hx-space-1, 0.25rem);
@@ -252,6 +252,11 @@ export const helixStepStyles = css`
 
     :host([status='complete']) .step__connector {
       background-color: Highlight;
+    }
+
+    :host(:focus-visible) .step__indicator {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
     }
   }
 `;

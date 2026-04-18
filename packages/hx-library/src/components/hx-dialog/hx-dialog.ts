@@ -1,8 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -37,6 +37,12 @@ const FOCUSABLE_SELECTORS = [
  * @fires {CustomEvent<void>} hx-open - Fired when the dialog opens.
  * @fires {CustomEvent<void>} hx-close - Fired when the dialog closes for any reason.
  * @fires {CustomEvent<void>} hx-cancel - Fired when the dialog is dismissed via Escape key or cancel action.
+ *
+ * **Event naming rationale:** hx-dialog intentionally uses `hx-open`/`hx-close`/`hx-cancel`
+ * instead of the `hx-show`/`hx-hide`/`hx-after-show`/`hx-after-hide` pattern used by overlay
+ * components (hx-drawer, hx-popover, hx-tooltip). This aligns with the native `<dialog>`
+ * element's `close` and `cancel` events and communicates that the dialog is a stateful container
+ * (open/closed) rather than a transient visibility toggle (show/hide).
  *
  * @csspart dialog - The inner container div that holds the dialog content.
  * @csspart backdrop - The non-modal backdrop overlay element.
@@ -84,7 +90,7 @@ const FOCUSABLE_SELECTORS = [
  * Focus restoration to the trigger element is handled automatically by the component.
  */
 @customElement('hx-dialog')
-export class HelixDialog extends LitElement {
+export class HelixDialog extends HelixElement {
   static override styles = [helixDialogStyles];
 
   // D10 — observe aria-label attribute without shadowing ARIAMixin.ariaLabel
@@ -114,9 +120,31 @@ export class HelixDialog extends LitElement {
   /** @internal */
   private _cachedFocusableElements: HTMLElement[] = [];
 
-  /** Guards against rapid open/close state changes causing asymmetric scroll lock. */
+  /**
+   * Guards against re-entrant open/close calls within a single async open cycle.
+   *
+   * STATE MANAGEMENT CONTRACT
+   * ─────────────────────────
+   * `this.open` (the Lit property) is the single source of truth for dialog open state.
+   * All native `<dialog>` state changes (`showModal()`, `show()`, `close()`) flow exclusively
+   * from `updated()` → `_openDialog()` / `_closeDialog()`. External callers MUST only set
+   * `this.open`; they must never call native dialog methods directly.
+   *
+   * `_isTransitioning` is set to `true` at the start of `_openDialog()` to prevent a second
+   * open call from running concurrently while the first is awaiting `updateComplete`. It is
+   * cleared synchronously after the async tail completes. A 200 ms fallback timeout ensures
+   * the flag is always released even if `updateComplete` never resolves (e.g. detached DOM).
+   *
+   * `_closeDialog()` does NOT use `_isTransitioning` as a guard — it always runs immediately
+   * to honour a `this.open = false` that arrives during the open async tail. The open async
+   * tail checks `this.open` before touching focus so it can abort cleanly.
+   */
   /** @internal */
   private _isTransitioning = false;
+
+  /** Fallback timer that releases `_isTransitioning` if the open async tail never fires. */
+  /** @internal */
+  private _transitionFallbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** The element that had focus when the dialog opened — restored on close (D1). */
   /** @internal */
@@ -145,12 +173,14 @@ export class HelixDialog extends LitElement {
   open = false;
 
   /**
-   * When true, renders as a modal dialog with a backdrop and focus trap.
-   * When false, renders as a non-modal dialog.
+   * When true, dialog renders as a modal with backdrop and focus trap using the native
+   * `showModal()` API. When false (default), dialog renders as a non-modal overlay using
+   * the native `show()` API. Defaults to false, consistent with HTML boolean attribute
+   * semantics (absent = false, present = true).
    * @attr modal
    */
   @property({ type: Boolean, reflect: true })
-  modal = true;
+  modal = false;
 
   /**
    * When true, clicking the backdrop closes the dialog.
@@ -170,7 +200,7 @@ export class HelixDialog extends LitElement {
    * Text content for the dialog heading. Used as the accessible label via aria-labelledby.
    * @attr heading
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   heading = '';
 
   /**
@@ -217,9 +247,9 @@ export class HelixDialog extends LitElement {
   }
 
   override firstUpdated(): void {
-    // Initialize header slot state without a querySelector in render()
-    this._hasHeaderSlot = this.querySelector('[slot="header"]') !== null;
-    // Warn when no accessible heading is available
+    // Warn when no accessible heading is available.
+    // _hasHeaderSlot is maintained by the slotchange handler; check it here
+    // on first paint so a missing heading triggers the dev warning immediately.
     if (!this.heading.trim() && !this._hasHeaderSlot) {
       devWarn(
         'hx-dialog',
@@ -230,6 +260,8 @@ export class HelixDialog extends LitElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    this._clearTransitionFallback();
+    this._isTransitioning = false;
     this._removeGlobalListeners();
     // Restore body scroll if disconnected while open
     if (this.modal && this.open) {
@@ -275,39 +307,66 @@ export class HelixDialog extends LitElement {
 
   // ─── Private: Open / Close ───
 
+  /** Clears the fallback timer that releases `_isTransitioning`. @internal */
+  private _clearTransitionFallback(): void {
+    if (this._transitionFallbackTimer !== null) {
+      clearTimeout(this._transitionFallbackTimer);
+      this._transitionFallbackTimer = null;
+    }
+  }
+
   /** @internal */
   private _openDialog(): void {
     const dialog = this._dialogEl;
     if (!dialog) return;
+
+    // Guard: already open in the native dialog — nothing to do.
+    if (dialog.open) return;
+
+    // Guard: re-entrant call during our own async open tail — skip.
     if (this._isTransitioning) return;
+
     this._isTransitioning = true;
 
+    // 200 ms fallback — releases the transitioning flag if updateComplete never
+    // resolves (e.g. component detached mid-cycle or in a test environment that
+    // does not flush promises). Prevents the dialog from getting permanently stuck.
+    this._clearTransitionFallback();
+    this._transitionFallbackTimer = setTimeout(() => {
+      this._transitionFallbackTimer = null;
+      this._isTransitioning = false;
+    }, 200);
+
     // D1 — store the element that triggered the dialog open for focus restoration on close
-    this._triggerElement = document.activeElement as HTMLElement | null;
+    const active = document.activeElement;
+    this._triggerElement = active instanceof HTMLElement ? active : null;
 
     if (this.modal) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
+      // showModal() throws if the dialog is already in the DOM as open — guard above
+      // ensures dialog.open is false before reaching here.
+      dialog.showModal();
       // D4 — lock body scroll when modal dialog is open. Uses a shared reference-counted
       // lock so that simultaneous hx-dialog / hx-drawer instances don't clobber each other
       // when one closes before the other (see utils/body-scroll-lock.ts).
       lockBodyScroll();
     } else {
-      if (!dialog.open) {
-        dialog.show();
-      }
+      dialog.show();
     }
 
     this._addGlobalListeners();
 
-    // Cache focusable elements after the dialog is open in the DOM
+    // Cache focusable elements after the dialog is open in the DOM.
     void this.updateComplete.then(() => {
+      // Cancel if `this.open` was set to false during this async tail — `_closeDialog`
+      // already ran synchronously and we must not clobber its state.
+      this._clearTransitionFallback();
+      this._isTransitioning = false;
+      if (!this.open) return;
+
       this._cachedFocusableElements = this._getFocusableElements();
       // D3 — explicitly move initial focus to the first focusable element inside the dialog
       // (browser's built-in focus delegation cannot reach slotted light DOM through Shadow DOM)
       this._cachedFocusableElements[0]?.focus();
-      this._isTransitioning = false;
     });
 
     this.dispatchEvent(
@@ -322,23 +381,35 @@ export class HelixDialog extends LitElement {
   private _closeDialog(): void {
     const dialog = this._dialogEl;
     if (!dialog) return;
-    if (this._isTransitioning) return;
-    this._isTransitioning = true;
 
-    const wasOpen = dialog.open;
-    if (dialog.open) {
-      // D11 — forward returnValue to native dialog.close() if provided
-      if (this._pendingReturnValue !== undefined) {
-        dialog.close(this._pendingReturnValue);
-        this._pendingReturnValue = undefined;
-      } else {
-        dialog.close();
-      }
+    // Guard: already closed in the native dialog — nothing to do, but still
+    // release any stuck transitioning state so the next open can proceed.
+    if (!dialog.open) {
+      // Release transitioning lock in case we are in the open async tail.
+      this._clearTransitionFallback();
+      this._isTransitioning = false;
+      return;
     }
 
-    // D4 — release body scroll lock. Uses shared counter so scroll is only restored
-    // after every open overlay (hx-dialog + hx-drawer) has closed.
-    unlockBodyScroll();
+    // Close always wins over a concurrent open async tail. We clear the
+    // transitioning flag and cancel the fallback so the open tail's own
+    // early-return check (`if (!this.open) return`) fires correctly.
+    this._clearTransitionFallback();
+    this._isTransitioning = false;
+
+    // D11 — forward returnValue to native dialog.close() if provided
+    if (this._pendingReturnValue !== undefined) {
+      dialog.close(this._pendingReturnValue);
+      this._pendingReturnValue = undefined;
+    } else {
+      dialog.close();
+    }
+
+    // D4 — release body scroll lock only when this dialog was opened as modal.
+    // Non-modal dialogs never call lockBodyScroll(), so the unlock must be symmetric.
+    if (this.modal) {
+      unlockBodyScroll();
+    }
 
     this._removeGlobalListeners();
     this._cachedFocusableElements = [];
@@ -347,16 +418,12 @@ export class HelixDialog extends LitElement {
     this._triggerElement?.focus();
     this._triggerElement = null;
 
-    this._isTransitioning = false;
-
-    if (wasOpen) {
-      this.dispatchEvent(
-        new CustomEvent<void>('hx-close', {
-          bubbles: true,
-          composed: true,
-        }),
-      );
-    }
+    this.dispatchEvent(
+      new CustomEvent<void>('hx-close', {
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   // ─── Event Listeners ───
@@ -451,7 +518,8 @@ export class HelixDialog extends LitElement {
     const active = document.activeElement;
     // Also check shadow root active element
     const shadowActive = this.shadowRoot?.activeElement;
-    const currentActive = (shadowActive ?? active) as HTMLElement | null;
+    const currentActiveEl = shadowActive ?? active;
+    const currentActive = currentActiveEl instanceof HTMLElement ? currentActiveEl : null;
 
     // The shadow close button may be the first focusable element when no light DOM
     // content exists (WCAG 2.1.2). Check both the element reference and shadow root

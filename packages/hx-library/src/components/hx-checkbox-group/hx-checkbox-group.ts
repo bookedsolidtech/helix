@@ -3,11 +3,17 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
+
+/** Detail for the hx-change event dispatched by hx-checkbox-group. */
+export interface HxCheckboxGroupChangeDetail {
+  values: string[];
+}
 
 /**
  * A form-associated checkbox group that manages a set of `<hx-checkbox>` children.
@@ -26,7 +32,7 @@ const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
  * @csspart group - The fieldset wrapper.
  * @csspart label - The legend/label.
  * @csspart help-text - The help text container.
- * @csspart error-message - The error message container.
+ * @csspart error - The error message container.
  *
  * @cssprop [--hx-checkbox-group-gap=var(--hx-space-3, 0.75rem)] - Gap between checkbox items.
  * @cssprop [--hx-checkbox-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
@@ -45,7 +51,7 @@ const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
  * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
  */
 @customElement('hx-checkbox-group')
-export class HelixCheckboxGroup extends HelixElement {
+export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   static override styles = [helixCheckboxGroupStyles];
 
   // ─── Form Association ───
@@ -163,8 +169,18 @@ export class HelixCheckboxGroup extends HelixElement {
     if (changedProperties.has('name')) {
       this._syncCheckboxNames();
     }
-    if (changedProperties.has('required')) {
-      this._updateValidity();
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
     }
   }
 
@@ -221,6 +237,7 @@ export class HelixCheckboxGroup extends HelixElement {
     const values = this._getCheckedValues();
     this._updateFormValue(values);
     this._updateValidity(values);
+    this._handleInteractionInput();
 
     /**
      * Dispatched when any child checkbox changes.
@@ -258,7 +275,7 @@ export class HelixCheckboxGroup extends HelixElement {
   }
 
   /** @internal */
-  private _updateValidity(values?: string[]): void {
+  override _updateValidity(values?: string[]): void {
     const checkedValues = values ?? this._getCheckedValues();
     if (this.required && checkedValues.length === 0) {
       const firstCheckbox = this._getCheckboxes()[0];
@@ -272,31 +289,6 @@ export class HelixCheckboxGroup extends HelixElement {
     }
   }
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the group satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
   protected override _onFormReset(): void {
     const checkboxes = this._getCheckboxes();
@@ -305,6 +297,7 @@ export class HelixCheckboxGroup extends HelixElement {
     });
     this._internals.setFormValue(null);
     this._updateValidity([]);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -365,7 +358,7 @@ export class HelixCheckboxGroup extends HelixElement {
         </div>
 
         ${hasError
-          ? html`<div part="error-message" class="fieldset__error" id=${this._errorId} role="alert">
+          ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert">
               <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
             </div>`
           : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}

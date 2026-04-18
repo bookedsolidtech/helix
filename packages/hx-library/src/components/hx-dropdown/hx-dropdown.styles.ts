@@ -20,7 +20,7 @@ export const helixDropdownStyles = css`
     z-index: var(--hx-dropdown-panel-z-index, 1000);
     min-width: var(--hx-dropdown-panel-min-width, 160px);
     background: var(--hx-dropdown-panel-bg, var(--hx-color-neutral-0, #ffffff));
-    border: 1px solid var(--hx-dropdown-panel-border-color, var(--hx-color-neutral-200, #e5e7eb));
+    border: 1px solid var(--hx-dropdown-panel-border-color, var(--hx-color-neutral-200, #e2e8f0));
     border-radius: var(--hx-dropdown-panel-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-dropdown-panel-shadow,

@@ -350,6 +350,193 @@ describe('hx-progress-bar', () => {
     });
   });
 
+  // ─── aria-valuetext ───
+
+  describe('aria-valuetext', () => {
+    it('sets aria-valuetext as percentage string for determinate state', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Progress"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuetext')).toBe('50%');
+    });
+
+    it('sets aria-valuetext to "In progress" for indeterminate state', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Loading"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuetext')).toBe('In progress');
+    });
+
+    it('includes variant label in aria-valuetext for success variant', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="100" variant="success" label="Done"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuetext')).toContain('Success');
+    });
+
+    it('includes variant label in aria-valuetext for warning variant', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" variant="warning" label="Progress"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuetext')).toContain('Warning');
+    });
+
+    it('includes variant label in aria-valuetext for danger variant', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="25" variant="danger" label="Critical"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-valuetext')).toContain('Danger');
+    });
+  });
+
+  // ─── hx-complete event properties ───
+
+  describe('hx-complete event properties', () => {
+    it('hx-complete event bubbles and is composed', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Upload"></hx-progress-bar>',
+      );
+      let capturedEvent: CustomEvent | null = null;
+      el.addEventListener('hx-complete', (e) => {
+        capturedEvent = e as CustomEvent;
+      });
+      el.value = 100;
+      await el.updateComplete;
+      expect(capturedEvent).toBeTruthy();
+      expect(capturedEvent!.bubbles).toBe(true);
+      expect(capturedEvent!.composed).toBe(true);
+    });
+
+    it('hx-complete fires when max changes to equal current value', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="80" label="Progress"></hx-progress-bar>',
+      );
+      const eventPromise = new Promise<Event>((resolve) => {
+        el.addEventListener('hx-complete', resolve, { once: true });
+      });
+      el.max = 80;
+      await el.updateComplete;
+      const event = await eventPromise;
+      expect(event.type).toBe('hx-complete');
+    });
+
+    it('updates live message to "Complete" when value reaches max', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Progress"></hx-progress-bar>',
+      );
+      el.value = 100;
+      await el.updateComplete;
+      // _liveMessage is @state() set in updated(); await a second cycle for its re-render.
+      await el.updateComplete;
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]')!;
+      expect(liveRegion.textContent?.trim()).toBe('Complete');
+    });
+
+    it('clears live message when value drops below max', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="100" label="Progress"></hx-progress-bar>',
+      );
+      // Initial value=100 triggers _liveMessage='Complete' in updated(); wait for its render.
+      await el.updateComplete;
+
+      el.value = 80;
+      await el.updateComplete;
+      // _liveMessage='' is set in updated(); await a second cycle for its re-render.
+      await el.updateComplete;
+      const liveRegion = shadowQuery(el, '[aria-live="polite"]')!;
+      expect(liveRegion.textContent?.trim()).toBe('');
+    });
+  });
+
+  // ─── variant label sr-only span ───
+
+  describe('Variant label sr-only span', () => {
+    it('renders sr-only variant label span for success variant', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="100" variant="success" label="Done"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const srSpans = shadowQueryAll(el, '.sr-only');
+      const variantSpan = srSpans.find((s) =>
+        s.classList.contains('progress-bar__variant-label'),
+      );
+      expect(variantSpan).toBeTruthy();
+      expect(variantSpan?.textContent).toBe('Success');
+    });
+
+    it('does not render variant label span for default variant', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Progress"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const variantSpan = shadowQuery(el, '.progress-bar__variant-label');
+      expect(variantSpan).toBeNull();
+    });
+  });
+
+  // ─── label slot: aria-labelledby vs aria-label ───
+
+  describe('label slot: aria-labelledby vs aria-label', () => {
+    it('uses aria-label when label attribute is set and no slot content', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Upload progress"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const track = shadowQuery(el, '[part="track"]')!;
+      expect(track.getAttribute('aria-label')).toBe('Upload progress');
+      expect(track.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('label wrapper is rendered when label attribute is set', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" label="Upload"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      const labelPart = shadowQuery(el, '[part="label"]');
+      expect(labelPart).toBeTruthy();
+    });
+  });
+
+  // ─── NaN value handling ───
+
+  describe('NaN value handling', () => {
+    it('devWarn fires and percentage defaults to 0 when value is NaN', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Progress"></hx-progress-bar>',
+      );
+      // Directly set value to NaN via property (reflects as attribute)
+      (el as unknown as { value: number }).value = NaN;
+      await el.updateComplete;
+
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0');
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── range <= 0 edge case ───
+
+  describe('range <= 0 edge case', () => {
+    it('percentage is 0 when min equals max', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" min="100" max="100" label="Progress"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_value-ratio')).toBe('0');
+    });
+  });
+
   // ─── Property: description ───
 
   describe('Property: description', () => {

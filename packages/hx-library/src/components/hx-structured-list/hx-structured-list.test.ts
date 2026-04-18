@@ -215,6 +215,80 @@ describe('hx-structured-list', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Property: label ───
+
+  describe('Property: label', () => {
+    it('defaults to empty string', async () => {
+      const el = await fixture<HelixStructuredList>('<hx-structured-list></hx-structured-list>');
+      expect(el.label).toBe('');
+    });
+
+    it('sets aria-label on base div when label is provided', async () => {
+      const el = await fixture<HelixStructuredList>(
+        '<hx-structured-list label="Patient info"></hx-structured-list>',
+      );
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-label')).toBe('Patient info');
+    });
+
+    it('does not set aria-label when label is empty string', async () => {
+      const el = await fixture<HelixStructuredList>('<hx-structured-list></hx-structured-list>');
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('updates aria-label when label property is changed', async () => {
+      const el = await fixture<HelixStructuredList>('<hx-structured-list></hx-structured-list>');
+      el.label = 'Updated label';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.getAttribute('aria-label')).toBe('Updated label');
+    });
+  });
+
+  // ─── Role preservation after upgrade (1) ───
+
+  describe('Role preservation', () => {
+    it('does not override an existing role attribute if already set', async () => {
+      const el = document.createElement('hx-structured-list') as HelixStructuredList;
+      el.setAttribute('role', 'region');
+      document.body.appendChild(el);
+      await customElements.whenDefined('hx-structured-list');
+      // connectedCallback should not overwrite an existing role
+      expect(el.getAttribute('role')).toBe('region');
+      el.remove();
+    });
+  });
+
+  // ─── Multiple rows (1) ───
+
+  describe('Multiple rows', () => {
+    it('accepts multiple hx-structured-list-row children', async () => {
+      const el = await fixture<HelixStructuredList>(`
+        <hx-structured-list>
+          <hx-structured-list-row><span slot="label">A</span>1</hx-structured-list-row>
+          <hx-structured-list-row><span slot="label">B</span>2</hx-structured-list-row>
+          <hx-structured-list-row><span slot="label">C</span>3</hx-structured-list-row>
+        </hx-structured-list>
+      `);
+      const rows = el.querySelectorAll('hx-structured-list-row');
+      expect(rows.length).toBe(3);
+    });
+  });
+
+  // ─── condensed + striped combined (1) ───
+
+  describe('Combined variants', () => {
+    it('bordered condensed striped attributes can all be set simultaneously', async () => {
+      const el = await fixture<HelixStructuredList>(
+        '<hx-structured-list bordered condensed striped></hx-structured-list>',
+      );
+      expect(el.bordered).toBe(true);
+      expect(el.condensed).toBe(true);
+      expect(el.striped).toBe(true);
+    });
+  });
 });
 
 // ─── hx-structured-list-row ───
@@ -360,6 +434,67 @@ describe('hx-structured-list-row', () => {
       await page.screenshot();
       const { violations } = await checkA11y(container);
       expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations — standalone row', async () => {
+      // hx-structured-list-row has role="listitem" on its host element. axe enforces
+      // aria-required-parent, so the row must be inside a role="list" container.
+      // Wrap in hx-structured-list (which sets role="list") to satisfy axe.
+      const container = await fixture<HelixStructuredList>(`
+        <hx-structured-list>
+          <hx-structured-list-row>
+            <span slot="label">Department</span>
+            Cardiology
+          </hx-structured-list-row>
+        </hx-structured-list>
+      `);
+      await container.updateComplete;
+      const el = container.querySelector<HelixStructuredListRow>('hx-structured-list-row')!;
+      await el.updateComplete;
+      await page.screenshot();
+      // Use useElement to allow axe to traverse across the shadow boundary
+      const { violations } = await checkA11y(container, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+
+    it('has no axe violations — row with actions', async () => {
+      const container = await fixture<HelixStructuredList>(`
+        <hx-structured-list>
+          <hx-structured-list-row>
+            <span slot="label">Phone</span>
+            555-0100
+            <button slot="actions" aria-label="Edit phone">Edit</button>
+          </hx-structured-list-row>
+        </hx-structured-list>
+      `);
+      await page.screenshot();
+      const { violations } = await checkA11y(container);
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── Role preservation (1) ───
+
+  describe('Role preservation', () => {
+    it('does not override an existing role attribute if already set', async () => {
+      const el = document.createElement('hx-structured-list-row') as HelixStructuredListRow;
+      el.setAttribute('role', 'row');
+      document.body.appendChild(el);
+      await customElements.whenDefined('hx-structured-list-row');
+      expect(el.getAttribute('role')).toBe('row');
+      el.remove();
+    });
+  });
+
+  // ─── Default slot empty state (1) ───
+
+  describe('Empty state', () => {
+    it('renders without content slots without throwing', async () => {
+      const el = await fixture<HelixStructuredListRow>(
+        '<hx-structured-list-row></hx-structured-list-row>',
+      );
+      const base = shadowQuery(el, '[part~="base"]');
+      expect(base).toBeTruthy();
     });
   });
 });

@@ -1,10 +1,24 @@
 #!/usr/bin/env node
-/* global console */
+/* global console, process */
 
 // Auto-generates src/index.ts from component directories.
-// Scans src/components/<name>/index.ts and re-exportLines everything.
-// Eliminates merge conflicts on the barrel file when multiple
-// component PRs target main simultaneously.
+// Scans src/components/<name>/index.ts and re-exports component-level symbols.
+// Eliminates merge conflicts on the barrel file when multiple component PRs
+// target main simultaneously.
+//
+// Public-API surface policy (HELiX 3.0.0 API freeze):
+// -----------------------------------------------------------------------------
+// Top-level re-exports from base/, mixins/, controllers/, and utilities/ are
+// governed by an explicit ALLOWLIST (see PUBLIC_API below). Internals are the
+// default — exposure through the public barrel must be opted into by adding
+// the symbol to the allowlist. Any symbol present in source but absent from
+// the allowlist is dropped from the generated barrel and flagged on stderr so
+// regressions are visible.
+//
+// Component-level exports (./components/*/index.ts) are auto-scanned and
+// forwarded as-is; component authors are expected to keep their own
+// index.ts minimal and public by construction.
+//
 // Usage: node scripts/generate-barrel.js
 
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -16,13 +30,44 @@ const rootDir = join(__dirname, '..');
 const componentsDir = join(rootDir, 'src', 'components');
 const outputFile = join(rootDir, 'src', 'index.ts');
 
-// Scan component directories
+// ─── Public-API allowlist ────────────────────────────────────────────────────
+// Every top-level symbol re-exported from the barrel must be listed here.
+// Adding a new public symbol: append to the relevant module group.
+// Removing a public symbol: delete it here; the generator will omit it.
+// Keep internal helpers (id-counter reset, audit controller, aria delegation
+// mixin, style-registry utilities, etc.) OUT of this list. Consumers that
+// need them must use a deep import path — that contract is intentional.
+/** @type {Record<string, { values: string[]; types: string[] }>} */
+const PUBLIC_API = {
+  './utilities/document-token-adoption.js': {
+    values: ['ensureDocumentTokens'],
+    types: [],
+  },
+  './base/index.js': {
+    // resetIdCounter is intentionally excluded — it is a test-only helper
+    // re-exported from ./test-utils.ts. Exposing it publicly would let
+    // consumers reset the ID counter mid-run and break ARIA relationships.
+    values: ['HelixElement', 'createIdCounter', 'mergeTokenStyles'],
+    types: [],
+  },
+  './mixins/index.js': {
+    // mixinDelegatesAria, AriaDelegationMixinInterface, AriaAttribute are
+    // internal implementation details consumed only by first-party components.
+    values: ['FocusMixin', 'FormMixin'],
+    types: ['FocusMixinInterface', 'FormMixinInterface'],
+  },
+  // Controllers are not part of the public API. HelixAuditController is
+  // internal observability infrastructure for HIPAA audit-trail integration;
+  // it remains importable via its deep path for consumers that explicitly
+  // opt in to the internal surface.
+};
+
+// ─── Component barrel scan ───────────────────────────────────────────────────
 const components = readdirSync(componentsDir, { withFileTypes: true })
   .filter((d) => d.isDirectory() && d.name.startsWith('hx-'))
   .map((d) => d.name)
   .sort();
 
-// Extract exportLines from each component's index.ts
 const exportLines = [];
 
 for (const component of components) {
@@ -31,11 +76,10 @@ for (const component of components) {
 
   const content = readFileSync(indexPath, 'utf-8');
 
-  // Match export { Foo } or export type { Foo } patterns
+  // Match `export { Foo }` or `export type { Foo }` patterns.
   const exportMatch = content.match(/export\s+(?:type\s+)?\{([^}]+)\}\s*from\s*['"][^'"]+['"]/g);
   if (!exportMatch) continue;
 
-  // Re-export from the component directory
   for (const line of exportMatch) {
     const isTypeExport = /^export\s+type\s+\{/.test(line);
     const names = line.match(/\{([^}]+)\}/)?.[1];
@@ -52,24 +96,139 @@ for (const component of components) {
   }
 }
 
-// Base infrastructure exports (manually maintained section, always prepended)
-const baseExports = [
-  "export { HelixElement } from './base/index.js';",
-  "export { createIdCounter, resetIdCounter } from './base/index.js';",
-  "export { mergeTokenStyles } from './base/index.js';",
-  '',
-  '// ─── Mixins ───────────────────────────────────────────────────────────────────',
-  "export { FocusMixin } from './mixins/index.js';",
-  "export type { FocusMixinInterface } from './mixins/index.js';",
-].join('\n');
+// ─── Allowlist materialization with leak detection ───────────────────────────
+// For each module in PUBLIC_API, read the source index and verify every
+// allowlisted symbol actually exists. Additionally, warn about symbols that
+// are exported from the source module but not allowlisted — these are
+// potential internal leaks that future work may need to audit.
+/**
+ * Extract the set of value and type identifiers exported from an index.ts-like
+ * source file. Handles:
+ *   - `export { A, B as C } from '...'` (value re-export)
+ *   - `export type { T } from '...'` (type re-export)
+ *   - `export { A, B } ;` (local value re-export)
+ *   - `export type { T } ;` (local type re-export)
+ *   - `export function foo()` / `export class Foo` / `export const foo =` (value)
+ *   - `export type Foo = ...` / `export interface Foo` (type)
+ */
+function scanModuleExports(sourcePath) {
+  if (!existsSync(sourcePath)) return { values: new Set(), types: new Set() };
+  const content = readFileSync(sourcePath, 'utf-8');
+  const values = new Set();
+  const types = new Set();
 
-// Controller exports (manually maintained — add new controllers here)
-const controllerExports = [
-  "export { HelixAuditController } from './controllers/helix-audit-controller.js';",
-  "export type { AuditEventDetail, AuditControllerOptions } from './controllers/helix-audit-controller.js';",
-].join('\n');
+  const stripAlias = (name) =>
+    name
+      .split(/\s+as\s+/)
+      .pop()
+      ?.trim() ?? name;
 
-// Generate the barrel file
+  // Re-exports with or without a `from '...'` clause.
+  const reexportPattern = /export\s+(type\s+)?\{([^}]+)\}\s*(?:from\s*['"][^'"]+['"])?\s*;?/g;
+  let match;
+  while ((match = reexportPattern.exec(content)) !== null) {
+    const isType = Boolean(match[1]);
+    const names = match[2]
+      .split(',')
+      .map((n) => n.trim())
+      .filter(Boolean)
+      .map(stripAlias);
+    for (const name of names) {
+      (isType ? types : values).add(name);
+    }
+  }
+
+  // Direct value declarations: export function / class / const / let / var.
+  const valueDeclPattern =
+    /^\s*export\s+(?:default\s+)?(?:async\s+)?(?:function\*?|class|const|let|var)\s+([A-Za-z_$][\w$]*)/gm;
+  while ((match = valueDeclPattern.exec(content)) !== null) {
+    values.add(match[1]);
+  }
+
+  // Direct type declarations: export type / interface / enum.
+  const typeDeclPattern = /^\s*export\s+(?:type|interface|enum)\s+([A-Za-z_$][\w$]*)/gm;
+  while ((match = typeDeclPattern.exec(content)) !== null) {
+    types.add(match[1]);
+  }
+
+  return { values, types };
+}
+
+/**
+ * Resolve an import specifier like './base/index.js' to an absolute source
+ * path, accounting for the .js → .ts mapping used by TypeScript projects.
+ */
+function resolveModulePath(spec) {
+  // Start from src/index.ts location (i.e., src/)
+  const srcDir = join(rootDir, 'src');
+  const asTs = join(srcDir, spec.replace(/\.js$/, '.ts'));
+  return existsSync(asTs) ? asTs : join(srcDir, spec);
+}
+
+const warnings = [];
+const renderedGroups = [];
+
+for (const [spec, allow] of Object.entries(PUBLIC_API)) {
+  const sourcePath = resolveModulePath(spec);
+  const { values: availableValues, types: availableTypes } = scanModuleExports(sourcePath);
+
+  // Detect allowlist entries that no longer exist in source (typos, deletions).
+  for (const name of allow.values) {
+    if (!availableValues.has(name)) {
+      warnings.push(
+        `[allowlist] ${spec}: value "${name}" is in PUBLIC_API but not exported by source.`,
+      );
+    }
+  }
+  for (const name of allow.types) {
+    if (!availableTypes.has(name)) {
+      warnings.push(
+        `[allowlist] ${spec}: type "${name}" is in PUBLIC_API but not exported by source.`,
+      );
+    }
+  }
+
+  // Detect symbols exported from source but not allowlisted — potential leaks
+  // that the generator is intentionally suppressing.
+  const droppedValues = [...availableValues].filter((n) => !allow.values.includes(n));
+  const droppedTypes = [...availableTypes].filter((n) => !allow.types.includes(n));
+  for (const name of droppedValues) {
+    warnings.push(
+      `[gated] ${spec}: value "${name}" is exported from source but NOT in PUBLIC_API (dropped from barrel).`,
+    );
+  }
+  for (const name of droppedTypes) {
+    warnings.push(
+      `[gated] ${spec}: type "${name}" is exported from source but NOT in PUBLIC_API (dropped from barrel).`,
+    );
+  }
+
+  const lines = [];
+  if (allow.values.length > 0) {
+    lines.push(`export { ${allow.values.join(', ')} } from '${spec}';`);
+  }
+  if (allow.types.length > 0) {
+    lines.push(`export type { ${allow.types.join(', ')} } from '${spec}';`);
+  }
+  if (lines.length > 0) {
+    renderedGroups.push({ spec, lines });
+  }
+}
+
+// Compose the prelude sections in a stable, readable order.
+const utilitySpec = './utilities/document-token-adoption.js';
+const baseSpec = './base/index.js';
+const mixinsSpec = './mixins/index.js';
+
+const utilityGroup = renderedGroups.find((g) => g.spec === utilitySpec);
+const baseGroup = renderedGroups.find((g) => g.spec === baseSpec);
+const mixinsGroup = renderedGroups.find((g) => g.spec === mixinsSpec);
+
+const utilityBlock = utilityGroup ? utilityGroup.lines.join('\n') : '';
+const baseBlock = baseGroup ? baseGroup.lines.join('\n') : '';
+const mixinsBlock = mixinsGroup ? mixinsGroup.lines.join('\n') : '';
+
+// ─── Render ──────────────────────────────────────────────────────────────────
 const output = `/**
  * @helixui/library - Enterprise Healthcare Web Component Library
  *
@@ -78,6 +237,10 @@ const output = `/**
  *
  * AUTO-GENERATED — Do not edit manually.
  * Run \`npm run generate:barrel\` to regenerate.
+ *
+ * Public-API surface is gated by an allowlist in scripts/generate-barrel.js.
+ * Internals (HelixAuditController, resetIdCounter, mixinDelegatesAria, etc.)
+ * are intentionally excluded and must be imported via deep paths if needed.
  */
 
 // ─── Document-level token adoption ──────────────────────────────────────────
@@ -86,13 +249,13 @@ const output = `/**
 import './utilities/document-token-adoption.js';
 
 // ─── Exported API for document-level token adoption ─────────────────────────
-export { ensureDocumentTokens } from './utilities/document-token-adoption.js';
+${utilityBlock}
 
 // ─── Base infrastructure ────────────────────────────────────────────────────
-${baseExports}
+${baseBlock}
 
-// ─── Controllers ─────────────────────────────────────────────────────────────
-${controllerExports}
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+${mixinsBlock}
 
 // ─── Components ──────────────────────────────────────────────────────────────
 ${exportLines.join('\n')}
@@ -100,5 +263,22 @@ ${exportLines.join('\n')}
 
 writeFileSync(outputFile, output);
 
-const count = exportLines.length;
-console.log(`Generated src/index.ts with ${count} component exports.`);
+const componentCount = exportLines.length;
+console.log(`Generated src/index.ts with ${componentCount} component export lines.`);
+
+if (warnings.length > 0) {
+  console.log(
+    `\nPublic-API allowlist report (${warnings.length} notice${warnings.length === 1 ? '' : 's'}):`,
+  );
+  for (const warning of warnings) {
+    console.log(`  ${warning}`);
+  }
+  // Notices are informational only — `[gated]` entries are the expected
+  // internal-suppression behavior. `[allowlist]` entries are real problems
+  // (allowlist points at a symbol that no longer exists) and fail the build.
+  const allowlistErrors = warnings.filter((w) => w.startsWith('[allowlist]'));
+  if (allowlistErrors.length > 0) {
+    console.error(`\n${allowlistErrors.length} allowlist entries reference missing symbols.`);
+    process.exit(1);
+  }
+}

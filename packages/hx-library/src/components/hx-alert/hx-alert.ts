@@ -1,11 +1,17 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixAlertStyles } from './hx-alert.styles.js';
 
 /** Alert variant determines visual styling and ARIA semantics. */
 export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
+
+/** Detail for the hx-close event dispatched by hx-alert. */
+export interface HxAlertCloseDetail {
+  reason: string;
+}
 
 /**
  * A feedback component for communicating status messages, warnings, and errors.
@@ -46,7 +52,7 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
  * @cssprop [--hx-alert-accent-width=4px] - Width of the left border accent stripe.
  */
 @customElement('hx-alert')
-export class HelixAlert extends LitElement {
+export class HelixAlert extends HelixElement {
   static override styles = [helixAlertStyles];
 
   // ─── Properties ───

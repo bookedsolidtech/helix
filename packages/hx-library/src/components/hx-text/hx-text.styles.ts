@@ -9,7 +9,7 @@ export const helixTextStyles = css`
 
   .text {
     display: inline;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-text-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-text-font-size);
     font-weight: var(--hx-text-font-weight);
     line-height: var(--hx-text-line-height);
@@ -75,7 +75,7 @@ export const helixTextStyles = css`
     --hx-text-font-size: var(--hx-font-size-xs, 0.75rem);
     --hx-text-font-weight: var(--hx-font-weight-semibold, 600);
     --hx-text-line-height: var(--hx-line-height-tight, 1.25);
-    --hx-text-letter-spacing: var(--hx-letter-spacing-wide, 0.05em);
+    --hx-text-letter-spacing: var(--hx-letter-spacing-wide, 0.025em);
     text-transform: uppercase;
   }
 
@@ -98,15 +98,15 @@ export const helixTextStyles = css`
   }
 
   .text--color-danger {
-    --hx-text-color: var(--hx-color-error-600, #dc2626);
+    --hx-text-color: var(--hx-color-error-600, #b91c1c);
   }
 
   .text--color-success {
-    --hx-text-color: var(--hx-color-success-600, #16a34a);
+    --hx-text-color: var(--hx-color-success-600, #15803d);
   }
 
   .text--color-warning {
-    --hx-text-color: var(--hx-color-warning-600, #d97706);
+    --hx-text-color: var(--hx-color-warning-600, #b45309);
   }
 
   /* ─── Weight Overrides ─── */
@@ -148,5 +148,38 @@ export const helixTextStyles = css`
 
   :host([lines]:not([lines='0'])) {
     display: block;
+  }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /*
+     * Semantic color variants (danger, success, warning) communicate state via color
+     * alone. In forced-colors mode the browser overrides custom colors, so we must
+     * use system color keywords to preserve the semantic distinction.
+     */
+    .text--color-danger {
+      color: LinkText;
+    }
+
+    .text--color-success {
+      color: CanvasText;
+    }
+
+    .text--color-warning {
+      color: CanvasText;
+    }
+
+    .text--color-disabled {
+      color: GrayText;
+    }
+
+    .text--color-inverse {
+      color: CanvasText;
+    }
+
+    .text--color-subtle {
+      color: CanvasText;
+    }
   }
 `;

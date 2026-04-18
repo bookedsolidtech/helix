@@ -12,4 +12,15 @@ export const hxStyleScopeStyles = css`
   :host {
     display: contents;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  /* hx-style-scope is a transparent layout wrapper (display: contents).
+     It has no visual output of its own. forced-color-adjust: auto (default)
+     is sufficient. */
+  @media (forced-colors: active) {
+    :host {
+      forced-color-adjust: auto;
+    }
+  }
 `;

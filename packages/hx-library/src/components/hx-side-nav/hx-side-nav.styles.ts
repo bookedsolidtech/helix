@@ -169,5 +169,10 @@ export const helixSideNavStyles = css`
       color: ButtonText;
       border: 1px solid ButtonText;
     }
+
+    .side-nav__toggle:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: 2px;
+    }
   }
 `;

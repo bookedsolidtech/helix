@@ -12,6 +12,12 @@ import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
 const _nextCheckboxId = createIdCounter('hx-checkbox');
 
+/** Detail for the hx-change event dispatched by hx-checkbox. */
+export interface HxCheckboxChangeDetail {
+  checked: boolean;
+  value: string;
+}
+
 /**
  * A checkbox component with label, validation, and form association.
  *
@@ -23,7 +29,7 @@ const _nextCheckboxId = createIdCounter('hx-checkbox');
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled.
+ * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`.
  *
  * @csspart checkbox - The visual checkbox element.
  * @csspart checkmark - The SVG checkmark icon inside the checkbox.
@@ -203,7 +209,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   }
 
   /** @internal */
-  protected _updateValidity(): void {
+  _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -396,13 +402,24 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 /** Canonical type alias for the hx-checkbox component. */
 export type HxCheckbox = HelixCheckbox;
 
-/** @deprecated Use {@link HxCheckbox} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcCheckbox = HelixCheckbox;
+/**
+ * Per-component event map for type-safe addEventListener on hx-checkbox.
+ * The `hx-change` detail always includes both `checked` and `value` for this component.
+ */
+export interface HxCheckboxEventMap {
+  'hx-change': CustomEvent<{ checked: boolean; value: string }>;
+}
 
 declare global {
   interface HTMLElementTagNameMap {
     'hx-checkbox': HelixCheckbox;
   }
+  /**
+   * Global hx-change event type. The detail shape is a union because hx-change is dispatched
+   * by multiple components: form-field components (value only) and toggle components
+   * (checked + value). Use per-component EventMap types (e.g. HxCheckboxEventMap) for
+   * narrowed addEventListener calls.
+   */
   interface HTMLElementEventMap {
     'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }

@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
 
 /**
@@ -15,7 +16,7 @@ import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
  * @cssprop [--hx-menu-divider-color=var(--hx-color-neutral-200)] - Divider line color.
  */
 @customElement('hx-menu-divider')
-export class HelixMenuDivider extends LitElement {
+export class HelixMenuDivider extends HelixElement {
   static override styles = [helixMenuDividerStyles];
 
   override render() {

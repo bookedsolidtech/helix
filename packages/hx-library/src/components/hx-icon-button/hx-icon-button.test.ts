@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixIconButton } from './hx-icon-button.js';
@@ -534,6 +534,113 @@ describe('hx-icon-button', () => {
         expect(violations, `variant="${variant}" should have no axe violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── Property: href — additional branches ───
+
+  describe('Property: href — additional branches', () => {
+    it('anchor does not have href when disabled', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="https://example.com" disabled></hx-icon-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('href')).toBe(false);
+    });
+
+    it('anchor does not have aria-disabled when enabled', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="https://example.com"></hx-icon-button>',
+      );
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.hasAttribute('aria-disabled')).toBe(false);
+    });
+
+    it('anchor does not have tabindex when enabled', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="https://example.com"></hx-icon-button>',
+      );
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.hasAttribute('tabindex')).toBe(false);
+    });
+
+    it('dispatches hx-click on anchor click when not disabled', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="https://example.com"></hx-icon-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      anchor.click();
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('does not dispatch hx-click on disabled anchor click', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="https://example.com" disabled></hx-icon-button>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      let fired = false;
+      el.addEventListener('hx-click', () => { fired = true; });
+      anchor.click();
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── devWarn: empty label logs warning ───
+
+  describe('devWarn: empty label', () => {
+    it('warns to console when label is empty string', async () => {
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixIconButton>('<hx-icon-button></hx-icon-button>');
+        await el.updateComplete;
+        const relevantCalls = spy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('label'),
+        );
+        expect(relevantCalls.length).toBeGreaterThan(0);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+  });
+
+  // ─── Dynamic property updates ───
+
+  describe('Dynamic property updates', () => {
+    it('updates variant class when variant property changes', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Action" variant="ghost"></hx-icon-button>',
+      );
+      el.variant = 'primary';
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--primary')).toBe(true);
+      expect(btn.classList.contains('button--ghost')).toBe(false);
+    });
+
+    it('updates size class when size property changes', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Action" hx-size="sm"></hx-icon-button>',
+      );
+      el.size = 'lg';
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--lg')).toBe(true);
+      expect(btn.classList.contains('button--sm')).toBe(false);
+    });
+
+    it('label property trimming normalizes whitespace-padded labels', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="  Close  "></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('Close');
     });
   });
 });

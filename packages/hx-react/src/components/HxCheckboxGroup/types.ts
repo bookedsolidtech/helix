@@ -26,12 +26,6 @@ export interface HxCheckboxGroupProps {
   helpText?: string;
   /** Layout orientation of the checkbox items. */
   orientation?: 'vertical' | 'horizontal';
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched when any child checkbox changes. */

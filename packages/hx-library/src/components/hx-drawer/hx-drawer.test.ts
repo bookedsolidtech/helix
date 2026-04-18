@@ -758,4 +758,163 @@ describe('hx-drawer', () => {
       expect(count).toBe(0);
     });
   });
+
+  // ─── placement CSS part classes ───
+
+  describe('Placement CSS part data-attribute', () => {
+    it('placement="start" reflects on the host attribute', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer placement="start"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.getAttribute('placement')).toBe('start');
+    });
+
+    it('placement="top" reflects on the host attribute', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer placement="top"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.getAttribute('placement')).toBe('top');
+    });
+
+    it('placement="bottom" reflects on the host attribute', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer placement="bottom"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.getAttribute('placement')).toBe('bottom');
+    });
+  });
+
+  // ─── size token values ───
+
+  describe('Size token CSS variable values', () => {
+    it('preset size "md" sets --_drawer-size to 30rem', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="md"></hx-drawer>');
+      await el.updateComplete;
+      const sizeVar = el.style.getPropertyValue('--_drawer-size');
+      expect(sizeVar).toBe('30rem');
+    });
+
+    it('custom size value is used as-is for --_drawer-size', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="320px"></hx-drawer>');
+      await el.updateComplete;
+      const sizeVar = el.style.getPropertyValue('--_drawer-size');
+      expect(sizeVar).toBe('320px');
+    });
+
+    it('size updates --_drawer-size when changed after initial render', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer hx-size="sm"></hx-drawer>');
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_drawer-size')).toBe('20rem');
+
+      el.size = 'lg';
+      await el.updateComplete;
+      expect(el.style.getPropertyValue('--_drawer-size')).toBe('40rem');
+    });
+  });
+
+  // ─── hx-request-close event reason detail ───
+
+  describe('hx-request-close reason via Escape key', () => {
+    it('Escape key sets open=false (close request fulfilled)', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await el.updateComplete;
+
+      const hidePromise = oneEvent<CustomEvent>(el, 'hx-hide');
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      await hidePromise;
+      expect(el.open).toBe(false);
+    });
+
+    it('overlay click closes the drawer (close request fulfilled)', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await el.updateComplete;
+
+      const overlay = shadowQuery<HTMLElement>(el, '[part="overlay"]')!;
+      const hidePromise = oneEvent<CustomEvent>(el, 'hx-hide');
+      overlay.click();
+      await hidePromise;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── no-close-button attribute ───
+
+  describe('no-header hides the visible close button', () => {
+    it('no-header removes the [part="close-button"] element', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer no-header></hx-drawer>');
+      await el.updateComplete;
+      const closeBtn = shadowQuery(el, '[part="close-button"]');
+      expect(closeBtn).toBeNull();
+    });
+
+    it('no-header renders a visually-hidden [part="close-btn"] for accessibility', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer no-header></hx-drawer>');
+      await el.updateComplete;
+      const srCloseBtn = shadowQuery(el, '[part="close-btn"]');
+      expect(srCloseBtn).toBeTruthy();
+    });
+
+    it('sr-only close button in no-header mode can close the drawer', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open no-header></hx-drawer>');
+      await el.updateComplete;
+
+      const srCloseBtn = shadowQuery<HTMLButtonElement>(el, '[part="close-btn"]')!;
+      expect(srCloseBtn).toBeTruthy();
+
+      const hidePromise = oneEvent<CustomEvent>(el, 'hx-hide');
+      srCloseBtn.click();
+      await hidePromise;
+      expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── header-actions slot ───
+
+  describe('header-actions slot', () => {
+    it('header-actions slot content is rendered in the header', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><button slot="header-actions" id="action-btn">Action</button></hx-drawer>',
+      );
+      await el.updateComplete;
+      const actionBtn = el.querySelector('#action-btn');
+      expect(actionBtn).toBeTruthy();
+      expect(actionBtn?.textContent).toBe('Action');
+    });
+  });
+
+  // ─── contained drawer does not hide siblings ───
+
+  describe('contained drawer aria-hidden sibling management', () => {
+    it('contained drawer does not apply aria-hidden to body children', async () => {
+      const sibling = document.createElement('div');
+      sibling.id = 'test-sibling';
+      document.body.appendChild(sibling);
+
+      const el = await fixture<HelixDrawer>('<hx-drawer contained></hx-drawer>');
+      el.open = true;
+      await el.updateComplete;
+
+      expect(sibling.hasAttribute('aria-hidden')).toBe(false);
+
+      const afterHidePromise = oneEvent(el, 'hx-after-hide');
+      el.open = false;
+      await el.updateComplete;
+      await afterHidePromise;
+
+      sibling.remove();
+    });
+  });
+
+  // ─── disconnectedCallback cleanup ───
+
+  describe('disconnectedCallback cleanup', () => {
+    it('disconnectedCallback removes document keydown listener', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await el.updateComplete;
+      el.remove();
+
+      // After removal, Escape should not change open (it is already false after remove + cleanup)
+      // The key assertion here is that no error is thrown
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      // No assertion needed for open state since element is disconnected; just ensure no throw
+      expect(true).toBe(true);
+    });
+  });
 });

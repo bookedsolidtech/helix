@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
 
 /** Minimum allowed value for feedbackDuration (ms). */
@@ -47,7 +48,7 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  * @cssprop [--hx-copy-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  */
 @customElement('hx-copy-button')
-export class HelixCopyButton extends LitElement {
+export class HelixCopyButton extends HelixElement {
   static override styles = [helixCopyButtonStyles];
 
   // ─── Public Properties ───

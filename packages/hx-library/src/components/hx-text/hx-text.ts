@@ -1,6 +1,6 @@
-import { LitElement } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
+import { HelixElement } from '../../base/index.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -39,7 +39,7 @@ import { helixTextStyles } from './hx-text.styles.js';
  * -->
  */
 @customElement('hx-text')
-export class HelixText extends LitElement {
+export class HelixText extends HelixElement {
   static override styles = [helixTextStyles];
 
   /**

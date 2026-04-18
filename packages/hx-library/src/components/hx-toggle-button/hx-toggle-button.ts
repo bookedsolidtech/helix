@@ -5,6 +5,11 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
 
+/** Detail for the hx-toggle event dispatched by hx-toggle-button. */
+export interface HxToggleDetail {
+  pressed: boolean;
+}
+
 /**
  * A two-state toggle button that communicates a pressed/unpressed status to
  * assistive technology via `aria-pressed`. Supports multiple visual variants

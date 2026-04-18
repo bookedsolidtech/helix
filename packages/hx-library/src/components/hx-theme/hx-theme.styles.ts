@@ -23,4 +23,15 @@ export const helixThemeStyles = css`
     white-space: nowrap;
     border: 0;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  /* hx-theme is a transparent wrapper that applies design tokens.
+     It has no visual output of its own. forced-color-adjust: auto (default)
+     is sufficient — theme tokens will resolve to system colors as needed. */
+  @media (forced-colors: active) {
+    :host {
+      forced-color-adjust: auto;
+    }
+  }
 `;

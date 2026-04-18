@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTableSectionBaseStyles } from './hx-table.styles.js';
 
 /**
@@ -16,7 +17,7 @@ import { helixTableSectionBaseStyles } from './hx-table.styles.js';
  * @csspart tfoot - The `<tfoot>` element.
  */
 @customElement('hx-tfoot')
-export class HelixTableFoot extends LitElement {
+export class HelixTableFoot extends HelixElement {
   static override styles = [helixTableSectionBaseStyles];
 
   override render() {

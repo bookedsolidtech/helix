@@ -608,4 +608,75 @@ describe('hx-switch', () => {
       expect(el.requiredMessage).toBe('You must accept terms.');
     });
   });
+
+  // ─── hx-change: unchecking (2) ───
+
+  describe('hx-change: unchecking', () => {
+    it('hx-change detail.checked is false when unchecking a checked switch', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch checked></hx-switch>');
+      const track = shadowQuery<HTMLElement>(el, '.switch__track');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      track?.click();
+      const event = await eventPromise;
+      expect(event.detail.checked).toBe(false);
+    });
+
+    it('hx-change is not fired when disabled switch is clicked', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
+      let fired = false;
+      el.addEventListener('hx-change', () => {
+        fired = true;
+      });
+      const track = shadowQuery<HTMLElement>(el, '.switch__track');
+      track?.click();
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── CSS class: switch--checked (2) ───
+
+  describe('CSS class: switch--checked', () => {
+    it('applies switch--checked class when checked', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch checked></hx-switch>');
+      const container = shadowQuery(el, '.switch');
+      expect(container?.classList.contains('switch--checked')).toBe(true);
+    });
+
+    it('removes switch--checked class when unchecked', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
+      const container = shadowQuery(el, '.switch');
+      expect(container?.classList.contains('switch--checked')).toBe(false);
+    });
+  });
+
+  // ─── CSS class: switch--disabled (1) ───
+
+  describe('CSS class: switch--disabled', () => {
+    it('applies switch--disabled class when disabled', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
+      const container = shadowQuery(el, '.switch');
+      expect(container?.classList.contains('switch--disabled')).toBe(true);
+    });
+  });
+
+  // ─── CSS class: switch--required (1) ───
+
+  describe('CSS class: switch--required', () => {
+    it('applies switch--required class when required', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch required></hx-switch>');
+      const container = shadowQuery(el, '.switch');
+      expect(container?.classList.contains('switch--required')).toBe(true);
+    });
+  });
+
+  // ─── CSS class: switch--error (1) ───
+
+  describe('CSS class: switch--error', () => {
+    it('applies switch--error class when error is set', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch error="Oops"></hx-switch>');
+      const container = shadowQuery(el, '.switch');
+      expect(container?.classList.contains('switch--error')).toBe(true);
+    });
+  });
 });

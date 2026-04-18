@@ -33,10 +33,6 @@ Handles singular/plural automatically. */
   labelStar?: string;
   /** Generates the aria-valuetext for the composite rating widget. */
   labelValueText?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
-  /** Returns the current validation message. */
-  validationMessage?: string;
 
   // Event callbacks
   /** Dispatched when the rating value changes. */

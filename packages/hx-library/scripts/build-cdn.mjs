@@ -39,7 +39,8 @@ import {
 } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as esbuild from '/Volumes/Development/booked/helix/node_modules/esbuild/lib/main.js';
+import { createHash } from 'node:crypto';
+import * as esbuild from 'esbuild';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -427,6 +428,191 @@ const manifest = {
 
 writeFileSync(join(CDN_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
 console.log(`\n[build-cdn] ✓ manifest.json`);
+
+// ---------------------------------------------------------------------------
+// 7. SRI hash generation — dist/cdn/sri-hashes.json + INTEGRATION-snippet.html
+//
+//    Subresource Integrity (SRI) hashes allow browsers to verify that CDN-
+//    served files have not been tampered with. This is a hard requirement in
+//    enterprise healthcare environments where HIPAA, HITRUST, and internal
+//    security policies mandate integrity checks on all externally-loaded assets.
+//
+//    Algorithm: SHA-384 (recommended by the W3C SRI specification and required
+//    by most healthcare security frameworks — SHA-256 is acceptable but SHA-384
+//    provides stronger guarantees with negligible performance cost).
+//
+//    Output:
+//      dist/cdn/sri-hashes.json          — machine-readable hash map
+//      dist/cdn/INTEGRATION-snippet.html — ready-to-paste HTML with integrity attrs
+// ---------------------------------------------------------------------------
+
+console.log(`\n[build-cdn] Computing SRI hashes (SHA-384)...`);
+
+/**
+ * Compute the SRI hash for a file on disk.
+ * Returns a string in the form "sha384-<base64>".
+ */
+function computeSriHash(filePath) {
+  const content = readFileSync(filePath);
+  const hash = createHash('sha384').update(content).digest('base64');
+  return `sha384-${hash}`;
+}
+
+// Collect the top-level CDN files that consumers load directly.
+// We hash the full bundle JS + CSS and the core bundle JS.
+// Per-component files are too numerous to list individually in the snippet,
+// but they are included in the hash map for tooling consumers.
+const sriHashes = {};
+
+// Full bundle JS
+const fullBundleFilename = `helix-${VERSION}.min.js`;
+const fullBundlePath = join(CDN_DIR, fullBundleFilename);
+if (existsSync(fullBundlePath)) {
+  sriHashes[fullBundleFilename] = computeSriHash(fullBundlePath);
+  console.log(`[build-cdn]   ${fullBundleFilename} → ${sriHashes[fullBundleFilename]}`);
+}
+
+// Full bundle CSS
+const fullCssFilename = `helix-${VERSION}.min.css`;
+const fullCssPath = join(CDN_DIR, fullCssFilename);
+if (existsSync(fullCssPath)) {
+  sriHashes[fullCssFilename] = computeSriHash(fullCssPath);
+  console.log(`[build-cdn]   ${fullCssFilename} → ${sriHashes[fullCssFilename]}`);
+}
+
+// Core bundle JS (Strategy B)
+if (existsSync(coreBundleOutfile)) {
+  sriHashes[coreBundleName] = computeSriHash(coreBundleOutfile);
+  console.log(`[build-cdn]   ${coreBundleName} → ${sriHashes[coreBundleName]}`);
+}
+
+// Per-component JS files
+for (const name of components) {
+  const compFilename = `components/${name}-${VERSION}.js`;
+  const compPath = join(CDN_COMPONENTS_DIR, `${name}-${VERSION}.js`);
+  if (existsSync(compPath)) {
+    sriHashes[compFilename] = computeSriHash(compPath);
+  }
+}
+
+// Per-component CSS files
+for (const name of components) {
+  const compCssFilename = `components/${name}-${VERSION}.css`;
+  const compCssPath = join(CDN_COMPONENTS_DIR, `${name}-${VERSION}.css`);
+  if (existsSync(compCssPath)) {
+    sriHashes[compCssFilename] = computeSriHash(compCssPath);
+  }
+}
+
+writeFileSync(join(CDN_DIR, 'sri-hashes.json'), JSON.stringify(sriHashes, null, 2));
+console.log(`[build-cdn] ✓ sri-hashes.json (${Object.keys(sriHashes).length} files hashed)`);
+
+// ---------------------------------------------------------------------------
+// INTEGRATION-snippet.html — ready-to-paste HTML for both strategies
+// ---------------------------------------------------------------------------
+
+const fullJsSri = sriHashes[fullBundleFilename] ?? '';
+const fullCssSri = sriHashes[fullCssFilename] ?? '';
+const coreJsSri = sriHashes[coreBundleName] ?? '';
+
+// Placeholder CDN base URL — replace with actual CDN root in deployment
+const CDN_BASE = `https://cdn.example.com/helix/${VERSION}`;
+
+const snippetLines = [
+  `<!-- ================================================================`,
+  `     HELiX CDN Integration Snippet — v${VERSION}`,
+  `     Generated: ${new Date().toISOString()}`,
+  ``,
+  `     These tags include Subresource Integrity (SRI) hashes.`,
+  `     Replace the CDN base URL with your actual serving location.`,
+  `     Keep the integrity and crossorigin attributes — they are required`,
+  `     for enterprise security compliance.`,
+  ``,
+  `     Full SRI hash map: sri-hashes.json`,
+  `     Documentation:     INTEGRATION.md`,
+  `     ================================================================ -->`,
+  ``,
+  `<!-- ================================================================`,
+  `     Strategy A: Full self-contained bundle`,
+  `     All 81 components available immediately. Best for sites that use`,
+  `     most components site-wide or for rapid prototyping.`,
+  `     ================================================================ -->`,
+  ``,
+];
+
+if (fullCssSri) {
+  snippetLines.push(
+    `<!-- HELiX component styles (Strategy A) -->`,
+    `<link`,
+    `  rel="stylesheet"`,
+    `  href="${CDN_BASE}/${fullCssFilename}"`,
+    `  integrity="${fullCssSri}"`,
+    `  crossorigin="anonymous"`,
+    `>`,
+    ``,
+  );
+}
+
+if (fullJsSri) {
+  snippetLines.push(
+    `<!-- HELiX full component bundle (Strategy A) -->`,
+    `<script`,
+    `  type="module"`,
+    `  src="${CDN_BASE}/${fullBundleFilename}"`,
+    `  integrity="${fullJsSri}"`,
+    `  crossorigin="anonymous"`,
+    `></script>`,
+    ``,
+  );
+}
+
+snippetLines.push(
+  `<!-- ================================================================`,
+  `     Strategy B: Split bundle (core + per-component)`,
+  `     Load the shared core runtime first, then only the component`,
+  `     files you need. Core is cached across all components on the page.`,
+  `     Per-component files are 1–5 KB gzipped.`,
+  `     ================================================================ -->`,
+  ``,
+);
+
+if (coreJsSri) {
+  snippetLines.push(
+    `<!-- HELiX shared core runtime (Strategy B — load first) -->`,
+    `<script`,
+    `  type="module"`,
+    `  src="${CDN_BASE}/${coreBundleName}"`,
+    `  integrity="${coreJsSri}"`,
+    `  crossorigin="anonymous"`,
+    `></script>`,
+    ``,
+    `<!-- Then load only the components you need, e.g.: -->`,
+  );
+
+  // Include a few example per-component entries as illustration
+  const exampleComponents = ['hx-button', 'hx-card', 'hx-alert'].filter((n) =>
+    components.includes(n),
+  );
+  for (const name of exampleComponents) {
+    const compFilename = `components/${name}-${VERSION}.js`;
+    const compSri = sriHashes[compFilename];
+    if (compSri) {
+      snippetLines.push(
+        `<script`,
+        `  type="module"`,
+        `  src="${CDN_BASE}/${compFilename}"`,
+        `  integrity="${compSri}"`,
+        `  crossorigin="anonymous"`,
+        `></script>`,
+      );
+    }
+  }
+  snippetLines.push(`<!-- Add additional hx-* component scripts as needed. -->`);
+  snippetLines.push(`<!-- See sri-hashes.json for the integrity hash of every file. -->`);
+}
+
+writeFileSync(join(CDN_DIR, 'INTEGRATION-snippet.html'), snippetLines.join('\n') + '\n');
+console.log(`[build-cdn] ✓ INTEGRATION-snippet.html`);
 
 // ---------------------------------------------------------------------------
 // Summary

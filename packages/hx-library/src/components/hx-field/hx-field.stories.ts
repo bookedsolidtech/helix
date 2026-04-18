@@ -756,7 +756,7 @@ export const CSSParts: Story = {
         font-style: italic;
       }
 
-      .css-parts-demo hx-field::part(error-message) {
+      .css-parts-demo hx-field::part(error) {
         background: #fff5f5;
         padding: 0.5rem 0.75rem;
         border-radius: 0.25rem;
@@ -797,11 +797,11 @@ export const CSSParts: Story = {
         <h4
           style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #495057);"
         >
-          Error state with ::part(error-message) left-border styling
+          Error state with ::part(error) left-border styling
         </h4>
         <hx-field
           label="Field with Error Part"
-          error="This error is styled with a left-border accent via ::part(error-message)."
+          error="This error is styled with a left-border accent via ::part(error)."
         >
           <input
             type="text"

@@ -60,4 +60,21 @@ export function ensureDocumentTokens(): void {
   }
 }
 
-ensureDocumentTokens();
+// Auto-execute on import so bare `import './document-token-adoption.js'` works
+// in browser components. The SSR guard inside ensureDocumentTokens() makes this
+// safe in Node/Deno/SSR environments where `document` is not defined.
+//
+// PERF: This top-level side effect intentionally runs on every per-component import.
+// Without it, components would render without design tokens until a consumer manually
+// calls ensureDocumentTokens(). This trade-off is acceptable because:
+// 1. The function is idempotent (Symbol.for marker prevents duplicate adoption)
+// 2. The CSSStyleSheet is shared across all components (~2KB overhead, not per-component)
+// 3. Tree-shakers correctly identify this file via the package.json sideEffects array
+// 4. SSR environments are guarded by the typeof document check
+//
+// To use components without auto-adoption (e.g., in a custom shadow root without
+// document-level tokens), import the component directly from its module path and
+// call ensureDocumentTokens() manually when ready.
+if (typeof document !== 'undefined') {
+  ensureDocumentTokens();
+}

@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixFormatDateStyles } from './hx-format-date.styles.js';
 
 /**
@@ -17,7 +18,7 @@ import { helixFormatDateStyles } from './hx-format-date.styles.js';
  * @csspart base - The inner `<time>` element.
  */
 @customElement('hx-format-date')
-export class HelixFormatDate extends LitElement {
+export class HelixFormatDate extends HelixElement {
   static override styles = [helixFormatDateStyles];
 
   // ─── Intl formatter caches (keyed by locale+options fingerprint) ───

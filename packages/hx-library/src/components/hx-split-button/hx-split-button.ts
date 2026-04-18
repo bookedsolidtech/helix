@@ -1,8 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
@@ -44,7 +44,7 @@ const _nextSplitButtonId = createIdCounter('hx-split-button');
  * @cssprop [--hx-split-button-menu-shadow] - Dropdown menu box shadow.
  */
 @customElement('hx-split-button')
-export class HelixSplitButton extends LitElement {
+export class HelixSplitButton extends HelixElement {
   static override styles = [helixSplitButtonStyles];
 
   // ─── Internal References ───
@@ -105,10 +105,16 @@ export class HelixSplitButton extends LitElement {
   /**
    * Accessible label for the primary action button. Required for icon-only usage
    * or when the button label alone is insufficient context.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because the
+   * `accessible-label` attribute approach avoids the ARIAMixin property conflict
+   * without requiring mixin overhead.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel = '';
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel = '';
 
   /**
    * Accessible label for the dropdown trigger button. Override for localization.
@@ -363,7 +369,7 @@ export class HelixSplitButton extends LitElement {
           class="split-button__primary"
           ?disabled=${this.disabled}
           type="button"
-          aria-label=${this.ariaLabel ?? (this.label || nothing)}
+          aria-label=${this.accessibleLabel ?? (this.label || nothing)}
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
         >

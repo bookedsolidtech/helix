@@ -5,9 +5,15 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 
 const _nextTextareaId = createIdCounter('hx-textarea');
+
+/** Detail for hx-input and hx-change events dispatched by hx-textarea. */
+export interface HxTextareaDetail {
+  value: string;
+}
 
 /**
  * A multi-line text area component with label, validation, and form association.
@@ -48,7 +54,7 @@ const _nextTextareaId = createIdCounter('hx-textarea');
  * @cssprop [--hx-textarea-min-height=var(--hx-size-20, 5rem)] - Minimum textarea height.
  */
 @customElement('hx-textarea')
-export class HelixTextarea extends HelixElement {
+export class HelixTextarea extends FormMixin(HelixElement) {
   static override styles = [helixTextareaStyles];
 
   // ─── Form Association ───
@@ -168,10 +174,18 @@ export class HelixTextarea extends HelixElement {
 
   /**
    * Accessible name for screen readers, if different from the visible label.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because form
+   * inputs with associated labels delegate accessible naming via `<label>`
+   * association and `aria-labelledby`, not host-level ARIA delegation. The
+   * `accessible-label` attribute is a fallback for label-free usage. The value is forwarded to the
+   * internal native textarea's `aria-label`.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
 
   // ─── Internal References ───
 
@@ -245,14 +259,6 @@ export class HelixTextarea extends HelixElement {
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
     }
-    if (
-      changedProperties.has('value') ||
-      changedProperties.has('required') ||
-      changedProperties.has('minlength') ||
-      changedProperties.has('maxlength')
-    ) {
-      this._updateValidity();
-    }
     // Auto-grow: respond to programmatic value changes
     if (changedProperties.has('value') && this.resize === 'auto' && this._textarea) {
       this._textarea.style.height = 'auto';
@@ -262,33 +268,8 @@ export class HelixTextarea extends HelixElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the textarea satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     const anchor = this._textarea ?? undefined;
     if (this.required && !this.value) {
       this._internals.setValidity(
@@ -321,6 +302,7 @@ export class HelixTextarea extends HelixElement {
   protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue('');
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -344,6 +326,7 @@ export class HelixTextarea extends HelixElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
+    this._handleInteractionInput();
     // Note: setFormValue is called in updated() via the value change — no double-call here (P1-06 fix)
 
     // Auto-grow: reset height then set to scrollHeight
@@ -384,7 +367,7 @@ export class HelixTextarea extends HelixElement {
     const target = e.target as HTMLTextAreaElement;
     this.value = target.value;
     this._internals.setFormValue(this.value);
-    this._updateValidity();
+    this._handleInteractionBlur();
 
     /**
      * Dispatched when the textarea loses focus after its value changed.
@@ -493,7 +476,7 @@ export class HelixTextarea extends HelixElement {
             minlength=${ifDefined(this.minlength)}
             maxlength=${ifDefined(this.maxlength)}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
             aria-labelledby=${ifDefined(
               this._hasLabelSlot ? `${this._textareaId}-slotted-label` : undefined,
             )}
@@ -527,18 +510,23 @@ export class HelixTextarea extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-textarea.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxTextareaEventMap {
+  'hx-input': CustomEvent<{ value: string }>;
+  'hx-change': CustomEvent<{ value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-textarea': HelixTextarea;
   }
   interface HTMLElementEventMap {
     'hx-input': CustomEvent<{ value: string }>;
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }
 }
 
 /** Canonical type alias for the hx-textarea component. */
 export type HxTextarea = HelixTextarea;
-
-/** @deprecated Use {@link HxTextarea} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcTextarea = HelixTextarea;

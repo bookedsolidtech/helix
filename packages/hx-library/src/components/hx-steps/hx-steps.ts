@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement } from '../../base/index.js';
 import { helixStepsStyles } from './hx-steps.styles.js';
 import type { HelixStep } from './hx-step.js';
 
@@ -29,7 +30,7 @@ import type { HelixStep } from './hx-step.js';
  * @cssprop [--hx-steps-description-color=var(--hx-color-neutral-500)] - Step description color.
  */
 @customElement('hx-steps')
-export class HelixSteps extends LitElement {
+export class HelixSteps extends HelixElement {
   static override styles = [helixStepsStyles];
 
   // ─── Public Properties ───
@@ -50,10 +51,16 @@ export class HelixSteps extends LitElement {
 
   /**
    * Accessible label for the list. Forwarded to the inner list element.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because the
+   * `accessible-label` attribute approach avoids the ARIAMixin property conflict
+   * without requiring mixin overhead.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
-  ariaLabel: string | null = null;
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
 
   // ─── Lifecycle ───
 
@@ -68,7 +75,7 @@ export class HelixSteps extends LitElement {
     }
     // STEPS-002: WCAG 2.1 SC 4.1.2 — the inner list must have an accessible name.
     // Warn developers when aria-label is missing so the list is not anonymous.
-    if (!this.ariaLabel) {
+    if (!this.accessibleLabel) {
       devWarn(
         'hx-steps',
         'An "aria-label" attribute is required to provide an accessible name for the steps list (WCAG 2.1 SC 4.1.2).',
@@ -153,7 +160,7 @@ export class HelixSteps extends LitElement {
 
   override render() {
     return html`
-      <div part="base" class="steps" role="list" aria-label=${this.ariaLabel ?? nothing}>
+      <div part="base" class="steps" role="list" aria-label=${this.accessibleLabel ?? nothing}>
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;

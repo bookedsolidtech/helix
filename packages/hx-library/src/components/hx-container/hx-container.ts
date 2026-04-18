@@ -1,7 +1,8 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixContainerStyles } from './hx-container.styles.js';
 
 /**
@@ -43,7 +44,7 @@ import { helixContainerStyles } from './hx-container.styles.js';
  * @cssprop [--hx-container-xl=1280px] - Max-width for the xl width preset.
  */
 @customElement('hx-container')
-export class HelixContainer extends LitElement {
+export class HelixContainer extends HelixElement {
   static override styles = [helixContainerStyles];
 
   /**
@@ -87,9 +88,6 @@ export class HelixContainer extends LitElement {
 
 /** Canonical type alias for the hx-container component. */
 export type HxContainer = HelixContainer;
-
-/** @deprecated Use {@link HxContainer} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcContainer = HelixContainer;
 
 declare global {
   interface HTMLElementTagNameMap {

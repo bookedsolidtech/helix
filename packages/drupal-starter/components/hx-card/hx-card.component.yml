@@ -13,8 +13,8 @@ props:
       default: 'default'
       enum:
         - default
-        - outlined
-        - filled
+        - featured
+        - compact
     elevation:
       type: string
       title: Elevation
@@ -23,7 +23,7 @@ props:
       enum:
         - flat
         - raised
-        - overlay
+        - floating
     hx_href:
       type: string
       title: Link URL

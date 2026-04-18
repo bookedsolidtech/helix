@@ -6,15 +6,15 @@
 # with the actual URL where you have hosted the HELiX CDN build artifacts.
 #
 # Example CDN_URL values:
-#   https://cdn.example.com/helix/1.1.2
-#   https://your-site.example.com/sites/default/files/helix-cdn/1.1.2
-#   /libraries/helix-cdn/1.1.2
+#   https://cdn.example.com/helix/2.1.2
+#   https://your-site.example.com/sites/default/files/helix-cdn/2.1.2
+#   /libraries/helix-cdn/2.1.2
 #
 # Usage in Twig:
-#   {{ attach_library('helix_cdn/all') }}
-#   {{ attach_library('helix_cdn/hx-button') }}
-#   {{ attach_library('helix_cdn/hx-card') }}
-#   {{ attach_library('helix_cdn/hx-text-input') }}
+#   {{ attach_library("helix_cdn/all") }}
+#   {{ attach_library("helix_cdn/hx-button") }}
+#   {{ attach_library("helix_cdn/hx-card") }}
+#   {{ attach_library("helix_cdn/hx-text-input") }}
 #
 # NOTE: These libraries load Lit and all dependencies inline.
 # Do NOT combine CDN libraries with the npm-based helixui libraries on the same page.
@@ -25,21 +25,21 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 all:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/helix-1.1.2.min.css:
+      {{CDN_URL}}/helix-2.1.2.min.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/helix-1.1.2.min.js:
+    {{CDN_URL}}/helix-2.1.2.min.js:
       type: external
       attributes:
         type: module
       minified: true
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Individual component libraries
+# Individual component libraries (Strategy B — per-component loading)
 # Use these for surgical per-page loading to minimize bytes transferred.
 # Each component bundles Lit inline and is fully self-contained.
 #
@@ -48,169 +48,1135 @@ all:
 # 3-4 components, the full bundle above is more efficient.
 # ─────────────────────────────────────────────────────────────────────────────
 
-hx-button:
-  version: 1.1.2
+hx-accordion:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-button-1.1.2.css:
+      {{CDN_URL}}/components/hx-accordion-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-button-1.1.2.js:
+    {{CDN_URL}}/components/hx-accordion-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
-hx-card:
-  version: 1.1.2
+hx-action-bar:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-card-1.1.2.css:
+      {{CDN_URL}}/components/hx-action-bar-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-card-1.1.2.js:
-      type: external
-      attributes:
-        type: module
-      minified: true
-
-hx-text-input:
-  version: 1.1.2
-  css:
-    theme:
-      {{CDN_URL}}/components/hx-text-input-1.1.2.css:
-        type: external
-        minified: true
-  js:
-    {{CDN_URL}}/components/hx-text-input-1.1.2.js:
+    {{CDN_URL}}/components/hx-action-bar-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-alert:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-alert-1.1.2.css:
+      {{CDN_URL}}/components/hx-alert-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-alert-1.1.2.js:
+    {{CDN_URL}}/components/hx-alert-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
-hx-dialog:
-  version: 1.1.2
+hx-avatar:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-dialog-1.1.2.css:
+      {{CDN_URL}}/components/hx-avatar-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-dialog-1.1.2.js:
+    {{CDN_URL}}/components/hx-avatar-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-badge:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-badge-1.1.2.css:
+      {{CDN_URL}}/components/hx-badge-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-badge-1.1.2.js:
+    {{CDN_URL}}/components/hx-badge-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
-hx-spinner:
-  version: 1.1.2
+hx-banner:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-spinner-1.1.2.css:
+      {{CDN_URL}}/components/hx-banner-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-spinner-1.1.2.js:
+    {{CDN_URL}}/components/hx-banner-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
-hx-tooltip:
-  version: 1.1.2
+hx-breadcrumb:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-tooltip-1.1.2.css:
+      {{CDN_URL}}/components/hx-breadcrumb-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-tooltip-1.1.2.js:
+    {{CDN_URL}}/components/hx-breadcrumb-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
-hx-tabs:
-  version: 1.1.2
+hx-button:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-tabs-1.1.2.css:
+      {{CDN_URL}}/components/hx-button-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-tabs-1.1.2.js:
+    {{CDN_URL}}/components/hx-button-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
-hx-select:
-  version: 1.1.2
+hx-button-group:
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-select-1.1.2.css:
+      {{CDN_URL}}/components/hx-button-group-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-select-1.1.2.js:
+    {{CDN_URL}}/components/hx-button-group-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-card:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-card-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-card-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-carousel:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-carousel-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-carousel-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-checkbox:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-checkbox-1.1.2.css:
+      {{CDN_URL}}/components/hx-checkbox-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-checkbox-1.1.2.js:
+    {{CDN_URL}}/components/hx-checkbox-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-checkbox-group:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-checkbox-group-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-checkbox-group-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-clinical-status:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-clinical-status-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-clinical-status-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-code-snippet:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-code-snippet-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-code-snippet-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-color-picker:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-color-picker-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-color-picker-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-combobox:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-combobox-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-combobox-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-container:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-container-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-container-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-copy-button:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-copy-button-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-copy-button-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-counter:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-counter-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-counter-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-data-table:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-data-table-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-data-table-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-date-picker:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-date-picker-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-date-picker-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-dialog:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-dialog-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-dialog-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-divider:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-divider-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-divider-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-drawer:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-drawer-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-drawer-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-dropdown:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-dropdown-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-dropdown-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-field:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-field-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-field-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-field-label:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-field-label-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-field-label-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-file-upload:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-file-upload-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-file-upload-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-form:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-form-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-form-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-format-date:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-format-date-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-format-date-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-grid:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-grid-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-grid-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-help-text:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-help-text-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-help-text-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-icon:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-icon-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-icon-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-icon-button:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-icon-button-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-icon-button-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-image:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-image-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-image-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-link:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-link-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-link-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-list:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-list-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-list-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-menu:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-menu-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-menu-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-meter:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-meter-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-meter-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-nav:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-nav-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-nav-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-number-input:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-number-input-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-number-input-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-overflow-menu:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-overflow-menu-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-overflow-menu-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-pagination:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-pagination-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-pagination-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-patient-banner:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-patient-banner-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-patient-banner-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-phi-field:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-phi-field-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-phi-field-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-popover:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-popover-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-popover-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-popup:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-popup-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-popup-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-progress-bar:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-progress-bar-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-progress-bar-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-progress-ring:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-progress-ring-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-progress-ring-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-prose:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-prose-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-prose-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-radio-group:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-radio-group-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-radio-group-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-rating:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-rating-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-rating-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-select:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-select-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-select-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-side-nav:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-side-nav-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-side-nav-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-skeleton:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-skeleton-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-skeleton-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-slider:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-slider-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-slider-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-spinner:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-spinner-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-spinner-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-split-button:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-split-button-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-split-button-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-split-panel:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-split-panel-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-split-panel-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-stack:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-stack-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-stack-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-stat:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-stat-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-stat-2.1.2.js:
       type: external
       attributes:
         type: module
       minified: true
 
 hx-status-indicator:
-  version: 1.1.2
+  version: 2.1.2
   css:
     theme:
-      {{CDN_URL}}/components/hx-status-indicator-1.1.2.css:
+      {{CDN_URL}}/components/hx-status-indicator-2.1.2.css:
         type: external
         minified: true
   js:
-    {{CDN_URL}}/components/hx-status-indicator-1.1.2.js:
+    {{CDN_URL}}/components/hx-status-indicator-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-steps:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-steps-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-steps-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-structured-list:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-structured-list-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-structured-list-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-style-scope:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-style-scope-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-style-scope-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-switch:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-switch-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-switch-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-table:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-table-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-table-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-tabs:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-tabs-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-tabs-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-tag:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-tag-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-tag-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-text:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-text-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-text-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-text-input:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-text-input-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-text-input-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-textarea:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-textarea-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-textarea-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-theme:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-theme-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-theme-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-time-picker:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-time-picker-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-time-picker-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-toast:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-toast-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-toast-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-toggle-button:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-toggle-button-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-toggle-button-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-tooltip:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-tooltip-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-tooltip-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-top-nav:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-top-nav-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-top-nav-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-tree-view:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-tree-view-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-tree-view-2.1.2.js:
+      type: external
+      attributes:
+        type: module
+      minified: true
+
+hx-visually-hidden:
+  version: 2.1.2
+  css:
+    theme:
+      {{CDN_URL}}/components/hx-visually-hidden-2.1.2.css:
+        type: external
+        minified: true
+  js:
+    {{CDN_URL}}/components/hx-visually-hidden-2.1.2.js:
       type: external
       attributes:
         type: module

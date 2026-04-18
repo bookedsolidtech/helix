@@ -42,12 +42,12 @@ drush cr
 
 ## CDN Configuration (default — no Node.js required)
 
-The module loads `@helixui/library@1.1.2` from jsDelivr by default. No npm
+The module loads `@helixui/library@2.1.2` from jsDelivr by default. No npm
 install or build step is required on the server. The library definition in
 `helix_module.libraries.yml` references:
 
 ```
-https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/helix-library.js
+https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/index.js
 ```
 
 The script is loaded as `type="module"` for native ES module parsing.
@@ -63,9 +63,9 @@ For environments without external CDN access, use the `helix-local` library
 instead. Build the bundle and copy it to the module directory:
 
 ```bash
-npm install @helixui/library@1.1.2
-cp node_modules/@helixui/library/dist/helix-library.js \
-   web/modules/custom/helix_module/dist/helix-library.js
+npm install @helixui/library@2.1.2
+cp node_modules/@helixui/library/dist/index.js \
+   web/modules/custom/helix_module/dist/index.js
 ```
 
 Then switch the library in `helix_module.module`:

@@ -128,7 +128,7 @@
 <hx-steps
   orientation="{{ orientation|default('horizontal') }}"
   hx-size="{{ size|default('md') }}"
-  aria-label="{{ aria_label|default('Progress steps') }}"
+  accessible-label="{{ aria_label|default('Progress steps') }}"
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% for step in steps|default([]) %}

@@ -1,6 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTableStyles } from './hx-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -26,7 +27,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-table-stripe-bg=var(--hx-color-neutral-50, #f8fafc)] - Striped row background.
  */
 @customElement('hx-table')
-export class HelixTable extends LitElement {
+export class HelixTable extends HelixElement {
   static override styles = [helixTableStyles];
 
   // ─── Public Properties ───

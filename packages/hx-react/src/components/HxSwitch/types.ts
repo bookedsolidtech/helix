@@ -32,12 +32,8 @@ export interface HxSwitchProps {
   helpText?: string;
   /** Validation message shown when the field is required but empty. */
   requiredMessage?: string;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
-  /** Dispatched when the switch is toggled. */
+  /** Dispatched when the switch is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`. */
   onHxChange?: (event: Event) => void;
 }

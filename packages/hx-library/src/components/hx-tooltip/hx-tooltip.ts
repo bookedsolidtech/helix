@@ -1,8 +1,8 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { computePosition, flip, shift, offset, arrow } from '@floating-ui/dom';
-import { createIdCounter } from '../../base/index.js';
+
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
 
 const _nextTooltipId = createIdCounter('hx-tooltip');
@@ -49,7 +49,7 @@ const _nextTooltipId = createIdCounter('hx-tooltip');
  */
 
 @customElement('hx-tooltip')
-export class HelixTooltip extends LitElement {
+export class HelixTooltip extends HelixElement {
   static override styles = [helixTooltipStyles];
 
   /**
@@ -165,10 +165,13 @@ export class HelixTooltip extends LitElement {
     if (!this._lightDomDescription && typeof document !== 'undefined') {
       this._lightDomDescription = document.createElement('span');
       this._lightDomDescription.id = this._tooltipId;
-      // Visually hidden but accessible to screen readers via aria-describedby
+      // Visually hidden but accessible to screen readers via aria-describedby.
+      // Appended to document.body (not this element) so that the ID is in the
+      // document scope and resolves correctly across shadow DOM boundaries.
+      // Web components must not mutate their own light DOM children.
       this._lightDomDescription.style.cssText =
         'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0';
-      this.appendChild(this._lightDomDescription);
+      document.body.appendChild(this._lightDomDescription);
     }
     if (this._lightDomDescription) {
       this._lightDomDescription.textContent = contentText;
@@ -231,6 +234,7 @@ export class HelixTooltip extends LitElement {
 
     if (!reference || !tooltipEl || !arrowEl) return;
 
+    const { computePosition, flip, shift, offset, arrow } = await import('@floating-ui/dom');
     const { x, y, placement, middlewareData } = await computePosition(reference, tooltipEl, {
       placement: this.placement,
       strategy: 'fixed',

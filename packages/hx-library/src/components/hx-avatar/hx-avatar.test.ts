@@ -609,5 +609,103 @@ describe('hx-avatar', () => {
         warnSpy.mockRestore();
       }
     });
+
+    it('does not warn when badge slot has a role attribute (P2-C)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar initials="JD" label="John Doe"><span slot="badge" role="img"></span></hx-avatar>',
+        );
+        await el.updateComplete;
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('badge slot content should have an accessible name'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when badge slot has aria-labelledby (P2-C)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixAvatar>(
+          '<hx-avatar initials="JD" label="John Doe"><span slot="badge" aria-labelledby="status-label"></span></hx-avatar>',
+        );
+        await el.updateComplete;
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('badge slot content should have an accessible name'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+  });
+
+  // ─── Dynamic property updates ───
+
+  describe('Dynamic property updates', () => {
+    it('updates size class when hx-size property changes', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar hx-size="sm"></hx-avatar>');
+      el.size = 'xl';
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--xl')).toBe(true);
+      expect(avatar?.classList.contains('avatar--sm')).toBe(false);
+    });
+
+    it('updates shape class when shape property changes', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar shape="circle"></hx-avatar>');
+      el.shape = 'square';
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.classList.contains('avatar--square')).toBe(true);
+      expect(avatar?.classList.contains('avatar--circle')).toBe(false);
+    });
+
+    it('shows initials when initials property set after render', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar></hx-avatar>');
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="initials"]')).toBeNull();
+      el.initials = 'AB';
+      el.label = 'Alice Brown';
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="initials"]')).toBeTruthy();
+    });
+  });
+
+  // ─── Slot: default slot text node content ───
+
+  describe('Slot: text node in default slot', () => {
+    it('whitespace-only text node does not activate slot mode', async () => {
+      // Only meaningful text nodes (non-whitespace) should activate _hasDefaultSlot
+      const el = await fixture<HelixAvatar>('<hx-avatar label="Test">   </hx-avatar>');
+      await el.updateComplete;
+      await el.updateComplete;
+      // Whitespace text node is present but trimmed to empty — slot should not suppress role
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      // With whitespace-only text, _hasDefaultSlot should remain false
+      expect(avatar?.getAttribute('role')).toBe('img');
+    });
+  });
+
+  // ─── aria-label in image mode: alt fallback chain ───
+
+  describe('aria-label: image mode alt fallback chain', () => {
+    it('uses "Avatar" fallback when alt and label are both empty in image mode', async () => {
+      const el = await fixture<HelixAvatar>(
+        '<hx-avatar src="https://example.com/avatar.png"></hx-avatar>',
+      );
+      await el.updateComplete;
+      const avatar = shadowQuery(el, '[part="avatar"]');
+      expect(avatar?.getAttribute('aria-label')).toBe('Avatar');
+    });
   });
 });

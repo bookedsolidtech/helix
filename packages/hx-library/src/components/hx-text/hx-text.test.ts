@@ -289,6 +289,117 @@ describe('hx-text', () => {
     });
   });
 
+  // ─── Dynamic property changes ───
+
+  describe('Dynamic property changes', () => {
+    it('updates variant class when variant property changes at runtime', async () => {
+      const el = await fixture<HelixText>('<hx-text variant="body">Text</hx-text>');
+      el.variant = 'label';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--label')).toBe(true);
+      expect(base.classList.contains('text--body')).toBe(false);
+    });
+
+    it('updates color class when color property changes at runtime', async () => {
+      const el = await fixture<HelixText>('<hx-text color="default">Text</hx-text>');
+      el.color = 'danger';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--color-danger')).toBe(true);
+      expect(base.classList.contains('text--color-default')).toBe(false);
+    });
+
+    it('updates weight class when weight property changes at runtime', async () => {
+      const el = await fixture<HelixText>('<hx-text>Text</hx-text>');
+      el.weight = 'bold';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--weight-bold')).toBe(true);
+    });
+
+    it('removes weight class when weight is set to undefined', async () => {
+      const el = await fixture<HelixText>('<hx-text weight="bold">Text</hx-text>');
+      el.weight = undefined;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--weight-bold')).toBe(false);
+    });
+
+    it('switches from span to p when as changes at runtime', async () => {
+      const el = await fixture<HelixText>('<hx-text>Text</hx-text>');
+      expect(shadowQuery(el, 'span[part="base"]')).toBeTruthy();
+      el.as = 'p';
+      await el.updateComplete;
+      expect(shadowQuery(el, 'p[part="base"]')).toBeTruthy();
+      expect(shadowQuery(el, 'span[part="base"]')).toBeNull();
+    });
+
+    it('enables truncation when truncate changes from false to true', async () => {
+      const el = await fixture<HelixText>('<hx-text>Text</hx-text>');
+      el.truncate = true;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--truncate')).toBe(true);
+    });
+
+    it('updates -webkit-line-clamp when lines changes at runtime', async () => {
+      const el = await fixture<HelixText>('<hx-text lines="2">Text</hx-text>');
+      el.lines = 5;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.style.getPropertyValue('-webkit-line-clamp')).toBe('5');
+    });
+
+    it('clears -webkit-line-clamp when lines changed to 0', async () => {
+      const el = await fixture<HelixText>('<hx-text lines="3">Text</hx-text>');
+      el.lines = 0;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.classList.contains('text--clamp')).toBe(false);
+      expect(base.style.getPropertyValue('-webkit-line-clamp')).toBe('');
+    });
+  });
+
+  // ─── Property: as — additional allowed tags ───
+
+  describe('Property: as — all allowed tags', () => {
+    it('reflects as="em" attribute to host', async () => {
+      const el = await fixture<HelixText>('<hx-text as="em">Text</hx-text>');
+      expect(el.getAttribute('as')).toBe('em');
+    });
+
+    it('reflects as="strong" attribute to host', async () => {
+      const el = await fixture<HelixText>('<hx-text as="strong">Text</hx-text>');
+      expect(el.getAttribute('as')).toBe('strong');
+    });
+
+    it('reflects as="div" attribute to host', async () => {
+      const el = await fixture<HelixText>('<hx-text as="div">Text</hx-text>');
+      expect(el.getAttribute('as')).toBe('div');
+    });
+  });
+
+  // ─── Title attribute edge cases ───
+
+  describe('Title attribute edge cases', () => {
+    it('title reflects updated textContent when lines changes at runtime', async () => {
+      const el = await fixture<HelixText>('<hx-text>Clinical note content</hx-text>');
+      el.lines = 2;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.getAttribute('title')).toBe('Clinical note content');
+    });
+
+    it('clears title attribute when truncate is turned off', async () => {
+      const el = await fixture<HelixText>('<hx-text truncate>Text</hx-text>');
+      el.truncate = false;
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]')!;
+      expect(base.hasAttribute('title')).toBe(false);
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

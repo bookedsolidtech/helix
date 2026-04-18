@@ -1,0 +1,63 @@
+# Dependabot configuration for @helixui monorepo
+# Groups related dependencies to minimize PR noise.
+# Documentation: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # Root package.json + pnpm-lock.yaml
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+    target-branch: 'dev'
+    labels:
+      - 'dependencies'
+    groups:
+      lit-ecosystem:
+        patterns:
+          - 'lit'
+          - 'lit-*'
+          - '@lit/*'
+          - '@lit-labs/*'
+      vitest-ecosystem:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+      vite-ecosystem:
+        patterns:
+          - 'vite'
+          - 'vite-*'
+          - '@vitejs/*'
+      playwright:
+        patterns:
+          - '@playwright/*'
+          - 'playwright'
+          - 'playwright-*'
+      storybook:
+        patterns:
+          - 'storybook'
+          - '@storybook/*'
+      typescript:
+        patterns:
+          - 'typescript'
+          - 'tslib'
+      eslint:
+        patterns:
+          - 'eslint'
+          - 'eslint-*'
+          - '@eslint/*'
+          - '@typescript-eslint/*'
+
+  # GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 5
+    target-branch: 'dev'
+    labels:
+      - 'dependencies'
+      - 'ci'

@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixAccordion } from './hx-accordion.js';
@@ -1250,6 +1250,617 @@ describe('hx-accordion — additional coverage', () => {
       await el.updateComplete;
       const { violations } = await checkA11y(el, { rules: a11yRules });
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── allowMultiple / multi mode expansion ───
+
+  describe('allowMultiple — multi mode simultaneous expansion', () => {
+    it('multi mode allows two items to be expanded at the same time', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="multi">
+          <hx-accordion-item expanded>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item expanded>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      expect(items[0].expanded).toBe(true);
+      expect(items[1].expanded).toBe(true);
+    });
+
+    it('multi mode does not collapse sibling on expand', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="multi">
+          <hx-accordion-item expanded>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const trigger2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+      trigger2.click();
+      await items[1].updateComplete;
+      await items[0].updateComplete;
+      expect(items[0].expanded).toBe(true);
+      expect(items[1].expanded).toBe(true);
+    });
+
+    it('switching from multi to single mode enforces single-expand', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="multi">
+          <hx-accordion-item expanded>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item expanded>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      expect(items[0].expanded).toBe(true);
+      expect(items[1].expanded).toBe(true);
+
+      el.mode = 'single';
+      await el.updateComplete;
+
+      // Only one item should remain expanded after enforcing single mode
+      const expandedCount = Array.from(items).filter((i) => i.expanded).length;
+      expect(expandedCount).toBeLessThanOrEqual(1);
+    });
+  });
+
+  // ─── Dynamic item mutation ───
+
+  describe('Dynamic item add/remove via slot mutation', () => {
+    it('single mode enforces exclusivity after a new expanded item is appended', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+
+      const newItem = document.createElement('hx-accordion-item') as HelixAccordionItem;
+      newItem.expanded = true;
+      const span = document.createElement('span');
+      span.slot = 'trigger';
+      span.textContent = 'B';
+      newItem.appendChild(span);
+      el.appendChild(newItem);
+
+      // Wait for MutationObserver to fire and re-enforce single mode
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const expandedCount = Array.from(items).filter((i) => i.expanded).length;
+      expect(expandedCount).toBeLessThanOrEqual(1);
+    });
+
+    it('accordion still operates after an item is removed', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item id="item-a">
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item id="item-b">
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const itemA = el.querySelector<HelixAccordionItem>('#item-a')!;
+      itemA.remove();
+      await el.updateComplete;
+
+      const itemB = el.querySelector<HelixAccordionItem>('#item-b')!;
+      const trigger = shadowQuery<HTMLElement>(itemB, 'summary')!;
+      trigger.click();
+      await itemB.updateComplete;
+      expect(itemB.expanded).toBe(true);
+    });
+  });
+
+  // ─── exclusive / single-mode collapse ───
+
+  describe('single mode exclusive expand (hx-expand triggers sibling collapse)', () => {
+    it('expanding item 2 collapses item 1 in single mode', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">Item 1</span><p>Content 1</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">Item 2</span><p>Content 2</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      expect(items[0].expanded).toBe(true);
+
+      const trigger2 = shadowQuery<HTMLElement>(items[1], 'summary')!;
+      trigger2.click();
+      await items[1].updateComplete;
+      await items[0].updateComplete;
+
+      expect(items[1].expanded).toBe(true);
+      expect(items[0].expanded).toBe(false);
+    });
+
+    it('hx-expand event from child is received by accordion in single mode', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item>
+            <span slot="trigger">Item 1</span><p>Content 1</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+
+      let received = false;
+      el.addEventListener('hx-expand', () => { received = true; });
+      item._dispatchToggleEvent(true);
+      expect(received).toBe(true);
+    });
+  });
+
+  // ─── hx-expand / hx-collapse events from accordion-item ───
+
+  describe('hx-expand and hx-collapse events from accordion-item', () => {
+    it('hx-expand dispatched with expanded=true and itemId when item expands', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item id="test-item">
+          <span slot="trigger">Test</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent<{ expanded: boolean; itemId: string }>>(el, 'hx-expand');
+      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
+      summary.click();
+      const event = await eventPromise;
+
+      expect(event.detail.expanded).toBe(true);
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('hx-collapse dispatched with expanded=false when item collapses', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item expanded>
+          <span slot="trigger">Test</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent<{ expanded: boolean; itemId: string }>>(el, 'hx-collapse');
+      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
+      summary.click();
+      const event = await eventPromise;
+
+      expect(event.detail.expanded).toBe(false);
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('hx-expand detail includes itemId when item has an id attribute', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item id="my-item">
+          <span slot="trigger">Test</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent<{ expanded: boolean; itemId: string }>>(el, 'hx-expand');
+      el._dispatchToggleEvent(true);
+      const event = await eventPromise;
+
+      expect(event.detail.itemId).toBe('my-item');
+    });
+  });
+
+  // ─── defaultExpanded initialization ───
+
+  describe('defaultExpanded initialization', () => {
+    it('item with expanded attribute is open on initial render', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item expanded>
+          <span slot="trigger">Default open</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      expect(el.expanded).toBe(true);
+      const details = shadowQuery<HTMLDetailsElement>(el, 'details')!;
+      expect(details.open).toBe(true);
+    });
+
+    it('item without expanded attribute is closed on initial render', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Default closed</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      expect(el.expanded).toBe(false);
+      const details = shadowQuery<HTMLDetailsElement>(el, 'details')!;
+      expect(details.open).toBe(false);
+    });
+
+    it('single mode with multiple expanded items: only first is kept open', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item expanded>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+          <hx-accordion-item expanded>
+            <span slot="trigger">C</span><p>Content C</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const expandedCount = Array.from(items).filter((i) => i.expanded).length;
+      expect(expandedCount).toBe(1);
+      // Only the first one should remain expanded
+      expect(items[0].expanded).toBe(true);
+    });
+  });
+
+  // ─── Accordion-item: level attribute ───
+
+  describe('accordion-item level attribute', () => {
+    it('trigger has aria-level="3" by default', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery(el, '[part="trigger"]')!;
+      expect(trigger.getAttribute('aria-level')).toBe('3');
+    });
+
+    it('trigger respects level="2" attribute', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item level="2">
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery(el, '[part="trigger"]')!;
+      expect(trigger.getAttribute('aria-level')).toBe('2');
+    });
+
+    it('trigger has role="heading"', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery(el, '[part="trigger"]')!;
+      expect(trigger.getAttribute('role')).toBe('heading');
+    });
+  });
+
+  // ─── Accordion-item: disabled ───
+
+  describe('accordion-item disabled state', () => {
+    it('disabled item cannot be toggled via click', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item disabled>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const summary = shadowQuery<HTMLElement>(el, 'summary')!;
+      summary.click();
+      await el.updateComplete;
+      expect(el.expanded).toBe(false);
+    });
+
+    it('disabled item cannot be toggled via Enter key', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item disabled>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(el.expanded).toBe(false);
+    });
+
+    it('disabled item has tabindex="-1" on trigger', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item disabled>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      expect(trigger.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('disabled item has aria-disabled="true" on trigger', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item disabled>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      expect(trigger.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('keyboard navigation skips disabled items', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item disabled>
+            <span slot="trigger">B (disabled)</span><p>Content B</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">C</span><p>Content C</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger3 = shadowQuery<HTMLElement>(items[2], '[part="trigger"]')!;
+
+      trigger1.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+      await el.updateComplete;
+
+      // Disabled item 2 should be skipped
+      expect(items[2].shadowRoot?.activeElement).toBe(trigger3);
+    });
+  });
+
+  // ─── Accordion-item: Space key ───
+
+  describe('accordion-item Space key toggle', () => {
+    it('Space key expands a closed item', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.expanded).toBe(true);
+    });
+
+    it('Space key collapses an expanded item', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item expanded>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.expanded).toBe(false);
+    });
+  });
+
+  // ─── Accordion-item: content region ARIA ───
+
+  describe('accordion-item content region ARIA', () => {
+    it('content region has role="region"', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const content = shadowQuery(el, '[part="content"]')!;
+      expect(content.getAttribute('role')).toBe('region');
+    });
+
+    it('content region has aria-labelledby referencing the trigger', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const trigger = shadowQuery<HTMLElement>(el, '[part="trigger"]')!;
+      const content = shadowQuery<HTMLElement>(el, '[part="content"]')!;
+      expect(content.getAttribute('aria-labelledby')).toBe(trigger.id);
+    });
+
+    it('content region has aria-hidden="true" when collapsed', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const content = shadowQuery(el, '[part="content"]')!;
+      expect(content.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('content region has no aria-hidden when expanded', async () => {
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item expanded>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      await el.updateComplete;
+      const content = shadowQuery(el, '[part="content"]')!;
+      expect(content.getAttribute('aria-hidden')).toBeNull();
+    });
+  });
+
+  // ─── Invalid mode warning ───
+
+  describe('invalid mode warning', () => {
+    it('warns and clamps to "single" when an invalid mode is set', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixAccordion>('<hx-accordion></hx-accordion>');
+      (el as HelixAccordion & { mode: string }).mode = 'invalid-mode' as 'single' | 'multi';
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid mode'));
+      expect(el.mode).toBe('single');
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── Accordion-item: warns when used outside accordion ───
+
+  describe('accordion-item outside hx-accordion', () => {
+    it('warns when hx-accordion-item is used outside hx-accordion', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <span slot="trigger">Item</span><p>Content</p>
+        </hx-accordion-item>
+      `);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('outside hx-accordion'));
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── Accordion-item: trigger slot empty warning ───
+
+  describe('accordion-item trigger slot empty warning', () => {
+    it('warns when trigger slot is empty', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixAccordionItem>(`
+        <hx-accordion-item>
+          <p>Content only, no trigger</p>
+        </hx-accordion-item>
+      `);
+      // Trigger the slotchange by dispatching it
+      const triggerSlot = el.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]');
+      if (triggerSlot) {
+        triggerSlot.dispatchEvent(new Event('slotchange', { bubbles: true }));
+      }
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('trigger slot is empty'));
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── Accordion: slot validation warning ───
+
+  describe('accordion slot validation', () => {
+    it('warns when non-accordion-item elements are slotted', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <div>Not an accordion item</div>
+        </hx-accordion>
+      `);
+      // Trigger slotchange manually if needed
+      const slot = el.shadowRoot?.querySelector<HTMLSlotElement>('slot');
+      if (slot) {
+        slot.dispatchEvent(new Event('slotchange', { bubbles: true }));
+      }
+      await el.updateComplete;
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('unexpected'));
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── ArrowDown wraps from last to first ───
+
+  describe('ArrowDown wraps from last to first trigger', () => {
+    it('ArrowDown on last item wraps to first', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger2 = shadowQuery<HTMLElement>(items[1], '[part="trigger"]')!;
+
+      trigger2.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+      await el.updateComplete;
+
+      expect(items[0].shadowRoot?.activeElement).toBe(trigger1);
+    });
+
+    it('ArrowUp on first item wraps to last', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      const trigger1 = shadowQuery<HTMLElement>(items[0], '[part="trigger"]')!;
+      const trigger2 = shadowQuery<HTMLElement>(items[1], '[part="trigger"]')!;
+
+      trigger1.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
+      await el.updateComplete;
+
+      expect(items[1].shadowRoot?.activeElement).toBe(trigger2);
+    });
+  });
+
+  // ─── disconnectedCallback cleanup ───
+
+  describe('disconnectedCallback cleanup', () => {
+    it('disconnectedCallback removes event listeners', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion mode="single">
+          <hx-accordion-item expanded>
+            <span slot="trigger">A</span><p>Content A</p>
+          </hx-accordion-item>
+          <hx-accordion-item>
+            <span slot="trigger">B</span><p>Content B</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      el.remove();
+
+      const items = el.querySelectorAll<HelixAccordionItem>('hx-accordion-item');
+      let _expandFired = false;
+      el.addEventListener('hx-expand', () => { _expandFired = true; });
+      items[1]._dispatchToggleEvent(true);
+      // After removal, handler is removed so sibling collapse does not run
+      expect(items[0].expanded).toBe(true); // stays expanded since coordinator removed
     });
   });
 });

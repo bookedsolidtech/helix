@@ -392,4 +392,70 @@ describe('hx-button-group', () => {
       expect(ctor.formAssociated).toBeFalsy();
     });
   });
+
+  // ─── Coverage Gap: invalid orientation setter ───
+
+  describe('Invalid orientation setter guard', () => {
+    it('defaults to "horizontal" when an invalid orientation value is set', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Actions">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      // Set an invalid value via the property setter
+      (el as unknown as { orientation: string }).orientation = 'diagonal';
+      await el.updateComplete;
+      // The setter must default back to horizontal
+      expect(el.orientation).toBe('horizontal');
+    });
+
+    it('accepts "vertical" as a valid orientation value', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Stacked actions" orientation="vertical">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      expect(el.orientation).toBe('vertical');
+    });
+  });
+
+  // ─── Coverage Gap: label property manages aria-label ───
+
+  describe('Label property aria-label management', () => {
+    it('sets aria-label on the host when label is provided', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Primary actions">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      expect(el.getAttribute('aria-label')).toBe('Primary actions');
+    });
+
+    it('removes aria-label from host when label is set to empty string', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Actions">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      el.label = '';
+      await el.updateComplete;
+      expect(el.getAttribute('aria-label')).toBeNull();
+    });
+
+    it('updates aria-label when label property changes', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Initial label">
+          <hx-button variant="secondary">Button</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      el.label = 'Updated label';
+      await el.updateComplete;
+      expect(el.getAttribute('aria-label')).toBe('Updated label');
+    });
+  });
 });

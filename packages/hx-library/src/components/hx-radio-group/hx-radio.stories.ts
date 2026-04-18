@@ -183,8 +183,11 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const radio = canvasElement.querySelector('hx-radio');
     expect(radio).toBeTruthy();
-    expect(radio!.getAttribute('role')).toBe('radio');
-    expect(radio!.getAttribute('aria-checked')).toBe('false');
+    // ARIA state lives on ElementInternals (a11y tree), not DOM attributes.
+    const internals = (radio as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.role).toBe('radio');
+    expect(internals.ariaChecked).toBe('false');
+    expect(radio!.hasAttribute('checked')).toBe(false);
   },
 };
 
@@ -201,7 +204,10 @@ export const Checked: Story = {
   play: async ({ canvasElement }) => {
     const radio = canvasElement.querySelector('hx-radio');
     expect(radio).toBeTruthy();
-    expect(radio!.getAttribute('aria-checked')).toBe('true');
+    // `checked` is a reflected @property — prefer the reflected attribute for user-visible state.
+    expect(radio!.hasAttribute('checked')).toBe(true);
+    const internals = (radio as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.ariaChecked).toBe('true');
     const control = radio!.shadowRoot!.querySelector('.radio--checked');
     expect(control).toBeTruthy();
   },
@@ -220,8 +226,10 @@ export const Disabled: Story = {
   play: async ({ canvasElement }) => {
     const radio = canvasElement.querySelector('hx-radio');
     expect(radio).toBeTruthy();
-    expect(radio!.getAttribute('aria-disabled')).toBe('true');
-    expect(radio!.hasAttribute('disabled')).toBeTruthy();
+    // `disabled` is a reflected @property — the attribute is the user-visible state.
+    expect(radio!.hasAttribute('disabled')).toBe(true);
+    const internals = (radio as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.ariaDisabled).toBe('true');
   },
 };
 

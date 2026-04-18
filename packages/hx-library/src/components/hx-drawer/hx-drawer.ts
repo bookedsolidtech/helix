@@ -1,11 +1,11 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { devWarn } from '../../utils/dev-warn.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 
 const _nextDrawerId = createIdCounter('hx-drawer');
@@ -36,6 +36,29 @@ const FOCUSABLE_SELECTORS = [
  * Supports focus trapping, overlay backdrop, keyboard navigation, and full
  * ARIA labelling for enterprise healthcare accessibility requirements.
  *
+ * ## Architecture Note: Native `<dialog>` Migration
+ *
+ * This component currently uses `role="dialog"` + `aria-modal="true"` on a
+ * `<div>` rather than the native `<dialog>` element. This is intentional for
+ * the current release because:
+ *
+ * 1. **SSR compatibility**: Native `<dialog>` requires `showModal()` to activate
+ *    its modal behavior (focus trapping, backdrop, top-layer). This JavaScript
+ *    call is not available during server-side rendering, which is a primary
+ *    consumption pattern for Drupal/Twig templates.
+ *
+ * 2. **Contained mode**: The `contained` property constrains the drawer to a
+ *    positioned parent. Native `<dialog>` in modal mode renders in the top layer
+ *    and cannot be constrained to a parent element.
+ *
+ * 3. **Animation control**: The current CSS transition approach provides precise
+ *    control over slide-in/slide-out animations. Native `<dialog>` `::backdrop`
+ *    animations have inconsistent cross-browser support.
+ *
+ * Migration to native `<dialog>` is tracked as a future enhancement. When browser
+ * support for `CloseWatcher`, `::backdrop` transitions, and declarative dialog
+ * opening stabilizes, this component will be migrated to native semantics.
+ *
  * @summary Slide-in panel overlay from any viewport edge.
  *
  * @tag hx-drawer
@@ -50,6 +73,12 @@ const FOCUSABLE_SELECTORS = [
  * @fires {CustomEvent<void>} hx-hide - Fired when the drawer begins to close.
  * @fires {CustomEvent<void>} hx-after-hide - Fired after the drawer close animation completes.
  * @fires {CustomEvent<void>} hx-initial-focus - Fired when initial focus is set inside the drawer. Cancelable to override focus behavior.
+ *
+ * **Event naming rationale:** hx-drawer uses the `hx-show`/`hx-hide`/`hx-after-show`/`hx-after-hide`
+ * pattern shared by all overlay components (hx-popover, hx-tooltip, hx-dropdown). This differs from
+ * hx-dialog's `hx-open`/`hx-close`/`hx-cancel` events, which align with native `<dialog>` semantics.
+ * The distinction is intentional: overlays are transient visibility toggles, while dialog is a stateful
+ * container with cancel semantics.
  *
  * @csspart overlay - The full-screen overlay container (includes backdrop and panel).
  * @csspart panel - The drawer panel itself.
@@ -75,7 +104,7 @@ const FOCUSABLE_SELECTORS = [
  * @cssprop [--hx-drawer-footer-border-color=var(--hx-color-neutral-200)] - Footer border color.
  */
 @customElement('hx-drawer')
-export class HelixDrawer extends LitElement {
+export class HelixDrawer extends HelixElement {
   static override styles = [helixDrawerStyles];
 
   // ─── Queries ───

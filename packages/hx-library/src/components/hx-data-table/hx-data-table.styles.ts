@@ -4,7 +4,7 @@ export const helixDataTableStyles = css`
   :host {
     display: block;
     overflow-x: auto;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-data-table-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 

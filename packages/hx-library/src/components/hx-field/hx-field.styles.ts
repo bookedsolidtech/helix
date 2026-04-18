@@ -48,7 +48,7 @@ export const helixFieldStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-field-label-color, var(--hx-color-neutral-700, #374151));
+    color: var(--hx-field-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: pointer;
   }
@@ -98,7 +98,7 @@ export const helixFieldStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-field-help-text-color, var(--hx-color-neutral-500, #6b7280));
+    color: var(--hx-field-help-text-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -115,7 +115,7 @@ export const helixFieldStyles = css`
   }
 
   .field--error .field__control {
-    outline: 2px solid var(--hx-field-error-color, var(--hx-color-error-500, #ef4444));
+    outline: 2px solid var(--hx-field-error-color, var(--hx-color-error-500, #dc2626));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

@@ -825,11 +825,11 @@ describe('hx-number-input', () => {
       expect(shadowQuery(el, '[part="help-text"]')).toBeTruthy();
     });
 
-    it('error-message part is present when error is set', async () => {
+    it('error part is present when error is set', async () => {
       const el = await fixture<HelixNumberInput>(
         '<hx-number-input error="Out of range"></hx-number-input>',
       );
-      expect(shadowQuery(el, '[part="error-message"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="error"]')).toBeTruthy();
     });
   });
 

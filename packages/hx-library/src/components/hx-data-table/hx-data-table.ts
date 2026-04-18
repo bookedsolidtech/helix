@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { HelixElement } from '../../base/index.js';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -21,6 +22,17 @@ export interface HxDataTableColumn {
 export interface HxDataTableSortState {
   key: string;
   direction: 'asc' | 'desc';
+}
+
+/** Detail for the hx-select event dispatched by hx-data-table. */
+export interface HxDataTableSelectDetail {
+  selectedRows: Record<string, unknown>[];
+}
+
+/** Detail for the hx-row-click event dispatched by hx-data-table. */
+export interface HxDataTableRowClickDetail {
+  row: Record<string, unknown>;
+  index: number;
 }
 
 /**
@@ -57,7 +69,7 @@ export interface HxDataTableSortState {
  * @cssprop [--hx-data-table-min-width=600px] - Minimum table width before horizontal scrolling.
  */
 @customElement('hx-data-table')
-export class HelixDataTable extends LitElement {
+export class HelixDataTable extends HelixElement {
   static override styles = [helixDataTableStyles];
 
   // ─── Public Properties ───
@@ -195,6 +207,22 @@ export class HelixDataTable extends LitElement {
    */
   @state() private _focusedHeaderIndex = -1;
 
+  /**
+   * Resolved columns array. Computed in willUpdate from the public `columns`
+   * property which may be a JSON string (Drupal/Twig path) or a JS array.
+   * All internal reads use this field to avoid mutating reactive properties
+   * inside willUpdate (which would trigger extra update cycles).
+   * @internal
+   */
+  @state() private _resolvedColumns: HxDataTableColumn[] = [];
+
+  /**
+   * Resolved rows array. Computed in willUpdate from the public `rows`
+   * property which may be a JSON string (Drupal/Twig path) or a JS array.
+   * @internal
+   */
+  @state() private _resolvedRows: Record<string, unknown>[] = [];
+
   // ─── Lifecycle ───
 
   override willUpdate(changed: PropertyValues<this>): void {
@@ -202,32 +230,41 @@ export class HelixDataTable extends LitElement {
     // Lit does not JSON-parse array attributes automatically, so we do it here.
     // Note: Lit's defaultConverter returns null (not a string) when JSON.parse fails for
     // type: Array — so we guard against both string and any non-array value.
+    //
+    // We write to private @state() resolved fields instead of mutating the public
+    // reactive properties. Mutating @property fields inside willUpdate triggers an
+    // additional update cycle; writing to separate @state fields does not because
+    // Lit batches all changes within the same willUpdate into a single render.
     if (changed.has('columns')) {
       const rawColumns: unknown = this.columns;
       if (typeof rawColumns === 'string') {
         try {
-          this.columns = JSON.parse(rawColumns) as HxDataTableColumn[];
+          this._resolvedColumns = JSON.parse(rawColumns) as HxDataTableColumn[];
         } catch {
-          this.columns = [];
+          this._resolvedColumns = [];
         }
-      } else if (!Array.isArray(this.columns)) {
-        this.columns = [];
+      } else if (Array.isArray(this.columns)) {
+        this._resolvedColumns = this.columns;
+      } else {
+        this._resolvedColumns = [];
       }
     }
     if (changed.has('rows')) {
       const rawRows: unknown = this.rows;
       if (typeof rawRows === 'string') {
         try {
-          this.rows = JSON.parse(rawRows) as Record<string, unknown>[];
+          this._resolvedRows = JSON.parse(rawRows) as Record<string, unknown>[];
         } catch {
-          this.rows = [];
+          this._resolvedRows = [];
         }
-      } else if (!Array.isArray(this.rows)) {
-        this.rows = [];
+      } else if (Array.isArray(this.rows)) {
+        this._resolvedRows = this.rows;
+      } else {
+        this._resolvedRows = [];
       }
     }
     // Only warn when rows actually changes to avoid noise on every property update.
-    if (changed.has('rows') && this.rows.length > 500) {
+    if (changed.has('rows') && this._resolvedRows.length > 500) {
       devWarn(
         'hx-data-table',
         'Rendering more than 500 rows may impact performance. Consider server-side pagination.',
@@ -236,7 +273,7 @@ export class HelixDataTable extends LitElement {
     // WCAG 4.1.2: data tables must have an accessible name so screen readers can identify them.
     if (
       (changed.has('label') || changed.has('columns')) &&
-      this.columns.length > 0 &&
+      this._resolvedColumns.length > 0 &&
       !this.label
     ) {
       devWarn(
@@ -248,7 +285,9 @@ export class HelixDataTable extends LitElement {
 
   override updated(changed: PropertyValues<this>): void {
     // Invalidate cell cache when rows or columns change so the next keyboard
-    // navigation re-queries and re-caches the updated DOM.
+    // navigation re-queries and re-caches the updated DOM. We check the public
+    // properties because _resolvedColumns/_resolvedRows are derived from them
+    // in willUpdate and always change in lockstep.
     if (changed.has('rows') || changed.has('columns')) {
       this._cachedCells = null;
     }
@@ -296,7 +335,7 @@ export class HelixDataTable extends LitElement {
 
   /** @internal */
   private _handleSelectAll(checked: boolean): void {
-    this._selectedRows = checked ? new Set(this.rows.map((_, i) => i)) : new Set<number>();
+    this._selectedRows = checked ? new Set(this._resolvedRows.map((_, i) => i)) : new Set<number>();
     this._dispatchSelect();
   }
 
@@ -308,7 +347,7 @@ export class HelixDataTable extends LitElement {
         composed: true,
         detail: {
           selectedRows: [...this._selectedRows].flatMap((i) => {
-            const row = this.rows[i];
+            const row = this._resolvedRows[i];
             return row !== undefined ? [row] : [];
           }),
         },
@@ -350,7 +389,7 @@ export class HelixDataTable extends LitElement {
       }
     }
 
-    const colCount = this.columns.length + (this.selectable ? 1 : 0);
+    const colCount = this._resolvedColumns.length + (this.selectable ? 1 : 0);
     const idx = cells.indexOf(focused);
     if (idx === -1) return;
 
@@ -423,7 +462,7 @@ export class HelixDataTable extends LitElement {
    * @internal
    */
   private get _sortableIndices(): number[] {
-    return this.columns.reduce<number[]>((acc, col, i) => {
+    return this._resolvedColumns.reduce<number[]>((acc, col, i) => {
       if (col.sortable) acc.push(i);
       return acc;
     }, []);
@@ -442,7 +481,7 @@ export class HelixDataTable extends LitElement {
 
     // Enter/Space on a sortable header triggers sort
     if (e.key === 'Enter' || e.key === ' ') {
-      const col = this.columns[this._focusedHeaderIndex];
+      const col = this._resolvedColumns[this._focusedHeaderIndex];
       if (col?.sortable) {
         e.preventDefault();
         this._handleSort(col.key);
@@ -502,15 +541,16 @@ export class HelixDataTable extends LitElement {
                   part="checkbox"
                   aria-label=${this.selectAllLabel}
                   .indeterminate=${this._selectedRows.size > 0 &&
-                  this._selectedRows.size < this.rows.length}
-                  .checked=${this._selectedRows.size === this.rows.length && this.rows.length > 0}
+                  this._selectedRows.size < this._resolvedRows.length}
+                  .checked=${this._selectedRows.size === this._resolvedRows.length &&
+                  this._resolvedRows.length > 0}
                   @change=${(e: Event) =>
                     this._handleSelectAll((e.target as HTMLInputElement).checked)}
                 />
               </th>
             `
           : nothing}
-        ${this.columns.map(
+        ${this._resolvedColumns.map(
           (col, i) => html`
             <th
               part="th"
@@ -561,7 +601,7 @@ export class HelixDataTable extends LitElement {
                 <span class="skeleton-cell" style="width:1rem;margin:auto"></span>
               </td>`
             : nothing}
-          ${this.columns.map(
+          ${this._resolvedColumns.map(
             () => html`
               <td part="td">
                 <span class="skeleton-cell"></span>
@@ -575,7 +615,7 @@ export class HelixDataTable extends LitElement {
 
   /** @internal */
   private _renderEmptyRow() {
-    const colSpan = this.columns.length + (this.selectable ? 1 : 0);
+    const colSpan = this._resolvedColumns.length + (this.selectable ? 1 : 0);
     return html`
       <tr part="tr">
         <td part="td" colspan=${colSpan} class="empty-cell">
@@ -587,12 +627,12 @@ export class HelixDataTable extends LitElement {
 
   /** @internal */
   private _renderDataRows() {
-    let displayRows = this.rows;
+    let displayRows = this._resolvedRows;
 
     // Client-side pagination when pageSize > 0
     if (this.pageSize > 0) {
       const start = (this.page - 1) * this.pageSize;
-      displayRows = this.rows.slice(start, start + this.pageSize);
+      displayRows = this._resolvedRows.slice(start, start + this.pageSize);
     }
 
     return repeat(
@@ -635,7 +675,7 @@ export class HelixDataTable extends LitElement {
                   </td>
                 `
               : nothing}
-            ${this.columns.map(
+            ${this._resolvedColumns.map(
               (col) => html`
                 <td part="td" tabindex="-1" data-row-index=${globalIndex}>
                   ${row[col.key] != null ? String(row[col.key]) : ''}
@@ -667,7 +707,7 @@ export class HelixDataTable extends LitElement {
           <tbody part="tbody">
             ${this.loading
               ? html`<slot name="loading">${this._renderSkeletonRows()}</slot>`
-              : this.rows.length === 0
+              : this._resolvedRows.length === 0
                 ? this._renderEmptyRow()
                 : this._renderDataRows()}
           </tbody>

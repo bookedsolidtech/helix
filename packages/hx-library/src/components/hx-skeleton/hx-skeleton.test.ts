@@ -214,6 +214,66 @@ describe('hx-skeleton', () => {
     });
   });
 
+  // ─── Property: height — no CSS var when undefined ───
+
+  describe('Property: height — conditional style', () => {
+    it('does not set --_height when height is undefined', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton width="200px"></hx-skeleton>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]') as HTMLElement;
+      expect(base.style.getPropertyValue('--_height')).toBe('');
+    });
+  });
+
+  // ─── Property: loaded transitions back to false ───
+
+  describe('Property: loaded — reset behavior', () => {
+    it('re-renders base span when loaded transitions from true back to false', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      el.loaded = true;
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="base"]')).toBeNull();
+      el.loaded = false;
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="base"]')).toBeTruthy();
+    });
+
+    it('does NOT dispatch hx-loaded when loaded transitions from true to false', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      el.loaded = true;
+      await el.updateComplete;
+      const events: Event[] = [];
+      el.addEventListener('hx-loaded', (e) => events.push(e));
+      el.loaded = false;
+      await el.updateComplete;
+      expect(events).toHaveLength(0);
+    });
+  });
+
+  // ─── hx-loaded event properties ───
+
+  describe('hx-loaded event properties', () => {
+    it('hx-loaded event bubbles and is composed', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      const eventPromise = oneEvent(el, 'hx-loaded');
+      el.loaded = true;
+      await el.updateComplete;
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+  });
+
+  // ─── connectedCallback: aria-hidden on host ───
+
+  describe('connectedCallback: aria-hidden on host', () => {
+    it('sets aria-hidden="true" on host via connectedCallback', async () => {
+      const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
+      // Attribute is set in connectedCallback before first render
+      expect(el.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

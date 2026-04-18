@@ -100,12 +100,9 @@ helix_checkbox:
 helix_radio:
   variables:
     label: ''
-    name: ''
     value: ''
     checked: false
     disabled: false
-    required: false
-    error: null
     attributes: {}
   template: helix-radio
 
@@ -126,9 +123,38 @@ helix_modal:
     label: ''
     body_content: ''
     open: false
-    dismissible: true
+    close_on_backdrop: true
     modal: true
     footer: null
     dialog_id: null
     attributes: {}
   template: helix-modal
+
+helix_nav:
+  variables:
+    items: []
+    orientation: 'horizontal'
+    label: 'Main navigation'
+    label_open: 'Open navigation menu'
+    label_close: 'Close navigation menu'
+    attributes: {}
+  template: helix-nav
+
+helix_side_nav:
+  variables:
+    items: []
+    collapsed: false
+    label: 'Main Navigation'
+    header: null
+    footer: null
+    attributes: {}
+  template: helix-side-nav
+
+helix_steps:
+  variables:
+    steps: []
+    orientation: 'horizontal'
+    size: 'md'
+    aria_label: 'Progress steps'
+    attributes: {}
+  template: helix-steps

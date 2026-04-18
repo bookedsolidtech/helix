@@ -85,16 +85,16 @@ Attaches to: `[data-drupal-accordion]`
 
 | Data attribute    | Type    | Description                                       |
 | ----------------- | ------- | ------------------------------------------------- |
-| `data-open-first` | boolean | When `"true"`, auto-expands the first panel       |
+| `data-open-first` | boolean | When `"true"`, auto-expands the first item        |
 
 Behavior:
-- Auto-expands the first `hx-accordion-panel` when `data-open-first="true"`
+- Auto-expands the first `hx-accordion-item` when `data-open-first="true"`
 - Announces panel state changes via `Drupal.announce()` for screen readers
 
 ```html
 <div data-drupal-accordion data-open-first="true">
   <hx-accordion>
-    <hx-accordion-panel>...</hx-accordion-panel>
+    <hx-accordion-item>...</hx-accordion-item>
   </hx-accordion>
 </div>
 ```

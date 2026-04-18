@@ -4,9 +4,16 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
+
+/** Detail for the hx-change event dispatched by hx-switch. */
+export interface HxSwitchChangeDetail {
+  checked: boolean;
+  value: string;
+}
 
 /**
  * A toggle switch component for on/off states.
@@ -24,7 +31,7 @@ const _nextSwitchId = createIdCounter('hx-switch');
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the switch is toggled.
+ * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the switch is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`.
  *
  * @csspart switch - The switch container (track + thumb wrapper).
  * @csspart track - The track background element.
@@ -43,7 +50,7 @@ const _nextSwitchId = createIdCounter('hx-switch');
  * @cssprop [--hx-switch-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-switch')
-export class HelixSwitch extends HelixElement {
+export class HelixSwitch extends FormMixin(HelixElement) {
   static override styles = [helixSwitchStyles];
 
   // ─── Form Association ───
@@ -129,38 +136,14 @@ export class HelixSwitch extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
-      this._updateValidity();
-    }
-    if (changedProperties.has('required')) {
-      this._updateValidity();
     }
   }
 
   // ─── Form Integration ───
 
-  /** Returns the validation message. */
-  override get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  override get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the switch satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** Recalculates and sets the validity state based on required and checked. */
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -175,6 +158,7 @@ export class HelixSwitch extends HelixElement {
   protected override _onFormReset(): void {
     this.checked = false;
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   protected override _onFormStateRestore(
@@ -226,6 +210,7 @@ export class HelixSwitch extends HelixElement {
   private _toggle(): void {
     if (this.disabled) return;
     this.checked = !this.checked;
+    this._handleInteractionInput();
 
     this.dispatchEvent(
       new CustomEvent<{ checked: boolean; value: string }>('hx-change', {
@@ -342,15 +327,18 @@ export class HelixSwitch extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-switch.
+ * The `hx-change` detail always includes both `checked` and `value` for this component.
+ */
+export interface HxSwitchEventMap {
+  'hx-change': CustomEvent<{ checked: boolean; value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-switch': HelixSwitch;
   }
-  interface HTMLElementEventMap {
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
-  }
 }
 
-/** @deprecated Use HxSwitch instead. */
-export type WcSwitch = HelixSwitch;
 export type HxSwitch = HelixSwitch;

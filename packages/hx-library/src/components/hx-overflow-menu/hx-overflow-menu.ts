@@ -1,9 +1,9 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { computePosition, flip, shift, offset } from '@floating-ui/dom';
-import { createIdCounter } from '../../base/index.js';
+
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 
 const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
@@ -44,7 +44,7 @@ const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
  * ```
  */
 @customElement('hx-overflow-menu')
-export class HelixOverflowMenu extends LitElement {
+export class HelixOverflowMenu extends HelixElement {
   static override styles = [helixOverflowMenuStyles];
 
   /**
@@ -169,6 +169,7 @@ export class HelixOverflowMenu extends LitElement {
     const panel = this._panelEl;
     if (!trigger || !panel) return;
 
+    const { computePosition, flip, shift, offset } = await import('@floating-ui/dom');
     const { x, y } = await computePosition(trigger, panel, {
       placement: this.placement,
       strategy: 'fixed',

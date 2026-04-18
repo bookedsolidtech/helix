@@ -115,13 +115,13 @@ describe('hx-checkbox-group', () => {
       expect(errorDiv?.textContent?.trim()).toBe('Please select at least one option');
     });
 
-    it('error div has part="error-message"', async () => {
+    it('error div has part="error"', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" error="Required">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv).toBeTruthy();
     });
 
@@ -268,13 +268,13 @@ describe('hx-checkbox-group', () => {
       expect(shadowQuery(el, '[part="help-text"]')).toBeTruthy();
     });
 
-    it('exposes "error-message" CSS part when error is set', async () => {
+    it('exposes "error" CSS part when error is set', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Test Group" error="Something went wrong">
           <hx-checkbox value="a" label="Option A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      expect(shadowQuery(el, '[part="error-message"]')).toBeTruthy();
+      expect(shadowQuery(el, '[part="error"]')).toBeTruthy();
     });
   });
 
@@ -646,6 +646,109 @@ describe('hx-checkbox-group', () => {
 
       // The new checkbox should inherit the group's disabled state via _handleSlotChange
       expect(newCb.disabled).toBe(true);
+    });
+  });
+
+  // ─── name property (2) ───
+
+  describe('Property: name', () => {
+    it('name attribute is reflected to host', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options" name="allergies">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      expect(el.getAttribute('name')).toBe('allergies');
+    });
+
+    it('name property can be set programmatically', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      el.setAttribute('name', 'medications');
+      await el.updateComplete;
+      expect(el.getAttribute('name')).toBe('medications');
+    });
+  });
+
+  // ─── reportValidity (1) ───
+
+  describe('reportValidity', () => {
+    it('reportValidity returns true when valid (not required)', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options" name="opts">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      expect(el.reportValidity()).toBe(true);
+    });
+  });
+
+  // ─── help-text property (2) ───
+
+  describe('Property: help-text', () => {
+    it('renders help text when help-text attribute is set', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options" help-text="Select all that apply">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const helpText = shadowQuery(el, '.fieldset__help-text');
+      expect(helpText?.textContent?.trim()).toBe('Select all that apply');
+    });
+
+    it('does not render help text container when neither help-text nor error is set', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const helpText = shadowQuery(el, '.fieldset__help-text');
+      // Either null or present but hidden — the key is no visible content
+      if (helpText) {
+        expect(helpText.textContent?.trim()).toBe('');
+      } else {
+        expect(helpText).toBeNull();
+      }
+    });
+  });
+
+  // ─── hx-change detail: multiple values (2) ───
+
+  describe('hx-change detail: multiple checked values', () => {
+    it('hx-change detail.values contains all currently checked values', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options" name="opts">
+          <hx-checkbox value="a" label="A" checked></hx-checkbox>
+          <hx-checkbox value="b" label="B"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const eventPromise = oneEvent<CustomEvent<{ values: string[] }>>(el, 'hx-change');
+      const checkboxB = el.querySelector('hx-checkbox[value="b"]') as HelixCheckbox;
+      const control = shadowQuery<HTMLElement>(checkboxB, '.checkbox__control');
+      if (!control) throw new Error('.checkbox__control not found');
+      control.click();
+      const event = await eventPromise;
+      expect(event.detail.values).toContain('a');
+      expect(event.detail.values).toContain('b');
+    });
+
+    it('hx-change detail.values is empty after unchecking the only checked box', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Options" name="opts">
+          <hx-checkbox value="a" label="A" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const eventPromise = oneEvent<CustomEvent<{ values: string[] }>>(el, 'hx-change');
+      const checkboxA = el.querySelector('hx-checkbox[value="a"]') as HelixCheckbox;
+      const control = shadowQuery<HTMLElement>(checkboxA, '.checkbox__control');
+      if (!control) throw new Error('.checkbox__control not found');
+      control.click();
+      const event = await eventPromise;
+      expect(event.detail.values).not.toContain('a');
+      expect(event.detail.values).toHaveLength(0);
     });
   });
 

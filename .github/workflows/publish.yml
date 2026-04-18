@@ -147,6 +147,9 @@ jobs:
       - name: Build
         run: pnpm turbo run build --filter='!docs'
 
+      - name: Build CDN artifacts
+        run: pnpm --filter=@helixui/library run build:cdn
+
       - name: Version and Publish
         uses: changesets/action@v1
         with:

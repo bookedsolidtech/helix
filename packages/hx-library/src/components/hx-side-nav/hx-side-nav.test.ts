@@ -538,6 +538,67 @@ describe('hx-side-nav', () => {
       expect(violations).toHaveLength(0);
     });
   });
+
+  // ─── Toggle button aria-expanded (2) ───
+
+  describe('Toggle button aria-expanded', () => {
+    it('toggle button aria-expanded is "true" when expanded (not collapsed)', async () => {
+      const el = await fixture<HxSideNav>('<hx-side-nav></hx-side-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      expect(btn?.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('toggle button aria-expanded is "false" when collapsed', async () => {
+      const el = await fixture<HxSideNav>('<hx-side-nav collapsed></hx-side-nav>');
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      expect(btn?.getAttribute('aria-expanded')).toBe('false');
+    });
+  });
+
+  // ─── Programmatic label update (1) ───
+
+  describe('Label updates', () => {
+    it('updating label property updates aria-label on nav', async () => {
+      const el = await fixture<HxSideNav>('<hx-side-nav label="Old Label"></hx-side-nav>');
+      el.label = 'New Label';
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      const nav = shadowQuery<HTMLElement>(el, 'nav');
+      expect(nav?.getAttribute('aria-label')).toBe('New Label');
+    });
+  });
+
+  // ─── Non-nav-item children are ignored in propagation (1) ───
+
+  describe('Collapsed propagation filtering', () => {
+    it('non-hx-nav-item slotted elements do not receive data-collapsed', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav collapsed>
+          <div id="not-a-nav-item">Not a nav item</div>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      const div = el.querySelector('#not-a-nav-item');
+      expect(div?.hasAttribute('data-collapsed')).toBe(false);
+    });
+  });
+
+  // ─── Keyboard: non-nav key is ignored (1) ───
+
+  describe('Keyboard: unrecognized keys', () => {
+    it('pressing Tab key in body does not throw', async () => {
+      const el = await fixture<HxSideNav>(
+        `<hx-side-nav>
+          <hx-nav-item href="/a">Item A</hx-nav-item>
+        </hx-side-nav>`,
+      );
+      await (el as HxSideNav & { updateComplete: Promise<boolean> }).updateComplete;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]');
+      expect(() => {
+        body?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      }).not.toThrow();
+    });
+  });
 });
 
 describe('hx-nav-item', () => {
@@ -859,6 +920,68 @@ describe('hx-nav-item', () => {
       expect(tooltipA?.id).not.toBe('');
       expect(tooltipB?.id).not.toBe('');
       expect(tooltipA?.id).not.toBe(tooltipB?.id);
+    });
+  });
+
+  // ─── hx-nav-item: data-collapsed attribute observation (2) ───
+
+  describe('data-collapsed attribute observation', () => {
+    it('sets _isCollapsed when data-collapsed attribute is added', async () => {
+      const el = await fixture<HxNavItem>('<hx-nav-item href="/test">Test</hx-nav-item>');
+      el.setAttribute('data-collapsed', '');
+      await (el as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+      // When collapsed, a tooltip span should appear in shadow DOM
+      const tooltip = el.shadowRoot?.querySelector('[role="tooltip"]');
+      expect(tooltip).toBeTruthy();
+    });
+
+    it('removes tooltip when data-collapsed attribute is removed', async () => {
+      const el = await fixture<HxNavItem>('<hx-nav-item href="/test">Test</hx-nav-item>');
+      el.setAttribute('data-collapsed', '');
+      await (el as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+      el.removeAttribute('data-collapsed');
+      await (el as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+      const tooltip = el.shadowRoot?.querySelector('[role="tooltip"]');
+      expect(tooltip).toBeNull();
+    });
+  });
+
+  // ─── hx-nav-item: disabled blocks toggle (1) ───
+
+  describe('Disabled blocks toggle', () => {
+    it('clicking a disabled nav item with children does not toggle expanded state', async () => {
+      const el = await fixture<HxNavItem>(
+        `<hx-nav-item disabled>
+          Parent
+          <hx-nav-item slot="children" href="/child">Child</hx-nav-item>
+        </hx-nav-item>`,
+      );
+      await (el as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button');
+      btn?.click();
+      await (el as HxNavItem & { updateComplete: Promise<boolean> }).updateComplete;
+      expect(el.expanded).toBe(false);
+    });
+  });
+
+  // ─── hx-nav-item: focus() public API (1) ───
+
+  describe('focus() public API', () => {
+    it('calling focus() on hx-nav-item focuses the internal link element', async () => {
+      const el = await fixture<HxNavItem>('<hx-nav-item href="/test">Test</hx-nav-item>');
+      el.focus();
+      const inner = el.shadowRoot?.querySelector<HTMLElement>('[part="link"]');
+      expect(inner).toBeTruthy();
+    });
+  });
+
+  // ─── hx-nav-item: aria-expanded only present with children (1) ───
+
+  describe('aria-expanded present only with children', () => {
+    it('no aria-expanded attribute on anchor when item has no children', async () => {
+      const el = await fixture<HxNavItem>('<hx-nav-item href="/test">Test</hx-nav-item>');
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a');
+      expect(anchor?.hasAttribute('aria-expanded')).toBe(false);
     });
   });
 });

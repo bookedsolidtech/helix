@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -34,7 +35,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-menu-item-hover-bg=var(--hx-color-neutral-100)] - Item hover/focus background.
  */
 @customElement('hx-menu-item')
-export class HelixMenuItem extends LitElement {
+export class HelixMenuItem extends HelixElement {
   static override styles = [helixMenuItemStyles];
 
   /**

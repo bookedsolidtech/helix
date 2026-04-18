@@ -41,3 +41,4 @@ packages/hx-library/drupal/helix.libraries.yml
 # Minified CSS assets — bundle-size optimized, must not be reformatted
 packages/hx-library/src/styles/form/form.scoped.css
 packages/hx-library/src/styles/prose/prose.scoped.css
+data/readiness/

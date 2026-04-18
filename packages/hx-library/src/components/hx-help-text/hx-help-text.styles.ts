@@ -13,7 +13,7 @@ export const helixHelpTextStyles = css`
     font-size: var(--hx-help-text-font-size, var(--hx-font-size-sm, 0.875rem));
     font-weight: var(--hx-help-text-font-weight, var(--hx-font-weight-normal, 400));
     line-height: var(--hx-help-text-line-height, var(--hx-line-height-normal, 1.5));
-    color: var(--hx-help-text-color, var(--hx-color-neutral-500, #6b7280));
+    color: var(--hx-help-text-color, var(--hx-color-neutral-500, #64748b));
     margin: 0;
   }
 
@@ -30,25 +30,25 @@ export const helixHelpTextStyles = css`
   /* ─── Variant: default ─── */
 
   .help-text--default {
-    --hx-help-text-color: var(--hx-color-neutral-500, #6b7280);
+    --hx-help-text-color: var(--hx-color-neutral-500, #64748b);
   }
 
   /* ─── Variant: error ─── */
 
   .help-text--error {
-    --hx-help-text-color: var(--hx-color-error-600, #dc2626);
+    --hx-help-text-color: var(--hx-color-error-600, #b91c1c);
   }
 
   /* ─── Variant: warning ─── */
 
   .help-text--warning {
-    --hx-help-text-color: var(--hx-color-warning-700, #b45309);
+    --hx-help-text-color: var(--hx-color-warning-700, #92400e);
   }
 
   /* ─── Variant: success ─── */
 
   .help-text--success {
-    --hx-help-text-color: var(--hx-color-success-700, #15803d);
+    --hx-help-text-color: var(--hx-color-success-700, #166534);
   }
 
   /* ─── High Contrast Mode (forced-colors) ─── */

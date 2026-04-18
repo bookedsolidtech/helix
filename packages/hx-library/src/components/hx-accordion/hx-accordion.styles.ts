@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const helixAccordionStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-accordion-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   .accordion {

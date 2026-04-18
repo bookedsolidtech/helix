@@ -213,12 +213,25 @@ Coverage reports are uploaded as GitHub Actions artifacts on every CI run:
 
 ## Batch Testing
 
-For large PRs or CI optimization, tests can be split into batches:
+The full test suite runs through a single Chromium instance with sequential
+file execution:
 
 ```bash
-pnpm run test:batch:1   # hx-accordion through hx-combobox
-pnpm run test:batch:2   # hx-container through hx-help-text
-pnpm run test:batch:3   # hx-icon through hx-popover
-pnpm run test:batch:4   # hx-progress through hx-slider
-pnpm run test:batch:5   # hx-spinner through hx-video-player
+pnpm run test:batch           # Run all tests locally (single Chromium)
+pnpm run test:batch -- --dry-run
+pnpm run test:batch -- --verbose
 ```
+
+For CI parallelism, use the shard runner. Each shard runs 1/N of the test
+files in its own Chromium so CI matrix jobs split wall time proportionally:
+
+```bash
+VITEST_SHARD=1/4 pnpm run test:shard
+VITEST_SHARD=2/4 pnpm run test:shard
+VITEST_SHARD=3/4 pnpm run test:shard
+VITEST_SHARD=4/4 pnpm run test:shard
+```
+
+Both runners use the shared stale-output watchdog
+(`scripts/lib/vitest-watchdog.sh`) to work around the Vitest 3.x browser
+mode teardown hang.

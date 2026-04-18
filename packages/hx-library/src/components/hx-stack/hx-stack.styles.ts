@@ -104,4 +104,14 @@ export const helixStackStyles = css`
   :host([gap='xl']) [part='base'] {
     gap: var(--hx-space-8, 2rem);
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  /* hx-stack is a layout wrapper with no state communicated via color.
+     forced-color-adjust: auto (default) is sufficient. */
+  @media (forced-colors: active) {
+    :host {
+      forced-color-adjust: auto;
+    }
+  }
 `;

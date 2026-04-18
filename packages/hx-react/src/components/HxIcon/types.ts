@@ -41,4 +41,8 @@ name (`hx-size`). */
 When empty the icon is treated as decorative and `aria-hidden="true"` is
 applied. */
   label?: string;
+  /** Comma-separated list of allowed origins for cross-origin SVG fetches.
+By default, only same-origin URLs are permitted. Set this to allow
+specific CDN or asset server origins (e.g., "https://cdn.example.com,https://assets.example.com"). */
+  allowedOrigins?: string;
 }

@@ -1,6 +1,7 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixFormScopedCss } from './hx-form.styles.js';
 
@@ -30,7 +31,7 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * @cssprop [--hx-form-padding=0] - Internal padding of the form.
  */
 @customElement('hx-form')
-export class HelixForm extends LitElement {
+export class HelixForm extends HelixElement {
   // ─── Light DOM ───
 
   override createRenderRoot(): HTMLElement {

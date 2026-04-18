@@ -91,4 +91,17 @@ export const helixButtonGroupStyles = css`
     z-index: 1;
     position: relative;
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /*
+     * In forced-colors mode, negative margins that collapse borders between grouped
+     * buttons can obscure focus rings. Raise focused children so the Highlight
+     * outline from hx-button's own forced-colors block is fully visible.
+     */
+    .group ::slotted(:focus-within) {
+      z-index: 2;
+    }
+  }
 `;
