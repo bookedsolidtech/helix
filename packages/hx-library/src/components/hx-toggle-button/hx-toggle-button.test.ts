@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixToggleButton } from './hx-toggle-button.js';
@@ -540,6 +540,143 @@ describe('hx-toggle-button', () => {
         expect(violations, `hx-size="${size}" should have no violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── Property: label (aria-label for icon-only usage) ───
+
+  describe('Property: label (icon-only aria-label)', () => {
+    it('sets aria-label on inner button when label is provided', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('Mute');
+    });
+
+    it('does not set aria-label when label is not provided', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Mute</hx-toggle-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
+  // ─── firstUpdated accessibility warning ───
+
+  describe('firstUpdated: no accessible label warning', () => {
+    it('warns when no slot text and no label attribute', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixToggleButton>('<hx-toggle-button></hx-toggle-button>');
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('No accessible label found'),
+        );
+        expect(relevantCalls.length).toBeGreaterThan(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when slot text is present', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixToggleButton>('<hx-toggle-button>Mute</hx-toggle-button>');
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('No accessible label found'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when label attribute is present (even without slot text)', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixToggleButton>(
+          '<hx-toggle-button label="Mute audio"></hx-toggle-button>',
+        );
+        await el.updateComplete;
+        const relevantCalls = warnSpy.mock.calls.filter(
+          (call) =>
+            typeof call[0] === 'string' &&
+            call[0].includes('No accessible label found'),
+        );
+        expect(relevantCalls).toHaveLength(0);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+  });
+
+  // ─── Form Association: value sync and validity ───
+
+  describe('Form Association: value sync', () => {
+    it('_syncFormValue sets null when pressed=false', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-toggle-button name="filter" value="active">Filter</hx-toggle-button>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-toggle-button') as HelixToggleButton;
+      await el.updateComplete;
+      // Not pressed — form value should be null
+      const formData = new FormData(form);
+      expect(formData.get('filter')).toBeNull();
+    });
+
+    it('required validity resets when pressed becomes true', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required>Toggle</hx-toggle-button>',
+      );
+      expect(el.checkValidity()).toBe(false);
+      el.pressed = true;
+      await el.updateComplete;
+      expect(el.checkValidity()).toBe(true);
+    });
+
+    it('validationMessage is non-empty when required and not pressed', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required>Toggle</hx-toggle-button>',
+      );
+      expect(el.validationMessage.length).toBeGreaterThan(0);
+    });
+
+    it('validationMessage is empty when required and pressed', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required pressed>Toggle</hx-toggle-button>',
+      );
+      expect(el.validationMessage).toBe('');
+    });
+  });
+
+  // ─── Dynamic updates ───
+
+  describe('Dynamic updates', () => {
+    it('updates variant class when variant property changes', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button variant="secondary">Toggle</hx-toggle-button>',
+      );
+      el.variant = 'primary';
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--primary')).toBe(true);
+      expect(btn.classList.contains('button--secondary')).toBe(false);
+    });
+
+    it('updates size class when size property changes', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button hx-size="sm">Toggle</hx-toggle-button>',
+      );
+      el.size = 'lg';
+      await el.updateComplete;
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--lg')).toBe(true);
+      expect(btn.classList.contains('button--sm')).toBe(false);
     });
   });
 });

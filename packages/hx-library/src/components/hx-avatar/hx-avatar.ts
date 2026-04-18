@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixAvatarStyles } from './hx-avatar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -29,7 +30,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-avatar-font-size] - Font size for the initials text, set per size variant.
  */
 @customElement('hx-avatar')
-export class HelixAvatar extends LitElement {
+export class HelixAvatar extends HelixElement {
   static override styles = [helixAvatarStyles];
 
   /**

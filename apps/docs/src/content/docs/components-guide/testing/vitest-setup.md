@@ -121,8 +121,11 @@ pnpm run test:coverage
 # Run a single component
 pnpm run test:component -- hx-button
 
-# Run tests for a specific batch
-pnpm run test:batch:1
+# Run the full sequential batch (single Chromium, local-friendly)
+pnpm run test:batch
+
+# Run a single shard for CI parallelism
+VITEST_SHARD=1/4 pnpm run test:shard
 ```
 
 ## Coverage Configuration

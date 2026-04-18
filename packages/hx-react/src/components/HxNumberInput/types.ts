@@ -44,12 +44,6 @@ export interface HxNumberInputProps {
   incrementLabel?: string;
   /** Accessible label for the decrement (-) stepper button. */
   decrementLabel?: string;
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched when the input loses focus after its value changed. */

@@ -18,7 +18,7 @@
 {{ attach_library('helixui/hx-badge') }}
 
 <hx-badge
-  {% if variant and variant != 'neutral' %}variant="{{ variant }}"{% endif %}
+  {% if variant and variant != 'primary' %}variant="{{ variant }}"{% endif %}
   {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
   {% if pill %}pill{% endif %}
   {% if pulse %}pulse{% endif %}

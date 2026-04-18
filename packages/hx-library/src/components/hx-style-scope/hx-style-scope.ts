@@ -1,6 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { hxStyleScopeStyles } from './hx-style-scope.styles.js';
 import { injectLightStyles } from '../../utilities/injectLightStyles.js';
 
@@ -36,7 +37,7 @@ import { injectLightStyles } from '../../utilities/injectLightStyles.js';
  * ```
  */
 @customElement('hx-style-scope')
-export class HxStyleScope extends LitElement {
+export class HxStyleScope extends HelixElement {
   static override styles = [hxStyleScopeStyles];
 
   /**

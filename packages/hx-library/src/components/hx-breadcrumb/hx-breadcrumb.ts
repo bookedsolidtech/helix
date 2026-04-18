@@ -1,7 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
-import { createIdCounter } from '../../base/index.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
@@ -40,7 +40,7 @@ const _nextBreadcrumbId = createIdCounter('hx-breadcrumb');
  * @cssprop [--hx-breadcrumb-item-max-width] - Max-width for item text truncation (e.g. `12rem`).
  */
 @customElement('hx-breadcrumb')
-export class HelixBreadcrumb extends LitElement {
+export class HelixBreadcrumb extends HelixElement {
   static override styles = [helixBreadcrumbStyles];
 
   /**
@@ -89,14 +89,14 @@ export class HelixBreadcrumb extends LitElement {
   @property({ type: Boolean, attribute: 'json-ld' })
   jsonLd = false;
 
-  /** @internal */
-  private _ellipsisItem: Element | null = null;
+  /**
+   * Whether the ellipsis expand button is currently shown (shadow DOM rendered).
+   * Driven by maxItems collapse logic; replaces the old light-DOM ellipsis injection.
+   * @internal
+   */
+  @state() private _showEllipsis = false;
   /** @internal */
   private _jsonLdScript: HTMLScriptElement | null = null;
-  /** @internal */
-  private readonly _boundEllipsisClick = (e: Event) => this._handleEllipsisClick(e);
-  /** @internal */
-  private readonly _boundEllipsisKeydown = (e: Event) => this._handleEllipsisKeydown(e);
 
   /**
    * Tracks which items had their `current` attribute set by this component
@@ -220,7 +220,9 @@ export class HelixBreadcrumb extends LitElement {
 
   /** @internal */
   private _applyCollapse(items: Element[]): void {
-    // Show only first and last; hide all middle items
+    // Show only first and last; hide all middle items via data attribute.
+    // The ellipsis is rendered in shadow DOM (see render()) to avoid mutating
+    // the consumer's light DOM structure (FS-014).
     items.forEach((item, i) => {
       const el = item as HTMLElement;
       if (i === 0 || i === items.length - 1) {
@@ -230,28 +232,7 @@ export class HelixBreadcrumb extends LitElement {
       }
     });
 
-    // Create the ellipsis element once (guard for SSR — document is unavailable server-side)
-    if (!this._ellipsisItem && typeof document !== 'undefined') {
-      const ellipsis = document.createElement('hx-breadcrumb-item');
-      ellipsis.classList.add('hx-bc-ellipsis');
-
-      // Keyboard-accessible expand button. Events handled via host-level delegation
-      // in _handleEllipsisClick / _handleEllipsisKeydown.
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = '…';
-      btn.setAttribute('aria-label', this.labelEllipsis);
-      ellipsis.appendChild(btn);
-
-      this._ellipsisItem = ellipsis;
-    }
-
-    // Insert ellipsis after first item only if not already correctly placed
-    const firstItem = items[0];
-    if (!firstItem || !this._ellipsisItem) return;
-    if (this._ellipsisItem.previousElementSibling !== firstItem) {
-      firstItem.after(this._ellipsisItem);
-    }
+    this._showEllipsis = true;
   }
 
   /** @internal */
@@ -260,27 +241,7 @@ export class HelixBreadcrumb extends LitElement {
       (item as HTMLElement).removeAttribute('data-bc-hidden');
     });
 
-    if (this._ellipsisItem?.isConnected) {
-      this._ellipsisItem.remove();
-    }
-  }
-
-  /** @internal */
-  private _handleEllipsisClick(e: Event): void {
-    if ((e.target as Element)?.closest?.('.hx-bc-ellipsis')) {
-      this._expandBreadcrumb();
-    }
-  }
-
-  /** @internal */
-  private _handleEllipsisKeydown(e: Event): void {
-    if (!(e instanceof KeyboardEvent)) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      if ((e.target as Element)?.closest?.('.hx-bc-ellipsis')) {
-        e.preventDefault();
-        this._expandBreadcrumb();
-      }
-    }
+    this._showEllipsis = false;
   }
 
   /**
@@ -355,14 +316,10 @@ export class HelixBreadcrumb extends LitElement {
     // aria-required-children because a list cannot own a navigation landmark.
     // Slotted items no longer need role="listitem" either; the native <ol>
     // handles list semantics in the composed accessibility tree.
-    this.addEventListener('click', this._boundEllipsisClick);
-    this.addEventListener('keydown', this._boundEllipsisKeydown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener('click', this._boundEllipsisClick);
-    this.removeEventListener('keydown', this._boundEllipsisKeydown);
     this._removeJsonLd();
   }
 
@@ -411,6 +368,19 @@ export class HelixBreadcrumb extends LitElement {
       <nav part="nav" aria-label=${this.label}>
         <ol part="list">
           <slot @slotchange=${this._handleSlotChange}></slot>
+          ${this._showEllipsis
+            ? html`
+                <hx-breadcrumb-item class="hx-bc-ellipsis">
+                  <button
+                    type="button"
+                    aria-label=${this.labelEllipsis}
+                    @click=${this._expandBreadcrumb}
+                  >
+                    …
+                  </button>
+                </hx-breadcrumb-item>
+              `
+            : nothing}
         </ol>
       </nav>
       <slot

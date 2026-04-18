@@ -16,8 +16,14 @@ export interface HxStepsProps {
   orientation?: 'horizontal' | 'vertical';
   /** Size variant of the steps. */
   size?: 'sm' | 'md' | 'lg';
-  /** Accessible label for the list. Forwarded to the inner list element. */
-  ariaLabel?: string | null;
+  /** Accessible label for the list. Forwarded to the inner list element.
+Uses `accessible-label` attribute instead of `aria-label` to avoid
+ARIAMixin shadowing on the host element.
+
+Note: `mixinDelegatesAria` is not applied to this component because the
+`accessible-label` attribute approach avoids the ARIAMixin property conflict
+without requiring mixin overhead. */
+  accessibleLabel?: string | null;
 
   // Event callbacks
   /** Dispatched when a step is clicked. Detail contains the clicked `step` element and its zero-based `index`. */

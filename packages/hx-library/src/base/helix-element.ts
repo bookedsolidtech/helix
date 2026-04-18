@@ -5,9 +5,11 @@ import { LitElement } from 'lit';
  * components: lazy `ElementInternals` access, form lifecycle hook delegation,
  * and convenience validity getters.
  *
+ * All subclasses get a lazy `_internals` accessor that calls
+ * `attachInternals()` on first access — useful for both form participation
+ * and ARIA role/state management via `ElementInternals`.
+ *
  * Form association is opt-in via `static formAssociated = true` on the subclass.
- * When set, `HelixElement` provides a lazy `_internals` accessor that calls
- * `attachInternals()` on first access — eliminating constructor boilerplate.
  *
  * Form components should also override the `_onForm*` hook methods rather than
  * re-declaring the raw browser callbacks (`formResetCallback`, etc.).
@@ -56,19 +58,13 @@ export class HelixElement extends LitElement {
    * Lazy accessor for `ElementInternals`. Calls `attachInternals()` on first
    * access and caches the result.
    *
-   * Only valid when `static formAssociated = true` is declared on the subclass.
-   * Accessing this on a non-form-associated component throws a descriptive error.
+   * Available to ALL components — not just form-associated ones.
+   * `ElementInternals` is also the standard mechanism for setting ARIA roles,
+   * states, and properties from within Shadow DOM (e.g., `this._internals.role`).
    *
-   * @throws {Error} If accessed on a component where `formAssociated` is `false`
    * @internal
    */
   get _internals(): ElementInternals {
-    if (!(this.constructor as typeof HelixElement).formAssociated) {
-      throw new Error(
-        `[HelixElement] _internals accessed on <${this.tagName.toLowerCase()}> but ` +
-          `static formAssociated is not set to true on ${this.constructor.name}.`,
-      );
-    }
     const cached = this.#internals;
     if (cached !== undefined) {
       return cached;

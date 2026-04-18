@@ -3,7 +3,7 @@
   "version": "1.1.4",
   "description": "React wrappers for HELiX web components",
   "type": "module",
-  "sideEffects": true,
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

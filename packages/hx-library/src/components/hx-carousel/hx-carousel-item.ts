@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixCarouselItemStyles } from './hx-carousel-item.styles.js';
 
 /**
@@ -15,7 +16,7 @@ import { helixCarouselItemStyles } from './hx-carousel-item.styles.js';
  * @csspart slide - The slide wrapper element.
  */
 @customElement('hx-carousel-item')
-export class HelixCarouselItem extends LitElement {
+export class HelixCarouselItem extends HelixElement {
   static override styles = [helixCarouselItemStyles];
 
   /**

@@ -167,35 +167,35 @@ describe('HELiX Drupal Behaviors', () => {
       expect(attachedElements.get('hx-accordion')?.size).toBe(1);
     });
 
-    it('opens first panel when data-open-first="true"', () => {
+    it('expands first item when data-open-first="true"', () => {
       const container = createContainer();
       const wrapper = document.createElement('div');
       wrapper.setAttribute('data-drupal-accordion', '');
       wrapper.setAttribute('data-open-first', 'true');
       const accordion = document.createElement('hx-accordion');
-      const panel = document.createElement('hx-accordion-panel');
-      accordion.appendChild(panel);
+      const item = document.createElement('hx-accordion-item');
+      accordion.appendChild(item);
       wrapper.appendChild(accordion);
       container.appendChild(wrapper);
 
       mockDrupal.behaviors.hxAccordion.attach(container);
 
-      expect((panel as HTMLElement & { open?: boolean }).open).toBe(true);
+      expect((item as HTMLElement & { expanded?: boolean }).expanded).toBe(true);
     });
 
-    it('does not open first panel when data-open-first is absent', () => {
+    it('does not expand first item when data-open-first is absent', () => {
       const container = createContainer();
       const wrapper = document.createElement('div');
       wrapper.setAttribute('data-drupal-accordion', '');
       const accordion = document.createElement('hx-accordion');
-      const panel = document.createElement('hx-accordion-panel');
-      accordion.appendChild(panel);
+      const item = document.createElement('hx-accordion-item');
+      accordion.appendChild(item);
       wrapper.appendChild(accordion);
       container.appendChild(wrapper);
 
       mockDrupal.behaviors.hxAccordion.attach(container);
 
-      expect((panel as HTMLElement & { open?: boolean }).open).toBeUndefined();
+      expect((item as HTMLElement & { expanded?: boolean }).expanded).toBeUndefined();
     });
 
     it('announces "Panel expanded" via Drupal.announce on hx-open', () => {

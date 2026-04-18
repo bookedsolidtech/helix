@@ -1,7 +1,8 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixToastStackStyles } from './hx-toast.styles.js';
 
 export type ToastStackPlacement =
@@ -27,7 +28,7 @@ export type ToastStackPlacement =
  * @cssprop [--hx-z-index-toast=9000] - Z-index for the fixed stack.
  */
 @customElement('hx-toast-stack')
-export class HelixToastStack extends LitElement {
+export class HelixToastStack extends HelixElement {
   static override styles = [helixToastStackStyles];
 
   /**

@@ -10,7 +10,7 @@ export const helixStatStyles = css`
     flex-direction: column;
     gap: var(--hx-stat-gap, var(--hx-space-1, 0.25rem));
     font-family: var(--hx-stat-font-family, var(--hx-font-family-sans, sans-serif));
-    color: var(--hx-stat-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-stat-color, var(--hx-color-neutral-800, #1e293b));
   }
 
   /* ─── Size Variants ─── */
@@ -54,13 +54,13 @@ export const helixStatStyles = css`
   }
 
   .stat__value {
-    color: var(--hx-stat-value-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-stat-value-color, var(--hx-color-neutral-900, #0f172a));
   }
 
   /* ─── Label ─── */
 
   .stat__label {
-    color: var(--hx-stat-label-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-stat-label-color, var(--hx-color-neutral-500, #64748b));
     font-weight: var(--hx-font-weight-normal, 400);
   }
 
@@ -86,12 +86,12 @@ export const helixStatStyles = css`
   }
 
   .stat__trend--up {
-    color: var(--hx-stat-trend-up-color, var(--hx-color-success-700, #15803d));
+    color: var(--hx-stat-trend-up-color, var(--hx-color-success-700, #166534));
     background-color: var(--hx-stat-trend-up-bg, var(--hx-color-success-50, #f0fdf4));
   }
 
   .stat__trend--down {
-    color: var(--hx-stat-trend-down-color, var(--hx-color-error-700, #b91c1c));
+    color: var(--hx-stat-trend-down-color, var(--hx-color-error-700, #991b1b));
     background-color: var(--hx-stat-trend-down-bg, var(--hx-color-error-50, #fef2f2));
   }
 

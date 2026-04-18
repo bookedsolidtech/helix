@@ -105,7 +105,7 @@ The component participates in HTML forms via `ElementInternals`, supports tick m
     <span slot="min-label">0 — No pain</span>
     <span slot="max-label">10 — Worst</span>
   </hx-slider>
-  <script>
+  <script>{`
     const painSlider = document.getElementById('pain-slider');
     const painLabels = [
       '0 — No pain', '1 — Very mild', '2 — Mild', '3 — Moderate',
@@ -116,23 +116,36 @@ The component participates in HTML forms via `ElementInternals`, supports tick m
       const v = e.detail.value;
       painSlider.setAttribute('aria-valuetext', painLabels[v] ?? String(v));
     });
-  </script>
+  `}</script>
 </ComponentDemo>
 
 ### In a Form
 
 <ComponentDemo title="Form Participation">
-  <form id="slider-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
-    <hx-slider name="dosage" label="Dosage (mg)" value="250" min="0" max="500" step="25" show-value></hx-slider>
-    <button type="submit" style="width: fit-content; padding: 0.5rem 1rem;">Submit</button>
+  <form
+    id="slider-form"
+    style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;"
+  >
+    <hx-slider
+      name="dosage"
+      label="Dosage (mg)"
+      value="250"
+      min="0"
+      max="500"
+      step="25"
+      show-value
+    ></hx-slider>
+    <button type="submit" style="width: fit-content; padding: 0.5rem 1rem;">
+      Submit
+    </button>
   </form>
-  <script>
+  <script>{`
     document.getElementById('slider-form')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = new FormData(e.target);
       console.log('dosage:', data.get('dosage'));
     });
-  </script>
+  `}</script>
 </ComponentDemo>
 
 ## Installation

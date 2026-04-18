@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
 
 /** Detail type for the `hx-tree-item-select` event. */
@@ -39,7 +40,7 @@ export interface HxTreeItemSelectDetail {
  * @fires {CustomEvent<HxTreeItemSelectDetail>} hx-tree-item-select - Dispatched when this item is clicked or activated via keyboard.
  */
 @customElement('hx-tree-item')
-export class HelixTreeItem extends LitElement {
+export class HelixTreeItem extends HelixElement {
   static override styles = [helixTreeItemStyles];
 
   // ─── Properties ───
@@ -366,6 +367,3 @@ declare global {
 
 /** Canonical type alias for HelixTreeItem. Use this when typing hx-tree-item element references. */
 export type HxTreeItem = HelixTreeItem;
-
-/** @deprecated Use {@link HxTreeItem} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcTreeItem = HelixTreeItem;

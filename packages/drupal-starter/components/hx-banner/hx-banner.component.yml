@@ -15,14 +15,14 @@ props:
         - info
         - success
         - warning
-        - danger
+        - error
     position:
       type: string
       title: Position
-      description: 'Whether the banner is fixed to the top of the viewport or inline in the document flow'
-      default: 'inline'
+      description: 'Whether the banner is sticky to the top of the viewport or fixed to the viewport'
+      default: 'sticky'
       enum:
-        - inline
+        - sticky
         - fixed
     heading:
       type: string

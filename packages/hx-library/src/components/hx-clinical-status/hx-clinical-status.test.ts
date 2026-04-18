@@ -361,9 +361,9 @@ describe('hx-clinical-status', () => {
 
   describe('Accessibility', () => {
     // ElementInternals.role is not reflected via the host's `role` IDL property,
-    // so we access the private _elInternals field to verify the ARIA role.
+    // so we access the base-class _internals getter to verify the ARIA role.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const getInternalsRole = (el: HxClinicalStatus) => (el as any)._elInternals?.role;
+    const getInternalsRole = (el: HxClinicalStatus) => (el as any)._internals?.role;
 
     it('uses role="status" for info severity', async () => {
       const el = await fixture<HxClinicalStatus>(

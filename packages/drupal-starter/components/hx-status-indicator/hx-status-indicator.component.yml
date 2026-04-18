@@ -10,15 +10,13 @@ props:
       type: string
       title: Status
       description: 'The semantic status to convey'
-      default: 'neutral'
+      default: 'unknown'
       enum:
-        - neutral
         - online
         - offline
-        - busy
         - away
-        - warning
-        - danger
+        - busy
+        - unknown
     hx_size:
       type: string
       title: Size

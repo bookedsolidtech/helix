@@ -142,7 +142,7 @@ export const helixButtonStyles = css`
   }
 
   .button--primary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-500));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-600));
   }
 
   /* ─── Disabled ─── */
@@ -209,7 +209,7 @@ export const helixButtonStyles = css`
 
   /* Primary inverted — slight transparent white overlay on hover */
   :host([inverted]) .button--primary:hover {
-    --hx-button-bg: var(--hx-color-primary-400, #3b82f6);
+    --hx-button-bg: var(--hx-color-primary-400, #60a5fa);
   }
 
   /* Secondary inverted — white border and text */

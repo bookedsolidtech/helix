@@ -18,7 +18,7 @@ export const helixCheckboxStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-checkbox-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* ─── Control (checkbox + label row) ─── */
@@ -60,7 +60,7 @@ export const helixCheckboxStyles = css`
     width: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
     border: var(--hx-border-width-medium, 2px) solid
-      var(--hx-checkbox-border-color, var(--hx-color-neutral-300, #ced4da));
+      var(--hx-checkbox-border-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-checkbox-border-radius, var(--hx-border-radius-sm, 0.25rem));
     background-color: var(--hx-checkbox-bg, var(--hx-color-neutral-0, #ffffff));
     transition:
@@ -98,13 +98,13 @@ export const helixCheckboxStyles = css`
   /* ─── Error State ─── */
 
   .checkbox--error .checkbox__box {
-    border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+    border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc2626));
   }
 
   .checkbox--error.checkbox--checked .checkbox__box,
   .checkbox--error.checkbox--indeterminate .checkbox__box {
-    background-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
-    border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+    background-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc2626));
+    border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc2626));
   }
 
   /* ─── Hover ─── */
@@ -122,7 +122,7 @@ export const helixCheckboxStyles = css`
   }
 
   .checkbox--error .checkbox__control:hover .checkbox__box {
-    border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc3545));
+    border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #dc2626));
   }
 
   /* ─── Checkmark Icon ─── */
@@ -151,7 +151,7 @@ export const helixCheckboxStyles = css`
   .checkbox__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-checkbox-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-checkbox-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     user-select: none;
     -webkit-user-select: none;
@@ -166,7 +166,7 @@ export const helixCheckboxStyles = css`
 
   .checkbox__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
     padding-inline-start: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)

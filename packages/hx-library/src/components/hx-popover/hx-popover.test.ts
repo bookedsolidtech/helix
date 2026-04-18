@@ -352,7 +352,7 @@ describe('hx-popover', () => {
       wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
       // WCAG 1.4.13: hover hide is delayed 150ms so the pointer can move into the body.
       // Wait for the delay to elapse before asserting the popover has hidden.
-      await new Promise((resolve) => setTimeout(resolve, 350));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await el.updateComplete;
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
     });
@@ -401,7 +401,7 @@ describe('hx-popover', () => {
 
       // Now leave the body — popover should close after WCAG 1.4.13 delay
       body.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-      await new Promise((resolve) => setTimeout(resolve, 350));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await el.updateComplete;
       expect(body.classList.contains('visible')).toBe(false);
     });
@@ -753,6 +753,117 @@ describe('hx-popover', () => {
         '<hx-popover distance="20"><button slot="anchor">T</button><p>C</p></hx-popover>',
       );
       expect(el.getAttribute('distance')).toBe('20');
+    });
+  });
+
+  // ─── Trigger mode: manual does not respond to focusin/out (2) ───
+
+  describe('Manual trigger mode ignores focus events', () => {
+    it('manual trigger does not show on focusin', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="manual"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(false);
+    });
+
+    it('manual trigger does not hide on focusout', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="manual" open><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+      await el.updateComplete;
+      // Manual trigger: focusout should not close the popover
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+    });
+  });
+
+  // ─── Disconnected cleanup (1) ───
+
+  describe('Disconnected cleanup', () => {
+    it('does not throw when element is removed while open', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      expect(() => el.remove()).not.toThrow();
+    });
+  });
+
+  // ─── open=false on already-closed does nothing (1) ───
+
+  describe('Open property idempotency', () => {
+    it('setting open=false on already-closed popover does not dispatch hx-hide', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      let fired = false;
+      el.addEventListener('hx-hide', () => {
+        fired = true;
+      });
+      el.open = false;
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── Hover trigger: body mouseenter prevents close, body mouseleave schedules close (1) ───
+
+  describe('Hover trigger: body mouse interactions do not fire for click trigger', () => {
+    it('body mouseenter when trigger=click does not cancel any hide', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="click"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await el.updateComplete;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+      // Should not throw and body should stay visible
+      body.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      expect(body.classList.contains('visible')).toBe(true);
+    });
+  });
+
+  // ─── Anchor slotchange re-applies ARIA (1) ───
+
+  describe('Anchor slotchange', () => {
+    it('anchor gets aria-haspopup after anchor slot change', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover><button slot="anchor" id="trig">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const trigger = el.querySelector('#trig');
+      expect(trigger?.getAttribute('aria-haspopup')).toBe('dialog');
+    });
+  });
+
+  // ─── Focus trigger focusout with relatedTarget inside component (1) ───
+
+  describe('Focus trigger focusout stays open when focus stays inside', () => {
+    it('does not close popover when focusout relatedTarget is inside the component', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="focus"><button slot="anchor">Trigger</button><button id="inner">Inner</button></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+
+      const innerBtn = el.querySelector<HTMLElement>('#inner')!;
+      wrapper.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, relatedTarget: innerBtn }),
+      );
+      await el.updateComplete;
+      // Focus moved to a child inside the component — popover must stay open
+      expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
     });
   });
 });

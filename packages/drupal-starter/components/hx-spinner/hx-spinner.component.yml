@@ -15,15 +15,14 @@ props:
         - sm
         - md
         - lg
-        - xl
     variant:
       type: string
       title: Variant
       description: 'Color variant for the spinner'
-      default: 'primary'
+      default: 'default'
       enum:
+        - default
         - primary
-        - neutral
         - inverted
     label:
       type: string

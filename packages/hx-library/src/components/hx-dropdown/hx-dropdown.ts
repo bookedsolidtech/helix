@@ -1,14 +1,9 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
-import {
-  computePosition,
-  flip,
-  shift,
-  offset,
-  type Placement as FloatingPlacement,
-} from '@floating-ui/dom';
+import { HelixElement } from '../../base/index.js';
+import type { Placement as FloatingPlacement } from '@floating-ui/dom';
 import { createIdCounter } from '../../base/index.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 
@@ -61,7 +56,7 @@ const _nextDropdownId = createIdCounter('hx-dropdown');
  * ```
  */
 @customElement('hx-dropdown')
-export class HelixDropdown extends LitElement {
+export class HelixDropdown extends HelixElement {
   static override styles = [helixDropdownStyles];
 
   // ─── Public Properties ───
@@ -214,6 +209,7 @@ export class HelixDropdown extends LitElement {
       .replace(/^start$/, 'left')
       .replace(/^end$/, 'right') as FloatingPlacement;
 
+    const { computePosition, flip, shift, offset } = await import('@floating-ui/dom');
     const { x, y } = await computePosition(reference, panel, {
       placement: floatingPlacement,
       strategy: 'fixed',

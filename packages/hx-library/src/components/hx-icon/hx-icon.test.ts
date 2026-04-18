@@ -553,6 +553,109 @@ describe('hx-icon', () => {
     });
   });
 
+  // ─── Sanitizer: data: URI stripped from href ───
+
+  describe('Sanitizer: data: URI in href', () => {
+    it('strips data: URI from href attributes in fetched SVG', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg"><a href="data:text/html,<script>alert(1)</script>"><path d="M0 0"/></a></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg"></hx-icon>');
+        await waitForInlineSvg(el);
+
+        expect(el.shadowRoot?.innerHTML).not.toContain('href="data:');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
+
+  // ─── Label whitespace-only treated as decorative ───
+
+  describe('Label whitespace-only treated as decorative', () => {
+    it('treats label with only whitespace as decorative in sprite mode', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon name="check" label="   "></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, '[part="svg"]');
+      expect(svg?.getAttribute('aria-hidden')).toBe('true');
+      expect(svg?.hasAttribute('role')).toBe(false);
+    });
+
+    it('treats label with only whitespace as decorative in inline mode', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/icon.svg" label="   "></hx-icon>');
+        await waitForInlineSvg(el);
+
+        const wrapper = shadowQuery(el, '[part="svg"]');
+        expect(wrapper?.getAttribute('aria-hidden')).toBe('true');
+        expect(wrapper?.hasAttribute('role')).toBe(false);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
+
+  // ─── src whitespace-only triggers inline render path ───
+
+  describe('src with only whitespace is treated as absent (sprite fallback)', () => {
+    it('renders sprite SVG when src is whitespace-only and name is set', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon name="check" src="   "></hx-icon>');
+      await el.updateComplete;
+      // src trim is empty → falls through to sprite mode
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg).toBeTruthy();
+    });
+  });
+
+  // ─── spriteUrl without name ───
+
+  describe('spriteUrl without name renders nothing', () => {
+    it('renders nothing when sprite-url is set but name is empty', async () => {
+      const el = await fixture<HelixIcon>(
+        '<hx-icon sprite-url="/icons/sprite.svg"></hx-icon>',
+      );
+      await el.updateComplete;
+      const svgPart = shadowQuery(el, '[part="svg"]');
+      expect(svgPart).toBeNull();
+    });
+  });
+
+  // ─── Sanitizer: SVG parse error returns empty ───
+
+  describe('Sanitizer: malformed SVG parse error', () => {
+    it('renders nothing when fetched content is not valid SVG', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () => 'this is not valid svg at all >>><<',
+        } as Response);
+
+        const el = await fixture<HelixIcon>('<hx-icon src="/bad.svg"></hx-icon>');
+        // Wait for fetch to settle
+        await el.updateComplete;
+        await el.updateComplete;
+
+        const svgPart = shadowQuery(el, '[part="svg"]');
+        expect(svgPart).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
+
   // ─── Fetch Cache (2) ───
 
   describe('Fetch Cache', () => {

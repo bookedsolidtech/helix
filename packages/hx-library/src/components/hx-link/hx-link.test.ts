@@ -283,4 +283,131 @@ describe('hx-link', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // --- Property: rel ---
+
+  describe('Property: rel', () => {
+    it('uses explicit rel when rel is set regardless of target', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="https://example.com" rel="nofollow">Link</hx-link>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('rel')).toBe('nofollow');
+    });
+
+    it('explicit rel takes precedence over target="_blank" auto-rel', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="https://example.com" target="_blank" rel="nofollow">Link</hx-link>',
+      );
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('rel')).toBe('nofollow');
+    });
+
+    it('no rel attribute when neither rel nor target="_blank" is set', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('rel')).toBe(false);
+    });
+  });
+
+  // --- Dynamic property updates ---
+
+  describe('Dynamic property updates', () => {
+    it('updates anchor href when href property changes', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page1">Link</hx-link>');
+      el.href = '/page2';
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('href')).toBe('/page2');
+    });
+
+    it('switches from anchor to span when disabled becomes true', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      expect(shadowQuery(el, 'a')).toBeTruthy();
+      el.disabled = true;
+      await el.updateComplete;
+      expect(shadowQuery(el, 'a')).toBeNull();
+      expect(shadowQuery(el, 'span[role="link"]')).toBeTruthy();
+    });
+
+    it('switches from span back to anchor when disabled becomes false', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
+      expect(shadowQuery(el, 'span[role="link"]')).toBeTruthy();
+      el.disabled = false;
+      await el.updateComplete;
+      expect(shadowQuery(el, 'a')).toBeTruthy();
+      expect(shadowQuery(el, 'span[role="link"]')).toBeNull();
+    });
+
+    it('shows external icon when target changes to "_blank"', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="https://example.com">Link</hx-link>');
+      expect(shadowQuery(el, '[part~="external-icon"]')).toBeNull();
+      el.target = '_blank';
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part~="external-icon"]')).toBeTruthy();
+    });
+
+    it('updates variant class when variant property changes', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      el.variant = 'danger';
+      await el.updateComplete;
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.classList.contains('link--danger')).toBe(true);
+    });
+  });
+
+  // --- Keyboard: disabled span blocks Enter/Space ---
+
+  describe('Keyboard: disabled span blocks activation', () => {
+    it('disabled span blocks Enter key default action', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
+      const span = shadowQuery<HTMLElement>(el, 'span')!;
+      const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+      span.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    it('disabled span blocks Space key default action', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
+      const span = shadowQuery<HTMLElement>(el, 'span')!;
+      const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true });
+      span.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(true);
+    });
+
+    it('disabled span does not block other keys', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
+      const span = shadowQuery<HTMLElement>(el, 'span')!;
+      const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+      span.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    });
+  });
+
+  // --- No href edge case ---
+
+  describe('No href edge case', () => {
+    it('renders anchor without href attribute when href is undefined', async () => {
+      const el = await fixture<HelixLink>('<hx-link>Link without href</hx-link>');
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a');
+      expect(anchor).toBeTruthy();
+      expect(anchor?.hasAttribute('href')).toBe(false);
+    });
+  });
+
+  // --- default variant does not add variant class ---
+
+  describe('Default variant class exclusion', () => {
+    it('default variant does not add link--default class', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.classList.contains('link--default')).toBe(false);
+    });
+
+    it('disabled default variant does not add link--default class', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
+      const span = shadowQuery(el, 'span')!;
+      expect(span.classList.contains('link--default')).toBe(false);
+    });
+  });
 });

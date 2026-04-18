@@ -73,13 +73,13 @@ Open `dist/components/hx-button/hx-button.d.ts` after a build and confirm:
 ```typescript
 // Expected shape in hx-button.d.ts
 import { LitElement, type TemplateResult } from 'lit';
-import { type AriadDelegationMixinInterface } from '../../mixins/aria-delegation.js';
+import { type AriaDelegationMixinInterface } from '../../mixins/aria-delegation.js';
 
 export interface HelixClickDetail {
   originalEvent: MouseEvent;
 }
 
-export declare class HelixButton extends LitElement implements AriadDelegationMixinInterface {
+export declare class HelixButton extends LitElement implements AriaDelegationMixinInterface {
   static formAssociated: boolean;
   variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline';
   size: 'sm' | 'md' | 'lg';

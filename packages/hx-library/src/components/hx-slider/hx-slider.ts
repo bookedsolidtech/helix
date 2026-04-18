@@ -6,10 +6,16 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSliderStyles } from './hx-slider.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextSliderId = createIdCounter('hx-slider');
+
+/** Detail for hx-input and hx-change events dispatched by hx-slider. */
+export interface HxSliderDetail {
+  value: number;
+}
 
 /**
  * A range slider component for selecting a numeric value within a min/max boundary.
@@ -57,7 +63,7 @@ const _nextSliderId = createIdCounter('hx-slider');
  * @cssprop [--hx-slider-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  */
 @customElement('hx-slider')
-export class HelixSlider extends HelixElement {
+export class HelixSlider extends FormMixin(HelixElement) {
   static override styles = [helixSliderStyles];
 
   // ─── Form Association ───
@@ -174,7 +180,7 @@ export class HelixSlider extends HelixElement {
    * @internal
    */
   @query('.slider__input')
-  declare private _input: HTMLInputElement | null;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Unique IDs ───
 
@@ -291,36 +297,12 @@ export class HelixSlider extends HelixElement {
 
   // ─── Form Integration ───
 
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the slider satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
   protected override _onFormReset(): void {
     const resetTo = this._clamp(this._defaultValue ?? this.min);
     this.value = resetTo;
     this._internals.setFormValue(String(resetTo));
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -381,6 +363,7 @@ export class HelixSlider extends HelixElement {
     const target = e.target as HTMLInputElement;
     this.value = parseFloat(target.value);
     this._internals.setFormValue(String(this.value));
+    this._handleInteractionInput();
 
     /**
      * Dispatched continuously while the user drags the thumb.
@@ -401,6 +384,7 @@ export class HelixSlider extends HelixElement {
     const target = e.target as HTMLInputElement;
     this.value = parseFloat(target.value);
     this._internals.setFormValue(String(this.value));
+    this._handleInteractionBlur();
 
     /**
      * Dispatched when the user releases the thumb after dragging.

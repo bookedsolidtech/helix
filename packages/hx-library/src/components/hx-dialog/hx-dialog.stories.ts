@@ -27,7 +27,7 @@ const meta = {
         'When true, renders as a modal dialog with a backdrop and focus trap. When false, renders as a non-modal dialog.',
       table: {
         category: 'Behavior',
-        defaultValue: { summary: 'true' },
+        defaultValue: { summary: 'false' },
         type: { summary: 'boolean' },
       },
     },
@@ -63,7 +63,7 @@ const meta = {
   },
   args: {
     open: false,
-    modal: true,
+    modal: false,
     closeOnBackdrop: true,
     heading: '',
   },
@@ -95,7 +95,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     open: false,
-    modal: true,
+    modal: false,
     closeOnBackdrop: true,
     heading: 'Patient Record',
   },

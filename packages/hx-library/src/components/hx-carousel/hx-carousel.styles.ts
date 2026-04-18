@@ -40,22 +40,22 @@ export const helixCarouselStyles = css`
     /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0);
     border-radius: var(--hx-border-radius-full, 9999px);
-    background: var(--hx-color-neutral-0, #fff);
-    color: var(--hx-color-neutral-700, #374151);
+    background: var(--hx-color-neutral-0, #ffffff);
+    color: var(--hx-color-neutral-700, #334155);
     cursor: pointer;
     padding: 0;
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      color var(--hx-transition-fast, 0.15s ease),
-      border-color var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      color var(--hx-transition-fast, 150ms ease),
+      border-color var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
   }
 
   .nav-btn:hover:not([disabled]) {
-    background: var(--hx-color-neutral-50, #f9fafb);
-    border-color: var(--hx-color-neutral-400, #9ca3af);
+    background: var(--hx-color-neutral-50, #f8fafc);
+    border-color: var(--hx-color-neutral-400, #94a3b8);
   }
 
   .nav-btn:focus-visible {
@@ -65,7 +65,7 @@ export const helixCarouselStyles = css`
   }
 
   .nav-btn[disabled] {
-    opacity: var(--hx-opacity-disabled, 0.4);
+    opacity: var(--hx-opacity-disabled, 0.5);
     cursor: not-allowed;
   }
 
@@ -88,16 +88,16 @@ export const helixCarouselStyles = css`
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
-    color: var(--hx-color-neutral-500, #6b7280);
+    color: var(--hx-color-neutral-500, #64748b);
     cursor: pointer;
     padding: 0;
     font-size: var(--hx-font-size-sm, 0.875rem);
-    transition: background-color var(--hx-transition-fast, 0.15s ease);
+    transition: background-color var(--hx-transition-fast, 150ms ease);
     flex-shrink: 0;
   }
 
   .play-pause-btn:hover {
-    background: var(--hx-color-neutral-100, #f3f4f6);
+    background: var(--hx-color-neutral-100, #f1f5f9);
   }
 
   .play-pause-btn:focus-visible {
@@ -160,15 +160,15 @@ export const helixCarouselStyles = css`
     width: var(--hx-carousel-pagination-dot-size, 0.5rem);
     height: var(--hx-carousel-pagination-dot-size, 0.5rem);
     border-radius: var(--hx-border-radius-full, 9999px);
-    background: var(--hx-color-neutral-300, #d1d5db);
+    background: var(--hx-color-neutral-300, #cbd5e1);
     transition:
-      background-color var(--hx-transition-fast, 0.15s ease),
-      transform var(--hx-transition-fast, 0.15s ease);
+      background-color var(--hx-transition-fast, 150ms ease),
+      transform var(--hx-transition-fast, 150ms ease);
   }
 
   .pagination-item[aria-current='true'] .pagination-dot,
   .pagination-item.is-active .pagination-dot {
-    background: var(--hx-color-primary-600, #2563eb);
+    background: var(--hx-color-primary-600, #1d4ed8);
     transform: scale(1.25);
   }
 

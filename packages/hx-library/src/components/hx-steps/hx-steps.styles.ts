@@ -52,4 +52,16 @@ export const helixStepsStyles = css`
     --hx-steps-label-font-size: var(--hx-font-size-md, 1rem);
     --hx-steps-description-font-size: var(--hx-font-size-sm, 0.875rem);
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  /*
+   * hx-steps is a layout container — forced-colors state is handled
+   * by each hx-step child element's own forced-colors block.
+   */
+  @media (forced-colors: active) {
+    :host {
+      forced-color-adjust: auto;
+    }
+  }
 `;

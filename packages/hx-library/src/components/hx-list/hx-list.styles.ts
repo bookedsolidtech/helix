@@ -48,4 +48,14 @@ export const helixListStyles = css`
     border-bottom: var(--hx-border-width-thin, 1px) solid
       var(--hx-list-divider-color, var(--hx-color-neutral-200, #e2e8f0));
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  @media (forced-colors: active) {
+    /* Divider borders are already using a border property, which forced-colors respects.
+       Ensure the system color is used for divider borders. */
+    :host([divided]) .list > ::slotted(hx-list-item:not(:last-child)) {
+      border-bottom-color: CanvasText;
+    }
+  }
 `;

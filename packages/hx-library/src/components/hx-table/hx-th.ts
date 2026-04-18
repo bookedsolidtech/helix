@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, css } from 'lit';
+import { html, nothing, css } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 
 /**
  * Detail type for `hx-sort` events dispatched from `hx-th`.
@@ -26,7 +27,7 @@ export interface HxTableSortDetail {
  * @csspart sort-icon - The sort indicator icon `<span>` inside sortable headers.
  */
 @customElement('hx-th')
-export class HelixTableHeader extends LitElement {
+export class HelixTableHeader extends HelixElement {
   static override styles = [
     css`
       :host {

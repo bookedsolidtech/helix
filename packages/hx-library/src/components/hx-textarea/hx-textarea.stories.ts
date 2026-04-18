@@ -140,7 +140,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description:
         'Accessible label for the textarea when no visible label is rendered.',

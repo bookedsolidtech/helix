@@ -19,12 +19,12 @@ export const helixPhiFieldStyles = css`
   .phi-field__value--masked {
     user-select: none;
     -webkit-user-select: none;
-    color: var(--hx-phi-field-masked-color, var(--hx-color-neutral-500, #6b7280));
+    color: var(--hx-phi-field-masked-color, var(--hx-color-neutral-500, #64748b));
     letter-spacing: var(--hx-phi-field-letter-spacing, 0.1em);
   }
 
   .phi-field__value--revealed {
-    color: var(--hx-phi-field-value-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-phi-field-value-color, var(--hx-color-neutral-900, #0f172a));
   }
 
   /* ─── Screen Reader Status ─── */
@@ -46,9 +46,12 @@ export const helixPhiFieldStyles = css`
   .phi-field__toggle {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     padding: var(--hx-space-1, 0.25rem);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     color: var(--hx-phi-field-toggle-color, var(--hx-color-primary-500, #2563eb));
     cursor: pointer;
     line-height: 1;

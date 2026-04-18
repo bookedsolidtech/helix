@@ -1,16 +1,7 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
-import {
-  computePosition,
-  flip as flipMiddleware,
-  shift as shiftMiddleware,
-  offset as offsetMiddleware,
-  arrow as arrowMiddleware,
-  autoUpdate,
-  size as sizeMiddleware,
-  autoPlacement as autoPlacementMiddleware,
-} from '@floating-ui/dom';
+import { HelixElement } from '../../base/index.js';
 import type { Placement, Middleware } from '@floating-ui/dom';
 import { helixPopupStyles } from './hx-popup.styles.js';
 
@@ -134,13 +125,23 @@ type ArrowData = { x?: number; y?: number; centerOffset: number };
  * ```
  */
 @customElement('hx-popup')
-export class HelixPopup extends LitElement {
+export class HelixPopup extends HelixElement {
   static override styles = [helixPopupStyles];
 
   /** @internal */
   private _anchorSlotEl: Element | null = null;
   /** @internal */
   private _cleanupAutoUpdate: (() => void) | null = null;
+  /** @internal */
+  private _floatingUi: typeof import('@floating-ui/dom') | null = null;
+
+  /** @internal */
+  private async _loadFloatingUi() {
+    if (!this._floatingUi) {
+      this._floatingUi = await import('@floating-ui/dom');
+    }
+    return this._floatingUi;
+  }
 
   /**
    * The reference element to anchor the popup to.
@@ -332,7 +333,7 @@ export class HelixPopup extends LitElement {
 
     if (activeChanged) {
       if (this.active) {
-        this._startAutoUpdate();
+        void this._startAutoUpdate();
       } else {
         this._stopAutoUpdate();
         // Clean up autoSize custom properties when popup goes inactive
@@ -378,12 +379,13 @@ export class HelixPopup extends LitElement {
   // ─── Positioning ───
 
   /** @internal */
-  private _startAutoUpdate(): void {
+  private async _startAutoUpdate(): Promise<void> {
     this._stopAutoUpdate();
     const anchorEl = this._getAnchorElement();
     const popupEl = this.shadowRoot?.querySelector<HTMLElement>('[part="popup"]');
     if (!anchorEl || !popupEl) return;
 
+    const { autoUpdate } = await this._loadFloatingUi();
     this._cleanupAutoUpdate = autoUpdate(anchorEl, popupEl, () => {
       void this._reposition();
     });
@@ -404,6 +406,16 @@ export class HelixPopup extends LitElement {
     const arrowEl = this.arrow
       ? (this.shadowRoot?.querySelector<HTMLElement>('[part="arrow"]') ?? null)
       : null;
+
+    const {
+      computePosition,
+      flip: flipMiddleware,
+      shift: shiftMiddleware,
+      offset: offsetMiddleware,
+      arrow: arrowMiddleware,
+      size: sizeMiddleware,
+      autoPlacement: autoPlacementMiddleware,
+    } = await this._loadFloatingUi();
 
     const middleware: Middleware[] = [
       offsetMiddleware({ mainAxis: this.distance, crossAxis: this.skidding }),
@@ -431,8 +443,6 @@ export class HelixPopup extends LitElement {
       middleware.push(
         sizeMiddleware({
           apply: ({ availableWidth, availableHeight }) => {
-            // Set on :host so the custom properties cascade into shadow DOM and
-            // are accessible from light DOM consumers via CSS inheritance.
             this.style.setProperty('--hx-auto-size-available-width', `${availableWidth}px`);
             this.style.setProperty('--hx-auto-size-available-height', `${availableHeight}px`);
           },
@@ -443,7 +453,6 @@ export class HelixPopup extends LitElement {
     const effectivePlacement: Placement =
       this.placement === 'auto' ? 'bottom' : (this.placement as Placement);
 
-    // Set position strategy before computing — inline style takes precedence over CSS
     popupEl.style.position = this.strategy;
 
     const { x, y, placement, middlewareData } = await computePosition(anchorEl, popupEl, {

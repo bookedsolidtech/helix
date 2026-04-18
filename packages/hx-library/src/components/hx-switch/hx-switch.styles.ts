@@ -20,7 +20,7 @@ export const helixSwitchStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-switch-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* WCAG 2.5.5 (healthcare mandate): minimum 44px touch target height.
@@ -43,7 +43,7 @@ export const helixSwitchStyles = css`
     border: none;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #ced4da));
+    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #cbd5e1));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;
@@ -139,7 +139,7 @@ export const helixSwitchStyles = css`
   .switch__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: pointer;
     user-select: none;
@@ -155,7 +155,7 @@ export const helixSwitchStyles = css`
 
   .switch__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-switch-help-text-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-switch-help-text-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

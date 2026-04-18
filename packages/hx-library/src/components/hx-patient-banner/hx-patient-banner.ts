@@ -1,14 +1,42 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
 
 /**
  * Patient identification banner implementing Joint Commission NPSG.01.01.01 two-identifier rule.
  * Renders as a landmark region containing named slots for patient identification fields.
  * Integrates with hx-phi-field for HIPAA-compliant display of masked identifiers.
- * Note: hx-phi-access events fired by slotted hx-phi-field elements bubble through this
- * component via composed: true — no re-dispatch is required.
+ *
+ * ## Security Model — Event Composition
+ *
+ * This component dispatches and propagates two categories of composed events:
+ *
+ * ### `hx-identifier-rule-violation` (dispatched by this component)
+ * Fired with `composed: true` when the two-identifier rule is violated. The event detail
+ * contains only structural metadata (`populatedIdentifiers` count, `requiredIdentifiers`
+ * count) and the `patientId` attribute value. **No raw PHI is included.**
+ *
+ * The `patientId` is a developer-provided attribute intended as a correlation key for
+ * application logic — it should be an opaque internal identifier (e.g., a UUID or
+ * encounter ID), not a human-readable identifier like an MRN or SSN.
+ *
+ * ### `hx-phi-access` (bubbles from slotted hx-phi-field children)
+ * Slotted `hx-phi-field` elements dispatch `hx-phi-access` with `composed: true`. These
+ * events bubble through this component's shadow DOM via slot projection. This component
+ * does NOT re-dispatch or modify these events. See `hx-phi-field` documentation for the
+ * security model of those events.
+ *
+ * ### Consumer Responsibilities
+ *
+ * - **Multi-tenant isolation**: In micro-frontend architectures where multiple patient
+ *   contexts share a document, scope event listeners to the appropriate DOM subtree.
+ *   Both `hx-phi-access` and `hx-identifier-rule-violation` use `composed: true` and
+ *   will bubble through shared ancestors across shadow boundaries.
+ * - **patientId hygiene**: Set the `patient-id` attribute to an opaque internal
+ *   identifier, not a human-readable clinical identifier. This value appears in
+ *   composed events that cross shadow boundaries.
  *
  * @summary Patient identification banner with two-identifier rule enforcement.
  *
@@ -29,7 +57,9 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  * @csspart field-value - The field value slot wrapper.
  * @csspart violation-message - The visually-hidden identifier rule violation status message.
  *
- * @fires {CustomEvent<PatientIdentifierRuleViolationDetail>} hx-identifier-rule-violation - Fired when fewer than 2 identifier slots are populated and enforce-identifier-rule is true.
+ * @fires {CustomEvent<PatientIdentifierRuleViolationDetail>} hx-identifier-rule-violation -
+ *   Fired when fewer than 2 identifier slots are populated and enforce-identifier-rule is
+ *   true. Contains structural metadata only — no raw PHI. Dispatched with `composed: true`.
  *
  * @cssprop [--hx-patient-banner-bg=var(--hx-color-neutral-50,#f9fafb)] - Banner background color.
  * @cssprop [--hx-patient-banner-border-color=var(--hx-color-neutral-200,#e5e7eb)] - Banner border color.
@@ -44,7 +74,7 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  * @cssprop [--hx-patient-banner-photo-bg=var(--hx-color-neutral-200,#e5e7eb)] - Photo area background color when empty.
  */
 @customElement('hx-patient-banner')
-export class HelixPatientBanner extends LitElement {
+export class HelixPatientBanner extends HelixElement {
   static override styles = [helixPatientBannerStyles];
 
   // ─── Public Properties ───
@@ -263,9 +293,21 @@ export class HelixPatientBanner extends LitElement {
   }
 }
 
+/**
+ * Event detail for identifier rule violations. Contains only structural metadata
+ * about the validation state — never raw PHI values.
+ *
+ * **Security note**: The `patientId` field reflects the `patient-id` HTML attribute,
+ * which should be set to an opaque internal identifier (UUID, encounter ID), not a
+ * human-readable clinical identifier. This value crosses shadow DOM boundaries via
+ * `composed: true` events.
+ */
 export interface PatientIdentifierRuleViolationDetail {
+  /** Number of identifier slots currently populated (0, 1, or 2). */
   populatedIdentifiers: number;
+  /** Minimum required identifiers per NPSG.01.01.01 (always 2). */
   requiredIdentifiers: number;
+  /** Opaque patient identifier from the patient-id attribute. Should NOT contain raw PHI. */
   patientId: string;
 }
 

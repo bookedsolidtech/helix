@@ -41,7 +41,7 @@ export const helixBreadcrumbItemStyles = css`
         var(--hx-focus-ring-color, var(--hx-color-primary-500))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
   [part='text'] {

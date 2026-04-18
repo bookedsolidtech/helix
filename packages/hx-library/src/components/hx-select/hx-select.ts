@@ -5,8 +5,11 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+
+// PERF: hx-select exceeds 5KB budget (6.31kb gzipped) -- custom listbox, keyboard navigation, grouped options
 
 // Module-level counter for stable, SSR-safe IDs (avoids Math.random() hydration mismatch)
 const _nextSelectId = createIdCounter('hx-select');
@@ -17,6 +20,11 @@ interface SelectOption {
   value: string;
   label: string;
   disabled: boolean;
+}
+
+/** Detail for the hx-change event dispatched by hx-select. */
+export interface HxSelectChangeDetail {
+  value: string;
 }
 
 /**
@@ -73,7 +81,7 @@ interface SelectOption {
  * @cssprop [--hx-select-placeholder-color=var(--hx-color-neutral-400)] - Placeholder text color.
  */
 @customElement('hx-select')
-export class HelixSelect extends HelixElement {
+export class HelixSelect extends FormMixin(HelixElement) {
   static override styles = [helixSelectStyles];
 
   // ─── Form Association ───
@@ -161,10 +169,18 @@ export class HelixSelect extends HelixElement {
 
   /**
    * Accessible name for screen readers, if different from the visible label.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because form
+   * inputs with associated labels delegate accessible naming via `<label>`
+   * association and `aria-labelledby`, not host-level ARIA delegation. The
+   * `accessible-label` attribute is a fallback for label-free usage. The value is forwarded to the
+   * internal trigger button's `aria-label`.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
 
   /**
    * Controls whether the dropdown listbox is open.
@@ -215,10 +231,6 @@ export class HelixSelect extends HelixElement {
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     // Safety net: remove listener if component is removed while dropdown is open
@@ -231,6 +243,7 @@ export class HelixSelect extends HelixElement {
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
     if (changedProperties.has('open')) {
       if (this.open) {
         document.addEventListener('click', this._handleOutsideClick);
@@ -241,7 +254,6 @@ export class HelixSelect extends HelixElement {
     if (changedProperties.has('value')) {
       this._syncNativeSelect();
       this._updateFormValue();
-      this._updateValidity();
     }
     if (changedProperties.has('size')) {
       const validSizes: string[] = ['sm', 'md', 'lg'];
@@ -252,34 +264,22 @@ export class HelixSelect extends HelixElement {
         );
       }
     }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
+    }
   }
 
   // ─── Form Integration ───
-
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the select satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
 
   /** @internal */
   private _updateFormValue(): void {
@@ -287,7 +287,7 @@ export class HelixSelect extends HelixElement {
   }
 
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -304,6 +304,7 @@ export class HelixSelect extends HelixElement {
   protected override _onFormReset(): void {
     this.value = '';
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   protected override _onFormStateRestore(
@@ -531,6 +532,8 @@ export class HelixSelect extends HelixElement {
   private _selectOption(option: SelectOption): void {
     if (option.disabled) return;
     this.value = option.value; // triggers updated() → sync + formValue + validity
+    this._handleInteractionInput();
+    this._handleInteractionBlur();
     this._dispatchChange();
     this.open = false;
     this._focusedOptionIndex = -1;
@@ -552,6 +555,8 @@ export class HelixSelect extends HelixElement {
   /** @internal */
   private _handleNativeChange(e: Event): void {
     this.value = (e.target as HTMLSelectElement).value; // triggers updated()
+    this._handleInteractionInput();
+    this._handleInteractionBlur();
     this._dispatchChange();
   }
 
@@ -602,7 +607,7 @@ export class HelixSelect extends HelixElement {
               'field__option--focused': isFocused,
               'field__option--disabled': opt.disabled,
             })}
-            aria-selected=${isSelected ? 'true' : nothing}
+            aria-selected=${isSelected ? 'true' : 'false'}
             aria-disabled=${opt.disabled ? 'true' : nothing}
             @click=${() => this._selectOption(opt)}
           >
@@ -684,7 +689,7 @@ export class HelixSelect extends HelixElement {
             aria-required=${this.required ? 'true' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
             @click=${this._toggleDropdown}
             @keydown=${this._handleKeydown}
           >
@@ -700,7 +705,7 @@ export class HelixSelect extends HelixElement {
             role="listbox"
             id=${this._listboxId}
             class="field__listbox"
-            aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}
+            aria-label=${ifDefined(this.label || this.accessibleLabel || undefined)}
             ?hidden=${!this.open}
           >
             <div class="field__options">${this._renderOptions()}</div>
@@ -715,7 +720,7 @@ export class HelixSelect extends HelixElement {
             ?required=${this.required}
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
@@ -752,15 +757,18 @@ export class HelixSelect extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-select.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxSelectEventMap {
+  'hx-change': CustomEvent<{ value: string }>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-select': HelixSelect;
   }
-  interface HTMLElementEventMap {
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
-  }
 }
 
 export type { HelixSelect as HxSelect };
-/** @deprecated Use HxSelect instead */
-export type { HelixSelect as WcSelect };

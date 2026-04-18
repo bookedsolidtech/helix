@@ -1,8 +1,9 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixSkeletonStyles } from './hx-skeleton.styles.js';
 
 /**
@@ -29,7 +30,7 @@ import { helixSkeletonStyles } from './hx-skeleton.styles.js';
  *   this event to update an external `aria-live` region announcing content availability.
  */
 @customElement('hx-skeleton')
-export class HelixSkeleton extends LitElement {
+export class HelixSkeleton extends HelixElement {
   static override styles = [helixSkeletonStyles];
 
   /**

@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { HelixElement } from '../../base/index.js';
 import { helixIconStyles } from './hx-icon.styles.js';
 
 /**
@@ -29,7 +30,7 @@ import { helixIconStyles } from './hx-icon.styles.js';
  * @cssprop [--hx-icon-color=currentColor] - Icon color.
  */
 @customElement('hx-icon')
-export class HelixIcon extends LitElement {
+export class HelixIcon extends HelixElement {
   static override styles = [helixIconStyles];
 
   /**
@@ -88,6 +89,15 @@ export class HelixIcon extends LitElement {
   label = '';
 
   /**
+   * Comma-separated list of allowed origins for cross-origin SVG fetches.
+   * By default, only same-origin URLs are permitted. Set this to allow
+   * specific CDN or asset server origins (e.g., "https://cdn.example.com,https://assets.example.com").
+   * @attr allowed-origins
+   */
+  @property({ type: String, attribute: 'allowed-origins' })
+  allowedOrigins = '';
+
+  /**
    * Stores the sanitized inner markup of an externally fetched SVG.
    * @internal
    */
@@ -130,6 +140,19 @@ export class HelixIcon extends LitElement {
       return;
     }
 
+    // Validate URL origin — only allow same-origin or data: URIs by default.
+    // Cross-origin SVGs are blocked unless explicitly allowed via allowedOrigins.
+    if (!this._isAllowedOrigin(url)) {
+      console.warn(
+        `[hx-icon] Blocked cross-origin SVG fetch: "${url}". ` +
+          'Only same-origin URLs are allowed by default. ' +
+          'Set the allowed-origins attribute to permit specific external origins.',
+      );
+      this._inlineSvg = '';
+      this._fetchedSrc = undefined;
+      return;
+    }
+
     // Use module-level cache to avoid duplicate network requests for the same URL.
     // Multiple hx-icon instances sharing the same src will share one in-flight fetch.
     try {
@@ -166,6 +189,42 @@ export class HelixIcon extends LitElement {
   }
 
   /**
+   * Checks whether a URL is same-origin or matches the configured allowedOrigins.
+   * Relative URLs and data: URIs are always allowed. Cross-origin URLs are blocked
+   * unless their origin appears in the allowedOrigins list.
+   * @internal
+   */
+  private _isAllowedOrigin(url: string): boolean {
+    // Relative URLs are always same-origin
+    if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) {
+      return true;
+    }
+
+    try {
+      const parsed = new URL(url, window.location.href);
+
+      // Same-origin is always allowed
+      if (parsed.origin === window.location.origin) {
+        return true;
+      }
+
+      // Check configured allowlist
+      if (this.allowedOrigins) {
+        const allowed = this.allowedOrigins
+          .split(',')
+          .map((o) => o.trim().toLowerCase())
+          .filter(Boolean);
+        return allowed.includes(parsed.origin.toLowerCase());
+      }
+
+      return false;
+    } catch {
+      // Unparseable URL — block it
+      return false;
+    }
+  }
+
+  /**
    * Parses the raw SVG text, strips dangerous content (script elements,
    * foreignObject, on* event-handler attributes, javascript:/data: URIs,
    * and style attributes that could carry CSS injection payloads), and
@@ -191,8 +250,22 @@ export class HelixIcon extends LitElement {
       return '';
     }
 
-    // Remove dangerous embedded elements.
-    svgEl.querySelectorAll('script, foreignObject').forEach((s) => {
+    // Remove dangerous embedded elements:
+    // - script: arbitrary code execution
+    // - foreignObject: can embed arbitrary HTML including scripts
+    // - style: CSS injection (url() payloads, expression(), external references)
+    // - animate, animateTransform, animateMotion, set: SMIL animation elements
+    //   can trigger event handlers and modify attributes to bypass sanitization
+    const dangerousElements = [
+      'script',
+      'foreignObject',
+      'style',
+      'animate',
+      'animateTransform',
+      'animateMotion',
+      'set',
+    ];
+    svgEl.querySelectorAll(dangerousElements.join(', ')).forEach((s) => {
       s.remove();
     });
 
