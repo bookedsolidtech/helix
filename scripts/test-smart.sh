@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Smart targeted test runner — only tests components changed vs origin/dev
+# scripts/test-smart.sh — Targeted test runner.
 #
-# Includes a stale-output watchdog to handle Vitest browser mode hanging after
-# all tests complete (known Vitest 3.x issue during Chromium teardown).
-# Mirrors the watchdog pattern in scripts/test-batch.sh.
+# Only tests components changed vs origin/dev (or $TEST_BASE_BRANCH). Falls
+# back to the full suite when more than 20 components changed — vitest's
+# regex filter chokes on 50+ pipe-separated names ("No test files found").
+#
+# Uses the shared watchdog from scripts/lib/vitest-watchdog.sh to handle the
+# known Vitest 3.x browser mode hang during Chromium teardown.
 set -uo pipefail
 
 BASE="${TEST_BASE_BRANCH:-origin/dev}"
@@ -12,97 +15,48 @@ COMMON_ANCESTOR=$(git merge-base HEAD "$BASE" 2>/dev/null || echo "")
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LIBRARY_DIR="$REPO_ROOT/packages/hx-library"
 
-# How many seconds of zero output growth before we declare vitest hung
-STALE_TIMEOUT=15
-POLL_INTERVAL=3
+# shellcheck source=lib/vitest-watchdog.sh
+source "$REPO_ROOT/scripts/lib/vitest-watchdog.sh"
+
+# The watchdog needs per-test markers. `verbose` writes them; `dot` does not.
+# Output is captured to a log file — stdout in non-verbose mode stays compact
+# — so no agent-context cost. Keep `json` so .cache/test-results.json is
+# still written (vitest replaces config reporters when --reporter is passed).
+REPORTER_FLAGS=(--reporter=verbose --reporter=json)
 
 # ── Cleanup on exit ──────────────────────────────────────────────────────────
 cleanup() {
-  if [[ -n "${VITEST_PID:-}" ]] && kill -0 "$VITEST_PID" 2>/dev/null; then
-    kill -9 "$VITEST_PID" 2>/dev/null || true
-    wait "$VITEST_PID" 2>/dev/null || true
-  fi
   pkill -f "chrome-headless-shell" 2>/dev/null || true
   if [[ "${EXIT_CODE:-1}" -eq 0 ]]; then
     rm -f "${LOGFILE:-}"
   else
-    echo "[test-smart] Log preserved at: ${LOGFILE:-<none>}"
+    echo "[test-smart] log preserved at: ${LOGFILE:-<none>}"
   fi
 }
 trap cleanup EXIT
 
-# ── Run vitest with watchdog ─────────────────────────────────────────────────
-run_vitest_with_watchdog() {
-  local cmd=("$@")
-  START_TIME=$(date +%s)
+# ── Wrapper around shared watchdog ───────────────────────────────────────────
+run_vitest() {
   LOGFILE=$(mktemp /tmp/helix-test-smart.XXXXXX)
-
   cd "$LIBRARY_DIR"
-  "${cmd[@]}" > "$LOGFILE" 2>&1 &
-  VITEST_PID=$!
+  run_vitest_with_watchdog "test-smart" "$LOGFILE" "$@"
+  local rc=$?
 
-  echo "[test-smart] vitest PID=$VITEST_PID"
-  echo ""
-
-  LAST_SIZE=0
-  STALE_SECONDS=0
-  FORCE_KILLED=false
-
-  while kill -0 "$VITEST_PID" 2>/dev/null; do
-    sleep "$POLL_INTERVAL"
-    CURRENT_SIZE=$(stat -f "%z" "$LOGFILE" 2>/dev/null || stat -c "%s" "$LOGFILE" 2>/dev/null || echo 0)
-    ELAPSED=$(( $(date +%s) - START_TIME ))
-
-    if [[ "$CURRENT_SIZE" -eq "$LAST_SIZE" ]] && [[ "$CURRENT_SIZE" -gt 0 ]]; then
-      STALE_SECONDS=$((STALE_SECONDS + POLL_INTERVAL))
-      if [[ "$STALE_SECONDS" -ge "$STALE_TIMEOUT" ]] && [[ "$ELAPSED" -ge 30 ]]; then
-        echo ""
-        echo "[test-smart] Output stale for ${STALE_SECONDS}s at ${ELAPSED}s elapsed — force killing vitest"
-        kill "$VITEST_PID" 2>/dev/null || true
-        sleep 1
-        kill -9 "$VITEST_PID" 2>/dev/null || true
-        FORCE_KILLED=true
-        break
-      fi
-    else
-      STALE_SECONDS=0
-    fi
-    LAST_SIZE=$CURRENT_SIZE
-  done
-
-  wait "$VITEST_PID" 2>/dev/null
-  VITEST_EXIT=$?
-
-  # Stream log to stdout
+  # Stream log to stdout so the user sees results.
   cat "$LOGFILE"
-
-  # Determine pass/fail
-  PASSED_TESTS=$(grep -c "^[[:space:]]*✓" "$LOGFILE" 2>/dev/null || true)
-  PASSED_TESTS=${PASSED_TESTS:-0}
-  FAILED_TESTS=$(grep -c "^[[:space:]]*×" "$LOGFILE" 2>/dev/null || true)
-  FAILED_TESTS=${FAILED_TESTS:-0}
-
-  if [[ "$FAILED_TESTS" -gt 0 ]]; then
-    EXIT_CODE=1
-  elif [[ "$PASSED_TESTS" -gt 0 ]]; then
-    EXIT_CODE=0
-  elif [[ "$VITEST_EXIT" -eq 0 ]] && [[ "$FORCE_KILLED" == false ]]; then
-    EXIT_CODE=0
-  else
-    EXIT_CODE=1
-  fi
 
   if [[ "$FORCE_KILLED" == true ]]; then
     echo "[test-smart] vitest force-killed after teardown hang — exit based on test output"
   fi
 
-  return $EXIT_CODE
+  EXIT_CODE=$rc
+  return $rc
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 if [ -z "$COMMON_ANCESTOR" ]; then
   echo "No common ancestor with $BASE — running full test suite"
-  run_vitest_with_watchdog pnpm exec vitest run --reporter=verbose
+  run_vitest pnpm exec vitest run "${REPORTER_FLAGS[@]}"
   exit $?
 fi
 
@@ -128,7 +82,7 @@ COMPONENT_COUNT=$(echo "$COMPONENTS" | wc -l | tr -d ' ')
 # a regex filter with 50+ pipe-separated component names ("No test files found").
 if [ "$COMPONENT_COUNT" -gt 20 ]; then
   echo "Smart test: $COMPONENT_COUNT components changed — running full suite"
-  run_vitest_with_watchdog pnpm exec vitest run --reporter=verbose
+  run_vitest pnpm exec vitest run "${REPORTER_FLAGS[@]}"
   exit $?
 fi
 
@@ -151,5 +105,5 @@ fi
 
 echo "Smart test: $COMPONENTS"
 # shellcheck disable=SC2086
-run_vitest_with_watchdog pnpm exec vitest run $TEST_FILES --reporter=verbose
+run_vitest pnpm exec vitest run $TEST_FILES "${REPORTER_FLAGS[@]}"
 exit $?
