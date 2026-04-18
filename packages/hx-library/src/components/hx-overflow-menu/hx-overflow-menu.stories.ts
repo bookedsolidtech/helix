@@ -127,13 +127,16 @@ export const Default: Story = {
     const triggerBtn = el?.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
     await expect(triggerBtn).toBeTruthy();
 
-    let showFired = false;
-    el?.addEventListener('hx-show', () => {
-      showFired = true;
+    // Floating-UI is now loaded via dynamic import inside _show(), so hx-show fires
+    // asynchronously after the click. Await a Promise that resolves on the event
+    // rather than polling a boolean flag.
+    const showFired = new Promise<boolean>((resolve) => {
+      el?.addEventListener('hx-show', () => resolve(true), { once: true });
+      window.setTimeout(() => resolve(false), 2000);
     });
 
     await userEvent.click(triggerBtn!);
-    await expect(showFired).toBe(true);
+    await expect(await showFired).toBe(true);
 
     // Panel should be present after open
     const panel = el?.shadowRoot?.querySelector('[part~="panel"]');
@@ -211,12 +214,15 @@ export const Disabled: Story = {
     await expect(triggerBtn).toBeTruthy();
     await expect(triggerBtn?.disabled).toBe(true);
 
-    let opened = false;
-    el?.addEventListener('hx-show', () => {
-      opened = true;
+    // hx-show fires async after a dynamic floating-ui import. Use a Promise that
+    // resolves true on hx-show or false on timeout — for a disabled trigger, we
+    // expect the timeout (false).
+    const opened = new Promise<boolean>((resolve) => {
+      el?.addEventListener('hx-show', () => resolve(true), { once: true });
+      window.setTimeout(() => resolve(false), 500);
     });
     triggerBtn?.click();
-    await expect(opened).toBe(false);
+    await expect(await opened).toBe(false);
   },
 };
 
@@ -240,8 +246,16 @@ export const SelectEvent: Story = {
     const selectSpy = fn();
     el?.addEventListener('hx-select', selectSpy);
 
+    // hx-show fires async via dynamic floating-ui import; wait for it before
+    // querying shadow DOM for the panel's slot.
+    const showFired = new Promise<boolean>((resolve) => {
+      el?.addEventListener('hx-show', () => resolve(true), { once: true });
+      window.setTimeout(() => resolve(false), 2000);
+    });
+
     const triggerBtn = el?.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
     await userEvent.click(triggerBtn!);
+    await expect(await showFired).toBe(true);
 
     const slot = el?.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
     const items = slot?.assignedElements({ flatten: true }) as HTMLElement[] | undefined;
@@ -442,19 +456,27 @@ export const KeyboardEscape: Story = {
     const el = canvasElement.querySelector('hx-overflow-menu');
     await expect(el).toBeTruthy();
 
-    let hideFired = false;
-    el?.addEventListener('hx-hide', () => {
-      hideFired = true;
+    // hx-show fires async via dynamic floating-ui import; use a Promise to wait.
+    const showFired = new Promise<boolean>((resolve) => {
+      el?.addEventListener('hx-show', () => resolve(true), { once: true });
+      window.setTimeout(() => resolve(false), 2000);
     });
 
     const triggerBtn = el?.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
     await userEvent.click(triggerBtn!);
+    await expect(await showFired).toBe(true);
 
     const panel = el?.shadowRoot?.querySelector('[part~="panel"]');
     await expect(panel).toBeTruthy();
 
+    // Set up hx-hide listener as a Promise before dispatching Escape.
+    const hideFired = new Promise<boolean>((resolve) => {
+      el?.addEventListener('hx-hide', () => resolve(true), { once: true });
+      window.setTimeout(() => resolve(false), 2000);
+    });
+
     await userEvent.keyboard('{Escape}');
-    await expect(hideFired).toBe(true);
+    await expect(await hideFired).toBe(true);
 
     const panelAfter = el?.shadowRoot?.querySelector('[part~="panel"]');
     await expect(panelAfter).toBeNull();
