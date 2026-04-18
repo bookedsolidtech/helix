@@ -35,7 +35,11 @@ notification_channel: ''
 
 # Push review gate — disabled by Jake 2026-04-11
 push_review: false
-
+# Commit review gate — disabled by Jake 2026-04-17
+# Sandbox denies `reagent cache set pass` so agents cannot self-approve
+# large commits. CI, gitleaks, and block_ai_attribution still enforce quality.
+quality_gates:
+  commit_review: false
 # Coverage quality gate (opt-in)
 # When enabled, the pre-push hook enforces minimum test coverage before push.
 # Requires @vitest/coverage-v8 (or equivalent) installed in the project.
