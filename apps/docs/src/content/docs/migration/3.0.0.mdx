@@ -40,7 +40,7 @@ React consumers:
 pnpm add @helixui/react@^3.0.0
 ```
 
-CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js` plus the per-component modules you use.
+CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js` plus the per-component modules you use.
 
 ## 2. `aria-label` → `accessible-label`
 
@@ -67,11 +67,21 @@ el.accessibleLabel = 'Close dialog';
 **Codemod:**
 
 ```bash
-rg -l '<hx-[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
+rg -P -l '<hx-(?!card\b)[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-(?!card\b)[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
 ```
 
 :::caution
 Do **not** rewrite `aria-label` on native HTML elements (`<button>`, `<input>`, etc.). Scope your find-and-replace to `hx-*` tags only.
+:::
+
+:::note[hx-card exception]
+`hx-card` uses `label` (not `accessible-label`) for its accessible name. The codemod above excludes it. Migrate manually:
+
+```diff
+- <hx-card hxAriaLabel="View patient record">...</hx-card>
++ <hx-card hx-label="View patient record">...</hx-card>
+```
+
 :::
 
 ## 3. `::part(error-message)` → `::part(error)`
@@ -270,7 +280,7 @@ static styles = ownStyles;
 **Pre-warming:** import the positioning utility at app startup.
 
 ```typescript
-import '@helixui/library/dist/positioning';
+import '@floating-ui/dom';
 ```
 
 ## 11. Public-API allowlist
@@ -293,10 +303,19 @@ If you relied on an undocumented deep import, [open an issue](https://github.com
 ### Strategy B (recommended) — core + per-component
 
 ```html
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js"
+></script>
 
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-button.js"></script>
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-card.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-button-3.0.0.js"
+></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-card-3.0.0.js"
+></script>
 ```
 
 Core is ~8.4KB min+gz. Each component is ~2KB.
@@ -304,7 +323,10 @@ Core is ~8.4KB min+gz. Each component is ~2KB.
 ### Strategy A (kitchen sink — back-compat only)
 
 ```html
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/bundle.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-3.0.0.min.js"
+></script>
 ```
 
 Strategy A may be removed in a future major.

@@ -2,6 +2,7 @@
 description: Run an adversarial review of the current branch via the Codex plugin (GPT-5.4). First-class step in the REA engineering process.
 argument-hint: "[diff-target]"
 allowed-tools:
+  - Agent
   - Bash(git diff:*)
   - Bash(git log:*)
   - Bash(git branch:*)
