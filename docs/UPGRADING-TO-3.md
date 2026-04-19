@@ -33,7 +33,7 @@ Consumers using the React wrapper:
 pnpm add @helixui/react@^3.0.0
 ```
 
-CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js` and the per-component modules you use (see [CDN delivery](#cdn-delivery)).
+CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js` and the per-component modules you use (see [CDN delivery](#12-cdn-delivery)).
 
 ---
 
@@ -70,6 +70,11 @@ Every component that previously accepted `aria-label` or `hxAriaLabel` now expos
 Components affected: `hx-button`, `hx-icon-button`, `hx-badge`, `hx-chip`, `hx-copy-button`, `hx-file-upload`, `hx-link`, `hx-menu-item`, `hx-nav-item`, `hx-overflow-menu`, `hx-side-nav`, `hx-split-button`, `hx-step`, `hx-toggle`, `hx-tooltip` (full list in CEM).
 
 **Exception — `hx-card`:** Interactive card accessible names use the `label` attribute, not `accessible-label`. If you were using the deprecated `hxAriaLabel` property on `hx-card`, migrate it to `label`:
+
+```diff
+- <hx-card hxAriaLabel="View patient record">...</hx-card>
++ <hx-card hx-label="View patient record">...</hx-card>
+```
 
 ---
 
@@ -341,18 +346,18 @@ The CDN build ships two strategies. 3.0.0 makes **Strategy B** the recommended p
 
 ```html
 <!-- Load core once (~8.4KB min+gz). Mounts the element registry. -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js"></script>
 
 <!-- Load only the components you use. -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-button.js"></script>
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-card.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-button-3.0.0.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-card-3.0.0.js"></script>
 ```
 
 ### Strategy A (kitchen-sink — back-compat only)
 
 ```html
 <!-- Single bundle with everything. Larger payload, not recommended. -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/bundle.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-3.0.0.min.js"></script>
 ```
 
 Strategy A is preserved in 3.0.0 for back-compat. It may be removed in a future major.
@@ -378,7 +383,7 @@ If your build tooling strips side effects, your HELiX components will render wit
 The tokens package bumps to 3.0.0 in lockstep with the library. Breaking changes:
 
 - `tokenStyles` export (deprecated in 2.1.2) is removed. Use `lightTokenCss` for raw CSS or rely on the library's automatic document-level adoption.
-- Semantic-tier token alignment (see [Design token delta](#design-token-delta) in the CHANGELOG). Consumers overriding at the semantic tier should audit their overrides.
+- Semantic-tier token alignment (see [Design token delta](../packages/hx-library/CHANGELOG.md#design-token-delta) in the CHANGELOG). Consumers overriding at the semantic tier should audit their overrides.
 
 ---
 
@@ -397,8 +402,8 @@ The React wrapper bumps to 3.0.0 to match. Breaking changes are mechanical — a
 A grep-based codemod is tracked as a 3.0.1 follow-up. For 3.0.0, the find-and-replace patterns listed in each section are precise enough to run manually or via `sd` / `ripgrep-replace`:
 
 ```bash
-# aria-label → accessible-label on HELiX component tags (scoped to avoid rewriting native HTML aria-label)
-rg -l '<hx-[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
+# aria-label → accessible-label on HELiX component tags (excludes hx-card, which uses label=)
+rg -P -l '<hx-(?!card\b)[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-(?!card\b)[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
 
 # ::part(error-message) → ::part(error)
 rg -l '::part\(error-message\)' | xargs sd '::part\(error-message\)' '::part(error)'

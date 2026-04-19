@@ -34,8 +34,8 @@ const outputFile = join(rootDir, 'src', 'index.ts');
 // Every top-level symbol re-exported from the barrel must be listed here.
 // Adding a new public symbol: append to the relevant module group.
 // Removing a public symbol: delete it here; the generator will omit it.
-// Keep internal helpers (id-counter reset, audit controller, aria delegation
-// mixin, style-registry utilities, etc.) OUT of this list. Consumers that
+// Keep internal helpers (id-counter reset, aria delegation mixin,
+// style-registry utilities, etc.) OUT of this list. Consumers that
 // need them must use a deep import path — that contract is intentional.
 /** @type {Record<string, { values: string[]; types: string[] }>} */
 const PUBLIC_API = {
@@ -47,7 +47,9 @@ const PUBLIC_API = {
     // resetIdCounter is intentionally excluded — it is a test-only helper
     // re-exported from ./test-utils.ts. Exposing it publicly would let
     // consumers reset the ID counter mid-run and break ARIA relationships.
-    values: ['HelixElement', 'createIdCounter', 'mergeTokenStyles'],
+    // mergeTokenStyles was removed in 3.0.0 — tokens adopt at the document
+    // level via ensureDocumentTokens() (auto-invoked on first import).
+    values: ['HelixElement', 'createIdCounter'],
     types: [],
   },
   './mixins/index.js': {
@@ -56,10 +58,13 @@ const PUBLIC_API = {
     values: ['FocusMixin', 'FormMixin'],
     types: ['FocusMixinInterface', 'FormMixinInterface'],
   },
-  // Controllers are not part of the public API. HelixAuditController is
-  // internal observability infrastructure for HIPAA audit-trail integration;
-  // it remains importable via its deep path for consumers that explicitly
-  // opt in to the internal surface.
+  './controllers/helix-audit-controller.js': {
+    // HelixAuditController is the public HIPAA audit-trail controller.
+    // It captures hx-* CustomEvents and re-dispatches as hx-audit events
+    // that bubble to the document for enterprise audit-log wiring.
+    values: ['HelixAuditController'],
+    types: ['AuditEventDetail', 'AuditControllerOptions'],
+  },
 };
 
 // ─── Component barrel scan ───────────────────────────────────────────────────
@@ -219,14 +224,17 @@ for (const [spec, allow] of Object.entries(PUBLIC_API)) {
 const utilitySpec = './utilities/document-token-adoption.js';
 const baseSpec = './base/index.js';
 const mixinsSpec = './mixins/index.js';
+const controllersSpec = './controllers/helix-audit-controller.js';
 
 const utilityGroup = renderedGroups.find((g) => g.spec === utilitySpec);
 const baseGroup = renderedGroups.find((g) => g.spec === baseSpec);
 const mixinsGroup = renderedGroups.find((g) => g.spec === mixinsSpec);
+const controllersGroup = renderedGroups.find((g) => g.spec === controllersSpec);
 
 const utilityBlock = utilityGroup ? utilityGroup.lines.join('\n') : '';
 const baseBlock = baseGroup ? baseGroup.lines.join('\n') : '';
 const mixinsBlock = mixinsGroup ? mixinsGroup.lines.join('\n') : '';
+const controllersBlock = controllersGroup ? controllersGroup.lines.join('\n') : '';
 
 // ─── Render ──────────────────────────────────────────────────────────────────
 const output = `/**
@@ -239,7 +247,7 @@ const output = `/**
  * Run \`npm run generate:barrel\` to regenerate.
  *
  * Public-API surface is gated by an allowlist in scripts/generate-barrel.js.
- * Internals (HelixAuditController, resetIdCounter, mixinDelegatesAria, etc.)
+ * Internals (resetIdCounter, mixinDelegatesAria, etc.)
  * are intentionally excluded and must be imported via deep paths if needed.
  */
 
@@ -256,6 +264,9 @@ ${baseBlock}
 
 // ─── Mixins ───────────────────────────────────────────────────────────────────
 ${mixinsBlock}
+
+// ─── HIPAA audit-trail controller ───────────────────────────────────────────
+${controllersBlock}
 
 // ─── Components ──────────────────────────────────────────────────────────────
 ${exportLines.join('\n')}
