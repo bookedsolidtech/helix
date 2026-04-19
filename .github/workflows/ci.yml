@@ -311,8 +311,11 @@ jobs:
             echo "FAILED TESTS:"
             grep "^[[:space:]]*×" "$LOGFILE" 2>/dev/null | head -60 || true
             echo ""
-            echo "--- last 200 lines of vitest log ---"
-            tail -200 "$LOGFILE" || true
+            echo "--- vitest error output (everything before Coverage report) ---"
+            awk '/Coverage report from/{exit} {print}' "$LOGFILE" || true
+            echo ""
+            echo "--- last 50 lines of full log ---"
+            tail -50 "$LOGFILE" || true
           fi
           echo "tests_ran=true" >> "$GITHUB_OUTPUT"
           exit $rc
