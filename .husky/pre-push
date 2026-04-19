@@ -147,4 +147,12 @@ if [ -f "$HOOKS_LIB" ]; then
   source "$HOOKS_LIB"
   discord_notify "dev" "Pre-push gates passed on \`$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\`" "green"
 fi
+
+# ── rea push-review-gate (Codex audit on protected paths) ────────────────────
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -x "$REPO_ROOT/.claude/hooks/push-review-gate.sh" ]; then
+  jq -Rn --arg remote "${1:-origin}"'{tool_input:{command:"git push \($remote)"}}' | "$REPO_ROOT/.claude/hooks/push-review-gate.sh" ||
+  exit $?
+fi
+
 exit 0
