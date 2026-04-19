@@ -48,6 +48,11 @@ function isUrlSafe(urlValue: string): boolean {
   // Empty url() is harmless
   if (trimmed === '') return true;
 
+  // Protocol-relative URLs (//host/path) resolve against the page's current
+  // protocol and load from an external host — same risk as explicit http://.
+  // Must reject before the allow-prefix / scheme checks, since they have no colon.
+  if (trimmed.startsWith('//')) return false;
+
   // Allow explicitly safe prefixes
   for (const prefix of ALLOWED_URL_PREFIXES) {
     if (trimmed.startsWith(prefix)) return true;
@@ -65,12 +70,50 @@ function isUrlSafe(urlValue: string): boolean {
 /**
  * Checks whether braces in the CSS string are balanced.
  * Unbalanced braces can be used to escape scoped selectors and inject global
- * styles into the document.
+ * styles into the document. Braces inside strings (`"..."`, `'...'`) and block
+ * comments are ignored so legitimate content like `content: "}"` or SVG data
+ * URIs (`url("data:image/svg+xml,<svg>{...}</svg>")`) does not trigger a false
+ * rejection.
  */
 function areBracesBalanced(css: string): boolean {
   let depth = 0;
+  let quote: '"' | "'" | null = null;
+  let inComment = false;
+
   for (let i = 0; i < css.length; i++) {
     const ch = css[i];
+
+    if (inComment) {
+      if (ch === '*' && css[i + 1] === '/') {
+        inComment = false;
+        i++;
+      }
+      continue;
+    }
+
+    if (quote !== null) {
+      if (ch === '\\') {
+        // Skip the escaped character (including an escaped quote).
+        i++;
+        continue;
+      }
+      if (ch === quote) {
+        quote = null;
+      }
+      continue;
+    }
+
+    if (ch === '/' && css[i + 1] === '*') {
+      inComment = true;
+      i++;
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      continue;
+    }
+
     if (ch === '{') {
       depth++;
     } else if (ch === '}') {
