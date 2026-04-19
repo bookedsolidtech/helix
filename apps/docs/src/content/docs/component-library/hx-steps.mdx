@@ -209,11 +209,11 @@ steps[2].disabled = true;
 
 ### hx-steps
 
-| Property      | Attribute     | Type                         | Default        | Description                                                                                                                                                                                                                 |
-| ------------- | ------------- | ---------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `orientation` | `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the steps. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute.                                                                                                           |
-| `size`        | `hx-size`     | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size variant. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute. Use the `hx-size` attribute in HTML; the legacy `size` attribute is accepted for backward compatibility but is deprecated. |
-| `accessibleLabel` | `accessible-label` | `string \| null`         | `null`         | Accessible label for the steps list. Always provide a descriptive value that names the workflow (e.g., `"Checkout progress"`). Forwarded to the inner `role="list"` element.                                                |
+| Property          | Attribute          | Type                         | Default        | Description                                                                                                                                                                                                                 |
+| ----------------- | ------------------ | ---------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `orientation`     | `orientation`      | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout direction of the steps. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute.                                                                                                           |
+| `size`            | `hx-size`          | `'sm' \| 'md' \| 'lg'`       | `'md'`         | Size variant. Propagated automatically to all child `<hx-step>` elements. Reflects to attribute. Use the `hx-size` attribute in HTML; the legacy `size` attribute is accepted for backward compatibility but is deprecated. |
+| `accessibleLabel` | `accessible-label` | `string \| null`             | `null`         | Accessible label for the steps list. Always provide a descriptive value that names the workflow (e.g., `"Checkout progress"`). Forwarded to the inner `role="list"` element.                                                |
 
 ### hx-step
 
@@ -337,18 +337,18 @@ hx-step::part(connector) {
 
 `hx-steps` is built for WCAG 2.1 AA compliance. Healthcare workflows require that step progress be communicated accurately to all users, including those relying on assistive technology.
 
-| Topic           | Details                                                                                                                                                                                       |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ARIA roles      | `<hx-steps>` uses `role="list"`. Each `<hx-step>` uses `role="listitem"`. This pattern is supported across all major screen readers and communicates a navigable sequence of items.           |
-| `accessible-label` | **Always provide `accessible-label` on `<hx-steps>`** describing the workflow (e.g., `"Checkout progress"`, `"Prior authorization steps"`). Without it, the list is announced without context.   |
-| `aria-current`  | The active step receives `aria-current="step"` on the host element. Screen readers announce the current position within the sequence.                                                         |
-| `aria-disabled` | Disabled steps receive `aria-disabled="true"` and `tabindex="-1"`, preventing focus and signaling non-interactivity to assistive technology.                                                  |
-| Keyboard        | Each non-disabled step is focusable (`tabindex="0"`). `Enter` and `Space` trigger `hx-step-click`. Tab order follows DOM order through the step list.                                         |
-| Focus styles    | `:focus-visible` styles are provided on the step indicator. The focus ring is visible at the 3:1 minimum contrast ratio required by WCAG 2.4.11 (Enhanced Focus Appearance).                  |
-| Status icons    | Complete steps show a checkmark SVG with visually hidden text "Complete". Error steps show an X SVG with visually hidden text "Error". These supplement color-only status communication.      |
-| Color           | Status is never communicated by color alone — icons and visually hidden text ensure compliance with WCAG 1.4.1 (Use of Color).                                                                |
-| Reduced motion  | Transition animations on connector lines and indicators are suppressed when `prefers-reduced-motion: reduce` is active.                                                                       |
-| WCAG            | Meets WCAG 2.1 AA. SC 1.3.1 (Info and Relationships), SC 1.4.1 (Use of Color), SC 2.1.1 (Keyboard), SC 2.4.3 (Focus Order), SC 4.1.2 (Name, Role, Value) satisfied. Zero axe-core violations. |
+| Topic              | Details                                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ARIA roles         | `<hx-steps>` uses `role="list"`. Each `<hx-step>` uses `role="listitem"`. This pattern is supported across all major screen readers and communicates a navigable sequence of items.            |
+| `accessible-label` | **Always provide `accessible-label` on `<hx-steps>`** describing the workflow (e.g., `"Checkout progress"`, `"Prior authorization steps"`). Without it, the list is announced without context. |
+| `aria-current`     | The active step receives `aria-current="step"` on the host element. Screen readers announce the current position within the sequence.                                                          |
+| `aria-disabled`    | Disabled steps receive `aria-disabled="true"` and `tabindex="-1"`, preventing focus and signaling non-interactivity to assistive technology.                                                   |
+| Keyboard           | Each non-disabled step is focusable (`tabindex="0"`). `Enter` and `Space` trigger `hx-step-click`. Tab order follows DOM order through the step list.                                          |
+| Focus styles       | `:focus-visible` styles are provided on the step indicator. The focus ring is visible at the 3:1 minimum contrast ratio required by WCAG 2.4.11 (Enhanced Focus Appearance).                   |
+| Status icons       | Complete steps show a checkmark SVG with visually hidden text "Complete". Error steps show an X SVG with visually hidden text "Error". These supplement color-only status communication.       |
+| Color              | Status is never communicated by color alone — icons and visually hidden text ensure compliance with WCAG 1.4.1 (Use of Color).                                                                 |
+| Reduced motion     | Transition animations on connector lines and indicators are suppressed when `prefers-reduced-motion: reduce` is active.                                                                        |
+| WCAG               | Meets WCAG 2.1 AA. SC 1.3.1 (Info and Relationships), SC 1.4.1 (Use of Color), SC 2.1.1 (Keyboard), SC 2.4.3 (Focus Order), SC 4.1.2 (Name, Role, Value) satisfied. Zero axe-core violations.  |
 
 ### Accessible Label Best Practices
 

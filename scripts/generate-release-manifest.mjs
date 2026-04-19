@@ -35,9 +35,7 @@ const ref = process.env.GITHUB_REF ?? null;
 
 const changesetDir = join(REPO_ROOT, '.changeset');
 const changesetFiles = existsSync(changesetDir)
-  ? readdirSync(changesetDir).filter(
-      (f) => f.endsWith('.md') && f !== 'README.md',
-    )
+  ? readdirSync(changesetDir).filter((f) => f.endsWith('.md') && f !== 'README.md')
   : [];
 
 const cdnBudget = readJson(join(REPO_ROOT, '.cdn-budget.json'));
@@ -77,9 +75,7 @@ const manifest = {
   published_at: new Date().toISOString(),
   publisher: publishActor,
   ci_run_id: ciRunId,
-  ci_run_url: ciRunId
-    ? `https://github.com/${repository}/actions/runs/${ciRunId}`
-    : null,
+  ci_run_url: ciRunId ? `https://github.com/${repository}/actions/runs/${ciRunId}` : null,
   packages: {
     '@helixui/library': libraryVersion,
     '@helixui/tokens': tokensPkg.version ?? null,

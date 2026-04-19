@@ -142,18 +142,18 @@ Minimal HTML snippet — no build tool required:
 
 ## Events
 
-| Event      | Detail Type                                                    | Description                                                                                                                 |
-| ---------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Event      | Detail Type                                                    | Description                                                                                                              |
+| ---------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `hx-click` | `{ href: string; originalEvent: MouseEvent \| KeyboardEvent }` | Dispatched when an interactive card (with `href`) is clicked or activated via keyboard. `bubbles: true, composed: true`. |
 
 ## Slots
 
-| Slot        | Description                                                                                                                                                                                                              |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `image`     | Optional image or media content at the top of the card. The slot wrapper is hidden when empty. Use a native `<img>` for best results — it will fill the container with `object-fit: cover`.                              |
-| `heading`   | The card heading/title content. Use a semantic heading element (`<h2>`, `<h3>`, etc.) for proper document outline. The slot wrapper is hidden when empty.                                                                |
-| _(default)_ | Default slot for the card body content. Always visible. Accepts any flow content.                                                                                                                                        |
-| `footer`    | Optional footer content rendered below the body — metadata, timestamps, attribution. The slot wrapper is hidden when empty.                                                                                              |
+| Slot        | Description                                                                                                                                                                                                           |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `image`     | Optional image or media content at the top of the card. The slot wrapper is hidden when empty. Use a native `<img>` for best results — it will fill the container with `object-fit: cover`.                           |
+| `heading`   | The card heading/title content. Use a semantic heading element (`<h2>`, `<h3>`, etc.) for proper document outline. The slot wrapper is hidden when empty.                                                             |
+| _(default)_ | Default slot for the card body content. Always visible. Accepts any flow content.                                                                                                                                     |
+| `footer`    | Optional footer content rendered below the body — metadata, timestamps, attribution. The slot wrapper is hidden when empty.                                                                                           |
 | `actions`   | Optional action buttons rendered with a top border separator. The slot wrapper is hidden when empty. **Do not use together with `href`** — nesting interactive controls inside `role="link"` is an ARIA anti-pattern. |
 
 ## CSS Parts
@@ -181,17 +181,17 @@ Minimal HTML snippet — no build tool required:
 
 ## Accessibility
 
-| Topic            | Details                                                                                                                                                                                                                            |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Static card      | When `href` is not set, the card is a non-interactive `<div>`. No ARIA role is applied. Screen readers encounter the card content in document order.                                                                              |
-| Interactive card | When `href` is set, the inner container receives `role="link"` and `tabindex="0"`. The card is keyboard-reachable and activatable via `Enter` or `Space`. This matches the WAI-ARIA link pattern.                                 |
-| Accessible name  | Use the `label` property on interactive cards to provide a meaningful accessible name beyond the visible content. Example: `label="View patient record for John Smith"`.                                                           |
-| Heading slot     | Always use a semantic heading element (`<h2>`, `<h3>`, etc.) in the `heading` slot to maintain a correct document outline. Avoid using `<span>` for headings in production.                                                        |
-| Actions slot     | Do **not** use the `actions` slot together with `href`. Nesting focusable controls (buttons, links) inside `role="link"` creates unreachable elements and violates WCAG 4.1.2. A console warning is issued if both are present.    |
-| Focus indicator  | Interactive cards display a visible `:focus-visible` outline styled with `--hx-focus-ring-width` and `--hx-focus-ring-color`, meeting WCAG 2.4.7.                                                                                  |
-| Reduced motion   | The hover lift and shadow transition animations are suppressed when `prefers-reduced-motion: reduce` is active, meeting WCAG 2.3.3.                                                                                                |
-| Color contrast   | Card text color pairings against background meet WCAG 2.1 AA 4.5:1 minimum contrast ratio.                                                                                                                                         |
-| WCAG             | Meets WCAG 2.1 AA when used correctly. Verify that heading slot content uses appropriate heading levels for the page context.                                                                                                      |
+| Topic            | Details                                                                                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static card      | When `href` is not set, the card is a non-interactive `<div>`. No ARIA role is applied. Screen readers encounter the card content in document order.                                                                            |
+| Interactive card | When `href` is set, the inner container receives `role="link"` and `tabindex="0"`. The card is keyboard-reachable and activatable via `Enter` or `Space`. This matches the WAI-ARIA link pattern.                               |
+| Accessible name  | Use the `label` property on interactive cards to provide a meaningful accessible name beyond the visible content. Example: `label="View patient record for John Smith"`.                                                        |
+| Heading slot     | Always use a semantic heading element (`<h2>`, `<h3>`, etc.) in the `heading` slot to maintain a correct document outline. Avoid using `<span>` for headings in production.                                                     |
+| Actions slot     | Do **not** use the `actions` slot together with `href`. Nesting focusable controls (buttons, links) inside `role="link"` creates unreachable elements and violates WCAG 4.1.2. A console warning is issued if both are present. |
+| Focus indicator  | Interactive cards display a visible `:focus-visible` outline styled with `--hx-focus-ring-width` and `--hx-focus-ring-color`, meeting WCAG 2.4.7.                                                                               |
+| Reduced motion   | The hover lift and shadow transition animations are suppressed when `prefers-reduced-motion: reduce` is active, meeting WCAG 2.3.3.                                                                                             |
+| Color contrast   | Card text color pairings against background meet WCAG 2.1 AA 4.5:1 minimum contrast ratio.                                                                                                                                      |
+| WCAG             | Meets WCAG 2.1 AA when used correctly. Verify that heading slot content uses appropriate heading levels for the page context.                                                                                                   |
 
 ## Drupal Integration
 

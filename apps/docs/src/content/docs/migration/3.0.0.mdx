@@ -181,11 +181,7 @@ class MyCustomInput extends FormMixin(HelixElement) {
 
   override _updateValidity(): void {
     if (this.required && !this.value) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        'Required',
-        this._inputEl,
-      );
+      this._internals.setValidity({ valueMissing: true }, 'Required', this._inputEl);
     } else {
       this._internals.setValidity({});
     }
@@ -205,15 +201,15 @@ If you previously implemented `dirty` / `touched` locally, delete it and rely on
 
 HelixElement and FormMixin hooks are now part of the public subclassing contract (previously `@internal`). Breaking changes to their signatures are gated to major releases.
 
-| Base class / mixin | Hook | When called |
-| --- | --- | --- |
-| `HelixElement` | `_onFormDisabled(disabled)` | Parent `<fieldset>` disabled toggled |
-| `HelixElement` | `_onFormReset()` | Owning form reset |
-| `HelixElement` | `_onFormStateRestore(state, mode)` | Form state restore (bfcache / autofill) |
-| `FormMixin` | `_handleInteractionInput()` | Call from native `input` event |
-| `FormMixin` | `_handleInteractionBlur()` | Call from native `blur` event |
-| `FormMixin` | `_resetInteractionState()` | Call from `_onFormReset()` |
-| `FormMixin` | `_updateValidity()` | Override for constraint logic |
+| Base class / mixin | Hook                               | When called                             |
+| ------------------ | ---------------------------------- | --------------------------------------- |
+| `HelixElement`     | `_onFormDisabled(disabled)`        | Parent `<fieldset>` disabled toggled    |
+| `HelixElement`     | `_onFormReset()`                   | Owning form reset                       |
+| `HelixElement`     | `_onFormStateRestore(state, mode)` | Form state restore (bfcache / autofill) |
+| `FormMixin`        | `_handleInteractionInput()`        | Call from native `input` event          |
+| `FormMixin`        | `_handleInteractionBlur()`         | Call from native `blur` event           |
+| `FormMixin`        | `_resetInteractionState()`         | Call from `_onFormReset()`              |
+| `FormMixin`        | `_updateValidity()`                | Override for constraint logic           |
 
 Consumers already using these hooks in 2.1.x need no code change — the `protected` access modifier was already in place. 3.0.0 promotes them from internal to stable contract.
 
@@ -239,14 +235,14 @@ rg -l "from '@helixui/library'" | xargs sd "\bWc([A-Z][a-zA-Z]+)\b" 'Hx$1'
 
 The back-compat shims preserving pre-2.0 property names are removed.
 
-| Component | Removed (deprecated in 2.0) | Use |
-| --- | --- | --- |
-| `hx-card` | `hxHref` | `href` |
-| `hx-card` | `hxAriaLabel` | `label` |
-| `hx-field` | `hxSize` | `size` |
-| `hx-banner`, `hx-dialog`, `hx-drawer`, `hx-toast` | `closeLabel` | `labelClose` |
-| `hx-split-button` | `triggerLabel` | `labelTrigger` |
-| `hx-split-button`, `hx-overflow-menu` | `menuLabel` | `labelMenu` |
+| Component                                         | Removed (deprecated in 2.0) | Use            |
+| ------------------------------------------------- | --------------------------- | -------------- |
+| `hx-card`                                         | `hxHref`                    | `href`         |
+| `hx-card`                                         | `hxAriaLabel`               | `label`        |
+| `hx-field`                                        | `hxSize`                    | `size`         |
+| `hx-banner`, `hx-dialog`, `hx-drawer`, `hx-toast` | `closeLabel`                | `labelClose`   |
+| `hx-split-button`                                 | `triggerLabel`              | `labelTrigger` |
+| `hx-split-button`, `hx-overflow-menu`             | `menuLabel`                 | `labelMenu`    |
 
 ### `mergeTokenStyles` utility
 
@@ -297,19 +293,10 @@ If you relied on an undocumented deep import, [open an issue](https://github.com
 ### Strategy B (recommended) — core + per-component
 
 ```html
-<script
-  type="module"
-  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js"
-></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js"></script>
 
-<script
-  type="module"
-  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-button.js"
-></script>
-<script
-  type="module"
-  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-card.js"
-></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-button.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-card.js"></script>
 ```
 
 Core is ~8.4KB min+gz. Each component is ~2KB.
@@ -317,10 +304,7 @@ Core is ~8.4KB min+gz. Each component is ~2KB.
 ### Strategy A (kitchen sink — back-compat only)
 
 ```html
-<script
-  type="module"
-  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/bundle.js"
-></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/bundle.js"></script>
 ```
 
 Strategy A may be removed in a future major.
