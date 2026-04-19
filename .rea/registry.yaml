@@ -42,12 +42,16 @@ servers:
     command: npx
     args:
       - -y
-      - discord-ops@latest
+      - discord-ops@^0.23.0
     env:
       BOOKED_DISCORD_BOT_TOKEN: '${BOOKED_DISCORD_BOT_TOKEN}'
       CLARITY_DISCORD_BOT_TOKEN: '${CLARITY_DISCORD_BOT_TOKEN}'
     enabled: true
 
+  # @modelcontextprotocol/server-github was deprecated in favor of the Go-based
+  # github/github-mcp-server (https://github.com/github/github-mcp-server).
+  # Disabled here until we wire the Go binary or Docker image into the registry.
+  # Tracked for a follow-up RE-add once the new server is vetted.
   - name: github
     command: npx
     args:
@@ -55,4 +59,4 @@ servers:
       - '@modelcontextprotocol/server-github'
     env:
       GITHUB_PERSONAL_ACCESS_TOKEN: '${GITHUB_PERSONAL_ACCESS_TOKEN}'
-    enabled: true
+    enabled: false
