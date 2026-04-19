@@ -226,12 +226,23 @@ jobs:
           CHANGESET_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
           HUSKY: '0'
         run: |
+          set -euo pipefail
           if ! git status --porcelain docs/releases/ | grep -q .; then
             echo "No release manifest changes to commit."
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # npm publish has already succeeded at this point, so the manifest
+          # MUST land on main. The workflow concurrency group only serialises
+          # runs of this workflow; unrelated merges can still advance main
+          # between actions/checkout and this step. Rebase the manifest on
+          # top of current origin/main to avoid a non-fast-forward rejection
+          # that would leave the npm release without its audit commit.
+          git stash push -u --message 'release-manifest' -- docs/releases/
+          git fetch origin main
+          git checkout -B publish-manifest origin/main
+          git stash pop
           git add docs/releases/
           git commit -m 'chore(release): add release manifest [skip ci]'
           git push "https://x-access-token:${CHANGESET_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main

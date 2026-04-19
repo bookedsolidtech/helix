@@ -147,11 +147,13 @@ The standard challenge: a consumer writes `<hx-text-input accessible-label="Pati
 HELiX handles this in one of two ways, depending on the component:
 
 1. **Components that document `accessible-label`.** Form controls and composite widgets — `hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-split-button`, `hx-steps`, `hx-action-bar` — expose a public `accessible-label` attribute (property: `accessibleLabel`) and forward it to the inner interactive element via `ElementInternals.ariaLabel` or a template binding. Every component page lists its public attributes; use `accessible-label` only on components that document it.
-2. **Components that accept native `aria-label`.** Most other HELiX components (including `hx-button`) read `this.ariaLabel` / `this.ariaLabelledBy` from the standard HTML attributes and forward those to the inner element. For these, use the native attribute:
+2. **Components that document native `aria-label` / `aria-labelledby`.** Some HELiX components (including `hx-button`) read `this.ariaLabel` / `this.ariaLabelledBy` from standard HTML attributes and forward them to the inner element. For these documented components, use the native attribute:
 
    ```html
    <hx-button aria-label="Close dialog">X</hx-button>
    ```
+
+Do not apply either pattern universally. Components that own their accessible-name lifecycle expose component-specific APIs instead — for example, `hx-status-indicator` derives its accessible name from the `label` property and overwrites any host `aria-label` you set, so you must use `<hx-status-indicator label="Patient online">` rather than `aria-label="…"`. Consult each component's documented API before applying an accessible-name attribute.
 
 The following LitElement pattern illustrates the `accessible-label` forwarding approach used in category (1):
 

@@ -303,6 +303,13 @@ jobs:
           SHARD_TOTAL="${VITEST_SHARD#*/}"
           SHARD_ARGS=(--shard="$VITEST_SHARD")
           if [[ "$TEST_FILE_COUNT" -le "$SHARD_TOTAL" ]]; then
+            if [[ "$TEST_FILE_COUNT" -eq 0 ]]; then
+              echo "[ci-shard-${VITEST_SHARD}] no test files resolved from: $PATHS — skipping"
+              echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+              mkdir -p .cache
+              echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              exit 0
+            fi
             if [[ "$SHARD_INDEX" -ne 1 ]]; then
               echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — skipping (shard ${SHARD_INDEX}/${SHARD_TOTAL} has nothing to run)"
               echo "tests_ran=true" >> "$GITHUB_OUTPUT"
@@ -337,9 +344,14 @@ jobs:
             echo "FAILED TESTS:"
             grep "^[[:space:]]*×" "$LOGFILE" 2>/dev/null | head -60 || true
             echo ""
-            echo "--- vitest error output (everything before Coverage report) ---"
-            awk '/Coverage report from/{exit} {print}' "$LOGFILE" || true
-            echo ""
+            # Only print the pre-coverage slice when the marker is actually
+            # present — otherwise awk falls through and duplicates the whole
+            # log against the tail -50 below.
+            if grep -q "Coverage report from" "$LOGFILE" 2>/dev/null; then
+              echo "--- vitest error output (everything before Coverage report) ---"
+              awk '/Coverage report from/{exit} {print}' "$LOGFILE" || true
+              echo ""
+            fi
             echo "--- last 50 lines of full log ---"
             tail -50 "$LOGFILE" || true
           fi
