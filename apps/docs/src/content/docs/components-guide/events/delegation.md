@@ -105,15 +105,23 @@ Arrow function property syntax (`private _handleShadowClick = ...`) preserves `t
 
 A common challenge in shadow DOM is connecting ARIA attributes on the host element to the interactive element inside the shadow root. For example, `aria-label` on `<hx-button>` should reach the `<button>` inside, not remain on the custom-element host that assistive technologies would otherwise read as a generic element.
 
-Built-in HELiX components solve this with `accessible-label` — a public host attribute that components forward to the inner target via `ElementInternals.ariaLabel` or template binding. Consumers write:
+HELiX components solve this in one of two ways, depending on the component:
 
-```html
-<hx-button accessible-label="Close dialog">X</hx-button>
-```
+1. **Native `aria-label` / `aria-labelledby`.** Most components (including `hx-button`) inherit from an internal mixin that reads `this.ariaLabel` / `this.ariaLabelledBy` and forwards the accessible name to the inner interactive element. For these, use the standard HTML attribute:
 
-And the accessible name correctly reaches the interactive inner element.
+   ```html
+   <hx-button aria-label="Close dialog">X</hx-button>
+   ```
 
-If you are building your own custom elements (not extending HELiX components), implement forwarding with `ElementInternals` ARIA properties — see [Form Accessibility](/components-guide/forms/accessibility/#elementinternalsarialabel-vs-attribute). The internal helper HELiX components use for attribute-level forwarding is not part of the public API; consumers should prefer `ElementInternals.ariaLabel` and explicit template bindings to the inner element.
+2. **Explicit `accessible-label` attribute.** A small set of form controls and composite widgets — `hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-split-button`, `hx-steps`, `hx-action-bar` — expose a public `accessible-label` attribute (and matching `accessibleLabel` JS property):
+
+   ```html
+   <hx-text-input accessible-label="Search patients" placeholder="Last name"></hx-text-input>
+   ```
+
+   Use `accessible-label` only on components that document it; every component page lists its public attributes.
+
+If you are building your own custom elements (not extending HELiX components), implement forwarding with `ElementInternals` ARIA properties — see [Form Accessibility](/components-guide/forms/accessibility/#elementinternalsarialabel-vs-attribute). The internal helpers HELiX components use are not part of the public API; build your own forwarding with `ElementInternals.ariaLabel` and explicit template bindings to the inner element.
 
 ## `delegatesFocus`
 

@@ -142,25 +142,32 @@ Using `ElementInternals` ARIA properties is preferable to adding ARIA attributes
 
 ## Forwarding Host ARIA to Shadow Elements
 
-The standard challenge: a consumer writes `<hx-button accessible-label="Close">` but an `aria-label` placed on the host `<hx-button>` does not automatically reach the `<button>` inside the shadow root — assistive technology would see it on the wrong element.
+The standard challenge: a consumer writes `<hx-text-input accessible-label="Patient last name">`, but an attribute placed on the host custom element does not automatically reach the `<input>` inside the shadow root — assistive technology would see it on the wrong element.
 
-Built-in HELiX components expose a public `accessible-label` attribute (property: `accessibleLabel`) and forward it to the inner interactive element, either via `ElementInternals.ariaLabel` on the host or via a template binding on the shadow-DOM target:
+HELiX handles this in one of two ways, depending on the component:
+
+1. **Components that document `accessible-label`.** Form controls and composite widgets — `hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-split-button`, `hx-steps`, `hx-action-bar` — expose a public `accessible-label` attribute (property: `accessibleLabel`) and forward it to the inner interactive element via `ElementInternals.ariaLabel` or a template binding. Every component page lists its public attributes; use `accessible-label` only on components that document it.
+2. **Components that accept native `aria-label`.** Most other HELiX components (including `hx-button`) read `this.ariaLabel` / `this.ariaLabelledBy` from the standard HTML attributes and forward those to the inner element. For these, use the native attribute:
+
+   ```html
+   <hx-button aria-label="Close dialog">X</hx-button>
+   ```
+
+The following LitElement pattern illustrates the `accessible-label` forwarding approach used in category (1):
 
 ```typescript
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('hx-button')
-export class HelixButton extends LitElement {
+@customElement('my-custom-input')
+export class MyCustomInput extends LitElement {
   static override styles = css`:host { display: inline-flex; }`;
 
   @property({ attribute: 'accessible-label' }) accessibleLabel = '';
 
   override render() {
     return html`
-      <button aria-label=${this.accessibleLabel || nothing}>
-        <slot></slot>
-      </button>
+      <input aria-label=${this.accessibleLabel || nothing} />
     `;
   }
 }
@@ -169,8 +176,8 @@ export class HelixButton extends LitElement {
 Consumer usage:
 
 ```html
-<!-- accessible-label is a public host attribute; components forward it to the inner element. -->
-<hx-button accessible-label="Close dialog">X</hx-button>
+<!-- accessible-label is a public host attribute on components that document it. -->
+<hx-text-input accessible-label="Patient last name" placeholder="Last name"></hx-text-input>
 ```
 
 For built-in HELiX components that accept additional ARIA state (`aria-expanded`, `aria-controls`), the component documents the specific attributes it forwards. When building your own custom elements, prefer `ElementInternals.ariaExpanded` / `ariaControls` or explicit template bindings — the internal attribute-level forwarding helper used by HELiX components is not part of the public API.

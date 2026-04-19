@@ -81,9 +81,9 @@ Drupal / Twig consumers should grep `*.twig` templates for the same pattern.
 
 #### `hx-phi-field` PHI no longer accepted via HTML attributes (security hardening)
 
-`hx-phi-field` exposes PHI exclusively through the `data` JS property. The underlying `@property({ attribute: false })` declaration means Lit does not reflect `data` to or from any HTML attribute — the property is **not** settable via `setAttribute('data', …)` or initial `<hx-phi-field data="…">` markup, and it does not appear in `outerHTML` or server-side DOM dumps.
+`hx-phi-field` exposes PHI exclusively through the `data` JS property (typed `string`). The underlying `@property({ attribute: false })` declaration means Lit does not reflect `data` to or from any HTML attribute. Do not use `setAttribute('data', …)` or initial `<hx-phi-field data="…">` markup for PHI.
 
-As a belt-and-suspenders defense for consumers writing PHI-laden markup anyway, `connectedCallback` scans for stray `data` / `value` attributes on the host, removes them from the DOM, and logs a `console.warn` identifying the element. PHI therefore cannot leak through DOM serialization, HTML templates, or browser DevTools Elements-panel inspection.
+As a belt-and-suspenders defense for consumers writing PHI-laden markup anyway, `connectedCallback` scans for stray `data` / `value` attributes on the host, removes them from the live DOM, and in development builds emits a `console.warn` identifying the element (the warn is stripped from production builds). This cleanup reduces exposure after upgrade, but PHI in HTML is still unsafe because it may already be present in templates, HTTP response bodies, `View Source`, browser caches, access logs, or pre-upgrade DOM — none of which the client can reach.
 
 Consumers must set PHI via the property on a live element reference:
 
@@ -91,10 +91,11 @@ Consumers must set PHI via the property on a live element reference:
 // Correct — property assignment after insertion
 const el = document.createElement('hx-phi-field');
 document.body.append(el);
-el.data = { mrn: '12345', dob: '1990-01-01' };
+el.data = 'MRN: 12345 • DOB: 1990-01-01';
 
-// Do NOT do this — ignored + warned + attribute stripped
-document.body.insertAdjacentHTML('beforeend', '<hx-phi-field data=\'{"mrn":"12345"}\'></hx-phi-field>');
+// Do NOT do this — the raw value is already in the HTML source the browser
+// received. The client-side strip only protects the live DOM after hydration.
+document.body.insertAdjacentHTML('beforeend', '<hx-phi-field data="123-45-6789"></hx-phi-field>');
 ```
 
 Consumers reading PHI continue to use the `data` property (`el.data`). Any existing integration reading the `value` attribute via `getAttribute` or `outerHTML` must migrate to the property accessor.

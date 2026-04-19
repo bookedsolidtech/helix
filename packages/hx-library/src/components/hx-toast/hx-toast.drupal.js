@@ -51,7 +51,7 @@
             return;
           }
 
-          import('@helixui/library/components/hx-toast/index.js')
+          import('@helixui/library/components/hx-toast')
             .then(function (module) {
               module.toast(rawOptions);
             })

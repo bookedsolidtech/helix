@@ -224,6 +224,7 @@ jobs:
         if: steps.changesets.outputs.published == 'true'
         env:
           CHANGESET_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
+          HUSKY: '0'
         run: |
           if ! git status --porcelain docs/releases/ | grep -q .; then
             echo "No release manifest changes to commit."

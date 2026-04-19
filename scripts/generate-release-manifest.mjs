@@ -58,12 +58,23 @@ const changesetFiles = existsSync(changesetDir)
 const publishedPackages = (() => {
   const raw = process.env.PUBLISHED_PACKAGES;
   if (!raw) return [];
+  let parsed;
   try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new Error(
+      `PUBLISHED_PACKAGES is set but not valid JSON — refusing to write an ` +
+        `incomplete release manifest. Raw value (first 200 chars): ` +
+        `${raw.slice(0, 200)} — original error: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
+  if (!Array.isArray(parsed)) {
+    throw new Error(
+      `PUBLISHED_PACKAGES parsed but is not an array — expected the output ` +
+        `shape from changesets/action. Got: ${typeof parsed}`,
+    );
+  }
+  return parsed;
 })();
 
 const cdnBudget = readJson(join(REPO_ROOT, '.cdn-budget.json'));

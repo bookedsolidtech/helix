@@ -161,7 +161,9 @@ Audit each hit. Confirmation dialogs, clinical alerts, and blocking workflows sh
 **Positive security change — HIPAA hardening.** Consumers that already set PHI via the `data` JS property benefit silently.
 :::
 
-`hx-phi-field` holds Protected Health Information via the `data` JS property. The property is declared with `@property({ attribute: false })` so Lit does not observe a `data` HTML attribute. If raw HTML markup sets `<hx-phi-field data="...">`, the component's `connectedCallback` rescues the value into the `data` property, emits a `console.warn`, and removes the attribute from the DOM so PHI is not retained in `outerHTML`, DevTools, or SSR snapshots.
+`hx-phi-field` holds Protected Health Information via the `data` JS property. The property is declared with `@property({ attribute: false })` so Lit does not observe a `data` HTML attribute. If raw HTML markup sets `<hx-phi-field data="...">`, the component's `connectedCallback` reassigns the value onto the `data` property and removes the attribute from the live DOM so the PHI is not retained in `outerHTML` or DevTools after upgrade. In development builds the rescue also emits a `console.warn`; production builds strip the warn at build time.
+
+This runtime rescue is a **mitigation, not a cleanup**. Any value shipped as an HTML attribute is already present in the SSR / server-rendered source, the HTTP response body, `View Source`, browser caches, and any access logs that recorded the response, all of which the client cannot reach. Never place PHI in HTML markup — always assign it to the `data` JS property on a live element reference.
 
 The supported pattern — set `data` via JS:
 
@@ -177,8 +179,10 @@ el.data = '123-45-6789';
 The unsupported pattern — setting via HTML attribute:
 
 ```html
-<!-- Do not do this. The component warns and strips the attribute at runtime,
-     but the raw value is briefly present in the HTML source (SSR, view-source). -->
+<!-- Do not do this. The client-side rescue removes the attribute from the live
+     DOM after upgrade, but the raw value has already been sent to the browser
+     in the SSR source and remains in view-source, HTTP response bodies, access
+     logs, and caches. Never ship PHI in HTML markup. -->
 <hx-phi-field data="123-45-6789"></hx-phi-field>
 ```
 
@@ -302,7 +306,9 @@ import '@floating-ui/dom';
 
 ## 11. Public-API allowlist
 
-3.0.0 blocks undocumented deep imports. The public surface is the root barrel (`@helixui/library`) and per-component entry points (`@helixui/library/components/<hx-name>`). There is no `@helixui/library/mixins` subpath export — `FocusMixin`, `FormMixin`, `HelixElement`, and `HelixAuditController` are all re-exported from the root barrel. Consumers importing from anything else will see a build-time error.
+3.0.0 blocks undocumented JavaScript/TypeScript deep imports. For JS/TS symbols, the public surface is the root barrel (`@helixui/library`) and per-component entry points (`@helixui/library/components/<hx-name>`). There is no `@helixui/library/mixins` subpath export — `FocusMixin`, `FormMixin`, `HelixElement`, and `HelixAuditController` are all re-exported from the root barrel. Consumers importing other JS/TS subpaths will see a build-time error.
+
+Documented non-JS asset subpaths (public CSS bundles under `@helixui/library/dist/css/*.css`, `@helixui/library/fouc.css`, and `@helixui/library/custom-elements.json`) remain part of the public surface via their package export paths and are unaffected by this rule.
 
 ```typescript
 // Before — blocked in 3.0.0
