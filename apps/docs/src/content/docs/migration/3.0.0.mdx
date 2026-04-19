@@ -81,6 +81,7 @@ Do **not** rewrite `aria-label` on native HTML elements (`<button>`, `<input>`, 
 - <hx-card hxAriaLabel="View patient record">...</hx-card>
 + <hx-card label="View patient record">...</hx-card>
 ```
+
 :::
 
 ## 3. `::part(error-message)` → `::part(error)`
@@ -302,10 +303,19 @@ If you relied on an undocumented deep import, [open an issue](https://github.com
 ### Strategy B (recommended) — core + per-component
 
 ```html
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js"
+></script>
 
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-button-3.0.0.js"></script>
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-card-3.0.0.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-button-3.0.0.js"
+></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/components/hx-card-3.0.0.js"
+></script>
 ```
 
 Core is ~8.4KB min+gz. Each component is ~2KB.
@@ -313,7 +323,10 @@ Core is ~8.4KB min+gz. Each component is ~2KB.
 ### Strategy A (kitchen sink — back-compat only)
 
 ```html
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-3.0.0.min.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-3.0.0.min.js"
+></script>
 ```
 
 Strategy A may be removed in a future major.
