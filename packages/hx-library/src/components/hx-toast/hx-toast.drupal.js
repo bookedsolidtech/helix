@@ -6,7 +6,7 @@
  *
  * Attach trigger elements with a `data-hx-toast` attribute containing a JSON
  * object of toast options. The behavior calls the imperative `toast()` utility
- * from @wc-2026/library when the trigger is clicked.
+ * from @helixui/library when the trigger is clicked.
  *
  * @example Twig template
  *   <button
@@ -51,7 +51,7 @@
             return;
           }
 
-          import('@wc-2026/library/components/hx-toast/index.js')
+          import('@helixui/library/components/hx-toast')
             .then(function (module) {
               module.toast(rawOptions);
             })

@@ -27,7 +27,7 @@ Consumers subclassing `HelixElement` or applying `FormMixin` should treat these 
 | Component | Old | New |
 | --- | --- | --- |
 | ARIA-labelable components (except `hx-card`) | `aria-label` / `hxAriaLabel` | `accessible-label` / `accessibleLabel` |
-| `hx-card` | `hxAriaLabel` | `label` |
+| `hx-card` | `hxAriaLabel` (prop) / no attribute | `label` (prop) / `hx-label` (attribute) |
 | `hx-date-picker` | native modal `<dialog>` | non-modal popup dialog |
 | `hx-time-picker` | native modal `<dialog>` | non-modal popup dialog |
 
@@ -39,7 +39,7 @@ The `accessible-label` naming aligns HELiX with the ARIA 1.2 guidance that `aria
 | --- | --- | --- |
 | all form controls | `error-message` | `error` |
 
-Form controls (`hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-checkbox`, `hx-radio`, `hx-date-picker`, `hx-time-picker`, `hx-number-input`, `hx-slider`, `hx-file-upload`, `hx-color-picker`, `hx-field`, `hx-switch`, `hx-phi-field`) now expose the validation-message slot as `part="error"` for consistency with `help-text`. Consumers targeting `::part(error-message)` must update selectors to `::part(error)`.
+Form controls (`hx-checkbox`, `hx-checkbox-group`, `hx-combobox`, `hx-date-picker`, `hx-field`, `hx-file-upload`, `hx-number-input`, `hx-radio-group`, `hx-select`, `hx-switch`, `hx-text-input`, `hx-textarea`, `hx-time-picker`) now expose the validation-message slot as `part="error"` for consistency with `help-text`. Consumers targeting `::part(error-message)` must update selectors to `::part(error)`.
 
 #### FormMixin consolidation
 
@@ -79,19 +79,26 @@ rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
 
 Drupal / Twig consumers should grep `*.twig` templates for the same pattern.
 
-#### `hx-phi-field` PHI attribute no longer retained post-hydration (security hardening)
+#### `hx-phi-field` PHI no longer accepted via HTML attributes (security hardening)
 
-`<hx-phi-field value="...">` previously left the `value` attribute on the DOM after `connectedCallback`, meaning PHI values were readable via `el.getAttribute('value')`, `el.outerHTML`, server-side DOM dumps, and browser DevTools inspection. In 3.0.0 the attribute is stripped from the DOM after hydration; the property still holds the value for reactive updates and form submission.
+`hx-phi-field` exposes PHI exclusively through the `data` JS property (typed `string`). The underlying `@property({ attribute: false })` declaration means Lit does not reflect `data` to or from any HTML attribute. Do not use `setAttribute('data', …)` or initial `<hx-phi-field data="…">` markup for PHI.
 
-This is a **positive security change** for HIPAA-aligned integrations — PHI no longer leaks through DOM serialization. Consumers reading PHI via the `value` property (e.g. `el.value`) are unaffected. Consumers reading the `value` *attribute* via `getAttribute` or `outerHTML` must switch to the property accessor.
+As a belt-and-suspenders defense for consumers writing PHI-laden markup anyway, `connectedCallback` scans for stray `data` / `value` attributes on the host, removes them from the live DOM, and in development builds emits a `console.warn` identifying the element (the warn is stripped from production builds). This cleanup reduces exposure after upgrade, but PHI in HTML is still unsafe because it may already be present in templates, HTTP response bodies, `View Source`, browser caches, access logs, or pre-upgrade DOM — none of which the client can reach.
+
+Consumers must set PHI via the property on a live element reference:
 
 ```typescript
-// Before — worked, but exposed PHI in DOM serialization
-const phi = el.getAttribute('value');
+// Correct — property assignment after insertion
+const el = document.createElement('hx-phi-field');
+document.body.append(el);
+el.data = 'MRN: 12345 • DOB: 1990-01-01';
 
-// After — PHI attribute is removed post-hydration; use the property
-const phi = el.value;
+// Do NOT do this — the raw value is already in the HTML source the browser
+// received. The client-side strip only protects the live DOM after hydration.
+document.body.insertAdjacentHTML('beforeend', '<hx-phi-field data="123-45-6789"></hx-phi-field>');
 ```
+
+Consumers reading PHI continue to use the `data` property (`el.data`). Any existing integration reading the `value` attribute via `getAttribute` or `outerHTML` must migrate to the property accessor.
 
 #### Bundle layout / barrel imports
 
