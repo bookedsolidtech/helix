@@ -4,7 +4,7 @@ description: How to install and set up the HELIX enterprise web component librar
 ---
 
 :::note[Upgrading from 2.x?]
-If you already have a 2.x release of `@helixui/library` installed, read the [Upgrading to 3.0.0](/migration/3.0.0) guide first. 3.0.0 removes the `aria-label` attribute and several other 2.x shims on HELiX elements.
+If you already have a 2.x release of `@helixui/library` installed, read the [Upgrading to 3.0.0](/migration/3.0.0) guide first. 3.0.0 renames the `aria-label` attribute to `accessible-label` and removes several other 2.x shims on HELiX elements.
 :::
 
 ## Install via npm

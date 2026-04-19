@@ -9,6 +9,8 @@
 # (likely build-tool ecosystem compat) and its red signal was masking real
 # regressions in required checks. Keeping the file for future repair — run
 # via workflow_dispatch when revisiting multi-Node support.
+# TODO: track Node 22/24 flakiness — open an issue at bookedsolidtech/helix
+#       to capture root cause and expected owner/milestone before re-enabling.
 # ============================================================================
 
 name: CI Matrix

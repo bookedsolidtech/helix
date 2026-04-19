@@ -377,7 +377,7 @@ Use the component in a Twig template after registering the library. A pre-built 
 <hx-steps
   orientation="{{ orientation|default('horizontal') }}"
   size="{{ size|default('md') }}"
-  accessible-label="{{ aria_label|default('Progress steps') }}"
+  accessible-label="{{ accessible_label|default('Progress steps') }}"
 >
   {% for step in steps %}
     <hx-step

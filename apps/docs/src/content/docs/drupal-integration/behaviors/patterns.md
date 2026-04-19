@@ -251,10 +251,8 @@ import { once } from 'core/once';
       const isValid = field.checkValidity();
 
       if (!isValid) {
-        field.setAttribute('error', '');
         field.setAttribute('error', field.validationMessage || 'Invalid input');
       } else {
-        field.removeAttribute('error');
         field.removeAttribute('error');
       }
 

@@ -387,7 +387,7 @@ libraries:
 </article>
 ```
 
-For link cards, use `href` (not `href`):
+For link cards, use `href` (not `hx-href`):
 
 ```twig
 <hx-card

@@ -173,7 +173,7 @@ export class HelixButton extends Base {
 Consumer usage:
 
 ```html
-<!-- aria-label, aria-expanded, aria-controls automatically forwarded to inner <button> -->
+<!-- accessible-label, aria-expanded, aria-controls automatically forwarded to inner <button> -->
 <hx-button accessible-label="Close dialog" aria-expanded="false" aria-controls="dialog-1">
   Close
 </hx-button>

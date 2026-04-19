@@ -30,6 +30,9 @@ servers:
     args:
       - -y
       - helixir
+    # NOTE: These env values contain machine-specific absolute paths. To use on a
+    # different machine, copy the values to a gitignored .rea/registry.yaml.local
+    # and override. Until rea ships ${VAR} interpolation, literals are required.
     env:
       MCP_WC_CEM_PATH: /Volumes/Development/booked/helix/packages/hx-library/custom-elements.json
       MCP_WC_PROJECT_ROOT: /Volumes/Development/booked/helix

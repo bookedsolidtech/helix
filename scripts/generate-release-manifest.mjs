@@ -20,11 +20,28 @@ const readJson = (path) => {
   return JSON.parse(readFileSync(path, 'utf8'));
 };
 
-const libraryPkg = readJson(join(REPO_ROOT, 'packages/hx-library/package.json')) ?? {};
-const tokensPkg = readJson(join(REPO_ROOT, 'packages/hx-tokens/package.json')) ?? {};
-const reactPkg = readJson(join(REPO_ROOT, 'packages/hx-react/package.json')) ?? {};
+const requirePackageVersion = (packagePath, packageName) => {
+  const pkg = readJson(packagePath);
+  if (!pkg?.version) {
+    throw new Error(`Missing required version for ${packageName} at ${packagePath}`);
+  }
+  return pkg;
+};
 
-const libraryVersion = libraryPkg.version ?? 'unknown';
+const libraryPkg = requirePackageVersion(
+  join(REPO_ROOT, 'packages/hx-library/package.json'),
+  '@helixui/library',
+);
+const tokensPkg = requirePackageVersion(
+  join(REPO_ROOT, 'packages/hx-tokens/package.json'),
+  '@helixui/tokens',
+);
+const reactPkg = requirePackageVersion(
+  join(REPO_ROOT, 'packages/hx-react/package.json'),
+  '@helixui/react',
+);
+
+const libraryVersion = libraryPkg.version;
 const tag = `@helixui/library@${libraryVersion}`;
 
 const commitSha = process.env.GITHUB_SHA ?? sh('git rev-parse HEAD');

@@ -728,7 +728,7 @@ Drupal.behaviors.helixCard = {
 # mytheme.libraries.yml
 
 helix-components:
-  version: 0.0.1 # Explicit version for cache-busting
+  version: 3.0.0 # Explicit version for cache-busting
   js:
     dist/cdn/core.js:
       preprocess: false

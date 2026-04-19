@@ -28,7 +28,7 @@ https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js
 
 Per-component CDN pattern:
 
-```
+```text
 https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js
 https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card/index.js
 https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-text-input/index.js

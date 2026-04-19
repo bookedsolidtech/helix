@@ -369,7 +369,7 @@ export default defineConfig({
 
 hx-library avoids hashes for library builds because:
 
-- npm versions serve as cache keys (consumers install `@helixui/library@3.0.0`, not `@helixui/library@3.0.0`)
+- npm versions serve as cache keys (consumers install `@helixui/library@3.0.0` by version pin, not by content hash)
 - File paths are documented in API guides (stable names reduce docs churn)
 
 ### Chunk File Names

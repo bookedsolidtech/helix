@@ -244,10 +244,10 @@ Rendered output:
 ### ARIA Attributes
 
 ```twig
-{# Add an accessible label for the card #}
+{# Add an accessible label for the card (hx-card uses label, not accessible-label) #}
 <hx-card {{
   attributes
-    .setAttribute('accessible-label', 'Patient record for ' ~ label)
+    .setAttribute('label', 'Patient record for ' ~ label)
     .setAttribute('role', 'article')
 }}>
   <span slot="heading">{{ label }}</span>

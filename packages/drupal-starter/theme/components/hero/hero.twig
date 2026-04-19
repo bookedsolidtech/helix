@@ -57,7 +57,7 @@
     {% if cta_text and cta_url %}
       <div class="hero__cta">
         <hx-button
-          variant="{{ variant == 'dark' ? 'primary' : 'primary' }}"
+          variant="primary"
           href="{{ cta_url }}"
           hx-size="lg"
           {% if variant == 'dark' %}inverted{% endif %}

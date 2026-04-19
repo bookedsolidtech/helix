@@ -971,7 +971,6 @@ import { once } from 'core/once';
       element.addEventListener('input', () => {
         if (element.hasAttribute('error')) {
           element.removeAttribute('error');
-          element.removeAttribute('error');
         }
       });
     },
@@ -980,7 +979,6 @@ import { once } from 'core/once';
       const value = element.value.trim();
 
       if (rules.required && !value) {
-        element.setAttribute('error', '');
         element.setAttribute('error', 'This field is required.');
         return false;
       }

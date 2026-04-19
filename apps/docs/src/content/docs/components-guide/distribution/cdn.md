@@ -122,7 +122,7 @@ Never use `@latest` in production CDN URLs. Pinning to a specific version preven
 
 <!-- Latest — fine for prototyping, risky in production -->
 <script type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js">
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/index.js">
 </script>
 ```
 

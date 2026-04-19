@@ -436,7 +436,7 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
   data-entity-bundle="patient"
   data-view-mode="{{ view_mode }}"
   {% if view_mode != 'full' %}
-    href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+    hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
   {% endif %}
 >
   {% if content.field_photo|render|trim %}
@@ -488,19 +488,8 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
         const entityId = card.getAttribute('data-entity-id');
         const viewMode = card.getAttribute('data-view-mode');
 
-        // Keyboard navigation for teaser/compact cards
-        if (viewMode !== 'full') {
-          card.setAttribute('tabindex', '0');
-          card.setAttribute('role', 'button');
-
-          card.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              const href = card.getAttribute('href');
-              if (href) window.location.href = href;
-            }
-          });
-        }
+        // hx-card with hx-href supplies role="link", tabindex="0", and Enter-only activation
+        // per WCAG 2.1.1 / ARIA APG — no custom keyboard handling is needed.
 
         // Analytics: track card clicks if configured
         if (settings.helixui?.trackCardClicks) {

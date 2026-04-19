@@ -26,7 +26,8 @@ Consumers subclassing `HelixElement` or applying `FormMixin` should treat these 
 
 | Component | Old | New |
 | --- | --- | --- |
-| all ARIA-labelable components | `aria-label` / `hxAriaLabel` | `accessible-label` / `accessibleLabel` |
+| ARIA-labelable components (except `hx-card`) | `aria-label` / `hxAriaLabel` | `accessible-label` / `accessibleLabel` |
+| `hx-card` | `hxAriaLabel` | `label` |
 | `hx-date-picker` | native modal `<dialog>` | non-modal popup dialog |
 | `hx-time-picker` | native modal `<dialog>` | non-modal popup dialog |
 

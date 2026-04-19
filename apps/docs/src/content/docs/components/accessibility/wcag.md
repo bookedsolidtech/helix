@@ -106,7 +106,7 @@ All non-text content that is presented to the user has a text alternative that s
   <img src="download.svg" alt="Download report" />
 </hx-button>
 
-<!-- Icon-only buttons use aria-label -->
+<!-- Icon-only buttons use accessible-label -->
 <hx-button accessible-label="Close dialog">
   <hx-icon name="close"></hx-icon>
 </hx-button>

@@ -10,7 +10,7 @@ Each HELiX release produces a JSON manifest in this directory that captures the 
 
 1. GitHub repo → **Settings** → **Environments** → **New environment**
 2. Name: `npm-publish`
-3. **Protection rules** → **Required reviewers** → add `jake` (or `@himerus`). Leave other reviewers off.
+3. **Protection rules** → **Required reviewers** → add `himerus` (GitHub username). Leave other reviewers off.
 4. **Wait timer**: `0` — the gate is a reviewer click, not a delay.
 5. **Deployment branches**: restrict to `main` only.
 

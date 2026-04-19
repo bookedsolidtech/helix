@@ -10,7 +10,7 @@ stays in `.mcp.json` directly — see [Known gap](#known-gap) below.
 
 ## How it works
 
-```
+```text
 Claude Code (MCP client)
   └── .mcp.json
         ├── rea-gateway  ── stdio ──▶  node_modules/@bookedsolid/rea serve
@@ -32,13 +32,14 @@ tool becomes `obsidian__list-available-vaults`.
 Every tool call through the gateway writes a hash-chained entry to
 `.rea/audit.jsonl`. Verify with:
 
-```
+```bash
 pnpm exec rea audit verify
 ```
 
 ## Add a new MCP to the gateway
 
 1. Add an entry under `servers:` in `.rea/registry.yaml`:
+
    ```yaml
    - name: my-server           # lowercase-kebab, becomes the tool prefix
      command: npx
@@ -47,11 +48,13 @@ pnpm exec rea audit verify
        SOME_PATH: /abs/path
      enabled: true
    ```
+
 2. Do NOT also list the server in `.mcp.json` — that would double-register the
    catalog.
 3. Restart Claude Code so `rea serve` re-loads the registry.
 4. Verify:
-   ```
+
+   ```bash
    node .helix-gateway-smoke.mjs
    ```
 

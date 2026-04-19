@@ -364,10 +364,9 @@ For heavy components used in specific contexts, split them into separate chunks.
 **Example (Vite):**
 
 ```typescript
-// Dynamically import heavy component
+// Dynamically import heavy component (the @customElement decorator registers it on import)
 async function loadDataTable() {
-  const { HxDataTable } = await import('@helixui/library/components/hx-data-table');
-  customElements.define('hx-data-table', HxDataTable);
+  await import('@helixui/library/components/hx-data-table');
 }
 
 // Load only when needed
@@ -424,8 +423,7 @@ Load components when they enter the viewport.
 ```typescript
 // Register observer for lazy components
 const lazyComponents = new Map([
-  ['hx-data-table', () => import('@helixui/library/components/wc-data-table')],
-  ['hx-chart', () => import('@helixui/library/components/wc-chart')],
+  ['hx-data-table', () => import('@helixui/library/components/hx-data-table')],
 ]);
 
 const observer = new IntersectionObserver((entries) => {
@@ -444,7 +442,7 @@ const observer = new IntersectionObserver((entries) => {
 
 // Observe all lazy component placeholders
 document
-  .querySelectorAll('hx-data-table:not(:defined), wc-chart:not(:defined)')
+  .querySelectorAll('hx-data-table:not(:defined)')
   .forEach((el) => observer.observe(el));
 ```
 

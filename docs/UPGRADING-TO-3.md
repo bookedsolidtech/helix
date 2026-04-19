@@ -67,7 +67,9 @@ Every component that previously accepted `aria-label` or `hxAriaLabel` now expos
 - Attribute form: `/(\s)(hxAriaLabel|aria-label)=/g` → `$1accessible-label=` *(inside HELiX component tags only — do not rewrite `aria-label` on native HTML elements)*
 - Property form: `/\.hxAriaLabel\b/g` → `.accessibleLabel`
 
-Components affected: `hx-button`, `hx-icon-button`, `hx-badge`, `hx-card`, `hx-chip`, `hx-copy-button`, `hx-file-upload`, `hx-link`, `hx-menu-item`, `hx-nav-item`, `hx-overflow-menu`, `hx-side-nav`, `hx-split-button`, `hx-step`, `hx-toggle`, `hx-tooltip` (full list in CEM).
+Components affected: `hx-button`, `hx-icon-button`, `hx-badge`, `hx-chip`, `hx-copy-button`, `hx-file-upload`, `hx-link`, `hx-menu-item`, `hx-nav-item`, `hx-overflow-menu`, `hx-side-nav`, `hx-split-button`, `hx-step`, `hx-toggle`, `hx-tooltip` (full list in CEM).
+
+**Exception — `hx-card`:** Interactive card accessible names use the `label` attribute, not `accessible-label`. If you were using the deprecated `hxAriaLabel` property on `hx-card`, migrate it to `label`:
 
 ---
 
@@ -144,11 +146,11 @@ The `modal` property on `hx-dialog` now defaults to `false`, aligning with HTML 
 **Find instances missing the attribute:**
 
 ```bash
-# HTML / TSX / Vue templates
-rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+# HTML / TSX / Vue templates (requires ripgrep with PCRE2 support)
+rg -P '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.html' -g '*.tsx' -g '*.vue'
 
 # Drupal / Twig templates
-rg '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.twig' -g '*.html.twig'
+rg -P '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.twig' -g '*.html.twig'
 ```
 
 **Audit each hit.** If the dialog was intended to be modal (confirmation dialogs, clinical alerts, blocking workflows), add `modal`. If it was intended to be non-modal (inline drawers, sidebar panels, toast-adjacent UIs), leave as-is.
@@ -308,10 +310,10 @@ Components that use `@floating-ui/dom` for positioning (`hx-select`, `hx-combobo
 
 **If your app has strict CSP:** ensure your `script-src` policy allows the chunk origin. For most consumers this is a no-op — the chunk serves from the same origin as the core bundle.
 
-**If you pre-warm chunks:** you can explicitly import the floating positioning utility at app startup:
+**If you pre-warm chunks:** you can pre-warm the floating-ui peer dependency at app startup by importing it directly:
 
 ```ts
-import '@helixui/library/dist/positioning';
+import '@floating-ui/dom';
 ```
 
 ---

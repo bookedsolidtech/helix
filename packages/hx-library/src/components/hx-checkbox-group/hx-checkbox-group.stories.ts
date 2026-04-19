@@ -178,7 +178,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    error: {
+    errorPart: {
       description: 'The error message container.',
       table: {
         category: 'CSS Parts',
