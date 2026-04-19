@@ -115,7 +115,50 @@ hx-date-picker::part(dialog)::backdrop {
 
 Tests asserting focus-trap behavior must be updated. Escape-close and focus-restoration tests continue to pass unchanged.
 
-## 5. FormMixin consolidation
+## 5. `hx-dialog` — `modal` defaults to `false`
+
+:::caution
+**Silent behavior change.** No type error, no runtime warning. `<hx-dialog open>` rendered as modal by default in 2.x; in 3.0.0 it renders non-modal.
+:::
+
+The `modal` property now defaults to `false`, matching HTML boolean-attribute semantics. To preserve 2.x behavior, add `modal` explicitly:
+
+```html
+<!-- Before: modal by default -->
+<hx-dialog open>...</hx-dialog>
+
+<!-- After: explicit opt-in to top-layer + backdrop + focus trap -->
+<hx-dialog open modal>...</hx-dialog>
+```
+
+**Find missing attributes:**
+
+```bash
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.twig' -g '*.html.twig'
+```
+
+Audit each hit. Confirmation dialogs, clinical alerts, and blocking workflows should add `modal`. Inline drawers and sidebar panels should stay non-modal.
+
+## 6. `hx-phi-field` — PHI attribute stripped post-hydration
+
+:::note
+**Positive security change.** HIPAA-aligned deployments benefit silently. Only consumers reading `el.getAttribute('value')` need to update.
+:::
+
+In 2.x, `<hx-phi-field value="...">` left the `value` attribute on the element, exposing PHI via `getAttribute('value')`, `outerHTML`, SSR dumps, and DevTools. In 3.0.0 the attribute is removed after `connectedCallback`; the property retains the value.
+
+```typescript
+// Before — worked, but leaked PHI in DOM serialization
+const phi = el.getAttribute('value');
+
+// After — read the property instead
+const phi = el.value;
+```
+
+This change surfaced during the Figgy (Northwell) integration audit as a HIPAA-relevant exposure vector.
+
+## 7. FormMixin consolidation
 
 All 15 form-associated components now compose `FormMixin(HelixElement)` and inherit shared interaction-state tracking.
 
@@ -158,7 +201,7 @@ class MyCustomInput extends FormMixin(HelixElement) {
 
 If you previously implemented `dirty` / `touched` locally, delete it and rely on the inherited getters. Wire your native input's `input` event to `this._handleInteractionInput()` and the `blur` event to `this._handleInteractionBlur()`.
 
-## 6. Subclassing contract — `@protected` override hooks
+## 8. Subclassing contract — `@protected` override hooks
 
 HelixElement and FormMixin hooks are now part of the public subclassing contract (previously `@internal`). Breaking changes to their signatures are gated to major releases.
 
@@ -174,7 +217,7 @@ HelixElement and FormMixin hooks are now part of the public subclassing contract
 
 Consumers already using these hooks in 2.1.x need no code change — the `protected` access modifier was already in place. 3.0.0 promotes them from internal to stable contract.
 
-## 7. Deprecated symbols removed
+## 9. Deprecated symbols removed
 
 ### `Wc*` type aliases
 
@@ -216,7 +259,7 @@ static styles = mergeTokenStyles(ownStyles);
 static styles = ownStyles;
 ```
 
-## 8. `@floating-ui/dom` dynamic import
+## 10. `@floating-ui/dom` dynamic import
 
 `hx-select`, `hx-combobox`, `hx-popover`, `hx-tooltip`, and `hx-overflow-menu` load `@floating-ui/dom` dynamically on first interaction.
 
@@ -234,7 +277,7 @@ static styles = ownStyles;
 import '@helixui/library/dist/positioning';
 ```
 
-## 9. Public-API allowlist
+## 11. Public-API allowlist
 
 3.0.0 blocks undocumented deep imports. Consumers importing from anything other than the root barrel, `@helixui/library/mixins`, or documented per-component entry points will see a build-time error.
 
@@ -247,7 +290,7 @@ import { _internalHelper } from '@helixui/library/src/internal/helper.js';
 
 If you relied on an undocumented deep import, [open an issue](https://github.com/bookedsolidtech/helix/issues) — we can promote the symbol in a minor release.
 
-## 10. CDN delivery
+## 12. CDN delivery
 
 3.0.0 makes **Strategy B** the recommended path.
 
@@ -282,7 +325,7 @@ Core is ~8.4KB min+gz. Each component is ~2KB.
 
 Strategy A may be removed in a future major.
 
-## 11. Adopted stylesheets side effect
+## 13. Adopted stylesheets side effect
 
 HELiX adopts design tokens at the document level via `document.adoptedStyleSheets` on first import of any component. This is the only supported theming path.
 
@@ -292,14 +335,14 @@ HELiX adopts design tokens at the document level via `document.adoptedStyleSheet
 
 If your build strips side effects, HELiX components render without tokens (no colors, no spacing, no typography). Fix at the bundler config level.
 
-## 12. Tokens package
+## 14. Tokens package
 
 `@helixui/tokens@3.0.0`:
 
 - `tokenStyles` export (deprecated in 2.1.2) removed. Use `lightTokenCss` for raw CSS or rely on automatic document-level adoption.
 - Semantic-tier token alignment — see the CHANGELOG for the complete delta.
 
-## 13. React wrapper
+## 15. React wrapper
 
 `@helixui/react@3.0.0`:
 

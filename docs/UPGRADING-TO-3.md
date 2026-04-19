@@ -112,7 +112,79 @@ The calendar / clock popup on `hx-date-picker` and `hx-time-picker` migrates fro
 
 ---
 
-## 5. FormMixin consolidation
+## 5. `hx-dialog` — `modal` property defaults to `false`
+
+> **HIGH impact — silent behavior change.** No type error, no runtime warning. The dialog just behaves differently.
+
+The `modal` property on `hx-dialog` now defaults to `false`, aligning with HTML boolean-attribute semantics (attribute absent = property `false`). In 2.x, `<hx-dialog open>` without an explicit `modal` attribute rendered in the top layer with a backdrop and a focus trap. In 3.0.0 the same markup renders as a non-modal dialog in document flow.
+
+**Before (2.x):**
+
+```html
+<!-- Rendered as modal by default: top-layer, backdrop, focus trapped -->
+<hx-dialog open>
+  <p>Are you sure?</p>
+</hx-dialog>
+```
+
+**After (3.0.0):**
+
+```html
+<!-- Non-modal — inline in document flow, no backdrop, no focus trap -->
+<hx-dialog open>
+  <p>Are you sure?</p>
+</hx-dialog>
+
+<!-- To preserve 2.x modal behavior, add `modal` explicitly -->
+<hx-dialog open modal>
+  <p>Are you sure?</p>
+</hx-dialog>
+```
+
+**Find instances missing the attribute:**
+
+```bash
+# HTML / TSX / Vue templates
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+
+# Drupal / Twig templates
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.twig' -g '*.html.twig'
+```
+
+**Audit each hit.** If the dialog was intended to be modal (confirmation dialogs, clinical alerts, blocking workflows), add `modal`. If it was intended to be non-modal (inline drawers, sidebar panels, toast-adjacent UIs), leave as-is.
+
+---
+
+## 6. `hx-phi-field` — PHI attribute removed from DOM post-hydration
+
+> **Positive security change — HIPAA hardening.** Most consumers benefit silently.
+
+In 2.x, `<hx-phi-field value="123-45-6789">` left the `value` attribute on the element after `connectedCallback`, meaning PHI values were readable via:
+
+- `el.getAttribute('value')`
+- `el.outerHTML`
+- Server-side HTML dumps (SSR, snapshot tests, audit logs)
+- Browser DevTools element inspector
+
+In 3.0.0 the attribute is stripped from the DOM after hydration. The `value` property still holds the value for reactive updates, form submission, and programmatic access.
+
+**Consumer impact.** Most consumers read PHI via the `value` property — they are unaffected. Only consumers reading the `value` *attribute* need to update:
+
+```typescript
+// Before — worked, but exposed PHI in DOM serialization
+const phi = el.getAttribute('value');
+const html = el.outerHTML; // PHI leaked in the string
+
+// After — use the property accessor
+const phi = el.value;
+const html = el.outerHTML; // PHI no longer present
+```
+
+**Why this change ships in 3.0.0.** HIPAA-aligned deployments (clinical records, patient portals) must not expose PHI through DOM serialization. The attribute retention in 2.x was a latent exposure vector surfaced during the Figgy (Northwell) integration audit.
+
+---
+
+## 7. FormMixin consolidation
 
 All 15 form-associated components now compose `FormMixin(HelixElement)`. If you subclass a HELiX form component, the mixin's interaction-state tracking is inherited automatically.
 
@@ -157,7 +229,7 @@ class MyCustomInput extends FormMixin(HelixElement) {
 
 ---
 
-## 6. Subclassing contract — `@protected` override hooks
+## 8. Subclassing contract — `@protected` override hooks
 
 HelixElement and FormMixin override hooks are now officially part of the public subclassing contract (previously tagged `@internal`). Breaking changes to their signatures will be gated to major releases.
 
@@ -177,7 +249,7 @@ No code change required for consumers using these hooks in 2.1.x — the access 
 
 ---
 
-## 7. Deprecated symbols removed
+## 9. Deprecated symbols removed
 
 ### `Wc*` type aliases
 
@@ -224,7 +296,7 @@ Deprecated component variants' `sticky` and `system` properties (and their tests
 
 ---
 
-## 8. `@floating-ui/dom` dynamic import
+## 10. `@floating-ui/dom` dynamic import
 
 Components that use `@floating-ui/dom` for positioning (`hx-select`, `hx-combobox`, `hx-popover`, `hx-tooltip`, `hx-overflow-menu`) now load the library dynamically on first interaction. The core bundle drops the dependency.
 
@@ -244,7 +316,7 @@ import '@helixui/library/dist/positioning';
 
 ---
 
-## 9. Public-API allowlist
+## 11. Public-API allowlist
 
 3.0.0 introduces a public-API allowlist that blocks undocumented deep imports from leaking through `@helixui/library`. Consumers importing from anything other than the root barrel, `@helixui/library/mixins`, or the documented per-component entry points will see a build-time error.
 
@@ -259,7 +331,7 @@ If you were relying on an undocumented deep import, open an issue at [bookedsoli
 
 ---
 
-## 10. CDN delivery
+## 12. CDN delivery
 
 The CDN build ships two strategies. 3.0.0 makes **Strategy B** the recommended path.
 
@@ -285,7 +357,7 @@ Strategy A is preserved in 3.0.0 for back-compat. It may be removed in a future 
 
 ---
 
-## 11. Adopted stylesheets side effect
+## 13. Adopted stylesheets side effect
 
 HELiX design tokens adopt at the document level via `document.adoptedStyleSheets` on first import of any component. This is the only supported theming path.
 
@@ -299,7 +371,7 @@ If your build tooling strips side effects, your HELiX components will render wit
 
 ---
 
-## 12. Tokens package — `@helixui/tokens@3.0.0`
+## 14. Tokens package — `@helixui/tokens@3.0.0`
 
 The tokens package bumps to 3.0.0 in lockstep with the library. Breaking changes:
 
@@ -308,7 +380,7 @@ The tokens package bumps to 3.0.0 in lockstep with the library. Breaking changes
 
 ---
 
-## 13. React wrapper — `@helixui/react@3.0.0`
+## 15. React wrapper — `@helixui/react@3.0.0`
 
 The React wrapper bumps to 3.0.0 to match. Breaking changes are mechanical — all wrapper props rename in parallel with the underlying component:
 

@@ -55,6 +55,42 @@ All 15 form-associated components now compose `FormMixin(HelixElement)` for shar
 
 `hx-date-picker` and `hx-time-picker` migrate from native modal `<dialog>` to a non-modal popup pattern. This avoids the browser's top-layer focus trap and backdrop behavior, which conflicted with form-inline usage. Keyboard behavior is preserved (Escape closes + restores focus; arrow keys navigate; Tab remains in document flow). Consumers that relied on the modal backdrop or top-layer stacking must adapt their layout.
 
+#### `hx-dialog` default `modal` flipped from `true` to `false`
+
+The `modal` property on `hx-dialog` now defaults to `false`, aligning with HTML boolean-attribute semantics (attribute absent = property `false`). In 2.x, any `<hx-dialog open>` without an explicit `modal` attribute rendered in the top layer with a backdrop and focus trap; in 3.0.0 the same markup renders as a non-modal dialog.
+
+This is a **silent behavior change** — no type error, no runtime warning. Every existing `<hx-dialog>` instance that relied on the default modal behavior must add `modal` explicitly:
+
+```html
+<!-- Before (2.x): modal by default -->
+<hx-dialog open>...</hx-dialog>
+
+<!-- After (3.0.0): add explicit modal -->
+<hx-dialog open modal>...</hx-dialog>
+```
+
+Find all instances missing the attribute:
+
+```bash
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+```
+
+Drupal / Twig consumers should grep `*.twig` templates for the same pattern.
+
+#### `hx-phi-field` PHI attribute no longer retained post-hydration (security hardening)
+
+`<hx-phi-field value="...">` previously left the `value` attribute on the DOM after `connectedCallback`, meaning PHI values were readable via `el.getAttribute('value')`, `el.outerHTML`, server-side DOM dumps, and browser DevTools inspection. In 3.0.0 the attribute is stripped from the DOM after hydration; the property still holds the value for reactive updates and form submission.
+
+This is a **positive security change** for HIPAA-aligned integrations — PHI no longer leaks through DOM serialization. Consumers reading PHI via the `value` property (e.g. `el.value`) are unaffected. Consumers reading the `value` *attribute* via `getAttribute` or `outerHTML` must switch to the property accessor.
+
+```typescript
+// Before — worked, but exposed PHI in DOM serialization
+const phi = el.getAttribute('value');
+
+// After — PHI attribute is removed post-hydration; use the property
+const phi = el.value;
+```
+
 #### Bundle layout / barrel imports
 
 - `@floating-ui/dom` is now imported dynamically at first use inside `hx-select`, `hx-combobox`, `hx-popover`, `hx-tooltip`, and `hx-overflow-menu`. First interaction on these components triggers a separate chunk load; the core bundle drops the floating-ui dependency.
