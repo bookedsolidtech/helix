@@ -178,11 +178,11 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    'error-message': {
+    error: {
       description: 'The error message container.',
       table: {
         category: 'CSS Parts',
-        type: { summary: '::part(error-message)' },
+        type: { summary: '::part(error)' },
       },
       control: false,
     },
@@ -1046,7 +1046,7 @@ export const CSSParts: Story = {
         font-weight: 600;
         color: #0369a1;
       }
-      .parts-demo-error hx-checkbox-group::part(error-message) {
+      .parts-demo-error hx-checkbox-group::part(error) {
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -1086,14 +1086,14 @@ export const CSSParts: Story = {
         <h4
           style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
         >
-          ::part(error-message)
+          ::part(error)
         </h4>
         <div class="parts-demo-error">
           <hx-checkbox-group
             label="With Styled Error"
             name="parts-demo-error"
             required
-            error="Uppercase bold error via ::part(error-message)."
+            error="Uppercase bold error via ::part(error)."
           >
             <hx-checkbox value="fever" label="Fever"></hx-checkbox>
             <hx-checkbox value="cough" label="Cough"></hx-checkbox>
