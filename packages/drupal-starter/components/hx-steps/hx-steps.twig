@@ -14,7 +14,7 @@
 {{ attach_library('helixui/hx-steps') }}
 
 <hx-steps
-  {% if label %}aria-label="{{ label }}"{% endif %}
+  {% if label %}accessible-label="{{ label }}"{% endif %}
   {% if orientation and orientation != 'horizontal' %}orientation="{{ orientation }}"{% endif %}
   {% if size and size != 'md' %}hx-size="{{ size }}"{% endif %}
   {{ attributes ? attributes }}

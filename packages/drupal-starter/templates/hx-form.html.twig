@@ -17,6 +17,10 @@
  * - title: Form heading text.
  * - description: Optional form description.
  * - submit_label: Submit button label. Default: Submit.
+ * - submit_accessible_label: ARIA name for the submit button when it has no
+ *   visible text label (icon-only submit). Rendered as the `accessible-label`
+ *   attribute on the submit hx-button in 3.0.0+. Use this instead of aria-label
+ *   on HELiX components.
  * - attributes: Drupal attributes object.
  *
  * Usage:
@@ -114,7 +118,11 @@
     >I agree to the terms and conditions</hx-checkbox>
 
     <div class="hx-form-wrapper__actions">
-      <hx-button type="submit" variant="primary">
+      <hx-button
+        type="submit"
+        variant="primary"
+        {% if submit_accessible_label %}accessible-label="{{ submit_accessible_label }}"{% endif %}
+      >
         {{ submit_label|default('Submit') }}
       </hx-button>
       <hx-button type="reset" variant="ghost">

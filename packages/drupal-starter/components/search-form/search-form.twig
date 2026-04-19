@@ -24,7 +24,7 @@
       label="{{ label|default('Search') }}"
       placeholder="{{ placeholder|default('Search...') }}"
     ></hx-text-input>
-    <hx-button type="submit" variant="primary" aria-label="{{ label|default('Search') }}">
+    <hx-button type="submit" variant="primary" accessible-label="{{ label|default('Search') }}">
       <hx-icon name="search" slot="prefix"></hx-icon>
       {{ label|default('Search') }}
     </hx-button>

@@ -252,10 +252,10 @@ import { once } from 'core/once';
 
       if (!isValid) {
         field.setAttribute('error', '');
-        field.setAttribute('error-message', field.validationMessage || 'Invalid input');
+        field.setAttribute('error', field.validationMessage || 'Invalid input');
       } else {
         field.removeAttribute('error');
-        field.removeAttribute('error-message');
+        field.removeAttribute('error');
       }
 
       return isValid;
@@ -279,7 +279,7 @@ import { once } from 'core/once';
       form.querySelectorAll('[error]').forEach((field) => {
         errors.push({
           name: field.getAttribute('name') || field.id,
-          message: field.getAttribute('error-message') || 'Validation failed',
+          message: field.getAttribute('error') || 'Validation failed',
         });
       });
       return errors;
@@ -1129,10 +1129,10 @@ import { once } from 'core/once';
 
       if (!isValid) {
         input.setAttribute('error', '');
-        input.setAttribute('error-message', input.validationMessage || 'Invalid');
+        input.setAttribute('error', input.validationMessage || 'Invalid');
       } else {
         input.removeAttribute('error');
-        input.removeAttribute('error-message');
+        input.removeAttribute('error');
       }
 
       return isValid;

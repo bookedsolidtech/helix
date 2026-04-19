@@ -46,7 +46,7 @@
       {% if difficulty %}
         <hx-badge
           variant="{{ difficulty|lower == 'easy' ? 'success' : (difficulty|lower == 'hard' ? 'danger' : 'warning') }}"
-          size="sm"
+          hx-size="sm"
         >{{ difficulty }}</hx-badge>
       {% endif %}
 

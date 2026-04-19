@@ -22,7 +22,7 @@
 
     <div slot="header" class="article-teaser__header">
       {% if category %}
-        <hx-badge variant="neutral" size="sm">{{ category }}</hx-badge>
+        <hx-badge variant="neutral" hx-size="sm">{{ category }}</hx-badge>
       {% endif %}
     </div>
 
@@ -43,7 +43,7 @@
     <div slot="footer" class="article-teaser__footer">
       <div class="article-teaser__meta">
         {% if author_name %}
-          <hx-avatar size="sm" label="{{ author_name }}"></hx-avatar>
+          <hx-avatar hx-size="sm" label="{{ author_name }}"></hx-avatar>
           <hx-text variant="body-xs">{{ author_name }}</hx-text>
         {% endif %}
 

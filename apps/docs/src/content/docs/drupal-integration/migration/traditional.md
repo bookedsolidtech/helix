@@ -1271,7 +1271,7 @@ $('#contact-form').validate({
     label="Email Address"
     type="email"
     required
-    error-message="Please enter a valid email address"
+    error="Please enter a valid email address"
   ></hx-text-input>
 
   <hx-text-input
@@ -1280,7 +1280,7 @@ $('#contact-form').validate({
     type="tel"
     pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
     required
-    error-message="Please enter a valid US phone number (xxx-xxx-xxxx)"
+    error="Please enter a valid US phone number (xxx-xxx-xxxx)"
   ></hx-text-input>
 
   <hx-button type="submit" variant="primary">
@@ -1292,7 +1292,7 @@ $('#contact-form').validate({
 **No JavaScript Needed**:
 
 - Browser validates on submit using `required`, `pattern`, `type="email"`
-- HELIX components display error messages via `error-message` attribute
+- HELIX components display error messages via `error` attribute (renamed from `error-message` in 3.0.0)
 - Form submission prevented if validation fails
 - Screen readers announce validation errors automatically
 
