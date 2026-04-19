@@ -169,7 +169,7 @@ console.log(host.shadowRoot); // null
 All HELiX components use **open mode** for testability, accessibility tooling compatibility, and developer experience:
 
 ```typescript
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   constructor() {
     super();
     // Lit creates open shadow root automatically
@@ -182,7 +182,7 @@ export class WcButton extends LitElement {
 Create shadow roots as early as possible, ideally in the constructor:
 
 ```typescript
-class WcCard extends HTMLElement {
+class HxCard extends HTMLElement {
   constructor() {
     super();
 
@@ -286,7 +286,7 @@ Events **do cross** the shadow boundary, but the `event.target` is **retargeted*
 
 ```javascript
 // Component implementation
-class WcButton extends LitElement {
+class HxButton extends LitElement {
   render() {
     return html`
       <button @click=${this._handleClick}>
@@ -436,7 +436,7 @@ Three primary methods:
 ```typescript
 import { LitElement, css } from 'lit';
 
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
@@ -468,7 +468,7 @@ template.innerHTML = `
   <button><slot></slot></button>
 `;
 
-class WcButton extends HTMLElement {
+class HxButton extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -624,7 +624,7 @@ Slots are the mechanism for projecting light DOM into shadow DOM. They create **
 
 ```typescript
 // Component definition
-class WcCard extends LitElement {
+class HxCard extends LitElement {
   render() {
     return html`
       <div class="card">
@@ -715,9 +715,9 @@ Shadow DOM must preserve accessibility:
 ARIA attributes work across shadow boundaries:
 
 ```html
-<wc-button aria-label="Close dialog">
+<hx-button accessible-label="Close dialog">
   <svg>...</svg>
-</wc-button>
+</hx-button>
 ```
 
 ```typescript
@@ -1072,7 +1072,7 @@ Rare pattern. Use for dynamic slot routing based on runtime conditions.
 Combine shadow DOM with `ElementInternals` for custom form controls:
 
 ```typescript
-class WcTextInput extends HTMLElement {
+class HxTextInput extends HTMLElement {
   static formAssociated = true;
 
   constructor() {

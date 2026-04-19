@@ -116,23 +116,33 @@ export class HelixElement extends LitElement {
    * Override in subclass to react to the element being disabled or enabled
    * via a parent `<fieldset>`.
    *
+   * Part of the HelixElement subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
    * @param _disabled - `true` when the element is being disabled
-   * @internal
+   * @protected
    */
   protected _onFormDisabled(_disabled: boolean): void {}
 
   /**
    * Override in subclass to reset component state when the owning form resets.
-   * @internal
+   *
+   * Part of the HelixElement subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
+   * @protected
    */
   protected _onFormReset(): void {}
 
   /**
    * Override in subclass to restore component state from saved form state.
    *
+   * Part of the HelixElement subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
    * @param _state - The saved state value, or `null` if none
    * @param _mode - `'restore'` for bfcache navigation, `'autocomplete'` for autofill
-   * @internal
+   * @protected
    */
   protected _onFormStateRestore(
     _state: File | string | FormData | null,

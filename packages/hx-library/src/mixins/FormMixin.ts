@@ -10,6 +10,7 @@ type Constructor<T = object> = new (...args: any[]) => T;
 
 /**
  * The public interface that FormMixin adds to any host element.
+ * Contains only the API that external consumers may access.
  *
  * @public
  */
@@ -25,22 +26,33 @@ export interface FormMixinInterface {
   checkValidity(): boolean;
   /** Delegates to ElementInternals.reportValidity(). */
   reportValidity(): boolean;
+}
 
+/**
+ * Protected subclassing hooks provided by FormMixin.
+ *
+ * These are part of the stable subclassing contract (breaking changes gated
+ * to major releases) but are NOT exposed as public consumer API.
+ * They are accessible only from within FormMixin subclasses.
+ *
+ * @internal
+ */
+export interface FormMixinProtectedHooks {
   /**
    * Advance `dirty` state. Call from the native input's `input` event handler.
-   * @internal
+   * @protected
    */
   _handleInteractionInput(): void;
 
   /**
    * Advance `touched` state. Call from the native input's `blur` event handler.
-   * @internal
+   * @protected
    */
   _handleInteractionBlur(): void;
 
   /**
    * Reset interaction flags. Call from `_onFormReset()` in the host component.
-   * @internal
+   * @protected
    */
   _resetInteractionState(): void;
 
@@ -48,7 +60,7 @@ export interface FormMixinInterface {
    * Override in the host component to run constraint validation logic.
    * Called automatically by `updated()`. Use `this._internals.setValidity()`
    * inside this method.
-   * @internal
+   * @protected
    */
   _updateValidity(...args: unknown[]): void;
 }
@@ -83,7 +95,7 @@ export interface FormMixinInterface {
  */
 export function FormMixin<TBase extends Constructor<HelixElement>>(
   superClass: TBase,
-): TBase & Constructor<FormMixinInterface> {
+): TBase & Constructor<FormMixinInterface & FormMixinProtectedHooks> {
   class FormMixinClass extends (superClass as Constructor<HelixElement>) {
     // ─── Interaction State ───────────────────────────────────────────────────
 
@@ -153,9 +165,11 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
      * Override in the host component to run constraint validation logic.
      * Called automatically by `updated()`. Use `this._internals.setValidity()`
      * inside this method.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract — compiler-enforced protected;
+     * do not call from outside a subclass.
      */
-    _updateValidity(): void {
+    protected _updateValidity(): void {
       // Default: valid. Subclasses override to apply constraints.
     }
 
@@ -163,9 +177,11 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
 
     /**
      * Advance `dirty` state. Call from the native input's `input` event.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract — compiler-enforced protected;
+     * do not call from outside a subclass.
      */
-    _handleInteractionInput(): void {
+    protected _handleInteractionInput(): void {
       if (!this._dirty) {
         const prev = this._dirty;
         this._dirty = true;
@@ -175,9 +191,11 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
 
     /**
      * Advance `touched` state. Call from the native input's `blur` event.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract — compiler-enforced protected;
+     * do not call from outside a subclass.
      */
-    _handleInteractionBlur(): void {
+    protected _handleInteractionBlur(): void {
       if (!this._touched) {
         const prev = this._touched;
         this._touched = true;
@@ -188,9 +206,11 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
     /**
      * Reset interaction state to initial values.
      * Call from `_onFormReset()` in the host component.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract — compiler-enforced protected;
+     * do not call from outside a subclass.
      */
-    _resetInteractionState(): void {
+    protected _resetInteractionState(): void {
       if (this._dirty || this._touched) {
         const prevDirty = this._dirty;
         const prevTouched = this._touched;
@@ -202,5 +222,6 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
     }
   }
 
-  return FormMixinClass as unknown as TBase & Constructor<FormMixinInterface>;
+  return FormMixinClass as unknown as TBase &
+    Constructor<FormMixinInterface & FormMixinProtectedHooks>;
 }

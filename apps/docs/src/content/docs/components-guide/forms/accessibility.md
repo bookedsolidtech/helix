@@ -74,7 +74,7 @@ These attributes connect controls to their accessible names and descriptions.
 
 **`aria-label`** — sets an accessible name directly as a string:
 ```html
-<hx-text-input aria-label="Search products"></hx-text-input>
+<hx-text-input accessible-label="Search products"></hx-text-input>
 ```
 
 **`aria-labelledby`** — points to the ID of a visible label element. Works for elements in the same DOM scope; cross-shadow-DOM references require `mixinDelegatesAria` (see below):
@@ -142,7 +142,7 @@ Using `ElementInternals` ARIA properties is preferable to adding ARIA attributes
 
 ## `mixinDelegatesAria` — Forwarding Host Attributes to Shadow Elements
 
-The standard challenge: a consumer writes `<hx-button aria-label="Close">` but the `aria-label` on the host `<hx-button>` does not automatically reach the `<button>` inside the shadow root — the assistive technology sees it on the wrong element.
+The standard challenge: a consumer writes `<hx-button accessible-label="Close">` but the `aria-label` on the host `<hx-button>` does not automatically reach the `<button>` inside the shadow root — the assistive technology sees it on the wrong element.
 
 HELiX's `mixinDelegatesAria` solves this by observing ARIA attributes on the host and mirroring them to the designated inner element:
 
@@ -173,8 +173,8 @@ export class HelixButton extends Base {
 Consumer usage:
 
 ```html
-<!-- aria-label, aria-expanded, aria-controls automatically forwarded to inner <button> -->
-<hx-button aria-label="Close dialog" aria-expanded="false" aria-controls="dialog-1">
+<!-- accessible-label, aria-expanded, aria-controls automatically forwarded to inner <button> -->
+<hx-button accessible-label="Close dialog" aria-expanded="false" aria-controls="dialog-1">
   Close
 </hx-button>
 ```

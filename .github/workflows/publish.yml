@@ -54,6 +54,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Regenerate Custom Elements Manifest
+        run: pnpm --filter=@helixui/library run cem
+        # CEM must be up-to-date with the tagged commit. Regenerating here
+        # catches any stale manifest that would ship to consumers with
+        # inaccurate API docs or broken React wrapper generation.
+
+      - name: Verify CEM matches committed manifest
+        run: |
+          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+            echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            exit 1
+          fi
+          echo "CEM matches committed manifest."
+
       - name: Build packages
         run: pnpm turbo run build --filter='!docs'
 
@@ -128,6 +142,15 @@ jobs:
     needs: secret-scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # ── Human-in-the-loop release gate ──────────────────────────────────────
+    # The `npm-publish` GitHub Environment enforces required-reviewer approval
+    # before this job runs. Configure in repo Settings → Environments:
+    #   1. Create environment `npm-publish`
+    #   2. Add Jake as a required reviewer (Protection rules → Required reviewers)
+    #   3. Set wait timer to 0 — the gate is a reviewer click, not a delay
+    # Without this environment configured, the job will fail at queue time
+    # with an "environment does not exist" error. See docs/releases/README.md.
+    environment: npm-publish
     steps:
       - uses: actions/checkout@v4
         with:
@@ -149,6 +172,20 @@ jobs:
 
       - name: Build CDN artifacts
         run: pnpm --filter=@helixui/library run build:cdn
+
+      - name: Generate release manifest
+        id: manifest
+        run: node scripts/generate-release-manifest.mjs
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REF: ${{ github.ref }}
+        # Emits docs/releases/<tag>-manifest.json with SHA, CI run ID,
+        # changeset list, bundle size snapshot, CEM SHA, and publish actor.
+        # Committed as part of the version-bump PR that changesets/action
+        # creates below.
 
       - name: Version and Publish
         uses: changesets/action@v1

@@ -595,7 +595,7 @@ Patient summary cards in a list that lift on hover to indicate interactivity.
 
 ```css
 /* Base: minimal shadow */
-hx-card[hx-href]::part(card) {
+hx-card[href]::part(card) {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   transition:
     box-shadow 200ms ease,
@@ -604,7 +604,7 @@ hx-card[hx-href]::part(card) {
 }
 
 /* Hover: elevation lift */
-hx-card[hx-href]:hover::part(card) {
+hx-card[href]:hover::part(card) {
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.1),
     0 2px 4px rgba(0, 0, 0, 0.08);
@@ -612,7 +612,7 @@ hx-card[hx-href]:hover::part(card) {
 }
 
 /* Focus: visible ring for keyboard navigation */
-hx-card[hx-href]:focus-within::part(card) {
+hx-card[href]:focus-within::part(card) {
   outline: 3px solid var(--hx-color-primary-500);
   outline-offset: 2px;
   box-shadow:
@@ -621,7 +621,7 @@ hx-card[hx-href]:focus-within::part(card) {
 }
 
 /* Active: depress on click */
-hx-card[hx-href]:active::part(card) {
+hx-card[href]:active::part(card) {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }

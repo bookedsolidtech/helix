@@ -119,7 +119,7 @@ For fine-grained control, override the fields template:
 <hx-card
   variant="compact"
   elevation="raised"
-  hx-href="{{ fields.path.content|striptags|trim }}"
+  href="{{ fields.path.content|striptags|trim }}"
 >
   {# Image field in media slot #}
   {% if fields.field_hero_image.content %}
@@ -287,7 +287,7 @@ Create the corresponding Twig template:
     <hx-card
       variant="{{ options.card_variant }}"
       elevation="{{ options.card_elevation }}"
-      {% if link_url %}hx-href="{{ link_url }}"{% endif %}
+      {% if link_url %}href="{{ link_url }}"{% endif %}
     >
       {# Map fields to slots based on plugin configuration #}
       {% if options.image_field and row.content[options.image_field] %}
@@ -554,7 +554,7 @@ class HelixCardRow extends EntityRow {
 <hx-card
   variant="{{ options.card_variant }}"
   elevation="{{ options.card_elevation }}"
-  hx-href="{{ url }}"
+  href="{{ url }}"
 >
   {# Render entity using configured view mode #}
   {% if entity.field_hero_image.value %}
@@ -707,7 +707,7 @@ Create `views-view-fields--patient-list.html.twig`:
 <hx-card
   variant="default"
   elevation="raised"
-  hx-href="{{ fields.view_patient.content|render|striptags|trim }}"
+  href="{{ fields.view_patient.content|render|striptags|trim }}"
 >
   {# Patient photo in image slot #}
   {% if fields.field_patient_photo.content %}
@@ -822,7 +822,7 @@ A responsive, accessible patient list where each card:
 
 - Shows patient photo, name, MRN, last visit, and status
 - Uses color-coded badge for status (green for Active, yellow for Pending, gray for Inactive)
-- Entire card is clickable via `hx-href`
+- Entire card is clickable via `href`
 - Action button provides redundant navigation for keyboard users
 - Content is visible before JavaScript loads
 - Meets WCAG 2.1 AA standards (HHS healthcare mandate)
@@ -899,10 +899,10 @@ Don't re-process field values in templates unless necessary.
 
 ### 6. Accessibility: Provide Redundant Navigation
 
-When using clickable cards (`hx-href`), include explicit action buttons for keyboard users:
+When using clickable cards (`href`), include explicit action buttons for keyboard users:
 
 ```twig
-<hx-card hx-href="{{ url }}">
+<hx-card href="{{ url }}">
   <span slot="heading">{{ title }}</span>
   {{ body }}
   <div slot="actions">
@@ -979,7 +979,7 @@ Clear caches after template changes: `drush cr`
 
 ### Click Handlers Not Working
 
-**Symptom:** `hx-href` doesn't navigate
+**Symptom:** `href` doesn't navigate
 **Cause:** JavaScript error or incorrect URL value
 **Solution:** Check browser console, verify URL is clean (use `|striptags|trim` filter)
 

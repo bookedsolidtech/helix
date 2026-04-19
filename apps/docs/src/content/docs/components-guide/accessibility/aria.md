@@ -180,7 +180,7 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
 With this pattern, consumers can write:
 
 ```html
-<hx-button aria-label="Close dialog">X</hx-button>
+<hx-button accessible-label="Close dialog">X</hx-button>
 ```
 
 And the `aria-label` will be reflected onto the inner `<button>`.

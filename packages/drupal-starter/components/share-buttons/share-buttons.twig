@@ -19,8 +19,8 @@
     {% if 'twitter' in active_platforms %}
       <hx-button
         variant="ghost"
-        size="sm"
-        aria-label="Share on Twitter"
+        hx-size="sm"
+        accessible-label="Share on Twitter"
         onclick="window.open('https://twitter.com/intent/tweet?url={{ share_url }}&text={{ share_title }}', '_blank', 'noopener,noreferrer')"
       >
         <hx-icon name="twitter" slot="prefix"></hx-icon>
@@ -30,8 +30,8 @@
     {% if 'facebook' in active_platforms %}
       <hx-button
         variant="ghost"
-        size="sm"
-        aria-label="Share on Facebook"
+        hx-size="sm"
+        accessible-label="Share on Facebook"
         onclick="window.open('https://www.facebook.com/sharer/sharer.php?u={{ share_url }}', '_blank', 'noopener,noreferrer')"
       >
         <hx-icon name="facebook" slot="prefix"></hx-icon>
@@ -41,8 +41,8 @@
     {% if 'linkedin' in active_platforms %}
       <hx-button
         variant="ghost"
-        size="sm"
-        aria-label="Share on LinkedIn"
+        hx-size="sm"
+        accessible-label="Share on LinkedIn"
         onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url={{ share_url }}', '_blank', 'noopener,noreferrer')"
       >
         <hx-icon name="linkedin" slot="prefix"></hx-icon>
@@ -52,8 +52,8 @@
     {% if 'email' in active_platforms %}
       <hx-button
         variant="ghost"
-        size="sm"
-        aria-label="Share via email"
+        hx-size="sm"
+        accessible-label="Share via email"
         onclick="window.location.href='mailto:?subject={{ share_title }}&body={{ share_url }}'"
       >
         <hx-icon name="email" slot="prefix"></hx-icon>

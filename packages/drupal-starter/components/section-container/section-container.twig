@@ -16,7 +16,7 @@
 ] %}
 
 <section class="{{ classes|join(' ') }}">
-  <hx-container{% if variant|default('default') == 'narrow' %} size="narrow"{% elseif variant|default('default') == 'wide' %} size="wide"{% elseif variant|default('default') == 'full' %} size="full"{% endif %}>
+  <hx-container{% if variant|default('default') == 'narrow' %} hx-size="narrow"{% elseif variant|default('default') == 'wide' %} hx-size="wide"{% elseif variant|default('default') == 'full' %} hx-size="full"{% endif %}>
     {% if content %}
       {{ content }}
     {% endif %}

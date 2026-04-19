@@ -21,7 +21,7 @@
             <hx-link href="{{ tag.url }}">
               <hx-tag
                 {% if tag_variant == 'weighted' and tag.count is defined %}
-                  size="{{ tag.count > 10 ? 'lg' : (tag.count > 5 ? 'md' : 'sm') }}"
+                  hx-size="{{ tag.count > 10 ? 'lg' : (tag.count > 5 ? 'md' : 'sm') }}"
                 {% endif %}
               >
                 {{ tag.name }}
@@ -33,7 +33,7 @@
           {% else %}
             <hx-tag
               {% if tag_variant == 'weighted' and tag.count is defined %}
-                size="{{ tag.count > 10 ? 'lg' : (tag.count > 5 ? 'md' : 'sm') }}"
+                hx-size="{{ tag.count > 10 ? 'lg' : (tag.count > 5 ? 'md' : 'sm') }}"
               {% endif %}
             >
               {{ tag.name }}

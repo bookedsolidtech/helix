@@ -131,7 +131,7 @@ export class HelixButton extends Base {
 With `mixinDelegatesAria`, a consumer can write:
 
 ```html
-<hx-button aria-label="Close dialog">X</hx-button>
+<hx-button accessible-label="Close dialog">X</hx-button>
 ```
 
 And the `aria-label` correctly targets the inner `<button>` — not the `<hx-button>` host element that assistive technologies would otherwise see as a generic `div`.

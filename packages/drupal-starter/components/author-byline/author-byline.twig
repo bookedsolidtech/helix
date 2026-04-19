@@ -15,24 +15,24 @@
     <hx-avatar
       src="{{ image_url }}"
       alt="{{ image_alt|default(name ~ ' avatar') }}"
-      size="sm"
+      hx-size="sm"
     ></hx-avatar>
   {% endif %}
   <div class="author-byline__info">
     <div class="author-byline__name-line">
       {% if url %}
         <hx-link href="{{ url }}">
-          <hx-text variant="body" size="sm" weight="bold">{{ name }}</hx-text>
+          <hx-text variant="body" hx-size="sm" weight="bold">{{ name }}</hx-text>
         </hx-link>
       {% else %}
-        <hx-text variant="body" size="sm" weight="bold">{{ name }}</hx-text>
+        <hx-text variant="body" hx-size="sm" weight="bold">{{ name }}</hx-text>
       {% endif %}
       {% if role %}
-        <hx-text variant="body" size="sm" color="muted">{{ role }}</hx-text>
+        <hx-text variant="body" hx-size="sm" color="muted">{{ role }}</hx-text>
       {% endif %}
     </div>
     {% if date %}
-      <hx-text variant="body" size="xs" color="muted">
+      <hx-text variant="body" hx-size="xs" color="muted">
         <time datetime="{{ date }}">{{ date }}</time>
       </hx-text>
     {% endif %}

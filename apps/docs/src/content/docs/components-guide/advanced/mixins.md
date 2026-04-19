@@ -88,7 +88,7 @@ export class HelixButton extends mixinDelegatesAria(LitElement) {
 }
 ```
 
-When a consumer writes `<hx-button aria-label="Close">`, the mixin:
+When a consumer writes `<hx-button accessible-label="Close">`, the mixin:
 
 1. Intercepts `attributeChangedCallback('aria-label', null, 'Close')`
 2. Sets `data-aria-label="Close"` on the host

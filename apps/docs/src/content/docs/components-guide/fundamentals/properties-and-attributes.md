@@ -12,7 +12,7 @@ One of the most important distinctions in Web Components development is the diff
 Attributes live in the HTML and are always strings. They appear in source markup and in DevTools' "Elements" panel:
 
 ```html
-<hx-button variant="primary" disabled aria-label="Submit form"></hx-button>
+<hx-button variant="primary" disabled accessible-label="Submit form"></hx-button>
 ```
 
 Attributes are accessible via:

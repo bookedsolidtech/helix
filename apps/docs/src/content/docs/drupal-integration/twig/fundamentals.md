@@ -181,8 +181,8 @@ HELIX components use `hx-` prefixed attributes to avoid conflicts with reserved 
 {# hx-size (not size, which is reserved for input elements) #}
 <hx-button hx-size="lg" variant="primary">Large Button</hx-button>
 
-{# hx-href (not href, which creates routing ambiguity) #}
-<hx-card hx-href="/patient/123" variant="default">
+{# href — the full card becomes a link and fires hx-click on activation #}
+<hx-card href="/patient/123" variant="default">
   <span slot="heading">Patient Record</span>
   Click anywhere on this card to navigate
 </hx-card>
@@ -539,7 +539,7 @@ JavaScript initialization via Drupal Behavior:
           <hx-card
             variant="compact"
             elevation="raised"
-            hx-href="{{ path('entity.node.canonical', {'node': item.target_id}) }}"
+            href="{{ path('entity.node.canonical', {'node': item.target_id}) }}"
           >
             {% if item.entity.field_thumbnail %}
               <img
@@ -569,7 +569,7 @@ JavaScript initialization via Drupal Behavior:
     <hx-card
       variant="default"
       elevation="raised"
-      hx-href="{{ path('entity.node.canonical', {'node': row_content._entity.id}) }}"
+      href="{{ path('entity.node.canonical', {'node': row_content._entity.id}) }}"
     >
       {# Patient photo #}
       {% if row_content._entity.field_photo %}
@@ -788,7 +788,7 @@ HELIX form components work with Drupal's Form API through native HTML form parti
 <hx-card
   variant="default"
   elevation="raised"
-  hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+  href="{{ url('entity.node.canonical', {'node': node.id}) }}"
   {{ attributes.addClass('patient-card') }}
 >
   {# Patient photo #}

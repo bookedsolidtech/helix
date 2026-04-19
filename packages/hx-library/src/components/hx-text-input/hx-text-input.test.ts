@@ -13,9 +13,6 @@ import type { HxTextInput } from './hx-text-input.js';
 import { HelixTextInput } from './hx-text-input.js';
 import './index.js';
 
-// Backward-compat alias used throughout tests
-type WcTextInput = HxTextInput;
-
 afterEach(cleanup);
 
 describe('hx-text-input', () => {
@@ -23,24 +20,24 @@ describe('hx-text-input', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders native <input>', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery(el, 'input');
       expect(input).toBeInstanceOf(HTMLInputElement);
     });
 
     it('exposes "field" CSS part', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const field = shadowQuery(el, '[part="field"]');
       expect(field).toBeTruthy();
     });
 
     it('exposes "input" CSS part', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery(el, '[part="input"]');
       expect(input).toBeTruthy();
     });
@@ -50,19 +47,19 @@ describe('hx-text-input', () => {
 
   describe('Property: label', () => {
     it('renders label text', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input label="Username"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input label="Username"></hx-text-input>');
       const label = shadowQuery(el, 'label');
       expect(label?.textContent?.trim()).toContain('Username');
     });
 
     it('does not render label when empty', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const label = shadowQuery(el, 'label');
       expect(label).toBeNull();
     });
 
     it('shows asterisk when required', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input label="Email" required></hx-text-input>',
       );
       const marker = shadowQuery(el, '.field__required-marker');
@@ -75,7 +72,7 @@ describe('hx-text-input', () => {
 
   describe('Property: placeholder', () => {
     it('sets placeholder attr on native input', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input placeholder="Enter text..."></hx-text-input>',
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -87,13 +84,13 @@ describe('hx-text-input', () => {
 
   describe('Property: value', () => {
     it('syncs value to native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input value="hello"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input value="hello"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.value).toBe('hello');
     });
 
     it('programmatic value update is reflected', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       el.value = 'updated';
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -105,49 +102,49 @@ describe('hx-text-input', () => {
 
   describe('Property: type', () => {
     it('defaults to type=text', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('text');
     });
 
     it('sets email type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="email"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="email"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('email');
     });
 
     it('sets password type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="password"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="password"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('password');
     });
 
     it('sets number type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="number"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="number"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('number');
     });
 
     it('sets tel type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="tel"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="tel"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('tel');
     });
 
     it('sets url type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="url"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="url"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('url');
     });
 
     it('sets search type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="search"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="search"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('search');
     });
 
     it('sets date type', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input type="date"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input type="date"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('type')).toBe('date');
     });
@@ -157,13 +154,13 @@ describe('hx-text-input', () => {
 
   describe('Property: required', () => {
     it('sets required attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.required).toBe(true);
     });
 
     it('native required attribute implies aria-required — no explicit aria-required set', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       // Native `required` maps to aria-required implicitly; we do NOT set it explicitly
       // to follow the "prefer native semantics" principle (avoids redundant ARIA).
@@ -176,13 +173,13 @@ describe('hx-text-input', () => {
 
   describe('Property: disabled', () => {
     it('sets disabled attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input disabled></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.disabled).toBe(true);
     });
 
     it('applies host opacity via disabled attribute', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input disabled></hx-text-input>');
       expect(el.hasAttribute('disabled')).toBe(true);
     });
   });
@@ -191,7 +188,7 @@ describe('hx-text-input', () => {
 
   describe('Property: error', () => {
     it('renders error message in role="alert" div', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input error="Required field"></hx-text-input>',
       );
       const errorDiv = shadowQuery(el, '[role="alert"]');
@@ -200,19 +197,19 @@ describe('hx-text-input', () => {
     });
 
     it('error div has role="alert"', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="Required"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="Required"></hx-text-input>');
       const errorDiv = shadowQuery(el, '.field__error');
       expect(errorDiv?.getAttribute('role')).toBe('alert');
     });
 
     it('sets aria-invalid="true" on input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="Required"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="Required"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('aria-invalid')).toBe('true');
     });
 
     it('error hides help text', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input error="Error" help-text="Help"></hx-text-input>',
       );
       const helpText = shadowQuery(el, '.field__help-text');
@@ -224,7 +221,7 @@ describe('hx-text-input', () => {
 
   describe('Property: helpText', () => {
     it('renders help text below input', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input help-text="Enter your username"></hx-text-input>',
       );
       const helpText = shadowQuery(el, '.field__help-text');
@@ -233,7 +230,7 @@ describe('hx-text-input', () => {
     });
 
     it('help text hidden when error present', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input help-text="Help" error="Error"></hx-text-input>',
       );
       const helpText = shadowQuery(el, '.field__help-text');
@@ -245,7 +242,7 @@ describe('hx-text-input', () => {
 
   describe('Property: name', () => {
     it('sets name attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input name="username"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input name="username"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('name')).toBe('username');
     });
@@ -255,7 +252,7 @@ describe('hx-text-input', () => {
 
   describe('Property: ariaLabel', () => {
     it('sets aria-label on native input', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input accessible-label="Search field"></hx-text-input>',
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -267,7 +264,7 @@ describe('hx-text-input', () => {
 
   describe('Events', () => {
     it('dispatches hx-input on keystroke', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
       input.value = 'a';
@@ -277,7 +274,7 @@ describe('hx-text-input', () => {
     });
 
     it('hx-input detail.value is correct', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
       input.value = 'hello';
@@ -287,7 +284,7 @@ describe('hx-text-input', () => {
     });
 
     it('dispatches hx-change on blur', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       input.value = 'changed';
@@ -297,7 +294,7 @@ describe('hx-text-input', () => {
     });
 
     it('hx-change bubbles and is composed', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       input.value = 'test';
@@ -308,7 +305,7 @@ describe('hx-text-input', () => {
     });
 
     it('hx-input bubbles and is composed', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
       input.value = 'x';
@@ -323,7 +320,7 @@ describe('hx-text-input', () => {
 
   describe('Slots', () => {
     it('prefix slot renders', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><span slot="prefix">@</span></hx-text-input>',
       );
       const prefix = el.querySelector('[slot="prefix"]');
@@ -332,7 +329,7 @@ describe('hx-text-input', () => {
     });
 
     it('suffix slot renders', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><span slot="suffix">.com</span></hx-text-input>',
       );
       const suffix = el.querySelector('[slot="suffix"]');
@@ -341,7 +338,7 @@ describe('hx-text-input', () => {
     });
 
     it('help-text slot renders', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input help-text="default"><em slot="help-text">Custom help</em></hx-text-input>',
       );
       const helpSlot = el.querySelector('[slot="help-text"]');
@@ -354,13 +351,13 @@ describe('hx-text-input', () => {
 
   describe('CSS Parts', () => {
     it('label part exposed', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input label="Test"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input label="Test"></hx-text-input>');
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
 
     it('input-wrapper part exposed', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const wrapper = shadowQuery(el, '[part="input-wrapper"]');
       expect(wrapper).toBeTruthy();
     });
@@ -375,7 +372,7 @@ describe('hx-text-input', () => {
     });
 
     it('has ElementInternals attached', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       expect(el.form).toBe(null);
     });
 
@@ -383,20 +380,20 @@ describe('hx-text-input', () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-text-input name="test"></hx-text-input>';
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-text-input') as WcTextInput;
+      const el = form.querySelector('hx-text-input') as HxTextInput;
       await el.updateComplete;
       expect(el.form).toBe(form);
     });
 
     it('formResetCallback resets value to empty', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input value="hello"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input value="hello"></hx-text-input>');
       el.formResetCallback();
       await el.updateComplete;
       expect(el.value).toBe('');
     });
 
     it('formStateRestoreCallback restores value', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       el.formStateRestoreCallback('restored');
       await el.updateComplete;
       expect(el.value).toBe('restored');
@@ -406,7 +403,7 @@ describe('hx-text-input', () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-text-input name="username" value="jane"></hx-text-input>';
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-text-input') as WcTextInput;
+      const el = form.querySelector('hx-text-input') as HxTextInput;
       await el.updateComplete;
       const data = new FormData(form);
       expect(data.get('username')).toBe('jane');
@@ -414,7 +411,7 @@ describe('hx-text-input', () => {
     });
 
     it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       el.formDisabledCallback(true);
       await el.updateComplete;
       expect(el.disabled).toBe(true);
@@ -428,42 +425,42 @@ describe('hx-text-input', () => {
 
   describe('Validation', () => {
     it('checkValidity returns false when required + empty', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       expect(el.checkValidity()).toBe(false);
     });
 
     it('checkValidity returns true when required + filled', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input required value="filled"></hx-text-input>',
       );
       expect(el.checkValidity()).toBe(true);
     });
 
     it('valueMissing validity flag is set when required + empty', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       expect(el.validity.valueMissing).toBe(true);
     });
 
     it('reportValidity returns false when required + empty', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       expect(el.reportValidity()).toBe(false);
     });
 
     it('reportValidity returns true when required + filled', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input required value="filled"></hx-text-input>',
       );
       expect(el.reportValidity()).toBe(true);
     });
 
     it('validationMessage is set when required + empty', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       await el.updateComplete;
       expect(el.validationMessage).toBeTruthy();
     });
 
     it('tooShort validity flag set when value shorter than minlength', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input minlength="5" value="ab"></hx-text-input>',
       );
       await el.updateComplete;
@@ -471,7 +468,7 @@ describe('hx-text-input', () => {
     });
 
     it('tooLong validity flag set when value longer than maxlength', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input maxlength="3" value="toolong"></hx-text-input>',
       );
       await el.updateComplete;
@@ -483,7 +480,7 @@ describe('hx-text-input', () => {
 
   describe('Methods', () => {
     it('focus() moves focus to native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       el.focus();
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -491,7 +488,7 @@ describe('hx-text-input', () => {
     });
 
     it('select() selects text in native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input value="hello world"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input value="hello world"></hx-text-input>');
       el.focus();
       el.select();
       await el.updateComplete;
@@ -505,7 +502,7 @@ describe('hx-text-input', () => {
 
   describe('aria-describedby', () => {
     it('references error ID when error set', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="Bad input"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="Bad input"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const errorDiv = shadowQuery(el, '.field__error')!;
       const describedBy = input.getAttribute('aria-describedby');
@@ -513,7 +510,7 @@ describe('hx-text-input', () => {
     });
 
     it('references help text ID when helpText set', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input help-text="Some help"></hx-text-input>',
       );
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -527,13 +524,13 @@ describe('hx-text-input', () => {
 
   describe('Property: readonly', () => {
     it('sets readonly attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input readonly></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input readonly></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.readOnly).toBe(true);
     });
 
     it('reflects readonly attribute to host', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input readonly></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input readonly></hx-text-input>');
       expect(el.hasAttribute('readonly')).toBe(true);
     });
   });
@@ -542,18 +539,18 @@ describe('hx-text-input', () => {
 
   describe('Property: hxSize', () => {
     it('defaults to md', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       expect(el.size).toBe('md');
     });
 
     it('applies field--size-sm class', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input hx-size="sm"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input hx-size="sm"></hx-text-input>');
       const field = shadowQuery(el, '.field');
       expect(field?.classList.contains('field--size-sm')).toBe(true);
     });
 
     it('applies field--size-lg class', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input hx-size="lg"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input hx-size="lg"></hx-text-input>');
       const field = shadowQuery(el, '.field');
       expect(field?.classList.contains('field--size-lg')).toBe(true);
     });
@@ -563,13 +560,13 @@ describe('hx-text-input', () => {
 
   describe('Property: minlength/maxlength', () => {
     it('sets minlength attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input minlength="3"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input minlength="3"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('minlength')).toBe('3');
     });
 
     it('sets maxlength attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input maxlength="50"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input maxlength="50"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('maxlength')).toBe('50');
     });
@@ -579,7 +576,7 @@ describe('hx-text-input', () => {
 
   describe('Property: pattern', () => {
     it('sets pattern attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input pattern="[A-Z]+"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input pattern="[A-Z]+"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('pattern')).toBe('[A-Z]+');
     });
@@ -589,7 +586,7 @@ describe('hx-text-input', () => {
 
   describe('Property: autocomplete', () => {
     it('sets autocomplete attr on native input', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input autocomplete="email"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input autocomplete="email"></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('autocomplete')).toBe('email');
     });
@@ -599,7 +596,7 @@ describe('hx-text-input', () => {
 
   describe('Slots: label and error', () => {
     it('label slot renders slotted content', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><label slot="label">Custom Label</label></hx-text-input>',
       );
       const slotted = el.querySelector('[slot="label"]');
@@ -608,7 +605,7 @@ describe('hx-text-input', () => {
     });
 
     it('error slot renders slotted content', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><div slot="error">Custom Error</div></hx-text-input>',
       );
       const slotted = el.querySelector('[slot="error"]');
@@ -621,7 +618,7 @@ describe('hx-text-input', () => {
 
   describe('Slot: error and help-text ARIA correctness', () => {
     it('slotted error activates error state (aria-invalid) without error attr', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><div slot="error">Slotted error</div></hx-text-input>',
       );
       await el.updateComplete;
@@ -630,7 +627,7 @@ describe('hx-text-input', () => {
     });
 
     it('slotted error wrapper has ID for aria-describedby', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><div slot="error">Slotted error</div></hx-text-input>',
       );
       await el.updateComplete;
@@ -641,7 +638,7 @@ describe('hx-text-input', () => {
     });
 
     it('help-text slot renders wrapper without helpText property (P0-01)', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><em slot="help-text">Rich help</em></hx-text-input>',
       );
       await el.updateComplete;
@@ -650,7 +647,7 @@ describe('hx-text-input', () => {
     });
 
     it('slotted help-text is included in aria-describedby (P1-03)', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><em slot="help-text">Rich help</em></hx-text-input>',
       );
       await el.updateComplete;
@@ -665,7 +662,7 @@ describe('hx-text-input', () => {
 
   describe('CSS Parts: help-text and error', () => {
     it('help-text part exposed', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input help-text="Some help"></hx-text-input>',
       );
       const helpText = shadowQuery(el, '[part="help-text"]');
@@ -673,7 +670,7 @@ describe('hx-text-input', () => {
     });
 
     it('error part exposed', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="An error"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="An error"></hx-text-input>');
       const errorPart = shadowQuery(el, '[part="error"]');
       expect(errorPart).toBeTruthy();
     });
@@ -697,13 +694,13 @@ describe('hx-text-input', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
     });
 
     it('has no axe violations in error state', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input label="Email" error="Invalid email"></hx-text-input>',
       );
       const { violations } = await checkA11y(el);
@@ -711,7 +708,7 @@ describe('hx-text-input', () => {
     });
 
     it('has no axe violations when disabled', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input label="Name" disabled></hx-text-input>',
       );
       const { violations } = await checkA11y(el);
@@ -719,7 +716,7 @@ describe('hx-text-input', () => {
     });
 
     it('has no axe violations when required', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input label="Name" required></hx-text-input>',
       );
       const { violations } = await checkA11y(el);
@@ -731,19 +728,19 @@ describe('hx-text-input', () => {
 
   describe('Property: requiredMessage', () => {
     it('defaults to "This field is required."', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       expect(el.requiredMessage).toBe('This field is required.');
     });
 
     it('accepts custom requiredMessage attribute', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input required required-message="Ce champ est obligatoire."></hx-text-input>',
       );
       expect(el.requiredMessage).toBe('Ce champ est obligatoire.');
     });
 
     it('uses requiredMessage as validation message when required and empty', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input required required-message="Please fill this in."></hx-text-input>',
       );
       await el.updateComplete;
@@ -756,7 +753,7 @@ describe('hx-text-input', () => {
 
   describe('Property: disabled — event suppression', () => {
     it('hx-input does not fire while disabled when input event is dispatched natively', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input disabled></hx-text-input>');
       // The native input is disabled — browser won't fire input events on it,
       // but we verify the disabled class is applied and the input is inert.
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -764,13 +761,13 @@ describe('hx-text-input', () => {
     });
 
     it('applies field--disabled class when disabled', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input disabled></hx-text-input>');
       const field = shadowQuery(el, '.field');
       expect(field?.classList.contains('field--disabled')).toBe(true);
     });
 
     it('programmatic disabled=false removes disabled class', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input disabled></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input disabled></hx-text-input>');
       el.disabled = false;
       await el.updateComplete;
       const field = shadowQuery(el, '.field');
@@ -782,13 +779,13 @@ describe('hx-text-input', () => {
 
   describe('Property: required — class applied', () => {
     it('applies field--required class when required', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       const field = shadowQuery(el, '.field');
       expect(field?.classList.contains('field--required')).toBe(true);
     });
 
     it('reflects required attribute to host', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input required></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
       expect(el.hasAttribute('required')).toBe(true);
     });
   });
@@ -797,13 +794,13 @@ describe('hx-text-input', () => {
 
   describe('Property: error — class applied', () => {
     it('applies field--error class when error set', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="Bad"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="Bad"></hx-text-input>');
       const field = shadowQuery(el, '.field');
       expect(field?.classList.contains('field--error')).toBe(true);
     });
 
     it('removes field--error class when error cleared', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="Bad"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="Bad"></hx-text-input>');
       el.error = '';
       await el.updateComplete;
       const field = shadowQuery(el, '.field');
@@ -811,7 +808,7 @@ describe('hx-text-input', () => {
     });
 
     it('error div has aria-atomic="true"', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input error="Oops"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input error="Oops"></hx-text-input>');
       const errorDiv = shadowQuery(el, '.field__error');
       expect(errorDiv?.getAttribute('aria-atomic')).toBe('true');
     });
@@ -821,7 +818,7 @@ describe('hx-text-input', () => {
 
   describe('hx-input event detail', () => {
     it('hx-input detail.value matches the typed value', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
       input.value = 'typed';
@@ -831,7 +828,7 @@ describe('hx-text-input', () => {
     });
 
     it('hx-input updates component value property', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
       input.value = 'synced';
@@ -845,7 +842,7 @@ describe('hx-text-input', () => {
 
   describe('hx-change event detail', () => {
     it('hx-change detail.value matches the changed value', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       input.value = 'final';
@@ -855,7 +852,7 @@ describe('hx-text-input', () => {
     });
 
     it('hx-change updates component value property', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       input.value = 'changed-value';
@@ -869,7 +866,7 @@ describe('hx-text-input', () => {
 
   describe('Validation: minlength/maxlength messages', () => {
     it('tooShort validationMessage references minlength', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input minlength="5" value="ab"></hx-text-input>',
       );
       await el.updateComplete;
@@ -877,7 +874,7 @@ describe('hx-text-input', () => {
     });
 
     it('tooLong validationMessage references maxlength', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input maxlength="3" value="toolong"></hx-text-input>',
       );
       await el.updateComplete;
@@ -885,7 +882,7 @@ describe('hx-text-input', () => {
     });
 
     it('valid when value equals minlength exactly', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input minlength="3" value="abc"></hx-text-input>',
       );
       await el.updateComplete;
@@ -894,7 +891,7 @@ describe('hx-text-input', () => {
     });
 
     it('valid when value equals maxlength exactly', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input maxlength="5" value="abcde"></hx-text-input>',
       );
       await el.updateComplete;
@@ -903,7 +900,7 @@ describe('hx-text-input', () => {
     });
 
     it('tooShort not set when value is empty (minlength only applies to non-empty values)', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input minlength="5"></hx-text-input>',
       );
       await el.updateComplete;
@@ -911,7 +908,7 @@ describe('hx-text-input', () => {
     });
 
     it('custom error message overrides tooShort validation message', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input minlength="5" value="ab" error="Custom error"></hx-text-input>',
       );
       await el.updateComplete;
@@ -923,7 +920,7 @@ describe('hx-text-input', () => {
 
   describe('Slot: prefix and suffix filled class', () => {
     it('prefix slot adds field__prefix--filled class', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><span slot="prefix">$</span></hx-text-input>',
       );
       await el.updateComplete;
@@ -932,7 +929,7 @@ describe('hx-text-input', () => {
     });
 
     it('suffix slot adds field__suffix--filled class', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><span slot="suffix">.00</span></hx-text-input>',
       );
       await el.updateComplete;
@@ -941,7 +938,7 @@ describe('hx-text-input', () => {
     });
 
     it('prefix slot without content does not add filled class', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       await el.updateComplete;
       const prefix = shadowQuery(el, '.field__prefix');
       expect(prefix?.classList.contains('field__prefix--filled')).toBe(false);
@@ -952,7 +949,7 @@ describe('hx-text-input', () => {
 
   describe('formStateRestoreCallback — non-string state', () => {
     it('formStateRestoreCallback with null does not change value', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input value="keep"></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input value="keep"></hx-text-input>');
       el.formStateRestoreCallback(null);
       await el.updateComplete;
       // Only string state is restored; null is a no-op per the implementation
@@ -964,7 +961,7 @@ describe('hx-text-input', () => {
 
   describe('Slot: label ARIA labelledby', () => {
     it('slotted label element gets an id assigned', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><label slot="label">My Label</label></hx-text-input>',
       );
       await el.updateComplete;
@@ -973,7 +970,7 @@ describe('hx-text-input', () => {
     });
 
     it('native input uses aria-labelledby when label slot is filled', async () => {
-      const el = await fixture<WcTextInput>(
+      const el = await fixture<HxTextInput>(
         '<hx-text-input><label slot="label">My Label</label></hx-text-input>',
       );
       await el.updateComplete;
@@ -986,7 +983,7 @@ describe('hx-text-input', () => {
 
   describe('Property: hxSize — md', () => {
     it('applies field--size-md class by default', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const field = shadowQuery(el, '.field');
       expect(field?.classList.contains('field--size-md')).toBe(true);
     });
@@ -996,13 +993,13 @@ describe('hx-text-input', () => {
 
   describe('FormMixin: dirty / touched / pristine', () => {
     it('pristine is true before any user interaction', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       expect(el.pristine).toBe(true);
       expect(el.dirty).toBe(false);
     });
 
     it('dirty becomes true after input event', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.value = 'x';
       input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1012,7 +1009,7 @@ describe('hx-text-input', () => {
     });
 
     it('touched becomes true after change event', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.value = 'y';
       input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1021,12 +1018,12 @@ describe('hx-text-input', () => {
     });
 
     it('touched is false before any blur/change', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       expect(el.touched).toBe(false);
     });
 
     it('formResetCallback resets dirty to false', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.value = 'x';
       input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1039,7 +1036,7 @@ describe('hx-text-input', () => {
     });
 
     it('formResetCallback resets touched to false', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       input.value = 'y';
       input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1055,7 +1052,7 @@ describe('hx-text-input', () => {
 
   describe('Property: readonly — input still fires events', () => {
     it('readonly input still dispatches hx-input (readonly is not disabled)', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input readonly></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input readonly></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-input');
       input.value = 'r';
@@ -1069,7 +1066,7 @@ describe('hx-text-input', () => {
 
   describe('hx-change syncs value and fires composed event', () => {
     it('hx-change detail.value updates component.value', async () => {
-      const el = await fixture<WcTextInput>('<hx-text-input></hx-text-input>');
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       input.value = 'sync-test';
@@ -1083,7 +1080,7 @@ describe('hx-text-input', () => {
 
   describe('Form Integration (ElementInternals lifecycle)', () => {
     it('FormData contains the correct value on submit', async () => {
-      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el, form } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'username',
         value: 'jane',
       });
@@ -1093,7 +1090,7 @@ describe('hx-text-input', () => {
     });
 
     it('FormData value updates when value property changes before submit', async () => {
-      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el, form } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'search',
       });
       el.value = 'new-value';
@@ -1103,7 +1100,7 @@ describe('hx-text-input', () => {
     });
 
     it('FormData reflects value typed via native input event', async () => {
-      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el, form } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'query',
       });
       const nativeInput = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -1115,7 +1112,7 @@ describe('hx-text-input', () => {
     });
 
     it('form.reset() clears value via formResetCallback', async () => {
-      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el, form } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'email',
         value: 'user@example.com',
       });
@@ -1126,7 +1123,7 @@ describe('hx-text-input', () => {
     });
 
     it('FormData is empty string after form.reset()', async () => {
-      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el, form } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'email',
         value: 'user@example.com',
       });
@@ -1138,7 +1135,7 @@ describe('hx-text-input', () => {
     });
 
     it('required field with empty value fails validity check (valueMissing)', async () => {
-      const { el } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'required-field',
         required: '',
       });
@@ -1148,7 +1145,7 @@ describe('hx-text-input', () => {
     });
 
     it('required field with value passes validity check', async () => {
-      const { el } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'required-field',
         required: '',
         value: 'filled',
@@ -1158,7 +1155,7 @@ describe('hx-text-input', () => {
     });
 
     it('form.reset() restores pristine and dirty interaction state', async () => {
-      const { el, form } = await formFixture<WcTextInput>('hx-text-input', {
+      const { el, form } = await formFixture<HxTextInput>('hx-text-input', {
         name: 'field',
       });
       const nativeInput = shadowQuery<HTMLInputElement>(el, 'input')!;

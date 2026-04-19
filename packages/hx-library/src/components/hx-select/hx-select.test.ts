@@ -3,9 +3,6 @@ import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-u
 import type { HxSelect } from './hx-select.js';
 import './index.js';
 
-// Backward-compat alias used by existing tests
-type WcSelect = HxSelect;
-
 afterEach(cleanup);
 
 describe('hx-select', () => {
@@ -13,30 +10,30 @@ describe('hx-select', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders native <select>', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const select = shadowQuery(el, 'select');
       expect(select).toBeInstanceOf(HTMLSelectElement);
     });
 
     it('exposes "field" CSS part', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const field = shadowQuery(el, '[part="field"]');
       expect(field).toBeTruthy();
     });
 
     it('exposes "select" CSS part', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const select = shadowQuery(el, '[part="select"]');
       expect(select).toBeTruthy();
     });
 
     it('renders custom chevron indicator', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const chevron = shadowQuery(el, '.field__chevron');
       expect(chevron).toBeTruthy();
       expect(chevron?.getAttribute('aria-hidden')).toBe('true');
@@ -47,19 +44,19 @@ describe('hx-select', () => {
 
   describe('Property: label', () => {
     it('renders label text', async () => {
-      const el = await fixture<WcSelect>('<hx-select label="Country"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select label="Country"></hx-select>');
       const label = shadowQuery(el, 'label');
       expect(label?.textContent?.trim()).toContain('Country');
     });
 
     it('does not render label when empty', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const label = shadowQuery(el, 'label');
       expect(label).toBeNull();
     });
 
     it('shows asterisk when required', async () => {
-      const el = await fixture<WcSelect>('<hx-select label="Country" required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select label="Country" required></hx-select>');
       const marker = shadowQuery(el, '.field__required-marker');
       expect(marker).toBeTruthy();
       expect(marker?.textContent).toBe('*');
@@ -70,7 +67,7 @@ describe('hx-select', () => {
 
   describe('Property: placeholder', () => {
     it('renders placeholder as first disabled option', async () => {
-      const el = await fixture<WcSelect>('<hx-select placeholder="Choose..."></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select placeholder="Choose..."></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       const firstOption = select.querySelector('option');
       expect(firstOption).toBeTruthy();
@@ -80,7 +77,7 @@ describe('hx-select', () => {
     });
 
     it('does not render placeholder option when not set', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       const options = select.querySelectorAll('option:not([data-cloned])');
       expect(options.length).toBe(0);
@@ -91,12 +88,12 @@ describe('hx-select', () => {
 
   describe('Property: value', () => {
     it('reflects value attribute', async () => {
-      const el = await fixture<WcSelect>('<hx-select value="opt1"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select value="opt1"></hx-select>');
       expect(el.getAttribute('value')).toBe('opt1');
     });
 
     it('programmatic value update is reflected', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       el.value = 'updated';
       await el.updateComplete;
       expect(el.value).toBe('updated');
@@ -108,18 +105,18 @@ describe('hx-select', () => {
 
   describe('Property: size', () => {
     it('defaults to md', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       expect(el.size).toBe('md');
     });
 
     it('applies sm size class', async () => {
-      const el = await fixture<WcSelect>('<hx-select hx-size="sm"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select hx-size="sm"></hx-select>');
       const select = shadowQuery(el, '.field__select--sm');
       expect(select).toBeTruthy();
     });
 
     it('applies lg size class', async () => {
-      const el = await fixture<WcSelect>('<hx-select hx-size="lg"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select hx-size="lg"></hx-select>');
       const select = shadowQuery(el, '.field__select--lg');
       expect(select).toBeTruthy();
     });
@@ -129,14 +126,14 @@ describe('hx-select', () => {
 
   describe('Property: error', () => {
     it('renders error message in role="alert" div', async () => {
-      const el = await fixture<WcSelect>('<hx-select error="Required field"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select error="Required field"></hx-select>');
       const errorDiv = shadowQuery(el, '[role="alert"]');
       expect(errorDiv).toBeTruthy();
       expect(errorDiv?.textContent?.trim()).toBe('Required field');
     });
 
     it('error div does not mix role="alert" with aria-live="polite"', async () => {
-      const el = await fixture<WcSelect>('<hx-select error="Required"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select error="Required"></hx-select>');
       const errorDiv = shadowQuery(el, '.field__error');
       // role="alert" implies assertive — must not be overridden with aria-live="polite"
       expect(errorDiv?.getAttribute('role')).toBe('alert');
@@ -144,13 +141,13 @@ describe('hx-select', () => {
     });
 
     it('sets aria-invalid="true" on select', async () => {
-      const el = await fixture<WcSelect>('<hx-select error="Required"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select error="Required"></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       expect(select.getAttribute('aria-invalid')).toBe('true');
     });
 
     it('error hides help text', async () => {
-      const el = await fixture<WcSelect>('<hx-select error="Error" help-text="Help"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select error="Error" help-text="Help"></hx-select>');
       const helpText = shadowQuery(el, '.field__help-text');
       expect(helpText).toBeNull();
     });
@@ -160,14 +157,14 @@ describe('hx-select', () => {
 
   describe('Property: helpText', () => {
     it('renders help text below select', async () => {
-      const el = await fixture<WcSelect>('<hx-select help-text="Pick carefully"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select help-text="Pick carefully"></hx-select>');
       const helpText = shadowQuery(el, '.field__help-text');
       expect(helpText).toBeTruthy();
       expect(helpText?.textContent?.trim()).toContain('Pick carefully');
     });
 
     it('help text hidden when error present', async () => {
-      const el = await fixture<WcSelect>('<hx-select help-text="Help" error="Error"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select help-text="Help" error="Error"></hx-select>');
       const helpText = shadowQuery(el, '.field__help-text');
       expect(helpText).toBeNull();
     });
@@ -177,13 +174,13 @@ describe('hx-select', () => {
 
   describe('Property: required', () => {
     it('sets required attr on native select', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       expect(select.required).toBe(true);
     });
 
     it('sets aria-required="true" on native select', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       expect(select.getAttribute('aria-required')).toBe('true');
     });
@@ -193,13 +190,13 @@ describe('hx-select', () => {
 
   describe('Property: disabled', () => {
     it('sets disabled attr on native select', async () => {
-      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select disabled></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       expect(select.disabled).toBe(true);
     });
 
     it('applies host opacity via disabled attribute', async () => {
-      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select disabled></hx-select>');
       expect(el.hasAttribute('disabled')).toBe(true);
     });
   });
@@ -208,7 +205,7 @@ describe('hx-select', () => {
 
   describe('Property: name', () => {
     it('sets name attr on native select', async () => {
-      const el = await fixture<WcSelect>('<hx-select name="country"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select name="country"></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       expect(select.getAttribute('name')).toBe('country');
     });
@@ -218,13 +215,13 @@ describe('hx-select', () => {
 
   describe('Property: accessibleLabel', () => {
     it('sets aria-label on the combobox trigger (the interactive element)', async () => {
-      const el = await fixture<WcSelect>('<hx-select accessible-label="Select country"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select accessible-label="Select country"></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-label')).toBe('Select country');
     });
 
     it('optgroup children are cloned into native select for form participation', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select name="region">
           <optgroup label="North America">
             <option value="us">United States</option>
@@ -244,7 +241,7 @@ describe('hx-select', () => {
 
   describe('Events', () => {
     it('dispatches hx-change via combobox option click (not via native select)', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
           <option value="b">B</option>
@@ -264,7 +261,7 @@ describe('hx-select', () => {
     });
 
     it('dispatches wc-change on selection', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
           <option value="b">B</option>
@@ -283,7 +280,7 @@ describe('hx-select', () => {
     });
 
     it('hx-change detail.value is correct', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
           <option value="b">B</option>
@@ -301,7 +298,7 @@ describe('hx-select', () => {
     });
 
     it('hx-change bubbles and is composed', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
           <option value="b">B</option>
@@ -324,7 +321,7 @@ describe('hx-select', () => {
 
   describe('Slots', () => {
     it('clones slotted options into native select', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="x">X</option>
           <option value="y">Y</option>
@@ -340,7 +337,7 @@ describe('hx-select', () => {
     });
 
     it('help-text slot renders', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select help-text="default"><em slot="help-text">Custom help</em></hx-select>',
       );
       const helpSlot = el.querySelector('[slot="help-text"]');
@@ -353,43 +350,43 @@ describe('hx-select', () => {
 
   describe('CSS Parts', () => {
     it('label part exposed', async () => {
-      const el = await fixture<WcSelect>('<hx-select label="Test"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select label="Test"></hx-select>');
       const label = shadowQuery(el, '[part="label"]');
       expect(label).toBeTruthy();
     });
 
     it('select-wrapper part exposed', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const wrapper = shadowQuery(el, '[part="select-wrapper"]');
       expect(wrapper).toBeTruthy();
     });
 
     it('error part exposed', async () => {
-      const el = await fixture<WcSelect>('<hx-select error="Error"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select error="Error"></hx-select>');
       const error = shadowQuery(el, '[part="error"]');
       expect(error).toBeTruthy();
     });
 
     it('help-text part exposed', async () => {
-      const el = await fixture<WcSelect>('<hx-select help-text="Help"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select help-text="Help"></hx-select>');
       const help = shadowQuery(el, '[part="help-text"]');
       expect(help).toBeTruthy();
     });
 
     it('trigger part exposed', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const trigger = shadowQuery(el, '[part="trigger"]');
       expect(trigger).toBeTruthy();
     });
 
     it('listbox part exposed', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const listbox = shadowQuery(el, '[part="listbox"]');
       expect(listbox).toBeTruthy();
     });
 
     it('option part exposed when options are present and dropdown is open', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="us">United States</option>
         </hx-select>
@@ -414,7 +411,7 @@ describe('hx-select', () => {
         </hx-select>
       `;
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-select') as WcSelect;
+      const el = form.querySelector('hx-select') as HxSelect;
       await el.updateComplete;
       const data = new FormData(form);
       expect(data.get('country')).toBe('us');
@@ -429,7 +426,7 @@ describe('hx-select', () => {
     });
 
     it('has ElementInternals attached', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       expect(el.form).toBe(null);
     });
 
@@ -437,27 +434,27 @@ describe('hx-select', () => {
       const form = document.createElement('form');
       form.innerHTML = '<hx-select name="test"></hx-select>';
       document.getElementById('test-fixture-container')!.appendChild(form);
-      const el = form.querySelector('hx-select') as WcSelect;
+      const el = form.querySelector('hx-select') as HxSelect;
       await el.updateComplete;
       expect(el.form).toBe(form);
     });
 
     it('formResetCallback resets value to empty', async () => {
-      const el = await fixture<WcSelect>('<hx-select value="hello"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select value="hello"></hx-select>');
       el.formResetCallback();
       await el.updateComplete;
       expect(el.value).toBe('');
     });
 
     it('formStateRestoreCallback restores value', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       el.formStateRestoreCallback('restored', 'restore');
       await el.updateComplete;
       expect(el.value).toBe('restored');
     });
 
     it('formDisabledCallback sets disabled when parent fieldset is disabled', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       el.formDisabledCallback(true);
       await el.updateComplete;
       expect(el.disabled).toBe(true);
@@ -471,32 +468,32 @@ describe('hx-select', () => {
 
   describe('Validation', () => {
     it('checkValidity returns false when required + empty', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       expect(el.checkValidity()).toBe(false);
     });
 
     it('checkValidity returns true when required + filled', async () => {
-      const el = await fixture<WcSelect>('<hx-select required value="filled"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required value="filled"></hx-select>');
       expect(el.checkValidity()).toBe(true);
     });
 
     it('valueMissing validity flag is set when required + empty', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       expect(el.validity.valueMissing).toBe(true);
     });
 
     it('reportValidity returns false when required + empty', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       expect(el.reportValidity()).toBe(false);
     });
 
     it('reportValidity returns true when required + filled', async () => {
-      const el = await fixture<WcSelect>('<hx-select required value="filled"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required value="filled"></hx-select>');
       expect(el.reportValidity()).toBe(true);
     });
 
     it('validationMessage is set when required + empty', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       await el.updateComplete;
       expect(el.validationMessage).toBeTruthy();
     });
@@ -506,14 +503,14 @@ describe('hx-select', () => {
 
   describe('Accessibility', () => {
     it('label is associated with select via for/id', async () => {
-      const el = await fixture<WcSelect>('<hx-select label="Country"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select label="Country"></hx-select>');
       const label = shadowQuery<HTMLLabelElement>(el, 'label')!;
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(label.getAttribute('for')).toBe(trigger.id);
     });
 
     it('aria-describedby references error ID when error set', async () => {
-      const el = await fixture<WcSelect>('<hx-select error="Bad input"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select error="Bad input"></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       const errorDiv = shadowQuery(el, '.field__error')!;
       const describedBy = select.getAttribute('aria-describedby');
@@ -521,7 +518,7 @@ describe('hx-select', () => {
     });
 
     it('aria-describedby references help text ID when helpText set', async () => {
-      const el = await fixture<WcSelect>('<hx-select help-text="Some help"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select help-text="Some help"></hx-select>');
       const select = shadowQuery<HTMLSelectElement>(el, 'select')!;
       const helpDiv = shadowQuery(el, '.field__help-text')!;
       const describedBy = select.getAttribute('aria-describedby');
@@ -529,7 +526,7 @@ describe('hx-select', () => {
     });
 
     it('chevron is hidden from assistive technology', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const chevron = shadowQuery(el, '.field__chevron');
       expect(chevron?.getAttribute('aria-hidden')).toBe('true');
     });
@@ -539,7 +536,7 @@ describe('hx-select', () => {
 
   describe('Methods', () => {
     it('focus() moves focus to the trigger button', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       el.focus();
       await el.updateComplete;
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
@@ -551,7 +548,7 @@ describe('hx-select', () => {
 
   describe('Dropdown Interaction', () => {
     it('opens the dropdown when trigger is clicked', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -566,7 +563,7 @@ describe('hx-select', () => {
     });
 
     it('closes the dropdown on second trigger click', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country" open>
           <option value="us">United States</option>
         </hx-select>
@@ -579,7 +576,7 @@ describe('hx-select', () => {
     });
 
     it('selects an option by clicking a listbox item', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -598,7 +595,7 @@ describe('hx-select', () => {
     });
 
     it('does not open when disabled', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select disabled><option value="a">A</option></hx-select>',
       );
       await el.updateComplete;
@@ -613,7 +610,7 @@ describe('hx-select', () => {
 
   describe('Keyboard Navigation', () => {
     it('ArrowDown opens the dropdown and focuses first option', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -627,7 +624,7 @@ describe('hx-select', () => {
     });
 
     it('ArrowDown navigates to next option when open', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -650,7 +647,7 @@ describe('hx-select', () => {
     });
 
     it('ArrowUp opens the dropdown and focuses last option', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -664,7 +661,7 @@ describe('hx-select', () => {
     });
 
     it('Enter confirms selection and closes dropdown', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -686,7 +683,7 @@ describe('hx-select', () => {
     });
 
     it('Space confirms selection and closes dropdown', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -707,7 +704,7 @@ describe('hx-select', () => {
     });
 
     it('Escape closes dropdown without changing value', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country" value="us">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -726,7 +723,7 @@ describe('hx-select', () => {
     });
 
     it('Home/End jump to first and last option', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -753,7 +750,7 @@ describe('hx-select', () => {
 
   describe('aria-activedescendant', () => {
     it('is absent when dropdown is closed', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
         </hx-select>
@@ -764,7 +761,7 @@ describe('hx-select', () => {
     });
 
     it('updates to focused option ID when navigating', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
           <option value="ca">Canada</option>
@@ -784,7 +781,7 @@ describe('hx-select', () => {
     });
 
     it('clears aria-activedescendant when dropdown closes', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select label="Country">
           <option value="us">United States</option>
         </hx-select>
@@ -805,7 +802,7 @@ describe('hx-select', () => {
 
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
-      const el = await fixture<WcSelect>(`<hx-select label="Country">
+      const el = await fixture<HxSelect>(`<hx-select label="Country">
         <option value="us">United States</option>
         <option value="ca">Canada</option>
       </hx-select>`);
@@ -814,7 +811,7 @@ describe('hx-select', () => {
     });
 
     it('has no axe violations in error state', async () => {
-      const el = await fixture<WcSelect>(`<hx-select label="Country" error="Required">
+      const el = await fixture<HxSelect>(`<hx-select label="Country" error="Required">
         <option value="us">United States</option>
       </hx-select>`);
       const { violations } = await checkA11y(el);
@@ -822,7 +819,7 @@ describe('hx-select', () => {
     });
 
     it('has no axe violations when disabled', async () => {
-      const el = await fixture<WcSelect>(`<hx-select label="Country" disabled>
+      const el = await fixture<HxSelect>(`<hx-select label="Country" disabled>
         <option value="us">United States</option>
       </hx-select>`);
       const { violations } = await checkA11y(el);
@@ -830,7 +827,7 @@ describe('hx-select', () => {
     });
 
     it('has no axe violations when dropdown is open', async () => {
-      const el = await fixture<WcSelect>(`<hx-select label="Country" open>
+      const el = await fixture<HxSelect>(`<hx-select label="Country" open>
         <option value="us">United States</option>
         <option value="ca">Canada</option>
       </hx-select>`);
@@ -895,7 +892,7 @@ describe('hx-select', () => {
 
   describe('Dropdown: display value in trigger', () => {
     it('shows placeholder text in trigger when no value selected', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select placeholder="Choose one"><option value="a">A</option></hx-select>',
       );
       await el.updateComplete;
@@ -904,7 +901,7 @@ describe('hx-select', () => {
     });
 
     it('shows selected option label in trigger after selection', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">Alpha</option>
           <option value="b">Beta</option>
@@ -922,7 +919,7 @@ describe('hx-select', () => {
     });
 
     it('trigger has placeholder class when no value selected', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select placeholder="Pick..."><option value="x">X</option></hx-select>',
       );
       await el.updateComplete;
@@ -931,7 +928,7 @@ describe('hx-select', () => {
     });
 
     it('trigger loses placeholder class after selection', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select placeholder="Pick...">
           <option value="x">X</option>
         </hx-select>
@@ -952,7 +949,7 @@ describe('hx-select', () => {
 
   describe('Dropdown: field--open class', () => {
     it('field--open class added when open=true', async () => {
-      const el = await fixture<WcSelect>('<hx-select><option value="a">A</option></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select><option value="a">A</option></hx-select>');
       await el.updateComplete;
       el.open = true;
       await el.updateComplete;
@@ -961,7 +958,7 @@ describe('hx-select', () => {
     });
 
     it('field--open class removed when closed', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select open><option value="a">A</option></hx-select>',
       );
       await el.updateComplete;
@@ -976,7 +973,7 @@ describe('hx-select', () => {
 
   describe('Disabled option in listbox', () => {
     it('clicking a disabled option does not change value', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
           <option value="b" disabled>B (disabled)</option>
@@ -994,7 +991,7 @@ describe('hx-select', () => {
     });
 
     it('disabled option has aria-disabled="true"', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">A</option>
           <option value="b" disabled>B</option>
@@ -1011,7 +1008,7 @@ describe('hx-select', () => {
 
   describe('Empty options state', () => {
     it('shows labelNoOptions when no options provided', async () => {
-      const el = await fixture<WcSelect>('<hx-select open></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select open></hx-select>');
       await el.updateComplete;
       const noOptions = shadowQuery(el, '.field__no-options');
       expect(noOptions).toBeTruthy();
@@ -1019,7 +1016,7 @@ describe('hx-select', () => {
     });
 
     it('custom labelNoOptions message is rendered', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select open label-no-options="Aucune option disponible"></hx-select>',
       );
       await el.updateComplete;
@@ -1032,7 +1029,7 @@ describe('hx-select', () => {
 
   describe('Listbox: selected option highlighted', () => {
     it('currently selected option has aria-selected="true"', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open value="b">
           <option value="a">A</option>
           <option value="b">B</option>
@@ -1045,7 +1042,7 @@ describe('hx-select', () => {
     });
 
     it('non-selected option has aria-selected="false"', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open value="b">
           <option value="a">A</option>
           <option value="b">B</option>
@@ -1063,44 +1060,44 @@ describe('hx-select', () => {
 
   describe('Trigger ARIA attributes', () => {
     it('trigger has role="combobox"', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const trigger = shadowQuery(el, '[role="combobox"]');
       expect(trigger).toBeTruthy();
     });
 
     it('trigger aria-expanded is "false" when closed', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('trigger aria-expanded is "true" when open', async () => {
-      const el = await fixture<WcSelect>('<hx-select open></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select open></hx-select>');
       await el.updateComplete;
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-expanded')).toBe('true');
     });
 
     it('trigger has aria-haspopup="listbox"', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-haspopup')).toBe('listbox');
     });
 
     it('trigger has aria-disabled="true" when disabled', async () => {
-      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select disabled></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('trigger tabindex is -1 when disabled', async () => {
-      const el = await fixture<WcSelect>('<hx-select disabled></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select disabled></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('tabindex')).toBe('-1');
     });
 
     it('trigger tabindex is 0 when enabled', async () => {
-      const el = await fixture<WcSelect>('<hx-select></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select></hx-select>');
       const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
       expect(trigger.getAttribute('tabindex')).toBe('0');
     });
@@ -1110,7 +1107,7 @@ describe('hx-select', () => {
 
   describe('Keyboard: Tab closes dropdown', () => {
     it('Tab key closes the dropdown', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">A</option>
         </hx-select>
@@ -1127,7 +1124,7 @@ describe('hx-select', () => {
 
   describe('Keyboard: typeahead', () => {
     it('typing a character jumps to the first matching option', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">Alpha</option>
           <option value="b">Beta</option>
@@ -1153,7 +1150,7 @@ describe('hx-select', () => {
 
   describe('Keyboard: Enter/Space opens closed dropdown', () => {
     it('Enter key opens closed dropdown', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
         </hx-select>
@@ -1166,7 +1163,7 @@ describe('hx-select', () => {
     });
 
     it('Space key opens closed dropdown', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select>
           <option value="a">A</option>
         </hx-select>
@@ -1183,7 +1180,7 @@ describe('hx-select', () => {
 
   describe('Keyboard: ArrowDown wraps to first option', () => {
     it('ArrowDown from last option wraps to first', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">A</option>
           <option value="b">B</option>
@@ -1207,7 +1204,7 @@ describe('hx-select', () => {
 
   describe('Keyboard: ArrowUp wraps to last option', () => {
     it('ArrowUp from first option wraps to last when open', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">A</option>
           <option value="b">B</option>
@@ -1232,7 +1229,7 @@ describe('hx-select', () => {
 
   describe('Lifecycle: disconnectedCallback', () => {
     it('sets open=false when disconnected while open', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">A</option>
         </hx-select>
@@ -1249,12 +1246,12 @@ describe('hx-select', () => {
 
   describe('Property: labelRequired', () => {
     it('defaults to "Please select an option."', async () => {
-      const el = await fixture<WcSelect>('<hx-select required></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select required></hx-select>');
       expect(el.labelRequired).toBe('Please select an option.');
     });
 
     it('uses custom labelRequired as validation message when required + empty', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select required label-required="Veuillez choisir une option."></hx-select>',
       );
       await el.updateComplete;
@@ -1266,7 +1263,7 @@ describe('hx-select', () => {
 
   describe('Slot: error slot activates error state', () => {
     it('slotted error sets aria-invalid on native select', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select label="Country"><span slot="error">Custom error</span></hx-select>',
       );
       await el.updateComplete;
@@ -1275,7 +1272,7 @@ describe('hx-select', () => {
     });
 
     it('slotted error sets aria-invalid on combobox trigger', async () => {
-      const el = await fixture<WcSelect>(
+      const el = await fixture<HxSelect>(
         '<hx-select label="Country"><span slot="error">Custom error</span></hx-select>',
       );
       await el.updateComplete;
@@ -1288,7 +1285,7 @@ describe('hx-select', () => {
 
   describe('Outside click closes the dropdown', () => {
     it('closes the dropdown when a click occurs outside the component', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">Alpha</option>
           <option value="b">Beta</option>
@@ -1307,7 +1304,7 @@ describe('hx-select', () => {
 
   describe('Typeahead: wraps from current position', () => {
     it('wraps typeahead search to the first match when no later match exists', async () => {
-      const el = await fixture<WcSelect>(`
+      const el = await fixture<HxSelect>(`
         <hx-select open>
           <option value="a">Alpha</option>
           <option value="b">Beta</option>
@@ -1338,7 +1335,7 @@ describe('hx-select', () => {
 
   describe('Empty options list', () => {
     it('renders without throwing when no option children are provided', async () => {
-      const el = await fixture<WcSelect>('<hx-select label="Empty select"></hx-select>');
+      const el = await fixture<HxSelect>('<hx-select label="Empty select"></hx-select>');
       await expect(el.updateComplete).resolves.toBeTruthy();
       expect(el.shadowRoot).toBeTruthy();
     });

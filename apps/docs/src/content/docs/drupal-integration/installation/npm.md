@@ -199,7 +199,7 @@ This adds HELIX to `package.json`:
 ```json
 {
   "dependencies": {
-    "@helixui/library": "^0.0.1"
+    "@helixui/library": "^3.0.0"
   }
 }
 ```
@@ -217,7 +217,7 @@ Resulting `package.json`:
 ```json
 {
   "dependencies": {
-    "@helixui/library": "0.0.1"
+    "@helixui/library": "3.0.0"
   }
 }
 ```
@@ -234,7 +234,7 @@ Resulting `package.json`:
 ```json
 {
   "dependencies": {
-    "@helixui/library": "^0.0.1" // Allows 0.0.2, 0.0.3, etc.
+    "@helixui/library": "^3.0.0" // Allows 3.0.1, 3.1.0, etc.
   }
 }
 ```
@@ -251,7 +251,7 @@ Output:
 
 ```
 mytheme@1.0.0 /path/to/mytheme
-└── @helixui/library@0.0.1
+└── @helixui/library@3.0.0
 ```
 
 Inspect installed files:
@@ -1253,7 +1253,7 @@ web/themes/custom/healthsystem/
     "prod": "cross-env NODE_ENV=production vite build"
   },
   "dependencies": {
-    "@helixui/library": "0.0.1"
+    "@helixui/library": "3.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
@@ -1414,7 +1414,7 @@ rsync -av dist/ /var/www/drupal/themes/custom/healthsystem/dist/
 ```json
 {
   "dependencies": {
-    "@helixui/library": "0.0.1" // Not ^0.0.1 or ~0.0.1
+    "@helixui/library": "3.0.0" // Not ^3.0.0 or ~3.0.0
   }
 }
 ```

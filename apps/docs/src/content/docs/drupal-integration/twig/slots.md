@@ -600,7 +600,7 @@ This pattern lets Layout Builder blocks seamlessly integrate with HELIX card com
     <hx-card
       variant="compact"
       elevation="raised"
-      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
     >
       {# View field: field_patient_photo → image slot #}
       {% if patient.field_patient_photo.entity %}
@@ -987,7 +987,7 @@ This pattern lets Layout Builder blocks seamlessly integrate with HELIX card com
           <hx-card
             variant="compact"
             elevation="raised"
-            hx-href="{{ path('entity.node.canonical', {'node': item.target_id}) }}"
+            href="{{ path('entity.node.canonical', {'node': item.target_id}) }}"
           >
             {% if item.entity.field_thumbnail.entity %}
               <img
@@ -1016,7 +1016,7 @@ This pattern lets Layout Builder blocks seamlessly integrate with HELIX card com
 2. **Nested components** - Cards inside article layout, alerts above main card
 3. **Entity reference loops** - `{% for item in node.field_related_articles %}` renders multiple cards
 4. **Conditional metadata** - Medical review date only renders if present
-5. **Interactive card** - `hx-href` makes entire card clickable for navigation
+5. **Interactive card** - `href` makes entire card clickable for navigation
 
 ### Example 3: Views Block with Empty State
 

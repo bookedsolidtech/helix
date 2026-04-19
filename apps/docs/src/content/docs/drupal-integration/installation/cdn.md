@@ -1,9 +1,17 @@
 ---
-title: CDN Installation
-description: Installing HELIX web components via CDN for Drupal integration
+title: CDN Installation (extended Drupal integration)
+description: Comprehensive Drupal CDN integration guide — library definitions, version pinning, SRI hashes, and fallback patterns.
 sidebar:
   order: 3
 ---
+
+:::note[Looking for the short version?]
+The consolidated CDN install guide lives at [`/drupal/installation/cdn`](/drupal/installation/cdn). That page leads with the recommended 3.0.0 pattern (core + per-component) and is the primary integration entry point. This page retains the deep-dive material on SRI, fallbacks, and caching. Upgrading from 2.x? Start with the [3.0.0 migration guide](/migration/3.0.0).
+:::
+
+:::tip[Strategy B is the recommended 3.0.0 path]
+HELiX 3.0.0 ships `dist/cdn/core.js` (registry + tokens, ~8.4KB min+gz) plus per-component modules at `dist/cdn/hx-<component>.js` (~2KB each). Load only what the site uses. The legacy single-file `dist/index.js` remains published but is not recommended for production.
+:::
 
 CDN installation is the fastest way to add HELIX web components to your Drupal site. This method requires no build pipeline, no npm dependencies, and no local compilation—just a library definition in your theme and you're ready to use components in TWIG templates.
 
@@ -56,9 +64,9 @@ web/themes/custom/mytheme/
 
 ## Step 1: Create Library Definition
 
-Drupal's Libraries API loads external assets via `*.libraries.yml` files. Create or edit your theme's library definition file:
+Drupal's Libraries API loads external assets via `*.libraries.yml` files. Create or edit your theme's library definition file.
 
-### Basic CDN Library (jsDelivr)
+### Strategy B — core + per-component (recommended, jsDelivr)
 
 **File:** `mytheme.libraries.yml`
 
@@ -66,9 +74,19 @@ Drupal's Libraries API loads external assets via `*.libraries.yml` files. Create
 # mytheme.libraries.yml
 
 helix-components:
-  version: 0.0.1
+  version: 3.0.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    # Core: registry + tokens, ~8.4KB min+gz
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
+      type: external
+      attributes:
+        type: module
+    # Per-component modules — ~2KB each; only list what the theme actually uses
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/hx-button.js:
+      type: external
+      attributes:
+        type: module
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/hx-card.js:
       type: external
       attributes:
         type: module
@@ -77,17 +95,33 @@ helix-components:
 **Explanation:**
 
 - `helix-components` — Library machine name (use in TWIG: `{{ attach_library('mytheme/helix-components') }}`)
-- `version: 0.0.1` — Drupal library version (for cache busting; increment when you change config)
+- `version: 3.0.0` — Drupal library version (for cache busting; increment when you change config)
 - `type: external` — Tells Drupal this is an external URL, not a local file
 - `attributes.type: module` — Critical: marks script as ES module (required for Lit components)
 
-### Alternative: unpkg CDN
+### Strategy A — single-file bundle (prototyping only)
+
+Back-compat single-file bundle. Ships every component (~150KB gzipped) whether you use it or not. Not recommended for production:
 
 ```yaml
 helix-components:
-  version: 0.0.1
+  version: 3.0.0
   js:
-    https://unpkg.com/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
+      type: external
+      attributes:
+        type: module
+```
+
+### Alternative: unpkg CDN
+
+Swap the host, same paths work:
+
+```yaml
+helix-components:
+  version: 3.0.0
+  js:
+    https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -207,7 +241,7 @@ CDN URLs support flexible version targeting. Choose the strategy that matches yo
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -231,7 +265,7 @@ helix-components:
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@^0.0/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@^3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -254,7 +288,7 @@ helix-components:
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -281,7 +315,7 @@ helix-components:
 helix-components:
   version: 0.0.1 # Drupal library version
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -304,7 +338,7 @@ helix-components:
 **URL format:**
 
 ```
-https://cdn.jsdelivr.net/npm/@helixui/library@{version}/dist/helix.bundled.js
+https://cdn.jsdelivr.net/npm/@helixui/library@{version}/dist/cdn/core.js
 ```
 
 **Features:**
@@ -319,7 +353,7 @@ https://cdn.jsdelivr.net/npm/@helixui/library@{version}/dist/helix.bundled.js
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -330,7 +364,7 @@ helix-cdn:
 **URL format:**
 
 ```
-https://unpkg.com/@helixui/library@{version}/dist/helix.bundled.js
+https://unpkg.com/@helixui/library@{version}/dist/cdn/core.js
 ```
 
 **Features:**
@@ -344,7 +378,7 @@ https://unpkg.com/@helixui/library@{version}/dist/helix.bundled.js
 ```yaml
 helix-cdn:
   js:
-    https://unpkg.com/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -369,7 +403,7 @@ https://esm.sh/@helixui/library@{version}
 ```yaml
 helix-cdn:
   js:
-    https://esm.sh/@helixui/library@0.0.1:
+    https://esm.sh/@helixui/library@3.0.0:
       type: external
       attributes:
         type: module
@@ -419,7 +453,7 @@ drush cr  # Drupal 8/9/10/11
 helix-components:
   version: 0.0.2 # Increment this
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -430,7 +464,7 @@ Drupal now serves:
 ```html
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js?v=0.0.2"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js?v=0.0.2"
 ></script>
 ```
 
@@ -444,7 +478,7 @@ Keep Drupal library version in sync with HELIX version:
 helix-components:
   version: 0.0.1 # Matches HELIX version
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -456,7 +490,7 @@ When you upgrade HELIX, both versions change:
 helix-components:
   version: 0.0.2 # Updated
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.2/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.2/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -479,7 +513,7 @@ helix-components:
   version: 0.0.1
   header: true # Load in <head> for early download
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -510,7 +544,7 @@ For critical components, preload the module:
 
 ```twig
 <head>
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js" crossorigin>
   {{ page_top }}
   <!-- rest of head -->
 </head>
@@ -527,14 +561,14 @@ Load only components you use (reduces bundle size):
 ```yaml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button.js:
       type: external
       attributes:
         type: module
 
 helix-card:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card.js:
       type: external
       attributes:
         type: module
@@ -568,7 +602,7 @@ CDNs can fail (outages, network issues, corporate firewalls). Implement fallback
 helix-components:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -584,7 +618,7 @@ helix-components:
 setTimeout(() => {
   if (!customElements.get('hx-button')) {
     console.warn('HELIX CDN failed, loading local fallback');
-    import('/themes/custom/mytheme/libraries/helix/dist/helix.bundled.js');
+    import('/themes/custom/mytheme/libraries/helix/dist/cdn/core.js');
   }
 }, 1000);
 ```
@@ -596,7 +630,7 @@ mytheme/
 ├── libraries/
 │   └── helix/
 │       └── dist/
-│           └── helix.bundled.js  # Local copy (backup)
+│           └── core.js  # Local copy (backup)
 ├── js/
 │   └── helix-fallback.js
 └── mytheme.libraries.yml
@@ -611,11 +645,11 @@ helix-components:
   version: 0.0.1
   js:
     # Try jsDelivr first
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
-        onerror: "this.onerror=null;this.remove();document.head.appendChild(Object.assign(document.createElement('script'),{type:'module',src:'https://unpkg.com/@helixui/library@0.0.1/dist/helix.bundled.js'}))"
+        onerror: "this.onerror=null;this.remove();document.head.appendChild(Object.assign(document.createElement('script'),{type:'module',src:'https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js'}))"
 ```
 
 **Result:** If jsDelivr fails, browser immediately tries unpkg.
@@ -670,7 +704,7 @@ Verify CDN delivers untampered files:
 helix-components:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -681,7 +715,7 @@ helix-components:
 **Generate SRI hash:**
 
 ```bash
-curl https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js | \
+curl https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
@@ -722,7 +756,7 @@ If missing, add `crossorigin` attribute:
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -753,7 +787,7 @@ helix-components:
   header: true # Load early
   js:
     # Primary CDN (jsDelivr)
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       minified: true
       attributes:
@@ -778,7 +812,7 @@ setTimeout(() => {
     console.warn('[HELIX] CDN failed, loading local fallback');
 
     // Load local backup
-    import('/libraries/helix/dist/helix.bundled.js')
+    import('/libraries/helix/dist/cdn/core.js')
       .then(() => console.info('[HELIX] Local fallback loaded'))
       .catch((err) => console.error('[HELIX] Fallback failed:', err));
   }
@@ -796,7 +830,7 @@ setTimeout(() => {
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
   {# Preload critical component module #}
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js" crossorigin>
 
   {{ page_top }}
   <head-placeholder token="{{ placeholder_token }}">
@@ -845,7 +879,7 @@ web/themes/custom/mytheme/
 ├── libraries/
 │   └── helix/
 │       └── dist/
-│           └── helix.bundled.js  # Local backup (copied from node_modules or CDN)
+│           └── core.js  # Local backup (copied from node_modules or CDN)
 └── templates/
     ├── html.html.twig
     └── node--article.html.twig
@@ -871,7 +905,7 @@ drush cr
 **DevTools → Network Tab:**
 
 - Filter: `helix`
-- Look for: `helix.bundled.js` from `cdn.jsdelivr.net`
+- Look for: `core.js` from `cdn.jsdelivr.net`
 - Status: `200 OK`
 - Type: `script`
 - Size: ~45KB (gzipped)
@@ -913,7 +947,7 @@ Simulate CDN failure:
 
 **DevTools → Network Tab:**
 
-- Right-click `helix.bundled.js` request
+- Right-click `core.js` request
 - Select "Block request URL"
 - Hard reload (Cmd+Shift+R)
 - Check Console: should see "HELIX CDN failed, loading local fallback"
@@ -938,7 +972,7 @@ Simulate CDN failure:
 # Check libraries.yml has correct config
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module # MUST BE PRESENT
@@ -955,7 +989,7 @@ helix-components:
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -968,7 +1002,7 @@ helix-components:
 
 **Cause:** Wrong file loaded (not the bundled build).
 
-**Fix:** Verify URL ends with `/dist/helix.bundled.js` (NOT `/src/index.ts` or `/dist/index.js`).
+**Fix:** Verify URL ends with `/dist/cdn/core.js` (NOT `/src/index.ts` or `/dist/index.js`).
 
 ### Stale Code After Update
 
@@ -1051,7 +1085,7 @@ helix-components:
   version: 0.0.1
   js:
     # OLD (CDN)
-    # https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    # https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
     #   type: external
     #   attributes:
     #     type: module

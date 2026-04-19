@@ -26,15 +26,15 @@ Default, outlined, and filled visual styles.
 
 <ComponentDemo title="Variants">
   <div style="display: flex; flex-direction: column; gap: 1rem;">
-    <hx-action-bar aria-label="Default actions" variant="default">
+    <hx-action-bar accessible-label="Default actions" variant="default">
       <button slot="start">Save</button>
       <button slot="end">Cancel</button>
     </hx-action-bar>
-    <hx-action-bar aria-label="Outlined actions" variant="outlined">
+    <hx-action-bar accessible-label="Outlined actions" variant="outlined">
       <button slot="start">Save</button>
       <button slot="end">Cancel</button>
     </hx-action-bar>
-    <hx-action-bar aria-label="Filled actions" variant="filled">
+    <hx-action-bar accessible-label="Filled actions" variant="filled">
       <button slot="start">Save</button>
       <button slot="end">Cancel</button>
     </hx-action-bar>
@@ -47,15 +47,15 @@ Small, medium, and large action bar sizes.
 
 <ComponentDemo title="Sizes">
   <div style="display: flex; flex-direction: column; gap: 1rem;">
-    <hx-action-bar aria-label="Small actions" size="sm" variant="outlined">
+    <hx-action-bar accessible-label="Small actions" size="sm" variant="outlined">
       <button slot="start">Save</button>
       <button slot="end">Cancel</button>
     </hx-action-bar>
-    <hx-action-bar aria-label="Medium actions" size="md" variant="outlined">
+    <hx-action-bar accessible-label="Medium actions" size="md" variant="outlined">
       <button slot="start">Save</button>
       <button slot="end">Cancel</button>
     </hx-action-bar>
-    <hx-action-bar aria-label="Large actions" size="lg" variant="outlined">
+    <hx-action-bar accessible-label="Large actions" size="lg" variant="outlined">
       <button slot="start">Save</button>
       <button slot="end">Cancel</button>
     </hx-action-bar>
@@ -67,7 +67,7 @@ Small, medium, and large action bar sizes.
 Use `start`, default (center), and `end` slots for flexible content placement.
 
 <ComponentDemo title="Three-section layout">
-  <hx-action-bar aria-label="Patient chart actions" variant="outlined">
+  <hx-action-bar accessible-label="Patient chart actions" variant="outlined">
     <button slot="start">Save</button>
     <button slot="start">Save &amp; Close</button>
     <span>Patient: Jane Doe</span>
@@ -80,7 +80,7 @@ Use `start`, default (center), and `end` slots for flexible content placement.
 The action bar can stick to the top or bottom of its scroll container.
 
 <ComponentDemo title="Sticky top">
-  <hx-action-bar aria-label="Sticky actions" position="sticky" variant="filled">
+  <hx-action-bar accessible-label="Sticky actions" position="sticky" variant="filled">
     <button slot="start">Save</button>
     <button slot="end">Cancel</button>
   </hx-action-bar>
@@ -91,7 +91,7 @@ The action bar can stick to the top or bottom of its scroll container.
 Use the `overflow` slot for actions that appear when space is constrained.
 
 <ComponentDemo title="With overflow actions">
-  <hx-action-bar aria-label="Actions with overflow" variant="outlined">
+  <hx-action-bar accessible-label="Actions with overflow" variant="outlined">
     <button slot="start">Primary</button>
     <button slot="end">Secondary</button>
     <button slot="overflow">More actions</button>
@@ -111,7 +111,7 @@ import '@helixui/library/components/hx-action-bar';
 ## Basic Usage
 
 ```html
-<hx-action-bar aria-label="Patient actions">
+<hx-action-bar accessible-label="Patient actions">
   <hx-button slot="start" variant="primary">Save</hx-button>
   <hx-button slot="end" variant="ghost">Cancel</hx-button>
 </hx-action-bar>
@@ -172,7 +172,7 @@ import '@helixui/library/components/hx-action-bar';
 ```twig
 {# my-module/templates/my-template.html.twig #}
 <hx-action-bar
-  aria-label="{{ label|default('Actions') }}"
+  accessible-label="{{ label|default('Actions') }}"
   variant="{{ variant|default('default') }}"
   {% if position %}position="{{ position }}"{% endif %}
 >
@@ -212,7 +212,7 @@ Copy-paste into a `.html` file and open in any browser — no build tool require
     <!-- In your project: import '@helixui/library'; in your bundler entry point -->
   </head>
   <body style="font-family: sans-serif; padding: 2rem;">
-    <hx-action-bar aria-label="Patient chart actions" variant="outlined">
+    <hx-action-bar accessible-label="Patient chart actions" variant="outlined">
       <hx-button slot="start" variant="primary">Save</hx-button>
       <hx-button slot="start" variant="secondary">Save &amp; Close</hx-button>
       <span>Record: Jane Doe</span>

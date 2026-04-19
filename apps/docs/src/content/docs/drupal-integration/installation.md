@@ -15,7 +15,7 @@ libraries:
 # mytheme.libraries.yml
 helix:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -46,7 +46,7 @@ Create a custom module that provides the library:
 components:
   version: 0.0.1
   js:
-    /libraries/helix/dist/helix.bundled.js:
+    /libraries/helix/dist/cdn/core.js:
       type: module
       preprocess: false
   dependencies:

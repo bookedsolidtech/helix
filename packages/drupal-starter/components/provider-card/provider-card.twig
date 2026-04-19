@@ -16,7 +16,7 @@
       <hx-avatar
         src="{{ image_url|default('') }}"
         label="{{ image_alt|default(name) }}"
-        size="lg"
+        hx-size="lg"
       ></hx-avatar>
 
       <div class="provider-card__identity">
@@ -36,7 +36,7 @@
 
     <div class="provider-card__body">
       {% if specialty %}
-        <hx-badge variant="neutral" size="sm">{{ specialty }}</hx-badge>
+        <hx-badge variant="neutral" hx-size="sm">{{ specialty }}</hx-badge>
       {% endif %}
 
       {% if badges %}
@@ -79,13 +79,13 @@
 
     <div slot="footer" class="provider-card__footer">
       {% if url %}
-        <hx-button variant="primary" size="sm">
+        <hx-button variant="primary" hx-size="sm">
           <a href="{{ url }}">View Profile</a>
         </hx-button>
       {% endif %}
 
       {% if phone %}
-        <hx-button variant="secondary" size="sm">
+        <hx-button variant="secondary" hx-size="sm">
           <a href="tel:{{ phone }}">Call Office</a>
         </hx-button>
       {% endif %}

@@ -288,7 +288,7 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
 ### Application shell: top nav + side nav
 
 ```html
-<hx-top-nav aria-label="Primary navigation">
+<hx-top-nav accessible-label="Primary navigation">
   <a slot="logo" href="/">
     <img src="/logo.svg" alt="Northwell Health Patient Portal" width="160" height="40" />
   </a>
@@ -301,7 +301,7 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
   </nav>
 
   <div slot="actions">
-    <hx-button variant="ghost" aria-label="Notifications (3 unread)">
+    <hx-button variant="ghost" accessible-label="Notifications (3 unread)">
       <hx-icon name="bell" aria-hidden="true"></hx-icon>
       <hx-badge variant="danger">3</hx-badge>
     </hx-button>
@@ -310,7 +310,7 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
 </hx-top-nav>
 
 <div class="app-layout">
-  <hx-side-nav aria-label="Section navigation">
+  <hx-side-nav accessible-label="Section navigation">
     <nav>
       <a href="/appointments/upcoming" aria-current="page">Upcoming</a>
       <a href="/appointments/past">Past visits</a>
@@ -320,7 +320,7 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
   </hx-side-nav>
 
   <main id="main-content">
-    <hx-breadcrumb aria-label="Breadcrumb">
+    <hx-breadcrumb accessible-label="Breadcrumb">
       <ol>
         <li><a href="/">Home</a></li>
         <li><a href="/appointments">Appointments</a></li>
@@ -338,7 +338,7 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
 Use `hx-tabs` for content within a single page view — not for page-level navigation. Tabs are appropriate when all content is available at once and the user needs to switch between views without leaving the page.
 
 ```html
-<hx-breadcrumb aria-label="Breadcrumb">
+<hx-breadcrumb accessible-label="Breadcrumb">
   <ol>
     <li><a href="/">Home</a></li>
     <li><a href="/records">Health Records</a></li>
@@ -347,7 +347,7 @@ Use `hx-tabs` for content within a single page view — not for page-level navig
 </hx-breadcrumb>
 
 <hx-tabs>
-  <hx-tab-list aria-label="Medication views">
+  <hx-tab-list accessible-label="Medication views">
     <hx-tab id="tab-current" panel="panel-current">Current medications</hx-tab>
     <hx-tab id="tab-history" panel="panel-history">History</hx-tab>
     <hx-tab id="tab-allergies" panel="panel-allergies">Allergies &amp; reactions</hx-tab>
@@ -387,7 +387,7 @@ Use `hx-tabs` for content within a single page view — not for page-level navig
 {{ attach_library('mytheme/helix-avatar') }}
 {{ attach_library('mytheme/helix-button') }}
 
-<hx-top-nav aria-label="Primary navigation">
+<hx-top-nav accessible-label="Primary navigation">
   <a slot="logo" href="{{ front_page }}">
     {{ logo }}
   </a>
@@ -429,18 +429,18 @@ Data display compositions pair `hx-data-table` with `hx-pagination` and `hx-acti
     slot="search"
     type="search"
     placeholder="Search patients..."
-    aria-label="Search patients"
+    accessible-label="Search patients"
   ></hx-text-input>
 
   <div slot="filters">
-    <hx-select aria-label="Filter by status">
+    <hx-select accessible-label="Filter by status">
       <option value="">All statuses</option>
       <option value="active">Active</option>
       <option value="discharged">Discharged</option>
       <option value="pending">Pending admission</option>
     </hx-select>
 
-    <hx-select aria-label="Filter by unit">
+    <hx-select accessible-label="Filter by unit">
       <option value="">All units</option>
       <option value="icu">ICU</option>
       <option value="cardiac">Cardiac Care</option>
@@ -454,7 +454,7 @@ Data display compositions pair `hx-data-table` with `hx-pagination` and `hx-acti
   </div>
 </hx-action-bar>
 
-<hx-data-table id="patient-list" aria-label="Patient list" sortable>
+<hx-data-table id="patient-list" accessible-label="Patient list" sortable>
   <hx-column key="mrn" label="MRN" sortable></hx-column>
   <hx-column key="name" label="Patient name" sortable></hx-column>
   <hx-column key="dob" label="Date of birth" sortable></hx-column>
@@ -467,7 +467,7 @@ Data display compositions pair `hx-data-table` with `hx-pagination` and `hx-acti
   total-items="847"
   page-size="25"
   current-page="1"
-  aria-label="Patient list pagination"
+  accessible-label="Patient list pagination"
 ></hx-pagination>
 ```
 
@@ -609,7 +609,7 @@ Overlays — dialogs and drawers — collect focused user input or display suppl
 
   <div class="patient-detail-content">
     <hx-tabs>
-      <hx-tab-list aria-label="Patient detail sections">
+      <hx-tab-list accessible-label="Patient detail sections">
         <hx-tab id="detail-tab-overview" panel="detail-panel-overview">Overview</hx-tab>
         <hx-tab id="detail-tab-vitals" panel="detail-panel-vitals">Vitals</hx-tab>
         <hx-tab id="detail-tab-notes" panel="detail-panel-notes">Notes</hx-tab>
@@ -726,7 +726,7 @@ Feedback compositions communicate system status, validation results, and process
 
 ```html
 <!-- Toast container — place once at the application level -->
-<hx-toast-region aria-label="Notifications" position="top-end"></hx-toast-region>
+<hx-toast-region accessible-label="Notifications" position="top-end"></hx-toast-region>
 
 <script>
   const toastRegion = document.querySelector('hx-toast-region');
@@ -849,7 +849,7 @@ Healthcare applications have recurring UI patterns unique to the domain. These c
 <hx-card variant="default" class="appointment-scheduler">
   <span slot="heading">Request an appointment</span>
 
-  <hx-steps current-step="1" total-steps="3" aria-label="Appointment scheduling progress">
+  <hx-steps current-step="1" total-steps="3" accessible-label="Appointment scheduling progress">
     <span slot="step-1">Choose provider</span>
     <span slot="step-2">Select time</span>
     <span slot="step-3">Confirm</span>

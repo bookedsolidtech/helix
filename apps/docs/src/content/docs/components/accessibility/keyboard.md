@@ -164,7 +164,7 @@ Focus management across shadow boundaries requires explicit methods:
 
 ```typescript
 // hx-text-input exposes a public focus() method
-export class WcTextInput extends LitElement {
+export class HxTextInput extends LitElement {
   @query('input') private inputElement!: HTMLInputElement;
 
   focus(options?: FocusOptions) {
@@ -211,9 +211,9 @@ Roving tabindex is appropriate for:
 
 ```typescript
 // Simplified wc-radio-group roving tabindex implementation
-export class WcRadioGroup extends LitElement {
+export class HxRadioGroup extends LitElement {
   @queryAssignedElements({ selector: 'hx-radio' })
-  private radios!: Array<WcRadio>;
+  private radios!: Array<HxRadio>;
 
   private handleKeyDown(e: KeyboardEvent) {
     const currentIndex = this.radios.findIndex((r) => r === e.target);
@@ -497,7 +497,7 @@ Focus traps are **not** appropriate for:
 ### Example: hx-modal (Future Component)
 
 ```typescript
-export class WcModal extends LitElement {
+export class HxModal extends LitElement {
   @property({ type: Boolean }) open = false;
 
   private previousFocus: HTMLElement | null = null;

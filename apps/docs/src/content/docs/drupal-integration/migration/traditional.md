@@ -334,7 +334,7 @@ Avoid loading the full HELIX bundle until you're using most components. Start wi
 # Core library (always loaded if using any HELIX components)
 helix-core:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/core.js:
       type: external
       attributes:
         type: module
@@ -342,7 +342,7 @@ helix-core:
 # Per-component libraries (attach only where used)
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button.js:
       type: external
       attributes:
         type: module
@@ -351,7 +351,7 @@ helix-button:
 
 helix-card:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card.js:
       type: external
       attributes:
         type: module
@@ -360,7 +360,7 @@ helix-card:
 
 helix-alert:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-alert.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-alert.js:
       type: external
       attributes:
         type: module
@@ -1271,7 +1271,7 @@ $('#contact-form').validate({
     label="Email Address"
     type="email"
     required
-    error-message="Please enter a valid email address"
+    error="Please enter a valid email address"
   ></hx-text-input>
 
   <hx-text-input
@@ -1280,7 +1280,7 @@ $('#contact-form').validate({
     type="tel"
     pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
     required
-    error-message="Please enter a valid US phone number (xxx-xxx-xxxx)"
+    error="Please enter a valid US phone number (xxx-xxx-xxxx)"
   ></hx-text-input>
 
   <hx-button type="submit" variant="primary">
@@ -1292,7 +1292,7 @@ $('#contact-form').validate({
 **No JavaScript Needed**:
 
 - Browser validates on submit using `required`, `pattern`, `type="email"`
-- HELIX components display error messages via `error-message` attribute
+- HELIX components display error messages via `error` attribute (renamed from `error-message` in 3.0.0)
 - Form submission prevented if validation fails
 - Screen readers announce validation errors automatically
 
@@ -1486,7 +1486,7 @@ If HELIX library itself is broken (CDN issue, browser bug), remove entirely.
 # Comment out all HELIX libraries
 # helix-core:
 #   js:
-#     https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/core.js:
+#     https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/core.js:
 #       type: external
 ```
 

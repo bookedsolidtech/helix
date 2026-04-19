@@ -47,7 +47,7 @@ The element is in the DOM but the Custom Element registry does not contain a def
 # mytheme.libraries.yml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes:

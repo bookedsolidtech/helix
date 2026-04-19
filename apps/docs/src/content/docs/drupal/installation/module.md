@@ -238,7 +238,7 @@ Install HELiX locally and copy the built files:
 mkdir -p web/modules/custom/hx_library/libraries/helix
 
 # Install HELiX in a temporary location
-npm install @helixui/library@1.1.2 --prefix /tmp/helix-install
+npm install @helixui/library@3.0.0 --prefix /tmp/helix-install
 
 # Copy the dist directory
 cp -r /tmp/helix-install/node_modules/@helixui/library/dist \
@@ -312,7 +312,7 @@ Add a `package.json` to the module itself and run npm as part of module setup:
   "name": "hx-library-drupal-module",
   "private": true,
   "scripts": {
-    "sync": "npm install @helixui/library@1.1.2 && node scripts/copy-dist.js"
+    "sync": "npm install @helixui/library@3.0.0 && node scripts/copy-dist.js"
   },
   "devDependencies": {
     "@helixui/library": "1.1.2"
@@ -412,10 +412,10 @@ function mytheme_page_attachments(array &$attachments) {
 <hx-button variant="primary" hx-size="lg">Submit</hx-button>
 <hx-button variant="secondary" hx-size="md">Cancel</hx-button>
 
-{# Card with hx-href for link behavior (not href) #}
+{# Card with href — the whole card is the link #}
 <hx-card
   variant="outlined"
-  hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+  href="{{ url('entity.node.canonical', {'node': node.id}) }}"
 >
   <span slot="heading">{{ node.title.value }}</span>
   <p>{{ node.field_summary.value }}</p>
@@ -431,7 +431,7 @@ function mytheme_page_attachments(array &$attachments) {
 
 Key attribute notes:
 - Use `hx-size` (not `size`) for component sizing
-- Use `hx-href` (not `href`) on `hx-card` for link card behavior
+- Use the `href` attribute on `hx-card` for link card behavior; the card fires `hx-click` on activation
 
 ---
 
@@ -489,7 +489,7 @@ function hx_library_requirements($phase) {
         'title' => t('HELiX Library files'),
         'value' => t('Missing'),
         'description' => t(
-          'HELiX component files not found at @path. Copy the files from @helixui/library@1.1.2/dist/ or run composer install.',
+          'HELiX component files not found at @path. Copy the files from @helixui/library@3.0.0/dist/ or run composer install.',
           ['@path' => $library_file]
         ),
         'severity' => REQUIREMENT_ERROR,

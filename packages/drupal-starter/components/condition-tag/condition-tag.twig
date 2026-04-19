@@ -13,7 +13,7 @@
     <hx-link href="{{ url }}">
       <hx-tag variant="{{ variant }}">
         {% if icon %}
-          <hx-icon name="{{ icon }}" slot="prefix" size="sm"></hx-icon>
+          <hx-icon name="{{ icon }}" slot="prefix" hx-size="sm"></hx-icon>
         {% endif %}
         {{ name }}
       </hx-tag>
@@ -21,7 +21,7 @@
   {% else %}
     <hx-tag variant="{{ variant }}">
       {% if icon %}
-        <hx-icon name="{{ icon }}" slot="prefix" size="sm"></hx-icon>
+        <hx-icon name="{{ icon }}" slot="prefix" hx-size="sm"></hx-icon>
       {% endif %}
       {{ name }}
     </hx-tag>

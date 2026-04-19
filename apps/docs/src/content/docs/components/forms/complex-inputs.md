@@ -144,7 +144,7 @@ import { repeat } from 'lit/directives/repeat.js';
  * @tag wc-tag-input
  */
 @customElement('hx-tag-input')
-export class WcTagInput extends LitElement {
+export class HxTagInput extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
 
@@ -326,7 +326,7 @@ export class WcTagInput extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-tag-input': WcTagInput;
+    'hx-tag-input': HxTagInput;
   }
 }
 ```
@@ -399,7 +399,7 @@ import { customElement, property, state } from 'lit/decorators.js';
  * @tag wc-date-picker
  */
 @customElement('hx-date-picker')
-export class WcDatePicker extends LitElement {
+export class HxDatePicker extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
 
@@ -718,7 +718,7 @@ export class WcDatePicker extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-date-picker': WcDatePicker;
+    'hx-date-picker': HxDatePicker;
   }
 }
 ```
@@ -789,7 +789,7 @@ import { customElement, property, state, query } from 'lit/decorators.js';
  * @tag wc-file-input
  */
 @customElement('hx-file-input')
-export class WcFileInput extends LitElement {
+export class HxFileInput extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
 
@@ -1104,7 +1104,7 @@ export class WcFileInput extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-file-input': WcFileInput;
+    'hx-file-input': HxFileInput;
   }
 }
 ```
@@ -1151,7 +1151,7 @@ import 'quill/dist/quill.snow.css';
  * @tag wc-rich-text-editor
  */
 @customElement('hx-rich-text-editor')
-export class WcRichTextEditor extends LitElement {
+export class HxRichTextEditor extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
   private _quill?: Quill;
@@ -1269,7 +1269,7 @@ export class WcRichTextEditor extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-rich-text-editor': WcRichTextEditor;
+    'hx-rich-text-editor': HxRichTextEditor;
   }
 }
 ```
