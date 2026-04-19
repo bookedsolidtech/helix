@@ -293,14 +293,18 @@ jobs:
           # vitest is force-killed before its summary line is flushed.
           # Keep json so .cache/test-results.json is still written (vitest
           # replaces config reporters when --reporter is passed).
+          # Do not let `set -e` abort the step when the watchdog returns
+          # non-zero — we need the diagnostic block below to surface vitest's
+          # actual error instead of GitHub Actions killing the step with no
+          # output on the way.
+          rc=0
           # shellcheck disable=SC2086
           run_vitest_with_watchdog "ci-shard-${VITEST_SHARD}" "$LOGFILE" \
             pnpm exec vitest run $PATHS \
               --shard="$VITEST_SHARD" \
               --coverage.enabled \
               --reporter=verbose \
-              --reporter=json
-          rc=$?
+              --reporter=json || rc=$?
           # On failure, surface only failed test lines + tail of log.
           # On success, suppress the log entirely — passing ticks are noise.
           if [[ $rc -ne 0 ]]; then
