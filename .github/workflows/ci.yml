@@ -289,6 +289,32 @@ jobs:
           LOGFILE=$(mktemp /tmp/helix-ci-shard.XXXXXX)
           PATHS="${{ steps.changed.outputs.paths }}"
           echo "Running shard ${VITEST_SHARD} over: $PATHS"
+          # Vitest 3.x refuses to run when the shard total is >= the number
+          # of test files ("--shard <count> must be a smaller than count of
+          # test files"). When the smart-changed filter resolves fewer test
+          # files than the matrix has shards, collapse: shard 1 runs every
+          # file unsharded, and the other shards exit cleanly with nothing
+          # to do. Without this, a PR that touches 1–3 components fails all
+          # 4 shards with a cryptic startup error.
+          # shellcheck disable=SC2086
+          TEST_FILE_COUNT=$(find $PATHS -type f -name '*.test.ts' 2>/dev/null | wc -l | tr -d ' ')
+          TEST_FILE_COUNT=${TEST_FILE_COUNT:-0}
+          SHARD_INDEX="${VITEST_SHARD%/*}"
+          SHARD_TOTAL="${VITEST_SHARD#*/}"
+          SHARD_ARGS=(--shard="$VITEST_SHARD")
+          if [[ "$TEST_FILE_COUNT" -le "$SHARD_TOTAL" ]]; then
+            if [[ "$SHARD_INDEX" -ne 1 ]]; then
+              echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — skipping (shard ${SHARD_INDEX}/${SHARD_TOTAL} has nothing to run)"
+              echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+              # Write an empty JSON report so the upload-artifact step has
+              # something to find and does not warn.
+              mkdir -p .cache
+              echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              exit 0
+            fi
+            echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — running all on shard 1 without --shard"
+            SHARD_ARGS=()
+          fi
           # Use verbose reporter so the watchdog can count ✓/× markers when
           # vitest is force-killed before its summary line is flushed.
           # Keep json so .cache/test-results.json is still written (vitest
@@ -301,7 +327,7 @@ jobs:
           # shellcheck disable=SC2086
           run_vitest_with_watchdog "ci-shard-${VITEST_SHARD}" "$LOGFILE" \
             pnpm exec vitest run $PATHS \
-              --shard="$VITEST_SHARD" \
+              "${SHARD_ARGS[@]}" \
               --coverage.enabled \
               --reporter=verbose \
               --reporter=json || rc=$?
