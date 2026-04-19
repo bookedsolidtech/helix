@@ -200,6 +200,18 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Migration',
+          collapsed: false,
+          badge: { text: '3.0.0', variant: 'tip' },
+          items: [
+            {
+              label: 'Upgrading to 3.0.0',
+              slug: 'migration/3.0.0',
+              badge: { text: 'New', variant: 'tip' },
+            },
+          ],
+        },
+        {
           label: 'Component Library',
           collapsed: true,
           badge: { text: '92', variant: 'success' },

@@ -539,7 +539,7 @@ The most common pattern: child components dispatch custom events that parent com
 **Child component dispatches event:**
 
 ```typescript
-class WcTextInput extends LitElement {
+class HxTextInput extends LitElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
@@ -629,7 +629,7 @@ input.select(); // ← Calls the component's select() method
 **Component implementation:**
 
 ```typescript
-class WcTextInput extends LitElement {
+class HxTextInput extends LitElement {
   private _input?: HTMLInputElement;
 
   /** Moves focus to the input element. */
@@ -716,7 +716,7 @@ Components coordinate with their children using internal events that are stopped
 
 ```typescript
 // wc-radio-group listens for wc-radio-select events from children
-class WcRadioGroup extends LitElement {
+class HxRadioGroup extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('hx-radio-select', this._handleRadioSelect);

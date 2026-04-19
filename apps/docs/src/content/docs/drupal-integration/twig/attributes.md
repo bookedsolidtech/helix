@@ -244,10 +244,10 @@ Rendered output:
 ### ARIA Attributes
 
 ```twig
-{# Add ARIA label for accessibility #}
+{# Add an accessible label for the card #}
 <hx-card {{
   attributes
-    .setAttribute('aria-label', 'Patient record for ' ~ label)
+    .setAttribute('accessible-label', 'Patient record for ' ~ label)
     .setAttribute('role', 'article')
 }}>
   <span slot="heading">{{ label }}</span>
@@ -291,7 +291,7 @@ Rendered output:
 }}
 {% if node.field_clickable.value %}
   {{
-    attributes.setAttribute('hx-href', path('entity.node.canonical', {'node': node.id}))
+    attributes.setAttribute('href', path('entity.node.canonical', {'node': node.id}))
   }}
 {% endif %}
 >
@@ -554,7 +554,7 @@ Build attributes dynamically based on field values and content state.
   variant="default"
   elevation="{{ node.field_elevated.value ? 'floating' : 'flat' }}"
   {% if node.field_clickable.value %}
-    hx-href="{{ path('entity.node.canonical', {'node': node.id}) }}"
+    href="{{ path('entity.node.canonical', {'node': node.id}) }}"
   {% endif %}
   {{ attributes }}
 >
@@ -714,7 +714,7 @@ Combine multiple attributes objects into one.
     <hx-card
       variant="default"
       elevation="raised"
-      hx-href="{{ path('entity.node.canonical', {'node': patient_node.id}) }}"
+      href="{{ path('entity.node.canonical', {'node': patient_node.id}) }}"
       {{ card_attributes }}
     >
       {# Patient photo #}
@@ -950,7 +950,7 @@ Combine multiple attributes objects into one.
     variant="{{ card_variant }}"
     elevation="{{ card_elevation }}"
     {% if view_mode != 'full' %}
-      hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+      href="{{ url('entity.node.canonical', {'node': node.id}) }}"
     {% endif %}
     {{ card_attributes }}
   >

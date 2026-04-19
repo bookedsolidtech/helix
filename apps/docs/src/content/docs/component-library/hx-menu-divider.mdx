@@ -20,7 +20,7 @@ Always place `hx-menu-divider` as a direct child of `hx-menu`, between logical g
 ## Live Demo
 
 <ComponentDemo title="Menu with Dividers">
-  <hx-menu aria-label="Document actions" style="max-width: 220px;">
+  <hx-menu accessible-label="Document actions" style="max-width: 220px;">
     <hx-menu-item value="undo">Undo</hx-menu-item>
     <hx-menu-item value="redo">Redo</hx-menu-item>
     <hx-menu-divider></hx-menu-divider>
@@ -45,7 +45,7 @@ import '@helixui/library/components/hx-menu';
 ## Basic Usage
 
 ```html
-<hx-menu aria-label="Actions">
+<hx-menu accessible-label="Actions">
   <hx-menu-item value="edit">Edit</hx-menu-item>
   <hx-menu-divider></hx-menu-divider>
   <hx-menu-item value="delete">Delete</hx-menu-item>
@@ -89,7 +89,7 @@ import '@helixui/library/components/hx-menu';
 
 ```twig
 {# Render a divider between item groups #}
-<hx-menu aria-label="{{ menu_label }}">
+<hx-menu accessible-label="{{ menu_label }}">
   {% for group in item_groups %}
     {% for item in group %}
       <hx-menu-item value="{{ item.value }}">{{ item.label }}</hx-menu-item>
@@ -122,7 +122,7 @@ helix-components:
     <!-- In your project: import '@helixui/library'; in your bundler entry point -->
   </head>
   <body style="font-family: sans-serif; padding: 2rem;">
-    <hx-menu aria-label="Patient record actions" style="max-width: 220px;">
+    <hx-menu accessible-label="Patient record actions" style="max-width: 220px;">
       <hx-menu-item value="view">View Record</hx-menu-item>
       <hx-menu-item value="edit">Edit Record</hx-menu-item>
       <hx-menu-divider></hx-menu-divider>

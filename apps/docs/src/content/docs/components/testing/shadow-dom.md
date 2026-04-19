@@ -311,7 +311,7 @@ Shadow DOM provides style encapsulation. Styles inside the shadow tree don't lea
 
 ```typescript
 it('has cursor:pointer when interactive', async () => {
-  const el = await fixture<HxCard>('<hx-card hx-href="/test">Content</hx-card>');
+  const el = await fixture<HxCard>('<hx-card href="/test">Content</hx-card>');
   const card = shadowQuery(el, '.card')!;
   const styles = getComputedStyle(card);
   expect(styles.cursor).toBe('pointer');

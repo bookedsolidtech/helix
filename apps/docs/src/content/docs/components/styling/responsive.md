@@ -625,7 +625,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 @customElement('hx-responsive-grid')
-export class WcResponsiveGrid extends LitElement {
+export class HxResponsiveGrid extends LitElement {
   static styles = css`
     :host {
       display: block;

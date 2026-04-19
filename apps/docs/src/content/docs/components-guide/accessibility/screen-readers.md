@@ -32,7 +32,7 @@ html`<button><slot></slot></button>`
 
 // aria-label on host, forwarded via mixinDelegatesAria
 html`<button aria-label=${ifDefined(this.ariaLabel ?? undefined)}><slot></slot></button>`
-// Consumer sets: <hx-button aria-label="Close dialog">X</hx-button>
+// Consumer sets: <hx-button accessible-label="Close dialog">X</hx-button>
 // Accessible name = "Close dialog" (overrides slot text)
 ```
 

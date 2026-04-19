@@ -211,7 +211,7 @@ describe('PatientCard — inherited HelixCard behavior', () => {
 
   it('preserves inherited hx-click event', async () => {
     const el = await fixture<PatientCard>(
-      '<org-patient-card hx-href="/chart">Content</org-patient-card>',
+      '<org-patient-card href="/chart">Content</org-patient-card>',
     );
     const card = shadowQuery<HTMLElement>(el, '.card')!;
     const { oneEvent } = await import('../test-utils.js');
@@ -443,9 +443,9 @@ describe('PatientCard — accessibility (axe-core WCAG 2.1 AA)', () => {
     expect(violations).toEqual([]);
   });
 
-  it('has no violations when interactive (hx-href + hx-label)', async () => {
+  it('has no violations when interactive (href + label)', async () => {
     const el = await fixture<PatientCard>(
-      '<org-patient-card hx-href="/chart/001" hx-label="View chart for James Martin">' +
+      '<org-patient-card href="/chart/001" label="View chart for James Martin">' +
         '<h2 slot="heading">James Martin</h2>' +
         '<p>Room 412</p>' +
         '</org-patient-card>',
@@ -762,7 +762,7 @@ describe('PatientCard', () => {
   describe('Inherited event: hx-click', () => {
     it('fires hx-click when interactive card is clicked', async () => {
       const el = await fixture<PatientCard>(
-        '<org-patient-card hx-href="/chart/001">Content</org-patient-card>',
+        '<org-patient-card href="/chart/001">Content</org-patient-card>',
       );
       const card = shadowQuery<HTMLElement>(el, '.card')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
@@ -885,9 +885,9 @@ describe('PatientCard', () => {
       expect(violations).toEqual([]);
     });
 
-    it('has no violations when interactive with hx-label', async () => {
+    it('has no violations when interactive with label', async () => {
       const el = await fixture<PatientCard>(
-        '<org-patient-card hx-href="/patients/MRN-001" hx-label="View chart for James Martin">' +
+        '<org-patient-card href="/patients/MRN-001" label="View chart for James Martin">' +
           '<h2 slot="heading">James Martin</h2>' +
           '<p>Room 412</p>' +
           '</org-patient-card>',

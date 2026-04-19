@@ -734,16 +734,16 @@ The `views-grid` SDC wraps a Drupal Views output with an `hx-grid` layout and op
     <hx-text-input
       placeholder="Search articles…"
       name="search"
-      aria-label="Search articles"
+      accessible-label="Search articles"
       clearable
     ></hx-text-input>
-    <hx-select name="category" aria-label="Filter by category">
+    <hx-select name="category" accessible-label="Filter by category">
       <option value="">All Categories</option>
       <option value="clinical-research">Clinical Research</option>
       <option value="patient-safety">Patient Safety</option>
       <option value="wellness">Wellness</option>
     </hx-select>
-    <hx-select name="sort" aria-label="Sort order">
+    <hx-select name="sort" accessible-label="Sort order">
       <option value="newest">Newest First</option>
       <option value="oldest">Oldest First</option>
       <option value="popular">Most Popular</option>
@@ -767,7 +767,7 @@ The `views-grid` SDC wraps a Drupal Views output with an `hx-grid` layout and op
   <hx-pagination
     current-page="1"
     total-pages="8"
-    aria-label="Article listing navigation"
+    accessible-label="Article listing navigation"
   ></hx-pagination>
 </div>
 ```
@@ -794,7 +794,7 @@ The `views-grid` SDC wraps a Drupal Views output with an `hx-grid` layout and op
         <hx-text-input
           placeholder="{{ search_placeholder }}"
           name="{{ search_field_name|default('search') }}"
-          aria-label="{{ 'Search'|t }}"
+          accessible-label="{{ 'Search'|t }}"
           clearable
         ></hx-text-input>
       {% endif %}
@@ -802,7 +802,7 @@ The `views-grid` SDC wraps a Drupal Views output with an `hx-grid` layout and op
       {% for filter in exposed_filters %}
         <hx-select
           name="{{ filter.name }}"
-          aria-label="{{ filter.label }}"
+          accessible-label="{{ filter.label }}"
         >
           {% if filter.all_option %}
             <option value="">{{ filter.all_option }}</option>
@@ -832,7 +832,7 @@ The `views-grid` SDC wraps a Drupal Views output with an `hx-grid` layout and op
     <hx-pagination
       current-page="{{ pager.current_page }}"
       total-pages="{{ pager.total_pages }}"
-      aria-label="{{ 'Content listing navigation'|t }}"
+      accessible-label="{{ 'Content listing navigation'|t }}"
     ></hx-pagination>
   {% endif %}
 </div>

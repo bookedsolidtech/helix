@@ -33,7 +33,26 @@ The key difference: library bundles say "go find `lit` yourself." CDN bundles mu
 
 HELiX uses a separate Vite config for CDN builds. This config produces self-contained bundles where Lit is included (not externalized) and everything is ready for direct `<script>` use.
 
-### Single-File CDN Bundle (All Components)
+:::tip[Strategy B is the recommended path]
+3.0.0 ships `dist/cdn/core.js` (registry + tokens, ~8.4KB min+gz) plus per-component modules at `dist/cdn/hx-<component>.js` (~2KB each). Load only what you use.
+
+The single-file bundle below remains available for prototyping and back-compat, but is **not recommended for production** — it ships every component whether you use it or not.
+:::
+
+### Per-Component CDN Bundles (recommended)
+
+For consumers who need only specific components, per-component CDN bundles reduce download weight significantly. This is the recommended 3.0.0 pattern — load `core.js` once, then load only the components you use:
+
+```html
+<!-- Core: registry + tokens (~8.4KB min+gz) -->
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js"></script>
+
+<!-- Per-component modules (~2KB each) -->
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-button.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-card.js"></script>
+```
+
+### Single-File CDN Bundle (not recommended for production)
 
 ```typescript
 // packages/hx-library/vite.cdn.config.ts
@@ -88,9 +107,9 @@ dist-cdn/
 └── hx-library.iife.js.map
 ```
 
-### Per-Component CDN Bundles
+### Per-Component CDN Bundles — build configuration
 
-For consumers who need only specific components, per-component CDN bundles reduce download weight significantly:
+The per-component Vite config that produces the recommended `dist/cdn/` output:
 
 ```typescript
 // packages/hx-library/vite.cdn.per-component.config.ts
@@ -349,7 +368,7 @@ This URL is permanently cached. When `2.3.2` ships, a new URL is served. Old URL
 <!-- ❌ BAD — a new release changes what this URL serves -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist-cdn/hx-library.es.js"
 ></script>
 
 <!-- ❌ BAD — minor/patch updates silently change the file -->

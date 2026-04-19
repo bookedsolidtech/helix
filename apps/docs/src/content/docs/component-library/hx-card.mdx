@@ -13,11 +13,11 @@ import ComponentDoc from '../../../components/ComponentDoc.astro';
 
 ## Overview
 
-`hx-card` is a flexible content container that groups related information into a visually distinct surface. It supports five named slots (image, heading, body, footer, actions), three visual style variants, three elevation levels, and an interactive link mode via `hx-href`.
+`hx-card` is a flexible content container that groups related information into a visually distinct surface. It supports five named slots (image, heading, body, footer, actions), three visual style variants, three elevation levels, and an interactive link mode via `href`.
 
 **Use `hx-card` when:** you need to present a self-contained piece of content — a patient summary, a clinical record, a feature callout — with optional media, a title, body copy, footer metadata, and action buttons.
 
-**Use `hx-card` with `hx-href` when:** the entire card should act as a navigable link. Note: do not combine `hx-href` with the `actions` slot — nesting focusable controls inside `role="link"` is an ARIA anti-pattern.
+**Use `hx-card` with `href` when:** the entire card should act as a navigable link. Note: do not combine `href` with the `actions` slot — nesting focusable controls inside `role="link"` is an ARIA anti-pattern.
 
 ## Live Demo
 
@@ -91,18 +91,18 @@ All available slots: image, heading, body, footer, and actions.
 
 ### Interactive Card
 
-Card with `hx-href` becomes clickable. Uses the `hx-` prefix to avoid conflicting with the native HTML `href` attribute.
+Card with `href` becomes clickable. The card fires `hx-click` on activation; follow the link in your handler or let the browser navigate.
 
 <ComponentDemo title="Interactive Card">
   <hx-card
     variant="default"
     elevation="raised"
-    hx-href="https://helix.dev"
-    hx-label="Learn more about Helix"
+    href="https://helix.dev"
+    label="Learn more about Helix"
   >
     <span slot="heading">Clickable Card</span>
     <p>
-      This card has a <code>hx-href</code> attribute — click anywhere or press Enter/Space to
+      This card has an <code>href</code> attribute — click anywhere or press Enter/Space to
       navigate.
     </p>
   </hx-card>
@@ -137,14 +137,14 @@ Minimal HTML snippet — no build tool required:
 | ----------- | ----------- | -------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variant`   | `variant`   | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card. `featured` adds a primary-colored border; `compact` reduces internal padding.                                                                  |
 | `elevation` | `elevation` | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card. `flat` has no shadow; `raised` adds a subtle shadow; `floating` adds a prominent shadow.                                                               |
-| `hxHref`    | `hx-href`   | `string \| undefined`                  | `undefined` | Optional URL. When set, the card becomes interactive — it gains `role="link"`, `tabindex="0"`, and fires `hx-click` on click or Enter/Space. Do not combine with `actions` slot. |
-| `label`     | `hx-label`  | `string \| undefined`                  | `undefined` | Accessible label for interactive cards. Provides a meaningful description beyond the visible content. Only applied when `hx-href` is set.                                        |
+| `href`      | `href`      | `string \| undefined`                  | `undefined` | Optional URL. When set, the card becomes interactive — it gains `role="link"`, `tabindex="0"`, and fires `hx-click` on click or Enter/Space. Do not combine with `actions` slot. |
+| `label`     | `label`     | `string \| undefined`                  | `undefined` | Accessible label for interactive cards. Provides a meaningful description beyond the visible content. Only applied when `href` is set.                                           |
 
 ## Events
 
 | Event      | Detail Type                                                    | Description                                                                                                                 |
 | ---------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `hx-click` | `{ href: string; originalEvent: MouseEvent \| KeyboardEvent }` | Dispatched when an interactive card (with `hx-href`) is clicked or activated via keyboard. `bubbles: true, composed: true`. |
+| `hx-click` | `{ href: string; originalEvent: MouseEvent \| KeyboardEvent }` | Dispatched when an interactive card (with `href`) is clicked or activated via keyboard. `bubbles: true, composed: true`. |
 
 ## Slots
 
@@ -154,7 +154,7 @@ Minimal HTML snippet — no build tool required:
 | `heading`   | The card heading/title content. Use a semantic heading element (`<h2>`, `<h3>`, etc.) for proper document outline. The slot wrapper is hidden when empty.                                                                |
 | _(default)_ | Default slot for the card body content. Always visible. Accepts any flow content.                                                                                                                                        |
 | `footer`    | Optional footer content rendered below the body — metadata, timestamps, attribution. The slot wrapper is hidden when empty.                                                                                              |
-| `actions`   | Optional action buttons rendered with a top border separator. The slot wrapper is hidden when empty. **Do not use together with `hx-href`** — nesting interactive controls inside `role="link"` is an ARIA anti-pattern. |
+| `actions`   | Optional action buttons rendered with a top border separator. The slot wrapper is hidden when empty. **Do not use together with `href`** — nesting interactive controls inside `role="link"` is an ARIA anti-pattern. |
 
 ## CSS Parts
 
@@ -183,11 +183,11 @@ Minimal HTML snippet — no build tool required:
 
 | Topic            | Details                                                                                                                                                                                                                            |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Static card      | When `hx-href` is not set, the card is a non-interactive `<div>`. No ARIA role is applied. Screen readers encounter the card content in document order.                                                                            |
-| Interactive card | When `hx-href` is set, the inner container receives `role="link"` and `tabindex="0"`. The card is keyboard-reachable and activatable via `Enter` or `Space`. This matches the WAI-ARIA link pattern.                               |
-| `aria-label`     | Use `hx-label` on interactive cards to provide a meaningful accessible name beyond the visible content. Example: `hx-label="View patient record for John Smith"`.                                                                  |
+| Static card      | When `href` is not set, the card is a non-interactive `<div>`. No ARIA role is applied. Screen readers encounter the card content in document order.                                                                              |
+| Interactive card | When `href` is set, the inner container receives `role="link"` and `tabindex="0"`. The card is keyboard-reachable and activatable via `Enter` or `Space`. This matches the WAI-ARIA link pattern.                                 |
+| Accessible name  | Use the `label` property on interactive cards to provide a meaningful accessible name beyond the visible content. Example: `label="View patient record for John Smith"`.                                                           |
 | Heading slot     | Always use a semantic heading element (`<h2>`, `<h3>`, etc.) in the `heading` slot to maintain a correct document outline. Avoid using `<span>` for headings in production.                                                        |
-| Actions slot     | Do **not** use the `actions` slot together with `hx-href`. Nesting focusable controls (buttons, links) inside `role="link"` creates unreachable elements and violates WCAG 4.1.2. A console warning is issued if both are present. |
+| Actions slot     | Do **not** use the `actions` slot together with `href`. Nesting focusable controls (buttons, links) inside `role="link"` creates unreachable elements and violates WCAG 4.1.2. A console warning is issued if both are present.    |
 | Focus indicator  | Interactive cards display a visible `:focus-visible` outline styled with `--hx-focus-ring-width` and `--hx-focus-ring-color`, meeting WCAG 2.4.7.                                                                                  |
 | Reduced motion   | The hover lift and shadow transition animations are suppressed when `prefers-reduced-motion: reduce` is active, meeting WCAG 2.3.3.                                                                                                |
 | Color contrast   | Card text color pairings against background meet WCAG 2.1 AA 4.5:1 minimum contrast ratio.                                                                                                                                         |
@@ -202,9 +202,9 @@ Use the component in a Twig template after registering the library:
 <hx-card
   variant="{{ variant|default('default') }}"
   elevation="{{ elevation|default('flat') }}"
-  {% if hx_href %}
-    hx-href="{{ hx_href }}"
-    hx-label="{{ hx_aria_label|default('') }}"
+  {% if href %}
+    href="{{ href }}"
+    label="{{ accessible_label|default('') }}"
   {% endif %}
 >
   {% if image_url %}
@@ -275,8 +275,8 @@ Copy-paste this into a `.html` file and open it in a browser — no build tool n
       <hx-card
         variant="default"
         elevation="flat"
-        hx-href="/patients/4821"
-        hx-label="Open patient record for John Smith"
+        href="/patients/4821"
+        label="Open patient record for John Smith"
         id="interactive-card"
       >
         <h3 slot="heading">Clickable Card</h3>

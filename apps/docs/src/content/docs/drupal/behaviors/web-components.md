@@ -436,7 +436,7 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
   data-entity-bundle="patient"
   data-view-mode="{{ view_mode }}"
   {% if view_mode != 'full' %}
-    hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+    href="{{ url('entity.node.canonical', {'node': node.id}) }}"
   {% endif %}
 >
   {% if content.field_photo|render|trim %}
@@ -496,7 +496,7 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
           card.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault();
-              const href = card.getAttribute('hx-href');
+              const href = card.getAttribute('href');
               if (href) window.location.href = href;
             }
           });

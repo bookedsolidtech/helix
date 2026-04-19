@@ -112,7 +112,7 @@ import { once } from 'core/once';
   <hx-card
     variant="default"
     elevation="raised"
-    hx-href="{{ patient.detail_url }}"
+    href="{{ patient.detail_url }}"
     data-patient-id="{{ patient.id }}"
     hidden
   >

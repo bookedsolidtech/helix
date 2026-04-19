@@ -348,13 +348,13 @@ For components with href attributes:
 ```twig
 {# SAFE: Drupal's URL system validates URLs #}
 <hx-button
-  hx-href="{{ path('entity.node.canonical', {'node': node.id}) }}"
+  href="{{ path('entity.node.canonical', {'node': node.id}) }}"
 >
   Read more
 </hx-button>
 
 {# SAFE: For external URLs from user input, validate in PHP first #}
-<hx-card hx-href="{{ content.field_link.0['#url'] }}">
+<hx-card href="{{ content.field_link.0['#url'] }}">
   {{ content.field_link.0['#title'] }}
 </hx-card>
 ```
@@ -397,7 +397,7 @@ ClassicEditor.create(element, {
         attributes: {
           variant: true,
           'hx-size': true,
-          'hx-href': true,
+          'href': true,
           disabled: true,
         },
         classes: false, // Prevent arbitrary classes
@@ -478,7 +478,7 @@ When using Drupal Behaviors to interact with HELIX components:
 
   Drupal.behaviors.helixCard = {
     attach(context) {
-      once('hx-card-init', 'hx-card[hx-href]', context).forEach((card) => {
+      once('hx-card-init', 'hx-card[href]', context).forEach((card) => {
         card.addEventListener('hx-card-click', (e) => {
           const url = e.detail.url;
 
@@ -787,7 +787,7 @@ This prevents any inline `<script>` tags or event handlers from executing, even 
   variant="{{ content.field_variant.0['#markup'] }}"
   hx-size="{{ content.field_size.0['#markup'] }}"
   {% if content.field_disabled.0['#markup'] == 'true' %}disabled{% endif %}
-  hx-href="{{ content.field_link.0['#url'] }}"
+  href="{{ content.field_link.0['#url'] }}"
 >
   {{ content.field_label }}
 </hx-button>
@@ -807,7 +807,7 @@ This prevents any inline `<script>` tags or event handlers from executing, even 
   {{ content.body }}
 
   <div slot="footer">
-    <hx-button hx-href="{{ path('entity.node.canonical', {'node': node.id}) }}">
+    <hx-button href="{{ path('entity.node.canonical', {'node': node.id}) }}">
       Read more
     </hx-button>
   </div>

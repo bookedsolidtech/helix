@@ -992,7 +992,7 @@ export class HxProviderCard extends LitElement {
           // Priority 1: Resolved template (shown when fetch completes)
           this.providerId ? this._fetchProvider(this.providerId) : undefined,
           // Priority 2: Fallback (shown immediately while fetching)
-          html`<hx-spinner aria-label="Loading provider..."></hx-spinner>`,
+          html`<hx-spinner accessible-label="Loading provider..."></hx-spinner>`,
         )}
       </div>
     `;

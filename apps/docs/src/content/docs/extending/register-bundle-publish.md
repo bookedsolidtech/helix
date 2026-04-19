@@ -611,7 +611,7 @@ When HELiX releases a major version, the upgrade path for consumer packages is:
 2. **You update your `peerDependencies`** — `"@helixui/library": ">=2.0.0 <3.0.0"`
 3. **You audit your extended components** — any subclasses that relied on changed public API must be updated
 4. **You publish a new major of your package** — `v2.0.0`, signaling the peer dependency upgrade requirement
-5. **End consumers update both packages** — `@helixui/library@^2` and `@your-org/design-system@^2`
+5. **End consumers update both packages** — `@helixui/library@^3` and `@your-org/design-system@^2`
 
 Do not try to maintain compatibility with both HELiX v1 and v2 in a single release. The shared `LitElement` instance requirement makes version straddling unreliable. Use separate major versions.
 
@@ -624,7 +624,7 @@ For Drupal projects consuming via CDN, pin the CDN URL to the major version:
 <script src="https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/index.js" type="module"></script>
 
 <!-- Pinned to exact version for zero-change deployments in regulated environments -->
-<script src="https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js" type="module"></script>
 ```
 
 For regulated healthcare environments (SOC 2, HIPAA-adjacent deployments), exact-version CDN pins or self-hosted copies are common — the `@1` floating major tag updates automatically on CDN cache refresh, which may violate change management policies.

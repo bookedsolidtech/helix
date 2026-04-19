@@ -3,6 +3,10 @@ title: Installation
 description: How to install and set up the HELIX enterprise web component library
 ---
 
+:::note[Upgrading from 2.x?]
+If you already have a 2.x release of `@helixui/library` installed, read the [Upgrading to 3.0.0](/migration/3.0.0) guide first. 3.0.0 removes the `aria-label` attribute and several other 2.x shims on HELiX elements.
+:::
+
 ## Install via npm
 
 ```bash
@@ -19,8 +23,8 @@ Current versions:
 
 | Package             | Version |
 | ------------------- | ------- |
-| `@helixui/library`  | 1.1.2   |
-| `@helixui/tokens`   | 0.3.4   |
+| `@helixui/library`  | 3.0.0   |
+| `@helixui/tokens`   | 3.0.0   |
 
 ## CDN (No Build Step)
 
@@ -28,15 +32,15 @@ Load HELiX directly in any HTML page via unpkg or jsDelivr:
 
 ```html
 <!-- All components (recommended for prototyping) -->
-<script type="module" src="https://unpkg.com/@helixui/library@1.1.2/dist/index.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@helixui/library@1.1.2/dist/css/helix-all.css">
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/index.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@helixui/library@3.0.0/dist/css/helix-all.css">
 ```
 
 jsDelivr alternative:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/css/helix-all.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css">
 ```
 
 ## Prerequisites

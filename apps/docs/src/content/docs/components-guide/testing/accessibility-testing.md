@@ -51,7 +51,7 @@ Disable specific rules when you have a documented exception:
 ```typescript
 it('icon-only button with aria-label has no violations', async () => {
   const el = await fixture<HelixButton>(
-    '<hx-button aria-label="Close dialog" variant="ghost">' +
+    '<hx-button accessible-label="Close dialog" variant="ghost">' +
     '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
     '</hx-button>'
   );
@@ -93,14 +93,14 @@ Verify that `aria-label` set on the host is forwarded to the inner interactive e
 
 ```typescript
 it('forwards aria-label to inner button', async () => {
-  const el = await fixture<HelixButton>('<hx-button aria-label="Close dialog">X</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button accessible-label="Close dialog">X</hx-button>');
   const btn = shadowQuery(el, 'button')!;
   expect(btn.getAttribute('aria-label')).toBe('Close dialog');
 });
 
 it('forwards aria-label to inner anchor', async () => {
   const el = await fixture<HelixButton>(
-    '<hx-button href="https://example.com" aria-label="Visit site">→</hx-button>'
+    '<hx-button href="https://example.com" accessible-label="Visit site">→</hx-button>'
   );
   const anchor = shadowQuery(el, 'a')!;
   expect(anchor.getAttribute('aria-label')).toBe('Visit site');

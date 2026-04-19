@@ -251,7 +251,7 @@ Output:
 
 ```
 mytheme@1.0.0 /path/to/mytheme
-└── @helixui/library@0.0.1
+└── @helixui/library@3.0.0
 ```
 
 Inspect installed files:

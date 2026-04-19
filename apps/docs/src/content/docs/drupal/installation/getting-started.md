@@ -106,7 +106,7 @@ Open your theme's `mytheme.libraries.yml` and add:
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -115,7 +115,7 @@ helix-components:
 
 **Important:** The `attributes: { type: module }` line is required. HELiX ships as an ES module — without this attribute, browsers will reject the script.
 
-The correct file path is `dist/index.js`. Do not use `dist/helix.bundled.js` or `dist/helix.min.js` — those paths do not exist in `@helixui/library@1.1.2`.
+The correct file path for the Drupal `libraries.yml` `js:` entry is `dist/index.js` (the npm entry point). For CDN-loaded integrations see the [Drupal CDN guide](/drupal/installation/cdn) — 3.0.0 ships `dist/cdn/core.js` plus per-component modules for that path.
 
 ### Step 2: Attach the library globally
 
@@ -176,9 +176,9 @@ All installation guides on this site use these versions.
 
 | Use case | URL |
 |---|---|
-| Full bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js` |
-| CSS bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/css/helix-all.css` |
-| Single component (example) | `https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-button/index.js` |
+| Full bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js` |
+| CSS bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css` |
+| Single component (example) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js` |
 
 ---
 

@@ -25,7 +25,7 @@ Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` 
 ### Basic Menu
 
 <ComponentDemo title="Basic Menu">
-  <hx-menu aria-label="Action menu" style="max-width: 200px;">
+  <hx-menu accessible-label="Action menu" style="max-width: 200px;">
     <hx-menu-item value="edit">Edit</hx-menu-item>
     <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
     <hx-menu-divider></hx-menu-divider>
@@ -36,7 +36,7 @@ Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` 
 ### With Prefix Icons
 
 <ComponentDemo title="With Prefix Icons">
-  <hx-menu aria-label="File menu" style="max-width: 220px;">
+  <hx-menu accessible-label="File menu" style="max-width: 220px;">
     <hx-menu-item value="new">
       <span slot="prefix">+</span>
       New File
@@ -60,7 +60,7 @@ Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` 
 ### Checkbox Items
 
 <ComponentDemo title="Checkbox Items">
-  <hx-menu aria-label="View options" style="max-width: 240px;">
+  <hx-menu accessible-label="View options" style="max-width: 240px;">
     <hx-menu-item type="checkbox" value="sidebar" checked>
       Show Sidebar
     </hx-menu-item>
@@ -76,7 +76,7 @@ Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` 
 ### Radio Items
 
 <ComponentDemo title="Radio Items">
-  <hx-menu aria-label="Sort order" style="max-width: 240px;">
+  <hx-menu accessible-label="Sort order" style="max-width: 240px;">
     <hx-menu-item type="radio" value="name" checked>
       Sort by Name
     </hx-menu-item>
@@ -92,7 +92,7 @@ Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` 
 ### With Keyboard Shortcuts (Suffix)
 
 <ComponentDemo title="With Keyboard Shortcuts">
-  <hx-menu aria-label="Edit menu" style="max-width: 220px;">
+  <hx-menu accessible-label="Edit menu" style="max-width: 220px;">
     <hx-menu-item value="cut">
       Cut
       <span slot="suffix" style="color: var(--hx-color-neutral-500); font-size: 0.75rem;">
@@ -117,7 +117,7 @@ Use `hx-menu` with `hx-menu-item` for interactive actions and `hx-menu-divider` 
 ### Loading State
 
 <ComponentDemo title="Loading State">
-  <hx-menu aria-label="Processing menu" style="max-width: 200px;">
+  <hx-menu accessible-label="Processing menu" style="max-width: 200px;">
     <hx-menu-item value="save" loading>
       Saving...
     </hx-menu-item>
@@ -138,7 +138,7 @@ import '@helixui/library/components/hx-menu';
 ## Basic Usage
 
 ```html
-<hx-menu aria-label="Actions">
+<hx-menu accessible-label="Actions">
   <hx-menu-item value="edit">Edit</hx-menu-item>
   <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
   <hx-menu-divider></hx-menu-divider>
@@ -217,7 +217,7 @@ import '@helixui/library/components/hx-menu';
 
 ```twig
 {# my-module/templates/action-menu.html.twig #}
-<hx-menu aria-label="{{ label }}">
+<hx-menu accessible-label="{{ label }}">
   {% for item in items %}
     {% if item.divider %}
       <hx-menu-divider></hx-menu-divider>
@@ -270,7 +270,7 @@ Drupal.behaviors.helixMenu = {
     <!-- In your project: import '@helixui/library'; in your bundler entry point -->
   </head>
   <body style="font-family: sans-serif; padding: 2rem;">
-    <hx-menu id="my-menu" aria-label="Document actions" style="max-width: 200px;">
+    <hx-menu id="my-menu" accessible-label="Document actions" style="max-width: 200px;">
       <hx-menu-item value="edit">Edit</hx-menu-item>
       <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
       <hx-menu-divider></hx-menu-divider>

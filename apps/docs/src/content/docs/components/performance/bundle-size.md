@@ -366,8 +366,8 @@ For heavy components used in specific contexts, split them into separate chunks.
 ```typescript
 // Dynamically import heavy component
 async function loadDataTable() {
-  const { WcDataTable } = await import('@helixui/library/components/wc-data-table');
-  customElements.define('hx-data-table', WcDataTable);
+  const { HxDataTable } = await import('@helixui/library/components/hx-data-table');
+  customElements.define('hx-data-table', HxDataTable);
 }
 
 // Load only when needed
