@@ -200,6 +200,11 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      # Build @helixui/library first — @helixui/react's type-check resolves
+      # deep-path imports (`@helixui/library/components/*`) through the
+      # `exports` map which points at `dist/`. Turbo's `^build` dependency is
+      # not reliably honored on fresh CI runners, so build explicitly.
+      - run: pnpm turbo run build --filter=@helixui/library
       - run: pnpm turbo run type-check --filter='!docs'
 
   # ── Tests (need Playwright browsers) ────────────────────────────────────
