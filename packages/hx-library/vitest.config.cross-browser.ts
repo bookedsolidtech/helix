@@ -29,8 +29,11 @@ export default defineConfig({
       provider: 'playwright',
       headless: true,
       viewport: { width: 1280, height: 720 },
-      // Run all three browser engines for cross-browser validation.
-      instances: [{ browser: 'chromium' }, { browser: 'firefox' }, { browser: 'webkit' }],
+      // In CI each matrix job sets BROWSER=<engine> so only that engine runs.
+      // Locally (no BROWSER env var) all three engines run in sequence.
+      instances: process.env.BROWSER
+        ? [{ browser: process.env.BROWSER as 'chromium' | 'firefox' | 'webkit' }]
+        : [{ browser: 'chromium' }, { browser: 'firefox' }, { browser: 'webkit' }],
     },
     include: [
       'src/components/**/*.test.ts',
