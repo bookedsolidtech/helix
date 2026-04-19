@@ -4,6 +4,22 @@ import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+const SUPPORTED_BROWSERS = ['chromium', 'firefox', 'webkit'] as const;
+type SupportedBrowser = (typeof SUPPORTED_BROWSERS)[number];
+
+function resolveBrowserInstances(): { browser: SupportedBrowser }[] {
+  const envBrowser = process.env.BROWSER;
+  if (!envBrowser) {
+    return SUPPORTED_BROWSERS.map((browser) => ({ browser }));
+  }
+  if (!(SUPPORTED_BROWSERS as readonly string[]).includes(envBrowser)) {
+    throw new Error(
+      `Invalid BROWSER env var: "${envBrowser}". Expected one of: ${SUPPORTED_BROWSERS.join(', ')}.`,
+    );
+  }
+  return [{ browser: envBrowser as SupportedBrowser }];
+}
+
 /**
  * Cross-browser test configuration for Vitest browser mode.
  *
@@ -31,9 +47,8 @@ export default defineConfig({
       viewport: { width: 1280, height: 720 },
       // In CI each matrix job sets BROWSER=<engine> so only that engine runs.
       // Locally (no BROWSER env var) all three engines run in sequence.
-      instances: process.env.BROWSER
-        ? [{ browser: process.env.BROWSER as 'chromium' | 'firefox' | 'webkit' }]
-        : [{ browser: 'chromium' }, { browser: 'firefox' }, { browser: 'webkit' }],
+      // Validated at config load — fails fast on typos (e.g. BROWSER=chrome).
+      instances: resolveBrowserInstances(),
     },
     include: [
       'src/components/**/*.test.ts',
