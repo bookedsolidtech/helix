@@ -67,7 +67,7 @@ el.accessibleLabel = 'Close dialog';
 **Codemod:**
 
 ```bash
-rg -l '<hx-(?!card)[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-(?!card)[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
+rg -P -l '<hx-(?!card\b)[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-(?!card\b)[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
 ```
 
 :::caution
@@ -79,7 +79,7 @@ Do **not** rewrite `aria-label` on native HTML elements (`<button>`, `<input>`, 
 
 ```diff
 - <hx-card hxAriaLabel="View patient record">...</hx-card>
-+ <hx-card label="View patient record">...</hx-card>
++ <hx-card hx-label="View patient record">...</hx-card>
 ```
 
 :::

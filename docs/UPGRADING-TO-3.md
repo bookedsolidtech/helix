@@ -33,7 +33,7 @@ Consumers using the React wrapper:
 pnpm add @helixui/react@^3.0.0
 ```
 
-CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js` and the per-component modules you use (see [CDN delivery](#cdn-delivery)).
+CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/helix-core-3.0.0.min.js` and the per-component modules you use (see [CDN delivery](#12-cdn-delivery)).
 
 ---
 
@@ -73,7 +73,7 @@ Components affected: `hx-button`, `hx-icon-button`, `hx-badge`, `hx-chip`, `hx-c
 
 ```diff
 - <hx-card hxAriaLabel="View patient record">...</hx-card>
-+ <hx-card label="View patient record">...</hx-card>
++ <hx-card hx-label="View patient record">...</hx-card>
 ```
 
 ---
@@ -403,7 +403,7 @@ A grep-based codemod is tracked as a 3.0.1 follow-up. For 3.0.0, the find-and-re
 
 ```bash
 # aria-label → accessible-label on HELiX component tags (excludes hx-card, which uses label=)
-rg -P -l '<hx-(?!card)[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-(?!card)[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
+rg -P -l '<hx-(?!card\b)[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-(?!card\b)[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
 
 # ::part(error-message) → ::part(error)
 rg -l '::part\(error-message\)' | xargs sd '::part\(error-message\)' '::part(error)'
