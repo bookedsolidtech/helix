@@ -187,21 +187,8 @@ jobs:
       - name: Build CDN artifacts
         run: pnpm --filter=@helixui/library run build:cdn
 
-      - name: Generate release manifest
-        id: manifest
-        run: node scripts/generate-release-manifest.mjs
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_REF: ${{ github.ref }}
-        # Emits docs/releases/<tag>-manifest.json with SHA, CI run ID,
-        # changeset list, bundle size snapshot, CEM SHA, and publish actor.
-        # Committed as part of the version-bump PR that changesets/action
-        # creates below.
-
       - name: Version and Publish
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: pnpm run changeset:publish
@@ -216,3 +203,34 @@ jobs:
           # version bump commits). The hook is designed for developer workflows,
           # not for internal CI git operations.
           HUSKY: '0'
+
+      - name: Generate release manifest
+        if: steps.changesets.outputs.published == 'true'
+        id: manifest
+        run: node scripts/generate-release-manifest.mjs
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REF: ${{ github.ref }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        # Emits docs/releases/<tag>-manifest.json with SHA, CI run ID,
+        # changeset list, bundle size snapshot, CEM SHA, and publish actor.
+        # Runs only on an actual publish — when changesets/action bumps
+        # versions without publishing (PR path), no manifest is generated.
+
+      - name: Commit release manifest
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          CHANGESET_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
+        run: |
+          if ! git status --porcelain docs/releases/ | grep -q .; then
+            echo "No release manifest changes to commit."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/releases/
+          git commit -m 'chore(release): add release manifest [skip ci]'
+          git push "https://x-access-token:${CHANGESET_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main

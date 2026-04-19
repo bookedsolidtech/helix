@@ -75,11 +75,16 @@ Do **not** rewrite `aria-label` on native HTML elements (`<button>`, `<input>`, 
 :::
 
 :::note[hx-card exception]
-`hx-card` uses `label` (not `accessible-label`) for its accessible name. The codemod above excludes it. Migrate manually:
+`hx-card` uses `hx-label` (HTML attribute) / `label` (JS property) for its accessible name — not `accessible-label`. The codemod above excludes it. Migrate manually:
 
 ```diff
 - <hx-card hxAriaLabel="View patient record">...</hx-card>
 + <hx-card hx-label="View patient record">...</hx-card>
+```
+
+```diff
+- el.hxAriaLabel = 'View patient record';
++ el.label = 'View patient record';
 ```
 
 :::
@@ -150,21 +155,34 @@ rg '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.twig' -g '*.html.twig'
 
 Audit each hit. Confirmation dialogs, clinical alerts, and blocking workflows should add `modal`. Inline drawers and sidebar panels should stay non-modal.
 
-## 6. `hx-phi-field` — PHI attribute stripped post-hydration
+## 6. `hx-phi-field` — PHI set via JS property, never as an HTML attribute
 
 :::note
-**Positive security change.** HIPAA-aligned deployments benefit silently. Only consumers reading `el.getAttribute('value')` need to update.
+**Positive security change — HIPAA hardening.** Consumers that already set PHI via the `data` JS property benefit silently.
 :::
 
-In 2.x, `<hx-phi-field value="...">` left the `value` attribute on the element, exposing PHI via `getAttribute('value')`, `outerHTML`, SSR dumps, and DevTools. In 3.0.0 the attribute is removed after `connectedCallback`; the property retains the value.
+`hx-phi-field` holds Protected Health Information via the `data` JS property. The property is declared with `@property({ attribute: false })` so Lit does not observe a `data` HTML attribute. If raw HTML markup sets `<hx-phi-field data="...">`, the component's `connectedCallback` rescues the value into the `data` property, emits a `console.warn`, and removes the attribute from the DOM so PHI is not retained in `outerHTML`, DevTools, or SSR snapshots.
+
+The supported pattern — set `data` via JS:
+
+```html
+<hx-phi-field id="mrn" field-id="patient-mrn" field-type="mrn"></hx-phi-field>
+```
 
 ```typescript
-// Before — worked, but leaked PHI in DOM serialization
-const phi = el.getAttribute('value');
-
-// After — read the property instead
-const phi = el.value;
+const el = document.querySelector('hx-phi-field#mrn');
+el.data = '123-45-6789';
 ```
+
+The unsupported pattern — setting via HTML attribute:
+
+```html
+<!-- Do not do this. The component warns and strips the attribute at runtime,
+     but the raw value is briefly present in the HTML source (SSR, view-source). -->
+<hx-phi-field data="123-45-6789"></hx-phi-field>
+```
+
+Consumers setting PHI via the `data` property need no change. Consumers setting PHI via an HTML attribute must move the assignment to JavaScript.
 
 This change surfaced during the Figgy (Northwell) integration audit as a HIPAA-relevant exposure vector.
 
@@ -183,8 +201,7 @@ Inherited for free:
 Subclassing example:
 
 ```typescript
-import { HelixElement } from '@helixui/library';
-import { FormMixin } from '@helixui/library/mixins';
+import { HelixElement, FormMixin } from '@helixui/library';
 
 class MyCustomInput extends FormMixin(HelixElement) {
   static override formAssociated = true;
@@ -285,7 +302,7 @@ import '@floating-ui/dom';
 
 ## 11. Public-API allowlist
 
-3.0.0 blocks undocumented deep imports. Consumers importing from anything other than the root barrel, `@helixui/library/mixins`, or documented per-component entry points will see a build-time error.
+3.0.0 blocks undocumented deep imports. The public surface is the root barrel (`@helixui/library`) and per-component entry points (`@helixui/library/components/<hx-name>`). There is no `@helixui/library/mixins` subpath export — `FocusMixin`, `FormMixin`, `HelixElement`, and `HelixAuditController` are all re-exported from the root barrel. Consumers importing from anything else will see a build-time error.
 
 ```typescript
 // Before — blocked in 3.0.0

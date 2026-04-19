@@ -101,40 +101,19 @@ private _handleShadowClick = (e: Event) => {
 
 Arrow function property syntax (`private _handleShadowClick = ...`) preserves `this` binding when the function is used as a callback directly. When using Lit template bindings (`@click=${...}`), Lit handles binding automatically.
 
-## ARIA Delegation with `mixinDelegatesAria`
+## ARIA Delegation in HELiX Components
 
-A common challenge in shadow DOM is connecting ARIA attributes on the host element to the interactive element inside the shadow root. For example, `aria-label` on `<hx-button>` should reach the `<button>` inside. HELiX provides `mixinDelegatesAria` for this:
+A common challenge in shadow DOM is connecting ARIA attributes on the host element to the interactive element inside the shadow root. For example, `aria-label` on `<hx-button>` should reach the `<button>` inside, not remain on the custom-element host that assistive technologies would otherwise read as a generic element.
 
-```typescript
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { mixinDelegatesAria } from '@helixui/library/mixins';
-
-const Base = mixinDelegatesAria(LitElement);
-
-@customElement('hx-button')
-export class HelixButton extends Base {
-  override render() {
-    return html`
-      <!--
-        The mixin forwards aria-label, aria-expanded, aria-controls, etc.
-        from the host to this button element automatically.
-      -->
-      <button>
-        <slot></slot>
-      </button>
-    `;
-  }
-}
-```
-
-With `mixinDelegatesAria`, a consumer can write:
+Built-in HELiX components solve this with `accessible-label` — a public host attribute that components forward to the inner target via `ElementInternals.ariaLabel` or template binding. Consumers write:
 
 ```html
 <hx-button accessible-label="Close dialog">X</hx-button>
 ```
 
-And the `aria-label` correctly targets the inner `<button>` — not the `<hx-button>` host element that assistive technologies would otherwise see as a generic `div`.
+And the accessible name correctly reaches the interactive inner element.
+
+If you are building your own custom elements (not extending HELiX components), implement forwarding with `ElementInternals` ARIA properties — see [Form Accessibility](/components-guide/forms/accessibility/#elementinternalsarialabel-vs-attribute). The internal helper HELiX components use for attribute-level forwarding is not part of the public API; consumers should prefer `ElementInternals.ariaLabel` and explicit template bindings to the inner element.
 
 ## `delegatesFocus`
 

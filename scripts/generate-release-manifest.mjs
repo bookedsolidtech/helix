@@ -55,6 +55,17 @@ const changesetFiles = existsSync(changesetDir)
   ? readdirSync(changesetDir).filter((f) => f.endsWith('.md') && f !== 'README.md')
   : [];
 
+const publishedPackages = (() => {
+  const raw = process.env.PUBLISHED_PACKAGES;
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+})();
+
 const cdnBudget = readJson(join(REPO_ROOT, '.cdn-budget.json'));
 
 const cemPath = join(REPO_ROOT, 'packages/hx-library/custom-elements.json');
@@ -99,14 +110,16 @@ const manifest = {
     '@helixui/react': reactPkg.version ?? null,
   },
   changeset_files: changesetFiles,
+  published_packages: publishedPackages,
   merged_prs_since_last_tag: mergedPrs,
   last_tag: lastTag,
   cem_sha256: cemSha,
   cdn_budget_snapshot: cdnBudget,
   coderabbit_final_review_sha: process.env.CODERABBIT_FINAL_REVIEW_SHA ?? null,
   notes:
-    'Emitted by scripts/generate-release-manifest.mjs during the publish workflow. ' +
-    'Committed to the repo as part of the version-bump PR that changesets/action creates.',
+    'Emitted by scripts/generate-release-manifest.mjs during the publish workflow ' +
+    'after changesets/action publishes to npm. Committed back to main via a ' +
+    'dedicated step in publish.yml — not part of the version-bump PR.',
 };
 
 if (!existsSync(MANIFEST_DIR)) {

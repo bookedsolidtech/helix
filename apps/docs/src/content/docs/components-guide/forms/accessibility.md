@@ -1,6 +1,6 @@
 ---
 title: Form Accessibility
-description: Build accessible form controls in HELiX using ARIA roles, ElementInternals ARIA reflection, and the mixinDelegatesAria pattern.
+description: Build accessible form controls in HELiX using ARIA roles, ElementInternals ARIA reflection, and accessible-label forwarding to shadow-DOM targets.
 ---
 
 Form controls must be accessible to users of assistive technologies. Shadow DOM creates unique challenges: ARIA relationships that reference element IDs (like `aria-labelledby`) and focus management both need special handling when elements live in different shadow roots.
@@ -77,7 +77,7 @@ These attributes connect controls to their accessible names and descriptions.
 <hx-text-input accessible-label="Search products"></hx-text-input>
 ```
 
-**`aria-labelledby`** — points to the ID of a visible label element. Works for elements in the same DOM scope; cross-shadow-DOM references require `mixinDelegatesAria` (see below):
+**`aria-labelledby`** — points to the ID of a visible label element. Works for elements in the same DOM scope; cross-shadow-DOM references need either `aria-labelledby` on an element that shares a DOM scope with the label, or forwarding via `ElementInternals.ariaLabelledByElements` on the custom element (see [Forwarding Host ARIA](#forwarding-host-aria-to-shadow-elements) below):
 ```html
 <label id="city-label">City</label>
 <hx-text-input aria-labelledby="city-label"></hx-text-input>
@@ -140,32 +140,28 @@ override connectedCallback() {
 
 Using `ElementInternals` ARIA properties is preferable to adding ARIA attributes to the shadow root's container element because it attaches semantics at the correct level of the accessibility tree.
 
-## `mixinDelegatesAria` — Forwarding Host Attributes to Shadow Elements
+## Forwarding Host ARIA to Shadow Elements
 
-The standard challenge: a consumer writes `<hx-button accessible-label="Close">` but the `aria-label` on the host `<hx-button>` does not automatically reach the `<button>` inside the shadow root — the assistive technology sees it on the wrong element.
+The standard challenge: a consumer writes `<hx-button accessible-label="Close">` but an `aria-label` placed on the host `<hx-button>` does not automatically reach the `<button>` inside the shadow root — assistive technology would see it on the wrong element.
 
-HELiX's `mixinDelegatesAria` solves this by observing ARIA attributes on the host and mirroring them to the designated inner element:
+Built-in HELiX components expose a public `accessible-label` attribute (property: `accessibleLabel`) and forward it to the inner interactive element, either via `ElementInternals.ariaLabel` on the host or via a template binding on the shadow-DOM target:
 
 ```typescript
-import { LitElement, html, css } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
-import { mixinDelegatesAria } from '@helixui/library/mixins';
-
-const Base = mixinDelegatesAria(LitElement);
+import { LitElement, html, css, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('hx-button')
-export class HelixButton extends Base {
+export class HelixButton extends LitElement {
   static override styles = css`:host { display: inline-flex; }`;
 
-  @query('button') private _button!: HTMLButtonElement;
-
-  // mixinDelegatesAria reads _ariaTarget to know where to forward attributes
-  protected get _ariaTarget() {
-    return this._button;
-  }
+  @property({ attribute: 'accessible-label' }) accessibleLabel = '';
 
   override render() {
-    return html`<button><slot></slot></button>`;
+    return html`
+      <button aria-label=${this.accessibleLabel || nothing}>
+        <slot></slot>
+      </button>
+    `;
   }
 }
 ```
@@ -173,11 +169,11 @@ export class HelixButton extends Base {
 Consumer usage:
 
 ```html
-<!-- accessible-label, aria-expanded, aria-controls automatically forwarded to inner <button> -->
-<hx-button accessible-label="Close dialog" aria-expanded="false" aria-controls="dialog-1">
-  Close
-</hx-button>
+<!-- accessible-label is a public host attribute; components forward it to the inner element. -->
+<hx-button accessible-label="Close dialog">X</hx-button>
 ```
+
+For built-in HELiX components that accept additional ARIA state (`aria-expanded`, `aria-controls`), the component documents the specific attributes it forwards. When building your own custom elements, prefer `ElementInternals.ariaExpanded` / `ariaControls` or explicit template bindings — the internal attribute-level forwarding helper used by HELiX components is not part of the public API.
 
 ## Connecting Visible Labels to Custom Controls
 
@@ -194,4 +190,4 @@ The browser connects the label to the custom element via the `for` / `id` associ
 
 - [Element Internals and Form Association](/components-guide/forms/element-internals/) — `attachInternals()` and `setFormValue()`
 - [Form Validation](/components-guide/forms/validation/) — `setValidity()` and constraint validation
-- [Event Delegation](/components-guide/events/delegation/) — `delegatesFocus` and `mixinDelegatesAria`
+- [Event Delegation](/components-guide/events/delegation/) — `delegatesFocus` and ARIA forwarding patterns

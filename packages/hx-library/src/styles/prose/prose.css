@@ -9,7 +9,7 @@
    intentionally need page-wide WYSIWYG reset styles scoped via your own selector.
 
    Usage:
-     @import '@wc-2026/library/styles/prose/prose.css';
+     @import '@helixui/library/styles/prose/prose.css';
 
    Override prose custom properties at :root or on any ancestor:
      :root {
