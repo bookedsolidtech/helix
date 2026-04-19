@@ -338,13 +338,13 @@ importers:
   packages/drupal-behaviors:
     dependencies:
       '@helixui/library':
-        specifier: ^2.1.2
+        specifier: ^2.1.2 || ^3.0.0
         version: 2.1.2(@floating-ui/dom@1.7.6)
 
   packages/drupal-starter:
     dependencies:
       '@helixui/library':
-        specifier: ^2.1.2
+        specifier: ^2.1.2 || ^3.0.0
         version: 2.1.2(@floating-ui/dom@1.7.6)
     devDependencies:
       twig:
