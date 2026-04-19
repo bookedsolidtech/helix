@@ -60,8 +60,8 @@ export class HelixCard extends LitElement {
 
   variant: 'default' | 'featured' | 'compact' = 'default';
   elevation: 'flat' | 'raised' | 'floating' = 'flat';
-  href: string | undefined;   // attribute: 'hx-href'
-  label: string | undefined;  // attribute: 'hx-label' — accessible name for interactive cards
+  href: string | undefined;   // attribute: 'href'
+  label: string | undefined;  // attribute: 'label' — accessible name for interactive cards
 
   override render(): TemplateResult { /* ... */ }
 }
@@ -375,8 +375,8 @@ Once registered, use the element like any other custom element:
   status="critical"
   severity="high"
   mrn="MRN-00123456"
-  hx-label="Navigate to patient James Martin's chart"
-  hx-href="/patients/MRN-00123456"
+  label="Navigate to patient James Martin's chart"
+  href="/patients/MRN-00123456"
 >
   <img slot="image" src="/photos/patient-thumb.jpg" alt="" />
 

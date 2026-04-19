@@ -364,7 +364,7 @@ Drupal.behaviors.hxDataBinding = {
         card.__entityData = entityData;
 
         // Set simple attributes
-        card.setAttribute('hx-href', entityData.url);
+        card.setAttribute('href', entityData.url);
         card.setAttribute('variant', entityData.featured ? 'featured' : 'default');
       }
     });

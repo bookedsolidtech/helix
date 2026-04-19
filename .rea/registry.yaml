@@ -1,8 +1,42 @@
-# .rea/registry.yaml — downstream MCP servers proxied through rea serve.
-# Every entry below is subject to the same middleware chain as native tool calls.
+# .rea/registry.yaml — downstream MCP servers proxied through `rea serve`.
+# Every entry below is subject to the 11-layer middleware chain (audit →
+# kill-switch → tier → policy → blocked-paths → rate-limit → circuit-breaker →
+# injection → redact → result-size-cap → terminal) and gets its tools surfaced
+# to the MCP client under the prefix `<name>__<tool>`.
 #
-# NOTE: rea serve (the MCP gateway) is a stub in 0.1.0. This file is kept
-# for forward-compatibility. Current installs consume rea purely as a
-# policy + hooks layer via .claude/hooks and .husky/commit-msg.
+# Servers configured here are invoked via `rea serve` (see .mcp.json). Do NOT
+# also list them in .mcp.json — that would double-register the catalog.
+#
+# Known gap (@bookedsolid/rea 0.3.0): env_passthrough refuses names matching
+# /(TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL)/i to prevent silent secret exfil.
+# Servers that require secret env vars (e.g. discord-ops with
+# BOOKED_DISCORD_BOT_TOKEN) must either (a) use literal `env:` values with a
+# gitignored registry file, or (b) stay in .mcp.json until rea ships explicit
+# `${VAR}` interpolation. We take path (b) for discord-ops below.
 version: '1'
-servers: []
+
+servers:
+  - name: obsidian
+    command: npx
+    args:
+      - -y
+      - obsidian-mcp
+      - /Volumes/Development/booked/data/bst
+    env: {}
+    enabled: true
+
+  - name: helixir
+    command: npx
+    args:
+      - -y
+      - helixir
+    # NOTE: These env values contain machine-specific absolute paths. To use on a
+    # different machine, copy the values to a gitignored .rea/registry.yaml.local
+    # and override. Until rea ships ${VAR} interpolation, literals are required.
+    env:
+      MCP_WC_CEM_PATH: /Volumes/Development/booked/helix/packages/hx-library/custom-elements.json
+      MCP_WC_PROJECT_ROOT: /Volumes/Development/booked/helix
+      MCP_WC_COMPONENT_PREFIX: hx-
+      MCP_WC_TSCONFIG_PATH: /Volumes/Development/booked/helix/tsconfig.base.json
+      MCP_WC_TOKENS_PATH: /Volumes/Development/booked/helix/packages/hx-tokens/dist/tokens.json
+    enabled: true

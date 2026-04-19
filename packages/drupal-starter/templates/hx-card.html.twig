@@ -12,6 +12,9 @@
  * - body: Card body content (safe markup allowed).
  * - footer: Footer slot content (safe markup allowed).
  * - url: If set, makes the card heading a link.
+ * - accessible_label: ARIA name for screen readers when the card heading alone
+ *   is not sufficient (e.g. a linked card wrapping mixed content). Rendered as
+ *   the `accessible-label` attribute on the host element in 3.0.0+.
  * - attributes: Drupal attributes object for additional HTML attributes.
  *
  * Usage:
@@ -37,6 +40,7 @@
 <hx-card
   variant="{{ variant|default('default') }}"
   elevation="{{ elevation|default('raised') }}"
+  {% if accessible_label %}accessible-label="{{ accessible_label }}"{% endif %}
   {% if attributes %}{{ attributes }}{% endif %}
 >
   {% if image_url %}

@@ -678,7 +678,7 @@ it('has no axe violations in error state', async () => {
 **Component:**
 
 ```html
-<hx-button aria-label="Close dialog">
+<hx-button accessible-label="Close dialog">
   <svg aria-hidden="true"><!-- X icon --></svg>
 </hx-button>
 ```
@@ -688,7 +688,7 @@ it('has no axe violations in error state', async () => {
 ```typescript
 it('icon-only button has accessible name', async () => {
   const el = await fixture<HxButton>(
-    '<hx-button aria-label="Close"><svg aria-hidden="true"></svg></hx-button>',
+    '<hx-button accessible-label="Close"><svg aria-hidden="true"></svg></hx-button>',
   );
   const { violations } = await checkA11y(el);
   expect(violations).toEqual([]);

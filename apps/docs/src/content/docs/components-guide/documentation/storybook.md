@@ -179,7 +179,7 @@ export const IconOnly: Story = {
     },
   },
   render: () => html`
-    <hx-button aria-label="Close" variant="ghost">
+    <hx-button accessible-label="Close" variant="ghost">
       <svg aria-hidden="true" viewBox="0 0 24 24">
         <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" />
       </svg>

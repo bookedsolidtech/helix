@@ -1,0 +1,351 @@
+---
+title: Upgrading to 3.0.0
+description: Complete migration guide from @helixui/library 2.x to 3.0.0 — breaking changes, find-and-replace patterns, and codemod availability.
+sidebar:
+  order: 1
+---
+
+HELiX 3.0.0 is the first major release to the enterprise healthcare channel. This guide walks through every breaking change between `@helixui/library@2.1.2` and `@helixui/library@3.0.0`.
+
+:::note
+**Authoritative source.** The repository-side guide at [`docs/UPGRADING-TO-3.md`](https://github.com/bookedsolidtech/helix/blob/main/docs/UPGRADING-TO-3.md) is the canonical version. This page mirrors it.
+:::
+
+## Scope and effort
+
+Most 3.0.0 changes are renames with precise grep-able patterns. Expected effort for a production app:
+
+- **Small app (~50 HELiX usages):** 1–2 hours.
+- **Mid-sized app (~200 usages):** half a day.
+- **Large app (~1000+ usages, multiple packages):** 1 day with scripted find-and-replace.
+
+Codemod support is tracked for 3.0.1. For 3.0.0, each section below provides a precise regex for scripted replacement with `sd` or `ripgrep-replace`.
+
+## Pre-upgrade checklist
+
+1. Pin current versions in a branch (`git checkout -b chore/helix-3-upgrade`).
+2. Run your test suite on 2.1.2 to capture a green baseline.
+3. Confirm your integration does not import from undocumented deep paths. Grep for `@helixui/library/src/` — anything found will break.
+4. Confirm your bundler preserves the `sideEffects` field — HELiX requires the first-import side effect to adopt design tokens at the document level.
+
+## 1. Install
+
+```bash
+pnpm add @helixui/library@^3.0.0 @helixui/tokens@^3.0.0
+```
+
+React consumers:
+
+```bash
+pnpm add @helixui/react@^3.0.0
+```
+
+CDN consumers: pin `https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js` plus the per-component modules you use.
+
+## 2. `aria-label` → `accessible-label`
+
+Every component that previously accepted `aria-label` or `hxAriaLabel` now publishes the public attribute as `accessible-label` (property: `accessibleLabel`).
+
+**Why.** ARIA 1.2 reserves `aria-*` attributes as host-scoped ARIA state, not authored component API. `accessible-label` makes the component's public label surface explicit.
+
+```html
+<!-- Before -->
+<hx-button aria-label="Close dialog">×</hx-button>
+
+<!-- After -->
+<hx-button accessible-label="Close dialog">×</hx-button>
+```
+
+```typescript
+// Before
+el.hxAriaLabel = 'Close dialog';
+
+// After
+el.accessibleLabel = 'Close dialog';
+```
+
+**Codemod:**
+
+```bash
+rg -l '<hx-[a-z-]+[^>]*aria-label=' | xargs sd '(<hx-[a-z-]+[^>]*?)aria-label=' '$1accessible-label='
+```
+
+:::caution
+Do **not** rewrite `aria-label` on native HTML elements (`<button>`, `<input>`, etc.). Scope your find-and-replace to `hx-*` tags only.
+:::
+
+## 3. `::part(error-message)` → `::part(error)`
+
+Form controls rename the validation-message part from `error-message` to `error`, aligning with `help-text`.
+
+```css
+/* Before */
+hx-text-input::part(error-message) {
+  color: var(--my-error);
+}
+
+/* After */
+hx-text-input::part(error) {
+  color: var(--my-error);
+}
+```
+
+**Codemod:**
+
+```bash
+rg -l '::part\(error-message\)' | xargs sd '::part\(error-message\)' '::part(error)'
+```
+
+## 4. `hx-date-picker` / `hx-time-picker` non-modal dialog
+
+The calendar / clock popup migrates from a native modal `<dialog>` to a non-modal popup. Escape still closes and restores focus; click-outside still closes; arrow-key navigation is unchanged.
+
+**What's gone:**
+
+- Top-layer stacking — you may need to raise `z-index` in custom stacking contexts.
+- `::backdrop` styling — remove any rules targeting it.
+- Focus trap inside the popup — Tab from the last control moves to the next document-flow focusable.
+
+```css
+/* Remove these rules — the non-modal dialog has no ::backdrop */
+hx-date-picker::part(dialog)::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+```
+
+Tests asserting focus-trap behavior must be updated. Escape-close and focus-restoration tests continue to pass unchanged.
+
+## 5. `hx-dialog` — `modal` defaults to `false`
+
+:::caution
+**Silent behavior change.** No type error, no runtime warning. `<hx-dialog open>` rendered as modal by default in 2.x; in 3.0.0 it renders non-modal.
+:::
+
+The `modal` property now defaults to `false`, matching HTML boolean-attribute semantics. To preserve 2.x behavior, add `modal` explicitly:
+
+```html
+<!-- Before: modal by default -->
+<hx-dialog open>...</hx-dialog>
+
+<!-- After: explicit opt-in to top-layer + backdrop + focus trap -->
+<hx-dialog open modal>...</hx-dialog>
+```
+
+**Find missing attributes:**
+
+```bash
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' -g '*.twig' -g '*.html.twig'
+```
+
+Audit each hit. Confirmation dialogs, clinical alerts, and blocking workflows should add `modal`. Inline drawers and sidebar panels should stay non-modal.
+
+## 6. `hx-phi-field` — PHI attribute stripped post-hydration
+
+:::note
+**Positive security change.** HIPAA-aligned deployments benefit silently. Only consumers reading `el.getAttribute('value')` need to update.
+:::
+
+In 2.x, `<hx-phi-field value="...">` left the `value` attribute on the element, exposing PHI via `getAttribute('value')`, `outerHTML`, SSR dumps, and DevTools. In 3.0.0 the attribute is removed after `connectedCallback`; the property retains the value.
+
+```typescript
+// Before — worked, but leaked PHI in DOM serialization
+const phi = el.getAttribute('value');
+
+// After — read the property instead
+const phi = el.value;
+```
+
+This change surfaced during the Figgy (Northwell) integration audit as a HIPAA-relevant exposure vector.
+
+## 7. FormMixin consolidation
+
+All 15 form-associated components now compose `FormMixin(HelixElement)` and inherit shared interaction-state tracking.
+
+Inherited for free:
+
+- `dirty` — true after first value mutation
+- `touched` — true after first blur
+- `pristine` — opposite of `dirty`
+- `checkValidity()` / `reportValidity()` — delegate to `ElementInternals`
+- `_updateValidity()` — override hook called after every `updated()` cycle
+
+Subclassing example:
+
+```typescript
+import { HelixElement } from '@helixui/library';
+import { FormMixin } from '@helixui/library/mixins';
+
+class MyCustomInput extends FormMixin(HelixElement) {
+  static override formAssociated = true;
+
+  override _updateValidity(): void {
+    if (this.required && !this.value) {
+      this._internals.setValidity({ valueMissing: true }, 'Required', this._inputEl);
+    } else {
+      this._internals.setValidity({});
+    }
+  }
+
+  override _onFormReset(): void {
+    this.value = '';
+    this._resetInteractionState();
+    this._internals.setFormValue('');
+  }
+}
+```
+
+If you previously implemented `dirty` / `touched` locally, delete it and rely on the inherited getters. Wire your native input's `input` event to `this._handleInteractionInput()` and the `blur` event to `this._handleInteractionBlur()`.
+
+## 8. Subclassing contract — `@protected` override hooks
+
+HelixElement and FormMixin hooks are now part of the public subclassing contract (previously `@internal`). Breaking changes to their signatures are gated to major releases.
+
+| Base class / mixin | Hook                               | When called                             |
+| ------------------ | ---------------------------------- | --------------------------------------- |
+| `HelixElement`     | `_onFormDisabled(disabled)`        | Parent `<fieldset>` disabled toggled    |
+| `HelixElement`     | `_onFormReset()`                   | Owning form reset                       |
+| `HelixElement`     | `_onFormStateRestore(state, mode)` | Form state restore (bfcache / autofill) |
+| `FormMixin`        | `_handleInteractionInput()`        | Call from native `input` event          |
+| `FormMixin`        | `_handleInteractionBlur()`         | Call from native `blur` event           |
+| `FormMixin`        | `_resetInteractionState()`         | Call from `_onFormReset()`              |
+| `FormMixin`        | `_updateValidity()`                | Override for constraint logic           |
+
+Consumers already using these hooks in 2.1.x need no code change — the `protected` access modifier was already in place. 3.0.0 promotes them from internal to stable contract.
+
+## 9. Deprecated symbols removed
+
+### `Wc*` type aliases
+
+```typescript
+// Before
+import type { WcButton, WcCard, WcSwitch } from '@helixui/library';
+
+// After
+import type { HxButton, HxCard, HxSwitch } from '@helixui/library';
+```
+
+**Codemod:**
+
+```bash
+rg -l "from '@helixui/library'" | xargs sd "\bWc([A-Z][a-zA-Z]+)\b" 'Hx$1'
+```
+
+### 2.0.0 property-rename shims
+
+The back-compat shims preserving pre-2.0 property names are removed.
+
+| Component                                         | Removed (deprecated in 2.0) | Use            |
+| ------------------------------------------------- | --------------------------- | -------------- |
+| `hx-card`                                         | `hxHref`                    | `href`         |
+| `hx-card`                                         | `hxAriaLabel`               | `label`        |
+| `hx-field`                                        | `hxSize`                    | `size`         |
+| `hx-banner`, `hx-dialog`, `hx-drawer`, `hx-toast` | `closeLabel`                | `labelClose`   |
+| `hx-split-button`                                 | `triggerLabel`              | `labelTrigger` |
+| `hx-split-button`, `hx-overflow-menu`             | `menuLabel`                 | `labelMenu`    |
+
+### `mergeTokenStyles` utility
+
+```typescript
+// Before
+import { mergeTokenStyles } from '@helixui/library/utilities';
+static styles = mergeTokenStyles(ownStyles);
+
+// After — tokens adopt at document level automatically
+static styles = ownStyles;
+```
+
+## 10. `@floating-ui/dom` dynamic import
+
+`hx-select`, `hx-combobox`, `hx-popover`, `hx-tooltip`, and `hx-overflow-menu` load `@floating-ui/dom` dynamically on first interaction.
+
+**What you'll see:**
+
+- A separate `chunk-floating-ui-*.js` in your build output.
+- First interaction fetches the chunk (~12KB min+gz).
+- Subsequent interactions use the cached chunk.
+
+**Strict CSP:** ensure `script-src` allows the chunk origin. For same-origin bundles this is a no-op.
+
+**Pre-warming:** import the positioning utility at app startup.
+
+```typescript
+import '@helixui/library/dist/positioning';
+```
+
+## 11. Public-API allowlist
+
+3.0.0 blocks undocumented deep imports. Consumers importing from anything other than the root barrel, `@helixui/library/mixins`, or documented per-component entry points will see a build-time error.
+
+```typescript
+// Before — blocked in 3.0.0
+import { _internalHelper } from '@helixui/library/src/internal/helper.js';
+
+// After — open an issue to request public export, or copy the helper locally.
+```
+
+If you relied on an undocumented deep import, [open an issue](https://github.com/bookedsolidtech/helix/issues) — we can promote the symbol in a minor release.
+
+## 12. CDN delivery
+
+3.0.0 makes **Strategy B** the recommended path.
+
+### Strategy B (recommended) — core + per-component
+
+```html
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js"></script>
+
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-button.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/hx-card.js"></script>
+```
+
+Core is ~8.4KB min+gz. Each component is ~2KB.
+
+### Strategy A (kitchen sink — back-compat only)
+
+```html
+<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/cdn/bundle.js"></script>
+```
+
+Strategy A may be removed in a future major.
+
+## 13. Adopted stylesheets side effect
+
+HELiX adopts design tokens at the document level via `document.adoptedStyleSheets` on first import of any component. This is the only supported theming path.
+
+- `package.json` `sideEffects` must remain truthy (or include the token-adoption module).
+- Bundlers with aggressive dead-code elimination must preserve the first-import side effect.
+- CDN consumers get adoption automatically.
+
+If your build strips side effects, HELiX components render without tokens (no colors, no spacing, no typography). Fix at the bundler config level.
+
+## 14. Tokens package
+
+`@helixui/tokens@3.0.0`:
+
+- `tokenStyles` export (deprecated in 2.1.2) removed. Use `lightTokenCss` for raw CSS or rely on automatic document-level adoption.
+- Semantic-tier token alignment — see the CHANGELOG for the complete delta.
+
+## 15. React wrapper
+
+`@helixui/react@3.0.0`:
+
+- `ariaLabel` → `accessibleLabel` everywhere.
+- `Wc*` type imports removed; use `Hx*`.
+- Event details exported as named types (`HxClickEvent`, `HxChangeEvent`, etc.) instead of anonymous `CustomEvent<unknown>`.
+
+## Rollback
+
+If 3.0.0 surfaces a critical defect:
+
+```bash
+pnpm add @helixui/library@2.1.2 @helixui/tokens@2.1.2
+```
+
+Open an issue with a reproduction. HELiX maintains the 2.1.x line with security-only patches for six months post-3.0.0.
+
+## Getting help
+
+- Migration questions: [open an issue](https://github.com/bookedsolidtech/helix/issues) tagged `migration-3.0`.
+- CEM / API reference: Starlight auto-docs at `/api`.
+- Subclassing contract: [`packages/hx-library/src/base/helix-element.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/base/helix-element.ts) and [`packages/hx-library/src/mixins/FormMixin.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/mixins/FormMixin.ts).

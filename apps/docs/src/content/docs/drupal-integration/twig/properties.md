@@ -988,7 +988,7 @@ HELIX atomic components should:
 </hx-text-input>
 
 {# ✅ CORRECT: Auto-escaping in attribute context #}
-<hx-button aria-label="{{ node.field_accessible_label.value }}">
+<hx-button accessible-label="{{ node.field_accessible_label.value }}">
   {{ button_text }}
 </hx-button>
 ```

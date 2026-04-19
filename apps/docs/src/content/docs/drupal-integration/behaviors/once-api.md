@@ -982,7 +982,7 @@ import { once } from 'core/once';
       element.addEventListener('input', () => {
         if (element.hasAttribute('error')) {
           element.removeAttribute('error');
-          element.removeAttribute('error-message');
+          element.removeAttribute('error');
         }
       });
     },
@@ -992,24 +992,24 @@ import { once } from 'core/once';
 
       if (rules.required && !value) {
         element.setAttribute('error', '');
-        element.setAttribute('error-message', rules.requiredMessage || 'This field is required.');
+        element.setAttribute('error', rules.requiredMessage || 'This field is required.');
         return false;
       }
 
       if (rules.pattern && value && !new RegExp(rules.pattern).test(value)) {
         element.setAttribute('error', '');
-        element.setAttribute('error-message', rules.patternMessage || 'Invalid format.');
+        element.setAttribute('error', rules.patternMessage || 'Invalid format.');
         return false;
       }
 
       if (rules.minLength && value.length < rules.minLength) {
         element.setAttribute('error', '');
-        element.setAttribute('error-message', `Minimum ${rules.minLength} characters required.`);
+        element.setAttribute('error', `Minimum ${rules.minLength} characters required.`);
         return false;
       }
 
       element.removeAttribute('error');
-      element.removeAttribute('error-message');
+      element.removeAttribute('error');
       return true;
     },
 

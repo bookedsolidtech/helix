@@ -136,7 +136,7 @@ Every interactive component needs a label. Use `label` properties, `aria-label`,
 <hx-button>Save changes</hx-button>
 
 <!-- Icon-only button — must have aria-label -->
-<hx-button aria-label="Close dialog" icon-only>
+<hx-button accessible-label="Close dialog" icon-only>
   <hx-icon name="x"></hx-icon>
 </hx-button>
 

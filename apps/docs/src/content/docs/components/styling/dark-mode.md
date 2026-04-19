@@ -538,7 +538,7 @@ In your `page.html.twig`, attach the library and add the theme toggle button:
 <hx-button
   id="theme-toggle"
   variant="ghost"
-  aria-label="Toggle dark mode"
+  accessible-label="Toggle dark mode"
 >
   Toggle Theme
 </hx-button>

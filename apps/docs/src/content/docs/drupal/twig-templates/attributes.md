@@ -201,10 +201,10 @@ Access in a Drupal Behavior:
 Set accessibility attributes that depend on rendered node data:
 
 ```twig
-{# ARIA label incorporating the node title #}
+{# Accessible label incorporating the node title #}
 <hx-card {{
   attributes
-    .setAttribute('aria-label', 'Patient record for ' ~ label)
+    .setAttribute('accessible-label', 'Patient record for ' ~ label)
     .setAttribute('role', 'article')
 }}>
   <span slot="heading">{{ label }}</span>
@@ -422,7 +422,7 @@ This is simpler but loses the semantic `<article>` element. Use it when the comp
     <hx-card
       variant="default"
       elevation="raised"
-      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
       {{ card_attrs }}
     >
       {% if patient.field_photo.entity %}

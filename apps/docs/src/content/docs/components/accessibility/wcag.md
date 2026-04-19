@@ -106,8 +106,8 @@ All non-text content that is presented to the user has a text alternative that s
   <img src="download.svg" alt="Download report" />
 </hx-button>
 
-<!-- Icon-only buttons use aria-label -->
-<hx-button aria-label="Close dialog">
+<!-- Icon-only buttons use accessible-label -->
+<hx-button accessible-label="Close dialog">
   <hx-icon name="close"></hx-icon>
 </hx-button>
 ```
@@ -514,7 +514,7 @@ For components with labels that include text or images of text, the accessible n
 
 ```html
 <!-- Visual label matches accessible name -->
-<hx-button aria-label="Submit form">Submit</hx-button>
+<hx-button accessible-label="Submit form">Submit</hx-button>
 
 <!-- Not: aria-label="Send" when visual text is "Submit" -->
 ```
@@ -957,7 +957,7 @@ Healthcare applications have unique accessibility requirements that go beyond ge
   type="password"
   label="Medical Record Number"
   privacy-mode="${this.privacyEnabled}"
-  aria-label="${this.privacyEnabled ? 'Medical Record Number (hidden for privacy)' : 'Medical Record Number'}">
+  accessible-label="${this.privacyEnabled ? 'Medical Record Number (hidden for privacy)' : 'Medical Record Number'}">
 </hx-text-input>
 ```
 
@@ -972,7 +972,7 @@ Healthcare applications have unique accessibility requirements that go beyond ge
 <hx-progress-stepper
   current-step="2"
   total-steps="5"
-  aria-label="Patient registration progress">
+  accessible-label="Patient registration progress">
   <hx-step completed>Personal Information</hx-step>
   <hx-step current aria-current="step">Insurance Details</hx-step>
   <hx-step>Medical History</hx-step>
@@ -1119,7 +1119,7 @@ Keep related elements in the same shadow root or use properties to pass label te
 **Alternative:** Use `aria-label` for simple cases:
 
 ```html
-<hx-text-input aria-label="Email address"></hx-text-input>
+<hx-text-input accessible-label="Email address"></hx-text-input>
 ```
 
 ### Issue 2: Focus Is Not Visible When Tab Navigation Enters Component

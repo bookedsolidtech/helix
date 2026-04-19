@@ -22,7 +22,7 @@ Always place `hx-menu-item` as a direct child of `hx-menu`. Never use it standal
 ### Item Types
 
 <ComponentDemo title="Item Types">
-  <hx-menu aria-label="Item types" style="max-width: 240px;">
+  <hx-menu accessible-label="Item types" style="max-width: 240px;">
     <hx-menu-item value="normal">Normal item</hx-menu-item>
     <hx-menu-item type="checkbox" value="check" checked>
       Checkbox item
@@ -36,7 +36,7 @@ Always place `hx-menu-item` as a direct child of `hx-menu`. Never use it standal
 ### States
 
 <ComponentDemo title="States">
-  <hx-menu aria-label="Item states" style="max-width: 240px;">
+  <hx-menu accessible-label="Item states" style="max-width: 240px;">
     <hx-menu-item value="enabled">Enabled</hx-menu-item>
     <hx-menu-item value="disabled" disabled>
       Disabled
@@ -50,7 +50,7 @@ Always place `hx-menu-item` as a direct child of `hx-menu`. Never use it standal
 ### With Prefix and Suffix
 
 <ComponentDemo title="Prefix and Suffix Slots">
-  <hx-menu aria-label="Slotted items" style="max-width: 240px;">
+  <hx-menu accessible-label="Slotted items" style="max-width: 240px;">
     <hx-menu-item value="save">
       <span slot="prefix">&#128190;</span>
       Save
@@ -81,7 +81,7 @@ import '@helixui/library/components/hx-menu';
 ## Basic Usage
 
 ```html
-<hx-menu aria-label="Actions">
+<hx-menu accessible-label="Actions">
   <hx-menu-item value="edit">Edit</hx-menu-item>
   <hx-menu-item value="delete" disabled>Delete</hx-menu-item>
 </hx-menu>
@@ -194,7 +194,7 @@ Drupal.behaviors.helixMenuItem = {
     <!-- In your project: import '@helixui/library'; in your bundler entry point -->
   </head>
   <body style="font-family: sans-serif; padding: 2rem;">
-    <hx-menu id="action-menu" aria-label="Patient actions" style="max-width: 220px;">
+    <hx-menu id="action-menu" accessible-label="Patient actions" style="max-width: 220px;">
       <hx-menu-item value="view-record">
         <span slot="prefix">&#128203;</span>
         View Record

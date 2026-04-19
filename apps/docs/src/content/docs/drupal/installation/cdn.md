@@ -49,15 +49,31 @@ Drupal's Libraries API manages JavaScript and CSS assets. When you define a libr
 
 Create or edit your theme's `.libraries.yml` file.
 
-### Full Bundle (jsDelivr)
+:::tip[Strategy B is the recommended 3.0.0 path]
+Load `dist/cdn/core.js` (registry + tokens, ~8.4KB min+gz) once, then load each `dist/cdn/hx-<component>.js` module for the components the site actually uses. The full-bundle fallback further down remains available but is **not recommended for production** — it ships every component whether you use it or not.
+:::
+
+### Strategy B — core + per-component (recommended, jsDelivr)
 
 ```yaml
 # mytheme.libraries.yml
 
 helix-components:
-  version: 1.1.2
+  version: 3.0.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    # Core: registry + tokens, ~8.4KB min+gz
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
+      type: external
+      attributes:
+        type: module
+      preprocess: false
+    # Per-component modules — ~2KB each; only list what the theme uses
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/hx-button.js:
+      type: external
+      attributes:
+        type: module
+      preprocess: false
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/hx-card.js:
       type: external
       attributes:
         type: module
@@ -67,27 +83,41 @@ helix-components:
 **Field explanations:**
 
 - `helix-components` — Library machine name. Referenced as `mytheme/helix-components` in templates and hooks.
-- `version: 1.1.2` — Drupal's internal library version for cache invalidation. Increment this when you update the CDN URL.
+- `version: 3.0.0` — Drupal's internal library version for cache invalidation. Increment this when you update the CDN URL.
 - `type: external` — Tells Drupal this is a URL, not a local file path.
 - `attributes: { type: module }` — Required. Without this, browsers load the script as a classic script and ES module `import` statements fail.
 - `preprocess: false` — Prevents Drupal from attempting to aggregate this external URL.
 
-The correct file is `dist/index.js`. The `@helixui/library` package.json declares `main: "./dist/index.js"` — this is the built entry point for the entire component library.
-
-### Full Bundle (unpkg Alternative)
+### Strategy A — single-file bundle (prototyping, not recommended for production)
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.0.0
   js:
-    https://unpkg.com/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
       preprocess: false
 ```
 
+The `@helixui/library` package.json declares `main: "./dist/index.js"` — this is the entry point for bundler-driven builds. Loading it from a CDN pulls every component (~150KB gzipped) whether the site uses it or not.
+
+### unpkg mirror
+
 Both jsDelivr and unpkg are reliable and serve correct ES module MIME types. jsDelivr is recommended for production due to its multi-CDN architecture (Cloudflare + Fastly + CloudFront) and higher uptime SLA.
+
+```yaml
+# Swap the host — same paths work on unpkg
+helix-components:
+  version: 3.0.0
+  js:
+    https://unpkg.com/@helixui/library@3.0.0/dist/cdn/core.js:
+      type: external
+      attributes:
+        type: module
+      preprocess: false
+```
 
 ### CSS Bundle
 
@@ -97,14 +127,14 @@ To load the HELiX CSS bundle alongside the JavaScript:
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
       preprocess: false
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/css/helix-all.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css:
         type: external
         preprocess: false
 ```
@@ -205,10 +235,10 @@ Note: Use `hx-size` (not `size`) — HELiX uses the `hx-` prefix on size and oth
 </hx-card>
 ```
 
-For link cards, use `hx-href` (not `href`):
+For link cards, use `href` (not `href`):
 
 ```twig
-<hx-card variant="outlined" hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}">
+<hx-card variant="outlined" href="{{ url('entity.node.canonical', {'node': node.id}) }}">
   <span slot="heading">{{ node.title.value }}</span>
   <p>{{ node.field_summary.value }}</p>
 </hx-card>
@@ -224,7 +254,7 @@ For link cards, use `hx-href` (not `href`):
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -247,7 +277,7 @@ When a new HELiX version is available:
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -257,7 +287,7 @@ helix-components:
 helix-components:
   version: 1.2.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -269,7 +299,7 @@ helix-components:
 ```yaml
 # DO NOT do this in production
 js:
-  https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/index.js:
+  https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
     type: external
     attributes:
       type: module
@@ -291,7 +321,7 @@ Loading the full bundle delivers all HELiX components. If your site uses only a 
 helix-button:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js:
       type: external
       attributes:
         type: module
@@ -300,7 +330,7 @@ helix-button:
 helix-card:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card/index.js:
       type: external
       attributes:
         type: module
@@ -309,7 +339,7 @@ helix-card:
 helix-text-input:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-text-input/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-text-input/index.js:
       type: external
       attributes:
         type: module
@@ -356,7 +386,7 @@ Subresource Integrity (SRI) lets browsers verify that CDN-delivered files haven'
 ### Generating the SRI Hash
 
 ```bash
-curl -s https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js | \
+curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
@@ -369,7 +399,7 @@ This outputs a base64-encoded SHA-384 hash. Prepend `sha384-` to form the integr
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -434,7 +464,7 @@ web/themes/custom/mytheme/
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -466,9 +496,9 @@ Download the local copy to include in your theme:
 
 ```bash
 cd web/themes/custom/mytheme/libraries/helix
-npm pack @helixui/library@1.1.2
-tar -xf helixui-library-1.1.2.tgz --strip-components=1 package/dist
-rm helixui-library-1.1.2.tgz
+npm pack @helixui/library@3.0.0
+tar -xf helixui-library-3.0.0.tgz --strip-components=1 package/dist
+rm helixui-library-3.0.0.tgz
 ```
 
 ---
@@ -503,7 +533,7 @@ helix-components:
   version: 1.1.2
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -545,7 +575,7 @@ customElements.get('hx-button');
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module   # This line must be present and indented under attributes
@@ -554,9 +584,9 @@ helix-components:
 
 ### CDN request returns 404
 
-**Cause:** Wrong file path in the URL. The file is `dist/index.js`, not `dist/helix.bundled.js` or `dist/helix.min.js`.
+**Cause:** Wrong file path in the URL.
 
-**Fix:** Verify the URL ends with `/dist/index.js`.
+**Fix:** The 3.0.0 CDN layout ships `dist/cdn/core.js` (registry + tokens) plus per-component modules at `dist/cdn/hx-<component>.js`. Legacy single-file paths from pre-3.0 releases are not published and will return 404. The npm entry for bundlers is `dist/index.js`.
 
 ### Components load but appear unstyled (no color/spacing)
 
@@ -567,7 +597,7 @@ helix-components:
 ```yaml
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/css/helix-all.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css:
         type: external
         preprocess: false
 ```
@@ -621,7 +651,7 @@ helix-components:
   version: 1.1.2
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -629,7 +659,7 @@ helix-components:
       preprocess: false
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/css/helix-all.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css:
         type: external
         preprocess: false
 ```
@@ -638,7 +668,7 @@ helix-components:
 
 ```twig
 <article{{ attributes }}>
-  <hx-card variant="elevated" hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}">
+  <hx-card variant="elevated" href="{{ url('entity.node.canonical', {'node': node.id}) }}">
     <span slot="heading">{{ node.title.value }}</span>
     {{ content.body }}
     <div slot="footer">

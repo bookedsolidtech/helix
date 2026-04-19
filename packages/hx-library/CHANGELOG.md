@@ -1,5 +1,153 @@
 # @helixui/library
 
+## 3.0.0
+
+### Major Changes
+
+First major release to the enterprise healthcare channel. 3.0.0 hardens the public API, codifies the subclassing contract consumers extend, and closes the breaking-change debt accumulated during the 2.x stabilization cycle. See `docs/UPGRADING-TO-3.md` for the complete migration guide and Starlight [Migration → 3.0.0](../../apps/docs/src/content/docs/migration/3.0.0.mdx) for the consumer-facing walkthrough.
+
+#### Subclassing contract — `@internal` hooks promoted to `@protected`
+
+HelixElement and FormMixin override hooks are now officially part of the public subclassing contract. They were previously tagged `@internal`, which meant the underlying `protected` access modifier carried no stability guarantee — a 2.x refactor could have silently broken downstream subclasses. The tag change surfaces these as supported extension points in the generated CEM and API docs.
+
+| Base class / mixin | Hook |
+| --- | --- |
+| `HelixElement` | `_onFormDisabled(disabled)` |
+| `HelixElement` | `_onFormReset()` |
+| `HelixElement` | `_onFormStateRestore(state, mode)` |
+| `FormMixin` | `_handleInteractionInput()` |
+| `FormMixin` | `_handleInteractionBlur()` |
+| `FormMixin` | `_resetInteractionState()` |
+| `FormMixin` | `_updateValidity()` |
+
+Consumers subclassing `HelixElement` or applying `FormMixin` should treat these methods as stable across minor/patch releases. Breaking changes to their signatures will be gated to major releases and called out in the migration guide.
+
+#### Attribute / property renames
+
+| Component | Old | New |
+| --- | --- | --- |
+| ARIA-labelable components (except `hx-card`) | `aria-label` / `hxAriaLabel` | `accessible-label` / `accessibleLabel` |
+| `hx-card` | `hxAriaLabel` | `label` |
+| `hx-date-picker` | native modal `<dialog>` | non-modal popup dialog |
+| `hx-time-picker` | native modal `<dialog>` | non-modal popup dialog |
+
+The `accessible-label` naming aligns HELiX with the ARIA 1.2 guidance that `aria-*` attributes on a custom element are *host* attributes, not authored API. Components expose `accessible-label` as the public surface and forward it to the shadow-DOM target via `ElementInternals` or template binding.
+
+#### CSS part renames
+
+| Component | Old part | New part |
+| --- | --- | --- |
+| all form controls | `error-message` | `error` |
+
+Form controls (`hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-checkbox`, `hx-radio`, `hx-date-picker`, `hx-time-picker`, `hx-number-input`, `hx-slider`, `hx-file-upload`, `hx-color-picker`, `hx-field`, `hx-switch`, `hx-phi-field`) now expose the validation-message slot as `part="error"` for consistency with `help-text`. Consumers targeting `::part(error-message)` must update selectors to `::part(error)`.
+
+#### FormMixin consolidation
+
+All 15 form-associated components now compose `FormMixin(HelixElement)` for shared `dirty`/`touched`/`pristine` tracking, automatic `_updateValidity()` invocation after every `updated()` cycle, and delegating `checkValidity()` / `reportValidity()`. Components that previously implemented interaction tracking locally now inherit it. Subclasses override `_updateValidity()` and use the inherited `_handleInteractionInput()` / `_handleInteractionBlur()` helpers on their native input event wiring.
+
+#### Deprecated symbols removed
+
+- `Wc*` type aliases (carry-over from the pre-rename era) — removed. Use the `Hx*` equivalents (`HxButton`, `HxCard`, etc.).
+- Deprecated property shims from 2.0.0 property renames (`hxHref`, `hxAriaLabel`, `hxSize`, `closeLabel`, `triggerLabel`, `menuLabel`) — removed. Update to the renamed properties documented in the 2.0.0 entry.
+- `mergeTokenStyles` utility — removed. Tokens adopt at the document level via `ensureDocumentTokens()` (auto-invoked on first import); per-component merging is no longer required.
+- Legacy `sticky` and `system` properties on deprecated component variants — removed with their tests.
+
+#### Dialog behavior
+
+`hx-date-picker` and `hx-time-picker` migrate from native modal `<dialog>` to a non-modal popup pattern. This avoids the browser's top-layer focus trap and backdrop behavior, which conflicted with form-inline usage. Keyboard behavior is preserved (Escape closes + restores focus; arrow keys navigate; Tab remains in document flow). Consumers that relied on the modal backdrop or top-layer stacking must adapt their layout.
+
+#### `hx-dialog` default `modal` flipped from `true` to `false`
+
+The `modal` property on `hx-dialog` now defaults to `false`, aligning with HTML boolean-attribute semantics (attribute absent = property `false`). In 2.x, any `<hx-dialog open>` without an explicit `modal` attribute rendered in the top layer with a backdrop and focus trap; in 3.0.0 the same markup renders as a non-modal dialog.
+
+This is a **silent behavior change** — no type error, no runtime warning. Every existing `<hx-dialog>` instance that relied on the default modal behavior must add `modal` explicitly:
+
+```html
+<!-- Before (2.x): modal by default -->
+<hx-dialog open>...</hx-dialog>
+
+<!-- After (3.0.0): add explicit modal -->
+<hx-dialog open modal>...</hx-dialog>
+```
+
+Find all instances missing the attribute:
+
+```bash
+rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+```
+
+Drupal / Twig consumers should grep `*.twig` templates for the same pattern.
+
+#### `hx-phi-field` PHI attribute no longer retained post-hydration (security hardening)
+
+`<hx-phi-field value="...">` previously left the `value` attribute on the DOM after `connectedCallback`, meaning PHI values were readable via `el.getAttribute('value')`, `el.outerHTML`, server-side DOM dumps, and browser DevTools inspection. In 3.0.0 the attribute is stripped from the DOM after hydration; the property still holds the value for reactive updates and form submission.
+
+This is a **positive security change** for HIPAA-aligned integrations — PHI no longer leaks through DOM serialization. Consumers reading PHI via the `value` property (e.g. `el.value`) are unaffected. Consumers reading the `value` *attribute* via `getAttribute` or `outerHTML` must switch to the property accessor.
+
+```typescript
+// Before — worked, but exposed PHI in DOM serialization
+const phi = el.getAttribute('value');
+
+// After — PHI attribute is removed post-hydration; use the property
+const phi = el.value;
+```
+
+#### Bundle layout / barrel imports
+
+- `@floating-ui/dom` is now imported dynamically at first use inside `hx-select`, `hx-combobox`, `hx-popover`, `hx-tooltip`, and `hx-overflow-menu`. First interaction on these components triggers a separate chunk load; the core bundle drops the floating-ui dependency.
+- A public-API allowlist enforces barrel hygiene — internal helpers can no longer leak through `@helixui/library` root exports. Consumers that were importing from undocumented deep paths should switch to the documented per-component entry points or the named barrel export.
+
+#### Design token delta
+
+The following semantic-tier tokens were aligned or added in 3.0.0. Consumers overriding at the semantic tier should audit their overrides against the 3.0.0 token source (`packages/hx-tokens/dist/tokens.json`):
+
+- `--hx-color-error-text` — canonicalized. All form controls consume this token for error messages; previously each control had its own fallback hex.
+- `--hx-focus-ring-*` cascade — now uses `color-mix()` against semantic fallbacks for forced-colors support. Components no longer hardcode focus ring colors.
+- `--hx-shadow-*` — shadow cascade now includes semantic-tier fallbacks; primitive-only overrides are honored in all tiers.
+- `--hx-font-family-*` — standardized across components; no component hardcodes a font-family outside the token cascade.
+
+#### CDN delivery
+
+The published CDN bundle ships two integration strategies:
+
+- **Strategy B (recommended)** — core `@helixui/library/dist/cdn/core.js` (~8.4KB min+gz) plus per-component modules (~2KB each). Consumers import only the components they use. **This is the recommended integration for Drupal, legacy CMS, and static-site consumers.**
+- **Strategy A (kitchen sink)** — a single `@helixui/library/dist/cdn/bundle.js` containing every component. Not recommended for production. Ships for back-compat and prototyping only; may be removed in a future major.
+
+The `INTEGRATION-snippet.html` emitted by the CDN build now leads with Strategy B. The Starlight CDN integration page is updated to match.
+
+#### Adopted stylesheets remain mandatory
+
+Design tokens are adopted at the document level via `document.adoptedStyleSheets` on first import of any `@helixui/library` component. This is the only supported theming path — consumers must not strip the `ensureDocumentTokens()` side effect from the bundle. `sideEffects` is preserved in `package.json`.
+
+### Patch Changes
+
+- 625f619: feat(hx-library)!: promote form lifecycle hooks to protected subclassing contract
+- 3f03cbd: fix(stories): align interaction tests with elementinternals aria, non-modal dialog, async open
+- b34b73e: test(hx-popover): raise hover-delay wait from 350ms to 500ms
+- 07ea389: fix(number-input,slider): drop declare on @query fields to fix esbuild decorator scan
+- d59d8b3: fix(radio): migrate hx-radio aria state to declarative template/elementinternals
+- c0f597f: fix(barrel): add public-api allowlist to prevent internal exports leaking
+- d8bfda2: fix(date-picker,time-picker): use non-modal dialog, adopt shared id counter
+- 89d899a: fix(perf): convert @floating-ui/dom to dynamic imports, fix split-panel/select bugs
+- 0336ec6: fix(api): unify CSS part name 'error-message' → 'error' across all form controls
+- 0d2f30a: fix(forms): adopt FormMixin across all 15 form-associated components
+- c474abc: fix(a11y): add forced-colors focus-visible overrides to step, nav-item, tree-item, side-nav
+- 4511b32: feat(security): add css sanitizer utility for hx-style-scope light-css attribute
+- c0d71a8: fix(v5-remediation): resolve p0 phi-field auto-re-mask, css sanitizer, token/drupal/tsconfig fixes
+- 7712464: fix(v4-remediation): resolve all 9 P1 findings, align token fallbacks, add touch targets
+- 7633e82: fix(types): correct accordion export path, remove orphaned WcSwitch alias, fix system property reference
+- acc56e6: fix(a11y): enforce 44px touch targets on copy-button, pagination, rating, phi-field, slider, patient-banner
+- d15ffdc: fix(security): restrict phi event composition across shadow boundaries
+- e89101b: fix(security): harden svg sanitizer with animation and style element blocking
+- 2c6c7cc: fix(types): export named event detail interfaces for all component events
+- 5c0b9cd: fix(api): remove deprecated Wc* type aliases and deprecated properties
+- 18d6f28: fix(a11y): standardize accessible-label attribute naming across components
+- 47690a0: fix(hx-date-picker): migrate calendar popup to native <dialog> element
+
+Updated dependencies:
+
+- @helixui/tokens@3.0.0
+
 ## 2.1.2
 
 ### Patch Changes

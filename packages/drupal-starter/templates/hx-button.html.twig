@@ -5,10 +5,13 @@
  *
  * Available variables:
  * - variant: Button variant (primary, secondary, tertiary, danger, ghost). Default: primary.
- * - size: Button size (sm, md, lg). Default: md.
+ * - size: Button size (sm, md, lg). Default: md. Rendered as `hx-size` on the element.
  * - disabled: Whether the button is disabled.
  * - type: Button type attribute (button, submit, reset). Default: button.
  * - href: If set, renders the button as a link.
+ * - accessible-label: ARIA name for screen readers when the button has no visible
+ *   text label (icon-only buttons). Use this instead of aria-label on HELiX
+ *   components — rendered as the `accessible-label` attribute in 3.0.0+.
  * - content: The button label text or markup.
  * - icon_start: Optional icon name to render before the label.
  * - icon_end: Optional icon name to render after the label.
@@ -35,6 +38,7 @@
   {% if type %}type="{{ type }}"{% endif %}
   {% if href %}href="{{ href }}"{% endif %}
   {% if disabled %}disabled{% endif %}
+  {% if accessible_label %}accessible-label="{{ accessible_label }}"{% endif %}
   {% if attributes %}{{ attributes }}{% endif %}
 >
   {% if icon_start %}

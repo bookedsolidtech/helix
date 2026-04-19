@@ -123,12 +123,19 @@ else
   COMPONENTS=$(echo "$CHANGED_COMPONENT_SOURCES" \
     | sed -E 's|packages/hx-library/src/components/(hx-[^/]+)/.*|\1|' \
     | sort -u)
-  PATTERN=$(echo "$COMPONENTS" | tr '\n' '|' | sed 's/|$//')
 
   echo "  Testing: $(echo "$COMPONENTS" | tr '\n' ' ')"
 
+  # Vitest 3.x treats positional args as literal substring filters, not
+  # pipe-delimited regex alternation — build one filter per component so the
+  # path match works even when every component directory is touched.
+  FILTERS=()
+  while IFS= read -r component; do
+    [ -n "$component" ] && FILTERS+=("${component}/")
+  done <<< "$COMPONENTS"
+
   # Run with coverage.enabled so check-coverage.mjs has data
-  (cd packages/hx-library && pnpm exec vitest run "${PATTERN}/" \
+  (cd packages/hx-library && pnpm exec vitest run "${FILTERS[@]}" \
     --reporter=verbose \
     --coverage.enabled)
 

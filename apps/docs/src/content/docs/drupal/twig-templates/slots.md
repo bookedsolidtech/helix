@@ -415,7 +415,7 @@ Views templates commonly map view result fields to component slots:
     <hx-card
       variant="default"
       elevation="raised"
-      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
     >
       {# Image slot #}
       {% if patient.field_photo.entity %}

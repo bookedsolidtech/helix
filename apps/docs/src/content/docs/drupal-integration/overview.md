@@ -46,7 +46,7 @@ Load components directly from a CDN with a single `<script>` tag. This is the fa
 helix_cdn:
   version: VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
       type: external
       attributes:
         type: module

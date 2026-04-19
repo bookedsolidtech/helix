@@ -12,8 +12,8 @@ installed_at: '2026-04-18T00:00:00Z'
 #   L1 — Writes allowed to non-blocked paths; destructive operations blocked
 #   L2 — Writes + PR creation allowed; destructive tier blocked
 #   L3 — All writes allowed; advisory on anomalous patterns
-autonomy_level: L1
-max_autonomy_level: L2
+autonomy_level: L2
+max_autonomy_level: L3
 
 # Human must approve any autonomy level increase
 promotion_requires_human_approval: true
@@ -39,3 +39,5 @@ context_protection:
     - pnpm run test
     - pnpm run build
   max_bash_output_lines: 100
+review:
+  codex_required: true

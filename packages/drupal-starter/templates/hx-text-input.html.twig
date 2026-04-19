@@ -17,6 +17,9 @@
  * - pattern: Validation pattern (regex).
  * - maxlength: Maximum character length.
  * - autocomplete: Autocomplete attribute value.
+ * - accessible_label: ARIA name for screen readers when the visible `label`
+ *   is hidden or absent. Rendered as the `accessible-label` attribute on the
+ *   host element in 3.0.0+. Use this instead of aria-label on HELiX components.
  * - attributes: Drupal attributes object for additional HTML attributes.
  *
  * Usage:
@@ -58,5 +61,6 @@
   {% if pattern %}pattern="{{ pattern }}"{% endif %}
   {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
   {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+  {% if accessible_label %}accessible-label="{{ accessible_label }}"{% endif %}
   {% if attributes %}{{ attributes }}{% endif %}
 ></hx-text-input>

@@ -143,7 +143,7 @@ import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('wc-button')
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
@@ -600,7 +600,7 @@ This allows components to use simple, semantic IDs without worrying about confli
 Lit uses **constructable stylesheets** (via `adoptedStyleSheets`) for optimal performance:
 
 ```typescript
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   static styles = css`
     :host {
       display: inline-block;
@@ -733,7 +733,7 @@ Every public token is documented via JSDoc:
  * @csspart button - The native button element.
  */
 @customElement('wc-button')
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   // ...
 }
 ```
@@ -1002,7 +1002,7 @@ wc-button.hero-cta {
  * @cssprop [--wc-button-color=var(--wc-color-neutral-0)] - Button text color.
  */
 @customElement('wc-button')
-export class WcButton extends LitElement {
+export class HxButton extends LitElement {
   /* ... */
 }
 ```

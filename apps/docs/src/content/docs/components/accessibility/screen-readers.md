@@ -111,7 +111,7 @@ This pattern works across shadow boundaries because both elements live in the sa
 Provides an explicit text string as the accessible name.
 
 ```html
-<hx-button aria-label="Close dialog">
+<hx-button accessible-label="Close dialog">
   <svg><!-- X icon --></svg>
 </hx-button>
 ```
@@ -436,7 +436,7 @@ Links announce their label, role, and (when appropriate) whether they open in a 
 **Example: Interactive card as link**
 
 ```html
-<hx-card hx-href="/patient/12345">
+<hx-card href="/patient/12345">
   <h3>John Doe</h3>
   <p>MRN: 12345678</p>
 </hx-card>
@@ -574,7 +574,7 @@ ARIA attributes that use ID references (`aria-labelledby`, `aria-describedby`, `
 **Solution 2: Use `aria-label` for cross-boundary labeling**
 
 ```html
-<hx-text-input aria-label="Username"></hx-text-input>
+<hx-text-input accessible-label="Username"></hx-text-input>
 ```
 
 The `aria-label` attribute is set on the custom element and passes through to the internal input.
@@ -1176,7 +1176,7 @@ Screen reader users in clinical settings need fast, accurate access to patient d
 ```html
 <hx-text-input
   label="BP"
-  aria-label="Blood pressure"
+  accessible-label="Blood pressure"
   help-text="Enter systolic/diastolic (e.g., 120/80)"
 >
 </hx-text-input>

@@ -30,9 +30,9 @@ Every interactive element needs a computable accessible name. The name algorithm
 html`<button><slot></slot></button>`
 // Accessible name = slot text: "Save document"
 
-// aria-label on host, forwarded via mixinDelegatesAria
+// accessible-label on host — forwarded as aria-label onto the inner button
 html`<button aria-label=${ifDefined(this.ariaLabel ?? undefined)}><slot></slot></button>`
-// Consumer sets: <hx-button aria-label="Close dialog">X</hx-button>
+// Consumer sets: <hx-button accessible-label="Close dialog">X</hx-button>
 // Accessible name = "Close dialog" (overrides slot text)
 ```
 
