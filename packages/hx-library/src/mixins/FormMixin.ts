@@ -28,19 +28,31 @@ export interface FormMixinInterface {
 
   /**
    * Advance `dirty` state. Call from the native input's `input` event handler.
-   * @internal
+   *
+   * Part of the FormMixin subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
+   * @protected
    */
   _handleInteractionInput(): void;
 
   /**
    * Advance `touched` state. Call from the native input's `blur` event handler.
-   * @internal
+   *
+   * Part of the FormMixin subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
+   * @protected
    */
   _handleInteractionBlur(): void;
 
   /**
    * Reset interaction flags. Call from `_onFormReset()` in the host component.
-   * @internal
+   *
+   * Part of the FormMixin subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
+   * @protected
    */
   _resetInteractionState(): void;
 
@@ -48,7 +60,11 @@ export interface FormMixinInterface {
    * Override in the host component to run constraint validation logic.
    * Called automatically by `updated()`. Use `this._internals.setValidity()`
    * inside this method.
-   * @internal
+   *
+   * Part of the FormMixin subclassing contract (stable across minor/patch
+   * releases; breaking changes gated to major releases).
+   *
+   * @protected
    */
   _updateValidity(...args: unknown[]): void;
 }
@@ -153,7 +169,10 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
      * Override in the host component to run constraint validation logic.
      * Called automatically by `updated()`. Use `this._internals.setValidity()`
      * inside this method.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract.
+     *
+     * @protected
      */
     _updateValidity(): void {
       // Default: valid. Subclasses override to apply constraints.
@@ -163,7 +182,10 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
 
     /**
      * Advance `dirty` state. Call from the native input's `input` event.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract.
+     *
+     * @protected
      */
     _handleInteractionInput(): void {
       if (!this._dirty) {
@@ -175,7 +197,10 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
 
     /**
      * Advance `touched` state. Call from the native input's `blur` event.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract.
+     *
+     * @protected
      */
     _handleInteractionBlur(): void {
       if (!this._touched) {
@@ -188,7 +213,10 @@ export function FormMixin<TBase extends Constructor<HelixElement>>(
     /**
      * Reset interaction state to initial values.
      * Call from `_onFormReset()` in the host component.
-     * @internal
+     *
+     * Part of the FormMixin subclassing contract.
+     *
+     * @protected
      */
     _resetInteractionState(): void {
       if (this._dirty || this._touched) {
