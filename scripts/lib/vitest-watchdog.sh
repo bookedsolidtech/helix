@@ -46,9 +46,8 @@ run_vitest_with_watchdog() {
   while kill -0 "$vitest_pid" 2>/dev/null; do
     sleep "$poll_interval"
     local current_size
-    current_size=$(stat -f "%z" "$logfile" 2>/dev/null \
-      || stat -c "%s" "$logfile" 2>/dev/null \
-      || echo 0)
+    current_size=$(wc -c < "$logfile" 2>/dev/null | tr -d '[:space:]' || echo 0)
+    current_size=${current_size:-0}
     local elapsed=$(( $(date +%s) - start_time ))
 
     if [[ "$current_size" -eq "$last_size" ]] && [[ "$current_size" -gt 0 ]]; then
