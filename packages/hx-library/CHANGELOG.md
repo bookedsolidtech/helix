@@ -50,6 +50,7 @@ All 15 form-associated components now compose `FormMixin(HelixElement)` for shar
 - `Wc*` type aliases (carry-over from the pre-rename era) — removed. Use the `Hx*` equivalents (`HxButton`, `HxCard`, etc.).
 - Deprecated property shims from 2.0.0 property renames (`hxHref`, `hxAriaLabel`, `hxSize`, `closeLabel`, `triggerLabel`, `menuLabel`) — removed. Update to the renamed properties documented in the 2.0.0 entry.
 - `mergeTokenStyles` utility — removed. Tokens adopt at the document level via `ensureDocumentTokens()` (auto-invoked on first import); per-component merging is no longer required.
+- `resetIdCounter` — removed from the main barrel. Moved to `test-utils.ts`. Update any test teardown imports: `import { resetIdCounter } from '@helixui/library/test-utils'` instead of `'@helixui/library'`.
 - Legacy `sticky` and `system` properties on deprecated component variants — removed with their tests.
 
 #### Dialog behavior

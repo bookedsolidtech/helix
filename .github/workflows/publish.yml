@@ -4,8 +4,9 @@
 # Triggers on push to main or manual dispatch. If unreleased changesets exist, bumps versions
 # and publishes to npm directly. Version bump is pushed back via a PR.
 #
-# Tests are NOT re-run here — CI (ci.yml + ci-matrix.yml) already validates
+# Tests are NOT re-run here — CI (ci.yml) already validates
 # all code before it reaches main via the staging→main promotion flow.
+# ci-matrix.yml is disabled (workflow_dispatch only) and is not part of the gate.
 #
 # Required secrets:
 #   CHANGESET_TOKEN — PAT or fine-grained token with contents:write + pull-requests:write
@@ -84,7 +85,7 @@ jobs:
           SCAN_DIR="$(mktemp -d)"
           FAIL=0
 
-          for pkg_dir in packages/hx-library packages/hx-tokens; do
+          for pkg_dir in packages/hx-library packages/hx-tokens packages/hx-react; do
             if [ ! -f "$pkg_dir/package.json" ]; then
               echo "Skipping $pkg_dir — no package.json"
               continue
@@ -169,6 +170,15 @@ jobs:
 
       - name: Build
         run: pnpm turbo run build --filter='!docs'
+
+      - name: Verify CEM matches committed manifest
+        run: |
+          pnpm --filter=@helixui/library run cem
+          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+            echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            exit 1
+          fi
+          echo "CEM matches committed manifest."
 
       - name: Build CDN artifacts
         run: pnpm --filter=@helixui/library run build:cdn

@@ -35,7 +35,7 @@ export interface FormMixinInterface {
  * to major releases) but are NOT exposed as public consumer API.
  * They are accessible only from within FormMixin subclasses.
  *
- * @internal
+ * @protected
  */
 export interface FormMixinProtectedHooks {
   /**
