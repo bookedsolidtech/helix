@@ -1,20 +1,44 @@
 #!/usr/bin/env tsx
 /**
  * Auto-generates React wrapper components from the HELiX Custom Elements Manifest.
- * Run: pnpm exec tsx scripts/generate-react-wrappers.ts
+ *
+ * Run modes:
+ *   pnpm exec tsx scripts/generate-react-wrappers.ts            # write wrappers
+ *   pnpm exec tsx scripts/generate-react-wrappers.ts --check    # dry-run, diff only
+ *
+ * Determinism contract:
+ *   - Components are sorted by tagName ascending before iteration
+ *   - Main index exports are sorted alphabetically by component name
+ *   - Re-running the generator against the same CEM produces byte-identical output
+ *
+ * Safety contract:
+ *   - Declarations missing required fields (name, valid tagName, component dir)
+ *     are logged with console.warn and skipped; the generator never throws
+ *   - Orphan directories (present on disk, absent from CEM) are logged but not deleted
+ *   - --check never touches packages/hx-react/src; it generates to a temp dir and diffs
  *
  * Generates packages/hx-react/src/components/<ComponentName>/index.ts for each component.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  readdirSync,
+  statSync,
+  rmSync,
+} from 'fs';
 import { execSync } from 'child_process';
-import { resolve, dirname } from 'path';
+import { resolve, relative } from 'path';
 import { fileURLToPath } from 'url';
+import { tmpdir } from 'os';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const rootDir = resolve(__dirname, '..');
 const cemPath = resolve(rootDir, 'packages/hx-library/custom-elements.json');
-const outputDir = resolve(rootDir, 'packages/hx-react/src/components');
+const realSrcDir = resolve(rootDir, 'packages/hx-react/src');
+const realOutputDir = resolve(realSrcDir, 'components');
 
 // --- CEM Types (subset) ---
 interface CemAttribute {
@@ -67,6 +91,9 @@ interface Cem {
 }
 
 // --- Utilities ---
+
+/** Matches a valid hx-* custom element tag name. */
+const TAG_NAME_PATTERN = /^hx-[a-z][a-z0-9-]*$/;
 
 /**
  * Converts hx-button -> HxButton (PascalCase React component name).
@@ -207,13 +234,14 @@ function getPublicProperties(decl: CemDeclaration): CemProperty[] {
 /**
  * Derives the component's directory name for import path resolution.
  * e.g. "src/components/hx-button/hx-button.ts" -> "hx-button"
+ * Returns an empty string if the path does not resolve to a component directory.
  */
 function getComponentDirFromModulePath(modulePath: string): string {
   // modulePath is like "src/components/hx-button/hx-button.ts"
   // or "src/components/hx-accordion/hx-accordion-item.ts"
   const parts = modulePath.split('/');
   // The component directory is always at index 2 (after src/components/)
-  return parts[2] ?? dirname(modulePath);
+  return parts[2] ?? '';
 }
 
 function generateTypesFile(
@@ -265,9 +293,9 @@ function generateComponentFile(
   decl: CemDeclaration,
   componentName: string,
   componentDir: string,
+  tagName: string,
   events: CemEvent[],
 ): string {
-  const tagName = decl.tagName!;
   // The actual Helix element class name (e.g. HelixButton)
   const elementClassName = decl.name;
 
@@ -336,7 +364,242 @@ export type { ${componentName}Props } from './types.js';
 }
 
 // --- Main ---
+
+interface ComponentEntry {
+  decl: CemDeclaration;
+  modulePath: string;
+  tagName: string;
+  componentName: string;
+  componentDir: string;
+}
+
+interface CollectedComponents {
+  components: ComponentEntry[];
+  skipped: { reason: string; tagName: string | undefined; name: string | undefined }[];
+}
+
+/**
+ * Walks the CEM and collects valid component entries, skipping any that fail guards.
+ * Returns entries sorted deterministically by tagName ascending.
+ */
+function collectComponents(cem: Cem): CollectedComponents {
+  const components: ComponentEntry[] = [];
+  const skipped: CollectedComponents['skipped'] = [];
+
+  for (const module of cem.modules ?? []) {
+    for (const decl of module.declarations ?? []) {
+      // Base predicate: must be a custom element class declaration
+      if (!decl.customElement || !decl.tagName || decl.kind !== 'class') {
+        continue;
+      }
+
+      // Guard: decl.name must be a non-empty string
+      if (typeof decl.name !== 'string' || decl.name.trim() === '') {
+        console.warn(
+          `SKIP: tagName=${decl.tagName} — missing or empty decl.name in CEM (module: ${module.path})`,
+        );
+        skipped.push({
+          reason: 'missing-name',
+          tagName: decl.tagName,
+          name: decl.name,
+        });
+        continue;
+      }
+
+      // Guard: tagName must match hx-* pattern
+      if (!TAG_NAME_PATTERN.test(decl.tagName)) {
+        console.warn(
+          `SKIP: tagName=${decl.tagName} — does not match /^hx-[a-z][a-z0-9-]*$/ (module: ${module.path})`,
+        );
+        skipped.push({
+          reason: 'invalid-tag-name',
+          tagName: decl.tagName,
+          name: decl.name,
+        });
+        continue;
+      }
+
+      // Guard: modulePath must yield a non-empty component directory segment
+      const componentDir = getComponentDirFromModulePath(module.path);
+      if (componentDir === '') {
+        console.warn(
+          `SKIP: tagName=${decl.tagName} — could not derive component directory from modulePath "${module.path}"`,
+        );
+        skipped.push({
+          reason: 'invalid-module-path',
+          tagName: decl.tagName,
+          name: decl.name,
+        });
+        continue;
+      }
+
+      components.push({
+        decl,
+        modulePath: module.path,
+        tagName: decl.tagName,
+        componentName: toPascalCase(decl.tagName),
+        componentDir,
+      });
+    }
+  }
+
+  // Deterministic ordering: sort by tagName ascending.
+  components.sort((a, b) => (a.tagName < b.tagName ? -1 : a.tagName > b.tagName ? 1 : 0));
+
+  return { components, skipped };
+}
+
+/**
+ * Writes all generated wrapper files for the given components under `targetSrcDir`.
+ * Layout:
+ *   <targetSrcDir>/components/<ComponentName>/{types.ts, <ComponentName>.ts, index.ts}
+ *   <targetSrcDir>/index.ts
+ */
+function writeAllWrappers(components: ComponentEntry[], targetSrcDir: string): void {
+  const targetComponentsDir = resolve(targetSrcDir, 'components');
+  mkdirSync(targetComponentsDir, { recursive: true });
+
+  for (const entry of components) {
+    const { decl, componentName, componentDir, tagName } = entry;
+    const properties = getPublicProperties(decl);
+    const events = decl.events ?? [];
+
+    const componentOutDir = resolve(targetComponentsDir, componentName);
+    mkdirSync(componentOutDir, { recursive: true });
+
+    writeFileSync(
+      resolve(componentOutDir, 'types.ts'),
+      generateTypesFile(componentName, properties, events),
+    );
+
+    writeFileSync(
+      resolve(componentOutDir, `${componentName}.ts`),
+      generateComponentFile(decl, componentName, componentDir, tagName, events),
+    );
+
+    writeFileSync(resolve(componentOutDir, 'index.ts'), generateComponentIndex(componentName));
+  }
+
+  // Main src/index.ts — sort exports alphabetically by component name to guarantee
+  // stable diffs on re-runs regardless of CEM module emit order.
+  const sortedNames = components.map((c) => c.componentName).sort();
+  const mainIndex =
+    sortedNames
+      .map((name) => `export { ${name}, type ${name}Props } from './components/${name}/index.js';`)
+      .join('\n') + '\n';
+
+  mkdirSync(targetSrcDir, { recursive: true });
+  writeFileSync(resolve(targetSrcDir, 'index.ts'), mainIndex);
+}
+
+/**
+ * Runs Prettier against the generated tree so output matches committed formatting.
+ *
+ * Passes --config explicitly so the formatting is identical whether the target tree
+ * lives inside the repo (write mode) or in a system temp directory (--check mode).
+ * Without --config, prettier's auto-discovery only walks up from the target tree and
+ * would fall back to built-in defaults when the target is outside the repo.
+ */
+function formatTree(targetSrcDir: string): void {
+  const prettierConfig = resolve(rootDir, '.prettierrc');
+  execSync(`prettier --config "${prettierConfig}" --write "${targetSrcDir}"`, {
+    cwd: rootDir,
+    stdio: 'inherit',
+  });
+}
+
+/**
+ * After a write, compare the PascalCase component directories on disk under
+ * packages/hx-react/src/components/ against the freshly generated set. Warn for
+ * any directory that exists on disk but is not in the CEM output. Never deletes.
+ */
+function reportOrphanDirectories(generated: ComponentEntry[], componentsDir: string): string[] {
+  if (!existsSync(componentsDir)) return [];
+
+  const generatedNames = new Set(generated.map((c) => c.componentName));
+  const orphans: string[] = [];
+  for (const entry of readdirSync(componentsDir)) {
+    const abs = resolve(componentsDir, entry);
+    if (!statSync(abs).isDirectory()) continue;
+    if (!generatedNames.has(entry)) {
+      const relPath = relative(rootDir, abs);
+      console.warn(`ORPHAN: ${relPath} — present on disk, absent from CEM`);
+      orphans.push(entry);
+    }
+  }
+  return orphans;
+}
+
+/**
+ * Recursively walks a directory and returns a map of relative-path -> file contents.
+ * Skips node_modules and dist defensively; the trees we compare do not contain these,
+ * but the guard protects against accidental expansion of scope.
+ */
+function snapshotTree(root: string): Map<string, string> {
+  const snapshot = new Map<string, string>();
+  if (!existsSync(root)) return snapshot;
+
+  function walk(dir: string): void {
+    for (const name of readdirSync(dir)) {
+      if (name === 'node_modules' || name === 'dist') continue;
+      const abs = resolve(dir, name);
+      const st = statSync(abs);
+      if (st.isDirectory()) {
+        walk(abs);
+      } else if (st.isFile()) {
+        const rel = relative(root, abs);
+        snapshot.set(rel, readFileSync(abs, 'utf-8'));
+      }
+    }
+  }
+
+  walk(root);
+  return snapshot;
+}
+
+interface DiffResult {
+  added: string[];
+  removed: string[];
+  changed: string[];
+}
+
+function diffSnapshots(expected: Map<string, string>, actual: Map<string, string>): DiffResult {
+  const added: string[] = [];
+  const removed: string[] = [];
+  const changed: string[] = [];
+
+  for (const [path, content] of expected) {
+    const actualContent = actual.get(path);
+    if (actualContent === undefined) {
+      added.push(path);
+    } else if (actualContent !== content) {
+      changed.push(path);
+    }
+  }
+  for (const path of actual.keys()) {
+    if (!expected.has(path)) {
+      removed.push(path);
+    }
+  }
+
+  added.sort();
+  removed.sort();
+  changed.sort();
+  return { added, removed, changed };
+}
+
+interface RunOptions {
+  check: boolean;
+}
+
+function parseArgs(argv: string[]): RunOptions {
+  const check = argv.includes('--check');
+  return { check };
+}
+
 function main(): void {
+  const options = parseArgs(process.argv.slice(2));
+
   if (!existsSync(cemPath)) {
     console.error(`ERROR: CEM not found at ${cemPath}`);
     console.error('Run: pnpm --filter=@helixui/library run build');
@@ -344,77 +607,98 @@ function main(): void {
   }
 
   const cem: Cem = JSON.parse(readFileSync(cemPath, 'utf-8'));
-
-  interface ComponentEntry {
-    decl: CemDeclaration;
-    modulePath: string;
-  }
-
-  const components: ComponentEntry[] = [];
-
-  for (const module of cem.modules ?? []) {
-    for (const decl of module.declarations ?? []) {
-      if (decl.customElement && decl.tagName && decl.kind === 'class') {
-        components.push({ decl, modulePath: module.path });
-      }
-    }
-  }
+  const { components, skipped } = collectComponents(cem);
 
   console.log(`Found ${components.length} components in CEM`);
-
-  mkdirSync(outputDir, { recursive: true });
-
-  const allExports: string[] = [];
-
-  for (const { decl, modulePath } of components) {
-    const tagName = decl.tagName!;
-    const componentName = toPascalCase(tagName);
-    const componentDir = getComponentDirFromModulePath(modulePath);
-    const properties = getPublicProperties(decl);
-    const events = decl.events ?? [];
-
-    const componentOutDir = resolve(outputDir, componentName);
-    mkdirSync(componentOutDir, { recursive: true });
-
-    // types.ts
-    writeFileSync(
-      resolve(componentOutDir, 'types.ts'),
-      generateTypesFile(componentName, properties, events),
-    );
-
-    // <ComponentName>.ts
-    writeFileSync(
-      resolve(componentOutDir, `${componentName}.ts`),
-      generateComponentFile(decl, componentName, componentDir, events),
-    );
-
-    // index.ts
-    writeFileSync(resolve(componentOutDir, 'index.ts'), generateComponentIndex(componentName));
-
-    allExports.push(componentName);
-    console.log(`  Generated: ${componentName} (${tagName})`);
+  if (skipped.length > 0) {
+    console.log(`Skipped ${skipped.length} declaration(s) due to guard failures`);
   }
 
-  // Main src/index.ts
-  const mainIndex =
-    allExports
-      .map((name) => `export { ${name}, type ${name}Props } from './components/${name}/index.js';`)
-      .join('\n') + '\n';
+  if (options.check) {
+    // --- Dry-run / drift detection ---
+    // Generate to a temp directory, format it with the same prettier config, then
+    // compare against the real tree. Never touches packages/hx-react/src.
+    const tempRoot = resolve(
+      tmpdir(),
+      `hx-react-wrappers-check-${process.pid}-${Date.now().toString(36)}`,
+    );
+    const tempSrcDir = resolve(tempRoot, 'src');
 
-  const srcDir = resolve(rootDir, 'packages/hx-react/src');
-  mkdirSync(srcDir, { recursive: true });
-  writeFileSync(resolve(srcDir, 'index.ts'), mainIndex);
+    try {
+      mkdirSync(tempSrcDir, { recursive: true });
+      writeAllWrappers(components, tempSrcDir);
+      formatTree(tempSrcDir);
+
+      const expected = snapshotTree(tempSrcDir);
+      // Only compare the subset of the real src tree that the generator owns:
+      // src/index.ts and everything under src/components/.
+      const actualAll = snapshotTree(realSrcDir);
+      const actual = new Map<string, string>();
+      for (const [path, content] of actualAll) {
+        if (path === 'index.ts' || path.startsWith(`components/`)) {
+          actual.set(path, content);
+        }
+      }
+
+      const diff = diffSnapshots(expected, actual);
+      const hasDiff = diff.added.length + diff.removed.length + diff.changed.length > 0;
+
+      if (!hasDiff) {
+        console.log('\nOK: generator output matches committed tree (--check passed)');
+        process.exit(0);
+      }
+
+      console.error('\nDRIFT: generator output differs from committed tree.');
+      if (diff.added.length > 0) {
+        console.error(`  Missing from disk (${diff.added.length}):`);
+        for (const p of diff.added) console.error(`    + ${p}`);
+      }
+      if (diff.removed.length > 0) {
+        console.error(`  Extra on disk (${diff.removed.length}):`);
+        for (const p of diff.removed) console.error(`    - ${p}`);
+      }
+      if (diff.changed.length > 0) {
+        console.error(`  Content differs (${diff.changed.length}):`);
+        for (const p of diff.changed) console.error(`    ~ ${p}`);
+      }
+      console.error(
+        '\nFix: run `pnpm --filter=@helixui/react run generate` and commit the result.',
+      );
+      process.exit(1);
+    } finally {
+      // Best-effort cleanup of the temp directory; do not fail the run on cleanup errors.
+      try {
+        rmSync(tempRoot, { recursive: true, force: true });
+      } catch {
+        // ignore
+      }
+    }
+    return;
+  }
+
+  // --- Write mode ---
+  mkdirSync(realOutputDir, { recursive: true });
+  writeAllWrappers(components, realSrcDir);
+
+  for (const c of components) {
+    console.log(`  Generated: ${c.componentName} (${c.tagName})`);
+  }
 
   console.log(`\nGenerated ${components.length} components`);
   console.log(`Main index: packages/hx-react/src/index.ts`);
 
-  // Format generated files so they match Prettier output and stay clean in git
   console.log('\nFormatting generated files with Prettier...');
-  execSync(`prettier --write "${resolve(rootDir, 'packages/hx-react/src')}"`, {
-    cwd: rootDir,
-    stdio: 'inherit',
-  });
+  formatTree(realSrcDir);
   console.log('Done.');
+
+  const orphans = reportOrphanDirectories(components, realOutputDir);
+  if (orphans.length > 0) {
+    console.warn(`\n${orphans.length} orphan director${orphans.length === 1 ? 'y' : 'ies'} found.`);
+    console.warn('These directories are present on disk but absent from the current CEM.');
+    console.warn(
+      'Not deleted automatically. Remove manually if the component was intentionally retired.',
+    );
+  }
 }
 
 main();
