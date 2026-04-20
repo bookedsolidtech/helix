@@ -8,6 +8,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
 const _nextCheckboxId = createIdCounter('hx-checkbox');
@@ -192,6 +193,25 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
+    }
+    // Warn when accessible-label is set alongside a visible label — they are mutually exclusive.
+    if (
+      changedProperties.has('accessibleLabel') ||
+      changedProperties.has('label' as keyof this)
+    ) {
+      const hasAccessibleLabel = !!(this.accessibleLabel || this.ariaLabel);
+      const hasVisibleLabel =
+        !!this.label ||
+        (this.shadowRoot
+          ?.querySelector<HTMLSlotElement>('.checkbox__label slot')
+          ?.assignedNodes({ flatten: true })
+          .length ?? 0) > 0;
+      if (hasAccessibleLabel && hasVisibleLabel) {
+        devWarn(
+          'hx-checkbox',
+          'accessible-label is set alongside a visible label. Use either accessible-label or the label slot, not both.',
+        );
+      }
     }
     // WCAG 4.1.3: Keep _announcedError in sync with the error property.
     // When error changes from one non-empty value to another, clear the live region
