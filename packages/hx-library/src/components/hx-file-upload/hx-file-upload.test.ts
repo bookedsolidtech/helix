@@ -974,6 +974,16 @@ describe('hx-file-upload', () => {
       const dropzone = shadowQuery(el, '[part="dropzone"]')!;
       expect(dropzone.getAttribute('aria-label')).toBe(el.labelDropzone);
     });
+
+    it('whitespace-only accessible-label falls back to aria-labelledby when label is set', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accessible-label="   " label="Upload files"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      const labelEl = shadowQuery(el, '[part="label"]')!;
+      expect(dropzone.getAttribute('aria-labelledby')).toBe(labelEl.id);
+      expect(dropzone.hasAttribute('aria-label')).toBe(false);
+    });
   });
 
   // ─── Size limit validation edge cases ───

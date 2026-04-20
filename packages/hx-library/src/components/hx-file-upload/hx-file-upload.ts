@@ -160,7 +160,7 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
    * @internal
    */
   private get _effectiveLabel(): string {
-    return this.accessibleLabel || this.ariaLabel || '';
+    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
   }
 
   /**

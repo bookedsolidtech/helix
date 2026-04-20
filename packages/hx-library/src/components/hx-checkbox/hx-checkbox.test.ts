@@ -876,6 +876,27 @@ describe('hx-checkbox', () => {
       expect(input.hasAttribute('aria-label')).toBe(false);
     });
 
+    it('whitespace-only accessible-label falls back to aria-labelledby and does not trigger devWarn', async () => {
+      const warns: string[] = [];
+      const original = console.warn;
+      console.warn = (...args: unknown[]) => {
+        warns.push(String(args[0]));
+      };
+      try {
+        const el = await fixture<HelixCheckbox>(
+          '<hx-checkbox accessible-label="   " label="Accept terms"></hx-checkbox>',
+        );
+        await el.updateComplete;
+        const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+        const labelSpan = shadowQuery<HTMLElement>(el, '.checkbox__label')!;
+        expect(input.getAttribute('aria-labelledby')).toBe(labelSpan.id);
+        expect(input.hasAttribute('aria-label')).toBe(false);
+        expect(warns.filter((w) => w.includes('hx-checkbox'))).toHaveLength(0);
+      } finally {
+        console.warn = original;
+      }
+    });
+
     it('devWarn fires when accessible-label is set alongside a visible label', async () => {
       const warns: string[] = [];
       const original = console.warn;

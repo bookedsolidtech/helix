@@ -160,7 +160,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    * @internal
    */
   private get _effectiveLabel(): string {
-    return this.accessibleLabel || this.ariaLabel || '';
+    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
   }
 
   /** @internal */
@@ -198,7 +198,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // Checked unconditionally (not gated on changedProperties) because ariaLabel is provided by
     // mixinDelegatesAria via Object.defineProperty and never appears in changedProperties.
     {
-      const hasAccessibleLabel = !!(this.accessibleLabel || this.ariaLabel);
+      const hasAccessibleLabel = !!(this.accessibleLabel?.trim() || this.ariaLabel?.trim());
       const hasVisibleLabel =
         !!this.label ||
         (this.shadowRoot
