@@ -875,6 +875,23 @@ describe('hx-checkbox', () => {
       expect(input.getAttribute('aria-labelledby')).toBe(labelSpan.id);
       expect(input.hasAttribute('aria-label')).toBe(false);
     });
+
+    it('devWarn fires when accessible-label is set alongside a visible label', async () => {
+      const warns: string[] = [];
+      const original = console.warn;
+      console.warn = (...args: unknown[]) => {
+        warns.push(String(args[0]));
+      };
+      try {
+        const el = await fixture<HelixCheckbox>(
+          '<hx-checkbox accessible-label="Screen reader label" label="Visible label"></hx-checkbox>',
+        );
+        await el.updateComplete;
+        expect(warns.some((w) => w.includes('hx-checkbox'))).toBe(true);
+      } finally {
+        console.warn = original;
+      }
+    });
   });
 
   // ─── CSS class: checkbox--disabled ───

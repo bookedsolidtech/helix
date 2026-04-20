@@ -195,17 +195,15 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       this._internals.setFormValue(this.checked ? this.value : null);
     }
     // Warn when accessible-label is set alongside a visible label — they are mutually exclusive.
-    if (
-      changedProperties.has('accessibleLabel') ||
-      changedProperties.has('label' as keyof this)
-    ) {
+    // Checked unconditionally (not gated on changedProperties) because ariaLabel is provided by
+    // mixinDelegatesAria via Object.defineProperty and never appears in changedProperties.
+    {
       const hasAccessibleLabel = !!(this.accessibleLabel || this.ariaLabel);
       const hasVisibleLabel =
         !!this.label ||
         (this.shadowRoot
           ?.querySelector<HTMLSlotElement>('.checkbox__label slot')
-          ?.assignedNodes({ flatten: true })
-          .length ?? 0) > 0;
+          ?.assignedNodes({ flatten: true }).length ?? 0) > 0;
       if (hasAccessibleLabel && hasVisibleLabel) {
         devWarn(
           'hx-checkbox',

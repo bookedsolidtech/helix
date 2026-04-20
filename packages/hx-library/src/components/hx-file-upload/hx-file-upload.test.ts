@@ -972,7 +972,7 @@ describe('hx-file-upload', () => {
     it('neither label nor accessible-label: aria-label falls back to labelDropzone default', async () => {
       const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
       const dropzone = shadowQuery(el, '[part="dropzone"]')!;
-      expect(dropzone.getAttribute('aria-label')).toBe('Drag files here or click to browse');
+      expect(dropzone.getAttribute('aria-label')).toBe(el.labelDropzone);
     });
   });
 
