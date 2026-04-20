@@ -139,6 +139,29 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   @property({ type: String, attribute: 'hx-size', reflect: true })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Accessible label for the checkbox when no visible label text is provided.
+   * Use when embedding a checkbox in a context where a label element is not practical.
+   *
+   * Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+   * `accessible-label` takes precedence when both are set.
+   * When set, replaces the visible label as the input's accessible name. Cannot be combined
+   * with a visible label — set either `accessible-label` or the `label` slot, not both.
+   *
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string = '';
+
+  /**
+   * Returns the effective label for the checkbox, checking accessible-label first,
+   * then the aria-label attribute, falling back to empty string.
+   * @internal
+   */
+  private get _effectiveLabel(): string {
+    return this.accessibleLabel || this.ariaLabel || '';
+  }
+
   /** @internal */
   @query('.checkbox__input')
   private _inputEl: HTMLInputElement | undefined;
@@ -315,7 +338,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         .filter(Boolean)
         .join(' ') || undefined;
 
-    const hostAriaLabel = this.ariaLabel ?? undefined;
+    const hostAriaLabel = this._effectiveLabel || undefined;
 
     return html`
       <div class=${classMap(containerClasses)}>

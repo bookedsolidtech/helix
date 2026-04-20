@@ -143,6 +143,27 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
   labelFileList = 'Selected files';
 
   /**
+   * Accessible label for the dropzone when no visible label text is provided.
+   * Falls back to `label-dropzone` prop value, then a default string.
+   *
+   * Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+   * `accessible-label` takes precedence when both are set.
+   *
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string = '';
+
+  /**
+   * Returns the effective label for the dropzone, checking accessible-label first,
+   * then the aria-label attribute, falling back to empty string.
+   * @internal
+   */
+  private get _effectiveLabel(): string {
+    return this.accessibleLabel || this.ariaLabel || '';
+  }
+
+  /**
    * Generates upload progress description for screen readers.
    * @param name - file name
    * @param progress - progress percentage 0-100
@@ -632,8 +653,8 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
           id=${this._dropzoneId}
           role="button"
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-label=${ifDefined(!this.label ? (this.ariaLabel ?? dropzoneLabel) : undefined)}
-          aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
+          aria-label=${ifDefined(this._effectiveLabel || (!this.label ? dropzoneLabel : undefined))}
+          aria-labelledby=${ifDefined(!this._effectiveLabel && this.label ? this._labelId : undefined)}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-invalid=${hasError ? 'true' : nothing}
           aria-describedby=${ifDefined(hasError ? this._errorId : undefined)}
