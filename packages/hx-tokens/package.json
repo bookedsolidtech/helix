@@ -49,6 +49,9 @@
     "directory": "packages/hx-tokens"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://helix.bookedsolid.tech",
   "bugs": "https://github.com/bookedsolidtech/helix/issues",
   "keywords": [
