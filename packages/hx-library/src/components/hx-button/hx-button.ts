@@ -157,7 +157,7 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
    * @internal
    */
   private get _effectiveLabel(): string {
-    return this.accessibleLabel || this.ariaLabel || '';
+    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
   }
 
   // ─── Form API ───
@@ -184,7 +184,9 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
-    const hasContent = (slot?.assignedNodes({ flatten: true }).length ?? 0) > 0;
+    const hasContent = (slot?.assignedNodes({ flatten: true }) ?? []).some(
+      (n) => n.nodeType !== Node.TEXT_NODE || (n.textContent?.trim().length ?? 0) > 0,
+    );
     if (!hasContent && !this._effectiveLabel) {
       this._emptySlotWarnEmitted = true;
       devWarn(
@@ -213,14 +215,20 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
   /** @internal */
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
+    const hasContent = slot
+      .assignedNodes({ flatten: true })
+      .some((n) => n.nodeType !== Node.TEXT_NODE || (n.textContent?.trim().length ?? 0) > 0);
     if (!hasContent && !this._effectiveLabel && !this._emptySlotWarnEmitted) {
       devWarn(
         'hx-button',
         'hx-button has no slot content and no accessible-label — button will have no accessible name.',
       );
     }
-    this._emptySlotWarnEmitted = false;
+    // Only reset once content arrives so the guard stays armed for browsers
+    // that fire a second slotchange for the same empty initial slot.
+    if (hasContent) {
+      this._emptySlotWarnEmitted = false;
+    }
   }
 
   // ─── Event Handling ───

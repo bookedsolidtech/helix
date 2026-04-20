@@ -969,6 +969,24 @@ describe('hx-file-upload', () => {
       expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
     });
 
+    it('only aria-label set: dropzone has that aria-label, no aria-labelledby', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload aria-label="Upload patient document"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe('Upload patient document');
+      expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('both aria-label and accessible-label set: accessible-label wins', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload aria-label="Old" accessible-label="New"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe('New');
+      expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
     it('neither label nor accessible-label: aria-label falls back to labelDropzone default', async () => {
       const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
       const dropzone = shadowQuery(el, '[part="dropzone"]')!;

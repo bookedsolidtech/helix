@@ -179,6 +179,9 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    */
   @state() private _announcedError = '';
 
+  /** @internal */
+  private _hasWarnedLabelConflict = false;
+
   // ─── Slot Handlers ───
 
   /** @internal */
@@ -204,11 +207,14 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         (this.shadowRoot
           ?.querySelector<HTMLSlotElement>('.checkbox__label slot')
           ?.assignedNodes({ flatten: true }).length ?? 0) > 0;
-      if (hasAccessibleLabel && hasVisibleLabel) {
+      if (hasAccessibleLabel && hasVisibleLabel && !this._hasWarnedLabelConflict) {
+        this._hasWarnedLabelConflict = true;
         devWarn(
           'hx-checkbox',
           'accessible-label is set alongside a visible label. Use either accessible-label or the label slot, not both.',
         );
+      } else if (!hasAccessibleLabel || !hasVisibleLabel) {
+        this._hasWarnedLabelConflict = false;
       }
     }
     // WCAG 4.1.3: Keep _announcedError in sync with the error property.
