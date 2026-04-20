@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "generate": "tsx ../../scripts/generate-react-wrappers.ts && prettier --write src/",
+    "generate:check": "tsx ../../scripts/generate-react-wrappers.ts --check",
     "prebuild": "pnpm run generate",
     "build": "vite build",
     "type-check": "tsc --noEmit",
