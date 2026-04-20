@@ -833,8 +833,18 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Security audit
-        run: pnpm audit --audit-level=critical 2>&1 || echo "::warning::pnpm audit failed (npm audit endpoint may be unavailable)"
-        continue-on-error: true
+        run: |
+          AUDIT_OUTPUT=$(pnpm audit --audit-level=critical 2>&1)
+          AUDIT_EXIT=$?
+          echo "$AUDIT_OUTPUT"
+          if [ $AUDIT_EXIT -ne 0 ]; then
+            if echo "$AUDIT_OUTPUT" | grep -qE "ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|network error|code ELIFECYCLE"; then
+              echo "::warning::pnpm audit registry endpoint unavailable — skipping vulnerability check"
+            else
+              echo "::error::Critical vulnerabilities found — see audit output above"
+              exit 1
+            fi
+          fi
 
   # ── Storybook Interaction Tests ─────────────────────────────────────────
   # Runs all 83 component story play functions as Vitest browser mode tests.
