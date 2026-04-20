@@ -16,9 +16,7 @@ afterEach(() => {
     storybookRoot.replaceChildren();
   }
   // Remove orphaned test elements added outside the storybook root.
-  document
-    .querySelectorAll('[data-testid]')
-    .forEach((el) => {
-      if (!el.closest('#storybook-root')) el.remove();
-    });
+  document.querySelectorAll('[data-testid]').forEach((el) => {
+    if (!el.closest('#storybook-root')) el.remove();
+  });
 });
