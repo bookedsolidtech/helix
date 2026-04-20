@@ -85,7 +85,21 @@ jobs:
           SCAN_DIR="$(mktemp -d)"
           FAIL=0
 
-          for pkg_dir in packages/hx-library packages/hx-tokens packages/hx-react; do
+          # Derive the list of publishable packages from the workspace rather
+          # than hardcoding it — any package with "private": true is skipped,
+          # anything else is treated as publishable and scanned.
+          PKG_DIRS=$(node -e "
+            const fs=require('fs'),path=require('path');
+            for (const d of fs.readdirSync('packages')) {
+              const p=path.join('packages',d,'package.json');
+              if (!fs.existsSync(p)) continue;
+              const pkg=JSON.parse(fs.readFileSync(p,'utf8'));
+              if (pkg.private) continue;
+              console.log(path.join('packages',d));
+            }
+          ")
+
+          for pkg_dir in $PKG_DIRS; do
             if [ ! -f "$pkg_dir/package.json" ]; then
               echo "Skipping $pkg_dir — no package.json"
               continue
