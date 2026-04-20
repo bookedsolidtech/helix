@@ -912,8 +912,6 @@ describe('hx-button', () => {
       try {
         const el = await fixture<HelixButton>('<hx-button></hx-button>');
         await el.updateComplete;
-        // slotchange fires in a separate task — flush one macrotask before asserting
-        await new Promise((r) => setTimeout(r, 0));
         expect(warns.some((w) => w.includes('hx-button'))).toBe(true);
       } finally {
         console.warn = original;

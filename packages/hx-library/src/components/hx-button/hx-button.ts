@@ -178,6 +178,22 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
     'outline',
   ] as const;
 
+  // Prevents double-warn on browsers that fire slotchange for empty initial slots.
+  private _emptySlotWarnEmitted = false;
+
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    const hasContent = (slot?.assignedNodes({ flatten: true }).length ?? 0) > 0;
+    if (!hasContent && !this._effectiveLabel) {
+      this._emptySlotWarnEmitted = true;
+      devWarn(
+        'hx-button',
+        'hx-button has no slot content and no accessible-label — button will have no accessible name.',
+      );
+    }
+  }
+
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('variant')) {
@@ -198,12 +214,13 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
-    if (!hasContent && !this._effectiveLabel) {
+    if (!hasContent && !this._effectiveLabel && !this._emptySlotWarnEmitted) {
       devWarn(
         'hx-button',
         'hx-button has no slot content and no accessible-label — button will have no accessible name.',
       );
     }
+    this._emptySlotWarnEmitted = false;
   }
 
   // ─── Event Handling ───
