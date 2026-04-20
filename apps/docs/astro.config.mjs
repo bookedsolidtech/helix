@@ -206,7 +206,7 @@ export default defineConfig({
           items: [
             {
               label: 'Upgrading to 3.0.0',
-              slug: 'migration/3.0.0',
+              slug: 'migration/upgrading-to-3',
               badge: { text: 'New', variant: 'tip' },
             },
           ],
