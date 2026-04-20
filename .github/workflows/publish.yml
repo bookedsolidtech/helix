@@ -70,7 +70,14 @@ jobs:
           echo "CEM matches committed manifest."
 
       - name: Build packages
-        run: pnpm turbo run build --filter='!docs'
+        run: |
+          pnpm turbo run build \
+            --filter=@helixui/library \
+            --filter=@helixui/tokens \
+            --filter=@helixui/react \
+            --filter=@helixui/drupal-behaviors \
+            --filter=@helixui/drupal-starter \
+            --filter=@helixui/mcp
 
       - name: Install gitleaks
         run: |
@@ -187,7 +194,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm turbo run build --filter='!docs'
+        run: |
+          pnpm turbo run build \
+            --filter=@helixui/library \
+            --filter=@helixui/tokens \
+            --filter=@helixui/react \
+            --filter=@helixui/drupal-behaviors \
+            --filter=@helixui/drupal-starter \
+            --filter=@helixui/mcp
 
       - name: Verify CEM matches committed manifest
         run: |
