@@ -3,7 +3,7 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@helixui/library", "@helixui/tokens"]],
+  "linked": [["@helixui/library", "@helixui/tokens", "@helixui/react"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
