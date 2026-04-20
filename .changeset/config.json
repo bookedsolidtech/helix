@@ -8,6 +8,7 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
+    "@helixui/mcp",
     "@helixui/mcp-cem-analyzer",
     "@helixui/mcp-health-scorer",
     "@helixui/mcp-typescript-diagnostics",
