@@ -28,7 +28,7 @@ export const HxBadge = createComponent({
   elementClass: HelixBadge,
   react: React,
   events: {
-    onHxRemove: 'hx-remove'
+    onHxRemove: 'hx-remove',
   },
   displayName: 'HxBadge',
 });

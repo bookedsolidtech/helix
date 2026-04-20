@@ -54,7 +54,7 @@ export const HxPhiField = createComponent({
   elementClass: HelixPhiField,
   react: React,
   events: {
-    onHxPhiAccess: 'hx-phi-access'
+    onHxPhiAccess: 'hx-phi-access',
   },
   displayName: 'HxPhiField',
 });

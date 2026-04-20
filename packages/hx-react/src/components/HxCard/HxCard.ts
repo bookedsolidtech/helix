@@ -28,7 +28,7 @@ export const HxCard = createComponent({
   elementClass: HelixCard,
   react: React,
   events: {
-    onHxClick: 'hx-click'
+    onHxClick: 'hx-click',
   },
   displayName: 'HxCard',
 });

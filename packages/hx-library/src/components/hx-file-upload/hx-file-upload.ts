@@ -654,7 +654,9 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
           role="button"
           tabindex=${this.disabled ? '-1' : '0'}
           aria-label=${ifDefined(this._effectiveLabel || (!this.label ? dropzoneLabel : undefined))}
-          aria-labelledby=${ifDefined(!this._effectiveLabel && this.label ? this._labelId : undefined)}
+          aria-labelledby=${ifDefined(
+            !this._effectiveLabel && this.label ? this._labelId : undefined,
+          )}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-invalid=${hasError ? 'true' : nothing}
           aria-describedby=${ifDefined(hasError ? this._errorId : undefined)}

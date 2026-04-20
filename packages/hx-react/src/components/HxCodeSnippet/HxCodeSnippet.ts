@@ -31,7 +31,7 @@ export const HxCodeSnippet = createComponent({
   elementClass: HelixCodeSnippet,
   react: React,
   events: {
-    onHxCopy: 'hx-copy'
+    onHxCopy: 'hx-copy',
   },
   displayName: 'HxCodeSnippet',
 });

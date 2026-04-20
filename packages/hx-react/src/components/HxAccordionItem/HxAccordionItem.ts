@@ -29,7 +29,7 @@ export const HxAccordionItem = createComponent({
   react: React,
   events: {
     onHxExpand: 'hx-expand',
-    onHxCollapse: 'hx-collapse'
+    onHxCollapse: 'hx-collapse',
   },
   displayName: 'HxAccordionItem',
 });

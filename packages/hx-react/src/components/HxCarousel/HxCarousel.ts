@@ -28,7 +28,7 @@ export const HxCarousel = createComponent({
   elementClass: HelixCarousel,
   react: React,
   events: {
-    onHxSlideChange: 'hx-slide-change'
+    onHxSlideChange: 'hx-slide-change',
   },
   displayName: 'HxCarousel',
 });
