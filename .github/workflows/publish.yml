@@ -259,4 +259,28 @@ jobs:
           git stash pop
           git add docs/releases/
           git commit -m 'chore(release): add release manifest [skip ci]'
-          git push "https://x-access-token:${CHANGESET_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
+
+          # Bounded retry: if another merge lands on main between our fetch
+          # and push, rebase and retry up to 3 times. Any failure after that
+          # is fatal and requires operator intervention — npm publish has
+          # already succeeded, so the manifest commit MUST land.
+          REMOTE="https://x-access-token:${CHANGESET_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          PUSH_OK=0
+          for attempt in 1 2 3; do
+            echo "Manifest push attempt $attempt/3..."
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push "$REMOTE" HEAD:main; then
+                PUSH_OK=1
+                break
+              fi
+            else
+              git rebase --abort || true
+            fi
+            sleep 5
+          done
+
+          if [ "$PUSH_OK" -ne 1 ]; then
+            echo "::error::Failed to push release manifest after 3 attempts. npm publish already succeeded — manifest must be committed manually."
+            exit 1
+          fi
