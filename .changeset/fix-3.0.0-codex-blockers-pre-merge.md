@@ -1,6 +1,5 @@
 ---
 '@helixui/library': patch
-'@helixui/drupal-starter': patch
 ---
 
 fix(barrel): restore HelixAuditController, AuditEventDetail, AuditControllerOptions to public barrel via generate-barrel.js allowlist
