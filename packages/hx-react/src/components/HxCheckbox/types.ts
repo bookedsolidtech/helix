@@ -34,6 +34,14 @@ export interface HxCheckboxProps {
   requiredMessage?: string;
   /** The size of the checkbox. */
   size?: 'sm' | 'md' | 'lg';
+  /** Accessible label for the checkbox when no visible label text is provided.
+Use when embedding a checkbox in a context where a label element is not practical.
+
+Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+`accessible-label` takes precedence when both are set.
+When set, replaces the visible label as the input's accessible name. Cannot be combined
+with a visible label — set either `accessible-label` or the `label` slot, not both. */
+  accessibleLabel?: string;
   /** Returns the associated form element, if any. */
   form?: HTMLFormElement | null;
   /** Returns the validation message. */

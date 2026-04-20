@@ -15,20 +15,7 @@ export interface HxTooltipProps {
   /** Preferred placement of the tooltip relative to the trigger.
 Supports all Floating UI placement values including alignment variants
 (e.g. 'top-start', 'bottom-end') and 'auto'. */
-  placement?:
-    | string
-    | 'top'
-    | 'top-start'
-    | 'top-end'
-    | 'right'
-    | 'right-start'
-    | 'right-end'
-    | 'bottom'
-    | 'bottom-start'
-    | 'bottom-end'
-    | 'left'
-    | 'left-start'
-    | 'left-end';
+  placement?: string | 'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end';
   /** Delay in milliseconds before the tooltip is shown. */
   showDelay?: number;
   /** Delay in milliseconds before the tooltip is hidden. */

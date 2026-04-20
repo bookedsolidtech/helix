@@ -37,6 +37,12 @@ Sets the host to `display: block` and the inner element to `width: 100%`. */
   /** When true, flips button colors for placement on dark or gradient backgrounds.
 Forces text to white and adjusts hover/focus ring colors across all variants. */
   inverted?: boolean;
+  /** Accessible label for icon-only or text-less buttons.
+Required when the button has no visible text content.
+
+Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+`accessible-label` takes precedence when both are set. */
+  accessibleLabel?: string;
 
   // Event callbacks
   /** Dispatched when the button is clicked and is neither disabled nor loading. */
