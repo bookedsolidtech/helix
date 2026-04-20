@@ -37,7 +37,21 @@
     "./dist/css/index.css": "./dist/css/index.css"
   },
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.js.map",
+    "dist/index.d.ts",
+    "dist/index.d.ts.map",
+    "dist/form-test-utils.d.ts",
+    "dist/form-test-utils.d.ts.map",
+    "dist/base/**",
+    "dist/components/**",
+    "dist/controllers/**",
+    "dist/css/**",
+    "dist/mixins/**",
+    "dist/shared/**",
+    "dist/styles/**",
+    "dist/utilities/**",
+    "dist/utils/**",
     "custom-elements.json",
     "fouc.css"
   ],
