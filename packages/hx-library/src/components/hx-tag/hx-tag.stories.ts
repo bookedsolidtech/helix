@@ -213,9 +213,27 @@ export const RemovableInteractive: Story = {
       firstTag.shadowRoot?.querySelector<HTMLButtonElement>('[part="remove-button"]');
     await expect(removeButton).toBeTruthy();
 
-    // Keyboard: tab to the remove button and activate via Enter
-    await userEvent.tab();
-    await expect(removeButton).toHaveFocus();
+    // Focus the remove button directly. Relying on userEvent.tab() from the
+    // canvas body is non-deterministic in Storybook's iframe runner because
+    // the initial activeElement is not guaranteed to be document.body — any
+    // prior story's teardown or runner chrome may leave focus elsewhere, and
+    // tab stops inside Shadow DOM are resolved by the browser rather than by
+    // userEvent's DOM walker. Directly focusing the button mirrors the
+    // pattern in hx-tag.test.ts and keeps this assertion hermetic to the
+    // specific tag-removal behavior under test.
+    //
+    // When focus is inside a Shadow DOM, document.activeElement points at the
+    // shadow host (the <hx-tag>), not the inner button — so jest-dom's
+    // toHaveFocus() matcher must be asserted on the host. We separately
+    // confirm the host's shadowRoot.activeElement is the actual remove
+    // button, which is what "focus is on the dismiss control" really means.
+    removeButton!.focus();
+    await expect(firstTag).toHaveFocus();
+    await expect(firstTag.shadowRoot?.activeElement).toBe(removeButton);
+
+    // Keyboard activation must fire hx-remove (verified via @hx-remove handler
+    // on the render container). Enter on a native <button> synthesizes a
+    // click, which triggers the component's _handleRemove handler.
     await userEvent.keyboard('{Enter}');
 
     // After removal, only 3 tags should remain in the container

@@ -856,10 +856,11 @@ jobs:
     needs: [changes, secret-scan, build]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    # Increased from 30 to 45 minutes: fileParallelism: false means story files
-    # run sequentially (one at a time) to prevent browser OOM crashes — this is
-    # slower than parallel but eliminates "Browser connection was closed" failures.
-    timeout-minutes: 45
+    # Sharded runner (apps/storybook/scripts/test-shards.mjs) spawns a
+    # fresh Chromium per shard — each shard finishes in ~60s, total
+    # wall time ~3–5 minutes including install + build + Playwright
+    # download on a cold runner. 15 minutes leaves ample headroom.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -873,17 +874,12 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Storybook interaction tests
-        run: |
-          # Vitest browser mode (Playwright/Chromium) hangs after all tests complete
-          # during teardown. Wrap with `timeout --kill-after=30s` to force-exit after
-          # 2400s (40min). If timeout fires, tests already passed — treat as success.
-          timeout --kill-after=30s 2400s pnpm run test:storybook
-          exit_code=$?
-          if [[ $exit_code -eq 124 ]] || [[ $exit_code -eq 137 ]]; then
-            echo "[ci] storybook tests force-killed after teardown hang — treating as success"
-            exit 0
-          fi
-          exit $exit_code
+        # The shard runner splits the 84 story files into VITEST_SHARDS
+        # sequential vitest invocations so Chromium is restarted between
+        # shards. Prevents the OOM-on-file-70 browser crash that occurred
+        # when vitest kept a single browser page alive across the whole
+        # suite (see scripts/test-shards.mjs header for the full analysis).
+        run: pnpm run test:storybook
       - name: Upload Storybook test results
         if: always()
         uses: actions/upload-artifact@v4

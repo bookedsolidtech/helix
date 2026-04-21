@@ -98,11 +98,22 @@ export const Default: Story = {
     const anchor = hxLink!.shadowRoot!.querySelector('a');
     await expect(anchor).toBeTruthy();
 
+    // Block default navigation before triggering the click. Without this,
+    // anchor!.click() makes the browser follow href="https://example.com",
+    // which navigates the vitest-browser test page away, crashing the test
+    // runner with "Browser connection was closed while running tests".
+    // We still exercise the full synchronous click dispatch path — the
+    // component's @click handler runs and fires hx-click — we just suppress
+    // the browser's default follow-the-link behavior after that.
+    const blockNav = (e: MouseEvent) => e.preventDefault();
+    anchor!.addEventListener('click', blockNav);
+
     const eventSpy = fn();
     hxLink!.addEventListener('hx-click', eventSpy);
     anchor!.click();
     await expect(eventSpy).toHaveBeenCalledTimes(1);
     hxLink!.removeEventListener('hx-click', eventSpy);
+    anchor!.removeEventListener('click', blockNav);
   },
 };
 
