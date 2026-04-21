@@ -856,10 +856,13 @@ jobs:
     needs: [changes, secret-scan, build]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    # Increased from 30 to 45 minutes: fileParallelism: false means story files
-    # run sequentially (one at a time) to prevent browser OOM crashes — this is
-    # slower than parallel but eliminates "Browser connection was closed" failures.
-    timeout-minutes: 45
+    # Per-file runner (apps/storybook/scripts/test-shards.mjs) spawns a
+    # fresh Chromium per story file — each file finishes in ~4–5s, full
+    # 84-file suite in ~6–7 minutes. Plus install + build + Playwright
+    # download on a cold runner lands total CI wall time around 10–12
+    # minutes worst case. 15 minutes leaves headroom for slower
+    # GitHub-hosted runners without reintroducing the 45m band-aid.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -873,17 +876,13 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Storybook interaction tests
-        run: |
-          # Vitest browser mode (Playwright/Chromium) hangs after all tests complete
-          # during teardown. Wrap with `timeout --kill-after=30s` to force-exit after
-          # 2400s (40min). If timeout fires, tests already passed — treat as success.
-          timeout --kill-after=30s 2400s pnpm run test:storybook
-          exit_code=$?
-          if [[ $exit_code -eq 124 ]] || [[ $exit_code -eq 137 ]]; then
-            echo "[ci] storybook tests force-killed after teardown hang — treating as success"
-            exit 0
-          fi
-          exit $exit_code
+        # The per-file runner invokes vitest once per story file so each
+        # file gets a fresh Chromium. Prevents the cumulative browser
+        # state crash ("Browser connection was closed") that occurred when
+        # vitest kept a single page alive across the whole suite
+        # (see apps/storybook/scripts/test-shards.mjs header for the
+        # full analysis).
+        run: pnpm run test:storybook
       - name: Upload Storybook test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -1011,9 +1010,13 @@ jobs:
             FAIL=1
           fi
 
-          # Storybook tests are informational until the new test infrastructure is verified
+          # Storybook tests are a blocking gate — per-file runner + story fixes
+          # landed in the same PR that flipped this from informational. Any
+          # future regression in a play() function blocks merge, matching the
+          # release-quality-gate doctrine in CLAUDE.md.
           if [[ "${{ needs.storybook-tests.result }}" != "success" && "${{ needs.storybook-tests.result }}" != "skipped" ]]; then
-            echo "::warning::Storybook interaction tests did not pass — see storybook-test-results artifact for details"
+            echo "::error::Storybook interaction tests failed — see storybook-test-results artifact for details"
+            FAIL=1
           fi
 
           # React wrapper tests are informational until the suite is stabilized
