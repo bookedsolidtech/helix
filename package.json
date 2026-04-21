@@ -100,7 +100,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
-    "@bookedsolid/rea": "^0.9.1",
+    "@bookedsolid/rea": "0.9.1",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
