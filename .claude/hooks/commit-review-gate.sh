@@ -154,9 +154,17 @@ fi
 
 # ── 9. Resolve rea CLI ────────────────────────────────────────────────────
 # Try local installs first, then dist build, then global PATH install.
+#
+# node_modules/.bin/rea is a launcher (pnpm writes a POSIX shell shim, npm
+# writes a symlink to dist/cli/index.js with its own `#!/usr/bin/env node`
+# shebang). Either way it is NOT a plain JS file, so running `node` on it
+# would parse shell syntax as JavaScript and SyntaxError. Execute the shim
+# directly — it handles `exec node` itself — and only prepend `node` on the
+# dist fallback, which is a real JS module. The `-x` guard picks up both
+# pnpm shims (executable regular file) and npm symlinks (executable target).
 REA_CLI_ARGS=()
-if [[ -f "${REA_ROOT}/node_modules/.bin/rea" ]]; then
-  REA_CLI_ARGS=(node "${REA_ROOT}/node_modules/.bin/rea")
+if [[ -x "${REA_ROOT}/node_modules/.bin/rea" ]]; then
+  REA_CLI_ARGS=("${REA_ROOT}/node_modules/.bin/rea")
 elif [[ -f "${REA_ROOT}/dist/cli/index.js" ]]; then
   REA_CLI_ARGS=(node "${REA_ROOT}/dist/cli/index.js")
 elif command -v rea >/dev/null 2>&1; then
