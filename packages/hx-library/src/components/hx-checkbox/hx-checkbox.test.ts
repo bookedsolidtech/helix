@@ -839,6 +839,82 @@ describe('hx-checkbox', () => {
     });
   });
 
+  // ─── accessible-label ───
+
+  describe('accessible-label', () => {
+    it('only accessible-label set: input has aria-label equal to accessibleLabel, no aria-labelledby', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox accessible-label="Agree to terms"></hx-checkbox>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Agree to terms');
+      expect(input.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('only aria-label set: input has aria-label equal to ariaLabel, no aria-labelledby', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox aria-label="Subscribe to newsletter"></hx-checkbox>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Subscribe to newsletter');
+      expect(input.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('accessible-label takes precedence over aria-label when both are set', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox aria-label="legacy label" accessible-label="preferred label"></hx-checkbox>',
+      );
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('preferred label');
+    });
+
+    it('neither set: aria-labelledby points to the component _labelId', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept terms"></hx-checkbox>');
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const labelSpan = shadowQuery<HTMLElement>(el, '.checkbox__label')!;
+      expect(input.getAttribute('aria-labelledby')).toBe(labelSpan.id);
+      expect(input.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('whitespace-only accessible-label falls back to aria-labelledby and does not trigger devWarn', async () => {
+      const warns: string[] = [];
+      const original = console.warn;
+      console.warn = (...args: unknown[]) => {
+        warns.push(String(args[0]));
+      };
+      try {
+        const el = await fixture<HelixCheckbox>(
+          '<hx-checkbox accessible-label="   " label="Accept terms"></hx-checkbox>',
+        );
+        await el.updateComplete;
+        const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+        const labelSpan = shadowQuery<HTMLElement>(el, '.checkbox__label')!;
+        expect(input.getAttribute('aria-labelledby')).toBe(labelSpan.id);
+        expect(input.hasAttribute('aria-label')).toBe(false);
+        expect(warns.filter((w) => w.includes('hx-checkbox'))).toHaveLength(0);
+      } finally {
+        console.warn = original;
+      }
+    });
+
+    it('devWarn fires when accessible-label is set alongside a visible label', async () => {
+      const warns: string[] = [];
+      const original = console.warn;
+      console.warn = (...args: unknown[]) => {
+        warns.push(String(args[0]));
+      };
+      try {
+        const el = await fixture<HelixCheckbox>(
+          '<hx-checkbox accessible-label="Screen reader label" label="Visible label"></hx-checkbox>',
+        );
+        await el.updateComplete;
+        expect(warns.some((w) => w.includes('hx-checkbox'))).toBe(true);
+      } finally {
+        console.warn = original;
+      }
+    });
+  });
+
   // ─── CSS class: checkbox--disabled ───
 
   describe('CSS class: checkbox--disabled', () => {

@@ -1,6 +1,6 @@
 {
   "name": "@helixui/react",
-  "version": "1.1.4",
+  "version": "2.1.2",
   "description": "React wrappers for HELiX web components",
   "type": "module",
   "sideEffects": false,
@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "generate": "tsx ../../scripts/generate-react-wrappers.ts && prettier --write src/",
+    "generate:check": "tsx ../../scripts/generate-react-wrappers.ts --check",
     "prebuild": "pnpm run generate",
     "build": "vite build",
     "type-check": "tsc --noEmit",

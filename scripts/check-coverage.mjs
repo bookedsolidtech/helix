@@ -196,7 +196,7 @@ function main() {
 
   if (components.size === 0) {
     console.warn('No component coverage data found — did tests run with --coverage.enabled?');
-    process.exit(0);
+    process.exit(1);
   }
 
   const passing = [];

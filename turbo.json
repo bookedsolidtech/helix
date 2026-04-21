@@ -36,6 +36,10 @@
       "dependsOn": ["^build"],
       "outputs": ["custom-elements.json"]
     },
+    "prebuild": {
+      "dependsOn": ["^cem"],
+      "outputs": []
+    },
     "generate": {
       "dependsOn": ["^cem"],
       "outputs": ["packages/hx-react/src/components/**"]

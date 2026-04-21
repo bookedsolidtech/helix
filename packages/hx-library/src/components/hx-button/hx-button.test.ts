@@ -876,6 +876,55 @@ describe('hx-button', () => {
     });
   });
 
+  // ─── accessible-label ───
+
+  describe('accessible-label', () => {
+    it('accessible-label maps to aria-label on the rendered <button>', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button accessible-label="Close dialog"></hx-button>',
+      );
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('Close dialog');
+    });
+
+    it('accessible-label maps to aria-label on the rendered <a> when href is set', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com" accessible-label="Visit site"></hx-button>',
+      );
+      const anchor = shadowQuery(el, 'a')!;
+      expect(anchor.getAttribute('aria-label')).toBe('Visit site');
+    });
+
+    it('accessibleLabel takes precedence over aria-label when both are set', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button aria-label="legacy label" accessible-label="preferred label"></hx-button>',
+      );
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('preferred label');
+    });
+
+    it('devWarn is called when button has no slot content and no accessibleLabel', async () => {
+      const warns: string[] = [];
+      const original = console.warn;
+      console.warn = (...args: unknown[]) => {
+        warns.push(String(args[0]));
+      };
+      try {
+        const el = await fixture<HelixButton>('<hx-button></hx-button>');
+        await el.updateComplete;
+        expect(warns.some((w) => w.includes('hx-button'))).toBe(true);
+      } finally {
+        console.warn = original;
+      }
+    });
+
+    it('no aria-label attribute on <button> when _effectiveLabel is empty', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click me</hx-button>');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
   // ─── Property: type — form integration ───
 
   describe('Property: type — form integration', () => {

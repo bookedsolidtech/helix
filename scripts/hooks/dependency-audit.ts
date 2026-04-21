@@ -25,7 +25,7 @@
  * - Peer dependency check limited to local workspace packages
  *
  * Performance Optimizations:
- * - npm audit results cached for 5 minutes (per package-lock.json hash)
+ * - npm audit results cached for 5 minutes (per pnpm-lock.yaml hash)
  * - Duplicate detection runs once per hook invocation (not per file)
  * - Bail-fast mode exits on first critical violation
  *
@@ -277,10 +277,10 @@ function parsePackageJson(filePath: string): PackageJson | null {
 }
 
 /**
- * Calculate hash of package-lock.json for cache invalidation
+ * Calculate hash of pnpm-lock.yaml for cache invalidation
  */
 function getPackageLockHash(projectRoot: string): string {
-  const lockFilePath = join(projectRoot, 'package-lock.json');
+  const lockFilePath = join(projectRoot, 'pnpm-lock.yaml');
   if (!existsSync(lockFilePath)) {
     return 'no-lock-file';
   }
@@ -397,7 +397,7 @@ function checkVulnerabilities(
 ): void {
   // Only run if dependencies or lock file changed
   const hasDependencyChanges = stagedFiles.some(
-    (file) => file.endsWith('package.json') || file.endsWith('package-lock.json'),
+    (file) => file.endsWith('package.json') || file.endsWith('pnpm-lock.yaml'),
   );
 
   if (!hasDependencyChanges) {

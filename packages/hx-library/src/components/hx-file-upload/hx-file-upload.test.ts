@@ -938,6 +938,72 @@ describe('hx-file-upload', () => {
     });
   });
 
+  // ─── accessible-label ───
+
+  describe('accessible-label', () => {
+    it('only label set: aria-labelledby present and equals _labelId, no aria-label', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload label="Patient records"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      const labelEl = shadowQuery(el, '[part="label"]')!;
+      expect(dropzone.getAttribute('aria-labelledby')).toBe(labelEl.id);
+      expect(dropzone.hasAttribute('aria-label')).toBe(false);
+    });
+
+    it('only accessible-label set: aria-label equals accessibleLabel, no aria-labelledby', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accessible-label="Upload patient document"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe('Upload patient document');
+      expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('both label and accessible-label set: aria-label wins (accessible-label overrides visible label)', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload label="Upload files" accessible-label="Upload patient document"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe('Upload patient document');
+      expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('only aria-label set: dropzone has that aria-label, no aria-labelledby', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload aria-label="Upload patient document"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe('Upload patient document');
+      expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('both aria-label and accessible-label set: accessible-label wins', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload aria-label="Old" accessible-label="New"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe('New');
+      expect(dropzone.hasAttribute('aria-labelledby')).toBe(false);
+    });
+
+    it('neither label nor accessible-label: aria-label falls back to labelDropzone default', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      expect(dropzone.getAttribute('aria-label')).toBe(el.labelDropzone);
+    });
+
+    it('whitespace-only accessible-label falls back to aria-labelledby when label is set', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accessible-label="   " label="Upload files"></hx-file-upload>',
+      );
+      const dropzone = shadowQuery(el, '[part="dropzone"]')!;
+      const labelEl = shadowQuery(el, '[part="label"]')!;
+      expect(dropzone.getAttribute('aria-labelledby')).toBe(labelEl.id);
+      expect(dropzone.hasAttribute('aria-label')).toBe(false);
+    });
+  });
+
   // ─── Size limit validation edge cases ───
 
   describe('Size limit validation edge cases', () => {

@@ -12,8 +12,4 @@ fix(mixins): promote FormMixinProtectedHooks jsdoc from @internal to @protected
 
 fix(changelog): add resetIdCounter test-utils migration note
 
-fix(drupal-starter): correct hx-card accessible-label to hx-label attribute in templates
-
-fix(drupal-starter): fix hx-nav hx-size="small" to hx-size="sm" invalid enum value
-
 fix(docs): correct CDN artifact URLs and floating-ui pre-warm import in migration guides

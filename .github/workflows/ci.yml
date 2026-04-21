@@ -186,6 +186,25 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run format:check
 
+  react-generator-drift:
+    name: React Generator Drift
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Generate CEM (required input for drift check)
+        run: pnpm --filter=@helixui/library run cem
+      - name: Verify @helixui/react wrappers are in sync with CEM
+        run: pnpm --filter=@helixui/react run generate:check
+
   type-check:
     name: Type Check
     needs: [changes, secret-scan]
@@ -814,8 +833,18 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Security audit
-        run: pnpm audit --audit-level=critical 2>&1 || echo "::warning::pnpm audit failed (npm audit endpoint may be unavailable)"
-        continue-on-error: true
+        run: |
+          AUDIT_OUTPUT=$(pnpm audit --audit-level=critical 2>&1)
+          AUDIT_EXIT=$?
+          echo "$AUDIT_OUTPUT"
+          if [ $AUDIT_EXIT -ne 0 ]; then
+            if echo "$AUDIT_OUTPUT" | grep -qE "ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|network error|code ELIFECYCLE"; then
+              echo "::warning::pnpm audit registry endpoint unavailable — skipping vulnerability check"
+            else
+              echo "::error::Critical vulnerabilities found — see audit output above"
+              exit 1
+            fi
+          fi
 
   # ── Storybook Interaction Tests ─────────────────────────────────────────
   # Runs all 83 component story play functions as Vitest browser mode tests.
@@ -903,6 +932,7 @@ jobs:
         secret-scan,
         lint,
         format,
+        react-generator-drift,
         type-check,
         test,
         build,
@@ -924,6 +954,7 @@ jobs:
           echo "Secret Scan:        ${{ needs.secret-scan.result }}"
           echo "Lint:               ${{ needs.lint.result }}"
           echo "Format:             ${{ needs.format.result }}"
+          echo "Generator Drift:    ${{ needs.react-generator-drift.result }}"
           echo "Type Check:         ${{ needs.type-check.result }}"
           echo "Test:               ${{ needs.test.result }}"
           echo "Build:              ${{ needs.build.result }}"
@@ -942,14 +973,15 @@ jobs:
 
           FAIL=0
 
-          for gate in secret-scan lint format type-check build; do
+          for gate in secret-scan lint format react-generator-drift type-check build; do
             result="${{ needs.lint.result }}"
             case "$gate" in
-              secret-scan) result="${{ needs.secret-scan.result }}" ;;
-              lint)        result="${{ needs.lint.result }}" ;;
-              format)      result="${{ needs.format.result }}" ;;
-              type-check)  result="${{ needs.type-check.result }}" ;;
-              build)       result="${{ needs.build.result }}" ;;
+              secret-scan)           result="${{ needs.secret-scan.result }}" ;;
+              lint)                  result="${{ needs.lint.result }}" ;;
+              format)                result="${{ needs.format.result }}" ;;
+              react-generator-drift) result="${{ needs.react-generator-drift.result }}" ;;
+              type-check)            result="${{ needs.type-check.result }}" ;;
+              build)                 result="${{ needs.build.result }}" ;;
             esac
             if [[ "$result" != "success" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
