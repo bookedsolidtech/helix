@@ -15,6 +15,62 @@ set -uo pipefail
 # ── 1. Read ALL stdin immediately ─────────────────────────────────────────────
 INPUT=$(cat)
 
+# ── 1a. Cross-repo guard (must come FIRST — before any rea-scoped check) ──────
+# BUG-012 (0.6.2) — mirror of push-review-gate.sh §1a. Script-location
+# anchor (not CLAUDE_PROJECT_DIR) owns the trust decision. See the
+# push-gate comment and THREAT_MODEL.md § CLAUDE_PROJECT_DIR for the full
+# rationale. In short: CLAUDE_PROJECT_DIR is caller-controlled, cannot be
+# trusted for authorization, and the hook's own filesystem location is the
+# only forge-resistant anchor available to a bash script.
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P 2>/dev/null)"
+# Walk up from SCRIPT_DIR looking for `.rea/policy.yaml`. Matches every
+# reasonable install topology (see push-review-gate.sh §1a for the full
+# rationale). A hard-coded `../..` breaks the source-path invocation
+# (`bash hooks/commit-review-gate.sh`) and silently reads .rea state from
+# the WRONG directory.
+REA_ROOT=""
+_anchor_candidate="$SCRIPT_DIR"
+for _ in 1 2 3 4; do
+  _anchor_candidate="$(cd -- "$_anchor_candidate/.." && pwd -P 2>/dev/null || true)"
+  if [[ -n "$_anchor_candidate" && -f "$_anchor_candidate/.rea/policy.yaml" ]]; then
+    REA_ROOT="$_anchor_candidate"
+    break
+  fi
+done
+if [[ -z "$REA_ROOT" ]]; then
+  printf 'rea-hook: no .rea/policy.yaml found within 4 parents of %s\n' \
+    "$SCRIPT_DIR" >&2
+  printf 'rea-hook:   is this an installed rea hook, or is `.rea/policy.yaml`\n' >&2
+  printf 'rea-hook:   nested more than 4 directories above the hook script?\n' >&2
+  exit 2
+fi
+unset _anchor_candidate
+
+if [[ -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+  CPD_REAL=$(cd -- "${CLAUDE_PROJECT_DIR}" 2>/dev/null && pwd -P 2>/dev/null || true)
+  if [[ -n "$CPD_REAL" && "$CPD_REAL" != "$REA_ROOT" ]]; then
+    printf 'rea-hook: ignoring CLAUDE_PROJECT_DIR=%s — anchoring to script location %s\n' \
+      "$CLAUDE_PROJECT_DIR" "$REA_ROOT" >&2
+  fi
+fi
+
+CWD_REAL=$(pwd -P 2>/dev/null || pwd)
+CWD_COMMON=$(git -C "$CWD_REAL" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+REA_COMMON=$(git -C "$REA_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+if [[ -n "$CWD_COMMON" && -n "$REA_COMMON" ]]; then
+  CWD_COMMON_REAL=$(cd "$CWD_COMMON" 2>/dev/null && pwd -P 2>/dev/null || echo "$CWD_COMMON")
+  REA_COMMON_REAL=$(cd "$REA_COMMON" 2>/dev/null && pwd -P 2>/dev/null || echo "$REA_COMMON")
+  if [[ "$CWD_COMMON_REAL" != "$REA_COMMON_REAL" ]]; then
+    exit 0
+  fi
+elif [[ -z "$CWD_COMMON" && -z "$REA_COMMON" ]]; then
+  case "$CWD_REAL/" in
+    "$REA_ROOT"/*|"$REA_ROOT"/) : ;;  # inside rea — run the gate
+    *) exit 0 ;;                       # outside rea — not our gate
+  esac
+fi
+# Mixed state or probe error → fail CLOSED: run the gate.
+
 # ── 2. Dependency check ──────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
   printf 'REA ERROR: jq is required but not installed.\n' >&2
@@ -23,7 +79,6 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
   printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
