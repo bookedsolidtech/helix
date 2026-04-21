@@ -445,8 +445,8 @@ pr_core_run() {
       --arg os_uid "$SKIP_OS_UID" \
       --arg os_whoami "$SKIP_OS_WHOAMI" \
       --arg os_hostname "$SKIP_OS_HOST" \
-      --arg os_pid "$SKIP_OS_PID" \
-      --arg os_ppid "$SKIP_OS_PPID" \
+      --argjson os_pid "$SKIP_OS_PID" \
+      --argjson os_ppid "$SKIP_OS_PPID" \
       --arg os_ppid_cmd "$SKIP_OS_PPID_CMD" \
       --arg os_tty "$SKIP_OS_TTY" \
       --arg os_ci "$SKIP_OS_CI" \
