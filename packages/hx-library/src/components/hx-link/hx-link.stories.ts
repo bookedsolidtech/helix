@@ -104,16 +104,20 @@ export const Default: Story = {
     // runner with "Browser connection was closed while running tests".
     // We still exercise the full synchronous click dispatch path — the
     // component's @click handler runs and fires hx-click — we just suppress
-    // the browser's default follow-the-link behavior after that.
+    // the browser's default follow-the-link behavior after that. The
+    // capture-phase listener is belt-and-suspenders: it wins the race over
+    // any future bubble-phase listener that might call
+    // stopImmediatePropagation, so navigation suppression stays intact even
+    // if the component's event wiring evolves.
     const blockNav = (e: MouseEvent) => e.preventDefault();
-    anchor!.addEventListener('click', blockNav);
+    anchor!.addEventListener('click', blockNav, { capture: true });
 
     const eventSpy = fn();
     hxLink!.addEventListener('hx-click', eventSpy);
     anchor!.click();
     await expect(eventSpy).toHaveBeenCalledTimes(1);
     hxLink!.removeEventListener('hx-click', eventSpy);
-    anchor!.removeEventListener('click', blockNav);
+    anchor!.removeEventListener('click', blockNav, { capture: true });
   },
 };
 

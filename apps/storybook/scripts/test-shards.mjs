@@ -21,24 +21,44 @@
  *   No file count is safe: the trigger is cumulative in-page state, so
  *   the only robust guarantee is "exactly one story file per process".
  *
+ *   This is an isolation strategy, not a leak fix — if any single story
+ *   file ever grows large enough to trigger the same cumulative state
+ *   crash on its own, the underlying Vitest/Playwright page-reuse leak
+ *   will resurface. Tracked separately; for now per-file isolation gives
+ *   deterministic CI while the upstream issue remains open.
+ *
  * How:
- *   We enumerate every `*.stories.ts` file under
- *   `packages/hx-library/src/components/` and run
- *   `vitest run <one-file>` sequentially for each. A fresh Chromium
- *   process means zero carry-over. Per-invocation wall time is ~4–5s
- *   (cold vite + playwright page open), giving ~5–7 min total for 84
- *   files — well under the 15 min CI budget.
+ *   We read `STORYBOOK_STORY_GLOBS` (or derive the patterns from the same
+ *   source of truth Storybook uses) and enumerate every matching file,
+ *   then run `vitest run <one-file>` sequentially for each. A fresh
+ *   Chromium process means zero carry-over. Per-invocation wall time is
+ *   ~4–5s (cold vite + playwright page open), giving ~6–7 min total for
+ *   84 files — well under the 15 min CI budget.
  *
  * Env:
- *   STORYBOOK_STORY_GLOB  glob pattern for story files, relative to the
- *                         monorepo root (default:
- *                         `packages/hx-library/src/components/**\/*.stories.ts`)
+ *   STORYBOOK_STORY_GLOBS space-separated globs, each relative to the
+ *                         monorepo root. Overrides the default patterns
+ *                         below. Example:
+ *                           STORYBOOK_STORY_GLOBS="packages/hx-library/src/**\/*.stories.ts apps/storybook/stories/**\/*.stories.tsx"
+ *   STORYBOOK_STORY_GLOB  (deprecated, singular) back-compat alias for
+ *                         STORYBOOK_STORY_GLOBS. Ignored if the plural
+ *                         form is also set.
  *   STORYBOOK_EXTRA_ARGS  space-separated extra args forwarded to each
- *                         `vitest run` invocation
+ *                         `vitest run` invocation. Merged with any extra
+ *                         args passed on the command line (see below).
  *   VITEST_SHARD_INDEX    1-based shard index — when set together with
  *                         VITEST_SHARDS, runs only the Nth equal slice of
  *                         the file list (for CI matrix parallelism)
  *   VITEST_SHARDS         total shard count (required if SHARD_INDEX set)
+ *
+ * CLI:
+ *   Additional args passed on the command line are forwarded to every
+ *   vitest invocation, e.g.
+ *       pnpm run test:storybook -- --reporter=json --coverage
+ *   is equivalent to
+ *       STORYBOOK_EXTRA_ARGS="--reporter=json --coverage" pnpm run test:storybook
+ *   Both sources are merged (env first, then CLI) — last-flag-wins applies
+ *   per vitest's own argument parsing.
  */
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -52,13 +72,71 @@ const cwd = path.resolve(__dirname, '..');
 // files are under packages/ inside that tree.
 const repoRoot = path.resolve(cwd, '../..');
 
-const STORY_GLOB =
-  process.env.STORYBOOK_STORY_GLOB ?? 'packages/hx-library/src/components/**/*.stories.ts';
+// Default patterns mirror the `stories` array in .storybook/main.ts so that
+// anything Storybook renders is also tested by CI. Keep these in sync — the
+// CI check below will fail closed if Storybook's config adds new roots that
+// this runner hasn't been taught about.
+const DEFAULT_STORY_GLOBS = [
+  'packages/hx-library/src/**/*.stories.@(ts|tsx)',
+  'apps/storybook/stories/**/*.stories.@(ts|tsx)',
+];
 
-// Pass extra args through to vitest (e.g. --coverage, --reporter=json).
-const extraArgs = (process.env.STORYBOOK_EXTRA_ARGS ?? '')
+// Accept either the new plural env var or the legacy singular one for
+// back-compat with scripts that pinned to the old name.
+const envGlobsRaw = process.env.STORYBOOK_STORY_GLOBS ?? process.env.STORYBOOK_STORY_GLOB ?? '';
+const STORY_GLOBS = envGlobsRaw
+  ? envGlobsRaw.split(/\s+/).filter((g) => g.length > 0)
+  : DEFAULT_STORY_GLOBS;
+
+// Drift guard: assert every `.stories.*` glob in .storybook/main.ts is
+// covered by STORY_GLOBS. A mismatch means Storybook renders stories the
+// runner would silently skip — CI would stay green with reduced coverage.
+// Skip the check when the caller has opted into a custom glob set via the
+// env var; that's an intentional override (e.g. testing a single root).
+if (!envGlobsRaw) {
+  const mainTsPath = path.resolve(cwd, '.storybook/main.ts');
+  if (fs.existsSync(mainTsPath)) {
+    const mainTsSource = fs.readFileSync(mainTsPath, 'utf8');
+    // Extract the `stories` array — quoted string literals inside it. We
+    // keep the regex simple and forgiving: any single- or double-quoted
+    // string anywhere in the file that ends with `.stories.<something>`.
+    // `.mdx` entries are intentionally ignored — they are rendered by
+    // Storybook docs but not under vitest interaction testing.
+    const storyPatternRe = /['"]([^'"]+\.stories\.[^'"]+)['"]/g;
+    const mainTsDir = path.dirname(mainTsPath);
+    const configured = new Set();
+    for (const match of mainTsSource.matchAll(storyPatternRe)) {
+      const raw = match[1];
+      // Resolve main.ts-relative glob against .storybook/ then make it
+      // repo-root relative so it's directly comparable to STORY_GLOBS.
+      const absolute = path.resolve(mainTsDir, raw);
+      const rel = path.relative(repoRoot, absolute);
+      configured.add(rel);
+    }
+    const active = new Set(STORY_GLOBS);
+    const missing = [...configured].filter((g) => !active.has(g));
+    if (missing.length > 0) {
+      console.error(
+        '[storybook-test] DEFAULT_STORY_GLOBS drifted from .storybook/main.ts — the following story globs are configured in Storybook but not covered by the test runner:',
+      );
+      for (const m of missing) console.error(`    ${m}`);
+      console.error(
+        '[storybook-test] fix: add the missing globs to DEFAULT_STORY_GLOBS in this file, or update main.ts if the new root was added by mistake.',
+      );
+      process.exit(2);
+    }
+  }
+}
+
+// Merge env-provided extra args with CLI args. Any argv after `node
+// test-shards.mjs` is forwarded to each vitest invocation. This restores
+// the behavior of the previous `vitest run` target where `pnpm run
+// test:storybook -- --coverage` flowed through untouched.
+const envArgs = (process.env.STORYBOOK_EXTRA_ARGS ?? '')
   .split(/\s+/)
   .filter((arg) => arg.length > 0);
+const cliArgs = process.argv.slice(2);
+const extraArgs = [...envArgs, ...cliArgs];
 
 // Optional CI matrix parallelism: slice the file list into N equal chunks.
 const SHARD_TOTAL = process.env.VITEST_SHARDS
@@ -88,23 +166,44 @@ if (SHARD_INDEX !== null) {
 }
 
 // Deterministic file enumeration. We use a tiny recursive walk rather than
-// pulling in a glob dep — the pattern is fixed (packages/hx-library/src/**)
-// and we only need to match `*.stories.ts`.
+// pulling in a glob dep — the pattern is fixed-shape and we only need to
+// match `*.stories.{ts,tsx}`. Any I/O error during enumeration is fatal —
+// a partial file list would silently drop coverage, which is worse for CI
+// than a loud failure.
 function findStoryFiles(globRelative) {
-  // Parse the two supported glob shapes:
-  //   <prefix>/**/*.stories.ts       — recursive
-  //   <prefix>/*.stories.ts          — single directory
-  // Test recursive first — the flat regex would otherwise happily match
-  // the recursive pattern (because `.+?/*.stories.ts` is a sub-string of
-  // `.+?/**/*.stories.ts`) and produce zero results.
-  const recursiveMatch = globRelative.match(/^(.+?)\/\*\*\/\*\.stories\.ts$/);
-  const flatMatch = recursiveMatch ? null : globRelative.match(/^(.+?)\/\*\.stories\.ts$/);
-  const prefix = recursiveMatch?.[1] ?? flatMatch?.[1] ?? globRelative;
-  const recursive = !flatMatch; // default to recursive when nothing matched
+  // Parse the two supported glob shapes (with optional extension group):
+  //   <prefix>/**/*.stories.@(ts|tsx)        — recursive, ts|tsx
+  //   <prefix>/**/*.stories.ts               — recursive, ts only
+  //   <prefix>/*.stories.@(ts|tsx)           — single dir, ts|tsx
+  //   <prefix>/*.stories.ts                  — single dir, ts only
+  // Check recursive first to avoid the flat regex swallowing it.
+  const recursiveExt = globRelative.match(/^(.+?)\/\*\*\/\*\.stories\.@\(([^)]+)\)$/);
+  const recursiveTs = recursiveExt
+    ? null
+    : globRelative.match(/^(.+?)\/\*\*\/\*\.stories\.(ts|tsx)$/);
+  const flatExt =
+    recursiveExt || recursiveTs ? null : globRelative.match(/^(.+?)\/\*\.stories\.@\(([^)]+)\)$/);
+  const flatTs =
+    recursiveExt || recursiveTs || flatExt
+      ? null
+      : globRelative.match(/^(.+?)\/\*\.stories\.(ts|tsx)$/);
+
+  const match = recursiveExt ?? recursiveTs ?? flatExt ?? flatTs;
+  if (!match) {
+    throw new Error(`[storybook-test] unsupported glob pattern: ${globRelative}`);
+  }
+
+  const prefix = match[1];
+  const extensionSpec = match[2];
+  const extensions = extensionSpec.split('|').map((e) => '.stories.' + e);
+  const recursive = Boolean(recursiveExt || recursiveTs);
 
   const rootDir = path.resolve(repoRoot, prefix);
   if (!fs.existsSync(rootDir)) {
-    throw new Error(`[storybook-test] story root does not exist: ${rootDir}`);
+    // A missing root is a common case for optional glob patterns (e.g.
+    // apps/storybook/stories/ may or may not exist). Treat it as
+    // "zero matches for this glob" rather than failing the whole run.
+    return [];
   }
 
   const results = [];
@@ -114,26 +213,37 @@ function findStoryFiles(globRelative) {
     let entries;
     try {
       entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      continue;
+    } catch (err) {
+      // Fail closed — a transient FS error or unreadable subtree must
+      // not be papered over, otherwise CI could go green on a partial
+      // run. The runner has no business fixing filesystem issues.
+      throw new Error(
+        `[storybook-test] failed to read ${dir}: ${err instanceof Error ? err.message : err}`,
+      );
     }
     for (const entry of entries) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         if (recursive) stack.push(full);
-      } else if (entry.isFile() && entry.name.endsWith('.stories.ts')) {
+      } else if (entry.isFile() && extensions.some((ext) => entry.name.endsWith(ext))) {
         results.push(full);
       }
     }
   }
-  // Sort so the order is stable across runs and platforms.
-  results.sort();
   return results;
 }
 
-const allFiles = findStoryFiles(STORY_GLOB);
-if (allFiles.length === 0) {
-  console.error(`[storybook-test] no story files matched: ${STORY_GLOB}`);
+const allFiles = [];
+for (const glob of STORY_GLOBS) {
+  allFiles.push(...findStoryFiles(glob));
+}
+// De-duplicate in case globs overlap, then sort so order is stable across
+// runs and platforms.
+const uniqueFiles = Array.from(new Set(allFiles)).sort();
+
+if (uniqueFiles.length === 0) {
+  console.error(`[storybook-test] no story files matched any of:`);
+  for (const glob of STORY_GLOBS) console.error(`    ${glob}`);
   process.exit(2);
 }
 
@@ -147,8 +257,8 @@ function sliceForShard(files, index, total) {
 }
 const filesToRun =
   SHARD_INDEX !== null && SHARD_TOTAL !== null
-    ? sliceForShard(allFiles, SHARD_INDEX, SHARD_TOTAL)
-    : allFiles;
+    ? sliceForShard(uniqueFiles, SHARD_INDEX, SHARD_TOTAL)
+    : uniqueFiles;
 
 // Resolve the vitest CLI through the local install rather than assuming
 // PATH — works for pnpm workspaces, worktrees, and CI runners.
@@ -190,7 +300,7 @@ function runOne(storyFile, index, total) {
 
 const scope =
   SHARD_INDEX !== null && SHARD_TOTAL !== null
-    ? `shard ${SHARD_INDEX}/${SHARD_TOTAL} (${filesToRun.length} of ${allFiles.length} files)`
+    ? `shard ${SHARD_INDEX}/${SHARD_TOTAL} (${filesToRun.length} of ${uniqueFiles.length} files)`
     : `${filesToRun.length} files`;
 console.log(`[storybook-test] running ${scope}, one vitest process per file`);
 
