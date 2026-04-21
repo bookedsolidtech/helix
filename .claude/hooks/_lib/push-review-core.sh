@@ -986,7 +986,9 @@ pr_core_run() {
   fi
 
   local LINE_COUNT
-  LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || echo "0")
+  # rea#62 backport (local): `|| echo "0"` on `grep -c` no-match produces "0\n0"
+  LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || true)
+  LINE_COUNT="${LINE_COUNT:-0}"
 
   # ── 7a. Protected-path Codex adversarial review gate ──────────────────────
   # The per-refspec check runs inside the main loop (section 7, above) so
@@ -998,7 +1000,24 @@ pr_core_run() {
 
   # ── 8. Check review cache ─────────────────────────────────────────────────
   local PUSH_SHA
-  PUSH_SHA=$(printf '%s' "$DIFF_FULL" | shasum -a 256 | cut -d' ' -f1 2>/dev/null || echo "")
+  # rea#63 backport (local): `shasum` isn't on Alpine/distroless — try portable chain.
+  # openssl form uses `$NF` (not `-r | $1`) so it works on BOTH OpenSSL 1.1.x
+  # (`(stdin)= <hex>`) and 3.x / LibreSSL 3.3+ (`<hex> *stdin`). `-r` is unknown
+  # on 1.1.x (Debian 11, Ubuntu 20.04, RHEL8, AL2) and would silently return empty.
+  if command -v sha256sum >/dev/null 2>&1; then
+    PUSH_SHA=$(printf '%s' "$DIFF_FULL" | sha256sum | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    PUSH_SHA=$(printf '%s' "$DIFF_FULL" | shasum -a 256 | awk '{print $1}')
+  elif command -v openssl >/dev/null 2>&1; then
+    PUSH_SHA=$(printf '%s' "$DIFF_FULL" | openssl dgst -sha256 | awk '{print $NF}')
+  else
+    printf 'push-review: WARN no sha256 hasher found (sha256sum/shasum/openssl); cache disabled\n' >&2
+    PUSH_SHA=""
+  fi
+  if [[ -n "$PUSH_SHA" && ! "$PUSH_SHA" =~ ^[0-9a-f]{64}$ ]]; then
+    printf 'push-review: WARN hasher returned invalid output; cache disabled\n' >&2
+    PUSH_SHA=""
+  fi
 
   local -a REA_CLI_ARGS
   REA_CLI_ARGS=()
@@ -1054,7 +1073,8 @@ pr_core_run() {
 
   # ── 9. Block and request review ───────────────────────────────────────────
   local FILE_COUNT
-  FILE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -c '^\+\+\+ ' 2>/dev/null || echo "0")
+  FILE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -c '^\+\+\+ ' 2>/dev/null || true)
+  FILE_COUNT="${FILE_COUNT:-0}"
 
   {
     printf 'PUSH REVIEW GATE: Review required before pushing\n'

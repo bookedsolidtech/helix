@@ -2,7 +2,7 @@
 '@helixui/library': patch
 ---
 
-Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of three 0.9.3 security fixes.
+Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of five 0.9.3 fixes (three security, two portability/correctness).
 
 ## Upstream bump
 
@@ -12,11 +12,13 @@ Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of three 0.9.3 sec
 
 ## Local 0.9.3 backports (CodeRabbit findings on PR #1506)
 
-Three security findings in the upstream-synced `push-review-core.sh`. All filed upstream for 0.9.3 and patched locally as a mitigation:
+Five findings in the upstream-synced `push-review-core.sh`. All filed upstream for 0.9.3 and patched locally as a mitigation:
 
 - **Legacy `push_review: false` grep bypass** — removed. The raw-grep check ran before the strict schema validator, so any agent could disarm the gate by adding `push_review: false` to `.rea/policy.yaml`. Upstream: [rea#56](https://github.com/bookedsolidtech/rea/issues/56).
 - **Protected-paths gap** — the matcher now also guards `.rea/` and `.husky/`. Previously an agent could flip autonomy level or neuter `.husky/pre-push` without tripping Codex review. Upstream: [rea#56](https://github.com/bookedsolidtech/rea/issues/56).
 - **Mixed-push deletion bypass** — the deletion guard now fires whenever any refspec is a deletion, regardless of whether a non-delete refspec is also present in the same push. Pre-0.9.3 the check was gated on `SOURCE_SHA` being empty, so a mixed push like `safe:safe :protected-branch` silently allowed the deletion. Upstream: [rea#61](https://github.com/bookedsolidtech/rea/issues/61).
+- **LINE_COUNT/FILE_COUNT "0\n0" misrender** — `grep -c ... || echo "0"` captures both grep's own `0` (printed before its non-zero exit on no-match) AND the fallback `echo "0"`, producing `0\n0` in the user-facing `PUSH REVIEW GATE` scope banner. Fixed by swapping to `|| true` plus `${VAR:-0}` bash fallback. Upstream: [rea#62](https://github.com/bookedsolidtech/rea/issues/62).
+- **PUSH_SHA portability / silent cache disarm** — the gate hashed the push diff with `shasum -a 256`, which is not installed on Alpine, distroless, or most minimal Linux CI images. The pipeline failed silently (`|| echo ""`), `PUSH_SHA` became empty, and the cache lookup was skipped with no signal — every push from a minimal-image runner burned a full codex review. Fixed with a portable hasher chain (`sha256sum` → `shasum` → `openssl dgst -sha256`) with an explicit empty fallback. Upstream: [rea#63](https://github.com/bookedsolidtech/rea/issues/63).
 
 Full rea defect catalog tracked in internal bug-report notes; local backport patches preserved for re-application on the next `rea upgrade` once 0.9.3 lands.
 
