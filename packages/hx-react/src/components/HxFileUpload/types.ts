@@ -34,6 +34,12 @@ Also used as the accessible label for the dropzone. */
   labelDropzone?: string;
   /** Accessible label for the selected files list. */
   labelFileList?: string;
+  /** Accessible label for the dropzone when no visible label text is provided.
+Falls back to `label-dropzone` prop value, then a default string.
+
+Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+`accessible-label` takes precedence when both are set. */
+  accessibleLabel?: string;
   /** Generates upload progress description for screen readers. */
   labelUploadProgress?: string;
   /** Screen reader announcement when file drag detected. Override for i18n. */
