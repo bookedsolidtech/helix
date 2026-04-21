@@ -934,17 +934,23 @@ pr_core_run() {
     fi
   done
 
+  # rea#61 backport (local): block any push containing a deletion refspec,
+  # regardless of whether a non-delete refspec is also present. Pre-0.9.3
+  # this check was nested inside `-z SOURCE_SHA`, so a mixed push like
+  # `safe:safe :protected-branch` set SOURCE_SHA from the safe refspec and
+  # silently allowed the deletion. Flagged by CodeRabbit on PR #1506.
+  if [[ "$HAS_DELETE" -eq 1 ]]; then
+    {
+      printf 'PUSH BLOCKED: refspec includes a branch deletion.\n'
+      printf '\n'
+      printf '  Branch deletions are sensitive operations and require explicit\n'
+      printf '  human action outside the agent. Perform the deletion manually.\n'
+      printf '\n'
+    } >&2
+    exit 2
+  fi
+
   if [[ -z "$SOURCE_SHA" || -z "$MERGE_BASE" ]]; then
-    if [[ "$HAS_DELETE" -eq 1 ]]; then
-      {
-        printf 'PUSH BLOCKED: refspec is a branch deletion.\n'
-        printf '\n'
-        printf '  Branch deletions are sensitive operations and require explicit\n'
-        printf '  human action outside the agent. Perform the deletion manually.\n'
-        printf '\n'
-      } >&2
-      exit 2
-    fi
     {
       printf 'PUSH BLOCKED: could not resolve a merge-base for any push refspec.\n'
       printf '\n'

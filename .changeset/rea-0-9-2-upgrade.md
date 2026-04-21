@@ -2,7 +2,7 @@
 '@helixui/library': patch
 ---
 
-Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of two 0.9.3 security fixes.
+Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of three 0.9.3 security fixes.
 
 ## Upstream bump
 
@@ -12,11 +12,12 @@ Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of two 0.9.3 secur
 
 ## Local 0.9.3 backports (CodeRabbit findings on PR #1506)
 
-Two CRITICAL security findings in the upstream-synced `push-review-core.sh`. Both filed upstream for 0.9.3 and patched locally as a mitigation:
+Three security findings in the upstream-synced `push-review-core.sh`. All filed upstream for 0.9.3 and patched locally as a mitigation:
 
 - **Legacy `push_review: false` grep bypass** — removed. The raw-grep check ran before the strict schema validator, so any agent could disarm the gate by adding `push_review: false` to `.rea/policy.yaml`. Upstream: [rea#56](https://github.com/bookedsolidtech/rea/issues/56).
 - **Protected-paths gap** — the matcher now also guards `.rea/` and `.husky/`. Previously an agent could flip autonomy level or neuter `.husky/pre-push` without tripping Codex review. Upstream: [rea#56](https://github.com/bookedsolidtech/rea/issues/56).
+- **Mixed-push deletion bypass** — the deletion guard now fires whenever any refspec is a deletion, regardless of whether a non-delete refspec is also present in the same push. Pre-0.9.3 the check was gated on `SOURCE_SHA` being empty, so a mixed push like `safe:safe :protected-branch` silently allowed the deletion. Upstream: [rea#61](https://github.com/bookedsolidtech/rea/issues/61).
 
-Full rea defect catalog with all active upstream issues (rea#56 + #57 + #58 + #59 + #60) logged to the bst Obsidian vault at `Projects/rea/Bug Reports/Rea Bug Reports.md`. Local patch preserved at `.reports/hook-patches/push-review-core-0.9.3-backports.patch` — drop it on next `rea upgrade` once 0.9.3 lands.
+Full rea defect catalog tracked in internal bug-report notes; local backport patches preserved for re-application on the next `rea upgrade` once 0.9.3 lands.
 
 No consumer-facing API changes. Internal governance infra only.
