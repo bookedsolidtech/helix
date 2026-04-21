@@ -5,116 +5,88 @@
 # security + code review before allowing the push.
 #
 # Exit codes:
-#   0 = allow (no meaningful diff, or review cached)
-#   2 = block (needs review)
+#   0 = allow (no meaningful diff, or review cached, or escape hatch invoked)
+#   2 = block (needs review, or escape hatch invoked but audit-append failed)
+#
+# ── Architecture (0.7.0 BUG-008 cleanup) ─────────────────────────────────────
+# This file is now a thin ADAPTER. All logic lives in
+# `hooks/_lib/push-review-core.sh` (see `pr_core_run`). The adapter's only
+# job is to (a) capture stdin, and (b) hand its own script path + stdin +
+# argv to the core so the cross-repo anchor walks up from the RIGHT script
+# location.
+#
+# Two adapters share the core:
+#   - push-review-gate.sh      ← this file, Claude Code PreToolUse stdin (JSON)
+#   - push-review-gate-git.sh  ← native `.husky/pre-push` stdin (git refspec)
+# The core's BUG-008 sniff makes either stdin shape work from either adapter,
+# so in practice a consumer can wire THIS file into `.husky/pre-push` and it
+# just works. The `-git` adapter exists for clarity of install intent.
+#
+# ── Codex-only waiver: REA_SKIP_CODEX_REVIEW ─────────────────────────────────
+# Env var `REA_SKIP_CODEX_REVIEW=<reason>` waives the Codex adversarial-
+# review requirement (section 7 protected-path check). Set to any non-empty
+# value; the value IS the reason recorded in the audit record (no default
+# reason is supplied — if the operator sets `REA_SKIP_CODEX_REVIEW=1` the
+# reason is literally "1").
+#
+# SCOPE (0.8.0, #85): Codex-only. The waiver only satisfies the
+# protected-path Codex-audit requirement. Every other gate this hook
+# runs still runs:
+#   • HALT (.rea/HALT) — still blocks.
+#   • Cross-repo guard — still blocks.
+#   • Ref-resolution failures — still block.
+#   • Push-review cache — a miss still falls through to section 9's general
+#     review-required block.
+# (Blocked-paths enforcement is a separate hook on Edit/Write tiers, not
+# this push hook — it was never gated by REA_SKIP_CODEX_REVIEW.)
+#
+# For a full-gate bypass, use `REA_SKIP_PUSH_REVIEW=<reason>` (section 5a).
+# The 0.7.0 semantic (whole-gate bypass via the Codex hatch) was misleading
+# — operators reached for REA_SKIP_CODEX_REVIEW to silence a transient
+# Codex unavailability and accidentally bypassed every other check too.
+# 0.8.0 narrows it to what the name implies.
+#
+# ORDERING: the waiver fires AFTER the HALT check but BEFORE ref-resolution.
+# Prior to 0.7.0 the check ran inside the protected-path branch and only
+# fired when the diff touched a protected path — which meant an operator
+# who wanted to skip Codex review got blocked by a transient ref-resolution
+# failure (missing remote object, unresolvable source ref, etc.) before the
+# skip ever fired. The current ordering preserves the skip audit record
+# even when downstream gates (ref-resolution, cache) block: the operator's
+# commitment to waive is durable, even if the push itself is blocked on
+# another gate.
+#
+# Every invocation appends a `tool_name: "codex.review.skipped"` record to
+# `.rea/audit.jsonl` via the public audit helper. This record is intentionally
+# NOT named `codex.review` so the existing jq predicate on `.tool_name ==
+# "codex.review" and .metadata.verdict in {pass, concerns}` will never match
+# a skip — a skipped review is not a review.
+#
+# Fail-closed contract:
+#   - `dist/audit/append.js` missing → exit 2 (build rea first)
+#   - Node invocation failure → exit 2
+#   - Unable to resolve actor from git config → exit 2
 
 set -uo pipefail
 
-# ── 1. Read ALL stdin immediately ─────────────────────────────────────────────
+# Read ALL stdin immediately. The core's BUG-008 sniff decides whether this
+# is Claude Code JSON or git's native pre-push refspec list.
 INPUT=$(cat)
 
-# ── 2. Dependency check ──────────────────────────────────────────────────────
-if ! command -v jq >/dev/null 2>&1; then
-  printf 'REA ERROR: jq is required but not installed.\n' >&2
-  printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
+# Resolve the core library from this adapter's own on-disk location. Using
+# BASH_SOURCE (not argv $0) so `bash hooks/push-review-gate.sh` and
+# `.../.claude/hooks/push-review-gate.sh` both find `_lib/` next to the
+# adapter. Consistent with the BUG-012 script-anchor rationale in core.
+_adapter_script="${BASH_SOURCE[0]:-$0}"
+_adapter_dir="$(cd -- "$(dirname -- "$_adapter_script")" && pwd -P 2>/dev/null)"
+_core_lib="${_adapter_dir}/_lib/push-review-core.sh"
+if [[ ! -f "$_core_lib" ]]; then
+  printf 'rea-hook: push-review-core.sh not found next to %s\n' \
+    "$_adapter_script" >&2
+  printf 'rea-hook:   expected at %s\n' "$_core_lib" >&2
   exit 2
 fi
+# shellcheck source=_lib/push-review-core.sh
+source "$_core_lib"
 
-# ── 3. HALT check ────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
-
-# ── 4. Parse command ──────────────────────────────────────────────────────────
-CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
-
-if [[ -z "$CMD" ]]; then
-  exit 0
-fi
-
-# Only trigger on git push commands
-if ! printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+push'; then
-  exit 0
-fi
-
-# ── 5. Check if quality gates are enabled ─────────────────────────────────────
-POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
-if [[ -f "$POLICY_FILE" ]]; then
-  if grep -qE 'push_review:[[:space:]]*false' "$POLICY_FILE" 2>/dev/null; then
-    exit 0
-  fi
-fi
-
-# ── 6. Determine target branch ───────────────────────────────────────────────
-CURRENT_BRANCH=$(cd "$REA_ROOT" && git branch --show-current 2>/dev/null || echo "")
-TARGET_BRANCH="main"
-
-# Try to extract target from push command (git push origin <branch>)
-PUSH_TARGET=$(printf '%s' "$CMD" | grep -oE 'git[[:space:]]+push[[:space:]]+[a-zA-Z_-]+[[:space:]]+([a-zA-Z0-9/_-]+)' | awk '{print $NF}' 2>/dev/null || echo "")
-if [[ -n "$PUSH_TARGET" ]]; then
-  TARGET_BRANCH="$PUSH_TARGET"
-fi
-
-# ── 7. Get diff against target ───────────────────────────────────────────────
-MERGE_BASE=$(cd "$REA_ROOT" && git merge-base "$TARGET_BRANCH" HEAD 2>/dev/null || echo "")
-
-if [[ -z "$MERGE_BASE" ]]; then
-  # Can't determine merge base — fail-open
-  exit 0
-fi
-
-DIFF_FULL=$(cd "$REA_ROOT" && git diff "$MERGE_BASE"...HEAD 2>/dev/null || echo "")
-
-if [[ -z "$DIFF_FULL" ]]; then
-  # No diff — nothing to review
-  exit 0
-fi
-
-LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || echo "0")
-
-# ── 8. Check review cache ────────────────────────────────────────────────────
-PUSH_SHA=$(printf '%s' "$DIFF_FULL" | shasum -a 256 | cut -d' ' -f1 2>/dev/null || echo "")
-
-# Resolve rea CLI (node_modules/.bin first, dist fallback)
-REA_CLI_ARGS=()
-if [[ -f "${REA_ROOT}/node_modules/.bin/rea" ]]; then
-  REA_CLI_ARGS=(node "${REA_ROOT}/node_modules/.bin/rea")
-elif [[ -f "${REA_ROOT}/dist/cli/index.js" ]]; then
-  REA_CLI_ARGS=(node "${REA_ROOT}/dist/cli/index.js")
-fi
-
-if [[ -n "$PUSH_SHA" ]] && [[ ${#REA_CLI_ARGS[@]} -gt 0 ]]; then
-  CACHE_RESULT=$("${REA_CLI_ARGS[@]}" cache check "$PUSH_SHA" --branch "$CURRENT_BRANCH" --base "$TARGET_BRANCH" 2>/dev/null || echo '{"hit":false}')
-  if printf '%s' "$CACHE_RESULT" | jq -e '.hit == true' >/dev/null 2>&1; then
-    # Review was already approved — notify and allow the push through
-    DISCORD_LIB="${REA_ROOT}/hooks/_lib/discord.sh"
-    if [ -f "$DISCORD_LIB" ]; then
-      # shellcheck source=/dev/null
-      source "$DISCORD_LIB"
-      discord_notify "dev" "Push passed quality gates on \`${CURRENT_BRANCH}\` -- $(cd "$REA_ROOT" && git log -1 --oneline 2>/dev/null)" "green"
-    fi
-    exit 0
-  fi
-fi
-
-# ── 9. Block and request review ──────────────────────────────────────────────
-FILE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -c '^\+\+\+ ' 2>/dev/null || echo "0")
-
-{
-  printf 'PUSH REVIEW GATE: Review required before pushing\n'
-  printf '\n'
-  printf '  Branch: %s → %s\n' "$CURRENT_BRANCH" "$TARGET_BRANCH"
-  printf '  Scope: %s files changed, %s lines\n' "$FILE_COUNT" "$LINE_COUNT"
-  printf '\n'
-  printf '  Action required:\n'
-  printf '  1. Spawn a code-reviewer agent to review: git diff %s...HEAD\n' "$MERGE_BASE"
-  printf '  2. Spawn a security-engineer agent for security review\n'
-  printf '  3. After both pass, cache the result:\n'
-  printf '     rea cache set %s pass --branch %s --base %s\n' "$PUSH_SHA" "$CURRENT_BRANCH" "$TARGET_BRANCH"
-  printf '\n'
-} >&2
-exit 2
+pr_core_run "$_adapter_script" "$INPUT" "$@"

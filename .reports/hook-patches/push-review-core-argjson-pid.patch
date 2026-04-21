@@ -1,0 +1,34 @@
+From: HELiX maintainers
+Subject: [PATCH] rea#64 backport: use --argjson for numeric os_pid/os_ppid
+
+CodeRabbit round-1 finding on PR #1506: `SKIP_METADATA` stringifies
+`os_pid`/`os_ppid` via `jq --arg`. `SKIP_OS_PID=$$` and
+`SKIP_OS_PPID=$PPID` are bash internals guaranteed non-empty numeric,
+so `--argjson` is safe and produces the numeric types the audit
+schema implies.
+
+Fixed only for pid/ppid. `os_uid` stays on `--arg` because
+`id -u 2>/dev/null || echo ""` can legitimately return empty, which
+would break `--argjson`.
+
+Filed upstream as rea#64. Drop this patch on next `rea upgrade` once
+0.9.3 lands.
+
+---
+ .claude/hooks/_lib/push-review-core.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.claude/hooks/_lib/push-review-core.sh b/.claude/hooks/_lib/push-review-core.sh
+--- a/.claude/hooks/_lib/push-review-core.sh
++++ b/.claude/hooks/_lib/push-review-core.sh
+@@ -446,8 +446,8 @@
+       --arg os_uid "$SKIP_OS_UID" \
+       --arg os_whoami "$SKIP_OS_WHOAMI" \
+       --arg os_hostname "$SKIP_OS_HOST" \
+-      --arg os_pid "$SKIP_OS_PID" \
+-      --arg os_ppid "$SKIP_OS_PPID" \
++      --argjson os_pid "$SKIP_OS_PID" \
++      --argjson os_ppid "$SKIP_OS_PPID" \
+       --arg os_ppid_cmd "$SKIP_OS_PPID_CMD" \
+       --arg os_tty "$SKIP_OS_TTY" \
+       --arg os_ci "$SKIP_OS_CI" \

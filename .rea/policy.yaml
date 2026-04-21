@@ -41,4 +41,3 @@ context_protection:
   max_bash_output_lines: 100
 review:
   codex_required: true
-  push_review: false

@@ -1,0 +1,89 @@
+From: HELiX maintainers
+Subject: [PATCH v2] rea#62 + rea#63 backports: counter double-zero + hash portability (+ Codex hardening)
+
+Three CodeRabbit / Codex findings on push-review-core.sh (round 3 + round 4,
+PR #1506):
+
+- rea#62: LINE_COUNT/FILE_COUNT with `grep -c ... || echo "0"` produce
+  "0\n0" when grep exits non-zero on no matches. Misrenders the user-
+  facing "Scope: X files changed, Y lines" message. Fix: replace
+  `|| echo "0"` with `|| true` + `${VAR:-0}` fallback so a single "0"
+  is captured.
+
+- rea#63: PUSH_SHA pipelines `shasum -a 256`, which isn't available on
+  Alpine or most distroless images. Silent empty PUSH_SHA disables the
+  review cache check with no signal. Fix: portable hasher chain
+  (sha256sum -> shasum -> openssl dgst) with Codex-review hardening:
+
+  * openssl form uses `awk '{print $NF}'` without `-r`, so it works on
+    BOTH OpenSSL 1.1.x (`(stdin)= <hex>`) and OpenSSL 3.x / LibreSSL
+    3.3+ (`<hex> *stdin`). The `-r` flag is unknown on 1.1.x — still
+    the default on Debian 11, Ubuntu 20.04, RHEL8, Amazon Linux 2, and
+    several Alpine 3.13–3.14 images — and would silently re-introduce
+    the empty-PUSH_SHA defect on exactly the distros this patch is
+    supposed to rescue.
+  * No-hasher branch now emits a stderr WARN so ops can see cache was
+    disabled instead of silent-disarming (closes defect F for this
+    path).
+  * Hex-validation sanity check: if any hasher returned anything other
+    than a 64-char lowercase hex digest (broken pipe, partial read,
+    unexpected output format), emit WARN and blank PUSH_SHA rather
+    than passing a garbage sha into the cache lookup.
+
+Both filed upstream for 0.9.3 (rea#62, rea#63). Drop this patch on next
+`rea upgrade` once 0.9.3 lands.
+
+---
+ .claude/hooks/_lib/push-review-core.sh | 27 ++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/.claude/hooks/_lib/push-review-core.sh b/.claude/hooks/_lib/push-review-core.sh
+--- a/.claude/hooks/_lib/push-review-core.sh
++++ b/.claude/hooks/_lib/push-review-core.sh
+@@ -986,7 +986,9 @@
+   fi
+
+   local LINE_COUNT
+-  LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || echo "0")
++  # rea#62 backport (local): `|| echo "0"` on `grep -c` no-match produces "0\n0"
++  LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || true)
++  LINE_COUNT="${LINE_COUNT:-0}"
+
+   # ── 7a. Protected-path Codex adversarial review gate ──────────────────────
+   # The per-refspec check runs inside the main loop (section 7, above) so
+@@ -998,7 +1000,24 @@
+
+   # ── 8. Check review cache ─────────────────────────────────────────────────
+   local PUSH_SHA
+-  PUSH_SHA=$(printf '%s' "$DIFF_FULL" | shasum -a 256 | cut -d' ' -f1 2>/dev/null || echo "")
++  # rea#63 backport (local): `shasum` isn't on Alpine/distroless — try portable chain.
++  # openssl form uses `$NF` (not `-r | $1`) so it works on BOTH OpenSSL 1.1.x
++  # (`(stdin)= <hex>`) and 3.x / LibreSSL 3.3+ (`<hex> *stdin`). `-r` is unknown
++  # on 1.1.x (Debian 11, Ubuntu 20.04, RHEL8, AL2) and would silently return empty.
++  if command -v sha256sum >/dev/null 2>&1; then
++    PUSH_SHA=$(printf '%s' "$DIFF_FULL" | sha256sum | awk '{print $1}')
++  elif command -v shasum >/dev/null 2>&1; then
++    PUSH_SHA=$(printf '%s' "$DIFF_FULL" | shasum -a 256 | awk '{print $1}')
++  elif command -v openssl >/dev/null 2>&1; then
++    PUSH_SHA=$(printf '%s' "$DIFF_FULL" | openssl dgst -sha256 | awk '{print $NF}')
++  else
++    printf 'push-review: WARN no sha256 hasher found (sha256sum/shasum/openssl); cache disabled\n' >&2
++    PUSH_SHA=""
++  fi
++  if [[ -n "$PUSH_SHA" && ! "$PUSH_SHA" =~ ^[0-9a-f]{64}$ ]]; then
++    printf 'push-review: WARN hasher returned invalid output; cache disabled\n' >&2
++    PUSH_SHA=""
++  fi
+
+   local -a REA_CLI_ARGS
+   REA_CLI_ARGS=()
+@@ -1054,7 +1073,8 @@
+
+   # ── 9. Block and request review ───────────────────────────────────────────
+   local FILE_COUNT
+-  FILE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -c '^\+\+\+ ' 2>/dev/null || echo "0")
++  FILE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -c '^\+\+\+ ' 2>/dev/null || true)
++  FILE_COUNT="${FILE_COUNT:-0}"
+
+   {
+     printf 'PUSH REVIEW GATE: Review required before pushing\n'

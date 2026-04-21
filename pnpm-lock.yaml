@@ -15,8 +15,8 @@ importers:
         specifier: ^4.10.1
         version: 4.11.1(playwright-core@1.58.2)
       '@bookedsolid/rea':
-        specifier: ^0.6.2
-        version: 0.6.2
+        specifier: 0.9.2
+        version: 0.9.2
       '@changesets/cli':
         specifier: ^2.29.8
         version: 2.30.0(@types/node@24.12.0)
@@ -671,8 +671,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bookedsolid/rea@0.6.2':
-    resolution: {integrity: sha512-MVgSAfcez9Lw03e/FPyFvwOOA/h0EG4PJRiAF7fdLkRI4teY9JPaCrir9oINUPtFQOaAVRM/tIwLLIGkCiAUVw==}
+  '@bookedsolid/rea@0.9.2':
+    resolution: {integrity: sha512-SfXsLBYCo1OykrWjyXady/yIYFunWJ+l3bEfbELNhg69MtLMNIoeg05X2soyts9Z1UL2ZiSO6fSUxPlnB02BpQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -7057,7 +7057,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bookedsolid/rea@0.6.2':
+  '@bookedsolid/rea@0.9.2':
     dependencies:
       '@anthropic-ai/sdk': 0.90.0(zod@3.25.76)
       '@clack/prompts': 1.2.0

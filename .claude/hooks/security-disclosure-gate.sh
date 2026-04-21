@@ -66,7 +66,7 @@ SECURITY_PATTERNS=(
   'CVE-'
   'CVSS'
   'GHSA-'
-  # Rea-specific sensitive terms
+  # Reagent-specific sensitive terms
   'hook.bypass'
   'HALT.bypass'
   'redaction.bypass'

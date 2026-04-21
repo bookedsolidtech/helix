@@ -114,6 +114,7 @@ mcpwc.config.json
 # rea gateway runtime state (hash-chained audit + HALT marker; never commit)
 .rea/audit.jsonl
 .rea/audit-*.jsonl
+.rea/review-cache.jsonl
 .rea/HALT
 
 # rea gateway dev smoke harness (not production code)

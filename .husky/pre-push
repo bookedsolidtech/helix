@@ -149,9 +149,14 @@ if [ -f "$HOOKS_LIB" ]; then
 fi
 
 # ── rea push-review-gate (Codex audit on protected paths) ────────────────────
+# 0.9.1: push-review-gate.sh is the canonical gate. Its core (push-review-core.sh)
+# has BUG-008 stdin-shape sniffing, so it handles both Claude Code JSON
+# (.tool_input.command) and git's native pre-push refspec stdin. We pass "$@"
+# through so the remote name (argv $1) is available to the core.
+# We invoke without `exec` so the EXIT trap above still runs to clean $OUT.
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
 if [ -x "$REPO_ROOT/.claude/hooks/push-review-gate.sh" ]; then
-  jq -Rn --arg remote "${1:-origin}"'{tool_input:{command:"git push \($remote)"}}' | "$REPO_ROOT/.claude/hooks/push-review-gate.sh" ||
+  "$REPO_ROOT/.claude/hooks/push-review-gate.sh" "$@"
   exit $?
 fi
 
