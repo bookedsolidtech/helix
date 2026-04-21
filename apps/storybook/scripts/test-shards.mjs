@@ -97,15 +97,41 @@ if (!envGlobsRaw) {
   const mainTsPath = path.resolve(cwd, '.storybook/main.ts');
   if (fs.existsSync(mainTsPath)) {
     const mainTsSource = fs.readFileSync(mainTsPath, 'utf8');
-    // Extract the `stories` array — quoted string literals inside it. We
-    // keep the regex simple and forgiving: any single- or double-quoted
-    // string anywhere in the file that ends with `.stories.<something>`.
+    // Scope the regex to the `stories:` array only so quoted `.stories.*`
+    // strings in comments, JSDoc examples, or unrelated config keys cannot
+    // trigger false positives. We locate the `stories:` key, then extract
+    // the bracketed array content with a balanced-bracket walk (the naive
+    // `\[.*?\]` would stop at the first `]`, which is fine here because
+    // story globs never contain brackets, but the walk is cheap and
+    // future-proofs against nested config).
+    const storiesKey = mainTsSource.search(/\bstories\s*:\s*\[/);
+    let storiesArrayText = '';
+    if (storiesKey !== -1) {
+      const openIdx = mainTsSource.indexOf('[', storiesKey);
+      let depth = 0;
+      let closeIdx = -1;
+      for (let i = openIdx; i < mainTsSource.length; i++) {
+        const ch = mainTsSource[i];
+        if (ch === '[') depth++;
+        else if (ch === ']') {
+          depth--;
+          if (depth === 0) {
+            closeIdx = i;
+            break;
+          }
+        }
+      }
+      if (closeIdx !== -1) {
+        storiesArrayText = mainTsSource.slice(openIdx + 1, closeIdx);
+      }
+    }
+    // Extract quoted `.stories.<ext>` literals from the scoped array text.
     // `.mdx` entries are intentionally ignored — they are rendered by
     // Storybook docs but not under vitest interaction testing.
     const storyPatternRe = /['"]([^'"]+\.stories\.[^'"]+)['"]/g;
     const mainTsDir = path.dirname(mainTsPath);
     const configured = new Set();
-    for (const match of mainTsSource.matchAll(storyPatternRe)) {
+    for (const match of storiesArrayText.matchAll(storyPatternRe)) {
       const raw = match[1];
       // Resolve main.ts-relative glob against .storybook/ then make it
       // repo-root relative so it's directly comparable to STORY_GLOBS.
@@ -114,6 +140,15 @@ if (!envGlobsRaw) {
       configured.add(rel);
     }
     const active = new Set(STORY_GLOBS);
+    // Exact string equality is deliberate: equivalent-but-differently-
+    // spelled globs (narrower prefix, single vs extglob extension,
+    // reordered group) are treated as drift and must be explicitly mirrored
+    // in DEFAULT_STORY_GLOBS. That is stricter than strictly necessary, but
+    // it keeps the invariant obvious: whatever Storybook renders, the
+    // runner runs, byte-for-byte. Loosening this to file-set equivalence
+    // would require pulling in a glob engine and enumerating files twice,
+    // which is not worth it for a guard that trips only on intentional
+    // config edits.
     const missing = [...configured].filter((g) => !active.has(g));
     if (missing.length > 0) {
       console.error(
@@ -121,7 +156,7 @@ if (!envGlobsRaw) {
       );
       for (const m of missing) console.error(`    ${m}`);
       console.error(
-        '[storybook-test] fix: add the missing globs to DEFAULT_STORY_GLOBS in this file, or update main.ts if the new root was added by mistake.',
+        '[storybook-test] fix: either add the missing globs to DEFAULT_STORY_GLOBS verbatim, or update main.ts so its globs match DEFAULT_STORY_GLOBS byte-for-byte. The guard intentionally enforces exact-string match to keep the Storybook-config ↔ runner invariant unambiguous.',
       );
       process.exit(2);
     }
@@ -132,6 +167,12 @@ if (!envGlobsRaw) {
 // test-shards.mjs` is forwarded to each vitest invocation. This restores
 // the behavior of the previous `vitest run` target where `pnpm run
 // test:storybook -- --coverage` flowed through untouched.
+//
+// Limitation: STORYBOOK_EXTRA_ARGS is split on whitespace with no quote
+// handling, so tokens with embedded spaces (e.g. `--outputFile="path with
+// spaces.xml"`) will be split incorrectly. Pass those via the CLI
+// passthrough instead (`pnpm run test:storybook -- --outputFile="..."`),
+// where the shell handles quoting before argv is parsed.
 const envArgs = (process.env.STORYBOOK_EXTRA_ARGS ?? '')
   .split(/\s+/)
   .filter((arg) => arg.length > 0);
