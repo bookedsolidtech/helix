@@ -43,9 +43,10 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart value - The value display span (masked or revealed).
  * @csspart toggle - The reveal/hide toggle button.
  *
- * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide, and
- *   clipboard-clear actions. Contains audit metadata only — never raw PHI. Dispatched with
- *   `composed: true` to cross shadow boundaries for application-level audit listeners.
+ * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide,
+ *   auto-hide, clipboard-clear, and clipboard-clear-failed actions. Contains audit
+ *   metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow
+ *   boundaries for application-level audit listeners.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#111827)] - Value text color.
@@ -131,9 +132,13 @@ export class HelixPhiField extends HelixElement {
 
   /** @internal Bound reference for visibilitychange listener cleanup. */
   private readonly _boundHandleVisibilityChange = (): void => {
-    if (document.visibilityState === 'hidden') {
-      this._clearClipboard();
-    }
+    if (document.visibilityState !== 'hidden') return;
+    // Only clear if the field has been revealed (unmasked) or an active
+    // clipboard-clear timer is running. Otherwise there's nothing to clear,
+    // and emitting hx-phi-access with action: 'clipboard-clear' would pollute
+    // the HIPAA audit log with events for fields that were never accessed.
+    if (this._masked && this._clipboardTimer === null) return;
+    this._clearClipboard();
   };
 
   /** @internal Bound reference for interaction-based auto-hide timer reset. */
@@ -218,7 +223,10 @@ export class HelixPhiField extends HelixElement {
     if (this._masked) return;
 
     this._removeAutoHideInteractionListeners();
-    this._cancelClipboardTimer();
+    // Do NOT cancel the clipboard-clear timer — same reasoning as the manual
+    // hide branch of `_handleToggle`. A reveal may have resulted in a copy,
+    // and cancelling the scheduled clear would leave PHI on the clipboard
+    // past the auto-hide ceiling.
     this._masked = true;
 
     this.dispatchEvent(
@@ -268,25 +276,88 @@ export class HelixPhiField extends HelixElement {
 
   /** @internal */
   private _clearClipboard(): void {
-    this._clipboardTimer = null;
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator?.clipboard?.writeText('').catch(() => {
-        // Clipboard clear failure is non-fatal — silently ignore
-      });
-    }
-    this.dispatchEvent(
-      new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          fieldId: this.fieldId || this.id || '',
-          action: 'clipboard-clear',
-          timestamp: new Date().toISOString(),
-          fieldType: this.fieldType,
-        },
-      }),
-    );
+    // Cancel any pending scheduled clear. When `_clearClipboard` is invoked
+    // from the setTimeout callback the timer has already fired and this is a
+    // no-op; when invoked from the visibilitychange pre-emption path it stops
+    // the scheduled timer from firing again and dispatching a duplicate
+    // clipboard-clear audit event.
+    this._cancelClipboardTimer();
+    // Also cancel the auto-hide timer and remove its interaction listeners.
+    // `_clearClipboard` force-masks the field below, so any scheduled auto-hide
+    // is now moot. Without this call the setTimeout stays pending and the
+    // `mouseenter / mousemove / focusin / keydown / pointerdown` listeners
+    // stay attached to the host; when the auto-hide timer later fires,
+    // `_autoHide()` early-returns on `this._masked` WITHOUT removing the
+    // listeners, leaking them until the next scheduleAutoHide/cancelAutoHideTimer
+    // path runs. `_cancelAutoHideTimer` already closes both — one call suffices.
+    this._cancelAutoHideTimer();
     this._masked = true;
+
+    // `navigator.clipboard.writeText` requires transient user activation in
+    // Chrome and Safari. The clipboard-clear timer fires async (activation
+    // expired) and the visibilitychange pre-emption path has no activation
+    // at all — both can reject silently. Dispatching an unconditional
+    // clipboard-clear audit event in that case would be MISLEADING: the
+    // audit trail would claim PHI was cleared while it in fact remains on
+    // the clipboard. Instead we observe the writeText outcome and dispatch
+    // `clipboard-clear` only on confirmed success, or `clipboard-clear-failed`
+    // when the API is unavailable or the promise rejects. This gives
+    // HIPAA audit consumers an accurate signal and lets them escalate
+    // failures (prompt the user, flag the session, etc).
+    const dispatchOutcome = (succeeded: boolean): void => {
+      this.dispatchEvent(
+        new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            fieldId: this.fieldId || this.id || '',
+            action: succeeded ? 'clipboard-clear' : 'clipboard-clear-failed',
+            timestamp: new Date().toISOString(),
+            fieldType: this.fieldType,
+          },
+        }),
+      );
+    };
+
+    if (typeof navigator === 'undefined') {
+      dispatchOutcome(false);
+      return;
+    }
+
+    // Every remaining clipboard interaction — including the `navigator.clipboard`
+    // read itself — runs inside this try. The Clipboard API's property descriptor
+    // is UA-defined, so `navigator.clipboard` can legally be an accessor that
+    // throws synchronously. Same for `clipboard.writeText`. Pulling the read
+    // inside the try ensures any sync throw resolves to `clipboard-clear-failed`
+    // instead of an uncaught error that would silently drop the HIPAA audit event.
+    //
+    // `navigator.clipboard` is captured exactly once and the same reference is
+    // used for both the method read and the call's receiver. A shim that exposes
+    // `navigator.clipboard` as a getter returning a fresh object per read (rare
+    // but legal) would otherwise let us grab `writeText` from object A and invoke
+    // it against object B — brand/instance checks inside a real polyfill would
+    // then fail and the call would reject spuriously.
+    //
+    // Promise.resolve() on a non-thenable still resolves, so the then() path
+    // normalizes the return value shape for us.
+    try {
+      const clipboard = navigator.clipboard;
+      if (!clipboard) {
+        dispatchOutcome(false);
+        return;
+      }
+      const writeText = clipboard.writeText;
+      if (typeof writeText !== 'function') {
+        dispatchOutcome(false);
+        return;
+      }
+      void Promise.resolve(writeText.call(clipboard, '')).then(
+        () => dispatchOutcome(true),
+        () => dispatchOutcome(false),
+      );
+    } catch {
+      dispatchOutcome(false);
+    }
   }
 
   /** @internal */
@@ -369,8 +440,12 @@ export class HelixPhiField extends HelixElement {
       this._scheduleClipboardClear();
       this._scheduleAutoHide();
     } else {
-      // Hiding: cancel any pending timers
-      this._cancelClipboardTimer();
+      // Hiding: cancel the auto-hide countdown (purpose already served — the
+      // field is hidden). Do NOT cancel the clipboard-clear timer — the user
+      // may have copied PHI while the field was revealed, and cancelling here
+      // would strand it on the clipboard if the tab later backgrounds. The
+      // timer fires naturally at `clipboardTimeout`, and the visibilitychange
+      // handler will pre-empt it if the tab hides sooner.
       this._cancelAutoHideTimer();
       this._masked = true;
     }
@@ -489,8 +564,19 @@ export class HelixPhiField extends HelixElement {
 export interface PhiAccessEventDetail {
   /** Developer-assigned logical identifier for the field (NOT the PHI value). */
   fieldId: string;
-  /** The action that triggered the audit event. */
-  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear';
+  /**
+   * The action that triggered the audit event.
+   *
+   * - `clipboard-clear`: `navigator.clipboard.writeText('')` resolved successfully
+   *   — the clipboard has been confirmed cleared.
+   * - `clipboard-clear-failed`: the clipboard API was unavailable OR `writeText('')`
+   *   rejected (most commonly because the browser required transient user
+   *   activation that the timer or visibilitychange pre-emption path did not
+   *   provide). The clipboard MAY still contain PHI. HIPAA audit consumers
+   *   should treat this as an actionable event — prompt the user to manually
+   *   clear their clipboard, flag the session, or escalate per policy.
+   */
+  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear' | 'clipboard-clear-failed';
   /** ISO 8601 timestamp of the access event. */
   timestamp: string;
   /** The category of PHI this field contains. */
