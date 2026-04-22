@@ -1446,7 +1446,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci
       - run: npm run prod
       - run: rsync -av dist/ ${{ secrets.DEPLOY_PATH }}

@@ -16,7 +16,7 @@ curl -fsSL https://raw.githubusercontent.com/himerus/wc-2026/main/scripts/check-
 
 The script checks for:
 
-- ✅ Node.js 20.x (via nvm)
+- ✅ Node.js 22.x (via nvm)
 - ✅ npm 10.x
 - ✅ Git 2.x
 - ✅ Code editor (VS Code, Cursor, etc.)
@@ -33,7 +33,7 @@ This single command:
 
 1. Clones the repository
 2. Checks out the main branch
-3. Installs Node.js 20.x via nvm
+3. Installs Node.js 22.x via nvm
 4. Installs all npm dependencies
 5. Builds all packages
 6. Verifies the setup (type-check, build)
