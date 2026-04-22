@@ -968,6 +968,16 @@ describe('hx-phi-field', () => {
       }
     };
 
+    /**
+     * Matches both `clipboard-clear` (writeText resolved) and `clipboard-clear-failed`
+     * (writeText rejected or API unavailable). A clipboard-clear audit event was
+     * intentionally dispatched either way — the assertion "a clipboard-clear
+     * attempt was audited" is independent of whether the browser honored
+     * navigator.clipboard.writeText under the current activation context.
+     */
+    const isClipboardClearAudit = (e: CustomEvent<PhiAccessEventDetail>): boolean =>
+      e.detail.action === 'clipboard-clear' || e.detail.action === 'clipboard-clear-failed';
+
     it('does not fire hx-phi-access with action="clipboard-clear" when tab is hidden on a never-accessed field', async () => {
       const el = await fixture<HelixPhiField>(
         '<hx-phi-field field-type="ssn" field-id="never-accessed"></hx-phi-field>',
@@ -986,8 +996,7 @@ describe('hx-phi-field', () => {
       });
       await el.updateComplete;
 
-      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
-      expect(clipboardClearEvents).toHaveLength(0);
+      expect(events.filter(isClipboardClearAudit)).toHaveLength(0);
     });
 
     it('fires hx-phi-access with action="clipboard-clear" when tab is hidden after the field was revealed', async () => {
@@ -1011,9 +1020,12 @@ describe('hx-phi-field', () => {
       await withVisibilityState('hidden', () => {
         document.dispatchEvent(new Event('visibilitychange'));
       });
+      // Allow the writeText() outcome promise (clipboard-clear | clipboard-clear-failed)
+      // to settle before asserting.
+      await new Promise((resolve) => setTimeout(resolve, 0));
       await el.updateComplete;
 
-      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+      const clipboardClearEvents = events.filter(isClipboardClearAudit);
       expect(clipboardClearEvents.length).toBeGreaterThanOrEqual(1);
       expect(clipboardClearEvents[0]?.detail.fieldId).toBe('revealed-field');
     });
@@ -1046,9 +1058,10 @@ describe('hx-phi-field', () => {
       await withVisibilityState('hidden', () => {
         document.dispatchEvent(new Event('visibilitychange'));
       });
+      await new Promise((resolve) => setTimeout(resolve, 0));
       await el.updateComplete;
 
-      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+      const clipboardClearEvents = events.filter(isClipboardClearAudit);
       expect(clipboardClearEvents.length).toBeGreaterThanOrEqual(1);
       expect(clipboardClearEvents[0]?.detail.fieldId).toBe('hide-then-hide');
     });
@@ -1080,8 +1093,102 @@ describe('hx-phi-field', () => {
       // Give the originally-scheduled 50ms timer a generous window to fire.
       await new Promise((resolve) => setTimeout(resolve, 150));
 
-      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+      const clipboardClearEvents = events.filter(isClipboardClearAudit);
       expect(clipboardClearEvents).toHaveLength(1);
+    });
+
+    it('dispatches clipboard-clear-failed when navigator.clipboard.writeText rejects', async () => {
+      // Regression guard: `navigator.clipboard.writeText('')` requires transient
+      // user activation in Chrome/Safari. The clipboard-clear timer and the
+      // visibilitychange pre-emption path both run without activation, so
+      // writeText can reject silently. Previously the audit event always fired
+      // as `clipboard-clear` regardless of outcome — a HIPAA audit integrity
+      // defect, because the trail would claim clearance that never happened.
+      // The dispatch now observes the writeText outcome and fires
+      // `clipboard-clear-failed` on rejection so consumers can escalate
+      // (prompt the user to clear clipboard, flag the session, etc).
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="write-reject"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+
+      const originalWriteText = navigator.clipboard.writeText.bind(navigator.clipboard);
+      Object.defineProperty(navigator.clipboard, 'writeText', {
+        value: () => Promise.reject(new Error('NotAllowedError: no user activation')),
+        configurable: true,
+        writable: true,
+      });
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      });
+
+      try {
+        await withVisibilityState('hidden', () => {
+          document.dispatchEvent(new Event('visibilitychange'));
+        });
+        // Let the rejected promise's onRejected handler run.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await el.updateComplete;
+
+        const failedEvents = events.filter((e) => e.detail.action === 'clipboard-clear-failed');
+        const successEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+        expect(failedEvents).toHaveLength(1);
+        expect(failedEvents[0]?.detail.fieldId).toBe('write-reject');
+        expect(successEvents).toHaveLength(0);
+      } finally {
+        Object.defineProperty(navigator.clipboard, 'writeText', {
+          value: originalWriteText,
+          configurable: true,
+          writable: true,
+        });
+      }
+    });
+
+    it('dispatches clipboard-clear-failed when navigator.clipboard is unavailable', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="no-clipboard-api"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+
+      const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+      Object.defineProperty(navigator, 'clipboard', {
+        value: undefined,
+        configurable: true,
+      });
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      });
+
+      try {
+        await withVisibilityState('hidden', () => {
+          document.dispatchEvent(new Event('visibilitychange'));
+        });
+        await el.updateComplete;
+
+        const failedEvents = events.filter((e) => e.detail.action === 'clipboard-clear-failed');
+        expect(failedEvents).toHaveLength(1);
+        expect(failedEvents[0]?.detail.fieldId).toBe('no-clipboard-api');
+      } finally {
+        if (originalClipboard) {
+          Object.defineProperty(navigator, 'clipboard', originalClipboard);
+        } else {
+          Reflect.deleteProperty(navigator, 'clipboard');
+        }
+      }
     });
   });
 

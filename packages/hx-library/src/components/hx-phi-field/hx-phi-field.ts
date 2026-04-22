@@ -281,24 +281,43 @@ export class HelixPhiField extends HelixElement {
     // the scheduled timer from firing again and dispatching a duplicate
     // clipboard-clear audit event.
     this._cancelClipboardTimer();
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator?.clipboard?.writeText('').catch(() => {
-        // Clipboard clear failure is non-fatal — silently ignore
-      });
-    }
-    this.dispatchEvent(
-      new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          fieldId: this.fieldId || this.id || '',
-          action: 'clipboard-clear',
-          timestamp: new Date().toISOString(),
-          fieldType: this.fieldType,
-        },
-      }),
-    );
     this._masked = true;
+
+    // `navigator.clipboard.writeText` requires transient user activation in
+    // Chrome and Safari. The clipboard-clear timer fires async (activation
+    // expired) and the visibilitychange pre-emption path has no activation
+    // at all — both can reject silently. Dispatching an unconditional
+    // clipboard-clear audit event in that case would be MISLEADING: the
+    // audit trail would claim PHI was cleared while it in fact remains on
+    // the clipboard. Instead we observe the writeText outcome and dispatch
+    // `clipboard-clear` only on confirmed success, or `clipboard-clear-failed`
+    // when the API is unavailable or the promise rejects. This gives
+    // HIPAA audit consumers an accurate signal and lets them escalate
+    // failures (prompt the user, flag the session, etc).
+    const dispatchOutcome = (succeeded: boolean): void => {
+      this.dispatchEvent(
+        new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            fieldId: this.fieldId || this.id || '',
+            action: succeeded ? 'clipboard-clear' : 'clipboard-clear-failed',
+            timestamp: new Date().toISOString(),
+            fieldType: this.fieldType,
+          },
+        }),
+      );
+    };
+
+    if (typeof navigator === 'undefined' || !navigator.clipboard) {
+      dispatchOutcome(false);
+      return;
+    }
+
+    navigator.clipboard.writeText('').then(
+      () => dispatchOutcome(true),
+      () => dispatchOutcome(false),
+    );
   }
 
   /** @internal */
@@ -505,8 +524,19 @@ export class HelixPhiField extends HelixElement {
 export interface PhiAccessEventDetail {
   /** Developer-assigned logical identifier for the field (NOT the PHI value). */
   fieldId: string;
-  /** The action that triggered the audit event. */
-  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear';
+  /**
+   * The action that triggered the audit event.
+   *
+   * - `clipboard-clear`: `navigator.clipboard.writeText('')` resolved successfully
+   *   — the clipboard has been confirmed cleared.
+   * - `clipboard-clear-failed`: the clipboard API was unavailable OR `writeText('')`
+   *   rejected (most commonly because the browser required transient user
+   *   activation that the timer or visibilitychange pre-emption path did not
+   *   provide). The clipboard MAY still contain PHI. HIPAA audit consumers
+   *   should treat this as an actionable event — prompt the user to manually
+   *   clear their clipboard, flag the session, or escalate per policy.
+   */
+  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear' | 'clipboard-clear-failed';
   /** ISO 8601 timestamp of the access event. */
   timestamp: string;
   /** The category of PHI this field contains. */
