@@ -102,3 +102,109 @@ describe('sanitizeCss — blocked patterns still enforced', () => {
     expect(sanitizeCss('.a { behavior: url(x.htc); }', COMPONENT)).toBeNull();
   });
 });
+
+describe('sanitizeCss — CSS escape bypass defense (url() validator)', () => {
+  // Each of these cases encodes a forbidden scheme or protocol-relative form
+  // using CSS escapes. The browser's CSS parser will decode the escape AFTER
+  // our validator runs, so we must decode before scheme-checking to prevent
+  // external-resource loads from slipping past the allow-list.
+
+  it('rejects hex-escaped colon in scheme (http\\3a//evil.example/x)', () => {
+    // `\3a` decodes to `:` — attacker-encoded `http:`
+    expect(
+      sanitizeCss('.a { background: url(http\\3a//evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects hex-escaped protocol-relative slashes (\\2f \\2f evil.example/x)', () => {
+    // Per the CSS spec, each hex escape greedily reads up to 6 hex digits.
+    // A naive `\2f\2fevil` actually decodes to `/˾vil` (second escape eats
+    // the `e`). The realistic encoded-// exploit uses whitespace terminators
+    // or 6-digit padding — both of which MUST still be rejected.
+    expect(
+      sanitizeCss('.a { background: url(\\2f \\2f evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects 6-digit hex-escaped protocol-relative slashes (\\00002f\\00002fevil.example/x)', () => {
+    // Padding each escape to 6 digits forces termination cleanly: this form
+    // decodes to `//evil.example/x` and must be rejected.
+    expect(
+      sanitizeCss('.a { background: url(\\00002f\\00002fevil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects fully hex-escaped http: scheme (\\68\\74\\74\\70\\3a//evil.example/x)', () => {
+    // `\68\74\74\70\3a` decodes character-by-character to `http:`
+    expect(
+      sanitizeCss(
+        '.a { background: url(\\68\\74\\74\\70\\3a//evil.example/x); }',
+        COMPONENT,
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects hex-escaped http: with whitespace terminator (\\68 \\74 \\74 \\70 \\3a //...)', () => {
+    // Each escape consumes a single trailing whitespace per the CSS spec.
+    expect(
+      sanitizeCss(
+        '.a { background: url(\\68 \\74 \\74 \\70 \\3a //evil.example/x); }',
+        COMPONENT,
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects backslash-newline continuation smuggling a scheme (http\\<LF>:xyz)', () => {
+    // CSS line-continuation decodes to empty string, so `http\<LF>:xyz`
+    // reconstructs as `http:xyz` at parse time.
+    expect(
+      sanitizeCss('.a { background: url(http\\\n://evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects CRLF line-continuation smuggling a scheme (http\\<CRLF>:...)', () => {
+    expect(
+      sanitizeCss('.a { background: url(http\\\r\n://evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects quoted url() that hex-escapes the colon', () => {
+    // Quoted form must decode the same way — the attacker-controlled payload
+    // lives inside the quotes.
+    expect(
+      sanitizeCss('.a { background: url("http\\3a//evil.example/x"); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('decodes 6-digit hex escape correctly (\\000041 → A) and still passes scheme check', () => {
+    // `\000041` decodes to `A`, producing the safe relative path `Apath.png`.
+    // This confirms the 6-digit max is honored without tripping the scheme
+    // regex on any residual hex digits.
+    expect(
+      sanitizeCss('.a { background: url(\\000041path.png); }', COMPONENT),
+    ).not.toBeNull();
+  });
+
+  it('still accepts positive control: data:image/png base64', () => {
+    expect(
+      sanitizeCss(
+        '.a { background: url(data:image/png;base64,iVBORw0KGgo=); }',
+        COMPONENT,
+      ),
+    ).not.toBeNull();
+  });
+
+  it('still accepts positive control: relative path', () => {
+    expect(sanitizeCss('.a { background: url(/rel/path.png); }', COMPONENT)).not.toBeNull();
+  });
+
+  it('still accepts positive control: fragment reference', () => {
+    expect(sanitizeCss('.a { clip-path: url(#filter); }', COMPONENT)).not.toBeNull();
+  });
+
+  it('accepts url() with only line-continuation escapes (decodes to empty)', () => {
+    // `\<LF>` alone decodes to empty string, which the validator treats as a
+    // harmless empty url(). The CSS is structurally intact so it should pass.
+    expect(sanitizeCss('.a { background: url(\\\n); }', COMPONENT)).not.toBeNull();
+  });
+});

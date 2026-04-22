@@ -23,9 +23,12 @@ const BLOCKED_PATTERNS: ReadonlyArray<{ pattern: RegExp; label: string }> = [
 
 /**
  * Matches `url(...)` values. Captures the content inside the parens.
- * Handles both quoted and unquoted forms.
+ * Handles both quoted and unquoted forms. The `s` (dotAll) flag allows the
+ * content to span newlines so CSS line-continuation escapes (`\<LF>`) inside
+ * `url()` do not slip past the matcher entirely — those continuations are
+ * part of the url payload the CSS parser will still evaluate.
  */
-const URL_PATTERN = /url\(\s*(['"]?)(.*?)\1\s*\)/gi;
+const URL_PATTERN = /url\(\s*(['"]?)(.*?)\1\s*\)/gis;
 
 /**
  * Allowed URI schemes inside `url()`. Relative paths (no scheme) are also
@@ -38,28 +41,143 @@ const ALLOWED_URL_PREFIXES: ReadonlyArray<string> = [
 ];
 
 /**
+ * Decodes CSS escape sequences found inside `url()` payloads to defeat
+ * encoding-based bypasses of the scheme check.
+ *
+ * Three escape forms per CSS Syntax Level 3 are handled:
+ *
+ * 1. Hex escape: `\` followed by 1-6 hex digits, optionally terminated by a
+ *    single whitespace character. Decodes to the codepoint
+ *    (e.g. `\3a` → `:`, `\2f\2f` → `//`, `\68\74\74\70\3a` → `http:`).
+ * 2. Line continuation: `\` followed by a newline (`\n`, `\r\n`, `\r`, or
+ *    `\f`). Decodes to the empty string — the browser strips these and the
+ *    remaining characters are concatenated, so `http\<LF>:xyz` becomes
+ *    `http:xyz`.
+ * 3. Identity escape: `\` followed by any other character. Decodes to the
+ *    literal character (e.g. `\:` → `:`).
+ *
+ * This intentionally implements only the subset of CSS escape handling that
+ * the parser applies to `url()` token contents. It is not a full CSS lexer.
+ */
+function decodeCssEscapes(input: string): string {
+  let out = '';
+  let i = 0;
+  const len = input.length;
+
+  while (i < len) {
+    const ch = input[i];
+
+    if (ch !== '\\') {
+      out += ch;
+      i++;
+      continue;
+    }
+
+    // Trailing lone backslash — keep it literal.
+    if (i + 1 >= len) {
+      out += ch;
+      i++;
+      continue;
+    }
+
+    const next = input[i + 1];
+
+    // Line continuation: \\r\n, \\n, \\r, \\f all decode to empty string.
+    if (next === '\n' || next === '\f') {
+      i += 2;
+      continue;
+    }
+    if (next === '\r') {
+      // Handle CRLF as a single continuation.
+      if (input[i + 2] === '\n') {
+        i += 3;
+      } else {
+        i += 2;
+      }
+      continue;
+    }
+
+    // Hex escape: up to 6 hex digits, optional single whitespace terminator.
+    if (/[0-9a-fA-F]/.test(next)) {
+      let hex = '';
+      let j = i + 1;
+      while (j < len && hex.length < 6 && /[0-9a-fA-F]/.test(input[j])) {
+        hex += input[j];
+        j++;
+      }
+      // Consume a single optional whitespace terminator per CSS spec.
+      // CRLF is treated as one whitespace token.
+      if (j < len) {
+        const term = input[j];
+        if (term === '\r' && input[j + 1] === '\n') {
+          j += 2;
+        } else if (term === ' ' || term === '\t' || term === '\n' || term === '\r' || term === '\f') {
+          j++;
+        }
+      }
+      const codepoint = parseInt(hex, 16);
+      // Spec: a codepoint of 0 or a surrogate or above max Unicode is replaced
+      // with U+FFFD. We replicate that defensively.
+      if (
+        !Number.isFinite(codepoint) ||
+        codepoint === 0 ||
+        (codepoint >= 0xd800 && codepoint <= 0xdfff) ||
+        codepoint > 0x10ffff
+      ) {
+        out += '\uFFFD';
+      } else {
+        out += String.fromCodePoint(codepoint);
+      }
+      i = j;
+      continue;
+    }
+
+    // Identity escape: \X decodes to literal X (for any non-hex, non-newline X).
+    out += next;
+    i += 2;
+  }
+
+  return out;
+}
+
+/**
  * Returns true if a `url()` value is safe for injection.
  * Safe values are: relative paths, data: URIs, blob: URIs, and fragment refs.
  * Anything with an explicit protocol scheme (http:, https:, ftp:, etc.) is blocked.
+ *
+ * The payload is CSS-escape-decoded before any scheme / prefix check is
+ * applied. This closes bypasses where hex escapes (`\3a` for `:`) or
+ * line-continuations (`http\<LF>:`) smuggle a protocol past the validator —
+ * the browser's CSS parser decodes these escapes after our check, so we must
+ * match what it will eventually see.
  */
 function isUrlSafe(urlValue: string): boolean {
-  const trimmed = urlValue.trim();
+  const trimmedRaw = urlValue.trim();
 
-  // Empty url() is harmless
-  if (trimmed === '') return true;
+  // Empty url() is harmless. Check this on the raw (pre-decode) value so a
+  // string consisting only of whitespace escapes still short-circuits cleanly
+  // after decoding — see below.
+  if (trimmedRaw === '') return true;
+
+  // Decode CSS escapes first so the scheme / prefix checks run against the
+  // same string the browser's CSS parser will materialize.
+  const decoded = decodeCssEscapes(trimmedRaw).trim();
+
+  // A url() that decodes to empty (e.g. only line-continuations) is harmless.
+  if (decoded === '') return true;
 
   // Protocol-relative URLs (//host/path) resolve against the page's current
   // protocol and load from an external host — same risk as explicit http://.
   // Must reject before the allow-prefix / scheme checks, since they have no colon.
-  if (trimmed.startsWith('//')) return false;
+  if (decoded.startsWith('//')) return false;
 
   // Allow explicitly safe prefixes
   for (const prefix of ALLOWED_URL_PREFIXES) {
-    if (trimmed.startsWith(prefix)) return true;
+    if (decoded.startsWith(prefix)) return true;
   }
 
   // Block any value containing a protocol scheme (e.g. http://, https://, ftp://)
-  if (/^[a-z][a-z0-9+\-.]*:/i.test(trimmed)) {
+  if (/^[a-z][a-z0-9+\-.]*:/i.test(decoded)) {
     return false;
   }
 
