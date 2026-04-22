@@ -2,7 +2,7 @@
 # https://docs.coderabbit.ai/getting-started/configure-coderabbit
 
 reviews:
-  profile: 'assertive'
+  profile: 'chill'
   path_filters:
     - '!**/AUDIT.md'
   request_changes_workflow: true
