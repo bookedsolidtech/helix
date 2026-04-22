@@ -2,9 +2,9 @@
 
 This guide walks through every breaking change between `@helixui/library@2.1.2` and `@helixui/library@3.0.0`. The same content is mirrored in Starlight at [`/docs/migration/3.0.0`](../apps/docs/src/content/docs/migration/3.0.0.mdx).
 
-**Audience.** Application teams upgrading a production HELiX integration. The changes are surgical — most are renames with grep-able patterns. Plan for one engineer for a half day on a mid-sized app (~200 HELiX usages), or a few hours on a small app. Codemod support is tracked for 3.0.1 — see [Codemod availability](#codemod-availability) below.
+**Audience.** Application teams upgrading a production HELiX integration. The changes are surgical — most are renames with grep-able patterns. Plan for one engineer for a half day on a mid-sized app (~200 HELiX usages), or a few hours on a small app. Drupal consumers with a fork of the SDC templates should budget an additional half day for a mid-sized site (~150 SDC component usages) — see [Drupal integration](#16-drupal-integration-helixuidrupal-starter-and-helixuidrupal-behaviors) below. Codemod support is tracked for 3.0.1 — see [Codemod availability](#codemod-availability) below.
 
-**Scope.** This guide covers `@helixui/library`. The `@helixui/tokens` and `@helixui/react` packages also bump to 3.0.0 in lockstep; changes are summarized at the end.
+**Scope.** This guide covers `@helixui/library`, `@helixui/drupal-starter`, and `@helixui/drupal-behaviors`. The `@helixui/tokens` and `@helixui/react` packages also bump to 3.0.0 in lockstep; changes are summarized at the end.
 
 ---
 
@@ -404,6 +404,226 @@ The React wrapper bumps to 3.0.0 to match. Breaking changes are mechanical — a
 - `ariaLabel` prop → `accessibleLabel` prop (everywhere).
 - `Wc*` type imports removed from `@helixui/react` — use `Hx*`.
 - Event detail interfaces now exported as named types (`HxClickEvent`, `HxChangeEvent`, etc.) instead of anonymous `CustomEvent<unknown>`.
+
+---
+
+## 16. Drupal integration (`@helixui/drupal-starter` and `@helixui/drupal-behaviors`)
+
+Both Drupal packages bump to 3.0.0 in lockstep with the library. The changes are a direct consequence of the library renames in §2 through §6 — SDC templates and Drupal behaviors are realigned with the canonical component API.
+
+**Effort.** A typical mid-sized Drupal consumer (~150 SDC component usages across theme templates, node templates, and block templates) should budget a half day for one engineer. Small sites with a handful of embeds land in under two hours; large multi-site platforms with forked templates should expect a day.
+
+**Peer range.** `@helixui/drupal-behaviors` declares `"@helixui/library": "^2.1.2 || ^3.0.0"` — the major bump is documentation-forcing rather than semver-forcing, so 2.x consumers can stay on 2.1.2 until they are ready to move. Sites upgrading the library to 3.0.0 must upgrade both Drupal packages in the same change.
+
+### 16.1 `@helixui/drupal-starter` — SDC template changes
+
+The shipped SDC templates (`packages/drupal-starter/components/<component>/<component>.twig`) are realigned with the 3.0.0 library public API. Consumers that installed the module unmodified pick up the new templates on upgrade. Consumers with forked templates must re-apply their customizations against the new 3.0.0 base.
+
+#### `hx-card` — `accessible-label` → `hx-label`
+
+`hx-card`'s interactive-link label uses the `hx-label` HTML attribute (JS property stays `label`), **not** `accessible-label`. This is the same exception called out in §2.
+
+```twig
+{# BEFORE (2.1.2) #}
+<hx-card
+  variant="{{ variant|default('default') }}"
+  {% if href %}hx-href="{{ href }}" accessible-label="{{ aria_label }}"{% endif %}
+>
+  {{ content }}
+</hx-card>
+
+{# AFTER (3.0.0) #}
+<hx-card
+  variant="{{ variant|default('default') }}"
+  {% if href %}hx-href="{{ href }}" hx-label="{{ aria_label }}"{% endif %}
+>
+  {{ content }}
+</hx-card>
+```
+
+#### `hx-nav` — `hx-size="small"` → `hx-size="sm"`
+
+The nav template previously emitted the invalid enum value `small`. The canonical enum is `sm | md | lg`:
+
+```twig
+{# BEFORE (2.1.2) #}
+<hx-nav hx-size="small" ...>
+
+{# AFTER (3.0.0) #}
+<hx-nav hx-size="sm" ...>
+```
+
+Audit any forked nav template (including derived `hx-top-nav` / `hx-side-nav` usages) for the same mistake.
+
+#### All ARIA-labelable components — `aria-label` → `accessible-label`
+
+Every template that previously emitted `aria-label` on a HELiX component tag (`hx-button`, `hx-text-input`, `hx-form`, `hx-steps`, etc.) now emits `accessible-label`. This matches the library-side rename in §2.
+
+```twig
+{# BEFORE (2.1.2) #}
+<hx-button
+  variant="{{ variant }}"
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+>{{ label }}</hx-button>
+
+{# AFTER (3.0.0) #}
+<hx-button
+  variant="{{ variant }}"
+  {% if aria_label %}accessible-label="{{ aria_label }}"{% endif %}
+>{{ label }}</hx-button>
+```
+
+Do **not** rewrite `aria-label` on native HTML elements in the same template (`<button>`, `<input>`, wrapping `<nav>` landmarks, etc.) — those keep `aria-label` as standard HTML.
+
+#### `hx-dialog` — `modal` default flipped to `false`
+
+The library changed `hx-dialog`'s `modal` default from `true` to `false` (see §5 for the full impact). The starter's `hx-dialog.twig` now adds `modal` explicitly where modal semantics are required:
+
+```twig
+{# BEFORE (2.1.2) — implicit modal #}
+<hx-dialog {% if open %}open{% endif %} heading="{{ heading }}">
+  {{ content }}
+</hx-dialog>
+
+{# AFTER (3.0.0) — modal is opt-in #}
+<hx-dialog
+  {% if open %}open{% endif %}
+  {% if modal ?? true %}modal{% endif %}
+  heading="{{ heading }}"
+>
+  {{ content }}
+</hx-dialog>
+```
+
+Audit each call site of the dialog SDC. Confirmation dialogs, clinical alerts, and blocking workflows should pass `modal: true` (or leave the default on if your wrapper defaults it to `true`). Inline drawers, sidebar panels, and toast-adjacent UIs should pass `modal: false` to preserve 3.0.0 non-modal behavior.
+
+#### `hx-date-picker` / `hx-time-picker` — non-modal popup contract
+
+The library migrated both pickers from a native modal `<dialog>` to a non-modal popup (see §4). The starter templates are unchanged at the markup level — the picker elements expose the same attribute surface — but consumers with CSS overrides must drop any `::backdrop` rules and audit picker stacking.
+
+- Remove `::backdrop` overrides from theme CSS targeting `hx-date-picker` / `hx-time-picker`.
+- Tests in the consumer theme that asserted focus-trap behavior on the picker popup must be updated. Escape-close and focus-restoration behavior is unchanged.
+- If your site wraps the picker in a custom stacking context (drawer, modal-within-modal), you may need to raise the popup's `z-index`.
+
+Cross-reference §4 for the full behavioral delta.
+
+#### `::part(error-message)` → `::part(error)`
+
+Theme CSS snippets in the starter that style form-validation messages use `::part(error)`:
+
+```css
+/* BEFORE (2.1.2) */
+hx-text-input::part(error-message) {
+  color: var(--hx-color-danger);
+}
+
+/* AFTER (3.0.0) */
+hx-text-input::part(error) {
+  color: var(--hx-color-danger);
+}
+```
+
+Audit any theme-level CSS overrides in your Drupal theme (`*.css`, `*.scss` under `themes/custom/*`) for the old selector name.
+
+#### `hx-phi-field` — no `value` attribute in SSR HTML
+
+The library now strips a `value` attribute off `hx-phi-field` in `connectedCallback` to prevent PHI from being retained in `outerHTML` / DevTools after hydration (see §6). The starter's `hx-phi-field.twig` template does **not** render `value` as an HTML attribute — PHI is passed to the component via the `data` JS property, set server-side-to-client-side through a Drupal behavior or a per-element script.
+
+If a forked template emits PHI into the `value` or `data` attribute from the server, the runtime rescue can remove it from the live DOM but **cannot** remove it from the SSR HTML, the HTTP response body, `View Source`, browser caches, or any access logs that recorded the response. The supported pattern for Drupal is:
+
+```twig
+{# Server-rendered SDC — no PHI in the attribute surface #}
+<hx-phi-field
+  id="mrn-{{ patient_id }}"
+  field-type="mrn"
+  field-id="patient-mrn"
+></hx-phi-field>
+```
+
+```js
+// Drupal.behaviors — assign PHI on the live element after attach
+Drupal.behaviors.hxPhiPopulate = {
+  attach(context) {
+    once('hx-phi-populate', 'hx-phi-field[id^="mrn-"]', context).forEach((el) => {
+      // PHI source must be role-gated server-side via drupalSettings
+      const phi = drupalSettings.helix?.phiByElementId?.[el.id];
+      if (phi) {
+        el.data = phi;
+      }
+    });
+  },
+};
+```
+
+This means PHI only ever crosses the wire inside `drupalSettings` (a JS-readable payload), not as an HTML attribute on the element. Combine with your site's existing role-based access checks and audit logging on the `hx-phi-access` event.
+
+### 16.2 `@helixui/drupal-behaviors` — API realignment
+
+`@helixui/drupal-behaviors` ships Drupal.behaviors wrappers around the interactive HELiX components (`hx-accordion`, `hx-dialog`, `hx-drawer`, `hx-menu`, `hx-popover`, `hx-tabs`, `hx-toast`, `hx-tooltip`). The 3.0.0 bump realigns them with the canonical library surface.
+
+#### FormMixin event-surface migration
+
+Behaviors that listen for form events on the 15 form-associated components are rewired to the consolidated `FormMixin` event surface. If a custom behavior subscribed to per-component events (for example `hx-text-input-input`, `hx-select-change`), migrate to the mixin-level events documented in §7.
+
+See §7 for the inherited interaction-state model (`dirty`, `touched`, `pristine`, `_handleInteractionInput`, `_handleInteractionBlur`). Custom Drupal behaviors that previously implemented these locally should delete the local implementation and read the inherited getters.
+
+#### `accessible-label` writes
+
+Behaviors that dynamically set or update a component's accessible name now write `accessible-label` where they previously wrote `aria-label` — matching the library rename in §2. This applies to any behavior that calls `element.setAttribute('aria-label', ...)` or `element.setAttribute('hxAriaLabel', ...)` on a HELiX component. Native HTML element writes (`<button>`, `<input>`) continue to use `aria-label`.
+
+#### Component tag name corrections
+
+Internal tag references in the behaviors are corrected to match the shipped element names. No consumer API change — if your code uses the exported behavior factories directly, recompile against 3.0.0 types to pick up the corrections.
+
+#### TypeScript consumers — `dist/` type declarations
+
+`@helixui/drupal-behaviors@3.0.0` ships `dist/index.d.ts` and per-behavior type declarations. TypeScript consumers no longer need to augment `Drupal.behaviors` manually:
+
+```ts
+// TypeScript consumer — 3.0.0
+import '@helixui/drupal-behaviors';
+// Types for Drupal.behaviors.hxDialog, hxDrawer, etc. are now resolved.
+```
+
+#### Peer range — backward-compatible with 2.x
+
+```json
+{
+  "peerDependencies": {
+    "@helixui/library": "^2.1.2 || ^3.0.0"
+  }
+}
+```
+
+The peer range stays wide on purpose. Consumers can install `@helixui/drupal-behaviors@3.0.0` alongside `@helixui/library@2.1.2` during a staged migration without the package manager complaining. The actual library upgrade still requires the attribute and CSS-part renames in this guide.
+
+### 16.3 Reconciliation checklist — Drupal consumers with forked templates
+
+Run these greps against your Drupal theme and any custom modules that fork the starter templates. Each hit is a 3.0.0 migration task.
+
+```bash
+# 1. hx-card accessible-label → hx-label (scope: hx-card templates only)
+rg -n 'accessible-label' --type twig -g '*hx-card*' -g '*card*'
+
+# 2. hx-nav invalid enum value
+rg -n 'hx-size="small"' --type twig
+
+# 3. ::part(error-message) in theme CSS
+rg -n '::part\(error-message\)' -g '*.css' -g '*.scss'
+
+# 4. Native <dialog> inside picker templates (library no longer uses it)
+rg -n '<dialog\b' --type twig -g '*date-picker*' -g '*time-picker*'
+
+# 5. aria-label on hx-* component tags (requires PCRE2 ripgrep)
+rg -P -n '<hx-(?!card\b)[a-z-]+[^>]*\baria-label=' --type twig
+
+# 6. hx-phi-field rendering value or data as an HTML attribute
+rg -n '<hx-phi-field[^>]*\b(value|data)=' --type twig
+```
+
+After each fix, run your Drupal theme's regression suite (or the site's visual regression harness) against the affected templates. The renames are mechanical; regressions usually surface as missing accessible names in axe, failing focus tests on the picker popup, or a flat/non-modal dialog where a modal was expected.
+
+A grep-based codemod that automates the first five patterns is tracked for 3.0.1 — same follow-up as the library-side codemod (see [Codemod availability](#codemod-availability)).
 
 ---
 
