@@ -384,7 +384,7 @@ jobs:
         run: node scripts/check-coverage.mjs
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-shard-${{ strategy.job-index }}-of-${{ strategy.job-total }}
           path: packages/hx-library/.cache/test-results.json
@@ -392,7 +392,7 @@ jobs:
           if-no-files-found: warn
       - name: Upload coverage report
         if: always() && matrix.shard == '1/4'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: packages/hx-library/.cache/coverage/
@@ -448,7 +448,7 @@ jobs:
       - name: Bundle size report (all components, tree-shaken)
         run: node scripts/bundle-size-report.js --save .cache/bundle-size-report.json
       - name: Upload bundle size artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bundle-size-report
           path: .cache/bundle-size-report.json
@@ -469,7 +469,7 @@ jobs:
           node scripts/check-cdn-size.mjs --json > .cache/cdn-size-report.json 2>/dev/null || true
       - name: Upload CDN size artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cdn-size-report
           path: .cache/cdn-size-report.json
@@ -521,7 +521,7 @@ jobs:
           exit $EXIT_CODE
       - name: Upload a11y report artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: a11y-report
           path: .cache/a11y-report.json
@@ -765,7 +765,7 @@ jobs:
           fi
       - name: Upload VRT diff images
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vrt-diffs
           path: packages/hx-library/.cache/vrt-results/
@@ -885,7 +885,7 @@ jobs:
         run: pnpm run test:storybook
       - name: Upload Storybook test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: storybook-test-results
           path: apps/storybook/.vitest/
