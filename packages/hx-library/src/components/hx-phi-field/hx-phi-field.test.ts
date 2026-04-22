@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixPhiField } from './hx-phi-field.js';
+import type { HelixPhiField, PhiAccessEventDetail } from './hx-phi-field.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -929,6 +929,94 @@ describe('hx-phi-field', () => {
       await el.updateComplete;
       expect(el.outerHTML).not.toContain('123-45-6789');
       el.remove();
+    });
+  });
+
+  // ─── Visibility Change Audit Pollution ───
+
+  describe('Visibility Change Audit Pollution', () => {
+    /**
+     * Helper: dispatch a visibilitychange event with the given visibilityState.
+     * Restores the original descriptor after running `fn`.
+     */
+    const withVisibilityState = async (
+      state: 'hidden' | 'visible',
+      fn: () => void | Promise<void>,
+    ): Promise<void> => {
+      const originalDescriptor = Object.getOwnPropertyDescriptor(
+        Document.prototype,
+        'visibilityState',
+      );
+      Object.defineProperty(document, 'visibilityState', {
+        value: state,
+        configurable: true,
+      });
+      try {
+        await fn();
+      } finally {
+        // Restore the original descriptor so we don't leak the override across tests.
+        // `visibilityState` is defined on Document.prototype in all browsers we target,
+        // so originalDescriptor will always be present. Fall back to deletion defensively.
+        if (originalDescriptor) {
+          Object.defineProperty(Document.prototype, 'visibilityState', originalDescriptor);
+        } else {
+          Reflect.deleteProperty(document, 'visibilityState');
+        }
+      }
+    };
+
+    it('does not fire hx-phi-access with action="clipboard-clear" when tab is hidden on a never-accessed field', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="never-accessed"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const events: CustomEvent[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent);
+      });
+
+      // Simulate tab hide without any prior interaction (field stays masked, no clipboard timer)
+      await withVisibilityState('hidden', () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await el.updateComplete;
+
+      const clipboardClearEvents = events.filter(
+        (e) => (e.detail as PhiAccessEventDetail).action === 'clipboard-clear',
+      );
+      expect(clipboardClearEvents).toHaveLength(0);
+    });
+
+    it('fires hx-phi-access with action="clipboard-clear" when tab is hidden after the field was revealed', async () => {
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="revealed-field"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      // Reveal the field first — this starts the clipboard timer and unmasks it
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+
+      const events: CustomEvent[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent);
+      });
+
+      // Now simulate tab hide — clipboard-clear SHOULD fire because there's real state to clear
+      await withVisibilityState('hidden', () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await el.updateComplete;
+
+      const clipboardClearEvents = events.filter(
+        (e) => (e.detail as PhiAccessEventDetail).action === 'clipboard-clear',
+      );
+      expect(clipboardClearEvents.length).toBeGreaterThanOrEqual(1);
+      expect(clipboardClearEvents[0].detail.fieldId).toBe('revealed-field');
     });
   });
 

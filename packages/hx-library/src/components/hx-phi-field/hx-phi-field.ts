@@ -131,9 +131,13 @@ export class HelixPhiField extends HelixElement {
 
   /** @internal Bound reference for visibilitychange listener cleanup. */
   private readonly _boundHandleVisibilityChange = (): void => {
-    if (document.visibilityState === 'hidden') {
-      this._clearClipboard();
-    }
+    if (document.visibilityState !== 'hidden') return;
+    // Only clear if the field has been revealed (unmasked) or an active
+    // clipboard-clear timer is running. Otherwise there's nothing to clear,
+    // and emitting hx-phi-access with action: 'clipboard-clear' would pollute
+    // the HIPAA audit log with events for fields that were never accessed.
+    if (this._masked && this._clipboardTimer === null) return;
+    this._clearClipboard();
   };
 
   /** @internal Bound reference for interaction-based auto-hide timer reset. */
