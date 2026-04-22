@@ -401,8 +401,8 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)
       axe-core:
-        specifier: ^4.11.1
-        version: 4.11.1
+        specifier: ^4.11.3
+        version: 4.11.3
       esbuild:
         specifier: ^0.27.0
         version: 0.27.4
@@ -2928,6 +2928,10 @@ packages:
 
   axe-core@4.11.1:
     resolution: {integrity: sha512-BASOg+YwO2C+346x3LZOeoovTIoTrRqEsqMa6fmfAV0P+U9mFr9NsyOEpiYvFjbc64NMrSswhV50WdXzdb/Z5A==}
+    engines: {node: '>=4'}
+
+  axe-core@4.11.3:
+    resolution: {integrity: sha512-zBQouZixDTbo3jMGqHKyePxYxr1e5W8UdTmBQ7sNtaA9M2bE32daxxPLS/jojhKOHxQ7LWwPjfiwf/fhaJWzlg==}
     engines: {node: '>=4'}
 
   axobject-query@4.1.0:
@@ -6936,7 +6940,7 @@ snapshots:
 
   '@axe-core/playwright@4.11.1(playwright-core@1.58.2)':
     dependencies:
-      axe-core: 4.11.1
+      axe-core: 4.11.3
       playwright-core: 1.58.2
 
   '@babel/code-frame@7.29.0':
@@ -9585,6 +9589,8 @@ snapshots:
 
   axe-core@4.11.1: {}
 
+  axe-core@4.11.3: {}
+
   axobject-query@4.1.0: {}
 
   b4a@1.8.0: {}
@@ -11327,7 +11333,7 @@ snapshots:
     dependencies:
       '@paulirish/trace_engine': 0.0.59
       '@sentry/node': 9.47.1
-      axe-core: 4.11.1
+      axe-core: 4.11.3
       chrome-launcher: 1.2.1
       configstore: 7.1.0
       csp_evaluator: 1.1.5
