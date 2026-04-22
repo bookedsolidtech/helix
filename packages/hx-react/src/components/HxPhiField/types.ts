@@ -34,6 +34,6 @@ Set to 0 to disable auto-hide. Defaults to 60 seconds. */
   disabled?: boolean;
 
   // Event callbacks
-  /** Fired on reveal, hide, and clipboard-clear actions. Contains audit metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow boundaries for application-level audit listeners. */
+  /** Fired on reveal, hide, auto-hide, clipboard-clear, and clipboard-clear-failed actions. Contains audit metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow boundaries for application-level audit listeners. */
   onHxPhiAccess?: (event: Event) => void;
 }
