@@ -70,7 +70,7 @@ HELiX components use Shadow DOM internally for CSS encapsulation. This means:
 
 ## Prerequisites
 
-- **Node.js** 20+ (for local builds and asset copying)
+- **Node.js** 22 LTS or Node.js 24 (for local builds and asset copying; Node 20 reaches upstream EOL on 2026-04-30)
 - **PHP** 8.2+ with Composer
 - **Drupal** 10.1+ or Drupal 11
 - **Drupal modules** (required):

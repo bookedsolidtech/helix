@@ -45,7 +45,7 @@
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@helixui/library": "^2.1.2 || ^3.0.0"
+    "@helixui/library": "workspace:^"
   },
   "publishConfig": {
     "access": "public",

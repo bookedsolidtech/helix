@@ -35,7 +35,7 @@ Local JavaScript files participate in Drupal's asset aggregation system. Drupal 
 
 Before starting, verify your environment has:
 
-- **Node.js 18 or later** — `node --version`
+- **Node.js 22 LTS or Node.js 24** — `node --version` (Node 18 and Node 20 are no longer supported)
 - **npm 9 or later** — `npm --version` (comes with Node.js)
 - A Drupal 10 or 11 site with a custom theme
 - Your theme located at `web/themes/custom/mytheme/`
@@ -454,10 +454,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: web/themes/custom/mytheme/package-lock.json
 

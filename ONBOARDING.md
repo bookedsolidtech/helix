@@ -16,7 +16,7 @@ curl -fsSL https://raw.githubusercontent.com/himerus/wc-2026/main/scripts/check-
 
 The script checks for:
 
-- ✅ Node.js 20.x (via nvm)
+- ✅ Node.js 22.x (via nvm)
 - ✅ npm 10.x
 - ✅ Git 2.x
 - ✅ Code editor (VS Code, Cursor, etc.)
@@ -33,7 +33,7 @@ This single command:
 
 1. Clones the repository
 2. Checks out the main branch
-3. Installs Node.js 20.x via nvm
+3. Installs Node.js 22.x via nvm
 4. Installs all npm dependencies
 5. Builds all packages
 6. Verifies the setup (type-check, build)
@@ -56,8 +56,8 @@ cd wc-2026
 
 ```bash
 nvm use
-# Automatically reads .nvmrc and switches to Node 20.x
-# If Node 20.x not installed: nvm install 20
+# Automatically reads .nvmrc and switches to Node 22.x
+# If Node 22.x not installed: nvm install 22
 ```
 
 ### Step 3: Install Dependencies

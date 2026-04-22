@@ -22,7 +22,7 @@
 #   SKIP_ACT=1 pnpm run preflight         # bypass Docker CI gate
 #   SKIP_FULL_TESTS=1 pnpm run preflight  # bypass full test suite (use smart only)
 #
-# For full CI Matrix parity (Node 20/22/24):
+# For full CI Matrix parity (Node 22/24):
 #   ./scripts/act-ci.sh --matrix
 # ==============================================================================
 
@@ -243,7 +243,7 @@ echo ""
 
 # ── Gate 8: Full test suite ──────────────────────────────────────────────────
 # Runs the FULL test suite (all components), not just changed ones.
-# This catches failures that CI Matrix (Node 20/22/24) would catch.
+# This catches failures that CI Matrix (Node 22/24) would catch.
 # The smart tests in Gate 5 only test changed components — this gate
 # ensures no cross-component regressions slip through.
 

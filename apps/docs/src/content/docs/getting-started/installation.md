@@ -45,7 +45,7 @@ jsDelivr alternative:
 
 ## Prerequisites
 
-- **Node.js** 20.x or later (LTS recommended)
+- **Node.js** 22 LTS or Node.js 24 (Node 20 reaches upstream EOL on 2026-04-30)
 - **pnpm** 9.x or later (the monorepo uses pnpm workspaces)
 
 ## Contributing / Monorepo Setup

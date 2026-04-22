@@ -11,4 +11,4 @@ Changes:
 - Behaviors now consume `accessible-label` attribute writes where they previously wrote `aria-label` (library renamed the public attribute)
 - Build pipeline added and types exported (FS-012) — package now ships type declarations under `dist/` for downstream TypeScript consumers
 
-Peer-dependency range `"@helixui/library": "^2.1.2 || ^3.0.0"` remains backward-compatible with 2.x, so the major bump is documentation-forcing rather than semver-forcing.
+Peer-dependency on `@helixui/library` is pinned to `^3.0.0` (rewritten from `workspace:^` at publish time). Consumers still on library 2.x must stay on `@helixui/drupal-behaviors@2.x`.
