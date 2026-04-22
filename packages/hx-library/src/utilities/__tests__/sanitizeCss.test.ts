@@ -277,3 +277,29 @@ describe('sanitizeCss — CSS escape bypass defense (ident-token smuggling)', ()
     ).not.toBeNull();
   });
 });
+
+describe('sanitizeCss — decode asymmetry guardrails', () => {
+  // These tests pin down the documented asymmetry between brace-balance
+  // (raw input) and the token-level checks (decoded input). They guard
+  // against regressions in either direction if either pass is re-engineered.
+
+  it('accepts CSS with hex-escaped braces inside strings (raw-balance handles strings)', () => {
+    // `\7b` and `\7d` are `{` and `}`. Inside a string, the browser does
+    // NOT treat these as block delimiters — it decodes them into the
+    // string's value. Raw brace-balance must stay at zero here because
+    // the string scanner skips over the escapes.
+    expect(
+      sanitizeCss('.a { content: "\\7b inner \\7d"; color: red; }', COMPONENT),
+    ).not.toBeNull();
+  });
+
+  it('rejects the documented decode false-positive: hex-escaped @import inside a string', () => {
+    // `content: "\40 import notes"` decodes to `content: "@import notes"`.
+    // Documented in the sanitizeCss JSDoc as an intentional false positive:
+    // the security gain from catching escape-encoded idents at at-rule
+    // positions outweighs the cost of rejecting the escape-in-string form.
+    expect(
+      sanitizeCss('.a::before { content: "\\40 import notes"; }', COMPONENT),
+    ).toBeNull();
+  });
+});

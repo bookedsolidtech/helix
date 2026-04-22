@@ -262,6 +262,20 @@ function areBracesBalanced(css: string): boolean {
  * - `-moz-binding` (XBL injection)
  * - `behavior:` (HTC injection)
  *
+ * ## Decode asymmetry
+ *
+ * Brace balance runs on the raw input (its scanner is string / escape aware).
+ * `BLOCKED_PATTERNS` and `URL_PATTERN` run on a post-decode copy so that
+ * escape-encoded idents (`@\69mport`, `u\72l(...)`) cannot smuggle a token
+ * past a literal-byte regex. The decode is deliberately context-blind — the
+ * tradeoff is a narrow false-positive surface: legitimate CSS that
+ * hex-escapes one of the blocked sequences inside a string or comment
+ * (e.g. `content: "\40 import notes"` decodes to `content: "@import notes"`)
+ * will be rejected even though the browser's tokenizer would never promote
+ * it to an at-rule. This is intentional and accepted — the security gain
+ * from closing the ident-escape bypass vastly outweighs the cost of a
+ * vanishingly rare user-authored escape-encoded blocked string.
+ *
  * @param css - The raw CSS string to validate.
  * @param componentName - The component name, used in dev warnings.
  * @returns The original CSS if safe, or `null` if rejected.
