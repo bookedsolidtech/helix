@@ -314,10 +314,38 @@ export class HelixPhiField extends HelixElement {
       return;
     }
 
-    navigator.clipboard.writeText('').then(
-      () => dispatchOutcome(true),
-      () => dispatchOutcome(false),
-    );
+    // `writeText` is spec'd to return a Promise, but a polyfill / test stub
+    // could throw synchronously or return a non-Promise. The read itself is
+    // also vulnerable: if `writeText` is defined as an accessor getter (rare,
+    // but legal per the Clipboard spec's property descriptor being left to the
+    // UA), reading it can throw. Everything from the property read onward runs
+    // inside the try so any sync throw — on read, on typeof branch, or on the
+    // call — resolves to `clipboard-clear-failed` rather than an uncaught error
+    // that would silently drop the audit event.
+    //
+    // We capture `navigator.clipboard` exactly once and use the same reference
+    // for both the method read and the call's receiver. A shim that exposes
+    // `navigator.clipboard` as a getter returning a fresh object per read
+    // (rare but legal) would otherwise let us grab `writeText` from object A
+    // and invoke it against object B — brand/instance checks inside a real
+    // polyfill would then fail and the call would reject spuriously.
+    //
+    // Promise.resolve() on a non-thenable still resolves, so the then() path
+    // normalizes the return value shape for us.
+    try {
+      const clipboard = navigator.clipboard;
+      const writeText = clipboard.writeText;
+      if (typeof writeText !== 'function') {
+        dispatchOutcome(false);
+        return;
+      }
+      Promise.resolve(writeText.call(clipboard, '')).then(
+        () => dispatchOutcome(true),
+        () => dispatchOutcome(false),
+      );
+    } catch {
+      dispatchOutcome(false);
+    }
   }
 
   /** @internal */

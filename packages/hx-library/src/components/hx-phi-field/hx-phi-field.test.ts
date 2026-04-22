@@ -1117,7 +1117,16 @@ describe('hx-phi-field', () => {
       toggle?.click();
       await el.updateComplete;
 
-      const originalWriteText = navigator.clipboard.writeText.bind(navigator.clipboard);
+      // Capture the full property descriptor so restore returns the slot to its
+      // original shape — whether it was an own data property, an own accessor,
+      // or (most commonly in a real browser) an inherited prototype property
+      // with no own descriptor at all. Blindly re-assigning `writeText` by
+      // value would leave an own-property shadow on `navigator.clipboard`
+      // that outlives the test and can leak into sibling tests.
+      const originalWriteTextDescriptor = Object.getOwnPropertyDescriptor(
+        navigator.clipboard,
+        'writeText',
+      );
       Object.defineProperty(navigator.clipboard, 'writeText', {
         value: () => Promise.reject(new Error('NotAllowedError: no user activation')),
         configurable: true,
@@ -1143,11 +1152,66 @@ describe('hx-phi-field', () => {
         expect(failedEvents[0]?.detail.fieldId).toBe('write-reject');
         expect(successEvents).toHaveLength(0);
       } finally {
-        Object.defineProperty(navigator.clipboard, 'writeText', {
-          value: originalWriteText,
-          configurable: true,
-          writable: true,
+        if (originalWriteTextDescriptor) {
+          Object.defineProperty(navigator.clipboard, 'writeText', originalWriteTextDescriptor);
+        } else {
+          Reflect.deleteProperty(navigator.clipboard, 'writeText');
+        }
+      }
+    });
+
+    it('dispatches clipboard-clear-failed when navigator.clipboard.writeText throws synchronously', async () => {
+      // Regression guard for the sync-throw defense inside `_clearClipboard`.
+      // A polyfill or a test stub can throw synchronously from `writeText`
+      // (for example, a wrapper that rejects a non-string argument, or an
+      // accessor getter that throws when read). Without the try/catch in the
+      // production path the throw would escape, no audit event would fire,
+      // and HIPAA audit integrity would silently break. Future refactors
+      // that remove the try/catch must fail this test.
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="write-sync-throw"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+
+      const originalWriteTextDescriptor = Object.getOwnPropertyDescriptor(
+        navigator.clipboard,
+        'writeText',
+      );
+      Object.defineProperty(navigator.clipboard, 'writeText', {
+        value: () => {
+          throw new TypeError('synchronous failure from polyfill');
+        },
+        configurable: true,
+        writable: true,
+      });
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      });
+
+      try {
+        await withVisibilityState('hidden', () => {
+          document.dispatchEvent(new Event('visibilitychange'));
         });
+        await el.updateComplete;
+
+        const failedEvents = events.filter((e) => e.detail.action === 'clipboard-clear-failed');
+        const successEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+        expect(failedEvents).toHaveLength(1);
+        expect(failedEvents[0]?.detail.fieldId).toBe('write-sync-throw');
+        expect(successEvents).toHaveLength(0);
+      } finally {
+        if (originalWriteTextDescriptor) {
+          Object.defineProperty(navigator.clipboard, 'writeText', originalWriteTextDescriptor);
+        } else {
+          Reflect.deleteProperty(navigator.clipboard, 'writeText');
+        }
       }
     });
 

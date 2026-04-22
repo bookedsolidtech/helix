@@ -420,20 +420,6 @@ Shipped SDC templates (`packages/drupal-starter/components/<component>/<componen
 </hx-card>
 ```
 
-#### `hx-nav` — `hx-size="small"` → `hx-size="sm"`
-
-The nav template previously emitted the invalid enum value `small`. The canonical enum is `sm | md | lg`.
-
-```twig
-{# BEFORE #}
-<hx-nav hx-size="small" ...>
-
-{# AFTER #}
-<hx-nav hx-size="sm" ...>
-```
-
-Audit any forked nav template (and derived `hx-top-nav` / `hx-side-nav` usages) for the same mistake.
-
 #### All ARIA-labelable components — `aria-label` → `accessible-label`
 
 Every template that previously emitted `aria-label` on a HELiX component tag (`hx-button`, `hx-text-input`, `hx-form`, `hx-steps`, etc.) now emits `accessible-label`. This matches the library-side rename in §2.
@@ -536,7 +522,7 @@ Drupal.behaviors.hxPhiPopulate = {
 };
 ```
 
-PHI only ever crosses the wire inside `drupalSettings` (a JS-readable payload), not as an HTML attribute. Combine with your site's existing role-based access checks and audit logging on the `hx-phi-access` event.
+PHI is assigned via JavaScript (`drupalSettings`) instead of element attributes, so it is not baked into the SSR HTML response body, `View Source`, browser caches, or access logs that recorded the response. `drupalSettings` is still client-visible response data — it ships as an inline `<script type="application/json">` payload readable by any script in the page — so keep PHI payloads minimal, enforce role-based access server-side before emitting the payload, and cover consumption with existing audit controls, including `hx-phi-access` handling.
 
 ### 16.2 `@helixui/drupal-behaviors` — API realignment
 

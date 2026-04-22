@@ -31,7 +31,20 @@ permissions:
 jobs:
   canary:
     name: Publish Canary (@next)
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'staging'
+    # Privileged step — publishes with NPM_TOKEN. workflow_run events fire for
+    # ANY CI run, including those from forked PRs. The trigger filter
+    # (`branches: [staging]`) narrows it but does not prevent a fork from
+    # pushing a branch named `staging` to its own repo and having its CI run
+    # surface here. Require:
+    #   - the upstream CI concluded success
+    #   - the head ref is literally `staging`
+    #   - the event was a push (not a pull_request that happens to target staging)
+    #   - the upstream run came from THIS repository (same owner/name)
+    if: >-
+      github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.head_branch == 'staging'
+      && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
