@@ -16,7 +16,7 @@
     "@helixui/mcp-shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "ts-morph": "^27.0.2",
-    "typescript": "^5.7.2",
+    "typescript": "^6.0.3",
     "zod": "^3.22.0"
   },
   "devDependencies": {
