@@ -98,11 +98,13 @@ function decodeCssEscapes(input: string): string {
     }
 
     // Hex escape: up to 6 hex digits, optional single whitespace terminator.
-    if (/[0-9a-fA-F]/.test(next)) {
+    if (next !== undefined && /[0-9a-fA-F]/.test(next)) {
       let hex = '';
       let j = i + 1;
-      while (j < len && hex.length < 6 && /[0-9a-fA-F]/.test(input[j])) {
-        hex += input[j];
+      while (j < len && hex.length < 6) {
+        const hexCh = input[j];
+        if (hexCh === undefined || !/[0-9a-fA-F]/.test(hexCh)) break;
+        hex += hexCh;
         j++;
       }
       // Consume a single optional whitespace terminator per CSS spec.
@@ -111,7 +113,13 @@ function decodeCssEscapes(input: string): string {
         const term = input[j];
         if (term === '\r' && input[j + 1] === '\n') {
           j += 2;
-        } else if (term === ' ' || term === '\t' || term === '\n' || term === '\r' || term === '\f') {
+        } else if (
+          term === ' ' ||
+          term === '\t' ||
+          term === '\n' ||
+          term === '\r' ||
+          term === '\f'
+        ) {
           j++;
         }
       }
