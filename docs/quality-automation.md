@@ -206,7 +206,7 @@ Tests across multiple environments for compatibility.
 
 **Fail-fast**: Disabled to see all failures
 
-**Required for merge**: Not a gating check. Run manually when touching build tooling or ecosystem-sensitive code.
+**Required for merge**: Not a gating check — best-effort diagnostic only. Run manually when a PR touches **build tooling, Vite/Turborepo config, or Node runtime APIs**. Matches the trigger rule in `CONTRIBUTING.md` and `.github/pull_request_template.md`.
 
 ### Pull Request Template
 
