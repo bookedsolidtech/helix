@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixPhiField, PhiAccessEventDetail } from './hx-phi-field.js';
@@ -1252,6 +1252,98 @@ describe('hx-phi-field', () => {
         } else {
           Reflect.deleteProperty(navigator, 'clipboard');
         }
+      }
+    });
+
+    it('cancels auto-hide timer and removes interaction listeners when clipboard is pre-emptively cleared', async () => {
+      // Regression guard: previously `_clearClipboard` set `this._masked = true`
+      // but did NOT cancel the auto-hide timer or remove its interaction
+      // listeners. If the field was revealed (auto-hide scheduled + listeners
+      // attached) and then `_clearClipboard` fired via visibilitychange
+      // pre-emption or the clipboard-clear timer, the auto-hide timer would
+      // keep running. When it later fired, `_autoHide()` early-returned on
+      // `this._masked` WITHOUT calling `_removeAutoHideInteractionListeners()`,
+      // leaking `mouseenter / mousemove / focusin / keydown / pointerdown`
+      // listeners attached to the host. The fix calls `_cancelAutoHideTimer`
+      // from `_clearClipboard` alongside `_cancelClipboardTimer`.
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="auto-hide-leak" auto-hide-delay="30"></hx-phi-field>',
+        );
+        el.data = '123-45-6789';
+        await el.updateComplete;
+
+        // Spy on the host's add/removeEventListener so we can count the
+        // lifecycle of the five interaction listeners without reaching into
+        // private state. Interaction events are a closed set — any delta
+        // between add and remove counts signals a leak.
+        const addSpy = vi.spyOn(el, 'addEventListener');
+        const removeSpy = vi.spyOn(el, 'removeEventListener');
+
+        const interactionEvents = [
+          'mouseenter',
+          'mousemove',
+          'focusin',
+          'keydown',
+          'pointerdown',
+        ] as const;
+        const countInteractionCalls = (
+          calls: readonly (readonly unknown[])[],
+          fromIndex: number,
+        ): number =>
+          calls
+            .slice(fromIndex)
+            .filter(([type]) =>
+              interactionEvents.includes(type as (typeof interactionEvents)[number]),
+            ).length;
+
+        // Reveal — this schedules auto-hide and attaches the 5 interaction
+        // listeners (mouseenter, mousemove, focusin, keydown, pointerdown).
+        const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+        toggle?.click();
+        await el.updateComplete;
+
+        const addedAfterReveal = countInteractionCalls(addSpy.mock.calls, 0);
+        expect(addedAfterReveal).toBe(5);
+
+        // Snapshot the removeEventListener call count BEFORE the clear so we
+        // isolate removes attributable to `_clearClipboard`. `_scheduleAutoHide`
+        // calls `_cancelAutoHideTimer` at the top of its body which runs
+        // `_removeAutoHideInteractionListeners` defensively even on the first
+        // reveal (no prior listeners) — those prior-call removes are irrelevant
+        // to the leak regression being guarded.
+        const removesBeforeClear = countInteractionCalls(removeSpy.mock.calls, 0);
+
+        // Fire `_clearClipboard` via visibilitychange pre-emption BEFORE the
+        // auto-hide timer (30s) fires. The fix must cancel the auto-hide
+        // timer and remove its 5 interaction listeners as part of the clear.
+        await withVisibilityState('hidden', () => {
+          document.dispatchEvent(new Event('visibilitychange'));
+        });
+        await el.updateComplete;
+
+        const removesDuringClear =
+          countInteractionCalls(removeSpy.mock.calls, 0) - removesBeforeClear;
+        // All 5 listeners must be removed during the clear — otherwise the
+        // leak regression is back.
+        expect(removesDuringClear).toBe(5);
+
+        // No auto-hide audit event should fire when we advance past the
+        // auto-hide delay — the timer must have been cancelled.
+        const events: CustomEvent<PhiAccessEventDetail>[] = [];
+        el.addEventListener('hx-phi-access', (e) => {
+          events.push(e as CustomEvent<PhiAccessEventDetail>);
+        });
+        vi.advanceTimersByTime(35_000);
+        await el.updateComplete;
+        const autoHideEvents = events.filter((e) => e.detail.action === 'auto-hide');
+        expect(autoHideEvents).toHaveLength(0);
+
+        addSpy.mockRestore();
+        removeSpy.mockRestore();
+      } finally {
+        vi.useRealTimers();
       }
     });
 

@@ -282,6 +282,15 @@ export class HelixPhiField extends HelixElement {
     // the scheduled timer from firing again and dispatching a duplicate
     // clipboard-clear audit event.
     this._cancelClipboardTimer();
+    // Also cancel the auto-hide timer and remove its interaction listeners.
+    // `_clearClipboard` force-masks the field below, so any scheduled auto-hide
+    // is now moot. Without this call the setTimeout stays pending and the
+    // `mouseenter / mousemove / focusin / keydown / pointerdown` listeners
+    // stay attached to the host; when the auto-hide timer later fires,
+    // `_autoHide()` early-returns on `this._masked` WITHOUT removing the
+    // listeners, leaking them until the next scheduleAutoHide/cancelAutoHideTimer
+    // path runs. `_cancelAutoHideTimer` already closes both — one call suffices.
+    this._cancelAutoHideTimer();
     this._masked = true;
 
     // `navigator.clipboard.writeText` requires transient user activation in
