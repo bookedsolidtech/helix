@@ -591,22 +591,29 @@ Run these greps against your Drupal theme and any custom modules that fork the s
 # 1. hx-card accessible-label → hx-label (scope: hx-card templates only)
 rg -n 'accessible-label' --type twig -g '*hx-card*' -g '*card*'
 
-# 2. ::part(error-message) in theme CSS
+# 2. Long-form hx-size values on size-aware components
+#    3.0.0 narrows the enum to sm | md | lg on hx-icon, hx-badge, hx-button, and
+#    any other size-aware component. Long-form "small" / "medium" / "large" no
+#    longer match. Common in forked starter templates where a pre-3.0.0 submenu
+#    chevron still reads <hx-icon hx-size="small">.
+rg -n 'hx-size="(small|medium|large)"' --type twig
+
+# 3. ::part(error-message) in theme CSS
 rg -n '::part\(error-message\)' -g '*.css' -g '*.scss'
 
-# 3. Native <dialog> inside picker templates (library no longer uses it)
+# 4. Native <dialog> inside picker templates (library no longer uses it)
 rg -n '<dialog\b' --type twig -g '*date-picker*' -g '*time-picker*'
 
-# 4. aria-label on hx-* component tags (requires PCRE2 ripgrep)
+# 5. aria-label on hx-* component tags (requires PCRE2 ripgrep)
 rg -P -n '<hx-(?!card\b)[a-z-]+[^>]*\baria-label=' --type twig
 
-# 5. hx-phi-field rendering value or data as an HTML attribute
+# 6. hx-phi-field rendering value or data as an HTML attribute
 rg -n '<hx-phi-field[^>]*\b(value|data)=' --type twig
 ```
 
 After each fix, run your Drupal theme's regression suite (or the site's visual regression harness) against the affected templates. The renames are mechanical; regressions usually surface as missing accessible names in axe, failing focus tests on the picker popup, or a flat/non-modal dialog where a modal was expected.
 
-A grep-based codemod that automates the first four patterns is tracked for 3.0.1 — same follow-up as the library-side codemod (see [Codemod availability](#codemod-availability)).
+A grep-based codemod that automates the first five patterns is tracked for 3.0.1 — same follow-up as the library-side codemod (see [Codemod availability](#codemod-availability)).
 
 ---
 
