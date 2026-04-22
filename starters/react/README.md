@@ -8,7 +8,7 @@ healthcare web component library.
 
 ## Prerequisites
 
-- Node.js 20 or 22
+- Node.js 22 LTS or Node.js 24
 - npm 10+
 
 ---

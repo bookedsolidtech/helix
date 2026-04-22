@@ -70,7 +70,7 @@ Organization members are exempt from this requirement.
 
 ### Prerequisites
 
-- **Node.js**: >= 20.0.0
+- **Node.js**: 22 LTS or Node.js 24 (Node 20 reaches upstream EOL on 2026-04-30)
 - **pnpm**: 9.15.9 (install via `corepack enable && corepack prepare pnpm@9.15.9 --activate`)
 - **Git**: Latest stable version
 - **IDE**: VSCode recommended (with recommended extensions)
@@ -300,7 +300,7 @@ The PR template will guide you through:
 All PRs must pass:
 
 1. Automated CI checks (all 7 quality gates)
-2. Matrix tests (Node 18/20/22, Ubuntu/macOS/Windows)
+2. Matrix tests (Node 22/24, Ubuntu/macOS/Windows)
 3. Code review approval
 4. No merge conflicts with `main`
 

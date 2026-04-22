@@ -165,7 +165,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
@@ -181,7 +181,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run format:check
@@ -197,7 +197,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Generate CEM (required input for drift check)
@@ -216,7 +216,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       # Build @helixui/library first — @helixui/react's type-check resolves
@@ -254,7 +254,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
@@ -435,7 +435,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
@@ -493,7 +493,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
@@ -549,7 +549,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Generate head CEM
@@ -608,7 +608,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
@@ -726,7 +726,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: steps.detect.outputs.changed != ''
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
         if: steps.detect.outputs.changed != ''
@@ -829,7 +829,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Security audit
@@ -868,7 +868,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Build library and generate CEM
@@ -907,7 +907,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright Chromium
