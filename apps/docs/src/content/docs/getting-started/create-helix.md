@@ -10,7 +10,7 @@ description: Scaffold a new project with HELiX web components using the create-h
 
 ## Requirements
 
-- Node.js >= 22.0.0 (Node 20 reaches EOL on 2026-04-30; use Node 22 LTS or Node 24)
+- Node.js 22 LTS or Node.js 24 (Node 20 reaches upstream EOL on 2026-04-30)
 
 ## Quick Start
 

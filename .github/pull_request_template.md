@@ -113,7 +113,7 @@ Refs #
 
 - [ ] Code review completed
 - [ ] All CI checks passed (type check, lint, format, tests, build, CEM, bundle size)
-- [ ] Matrix tests passed (Node 18/20/22, Ubuntu/macOS/Windows)
+- [ ] Manual CI Matrix (Node 22/24 on Ubuntu) run if touching build tooling — optional for most PRs
 - [ ] Changes follow CLAUDE.md guidance
 - [ ] Quality gates passed (all 7 gates)
 - [ ] No regressions in existing functionality

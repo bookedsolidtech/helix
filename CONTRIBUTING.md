@@ -70,7 +70,7 @@ Organization members are exempt from this requirement.
 
 ### Prerequisites
 
-- **Node.js**: >= 22.0.0 — this project supports Node 22 LTS and Node 24 only (Node 20 reaches upstream EOL on 2026-04-30)
+- **Node.js**: 22 LTS or Node.js 24 (Node 20 reaches upstream EOL on 2026-04-30)
 - **pnpm**: 9.15.9 (install via `corepack enable && corepack prepare pnpm@9.15.9 --activate`)
 - **Git**: Latest stable version
 - **IDE**: VSCode recommended (with recommended extensions)

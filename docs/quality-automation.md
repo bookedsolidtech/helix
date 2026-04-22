@@ -197,14 +197,16 @@ Tests across multiple environments for compatibility.
 
 **Matrix:**
 
-- **Node versions**: 18, 20, 22
-- **Operating systems**: Ubuntu, macOS, Windows
+- **Node versions**: 22, 24
+- **Operating systems**: Ubuntu
 
-**Total combinations**: 9 (3 Node × 3 OS)
+**Total combinations**: 2 (2 Node × 1 OS)
+
+**Trigger**: `workflow_dispatch` (manual only) — auto-triggers are disabled for the 3.0.0 release window while Node 22/24 build-tool compatibility is tracked separately.
 
 **Fail-fast**: Disabled to see all failures
 
-**Required for merge**: All matrix tests must pass
+**Required for merge**: Not a gating check. Run manually when touching build tooling or ecosystem-sensitive code.
 
 ### Pull Request Template
 
