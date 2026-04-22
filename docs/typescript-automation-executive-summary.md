@@ -161,7 +161,7 @@ This proposal introduces a comprehensive TypeScript automation system for wc-202
 
 ### Technical
 
-- ✅ Node.js 20+ (already installed)
+- ✅ Node.js 22+ (already installed)
 - ✅ TypeScript 5.7+ (already installed)
 - ⚠️ `ts-morph@^21.0.0` (needs install)
 - ⚠️ `@modelcontextprotocol/sdk` (needs install)

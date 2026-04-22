@@ -178,7 +178,7 @@ Runs on every push and pull request to `main`.
 
 **Jobs:**
 
-1. Quality Gates - Single run on Ubuntu with Node 20
+1. Quality Gates - Single run on Ubuntu with Node 22
    - Type check
    - Lint
    - Format check
