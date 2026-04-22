@@ -591,13 +591,14 @@ Run these greps against your Drupal theme and any custom modules that fork the s
 # 1. hx-card accessible-label → hx-label (scope: hx-card templates only)
 rg -n 'accessible-label' --type twig -g '*hx-card*' -g '*card*'
 
-# 2. Long-form hx-size values on size-aware components
-#    3.0.0 drops support for long-form "small" / "medium" / "large" on every
-#    size-aware component (hx-icon, hx-badge, hx-button, …). Use the short-form
-#    alias instead — the short-enum shape itself varies per component
-#    (hx-icon keeps xs | sm | md | lg | xl; hx-badge and hx-button narrow to
-#    sm | md | lg). Common in forked starter templates where a pre-3.0.0
-#    submenu chevron still reads <hx-icon hx-size="small">.
+# 2. Invalid long-form hx-size values on size-aware components
+#    Forked starter templates sometimes carry long-form "small" / "medium" /
+#    "large" on hx-size — these never matched the enum on any 2.x release, so
+#    they silently produced the default size. 3.0.0 still rejects them; the
+#    grep surfaces them so you can convert to the correct short-form alias per
+#    component (hx-icon: xs | sm | md | lg | xl; hx-badge and hx-button:
+#    sm | md | lg). Not a 3.0.0 regression — a dormant defect worth fixing
+#    while you're already touching these files.
 #    Note: `--type twig` matches both *.twig and *.html.twig — no extra glob
 #    is required for Drupal's hyphenated template extension.
 rg -n 'hx-size="(small|medium|large)"' --type twig
