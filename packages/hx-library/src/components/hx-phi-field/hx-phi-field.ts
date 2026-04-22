@@ -43,9 +43,10 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart value - The value display span (masked or revealed).
  * @csspart toggle - The reveal/hide toggle button.
  *
- * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide, and
- *   clipboard-clear actions. Contains audit metadata only — never raw PHI. Dispatched with
- *   `composed: true` to cross shadow boundaries for application-level audit listeners.
+ * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide,
+ *   auto-hide, clipboard-clear, and clipboard-clear-failed actions. Contains audit
+ *   metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow
+ *   boundaries for application-level audit listeners.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#111827)] - Value text color.
@@ -309,37 +310,39 @@ export class HelixPhiField extends HelixElement {
       );
     };
 
-    if (typeof navigator === 'undefined' || !navigator.clipboard) {
+    if (typeof navigator === 'undefined') {
       dispatchOutcome(false);
       return;
     }
 
-    // `writeText` is spec'd to return a Promise, but a polyfill / test stub
-    // could throw synchronously or return a non-Promise. The read itself is
-    // also vulnerable: if `writeText` is defined as an accessor getter (rare,
-    // but legal per the Clipboard spec's property descriptor being left to the
-    // UA), reading it can throw. Everything from the property read onward runs
-    // inside the try so any sync throw — on read, on typeof branch, or on the
-    // call — resolves to `clipboard-clear-failed` rather than an uncaught error
-    // that would silently drop the audit event.
+    // Every remaining clipboard interaction — including the `navigator.clipboard`
+    // read itself — runs inside this try. The Clipboard API's property descriptor
+    // is UA-defined, so `navigator.clipboard` can legally be an accessor that
+    // throws synchronously. Same for `clipboard.writeText`. Pulling the read
+    // inside the try ensures any sync throw resolves to `clipboard-clear-failed`
+    // instead of an uncaught error that would silently drop the HIPAA audit event.
     //
-    // We capture `navigator.clipboard` exactly once and use the same reference
-    // for both the method read and the call's receiver. A shim that exposes
-    // `navigator.clipboard` as a getter returning a fresh object per read
-    // (rare but legal) would otherwise let us grab `writeText` from object A
-    // and invoke it against object B — brand/instance checks inside a real
-    // polyfill would then fail and the call would reject spuriously.
+    // `navigator.clipboard` is captured exactly once and the same reference is
+    // used for both the method read and the call's receiver. A shim that exposes
+    // `navigator.clipboard` as a getter returning a fresh object per read (rare
+    // but legal) would otherwise let us grab `writeText` from object A and invoke
+    // it against object B — brand/instance checks inside a real polyfill would
+    // then fail and the call would reject spuriously.
     //
     // Promise.resolve() on a non-thenable still resolves, so the then() path
     // normalizes the return value shape for us.
     try {
       const clipboard = navigator.clipboard;
+      if (!clipboard) {
+        dispatchOutcome(false);
+        return;
+      }
       const writeText = clipboard.writeText;
       if (typeof writeText !== 'function') {
         dispatchOutcome(false);
         return;
       }
-      Promise.resolve(writeText.call(clipboard, '')).then(
+      void Promise.resolve(writeText.call(clipboard, '')).then(
         () => dispatchOutcome(true),
         () => dispatchOutcome(false),
       );

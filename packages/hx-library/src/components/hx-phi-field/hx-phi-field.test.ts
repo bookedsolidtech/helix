@@ -1254,6 +1254,54 @@ describe('hx-phi-field', () => {
         }
       }
     });
+
+    it('dispatches clipboard-clear-failed when navigator.clipboard is a throwing accessor', async () => {
+      // The Clipboard API's property descriptor on `navigator` is UA-defined.
+      // A shim or hostile environment can install `navigator.clipboard` as a
+      // getter that throws synchronously. The audit event MUST still fire —
+      // HIPAA consumers rely on it to escalate on silent failure.
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="clipboard-getter-throws"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+
+      const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        get() {
+          throw new TypeError('clipboard getter threw');
+        },
+      });
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      });
+
+      try {
+        await withVisibilityState('hidden', () => {
+          document.dispatchEvent(new Event('visibilitychange'));
+        });
+        await el.updateComplete;
+
+        const failedEvents = events.filter((e) => e.detail.action === 'clipboard-clear-failed');
+        expect(failedEvents).toHaveLength(1);
+        expect(failedEvents[0]?.detail.fieldId).toBe('clipboard-getter-throws');
+        const successEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+        expect(successEvents).toHaveLength(0);
+      } finally {
+        if (originalClipboard) {
+          Object.defineProperty(navigator, 'clipboard', originalClipboard);
+        } else {
+          Reflect.deleteProperty(navigator, 'clipboard');
+        }
+      }
+    });
   });
 
   // ─── Keyboard Interaction ───
