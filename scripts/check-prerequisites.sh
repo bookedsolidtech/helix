@@ -20,15 +20,15 @@ echo -n "Checking Node.js... "
 if command -v node &> /dev/null; then
   NODE_VERSION=$(node -v)
   NODE_MAJOR=$(echo $NODE_VERSION | sed 's/v//' | cut -d. -f1)
-  if [ "$NODE_MAJOR" -ge 20 ]; then
+  if [ "$NODE_MAJOR" -ge 22 ]; then
     echo -e "${GREEN}✓ ${NODE_VERSION}${NC}"
   else
-    echo -e "${YELLOW}⚠️  ${NODE_VERSION} (20.x recommended)${NC}"
+    echo -e "${YELLOW}⚠️  ${NODE_VERSION} (22.x or 24.x required)${NC}"
     ALL_GOOD=false
   fi
 else
   echo -e "${RED}✗ Not installed${NC}"
-  echo "  Install: https://nodejs.org/ (version 20.x)"
+  echo "  Install: https://nodejs.org/ (version 22.x or 24.x)"
   ALL_GOOD=false
 fi
 

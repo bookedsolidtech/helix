@@ -13,7 +13,7 @@ helix/
 ├── pnpm-workspace.yaml       # pnpm workspace package globs
 ├── turbo.json                # Turborepo task configuration
 ├── tsconfig.base.json        # Shared TypeScript config
-├── .nvmrc                    # Node.js version (20.x)
+├── .nvmrc                    # Node.js version (22.x)
 │
 ├── apps/
 │   ├── docs/                 # Astro/Starlight documentation (port 3150)
@@ -48,7 +48,7 @@ helix/
 | `pnpm-workspace.yaml`        | Declares workspace package globs for pnpm      |
 | `turbo.json`                 | Defines build tasks, dependencies, and caching |
 | `tsconfig.base.json`         | Shared TypeScript strict mode settings         |
-| `.nvmrc`                     | Pins Node.js to version 20.x                   |
+| `.nvmrc`                     | Pins Node.js to version 22.x                   |
 | `apps/docs/astro.config.mjs` | Starlight sidebar, theme, and plugins          |
 
 ## Build Pipeline

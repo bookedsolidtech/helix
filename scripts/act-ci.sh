@@ -16,7 +16,7 @@
 #   --clean       Remove all stale act containers before running
 #   --native      Use linux/arm64 native architecture (no Rosetta emulation)
 #   --full        Run full test suite on current Node (triggers test-full job)
-#   --matrix      Run full test suite on Node 20/22/24 matrix (CI Matrix parity)
+#   --matrix      Run full test suite on Node 22/24 matrix (CI Matrix parity)
 #   --batch       Run all tests in batches (default 10 at a time, avoids Docker OOM)
 #
 # Performance notes:
@@ -28,7 +28,7 @@
 #   Default mode runs linux/amd64 via Rosetta 2, which uses 2-3x more memory.
 #   Use --native for linux/arm64 containers (no emulation overhead).
 #   Use --full to run the complete test suite (default is smart/changed only).
-#   Use --matrix for full CI Matrix parity (Node 20/22/24).
+#   Use --matrix for full CI Matrix parity (Node 22/24).
 #   Use --batch to run all tests in small batches (avoids OOM, slower but reliable).
 #   Best combo: ./scripts/act-ci.sh --native --batch
 set -euo pipefail
@@ -74,7 +74,7 @@ show_help() {
   echo "Examples:"
   echo "  ./scripts/act-ci.sh                    # Smart tests, current Node"
   echo "  ./scripts/act-ci.sh --full             # Full test suite, current Node"
-  echo "  ./scripts/act-ci.sh --matrix           # Full test suite, Node 20/22/24"
+  echo "  ./scripts/act-ci.sh --matrix           # Full test suite, Node 22/24"
   echo "  ./scripts/act-ci.sh --native --matrix  # Matrix tests, ARM64 (no Rosetta)"
   exit 0
 }
@@ -151,7 +151,7 @@ if [[ "$USE_BATCH" == true ]]; then
   TEST_MODE="batched (all components, ${BATCH_SIZE:-10} at a time)"
 elif [[ "$USE_MATRIX" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_MATRIX_TESTS=true --env ACT_FULL_TESTS=true"
-  TEST_MODE="full suite + Node 20/22/24 matrix (CI Matrix parity)"
+  TEST_MODE="full suite + Node 22/24 matrix (CI Matrix parity)"
 elif [[ "$USE_FULL" == true ]]; then
   ENV_ARGS="$ENV_ARGS --env ACT_FULL_TESTS=true"
   TEST_MODE="full suite (current Node)"

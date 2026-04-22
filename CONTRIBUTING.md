@@ -70,7 +70,7 @@ Organization members are exempt from this requirement.
 
 ### Prerequisites
 
-- **Node.js**: >= 20.0.0
+- **Node.js**: >= 22.0.0 (Node 20 is EOL — use Node 22 LTS or Node 24)
 - **pnpm**: 9.15.9 (install via `corepack enable && corepack prepare pnpm@9.15.9 --activate`)
 - **Git**: Latest stable version
 - **IDE**: VSCode recommended (with recommended extensions)

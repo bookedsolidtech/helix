@@ -56,8 +56,8 @@ cd wc-2026
 
 ```bash
 nvm use
-# Automatically reads .nvmrc and switches to Node 20.x
-# If Node 20.x not installed: nvm install 20
+# Automatically reads .nvmrc and switches to Node 22.x
+# If Node 22.x not installed: nvm install 22
 ```
 
 ### Step 3: Install Dependencies
