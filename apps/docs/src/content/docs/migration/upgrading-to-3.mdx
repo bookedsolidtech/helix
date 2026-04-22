@@ -506,11 +506,11 @@ hx-text-input::part(error) {
 
 Audit any theme-level CSS overrides in your Drupal theme (`*.css`, `*.scss` under `themes/custom/*`) for the old selector name.
 
-#### `hx-phi-field` — no `value` attribute in SSR HTML
+#### `hx-phi-field` — no `data` attribute in SSR HTML
 
-The library strips a `value` attribute off `hx-phi-field` in `connectedCallback` to prevent PHI retention in `outerHTML` / DevTools after hydration (see §6). The starter's `hx-phi-field.twig` does **not** render `value` as an HTML attribute — PHI is passed to the component via the `data` JS property, set client-side through a Drupal behavior.
+The library strips a `data` attribute off `hx-phi-field` in `connectedCallback` to prevent PHI retention in `outerHTML` / DevTools after hydration (see §6). The starter's `hx-phi-field.twig` does **not** render `data` as an HTML attribute — PHI is passed to the component via the `data` JS property (`@property({ attribute: false })` — Lit does not observe it), set client-side through a Drupal behavior.
 
-If a forked template emits PHI into the `value` or `data` attribute from the server, the runtime rescue can remove it from the live DOM but **cannot** remove it from the SSR HTML, the HTTP response body, `View Source`, browser caches, or any access logs that recorded the response. The supported pattern for Drupal:
+The runtime rescue only removes the `data` attribute from the live DOM after hydration; it does **not** touch any other attribute, and it **cannot** remove any attribute from the SSR HTML, the HTTP response body, `View Source`, browser caches, or access logs that recorded the response. Any server-rendered PHI — including a hand-authored `value` attribute or any other custom attribute on `hx-phi-field` — must be removed at template-render time. The supported pattern for Drupal:
 
 ```twig
 {# Server-rendered SDC — no PHI in the attribute surface #}

@@ -222,7 +222,10 @@ export class HelixPhiField extends HelixElement {
     if (this._masked) return;
 
     this._removeAutoHideInteractionListeners();
-    this._cancelClipboardTimer();
+    // Do NOT cancel the clipboard-clear timer — same reasoning as the manual
+    // hide branch of `_handleToggle`. A reveal may have resulted in a copy,
+    // and cancelling the scheduled clear would leave PHI on the clipboard
+    // past the auto-hide ceiling.
     this._masked = true;
 
     this.dispatchEvent(
@@ -272,7 +275,12 @@ export class HelixPhiField extends HelixElement {
 
   /** @internal */
   private _clearClipboard(): void {
-    this._clipboardTimer = null;
+    // Cancel any pending scheduled clear. When `_clearClipboard` is invoked
+    // from the setTimeout callback the timer has already fired and this is a
+    // no-op; when invoked from the visibilitychange pre-emption path it stops
+    // the scheduled timer from firing again and dispatching a duplicate
+    // clipboard-clear audit event.
+    this._cancelClipboardTimer();
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator?.clipboard?.writeText('').catch(() => {
         // Clipboard clear failure is non-fatal — silently ignore
@@ -373,8 +381,12 @@ export class HelixPhiField extends HelixElement {
       this._scheduleClipboardClear();
       this._scheduleAutoHide();
     } else {
-      // Hiding: cancel any pending timers
-      this._cancelClipboardTimer();
+      // Hiding: cancel the auto-hide countdown (purpose already served — the
+      // field is hidden). Do NOT cancel the clipboard-clear timer — the user
+      // may have copied PHI while the field was revealed, and cancelling here
+      // would strand it on the clipboard if the tab later backgrounds. The
+      // timer fires naturally at `clipboardTimeout`, and the visibilitychange
+      // handler will pre-empt it if the tab hides sooner.
       this._cancelAutoHideTimer();
       this._masked = true;
     }

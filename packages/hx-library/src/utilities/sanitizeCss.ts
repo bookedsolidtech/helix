@@ -154,10 +154,9 @@ function decodeCssEscapes(input: string): string {
  * Anything with an explicit protocol scheme (http:, https:, ftp:, etc.) is blocked.
  *
  * The payload is CSS-escape-decoded before any scheme / prefix check is
- * applied. This closes bypasses where hex escapes (`\3a` for `:`) or
- * line-continuations (`http\<LF>:`) smuggle a protocol past the validator —
- * the browser's CSS parser decodes these escapes after our check, so we must
- * match what it will eventually see.
+ * applied. `sanitizeCss` pre-decodes the full stylesheet so this decode is
+ * normally idempotent, but the defense is retained here so `isUrlSafe` remains
+ * correct in isolation and survives any future caller that passes raw payloads.
  */
 function isUrlSafe(urlValue: string): boolean {
   const trimmedRaw = urlValue.trim();
@@ -268,7 +267,9 @@ function areBracesBalanced(css: string): boolean {
  * @returns The original CSS if safe, or `null` if rejected.
  */
 export function sanitizeCss(css: string, componentName: string): string | null {
-  // Check brace balance first — this is the primary scope-escape vector.
+  // Check brace balance on the raw input — the balance scanner already tracks
+  // string quoting and backslash escapes, so it does not need pre-decoded CSS
+  // and is safer run against the source bytes.
   if (!areBracesBalanced(css)) {
     devWarn(
       componentName,
@@ -278,18 +279,27 @@ export function sanitizeCss(css: string, componentName: string): string | null {
     return null;
   }
 
-  // Check for blocked patterns.
+  // Decode CSS escape sequences before the token-level checks.
+  // The CSS tokenizer decodes escapes inside <ident-token>, <at-keyword-token>,
+  // and <url-token> before comparing against rule/function names (CSS Syntax
+  // Level 3 §4.3.3–§4.3.7). So `@\69mport` tokenizes as `@import` and
+  // `u\72l(http://evil/x)` tokenizes as `url(http://evil/x)` — both would slip
+  // past regex checks that match only the literal bytes. Decoding first forces
+  // our patterns to see what the browser will actually tokenize.
+  const decoded = decodeCssEscapes(css);
+
+  // Check for blocked patterns against the decoded CSS.
   for (const { pattern, label } of BLOCKED_PATTERNS) {
-    if (pattern.test(css)) {
+    if (pattern.test(decoded)) {
       devWarn(componentName, `light-css rejected: ${label} is not allowed in injected styles.`);
       return null;
     }
   }
 
-  // Validate all url() values — block external domains.
+  // Validate all url() values on the decoded CSS — block external domains.
   let urlMatch: RegExpExecArray | null;
   URL_PATTERN.lastIndex = 0;
-  while ((urlMatch = URL_PATTERN.exec(css)) !== null) {
+  while ((urlMatch = URL_PATTERN.exec(decoded)) !== null) {
     const urlValue = urlMatch[2] ?? '';
     if (!isUrlSafe(urlValue)) {
       devWarn(

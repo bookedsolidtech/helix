@@ -938,6 +938,13 @@ describe('hx-phi-field', () => {
     /**
      * Helper: dispatch a visibilitychange event with the given visibilityState.
      * Restores the original descriptor after running `fn`.
+     *
+     * `Object.defineProperty(document, 'visibilityState', ...)` installs an own
+     * property on the `document` instance that shadows the accessor defined on
+     * `Document.prototype`. Restoring the prototype descriptor alone leaves the
+     * shadowing own property in place and the override leaks across tests. The
+     * `finally` block therefore deletes the own property AND reinstalls the
+     * original prototype descriptor.
      */
     const withVisibilityState = async (
       state: 'hidden' | 'visible',
@@ -954,13 +961,9 @@ describe('hx-phi-field', () => {
       try {
         await fn();
       } finally {
-        // Restore the original descriptor so we don't leak the override across tests.
-        // `visibilityState` is defined on Document.prototype in all browsers we target,
-        // so originalDescriptor will always be present. Fall back to deletion defensively.
+        Reflect.deleteProperty(document, 'visibilityState');
         if (originalDescriptor) {
           Object.defineProperty(Document.prototype, 'visibilityState', originalDescriptor);
-        } else {
-          Reflect.deleteProperty(document, 'visibilityState');
         }
       }
     };
@@ -972,9 +975,9 @@ describe('hx-phi-field', () => {
       el.data = '123-45-6789';
       await el.updateComplete;
 
-      const events: CustomEvent[] = [];
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
       el.addEventListener('hx-phi-access', (e) => {
-        events.push(e as CustomEvent);
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
       });
 
       // Simulate tab hide without any prior interaction (field stays masked, no clipboard timer)
@@ -983,9 +986,7 @@ describe('hx-phi-field', () => {
       });
       await el.updateComplete;
 
-      const clipboardClearEvents = events.filter(
-        (e) => (e.detail as PhiAccessEventDetail).action === 'clipboard-clear',
-      );
+      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
       expect(clipboardClearEvents).toHaveLength(0);
     });
 
@@ -1001,9 +1002,9 @@ describe('hx-phi-field', () => {
       toggle?.click();
       await el.updateComplete;
 
-      const events: CustomEvent[] = [];
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
       el.addEventListener('hx-phi-access', (e) => {
-        events.push(e as CustomEvent);
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
       });
 
       // Now simulate tab hide — clipboard-clear SHOULD fire because there's real state to clear
@@ -1012,11 +1013,75 @@ describe('hx-phi-field', () => {
       });
       await el.updateComplete;
 
-      const clipboardClearEvents = events.filter(
-        (e) => (e.detail as PhiAccessEventDetail).action === 'clipboard-clear',
-      );
+      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
       expect(clipboardClearEvents.length).toBeGreaterThanOrEqual(1);
-      expect(clipboardClearEvents[0].detail.fieldId).toBe('revealed-field');
+      expect(clipboardClearEvents[0]?.detail.fieldId).toBe('revealed-field');
+    });
+
+    it('fires clipboard-clear after reveal → manual hide → tab background (PHI-on-clipboard defense)', async () => {
+      // Regression guard: previously the manual-hide branch of _handleToggle
+      // cancelled the clipboard-clear timer. A reveal → copy → manual-hide
+      // → background sequence would then leave PHI on the clipboard without
+      // ever firing an audit event. The fix preserves the timer on manual
+      // hide so the visibilitychange pre-emption path can still fire.
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="hide-then-hide"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      // Reveal — starts clipboard-clear timer.
+      toggle?.click();
+      await el.updateComplete;
+      // Manual hide — must NOT cancel the clipboard-clear timer.
+      toggle?.click();
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      });
+
+      await withVisibilityState('hidden', () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await el.updateComplete;
+
+      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+      expect(clipboardClearEvents.length).toBeGreaterThanOrEqual(1);
+      expect(clipboardClearEvents[0]?.detail.fieldId).toBe('hide-then-hide');
+    });
+
+    it('does not double-dispatch clipboard-clear when pre-empted by visibilitychange', async () => {
+      // Regression guard: `_clearClipboard` now cancels its pending timer so
+      // that when visibilitychange fires the clear path, the originally
+      // scheduled setTimeout callback does not later run and emit a duplicate
+      // audit event.
+      const el = await fixture<HelixPhiField>(
+        '<hx-phi-field field-type="ssn" field-id="no-dup" clipboard-timeout="50"></hx-phi-field>',
+      );
+      el.data = '123-45-6789';
+      await el.updateComplete;
+
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      el.addEventListener('hx-phi-access', (e) => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      });
+
+      await withVisibilityState('hidden', () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await el.updateComplete;
+      // Give the originally-scheduled 50ms timer a generous window to fire.
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const clipboardClearEvents = events.filter((e) => e.detail.action === 'clipboard-clear');
+      expect(clipboardClearEvents).toHaveLength(1);
     });
   });
 

@@ -208,3 +208,72 @@ describe('sanitizeCss — CSS escape bypass defense (url() validator)', () => {
     expect(sanitizeCss('.a { background: url(\\\n); }', COMPONENT)).not.toBeNull();
   });
 });
+
+describe('sanitizeCss — CSS escape bypass defense (ident-token smuggling)', () => {
+  // Per CSS Syntax Level 3 §4.3.3 (at-keyword-token) and §4.3.4 (url-token),
+  // the tokenizer decodes ident escapes before comparing against rule and
+  // function names. So `@\69mport` tokenizes as `@import` and `u\72l(...)`
+  // tokenizes as `url(...)` — both would bypass regex checks that match only
+  // the literal bytes. These cases pin down the decode-before-check defense.
+
+  it('rejects escaped url function name (u\\72l) pointing to external scheme', () => {
+    expect(
+      sanitizeCss('.a { background: u\\72l(http://evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects escaped url function name with 6-digit hex (u\\000072l) pointing to external scheme', () => {
+    expect(
+      sanitizeCss('.a { background: u\\000072l(https://evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects fully escaped url function name (\\75\\72\\6c)', () => {
+    // `\75\72\6c` decodes to `url`.
+    expect(
+      sanitizeCss('.a { background: \\75\\72\\6c(http://evil.example/x); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects escaped @import keyword (@\\69mport)', () => {
+    expect(
+      sanitizeCss('@\\69mport "http://evil.example/x.css";', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects fully escaped @import keyword (@\\69\\6d\\70\\6f\\72\\74)', () => {
+    // `\69\6d\70\6f\72\74` decodes to `import`.
+    expect(
+      sanitizeCss('@\\69\\6d\\70\\6f\\72\\74 "http://evil.example/x.css";', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects escaped @import keyword with whitespace terminators', () => {
+    // Each hex escape consumes a single optional whitespace per §4.3.7.
+    expect(
+      sanitizeCss('@\\69 mport "http://evil.example/x.css";', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects escaped expression function name (expres\\73ion())', () => {
+    // `\73` decodes to `s`, reconstructing `expression()`.
+    expect(sanitizeCss('.a { width: expres\\73ion(alert(1)); }', COMPONENT)).toBeNull();
+  });
+
+  it('rejects escaped -moz-binding property (-moz-bindin\\67)', () => {
+    expect(
+      sanitizeCss('.a { -moz-bindin\\67: url(evil.xml#xbl); }', COMPONENT),
+    ).toBeNull();
+  });
+
+  it('rejects escaped behavior property (behavio\\72)', () => {
+    expect(sanitizeCss('.a { behavio\\72: url(evil.htc); }', COMPONENT)).toBeNull();
+  });
+
+  it('still accepts legitimate url() with unrelated escapes in surrounding CSS', () => {
+    // Harmless identity-escape inside a selector; url() payload is safe.
+    expect(
+      sanitizeCss('.\\:hover-safe { background: url(/safe.png); }', COMPONENT),
+    ).not.toBeNull();
+  });
+});
