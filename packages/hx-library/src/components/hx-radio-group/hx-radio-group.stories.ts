@@ -326,7 +326,8 @@ export const PreSelected: Story = {
     expect(group).toBeTruthy();
     const englishRadio = canvasElement.querySelector('hx-radio[value="english"]');
     expect(englishRadio).toBeTruthy();
-    expect(englishRadio!.getAttribute('aria-checked')).toBe('true');
+    // `checked` is reflected on hx-radio — ARIA state is on ElementInternals, not DOM attrs.
+    expect(englishRadio!.hasAttribute('checked')).toBe(true);
   },
 };
 
@@ -1019,8 +1020,8 @@ export const ClickSelection: Story = {
     expect(changeEventFired).toBeTruthy();
     expect(changeDetail.value).toBe('neurology');
 
-    // Verify the radio is checked
-    expect(neurologyRadio!.getAttribute('aria-checked')).toBe('true');
+    // Verify the radio is checked — `checked` is a reflected @property on hx-radio.
+    expect(neurologyRadio!.hasAttribute('checked')).toBe(true);
 
     // Click a different radio
     changeEventFired = false;
@@ -1031,9 +1032,9 @@ export const ClickSelection: Story = {
     expect(group!.value).toBe('cardiology');
     expect(changeEventFired).toBeTruthy();
 
-    // Previous radio should be unchecked
-    expect(neurologyRadio!.getAttribute('aria-checked')).toBe('false');
-    expect(cardioRadio!.getAttribute('aria-checked')).toBe('true');
+    // Previous radio should be unchecked; new radio should be checked.
+    expect(neurologyRadio!.hasAttribute('checked')).toBe(false);
+    expect(cardioRadio!.hasAttribute('checked')).toBe(true);
   },
 };
 
@@ -1060,23 +1061,24 @@ export const KeyboardNavigation: Story = {
     radios[0].focus();
     await new Promise((r) => setTimeout(r, 50));
 
-    // Arrow Down should move to next and select it
+    // Arrow Down should move to next and select it.
+    // `checked` is reflected on hx-radio — ARIA state is on ElementInternals, not DOM attrs.
     radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
-    expect(radios[1].getAttribute('aria-checked')).toBe('true');
+    expect(radios[1].hasAttribute('checked')).toBe(true);
 
     // Arrow Down again
     radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
-    expect(radios[2].getAttribute('aria-checked')).toBe('true');
+    expect(radios[2].hasAttribute('checked')).toBe(true);
 
     // Arrow Up should move back
     radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
-    expect(radios[1].getAttribute('aria-checked')).toBe('true');
+    expect(radios[1].hasAttribute('checked')).toBe(true);
   },
 };
 

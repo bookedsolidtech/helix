@@ -8,6 +8,11 @@ import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
+/** Detail for the hx-click event dispatched by hx-button. */
+export interface HxButtonClickDetail {
+  originalEvent: MouseEvent;
+}
+
 /**
  * A production-grade button component for user interaction. Supports multiple
  * visual variants, sizes, loading state, prefix/suffix slots, anchor rendering,
@@ -134,6 +139,27 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
   @property({ type: Boolean, reflect: true })
   inverted = false;
 
+  /**
+   * Accessible label for icon-only or text-less buttons.
+   * Required when the button has no visible text content.
+   *
+   * Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+   * `accessible-label` takes precedence when both are set.
+   *
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string = '';
+
+  /**
+   * Returns the effective label for the button, checking accessible-label first,
+   * then the aria-label attribute, falling back to empty string.
+   * @internal
+   */
+  private get _effectiveLabel(): string {
+    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
+  }
+
   // ─── Form API ───
 
   protected override _onFormDisabled(disabled: boolean): void {
@@ -151,6 +177,24 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
     'ghost',
     'outline',
   ] as const;
+
+  // Prevents double-warn on browsers that fire slotchange for empty initial slots.
+  private _emptySlotWarnEmitted = false;
+
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    const hasContent = (slot?.assignedNodes({ flatten: true }) ?? []).some(
+      (n) => n.nodeType !== Node.TEXT_NODE || (n.textContent?.trim().length ?? 0) > 0,
+    );
+    if (!hasContent && !this._effectiveLabel) {
+      this._emptySlotWarnEmitted = true;
+      devWarn(
+        'hx-button',
+        'hx-button has no slot content and no accessible-label — button will have no accessible name.',
+      );
+    }
+  }
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
@@ -171,12 +215,19 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
   /** @internal */
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
-    if (!hasContent && !this.ariaLabel) {
+    const hasContent = slot
+      .assignedNodes({ flatten: true })
+      .some((n) => n.nodeType !== Node.TEXT_NODE || (n.textContent?.trim().length ?? 0) > 0);
+    if (!hasContent && !this._effectiveLabel && !this._emptySlotWarnEmitted) {
       devWarn(
         'hx-button',
-        'hx-button has no label and no aria-label — button will have no accessible name.',
+        'hx-button has no slot content and no accessible-label — button will have no accessible name.',
       );
+    }
+    // Only reset once content arrives so the guard stays armed for browsers
+    // that fire a second slotchange for the same empty initial slot.
+    if (hasContent) {
+      this._emptySlotWarnEmitted = false;
     }
   }
 
@@ -288,7 +339,7 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
           href=${this.disabled || this.loading ? nothing : ifDefined(this.href)}
           target=${ifDefined(this.target)}
           rel=${this.target === '_blank' ? 'noopener noreferrer' : nothing}
-          aria-label=${this.ariaLabel ?? nothing}
+          aria-label=${this._effectiveLabel || nothing}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           tabindex=${this.disabled ? '-1' : nothing}
@@ -305,7 +356,7 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type=${this.type}
-        aria-label=${this.ariaLabel ?? nothing}
+        aria-label=${this._effectiveLabel || nothing}
         aria-busy=${this.loading ? 'true' : nothing}
         @click=${this._handleClick}
       >

@@ -15,7 +15,8 @@
       "persistent": true
     },
     "type-check": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "test": {
       "dependsOn": ["^build"],
@@ -25,7 +26,8 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "clean": {
       "cache": false
@@ -33,6 +35,10 @@
     "cem": {
       "dependsOn": ["^build"],
       "outputs": ["custom-elements.json"]
+    },
+    "prebuild": {
+      "dependsOn": ["^cem"],
+      "outputs": []
     },
     "generate": {
       "dependsOn": ["^cem"],

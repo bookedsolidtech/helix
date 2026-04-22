@@ -29,7 +29,7 @@ export const helixCopyButtonStyles = css`
     user-select: none;
     -webkit-user-select: none;
     flex-shrink: 0;
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-copy-button-font-family, var(--hx-font-family-sans));
     font-weight: var(--hx-font-weight-medium);
     white-space: nowrap;
   }
@@ -52,8 +52,8 @@ export const helixCopyButtonStyles = css`
 
   .button--sm {
     padding: var(--hx-space-1);
-    min-width: var(--hx-size-8);
-    height: var(--hx-size-8);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-sm);
   }
 

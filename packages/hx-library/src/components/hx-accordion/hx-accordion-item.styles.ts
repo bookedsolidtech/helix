@@ -7,13 +7,13 @@ export const helixAccordionItemStyles = css`
 
   .item {
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #dee2e6));
-    font-family: var(--hx-font-family-sans, sans-serif);
+      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #e2e8f0));
+    font-family: var(--hx-accordion-item-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   :host(:first-child) .item {
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #dee2e6));
+      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #e2e8f0));
   }
 
   /* Remove native details marker */
@@ -27,7 +27,7 @@ export const helixAccordionItemStyles = css`
     list-style: none;
     font-size: var(--hx-font-size-md, 1rem);
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-accordion-trigger-color, var(--hx-color-neutral-800, #212529));
+    color: var(--hx-accordion-trigger-color, var(--hx-color-neutral-800, #1e293b));
     background-color: var(--hx-accordion-trigger-bg, transparent);
     user-select: none;
     transition: background-color var(--hx-transition-fast, 150ms ease);
@@ -47,7 +47,7 @@ export const helixAccordionItemStyles = css`
   }
 
   :host(:not([disabled])) .trigger:hover {
-    background-color: var(--hx-accordion-trigger-hover-bg, var(--hx-color-neutral-50, #f8f9fa));
+    background-color: var(--hx-accordion-trigger-hover-bg, var(--hx-color-neutral-50, #f8fafc));
   }
 
   .trigger:focus-visible {
@@ -65,7 +65,7 @@ export const helixAccordionItemStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--hx-accordion-icon-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-accordion-icon-color, var(--hx-color-neutral-500, #64748b));
     transition: transform var(--hx-transition-normal, 250ms ease);
   }
 
@@ -95,7 +95,7 @@ export const helixAccordionItemStyles = css`
     padding: var(--hx-accordion-content-padding, 0 var(--hx-space-4, 1rem) var(--hx-space-4, 1rem));
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-accordion-content-color, var(--hx-color-neutral-600, #495057));
+    color: var(--hx-accordion-content-color, var(--hx-color-neutral-600, #475569));
   }
 
   /* ─── Disabled host ─── */

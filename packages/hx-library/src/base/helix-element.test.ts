@@ -90,9 +90,10 @@ describe('HelixElement', () => {
       expect(el).toBeInstanceOf(HelixElement);
     });
 
-    it('throws when _internals is accessed on a non-form-associated element', async () => {
+    it('provides _internals on non-form-associated elements (for ARIA)', async () => {
       const el = await fixture<TestHelixDisplay>('<test-helix-display></test-helix-display>');
-      expect(() => el._internals).toThrow('[HelixElement]');
+      expect(() => el._internals).not.toThrow();
+      expect(el._internals).toBeInstanceOf(ElementInternals);
     });
 
     it('returns null for form getter when not form-associated', async () => {

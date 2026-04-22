@@ -304,6 +304,77 @@ describe('hx-stack', () => {
     });
   });
 
+  // ─── Property: gap — xs and xl computed styles ───
+
+  describe('Property: gap — xs and xl', () => {
+    it('applies non-zero gap for xs', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="xs"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      expect(styles.gap).not.toBe('0px');
+    });
+
+    it('applies non-zero gap for xl', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="xl"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      expect(styles.gap).not.toBe('0px');
+    });
+
+    it('applies non-zero gap for sm', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="sm"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      expect(styles.gap).not.toBe('0px');
+    });
+
+    it('applies non-zero gap for lg', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="lg"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      expect(styles.gap).not.toBe('0px');
+    });
+  });
+
+  // ─── Slots: multiple children ───
+
+  describe('Slots: multiple children', () => {
+    it('renders multiple slotted children', async () => {
+      const el = await fixture<HelixStack>(
+        '<hx-stack><div id="a">A</div><div id="b">B</div><div id="c">C</div></hx-stack>',
+      );
+      expect(el.querySelector('#a')).toBeTruthy();
+      expect(el.querySelector('#b')).toBeTruthy();
+      expect(el.querySelector('#c')).toBeTruthy();
+    });
+  });
+
+  // ─── Property: inline — computed inline-flex on base ───
+
+  describe('Property: inline — flex-display on base', () => {
+    it('base container uses flex display even in inline mode', async () => {
+      const el = await fixture<HelixStack>('<hx-stack inline></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      const styles = getComputedStyle(base);
+      // The base div uses flex regardless; host switches display to inline-block
+      expect(['flex', 'inline-flex']).toContain(styles.display);
+    });
+  });
+
+  // ─── Reactivity: gap updates ───
+
+  describe('Reactivity: gap updates', () => {
+    it('updates gap when gap property changes at runtime', async () => {
+      const el = await fixture<HelixStack>('<hx-stack gap="none"></hx-stack>');
+      const base = shadowQuery(el, '[part="base"]');
+      expect(getComputedStyle(base).gap).toBe('0px');
+
+      el.gap = 'lg';
+      await el.updateComplete;
+      expect(getComputedStyle(base).gap).not.toBe('0px');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

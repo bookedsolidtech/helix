@@ -110,7 +110,7 @@ describe('hx-field', () => {
 
     it('renders error message container when error is set', async () => {
       const el = await fixture<HelixField>('<hx-field error="This field is required"></hx-field>');
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv).toBeTruthy();
       expect(errorDiv?.textContent?.trim()).toBe('This field is required');
     });
@@ -132,7 +132,7 @@ describe('hx-field', () => {
       const el = await fixture<HelixField>('<hx-field error="Required"></hx-field>');
       el.error = '';
       await el.updateComplete;
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv).toBeNull();
     });
   });
@@ -325,9 +325,9 @@ describe('hx-field', () => {
       expect(helpText).toBeTruthy();
     });
 
-    it('error-message part is present when error is set', async () => {
+    it('error part is present when error is set', async () => {
       const el = await fixture<HelixField>('<hx-field error="Error occurred"></hx-field>');
-      const errorMsg = shadowQuery(el, '[part="error-message"]');
+      const errorMsg = shadowQuery(el, '[part="error"]');
       expect(errorMsg).toBeTruthy();
     });
 
@@ -353,7 +353,7 @@ describe('hx-field', () => {
       const el = await fixture<HelixField>('<hx-field></hx-field>');
       el.error = 'Field is required';
       await el.updateComplete;
-      const errorDiv = shadowQuery(el, '[part="error-message"]');
+      const errorDiv = shadowQuery(el, '[part="error"]');
       expect(errorDiv?.textContent?.trim()).toBe('Field is required');
     });
 
@@ -737,6 +737,76 @@ describe('hx-field', () => {
       // The help-text container should be visible because the slot has content
       expect(helpDiv).toBeTruthy();
       expect(helpDiv?.hasAttribute('hidden')).toBe(false);
+    });
+  });
+
+  // ─── field--required CSS class (2) ───
+
+  describe('field--required CSS class', () => {
+    it('applies field--required class when required attribute is set', async () => {
+      const el = await fixture<HelixField>('<hx-field required></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--required')).toBe(true);
+    });
+
+    it('does not apply field--required class when required is false', async () => {
+      const el = await fixture<HelixField>('<hx-field></hx-field>');
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--required')).toBe(false);
+    });
+  });
+
+  // ─── error state: aria-invalid on slot change (2) ───
+
+  describe('error slot: aria-invalid on slotted textarea', () => {
+    it('sets aria-invalid on slotted textarea when error slot has content', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><textarea></textarea><span slot="error">Error msg</span></hx-field>',
+      );
+      await el.updateComplete;
+      const textarea = el.querySelector('textarea');
+      expect(textarea?.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('sets aria-invalid on slotted select when error slot has content', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field><select><option>A</option></select><span slot="error">Select error</span></hx-field>',
+      );
+      await el.updateComplete;
+      const select = el.querySelector('select');
+      expect(select?.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
+
+  // ─── error clears help text visibility (2) ───
+
+  describe('error interaction with help text slot', () => {
+    it('help-text container is hidden when error slot has content', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field help-text="guidance"><span slot="error">Error</span></hx-field>',
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv?.hasAttribute('hidden')).toBe(true);
+    });
+
+    it('help-text container is visible when error slot is empty and helpText is set', async () => {
+      const el = await fixture<HelixField>('<hx-field help-text="guidance"></hx-field>');
+      await el.updateComplete;
+      const helpDiv = shadowQuery(el, '[part="help-text"]');
+      expect(helpDiv?.hasAttribute('hidden')).toBe(false);
+    });
+  });
+
+  // ─── Programmatic disabled toggle (1) ───
+
+  describe('Programmatic disabled toggle', () => {
+    it('field--disabled class removed when disabled set to false programmatically', async () => {
+      const el = await fixture<HelixField>('<hx-field disabled></hx-field>');
+      el.disabled = false;
+      await el.updateComplete;
+      const field = shadowQuery(el, '[part="field"]');
+      expect(field?.classList.contains('field--disabled')).toBe(false);
     });
   });
 

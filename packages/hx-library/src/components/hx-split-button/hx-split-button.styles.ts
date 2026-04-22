@@ -80,7 +80,7 @@ export const helixSplitButtonStyles = css`
     flex-shrink: 0;
     border: var(--hx-border-width-thin, 1px) solid var(--hx-split-button-border-color, transparent);
     border-inline-start: var(--hx-border-width-thin, 1px) solid
-      var(--hx-split-button-divider-color, var(--hx-color-primary-400, #3b82f6));
+      var(--hx-split-button-divider-color, var(--hx-color-primary-400, #60a5fa));
     border-radius: 0 var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem))
       var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem)) 0;
     background-color: var(--hx-split-button-bg, var(--hx-color-primary-500, #2563eb));
@@ -174,7 +174,7 @@ export const helixSplitButtonStyles = css`
     --hx-split-button-bg: var(--hx-color-primary-500, #2563eb);
     --hx-split-button-color: var(--hx-color-neutral-0, #ffffff);
     --hx-split-button-border-color: transparent;
-    --hx-split-button-divider-color: var(--hx-color-primary-400, #3b82f6);
+    --hx-split-button-divider-color: var(--hx-color-primary-400, #60a5fa);
   }
 
   /* ─── Variant: secondary ─── */

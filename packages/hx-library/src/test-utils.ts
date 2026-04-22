@@ -3,6 +3,9 @@
  * Provides helpers for creating fixtures, querying shadow DOM, and event handling.
  */
 
+export { resetIdCounter } from './base/id-counter.js';
+export { formFixture, getFormData, resetForm } from './form-test-utils.js';
+
 const fixtureContainer = document.createElement('div');
 fixtureContainer.id = 'test-fixture-container';
 document.body.appendChild(fixtureContainer);
@@ -47,12 +50,33 @@ export function shadowQueryAll<T extends Element = Element>(
 
 /**
  * Returns a Promise that resolves on the next occurrence of an event on the element.
+ * Rejects with a descriptive error if the event does not fire within the timeout.
+ *
+ * @param el - The target to listen on.
+ * @param eventName - The event name to wait for.
+ * @param timeoutMs - Maximum wait time in milliseconds (default 5000).
  */
-export function oneEvent<T extends Event = Event>(el: EventTarget, eventName: string): Promise<T> {
-  return new Promise<T>((resolve) => {
-    el.addEventListener(eventName, ((e: Event) => resolve(e as T)) as EventListener, {
-      once: true,
-    });
+export function oneEvent<T extends Event = Event>(
+  el: EventTarget,
+  eventName: string,
+  timeoutMs = 5000,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const tag = el instanceof HTMLElement ? `<${el.tagName.toLowerCase()}>` : String(el);
+
+    const timer = setTimeout(() => {
+      el.removeEventListener(eventName, handler as EventListener);
+      reject(
+        new Error(`[oneEvent] Timed out after ${timeoutMs}ms waiting for "${eventName}" on ${tag}`),
+      );
+    }, timeoutMs);
+
+    const handler = (e: Event) => {
+      clearTimeout(timer);
+      resolve(e as T);
+    };
+
+    el.addEventListener(eventName, handler as EventListener, { once: true });
   });
 }
 

@@ -884,4 +884,133 @@ describe('hx-nav', () => {
       expect(el.labelCloseMenu).toBe('Fermer le menu de navigation');
     });
   });
+
+  // ─── URL Sanitization edge cases (3) ───
+
+  describe('URL Sanitization edge cases', () => {
+    it('allows relative ./path links', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = [{ label: 'Page', href: './relative' }];
+      await el.updateComplete;
+      const link = el.shadowRoot?.querySelector<HTMLAnchorElement>('a[part="link"]');
+      expect(link?.getAttribute('href')).toBe('./relative');
+    });
+
+    it('allows ../parent relative links', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = [{ label: 'Parent', href: '../parent' }];
+      await el.updateComplete;
+      const link = el.shadowRoot?.querySelector<HTMLAnchorElement>('a[part="link"]');
+      expect(link?.getAttribute('href')).toBe('../parent');
+    });
+
+    it('allows bare # as href', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = [{ label: 'Anchor', href: '#' }];
+      await el.updateComplete;
+      const link = el.shadowRoot?.querySelector<HTMLAnchorElement>('a[part="link"]');
+      expect(link?.getAttribute('href')).toBe('#');
+    });
+
+    it('sanitizes missing href to #', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = [{ label: 'No href' }];
+      await el.updateComplete;
+      const link = el.shadowRoot?.querySelector<HTMLAnchorElement>('a[part="link"]');
+      expect(link?.getAttribute('href')).toBe('#');
+    });
+  });
+
+  // ─── ArrowLeft wraps from first to last ───
+
+  describe('ArrowLeft wrap', () => {
+    it('ArrowLeft wraps from first item to last item', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = sampleItems;
+      await el.updateComplete;
+      const links = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '[part="list"] > [part="item"] > [part="link"]',
+      );
+      const focusSpy = vi.spyOn(links![2], 'focus');
+      links?.[0]?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+  });
+
+  // ─── Orientation: ArrowDown on horizontal with submenu (1) ───
+
+  describe('ArrowDown opens submenu on horizontal orientation', () => {
+    it('ArrowDown on a submenu button in horizontal mode opens submenu', async () => {
+      const el = await fixture<HelixNav>('<hx-nav orientation="horizontal"></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      btn?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      expect(btn?.getAttribute('aria-expanded')).toBe('true');
+    });
+  });
+
+  // ─── ArrowDown in submenu wraps from last to first (1) ───
+
+  describe('ArrowDown wrap in submenu', () => {
+    it('ArrowDown in submenu wraps from last sub-item to first', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      btn?.click();
+      await el.updateComplete;
+      const subLinks = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '.nav__submenu:not([hidden]) [part="link"]',
+      );
+      const focusSpy = vi.spyOn(subLinks![0], 'focus');
+      subLinks?.[subLinks.length - 1]?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+      );
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+  });
+
+  // ─── ArrowUp in submenu wraps from first to last (1) ───
+
+  describe('ArrowUp wrap in submenu', () => {
+    it('ArrowUp in submenu wraps from first sub-item to last', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = itemsWithSubmenus;
+      await el.updateComplete;
+      const btn = el.shadowRoot?.querySelector<HTMLButtonElement>('button[part="link"]');
+      btn?.click();
+      await el.updateComplete;
+      const subLinks = el.shadowRoot?.querySelectorAll<HTMLElement>(
+        '.nav__submenu:not([hidden]) [part="link"]',
+      );
+      const focusSpy = vi.spyOn(subLinks![subLinks!.length - 1], 'focus');
+      subLinks?.[0]?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }),
+      );
+      expect(focusSpy).toHaveBeenCalled();
+      focusSpy.mockRestore();
+    });
+  });
+
+  // ─── Click item with no children dispatches event and closes mobile menu (1) ───
+
+  describe('Click item with no children closes mobile menu', () => {
+    it('clicking a link item while mobile menu is open closes mobile menu', async () => {
+      const el = await fixture<HelixNav>('<hx-nav></hx-nav>');
+      el.items = sampleItems;
+      await el.updateComplete;
+      const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+      toggle?.click();
+      await el.updateComplete;
+      expect(toggle?.getAttribute('aria-expanded')).toBe('true');
+      const links = el.shadowRoot?.querySelectorAll<HTMLAnchorElement>('a[part="link"]');
+      links?.[0]?.click();
+      await el.updateComplete;
+      expect(toggle?.getAttribute('aria-expanded')).toBe('false');
+    });
+  });
 });

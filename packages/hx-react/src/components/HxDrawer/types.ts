@@ -40,6 +40,6 @@ When the `label` slot is used, `aria-labelledby` takes precedence. */
   onHxHide?: (event: Event) => void;
   /** Fired after the drawer close animation completes. */
   onHxAfterHide?: (event: Event) => void;
-  /** Fired when initial focus is set inside the drawer. Cancelable to override focus behavior. */
+  /** Fired when initial focus is set inside the drawer. Cancelable to override focus behavior. **Event naming rationale:** hx-drawer uses the `hx-show`/`hx-hide`/`hx-after-show`/`hx-after-hide` pattern shared by all overlay components (hx-popover, hx-tooltip, hx-dropdown). This differs from hx-dialog's `hx-open`/`hx-close`/`hx-cancel` events, which align with native `<dialog>` semantics. The distinction is intentional: overlays are transient visibility toggles, while dialog is a stateful container with cancel semantics. */
   onHxInitialFocus?: (event: Event) => void;
 }

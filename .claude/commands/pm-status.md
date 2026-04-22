@@ -14,8 +14,8 @@ No arguments. The command operates on the current repo derived from `gh repo vie
 
 Before anything else:
 
-1. Read `.reagent/policy.yaml` — confirm autonomy level is L1 or higher. L0 blocks all writes; report and stop.
-2. Check for `.reagent/HALT` — if the file exists, stop immediately: "Agent operations frozen. Check .reagent/HALT."
+1. Read `.rea/policy.yaml` — confirm autonomy level is L1 or higher. L0 blocks all writes; report and stop.
+2. Check for `.rea/HALT` — if the file exists, stop immediately: "Agent operations frozen. Check .rea/HALT."
 3. Verify `gh` CLI is available: `gh --version`
 4. Resolve the current repo: `gh repo view --json nameWithOwner --jq '.nameWithOwner'`
 
@@ -135,7 +135,7 @@ This PR promotes the current `dev` branch to `staging` for pre-release validatio
 - [ ] CHANGELOG reviewed
 - [ ] No open security advisories blocking release
 
-🔁 Updated automatically by reagent PM workflow
+🔁 Updated automatically by helix PM workflow
 EOF
 )"
 ```
@@ -211,7 +211,7 @@ Release PR:         green and ready | waiting on CI | none
 
 | Situation                       | Action                                                                                            |
 | ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| HALT file present               | Stop immediately — "Agent operations frozen. Check .reagent/HALT."                                |
+| HALT file present               | Stop immediately — "Agent operations frozen. Check .rea/HALT."                                |
 | Autonomy level L0               | Stop — "L0 policy: all writes require explicit approval. Report only — no merges or PR creation." |
 | `gh` not installed              | Stop — "gh CLI not found. Install it and run gh auth login."                                      |
 | `gh repo view` fails            | Stop — "Cannot resolve repo. Confirm this directory has a GitHub remote."                         |

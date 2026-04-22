@@ -306,6 +306,99 @@ describe('hx-stat', () => {
     });
   });
 
+  // ─── Property: labelTrend (i18n) ───
+
+  describe('Property: labelTrend', () => {
+    it('defaults to "Trend"', async () => {
+      const el = await fixture<HelixStat>('<hx-stat value="42" trend="up"></hx-stat>');
+      const trendPart = shadowQuery(el, '[part~="trend"]');
+      expect(trendPart?.getAttribute('aria-label')).toBe('Trend: up');
+    });
+
+    it('uses custom label-trend for aria-label', async () => {
+      const el = await fixture<HelixStat>(
+        '<hx-stat value="42" trend="up" label-trend="Tendencia"></hx-stat>',
+      );
+      const trendPart = shadowQuery(el, '[part~="trend"]');
+      expect(trendPart?.getAttribute('aria-label')).toBe('Tendencia: up');
+    });
+
+    it('live region uses custom label-trend', async () => {
+      const el = await fixture<HelixStat>(
+        '<hx-stat label="Métrica" value="42" trend="up" label-trend="Tendencia"></hx-stat>',
+      );
+      const live = el.shadowRoot?.querySelector('.stat__live-region');
+      expect(live?.textContent).toContain('Tendencia');
+    });
+  });
+
+  // ─── role="group" and aria-label ───
+
+  describe('role="group" and aria-label', () => {
+    it('container has role="group"', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Patients" value="42"></hx-stat>');
+      const container = shadowQuery(el, '[part~="container"]');
+      expect(container?.getAttribute('role')).toBe('group');
+    });
+
+    it('aria-label on group is "value: label" when both are set', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Patients" value="42"></hx-stat>');
+      const container = shadowQuery(el, '[part~="container"]');
+      expect(container?.getAttribute('aria-label')).toBe('42: Patients');
+    });
+
+    it('aria-label on group is just value when label is empty', async () => {
+      const el = await fixture<HelixStat>('<hx-stat value="42"></hx-stat>');
+      const container = shadowQuery(el, '[part~="container"]');
+      expect(container?.getAttribute('aria-label')).toBe('42');
+    });
+
+    it('aria-label on group is just label when value is empty', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Patients"></hx-stat>');
+      const container = shadowQuery(el, '[part~="container"]');
+      expect(container?.getAttribute('aria-label')).toBe('Patients');
+    });
+  });
+
+  // ─── aria-hidden on visible value and label ───
+
+  describe('aria-hidden on visible value and label elements', () => {
+    it('value span has aria-hidden="true"', async () => {
+      const el = await fixture<HelixStat>('<hx-stat value="42"></hx-stat>');
+      const valuePart = shadowQuery(el, '[part~="value"]');
+      expect(valuePart?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('label span has aria-hidden="true"', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Patients"></hx-stat>');
+      const labelPart = shadowQuery(el, '[part~="label"]');
+      expect(labelPart?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('trend element has role="img"', async () => {
+      const el = await fixture<HelixStat>('<hx-stat value="42" trend="down"></hx-stat>');
+      const trendPart = shadowQuery(el, '[part~="trend"]');
+      expect(trendPart?.getAttribute('role')).toBe('img');
+    });
+  });
+
+  // ─── _hasWarnedUnnamed resets when value/label provided ───
+
+  describe('_hasWarnedUnnamed guard resets', () => {
+    it('allows warning again after value is cleared', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      const el = await fixture<HelixStat>('<hx-stat value="42"></hx-stat>');
+      // No warning yet since value is set
+      el.value = '';
+      await el.updateComplete;
+      // Now both value and label are empty — warning should fire
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('unnamed hx-stat'));
+
+      warnSpy.mockRestore();
+    });
+  });
+
   // ─── devWarn for empty state (2) ───
 
   describe('devWarn for empty state', () => {

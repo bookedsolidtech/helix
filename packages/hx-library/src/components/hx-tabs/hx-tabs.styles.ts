@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const helixTabsStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-tabs-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   * {
@@ -30,7 +30,7 @@ export const helixTabsStyles = css`
     flex-wrap: nowrap;
     gap: 0;
     border-bottom: var(--hx-tabs-border-width, 1px) solid
-      var(--hx-tabs-border-color, var(--hx-color-neutral-200, #e9ecef));
+      var(--hx-tabs-border-color, var(--hx-color-neutral-200, #e2e8f0));
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -55,7 +55,7 @@ export const helixTabsStyles = css`
     flex-direction: column;
     border-bottom: none;
     border-inline-end: var(--hx-tabs-border-width, 1px) solid
-      var(--hx-tabs-border-color, var(--hx-color-neutral-200, #e9ecef));
+      var(--hx-tabs-border-color, var(--hx-color-neutral-200, #e2e8f0));
     overflow-x: visible;
     overflow-y: auto;
     min-width: var(--hx-tabs-vertical-width, 12rem);

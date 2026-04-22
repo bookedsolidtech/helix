@@ -82,13 +82,11 @@ jobs:
             echo "Running tests for specific components: $PATHS"
             BROWSER=${{ matrix.browser }} pnpm exec vitest run \
               --config vitest.config.cross-browser.ts \
-              --browser.instances "[{\"browser\":\"${{ matrix.browser }}\"}]" \
               $PATHS
           else
             echo "Running full test suite on ${{ matrix.browser }}"
             BROWSER=${{ matrix.browser }} pnpm exec vitest run \
-              --config vitest.config.cross-browser.ts \
-              --browser.instances "[{\"browser\":\"${{ matrix.browser }}\"}]"
+              --config vitest.config.cross-browser.ts
           fi
         working-directory: packages/hx-library
 

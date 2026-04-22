@@ -234,9 +234,9 @@ once('helixui:card-init', 'hx-card', context).forEach((card) => {
 
 ```javascript
 // Most common form: selector string
-once('helixui:card-click', 'hx-card[hx-href]', context).forEach((card) => {
+once('helixui:card-click', 'hx-card[href]', context).forEach((card) => {
   card.addEventListener('hx-click', () => {
-    window.location.href = card.getAttribute('hx-href');
+    window.location.href = card.getAttribute('href');
   });
 });
 ```

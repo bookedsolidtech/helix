@@ -19,7 +19,7 @@
 {{ attach_library('helixui/hx-tag') }}
 
 <hx-tag
-  {% if variant and variant != 'neutral' %}variant="{{ variant }}"{% endif %}
+  {% if variant and variant != 'default' %}variant="{{ variant }}"{% endif %}
   {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
   {% if pill %}pill{% endif %}
   {% if removable %}removable{% endif %}

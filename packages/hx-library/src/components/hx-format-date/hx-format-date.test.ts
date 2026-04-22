@@ -412,4 +412,234 @@ describe('hx-format-date', () => {
       expect(el.hourFormat).toBe('24');
     });
   });
+
+  // ─── Property: numeric ───
+
+  describe('Property: numeric', () => {
+    it('defaults to "auto"', async () => {
+      const el = await fixture<HxFormatDate>('<hx-format-date></hx-format-date>');
+      expect(el.numeric).toBe('auto');
+    });
+
+    it('accepts numeric="always"', async () => {
+      const el = await fixture<HxFormatDate>(
+        '<hx-format-date numeric="always"></hx-format-date>',
+      );
+      expect(el.numeric).toBe('always');
+    });
+  });
+
+  // ─── Property: relative ───
+
+  describe('Property: relative', () => {
+    it('defaults to false', async () => {
+      const el = await fixture<HxFormatDate>('<hx-format-date></hx-format-date>');
+      expect(el.relative).toBe(false);
+    });
+
+    it('sets relative=true via attribute', async () => {
+      const el = await fixture<HxFormatDate>('<hx-format-date relative></hx-format-date>');
+      expect(el.relative).toBe(true);
+    });
+  });
+
+  // ─── Date parsing: Date object invalid ───
+
+  describe('Date parsing: invalid Date object', () => {
+    it('falls back to current date for invalid Date object', async () => {
+      const before = Date.now();
+      const el = await fixture<HxFormatDate>('<hx-format-date></hx-format-date>');
+      el.date = new Date('not-a-date');
+      await el.updateComplete;
+      const after = Date.now();
+      const time = shadowQuery(el, 'time')!;
+      const dt = new Date(time.getAttribute('datetime')!).getTime();
+      expect(dt).toBeGreaterThanOrEqual(before);
+      expect(dt).toBeLessThanOrEqual(after);
+    });
+  });
+
+  // ─── Relative time: seconds range ───
+
+  describe('Relative time: seconds range', () => {
+    it('renders "X seconds ago" for very recent past', async () => {
+      const thirtySecondsAgo = new Date(Date.now() - 30000).toISOString();
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${thirtySecondsAgo}" lang="en-US" relative></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+
+    it('renders relative text for date hours away', async () => {
+      const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${threeHoursAgo}" lang="en-US" relative></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toMatch(/ago/i);
+    });
+
+    it('renders relative text for date months away', async () => {
+      const sixMonthsAgo = new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000).toISOString();
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${sixMonthsAgo}" lang="en-US" relative></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+
+    it('renders relative text for date years away', async () => {
+      const twoYearsAgo = new Date(Date.now() - 2 * 365 * 24 * 60 * 60 * 1000).toISOString();
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${twoYearsAgo}" lang="en-US" relative></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+  });
+
+  // ─── Dynamic property updates ───
+
+  describe('Dynamic property updates', () => {
+    it('re-renders when date property changes', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" year="numeric"></hx-format-date>`,
+      );
+      const time1 = shadowQuery(el, 'time')!;
+      const dt1 = time1.getAttribute('datetime');
+      el.date = '2025-01-01T00:00:00.000Z';
+      await el.updateComplete;
+      const dt2 = time1.getAttribute('datetime');
+      expect(dt1).not.toBe(dt2);
+    });
+
+    it('re-renders when lang property changes', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="long" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('June');
+      el.lang = 'de';
+      await el.updateComplete;
+      expect(time.textContent).toContain('Juni');
+    });
+  });
+
+  // ─── Locale fallback chain ───
+
+  describe('Locale fallback chain', () => {
+    it('falls back to navigator.language when lang and document lang are empty', async () => {
+      // The component will use navigator.language or 'en' as final fallback
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" month="long" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      // Should still produce a non-empty string with any locale
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+  });
+
+  // ─── timezone-offset datetime: hour=24 edge case ───
+
+  describe('Timezone offset: UTC+0 produces +00:00', () => {
+    it('UTC timezone produces +00:00 offset in datetime', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" time-zone="UTC"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      const dt = time.getAttribute('datetime')!;
+      expect(dt).toContain('+00:00');
+    });
+  });
+
+  // ─── Format options: weekday narrow/short ───
+
+  describe('Format options: additional weekday values', () => {
+    it('applies weekday="short"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" weekday="short" month="short" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      // Short weekday for Saturday in en-US is "Sat"
+      expect(time.textContent).toContain('Sat');
+    });
+
+    it('applies weekday="narrow"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" weekday="narrow" month="short" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      // Narrow weekday for Saturday in en-US is "S"
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+  });
+
+  // ─── Format options: month 2-digit, numeric ───
+
+  describe('Format options: additional month/day values', () => {
+    it('applies month="numeric"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="numeric" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('6');
+    });
+
+    it('applies month="2-digit"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="2-digit" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('06');
+    });
+
+    it('applies month="narrow"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="narrow" year="numeric" day="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+
+    it('applies day="2-digit"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" month="numeric" year="numeric" day="2-digit"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('15');
+    });
+
+    it('applies year="2-digit"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" year="2-digit"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('24');
+    });
+
+    it('applies minute="2-digit"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent).toContain('30');
+    });
+
+    it('applies second="numeric"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="numeric" minute="2-digit" second="numeric"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+
+    it('applies hour="2-digit"', async () => {
+      const el = await fixture<HxFormatDate>(
+        `<hx-format-date date="${ISO_DATE}" lang="en-US" hour="2-digit" minute="2-digit"></hx-format-date>`,
+      );
+      const time = shadowQuery(el, 'time')!;
+      expect(time.textContent!.trim().length).toBeGreaterThan(0);
+    });
+  });
 });

@@ -1,7 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { HelixElement } from '../../base/index.js';
 import { helixListStyles } from './hx-list.styles.js';
 import { HelixListItem } from './hx-list-item.js'; // real import for instanceof check and property access
 import { devWarn } from '../../utils/dev-warn.js';
@@ -24,7 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-list-divider-color=var(--hx-color-neutral-200)] - Divider line color.
  */
 @customElement('hx-list')
-export class HelixList extends LitElement {
+export class HelixList extends HelixElement {
   static override styles = [helixListStyles];
 
   /**

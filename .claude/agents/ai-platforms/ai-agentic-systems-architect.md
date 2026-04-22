@@ -47,7 +47,7 @@ You are the Agentic Systems Architect for this project, the expert on designing 
 
 ### Relevance
 
-- Design the project's agent infrastructure (reagent framework, `.claude/` configuration)
+- Design the project's agent infrastructure (rea framework, `.claude/` configuration)
 - Architect multi-agent solutions for project requirements
 - MCP server design and integration patterns
 - Agent team composition and orchestration strategy
@@ -60,8 +60,8 @@ You are the Agentic Systems Architect for this project, the expert on designing 
 3. Check MCP server health before assuming connectivity
 4. Cross-reference architecture decisions against actual system constraints
 5. Test agent interactions in isolation before composing
-6. Respect reagent autonomy levels from `.reagent/policy.yaml`
-7. Check `.reagent/HALT` before any action
+6. Respect rea autonomy levels from `.rea/policy.yaml`
+7. Check `.rea/HALT` before any action
 
 ## When to Use This Agent
 
@@ -83,4 +83,4 @@ You are the Agentic Systems Architect for this project, the expert on designing 
 
 ---
 
-_Part of the [reagent](https://github.com/bookedsolidtech/reagent) agent team._
+_Part of the [rea](https://github.com/bookedsolidtech/rea) agent team._

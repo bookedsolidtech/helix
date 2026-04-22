@@ -592,4 +592,74 @@ describe('hx-card', () => {
       expect((el as unknown as Record<string, unknown>)['layout']).toBeUndefined();
     });
   });
+
+  // ─── Coverage Gap: aria-labelledby from heading text ───
+
+  describe('aria-labelledby from heading slot', () => {
+    it('sets aria-labelledby on the card div when heading slot is populated and no hx-label', async () => {
+      const el = await fixture<HelixCard>(`
+        <hx-card hx-href="https://example.com">
+          <h2 slot="heading">Card Title</h2>
+          Card body
+        </hx-card>
+      `);
+      await el.updateComplete;
+      // Allow slot change event to propagate
+      await Promise.resolve();
+      await el.updateComplete;
+      const card = shadowQuery(el, '[part="card"]');
+      expect(card).toBeTruthy();
+      // With heading slotted and no hx-label, aria-labelledby should point to the heading container
+      const ariaLabelledby = card!.getAttribute('aria-labelledby');
+      expect(ariaLabelledby).toBeTruthy();
+    });
+
+    it('uses hx-label as aria-label when both label and heading are present', async () => {
+      const el = await fixture<HelixCard>(`
+        <hx-card hx-href="https://example.com" hx-label="Explicit label">
+          <h2 slot="heading">Card Title</h2>
+          Card body
+        </hx-card>
+      `);
+      await el.updateComplete;
+      const card = shadowQuery(el, '[part="card"]');
+      expect(card!.getAttribute('aria-label')).toBe('Explicit label');
+      // When hx-label is set, aria-labelledby should not be applied
+      expect(card!.getAttribute('aria-labelledby')).toBeNull();
+    });
+  });
+
+  // ─── Coverage Gap: actions slot + href anti-pattern warning ───
+
+  describe('Actions slot + href anti-pattern', () => {
+    it('does not throw when actions slot is used together with hx-href', async () => {
+      // The component issues a devWarn but must not throw
+      const el = await fixture<HelixCard>(`
+        <hx-card hx-href="https://example.com" hx-label="Card with actions">
+          Card body
+          <div slot="actions">
+            <button>Action</button>
+          </div>
+        </hx-card>
+      `);
+      await expect(el.updateComplete).resolves.toBeTruthy();
+    });
+  });
+
+  // ─── Coverage Gap: Space key does NOT activate interactive card ───
+
+  describe('Keyboard: Space does not activate interactive card', () => {
+    it('does not dispatch hx-click on Space keydown (ARIA link pattern)', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="https://example.com" hx-label="Test card">Content</hx-card>',
+      );
+      await el.updateComplete;
+      const card = shadowQuery<HTMLDivElement>(el, '[part="card"]')!;
+      let fired = false;
+      el.addEventListener('hx-click', () => { fired = true; });
+      card.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      // Space must NOT fire hx-click on role="link" per WCAG 2.1.1 / ARIA APG
+      expect(fired).toBe(false);
+    });
+  });
 });

@@ -30,7 +30,7 @@ The CDN (Content Delivery Network) approach loads HELIX components from an exter
 hx-library:
   version: 1.0.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -43,7 +43,7 @@ hx-library:
 hx-library:
   version: 1.2.4
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.4/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -66,7 +66,7 @@ libraries:
 hx-button:
   version: 1.2.4
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.4/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button.js:
       type: external
       attributes:
         type: module
@@ -74,7 +74,7 @@ hx-button:
 hx-card:
   version: 1.2.4
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.2.4/dist/components/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card.js:
       type: external
       attributes:
         type: module
@@ -339,7 +339,7 @@ web/modules/custom/helix_library/
 ├── libraries/
 │   └── helix/
 │       └── dist/
-│           └── helix.bundled.js
+│           └── core.js
 ```
 
 **Module Info File** (`helix_library.info.yml`):
@@ -358,7 +358,7 @@ package: Custom
 components:
   version: 1.2.4
   js:
-    libraries/helix/dist/helix.bundled.js:
+    libraries/helix/dist/cdn/core.js:
       attributes:
         type: module
       preprocess: false

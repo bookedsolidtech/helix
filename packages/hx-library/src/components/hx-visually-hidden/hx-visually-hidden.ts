@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixVisuallyHiddenStyles } from './hx-visually-hidden.styles.js';
 
 /**
@@ -33,7 +34,7 @@ import { helixVisuallyHiddenStyles } from './hx-visually-hidden.styles.js';
  * ```
  */
 @customElement('hx-visually-hidden')
-export class HelixVisuallyHidden extends LitElement {
+export class HelixVisuallyHidden extends HelixElement {
   static override styles = [helixVisuallyHiddenStyles];
 
   /**

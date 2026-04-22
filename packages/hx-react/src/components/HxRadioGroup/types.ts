@@ -28,12 +28,6 @@ export interface HxRadioGroupProps {
   helpText?: string;
   /** Layout orientation of the radio items. */
   orientation?: 'vertical' | 'horizontal';
-  /** Returns the associated form element, if any. */
-  form?: HTMLFormElement | null;
-  /** Returns the validation message. */
-  validationMessage?: string;
-  /** Returns the ValidityState object. */
-  validity?: ValidityState;
 
   // Event callbacks
   /** Dispatched when the selected radio changes. */

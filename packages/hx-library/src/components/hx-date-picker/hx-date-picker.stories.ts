@@ -54,10 +54,20 @@ function getTrigger(canvasElement: HTMLElement): HTMLButtonElement {
   return trigger as HTMLButtonElement;
 }
 
+/**
+ * Returns the calendar `<dialog>` element only when it is currently open.
+ *
+ * The dialog is always rendered in the shadow DOM (commit d8bfda2d0 switched
+ * from `showModal()` to non-modal `show()`, which toggles the `open` attribute
+ * on an always-present element). Returning null when closed preserves the
+ * `toBeTruthy()` / `toBeFalsy()` semantics used throughout these stories.
+ */
 function getCalendar(canvasElement: HTMLElement): HTMLElement | null {
   const host = canvasElement.querySelector('hx-date-picker');
   if (!host?.shadowRoot) return null;
-  return host.shadowRoot.querySelector('[part="calendar"]') as HTMLElement | null;
+  const dialog = host.shadowRoot.querySelector('[part="calendar"]') as HTMLDialogElement | null;
+  if (!dialog) return null;
+  return dialog.open ? dialog : null;
 }
 
 // ─────────────────────────────────────────────────
@@ -895,13 +905,14 @@ export const OpenCalendar: Story = {
     // Wait for the Lit update cycle
     await host!.updateComplete;
 
-    // Calendar should now be visible
+    // Calendar should now be visible (dialog element has the `open` attribute).
     calendar = getCalendar(canvasElement);
     await expect(calendar).toBeTruthy();
+    await expect((calendar as HTMLDialogElement).open).toBe(true);
 
-    // The calendar dialog should have the correct role
-    await expect(calendar!.getAttribute('role')).toBe('dialog');
-    await expect(calendar!.getAttribute('aria-modal')).toBe('true');
+    // Native <dialog> implies role="dialog" — no explicit role attribute is required.
+    // The picker uses non-modal show(), so aria-modal must NOT be "true".
+    await expect(calendar!.getAttribute('aria-modal')).not.toBe('true');
   },
 };
 

@@ -18,8 +18,8 @@ Fetch a pull request diff, run code-reviewer analysis, translate findings to own
 
 Before anything else:
 
-1. Read `.reagent/policy.yaml` — confirm autonomy level is L1 or higher
-2. Check for `.reagent/HALT` — if present, stop immediately
+1. Read `.rea/policy.yaml` — confirm autonomy level is L1 or higher
+2. Check for `.rea/HALT` — if present, stop immediately
 3. Verify `gh` CLI is available: `gh --version`
 4. Confirm caller is in a git repo with a GitHub remote: `gh repo view --json nameWithOwner`
 
@@ -179,7 +179,7 @@ Task: T-NNN → completed  (or "no task linked")
 | Situation                          | Action                                                             |
 | ---------------------------------- | ------------------------------------------------------------------ |
 | PR not found                       | Stop — "PR #N not found. Check the number and repo."               |
-| HALT file present                  | Stop — "Agent operations frozen. Check .reagent/HALT."             |
+| HALT file present                  | Stop — "Agent operations frozen. Check .rea/HALT."             |
 | Empty diff                         | Stop — "Empty diff — nothing to review."                           |
 | code-reviewer returns invalid JSON | Stop — "code-reviewer output was not valid JSON. Raw output: ..."  |
 | GitHub API error                   | Stop — print full error, do not retry                              |

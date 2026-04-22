@@ -1,8 +1,8 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { createIdCounter } from '../../base/index.js';
+import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixMeterStyles } from './hx-meter.styles.js';
 
 type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
@@ -39,7 +39,7 @@ const _nextMeterId = createIdCounter('hx-meter');
  * @cssprop [--hx-meter-label-color] - Label text color.
  */
 @customElement('hx-meter')
-export class HelixMeter extends LitElement {
+export class HelixMeter extends HelixElement {
   static override styles = [helixMeterStyles];
 
   /** @internal */

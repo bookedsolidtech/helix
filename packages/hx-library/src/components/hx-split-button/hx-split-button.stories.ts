@@ -53,7 +53,7 @@ const meta = {
         type: { summary: 'string' },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description: 'Accessible label for the split button group.',
       table: {

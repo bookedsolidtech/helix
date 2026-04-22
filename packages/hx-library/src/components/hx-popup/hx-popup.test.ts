@@ -759,4 +759,90 @@ describe('hx-popup', () => {
       expect(el.style.getPropertyValue('--hx-auto-size-available-height')).toBe('');
     });
   });
+
+  // ─── flip middleware activated (1) ───
+
+  describe('flip middleware', () => {
+    it('popup with flip=true repositions without error', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active flip placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+      const popup = shadowQuery<HTMLElement>(el, '[part="popup"]');
+      expect(popup?.style.left).toBeTruthy();
+    });
+  });
+
+  // ─── shift middleware activated (1) ───
+
+  describe('shift middleware', () => {
+    it('popup with shift=true repositions without error', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active shift placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+      const popup = shadowQuery<HTMLElement>(el, '[part="popup"]');
+      expect(popup?.style.top).toBeTruthy();
+    });
+  });
+
+  // ─── arrow with center placement (1) ───
+
+  describe('arrow center placement', () => {
+    it('arrow with center arrowPlacement uses floating-ui computed position', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active arrow arrow-placement="center" placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]');
+      expect(arrowEl?.getAttribute('data-placement')).toBe('bottom');
+    });
+  });
+
+  // ─── positioning changes while active triggers reposition (1) ───
+
+  describe('positioning property changes while active', () => {
+    it('changing distance while active triggers reposition', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active placement="bottom" distance="8"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      // Wait for initial reposition
+      const firstEventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await firstEventPromise;
+
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      el.distance = 16;
+      await el.updateComplete;
+      const event = await eventPromise;
+      expect(event.type).toBe('hx-reposition');
+    });
+  });
+
+  // ─── anchor slot element detection (1) ───
+
+  describe('anchor slot element detection', () => {
+    it('popup uses slot anchor element when no anchor property is set', async () => {
+      const el = await fixture<HelixPopup>(
+        '<hx-popup active placement="bottom" distance="4"><button slot="anchor">Anchor</button><div>Content</div></hx-popup>',
+      );
+      await el.updateComplete;
+      const eventPromise = oneEvent(el, 'hx-reposition');
+      await el.reposition();
+      await eventPromise;
+      const popup = shadowQuery<HTMLElement>(el, '[part="popup"]');
+      // Positioning was computed — popup left/top should be set
+      expect(popup?.style.left).toBeTruthy();
+    });
+  });
 });

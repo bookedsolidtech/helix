@@ -239,7 +239,7 @@ The simplest approach: map Paragraph fields to component attributes.
   variant="{{ paragraph.field_card_variant.value }}"
   elevation="{{ paragraph.field_card_elevation.value }}"
   {% if paragraph.field_card_link.0.url %}
-    hx-href="{{ paragraph.field_card_link.0.url }}"
+    href="{{ paragraph.field_card_link.0.url }}"
   {% endif %}
   {{ attributes }}
 >
@@ -283,11 +283,11 @@ This renders the field through Drupal's rendering pipeline with formatters, filt
 
 ```twig
 {% if paragraph.field_card_link.0.url %}
-  hx-href="{{ paragraph.field_card_link.0.url }}"
+  href="{{ paragraph.field_card_link.0.url }}"
 {% endif %}
 ```
 
-Only add the `hx-href` attribute if a link is provided. The component becomes interactive only when needed.
+Only add the `href` attribute if a link is provided. The component becomes interactive only when needed.
 
 **Conditional slot rendering:**
 
@@ -608,7 +608,7 @@ field_card_link:
   variant="{{ paragraph.field_card_variant.value }}"
   elevation="{{ paragraph.field_card_elevation.value }}"
   {% if paragraph.field_card_link.0.url %}
-    hx-href="{{ paragraph.field_card_link.0.url }}"
+    href="{{ paragraph.field_card_link.0.url }}"
   {% endif %}
   {{ attributes.addClass(classes) }}
 >
@@ -685,9 +685,9 @@ function mytheme_preprocess_paragraph__card(&$variables) {
   variant="{{ card_variant }}"
   elevation="{{ paragraph.field_card_elevation.value }}"
   {% if paragraph.field_card_link.0.url %}
-    hx-href="{{ paragraph.field_card_link.0.url }}"
+    href="{{ paragraph.field_card_link.0.url }}"
     {% if is_external_link %}
-      aria-label="External link: {{ paragraph.field_card_heading.value }}"
+      accessible-label="External link: {{ paragraph.field_card_heading.value }}"
     {% endif %}
   {% endif %}
   {{ attributes }}
@@ -816,7 +816,7 @@ Document slot mappings and rendering strategies in template comments:
   Attributes:
   - variant: field_card_variant (list field)
   - elevation: field_card_elevation (list field)
-  - hx-href: field_card_link.url (optional)
+  - href: field_card_link.url (optional)
 #}
 ```
 
@@ -855,7 +855,7 @@ Using `content.*` preserves cache tags, cache contexts, and max-age metadata.
 
 ```twig
 {% if is_external_link %}
-  <hx-icon name="external" aria-label="External link"></hx-icon>
+  <hx-icon name="external" accessible-label="External link"></hx-icon>
 {% endif %}
 ```
 
@@ -876,7 +876,7 @@ Check for field existence before accessing values:
 {# Defensive checks #}
 {% if paragraph.field_card_link and paragraph.field_card_link.0 %}
   {% if paragraph.field_card_link.0.url %}
-    hx-href="{{ paragraph.field_card_link.0.url }}"
+    href="{{ paragraph.field_card_link.0.url }}"
   {% endif %}
 {% endif %}
 ```
@@ -885,7 +885,7 @@ Or use Twig's null-safe operators (Drupal 10+):
 
 ```twig
 {% if paragraph.field_card_link.0.url ?? false %}
-  hx-href="{{ paragraph.field_card_link.0.url }}"
+  href="{{ paragraph.field_card_link.0.url }}"
 {% endif %}
 ```
 

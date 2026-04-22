@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixActionBar } from './hx-action-bar.js';
@@ -129,11 +129,6 @@ describe('hx-action-bar', () => {
       expect(base?.classList.contains('base--bottom')).toBe(true);
     });
 
-    it('legacy sticky boolean applies sticky class', async () => {
-      const el = await fixture<HelixActionBar>('<hx-action-bar sticky></hx-action-bar>');
-      const base = shadowQuery(el, '[part="base"]');
-      expect(base?.classList.contains('base--sticky')).toBe(true);
-    });
   });
 
   // ─── Slots (4) ───
@@ -487,6 +482,139 @@ describe('hx-action-bar', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── accessible-label property ───
+
+  describe('accessible-label vs aria-label fallback', () => {
+    it('accessible-label attribute takes precedence over aria-label', async () => {
+      const el = await fixture<HelixActionBar>(
+        '<hx-action-bar accessible-label="Custom Label" aria-label="Aria Label"><button slot="start">A</button></hx-action-bar>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Custom Label');
+    });
+
+    it('falls back to aria-label when accessible-label is not set', async () => {
+      const el = await fixture<HelixActionBar>(
+        '<hx-action-bar aria-label="Toolbar Label"><button slot="start">A</button></hx-action-bar>',
+      );
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Toolbar Label');
+    });
+
+    it('falls back to "Actions" when neither accessible-label nor aria-label are set', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Actions');
+    });
+
+    it('accessible-label property update re-renders toolbar label', async () => {
+      const el = await fixture<HelixActionBar>(
+        '<hx-action-bar accessible-label="Initial"><button slot="start">A</button></hx-action-bar>',
+      );
+      await el.updateComplete;
+      el.accessibleLabel = 'Updated';
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-label')).toBe('Updated');
+    });
+  });
+
+  // ─── size propagation ───
+
+  describe('size propagation to slotted children', () => {
+    it('size "sm" applies base--sm class', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar hx-size="sm"><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('base--sm')).toBe(true);
+    });
+
+    it('size "md" applies base--md class (default)', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('base--md')).toBe(true);
+    });
+
+    it('size "lg" applies base--lg class', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar hx-size="lg"><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('base--lg')).toBe(true);
+    });
+  });
+
+  // ─── position values ───
+
+  describe('position values', () => {
+    it('position="top" does not apply sticky or bottom class', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar position="top"><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('base--sticky')).toBe(false);
+      expect(base?.classList.contains('base--bottom')).toBe(false);
+    });
+
+    it('position="bottom" applies base--bottom class', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar position="bottom"><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.classList.contains('base--bottom')).toBe(true);
+    });
+  });
+
+
+  // ─── legacy size attr deprecation ───
+
+  describe('legacy size attr deprecation', () => {
+    it('warns when legacy size attribute is used without hx-size', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixActionBar>('<hx-action-bar size="sm"><button slot="start">A</button></hx-action-bar>');
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('deprecated'));
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── overflow slot detection ───
+
+  describe('overflow slot detection', () => {
+    it('overflow part is hidden when overflow slot is empty', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const overflow = shadowQuery(el, '[part="overflow"]');
+      expect(overflow?.hasAttribute('hidden')).toBe(true);
+    });
+
+    it('overflow part is visible when overflow slot has content', async () => {
+      const el = await fixture<HelixActionBar>(
+        '<hx-action-bar><button slot="start">A</button><button slot="overflow">More</button></hx-action-bar>',
+      );
+      await el.updateComplete;
+      const overflow = shadowQuery(el, '[part="overflow"]');
+      expect(overflow?.hasAttribute('hidden')).toBe(false);
+    });
+  });
+
+  // ─── host role=none ───
+
+  describe('host role="none" to prevent dual announcement', () => {
+    it('host element has role="none" set automatically', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      expect(el.getAttribute('role')).toBe('none');
+    });
+
+    it('toolbar has aria-orientation="horizontal"', async () => {
+      const el = await fixture<HelixActionBar>('<hx-action-bar><button slot="start">A</button></hx-action-bar>');
+      await el.updateComplete;
+      const base = shadowQuery(el, '[part="base"]');
+      expect(base?.getAttribute('aria-orientation')).toBe('horizontal');
     });
   });
 });

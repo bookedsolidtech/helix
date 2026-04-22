@@ -101,40 +101,29 @@ private _handleShadowClick = (e: Event) => {
 
 Arrow function property syntax (`private _handleShadowClick = ...`) preserves `this` binding when the function is used as a callback directly. When using Lit template bindings (`@click=${...}`), Lit handles binding automatically.
 
-## ARIA Delegation with `mixinDelegatesAria`
+## ARIA Delegation in HELiX Components
 
-A common challenge in shadow DOM is connecting ARIA attributes on the host element to the interactive element inside the shadow root. For example, `aria-label` on `<hx-button>` should reach the `<button>` inside. HELiX provides `mixinDelegatesAria` for this:
+A common challenge in shadow DOM is connecting ARIA attributes on the host element to the interactive element inside the shadow root. For example, `aria-label` on `<hx-button>` should reach the `<button>` inside, not remain on the custom-element host that assistive technologies would otherwise read as a generic element.
 
-```typescript
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { mixinDelegatesAria } from '@helixui/library/mixins';
+HELiX components solve this in one of two ways, depending on the component:
 
-const Base = mixinDelegatesAria(LitElement);
+1. **Components that document native `aria-label` / `aria-labelledby`.** Some HELiX components (including `hx-button`) read `this.ariaLabel` / `this.ariaLabelledBy` from standard HTML attributes and forward them to the inner interactive element. For these documented components, use the standard HTML attribute:
 
-@customElement('hx-button')
-export class HelixButton extends Base {
-  override render() {
-    return html`
-      <!--
-        The mixin forwards aria-label, aria-expanded, aria-controls, etc.
-        from the host to this button element automatically.
-      -->
-      <button>
-        <slot></slot>
-      </button>
-    `;
-  }
-}
-```
+   ```html
+   <hx-button aria-label="Close dialog">X</hx-button>
+   ```
 
-With `mixinDelegatesAria`, a consumer can write:
+2. **Components that document `accessible-label`.** A small set of form controls and composite widgets — `hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-split-button`, `hx-steps`, `hx-action-bar` — expose a public `accessible-label` attribute (and matching `accessibleLabel` JS property):
 
-```html
-<hx-button aria-label="Close dialog">X</hx-button>
-```
+   ```html
+   <hx-text-input accessible-label="Search patients" placeholder="Last name"></hx-text-input>
+   ```
 
-And the `aria-label` correctly targets the inner `<button>` — not the `<hx-button>` host element that assistive technologies would otherwise see as a generic `div`.
+   Use `accessible-label` only on components that document it; every component page lists its public attributes.
+
+Do not apply either pattern universally. Components that own their accessible-name lifecycle expose component-specific APIs instead — for example, `hx-status-indicator` derives its accessible name from the `label` property and overwrites any host `aria-label` you set, so you must use `<hx-status-indicator label="Patient online">` rather than `aria-label="…"`. Consult each component's documented API before applying an accessible-name attribute.
+
+If you are building your own custom elements (not extending HELiX components), implement forwarding with `ElementInternals` ARIA properties — see [Form Accessibility](/components-guide/forms/accessibility/#elementinternalsarialabel-vs-attribute). The internal helpers HELiX components use are not part of the public API; build your own forwarding with `ElementInternals.ariaLabel` and explicit template bindings to the inner element.
 
 ## `delegatesFocus`
 

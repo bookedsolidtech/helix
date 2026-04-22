@@ -10,7 +10,7 @@ afterEach(cleanup);
 // ─── Fixture Helpers ───────────────────────────────────────────────────────────
 
 const THREE_STEPS_HTML = `
-  <hx-steps aria-label="Checkout progress">
+  <hx-steps accessible-label="Checkout progress">
     <hx-step label="Cart" status="complete" description="Items added"></hx-step>
     <hx-step label="Payment" status="active" description="Enter payment info"></hx-step>
     <hx-step label="Confirm" status="pending" description="Review order"></hx-step>
@@ -18,7 +18,7 @@ const THREE_STEPS_HTML = `
 `;
 
 const ALL_STATUSES_HTML = `
-  <hx-steps aria-label="All statuses">
+  <hx-steps accessible-label="All statuses">
     <hx-step label="Complete" status="complete"></hx-step>
     <hx-step label="Active" status="active"></hx-step>
     <hx-step label="Error" status="error"></hx-step>
@@ -574,7 +574,7 @@ describe('hx-step', () => {
   describe('Accessibility (axe-core)', () => {
     it('hx-steps with steps has no axe violations', async () => {
       const el = await fixture<HelixSteps>(
-        `<hx-steps aria-label="Progress steps">
+        `<hx-steps accessible-label="Progress steps">
           <hx-step label="Step one" status="complete"></hx-step>
           <hx-step label="Step two" status="active"></hx-step>
           <hx-step label="Step three" status="pending"></hx-step>
@@ -587,7 +587,7 @@ describe('hx-step', () => {
 
     it('hx-steps vertical has no axe violations', async () => {
       const el = await fixture<HelixSteps>(
-        `<hx-steps aria-label="Vertical progress" orientation="vertical">
+        `<hx-steps accessible-label="Vertical progress" orientation="vertical">
           <hx-step label="Step one" status="complete"></hx-step>
           <hx-step label="Step two" status="active"></hx-step>
           <hx-step label="Step three" status="pending"></hx-step>
@@ -607,7 +607,7 @@ describe('hx-step', () => {
 
     it('hx-step within hx-steps has no axe violations', async () => {
       const el = await fixture<HelixSteps>(
-        '<hx-steps aria-label="Test steps"><hx-step label="A step" status="pending" description="With description"></hx-step></hx-steps>',
+        '<hx-steps accessible-label="Test steps"><hx-step label="A step" status="pending" description="With description"></hx-step></hx-steps>',
       );
       await page.screenshot();
       const { violations } = await checkA11y(el);
@@ -621,7 +621,7 @@ describe('hx-step', () => {
 describe('hx-steps — Dynamic orientation / size changes', () => {
   it('changes orientation on children when orientation property is updated', async () => {
     const el = await fixture<HelixSteps>(
-      '<hx-steps aria-label="Dynamic steps"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="active"></hx-step></hx-steps>',
+      '<hx-steps accessible-label="Dynamic steps"><hx-step label="A" status="pending"></hx-step><hx-step label="B" status="active"></hx-step></hx-steps>',
     );
     await el.updateComplete;
 
@@ -689,5 +689,212 @@ describe('hx-steps — Dynamic orientation / size changes', () => {
 
     expect(event.detail.index).toBe(1);
     expect(event.detail.step).toBe(activeStep);
+  });
+});
+
+// ─── hx-steps — additional edge cases ─────────────────────────────────────────
+
+describe('hx-steps — additional edge cases', () => {
+  // ─── Connector rendering ───
+
+  describe('connector rendering between steps', () => {
+    it('each hx-step renders a connector part', async () => {
+      const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+      await el.updateComplete;
+      const steps = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+      for (const step of steps) {
+        const connector = step.shadowRoot?.querySelector('[part~="connector"]');
+        expect(connector).toBeTruthy();
+      }
+    });
+
+    it('connector has aria-hidden="true" on every step', async () => {
+      const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+      await el.updateComplete;
+      const steps = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+      for (const step of steps) {
+        const connector = step.shadowRoot?.querySelector('[part~="connector"]');
+        expect(connector?.getAttribute('aria-hidden')).toBe('true');
+      }
+    });
+  });
+
+  // ─── All step statuses rendering ───
+
+  describe('all step statuses', () => {
+    it('complete step renders a checkmark SVG in the indicator', async () => {
+      const el = await fixture<HelixSteps>(ALL_STATUSES_HTML);
+      await el.updateComplete;
+      const completeStep = el.querySelector<HelixStep>('[status="complete"]')!;
+      const indicator = completeStep.shadowRoot?.querySelector('[part~="indicator"]');
+      expect(indicator?.querySelector('svg')).toBeTruthy();
+    });
+
+    it('active step displays step number in indicator', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Active" status="active"></hx-step>');
+      el.index = 1;
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part~="indicator"]')!;
+      expect(indicator.textContent?.trim()).toContain('2');
+    });
+
+    it('pending step displays step number in indicator', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Pending" status="pending"></hx-step>');
+      el.index = 2;
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part~="indicator"]')!;
+      expect(indicator.textContent?.trim()).toContain('3');
+    });
+
+    it('error step renders an X SVG in the indicator', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Error" status="error"></hx-step>');
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part~="indicator"]')!;
+      expect(indicator.querySelector('svg')).toBeTruthy();
+    });
+  });
+
+  // ─── orientation propagation ───
+
+  describe('orientation propagation to hx-step', () => {
+    it('hx-step reflects orientation attribute set by parent', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps orientation="vertical" aria-label="Steps"><hx-step label="A" status="pending"></hx-step></hx-steps>',
+      );
+      await el.updateComplete;
+      const step = el.querySelector<HelixStep>('hx-step')!;
+      expect(step.orientation).toBe('vertical');
+      expect(step.getAttribute('orientation')).toBe('vertical');
+    });
+
+    it('hx-step receives horizontal orientation by default', async () => {
+      const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+      await el.updateComplete;
+      const steps = Array.from(el.querySelectorAll<HelixStep>('hx-step'));
+      for (const step of steps) {
+        expect(step.orientation).toBe('horizontal');
+      }
+    });
+  });
+
+  // ─── clickable / hx-step-click ───
+
+  describe('clickable variant and hx-step-click detail', () => {
+    it('clicking a pending step fires hx-step-click with correct index', async () => {
+      const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+      await el.updateComplete;
+
+      const steps = el.querySelectorAll<HelixStep>('hx-step');
+      const pendingStep = steps[2]!; // status="pending"
+
+      const eventPromise = oneEvent<CustomEvent<{ step: HelixStep; index: number }>>(el, 'hx-step-click');
+      pendingStep.shadowRoot
+        ?.querySelector('.step')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      const event = await eventPromise;
+
+      expect(event.detail.index).toBe(2);
+      expect(event.detail.step).toBe(pendingStep);
+    });
+
+    it('clicking a complete step fires hx-step-click with correct index', async () => {
+      const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+      await el.updateComplete;
+
+      const steps = el.querySelectorAll<HelixStep>('hx-step');
+      const completeStep = steps[0]!; // status="complete"
+
+      const eventPromise = oneEvent<CustomEvent<{ step: HelixStep; index: number }>>(el, 'hx-step-click');
+      completeStep.shadowRoot
+        ?.querySelector('.step')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+      const event = await eventPromise;
+
+      expect(event.detail.index).toBe(0);
+    });
+  });
+
+  // ─── dynamic state changes ───
+
+  describe('dynamic state changes', () => {
+    it('changing status from pending to complete updates aria-current removal', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
+
+      el.status = 'complete';
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-current')).toBe(false);
+    });
+
+    it('changing status from pending to active sets aria-current="step"', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending"></hx-step>');
+      await el.updateComplete;
+      el.status = 'active';
+      await el.updateComplete;
+      expect(el.getAttribute('aria-current')).toBe('step');
+    });
+
+    it('changing label updates the visible label text', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Initial" status="pending"></hx-step>');
+      await el.updateComplete;
+      el.label = 'Updated Label';
+      await el.updateComplete;
+      const labelEl = shadowQuery(el, '[part~="label"]')!;
+      expect(labelEl.textContent?.trim()).toContain('Updated Label');
+    });
+
+    it('changing description updates the visible description text', async () => {
+      const el = await fixture<HelixStep>('<hx-step label="Test" status="pending" description="Original"></hx-step>');
+      await el.updateComplete;
+      el.description = 'New description';
+      await el.updateComplete;
+      const descEl = shadowQuery(el, '[part~="description"]')!;
+      expect(descEl.textContent?.trim()).toContain('New description');
+    });
+  });
+
+  // ─── disconnectedCallback ───
+
+  describe('hx-steps disconnectedCallback', () => {
+    it('removes hx-step-click-internal listener after disconnect', async () => {
+      const el = await fixture<HelixSteps>(THREE_STEPS_HTML);
+      await el.updateComplete;
+
+      el.remove();
+
+      let clickFired = false;
+      el.addEventListener('hx-step-click', () => { clickFired = true; });
+
+      const steps = el.querySelectorAll<HelixStep>('hx-step');
+      steps[0]?.dispatchEvent(
+        new CustomEvent('hx-step-click-internal', { bubbles: true, composed: true }),
+      );
+
+      // After removal, the internal handler is gone so hx-step-click should NOT be re-emitted
+      expect(clickFired).toBe(false);
+    });
+  });
+
+  // ─── hx-step size propagation ───
+
+  describe('hx-step size propagation', () => {
+    it('size "sm" is reflected on hx-step', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps hx-size="sm" aria-label="Steps"><hx-step label="A" status="pending"></hx-step></hx-steps>',
+      );
+      await el.updateComplete;
+      const step = el.querySelector<HelixStep>('hx-step')!;
+      expect(step.size).toBe('sm');
+    });
+
+    it('size "lg" is reflected on hx-step', async () => {
+      const el = await fixture<HelixSteps>(
+        '<hx-steps hx-size="lg" aria-label="Steps"><hx-step label="A" status="pending"></hx-step></hx-steps>',
+      );
+      await el.updateComplete;
+      const step = el.querySelector<HelixStep>('hx-step')!;
+      expect(step.size).toBe('lg');
+    });
   });
 });

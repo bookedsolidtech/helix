@@ -27,11 +27,11 @@
             : element.querySelector('hx-accordion');
         if (!accordion) return;
 
-        // Auto-expand first panel from data attribute
+        // Auto-expand first item from data attribute
         if (element.dataset.openFirst === 'true') {
-          var firstPanel = accordion.querySelector('hx-accordion-panel');
-          if (firstPanel) {
-            firstPanel.open = true;
+          var firstItem = accordion.querySelector('hx-accordion-item');
+          if (firstItem) {
+            firstItem.expanded = true;
           }
         }
 

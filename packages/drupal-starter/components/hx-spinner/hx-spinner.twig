@@ -18,7 +18,7 @@
 
 <hx-spinner
   {% if hx_size and hx_size != 'md' %}hx-size="{{ hx_size }}"{% endif %}
-  {% if variant and variant != 'primary' %}variant="{{ variant }}"{% endif %}
+  {% if variant and variant != 'default' %}variant="{{ variant }}"{% endif %}
   {% if label and label != 'Loading' %}label="{{ label }}"{% endif %}
   {% if decorative %}decorative{% endif %}
   {{ attributes ? attributes }}

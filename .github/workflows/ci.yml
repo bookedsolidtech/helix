@@ -142,8 +142,11 @@ jobs:
               - 'packages/hx-library/tsconfig*.json'
               - 'scripts/check-coverage.mjs'
               - 'scripts/check-bundle-size.mjs'
+              - 'scripts/check-cdn-size.mjs'
               - 'bundle-budgets.json'
               - '.bundle-budget.json'
+              - '.cdn-budget.json'
+              - 'packages/hx-library/scripts/build-cdn.mjs'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
@@ -183,6 +186,25 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run format:check
 
+  react-generator-drift:
+    name: React Generator Drift
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Generate CEM (required input for drift check)
+        run: pnpm --filter=@helixui/library run cem
+      - name: Verify @helixui/react wrappers are in sync with CEM
+        run: pnpm --filter=@helixui/react run generate:check
+
   type-check:
     name: Type Check
     needs: [changes, secret-scan]
@@ -197,19 +219,34 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      # Build @helixui/library first — @helixui/react's type-check resolves
+      # deep-path imports (`@helixui/library/components/*`) through the
+      # `exports` map which points at `dist/`. Turbo's `^build` dependency is
+      # not reliably honored on fresh CI runners, so build explicitly.
+      - run: pnpm turbo run build --filter=@helixui/library
       - run: pnpm turbo run type-check --filter='!docs'
 
   # ── Tests (need Playwright browsers) ────────────────────────────────────
-  # Changed-file mode: only runs tests for components touched in this PR/push.
-  # A single-component PR runs ~20-50 tests in <2 min instead of 3,200+ tests.
-  # Full suite only runs when triggered manually or on a scheduled basis.
+  # Path-filtered by changed components, then split across a 4-way shard
+  # matrix via vitest's native --shard flag. Each shard runs its slice of the
+  # selected test files in its own Chromium, so wall time drops ~4x on
+  # large-touch PRs while single-component PRs short-circuit empty shards
+  # quickly. The shared watchdog (scripts/lib/vitest-watchdog.sh) handles the
+  # Vitest 3.x Chromium teardown hang — still present on sharded runs.
 
   test:
-    name: Test
+    name: Test (${{ matrix.shard }})
     needs: [changes, secret-scan]
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/4', '2/4', '3/4', '4/4']
+    env:
+      AGENT_RUN: '1'
+      VITEST_SHARD: ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -222,112 +259,139 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build --filter='!docs'
       - run: pnpm exec playwright install --with-deps chromium
-      - name: Run tests (PR — path-filtered by changed components)
-        id: test-pr
-        if: github.event_name == 'pull_request'
+      - name: Resolve changed components
+        id: changed
         run: |
-          BRANCH="${{ github.head_ref }}"
-          BASE="${{ github.base_ref }}"
-
-          # Promotion PRs (staging→main): tests already passed on staging CI — skip
-          if [[ "$BRANCH" == "staging" && "$BASE" == "main" ]]; then
-            echo "Promotion PR (staging → main) — tests already verified on staging. Skipping."
-            exit 0
-          fi
-
-          # Vitest browser mode (Playwright/Chromium) hangs after all tests complete
-          # during teardown. Wrap with `timeout --kill-after=30s` to force-exit.
-          # 480s (8min) gives ample headroom within the 10min job timeout.
-          run_vitest() {
-            timeout --kill-after=30s 480s "$@"
-            local exit_code=$?
-            # timeout exits 124 on timeout, 137 on kill. Treat as success if
-            # tests passed (vitest exits 0 before the hang).
-            if [[ $exit_code -eq 124 ]] || [[ $exit_code -eq 137 ]]; then
-              echo "[ci] vitest force-killed after teardown hang — treating as success"
-              return 0
-            fi
-            return $exit_code
-          }
-
-          # Fast path: audit-fix branches encode the component name directly
-          if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
-            COMPONENT="${BASH_REMATCH[1]}"
-            echo "Audit-fix branch — running tests for: $COMPONENT"
-            run_vitest pnpm exec vitest run "src/components/$COMPONENT/" --coverage.enabled
-            echo "tests_ran=true" >> "$GITHUB_OUTPUT"
-            # Scope coverage enforcement to only this component (prevents transitive-import false failures)
-            echo "HX_COVERAGE_COMPONENTS=$COMPONENT" >> "$GITHUB_ENV"
-          else
-            # General PR: extract changed component dirs from git diff
-            # Exclude .stories.ts, .test.ts, and index.ts — they don't affect component coverage
-            CHANGED=$(git diff --name-only "origin/$BASE...HEAD" \
-              | grep 'src/components/hx-' \
-              | grep -v '\.stories\.ts$' \
-              | grep -v '\.test\.ts$' \
-              | grep -v '/index\.ts$' \
-              | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
-              | sort -u)
-            if [ -z "$CHANGED" ]; then
-              echo "No component changes — skipping tests"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${{ github.head_ref }}"
+            BASE="${{ github.base_ref }}"
+            if [[ "$BRANCH" == "staging" && "$BASE" == "main" ]]; then
+              echo "Promotion PR (staging → main) — tests already verified on staging."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
-            echo "Running tests for: $PATHS"
-            run_vitest pnpm exec vitest run $PATHS --coverage.enabled
-            echo "tests_ran=true" >> "$GITHUB_OUTPUT"
-            # Scope coverage enforcement to only explicitly tested components
-            COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
-            echo "HX_COVERAGE_COMPONENTS=$COMPONENTS_CSV" >> "$GITHUB_ENV"
-          fi
-        working-directory: packages/hx-library
-      - name: Run tests (push — path-filtered by merged changes)
-        id: test-push
-        if: github.event_name == 'push'
-        run: |
-          # Vitest browser mode hangs after teardown — wrap with timeout to force-exit
-          run_vitest() {
-            timeout --kill-after=30s 480s "$@"
-            local exit_code=$?
-            if [[ $exit_code -eq 124 ]] || [[ $exit_code -eq 137 ]]; then
-              echo "[ci] vitest force-killed after teardown hang — treating as success"
-              return 0
+            if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
+              COMPONENT="${BASH_REMATCH[1]}"
+              echo "paths=src/components/$COMPONENT/" >> "$GITHUB_OUTPUT"
+              echo "components_csv=$COMPONENT" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
-            return $exit_code
-          }
+            DIFF_RANGE="origin/$BASE...HEAD"
+          else
+            DIFF_RANGE="HEAD~1...HEAD"
+          fi
 
-          CHANGED=$(git diff --name-only HEAD~1...HEAD \
+          CHANGED=$(git diff --name-only "$DIFF_RANGE" \
             | grep 'src/components/hx-' \
             | grep -v '\.stories\.ts$' \
             | grep -v '\.test\.ts$' \
             | grep -v '/index\.ts$' \
             | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
-            | sort -u)
+            | sort -u || true)
           if [ -z "$CHANGED" ]; then
             echo "No component changes — skipping tests"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           PATHS=$(echo "$CHANGED" | sed 's|^|src/components/|' | sed 's|$|/|' | tr '\n' ' ')
-          echo "Running tests for: $PATHS"
-          run_vitest pnpm exec vitest run $PATHS --coverage.enabled
-          echo "tests_ran=true" >> "$GITHUB_OUTPUT"
-          # Scope coverage enforcement to only explicitly tested components
           COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
-          echo "HX_COVERAGE_COMPONENTS=$COMPONENTS_CSV" >> "$GITHUB_ENV"
+          echo "paths=$PATHS" >> "$GITHUB_OUTPUT"
+          echo "components_csv=$COMPONENTS_CSV" >> "$GITHUB_OUTPUT"
+      - name: Run shard ${{ matrix.shard }}
+        id: run-tests
+        if: steps.changed.outputs.skip != 'true'
+        env:
+          HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
+        run: |
+          # shellcheck disable=SC1091
+          source "$GITHUB_WORKSPACE/scripts/lib/vitest-watchdog.sh"
+          LOGFILE=$(mktemp /tmp/helix-ci-shard.XXXXXX)
+          PATHS="${{ steps.changed.outputs.paths }}"
+          echo "Running shard ${VITEST_SHARD} over: $PATHS"
+          # Vitest 3.x refuses to run when the shard total is >= the number
+          # of test files ("--shard <count> must be a smaller than count of
+          # test files"). When the smart-changed filter resolves fewer test
+          # files than the matrix has shards, collapse: shard 1 runs every
+          # file unsharded, and the other shards exit cleanly with nothing
+          # to do. Without this, a PR that touches 1–3 components fails all
+          # 4 shards with a cryptic startup error.
+          # shellcheck disable=SC2086
+          TEST_FILE_COUNT=$(find $PATHS -type f -name '*.test.ts' 2>/dev/null | wc -l | tr -d ' ')
+          TEST_FILE_COUNT=${TEST_FILE_COUNT:-0}
+          SHARD_INDEX="${VITEST_SHARD%/*}"
+          SHARD_TOTAL="${VITEST_SHARD#*/}"
+          SHARD_ARGS=(--shard="$VITEST_SHARD")
+          if [[ "$TEST_FILE_COUNT" -le "$SHARD_TOTAL" ]]; then
+            if [[ "$TEST_FILE_COUNT" -eq 0 ]]; then
+              echo "[ci-shard-${VITEST_SHARD}] no test files resolved from: $PATHS — skipping"
+              echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+              mkdir -p .cache
+              echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              exit 0
+            fi
+            if [[ "$SHARD_INDEX" -ne 1 ]]; then
+              echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — skipping (shard ${SHARD_INDEX}/${SHARD_TOTAL} has nothing to run)"
+              echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+              # Write an empty JSON report so the upload-artifact step has
+              # something to find and does not warn.
+              mkdir -p .cache
+              echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              exit 0
+            fi
+            echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — running all on shard 1 without --shard"
+            SHARD_ARGS=()
+          fi
+          # Use verbose reporter so the watchdog can count ✓/× markers when
+          # vitest is force-killed before its summary line is flushed.
+          # Keep json so .cache/test-results.json is still written (vitest
+          # replaces config reporters when --reporter is passed).
+          # Do not let `set -e` abort the step when the watchdog returns
+          # non-zero — we need the diagnostic block below to surface vitest's
+          # actual error instead of GitHub Actions killing the step with no
+          # output on the way.
+          rc=0
+          # shellcheck disable=SC2086
+          run_vitest_with_watchdog "ci-shard-${VITEST_SHARD}" "$LOGFILE" \
+            pnpm exec vitest run $PATHS \
+              "${SHARD_ARGS[@]}" \
+              --coverage.enabled \
+              --reporter=verbose \
+              --reporter=json || rc=$?
+          # On failure, surface only failed test lines + tail of log.
+          # On success, suppress the log entirely — passing ticks are noise.
+          if [[ $rc -ne 0 ]]; then
+            echo "FAILED TESTS:"
+            grep "^[[:space:]]*×" "$LOGFILE" 2>/dev/null | head -60 || true
+            echo ""
+            # Only print the pre-coverage slice when the marker is actually
+            # present — otherwise awk falls through and duplicates the whole
+            # log against the tail -50 below.
+            if grep -q "Coverage report from" "$LOGFILE" 2>/dev/null; then
+              echo "--- vitest error output (everything before Coverage report) ---"
+              awk '/Coverage report from/{exit} {print}' "$LOGFILE" || true
+              echo ""
+            fi
+            echo "--- last 50 lines of full log ---"
+            tail -50 "$LOGFILE" || true
+          fi
+          echo "tests_ran=true" >> "$GITHUB_OUTPUT"
+          exit $rc
         working-directory: packages/hx-library
       - name: Enforce coverage thresholds for changed components
-        if: steps.test-pr.outputs.tests_ran == 'true' || steps.test-push.outputs.tests_ran == 'true'
+        if: steps.run-tests.outputs.tests_ran == 'true' && matrix.shard == '1/4'
+        env:
+          HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
         run: node scripts/check-coverage.mjs
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-shard-${{ strategy.job-index }}-of-${{ strategy.job-total }}
           path: packages/hx-library/.cache/test-results.json
           retention-days: 30
           if-no-files-found: warn
       - name: Upload coverage report
-        if: always()
+        if: always() && matrix.shard == '1/4'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -335,7 +399,7 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
       - name: Post coverage summary as PR comment
-        if: github.event_name == 'pull_request' && always()
+        if: github.event_name == 'pull_request' && matrix.shard == '1/4' && always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -388,6 +452,27 @@ jobs:
         with:
           name: bundle-size-report
           path: .cache/bundle-size-report.json
+          retention-days: 30
+          if-no-files-found: warn
+      # ── CDN bundle + size budget (FS-019) ───────────────────────────────
+      # The CDN payload is what Drupal/CDN consumers download. Budget is
+      # per-artifact and enforced via .cdn-budget.json. Gate fails on any
+      # artifact exceeding its ceiling.
+      - name: Build CDN artifacts
+        run: pnpm --filter=@helixui/library run build:cdn
+      - name: Enforce CDN size budget
+        run: node scripts/check-cdn-size.mjs
+      - name: Save CDN size report
+        if: always()
+        run: |
+          mkdir -p .cache
+          node scripts/check-cdn-size.mjs --json > .cache/cdn-size-report.json 2>/dev/null || true
+      - name: Upload CDN size artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdn-size-report
+          path: .cache/cdn-size-report.json
           retention-days: 30
           if-no-files-found: warn
 
@@ -748,8 +833,18 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Security audit
-        run: pnpm audit --audit-level=critical 2>&1 || echo "::warning::pnpm audit failed (npm audit endpoint may be unavailable)"
-        continue-on-error: true
+        run: |
+          AUDIT_OUTPUT=$(pnpm audit --audit-level=critical 2>&1)
+          AUDIT_EXIT=$?
+          echo "$AUDIT_OUTPUT"
+          if [ $AUDIT_EXIT -ne 0 ]; then
+            if echo "$AUDIT_OUTPUT" | grep -qE "ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|network error|code ELIFECYCLE"; then
+              echo "::warning::pnpm audit registry endpoint unavailable — skipping vulnerability check"
+            else
+              echo "::error::Critical vulnerabilities found — see audit output above"
+              exit 1
+            fi
+          fi
 
   # ── Storybook Interaction Tests ─────────────────────────────────────────
   # Runs all 83 component story play functions as Vitest browser mode tests.
@@ -761,10 +856,13 @@ jobs:
     needs: [changes, secret-scan, build]
     if: needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
-    # Increased from 30 to 45 minutes: fileParallelism: false means story files
-    # run sequentially (one at a time) to prevent browser OOM crashes — this is
-    # slower than parallel but eliminates "Browser connection was closed" failures.
-    timeout-minutes: 45
+    # Per-file runner (apps/storybook/scripts/test-shards.mjs) spawns a
+    # fresh Chromium per story file — each file finishes in ~4–5s, full
+    # 84-file suite in ~6–7 minutes. Plus install + build + Playwright
+    # download on a cold runner lands total CI wall time around 10–12
+    # minutes worst case. 15 minutes leaves headroom for slower
+    # GitHub-hosted runners without reintroducing the 45m band-aid.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -778,17 +876,13 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Storybook interaction tests
-        run: |
-          # Vitest browser mode (Playwright/Chromium) hangs after all tests complete
-          # during teardown. Wrap with `timeout --kill-after=30s` to force-exit after
-          # 2400s (40min). If timeout fires, tests already passed — treat as success.
-          timeout --kill-after=30s 2400s pnpm run test:storybook
-          exit_code=$?
-          if [[ $exit_code -eq 124 ]] || [[ $exit_code -eq 137 ]]; then
-            echo "[ci] storybook tests force-killed after teardown hang — treating as success"
-            exit 0
-          fi
-          exit $exit_code
+        # The per-file runner invokes vitest once per story file so each
+        # file gets a fresh Chromium. Prevents the cumulative browser
+        # state crash ("Browser connection was closed") that occurred when
+        # vitest kept a single page alive across the whole suite
+        # (see apps/storybook/scripts/test-shards.mjs header for the
+        # full analysis).
+        run: pnpm run test:storybook
       - name: Upload Storybook test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -837,6 +931,7 @@ jobs:
         secret-scan,
         lint,
         format,
+        react-generator-drift,
         type-check,
         test,
         build,
@@ -858,6 +953,7 @@ jobs:
           echo "Secret Scan:        ${{ needs.secret-scan.result }}"
           echo "Lint:               ${{ needs.lint.result }}"
           echo "Format:             ${{ needs.format.result }}"
+          echo "Generator Drift:    ${{ needs.react-generator-drift.result }}"
           echo "Type Check:         ${{ needs.type-check.result }}"
           echo "Test:               ${{ needs.test.result }}"
           echo "Build:              ${{ needs.build.result }}"
@@ -876,14 +972,15 @@ jobs:
 
           FAIL=0
 
-          for gate in secret-scan lint format type-check build; do
+          for gate in secret-scan lint format react-generator-drift type-check build; do
             result="${{ needs.lint.result }}"
             case "$gate" in
-              secret-scan) result="${{ needs.secret-scan.result }}" ;;
-              lint)        result="${{ needs.lint.result }}" ;;
-              format)      result="${{ needs.format.result }}" ;;
-              type-check)  result="${{ needs.type-check.result }}" ;;
-              build)       result="${{ needs.build.result }}" ;;
+              secret-scan)           result="${{ needs.secret-scan.result }}" ;;
+              lint)                  result="${{ needs.lint.result }}" ;;
+              format)                result="${{ needs.format.result }}" ;;
+              react-generator-drift) result="${{ needs.react-generator-drift.result }}" ;;
+              type-check)            result="${{ needs.type-check.result }}" ;;
+              build)                 result="${{ needs.build.result }}" ;;
             esac
             if [[ "$result" != "success" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
@@ -907,14 +1004,19 @@ jobs:
             fi
           done
 
-          # A11y audit is informational until baseline violations are resolved
+          # A11y audit is a blocking gate — healthcare WCAG 2.1 AA mandate
           if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
-            echo "::warning::A11y audit has violations — see report artifact for details"
+            echo "::error::A11y audit failed — WCAG 2.1 AA violations detected. See a11y-report artifact."
+            FAIL=1
           fi
 
-          # Storybook tests are informational until the new test infrastructure is verified
+          # Storybook tests are a blocking gate — per-file runner + story fixes
+          # landed in the same PR that flipped this from informational. Any
+          # future regression in a play() function blocks merge, matching the
+          # release-quality-gate doctrine in CLAUDE.md.
           if [[ "${{ needs.storybook-tests.result }}" != "success" && "${{ needs.storybook-tests.result }}" != "skipped" ]]; then
-            echo "::warning::Storybook interaction tests did not pass — see storybook-test-results artifact for details"
+            echo "::error::Storybook interaction tests failed — see storybook-test-results artifact for details"
+            FAIL=1
           fi
 
           # React wrapper tests are informational until the suite is stabilized

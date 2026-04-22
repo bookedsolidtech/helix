@@ -6,6 +6,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 
 const _nextFileUploadId = createIdCounter('hx-file-upload');
@@ -13,6 +14,23 @@ const _nextFileUploadId = createIdCounter('hx-file-upload');
 interface FileEntry {
   file: File;
   progress: number;
+}
+
+/** Detail for the hx-upload event dispatched by hx-file-upload. */
+export interface HxFileUploadDetail {
+  files: File[];
+}
+
+/** Detail for the hx-remove event dispatched by hx-file-upload. */
+export interface HxFileRemoveDetail {
+  file: File;
+  index: number;
+}
+
+/** Detail for the hx-error event dispatched by hx-file-upload. */
+export interface HxFileErrorDetail {
+  message: string;
+  files: File[];
 }
 
 /**
@@ -45,7 +63,7 @@ interface FileEntry {
  * @cssprop [--hx-file-upload-error-color=var(--hx-color-error-500)] - Error state and remove-button hover color.
  */
 @customElement('hx-file-upload')
-export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
+export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement)) {
   static override styles = [helixFileUploadStyles];
 
   // ─── Form Association ───
@@ -125,6 +143,27 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
   labelFileList = 'Selected files';
 
   /**
+   * Accessible label for the dropzone when no visible label text is provided.
+   * Falls back to `label-dropzone` prop value, then a default string.
+   *
+   * Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+   * `accessible-label` takes precedence when both are set.
+   *
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string = '';
+
+  /**
+   * Returns the effective label for the dropzone, checking accessible-label first,
+   * then the aria-label attribute, falling back to empty string.
+   * @internal
+   */
+  private get _effectiveLabel(): string {
+    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
+  }
+
+  /**
    * Generates upload progress description for screen readers.
    * @param name - file name
    * @param progress - progress percentage 0-100
@@ -183,24 +222,28 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
     if (changedProperties.has('_files' as keyof HelixFileUpload) || changedProperties.has('name')) {
       this._syncFormValue();
     }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
+    }
   }
 
   // ─── Form Integration ───
-
-  /** Checks whether the component satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
 
   /** @internal */
   protected override _onFormReset(): void {
     this._files = [];
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -353,6 +396,8 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
       } else {
         this._files = newEntries;
       }
+
+      this._handleInteractionInput();
 
       this.dispatchEvent(
         new CustomEvent<{ files: File[] }>('hx-upload', {
@@ -608,8 +653,10 @@ export class HelixFileUpload extends mixinDelegatesAria(HelixElement) {
           id=${this._dropzoneId}
           role="button"
           tabindex=${this.disabled ? '-1' : '0'}
-          aria-label=${ifDefined(!this.label ? (this.ariaLabel ?? dropzoneLabel) : undefined)}
-          aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
+          aria-label=${ifDefined(this._effectiveLabel || (!this.label ? dropzoneLabel : undefined))}
+          aria-labelledby=${ifDefined(
+            !this._effectiveLabel && this.label ? this._labelId : undefined,
+          )}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-invalid=${hasError ? 'true' : nothing}
           aria-describedby=${ifDefined(hasError ? this._errorId : undefined)}

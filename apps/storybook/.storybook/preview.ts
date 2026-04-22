@@ -12,6 +12,9 @@ setCustomElementsManifest(customElements);
 
 const preview: Preview = {
   parameters: {
+    beforeEach: async () => {
+      document.body.removeAttribute('style');
+    },
     controls: {
       expanded: true,
       sort: 'requiredFirst',

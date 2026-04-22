@@ -36,17 +36,13 @@
     "test:cross-browser": "pnpm --filter=@helixui/library run test:cross-browser",
     "test:vrt": "playwright test",
     "test:vrt:update": "playwright test --update-snapshots",
-    "test:batch:1": "pnpm --filter=@helixui/library run test:batch:1",
-    "test:batch:2": "pnpm --filter=@helixui/library run test:batch:2",
-    "test:batch:3": "pnpm --filter=@helixui/library run test:batch:3",
-    "test:batch:4": "pnpm --filter=@helixui/library run test:batch:4",
-    "test:batch:5": "pnpm --filter=@helixui/library run test:batch:5",
     "test:component": "pnpm --filter=@helixui/library run test:component --",
     "test:drupal-behaviors": "pnpm --filter=@helixui/drupal-behaviors run test",
     "test:drupal-starter": "pnpm --filter=@helixui/drupal-starter run test",
     "test:tokens": "pnpm --filter=@helixui/tokens run test",
     "test:smart": "bash scripts/test-smart.sh",
     "test:batch": "bash scripts/test-batch.sh",
+    "test:shard": "bash scripts/test-shard.sh",
     "test:storybook": "pnpm --filter=@helixui/storybook run test",
     "audit:story-coverage": "node scripts/audit-story-coverage.js",
     "format": "prettier --write .",
@@ -56,6 +52,8 @@
     "bundle-size": "node scripts/bundle-size-report.js",
     "bundle-size:ci": "node scripts/bundle-size-report.js --ci",
     "check:bundle": "node scripts/check-bundle-size.mjs",
+    "check:cdn-size": "node scripts/check-cdn-size.mjs",
+    "build:cdn": "pnpm --filter=@helixui/library run build:cdn",
     "preflight": "bash scripts/preflight.sh",
     "verify": "pnpm run lint && pnpm run format:check && pnpm run type-check && pnpm run build",
     "pre-commit-check": "bash scripts/pre-commit-check.sh",
@@ -102,7 +100,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
-    "@bookedsolid/reagent": "^0.14.3",
+    "@bookedsolid/rea": "0.9.2",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
@@ -136,6 +134,5 @@
       "locutus": ">=3.0.14"
     }
   },
-  "packageManager": "pnpm@9.15.9",
-  "customElements": ".worktrees/feature-healthba-hx-carousel-document-25/packages/hx-library/custom-elements.json"
+  "packageManager": "pnpm@9.15.9"
 }

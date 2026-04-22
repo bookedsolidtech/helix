@@ -15,9 +15,9 @@
 
 <div class="contact-form">
   <div class="contact-form__header">
-    <hx-text variant="heading" size="lg">{{ title|default('Contact Us') }}</hx-text>
+    <hx-text variant="heading" hx-size="lg">{{ title|default('Contact Us') }}</hx-text>
     {% if description %}
-      <hx-text variant="body" size="md">{{ description }}</hx-text>
+      <hx-text variant="body" hx-size="md">{{ description }}</hx-text>
     {% endif %}
   </div>
   <form

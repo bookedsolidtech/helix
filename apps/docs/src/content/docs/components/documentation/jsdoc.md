@@ -218,7 +218,7 @@ For events with complex payloads:
 
 ```typescript
 /**
- * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
+ * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with `href` set) is clicked.
  */
 ```
 
@@ -639,8 +639,8 @@ Document when a feature was added:
  *
  * @since 1.2.0
  */
-@property({ type: String, attribute: 'hx-href' })
-wcHref = '';
+@property({ type: String, reflect: true })
+href: string | undefined;
 ```
 
 ### `@default`
@@ -987,7 +987,7 @@ export class HelixTextInput extends LitElement {
  * @slot footer - Optional footer content below the body.
  * @slot actions - Optional action buttons, rendered with a top border separator.
  *
- * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with hx-href) is clicked.
+ * @fires {CustomEvent<{url: string, originalEvent: MouseEvent}>} hx-card-click - Dispatched when an interactive card (with `href` set) is clicked.
  *
  * @csspart card - The outer card container element.
  * @csspart image - The image slot container.
@@ -1023,12 +1023,11 @@ export class HelixCard extends LitElement {
 
   /**
    * Optional URL. When set, the card becomes interactive (clickable)
-   * and navigates to this URL on click.
-   * Uses hx-href to avoid conflicting with the native HTML href attribute.
-   * @attr hx-href
+   * and fires `hx-click` on activation. Reflects to the `href` HTML attribute.
+   * @attr href
    */
-  @property({ type: String, attribute: 'hx-href' })
-  wcHref = '';
+  @property({ type: String, reflect: true })
+  href: string | undefined;
 
   // ... implementation
 }

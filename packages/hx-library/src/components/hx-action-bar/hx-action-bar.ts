@@ -1,6 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -45,7 +46,7 @@ export type ActionBarSize = 'sm' | 'md' | 'lg';
  * ```
  */
 @customElement('hx-action-bar')
-export class HelixActionBar extends LitElement {
+export class HelixActionBar extends HelixElement {
   static override styles = [helixActionBarStyles];
 
   /**
@@ -73,28 +74,8 @@ export class HelixActionBar extends LitElement {
   @property({ type: String, reflect: true })
   position: 'top' | 'bottom' | 'sticky' = 'top';
 
-  /**
-   * @deprecated Use `position="sticky"` instead.
-   * When true, the bar sticks to the top of its scroll container.
-   * @attr sticky
-   */
-  @property({ type: Boolean, reflect: true })
-  get sticky(): boolean {
-    return this._sticky;
-  }
-  set sticky(value: boolean) {
-    if (value) {
-      devWarn(
-        'hx-action-bar',
-        'The `sticky` property is deprecated. Use `position="sticky"` instead.',
-      );
-    }
-    const old = this._sticky;
-    this._sticky = value;
-    this.requestUpdate('sticky', old);
-  }
-  /** @internal */
-  private _sticky = false;
+  // The deprecated `sticky` boolean property has been removed in 3.0.0.
+  // Use `position="sticky"` instead.
 
   /**
    * Accessible label for the toolbar.
@@ -303,7 +284,7 @@ export class HelixActionBar extends LitElement {
   // ─── Render ───
 
   override render() {
-    const isSticky = this.position === 'sticky' || this.sticky;
+    const isSticky = this.position === 'sticky';
     const isBottom = this.position === 'bottom';
     const positionClass = isSticky ? ' base--sticky' : isBottom ? ' base--bottom' : '';
 

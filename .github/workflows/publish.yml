@@ -4,8 +4,9 @@
 # Triggers on push to main or manual dispatch. If unreleased changesets exist, bumps versions
 # and publishes to npm directly. Version bump is pushed back via a PR.
 #
-# Tests are NOT re-run here — CI (ci.yml + ci-matrix.yml) already validates
+# Tests are NOT re-run here — CI (ci.yml) already validates
 # all code before it reaches main via the staging→main promotion flow.
+# ci-matrix.yml is disabled (workflow_dispatch only) and is not part of the gate.
 #
 # Required secrets:
 #   CHANGESET_TOKEN — PAT or fine-grained token with contents:write + pull-requests:write
@@ -54,8 +55,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Regenerate Custom Elements Manifest
+        run: pnpm --filter=@helixui/library run cem
+        # CEM must be up-to-date with the tagged commit. Regenerating here
+        # catches any stale manifest that would ship to consumers with
+        # inaccurate API docs or broken React wrapper generation.
+
+      - name: Verify CEM matches committed manifest
+        run: |
+          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+            echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            exit 1
+          fi
+          echo "CEM matches committed manifest."
+
       - name: Build packages
-        run: pnpm turbo run build --filter='!docs'
+        run: |
+          pnpm turbo run build \
+            --filter=@helixui/library \
+            --filter=@helixui/tokens \
+            --filter=@helixui/react \
+            --filter=@helixui/drupal-behaviors \
+            --filter=@helixui/drupal-starter \
+            --filter=@helixui/mcp
 
       - name: Install gitleaks
         run: |
@@ -70,7 +92,21 @@ jobs:
           SCAN_DIR="$(mktemp -d)"
           FAIL=0
 
-          for pkg_dir in packages/hx-library packages/hx-tokens; do
+          # Derive the list of publishable packages from the workspace rather
+          # than hardcoding it — any package with "private": true is skipped,
+          # anything else is treated as publishable and scanned.
+          PKG_DIRS=$(node -e "
+            const fs=require('fs'),path=require('path');
+            for (const d of fs.readdirSync('packages')) {
+              const p=path.join('packages',d,'package.json');
+              if (!fs.existsSync(p)) continue;
+              const pkg=JSON.parse(fs.readFileSync(p,'utf8'));
+              if (pkg.private) continue;
+              console.log(path.join('packages',d));
+            }
+          ")
+
+          for pkg_dir in $PKG_DIRS; do
             if [ ! -f "$pkg_dir/package.json" ]; then
               echo "Skipping $pkg_dir — no package.json"
               continue
@@ -79,12 +115,16 @@ jobs:
             PKG_NAME=$(node -p "require('./$pkg_dir/package.json').name" 2>/dev/null || echo "unknown")
             echo "Packing $PKG_NAME ($pkg_dir)..."
 
-            TARBALL=$(cd "$pkg_dir" && pnpm pack --pack-destination "$SCAN_DIR" 2>/dev/null \
-              | tail -1)
-            if [ ! -f "$TARBALL" ]; then
-              # pnpm pack writes the filename relative to pack-destination
-              TARBALL=$(ls -t "$SCAN_DIR"/*.tgz 2>/dev/null | head -1)
+            PKG_PACK_DIR="$SCAN_DIR/pack-$(basename "$pkg_dir")"
+            mkdir -p "$PKG_PACK_DIR"
+            if ! PACK_OUTPUT=$(cd "$pkg_dir" && npm pack --pack-destination "$PKG_PACK_DIR" 2>&1); then
+              echo "::error::Failed to produce tarball for $PKG_NAME"
+              echo "$PACK_OUTPUT"
+              FAIL=1
+              continue
             fi
+
+            TARBALL=$(find "$PKG_PACK_DIR" -maxdepth 1 -type f -name '*.tgz' -print -quit)
 
             if [ -z "$TARBALL" ]; then
               echo "::error::Failed to produce tarball for $PKG_NAME"
@@ -128,6 +168,15 @@ jobs:
     needs: secret-scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # ── Human-in-the-loop release gate ──────────────────────────────────────
+    # The `npm-publish` GitHub Environment enforces required-reviewer approval
+    # before this job runs. Configure in repo Settings → Environments:
+    #   1. Create environment `npm-publish`
+    #   2. Add Jake as a required reviewer (Protection rules → Required reviewers)
+    #   3. Set wait timer to 0 — the gate is a reviewer click, not a delay
+    # Without this environment configured, the job will fail at queue time
+    # with an "environment does not exist" error. See docs/releases/README.md.
+    environment: npm-publish
     steps:
       - uses: actions/checkout@v4
         with:
@@ -145,9 +194,29 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm turbo run build --filter='!docs'
+        run: |
+          pnpm turbo run build \
+            --filter=@helixui/library \
+            --filter=@helixui/tokens \
+            --filter=@helixui/react \
+            --filter=@helixui/drupal-behaviors \
+            --filter=@helixui/drupal-starter \
+            --filter=@helixui/mcp
+
+      - name: Verify CEM matches committed manifest
+        run: |
+          pnpm --filter=@helixui/library run cem
+          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+            echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            exit 1
+          fi
+          echo "CEM matches committed manifest."
+
+      - name: Build CDN artifacts
+        run: pnpm --filter=@helixui/library run build:cdn
 
       - name: Version and Publish
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: pnpm run changeset:publish
@@ -162,3 +231,70 @@ jobs:
           # version bump commits). The hook is designed for developer workflows,
           # not for internal CI git operations.
           HUSKY: '0'
+
+      - name: Generate release manifest
+        if: steps.changesets.outputs.published == 'true'
+        id: manifest
+        run: node scripts/generate-release-manifest.mjs
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REF: ${{ github.ref }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        # Emits docs/releases/<tag>-manifest.json with SHA, CI run ID,
+        # changeset list, bundle size snapshot, CEM SHA, and publish actor.
+        # Runs only on an actual publish — when changesets/action bumps
+        # versions without publishing (PR path), no manifest is generated.
+
+      - name: Commit release manifest
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          CHANGESET_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
+          HUSKY: '0'
+        run: |
+          set -euo pipefail
+          if ! git status --porcelain docs/releases/ | grep -q .; then
+            echo "No release manifest changes to commit."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # npm publish has already succeeded at this point, so the manifest
+          # MUST land on main. The workflow concurrency group only serialises
+          # runs of this workflow; unrelated merges can still advance main
+          # between actions/checkout and this step. Rebase the manifest on
+          # top of current origin/main to avoid a non-fast-forward rejection
+          # that would leave the npm release without its audit commit.
+          git stash push -u --message 'release-manifest' -- docs/releases/
+          git fetch origin main
+          git checkout -B publish-manifest origin/main
+          git stash pop
+          git add docs/releases/
+          git commit -m 'chore(release): add release manifest [skip ci]'
+
+          # Bounded retry: if another merge lands on main between our fetch
+          # and push, rebase and retry up to 3 times. Any failure after that
+          # is fatal and requires operator intervention — npm publish has
+          # already succeeded, so the manifest commit MUST land.
+          REMOTE="https://x-access-token:${CHANGESET_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          PUSH_OK=0
+          for attempt in 1 2 3; do
+            echo "Manifest push attempt $attempt/3..."
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push "$REMOTE" HEAD:main; then
+                PUSH_OK=1
+                break
+              fi
+            else
+              git rebase --abort || true
+            fi
+            sleep 5
+          done
+
+          if [ "$PUSH_OK" -ne 1 ]; then
+            echo "::error::Failed to push release manifest after 3 attempts. npm publish already succeeded — manifest must be committed manually."
+            exit 1
+          fi

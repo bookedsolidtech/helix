@@ -67,7 +67,7 @@ For external URLs (CDN):
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
 ```
 
@@ -141,7 +141,7 @@ For CDN-hosted files:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -269,7 +269,7 @@ For CDN assets with their own versioning:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       version: -1 # Disable query string
       attributes:
@@ -372,7 +372,7 @@ For optimal performance, define one library per component. This enables tree-sha
 helix-all:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       minified: true
       preprocess: false
@@ -657,7 +657,7 @@ Drupal's library system integrates with its cache system:
    ```yaml
    helix-cdn:
      js:
-       https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+       https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
          type: external
          minified: true
    ```
@@ -686,7 +686,7 @@ ls -lh dist/js/hx-*.js | awk '{print $5, $9}'
 helix-button-cdn:
   version: 0.0.1
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button.js:
       type: external
       minified: true
       preprocess: false
@@ -804,7 +804,7 @@ helix-card:
 
   Drupal.behaviors.helixCard = {
     attach(context) {
-      once('helix-card-init', 'hx-card[hx-href]', context).forEach((card) => {
+      once('helix-card-init', 'hx-card[href]', context).forEach((card) => {
         card.addEventListener('hx-card-click', (e) => {
           const { url } = e.detail;
 
@@ -833,7 +833,7 @@ helix-card:
 <hx-card
   variant="featured"
   elevation="raised"
-  hx-href="{{ url }}"
+  href="{{ url }}"
 >
   <img slot="image" src="{{ content.field_image }}" alt="{{ content.field_image.alt }}">
   <span slot="heading">{{ label }}</span>

@@ -35,16 +35,18 @@ export const helixRatingStyles = css`
     justify-content: center;
     position: relative;
     cursor: pointer;
-    color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #d1d5db));
+    color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #cbd5e1));
     line-height: 1;
-    transition: transform var(--hx-transition-fast, 0.15s ease);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
+    transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
   .symbol:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
     outline-offset: var(--hx-focus-ring-offset, 2px);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
   .symbol--full,
@@ -84,7 +86,7 @@ export const helixRatingStyles = css`
     position: absolute;
     left: 0;
     top: 0;
-    color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #d1d5db));
+    color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #cbd5e1));
     /* Clip to right 50% for the empty half */
     clip-path: inset(0 0 0 50%);
   }

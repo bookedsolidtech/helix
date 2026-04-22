@@ -42,7 +42,7 @@ const meta = {
         type: { summary: 'CustomEvent<{ step: HelixStep; index: number }>' },
       },
     },
-    ariaLabel: {
+    accessibleLabel: {
       control: 'text',
       description: 'Accessible label for the steps component.',
       table: {

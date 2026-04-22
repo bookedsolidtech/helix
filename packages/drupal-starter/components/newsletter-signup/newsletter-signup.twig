@@ -13,9 +13,9 @@
 
 <div class="newsletter-signup">
   <div class="newsletter-signup__header">
-    <hx-text variant="heading" size="md">{{ title|default('Subscribe to our newsletter') }}</hx-text>
+    <hx-text variant="heading" hx-size="md">{{ title|default('Subscribe to our newsletter') }}</hx-text>
     {% if description %}
-      <hx-text variant="body" size="sm">{{ description }}</hx-text>
+      <hx-text variant="body" hx-size="sm">{{ description }}</hx-text>
     {% endif %}
   </div>
   <form

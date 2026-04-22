@@ -53,29 +53,29 @@ export const helixBadgeStyles = css`
   }
 
   .badge--secondary {
-    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6));
-    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #374151));
+    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f1f5f9));
+    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #334155));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f3f4f6))
+      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f1f5f9))
     );
   }
 
   .badge--success {
-    --hx-badge-bg: var(--hx-color-success-700, #15803d);
+    --hx-badge-bg: var(--hx-color-success-700, #166534);
     --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-success-700, #15803d)
+      var(--hx-color-success-700, #166534)
     );
   }
 
   .badge--warning {
-    --hx-badge-bg: var(--hx-color-warning-500, #eab308);
-    --hx-badge-color: var(--hx-color-neutral-900, #1a1a1a);
+    --hx-badge-bg: var(--hx-color-warning-500, #d97706);
+    --hx-badge-color: var(--hx-color-neutral-900, #0f172a);
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-warning-500, #eab308)
+      var(--hx-color-warning-500, #d97706)
     );
   }
 
@@ -89,20 +89,20 @@ export const helixBadgeStyles = css`
   }
 
   .badge--neutral {
-    --hx-badge-bg: var(--hx-color-neutral-200, #e5e7eb);
-    --hx-badge-color: var(--hx-color-neutral-700, #374151);
+    --hx-badge-bg: var(--hx-color-neutral-200, #e2e8f0);
+    --hx-badge-color: var(--hx-color-neutral-700, #334155);
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-neutral-200, #e5e7eb)
+      var(--hx-color-neutral-200, #e2e8f0)
     );
   }
 
   .badge--info {
-    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1));
+    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #075985));
     --hx-badge-color: var(--hx-badge-info-color, var(--hx-color-neutral-0, #ffffff));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-info-bg, var(--hx-color-info-700, #0369a1))
+      var(--hx-badge-info-bg, var(--hx-color-info-700, #075985))
     );
   }
 
@@ -182,7 +182,7 @@ export const helixBadgeStyles = css`
     cursor: pointer;
     color: inherit;
     opacity: var(--hx-opacity-75, 0.75);
-    border-radius: var(--hx-border-radius-sm, 0.125rem);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
     line-height: 0;
     /* WCAG 2.5.5: minimum 44×44px touch target */
     min-width: var(--hx-touch-target-min, 2.75rem);
@@ -195,7 +195,7 @@ export const helixBadgeStyles = css`
 
   .badge__remove-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, currentColor);
-    outline-offset: var(--hx-focus-ring-offset, 1px);
+    outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */

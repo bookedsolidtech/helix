@@ -76,4 +76,14 @@ export const helixContainerStyles = css`
   .container__inner--xl {
     max-width: var(--hx-container-max-width, var(--hx-container-xl, 1280px));
   }
+
+  /* ─── High Contrast Mode (forced-colors) ─── */
+
+  /* hx-container is a layout wrapper with no state communicated via color.
+     forced-color-adjust: auto (default) is sufficient. */
+  @media (forced-colors: active) {
+    :host {
+      forced-color-adjust: auto;
+    }
+  }
 `;

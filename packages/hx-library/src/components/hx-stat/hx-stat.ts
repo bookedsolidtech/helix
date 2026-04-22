@@ -1,8 +1,9 @@
-import { LitElement, html, nothing, type PropertyValues } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { HelixElement } from '../../base/index.js';
 import { helixStatStyles } from './hx-stat.styles.js';
 
 export type StatSize = 'sm' | 'md' | 'lg';
@@ -44,7 +45,7 @@ export type StatTrend = 'up' | 'down' | 'neutral';
  * @cssprop [--hx-stat-trend-down-bg=var(--hx-color-error-50)] - Trend down background color.
  */
 @customElement('hx-stat')
-export class HelixStat extends LitElement {
+export class HelixStat extends HelixElement {
   static override styles = [helixStatStyles];
 
   /**

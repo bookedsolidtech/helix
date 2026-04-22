@@ -111,18 +111,32 @@ jobs:
           fi
 
   # ── Full suite test with Node version matrix (mirrors ci-matrix.yml) ───
+  # Gated at step level (not job level) — env.* is not an allowed context
+  # in job-level `if:` per GitHub's schema. Every step checks the gate
+  # output from the first step; matrix containers still spin up but
+  # exit cheaply when neither ACT_MATRIX_TESTS nor ACT_FULL_TESTS is set.
   test-full:
     name: Test Full (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: ${{ env.ACT_MATRIX_TESTS == 'true' || env.ACT_FULL_TESTS == 'true' }}
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node ${{ matrix.node-version }} via nvm
+      - name: Check full-test gate
+        id: gate
+        run: |
+          if [ "${ACT_MATRIX_TESTS}" = "true" ] || [ "${ACT_FULL_TESTS}" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "test-full: skipped (ACT_MATRIX_TESTS/ACT_FULL_TESTS not set)"
+          fi
+      - if: steps.gate.outputs.run == 'true'
+        uses: actions/checkout@v4
+      - if: steps.gate.outputs.run == 'true'
+        name: Setup Node ${{ matrix.node-version }} via nvm
         run: |
           if [ "${{ matrix.node-version }}" != "" ]; then
             export NVM_DIR="$HOME/.nvm"
@@ -134,16 +148,20 @@ jobs:
             nvm use ${{ matrix.node-version }}
             echo "Node version: $(node --version)"
           fi
-      - name: Setup pnpm
+      - if: steps.gate.outputs.run == 'true'
+        name: Setup pnpm
         run: |
           corepack enable
           corepack prepare pnpm@9.15.9 --activate
           pnpm install --frozen-lockfile
-      - name: Install Playwright browsers
+      - if: steps.gate.outputs.run == 'true'
+        name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
-      - name: Build library
+      - if: steps.gate.outputs.run == 'true'
+        name: Build library
         run: pnpm turbo run build --filter='!docs' --filter='!@helixui/admin' --filter='!@helixui/storybook'
-      - name: Run full test suite with hang watchdog
+      - if: steps.gate.outputs.run == 'true'
+        name: Run full test suite with hang watchdog
         run: |
           # Vitest hang watchdog — kills stale processes after 15s of no output
           # Mirrors the pattern from scripts/test-batch.sh

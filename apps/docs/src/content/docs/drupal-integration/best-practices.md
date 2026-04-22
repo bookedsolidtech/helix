@@ -33,7 +33,7 @@ HELIX web components provide a **zero-coupling, standards-based architecture** f
 # mytheme.libraries.yml — No module dependencies
 helix-components:
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false
       attributes:
         type: module
@@ -427,7 +427,7 @@ helix-alert:
     done
 
     # Check total bundle size
-    total=$(gzip -c dist/js/helix.bundled.js | wc -c)
+    total=$(gzip -c dist/cdn/core.js | wc -c)
     if [ "$total" -gt 51200 ]; then
       echo "ERROR: Total bundle is ${total} bytes (limit: 50KB)"
       exit 1
@@ -576,7 +576,7 @@ $config['system.performance']['csp'] = [
 **Generate SRI hash:**
 
 ```bash
-curl -s https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js | \
+curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
@@ -588,7 +588,7 @@ curl -s https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.j
 
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       minified: true
       preprocess: false
@@ -728,9 +728,9 @@ Drupal.behaviors.helixCard = {
 # mytheme.libraries.yml
 
 helix-components:
-  version: 0.0.1 # Explicit version for cache-busting
+  version: 3.0.0 # Explicit version for cache-busting
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false
       attributes:
         type: module
@@ -937,7 +937,7 @@ export default meta;
 
 ### Adding New Components
 
-1. Install: `npm install @helixui/library@latest`
+1. Install: `npm install @helixui/library@3.0.0`
 2. Build: `npm run build`
 3. Define library in `mytheme.libraries.yml`
 4. Create Twig template in `templates/components/`

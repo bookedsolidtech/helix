@@ -4,6 +4,7 @@
   "description": "Drupal behaviors for all interactive HELiX web components using the once() pattern",
   "license": "MIT",
   "author": "BookedSolid Technologies",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/bookedsolidtech/helix.git",
@@ -19,17 +20,32 @@
     "bigpipe",
     "healthcare"
   ],
-  "main": "src/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./behaviors/*": {
+      "import": "./dist/behaviors/*",
+      "default": "./dist/behaviors/*"
+    }
+  },
   "files": [
-    "src",
+    "dist",
     "README.md",
     "USAGE.md"
   ],
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "type-check": "tsc --noEmit",
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@helixui/library": "workspace:^"
+    "@helixui/library": "^2.1.2 || ^3.0.0"
   },
   "publishConfig": {
     "access": "public",

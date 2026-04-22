@@ -229,9 +229,9 @@ When a single page context contains several HELiX component types that all need 
     attach(context, settings) {
 
       // Each component type gets its own once() key
-      once('helixui:card-click', 'hx-card[hx-href]', context).forEach((card) => {
+      once('helixui:card-click', 'hx-card[href]', context).forEach((card) => {
         card.addEventListener('hx-click', () => {
-          window.location.href = card.getAttribute('hx-href');
+          window.location.href = card.getAttribute('href');
         });
       });
 

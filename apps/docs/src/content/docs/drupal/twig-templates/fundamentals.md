@@ -192,14 +192,14 @@ HELiX uses `hx-` prefixed attribute names where native HTML already reserves the
 <hx-button hx-size="lg" variant="primary">Large Button</hx-button>
 <hx-badge hx-size="sm" variant="secondary">New</hx-badge>
 
-{# hx-href — avoids routing ambiguity; makes the whole card a link #}
-<hx-card hx-href="/patient/{{ node.id }}" variant="default">
+{# href — makes the whole card a link; fires hx-click on activation #}
+<hx-card href="/patient/{{ node.id }}" variant="default">
   <span slot="heading">{{ label }}</span>
   Click anywhere on this card to navigate
 </hx-card>
 ```
 
-Always use `hx-size` rather than `size`, and `hx-href` rather than `href`, when those attributes appear in the component's documented API.
+Always use `hx-size` rather than `size`. `hx-card` uses `href` directly — it reflects to the `href` HTML attribute and activates via click or Enter/Space.
 
 ### Boolean Attributes
 
@@ -420,7 +420,7 @@ See the [Behaviors documentation](/drupal/behaviors/fundamentals/) for the compl
     <hx-card
       variant="default"
       elevation="raised"
-      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
     >
       {% if patient.field_photo.entity %}
         <img

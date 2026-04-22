@@ -19,14 +19,14 @@
     {% endif %}
   </div>
 
-  <hx-nav aria-label="{{ 'Primary'|t }}">
+  <hx-nav label="{{ 'Primary'|t }}">
     {% if menu_items %}
       {% for item in menu_items %}
         {% if item.children is not empty %}
           <hx-dropdown>
             <hx-button slot="trigger" variant="text"{% if item.is_active %} aria-current="true"{% endif %}>
               {{ item.title }}
-              <hx-icon slot="suffix" name="chevron-down" size="small"></hx-icon>
+              <hx-icon slot="suffix" name="chevron-down" hx-size="sm"></hx-icon>
             </hx-button>
             {% for child in item.children %}
               <hx-link href="{{ child.url }}"{% if child.is_active %} aria-current="page"{% endif %}>

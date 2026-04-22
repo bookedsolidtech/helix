@@ -25,21 +25,21 @@
 
     <div class="recipe-full__meta">
       {% if prep_time %}
-        <hx-badge variant="neutral" size="sm">Prep: {{ prep_time }}</hx-badge>
+        <hx-badge variant="neutral" hx-size="sm">Prep: {{ prep_time }}</hx-badge>
       {% endif %}
 
       {% if cook_time %}
-        <hx-badge variant="neutral" size="sm">Cook: {{ cook_time }}</hx-badge>
+        <hx-badge variant="neutral" hx-size="sm">Cook: {{ cook_time }}</hx-badge>
       {% endif %}
 
       {% if servings %}
-        <hx-badge variant="neutral" size="sm">Serves: {{ servings }}</hx-badge>
+        <hx-badge variant="neutral" hx-size="sm">Serves: {{ servings }}</hx-badge>
       {% endif %}
 
       {% if difficulty %}
         <hx-badge
           variant="{{ difficulty|lower == 'easy' ? 'success' : (difficulty|lower == 'hard' ? 'danger' : 'warning') }}"
-          size="sm"
+          hx-size="sm"
         >{{ difficulty }}</hx-badge>
       {% endif %}
     </div>

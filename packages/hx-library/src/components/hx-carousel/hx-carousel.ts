@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixCarouselStyles } from './hx-carousel.styles.js';
 import type { HelixCarouselItem } from './hx-carousel-item.js';
 
@@ -110,7 +111,7 @@ const _svgPause = html`<svg
  * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
  */
 @customElement('hx-carousel')
-export class HelixCarousel extends LitElement {
+export class HelixCarousel extends HelixElement {
   static override styles = [helixCarouselStyles];
 
   /**

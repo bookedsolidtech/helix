@@ -60,8 +60,8 @@ When evaluating AI costs:
 3. Cross-reference cost estimates with actual billing data when available
 4. Flag when pricing information may be stale (providers change pricing frequently)
 5. Distinguish between list price and negotiated enterprise pricing
-6. Respect reagent autonomy levels from `.reagent/policy.yaml`
-7. Check `.reagent/HALT` before any action
+6. Respect rea autonomy levels from `.rea/policy.yaml`
+7. Check `.rea/HALT` before any action
 
 ## When to Use This Agent
 
@@ -83,4 +83,4 @@ When evaluating AI costs:
 
 ---
 
-_Part of the [reagent](https://github.com/bookedsolidtech/reagent) agent team._
+_Part of the [rea](https://github.com/bookedsolidtech/rea) agent team._

@@ -702,4 +702,308 @@ describe('hx-list-item', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── hx-list: devWarn for interactive without label ───
+
+  describe('hx-list: devWarn for interactive without label', () => {
+    it('warns when interactive variant has no label', async () => {
+      const { vi } = await import('vitest');
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixList>('<hx-list variant="interactive"></hx-list>');
+        await el.updateComplete;
+        const calls = spy.mock.calls.filter(
+          (c) => typeof c[0] === 'string' && c[0].includes('"label" attribute is required'),
+        );
+        expect(calls.length).toBeGreaterThan(0);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it('does not warn when interactive variant has label', async () => {
+      const { vi } = await import('vitest');
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixList>(
+          '<hx-list variant="interactive" label="Options"></hx-list>',
+        );
+        await el.updateComplete;
+        const calls = spy.mock.calls.filter(
+          (c) => typeof c[0] === 'string' && c[0].includes('"label" attribute is required'),
+        );
+        expect(calls).toHaveLength(0);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it('does not warn for non-interactive variants without label', async () => {
+      const { vi } = await import('vitest');
+      const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixList>('<hx-list variant="plain"></hx-list>');
+        await el.updateComplete;
+        const calls = spy.mock.calls.filter(
+          (c) => typeof c[0] === 'string' && c[0].includes('"label" attribute is required'),
+        );
+        expect(calls).toHaveLength(0);
+      } finally {
+        spy.mockRestore();
+      }
+    });
+  });
+
+  // ─── hx-list: hx-select event detail structure ───
+
+  describe('hx-list: hx-select event detail', () => {
+    it('hx-select bubbles and is composed', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="x">X</hx-list-item>
+        </hx-list>
+      `);
+      const item = el.querySelector('hx-list-item')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      liEl.click();
+      const event = await eventPromise;
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('hx-select detail.item is the HelixListItem element', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="item-val">Item</hx-list-item>
+        </hx-list>
+      `);
+      const item = el.querySelector('hx-list-item')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      liEl.click();
+      const event = await eventPromise;
+      expect(event.detail.item).toBe(item);
+    });
+
+    it('does not dispatch hx-select for disabled item in interactive mode', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="x" disabled>X</hx-list-item>
+        </hx-list>
+      `);
+      const item = el.querySelector('hx-list-item')!;
+      let fired = false;
+      el.addEventListener('hx-select', () => { fired = true; });
+      const liEl = shadowQuery<HTMLElement>(item, '[part~="base"]')!;
+      liEl.click();
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+  });
+
+  // ─── hx-list: keyboard navigation edge cases ───
+
+  describe('hx-list: keyboard navigation edge cases', () => {
+    it('ArrowDown wraps from last item to first', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      await items[1].updateComplete;
+      items[1].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('ArrowUp wraps from first item to last', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+          <hx-list-item value="b">B</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      await items[0].updateComplete;
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('keydown does nothing in non-interactive mode', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="plain">
+          <hx-list-item>Item A</hx-list-item>
+          <hx-list-item>Item B</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      // Should not throw, and focus should not change
+      const before = document.activeElement;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(before);
+    });
+
+    it('keydown does nothing when no items present', async () => {
+      const el = await fixture<HelixList>(
+        '<hx-list variant="interactive" label="Empty"></hx-list>',
+      );
+      await el.updateComplete;
+      // Should not throw with empty list
+      expect(() => {
+        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      }).not.toThrow();
+    });
+
+    it('unrecognized key does nothing', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll<HelixListItem>('hx-list-item'));
+      items[0].focus();
+      // Tab is not handled — should not change focus or throw
+      expect(() => {
+        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      }).not.toThrow();
+    });
+  });
+
+  // ─── hx-list: variant switch updates item interactive state ───
+
+  describe('hx-list: variant switch updates child items', () => {
+    it('sets interactive=true on child items when variant changes to interactive', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="plain">
+          <hx-list-item value="a">A</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixListItem>('hx-list-item')!;
+      expect(item.interactive).toBe(false);
+      el.variant = 'interactive';
+      await el.updateComplete;
+      await item.updateComplete;
+      expect(item.interactive).toBe(true);
+    });
+
+    it('sets interactive=false on child items when variant changes from interactive', async () => {
+      const el = await fixture<HelixList>(`
+        <hx-list variant="interactive" label="Options">
+          <hx-list-item value="a">A</hx-list-item>
+        </hx-list>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixListItem>('hx-list-item')!;
+      await item.updateComplete;
+      expect(item.interactive).toBe(true);
+      el.variant = 'plain';
+      await el.updateComplete;
+      await item.updateComplete;
+      expect(item.interactive).toBe(false);
+    });
+  });
+
+  // ─── hx-list-item: additional ARIA / keyboard ───
+
+  describe('hx-list-item: ARIA and keyboard extras', () => {
+    it('sets tabindex="0" on host in interactive mode when not disabled', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('removes tabindex from host in interactive mode when disabled', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive disabled>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      expect(el.hasAttribute('tabindex')).toBe(false);
+    });
+
+    it('sets aria-disabled on host in interactive disabled mode', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive disabled>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    it('removes ARIA attributes from host when interactive becomes false', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('role')).toBe('option');
+      el.interactive = false;
+      await el.updateComplete;
+      expect(el.hasAttribute('role')).toBe(false);
+      expect(el.hasAttribute('aria-selected')).toBe(false);
+    });
+
+    it('hx-list-item-click detail contains item reference', async () => {
+      const el = await fixture<HelixListItem>('<hx-list-item value="test">Item</hx-list-item>');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-list-item-click');
+      const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      liEl.click();
+      const event = await eventPromise;
+      expect(event.detail.item).toBe(el);
+    });
+
+    it('Enter key on disabled item does not dispatch hx-list-item-click', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive disabled>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      let fired = false;
+      el.addEventListener('hx-list-item-click', () => { fired = true; });
+      const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      liEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+
+    it('Space key on disabled item does not dispatch hx-list-item-click', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive disabled>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      let fired = false;
+      el.addEventListener('hx-list-item-click', () => { fired = true; });
+      const liEl = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
+      liEl.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(fired).toBe(false);
+    });
+
+    it('renders <li> with role="presentation" in interactive mode', async () => {
+      const el = await fixture<HelixListItem>(
+        '<hx-list-item interactive>Item</hx-list-item>',
+      );
+      await el.updateComplete;
+      const li = shadowQuery(el, 'li')!;
+      expect(li.getAttribute('role')).toBe('presentation');
+    });
+  });
+
+  // ─── hx-list: description variant with aria-label ───
+
+  describe('hx-list: description variant with aria-label', () => {
+    it('sets aria-label on dl element when label is provided', async () => {
+      const el = await fixture<HelixList>(
+        '<hx-list variant="description" label="Patient info"></hx-list>',
+      );
+      const dl = shadowQuery(el, 'dl')!;
+      expect(dl.getAttribute('aria-label')).toBe('Patient info');
+    });
+  });
 });

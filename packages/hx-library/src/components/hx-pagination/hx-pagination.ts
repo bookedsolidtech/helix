@@ -1,9 +1,20 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { HelixElement } from '../../base/index.js';
 import { helixPaginationStyles } from './hx-pagination.styles.js';
+
+/** Detail for the hx-page-change event dispatched by hx-pagination. */
+export interface HxPageChangeDetail {
+  page: number;
+}
+
+/** Detail for the hx-page-size-change event dispatched by hx-pagination. */
+export interface HxPageSizeChangeDetail {
+  pageSize: number;
+}
 
 /**
  * A pagination component for navigating content listings.
@@ -64,7 +75,7 @@ import { helixPaginationStyles } from './hx-pagination.styles.js';
  * ```
  */
 @customElement('hx-pagination')
-export class HelixPagination extends LitElement {
+export class HelixPagination extends HelixElement {
   static override styles = [helixPaginationStyles];
 
   /**

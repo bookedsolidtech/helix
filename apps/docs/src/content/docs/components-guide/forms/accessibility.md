@@ -1,6 +1,6 @@
 ---
 title: Form Accessibility
-description: Build accessible form controls in HELiX using ARIA roles, ElementInternals ARIA reflection, and the mixinDelegatesAria pattern.
+description: Build accessible form controls in HELiX using ARIA roles, ElementInternals ARIA reflection, and accessible-label forwarding to shadow-DOM targets.
 ---
 
 Form controls must be accessible to users of assistive technologies. Shadow DOM creates unique challenges: ARIA relationships that reference element IDs (like `aria-labelledby`) and focus management both need special handling when elements live in different shadow roots.
@@ -74,10 +74,10 @@ These attributes connect controls to their accessible names and descriptions.
 
 **`aria-label`** — sets an accessible name directly as a string:
 ```html
-<hx-text-input aria-label="Search products"></hx-text-input>
+<hx-text-input accessible-label="Search products"></hx-text-input>
 ```
 
-**`aria-labelledby`** — points to the ID of a visible label element. Works for elements in the same DOM scope; cross-shadow-DOM references require `mixinDelegatesAria` (see below):
+**`aria-labelledby`** — points to the ID of a visible label element. Works for elements in the same DOM scope; cross-shadow-DOM references need either `aria-labelledby` on an element that shares a DOM scope with the label, or forwarding via `ElementInternals.ariaLabelledByElements` on the custom element (see [Forwarding Host ARIA](#forwarding-host-aria-to-shadow-elements) below):
 ```html
 <label id="city-label">City</label>
 <hx-text-input aria-labelledby="city-label"></hx-text-input>
@@ -140,32 +140,37 @@ override connectedCallback() {
 
 Using `ElementInternals` ARIA properties is preferable to adding ARIA attributes to the shadow root's container element because it attaches semantics at the correct level of the accessibility tree.
 
-## `mixinDelegatesAria` — Forwarding Host Attributes to Shadow Elements
+## Forwarding Host ARIA to Shadow Elements
 
-The standard challenge: a consumer writes `<hx-button aria-label="Close">` but the `aria-label` on the host `<hx-button>` does not automatically reach the `<button>` inside the shadow root — the assistive technology sees it on the wrong element.
+The standard challenge: a consumer writes `<hx-text-input accessible-label="Patient last name">`, but an attribute placed on the host custom element does not automatically reach the `<input>` inside the shadow root — assistive technology would see it on the wrong element.
 
-HELiX's `mixinDelegatesAria` solves this by observing ARIA attributes on the host and mirroring them to the designated inner element:
+HELiX handles this in one of two ways, depending on the component:
+
+1. **Components that document `accessible-label`.** Form controls and composite widgets — `hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-split-button`, `hx-steps`, `hx-action-bar` — expose a public `accessible-label` attribute (property: `accessibleLabel`) and forward it to the inner interactive element via `ElementInternals.ariaLabel` or a template binding. Every component page lists its public attributes; use `accessible-label` only on components that document it.
+2. **Components that document native `aria-label` / `aria-labelledby`.** Some HELiX components (including `hx-button`) read `this.ariaLabel` / `this.ariaLabelledBy` from standard HTML attributes and forward them to the inner element. For these documented components, use the native attribute:
+
+   ```html
+   <hx-button aria-label="Close dialog">X</hx-button>
+   ```
+
+Do not apply either pattern universally. Components that own their accessible-name lifecycle expose component-specific APIs instead — for example, `hx-status-indicator` derives its accessible name from the `label` property and overwrites any host `aria-label` you set, so you must use `<hx-status-indicator label="Patient online">` rather than `aria-label="…"`. Consult each component's documented API before applying an accessible-name attribute.
+
+The following LitElement pattern illustrates the `accessible-label` forwarding approach used in category (1):
 
 ```typescript
-import { LitElement, html, css } from 'lit';
-import { customElement, query } from 'lit/decorators.js';
-import { mixinDelegatesAria } from '@helixui/library/mixins';
+import { LitElement, html, css, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
-const Base = mixinDelegatesAria(LitElement);
-
-@customElement('hx-button')
-export class HelixButton extends Base {
+@customElement('my-custom-input')
+export class MyCustomInput extends LitElement {
   static override styles = css`:host { display: inline-flex; }`;
 
-  @query('button') private _button!: HTMLButtonElement;
-
-  // mixinDelegatesAria reads _ariaTarget to know where to forward attributes
-  protected get _ariaTarget() {
-    return this._button;
-  }
+  @property({ attribute: 'accessible-label' }) accessibleLabel = '';
 
   override render() {
-    return html`<button><slot></slot></button>`;
+    return html`
+      <input aria-label=${this.accessibleLabel || nothing} />
+    `;
   }
 }
 ```
@@ -173,11 +178,11 @@ export class HelixButton extends Base {
 Consumer usage:
 
 ```html
-<!-- aria-label, aria-expanded, aria-controls automatically forwarded to inner <button> -->
-<hx-button aria-label="Close dialog" aria-expanded="false" aria-controls="dialog-1">
-  Close
-</hx-button>
+<!-- accessible-label is a public host attribute on components that document it. -->
+<hx-text-input accessible-label="Patient last name" placeholder="Last name"></hx-text-input>
 ```
+
+For built-in HELiX components that accept additional ARIA state (`aria-expanded`, `aria-controls`), the component documents the specific attributes it forwards. When building your own custom elements, prefer `ElementInternals.ariaExpanded` / `ariaControls` or explicit template bindings — the internal attribute-level forwarding helper used by HELiX components is not part of the public API.
 
 ## Connecting Visible Labels to Custom Controls
 
@@ -194,4 +199,4 @@ The browser connects the label to the custom element via the `for` / `id` associ
 
 - [Element Internals and Form Association](/components-guide/forms/element-internals/) — `attachInternals()` and `setFormValue()`
 - [Form Validation](/components-guide/forms/validation/) — `setValidity()` and constraint validation
-- [Event Delegation](/components-guide/events/delegation/) — `delegatesFocus` and `mixinDelegatesAria`
+- [Event Delegation](/components-guide/events/delegation/) — `delegatesFocus` and ARIA forwarding patterns

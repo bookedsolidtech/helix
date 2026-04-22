@@ -6,9 +6,15 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
 
 const _nextNumberInputId = createIdCounter('hx-number-input');
+
+/** Detail for hx-input and hx-change events dispatched by hx-number-input. */
+export interface HxNumberInputDetail {
+  value: number | null;
+}
 
 /**
  * A numeric input component with stepper controls, label, validation, and
@@ -34,7 +40,7 @@ const _nextNumberInputId = createIdCounter('hx-number-input');
  * @csspart input-wrapper - The wrapper around prefix, input, suffix, and stepper.
  * @csspart input - The native input element.
  * @csspart help-text - The help text container.
- * @csspart error-message - The error message container.
+ * @csspart error - The error message container.
  * @csspart stepper - The stepper button group container.
  * @csspart increment - The increment (+) button.
  * @csspart decrement - The decrement (-) button.
@@ -49,7 +55,7 @@ const _nextNumberInputId = createIdCounter('hx-number-input');
  * @cssprop [--hx-number-input-font-family=var(--hx-font-family-sans)] - Font family.
  */
 @customElement('hx-number-input')
-export class HelixNumberInput extends HelixElement {
+export class HelixNumberInput extends FormMixin(HelixElement) {
   static override styles = [helixNumberInputStyles];
 
   // ─── Form Association ───
@@ -186,7 +192,7 @@ export class HelixNumberInput extends HelixElement {
 
   /** @internal */
   @query('.field__input')
-  declare private _input: HTMLInputElement | null;
+  private _input: HTMLInputElement | undefined;
 
   // ─── Internal State ───
 
@@ -285,36 +291,23 @@ export class HelixNumberInput extends HelixElement {
       changedProperties.has('step')
     ) {
       this._syncFormValue();
-      this._updateValidity();
+    }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
     }
   }
 
   // ─── Form Integration ───
-
-  /** Returns the associated form element, if any. */
-  get form(): HTMLFormElement | null {
-    return this._internals.form;
-  }
-
-  /** Returns the validation message. */
-  get validationMessage(): string {
-    return this._internals.validationMessage;
-  }
-
-  /** Returns the ValidityState object. */
-  get validity(): ValidityState {
-    return this._internals.validity;
-  }
-
-  /** Checks whether the input satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
 
   /** @internal */
   private _syncFormValue(): void {
@@ -322,7 +315,7 @@ export class HelixNumberInput extends HelixElement {
   }
 
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && this.value === null) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -372,6 +365,7 @@ export class HelixNumberInput extends HelixElement {
   protected override _onFormReset(): void {
     this.value = this._defaultValue;
     this._internals.setFormValue(this.value !== null ? String(this.value) : null);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -436,6 +430,7 @@ export class HelixNumberInput extends HelixElement {
 
     if (next === this.value) return;
     this.value = next;
+    this._handleInteractionInput();
 
     this.dispatchEvent(
       new CustomEvent<{ value: number | null }>('hx-change', {
@@ -502,6 +497,7 @@ export class HelixNumberInput extends HelixElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = this._parseInput(target.value);
+    this._handleInteractionInput();
     this._syncFormValue();
 
     this.dispatchEvent(
@@ -518,8 +514,8 @@ export class HelixNumberInput extends HelixElement {
     const target = e.target as HTMLInputElement;
     const parsed = this._parseInput(target.value);
     this.value = parsed !== null ? this._clamp(parsed) : null;
+    this._handleInteractionBlur();
     this._syncFormValue();
-    this._updateValidity();
 
     this.dispatchEvent(
       new CustomEvent<{ value: number | null }>('hx-change', {
@@ -681,7 +677,7 @@ export class HelixNumberInput extends HelixElement {
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>
           ${this.error
             ? html`
-                <div part="error-message" class="field__error" id=${this._errorId} role="alert">
+                <div part="error" class="field__error" id=${this._errorId} role="alert">
                   ${this.error}
                 </div>
               `

@@ -1,0 +1,62 @@
+# .rea/registry.yaml — downstream MCP servers proxied through `rea serve`.
+# Every entry is subject to the 11-layer middleware chain (audit → kill-switch →
+# tier → policy → blocked-paths → rate-limit → circuit-breaker → injection →
+# redact → result-size-cap → terminal) and gets its tools surfaced to the MCP
+# client under the prefix `<name>__<tool>`.
+#
+# Servers configured here are invoked via `rea serve` (see .mcp.json). Do NOT
+# also list them in .mcp.json — that would double-register the catalog.
+#
+# env: values support ${VAR} interpolation against rea-serve's process.env
+# (landed in @bookedsolid/rea 0.3.0+). Secret-looking values (TOKEN/KEY/SECRET/
+# PASSWORD/CREDENTIAL) are redacted in audit logs by default.
+version: '1'
+
+servers:
+  - name: obsidian
+    command: npx
+    args:
+      - -y
+      - obsidian-mcp
+      - /Volumes/Development/booked/data/bst
+    env: {}
+    enabled: true
+
+  - name: helixir
+    command: npx
+    args:
+      - -y
+      - helixir
+    # NOTE: These env values contain machine-specific absolute paths. To use on
+    # a different machine, copy the values to a gitignored
+    # .rea/registry.yaml.local and override.
+    env:
+      MCP_WC_CEM_PATH: /Volumes/Development/booked/helix/packages/hx-library/custom-elements.json
+      MCP_WC_PROJECT_ROOT: /Volumes/Development/booked/helix
+      MCP_WC_COMPONENT_PREFIX: hx-
+      MCP_WC_TSCONFIG_PATH: /Volumes/Development/booked/helix/tsconfig.base.json
+      MCP_WC_TOKENS_PATH: /Volumes/Development/booked/helix/packages/hx-tokens/dist/tokens.json
+    enabled: true
+
+  - name: discord-ops
+    command: npx
+    args:
+      - -y
+      - discord-ops@^0.23.0
+    env:
+      BOOKED_DISCORD_BOT_TOKEN: '${BOOKED_DISCORD_BOT_TOKEN}'
+      CLARITY_DISCORD_BOT_TOKEN: '${CLARITY_DISCORD_BOT_TOKEN}'
+    enabled: true
+
+  # @modelcontextprotocol/server-github was deprecated in favor of the Go-based
+  # github/github-mcp-server (https://github.com/github/github-mcp-server).
+  # Disabled here until we wire the Go binary or Docker image into the registry.
+  # Tracked for a follow-up RE-add once the new server is vetted.
+  - name: github
+    command: npx
+    args:
+      - -y
+      - '@modelcontextprotocol/server-github'
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: '${GITHUB_PERSONAL_ACCESS_TOKEN}'
+    enabled: false

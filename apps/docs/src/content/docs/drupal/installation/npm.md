@@ -60,7 +60,7 @@ This creates a minimal `package.json`. You'll customize it in a moment.
 ## Step 2: Install HELiX
 
 ```bash
-npm install @helixui/library@1.1.2
+npm install @helixui/library@3.0.0
 ```
 
 To also install the design tokens package (required if your theme uses HELiX CSS custom properties outside of components):
@@ -387,12 +387,12 @@ libraries:
 </article>
 ```
 
-For link cards, use `hx-href` (not `href`):
+For link cards, use `href` (not `hx-href`):
 
 ```twig
 <hx-card
   variant="outlined"
-  hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+  href="{{ url('entity.node.canonical', {'node': node.id}) }}"
 >
   <span slot="heading">{{ node.title.value }}</span>
   <p>{{ node.field_teaser.value }}</p>
@@ -486,7 +486,7 @@ jobs:
 cd web/themes/custom/mytheme
 
 # Install the new version
-npm install @helixui/library@1.2.0
+npm install @helixui/library@3.0.0
 
 # Review the HELiX changelog before rebuilding
 

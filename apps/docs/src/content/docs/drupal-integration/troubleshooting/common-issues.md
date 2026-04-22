@@ -63,7 +63,7 @@ customElements.get('hx-button');
 
 DevTools → Network → Filter: JS
 
-Look for your component file (e.g., `hx-button.js` or `helix.bundled.js`):
+Look for your component file (e.g., `hx-button.js` or `core.js`):
 
 - **200 OK** - File loaded successfully (move to Step 3)
 - **404 Not Found** - File path incorrect (see Solution A)
@@ -75,10 +75,10 @@ DevTools → Elements → Search for your script tag:
 
 ```html
 <!-- Correct (type="module") -->
-<script type="module" src="/path/to/helix.bundled.js"></script>
+<script type="module" src="/path/to/core.js"></script>
 
 <!-- Wrong (missing type="module") -->
-<script src="/path/to/helix.bundled.js"></script>
+<script src="/path/to/core.js"></script>
 ```
 
 **Solutions:**
@@ -154,7 +154,7 @@ function mytheme_preprocess_page(&$variables) {
 helix-components:
   version: 0.0.1
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false
       attributes:
         type: module # CRITICAL: Required for ES modules
@@ -196,7 +196,7 @@ Search for duplicate library definitions:
 
 ```bash
 # In your theme directory
-grep -r "helix.bundled.js" *.libraries.yml
+grep -r "core.js" *.libraries.yml
 grep -r "hx-button" *.libraries.yml
 ```
 
@@ -210,7 +210,7 @@ Remove duplicates. Keep only one library definition per component.
 helix-components:
   version: 0.0.1
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false # REQUIRED: Disables aggregation
       minified: true # Mark as pre-minified
       attributes:
@@ -290,7 +290,7 @@ chmod 644 dist/js/*.js
 chmod 755 dist/js
 
 # Verify web server can read
-sudo -u www-data cat dist/js/helix.bundled.js
+sudo -u www-data cat dist/cdn/core.js
 # Should output file contents
 ```
 
@@ -301,10 +301,10 @@ sudo -u www-data cat dist/js/helix.bundled.js
 helix-components:
   js:
     # WRONG (HTTP)
-    # http://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js
+    # http://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js
 
     # CORRECT (HTTPS)
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -517,7 +517,7 @@ Uncaught SyntaxError: Cannot use import statement outside a module
 ```yaml
 helix-components:
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       attributes:
         type: module # ADD THIS
 ```
@@ -803,7 +803,7 @@ public function build() {
 ```yaml
 helix-components:
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false # CRITICAL for ES modules
       minified: true
       attributes:
@@ -835,7 +835,7 @@ helix-components:
 helix-components:
   version: 0.0.2 # INCREMENT THIS (was 0.0.1)
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false
       attributes:
         type: module
@@ -862,7 +862,7 @@ If using CDN, purge after deployment:
 # Cloudflare
 curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache" \
   -H "Authorization: Bearer {api_token}" \
-  -d '{"files":["https://example.com/dist/js/helix.bundled.js"]}'
+  -d '{"files":["https://example.com/dist/cdn/core.js"]}'
 ```
 
 **Solution D: Clear Varnish cache**
@@ -959,7 +959,7 @@ webcomponents-polyfills:
 
 helix-components:
   js:
-    dist/js/helix.bundled.js:
+    dist/cdn/core.js:
       preprocess: false
       attributes:
         type: module
@@ -1021,7 +1021,7 @@ helix-form:
 helix-components:
   js:
     # Primary: CDN
-    https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js:
       type: external
       preprocess: false
       attributes:
@@ -1045,7 +1045,7 @@ setTimeout(() => {
     console.warn('[HELIX] CDN failed, loading local fallback');
 
     // Dynamic import of local backup
-    import('/themes/custom/mytheme/libraries/helix/dist/helix.bundled.js')
+    import('/themes/custom/mytheme/libraries/helix/dist/cdn/core.js')
       .then(() => console.info('[HELIX] Local fallback loaded'))
       .catch((err) => console.error('[HELIX] Fallback failed:', err));
   }
@@ -1059,7 +1059,7 @@ mytheme/
 ├── libraries/
 │   └── helix/
 │       └── dist/
-│           └── helix.bundled.js  # Downloaded from npm or CDN
+│           └── core.js  # Downloaded from npm or CDN
 └── js/
     └── helix-fallback.js
 ```
@@ -1318,7 +1318,7 @@ console.log(navigator.userAgent);
 ```javascript
 if ('customElements' in window && 'attachShadow' in Element.prototype) {
   // Browser supports Web Components
-  import('/themes/custom/mytheme/dist/js/helix.bundled.js');
+  import('/themes/custom/mytheme/dist/cdn/core.js');
 } else {
   // Show fallback message
   document.body.innerHTML = '<p>Please upgrade your browser.</p>';
@@ -1420,7 +1420,7 @@ Create `test.html` in your theme:
     <hx-button variant="primary">Test Button</hx-button>
 
     <script type="module">
-      import 'https://cdn.jsdelivr.net/npm/@helixui/library@0.0.1/dist/helix.bundled.js';
+      import 'https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/cdn/core.js';
     </script>
   </body>
 </html>

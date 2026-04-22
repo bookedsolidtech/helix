@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const helixPaginationStyles = css`
   :host {
     display: block;
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-pagination-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   .pagination-root {
@@ -36,14 +36,14 @@ export const helixPaginationStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--hx-pagination-button-size, 2.25rem);
-    height: var(--hx-pagination-button-size, 2.25rem);
+    min-width: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
+    min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-pagination-border-color, var(--hx-color-neutral-300, #d1d5db));
+      var(--hx-pagination-border-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-pagination-border-radius, var(--hx-border-radius-md, 0.375rem));
     background: var(--hx-pagination-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-pagination-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-pagination-color, var(--hx-color-neutral-900, #0f172a));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-family: inherit;
     cursor: pointer;
@@ -56,7 +56,7 @@ export const helixPaginationStyles = css`
   }
 
   .button:hover:not(:disabled) {
-    background: var(--hx-pagination-hover-bg, var(--hx-color-neutral-100, #f3f4f6));
+    background: var(--hx-pagination-hover-bg, var(--hx-color-neutral-100, #f1f5f9));
     border-color: var(--hx-pagination-hover-border-color, var(--hx-color-primary-500, #2563eb));
   }
 
@@ -87,9 +87,9 @@ export const helixPaginationStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--hx-pagination-button-size, 2.25rem);
-    height: var(--hx-pagination-button-size, 2.25rem);
-    color: var(--hx-pagination-ellipsis-color, var(--hx-color-neutral-500, #6b7280));
+    min-width: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
+    min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
+    color: var(--hx-pagination-ellipsis-color, var(--hx-color-neutral-500, #64748b));
     font-size: var(--hx-font-size-sm, 0.875rem);
     user-select: none;
   }
@@ -110,18 +110,18 @@ export const helixPaginationStyles = css`
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-500, #6b7280);
+    color: var(--hx-color-neutral-500, #64748b);
     white-space: nowrap;
   }
 
   .page-size-select {
-    height: var(--hx-pagination-button-size, 2.25rem);
+    min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-pagination-border-color, var(--hx-color-neutral-300, #d1d5db));
+      var(--hx-pagination-border-color, var(--hx-color-neutral-300, #cbd5e1));
     border-radius: var(--hx-pagination-border-radius, var(--hx-border-radius-md, 0.375rem));
     background: var(--hx-pagination-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-pagination-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-pagination-color, var(--hx-color-neutral-900, #0f172a));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-family: inherit;
     cursor: pointer;

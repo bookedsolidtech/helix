@@ -1,7 +1,8 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixTagStyles } from './hx-tag.styles.js';
 
 /**
@@ -42,7 +43,7 @@ import { helixTagStyles } from './hx-tag.styles.js';
  * own aria-live region to inform screen reader users of clinical data filter changes.
  */
 @customElement('hx-tag')
-export class HelixTag extends LitElement {
+export class HelixTag extends HelixElement {
   static override styles = [helixTagStyles];
 
   /**
@@ -207,9 +208,6 @@ export class HelixTag extends LitElement {
 }
 
 export type HxTag = HelixTag;
-
-/** @deprecated Use {@link HxTag} instead. The `Wc` prefix was a legacy alias. */
-export type WcTag = HelixTag;
 
 declare global {
   interface HTMLElementTagNameMap {

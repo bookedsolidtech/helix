@@ -482,7 +482,7 @@ Twig auto-escapes HTML entities in attribute values by default. This means `"`, 
 1. **Use `default` filter** for any field-sourced attribute to prevent empty or null attribute values.
 2. **Boolean attributes must be conditional presence** — never `disabled="{{ value }}"`.
 3. **Use `hx-size`** not `size` for component size configuration.
-4. **Use `hx-href`** not `href` for card navigation.
+4. **Use `href`** not `hx-href` for card navigation.
 5. **Objects and arrays require a Drupal Behavior** — JSON-encode to `data-` attributes in Twig, parse in JavaScript.
 6. **Keep property logic in Twig** — derive variant values, size values, and conditional states in the template rather than JavaScript.
 7. **Check field existence** before accessing `.value` to avoid Twig errors on nodes without that field type.

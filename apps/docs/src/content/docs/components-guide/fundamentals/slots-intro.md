@@ -229,7 +229,7 @@ export class HelixButtonGroup extends LitElement {
 Usage:
 
 ```html
-<hx-button-group aria-label="Text formatting">
+<hx-button-group accessible-label="Text formatting">
   <hx-button variant="ghost">Bold</hx-button>
   <hx-button variant="ghost">Italic</hx-button>
   <hx-button variant="ghost">Underline</hx-button>

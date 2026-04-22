@@ -1,6 +1,7 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
 import { mergeBrandTokens } from '../../utils/token-merger.js';
@@ -255,7 +256,7 @@ function _buildThemeCss(theme: ThemeName): string {
  * ```
  */
 @customElement('hx-theme')
-export class HelixTheme extends LitElement {
+export class HelixTheme extends HelixElement {
   static override styles = [helixThemeStyles];
 
   /**
@@ -269,14 +270,8 @@ export class HelixTheme extends LitElement {
   @property({ type: String, reflect: true })
   theme: 'light' | 'dark' | 'high-contrast' | 'auto' = 'light';
 
-  /**
-   * @deprecated Use `theme="auto"` instead.
-   * When true, auto-detects the preferred color scheme via the
-   * `prefers-color-scheme` media query, overriding the `theme` prop.
-   * @attr system
-   */
-  @property({ type: Boolean, reflect: true })
-  system = false;
+  // The deprecated `system` boolean property has been removed in 3.0.0.
+  // Use `theme="auto"` instead.
 
   /**
    * The registered brand name to apply on top of the base theme.
@@ -340,7 +335,7 @@ export class HelixTheme extends LitElement {
   override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
     this._initThemeSheet();
-    if (this.system || this.theme === 'auto') {
+    if (this.theme === 'auto') {
       this._attachMediaQuery();
     }
     if (this.motion === 'full') {
@@ -350,8 +345,8 @@ export class HelixTheme extends LitElement {
 
   override updated(changed: PropertyValues<this>): void {
     super.updated(changed);
-    const autoMode = this.system || this.theme === 'auto';
-    if (changed.has('system') || changed.has('theme')) {
+    const autoMode = this.theme === 'auto';
+    if (changed.has('theme')) {
       if (autoMode) {
         this._attachMediaQuery();
       } else {
@@ -387,7 +382,7 @@ export class HelixTheme extends LitElement {
    * Otherwise returns the `theme` property value.
    */
   get effectiveTheme(): 'light' | 'dark' | 'high-contrast' | 'auto' {
-    if (this.system || this.theme === 'auto') {
+    if (this.theme === 'auto') {
       if (typeof window === 'undefined') return 'light';
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
@@ -531,6 +526,3 @@ declare global {
 
 /** Canonical type alias for HelixTheme. Use this when typing hx-theme element references. */
 export type HxTheme = HelixTheme;
-
-/** @deprecated Use {@link HxTheme} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcTheme = HelixTheme;

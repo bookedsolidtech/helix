@@ -18,16 +18,16 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
 
 # ── 4. Check if enabled ──────────────────────────────────────────────────────
-POLICY_FILE="${REAGENT_ROOT}/.reagent/policy.yaml"
+POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
 if [[ -f "$POLICY_FILE" ]]; then
   if grep -qE 'architecture_advisory:[[:space:]]*false' "$POLICY_FILE" 2>/dev/null; then
     exit 0
@@ -42,8 +42,8 @@ if [[ -z "$FILE_PATH" ]]; then
 fi
 
 # Normalize to relative path
-if [[ "$FILE_PATH" == "$REAGENT_ROOT"/* ]]; then
-  FILE_PATH="${FILE_PATH#$REAGENT_ROOT/}"
+if [[ "$FILE_PATH" == "$REA_ROOT"/* ]]; then
+  FILE_PATH="${FILE_PATH#$REA_ROOT/}"
 fi
 
 # ── 6. Check architecture-sensitive paths ─────────────────────────────────────

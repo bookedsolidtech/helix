@@ -65,12 +65,12 @@ export const helixStructuredListRowStyles = css`
 
   .row__label {
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-structured-list-label-color, var(--hx-color-neutral-700, #374151));
+    color: var(--hx-structured-list-label-color, var(--hx-color-neutral-700, #334155));
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
   .row__value {
-    color: var(--hx-structured-list-value-color, var(--hx-color-neutral-900, #111827));
+    color: var(--hx-structured-list-value-color, var(--hx-color-neutral-900, #0f172a));
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 

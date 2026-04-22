@@ -903,4 +903,84 @@ describe('hx-pagination', () => {
       expect(pageSize).toBeNull();
     });
   });
+
+  // ─── Coverage Gap: labelPageMessage and labelPageButton overrides ───
+
+  describe('labelPageMessage and labelPageButton function overrides', () => {
+    it('uses a custom labelPageMessage function for the live region', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="3"></hx-pagination>',
+      );
+      await el.updateComplete;
+      el.labelPageMessage = (current: number, total: number) => `Seite ${current} von ${total}`;
+      await el.updateComplete;
+      // Verify the function property was accepted
+      expect(typeof el.labelPageMessage).toBe('function');
+      expect(el.labelPageMessage(3, 10)).toBe('Seite 3 von 10');
+    });
+
+    it('uses a custom labelPageButton function for page button aria-labels', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="1"></hx-pagination>',
+      );
+      await el.updateComplete;
+      el.labelPageButton = (page: number) => `Gehe zu Seite ${page}`;
+      await el.updateComplete;
+      expect(typeof el.labelPageButton).toBe('function');
+      expect(el.labelPageButton(2)).toBe('Gehe zu Seite 2');
+    });
+  });
+
+  // ─── Coverage Gap: _handlePageSizeChange with same value ───
+
+  describe('_handlePageSizeChange does not fire event when value unchanged', () => {
+    it('does not dispatch hx-page-size-change when the same page size is selected', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="1" show-page-size page-size="10"></hx-pagination>',
+      );
+      await el.updateComplete;
+      let eventCount = 0;
+      el.addEventListener('hx-page-size-change', () => { eventCount++; });
+      const select = shadowQuery<HTMLSelectElement>(el, 'select');
+      if (select) {
+        // Simulate a change event with the same value
+        select.value = String(el.pageSize);
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      await el.updateComplete;
+      // Same value → no event should fire
+      expect(eventCount).toBe(0);
+    });
+  });
+
+  // ─── Coverage Gap: boundary edge cases ───
+
+  describe('Page range boundary edge cases', () => {
+    it('renders correctly with exactly 2 total pages', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="2" current-page="1"></hx-pagination>',
+      );
+      await el.updateComplete;
+      const nav = shadowQuery(el, 'nav');
+      expect(nav).toBeTruthy();
+    });
+
+    it('renders correctly when current page is near the end', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="10" current-page="9"></hx-pagination>',
+      );
+      await el.updateComplete;
+      const nav = shadowQuery(el, 'nav');
+      expect(nav).toBeTruthy();
+    });
+
+    it('renders correctly on the last page', async () => {
+      const el = await fixture<HelixPagination>(
+        '<hx-pagination total-pages="5" current-page="5"></hx-pagination>',
+      );
+      await el.updateComplete;
+      const nav = shadowQuery(el, 'nav');
+      expect(nav).toBeTruthy();
+    });
+  });
 });

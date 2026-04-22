@@ -18,7 +18,7 @@ export const helixListItemStyles = css`
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-list-item-padding, var(--hx-space-3, 0.75rem));
     color: var(--hx-list-item-color, var(--hx-color-neutral-900, #0f172a));
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-list-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: default;
@@ -40,7 +40,7 @@ export const helixListItemStyles = css`
 
   :host([interactive]):focus-visible .list-item {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #2563eb));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #1d4ed8));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -48,7 +48,7 @@ export const helixListItemStyles = css`
 
   .list-item--selected {
     background-color: var(--hx-list-item-bg-selected, var(--hx-color-primary-50, #eff6ff));
-    color: var(--hx-list-item-color-selected, var(--hx-color-primary-700, #1d4ed8));
+    color: var(--hx-list-item-color-selected, var(--hx-color-primary-700, #1e40af));
   }
 
   /* ─── Disabled state ─── */
@@ -71,7 +71,7 @@ export const helixListItemStyles = css`
 
   .list-item__link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #2563eb));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #1d4ed8));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

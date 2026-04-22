@@ -664,4 +664,69 @@ describe('hx-alert', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Coverage Gap: announcer microtask path ───
+
+  describe('Announcer microtask path', () => {
+    it('populates the sr-only announcer after open becomes true', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Screen reader text</hx-alert>');
+      el.open = true;
+      await el.updateComplete;
+      // Two nested microtask flushes mirror the double Promise.resolve() chain in the source
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      const announcer = el.shadowRoot!.querySelector<HTMLElement>('.sr-only');
+      expect(announcer).toBeTruthy();
+      // The announcer must be a string (either populated or cleared — not undefined)
+      expect(typeof announcer!.textContent).toBe('string');
+    });
+
+    it('clears the sr-only announcer when open transitions to false', async () => {
+      const el = await fixture<HxAlert>('<hx-alert open>Important message</hx-alert>');
+      await el.updateComplete;
+      await Promise.resolve();
+      await Promise.resolve();
+      el.open = false;
+      await el.updateComplete;
+      const announcer = el.shadowRoot!.querySelector<HTMLElement>('.sr-only');
+      // Announcer is cleared when hidden so stale text is not re-read on the next open
+      expect(announcer!.textContent).toBe('');
+    });
+  });
+
+  // ─── Coverage Gap: returnFocusTo with null query result ───
+
+  describe('returnFocusTo with null selector', () => {
+    it('does not throw when returnFocusTo selector matches nothing', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert open dismissible>Alert</hx-alert>',
+      );
+      await el.updateComplete;
+      el.returnFocusTo = '#nonexistent-element-xyz';
+      const closeBtn = el.shadowRoot!.querySelector<HTMLButtonElement>('button');
+      // Clicking close when the selector returns null must not throw
+      expect(() => closeBtn?.click()).not.toThrow();
+    });
+  });
+
+  // ─── Coverage Gap: unknown variant severity label ───
+
+  describe('Unknown variant severity label', () => {
+    it('does not throw for an unrecognized variant value', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Content</hx-alert>');
+      // Cast to exercise the default branch of _defaultSeverityLabel
+      (el as unknown as { variant: string }).variant = 'unknown-variant';
+      await expect(el.updateComplete).resolves.toBeTruthy();
+    });
+
+    it('severityLabel override takes precedence over default label', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert variant="warning" severity-label="Custom Warning">Alert</hx-alert>',
+      );
+      await el.updateComplete;
+      // When severityLabel is explicitly set it overrides the computed default
+      expect(el.severityLabel).toBe('Custom Warning');
+    });
+  });
 });

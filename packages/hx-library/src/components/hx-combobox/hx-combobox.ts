@@ -2,10 +2,13 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
+
+// PERF: hx-combobox exceeds 5KB budget (6.87kb gzipped) -- typeahead filtering, multi-select chips, async loading
 
 // ─── Internal option model ───
 
@@ -20,6 +23,11 @@ export interface ComboboxOption {
 export type HxComboboxSize = 'sm' | 'md' | 'lg';
 
 const _nextComboboxId = createIdCounter('hx-combobox');
+
+/** Detail for hx-input and hx-change events dispatched by hx-combobox. */
+export interface HxComboboxDetail {
+  value: string;
+}
 
 /**
  * A form-associated combobox component combining a text input with a listbox
@@ -68,7 +76,7 @@ const _nextComboboxId = createIdCounter('hx-combobox');
  * @cssprop [--hx-combobox-option-selected-bg=var(--hx-color-primary-100)] - Selected option background.
  */
 @customElement('hx-combobox')
-export class HelixCombobox extends HelixElement {
+export class HelixCombobox extends FormMixin(HelixElement) {
   static override styles = [helixComboboxStyles];
 
   // ─── Form Association ───
@@ -186,10 +194,18 @@ export class HelixCombobox extends HelixElement {
 
   /**
    * Accessible name for screen readers, if different from the visible label.
-   * @attr aria-label
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element.
+   *
+   * Note: `mixinDelegatesAria` is not applied to this component because form
+   * inputs with associated labels delegate accessible naming via `<label>`
+   * association and `aria-labelledby`, not host-level ARIA delegation. The
+   * `accessible-label` attribute is a fallback for label-free usage. The value is forwarded to the
+   * internal input's `aria-label`.
+   * @attr accessible-label
    */
-  @property({ type: String, attribute: 'aria-label' })
-  override ariaLabel: string | null = null;
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
 
   /**
    * Text shown when no options match the current filter.
@@ -258,10 +274,6 @@ export class HelixCombobox extends HelixElement {
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     // Safety net: remove listener if component is removed while dropdown is open
@@ -281,21 +293,23 @@ export class HelixCombobox extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('value')) {
       this._updateFormValue();
-      this._updateValidity();
+    }
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
     }
   }
 
   // ─── Form Integration ───
-
-  /** Checks whether the combobox satisfies its constraints. */
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  /** Reports validity and shows the browser's constraint validation UI. */
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
 
   /** @internal */
   private _updateFormValue(): void {
@@ -303,7 +317,7 @@ export class HelixCombobox extends HelixElement {
   }
 
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -320,6 +334,7 @@ export class HelixCombobox extends HelixElement {
     this.value = '';
     this._filterText = '';
     this._internals.setFormValue(null);
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -396,6 +411,7 @@ export class HelixCombobox extends HelixElement {
     if (!this._open) return;
     this._open = false;
     this._focusedOptionIndex = -1;
+    this._handleInteractionBlur();
     if (typeof document !== 'undefined') {
       document.removeEventListener('click', this._handleOutsideClick);
     }
@@ -555,6 +571,7 @@ export class HelixCombobox extends HelixElement {
       this.value = option.value;
       this._closeDropdown();
     }
+    this._handleInteractionInput();
     this._filterText = '';
     if (this._input) this._input.value = '';
     this._dispatchChange();
@@ -683,7 +700,7 @@ export class HelixCombobox extends HelixElement {
   // ─── Main Render ───
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
     const showClear = this.clearable && !!this.value && !this.disabled;
 
     const fieldClasses = {
@@ -783,8 +800,10 @@ export class HelixCombobox extends HelixElement {
             aria-invalid=${hasError ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-required=${this.required ? 'true' : nothing}
-            aria-label=${ifDefined(this.ariaLabel || undefined)}
-            aria-labelledby=${ifDefined(this.label && !this.ariaLabel ? this._labelId : undefined)}
+            aria-label=${ifDefined(this.accessibleLabel || undefined)}
+            aria-labelledby=${ifDefined(
+              this.label && !this.accessibleLabel ? this._labelId : undefined,
+            )}
             aria-busy=${this.loading ? 'true' : nothing}
             .value=${this._filterText || (this._open ? '' : this._displayValue)}
             placeholder=${ifDefined(this.placeholder || undefined)}
@@ -813,7 +832,7 @@ export class HelixCombobox extends HelixElement {
                   part="clear-button"
                   type="button"
                   class="field__clear-button"
-                  aria-label=${`Clear ${this.label || this.ariaLabel || 'selection'}`}
+                  aria-label=${`Clear ${this.label || this.accessibleLabel || 'selection'}`}
                   tabindex="0"
                   @click=${this._handleClear}
                 >
@@ -846,7 +865,7 @@ export class HelixCombobox extends HelixElement {
           role="listbox"
           id=${this._listboxId}
           class="field__listbox"
-          aria-label=${ifDefined(this.label || this.ariaLabel || undefined)}
+          aria-label=${ifDefined(this.label || this.accessibleLabel || undefined)}
           aria-multiselectable=${this.multiple ? 'true' : nothing}
           ?hidden=${!this._open}
         >
@@ -883,13 +902,24 @@ export class HelixCombobox extends HelixElement {
   }
 }
 
+/**
+ * Per-component event map for type-safe addEventListener on hx-combobox.
+ * The `hx-change` detail is `{ value: string }` only — no `checked` property.
+ */
+export interface HxComboboxEventMap {
+  'hx-input': CustomEvent<{ value: string }>;
+  'hx-change': CustomEvent<{ value: string }>;
+  'hx-clear': CustomEvent<void>;
+  'hx-show': CustomEvent<void>;
+  'hx-hide': CustomEvent<void>;
+}
+
 declare global {
   interface HTMLElementTagNameMap {
     'hx-combobox': HelixCombobox;
   }
   interface HTMLElementEventMap {
     'hx-input': CustomEvent<{ value: string }>;
-    'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
     'hx-clear': CustomEvent<void>;
     'hx-show': CustomEvent<void>;
     'hx-hide': CustomEvent<void>;

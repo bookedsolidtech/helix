@@ -211,7 +211,7 @@ The `libraryOverrides.dependencies` key in `component.yml` attaches Drupal libra
 helix-runtime:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/lit-runtime.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/lit-runtime.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -219,7 +219,7 @@ helix-runtime:
 helix-card:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -229,7 +229,7 @@ helix-card:
 helix-badge:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-badge/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-badge/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -239,7 +239,7 @@ helix-badge:
 helix-button:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -249,7 +249,7 @@ helix-button:
 helix-avatar:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/components/hx-avatar/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-avatar/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }

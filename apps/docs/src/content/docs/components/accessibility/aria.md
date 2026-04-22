@@ -415,7 +415,7 @@ override ariaLabel: string | null = null;
 ```
 
 ```html
-<hx-text-input aria-label="Search" placeholder="Search..."></hx-text-input>
+<hx-text-input accessible-label="Search" placeholder="Search..."></hx-text-input>
 ```
 
 #### aria-labelledby

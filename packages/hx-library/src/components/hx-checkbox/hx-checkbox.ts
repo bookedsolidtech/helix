@@ -8,9 +8,16 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
+import { devWarn } from '../../utils/dev-warn.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
 const _nextCheckboxId = createIdCounter('hx-checkbox');
+
+/** Detail for the hx-change event dispatched by hx-checkbox. */
+export interface HxCheckboxChangeDetail {
+  checked: boolean;
+  value: string;
+}
 
 /**
  * A checkbox component with label, validation, and form association.
@@ -23,7 +30,7 @@ const _nextCheckboxId = createIdCounter('hx-checkbox');
  * @slot error - Custom error content (overrides the error property).
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
- * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled.
+ * @fires {CustomEvent<{checked: boolean, value: string}>} hx-change - Dispatched when the checkbox is toggled. Boolean-selection controls (`hx-switch`, `hx-checkbox`) include both `checked` (boolean state) and `value` (form value) in the detail; text-value controls (`hx-text-input`, `hx-combobox`, `hx-select`) emit only `{value}`.
  *
  * @csspart checkbox - The visual checkbox element.
  * @csspart checkmark - The SVG checkmark icon inside the checkbox.
@@ -133,6 +140,29 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   @property({ type: String, attribute: 'hx-size', reflect: true })
   size: 'sm' | 'md' | 'lg' = 'md';
 
+  /**
+   * Accessible label for the checkbox when no visible label text is provided.
+   * Use when embedding a checkbox in a context where a label element is not practical.
+   *
+   * Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
+   * `accessible-label` takes precedence when both are set.
+   * When set, replaces the visible label as the input's accessible name. Cannot be combined
+   * with a visible label — set either `accessible-label` or the `label` slot, not both.
+   *
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string = '';
+
+  /**
+   * Returns the effective label for the checkbox, checking accessible-label first,
+   * then the aria-label attribute, falling back to empty string.
+   * @internal
+   */
+  private get _effectiveLabel(): string {
+    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
+  }
+
   /** @internal */
   @query('.checkbox__input')
   private _inputEl: HTMLInputElement | undefined;
@@ -149,6 +179,9 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    */
   @state() private _announcedError = '';
 
+  /** @internal */
+  private _hasWarnedLabelConflict = false;
+
   // ─── Slot Handlers ───
 
   /** @internal */
@@ -163,6 +196,26 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
+    }
+    // Warn when accessible-label is set alongside a visible label — they are mutually exclusive.
+    // Checked unconditionally (not gated on changedProperties) because ariaLabel is provided by
+    // mixinDelegatesAria via Object.defineProperty and never appears in changedProperties.
+    {
+      const hasAccessibleLabel = !!(this.accessibleLabel?.trim() || this.ariaLabel?.trim());
+      const hasVisibleLabel =
+        !!this.label ||
+        (this.shadowRoot
+          ?.querySelector<HTMLSlotElement>('.checkbox__label slot')
+          ?.assignedNodes({ flatten: true }).length ?? 0) > 0;
+      if (hasAccessibleLabel && hasVisibleLabel && !this._hasWarnedLabelConflict) {
+        this._hasWarnedLabelConflict = true;
+        devWarn(
+          'hx-checkbox',
+          'accessible-label is set alongside a visible label. Use either accessible-label or the label slot, not both.',
+        );
+      } else if (!hasAccessibleLabel || !hasVisibleLabel) {
+        this._hasWarnedLabelConflict = false;
+      }
     }
     // WCAG 4.1.3: Keep _announcedError in sync with the error property.
     // When error changes from one non-empty value to another, clear the live region
@@ -203,7 +256,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   }
 
   /** @internal */
-  protected _updateValidity(): void {
+  _updateValidity(): void {
     if (this.required && !this.checked) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -309,7 +362,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         .filter(Boolean)
         .join(' ') || undefined;
 
-    const hostAriaLabel = this.ariaLabel ?? undefined;
+    const hostAriaLabel = this._effectiveLabel || undefined;
 
     return html`
       <div class=${classMap(containerClasses)}>
@@ -396,13 +449,24 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 /** Canonical type alias for the hx-checkbox component. */
 export type HxCheckbox = HelixCheckbox;
 
-/** @deprecated Use {@link HxCheckbox} instead. The `Wc` prefix was a legacy naming convention. */
-export type WcCheckbox = HelixCheckbox;
+/**
+ * Per-component event map for type-safe addEventListener on hx-checkbox.
+ * The `hx-change` detail always includes both `checked` and `value` for this component.
+ */
+export interface HxCheckboxEventMap {
+  'hx-change': CustomEvent<{ checked: boolean; value: string }>;
+}
 
 declare global {
   interface HTMLElementTagNameMap {
     'hx-checkbox': HelixCheckbox;
   }
+  /**
+   * Global hx-change event type. The detail shape is a union because hx-change is dispatched
+   * by multiple components: form-field components (value only) and toggle components
+   * (checked + value). Use per-component EventMap types (e.g. HxCheckboxEventMap) for
+   * narrowed addEventListener calls.
+   */
   interface HTMLElementEventMap {
     'hx-change': CustomEvent<{ value: string } | { checked: boolean; value: string }>;
   }

@@ -367,6 +367,84 @@ describe('hx-status-indicator', () => {
     });
   });
 
+  // ─── devWarn: legacy size attribute ───
+
+  describe('devWarn: legacy size attribute', () => {
+    it('emits deprecation warning when legacy size attribute is used', async () => {
+      const { vi } = await import('vitest');
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator size="sm"></hx-status-indicator>',
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"size" attribute is deprecated'),
+      );
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── show-label: dynamic toggle ───
+
+  describe('show-label: dynamic toggle', () => {
+    it('shows label after showLabel changes from false to true', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online"></hx-status-indicator>',
+      );
+      expect(shadowQuery(el, '[part~="label"]')).toBeNull();
+      el.showLabel = true;
+      await el.updateComplete;
+      const label = shadowQuery(el, '[part~="label"]');
+      expect(label).toBeTruthy();
+      expect(label?.textContent?.trim()).toBe('Online');
+    });
+
+    it('hides label after showLabel changes from true to false', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="online" show-label></hx-status-indicator>',
+      );
+      expect(shadowQuery(el, '[part~="label"]')).toBeTruthy();
+      el.showLabel = false;
+      await el.updateComplete;
+      expect(shadowQuery(el, '[part~="label"]')).toBeNull();
+    });
+  });
+
+  // ─── pulse attribute CSS class ───
+
+  describe('pulse attribute CSS class', () => {
+    it('pulse class or attribute is reflected when pulse is set', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator pulse></hx-status-indicator>',
+      );
+      expect(el.hasAttribute('pulse')).toBe(true);
+      expect(el.pulse).toBe(true);
+    });
+  });
+
+  // ─── _getStatusText fallback for unknown status ───
+
+  describe('_getStatusText fallback for unknown status', () => {
+    it('falls back to "Unknown" label for unrecognized status value', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator status="unknown"></hx-status-indicator>',
+      );
+      // Direct label check on the host
+      expect(el.getAttribute('aria-label')).toBe('Status: Unknown');
+    });
+  });
+
+  // ─── role is not overridden when already set ───
+
+  describe('role preservation', () => {
+    it('does not override explicit role when already set on the host', async () => {
+      const el = await fixture<HelixStatusIndicator>(
+        '<hx-status-indicator role="presentation"></hx-status-indicator>',
+      );
+      // connectedCallback guard: if role already set, do NOT overwrite
+      expect(el.getAttribute('role')).toBe('presentation');
+    });
+  });
+
   // ─── Accessibility (axe-core) ───
 
   describe('Accessibility (axe-core)', () => {

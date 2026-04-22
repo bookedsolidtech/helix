@@ -16,9 +16,8 @@ props:
         - secondary
         - tertiary
         - danger
-        - success
         - ghost
-        - link
+        - outline
     hx_size:
       type: string
       title: Size

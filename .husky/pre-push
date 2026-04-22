@@ -88,13 +88,13 @@ else
 fi
 
 # ── Optional: coverage threshold gate ─────────────────────────────────────────
-# Enabled via .reagent/policy.yaml:
+# Enabled via .rea/policy.yaml:
 #   coverage:
 #     enabled: true
 #     threshold: 80   # line/function/statement coverage percentage (branches: threshold - 10)
 #
 # Only runs if coverage.enabled is true AND the project has a test script.
-POLICY_FILE=".reagent/policy.yaml"
+POLICY_FILE=".rea/policy.yaml"
 COVERAGE_ENABLED="false"
 COVERAGE_THRESHOLD=80
 
@@ -147,4 +147,17 @@ if [ -f "$HOOKS_LIB" ]; then
   source "$HOOKS_LIB"
   discord_notify "dev" "Pre-push gates passed on \`$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\`" "green"
 fi
+
+# ── rea push-review-gate (Codex audit on protected paths) ────────────────────
+# 0.9.1: push-review-gate.sh is the canonical gate. Its core (push-review-core.sh)
+# has BUG-008 stdin-shape sniffing, so it handles both Claude Code JSON
+# (.tool_input.command) and git's native pre-push refspec stdin. We pass "$@"
+# through so the remote name (argv $1) is available to the core.
+# We invoke without `exec` so the EXIT trap above still runs to clean $OUT.
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -x "$REPO_ROOT/.claude/hooks/push-review-gate.sh" ]; then
+  "$REPO_ROOT/.claude/hooks/push-review-gate.sh" "$@"
+  exit $?
+fi
+
 exit 0

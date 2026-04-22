@@ -21,6 +21,10 @@ on:
     tags:
       - '@helixui/library@*'
       - '@helixui/tokens@*'
+      - '@helixui/react@*'
+      - '@helixui/drupal-behaviors@*'
+      - '@helixui/drupal-starter@*'
+      - '@helixui/mcp@*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,10 +43,9 @@ jobs:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Only run for library releases (primary publishable package)
-    if: startsWith(github.ref_name, '@helixui/library@')
     outputs:
       version: ${{ steps.extract.outputs.version }}
+      pkg_name: ${{ steps.extract.outputs.pkg_name }}
       release_url: ${{ steps.create-release.outputs.html_url }}
       changelog_body: ${{ steps.changelog.outputs.body }}
 
@@ -51,14 +54,35 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from tag
+      # ── Resolve package name, version, and workspace dir from the tag ────
+      # Tag format: @helixui/<name>@<version>. Folder names do not match the
+      # npm name (e.g. @helixui/library lives at packages/hx-library), so a
+      # case statement maps each package to its workspace directory.
+      - name: Extract version and package from tag
         id: extract
         run: |
           TAG="${{ github.ref_name }}"
-          VERSION="${TAG#@helixui/library@}"
+          PKG_NAME="${TAG%@*}"       # e.g. @helixui/library
+          VERSION="${TAG##*@}"       # e.g. 3.0.0
+
+          case "$PKG_NAME" in
+            @helixui/library)          PKG_DIR=packages/hx-library ;;
+            @helixui/tokens)           PKG_DIR=packages/hx-tokens ;;
+            @helixui/react)            PKG_DIR=packages/hx-react ;;
+            @helixui/drupal-behaviors) PKG_DIR=packages/drupal-behaviors ;;
+            @helixui/drupal-starter)   PKG_DIR=packages/drupal-starter ;;
+            @helixui/mcp)              PKG_DIR=packages/helixui-mcp ;;
+            *)
+              echo "::error::Unknown package $PKG_NAME for tag $TAG"
+              exit 1
+              ;;
+          esac
+
+          echo "pkg_name=$PKG_NAME" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Releasing version: $VERSION"
+          echo "pkg_dir=$PKG_DIR" >> "$GITHUB_OUTPUT"
+          echo "Releasing $PKG_NAME version $VERSION from $PKG_DIR"
 
       - uses: pnpm/action-setup@v4
 
@@ -70,12 +94,35 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # ── Build the package that is being released ─────────────────────────
+      - name: Build package
+        run: pnpm turbo run build --filter=${{ steps.extract.outputs.pkg_name }}
+
+      # ── Build CDN artifacts (library-only) ───────────────────────────────
+      # CDN bundles are specific to @helixui/library; skip cleanly for any
+      # other published package tag.
+      - name: Build CDN artifacts
+        if: steps.extract.outputs.pkg_name == '@helixui/library'
+        run: pnpm --filter=@helixui/library run build:cdn
+
+      - name: Package CDN tarball
+        if: steps.extract.outputs.pkg_name == '@helixui/library'
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+          TARBALL="helix-cdn-${VERSION}.tar.gz"
+          tar -czf "/tmp/${TARBALL}" -C packages/hx-library/dist/cdn .
+          echo "CDN tarball: /tmp/${TARBALL} ($(du -sh /tmp/${TARBALL} | cut -f1))"
+          echo "tarball=/tmp/${TARBALL}" >> "$GITHUB_ENV"
+          echo "tarball_name=${TARBALL}" >> "$GITHUB_ENV"
+
       # ── Extract changelog entry for this version ─────────────────────────
       - name: Extract CHANGELOG entry
         id: changelog
         run: |
           VERSION="${{ steps.extract.outputs.version }}"
-          CHANGELOG="packages/hx-library/CHANGELOG.md"
+          PKG_NAME="${{ steps.extract.outputs.pkg_name }}"
+          PKG_DIR="${{ steps.extract.outputs.pkg_dir }}"
+          CHANGELOG="${PKG_DIR}/CHANGELOG.md"
 
           if [ ! -f "$CHANGELOG" ]; then
             echo "body=No changelog found." >> "$GITHUB_OUTPUT"
@@ -94,16 +141,19 @@ jobs:
           ' "$CHANGELOG" | sed '/^[[:space:]]*$/d' | head -200)
 
           if [ -z "$BODY" ]; then
-            BODY="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/packages/hx-library/CHANGELOG.md) for full details."
+            BODY="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/${PKG_DIR}/CHANGELOG.md) for full details."
           fi
 
           # Write to a file to avoid quoting issues with multiline content
           echo "$BODY" > /tmp/changelog-body.md
           echo "Changelog entry extracted ($(wc -l < /tmp/changelog-body.md) lines)"
 
-      # ── CEM diff between this version and the previous tag ───────────────
+      # ── CEM diff between this version and the previous library tag ───────
+      # CEM diffs are library-specific (only @helixui/library ships a CEM).
+      # Skip cleanly for any other released package.
       - name: Generate CEM diff for release notes
         id: cem-diff
+        if: steps.extract.outputs.pkg_name == '@helixui/library'
         run: |
           VERSION="${{ steps.extract.outputs.version }}"
 
@@ -125,38 +175,57 @@ jobs:
           pnpm --filter=@helixui/library run cem
           cp packages/hx-library/custom-elements.json /tmp/cem-head.json
 
-          # Check out previous tag source and generate base CEM
-          git checkout "$PREV_TAG" -- packages/hx-library/src/ 2>/dev/null || true
-          pnpm --filter=@helixui/library run cem || true
-          cp packages/hx-library/custom-elements.json /tmp/cem-base.json
-
-          # Restore head source
-          git checkout HEAD -- packages/hx-library/src/ 2>/dev/null || true
-
-          # Run diff
-          node scripts/cem-diff.js \
-            --base /tmp/cem-base.json \
-            --head /tmp/cem-head.json \
-            --output /tmp/cem-diff-raw.md || true
-
-          # Wrap in a release notes section
-          if [ -f /tmp/cem-diff-raw.md ]; then
-            echo "" > /tmp/cem-diff-section.md
-            echo "---" >> /tmp/cem-diff-section.md
-            echo "" >> /tmp/cem-diff-section.md
-            cat /tmp/cem-diff-raw.md >> /tmp/cem-diff-section.md
+          # Check out previous tag source and generate base CEM. Each step has
+          # explicit error handling: surface the failure, leave a placeholder
+          # in the release notes, but do not silently swallow the error.
+          if ! git checkout "$PREV_TAG" -- packages/hx-library/src/; then
+            echo "::warning::Unable to check out $PREV_TAG source — CEM diff unavailable"
+            echo "CEM diff unavailable (base checkout failed)." > /tmp/cem-diff-section.md
           else
-            echo "CEM diff unavailable." > /tmp/cem-diff-section.md
+            if ! pnpm --filter=@helixui/library run cem; then
+              echo "::error::CEM regeneration failed on base tag $PREV_TAG"
+              exit 1
+            fi
+            cp packages/hx-library/custom-elements.json /tmp/cem-base.json
+
+            # Restore head source unconditionally and verify the tree is clean.
+            git checkout HEAD -- packages/hx-library/src/
+            if ! git diff --quiet -- packages/hx-library/src/; then
+              echo "::error::Source tree dirty after restore of packages/hx-library/src/"
+              exit 1
+            fi
+
+            if ! node scripts/cem-diff.js \
+              --base /tmp/cem-base.json \
+              --head /tmp/cem-head.json \
+              --output /tmp/cem-diff-raw.md; then
+              echo "::warning::CEM diff script failed"
+              echo "CEM diff unavailable (diff script failed)." > /tmp/cem-diff-section.md
+            else
+              {
+                echo ""
+                echo "---"
+                echo ""
+                cat /tmp/cem-diff-raw.md
+              } > /tmp/cem-diff-section.md
+            fi
           fi
+
+      # ── Non-library releases: no CEM diff section ────────────────────────
+      - name: Skip CEM diff for non-library release
+        if: steps.extract.outputs.pkg_name != '@helixui/library'
+        run: |
+          echo "" > /tmp/cem-diff-section.md
 
       # ── Assemble full release body ────────────────────────────────────────
       - name: Assemble release body
         id: assemble
         run: |
           VERSION="${{ steps.extract.outputs.version }}"
+          PKG_NAME="${{ steps.extract.outputs.pkg_name }}"
 
           {
-            echo "## @helixui/library v${VERSION}"
+            echo "## ${PKG_NAME} v${VERSION}"
             echo ""
             cat /tmp/changelog-body.md
             echo ""
@@ -167,15 +236,21 @@ jobs:
             echo "**Install**"
             echo ""
             echo '```sh'
-            echo "npm install @helixui/library@${VERSION}"
-            echo '```'
-            echo ""
-            echo "**CDN**"
-            echo ""
-            echo '```html'
-            echo "<script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@helixui/library@${VERSION}/dist/index.js\"></script>"
+            echo "npm install ${PKG_NAME}@${VERSION}"
             echo '```'
           } > /tmp/release-body.md
+
+          # CDN block is library-specific.
+          if [ "$PKG_NAME" = "@helixui/library" ]; then
+            {
+              echo ""
+              echo "**CDN**"
+              echo ""
+              echo '```html'
+              echo "<script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@helixui/library@${VERSION}/dist/index.js\"></script>"
+              echo '```'
+            } >> /tmp/release-body.md
+          fi
 
           echo "Release body assembled ($(wc -l < /tmp/release-body.md) lines)"
 
@@ -186,13 +261,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ steps.extract.outputs.version }}"
+          PKG_NAME="${{ steps.extract.outputs.pkg_name }}"
           TAG="${{ steps.extract.outputs.tag }}"
 
-          gh release create "$TAG" \
-            --repo "${{ github.repository }}" \
-            --title "@helixui/library v${VERSION}" \
-            --notes-file /tmp/release-body.md \
-            --latest
+          # CDN tarball asset is library-only.
+          if [ "$PKG_NAME" = "@helixui/library" ] && [ -n "${tarball:-}" ]; then
+            gh release create "$TAG" \
+              --repo "${{ github.repository }}" \
+              --title "${PKG_NAME} v${VERSION}" \
+              --notes-file /tmp/release-body.md \
+              --latest \
+              "${tarball}#${tarball_name}"
+          else
+            gh release create "$TAG" \
+              --repo "${{ github.repository }}" \
+              --title "${PKG_NAME} v${VERSION}" \
+              --notes-file /tmp/release-body.md
+          fi
 
           RELEASE_URL=$(gh release view "$TAG" \
             --repo "${{ github.repository }}" \
@@ -215,11 +300,12 @@ jobs:
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           RELEASE_CHANNEL_ID: '1478227528412958810'
+          PKG_NAME: ${{ needs.github-release.outputs.pkg_name }}
           VERSION: ${{ needs.github-release.outputs.version }}
           RELEASE_URL: ${{ needs.github-release.outputs.release_url }}
         run: |
-          MESSAGE="**@helixui/library v${VERSION} released**\n\n"
-          MESSAGE+="Install: \`npm install @helixui/library@${VERSION}\`\n"
+          MESSAGE="**${PKG_NAME} v${VERSION} released**\n\n"
+          MESSAGE+="Install: \`npm install ${PKG_NAME}@${VERSION}\`\n"
           MESSAGE+="Release notes: ${RELEASE_URL}"
 
           curl -s -X POST \

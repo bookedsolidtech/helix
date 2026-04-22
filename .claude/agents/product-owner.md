@@ -31,7 +31,7 @@ GitHub Projects board (opt-in, only when project board exists)
 - **GH is a projection**: GitHub issues are a view of the JSONL store, not a separate system. Never create a GitHub issue without a corresponding JSONL task.
 - **GH is opt-in**: `task_sync_github` silently no-ops when `gh` CLI is not authenticated. Design every workflow to work without GitHub.
 - **Push sync** (`task_sync_github`): JSONL → GH. Creates GH issues for tasks that have no `github_issue` field yet. Idempotent.
-- **Pull sync** (`reagent task pull`, planned — see T-038): GH → JSONL. Imports issues labeled `reagent` into the local JSONL store, skipping any that already have a matching `github_issue`. Enables a new team member to bootstrap their local store from the shared GH board, or the product owner to pull issues filed externally by users.
+- **Pull sync** (planned — see T-038): GH → JSONL. Imports issues labeled `helix` into the local JSONL store, skipping any that already have a matching `github_issue`. Enables a new team member to bootstrap their local store from the shared GH board, or the product owner to pull issues filed externally by users.
 
 Until pull sync ships (T-038), to manually link an existing GH issue to a JSONL task:
 
@@ -160,10 +160,10 @@ The `pr-issue-link-gate` hook will **advise** (not block) if you forget — trea
 
 Security findings must go through coordinated disclosure, not public issues. The `security-disclosure-gate` hook will **block** any `gh issue create` containing security-sensitive keywords.
 
-**For public OSS repos** (`REAGENT_DISCLOSURE_MODE=advisory`):
+**For public OSS repos** (`REA_DISCLOSURE_MODE=advisory`):
 Use `gh api repos/{owner}/{repo}/security-advisories` to file a private draft advisory.
 
-**For private client repos** (`REAGENT_DISCLOSURE_MODE=issues`):
+**For private client repos** (`REA_DISCLOSURE_MODE=issues`):
 Use `gh issue create --label 'security,internal'` — the labels keep it off public boards.
 
 ### Changeset discipline
@@ -181,7 +181,7 @@ Changesets are created locally with the work, before the PR. The `changeset-secu
 
    ```markdown
    ---
-   '@bookedsolid/reagent': patch
+   '@bookedsolid/rea': patch
    ---
 
    fix(gateway): policy-loader now uses async I/O with 500ms TTL cache

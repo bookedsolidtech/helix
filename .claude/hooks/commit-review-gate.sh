@@ -15,18 +15,73 @@ set -uo pipefail
 # ── 1. Read ALL stdin immediately ─────────────────────────────────────────────
 INPUT=$(cat)
 
+# ── 1a. Cross-repo guard (must come FIRST — before any rea-scoped check) ──────
+# BUG-012 (0.6.2) — mirror of push-review-gate.sh §1a. Script-location
+# anchor (not CLAUDE_PROJECT_DIR) owns the trust decision. See the
+# push-gate comment and THREAT_MODEL.md § CLAUDE_PROJECT_DIR for the full
+# rationale. In short: CLAUDE_PROJECT_DIR is caller-controlled, cannot be
+# trusted for authorization, and the hook's own filesystem location is the
+# only forge-resistant anchor available to a bash script.
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" && pwd -P 2>/dev/null)"
+# Walk up from SCRIPT_DIR looking for `.rea/policy.yaml`. Matches every
+# reasonable install topology (see push-review-gate.sh §1a for the full
+# rationale). A hard-coded `../..` breaks the source-path invocation
+# (`bash hooks/commit-review-gate.sh`) and silently reads .rea state from
+# the WRONG directory.
+REA_ROOT=""
+_anchor_candidate="$SCRIPT_DIR"
+for _ in 1 2 3 4; do
+  _anchor_candidate="$(cd -- "$_anchor_candidate/.." && pwd -P 2>/dev/null || true)"
+  if [[ -n "$_anchor_candidate" && -f "$_anchor_candidate/.rea/policy.yaml" ]]; then
+    REA_ROOT="$_anchor_candidate"
+    break
+  fi
+done
+if [[ -z "$REA_ROOT" ]]; then
+  printf 'rea-hook: no .rea/policy.yaml found within 4 parents of %s\n' \
+    "$SCRIPT_DIR" >&2
+  printf 'rea-hook:   is this an installed rea hook, or is `.rea/policy.yaml`\n' >&2
+  printf 'rea-hook:   nested more than 4 directories above the hook script?\n' >&2
+  exit 2
+fi
+unset _anchor_candidate
+
+if [[ -n "${CLAUDE_PROJECT_DIR:-}" ]]; then
+  CPD_REAL=$(cd -- "${CLAUDE_PROJECT_DIR}" 2>/dev/null && pwd -P 2>/dev/null || true)
+  if [[ -n "$CPD_REAL" && "$CPD_REAL" != "$REA_ROOT" ]]; then
+    printf 'rea-hook: ignoring CLAUDE_PROJECT_DIR=%s — anchoring to script location %s\n' \
+      "$CLAUDE_PROJECT_DIR" "$REA_ROOT" >&2
+  fi
+fi
+
+CWD_REAL=$(pwd -P 2>/dev/null || pwd)
+CWD_COMMON=$(git -C "$CWD_REAL" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+REA_COMMON=$(git -C "$REA_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+if [[ -n "$CWD_COMMON" && -n "$REA_COMMON" ]]; then
+  CWD_COMMON_REAL=$(cd "$CWD_COMMON" 2>/dev/null && pwd -P 2>/dev/null || echo "$CWD_COMMON")
+  REA_COMMON_REAL=$(cd "$REA_COMMON" 2>/dev/null && pwd -P 2>/dev/null || echo "$REA_COMMON")
+  if [[ "$CWD_COMMON_REAL" != "$REA_COMMON_REAL" ]]; then
+    exit 0
+  fi
+elif [[ -z "$CWD_COMMON" && -z "$REA_COMMON" ]]; then
+  case "$CWD_REAL/" in
+    "$REA_ROOT"/*|"$REA_ROOT"/) : ;;  # inside rea — run the gate
+    *) exit 0 ;;                       # outside rea — not our gate
+  esac
+fi
+# Mixed state or probe error → fail CLOSED: run the gate.
+
 # ── 2. Dependency check ──────────────────────────────────────────────────────
 if ! command -v jq >/dev/null 2>&1; then
-  printf 'REAGENT ERROR: jq is required but not installed.\n' >&2
+  printf 'REA ERROR: jq is required but not installed.\n' >&2
   printf 'Install: brew install jq  OR  apt-get install -y jq\n' >&2
   exit 2
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REAGENT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REAGENT_ROOT}/.reagent/HALT"
+HALT_FILE="${REA_ROOT}/.rea/HALT"
 if [ -f "$HALT_FILE" ]; then
-  printf 'REAGENT HALT: %s\nAll agent operations suspended. Run: reagent unfreeze\n' \
+  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
     "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
   exit 2
 fi
@@ -50,7 +105,7 @@ fi
 
 # ── 5. Check if quality gates are enabled ─────────────────────────────────────
 # Fail-open if policy doesn't exist or doesn't have quality_gates
-POLICY_FILE="${REAGENT_ROOT}/.reagent/policy.yaml"
+POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
 if [[ -f "$POLICY_FILE" ]]; then
   if grep -qE '^quality_gates:' "$POLICY_FILE" 2>/dev/null; then
     if grep -qE 'commit_review:[[:space:]]*false' "$POLICY_FILE" 2>/dev/null; then
@@ -61,8 +116,8 @@ fi
 
 # ── 6. Compute diff stats ────────────────────────────────────────────────────
 # Get staged diff (what would be committed)
-DIFF_OUTPUT=$(cd "$REAGENT_ROOT" && git diff --cached --stat 2>/dev/null || echo "")
-DIFF_FULL=$(cd "$REAGENT_ROOT" && git diff --cached 2>/dev/null || echo "")
+DIFF_OUTPUT=$(cd "$REA_ROOT" && git diff --cached --stat 2>/dev/null || echo "")
+DIFF_FULL=$(cd "$REA_ROOT" && git diff --cached 2>/dev/null || echo "")
 
 if [[ -z "$DIFF_OUTPUT" ]]; then
   # No staged changes — let git commit handle the error
@@ -75,9 +130,9 @@ LINE_COUNT=$(printf '%s' "$DIFF_FULL" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null ||
 # Check for sensitive paths
 SENSITIVE=0
 SENSITIVE_FILES=""
-if printf '%s' "$DIFF_FULL" | grep -qE '^\+\+\+ .*(\.reagent/|\.claude/|\.env|auth|security|\.github/workflows)'; then
+if printf '%s' "$DIFF_FULL" | grep -qE '^\+\+\+ .*(\.rea/|\.claude/|\.env|auth|security|\.github/workflows)'; then
   SENSITIVE=1
-  SENSITIVE_FILES=$(printf '%s' "$DIFF_FULL" | grep -oE '^\+\+\+ .*(\.reagent/|\.claude/|\.env|auth|security|\.github/workflows)[^ ]*' | sed 's/^\+\+\+ [ab]\//  /' | head -5)
+  SENSITIVE_FILES=$(printf '%s' "$DIFF_FULL" | grep -oE '^\+\+\+ .*(\.rea/|\.claude/|\.env|auth|security|\.github/workflows)[^ ]*' | sed 's/^\+\+\+ [ab]\//  /' | head -5)
 fi
 
 # ── 7. Triage scoring ────────────────────────────────────────────────────────
@@ -97,35 +152,43 @@ if [[ "$SCORE" == "trivial" ]]; then
   exit 0
 fi
 
-# ── 9. Resolve reagent CLI ────────────────────────────────────────────────────
+# ── 9. Resolve rea CLI ────────────────────────────────────────────────────
 # Try local installs first, then dist build, then global PATH install.
-REAGENT_CLI_ARGS=()
-if [[ -f "${REAGENT_ROOT}/node_modules/.bin/reagent" ]]; then
-  REAGENT_CLI_ARGS=(node "${REAGENT_ROOT}/node_modules/.bin/reagent")
-elif [[ -f "${REAGENT_ROOT}/dist/cli/index.js" ]]; then
-  REAGENT_CLI_ARGS=(node "${REAGENT_ROOT}/dist/cli/index.js")
-elif command -v reagent >/dev/null 2>&1; then
-  REAGENT_CLI_ARGS=(reagent)
+#
+# node_modules/.bin/rea is a launcher (pnpm writes a POSIX shell shim, npm
+# writes a symlink to dist/cli/index.js with its own `#!/usr/bin/env node`
+# shebang). Either way it is NOT a plain JS file, so running `node` on it
+# would parse shell syntax as JavaScript and SyntaxError. Execute the shim
+# directly — it handles `exec node` itself — and only prepend `node` on the
+# dist fallback, which is a real JS module. The `-x` guard picks up both
+# pnpm shims (executable regular file) and npm symlinks (executable target).
+REA_CLI_ARGS=()
+if [[ -x "${REA_ROOT}/node_modules/.bin/rea" ]]; then
+  REA_CLI_ARGS=("${REA_ROOT}/node_modules/.bin/rea")
+elif [[ -f "${REA_ROOT}/dist/cli/index.js" ]]; then
+  REA_CLI_ARGS=(node "${REA_ROOT}/dist/cli/index.js")
+elif command -v rea >/dev/null 2>&1; then
+  REA_CLI_ARGS=(rea)
 fi
 
 # ── 10. Check review cache for all non-trivial commits ────────────────────────
 # Compute SHA and branch here so both standard and significant tiers share them.
-STAGED_SHA=$(cd "$REAGENT_ROOT" && git diff --cached | shasum -a 256 | cut -d' ' -f1 2>/dev/null || echo "")
-BRANCH=$(cd "$REAGENT_ROOT" && git branch --show-current 2>/dev/null || echo "")
-CACHE_FILE="${REAGENT_ROOT}/.reagent/review-cache.json"
+STAGED_SHA=$(cd "$REA_ROOT" && git diff --cached | shasum -a 256 | cut -d' ' -f1 2>/dev/null || echo "")
+BRANCH=$(cd "$REA_ROOT" && git branch --show-current 2>/dev/null || echo "")
+CACHE_FILE="${REA_ROOT}/.rea/review-cache.json"
 
 if [[ -n "$STAGED_SHA" ]]; then
   CACHE_HIT=false
 
   # Primary: use CLI when available — handles TTL, expiry, and branch-scoped keys
-  if [[ ${#REAGENT_CLI_ARGS[@]} -gt 0 ]]; then
-    CACHE_RESULT=$("${REAGENT_CLI_ARGS[@]}" cache check "$STAGED_SHA" --branch "$BRANCH" 2>/dev/null || echo '{"hit":false}')
+  if [[ ${#REA_CLI_ARGS[@]} -gt 0 ]]; then
+    CACHE_RESULT=$("${REA_CLI_ARGS[@]}" cache check "$STAGED_SHA" --branch "$BRANCH" 2>/dev/null || echo '{"hit":false}')
     if printf '%s' "$CACHE_RESULT" | jq -e '.hit == true' >/dev/null 2>&1; then
       CACHE_HIT=true
     fi
   fi
 
-  # Fallback: read cache JSON directly — works when reagent is not on PATH.
+  # Fallback: read cache JSON directly — works when rea is not on PATH.
   # Checks branch-scoped key ("branch:sha") first, then bare SHA (empty-branch case).
   if [[ "$CACHE_HIT" == "false" ]] && [[ -f "$CACHE_FILE" ]]; then
     CACHE_KEY="${BRANCH}:${STAGED_SHA}"
@@ -158,7 +221,7 @@ fi
   printf '  1. Inspect:  git diff --cached\n'
   printf '  2. Decide:   Is this safe to commit? (initial commits, refactors, and\n'
   printf '               feature work are normal — use judgement, not ceremony)\n'
-  printf '  3. Approve:  reagent cache set %s pass\n' "$STAGED_SHA"
+  printf '  3. Approve:  rea cache set %s pass\n' "$STAGED_SHA"
   printf '  4. Retry the git commit command\n'
   printf '\n'
   printf '  Only escalate to the user if you find a genuine problem in the diff.\n'

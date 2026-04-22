@@ -1,7 +1,8 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
+import { HelixElement } from '../../base/index.js';
 import { helixGridStyles, helixGridItemStyles } from './hx-grid.styles.js';
 
 type GapSize = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -32,7 +33,7 @@ const GAP_TOKENS: Record<GapSize, string> = {
  * @cssprop [--hx-grid-column-gap] - Override the computed column-gap.
  */
 @customElement('hx-grid')
-export class HelixGrid extends LitElement {
+export class HelixGrid extends HelixElement {
   static override styles = [helixGridStyles];
 
   /**
@@ -140,7 +141,7 @@ export class HelixGrid extends LitElement {
  * @slot - Default slot for item content.
  */
 @customElement('hx-grid-item')
-export class HelixGridItem extends LitElement {
+export class HelixGridItem extends HelixElement {
   static override styles = [helixGridItemStyles];
 
   /**

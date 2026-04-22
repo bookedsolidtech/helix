@@ -8,7 +8,7 @@ export const helixStatusIndicatorStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     position: relative;
     flex-shrink: 0;
-    --_dot-color: var(--hx-status-indicator-color-default, var(--hx-color-neutral-300, #ced4da));
+    --_dot-color: var(--hx-status-indicator-color-default, var(--hx-color-neutral-300, #cbd5e1));
     /* Default size (md) — always defined so .indicator never collapses to 0x0 */
     --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-space-3, 0.75rem));
   }
@@ -72,7 +72,7 @@ export const helixStatusIndicatorStyles = css`
       --hx-status-indicator-label-font-size,
       var(--hx-font-size-sm, var(--hx-text-sm, 0.875rem))
     );
-    color: var(--hx-status-indicator-label-color, var(--hx-color-neutral-700, #374151));
+    color: var(--hx-status-indicator-label-color, var(--hx-color-neutral-700, #334155));
     line-height: 1;
     white-space: nowrap;
   }

@@ -6,20 +6,20 @@ export const helixPatientBannerStyles = css`
     width: 100%;
 
     /* ─── Private token vars (3-tier cascade) ─── */
-    --_bg: var(--hx-patient-banner-bg, var(--hx-color-neutral-50, #f9fafb));
-    --_border-color: var(--hx-patient-banner-border-color, var(--hx-color-neutral-200, #e5e7eb));
+    --_bg: var(--hx-patient-banner-bg, var(--hx-color-neutral-50, #f8fafc));
+    --_border-color: var(--hx-patient-banner-border-color, var(--hx-color-neutral-200, #e2e8f0));
     --_padding: var(
       --hx-patient-banner-padding,
       var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem)
     );
     --_gap: var(--hx-patient-banner-gap, var(--hx-space-4, 1rem));
     --_font-family: var(--hx-patient-banner-font-family, var(--hx-font-family-sans, sans-serif));
-    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-500, #6b7280));
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-500, #64748b));
     --_label-font-size: var(--hx-patient-banner-label-font-size, var(--hx-font-size-xs, 0.75rem));
-    --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #111827));
+    --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #0f172a));
     --_value-font-size: var(--hx-patient-banner-value-font-size, var(--hx-font-size-sm, 0.875rem));
     --_photo-size: var(--hx-patient-banner-photo-size, var(--hx-space-10, 2.5rem));
-    --_photo-bg: var(--hx-patient-banner-photo-bg, var(--hx-color-neutral-200, #e5e7eb));
+    --_photo-bg: var(--hx-patient-banner-photo-bg, var(--hx-color-neutral-200, #e2e8f0));
   }
 
   * {
@@ -46,9 +46,9 @@ export const helixPatientBannerStyles = css`
     flex-shrink: 0;
     width: var(--_photo-size);
     height: var(--_photo-size);
-    /* Minimum 44x44px touch target for interactive photo content. */
-    min-width: 44px;
-    min-height: 44px;
+    /* Minimum touch target for interactive photo content (WCAG 2.5.8). */
+    min-width: var(--hx-touch-target-size, 44px);
+    min-height: var(--hx-touch-target-size, 44px);
     border-radius: var(--hx-border-radius-full, 9999px);
     overflow: hidden;
     display: flex;
@@ -101,7 +101,7 @@ export const helixPatientBannerStyles = css`
     border-bottom-color: var(--hx-color-error-400, #f87171);
     background-color: var(--hx-color-error-50, #fef2f2);
     /* Darken label color to maintain 4.5:1 contrast on error-50 background. */
-    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-700, #374151));
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-700, #334155));
   }
 
   :host([aria-invalid='true']) .banner::before {
@@ -112,7 +112,7 @@ export const helixPatientBannerStyles = css`
     top: 0;
     bottom: 0;
     width: var(--hx-border-width-thick, 4px);
-    background-color: var(--hx-color-error-500, #ef4444);
+    background-color: var(--hx-color-error-500, #dc2626);
     border-radius: 0;
   }
 

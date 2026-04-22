@@ -20,7 +20,7 @@ export const helixSliderStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-font-family-sans, sans-serif);
+    font-family: var(--hx-slider-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   /* ─── Label Row ─── */
@@ -35,14 +35,14 @@ export const helixSliderStyles = css`
   .slider__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-label-color, var(--hx-color-neutral-700, #343a40));
+    color: var(--hx-slider-label-color, var(--hx-color-neutral-700, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .slider__value-display {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-value-color, var(--hx-color-neutral-600, #6c757d));
+    color: var(--hx-slider-value-color, var(--hx-color-neutral-600, #475569));
     line-height: var(--hx-line-height-normal, 1.5);
     font-variant-numeric: tabular-nums;
     min-width: var(--hx-size-8, 2rem);
@@ -60,7 +60,7 @@ export const helixSliderStyles = css`
     position: relative;
     width: 100%;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-slider-track-bg, var(--hx-color-neutral-200, #e9ecef));
+    background-color: var(--hx-slider-track-bg, var(--hx-color-neutral-200, #e2e8f0));
     overflow: visible;
   }
 
@@ -138,8 +138,13 @@ export const helixSliderStyles = css`
     background: transparent;
     border: none;
     outline: none;
-    /* Expand the hit area so the thumb is easy to grab */
-    padding-block: var(--hx-slider-input-padding-block, 0.75rem);
+    /* Expand the hit area so the thumb meets WCAG 2.5.8 touch target (44px).
+       The input's total height = track height + 2 * padding-block. With 0.75rem
+       (~12px) padding on each side and a track of ~6px, the total target area is
+       ~30px. We increase to 1rem (~16px) per side for a ~38px minimum, supplemented
+       by the visual thumb size. */
+    padding-block: var(--hx-slider-input-padding-block, 1rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   /* In forced-color mode, restore native outline so the input remains focusable */
@@ -255,7 +260,7 @@ export const helixSliderStyles = css`
     top: 0;
     width: var(--hx-border-width-thin, 1px);
     height: 100%;
-    background-color: var(--hx-slider-tick-color, var(--hx-color-neutral-400, #adb5bd));
+    background-color: var(--hx-slider-tick-color, var(--hx-color-neutral-400, #94a3b8));
     transform: translateX(-50%);
   }
 
@@ -265,7 +270,7 @@ export const helixSliderStyles = css`
     display: flex;
     justify-content: space-between;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-range-label-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-slider-range-label-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
     margin-top: var(--hx-space-0-5, 0.125rem);
   }
@@ -274,17 +279,17 @@ export const helixSliderStyles = css`
 
   .slider__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-help-text-color, var(--hx-color-neutral-500, #6c757d));
+    color: var(--hx-slider-help-text-color, var(--hx-color-neutral-500, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   /* ─── Disabled state ─── */
 
   .slider--disabled .slider__fill {
-    background-color: var(--hx-color-neutral-400, #adb5bd);
+    background-color: var(--hx-color-neutral-400, #94a3b8);
   }
 
   .slider--disabled .slider__thumb-visual {
-    border-color: var(--hx-color-neutral-400, #adb5bd);
+    border-color: var(--hx-color-neutral-400, #94a3b8);
   }
 `;

@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { WcTreeView } from './hx-tree-view.js';
-import type { WcTreeItem } from './hx-tree-item.js';
+import type { HxTreeView } from './hx-tree-view.js';
+import type { HxTreeItem } from './hx-tree-item.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -15,31 +15,31 @@ describe('hx-tree-view', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders tree container with role="tree"', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
       expect(tree).toBeTruthy();
       expect(tree?.getAttribute('role')).toBe('tree');
     });
 
     it('tree container has tabindex="0" for keyboard access', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
       expect(tree?.getAttribute('tabindex')).toBe('0');
     });
 
     it('omits aria-multiselectable when selection="none" (default)', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
       expect(tree?.hasAttribute('aria-multiselectable')).toBe(false);
     });
 
     it('sets aria-multiselectable="true" in multiple selection mode', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view selection="multiple"></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view selection="multiple"></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
       expect(tree?.getAttribute('aria-multiselectable')).toBe('true');
     });
@@ -49,17 +49,17 @@ describe('hx-tree-view', () => {
 
   describe('Property: selection', () => {
     it('defaults to "none"', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       expect(el.selection).toBe('none');
     });
 
     it('reflects selection attribute to property', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view selection="single"></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view selection="single"></hx-tree-view>');
       expect(el.selection).toBe('single');
     });
 
     it('reflects "multiple" selection', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view selection="multiple"></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view selection="multiple"></hx-tree-view>');
       expect(el.selection).toBe('multiple');
     });
   });
@@ -68,14 +68,14 @@ describe('hx-tree-view', () => {
 
   describe('Selection behavior', () => {
     it('does not select items when selection is "none"', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="none">
           <hx-tree-item>Item 1</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       item.dispatchEvent(
         new CustomEvent('hx-tree-item-select', {
           bubbles: true,
@@ -89,7 +89,7 @@ describe('hx-tree-view', () => {
     });
 
     it('selects item in single selection mode', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -97,7 +97,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const [item1, item2] = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const [item1, item2] = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
 
       item1.dispatchEvent(
         new CustomEvent('hx-tree-item-select', {
@@ -113,7 +113,7 @@ describe('hx-tree-view', () => {
     });
 
     it('deselects previous item in single selection mode', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item selected>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -121,7 +121,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const [item1, item2] = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const [item1, item2] = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       expect(item1.selected).toBe(true);
 
       item2.dispatchEvent(
@@ -138,7 +138,7 @@ describe('hx-tree-view', () => {
     });
 
     it('allows multiple selections in multiple selection mode', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="multiple">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -146,7 +146,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const [item1, item2] = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const [item1, item2] = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
 
       item1.dispatchEvent(
         new CustomEvent('hx-tree-item-select', {
@@ -173,14 +173,14 @@ describe('hx-tree-view', () => {
 
   describe('Events', () => {
     it('dispatches hx-select when item is selected', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item>Item 1</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       const eventPromise = oneEvent(el, 'hx-select');
 
       item.dispatchEvent(
@@ -196,14 +196,14 @@ describe('hx-tree-view', () => {
     });
 
     it('hx-select event has correct detail', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item>Item 1</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
 
       item.dispatchEvent(
@@ -220,14 +220,14 @@ describe('hx-tree-view', () => {
     });
 
     it('hx-select is composed (crosses shadow boundaries)', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item>Item 1</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       const parentEventPromise = oneEvent<CustomEvent>(document.body, 'hx-select');
 
       item.dispatchEvent(
@@ -243,14 +243,14 @@ describe('hx-tree-view', () => {
     });
 
     it('does not dispatch hx-select when selection is "none"', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view selection="none">
           <hx-tree-item>Item 1</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       let fired = false;
       el.addEventListener('hx-select', () => {
         fired = true;
@@ -273,23 +273,23 @@ describe('hx-tree-view', () => {
 
   describe('Property: label', () => {
     it('defaults to empty string', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       expect(el.label).toBe('');
     });
 
     it('reflects label attribute to property', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
       expect(el.label).toBe('File browser');
     });
 
     it('sets aria-label on the tree container', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
       expect(tree?.getAttribute('aria-label')).toBe('File browser');
     });
 
     it('falls back to "Tree" aria-label when label is empty', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
       expect(tree?.getAttribute('aria-label')).toBe('Tree');
     });
@@ -299,7 +299,7 @@ describe('hx-tree-view', () => {
 
   describe('CSS Parts', () => {
     it('exposes "tree" part on the container', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const part = shadowQuery(el, '[part~="tree"]');
       expect(part).toBeTruthy();
     });
@@ -309,13 +309,13 @@ describe('hx-tree-view', () => {
 
   describe('Accessibility', () => {
     it('has role="tree" on the container', async () => {
-      const el = await fixture<WcTreeView>('<hx-tree-view></hx-tree-view>');
+      const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '[role="tree"]');
       expect(tree).toBeTruthy();
     });
 
     it('has no axe violations with labeled tree', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Test tree" selection="single">
           <hx-tree-item>Label</hx-tree-item>
           <hx-tree-item selected>Selected</hx-tree-item>
@@ -328,7 +328,7 @@ describe('hx-tree-view', () => {
     });
 
     it('has no axe violations with nested items', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nested tree" selection="single">
           <hx-tree-item expanded>
             Parent
@@ -347,7 +347,7 @@ describe('hx-tree-view', () => {
 
   describe('Tree-level Keyboard Navigation', () => {
     it('ArrowDown moves focus to next visible item', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -356,7 +356,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       // Focus the first item's row via the component's public focus() method
       items[0]!.focus();
       await el.updateComplete;
@@ -373,7 +373,7 @@ describe('hx-tree-view', () => {
     });
 
     it('ArrowUp moves focus to previous visible item', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -381,7 +381,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       items[1]!.focus();
       await el.updateComplete;
 
@@ -396,7 +396,7 @@ describe('hx-tree-view', () => {
     });
 
     it('Home moves focus to first visible item', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -405,7 +405,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       items[2]!.focus();
       await el.updateComplete;
 
@@ -420,7 +420,7 @@ describe('hx-tree-view', () => {
     });
 
     it('End moves focus to last visible item', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -429,7 +429,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       items[0]!.focus();
       await el.updateComplete;
 
@@ -444,7 +444,7 @@ describe('hx-tree-view', () => {
     });
 
     it('ArrowDown wraps from last item to first', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -452,7 +452,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       items[1]!.focus();
       await el.updateComplete;
 
@@ -467,7 +467,7 @@ describe('hx-tree-view', () => {
     });
 
     it('ArrowUp wraps from first item to last', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Item 1</hx-tree-item>
           <hx-tree-item>Item 2</hx-tree-item>
@@ -475,7 +475,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       items[0]!.focus();
       await el.updateComplete;
 
@@ -490,7 +490,7 @@ describe('hx-tree-view', () => {
     });
 
     it('ArrowLeft collapses expanded parent item', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item expanded>
             Parent
@@ -500,7 +500,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const parent = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const parent = el.querySelector<HxTreeItem>('hx-tree-item')!;
       expect(parent.expanded).toBe(true);
       parent.focus();
       await el.updateComplete;
@@ -513,7 +513,7 @@ describe('hx-tree-view', () => {
     });
 
     it('ArrowLeft on collapsed leaf item moves focus to parent', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item expanded>
             Parent
@@ -523,7 +523,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const allItems = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const allItems = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       const parentItem = allItems[0]!;
       const childItem = allItems[1]!;
 
@@ -542,7 +542,7 @@ describe('hx-tree-view', () => {
     });
 
     it('ArrowDown skips collapsed children (only navigates visible items)', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>
             Parent (collapsed)
@@ -555,7 +555,7 @@ describe('hx-tree-view', () => {
 
       const topLevelItems = Array.from(el.children).filter(
         (c) => c.tagName.toLowerCase() === 'hx-tree-item',
-      ) as WcTreeItem[];
+      ) as HxTreeItem[];
       const firstTop = topLevelItems[0]!;
       const secondTop = topLevelItems[1]!;
 
@@ -574,14 +574,14 @@ describe('hx-tree-view', () => {
     });
 
     it('disabled item does not dispatch hx-tree-item-select on keyboard Enter', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Test" selection="single">
           <hx-tree-item disabled>Disabled Item</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       const row = shadowQuery<HTMLElement>(item, '.item-row')!;
 
       let fired = false;
@@ -596,7 +596,7 @@ describe('hx-tree-view', () => {
     });
 
     it('typeahead moves focus to next visible item starting with typed character', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Apple</hx-tree-item>
           <hx-tree-item>Banana</hx-tree-item>
@@ -605,7 +605,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       // Wait for slotchange label text to settle
       await items[0]!.updateComplete;
       await items[1]!.updateComplete;
@@ -625,7 +625,7 @@ describe('hx-tree-view', () => {
     });
 
     it('typeahead is case-insensitive', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Apple</hx-tree-item>
           <hx-tree-item>Cherry</hx-tree-item>
@@ -634,7 +634,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       await items[0]!.updateComplete;
       await items[2]!.updateComplete;
 
@@ -653,7 +653,7 @@ describe('hx-tree-view', () => {
     });
 
     it('typeahead wraps around to find a match before current index', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Apple</hx-tree-item>
           <hx-tree-item>Banana</hx-tree-item>
@@ -662,7 +662,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       await items[0]!.updateComplete;
       await items[1]!.updateComplete;
       await items[2]!.updateComplete;
@@ -682,7 +682,7 @@ describe('hx-tree-view', () => {
     });
 
     it('typeahead does nothing when no item matches', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Nav test">
           <hx-tree-item>Apple</hx-tree-item>
           <hx-tree-item>Banana</hx-tree-item>
@@ -690,7 +690,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
       await items[0]!.updateComplete;
       await items[1]!.updateComplete;
 
@@ -709,7 +709,7 @@ describe('hx-tree-view', () => {
     });
 
     it('disabled item does not expand on keyboard ArrowRight', async () => {
-      const el = await fixture<WcTreeView>(
+      const el = await fixture<HxTreeView>(
         `<hx-tree-view label="Test">
           <hx-tree-item disabled>
             Disabled Parent
@@ -719,7 +719,7 @@ describe('hx-tree-view', () => {
       );
       await el.updateComplete;
 
-      const item = el.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
       expect(item.expanded).toBe(false);
 
       const row = shadowQuery<HTMLElement>(item, '.item-row')!;
@@ -740,36 +740,36 @@ describe('hx-tree-item', () => {
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders item row', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery(el, '.item-row');
       expect(row).toBeTruthy();
     });
 
     it('renders item-row with role="treeitem"', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery(el, '.item-row');
       expect(row?.getAttribute('role')).toBe('treeitem');
     });
 
     it('renders label slot content', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>My Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>My Label</hx-tree-item>');
       expect(el.textContent?.trim()).toContain('My Label');
     });
 
     it('does not render expand button without children', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       await el.updateComplete;
       const btn = shadowQuery(el, '.expand-btn');
       expect(btn).toBeNull();
     });
 
     it('renders placeholder when no children', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       await el.updateComplete;
       const placeholder = shadowQuery(el, '.expand-placeholder');
       expect(placeholder).toBeTruthy();
@@ -780,31 +780,31 @@ describe('hx-tree-item', () => {
 
   describe('Property: expanded', () => {
     it('defaults to false', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       expect(el.expanded).toBe(false);
     });
 
     it('reflects expanded attribute to property', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item expanded>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item expanded>Label</hx-tree-item>');
       expect(el.expanded).toBe(true);
     });
 
     it('reflects expanded property to attribute', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       el.expanded = true;
       await el.updateComplete;
       expect(el.hasAttribute('expanded')).toBe(true);
     });
 
     it('children container has expanded class when expanded', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item expanded>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item expanded>Label</hx-tree-item>');
       await el.updateComplete;
       const children = shadowQuery(el, '.children');
       expect(children?.classList.contains('children--expanded')).toBe(true);
     });
 
     it('children container lacks expanded class when collapsed', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       await el.updateComplete;
       const children = shadowQuery(el, '.children');
       expect(children?.classList.contains('children--expanded')).toBe(false);
@@ -815,35 +815,35 @@ describe('hx-tree-item', () => {
 
   describe('Property: selected', () => {
     it('defaults to false', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       expect(el.selected).toBe(false);
     });
 
     it('reflects selected attribute to property', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item selected>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item selected>Label</hx-tree-item>');
       expect(el.selected).toBe(true);
     });
 
     it('sets aria-selected on item row when inside selectable tree', async () => {
-      const tree = await fixture<WcTreeView>(
+      const tree = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item selected>Label</hx-tree-item>
         </hx-tree-view>`,
       );
       await tree.updateComplete;
-      const item = tree.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
       const row = shadowQuery(item, '.item-row');
       expect(row?.getAttribute('aria-selected')).toBe('true');
     });
 
     it('omits aria-selected when selection is "none"', async () => {
-      const tree = await fixture<WcTreeView>(
+      const tree = await fixture<HxTreeView>(
         `<hx-tree-view selection="none">
           <hx-tree-item>Label</hx-tree-item>
         </hx-tree-view>`,
       );
       await tree.updateComplete;
-      const item = tree.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
       const row = shadowQuery(item, '.item-row');
       expect(row?.getAttribute('aria-selected')).toBeNull();
     });
@@ -853,23 +853,23 @@ describe('hx-tree-item', () => {
 
   describe('Property: disabled', () => {
     it('defaults to false', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       expect(el.disabled).toBe(false);
     });
 
     it('reflects disabled attribute to property', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
       expect(el.disabled).toBe(true);
     });
 
     it('sets aria-disabled="true" when disabled', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
       const row = shadowQuery(el, '.item-row');
       expect(row?.getAttribute('aria-disabled')).toBe('true');
     });
 
     it('does not set aria-disabled when not disabled', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery(el, '.item-row');
       expect(row?.getAttribute('aria-disabled')).toBeNull();
     });
@@ -879,19 +879,19 @@ describe('hx-tree-item', () => {
 
   describe('ARIA tree semantics', () => {
     it('sets aria-level="1" on top-level items', async () => {
-      const tree = await fixture<WcTreeView>(
+      const tree = await fixture<HxTreeView>(
         `<hx-tree-view label="Test">
           <hx-tree-item>Item</hx-tree-item>
         </hx-tree-view>`,
       );
       await tree.updateComplete;
-      const item = tree.querySelector<WcTreeItem>('hx-tree-item')!;
+      const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
       const row = shadowQuery(item, '.item-row');
       expect(row?.getAttribute('aria-level')).toBe('1');
     });
 
     it('sets aria-level="2" on nested items', async () => {
-      const tree = await fixture<WcTreeView>(
+      const tree = await fixture<HxTreeView>(
         `<hx-tree-view label="Test">
           <hx-tree-item expanded>
             Parent
@@ -900,13 +900,13 @@ describe('hx-tree-item', () => {
         </hx-tree-view>`,
       );
       await tree.updateComplete;
-      const child = tree.querySelectorAll<WcTreeItem>('hx-tree-item')[1]!;
+      const child = tree.querySelectorAll<HxTreeItem>('hx-tree-item')[1]!;
       const row = shadowQuery(child, '.item-row');
       expect(row?.getAttribute('aria-level')).toBe('2');
     });
 
     it('sets correct aria-posinset and aria-setsize for siblings', async () => {
-      const tree = await fixture<WcTreeView>(
+      const tree = await fixture<HxTreeView>(
         `<hx-tree-view label="Test">
           <hx-tree-item>First</hx-tree-item>
           <hx-tree-item>Second</hx-tree-item>
@@ -914,7 +914,7 @@ describe('hx-tree-item', () => {
         </hx-tree-view>`,
       );
       await tree.updateComplete;
-      const items = Array.from(tree.querySelectorAll<WcTreeItem>('hx-tree-item'));
+      const items = Array.from(tree.querySelectorAll<HxTreeItem>('hx-tree-item'));
 
       const row0 = shadowQuery(items[0]!, '.item-row');
       expect(row0?.getAttribute('aria-posinset')).toBe('1');
@@ -926,7 +926,7 @@ describe('hx-tree-item', () => {
     });
 
     it('hasChildItems reflects child slot state', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -937,7 +937,7 @@ describe('hx-tree-item', () => {
     });
 
     it('hasChildItems is false without children', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Leaf</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Leaf</hx-tree-item>');
       await el.updateComplete;
       expect(el.hasChildItems).toBe(false);
     });
@@ -947,7 +947,7 @@ describe('hx-tree-item', () => {
 
   describe('Children slot', () => {
     it('renders children slot', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -959,7 +959,7 @@ describe('hx-tree-item', () => {
     });
 
     it('renders expand button when children are present', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -971,13 +971,13 @@ describe('hx-tree-item', () => {
     });
 
     it('children container has role="group"', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const children = shadowQuery(el, '[role="group"]');
       expect(children).toBeTruthy();
     });
 
     it('collapsed children group has aria-hidden="true" to hide from assistive technology', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -990,7 +990,7 @@ describe('hx-tree-item', () => {
     });
 
     it('expanded children group does not have aria-hidden', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item expanded>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -1003,7 +1003,7 @@ describe('hx-tree-item', () => {
     });
 
     it('aria-hidden updates when item is expanded programmatically', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -1027,26 +1027,26 @@ describe('hx-tree-item', () => {
 
   describe('CSS Parts', () => {
     it('exposes "item" part', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '[part~="item"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "row" part on the interactive row', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '[part~="row"]');
       expect(part).toBeTruthy();
       expect(part?.getAttribute('role')).toBe('treeitem');
     });
 
     it('exposes "label" part on the text content', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '.item-label[part~="label"]');
       expect(part).toBeTruthy();
     });
 
     it('exposes "children" part', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '[part~="children"]');
       expect(part).toBeTruthy();
     });
@@ -1056,7 +1056,7 @@ describe('hx-tree-item', () => {
 
   describe('Events', () => {
     it('dispatches hx-tree-item-select on click', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tree-item-select');
@@ -1067,7 +1067,7 @@ describe('hx-tree-item', () => {
     });
 
     it('does not dispatch hx-tree-item-select when disabled', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       let fired = false;
@@ -1081,7 +1081,7 @@ describe('hx-tree-item', () => {
     });
 
     it('hx-tree-item-select is composed', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       const eventPromise = oneEvent<CustomEvent>(document.body, 'hx-tree-item-select');
@@ -1096,7 +1096,7 @@ describe('hx-tree-item', () => {
 
   describe('Keyboard Navigation', () => {
     it('expands on ArrowRight when collapsed and has children', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -1113,7 +1113,7 @@ describe('hx-tree-item', () => {
     });
 
     it('collapses on ArrowLeft when expanded and has children', async () => {
-      const el = await fixture<WcTreeItem>(
+      const el = await fixture<HxTreeItem>(
         `<hx-tree-item expanded>
           Parent
           <hx-tree-item slot="children">Child</hx-tree-item>
@@ -1130,7 +1130,7 @@ describe('hx-tree-item', () => {
     });
 
     it('dispatches hx-tree-item-select on Enter keydown', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tree-item-select');
@@ -1141,7 +1141,7 @@ describe('hx-tree-item', () => {
     });
 
     it('dispatches hx-tree-item-select on Space keydown', async () => {
-      const el = await fixture<WcTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+      const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tree-item-select');
@@ -1159,7 +1159,7 @@ describe('hx-tree-item', () => {
 
 describe('hx-tree-view — Dynamic Item Add / Remove', () => {
   it('reflects newly appended top-level hx-tree-item in visible items', async () => {
-    const el = await fixture<WcTreeView>(
+    const el = await fixture<HxTreeView>(
       `<hx-tree-view label="Dynamic tree">
         <hx-tree-item>Item 1</hx-tree-item>
         <hx-tree-item>Item 2</hx-tree-item>
@@ -1167,7 +1167,7 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
     );
     await el.updateComplete;
 
-    const newItem = document.createElement('hx-tree-item') as WcTreeItem;
+    const newItem = document.createElement('hx-tree-item') as HxTreeItem;
     newItem.textContent = 'Item 3';
     el.appendChild(newItem);
 
@@ -1180,14 +1180,14 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
   });
 
   it('updates aria-setsize for siblings when a new item is appended', async () => {
-    const el = await fixture<WcTreeView>(
+    const el = await fixture<HxTreeView>(
       `<hx-tree-view label="Dynamic tree">
         <hx-tree-item>Item 1</hx-tree-item>
       </hx-tree-view>`,
     );
     await el.updateComplete;
 
-    const newItem = document.createElement('hx-tree-item') as WcTreeItem;
+    const newItem = document.createElement('hx-tree-item') as HxTreeItem;
     newItem.textContent = 'Item 2';
     el.appendChild(newItem);
 
@@ -1195,7 +1195,7 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
     await newItem.updateComplete;
 
     // Both items should now report setsize=2
-    const items = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+    const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
     const row0 = shadowQuery(items[0]!, '.item-row');
     const row1 = shadowQuery(items[1]!, '.item-row');
     expect(row0?.getAttribute('aria-setsize')).toBe('2');
@@ -1203,7 +1203,7 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
   });
 
   it('single-mode selection remains stable after removing items', async () => {
-    const el = await fixture<WcTreeView>(
+    const el = await fixture<HxTreeView>(
       `<hx-tree-view label="Dynamic tree" selection="single">
         <hx-tree-item>Item 1</hx-tree-item>
         <hx-tree-item>Item 2</hx-tree-item>
@@ -1213,7 +1213,7 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
     await el.updateComplete;
 
     // Select item 1
-    const [item1, , item3] = Array.from(el.querySelectorAll<WcTreeItem>('hx-tree-item'));
+    const [item1, , item3] = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
     item1!.dispatchEvent(
       new CustomEvent('hx-tree-item-select', {
         bubbles: true,
@@ -1231,5 +1231,164 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
     expect(item1!.selected).toBe(true);
     const remaining = el.querySelectorAll('hx-tree-item');
     expect(remaining.length).toBe(2);
+  });
+});
+
+// ─────────────────────────────────────────────────
+// hx-tree-view — Deep nesting, hx-select event detail, lazy load pattern
+// ─────────────────────────────────────────────────
+
+describe('hx-tree-view — Deep nesting and expand/collapse', () => {
+  it('deeply nested item expand/collapse cycle works without error', async () => {
+    const el = await fixture<HxTreeView>(
+      `<hx-tree-view label="Deep tree" selection="single">
+        <hx-tree-item>
+          Level 1
+          <hx-tree-item slot="children">
+            Level 2
+            <hx-tree-item slot="children">Level 3 A</hx-tree-item>
+            <hx-tree-item slot="children">Level 3 B</hx-tree-item>
+          </hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const l1 = el.querySelector<HxTreeItem>('hx-tree-view > hx-tree-item')!;
+    const l2 = l1.querySelector<HxTreeItem>('[slot="children"] > hx-tree-item, hx-tree-item')!;
+
+    // Expand level 1
+    l1.expanded = true;
+    await el.updateComplete;
+    expect(l1.expanded).toBe(true);
+
+    // Expand level 2
+    l2.expanded = true;
+    await el.updateComplete;
+    expect(l2.expanded).toBe(true);
+
+    // Collapse level 1 — subtree should close
+    l1.expanded = false;
+    await el.updateComplete;
+    expect(l1.expanded).toBe(false);
+  });
+
+  it('hx-select event detail contains item and selected=true on selection', async () => {
+    const el = await fixture<HxTreeView>(
+      `<hx-tree-view label="Select test" selection="single">
+        <hx-tree-item>Leaf A</hx-tree-item>
+        <hx-tree-item>Leaf B</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
+    const eventPromise = oneEvent<CustomEvent<{ item: HxTreeItem; selected: boolean }>>(
+      el,
+      'hx-select',
+    );
+
+    item.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item },
+      }),
+    );
+
+    const event = await eventPromise;
+    expect(event.detail.item).toBe(item);
+    expect(event.detail.selected).toBe(true);
+  });
+
+  it('hx-select event detail has selected=false when deselecting in multiple mode', async () => {
+    const el = await fixture<HxTreeView>(
+      `<hx-tree-view label="Multi test" selection="multiple">
+        <hx-tree-item>Item X</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const item = el.querySelector<HxTreeItem>('hx-tree-item')!;
+
+    // First select
+    item.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item },
+      }),
+    );
+    await el.updateComplete;
+    expect(item.selected).toBe(true);
+
+    // Second dispatch = deselect
+    const deselectPromise = oneEvent<CustomEvent<{ item: HxTreeItem; selected: boolean }>>(
+      el,
+      'hx-select',
+    );
+    item.dispatchEvent(
+      new CustomEvent('hx-tree-item-select', {
+        bubbles: true,
+        composed: true,
+        detail: { item },
+      }),
+    );
+    const deselect = await deselectPromise;
+    expect(deselect.detail.selected).toBe(false);
+    expect(item.selected).toBe(false);
+  });
+
+  it('lazy load pattern: appending children to an expanded item reveals them', async () => {
+    const el = await fixture<HxTreeView>(
+      `<hx-tree-view label="Lazy" selection="single">
+        <hx-tree-item expanded>Parent</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const parent = el.querySelector<HxTreeItem>('hx-tree-item')!;
+    expect(parent.expanded).toBe(true);
+
+    // Lazy-append a child
+    const child = document.createElement('hx-tree-item') as HxTreeItem;
+    child.setAttribute('slot', 'children');
+    child.textContent = 'Lazy child';
+    parent.appendChild(child);
+
+    await el.updateComplete;
+    await child.updateComplete;
+
+    const children = parent.querySelectorAll('[slot="children"]');
+    expect(children.length).toBe(1);
+  });
+
+  it('querySelectorAll hx-tree-item[selected] returns all selected items in multiple mode', async () => {
+    const el = await fixture<HxTreeView>(
+      `<hx-tree-view label="Multi select" selection="multiple">
+        <hx-tree-item>Item 1</hx-tree-item>
+        <hx-tree-item>Item 2</hx-tree-item>
+        <hx-tree-item>Item 3</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await el.updateComplete;
+
+    const [i1, i2] = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
+
+    [i1!, i2!].forEach((item) => {
+      item.dispatchEvent(
+        new CustomEvent('hx-tree-item-select', {
+          bubbles: true,
+          composed: true,
+          detail: { item },
+        }),
+      );
+    });
+    await el.updateComplete;
+
+    const selected = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item[selected]'));
+    expect(selected.length).toBe(2);
+    expect(selected).toContain(i1);
+    expect(selected).toContain(i2);
   });
 });

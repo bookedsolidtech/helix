@@ -18,6 +18,8 @@ apps/mcp-servers/**/__fixtures__/*-invalid.json
 packages/.mcp-wc/
 # Claude Code local state
 .claude/
+# Ephemeral review/audit artifacts (hook patches, codex transcripts)
+.reports/
 
 # Markdown files — documentation, not source code; skip format enforcement
 **/*.md
@@ -41,3 +43,4 @@ packages/hx-library/drupal/helix.libraries.yml
 # Minified CSS assets — bundle-size optimized, must not be reformatted
 packages/hx-library/src/styles/form/form.scoped.css
 packages/hx-library/src/styles/prose/prose.scoped.css
+data/readiness/

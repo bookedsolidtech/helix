@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixProgressRing } from './hx-progress-ring.js';
@@ -338,6 +338,149 @@ describe('hx-progress-ring', () => {
       const span = el.querySelector('span.pct');
       expect(span).toBeTruthy();
       expect(span?.textContent).toBe('50%');
+    });
+  });
+
+  // ─── Property: label / devWarn ───
+
+  describe('Property: label devWarn', () => {
+    it('emits devWarn when label is not provided', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixProgressRing>('<hx-progress-ring value="50"></hx-progress-ring>');
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[hx-progress-ring]'),
+      );
+      warnSpy.mockRestore();
+    });
+
+    it('does not emit devWarn when label is provided', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50" label="Upload progress"></hx-progress-ring>',
+      );
+      const ringCalls = warnSpy.mock.calls.filter((args) =>
+        String(args[0]).includes('[hx-progress-ring]'),
+      );
+      expect(ringCalls).toHaveLength(0);
+      warnSpy.mockRestore();
+    });
+
+    it('emits devWarn only once across multiple willUpdate cycles', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixProgressRing>('<hx-progress-ring></hx-progress-ring>');
+      const warnCountBefore = warnSpy.mock.calls.filter((args) =>
+        String(args[0]).includes('[hx-progress-ring]'),
+      ).length;
+
+      el.value = 50;
+      await el.updateComplete;
+      el.value = 75;
+      await el.updateComplete;
+
+      const warnCountAfter = warnSpy.mock.calls.filter((args) =>
+        String(args[0]).includes('[hx-progress-ring]'),
+      ).length;
+
+      expect(warnCountAfter).toBe(warnCountBefore);
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── devWarn: legacy size attribute ───
+
+  describe('devWarn: legacy size attribute', () => {
+    it('emits deprecation warning when legacy size attribute is used', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await fixture<HelixProgressRing>(
+        '<hx-progress-ring size="sm" label="Loading"></hx-progress-ring>',
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('"size" attribute is deprecated'),
+      );
+      warnSpy.mockRestore();
+    });
+  });
+
+  // ─── aria-valuetext ───
+
+  describe('aria-valuetext', () => {
+    it('sets aria-valuetext as "{n}% complete" for determinate state', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="75" label="Upload progress"></hx-progress-ring>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('aria-valuetext')).toBe('75% complete');
+    });
+
+    it('removes aria-valuetext in indeterminate state', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring label="Loading"></hx-progress-ring>',
+      );
+      await el.updateComplete;
+      expect(el.hasAttribute('aria-valuetext')).toBe(false);
+    });
+
+    it('updates aria-valuetext when value changes', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="25" label="Progress"></hx-progress-ring>',
+      );
+      el.value = 50;
+      await el.updateComplete;
+      expect(el.getAttribute('aria-valuetext')).toBe('50% complete');
+    });
+  });
+
+  // ─── Stroke geometry ───
+
+  describe('Stroke geometry', () => {
+    it('indicator stroke-dasharray uses "1 200" in indeterminate mode', async () => {
+      const el = await fixture<HelixProgressRing>('<hx-progress-ring label="Loading"></hx-progress-ring>');
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      expect(indicator?.getAttribute('stroke-dasharray')).toBe('1 200');
+    });
+
+    it('indicator stroke-dashoffset is "0" in indeterminate mode', async () => {
+      const el = await fixture<HelixProgressRing>('<hx-progress-ring label="Loading"></hx-progress-ring>');
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      expect(indicator?.getAttribute('stroke-dashoffset')).toBe('0');
+    });
+
+    it('indicator stroke-dasharray reflects circumference in determinate mode', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50" label="Progress"></hx-progress-ring>',
+      );
+      await el.updateComplete;
+      const indicator = shadowQuery(el, '[part="indicator"]');
+      const dashArray = indicator?.getAttribute('stroke-dasharray') ?? '';
+      // circumference = 2 * PI * (100 - 4) / 2 = 2 * PI * 48 ≈ 301.59...
+      // The two values should be equal (circumference circumference)
+      const parts = dashArray.split(' ');
+      expect(parts).toHaveLength(2);
+      expect(parseFloat(parts[0])).toBeCloseTo(parseFloat(parts[1]), 5);
+    });
+  });
+
+  // ─── Dynamic updates ───
+
+  describe('Dynamic updates', () => {
+    it('updates aria-valuemax when max changes at runtime', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50" label="Progress"></hx-progress-ring>',
+      );
+      el.max = 200;
+      await el.updateComplete;
+      expect(el.getAttribute('aria-valuemax')).toBe('200');
+    });
+
+    it('updates aria-label when label changes at runtime', async () => {
+      const el = await fixture<HelixProgressRing>(
+        '<hx-progress-ring value="50" label="Old label"></hx-progress-ring>',
+      );
+      el.label = 'New label';
+      await el.updateComplete;
+      expect(el.getAttribute('aria-label')).toBe('New label');
     });
   });
 

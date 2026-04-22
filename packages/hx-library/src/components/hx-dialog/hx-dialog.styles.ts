@@ -103,7 +103,7 @@ export const helixDialogStyles = css`
 
   .dialog__heading {
     margin: 0;
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-dialog-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-tight);
@@ -129,7 +129,7 @@ export const helixDialogStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
-    color: var(--hx-color-neutral-500, #6b7280);
+    color: var(--hx-color-neutral-500, #64748b);
     font-size: var(--hx-font-size-xl, 1.25rem);
     line-height: 1; /* intentional literal: icon button needs line-height 1; no token maps to exactly 1 */
     transition:

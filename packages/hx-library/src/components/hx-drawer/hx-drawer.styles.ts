@@ -168,7 +168,7 @@ export const helixDrawerStyles = css`
   .drawer-title {
     margin: 0;
     flex: 1 1 auto;
-    font-family: var(--hx-font-family-sans);
+    font-family: var(--hx-drawer-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-tight);

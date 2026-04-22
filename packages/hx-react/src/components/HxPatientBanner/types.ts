@@ -32,6 +32,6 @@ slots (name, mrn, dob) are populated. */
   enforceIdentifierRule?: boolean;
 
   // Event callbacks
-  /** Fired when fewer than 2 identifier slots are populated and enforce-identifier-rule is true. */
+  /** Fired when fewer than 2 identifier slots are populated and enforce-identifier-rule is true. Contains structural metadata only — no raw PHI. Dispatched with `composed: true`. */
   onHxIdentifierRuleViolation?: (event: Event) => void;
 }

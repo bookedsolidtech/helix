@@ -654,7 +654,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('hx-docs-section')
-export class WcDocsSection extends LitElement {
+export class HxDocsSection extends LitElement {
   static styles = css`
     :host {
       display: block;
@@ -775,7 +775,7 @@ import { LitElement, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 
 @customElement('hx-collapsible')
-export class WcCollapsible extends LitElement {
+export class HxCollapsible extends LitElement {
   @query('.content')
   private _content!: HTMLElement;
 
@@ -1040,7 +1040,7 @@ export const wcCardStyles = css`
 
 ```typescript
 @customElement('hx-tabs')
-export class WcTabs extends LitElement {
+export class HxTabs extends LitElement {
   render() {
     return html`
       ${this.tabs.map(

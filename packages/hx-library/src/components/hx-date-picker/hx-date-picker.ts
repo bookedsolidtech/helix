@@ -2,11 +2,20 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 
+// PERF: hx-date-picker exceeds 5KB budget (7.98kb gzipped) -- calendar grid, date parsing, keyboard navigation, localization
+
 const _nextDatePickerId = createIdCounter('hx-date-picker');
+
+/** Detail for the hx-change event dispatched by hx-date-picker. */
+export interface HxDatePickerChangeDetail {
+  value: string;
+  date: Date | null;
+}
 
 /**
  * Date picker component for selecting dates with keyboard-accessible calendar popup.
@@ -50,7 +59,7 @@ const _nextDatePickerId = createIdCounter('hx-date-picker');
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
  */
 @customElement('hx-date-picker')
-export class HelixDatePicker extends HelixElement {
+export class HelixDatePicker extends FormMixin(HelixElement) {
   static override styles = [helixDatePickerStyles];
 
   // ─── Form Association ───
@@ -74,7 +83,7 @@ export class HelixDatePicker extends HelixElement {
    * The current value as an ISO 8601 date string (e.g. 2026-03-04).
    * @attr value
    */
-  @property({ type: String, reflect: true })
+  @property({ type: String })
   value = '';
 
   /**
@@ -144,42 +153,42 @@ export class HelixDatePicker extends HelixElement {
    * Validation message shown when the field is required but empty.
    * @attr required-message
    */
-  @property({ attribute: 'required-message' })
+  @property({ type: String, attribute: 'required-message' })
   requiredMessage = 'This field is required.';
 
   /**
    * Accessible label for the calendar dialog.
    * @attr choose-date-label
    */
-  @property({ attribute: 'choose-date-label' })
+  @property({ type: String, attribute: 'choose-date-label' })
   chooseDateLabel = 'Choose a date';
 
   /**
    * Accessible label for the calendar trigger button when the calendar is closed.
    * @attr open-calendar-label
    */
-  @property({ attribute: 'open-calendar-label' })
+  @property({ type: String, attribute: 'open-calendar-label' })
   openCalendarLabel = 'Open calendar';
 
   /**
    * Accessible label for the calendar trigger button when the calendar is open.
    * @attr close-calendar-label
    */
-  @property({ attribute: 'close-calendar-label' })
+  @property({ type: String, attribute: 'close-calendar-label' })
   closeCalendarLabel = 'Close calendar';
 
   /**
    * Accessible label for the previous month navigation button.
    * @attr previous-month-label
    */
-  @property({ attribute: 'previous-month-label' })
+  @property({ type: String, attribute: 'previous-month-label' })
   previousMonthLabel = 'Previous month';
 
   /**
    * Accessible label for the next month navigation button.
    * @attr next-month-label
    */
-  @property({ attribute: 'next-month-label' })
+  @property({ type: String, attribute: 'next-month-label' })
   nextMonthLabel = 'Next month';
 
   // ─── Internal State ───
@@ -209,6 +218,20 @@ export class HelixDatePicker extends HelixElement {
    * @internal
    */
   @state() private _liveMessage = '';
+
+  /**
+   * Cached calendar day grid for the current view month/year.
+   * Recomputed in willUpdate() only when _viewMonth or _viewYear changes.
+   * @internal
+   */
+  private _dayGrid: (Date | null)[] = [];
+
+  /**
+   * Cached aria-label strings for each date in the current grid, keyed by ISO date string.
+   * Recomputed in willUpdate() alongside _dayGrid.
+   * @internal
+   */
+  private _dayAriaLabels: Map<string, string> = new Map();
 
   // ─── Memoized formatters ───
 
@@ -257,7 +280,7 @@ export class HelixDatePicker extends HelixElement {
    * @internal
    */
   @query('.calendar')
-  private _calendar: HTMLElement | undefined;
+  private _calendar: HTMLDialogElement | undefined;
 
   // ─── Unique IDs ───
 
@@ -298,12 +321,12 @@ export class HelixDatePicker extends HelixElement {
    * Whether the label slot has any assigned elements, used to switch between slotted and property-based label rendering.
    * @internal
    */
-  private _hasLabelSlot = false;
+  @state() private _hasLabelSlot = false;
   /**
    * Whether the error slot has any assigned elements, used to switch between slotted and property-based error rendering.
    * @internal
    */
-  private _hasErrorSlot = false;
+  @state() private _hasErrorSlot = false;
 
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
@@ -315,48 +338,72 @@ export class HelixDatePicker extends HelixElement {
         slottedLabel.id = `${this._inputId}-slotted-label`;
       }
     }
-    this.requestUpdate();
   }
 
   /** @internal */
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedElements().length > 0;
-    this.requestUpdate();
   }
-
-  // ─── Bound Handler References ───
-
-  /**
-   * Bound reference to the outside-click handler, stored so the same function reference can be removed from document listeners.
-   * @internal
-   */
-  private readonly _boundHandleOutsideClick = (e: MouseEvent) => this._handleOutsideClick(e);
-  /**
-   * Bound reference to the document keydown handler, stored so the same function reference can be removed from document listeners.
-   * @internal
-   */
-  private readonly _boundHandleDocumentKeydown = (e: KeyboardEvent) =>
-    this._handleDocumentKeydown(e);
 
   // ─── Lifecycle ───
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._boundHandleOutsideClick);
-    document.removeEventListener('keydown', this._boundHandleDocumentKeydown);
+    document.removeEventListener('click', this._handleDocumentClick, true);
+  }
+
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+
+    // Sync form state before render so the browser form participation is
+    // always up-to-date without causing an extra render cycle.
+    if (changedProperties.has('value')) {
+      this._internals.setFormValue(this.value);
+    }
+
+    // Recompute the day grid and aria-labels only when the viewed month/year
+    // or locale changes — not on every render.
+    const gridChanged =
+      (changedProperties as Map<PropertyKey, unknown>).has('_viewMonth') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_viewYear') ||
+      changedProperties.has('locale') ||
+      this._dayGrid.length === 0;
+
+    if (gridChanged) {
+      this._dayGrid = this._getDaysInGrid();
+      this._dayAriaLabels = new Map(
+        this._dayGrid
+          .filter((d): d is Date => d !== null)
+          .map((d) => [
+            this._toISO(d),
+            d.toLocaleDateString(this.locale, {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }),
+          ]),
+      );
+    }
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
-    if (changedProperties.has('value')) {
-      this._internals.setFormValue(this.value);
-      this._updateValidity();
+    // FormMixin calls _updateValidity() automatically after updated().
+    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    if (changedProperties.has('error') && this.error) {
+      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      if (errorEl) {
+        const msg = this.error;
+        requestAnimationFrame(() => {
+          errorEl.textContent = '';
+          requestAnimationFrame(() => {
+            errorEl.textContent = msg;
+          });
+        });
+      }
     }
 
     if ((changedProperties as Map<PropertyKey, unknown>).has('_isOpen')) {
@@ -367,16 +414,15 @@ export class HelixDatePicker extends HelixElement {
           this._viewYear = selected.getFullYear();
           this._viewMonth = selected.getMonth();
         }
-        document.addEventListener('click', this._boundHandleOutsideClick);
-        document.addEventListener('keydown', this._boundHandleDocumentKeydown);
-        // Focus the calendar after it renders.
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
+          this._calendar?.show();
           this._focusActiveDay();
+          document.addEventListener('click', this._handleDocumentClick, true);
         });
       } else {
-        document.removeEventListener('click', this._boundHandleOutsideClick);
-        document.removeEventListener('keydown', this._boundHandleDocumentKeydown);
+        this._calendar?.close();
         this._focusedDay = null;
+        document.removeEventListener('click', this._handleDocumentClick, true);
       }
     }
 
@@ -387,40 +433,25 @@ export class HelixDatePicker extends HelixElement {
       if (this._isOpen) {
         const monthName = this._getMonthName(this._viewMonth);
         this._liveMessage = `${monthName} ${this._viewYear}`;
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._focusActiveDay();
         });
       }
     }
   }
 
-  /** @internal */
-  private _handleOutsideClick(e: MouseEvent): void {
+  private readonly _handleDocumentClick = (e: MouseEvent): void => {
+    if (!this._isOpen) return;
     const path = e.composedPath();
     if (!path.includes(this)) {
       this._closeCalendar();
     }
-  }
-
-  /** @internal */
-  private _handleDocumentKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Escape' && this._isOpen) {
-      this._closeCalendar();
-    }
-  }
+  };
 
   // ─── Form Integration ───
 
-  checkValidity(): boolean {
-    return this._internals.checkValidity();
-  }
-
-  reportValidity(): boolean {
-    return this._internals.reportValidity();
-  }
-
   /** @internal */
-  private _updateValidity(): void {
+  override _updateValidity(): void {
     if (this.required && !this.value) {
       this._internals.setValidity(
         { valueMissing: true },
@@ -437,6 +468,7 @@ export class HelixDatePicker extends HelixElement {
     this.value = '';
     this._internals.setFormValue(null);
     this._isOpen = false;
+    this._resetInteractionState();
   }
 
   /** @internal */
@@ -603,7 +635,7 @@ export class HelixDatePicker extends HelixElement {
   private _closeCalendar(): void {
     this._isOpen = false;
     // Return focus to trigger after calendar closes.
-    this.updateComplete.then(() => {
+    void this.updateComplete.then(() => {
       this._trigger?.focus();
     });
   }
@@ -659,7 +691,7 @@ export class HelixDatePicker extends HelixElement {
 
     if (targetDay !== null) {
       this._focusedDay = targetDay;
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const btn = this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${targetDay}"]`);
         btn?.focus();
       });
@@ -697,7 +729,8 @@ export class HelixDatePicker extends HelixElement {
     const iso = this._toISO(date);
     this.value = iso;
     this._internals.setFormValue(iso);
-    this._updateValidity();
+    this._handleInteractionInput();
+    this._handleInteractionBlur();
 
     this.dispatchEvent(
       new CustomEvent<{ value: string; date: Date }>('hx-change', {
@@ -710,6 +743,23 @@ export class HelixDatePicker extends HelixElement {
     this._closeCalendar();
   }
 
+  /**
+   * Delegated click handler for the calendar day grid.
+   * A single handler on the grid container replaces per-cell closures,
+   * eliminating 42 inline function allocations per render.
+   * @internal
+   */
+  private readonly _handleGridClick = (e: Event): void => {
+    const target = (e.target as Element).closest<HTMLElement>('[data-date]');
+    if (!target) return;
+    const iso = target.dataset['date'];
+    if (!iso) return;
+    const date = this._parseISODate(iso);
+    if (date) {
+      this._selectDay(date);
+    }
+  };
+
   // ─── Calendar Keyboard Navigation ───
 
   /** @internal */
@@ -721,9 +771,7 @@ export class HelixDatePicker extends HelixElement {
       return;
     }
 
-    // Explicit Escape handler on the calendar container provides a reliable
-    // exit path even when the document-level handler does not fire (e.g. when
-    // the event is stopped by a descendant or the shadow boundary interferes).
+    // Handle Escape to call _closeCalendar() with focus-restore.
     if (key === 'Escape') {
       e.stopPropagation();
       this._closeCalendar();
@@ -775,7 +823,7 @@ export class HelixDatePicker extends HelixElement {
       const newDay = currentFocused - dayOfWeek;
       if (newDay >= 1) {
         this._focusedDay = newDay;
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${newDay}"]`)?.focus();
         });
       }
@@ -790,7 +838,7 @@ export class HelixDatePicker extends HelixElement {
       const newDay = currentFocused + daysToSaturday;
       if (newDay <= daysInMonth) {
         this._focusedDay = newDay;
-        this.updateComplete.then(() => {
+        void this.updateComplete.then(() => {
           this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${newDay}"]`)?.focus();
         });
       }
@@ -809,7 +857,7 @@ export class HelixDatePicker extends HelixElement {
       this._prevMonth();
       const prevDaysInMonth = new Date(this._viewYear, this._viewMonth + 1, 0).getDate();
       this._focusedDay = prevDaysInMonth + newDay;
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const day = this._focusedDay;
         this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${day}"]`)?.focus();
       });
@@ -821,7 +869,7 @@ export class HelixDatePicker extends HelixElement {
       const overflow = newDay - daysInMonth;
       this._nextMonth();
       this._focusedDay = overflow;
-      this.updateComplete.then(() => {
+      void this.updateComplete.then(() => {
         const day = this._focusedDay;
         this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${day}"]`)?.focus();
       });
@@ -829,7 +877,7 @@ export class HelixDatePicker extends HelixElement {
     }
 
     this._focusedDay = newDay;
-    this.updateComplete.then(() => {
+    void this.updateComplete.then(() => {
       this._calendar?.querySelector<HTMLButtonElement>(`[data-day="${newDay}"]`)?.focus();
     });
   }
@@ -903,8 +951,11 @@ export class HelixDatePicker extends HelixElement {
 
   /** @internal */
   private _renderDayGrid() {
-    const cells = this._getDaysInGrid();
+    // Use the memoized grid — recomputed in willUpdate() only on month/year/locale change.
+    const cells = this._dayGrid;
     const selectedDate = this._parseISODate(this.value);
+    // Cache today once per render — avoids 42 new Date() allocations per keyboard navigation event.
+    const today = new Date();
 
     const rows: ReturnType<typeof html>[] = [];
 
@@ -915,17 +966,13 @@ export class HelixDatePicker extends HelixElement {
         }
 
         const isSelected = selectedDate ? this._isSameDay(date, selectedDate) : false;
-        const isToday = this._isToday(date);
+        const isToday = this._isSameDay(date, today);
         const isDisabled = this._isDateDisabled(date);
         const isFocused = this._focusedDay === date.getDate();
         const dayNumber = date.getDate();
-
-        const ariaLabel = date.toLocaleDateString(this.locale, {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        });
+        const iso = this._toISO(date);
+        // Read from the pre-computed aria-label map — no per-render toLocaleDateString calls.
+        const ariaLabel = this._dayAriaLabels.get(iso) ?? iso;
 
         const dayClasses = {
           calendar__day: true,
@@ -934,22 +981,27 @@ export class HelixDatePicker extends HelixElement {
           'calendar__day--disabled': isDisabled,
         };
 
-        return html`<div class="calendar__day-cell">
+        // data-date carries the ISO string so the delegated grid click handler
+        // (_handleGridClick) can identify the clicked day without any closure.
+        // role="gridcell" belongs on the cell container (ARIA 1.2 grid ownership rules),
+        // not the inner <button>. aria-selected/aria-disabled/aria-current describe
+        // the cell state and live on the gridcell element.
+        return html`<div
+          class="calendar__day-cell"
+          role="gridcell"
+          aria-selected=${isSelected ? 'true' : 'false'}
+          aria-disabled=${isDisabled ? 'true' : nothing}
+          aria-current=${isToday ? 'date' : nothing}
+        >
           <button
             part="day"
             class=${classMap(dayClasses)}
             type="button"
-            role="gridcell"
             data-day=${dayNumber}
+            data-date=${iso}
             aria-label=${ariaLabel}
-            aria-selected=${isSelected ? 'true' : 'false'}
-            aria-disabled=${isDisabled ? 'true' : nothing}
-            aria-current=${isToday ? 'date' : nothing}
             tabindex=${isFocused ? '0' : '-1'}
             ?disabled=${isDisabled}
-            @click=${() => {
-              this._selectDay(date);
-            }}
           >
             ${dayNumber}
           </button>
@@ -1052,59 +1104,59 @@ export class HelixDatePicker extends HelixElement {
         </div>
 
         <!-- Calendar Popup -->
-        ${this._isOpen
-          ? html`
-              <div
-                part="calendar"
-                class="calendar"
-                id=${this._calendarId}
-                role="dialog"
-                aria-modal="true"
-                aria-label=${this.chooseDateLabel}
-                @keydown=${this._handleCalendarKeydown}
-              >
-                <!-- Screen reader live region -->
-                <div
-                  id=${this._liveRegionId}
-                  class="calendar__live-region"
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  ${this._liveMessage}
-                </div>
+        <dialog
+          part="calendar"
+          class="calendar"
+          id=${this._calendarId}
+          aria-label=${this.chooseDateLabel}
+          @keydown=${this._handleCalendarKeydown}
+        >
+          <!-- Screen reader live region -->
+          <div
+            id=${this._liveRegionId}
+            class="calendar__live-region"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            ${this._liveMessage}
+          </div>
 
-                <!-- Month Navigation -->
-                <div part="month-nav" class="calendar__nav">
-                  <button
-                    class="calendar__nav-btn"
-                    type="button"
-                    aria-label=${this.previousMonthLabel}
-                    ?disabled=${this._isPrevMonthDisabled()}
-                    @click=${this._prevMonth}
-                  >
-                    &#8249;
-                  </button>
-                  <span class="calendar__month-label" aria-hidden="true">
-                    ${monthName} ${this._viewYear}
-                  </span>
-                  <button
-                    class="calendar__nav-btn"
-                    type="button"
-                    aria-label=${this.nextMonthLabel}
-                    ?disabled=${this._isNextMonthDisabled()}
-                    @click=${this._nextMonth}
-                  >
-                    &#8250;
-                  </button>
-                </div>
+          <!-- Month Navigation -->
+          <div part="month-nav" class="calendar__nav">
+            <button
+              class="calendar__nav-btn"
+              type="button"
+              aria-label=${this.previousMonthLabel}
+              ?disabled=${this._isPrevMonthDisabled()}
+              @click=${this._prevMonth}
+            >
+              &#8249;
+            </button>
+            <span class="calendar__month-label" aria-hidden="true">
+              ${monthName} ${this._viewYear}
+            </span>
+            <button
+              class="calendar__nav-btn"
+              type="button"
+              aria-label=${this.nextMonthLabel}
+              ?disabled=${this._isNextMonthDisabled()}
+              @click=${this._nextMonth}
+            >
+              &#8250;
+            </button>
+          </div>
 
-                <!-- Day Grid -->
-                <div class="calendar__grid" role="grid" aria-label="${monthName} ${this._viewYear}">
-                  ${this._renderWeekdayHeaders()} ${this._renderDayGrid()}
-                </div>
-              </div>
-            `
-          : nothing}
+          <!-- Day Grid -->
+          <!-- Single delegated click handler on the grid replaces per-cell closures. -->
+          <div
+            class="calendar__grid"
+            role="grid"
+            aria-label="${monthName} ${this._viewYear}"
+            @click=${this._handleGridClick}
+          >
+            ${this._renderWeekdayHeaders()} ${this._renderDayGrid()}
+          </div>
+        </dialog>
 
         <!-- Error -->
         <slot name="error" @slotchange=${this._handleErrorSlotChange}>

@@ -1,6 +1,7 @@
-import { LitElement, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/index.js';
 import { helixFieldLabelStyles } from './hx-field-label.styles.js';
 
 /**
@@ -45,7 +46,7 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * @cssprop [--hx-font-label-family=var(--hx-font-family-sans)] - Label font family.
  */
 @customElement('hx-field-label')
-export class HelixFieldLabel extends LitElement {
+export class HelixFieldLabel extends HelixElement {
   static override styles = [helixFieldLabelStyles];
 
   /**
