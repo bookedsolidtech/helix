@@ -49,7 +49,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -117,7 +117,7 @@ jobs:
 
             PKG_PACK_DIR="$SCAN_DIR/pack-$(basename "$pkg_dir")"
             mkdir -p "$PKG_PACK_DIR"
-            if ! PACK_OUTPUT=$(cd "$pkg_dir" && npm pack --pack-destination "$PKG_PACK_DIR" 2>&1); then
+            if ! PACK_OUTPUT=$(cd "$pkg_dir" && pnpm pack --pack-destination "$PKG_PACK_DIR" 2>&1); then
               echo "::error::Failed to produce tarball for $PKG_NAME"
               echo "$PACK_OUTPUT"
               FAIL=1
@@ -186,7 +186,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 

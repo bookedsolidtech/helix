@@ -117,7 +117,7 @@ See the [Drupal Integration Guide](https://helix.bookedsolid.tech/guides/drupal/
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22 LTS or Node.js 24 (Node 20 reaches upstream EOL on 2026-04-30)
 - pnpm 9+ (via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`)
 - Git
 

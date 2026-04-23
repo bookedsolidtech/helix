@@ -338,14 +338,14 @@ importers:
   packages/drupal-behaviors:
     dependencies:
       '@helixui/library':
-        specifier: ^2.1.2 || ^3.0.0
-        version: 2.1.2(@floating-ui/dom@1.7.6)
+        specifier: workspace:^
+        version: link:../hx-library
 
   packages/drupal-starter:
     dependencies:
       '@helixui/library':
-        specifier: ^2.1.2 || ^3.0.0
-        version: 2.1.2(@floating-ui/dom@1.7.6)
+        specifier: workspace:^
+        version: link:../hx-library
     devDependencies:
       twig:
         specifier: ^2.0.0
@@ -1251,14 +1251,6 @@ packages:
 
   '@github/catalyst@1.8.0':
     resolution: {integrity: sha512-uLpi/D/mKfylYaFLfzNuloXNENi0AlcM0Z7hwYLH8Z030jBCr+ueMdX2xLxCzpMH/keYXKh0uPrHSMfcbxU6KA==}
-
-  '@helixui/library@2.1.2':
-    resolution: {integrity: sha512-s2Po8l966Q5sMKlPk+Gg/3oZ86bgMN6zTvwx5A9bJSFgX3GtC+tZcvxQ3y0cGKFjQsf/OODCkDsxTIai6/SXHg==}
-    peerDependencies:
-      '@floating-ui/dom': ^1.7.6
-
-  '@helixui/tokens@2.1.2':
-    resolution: {integrity: sha512-1s5ioPevqTY6hAIudQVNLf9nM7WSo3s8L6hAhZzhKMah3WYYIUAJsBOtWcwyBXiysnxp9x45ggyXzliHXKxZfw==}
 
   '@hono/node-server@1.19.11':
     resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
@@ -7676,16 +7668,6 @@ snapshots:
       tslib: 2.8.1
 
   '@github/catalyst@1.8.0': {}
-
-  '@helixui/library@2.1.2(@floating-ui/dom@1.7.6)':
-    dependencies:
-      '@floating-ui/dom': 1.7.6
-      '@helixui/tokens': 2.1.2
-      lit: 3.3.2
-
-  '@helixui/tokens@2.1.2':
-    dependencies:
-      lit: 3.3.2
 
   '@hono/node-server@1.19.11(hono@4.12.8)':
     dependencies:

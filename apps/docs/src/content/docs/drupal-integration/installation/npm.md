@@ -62,10 +62,10 @@ Before beginning npm installation, ensure your development environment meets the
 
 ### System Requirements
 
-**Node.js** (version 20+):
+**Node.js** (version 22+):
 
 ```bash
-node --version  # Should output v20.0.0 or higher
+node --version  # Should output v22.0.0 or higher
 ```
 
 **npm** (version 10+):
@@ -87,13 +87,13 @@ drush status | grep "Drupal version"
 **macOS** (via Homebrew):
 
 ```bash
-brew install node@20
+brew install node@22
 ```
 
 **Ubuntu/Debian**:
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -1446,7 +1446,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci
       - run: npm run prod
       - run: rsync -av dist/ ${{ secrets.DEPLOY_PATH }}
