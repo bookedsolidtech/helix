@@ -1,5 +1,12 @@
 # @helixui/react
 
+## 3.1.0
+
+### Patch Changes
+
+- Updated dependencies [36d5bde]
+  - @helixui/library@3.1.0
+
 ## 3.0.0
 
 ### Major Changes
