@@ -409,6 +409,9 @@ importers:
       playwright:
         specifier: ^1.50.0
         version: 1.58.2
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
