@@ -1,1 +1,0 @@
-engineering/design-systems-animator.md
