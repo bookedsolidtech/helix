@@ -1,6 +1,6 @@
 {
   "name": "@helixui/library",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
@@ -53,6 +53,7 @@
     "dist/utilities/**",
     "dist/utils/**",
     "custom-elements.json",
+    "figma-inventory.json",
     "fouc.css"
   ],
   "customElements": "custom-elements.json",
@@ -76,8 +77,11 @@
     "test:smart": "bash ../../scripts/test-smart.sh",
     "test:shard": "bash ../../scripts/test-shard.sh",
     "test:component": "vitest run",
-    "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" && node ../../scripts/validate-cem.mjs",
+    "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" && node ../../scripts/validate-cem.mjs && pnpm run figma:inventory",
     "cem:watch": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" --watch",
+    "figma:inventory": "tsx scripts/generate-figma-inventory.ts",
+    "figma:inventory:check": "tsx scripts/generate-figma-inventory.ts --check",
+    "test:scripts": "vitest run --config vitest.scripts.config.ts",
     "build:cdn": "node scripts/build-cdn.mjs",
     "generate:drupal-libraries": "tsx ../../scripts/generate-drupal-libraries.ts",
     "lint": "eslint src/",
@@ -122,6 +126,7 @@
     "axe-core": "^4.11.1",
     "playwright": "^1.50.0",
     "typescript": "^5.7.2",
+    "tsx": "^4.21.0",
     "vite": "^6.2.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.0.0"
