@@ -1,0 +1,27 @@
+--- a/.husky/pre-push
++++ b/.husky/pre-push
+@@ -148,14 +148,13 @@ if [ -f "$HOOKS_LIB" ]; then
+   discord_notify "dev" "Pre-push gates passed on \`$(git rev-parse --abbrev-ref HEAD 2>/dev/null)\`" "green"
+ fi
+
+-# ── rea push-review-gate (Codex audit on protected paths) ────────────────────
+-# 0.9.1: push-review-gate.sh is the canonical gate. Its core (push-review-core.sh)
+-# has BUG-008 stdin-shape sniffing, so it handles both Claude Code JSON
+-# (.tool_input.command) and git's native pre-push refspec stdin. We pass "$@"
+-# through so the remote name (argv $1) is available to the core.
+-# We invoke without `exec` so the EXIT trap above still runs to clean $OUT.
+-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+-if [ -x "$REPO_ROOT/.claude/hooks/push-review-gate.sh" ]; then
+-  "$REPO_ROOT/.claude/hooks/push-review-gate.sh" "$@"
+-  exit $?
+-fi
++# ── rea push-review-gate — REMOVED 2026-04-22 ────────────────────────────────
++# Removed per project owner directive. Two upstream rea bugs (schema mismatch
++# between codex-adversarial agent output and the gate's jq predicate; escape
++# hatch resolving `dist/audit/append.js` at repo root instead of node_modules)
++# made the gate unworkable across multiple releases. Codex adversarial review
++# is retained as a first-class step via the /codex-review slash command and
++# the codex-adversarial subagent, and is enforced in CI rather than at the
++# local push boundary. CodeRabbit + 3-tier agent review remain.
+
+ exit 0
