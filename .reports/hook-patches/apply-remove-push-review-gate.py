@@ -32,7 +32,19 @@ new_block = '''# ── rea push-review-gate — REMOVED 2026-04-22 ────
 exit 0
 '''
 
-if old_block not in content:
+has_old = old_block in content
+has_new = new_block in content
+
+if has_old and has_new:
+    print('MIXED STATE: both old and new blocks present — refusing to touch', file=sys.stderr)
+    print('  fix .husky/pre-push by hand, then re-run', file=sys.stderr)
+    sys.exit(1)
+
+if has_new:
+    print('OK (already applied)')
+    sys.exit(0)
+
+if not has_old:
     print('OLD BLOCK NOT FOUND', file=sys.stderr)
     sys.exit(1)
 
