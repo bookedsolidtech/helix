@@ -299,10 +299,11 @@ The PR template will guide you through:
 
 All PRs must pass:
 
-1. Automated CI checks (all 7 quality gates)
-2. Matrix tests (Node 22/24, Ubuntu/macOS/Windows)
-3. Code review approval
-4. No merge conflicts with `main`
+1. Automated CI checks (all 7 quality gates) — Node 22 (pinned via `.nvmrc`) on Ubuntu
+2. Code review approval
+3. No merge conflicts with `main`
+
+The optional CI matrix (`ci-matrix.yml`, Node 22/24 on Ubuntu, `workflow_dispatch` only) is a best-effort diagnostic, not a merge gate — auto-triggers are disabled for the 3.0.0 release window and the job has a history of noise unrelated to library code. Run it manually when a PR touches **build tooling, Vite/Turborepo config, or Node runtime APIs**. Node 24 support is declared in `engines` (`^22.0.0 || ^24.0.0`) but is not exercised by any required check; treat a green matrix run as positive signal, not a guarantee, and a red matrix run as a prompt to investigate, not a blanket block.
 
 ### After Approval
 
