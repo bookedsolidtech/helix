@@ -1,1 +1,0 @@
-engineering/qa-engineer-automation.md

@@ -202,8 +202,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Generate CEM (required input for drift check)
         run: pnpm --filter=@helixui/library run cem
+      - name: Verify Figma inventory file is byte-identical after CEM regen
+        run: |
+          if ! git diff --exit-code packages/hx-library/figma-inventory.json; then
+            echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit."
+            exit 1
+          fi
       - name: Verify @helixui/react wrappers are in sync with CEM
         run: pnpm --filter=@helixui/react run generate:check
+      - name: Verify Figma inventory matches committed snapshot
+        run: pnpm --filter=@helixui/library run figma:inventory:check
 
   type-check:
     name: Type Check

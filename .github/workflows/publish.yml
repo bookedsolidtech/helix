@@ -69,6 +69,14 @@ jobs:
           fi
           echo "CEM matches committed manifest."
 
+      - name: Verify Figma inventory matches committed snapshot
+        run: |
+          if ! git diff --exit-code packages/hx-library/figma-inventory.json; then
+            echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit before tagging."
+            exit 1
+          fi
+          pnpm --filter=@helixui/library run figma:inventory:check
+
       - name: Build packages
         run: |
           pnpm turbo run build \
@@ -211,6 +219,14 @@ jobs:
             exit 1
           fi
           echo "CEM matches committed manifest."
+
+      - name: Verify Figma inventory matches committed snapshot
+        run: |
+          if ! git diff --exit-code packages/hx-library/figma-inventory.json; then
+            echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit before tagging."
+            exit 1
+          fi
+          pnpm --filter=@helixui/library run figma:inventory:check
 
       - name: Build CDN artifacts
         run: pnpm --filter=@helixui/library run build:cdn

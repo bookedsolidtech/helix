@@ -40,4 +40,5 @@ context_protection:
     - pnpm run build
   max_bash_output_lines: 100
 review:
+  concerns_blocks: true
   codex_required: true
