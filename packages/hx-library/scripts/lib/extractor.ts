@@ -643,7 +643,12 @@ export interface BuildComponentInput {
 
 export function buildComponentEntry(input: BuildComponentInput): ComponentEntry {
   const { decl, module: mod, templateDependencies, tierOverride } = input;
-  const tag = decl.tagName!;
+  if (!decl.tagName) {
+    throw new Error(
+      `buildComponentEntry: declaration "${decl.name ?? '<anonymous>'}" is missing tagName`,
+    );
+  }
+  const tag = decl.tagName;
   const cssParts = decl.cssParts ?? [];
   const cssProperties = (decl.cssProperties ?? []).map(
     (cp): ResolvedCssProperty => ({

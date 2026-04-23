@@ -253,6 +253,8 @@ describe('nameless attribute handling', () => {
       { name: '', type: { text: 'boolean' } },
       { name: 'variant', fieldName: 'variant', type: { text: "'primary' | 'secondary'" }, default: "'primary'" },
       { name: 'label', fieldName: 'label', type: { text: 'string' } },
+      { name: 'aria-label', type: { text: 'string' } },
+      { name: 'id', type: { text: 'string' } },
     ],
   } as unknown as CemDeclaration;
 
@@ -266,8 +268,9 @@ describe('nameless attribute handling', () => {
     expect(props.map((p) => p.figmaPropertyName)).toEqual(['label']);
   });
 
-  it('excludedAttributeNames never emits undefined or empty strings', () => {
+  it('excludedAttributeNames emits named infra attrs and never undefined or empty strings', () => {
     const excluded = excludedAttributeNames(NAMELESS_DECL);
+    expect(excluded).toEqual(expect.arrayContaining(['aria-label', 'id']));
     expect(excluded).not.toContain(undefined);
     expect(excluded).not.toContain('');
     for (const name of excluded) {
