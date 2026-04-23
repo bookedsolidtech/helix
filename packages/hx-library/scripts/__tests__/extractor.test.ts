@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildComponentEntry,
   classifyTier,
+  excludedAttributeNames,
   extractHxTagsFromSource,
   extractSlots,
   extractTextProperties,
@@ -235,6 +236,44 @@ describe('extractTextProperties', () => {
   it('does not emit aria-* as text properties', () => {
     const props = extractTextProperties(BUTTON_DECL);
     expect(props.find((p) => p.cemAttribute === 'aria-label')).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Regression — nameless CEM attributes (malformed input must not crash)
+// ---------------------------------------------------------------------------
+
+describe('nameless attribute handling', () => {
+  const NAMELESS_DECL = {
+    kind: 'class',
+    tagName: 'hx-weird',
+    name: 'HelixWeird',
+    attributes: [
+      { type: { text: "'a' | 'b'" }, default: "'a'" },
+      { name: '', type: { text: 'boolean' } },
+      { name: 'variant', fieldName: 'variant', type: { text: "'primary' | 'secondary'" }, default: "'primary'" },
+      { name: 'label', fieldName: 'label', type: { text: 'string' } },
+    ],
+  } as unknown as CemDeclaration;
+
+  it('extractVariantAxes skips attributes missing a name', () => {
+    const axes = extractVariantAxes(NAMELESS_DECL);
+    expect(axes.map((a) => a.figmaAxisName)).toEqual(['variant']);
+  });
+
+  it('extractTextProperties skips attributes missing a name', () => {
+    const props = extractTextProperties(NAMELESS_DECL);
+    expect(props.map((p) => p.figmaPropertyName)).toEqual(['label']);
+  });
+
+  it('excludedAttributeNames never emits undefined or empty strings', () => {
+    const excluded = excludedAttributeNames(NAMELESS_DECL);
+    expect(excluded).not.toContain(undefined);
+    expect(excluded).not.toContain('');
+    for (const name of excluded) {
+      expect(typeof name).toBe('string');
+      expect(name.length).toBeGreaterThan(0);
+    }
   });
 });
 
