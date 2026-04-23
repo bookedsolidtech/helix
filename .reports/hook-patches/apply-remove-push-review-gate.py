@@ -32,6 +32,10 @@ new_block = '''# ── rea push-review-gate — REMOVED 2026-04-22 ────
 exit 0
 '''
 
+if new_block in content:
+    print('OK (already applied)')
+    sys.exit(0)
+
 if old_block not in content:
     print('OLD BLOCK NOT FOUND', file=sys.stderr)
     sys.exit(1)
