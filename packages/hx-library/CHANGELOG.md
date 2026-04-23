@@ -4,40 +4,236 @@
 
 ### Major Changes
 
+- edee58a: HELiX 3.0.0 — first major release to the enterprise healthcare channel.
+
+  This release bumps `@helixui/library`, `@helixui/tokens`, and `@helixui/react` to `3.0.0` in lockstep (enforced via the `linked` package group in `.changeset/config.json`). See `packages/hx-library/CHANGELOG.md` and `docs/UPGRADING-TO-3.md` for the complete breaking-change surface and migration guide.
+
+  Headline changes:
+  - Subclassing contract — `HelixElement` and `FormMixin` override hooks promoted from `@internal` to `@protected` with stability guarantees gated to major releases.
+  - `aria-label` / `hxAriaLabel` → `accessible-label` / `accessibleLabel` on all ARIA-labelable components.
+  - `::part(error-message)` → `::part(error)` on the 13 form controls that expose the part (`hx-checkbox`, `hx-checkbox-group`, `hx-combobox`, `hx-date-picker`, `hx-field`, `hx-file-upload`, `hx-number-input`, `hx-radio-group`, `hx-select`, `hx-switch`, `hx-text-input`, `hx-textarea`, `hx-time-picker`). See `docs/UPGRADING-TO-3.md` §5 for the full list.
+  - `hx-dialog.modal` defaults to `false` (silent behavior change — consumers relying on default modal behavior must add `modal` explicitly).
+  - `hx-phi-field` strips the `value` attribute from the DOM after `connectedCallback` for HIPAA-aligned DOM-serialization safety.
+  - `hx-date-picker` and `hx-time-picker` migrate from native modal `<dialog>` to non-modal popup.
+  - `FormMixin` consolidation across all 15 form-associated components.
+  - `Wc*` type aliases and 2.0 property-rename shims removed.
+  - `@floating-ui/dom` becomes a dynamic import on first use.
+  - Public-API allowlist enforced on the library barrel.
+  - `@helixui/tokens` — `tokenStyles` remains exported but is deprecated since 2.1.0 (planned removal targeted for 4.0). Version bumped to 3.0.0 in lockstep with `@helixui/library` via the linked-package policy; no tokens source removals in this release.
+  - `@helixui/react` — `ariaLabel` → `accessibleLabel`; named event detail types replace anonymous `CustomEvent<unknown>`. Version jumps from 1.x to 3.0.0 (bookkeeping bump realigned 1.1.4 → 2.1.2 before the major so all three public packages share a 3.0.0 line; see `.changeset/align-react-version.md`).
+
+### Patch Changes
+
+- 1ae0509: fix(hx-container): remove redundant padding="none" CSS rule
+
+  fix(hx-skeleton): expose --hx-skeleton-border-radius-circle and
+  --hx-skeleton-shimmer-width custom properties replacing hardcoded values
+
+  fix(hx-breadcrumb): replace hardcoded hex colors in Storybook stories with
+  design token references
+
+- a610bb7: fix(hx-link): add missing tabindex="0" to disabled span — screen readers can
+  now reach disabled links via keyboard navigation and announce the disabled state
+  (P0-1 audit finding)
+- aff17e8: Add Drupal 3.0.0 migration content to `docs/UPGRADING-TO-3.md` and its Starlight mirror. The 3.0.0 release ships breaking changes in `@helixui/drupal-starter` (SDC template renames, attribute changes, dialog/picker semantic shifts) and `@helixui/drupal-behaviors` (consolidated FormMixin event surface, accessible-label writes). Consumers of the Drupal packages now have a first-class migration path instead of having to reverse-engineer the changesets.
+- 373bf84: fix(barrel): restore HelixAuditController, AuditEventDetail, AuditControllerOptions to public barrel via generate-barrel.js allowlist
+
+  fix(publish): add CEM regeneration + verification step to publish job so both secret-scan and publish jobs independently verify CEM freshness
+
+  fix(publish): add @helixui/react to secret-scan package loop
+
+  fix(mixins): promote FormMixinProtectedHooks jsdoc from @internal to @protected
+
+  fix(changelog): add resetIdCounter test-utils migration note
+
+  fix(docs): correct CDN artifact URLs and floating-ui pre-warm import in migration guides
+
+- 19e966b: fix(docs): rewrite `hx-phi-field` §6 migration to use `data` property (attribute: false) — prior text described `value` attribute/property, which does not exist on the component
+
+  fix(docs): correct subclassing example to import `FormMixin` from `@helixui/library` root barrel — the `/mixins` subpath export is intentionally absent from `package.json` exports map
+
+  fix(docs): correct public-API allowlist prose to reflect that `FocusMixin`, `FormMixin`, and `HelixAuditController` are re-exported from the root barrel (no `/mixins` subpath)
+
+  fix(docs): correct `::part(error)` component list — 13 components actually expose the part (hx-checkbox, hx-checkbox-group, hx-combobox, hx-date-picker, hx-field, hx-file-upload, hx-number-input, hx-radio-group, hx-select, hx-switch, hx-text-input, hx-textarea, hx-time-picker); removed invalid entries (hx-radio, hx-slider, hx-color-picker, hx-phi-field)
+
+  fix(docs): disambiguate `hx-card` accessible-name migration — HTML attribute is `hx-label`, JS property is `label`
+
+  fix(docs): replace `@helixui/library/mixins` import prescription in components-guide ARIA docs with `ElementInternals.ariaLabel` + explicit template binding — the internal `mixinDelegatesAria` helper is not a public export
+
+  fix(ci): reorder `publish.yml` so release-manifest generation runs after `changesets/action` and is gated on `outputs.published == 'true'`; commit the manifest back to main via dedicated step
+
+  fix(shipping): replace stale `@wc-2026/library` specifier with `@helixui/library` in shipped CSS import, Drupal JS dynamic import, and Twig library registration comments (prose.css, hx-toast.drupal.js, hx-spinner.twig, hx-code-snippet.twig)
+
+- c8a63a0: fix(ci): align `publish.yml` pre-publish secret scan with the published tarball by switching from `npm pack` to `pnpm pack` — corrects a Codex-flagged mismatch where the scanned tarball would not contain `workspace:^` peer-deps as they would be rewritten at publish time
+
+  fix(docs): remove false "Matrix tests (Node 22/24, Ubuntu/macOS/Windows)" merge-gate claim from `CONTRIBUTING.md`; clarify that Node 24 support is declared in `engines` (^22.0.0 || ^24.0.0) but exercised only via manual `workflow_dispatch` of `ci-matrix.yml` — not a required check
+
+  fix(docs): standardize the manual-matrix trigger phrase "build tooling, Vite/Turborepo config, or Node runtime APIs" byte-identically across `CONTRIBUTING.md`, `.github/pull_request_template.md`, and `docs/quality-automation.md` — addresses Codex round-3 reviewer-checklist drift finding
+
+  chore(hooks): remove rea push-review-gate from `.husky/pre-push` — two upstream rea defects (gate jq predicate schema mismatch with the codex-adversarial agent's audit shape; escape hatch resolving `dist/audit/append.js` from repo root instead of installed node_modules) made the gate unworkable across multiple releases. Codex adversarial review retained as a first-class step via `/codex-review` and the `codex-adversarial` subagent; enforcement moves to CI rather than the local push boundary.
+
+- 61911c1: Fix `.github/workflows/act-ci.yml` failing GitHub's workflow validator on every push. The `test-full` job used `env.*` in its job-level `if:`, which is not in the allowed context set (`github`, `inputs`, `needs`, `vars`) per the Actions schema. GitHub rejected the file at preflight validation — creating a "workflow file issue" failure run on every push to every branch since 2026-04-12, visible in Actions UI but not blocking any required check.
+
+  Moved the gate to step-level (where `env.*` IS allowed). A new first step (`Check full-test gate`) reads `ACT_MATRIX_TESTS` / `ACT_FULL_TESTS` and writes a `run` output; every subsequent step gates on `steps.gate.outputs.run == 'true'`. Matrix containers still start when the workflow is dispatched but exit cheaply when neither env var is set — identical semantic behavior to the previous job-level gate, just routed through a context GitHub accepts.
+
+  `actionlint` now clean on this file. No consumer impact.
+
+- 50b36a3: Harden the Canary publish pipeline's trigger gate. Two defects addressed:
+  1. **Wrong commit checked out.** `actions/checkout` under `workflow_run` defaults to the default-branch commit, not the upstream run's head. The canary job now pins `ref: ${{ github.event.workflow_run.head_sha }}` so the stamped publish reflects the staging commit that triggered the pipeline, not whatever `main` happens to point at.
+  2. **Fork-PR privilege escalation surface.** `workflow_run` fires for any CI run that completes, including runs from forked pull requests whose branch happens to be named `staging`. The `branches: [staging]` trigger filter narrows the pool but does not prove the run came from this repository. The job's `if` now additionally requires `github.event.workflow_run.event == 'push'` and `github.event.workflow_run.head_repository.full_name == github.repository` so a fork cannot surface a run that publishes with this repo's `NPM_TOKEN`.
+
+  Defense-in-depth on the trigger gate is critical: the canary job holds the npm automation token and publishes to a public dist-tag. A misrouted run would either ship the wrong source to `@next` or give a fork write access to the package.
+
+- ae1e6e8: fix(docs): clarify `CONTRIBUTING.md` review-process section — Gate 7 (code review) is a manual step, not a CI-automated gate. Previous wording "all 7 quality gates" under "Automated CI checks" conflated the two. Now preserves the canonical "all 7 quality gates" phrasing used across the repo and adds a parenthetical clarifying gates 1–6 are CI-enforced while Gate 7 is the manual 3-tier review.
+
+  fix(docs): standardize Node runtime wording in `docs/typescript-automation-executive-summary.md` from ambiguous "Node.js 22+" to canonical "Node.js 22 LTS or Node.js 24" — matches the `engines` field (`^22.0.0 || ^24.0.0`) and the rest of the documentation.
+
+  fix(docs): extend canonical Node runtime wording in `starters/react/README.md` with the Node 20 EOL note (`Node 20 reaches upstream EOL on 2026-04-30`) to match phrasing elsewhere in the repo.
+
+  chore(hooks): make `.reports/hook-patches/apply-remove-push-review-gate.py` idempotent and mixed-state-safe — return success if the new block is already applied, refuse (exit 1) if both old and new blocks are present simultaneously, so the one-off applicator cannot silently succeed while the pre-removal hook invocation is still live.
+
+- 49fdb6c: fix(hx-alert): consolidate duplicate icon/showIcon Storybook control — the icon
+  argType now correctly binds to the component's showIcon property via show-icon
+  attribute
+
+  fix(hx-badge): strengthen dot-mode CSS guards to prevent prefix slot from
+  rendering in dot indicator mode; refactor --hx-badge-pulse-color to use private
+  --hx-badge-pulse-color-internal variable so consumers can override via the public
+  custom property
+
+  fix(hx-action-bar): replace ariaLabel property that shadowed native
+  HTMLElement.ariaLabel with accessibleLabel property (accessible-label attribute).
+  The standard aria-label HTML attribute continues to work unchanged.
+
+- 196094a: fix(hx-card): correct devWarn attribute reference from "hx-aria-label" to "hx-label"
+- 6d62cc2: fix(hx-counter): add role=status on counter, enforce accessible name, include label in live region, guard invalid easing/duration
+- 9c8720f: fix(hx-file-upload): resolve 5 P0 accessibility blockers — aria-invalid, forced-colors, focus restoration, touch target, and mixinDelegatesAria
+- fce3340: fix(hx-form): remove redundant aria-live on error summary (role="alert" implies it)
+- a0562c4: fix(hx-list): enforce accessible name on interactive listbox, add forced-colors support for selected/hover/disabled states
+- 20d0129: fix(hx-meter): add focus-visible ring styles and remove duplicate prefers-reduced-motion block
+- 700c329: fix(hx-phi-field): hide masked value from screen readers (PHI exposure), prevent PHI in DOM attribute, add forced-colors support
+- d3f1d2a: fix(hx-stat): add aria-live region for dynamic value/trend updates, forced-colors support, and devWarn for empty state
+- 04ddfae: fix(hx-popover, hx-popup): use Lit nothing sentinel instead of empty string for conditional rendering
+- 2d16e9b: Fix five HIPAA audit defects in `hx-phi-field`:
+  1. **Audit log pollution on never-accessed fields.** The `visibilitychange` handler no longer calls `_clearClipboard()` (and therefore does not dispatch `action: 'clipboard-clear'`) unless the field has actually been revealed or has an active clipboard-clear timer. Previously every tab switch on a page with PHI fields generated unnecessary audit entries.
+  2. **Clipboard leak after reveal → hide → tab background.** Manual-hide (toggle click) and auto-hide previously cancelled the scheduled `clipboard-clear` timer. A reveal-then-hide sequence where the user copied PHI during the reveal window would leave the clipboard populated and the `visibilitychange` pre-emption path would silently skip it. Both hide paths now preserve the clipboard-clear timer; it fires naturally at `clipboardTimeout`, and the `visibilitychange` pre-emption fires it earlier if the tab hides first. `_clearClipboard` now cancels its own scheduled timer so pre-emption cannot double-dispatch.
+  3. **Audit integrity when `navigator.clipboard.writeText` rejects.** The clipboard-clear timer and the `visibilitychange` pre-emption path both run without transient user activation, so `navigator.clipboard.writeText('')` can reject silently in Chrome/Safari. Previously `hx-phi-access` fired with `action: 'clipboard-clear'` unconditionally, producing a misleading audit trail that claimed clearance while PHI remained on the clipboard. The dispatch now observes the `writeText` outcome: `action: 'clipboard-clear'` only on confirmed success, `action: 'clipboard-clear-failed'` when the API is unavailable or the promise rejects. HIPAA audit consumers can now distinguish the two states and escalate failures (prompt the user to clear clipboard, flag the session).
+  4. **Audit integrity when `navigator.clipboard` itself is a throwing accessor.** The Clipboard API's property descriptor on `navigator` is UA-defined — a shim or hostile environment can legally install `navigator.clipboard` as a getter that throws synchronously. The previous guard read `navigator.clipboard` before entering the try/catch, so such a throw would bypass the audit dispatch and produce a silent failure. The entire clipboard interaction — including the `navigator.clipboard` read, the `writeText` property access, and the call — now runs inside the protected try block. Any synchronous throw at any step resolves to `action: 'clipboard-clear-failed'` rather than an uncaught error.
+  5. **Auto-hide listener leak when clipboard is pre-emptively cleared.** `_clearClipboard` set `this._masked = true` but did not cancel the scheduled auto-hide timer or remove its interaction listeners (`mouseenter`, `mousemove`, `focusin`, `keydown`, `pointerdown`). If a revealed field had its clipboard pre-empted by visibilitychange or the clipboard-clear timer firing before the auto-hide delay, the auto-hide timer kept running. When it later fired, `_autoHide()` early-returned on `this._masked` without removing the interaction listeners, leaking them on the host element until the next `_scheduleAutoHide`/`_cancelAutoHideTimer` cycle. `_clearClipboard` now calls `_cancelAutoHideTimer` alongside `_cancelClipboardTimer`, closing both the pending timer and the listener set in one call.
+
+  The `PhiAccessEventDetail.action` union now includes `'clipboard-clear-failed'`. Consumers with exhaustive switches on the action type will see a new variant and should handle it (treat as an actionable audit event — clipboard state uncertain).
+
+  **Timing change:** the `clipboard-clear` / `clipboard-clear-failed` audit event now dispatches asynchronously (after the `navigator.clipboard.writeText` promise settles — a microtask at minimum). Test assertions on this event must await a microtask after triggering the clear path; synchronous assertions will observe zero events. Previous behavior fired the event synchronously regardless of clipboard outcome.
+
+- d830889: Fix CSS escape bypass in `sanitizeCss`. The validator now decodes CSS escape sequences (hex, line-continuation, identity) across the full stylesheet before applying `BLOCKED_PATTERNS` and `URL_PATTERN` checks, and `isUrlSafe()` continues to decode its payload defensively.
+
+  This closes three classes of encoded bypass:
+  - Encoded url() payloads: `url(http\3a//evil.example/x)`, `url(\68\74\74\70\3a//evil.example/x)`, `url(http\<LF>://evil.example/x)`.
+  - Encoded `url` function name: `u\72l(http://evil.example/x)`, `\75\72\6c(...)` — per CSS Syntax Level 3 §4.3.4 the tokenizer decodes ident escapes, so these tokenize identically to `url(...)` in the browser.
+  - Encoded at-keywords: `@\69mport "..."`, `@\69\6d\70\6f\72\74 "..."`, `expres\73ion(...)`, `-moz-bindin\67:`, `behavio\72:` — per §4.3.3 at-keyword and §4.3.5 ident tokenizers decode escapes before rule/property name resolution.
+
+  Regex-only defenses matched literal bytes while the browser decodes escapes at parse time. Decoding first forces the validator to see what the browser will ultimately tokenize.
+
+- bfca244: Harden `sanitizeCss` against protocol-relative URL bypass and quoted-string brace-count false-positives (codex-adversarial final-pass finding).
+- 3f6c595: fix storybook tests: eliminate teardown hang and two deterministic story failures
+  - `apps/storybook/scripts/test-shards.mjs` runs one vitest process per story file, giving each test a fresh Chromium and avoiding cumulative page state that crashes the browser ("Browser connection was closed while running tests"). CI timeout lowered from 45m to 15m — the full suite of 84 story files completes in ~6–7m locally; CI sees ~7 min including cold vite/playwright warmup. This is an isolation strategy, not a root-cause fix for the underlying Vitest/Playwright page-reuse leak, which is tracked upstream.
+  - `hx-link` Default story no longer navigates the vitest-browser test page to `https://example.com` when invoking `anchor.click()` — a one-shot `preventDefault` listener on the shadow-DOM anchor keeps the synchronous `hx-click` dispatch path intact while suppressing the browser's default follow-the-link behavior.
+  - `hx-tag` Removable Interactive story focuses the shadow-DOM remove button directly and asserts focus on the host (matching how Shadow DOM exposes `document.activeElement`), plus checks `shadowRoot.activeElement` equals the button. Previous assertion relied on a `userEvent.tab()` round-trip that was non-deterministic from Storybook's canvas. Keyboard reachability (tabindex, not disabled) is asserted explicitly to guard against regressions.
+
+- 1fb3e7a: fix: address tier 3 review findings (list label fallback, phi-field token, test assertions, orphan JSDoc)
+- 91e00b4: fix: P1 audit fixes for 3.0.0 release
+  - fix(a11y): use ElementInternals for ARIA role on hx-clinical-status (#1420)
+  - fix(a11y): add role="list" to hx-breadcrumb host element for aria-required-parent
+  - fix(a11y): block keyboard activation on disabled hx-link (#1423)
+  - fix(ts): remove non-null assertions from @query declarations (#1422)
+  - fix(ts): revert @query to definite assignment assertion for Node 22 compat
+  - fix(ts): migrate hx-code-snippet and hx-color-picker to HelixElement base class (#1418)
+  - fix(css): correct hx-size attribute selectors in hx-spinner and hx-progress-ring (#1417)
+  - fix(css): replace :focus with :focus-visible in hx-color-picker and hx-select (#1419)
+  - fix(storybook): add 6 stories for hx-style-scope (#1421)
+  - fix(storybook): correct tree-view async loading story assertion
+  - fix(ci): change act-ci.yml trigger to workflow_dispatch (local-only)
+  - fix(dx): improve test-smart.sh to pass file paths instead of regex filter
+  - fix(ts): fix PropertyValues type in hx-style-scope
+
+- 9a8cafb: Production readiness remediation: HelixElement migration, forced-colors, focus-visible, accessibility fixes
+  - Migrate 14 form components to HelixElement base class (lazy \_internals, form lifecycle hooks)
+  - Fix hx-button-group invalid attachInternals() crash (P0-1)
+  - Fix hx-icon-button LitElement→HelixElement migration (P0-3)
+  - Add forced-colors @media rules to 64 component style files for Windows High Contrast
+  - Add focus-visible styles to form components
+  - Replace ad-hoc ID counters with createIdCounter factory across 22 components
+  - Export mixins from barrel and fix AriadDelegationMixinInterface typo
+  - Fix HelixElement convenience getters (form, validity, validationMessage) lazy init
+  - Add roving tabindex keyboard navigation to hx-data-table sortable headers
+  - Fix hx-textarea counter aria-hidden/aria-describedby conflict
+  - Replace hx-drawer setTimeout with transitionend for animation events
+  - Enforce 44px minimum touch targets on sm size variants
+  - Add PropertyValues<this> generic to lifecycle methods
+
+- 6b2500d: Upgrade `@bookedsolid/rea` to 0.9.2 (exact) + local backports of six 0.9.3 fixes (three security, three correctness).
+
+  ## Upstream bump
+  - 0.9.2 fixes the push-review and commit-review hook cache-check invocation — `node_modules/.bin/rea` is a POSIX shell shim (pnpm) or symlink (npm), never a plain JS file, so prefixing it with `node` produced a SyntaxError and both gates silently fell back to `{"hit":false}` (upstream bookedsolidtech/rea#53).
+  - Synced `.claude/hooks/_lib/push-review-core.sh` and `.claude/hooks/commit-review-gate.sh` from the 0.9.2 package so both local hooks match the fixed invocation. Both carried the identical `node <shim>` bug — without the second sync the commit gate would keep silently falling back to cache-miss on every agent commit.
+  - Removed legacy `review.push_review` key from `.rea/policy.yaml` (carried from 0.9.1 upgrade) — the 0.9.x policy schema only recognizes `review.codex_required`.
+
+  ## Local 0.9.3 backports (CodeRabbit findings on PR #1506)
+
+  Six findings in the upstream-synced `push-review-core.sh`. All filed upstream for 0.9.3 and patched locally as a mitigation:
+  - **Legacy `push_review: false` grep bypass** — removed. The raw-grep check ran before the strict schema validator, so any agent could disarm the gate by adding `push_review: false` to `.rea/policy.yaml`. Upstream: [rea#56](https://github.com/bookedsolidtech/rea/issues/56).
+  - **Protected-paths gap** — the matcher now also guards `.rea/` and `.husky/`. Previously an agent could flip autonomy level or neuter `.husky/pre-push` without tripping Codex review. Upstream: [rea#56](https://github.com/bookedsolidtech/rea/issues/56).
+  - **Mixed-push deletion bypass** — the deletion guard now fires whenever any refspec is a deletion, regardless of whether a non-delete refspec is also present in the same push. Pre-0.9.3 the check was gated on `SOURCE_SHA` being empty, so a mixed push like `safe:safe :protected-branch` silently allowed the deletion. Upstream: [rea#61](https://github.com/bookedsolidtech/rea/issues/61).
+  - **LINE_COUNT/FILE_COUNT "0\n0" misrender** — `grep -c ... || echo "0"` captures both grep's own `0` (printed before its non-zero exit on no-match) AND the fallback `echo "0"`, producing `0\n0` in the user-facing `PUSH REVIEW GATE` scope banner. Fixed by swapping to `|| true` plus `${VAR:-0}` bash fallback. Upstream: [rea#62](https://github.com/bookedsolidtech/rea/issues/62).
+  - **PUSH_SHA portability / silent cache disarm** — the gate hashed the push diff with `shasum -a 256`, which is not installed on Alpine, distroless, or most minimal Linux CI images. The pipeline failed silently (`|| echo ""`), `PUSH_SHA` became empty, and the cache lookup was skipped with no signal — every push from a minimal-image runner burned a full codex review. Fixed with a portable hasher chain (`sha256sum` → `shasum` → `openssl dgst -sha256`), no-hasher stderr WARN, and hex-digest validation. openssl form uses `awk '{print $NF}'` without `-r` so it works on OpenSSL 1.1.x (Debian 11, Ubuntu 20.04, RHEL8, AL2). Upstream: [rea#63](https://github.com/bookedsolidtech/rea/issues/63).
+  - **SKIP_METADATA stringifies numeric os_pid/os_ppid** — the `REA_SKIP_PUSH_REVIEW` audit record used `jq --arg` for `$$` and `$PPID`, yielding string-typed fields in the JSONL audit log. Downstream auditors querying `.metadata.os_identity.pid == 1234` silently got zero matches. Fixed by switching those two fields to `jq --argjson` (safe — bash internals are guaranteed non-empty numeric). Upstream: [rea#64](https://github.com/bookedsolidtech/rea/issues/64).
+
+  Full rea defect catalog tracked in internal bug-report notes; local backport patches preserved for re-application on the next `rea upgrade` once 0.9.3 lands.
+
+  No consumer-facing API changes. Internal governance infra only.
+
+- 5c36408: Fix Storybook interaction tests for shadow DOM focus and event patterns; remove dead mixinDelegatesAria export; rename ariaLabel to accessibleLabel in React types to stop shadowing native HTMLElement.ariaLabel
+- Updated dependencies [edee58a]
+  - @helixui/tokens@3.0.0
+
+## 3.0.0
+
+### Major Changes
+
 First major release to the enterprise healthcare channel. 3.0.0 hardens the public API, codifies the subclassing contract consumers extend, and closes the breaking-change debt accumulated during the 2.x stabilization cycle. See `docs/UPGRADING-TO-3.md` for the complete migration guide and Starlight [Migration → 3.0.0](../../apps/docs/src/content/docs/migration/3.0.0.mdx) for the consumer-facing walkthrough.
 
 #### Subclassing contract — `@internal` hooks promoted to `@protected`
 
 HelixElement and FormMixin override hooks are now officially part of the public subclassing contract. They were previously tagged `@internal`, which meant the underlying `protected` access modifier carried no stability guarantee — a 2.x refactor could have silently broken downstream subclasses. The tag change surfaces these as supported extension points in the generated CEM and API docs.
 
-| Base class / mixin | Hook |
-| --- | --- |
-| `HelixElement` | `_onFormDisabled(disabled)` |
-| `HelixElement` | `_onFormReset()` |
-| `HelixElement` | `_onFormStateRestore(state, mode)` |
-| `FormMixin` | `_handleInteractionInput()` |
-| `FormMixin` | `_handleInteractionBlur()` |
-| `FormMixin` | `_resetInteractionState()` |
-| `FormMixin` | `_updateValidity()` |
+| Base class / mixin | Hook                               |
+| ------------------ | ---------------------------------- |
+| `HelixElement`     | `_onFormDisabled(disabled)`        |
+| `HelixElement`     | `_onFormReset()`                   |
+| `HelixElement`     | `_onFormStateRestore(state, mode)` |
+| `FormMixin`        | `_handleInteractionInput()`        |
+| `FormMixin`        | `_handleInteractionBlur()`         |
+| `FormMixin`        | `_resetInteractionState()`         |
+| `FormMixin`        | `_updateValidity()`                |
 
 Consumers subclassing `HelixElement` or applying `FormMixin` should treat these methods as stable across minor/patch releases. Breaking changes to their signatures will be gated to major releases and called out in the migration guide.
 
 #### Attribute / property renames
 
-| Component | Old | New |
-| --- | --- | --- |
-| ARIA-labelable components (except `hx-card`) | `aria-label` / `hxAriaLabel` | `accessible-label` / `accessibleLabel` |
-| `hx-card` | `hxAriaLabel` (prop) / no attribute | `label` (prop) / `hx-label` (attribute) |
-| `hx-date-picker` | native modal `<dialog>` | non-modal popup dialog |
-| `hx-time-picker` | native modal `<dialog>` | non-modal popup dialog |
+| Component                                    | Old                                 | New                                     |
+| -------------------------------------------- | ----------------------------------- | --------------------------------------- |
+| ARIA-labelable components (except `hx-card`) | `aria-label` / `hxAriaLabel`        | `accessible-label` / `accessibleLabel`  |
+| `hx-card`                                    | `hxAriaLabel` (prop) / no attribute | `label` (prop) / `hx-label` (attribute) |
+| `hx-date-picker`                             | native modal `<dialog>`             | non-modal popup dialog                  |
+| `hx-time-picker`                             | native modal `<dialog>`             | non-modal popup dialog                  |
 
-The `accessible-label` naming aligns HELiX with the ARIA 1.2 guidance that `aria-*` attributes on a custom element are *host* attributes, not authored API. Components expose `accessible-label` as the public surface and forward it to the shadow-DOM target via `ElementInternals` or template binding.
+The `accessible-label` naming aligns HELiX with the ARIA 1.2 guidance that `aria-*` attributes on a custom element are _host_ attributes, not authored API. Components expose `accessible-label` as the public surface and forward it to the shadow-DOM target via `ElementInternals` or template binding.
 
 #### CSS part renames
 
-| Component | Old part | New part |
-| --- | --- | --- |
-| all form controls | `error-message` | `error` |
+| Component         | Old part        | New part |
+| ----------------- | --------------- | -------- |
+| all form controls | `error-message` | `error`  |
 
 Form controls (`hx-checkbox`, `hx-checkbox-group`, `hx-combobox`, `hx-date-picker`, `hx-field`, `hx-file-upload`, `hx-number-input`, `hx-radio-group`, `hx-select`, `hx-switch`, `hx-text-input`, `hx-textarea`, `hx-time-picker`) now expose the validation-message slot as `part="error"` for consistency with `help-text`. Consumers targeting `::part(error-message)` must update selectors to `::part(error)`.
 
@@ -148,7 +344,7 @@ Design tokens are adopted at the document level via `document.adoptedStyleSheets
 - d15ffdc: fix(security): restrict phi event composition across shadow boundaries
 - e89101b: fix(security): harden svg sanitizer with animation and style element blocking
 - 2c6c7cc: fix(types): export named event detail interfaces for all component events
-- 5c0b9cd: fix(api): remove deprecated Wc* type aliases and deprecated properties
+- 5c0b9cd: fix(api): remove deprecated Wc\* type aliases and deprecated properties
 - 18d6f28: fix(a11y): standardize accessible-label attribute naming across components
 - 47690a0: fix(hx-date-picker): migrate calendar popup to native <dialog> element
 

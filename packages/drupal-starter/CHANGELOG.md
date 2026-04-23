@@ -1,5 +1,63 @@
 # @helixui/drupal-starter
 
+## 3.0.0
+
+### Major Changes
+
+- e4b79be: BREAKING: All SDC templates aligned with `@helixui/library@3.0.0` public API. Consumers who have forked any drupal-starter templates must re-apply their customizations against the new 3.0.0 base.
+
+  Template / attribute changes:
+  - `hx-card` — `accessible-label` attribute replaced with `hx-label` (HTML attribute; JS property remains `label`)
+  - `hx-nav` — `hx-size="small"` corrected to `hx-size="sm"` (enum value alignment)
+  - All ARIA-labelable components (`hx-button`, `hx-text-input`, `hx-form`, etc.) — templates now emit `accessible-label` instead of `aria-label` to match library's new public attribute name
+  - `hx-dialog` — templates no longer rely on the default `modal="true"` behavior (library default flipped to `false`); explicit `modal` attribute added where modal semantics are required
+  - `hx-date-picker` / `hx-time-picker` — templates updated for the non-modal popup contract (library migrated from native `<dialog>` to non-modal)
+  - `::part(error-message)` selectors replaced with `::part(error)` in CSS snippets that style form validation
+  - `hx-phi-field` — template no longer renders the `value` attribute in server-rendered HTML (library strips the attribute post-`connectedCallback` for HIPAA DOM-serialization safety)
+
+  See `packages/drupal-starter/CHANGELOG.md` and the 3.0.0 migration guide `docs/UPGRADING-TO-3.md` for the full list of affected components and the recommended codemod for consumer fork reconciliation.
+
+### Patch Changes
+
+- e4b79be: fix(drupal-starter): correct hx-card accessible-label to hx-label attribute in templates
+
+  fix(drupal-starter): fix hx-nav hx-size="small" to hx-size="sm" invalid enum value
+
+- 3d9a4b9: Unblock 3.0.0 release publish and drop Node 20 from all CI matrices.
+  - Replace `peerDependencies["@helixui/library"]` in `@helixui/drupal-behaviors` and `@helixui/drupal-starter` with `workspace:^`. pnpm rewrites this to `^3.0.0` at publish time; the old `^2.1.2 || ^3.0.0` range caused `ERR_PNPM_NO_MATCHING_VERSION` during `changesets version && pnpm install --no-frozen-lockfile` because 3.0.0 wasn't on npm yet.
+  - Drop Node 20 from `.nvmrc` (→22), root `package.json` engines, `packages/helixui-mcp/package.json` engines, and all GitHub Actions workflows (`ci.yml`, `publish.yml`, `release.yml`, `canary.yml`, `audit-batch-ci.yml`, `cross-browser.yml`). Node 20 reaches upstream EOL on 2026-04-30; this project standardizes on Node 22 LTS and Node 24 as the supported runtimes.
+
+- Updated dependencies [1ae0509]
+- Updated dependencies [a610bb7]
+- Updated dependencies [aff17e8]
+- Updated dependencies [373bf84]
+- Updated dependencies [19e966b]
+- Updated dependencies [c8a63a0]
+- Updated dependencies [61911c1]
+- Updated dependencies [50b36a3]
+- Updated dependencies [ae1e6e8]
+- Updated dependencies [49fdb6c]
+- Updated dependencies [196094a]
+- Updated dependencies [6d62cc2]
+- Updated dependencies [9c8720f]
+- Updated dependencies [fce3340]
+- Updated dependencies [a0562c4]
+- Updated dependencies [20d0129]
+- Updated dependencies [700c329]
+- Updated dependencies [d3f1d2a]
+- Updated dependencies [04ddfae]
+- Updated dependencies [2d16e9b]
+- Updated dependencies [d830889]
+- Updated dependencies [bfca244]
+- Updated dependencies [3f6c595]
+- Updated dependencies [1fb3e7a]
+- Updated dependencies [91e00b4]
+- Updated dependencies [9a8cafb]
+- Updated dependencies [6b2500d]
+- Updated dependencies [edee58a]
+- Updated dependencies [5c36408]
+  - @helixui/library@3.0.0
+
 ## 2.0.0
 
 ### Patch Changes
