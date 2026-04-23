@@ -162,6 +162,8 @@ if [ -n "$LIBRARY_SOURCE_CHANGED" ]; then
 else
   echo "  ✓ No library source changes — CEM skipped"
 fi
+pnpm --filter=@helixui/library run figma:inventory:check
+echo "  ✓ Figma inventory current"
 echo ""
 
 # ── Gate 7: Changeset ────────────────────────────────────────────────────────

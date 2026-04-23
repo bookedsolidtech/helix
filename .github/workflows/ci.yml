@@ -204,6 +204,8 @@ jobs:
         run: pnpm --filter=@helixui/library run cem
       - name: Verify @helixui/react wrappers are in sync with CEM
         run: pnpm --filter=@helixui/react run generate:check
+      - name: Verify Figma inventory matches committed snapshot
+        run: pnpm --filter=@helixui/library run figma:inventory:check
 
   type-check:
     name: Type Check
