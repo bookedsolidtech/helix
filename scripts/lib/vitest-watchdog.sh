@@ -73,11 +73,9 @@ run_vitest_with_watchdog() {
   # Strip ANSI escape codes first — vitest emits colors even when writing to a
   # file (non-TTY detection is unreliable), so the raw `[32m✓` prefix would
   # otherwise prevent the pattern from matching.
-  local stripped_log
-  stripped_log="$(sed 's/\x1b\[[0-9;]*m//g' "$logfile" 2>/dev/null || true)"
-  PASSED_TESTS=$(echo "$stripped_log" | grep -c "^[[:space:]]*[✓✔]" 2>/dev/null || true)
+  PASSED_TESTS=$(sed 's/\x1b\[[0-9;]*m//g' "$logfile" 2>/dev/null | grep -c "^[[:space:]]*[✓✔]" 2>/dev/null || true)
   PASSED_TESTS=${PASSED_TESTS:-0}
-  FAILED_TESTS=$(echo "$stripped_log" | grep -c "^[[:space:]]*[×x]" 2>/dev/null || true)
+  FAILED_TESTS=$(sed 's/\x1b\[[0-9;]*m//g' "$logfile" 2>/dev/null | grep -c "^[[:space:]]*[×x]" 2>/dev/null || true)
   FAILED_TESTS=${FAILED_TESTS:-0}
 
   # Always clean up chromium shells — they leak when vitest is force-killed.
