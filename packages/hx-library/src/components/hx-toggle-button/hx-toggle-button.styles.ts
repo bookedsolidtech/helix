@@ -175,7 +175,10 @@ export const helixToggleButtonStyles = css`
 
   /* Outline pressed: fills with a neutral tint, darkens the border, and adds an inset shadow for WCAG 3:1 non-text contrast. */
   .button--outline.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-surface-sunken, #f1f5f9));
+    --hx-toggle-button-bg: var(
+      --hx-toggle-button-pressed-bg,
+      var(--hx-color-surface-sunken, #f1f5f9)
+    );
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
       var(--hx-color-text-primary, #0f172a)
