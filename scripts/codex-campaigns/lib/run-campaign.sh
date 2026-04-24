@@ -86,6 +86,14 @@ TOTAL="$(wc -l < "$TARGET_LIST" | tr -d ' ')"
 [[ -f "$FINDINGS" ]] || : > "$FINDINGS"
 START_COUNT="$(wc -l < "$FINDINGS" | tr -d ' ')"
 
+# Track the targets actually processed in this run. Without this, a partial
+# run (--limit / --targets override) would consolidate against the full
+# campaign manifest and pre-seed every un-run target as `verdict: "pass"`,
+# inflating scoreboard pass counts and hiding gaps. The consolidator prefers
+# this file when present.
+TARGETS_PROCESSED="$REPORT_DIR/targets-processed.txt"
+: > "$TARGETS_PROCESSED"
+
 echo "campaign=$CAMPAIGN targets=$TOTAL head=$HEAD_SHA" | tee -a "$RUN_LOG"
 
 # ─── Per-target execution ─────────────────────────────────────────────────
@@ -149,6 +157,38 @@ run_target() {
     fi
   done < "$source_file"
 
+  # Crashed Codex runs must register as `error` verdicts, not silent passes.
+  # Without this, a non-zero exit produces an empty $last_msg → zero parsed
+  # findings → the consolidator's pre-seeded `pass` verdict for the target
+  # stands. Emit a synthetic finding so scoreboard.json + audit logs surface
+  # the failure.
+  if (( codex_rc != 0 )) && (( parsed == 0 )); then
+    local now; now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    jq -nc \
+      --arg campaign "$CAMPAIGN" \
+      --arg target "$target" \
+      --arg tag "$tag" \
+      --arg ts "$now" \
+      --arg sha "$HEAD_SHA" \
+      --arg transcript "$transcript" \
+      '{
+        campaign: $campaign,
+        target: $target,
+        tag: $tag,
+        ts: $ts,
+        codex_run: $sha,
+        severity: "high",
+        category: "infra",
+        file: $transcript,
+        line: 1,
+        issue: "codex exec exited non-zero — no findings parsed",
+        evidence: "see transcript",
+        fix: "rerun the target or inspect the transcript for the underlying failure",
+        verdict_for_target: "error"
+      }' >> "$tmpf"
+    parsed=1
+  fi
+
   # Sequential loop — no concurrent appenders, so no locking needed.
   # If we ever add `xargs -P`, reintroduce flock here.
   if (( parsed > 0 )); then
@@ -156,12 +196,13 @@ run_target() {
   fi
   rm -f "$tmpf"
 
-  echo "[$idx/$TOTAL] $tag parsed=$parsed rejected=$rejected" | tee -a "$RUN_LOG"
+  echo "[$idx/$TOTAL] $tag parsed=$parsed rejected=$rejected codex_rc=$codex_rc" | tee -a "$RUN_LOG"
 }
 
 IDX=0
 while IFS= read -r target; do
   IDX=$((IDX + 1))
+  echo "$target" >> "$TARGETS_PROCESSED"
   run_target "$target" "$IDX"
 
   if (( IDX % 5 == 0 )); then
