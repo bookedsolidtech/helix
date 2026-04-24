@@ -27,10 +27,10 @@ export const helixTopNavStyles = css`
   /* ─── Nav container ─── */
 
   .nav {
-    background-color: var(--hx-top-nav-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-top-nav-color, var(--hx-color-neutral-800, #1e293b));
+    background-color: var(--hx-top-nav-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-top-nav-color, var(--hx-color-text-strong, #1e293b));
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-top-nav-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-top-nav-border-color, var(--hx-color-border-default, #e2e8f0));
     font-family: var(--hx-top-nav-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
@@ -64,13 +64,13 @@ export const helixTopNavStyles = css`
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
-    color: var(--hx-top-nav-toggle-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-top-nav-toggle-color, var(--hx-color-text-strong, #334155));
     cursor: pointer;
     line-height: 0;
   }
 
   .mobile-toggle:hover {
-    background: var(--hx-color-neutral-100, #f1f5f9);
+    background: var(--hx-color-surface-sunken, #f1f5f9);
   }
 
   .mobile-toggle:focus-visible {
@@ -92,7 +92,7 @@ export const helixTopNavStyles = css`
     width: 100%;
     padding-block: var(--hx-space-3, 0.75rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-top-nav-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-top-nav-border-color, var(--hx-color-border-default, #e2e8f0));
   }
 
   .nav__collapsible--open {
@@ -114,7 +114,7 @@ export const helixTopNavStyles = css`
     margin-top: var(--hx-space-3, 0.75rem);
     padding-top: var(--hx-space-3, 0.75rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-top-nav-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-top-nav-border-color, var(--hx-color-border-default, #e2e8f0));
   }
 
   /* ─── Desktop breakpoint ─── */

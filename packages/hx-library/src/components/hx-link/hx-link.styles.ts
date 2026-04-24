@@ -50,7 +50,7 @@ export const helixLinkStyles = css`
   /* --- Variant: subtle --- */
 
   .link--subtle {
-    color: var(--hx-link-color-subtle, var(--hx-color-neutral-600, #475569));
+    color: var(--hx-link-color-subtle, var(--hx-color-text-secondary, #475569));
     text-decoration: none;
   }
 
@@ -72,7 +72,7 @@ export const helixLinkStyles = css`
   /* --- Disabled --- */
 
   .link--disabled {
-    color: var(--hx-link-color-disabled, var(--hx-color-neutral-400, #94a3b8));
+    color: var(--hx-link-color-disabled, var(--hx-color-text-disabled, #94a3b8));
     text-decoration: none;
     cursor: not-allowed;
   }

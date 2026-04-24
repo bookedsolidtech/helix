@@ -60,9 +60,9 @@ export const helixCheckboxStyles = css`
     width: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
     border: var(--hx-border-width-medium, 2px) solid
-      var(--hx-checkbox-border-color, var(--hx-color-neutral-300, #cbd5e1));
+      var(--hx-checkbox-border-color, var(--hx-color-border-strong, #cbd5e1));
     border-radius: var(--hx-checkbox-border-radius, var(--hx-border-radius-sm, 0.25rem));
-    background-color: var(--hx-checkbox-bg, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-checkbox-bg, var(--hx-color-surface-default, #ffffff));
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       border-color var(--hx-transition-fast, 150ms ease),
@@ -132,7 +132,7 @@ export const helixCheckboxStyles = css`
     width: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
     height: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
     fill: none;
-    stroke: var(--hx-checkbox-checkmark-color, var(--hx-color-neutral-0, #ffffff));
+    stroke: var(--hx-checkbox-checkmark-color, var(--hx-color-text-on-primary, #ffffff));
     stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -151,7 +151,7 @@ export const helixCheckboxStyles = css`
   .checkbox__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-checkbox-label-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-checkbox-label-color, var(--hx-color-text-strong, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     user-select: none;
     -webkit-user-select: none;
@@ -166,7 +166,7 @@ export const helixCheckboxStyles = css`
 
   .checkbox__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-checkbox-help-text-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-checkbox-help-text-color, var(--hx-color-text-muted, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
     padding-inline-start: calc(
       var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) + var(--hx-space-2, 0.5rem)

@@ -43,7 +43,7 @@ export const helixSwitchStyles = css`
     border: none;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-track-bg, var(--hx-color-neutral-300, #cbd5e1));
+    background-color: var(--hx-switch-track-bg, var(--hx-color-border-strong, #cbd5e1));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;
@@ -69,7 +69,7 @@ export const helixSwitchStyles = css`
   .switch__thumb {
     position: absolute;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-thumb-bg, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-switch-thumb-bg, var(--hx-color-surface-default, #ffffff));
     box-shadow: var(--hx-switch-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
     transition: transform var(--hx-transition-fast, 150ms ease);
   }
@@ -139,7 +139,7 @@ export const helixSwitchStyles = css`
   .switch__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-switch-label-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-switch-label-color, var(--hx-color-text-strong, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: pointer;
     user-select: none;
@@ -155,7 +155,7 @@ export const helixSwitchStyles = css`
 
   .switch__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-switch-help-text-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-switch-help-text-color, var(--hx-color-text-muted, #64748b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

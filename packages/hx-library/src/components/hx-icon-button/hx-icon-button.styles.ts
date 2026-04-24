@@ -77,7 +77,7 @@ export const helixIconButtonStyles = css`
 
   .button--primary {
     --hx-icon-button-bg: var(--hx-color-primary-500);
-    --hx-icon-button-color: var(--hx-color-neutral-0);
+    --hx-icon-button-color: var(--hx-color-text-on-primary);
     --hx-icon-button-border-color: transparent;
   }
 
@@ -97,17 +97,17 @@ export const helixIconButtonStyles = css`
 
   .button--tertiary {
     --hx-icon-button-bg: transparent;
-    --hx-icon-button-color: var(--hx-color-neutral-700);
-    --hx-icon-button-border-color: var(--hx-color-neutral-300);
+    --hx-icon-button-color: var(--hx-color-text-strong);
+    --hx-icon-button-border-color: var(--hx-color-border-strong);
   }
 
   .button--tertiary:hover {
-    --hx-icon-button-bg: var(--hx-color-neutral-100);
+    --hx-icon-button-bg: var(--hx-color-surface-sunken);
   }
 
   .button--danger {
     --hx-icon-button-bg: var(--hx-color-error-500);
-    --hx-icon-button-color: var(--hx-color-neutral-0);
+    --hx-icon-button-color: var(--hx-color-text-on-error);
     --hx-icon-button-border-color: transparent;
   }
 
@@ -122,7 +122,7 @@ export const helixIconButtonStyles = css`
   }
 
   .button--ghost:hover {
-    --hx-icon-button-bg: var(--hx-color-neutral-100);
+    --hx-icon-button-bg: var(--hx-color-surface-raised);
   }
 
   /* ─── Icon Container ─── */

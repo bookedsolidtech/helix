@@ -87,7 +87,7 @@ export const helixButtonStyles = css`
 
   .button--primary {
     --hx-button-bg: var(--hx-color-primary-500);
-    --hx-button-color: var(--hx-color-neutral-0);
+    --hx-button-color: var(--hx-color-text-on-primary);
     --hx-button-border-color: transparent;
   }
 
@@ -98,22 +98,22 @@ export const helixButtonStyles = css`
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-50));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--tertiary {
-    --hx-button-bg: var(--hx-color-neutral-100);
-    --hx-button-color: var(--hx-color-neutral-900);
+    --hx-button-bg: var(--hx-color-surface-sunken, #f1f5f9);
+    --hx-button-color: var(--hx-color-text-primary, #0f172a);
     --hx-button-border-color: transparent;
   }
 
   .button--tertiary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-200));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--danger {
     --hx-button-bg: var(--hx-color-error-500);
-    --hx-button-color: var(--hx-color-neutral-0);
+    --hx-button-color: var(--hx-color-text-on-error);
     --hx-button-border-color: transparent;
   }
 
@@ -128,17 +128,17 @@ export const helixButtonStyles = css`
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-100));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--outline {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-neutral-900);
-    --hx-button-border-color: var(--hx-color-neutral-300);
+    --hx-button-color: var(--hx-color-text-primary, #0f172a);
+    --hx-button-border-color: var(--hx-color-border-strong, #94a3b8);
   }
 
   .button--outline:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-50));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--primary:hover {
