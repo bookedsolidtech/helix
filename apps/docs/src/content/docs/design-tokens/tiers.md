@@ -100,6 +100,19 @@ In dark mode, text color resolves differently:
 
 The key insight: **dark mode only swaps Semantic references**, not Primitive values. `--hx-color-primary-500` stays `#2563EB` in both themes. What changes is which Primitive token the Semantic tokens point to.
 
+## Component Token Binding Rule
+
+When authoring a new component's CSS, bind to the correct tier so that Light, Dark, and High-Contrast modes flip correctly. The rule, in priority order:
+
+- **Surfaces, text, and borders** users see globally bind to a **Semantic** token. These are the tokens that swap per mode. Use `--hx-color-surface-*`, `--hx-color-text-*`, and `--hx-color-border-*` — never `--hx-color-neutral-*` directly.
+- **Brand-identity signals** (the ramps at 400–700 for `primary`, `danger`, `success`, `warning`, `info`) bind to the **Primitive**. Brand colors stay constant across modes — a blue "Save" button should read as blue in Dark mode too.
+- **Spatial values** (padding, radius, gap, font-size, line-height) bind to the **Primitive**. Sizes don't flip per mode.
+- **Dark-surface components** (tooltips, inverse side-nav, dark-always cards) bind to `--hx-color-surface-inverse` + `--hx-color-text-inverse`. Never hardcode `neutral-900` or `neutral-50` on an inverse surface — those are primitives, and the whole point of `surface-inverse` is that it flips to a light surface in Dark mode.
+- **Loading shimmers and decorative gradients** may bind to primitives so the animation reads identically across modes. Mark these with a one-line CSS comment explaining the carve-out.
+- **When in doubt, semantic.** The default is "semantic unless proven brand."
+
+Failing to follow this rule produces components that render correctly in Light mode but stay frozen in Light palette when the page switches to Dark or High-Contrast. Focus rings will be the only thing that flips. Healthcare WCAG contract requires full mode fidelity — primitive creep is a regression, not a style preference.
+
 ## Next Steps
 
 - [Theming](/design-tokens/theming/) -- How themes swap Semantic references
