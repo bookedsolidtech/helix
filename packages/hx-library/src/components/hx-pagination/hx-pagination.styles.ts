@@ -72,7 +72,7 @@ export const helixPaginationStyles = css`
       --hx-pagination-active-border-color,
       var(--hx-pagination-active-bg, var(--hx-color-primary-500, #2563eb))
     );
-    color: var(--hx-pagination-active-color, var(--hx-color-text-inverse, #ffffff));
+    color: var(--hx-pagination-active-color, var(--hx-color-text-on-primary, #ffffff));
     font-weight: var(--hx-font-weight-semibold, 600);
     cursor: default;
     pointer-events: none;
