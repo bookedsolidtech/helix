@@ -33,7 +33,7 @@ export const helixTextareaStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-input-label-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-input-label-color, var(--hx-color-text-strong, #334155));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -48,9 +48,9 @@ export const helixTextareaStyles = css`
     display: flex;
     flex-direction: column;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-input-border-color, var(--hx-color-neutral-300, #cbd5e1));
+      var(--hx-input-border-color, var(--hx-color-border-strong, #cbd5e1));
     border-radius: var(--hx-input-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-input-bg, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-input-bg, var(--hx-color-surface-default, #ffffff));
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -100,7 +100,7 @@ export const helixTextareaStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-input-color, var(--hx-color-neutral-800, #1e293b));
+    color: var(--hx-input-color, var(--hx-color-text-strong, #1e293b));
     line-height: var(--hx-line-height-normal, 1.5);
     min-height: var(--hx-textarea-min-height, var(--hx-size-20, 5rem));
     width: 100%;
@@ -108,7 +108,7 @@ export const helixTextareaStyles = css`
   }
 
   .field__textarea::placeholder {
-    color: var(--hx-color-neutral-400, #94a3b8);
+    color: var(--hx-color-text-placeholder, #94a3b8);
   }
 
   .field__textarea:focus-visible {
@@ -146,7 +146,7 @@ export const helixTextareaStyles = css`
 
   .field__counter {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #64748b);
+    color: var(--hx-color-text-muted, #64748b);
     line-height: var(--hx-line-height-normal, 1.5);
     text-align: end;
   }
@@ -169,7 +169,7 @@ export const helixTextareaStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #64748b);
+    color: var(--hx-color-text-muted, #64748b);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

@@ -19,12 +19,12 @@ export const helixPhiFieldStyles = css`
   .phi-field__value--masked {
     user-select: none;
     -webkit-user-select: none;
-    color: var(--hx-phi-field-masked-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-phi-field-masked-color, var(--hx-color-text-muted, #64748b));
     letter-spacing: var(--hx-phi-field-letter-spacing, 0.1em);
   }
 
   .phi-field__value--revealed {
-    color: var(--hx-phi-field-value-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-phi-field-value-color, var(--hx-color-text-primary, #0f172a));
   }
 
   /* ─── Screen Reader Status ─── */

@@ -33,7 +33,7 @@ export const helixNumberInputStyles = css`
     gap: var(--hx-space-1);
     font-size: var(--hx-font-size-sm);
     font-weight: var(--hx-font-weight-medium);
-    color: var(--hx-number-input-label-color, var(--hx-color-neutral-700));
+    color: var(--hx-number-input-label-color, var(--hx-color-text-strong));
     line-height: var(--hx-line-height-normal);
   }
 
@@ -48,9 +48,9 @@ export const helixNumberInputStyles = css`
     display: flex;
     align-items: stretch;
     border: var(--hx-border-width-thin) solid
-      var(--hx-number-input-border-color, var(--hx-color-neutral-300));
+      var(--hx-number-input-border-color, var(--hx-color-border-strong));
     border-radius: var(--hx-number-input-border-radius, var(--hx-border-radius-md));
-    background-color: var(--hx-number-input-bg, var(--hx-color-neutral-0));
+    background-color: var(--hx-number-input-bg, var(--hx-color-surface-default));
     transition:
       border-color var(--hx-transition-fast),
       box-shadow var(--hx-transition-fast);
@@ -98,7 +98,7 @@ export const helixNumberInputStyles = css`
     display: flex;
     align-items: center;
     padding: 0 var(--hx-space-3);
-    color: var(--hx-color-neutral-500);
+    color: var(--hx-color-text-muted);
     flex-shrink: 0;
   }
 
@@ -110,7 +110,7 @@ export const helixNumberInputStyles = css`
     outline: none;
     background: transparent;
     font-family: inherit;
-    color: var(--hx-number-input-color, var(--hx-color-neutral-800));
+    color: var(--hx-number-input-color, var(--hx-color-text-strong));
     line-height: var(--hx-line-height-normal);
     width: 100%;
     /* Size: md (default) */
@@ -120,7 +120,7 @@ export const helixNumberInputStyles = css`
   }
 
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400);
+    color: var(--hx-color-text-placeholder);
   }
 
   .field__input:disabled {
@@ -159,7 +159,7 @@ export const helixNumberInputStyles = css`
     flex-direction: column;
     flex-shrink: 0;
     border-inline-start: var(--hx-border-width-thin) solid
-      var(--hx-number-input-border-color, var(--hx-color-neutral-300));
+      var(--hx-number-input-border-color, var(--hx-color-border-strong));
   }
 
   .field__stepper-btn {
@@ -169,7 +169,7 @@ export const helixNumberInputStyles = css`
     background: transparent;
     border: none;
     cursor: pointer;
-    color: var(--hx-color-neutral-600);
+    color: var(--hx-color-text-secondary);
     padding: 0;
     flex: 1;
     min-width: var(--hx-size-8);
@@ -181,12 +181,12 @@ export const helixNumberInputStyles = css`
 
   .field__stepper-btn:not(:last-child) {
     border-bottom: var(--hx-border-width-thin) solid
-      var(--hx-number-input-border-color, var(--hx-color-neutral-300));
+      var(--hx-number-input-border-color, var(--hx-color-border-strong));
   }
 
   .field__stepper-btn:hover:not(:disabled) {
-    background-color: var(--hx-color-neutral-50);
-    color: var(--hx-color-neutral-800);
+    background-color: var(--hx-color-surface-raised);
+    color: var(--hx-color-text-strong);
   }
 
   /* Suppress focus ring for mouse/touch focus; keep for keyboard and programmatic focus */
@@ -225,7 +225,7 @@ export const helixNumberInputStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs);
-    color: var(--hx-color-neutral-500);
+    color: var(--hx-color-text-muted);
     line-height: var(--hx-line-height-normal);
   }
 
