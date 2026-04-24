@@ -91,8 +91,16 @@ START_COUNT="$(wc -l < "$FINDINGS" | tr -d ' ')"
 # campaign manifest and pre-seed every un-run target as `verdict: "pass"`,
 # inflating scoreboard pass counts and hiding gaps. The consolidator prefers
 # this file when present.
+#
+# Resume semantics: on `--resume` we APPEND so a resumed run preserves the
+# prior invocations' processed-target list. On a fresh run we truncate. A
+# target is only appended AFTER `run_target` returns, so a killed-mid-target
+# invocation does not falsely register the target as a clean pass when the
+# consolidator pre-seeds the manifest (see consolidate-findings.ts).
 TARGETS_PROCESSED="$REPORT_DIR/targets-processed.txt"
-: > "$TARGETS_PROCESSED"
+if (( RESUME == 0 )); then
+  : > "$TARGETS_PROCESSED"
+fi
 
 echo "campaign=$CAMPAIGN targets=$TOTAL head=$HEAD_SHA" | tee -a "$RUN_LOG"
 
@@ -178,7 +186,7 @@ run_target() {
         ts: $ts,
         codex_run: $sha,
         severity: "high",
-        category: "infra",
+        category: "other",
         file: $transcript,
         line: 1,
         issue: "codex exec exited non-zero — no findings parsed",
@@ -202,8 +210,11 @@ run_target() {
 IDX=0
 while IFS= read -r target; do
   IDX=$((IDX + 1))
-  echo "$target" >> "$TARGETS_PROCESSED"
   run_target "$target" "$IDX"
+  # Append AFTER run_target completes — if the process is killed mid-target
+  # (OOM, CI timeout, watchdog), the target stays absent from the processed
+  # list, so the consolidator does not pre-seed it as `verdict: "pass"`.
+  echo "$target" >> "$TARGETS_PROCESSED"
 
   if (( IDX % 5 == 0 )); then
     echo "validating after batch of 5…" | tee -a "$RUN_LOG"
