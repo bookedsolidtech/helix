@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-24T11:32:26.432Z",
+  "generatedAt": "2026-04-24T13:14:13.353Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.1.0",
   "tokensVersion": "3.0.0",
@@ -3348,7 +3348,7 @@
           }
         },
         {
-          "description": "CSS custom property.",
+          "description": "Font family for card text content.",
           "name": "--hx-card-font-family",
           "default": "var(--hx-font-family-sans)",
           "figmaBinding": {
@@ -3465,7 +3465,7 @@
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Transform applied on hover to lift the card.",
           "name": "--hx-transform-lift-md",
           "figmaBinding": null
         },
@@ -4208,7 +4208,7 @@
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Font family for checkbox label and help text.",
           "name": "--hx-checkbox-font-family",
           "default": "var(--hx-font-family-sans)",
           "figmaBinding": {
@@ -5351,7 +5351,7 @@
           }
         },
         {
-          "description": "CSS custom property.",
+          "description": "Number of spaces per tab character.",
           "name": "--hx-code-snippet-tab-size",
           "default": "2",
           "figmaBinding": {
@@ -15846,7 +15846,7 @@
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Border radius.",
           "name": "--hx-border-radius-full",
           "figmaBinding": null
         },
@@ -15891,7 +15891,7 @@
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Animation duration for indeterminate state.",
           "name": "--hx-progress-bar-indeterminate-duration",
           "default": "1.5s",
           "figmaBinding": {
@@ -20565,32 +20565,32 @@
           }
         },
         {
-          "description": "CSS custom property.",
+          "description": "Font size for step indicator text.",
           "name": "--hx-steps-indicator-font-size",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Icon size within step indicator.",
           "name": "--hx-steps-indicator-icon-size",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Font size for step labels.",
           "name": "--hx-steps-label-font-size",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Font size for step description text.",
           "name": "--hx-steps-description-font-size",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
+          "description": "Flex grow/shrink value for step items.",
           "name": "--hx-steps-item-flex",
           "figmaBinding": null
         },
         {
-          "description": "Width.",
+          "description": "Fixed width for step items.",
           "name": "--hx-steps-item-width",
           "figmaBinding": null
         },
