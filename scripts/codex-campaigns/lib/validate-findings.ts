@@ -12,21 +12,19 @@
  *   2 — input file missing
  */
 
-import { readFileSync, existsSync } from "node:fs";
-import { resolve } from "node:path";
-import { validateFinding } from "./finding-schema.js";
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { validateFinding } from './finding-schema.js';
 
 const args = process.argv.slice(2);
 let path: string;
 
-if (args[0] === "--file" && args[1]) {
+if (args[0] === '--file' && args[1]) {
   path = resolve(args[1]);
-} else if (args[0] && !args[0].startsWith("--")) {
+} else if (args[0] && !args[0].startsWith('--')) {
   path = resolve(`.reports/codex/campaigns/${args[0]}/findings.jsonl`);
 } else {
-  console.error(
-    "usage: validate-findings.ts <campaign-name> | --file <path-to-jsonl>",
-  );
+  console.error('usage: validate-findings.ts <campaign-name> | --file <path-to-jsonl>');
   process.exit(2);
 }
 
@@ -35,7 +33,7 @@ if (!existsSync(path)) {
   process.exit(2);
 }
 
-const lines = readFileSync(path, "utf8").split("\n");
+const lines = readFileSync(path, 'utf8').split('\n');
 let invalid = 0;
 let total = 0;
 
@@ -57,7 +55,7 @@ lines.forEach((raw, index) => {
   const result = validateFinding(parsed);
   if (!result.ok) {
     invalid += 1;
-    console.error(`L${lineNo}: ${result.errors.join("; ")}`);
+    console.error(`L${lineNo}: ${result.errors.join('; ')}`);
   }
 });
 

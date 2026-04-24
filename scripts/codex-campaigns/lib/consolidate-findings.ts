@@ -11,24 +11,24 @@
  *   tsx scripts/codex-campaigns/lib/consolidate-findings.ts <campaign-name>
  */
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { resolve, dirname, basename } from "node:path";
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve, dirname, basename } from 'node:path';
 import {
   validateFinding,
   type Finding,
   type Severity,
   type Verdict,
   SEVERITY_ORDER,
-} from "./finding-schema.js";
+} from './finding-schema.js';
 
 const campaign = process.argv[2];
 if (!campaign) {
-  console.error("usage: consolidate-findings.ts <campaign-name>");
+  console.error('usage: consolidate-findings.ts <campaign-name>');
   process.exit(2);
 }
 
 const campaignDir = resolve(`.reports/codex/campaigns/${campaign}`);
-const jsonlPath = resolve(campaignDir, "findings.jsonl");
+const jsonlPath = resolve(campaignDir, 'findings.jsonl');
 
 if (!existsSync(jsonlPath)) {
   console.error(`findings file not found: ${jsonlPath}`);
@@ -36,7 +36,7 @@ if (!existsSync(jsonlPath)) {
 }
 
 const findings: Finding[] = [];
-const lines = readFileSync(jsonlPath, "utf8").split("\n");
+const lines = readFileSync(jsonlPath, 'utf8').split('\n');
 let invalid = 0;
 
 lines.forEach((raw, index) => {
@@ -53,7 +53,7 @@ lines.forEach((raw, index) => {
   const result = validateFinding(parsed);
   if (!result.ok) {
     invalid += 1;
-    console.error(`L${index + 1}: ${result.errors.join("; ")}`);
+    console.error(`L${index + 1}: ${result.errors.join('; ')}`);
     return;
   }
   findings.push(parsed as Finding);
@@ -66,8 +66,8 @@ if (invalid > 0) {
 const scoreboard = buildScoreboard(findings);
 const markdown = buildMarkdown(campaign, findings, invalid);
 
-writeFileSync(resolve(campaignDir, "scoreboard.json"), JSON.stringify(scoreboard, null, 2));
-writeFileSync(resolve(campaignDir, "findings.md"), markdown);
+writeFileSync(resolve(campaignDir, 'scoreboard.json'), JSON.stringify(scoreboard, null, 2));
+writeFileSync(resolve(campaignDir, 'findings.md'), markdown);
 
 console.log(
   `wrote ${campaignDir}/findings.md and scoreboard.json — ${findings.length} valid findings across ${scoreboard.targets.length} targets`,
@@ -113,7 +113,7 @@ function buildScoreboard(items: Finding[]): Scoreboard {
         tag: f.tag,
         finding_count: 0,
         by_severity: emptySeverityMap(),
-        verdict: "pass",
+        verdict: 'pass',
       };
       targets.set(f.target, entry);
     }
@@ -157,56 +157,56 @@ function buildMarkdown(name: string, items: Finding[], invalidCount: number): st
 
   const out: string[] = [];
   out.push(`# ${name} — Codex Campaign Findings`);
-  out.push("");
+  out.push('');
   out.push(`Generated: ${new Date().toISOString()}`);
   out.push(`Source: \`.reports/codex/campaigns/${name}/findings.jsonl\` (canonical)`);
-  out.push("");
+  out.push('');
   out.push(`Total findings: **${items.length}**`);
   if (invalidCount > 0) {
     out.push(`Invalid lines skipped: **${invalidCount}** (see stderr)`);
   }
-  out.push("");
+  out.push('');
   out.push(severityTable(items));
-  out.push("");
+  out.push('');
   out.push(targetTable(items));
-  out.push("");
-  out.push("## Findings");
-  out.push("");
+  out.push('');
+  out.push('## Findings');
+  out.push('');
 
   let lastSeverity: Severity | undefined;
   let lastFile: string | undefined;
   for (const f of sorted) {
     if (f.severity !== lastSeverity) {
       out.push(`### ${f.severity.toUpperCase()}`);
-      out.push("");
+      out.push('');
       lastSeverity = f.severity;
       lastFile = undefined;
     }
     if (f.file !== lastFile) {
       out.push(`#### \`${f.file}\``);
-      out.push("");
+      out.push('');
       lastFile = f.file;
     }
-    out.push(`- **${f.category}** — \`${f.file}:${f.line}\`${f.public_surface ? ` (\`${f.public_surface}\`)` : ""}`);
+    out.push(
+      `- **${f.category}** — \`${f.file}:${f.line}\`${f.public_surface ? ` (\`${f.public_surface}\`)` : ''}`,
+    );
     out.push(`  - **Issue:** ${f.issue}`);
     out.push(`  - **Evidence:** \`${escapeBackticks(f.evidence)}\``);
     out.push(`  - **Fix:** ${f.fix}`);
-    out.push("");
+    out.push('');
   }
 
-  return out.join("\n");
+  return out.join('\n');
 }
 
 function escapeBackticks(s: string): string {
-  return s.replace(/`/g, "\\`");
+  return s.replace(/`/g, '\\`');
 }
 
 function severityTable(items: Finding[]): string {
   const counts = emptySeverityMap();
   for (const f of items) counts[f.severity] += 1;
-  const rows = (Object.keys(counts) as Severity[])
-    .map((s) => `| ${s} | ${counts[s]} |`)
-    .join("\n");
+  const rows = (Object.keys(counts) as Severity[]).map((s) => `| ${s} | ${counts[s]} |`).join('\n');
   return `| Severity | Count |\n| --- | --- |\n${rows}`;
 }
 
@@ -215,7 +215,7 @@ function targetTable(items: Finding[]): string {
   for (const f of items) {
     let row = map.get(f.target);
     if (!row) {
-      row = { verdict: "pass", count: 0, tag: f.tag };
+      row = { verdict: 'pass', count: 0, tag: f.tag };
       map.set(f.target, row);
     }
     row.count += 1;
@@ -223,8 +223,11 @@ function targetTable(items: Finding[]): string {
   }
   const rows = [...map.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([target, r]) => `| ${r.tag ?? basename(target)} | ${r.verdict} | ${r.count} | \`${target}\` |`)
-    .join("\n");
+    .map(
+      ([target, r]) =>
+        `| ${r.tag ?? basename(target)} | ${r.verdict} | ${r.count} | \`${target}\` |`,
+    )
+    .join('\n');
   return `| Tag | Verdict | Findings | Target |\n| --- | --- | --- | --- |\n${rows}`;
 }
 
