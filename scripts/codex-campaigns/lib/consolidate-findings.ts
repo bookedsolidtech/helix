@@ -29,10 +29,23 @@ if (!campaign) {
 
 const campaignDir = resolve(`.reports/codex/campaigns/${campaign}`);
 const jsonlPath = resolve(campaignDir, 'findings.jsonl');
+const targetsPath = resolve(`scripts/codex-campaigns/campaign-${campaign}`, 'targets.txt');
 
 if (!existsSync(jsonlPath)) {
   console.error(`findings file not found: ${jsonlPath}`);
   process.exit(2);
+}
+
+// Seed the scoreboard with the full target manifest so targets that produced
+// zero findings (clean passes) still appear with verdict="pass". Without
+// this, the scoreboard only surfaces targets with at least one finding and
+// cannot distinguish "passed cleanly" from "never ran."
+function loadTargetManifest(): string[] {
+  if (!existsSync(targetsPath)) return [];
+  return readFileSync(targetsPath, 'utf8')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0 && !l.startsWith('#'));
 }
 
 const findings: Finding[] = [];
@@ -63,7 +76,7 @@ if (invalid > 0) {
   console.error(`\n${invalid} invalid findings skipped`);
 }
 
-const scoreboard = buildScoreboard(findings);
+const scoreboard = buildScoreboard(findings, loadTargetManifest());
 const markdown = buildMarkdown(campaign, findings, invalid);
 
 writeFileSync(resolve(campaignDir, 'scoreboard.json'), JSON.stringify(scoreboard, null, 2));
@@ -99,9 +112,20 @@ function emptyVerdictMap(): Record<Verdict, number> {
   return { pass: 0, concerns: 0, blocking: 0, error: 0 };
 }
 
-function buildScoreboard(items: Finding[]): Scoreboard {
+function buildScoreboard(items: Finding[], manifest: string[]): Scoreboard {
   const targets = new Map<string, TargetScore>();
   const bySeverity = emptySeverityMap();
+
+  // Pre-seed every target from the manifest with a default pass entry so
+  // zero-finding runs register as passes rather than disappearing.
+  for (const target of manifest) {
+    targets.set(target, {
+      target,
+      finding_count: 0,
+      by_severity: emptySeverityMap(),
+      verdict: 'pass',
+    });
+  }
 
   for (const f of items) {
     bySeverity[f.severity] += 1;
@@ -117,6 +141,7 @@ function buildScoreboard(items: Finding[]): Scoreboard {
       };
       targets.set(f.target, entry);
     }
+    if (f.tag && !entry.tag) entry.tag = f.tag;
     entry.finding_count += 1;
     entry.by_severity[f.severity] += 1;
     entry.verdict = escalate(entry.verdict, f.verdict_for_target);
