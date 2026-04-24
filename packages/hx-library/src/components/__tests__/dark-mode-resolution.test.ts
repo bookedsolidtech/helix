@@ -19,17 +19,21 @@ import { fixture, shadowQuery, cleanup } from '../../test-utils.js';
 import type { HelixTheme } from '../hx-theme/hx-theme.js';
 import '../hx-theme/index.js';
 import '../hx-button/index.js';
+import '../hx-pagination/index.js';
+import '../hx-tooltip/index.js';
 
 afterEach(cleanup);
 
-async function resolveButtonStyles(theme: 'light' | 'dark') {
-  const wrapper = await fixture<HelixTheme>(
-    `<hx-theme theme="${theme}"><hx-button variant="outline">Action</hx-button></hx-theme>`
-  );
+type ThemeMode = 'light' | 'dark' | 'high-contrast';
+
+async function resolveStyles(theme: ThemeMode, markup: string, selector: string, shadowSel: string) {
+  const wrapper = await fixture<HelixTheme>(`<hx-theme theme="${theme}">${markup}</hx-theme>`);
   await wrapper.updateComplete;
-  const button = wrapper.querySelector('hx-button')!;
-  await (button as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete;
-  const inner = shadowQuery(button, '.button')!;
+  const target = wrapper.querySelector(selector) as HTMLElement & {
+    updateComplete?: Promise<unknown>;
+  };
+  if (target.updateComplete) await target.updateComplete;
+  const inner = shadowQuery(target, shadowSel)!;
   const cs = getComputedStyle(inner);
   return {
     color: cs.color.trim(),
@@ -40,11 +44,46 @@ async function resolveButtonStyles(theme: 'light' | 'dark') {
 
 describe('dark-mode token resolution', () => {
   it('outline button resolves different color, border, and surface in dark vs light', async () => {
-    const light = await resolveButtonStyles('light');
+    const light = await resolveStyles('light', '<hx-button variant="outline">Action</hx-button>', 'hx-button', '.button');
     cleanup();
-    const dark = await resolveButtonStyles('dark');
+    const dark = await resolveStyles('dark', '<hx-button variant="outline">Action</hx-button>', 'hx-button', '.button');
 
     expect(dark.color).not.toBe(light.color);
     expect(dark.borderColor).not.toBe(light.borderColor);
+  });
+
+  it('primary button foreground stays light on brand fill across modes (text-on-primary contract)', async () => {
+    const markup = '<hx-button variant="primary">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+    cleanup();
+    const hc = await resolveStyles('high-contrast', markup, 'hx-button', '.button');
+
+    // light + dark: foreground stays near-white on primary-500 fill. HC: fg flips to #000 on bright HC primary.
+    expect(light.color).toBe(dark.color);
+    expect(hc.color).not.toBe(light.color);
+  });
+
+  it('pagination active page uses text-on-primary (not text-inverse) so fg is stable on brand fill', async () => {
+    const markup = '<hx-pagination total-pages="5" current-page="3"></hx-pagination>';
+    const light = await resolveStyles('light', markup, 'hx-pagination', '.button[aria-current="page"]');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-pagination', '.button[aria-current="page"]');
+
+    // regression guard: if fg were bound to text-inverse, dark would flip to near-black
+    // which is illegible on a primary-500 bg. text-on-primary keeps it light in both modes.
+    expect(light.color).toBe(dark.color);
+  });
+
+  it('tooltip surface-inverse + text-inverse flip between light and dark', async () => {
+    const markup =
+      '<hx-tooltip><button>T</button><span slot="content">Help</span></hx-tooltip>';
+    const light = await resolveStyles('light', markup, 'hx-tooltip', '[part="tooltip"]');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-tooltip', '[part="tooltip"]');
+
+    expect(dark.backgroundColor).not.toBe(light.backgroundColor);
+    expect(dark.color).not.toBe(light.color);
   });
 });
