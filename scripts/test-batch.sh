@@ -13,7 +13,7 @@
 #
 # Known issue: Vitest 3.x browser mode hangs during Chromium teardown after
 # all tests complete. The shared watchdog in scripts/lib/vitest-watchdog.sh
-# detects stale output (no new lines for 15s), force-kills vitest, then
+# detects stale output (no new lines for 120s), force-kills vitest, then
 # determines pass/fail from the captured output markers.
 set -uo pipefail
 
@@ -78,7 +78,7 @@ echo "============================================="
 echo "Test files:    $TOTAL_FILES"
 echo "Strategy:      Single Chromium, sequential files"
 echo "Flag:          --no-file-parallelism"
-echo "Hang guard:    ${STALE_TIMEOUT:-15}s stale output watchdog"
+echo "Hang guard:    ${STALE_TIMEOUT:-120}s stale output watchdog"
 echo "============================================="
 echo ""
 

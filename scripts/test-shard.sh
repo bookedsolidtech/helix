@@ -49,7 +49,7 @@ echo "============================================="
 echo "  HELiX Sharded Test Runner"
 echo "============================================="
 echo "Shard:         ${SHARD}"
-echo "Hang guard:    ${STALE_TIMEOUT:-15}s stale output watchdog"
+echo "Hang guard:    ${STALE_TIMEOUT:-120}s stale output watchdog"
 echo "============================================="
 echo ""
 

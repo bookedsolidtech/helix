@@ -182,7 +182,7 @@ async function main() {
     if (typeof f.public_surface !== 'string' || !f.public_surface.startsWith('css-property:'))
       continue;
 
-    const tokenName = f.public_surface.slice('css-property:'.length);
+    const tokenName = f.public_surface.slice('css-property:'.length).trim();
     if (!tokenName.startsWith('--')) continue;
 
     if (!byTarget.has(f.target)) {

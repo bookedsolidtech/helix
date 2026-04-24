@@ -72,10 +72,12 @@ run_vitest_with_watchdog() {
   # Parse pass/fail from output. Support both `✓`/`×` and `✔`/`x` markers.
   # Strip ANSI escape codes first — vitest emits colors even when writing to a
   # file (non-TTY detection is unreliable), so the raw `[32m✓` prefix would
-  # otherwise prevent the pattern from matching.
-  PASSED_TESTS=$(sed 's/\x1b\[[0-9;]*m//g' "$logfile" 2>/dev/null | grep -c "^[[:space:]]*[✓✔]" 2>/dev/null || true)
+  # otherwise prevent the pattern from matching. Use awk with sprintf("%c",27)
+  # to build the ESC byte portably — BSD sed (macOS) does not support `\x1b`.
+  local strip_ansi='BEGIN{esc=sprintf("%c",27)} { gsub(esc "\\[[0-9;]*m",""); print }'
+  PASSED_TESTS=$(awk "$strip_ansi" "$logfile" 2>/dev/null | grep -c "^[[:space:]]*[✓✔]" 2>/dev/null || true)
   PASSED_TESTS=${PASSED_TESTS:-0}
-  FAILED_TESTS=$(sed 's/\x1b\[[0-9;]*m//g' "$logfile" 2>/dev/null | grep -c "^[[:space:]]*[×x]" 2>/dev/null || true)
+  FAILED_TESTS=$(awk "$strip_ansi" "$logfile" 2>/dev/null | grep -c "^[[:space:]]*[×x]" 2>/dev/null || true)
   FAILED_TESTS=${FAILED_TESTS:-0}
 
   # Always clean up chromium shells — they leak when vitest is force-killed.
