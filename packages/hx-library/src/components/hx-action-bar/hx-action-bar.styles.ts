@@ -55,16 +55,16 @@ export const helixActionBarStyles = css`
     background: var(--hx-action-bar-bg, var(--hx-color-surface-default, #ffffff));
     border: var(
       --hx-action-bar-border,
-      var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #e2e8f0)
+      var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #d6dbd5)
     );
-    border-radius: var(--hx-border-radius-md, 0.375rem);
+    border-radius: var(--hx-action-bar-border-radius, var(--hx-border-radius-md, 0.375rem));
   }
 
   /* ─── Variant: filled ─── */
 
   .base--filled {
-    background: var(--hx-action-bar-bg, var(--hx-color-surface-raised, #f8fafc));
-    border-radius: var(--hx-border-radius-md, 0.375rem);
+    background: var(--hx-action-bar-bg, var(--hx-color-surface-raised, #f5f8f3));
+    border-radius: var(--hx-action-bar-border-radius, var(--hx-border-radius-md, 0.375rem));
   }
 
   /* ─── Size modifiers ─── */

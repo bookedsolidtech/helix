@@ -6,6 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /** Detail for the hx-click event dispatched by hx-button. */
@@ -92,7 +93,7 @@ export interface HxButtonClickDetail {
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {
-  static override styles = [helixButtonStyles];
+  static override styles = [helixButtonStyles, forcedColorsInteractive];
 
   // ─── Form Association ───
 

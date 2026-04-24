@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -60,7 +61,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-icon-button')
 export class HelixIconButton extends HelixElement {
-  static override styles = [helixIconButtonStyles];
+  static override styles = [helixIconButtonStyles, forcedColorsInteractive];
 
   /**
    * Accessible name for the button. Required. Rendered as `aria-label` and

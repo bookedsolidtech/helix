@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixActionBarStyles } from './hx-action-bar.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // Re-export size type for external consumers.
@@ -61,7 +62,7 @@ export type ActionBarSize = 'sm' | 'md' | 'lg';
  */
 @customElement('hx-action-bar')
 export class HelixActionBar extends HelixElement {
-  static override styles = [helixActionBarStyles];
+  static override styles = [helixActionBarStyles, forcedColorsInteractive];
 
   /**
    * Size of the action bar — propagated as a data attribute to slotted children.
