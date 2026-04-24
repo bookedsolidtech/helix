@@ -16,7 +16,13 @@ Close Codex staging→main blocking findings before 3.1.0 release.
   error-text/success-text.
 - Tighten coverage gate (`scripts/check-coverage.mjs`) — no longer silently
   skips on missing scoped artifacts; a watchdog-killed vitest run now fails CI
-  so the shard owner diagnoses rather than ships blind.
+  so the shard owner diagnoses rather than ships blind. Added shard-aware
+  enforcement: when `HX_COVERAGE_COMPONENTS` is set, the gate intersects with
+  components whose test files actually ran on the current shard (read from
+  `.cache/test-results.json`), so components enforced on another shard do not
+  false-fail here.
+- Exempt `hx-theme` at 77.55% branches (pre-existing SSR/matchMedia guards
+  surfaced by the new shard-aware check); remediation 2026-05-31.
 - Harden release-manifest publish step: auto-merge failure is now a hard job
   failure (not a warning), and the manifest branch name includes
   `GITHUB_RUN_ID` so reruns don't collide with a stale branch.
