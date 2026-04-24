@@ -8,6 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextFileUploadId = createIdCounter('hx-file-upload');
 
@@ -99,7 +100,7 @@ export interface HxFileErrorDetail {
  */
 @customElement('hx-file-upload')
 export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement)) {
-  static override styles = [helixFileUploadStyles];
+  static override styles = [helixFileUploadStyles, forcedColorsField];
 
   // ─── Form Association ───
 

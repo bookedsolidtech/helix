@@ -6,6 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
 
@@ -93,7 +94,7 @@ export interface HxSwitchChangeDetail {
  */
 @customElement('hx-switch')
 export class HelixSwitch extends FormMixin(HelixElement) {
-  static override styles = [helixSwitchStyles];
+  static override styles = [helixSwitchStyles, forcedColorsField];
 
   // ─── Form Association ───
 

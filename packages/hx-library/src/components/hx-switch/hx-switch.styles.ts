@@ -43,7 +43,7 @@ export const helixSwitchStyles = css`
     border: none;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-track-bg, var(--hx-color-border-strong, #cbd5e1));
+    background-color: var(--hx-switch-track-bg, var(--hx-color-border-strong, #8E9C98));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;
@@ -55,13 +55,27 @@ export const helixSwitchStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-switch-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .switch--checked .switch__track {
-    background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #2563eb));
+    background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #429797));
+  }
+
+  .switch:not(.switch--checked) .switch__track:hover {
+    background-color: var(
+      --hx-switch-track-hover-bg,
+      var(--hx-color-border-strong, #8E9C98)
+    );
+  }
+
+  .switch--checked .switch__track:hover {
+    background-color: var(
+      --hx-switch-track-checked-hover-bg,
+      var(--hx-color-primary-600, #0F7078)
+    );
   }
 
   /* --- Thumb --- */
@@ -69,7 +83,7 @@ export const helixSwitchStyles = css`
   .switch__thumb {
     position: absolute;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-thumb-bg, var(--hx-color-surface-default, #ffffff));
+    background-color: var(--hx-switch-thumb-bg, var(--hx-color-surface-default, #FFFFFF));
     box-shadow: var(--hx-switch-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
     transition: transform var(--hx-transition-fast, 150ms ease);
   }
@@ -139,7 +153,7 @@ export const helixSwitchStyles = css`
   .switch__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-switch-label-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-switch-label-color, var(--hx-color-text-strong, #202B39));
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: pointer;
     user-select: none;
@@ -147,7 +161,7 @@ export const helixSwitchStyles = css`
   }
 
   .switch__required-marker {
-    color: var(--hx-switch-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-switch-error-color, var(--hx-color-error-text, #C92A2A));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -155,13 +169,13 @@ export const helixSwitchStyles = css`
 
   .switch__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-switch-help-text-color, var(--hx-color-text-muted, #64748b));
+    color: var(--hx-switch-help-text-color, var(--hx-color-text-muted, #66787B));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .switch__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-switch-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-switch-error-color, var(--hx-color-error-text, #C92A2A));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

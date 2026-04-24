@@ -6,6 +6,7 @@ import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixRadio } from './hx-radio.js';
 
 const _nextRadioGroupId = createIdCounter('hx-radio-group');
@@ -57,7 +58,7 @@ export interface HxRadioGroupChangeDetail {
  */
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends FormMixin(HelixElement) {
-  static override styles = [helixRadioGroupStyles];
+  static override styles = [helixRadioGroupStyles, forcedColorsField];
 
   // ─── Form Association ───
 

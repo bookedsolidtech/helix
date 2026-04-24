@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixRadioStyles } from './hx-radio.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextRadioId = createIdCounter('hx-radio');
 
@@ -29,7 +30,7 @@ const _nextRadioId = createIdCounter('hx-radio');
  */
 @customElement('hx-radio')
 export class HelixRadio extends HelixElement {
-  static override styles = [helixRadioStyles];
+  static override styles = [helixRadioStyles, forcedColorsField];
 
   // ─── Properties ───
 

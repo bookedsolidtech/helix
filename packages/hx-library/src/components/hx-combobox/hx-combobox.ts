@@ -7,6 +7,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 // PERF: hx-combobox exceeds 5KB budget (6.87kb gzipped) -- typeahead filtering, multi-select chips, async loading
 
@@ -126,7 +127,7 @@ export interface HxComboboxDetail {
  */
 @customElement('hx-combobox')
 export class HelixCombobox extends FormMixin(HelixElement) {
-  static override styles = [helixComboboxStyles];
+  static override styles = [helixComboboxStyles, forcedColorsField];
 
   // ─── Form Association ───
 

@@ -8,6 +8,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
@@ -85,7 +86,7 @@ export interface HxCheckboxChangeDetail {
  */
 @customElement('hx-checkbox')
 export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
-  static override styles = [helixCheckboxStyles];
+  static override styles = [helixCheckboxStyles, forcedColorsField];
 
   // ─── Form Association ───
 

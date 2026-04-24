@@ -6,39 +6,39 @@ export const helixSelectStyles = css`
     display: block;
 
     /* Background & foreground */
-    --_bg: var(--hx-select-bg, var(--hx-color-surface-default, #ffffff));
-    --_color: var(--hx-select-color, var(--hx-color-text-strong, #1e293b));
+    --_bg: var(--hx-select-bg, var(--hx-color-surface-default, #FFFFFF));
+    --_color: var(--hx-select-color, var(--hx-color-text-strong, #202B39));
     --_placeholder-color: var(
       --hx-select-placeholder-color,
-      var(--hx-color-text-placeholder, #64748b)
+      var(--hx-color-text-placeholder, #66787B)
     );
 
     /* Label */
-    --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #1e293b));
+    --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #202B39));
 
     /* Border */
-    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #94a3b8));
+    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #8E9C98));
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */
     --_focus-ring-color: var(
       --hx-select-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
     );
 
     /* Error */
-    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc2626));
+    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #E5493E));
 
     /* Chevron */
-    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-text-muted, #64748b));
+    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-text-muted, #66787B));
     --_chevron-size: var(--hx-select-chevron-size, 0.5rem);
 
     /* Listbox */
-    --_listbox-bg: var(--hx-select-listbox-bg, var(--hx-color-surface-default, #ffffff));
-    --_option-hover-bg: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    --_listbox-bg: var(--hx-select-listbox-bg, var(--hx-color-surface-default, #FFFFFF));
+    --_option-hover-bg: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #EBF8F8));
     --_option-selected-bg: var(
       --hx-select-option-selected-bg,
-      var(--hx-color-primary-100, #dbeafe)
+      var(--hx-color-primary-100, #DBF0F0)
     );
 
     /* Typography */
@@ -73,7 +73,7 @@ export const helixSelectStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-select-error-color, var(--hx-color-error-text, #C92A2A));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -282,11 +282,11 @@ export const helixSelectStyles = css`
   }
 
   .field__help-text {
-    color: var(--hx-color-text-muted, #64748b);
+    color: var(--hx-color-text-muted, #66787B);
   }
 
   .field__error {
-    color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-select-error-color, var(--hx-color-error-text, #C92A2A));
   }
 
   @media (prefers-reduced-motion: reduce) {
