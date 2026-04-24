@@ -58,6 +58,8 @@ const _hcOverrides: Array<[string, string]> = [
   ['--hx-color-text-on-success', '#000000'],
   ['--hx-color-text-on-warning', '#000000'],
   ['--hx-color-text-on-info', '#000000'],
+  ['--hx-color-error-text', '#FCA5A5'],
+  ['--hx-color-success-text', '#86EFAC'],
   ['--hx-color-text-link', '#FFFF00'],
   ['--hx-color-text-link-hover', '#FFFF99'],
   ['--hx-color-text-link-visited', '#FF80FF'],

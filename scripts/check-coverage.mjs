@@ -37,6 +37,7 @@ const ROOT = resolve(__dirname, '..');
 const COVERAGE_DIR = resolve(ROOT, 'packages/hx-library/.cache/coverage');
 const COVERAGE_JSON = resolve(COVERAGE_DIR, 'coverage-final.json');
 const COVERAGE_SUMMARY = resolve(COVERAGE_DIR, 'coverage-summary.json');
+const TEST_RESULTS_PATH = resolve(ROOT, 'packages/hx-library/.cache/test-results.json');
 const CONFIG_PATH = resolve(ROOT, 'packages/hx-library/coverage-config.json');
 
 const THRESHOLD = 80;
@@ -56,6 +57,28 @@ const HX_COVERAGE_COMPONENTS = process.env.HX_COVERAGE_COMPONENTS
         .filter(Boolean),
     )
   : null; // null = no scoping, check all components
+
+// ── Identify components whose tests actually ran on this shard ─────────────
+// Vitest's --shard partitions test files by hash. When a PR changes N
+// components but only M of their tests land on the current shard, the other
+// N-M components' coverage appears as 0% even though their code is healthy —
+// their tests simply ran on a different shard. We intersect the scoped
+// component list with "components whose test file was in this run" so the
+// coverage gate only enforces on components the shard actually exercised.
+function loadShardComponents() {
+  if (!existsSync(TEST_RESULTS_PATH)) return null;
+  try {
+    const results = JSON.parse(readFileSync(TEST_RESULTS_PATH, 'utf8'));
+    const names = (results.testResults || [])
+      .map((tr) => tr.name)
+      .filter(Boolean)
+      .map(extractComponent)
+      .filter(Boolean);
+    return new Set(names);
+  } catch {
+    return null;
+  }
+}
 
 // ── Load coverage config (exemptions) ──────────────────────────────────────
 
@@ -89,24 +112,23 @@ function loadCoverageData() {
 
   if (!summaryPath && !finalPath) {
     if (HX_COVERAGE_COMPONENTS) {
-      // Coverage data missing in a scoped CI shard run. This happens when the
-      // vitest watchdog force-kills the process during V8 coverage collection
-      // (Chromium teardown hang prevents the browser from flushing coverage data).
-      // The watchdog already confirmed all tests passed via ✓/× marker counting.
-      // Treating as a skip is safe: we can't enforce thresholds on data we don't have,
-      // and blocking the PR here would be a false gate failure, not a real quality issue.
+      // Coverage data missing in a scoped CI shard run. Previously this path
+      // exited 0 to work around a vitest/V8 Chromium teardown hang, but that
+      // silently hid real coverage regressions. Fail the job so CI flags it;
+      // the watchdog kill is now a real gate failure the shard owner must
+      // diagnose (rerun the shard or raise the watchdog timeout).
+      const msg =
+        `No coverage data found in ${COVERAGE_DIR}. ` +
+        `Scoped components: ${[...HX_COVERAGE_COMPONENTS].join(', ')}. ` +
+        `Most likely the vitest watchdog killed the run during V8 coverage ` +
+        `collection (Chromium teardown hang). Rerun this shard; if it hangs ` +
+        `again, raise HX_VITEST_STALE_TIMEOUT for the shard or fix the ` +
+        `underlying teardown.`;
       if (process.env.GITHUB_ACTIONS === 'true') {
-        console.log(
-          `::warning title=Coverage gate skipped::No coverage artifacts found for scoped run (${[...HX_COVERAGE_COMPONENTS].join(', ')}); likely vitest watchdog interruption.`,
-        );
+        console.log(`::error title=Coverage gate failed::${msg}`);
       }
-      console.warn(
-        `Warning: No coverage data found in ${COVERAGE_DIR}\n` +
-          `Coverage collection was likely interrupted by the vitest watchdog (V8/Chromium teardown hang).\n` +
-          `All tests passed — skipping coverage threshold enforcement for this run.\n` +
-          `Scoped components: ${[...HX_COVERAGE_COMPONENTS].join(', ')}`,
-      );
-      process.exit(0);
+      console.error(msg);
+      process.exit(1);
     }
     console.error(
       `No coverage data found in ${COVERAGE_DIR}\n` +
@@ -224,17 +246,33 @@ function main() {
   const failing = [];
   const exempt = [];
   const transitive = []; // components skipped because they were not explicitly under test
+  const otherShard = []; // components in scope but whose tests ran on a different shard
+
+  const shardComponents = HX_COVERAGE_COMPONENTS ? loadShardComponents() : null;
 
   if (HX_COVERAGE_COMPONENTS) {
     console.log(
-      `Scoped enforcement: checking only [${[...HX_COVERAGE_COMPONENTS].join(', ')}] — other components in coverage data are transitive imports and will be skipped.\n`,
+      `Scoped enforcement: checking only [${[...HX_COVERAGE_COMPONENTS].join(', ')}] — other components in coverage data are transitive imports and will be skipped.`,
     );
+    if (shardComponents) {
+      console.log(
+        `Shard ran tests for: [${[...shardComponents].sort().join(', ') || '(none)'}]. Scoped components not in this list are enforced on another shard.`,
+      );
+    }
+    console.log('');
   }
 
   for (const [name, metrics] of [...components.entries()].sort()) {
     // If scoped enforcement is active, skip components not in the explicit test list
     if (HX_COVERAGE_COMPONENTS && !HX_COVERAGE_COMPONENTS.has(name)) {
       transitive.push({ name, metrics });
+      continue;
+    }
+
+    // Scoped component whose test file did not run on this shard — skip.
+    // Its coverage will be enforced by the shard that actually ran it.
+    if (HX_COVERAGE_COMPONENTS && shardComponents && !shardComponents.has(name)) {
+      otherShard.push({ name, metrics });
       continue;
     }
 
@@ -371,9 +409,15 @@ function main() {
 
   console.log(`PASS — ${passing.length} component(s) meeting threshold`);
   console.log('');
+  if (otherShard.length > 0) {
+    console.log(
+      `SHARD-SKIP — ${otherShard.length} scoped component(s) whose tests ran on a different shard: ${otherShard.map((o) => o.name).join(', ')}\n`,
+    );
+  }
   const transitiveNote = transitive.length > 0 ? `, ${transitive.length} transitive-skip` : '';
+  const shardNote = otherShard.length > 0 ? `, ${otherShard.length} shard-skip` : '';
   console.log(
-    `Summary: ${passing.length} passing, ${failing.length} failing, ${exempt.length} exempt${transitiveNote} (${components.size} total)\n`,
+    `Summary: ${passing.length} passing, ${failing.length} failing, ${exempt.length} exempt${shardNote}${transitiveNote} (${components.size} total)\n`,
   );
 
   if (failing.length > 0) {

@@ -301,7 +301,10 @@ jobs:
           if [ -z "${VERSION}" ]; then
             VERSION="run-${GITHUB_RUN_ID}"
           fi
-          BRANCH="release-manifest/${VERSION}"
+          # Include GITHUB_RUN_ID so reruns of the same published version do
+          # not collide with a pre-existing release-manifest branch (which
+          # would cause a non-fast-forward push and orphan the PR).
+          BRANCH="release-manifest/${VERSION}-${GITHUB_RUN_ID}"
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -333,5 +336,11 @@ jobs:
             --title "chore(release): add ${VERSION} release manifest" \
             --body "Post-publish manifest for \`${VERSION}\`. Auto-opened by the publish workflow after npm publish succeeded. Documentation only — safe to auto-merge.")
           echo "Opened: ${PR_URL}"
-          gh pr merge "${PR_URL}" --merge --auto || \
-            echo "::warning::Could not enable auto-merge on ${PR_URL}; manifest PR needs manual merge."
+          # Enabling auto-merge must succeed — otherwise the manifest PR is
+          # orphaned and main drifts from the published npm artifact with no
+          # alarm. Treat failure as a hard error so the release is visibly
+          # incomplete until an operator merges the PR.
+          if ! gh pr merge "${PR_URL}" --merge --auto; then
+            echo "::error title=Release manifest auto-merge failed::Could not enable auto-merge on ${PR_URL}. The release manifest PR is open but not queued; main is out of sync with the published npm artifact until this PR is merged manually."
+            exit 1
+          fi
