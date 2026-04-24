@@ -33,6 +33,25 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-side-nav-header-padding=var(--hx-space-4)] - Header padding.
  * @cssprop [--hx-side-nav-footer-padding=var(--hx-space-4)] - Footer padding.
  * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-neutral-400)] - Toggle button icon color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-transition-normal] - Transition timing.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-14] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-8] - Spacing token.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-overlay-white-10] - Overlay color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-space-5] - Spacing token.
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {

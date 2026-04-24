@@ -52,6 +52,33 @@ export interface HxTextareaDetail {
  * @cssprop [--hx-input-error-color=var(--hx-color-error-500)] - Error state color.
  * @cssprop [--hx-input-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-textarea-min-height=var(--hx-size-20, 5rem)] - Minimum textarea height.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-opacity] - CSS custom property.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-size-20] - Size token.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
  */
 @customElement('hx-textarea')
 export class HelixTextarea extends FormMixin(HelixElement) {

@@ -23,6 +23,21 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-progress-ring-track-color=var(--hx-color-neutral-200)] - Track stroke color.
  * @cssprop [--hx-progress-ring-indicator-color=var(--hx-color-primary-500)] - Indicator stroke color.
  * @cssprop [--hx-progress-ring-label-color=var(--hx-color-neutral-900)] - Center label text color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-transition-base] - Transition timing.
+ * @cssprop [--hx-color-success-500] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-duration-spinner] - Animation duration.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-size-16] - Size token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-progress-ring-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-color-neutral-900] - Color.
  */
 @customElement('hx-progress-ring')
 export class HelixProgressRing extends HelixElement {

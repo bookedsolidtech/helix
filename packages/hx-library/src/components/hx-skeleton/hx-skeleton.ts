@@ -28,6 +28,11 @@ import { helixSkeletonStyles } from './hx-skeleton.styles.js';
  *
  * @fires hx-loaded - Dispatched when `loaded` transitions to `true`. Consumers should use
  *   this event to update an external `aria-live` region announcing content availability.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-overlay-white-40] - Overlay color.
  */
 @customElement('hx-skeleton')
 export class HelixSkeleton extends HelixElement {

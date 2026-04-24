@@ -51,6 +51,37 @@ export interface HxCheckboxChangeDetail {
  * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
  * @cssprop [--hx-checkbox-hover-border-color=var(--hx-checkbox-border-color)] - Border color on hover.
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-checkbox-font-family=var(--hx-font-family-sans)] - Font family for checkbox label and help text.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-size-5] - Size token.
+ * @cssprop [--hx-border-width-medium] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-space-px] - Spacing token.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-filter-brightness-hover] - CSS filter.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-color-error-500] - Color.
  */
 @customElement('hx-checkbox')
 export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {

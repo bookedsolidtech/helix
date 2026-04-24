@@ -23,6 +23,9 @@ import { devWarn } from '../../utils/dev-warn.js';
  *
  * @cssprop [--hx-list-gap=0] - Gap between list items.
  * @cssprop [--hx-list-divider-color=var(--hx-color-neutral-200)] - Divider line color.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-200] - Color.
  */
 @customElement('hx-list')
 export class HelixList extends HelixElement {

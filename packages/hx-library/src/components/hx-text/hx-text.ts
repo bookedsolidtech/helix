@@ -37,6 +37,28 @@ import { helixTextStyles } from './hx-text.styles.js';
  *   <hx-text as="p" variant="body">Paragraph-level content.</hx-text>
  *   <hx-text as="strong" variant="label">Bold label</hx-text>
  * -->
+ * @cssprop [--hx-text-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-weight-normal] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-letter-spacing-normal] - CSS custom property.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-family-mono] - Font family.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-letter-spacing-wide] - CSS custom property.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
+ * @cssprop [--hx-color-success-600] - Color.
+ * @cssprop [--hx-color-warning-600] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
  */
 @customElement('hx-text')
 export class HelixText extends HelixElement {

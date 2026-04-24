@@ -50,6 +50,10 @@ export interface HxTabChangeDetail {
  * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #2563eb)] - Focus ring color for tabs and panels.
  * @cssprop [--hx-tabs-panel-padding=var(--hx-space-4, 1rem)] - Panel inner padding.
  * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #343a40)] - Panel text color.
+ * @cssprop [--hx-tabs-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
  */
 @customElement('hx-tabs')
 export class HelixTabs extends HelixElement {

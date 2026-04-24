@@ -27,6 +27,12 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-menu-shadow] - Menu box shadow.
  * @cssprop [--hx-menu-min-width=10rem] - Minimum menu width.
  * @cssprop [--hx-menu-max-height=20rem] - Maximum menu height before vertical scroll is activated.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-shadow-md] - Box shadow.
  */
 @customElement('hx-menu')
 export class HelixMenu extends HelixElement {

@@ -44,6 +44,17 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  * @cssprop [--hx-font-label-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-font-label-line-height=var(--hx-line-height-normal)] - Label line height.
  * @cssprop [--hx-font-label-family=var(--hx-font-family-sans)] - Label font family.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-weight-normal] - Font weight.
+ * @cssprop [--hx-color-neutral-500] - Color.
  */
 @customElement('hx-field-label')
 export class HelixFieldLabel extends HelixElement {

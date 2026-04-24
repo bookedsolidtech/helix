@@ -109,6 +109,31 @@ const _svgPause = html`<svg
  * @cssprop [--hx-carousel-slide-width=100%] - Width override for each slide.
  * @cssprop [--hx-carousel-nav-btn-size=2.5rem] - Size of previous/next navigation buttons.
  * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-carousel-focus-ring-color=var(--hx-focus-ring-color)] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-transition-base] - Transition timing.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-primary-600] - Color.
  */
 @customElement('hx-carousel')
 export class HelixCarousel extends HelixElement {

@@ -46,6 +46,19 @@ const _nextTooltipId = createIdCounter('hx-tooltip');
  *   <span slot="content">{{ tooltip_text }}</span>
  * </hx-tooltip>
  * ```
+ * @cssprop [--hx-tooltip-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-z-index-tooltip] - Z-index layer.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-shadow-sm] - Box shadow.
+ * @cssprop [--hx-overlay-black-20] - Overlay color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 
 @customElement('hx-tooltip')

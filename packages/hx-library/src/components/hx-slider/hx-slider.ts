@@ -61,6 +61,44 @@ export interface HxSliderDetail {
  * @cssprop [--hx-slider-tick-color=var(--hx-color-neutral-400)] - Tick mark color.
  * @cssprop [--hx-slider-range-label-color=var(--hx-color-neutral-500)] - Range label text color.
  * @cssprop [--hx-slider-help-text-color=var(--hx-color-neutral-500)] - Help text color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-slider-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-slider-track-height-sm=var(--hx-size-1)] - Height.
+ * @cssprop [--hx-size-1] - Size token.
+ * @cssprop [--hx-slider-track-height-md=var(--hx-size-1-5)] - Height.
+ * @cssprop [--hx-size-1-5] - Size token.
+ * @cssprop [--hx-slider-track-height-lg=var(--hx-space-2)] - Height.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-slider-input-padding-block=1rem] - Padding.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-shadow-sm] - Box shadow.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-slider-thumb-size-sm=var(--hx-size-3)] - CSS custom property.
+ * @cssprop [--hx-size-3] - Size token.
+ * @cssprop [--hx-slider-thumb-size-md=var(--hx-size-4)] - CSS custom property.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-slider-thumb-size-lg=var(--hx-size-5)] - CSS custom property.
+ * @cssprop [--hx-size-5] - Size token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-space-0-5] - Spacing token.
  */
 @customElement('hx-slider')
 export class HelixSlider extends FormMixin(HelixElement) {

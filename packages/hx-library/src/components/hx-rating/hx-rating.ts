@@ -75,6 +75,19 @@ export interface HxRatingHoverDetail {
  * <!-- Read-only display -->
  * <hx-rating value="4.5" max="5" precision="0.5" readonly></hx-rating>
  * ```
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-size-xl] - Font size.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-warning-400] - Color.
+ * @cssprop [--hx-color-warning-300] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
  */
 @customElement('hx-rating')
 export class HelixRating extends FormMixin(HelixElement) {

@@ -31,6 +31,11 @@ const GAP_TOKENS: Record<GapSize, string> = {
  * @cssprop [--hx-grid-gap] - Override the computed gap.
  * @cssprop [--hx-grid-row-gap] - Override the computed row-gap.
  * @cssprop [--hx-grid-column-gap] - Override the computed column-gap.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-space-8] - Spacing token.
  */
 @customElement('hx-grid')
 export class HelixGrid extends HelixElement {

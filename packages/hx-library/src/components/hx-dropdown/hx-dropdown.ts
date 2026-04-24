@@ -54,6 +54,12 @@ const _nextDropdownId = createIdCounter('hx-dropdown');
  *   </ul>
  * </hx-dropdown>
  * ```
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-overlay-black-12] - Overlay color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 @customElement('hx-dropdown')
 export class HelixDropdown extends HelixElement {

@@ -44,6 +44,16 @@ export type SpinnerSize = 'sm' | 'md' | 'lg';
  * @cssprop [--hx-spinner-color] - Spinner arc color. Defaults per variant.
  * @cssprop [--hx-spinner-track-color] - Spinner track color. Defaults per variant.
  * @cssprop [--hx-duration-spinner] - Duration of the rotation animation. Defaults to 750ms.
+ * @cssprop [--hx-easing-in-out] - CSS custom property.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-primary-100] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-overlay-white-30] - Overlay color.
  */
 @customElement('hx-spinner')
 export class HelixSpinner extends HelixElement {

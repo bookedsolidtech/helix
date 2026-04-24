@@ -52,6 +52,35 @@ type NavOrientation = 'horizontal' | 'vertical';
  * @cssprop [--hx-nav-padding=var(--hx-space-2) var(--hx-space-4)] - Navigation padding.
  * @cssprop [--hx-nav-item-padding=var(--hx-space-2) var(--hx-space-3)] - Item padding.
  * @cssprop [--hx-nav-border-radius=var(--hx-border-radius-sm)] - Item border radius.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-nav-focus-ring-color=var(--hx-focus-ring-color)] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-primary-600] - Color.
+ * @cssprop [--hx-transition-normal] - Transition timing.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-nav-shadow] - CSS custom property.
+ * @cssprop [--hx-shadow-md] - Box shadow.
+ * @cssprop [--hx-z-index-dropdown] - Z-index layer.
+ * @cssprop [--hx-space-1-5] - Spacing token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-300] - Color.
  */
 @customElement('hx-nav')
 export class HelixNav extends HelixElement {

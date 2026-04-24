@@ -40,6 +40,20 @@ export interface HxRadioGroupChangeDetail {
  * @cssprop [--hx-radio-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
  * @cssprop [--hx-radio-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
  * @cssprop [--hx-radio-group-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-radio-group-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
  */
 @customElement('hx-radio-group')
 export class HelixRadioGroup extends FormMixin(HelixElement) {
