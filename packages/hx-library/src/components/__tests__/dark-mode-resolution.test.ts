@@ -21,6 +21,7 @@ import '../hx-theme/index.js';
 import '../hx-button/index.js';
 import '../hx-pagination/index.js';
 import '../hx-tooltip/index.js';
+import '../hx-side-nav/index.js';
 
 afterEach(cleanup);
 
@@ -74,6 +75,18 @@ describe('dark-mode token resolution', () => {
     // regression guard: if fg were bound to text-inverse, dark would flip to near-black
     // which is illegible on a primary-500 bg. text-on-primary keeps it light in both modes.
     expect(light.color).toBe(dark.color);
+  });
+
+  it('nav-item surface-inverse + text-inverse flip between light and dark', async () => {
+    const markup = '<hx-nav-item label="Home"></hx-nav-item>';
+    const light = await resolveStyles('light', markup, 'hx-nav-item', '.nav-item__link');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-nav-item', '.nav-item__link');
+
+    // host binds surface-inverse + text-inverse — both must flip per mode.
+    // regression guard: if host were bound to neutral-900 directly, dark mode
+    // would freeze at the Light-palette value.
+    expect(dark.color).not.toBe(light.color);
   });
 
   it('tooltip surface-inverse + text-inverse flip between light and dark', async () => {
