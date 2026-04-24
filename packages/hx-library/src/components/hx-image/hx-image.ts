@@ -31,6 +31,10 @@ import { devWarn } from '../../utils/dev-warn.js';
  *
  * @fires hx-load - Dispatched when the image has successfully loaded.
  * @fires hx-error - Dispatched when the image fails to load (including after fallback-src also fails).
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
  */
 @customElement('hx-image')
 export class HelixImage extends HelixElement {

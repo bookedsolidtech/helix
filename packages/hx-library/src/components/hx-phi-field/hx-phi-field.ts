@@ -55,6 +55,20 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#2563eb))] - Focus ring color.
  * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
  * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#f59e0b)] - Color for auto-hide countdown warning (future use).
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-font-family-mono] - Font family.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-phi-field-letter-spacing=0.1em] - CSS custom property.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-opacity-90] - Opacity.
+ * @cssprop [--hx-opacity-50] - Opacity.
  */
 @customElement('hx-phi-field')
 export class HelixPhiField extends HelixElement {

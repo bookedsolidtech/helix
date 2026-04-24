@@ -20,7 +20,7 @@ export const helixToggleButtonStyles = css`
     border: var(--hx-border-width-thin, 1px) solid var(--hx-toggle-button-border-color, transparent);
     border-radius: var(--hx-toggle-button-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-toggle-button-bg, var(--hx-color-primary-500, #2563eb));
-    color: var(--hx-toggle-button-color, var(--hx-color-neutral-0, #ffffff));
+    color: var(--hx-toggle-button-color, var(--hx-color-text-on-primary, #ffffff));
     font-family: var(--hx-toggle-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-toggle-button-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -80,7 +80,7 @@ export const helixToggleButtonStyles = css`
 
   .button--primary {
     --hx-toggle-button-bg: var(--hx-color-primary-500, #2563eb);
-    --hx-toggle-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toggle-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-toggle-button-border-color: transparent;
   }
 
@@ -95,13 +95,13 @@ export const helixToggleButtonStyles = css`
   }
 
   .button--tertiary {
-    --hx-toggle-button-bg: var(--hx-color-neutral-100, #f1f5f9);
-    --hx-toggle-button-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-toggle-button-bg: var(--hx-color-surface-sunken, #f1f5f9);
+    --hx-toggle-button-color: var(--hx-color-text-primary, #0f172a);
     --hx-toggle-button-border-color: transparent;
   }
 
   .button--tertiary:hover {
-    --hx-toggle-button-bg: var(--hx-color-neutral-200, #e2e8f0);
+    --hx-toggle-button-bg: var(--hx-color-surface-raised, #e2e8f0);
   }
 
   .button--ghost {
@@ -111,17 +111,17 @@ export const helixToggleButtonStyles = css`
   }
 
   .button--ghost:hover {
-    --hx-toggle-button-bg: var(--hx-color-neutral-100, #f1f5f9);
+    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f1f5f9);
   }
 
   .button--outline {
     --hx-toggle-button-bg: transparent;
-    --hx-toggle-button-color: var(--hx-color-neutral-900, #0f172a);
-    --hx-toggle-button-border-color: var(--hx-color-neutral-300, #cbd5e1);
+    --hx-toggle-button-color: var(--hx-color-text-primary, #0f172a);
+    --hx-toggle-button-border-color: var(--hx-color-border-strong, #cbd5e1);
   }
 
   .button--outline:hover {
-    --hx-toggle-button-bg: var(--hx-color-neutral-50, #f8fafc);
+    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f8fafc);
   }
 
   /* ─── Pressed State ─── */
@@ -134,7 +134,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #1e40af));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-neutral-0, #ffffff)
+      var(--hx-color-text-on-primary, #ffffff)
     );
     --hx-toggle-button-border-color: transparent;
   }
@@ -147,7 +147,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-500, #2563eb));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-neutral-0, #ffffff)
+      var(--hx-color-text-on-primary, #ffffff)
     );
     --hx-toggle-button-border-color: var(--hx-color-primary-500, #2563eb);
   }
@@ -175,12 +175,15 @@ export const helixToggleButtonStyles = css`
 
   /* Outline pressed: fills with a neutral tint, darkens the border, and adds an inset shadow for WCAG 3:1 non-text contrast. */
   .button--outline.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-neutral-100, #f1f5f9));
+    --hx-toggle-button-bg: var(
+      --hx-toggle-button-pressed-bg,
+      var(--hx-color-surface-sunken, #f1f5f9)
+    );
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-neutral-900, #0f172a)
+      var(--hx-color-text-primary, #0f172a)
     );
-    --hx-toggle-button-border-color: var(--hx-color-neutral-500, #64748b);
+    --hx-toggle-button-border-color: var(--hx-color-text-muted, #64748b);
     box-shadow: inset 0 0 0 1px var(--hx-color-neutral-500, #64748b);
   }
 

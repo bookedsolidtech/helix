@@ -48,8 +48,16 @@ const _hcOverrides: Array<[string, string]> = [
   ['--hx-color-text-primary', '#FFFFFF'],
   ['--hx-color-text-secondary', '#FFFFFF'],
   ['--hx-color-text-muted', '#E0E0E0'],
+  ['--hx-color-text-strong', '#FFFFFF'],
+  ['--hx-color-text-placeholder', '#B0B0B0'],
   ['--hx-color-text-disabled', '#767676'],
   ['--hx-color-text-inverse', '#000000'],
+  ['--hx-color-text-on-primary', '#000000'],
+  ['--hx-color-text-on-secondary', '#000000'],
+  ['--hx-color-text-on-error', '#000000'],
+  ['--hx-color-text-on-success', '#000000'],
+  ['--hx-color-text-on-warning', '#000000'],
+  ['--hx-color-text-on-info', '#000000'],
   ['--hx-color-text-link', '#FFFF00'],
   ['--hx-color-text-link-hover', '#FFFF99'],
   ['--hx-color-text-link-visited', '#FF80FF'],
@@ -57,6 +65,7 @@ const _hcOverrides: Array<[string, string]> = [
   ['--hx-color-surface-default', '#000000'],
   ['--hx-color-surface-raised', '#1A1A1A'],
   ['--hx-color-surface-sunken', '#000000'],
+  ['--hx-color-surface-inverse', '#FFFFFF'],
   ['--hx-color-surface-overlay', 'rgba(0, 0, 0, 0.95)'],
   ['--hx-color-border-default', '#FFFFFF'],
   ['--hx-color-border-subtle', '#C0C0C0'],
@@ -254,6 +263,9 @@ function _buildThemeCss(theme: ThemeName): string {
  *   <!-- Clinical dashboard content -->
  * </hx-theme>
  * ```
+ * @cssprop [--hx-color-text-primary] - Color.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-duration-fast] - Animation duration.
  */
 @customElement('hx-theme')
 export class HelixTheme extends HelixElement {

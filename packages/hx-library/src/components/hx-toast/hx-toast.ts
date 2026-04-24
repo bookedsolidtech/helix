@@ -35,6 +35,30 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  * @cssprop [--hx-toast-border-radius=var(--hx-border-radius-md)] - Toast border radius.
  * @cssprop [--hx-toast-shadow] - Toast box shadow.
  * @cssprop [--hx-toast-width=20rem] - Toast width.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-toast-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-shadow-md] - Box shadow.
+ * @cssprop [--hx-toast-enter-translate=var(--hx-space-2)] - CSS custom property.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-transition-normal] - Transition timing.
+ * @cssprop [--hx-color-success-600] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
+ * @cssprop [--hx-color-primary-600] - Color.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-opacity-75] - Opacity.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
  */
 @customElement('hx-toast')
 export class HelixToast extends HelixElement {

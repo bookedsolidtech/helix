@@ -26,6 +26,13 @@ export type CounterFormat = 'integer' | 'decimal';
  * @cssprop [--hx-counter-font-size-sm=var(--hx-font-size-xl)] - Font size at sm.
  * @cssprop [--hx-counter-font-size-md=var(--hx-font-size-3xl)] - Font size at md.
  * @cssprop [--hx-counter-font-size-lg=var(--hx-font-size-5xl)] - Font size at lg.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-font-size-xl] - Font size.
+ * @cssprop [--hx-font-size-3xl] - Font size.
+ * @cssprop [--hx-font-size-5xl] - Font size.
  */
 @customElement('hx-counter')
 export class HelixCounter extends HelixElement {

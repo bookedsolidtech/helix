@@ -1,5 +1,14 @@
 # @helixui/drupal-behaviors
 
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [36d5bde]
+  - @helixui/library@3.1.0
+
+  Note: the 3.1.0 release cycle initially published this package as `4.0.0` because changesets' default policy treats any peer-dependency update as a major bump. The bump was cosmetic — the peer range `^3.0.0` still satisfies `@helixui/library@3.1.0` and no API changed. `4.0.0` was unpublished from npm and this patch release (`3.0.1`) is the correct version. `.changeset/config.json` now sets `onlyUpdatePeerDependentsWhenOutOfRange: true` to prevent recurrence.
+
 ## 3.0.0
 
 ### Major Changes

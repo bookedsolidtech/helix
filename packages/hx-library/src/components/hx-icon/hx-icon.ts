@@ -28,6 +28,11 @@ import { helixIconStyles } from './hx-icon.styles.js';
  *
  * @cssprop [--hx-icon-size=var(--hx-size-6,1.5rem)] - Width and height of the icon.
  * @cssprop [--hx-icon-color=currentColor] - Icon color.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-size-5] - Size token.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-size-10] - Size token.
  */
 @customElement('hx-icon')
 export class HelixIcon extends HelixElement {

@@ -25,6 +25,20 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-table-cell-color=var(--hx-color-neutral-900, #0f172a)] - Cell text color.
  * @cssprop [--hx-table-row-hover-bg=var(--hx-color-neutral-50, #f8fafc)] - Row hover background.
  * @cssprop [--hx-table-stripe-bg=var(--hx-color-neutral-50, #f8fafc)] - Striped row background.
+ * @cssprop [--hx-table-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
  */
 @customElement('hx-table')
 export class HelixTable extends HelixElement {

@@ -52,10 +52,10 @@ export const helixActionBarStyles = css`
   /* ─── Variant: outlined ─── */
 
   .base--outlined {
-    background: var(--hx-action-bar-bg, var(--hx-color-neutral-0, #ffffff));
+    background: var(--hx-action-bar-bg, var(--hx-color-surface-default, #ffffff));
     border: var(
       --hx-action-bar-border,
-      var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0)
+      var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #e2e8f0)
     );
     border-radius: var(--hx-border-radius-md, 0.375rem);
   }
@@ -63,7 +63,7 @@ export const helixActionBarStyles = css`
   /* ─── Variant: filled ─── */
 
   .base--filled {
-    background: var(--hx-action-bar-bg, var(--hx-color-neutral-50, #f8fafc));
+    background: var(--hx-action-bar-bg, var(--hx-color-surface-raised, #f8fafc));
     border-radius: var(--hx-border-radius-md, 0.375rem);
   }
 

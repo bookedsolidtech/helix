@@ -5,9 +5,10 @@ export const helixNavItemStyles = css`
     display: block;
     /* The host background must be a concrete color so that axe-core can
        resolve text contrast ratios for shadow-DOM content correctly.
-       WCAG 2.1 AA: neutral-300 (#cbd5e1) on neutral-900 (#0f172a) = 12.02:1. */
-    background-color: var(--hx-nav-item-host-bg, var(--hx-color-neutral-900, #0f172a));
-    color: var(--hx-nav-item-color, var(--hx-color-neutral-300, #cbd5e1));
+       surface-inverse + text-inverse flip per mode: dark-on-light in dark
+       mode, light-on-dark in light mode. */
+    background-color: var(--hx-nav-item-host-bg, var(--hx-color-surface-inverse, #0f172a));
+    color: var(--hx-nav-item-color, var(--hx-color-text-inverse, #ffffff));
   }
 
   * {
@@ -30,7 +31,7 @@ export const helixNavItemStyles = css`
     padding: var(--hx-nav-item-padding, var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem));
     min-height: var(--hx-space-10, 2.5rem);
     text-decoration: none;
-    color: var(--hx-nav-item-color, var(--hx-color-neutral-300, #cbd5e1));
+    color: var(--hx-nav-item-color, var(--hx-color-text-inverse, #ffffff));
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     margin: 0 var(--hx-space-2, 0.5rem);
     transition:
@@ -60,7 +61,7 @@ export const helixNavItemStyles = css`
       --hx-nav-item-hover-bg,
       var(--hx-overlay-white-8, rgba(255, 255, 255, 0.08))
     ); /* fallback for browsers without color-mix() */
-    color: var(--hx-nav-item-hover-color, var(--hx-color-neutral-100, #f1f5f9));
+    color: var(--hx-nav-item-hover-color, var(--hx-color-text-inverse, #ffffff));
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
@@ -81,13 +82,15 @@ export const helixNavItemStyles = css`
   /* ─── Active State ─── */
 
   :host([active]) .nav-item__link {
-    /* neutral-50 (#f8fafc) on primary-600 (#1d4ed8) = 6.41:1 — WCAG AA ✓ */
+    /* active state sits on a brand-primary fill — use text-on-primary so HC
+       on-color overrides apply. text-on-primary (#fff) on primary-600
+       (#1d4ed8) = 7.01:1 — WCAG AA ✓ */
     background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #1d4ed8));
-    color: var(--hx-nav-item-active-color, var(--hx-color-neutral-50, #f8fafc));
+    color: var(--hx-nav-item-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
   :host([active]) .nav-item__link:hover {
-    /* neutral-50 (#f8fafc) on primary-700 (#1e40af) = 8.34:1 — WCAG AA ✓ */
+    /* text-on-primary (#ffffff) on primary-700 (#1e40af) = 8.59:1 — WCAG AA ✓ */
     background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #1e40af));
   }
 
@@ -178,9 +181,10 @@ export const helixNavItemStyles = css`
     left: calc(100% + var(--hx-space-2, 0.5rem));
     top: 50%;
     transform: translateY(-50%);
-    /* neutral-100 (#f1f5f9) on neutral-800 (#1e293b) = 13.35:1 — WCAG AA ✓ */
-    background-color: var(--hx-color-neutral-800, #1e293b);
-    color: var(--hx-color-neutral-100, #f1f5f9);
+    /* tooltip is an inverted surface — flips per mode via surface-inverse /
+       text-inverse. */
+    background-color: var(--hx-color-surface-inverse, #1e293b);
+    color: var(--hx-color-text-inverse, #f1f5f9);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-size: var(--hx-font-size-xs, 0.75rem);

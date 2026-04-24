@@ -4,17 +4,17 @@ export const helixCardStyles = css`
   :host {
     display: block;
     color: var(--hx-card-color, inherit);
-    background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-card-bg, var(--hx-color-surface-default, #ffffff));
   }
 
   .card {
     display: flex;
     flex-direction: column;
     gap: var(--hx-card-gap, var(--hx-space-4, 1rem));
-    background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-card-color, var(--hx-color-neutral-800, #1e293b));
+    background-color: var(--hx-card-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-card-color, var(--hx-color-text-strong, #1e293b));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-card-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-card-border-color, var(--hx-color-border-default, #e2e8f0));
     border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
     overflow: hidden;
     font-family: var(--hx-card-font-family, var(--hx-font-family-sans, sans-serif));
@@ -140,7 +140,7 @@ export const helixCardStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-card-color, var(--hx-color-neutral-600, #475569));
+    color: var(--hx-card-color, var(--hx-color-text-secondary, #475569));
   }
 
   .card__footer {
@@ -158,7 +158,7 @@ export const helixCardStyles = css`
     padding-bottom: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-inline-start: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-card-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-card-border-color, var(--hx-color-border-default, #e2e8f0));
     margin-top: auto;
   }
 

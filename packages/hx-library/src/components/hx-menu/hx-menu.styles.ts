@@ -9,9 +9,9 @@ export const helixMenuStyles = css`
     display: flex;
     flex-direction: column;
     padding: var(--hx-space-1, 0.25rem);
-    background: var(--hx-menu-bg, var(--hx-color-neutral-0, #ffffff));
+    background: var(--hx-menu-bg, var(--hx-color-surface-default, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-menu-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-menu-border-color, var(--hx-color-border-default, #e2e8f0));
     border-radius: var(--hx-menu-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-menu-shadow,

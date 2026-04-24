@@ -49,6 +49,20 @@ export interface HxCheckboxGroupChangeDetail {
  * </hx-checkbox-group>
  * ```
  * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-checkbox-group-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
  */
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends FormMixin(HelixElement) {

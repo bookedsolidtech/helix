@@ -28,6 +28,21 @@ import type { HelixStep } from './hx-step.js';
  * @cssprop [--hx-steps-connector-color=var(--hx-color-neutral-200)] - Connector line color.
  * @cssprop [--hx-steps-label-color=var(--hx-color-neutral-600)] - Step label text color.
  * @cssprop [--hx-steps-description-color=var(--hx-color-neutral-500)] - Step description color.
+ * @cssprop [--hx-steps-indicator-font-size] - Font size for step indicator text.
+ * @cssprop [--hx-steps-indicator-icon-size] - Icon size within step indicator.
+ * @cssprop [--hx-steps-label-font-size] - Font size for step labels.
+ * @cssprop [--hx-steps-description-font-size] - Font size for step description text.
+ * @cssprop [--hx-steps-item-flex] - Flex grow/shrink value for step items.
+ * @cssprop [--hx-steps-item-width] - Fixed width for step items.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-size-5] - Size token.
  */
 @customElement('hx-steps')
 export class HelixSteps extends HelixElement {

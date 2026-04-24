@@ -42,6 +42,45 @@ const _nextSplitButtonId = createIdCounter('hx-split-button');
  * @cssprop [--hx-split-button-menu-border-color=var(--hx-color-neutral-200)] - Dropdown menu border color.
  * @cssprop [--hx-split-button-menu-border-radius=var(--hx-border-radius-md)] - Dropdown menu border radius.
  * @cssprop [--hx-split-button-menu-shadow] - Dropdown menu box shadow.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-filter-brightness-hover] - CSS filter.
+ * @cssprop [--hx-filter-brightness-active] - CSS filter.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-color-primary-300] - Color.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-400] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
+ * @cssprop [--hx-color-primary-200] - Color.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-overlay-black-10] - Overlay color.
+ * @cssprop [--hx-z-index-dropdown] - Z-index layer.
  */
 @customElement('hx-split-button')
 export class HelixSplitButton extends HelixElement {

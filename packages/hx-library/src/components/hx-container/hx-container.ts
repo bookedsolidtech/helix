@@ -42,6 +42,11 @@ import { helixContainerStyles } from './hx-container.styles.js';
  * @cssprop [--hx-container-md=768px] - Max-width for the md width preset.
  * @cssprop [--hx-container-lg=1024px] - Max-width for the lg width preset.
  * @cssprop [--hx-container-xl=1280px] - Max-width for the xl width preset.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-space-12] - Spacing token.
+ * @cssprop [--hx-space-16] - Spacing token.
+ * @cssprop [--hx-space-24] - Spacing token.
+ * @cssprop [--hx-space-32] - Spacing token.
  */
 @customElement('hx-container')
 export class HelixContainer extends HelixElement {

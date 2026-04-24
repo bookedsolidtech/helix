@@ -16,12 +16,12 @@ export const helixPopoverStyles = css`
     z-index: var(--hx-popover-z-index, 9999);
     max-width: var(--hx-popover-max-width, 320px);
     padding: var(--hx-popover-padding, var(--hx-space-3, 0.75rem));
-    background: var(--hx-popover-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-popover-color, var(--hx-color-neutral-900, #0f172a));
+    background: var(--hx-popover-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-popover-color, var(--hx-color-text-primary, #0f172a));
     font-family: var(--hx-popover-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-popover-font-size, var(--hx-font-size-sm, 0.875rem));
     line-height: var(--hx-line-height-normal, 1.5);
-    border: 1px solid var(--hx-popover-border-color, var(--hx-color-neutral-200, #e2e8f0));
+    border: 1px solid var(--hx-popover-border-color, var(--hx-color-border-default, #e2e8f0));
     border-radius: var(--hx-popover-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-popover-shadow,
@@ -50,8 +50,8 @@ export const helixPopoverStyles = css`
     position: absolute;
     width: var(--hx-popover-arrow-size, 10px);
     height: var(--hx-popover-arrow-size, 10px);
-    background: var(--hx-popover-bg, var(--hx-color-neutral-0, #ffffff));
-    border: 1px solid var(--hx-popover-border-color, var(--hx-color-neutral-200, #e2e8f0));
+    background: var(--hx-popover-bg, var(--hx-color-surface-default, #ffffff));
+    border: 1px solid var(--hx-popover-border-color, var(--hx-color-border-default, #e2e8f0));
     transform: rotate(45deg);
     pointer-events: none;
   }

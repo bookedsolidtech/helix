@@ -87,6 +87,14 @@ const variantIcons = {
  * @cssprop [--hx-help-text-font-weight=var(--hx-font-weight-normal)] - Font weight.
  * @cssprop [--hx-help-text-line-height=var(--hx-line-height-normal)] - Line height.
  * @cssprop [--hx-help-text-icon-gap=0.375rem] - Gap between icon and text.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-normal] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
+ * @cssprop [--hx-color-warning-700] - Color.
+ * @cssprop [--hx-color-success-700] - Color.
  */
 @customElement('hx-help-text')
 export class HelixHelpText extends HelixElement {

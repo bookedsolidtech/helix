@@ -29,6 +29,9 @@ import { devWarn } from '../../utils/dev-warn.js';
  *   </hx-accordion-item>
  * </hx-accordion>
  * ```
+ * @cssprop [--hx-accordion-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
  */
 @customElement('hx-accordion')
 export class HelixAccordion extends HelixElement {

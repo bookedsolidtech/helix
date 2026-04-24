@@ -44,6 +44,20 @@ export type ActionBarSize = 'sm' | 'md' | 'lg';
  *   <hx-button slot="end" variant="ghost">Cancel</hx-button>
  * </hx-action-bar>
  * ```
+ * @cssprop [--hx-action-bar-padding-block-start=0px] - Padding.
+ * @cssprop [--hx-action-bar-padding-block-end=0px] - Padding.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
  */
 @customElement('hx-action-bar')
 export class HelixActionBar extends HelixElement {
