@@ -265,8 +265,12 @@ function figmaAxisNameFor(attr: CemAttribute): string {
   return attr.fieldName || attr.name;
 }
 
+function isNamedAttribute(attr: CemAttribute): attr is CemAttribute & { name: string } {
+  return typeof attr.name === 'string' && attr.name.length > 0;
+}
+
 function isInfraAttribute(attr: CemAttribute): boolean {
-  if (!attr.name) return true;
+  if (!isNamedAttribute(attr)) return true;
   if (INFRA_ATTR_NAMES.has(attr.name)) return true;
   for (const prefix of INFRA_ATTR_PREFIXES) {
     if (attr.name.startsWith(prefix)) return true;
@@ -278,6 +282,7 @@ export function extractVariantAxes(decl: CemDeclaration): VariantAxis[] {
   const attrs = decl.attributes ?? [];
   const axes: VariantAxis[] = [];
   for (const attr of attrs) {
+    if (!isNamedAttribute(attr)) continue;
     if (isInfraAttribute(attr)) continue;
     const typeText = attr.type?.text ?? '';
     const enumValues = parseLiteralUnion(typeText);
@@ -312,6 +317,7 @@ export function extractTextProperties(decl: CemDeclaration): TextProperty[] {
   const attrs = decl.attributes ?? [];
   const props: TextProperty[] = [];
   for (const attr of attrs) {
+    if (!isNamedAttribute(attr)) continue;
     if (isInfraAttribute(attr)) continue;
     const typeText = attr.type?.text ?? '';
     // Skip anything that would have been a variant axis.
@@ -341,7 +347,10 @@ export function extractTextProperties(decl: CemDeclaration): TextProperty[] {
 
 export function excludedAttributeNames(decl: CemDeclaration): string[] {
   const attrs = decl.attributes ?? [];
-  return attrs.filter((a) => isInfraAttribute(a)).map((a) => a.name);
+  return attrs
+    .filter(isNamedAttribute)
+    .filter(isInfraAttribute)
+    .map((a) => a.name);
 }
 
 // ---------------------------------------------------------------------------
@@ -634,7 +643,12 @@ export interface BuildComponentInput {
 
 export function buildComponentEntry(input: BuildComponentInput): ComponentEntry {
   const { decl, module: mod, templateDependencies, tierOverride } = input;
-  const tag = decl.tagName!;
+  if (!decl.tagName) {
+    throw new Error(
+      `buildComponentEntry: declaration "${decl.name ?? '<anonymous>'}" is missing tagName`,
+    );
+  }
+  const tag = decl.tagName;
   const cssParts = decl.cssParts ?? [];
   const cssProperties = (decl.cssProperties ?? []).map(
     (cp): ResolvedCssProperty => ({

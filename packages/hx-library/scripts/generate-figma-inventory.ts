@@ -210,9 +210,8 @@ function normalizeForCompare(inv: Inventory): Inventory {
   return { ...inv, generatedAt: '' };
 }
 
-function freezeGeneratedAt(inv: Inventory): Inventory {
-  // Use a stable commit-ordered timestamp when possible, else now().
-  return { ...inv, generatedAt: new Date().toISOString() };
+function freezeGeneratedAt(inv: Inventory, reusedTimestamp?: string): Inventory {
+  return { ...inv, generatedAt: reusedTimestamp ?? new Date().toISOString() };
 }
 
 function main(): void {
@@ -252,8 +251,30 @@ function main(): void {
     return;
   }
 
-  const finalInv = freezeGeneratedAt(inventory);
-  writeFileSync(OUT_PATH, stableStringify(finalInv), 'utf8');
+  let reusedTimestamp: string | undefined;
+  if (existsSync(OUT_PATH)) {
+    try {
+      const existing = readJson<Inventory>(OUT_PATH);
+      const existingNorm = stableStringify(normalizeForCompare(existing));
+      const pendingNorm = stableStringify(normalizeForCompare(inventory));
+      if (existingNorm === pendingNorm && typeof existing.generatedAt === 'string') {
+        reusedTimestamp = existing.generatedAt;
+      }
+    } catch {
+      // fall through — will write with a fresh timestamp
+    }
+  }
+
+  const finalInv = freezeGeneratedAt(inventory, reusedTimestamp);
+  const nextBytes = stableStringify(finalInv);
+  const prevBytes = existsSync(OUT_PATH) ? readFileSync(OUT_PATH, 'utf8') : '';
+  if (nextBytes === prevBytes) {
+    console.log(
+      `figma-inventory.json unchanged — ${finalInv.components.length} components, ${finalInv.excluded.length} excluded.`,
+    );
+    return;
+  }
+  writeFileSync(OUT_PATH, nextBytes, 'utf8');
   console.log(
     `Wrote ${OUT_PATH} — ${finalInv.components.length} components, ${finalInv.excluded.length} excluded.`,
   );

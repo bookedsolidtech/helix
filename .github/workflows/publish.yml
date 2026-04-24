@@ -63,11 +63,26 @@ jobs:
 
       - name: Verify CEM matches committed manifest
         run: |
-          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+          # `git status --porcelain` catches both modified AND untracked changes;
+          # `git diff --exit-code` would silently pass if the committed file was
+          # deleted and regeneration re-created it as untracked.
+          STATUS=$(git status --porcelain -- packages/hx-library/custom-elements.json)
+          if [ -n "$STATUS" ]; then
             echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            echo "$STATUS"
             exit 1
           fi
           echo "CEM matches committed manifest."
+
+      - name: Verify Figma inventory matches committed snapshot
+        run: |
+          STATUS=$(git status --porcelain -- packages/hx-library/figma-inventory.json)
+          if [ -n "$STATUS" ]; then
+            echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit before tagging."
+            echo "$STATUS"
+            exit 1
+          fi
+          pnpm --filter=@helixui/library run figma:inventory:check
 
       - name: Build packages
         run: |
@@ -206,11 +221,23 @@ jobs:
       - name: Verify CEM matches committed manifest
         run: |
           pnpm --filter=@helixui/library run cem
-          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+          STATUS=$(git status --porcelain -- packages/hx-library/custom-elements.json)
+          if [ -n "$STATUS" ]; then
             echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            echo "$STATUS"
             exit 1
           fi
           echo "CEM matches committed manifest."
+
+      - name: Verify Figma inventory matches committed snapshot
+        run: |
+          STATUS=$(git status --porcelain -- packages/hx-library/figma-inventory.json)
+          if [ -n "$STATUS" ]; then
+            echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit before tagging."
+            echo "$STATUS"
+            exit 1
+          fi
+          pnpm --filter=@helixui/library run figma:inventory:check
 
       - name: Build CDN artifacts
         run: pnpm --filter=@helixui/library run build:cdn
