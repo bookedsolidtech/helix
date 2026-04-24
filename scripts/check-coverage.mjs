@@ -66,7 +66,13 @@ const HX_COVERAGE_COMPONENTS = process.env.HX_COVERAGE_COMPONENTS
 // component list with "components whose test file was in this run" so the
 // coverage gate only enforces on components the shard actually exercised.
 function loadShardComponents() {
-  if (!existsSync(TEST_RESULTS_PATH)) return null;
+  if (!existsSync(TEST_RESULTS_PATH)) {
+    // Treated as a hard error by the caller when scoped enforcement is on —
+    // we cannot intersect against a list that does not exist, and silently
+    // enforcing every scoped component on every shard would re-introduce
+    // the false-failure that the shard-aware check exists to fix.
+    return null;
+  }
   try {
     const results = JSON.parse(readFileSync(TEST_RESULTS_PATH, 'utf8'));
     const names = (results.testResults || [])
@@ -75,7 +81,8 @@ function loadShardComponents() {
       .map(extractComponent)
       .filter(Boolean);
     return new Set(names);
-  } catch {
+  } catch (err) {
+    console.error(`Failed to parse ${TEST_RESULTS_PATH}: ${err.message}`);
     return null;
   }
 }
@@ -233,6 +240,35 @@ function main() {
     statements: config.threshold?.statements ?? THRESHOLD,
   };
   const exemptions = config.exemptions ?? {};
+
+  // Shard-level short-circuit. The "few test files" branch in ci.yml writes
+  // an empty test-results.json and skips vitest entirely on shards 2-4 when
+  // the changed-file set produces fewer test files than shards. With no
+  // vitest run there is no coverage data — but the shard still has nothing
+  // to enforce. Exit 0 before loadCoverageData() trips the missing-data
+  // hard fail. Only applies when scoped enforcement is active; full runs
+  // continue to require coverage data.
+  if (HX_COVERAGE_COMPONENTS) {
+    const shardComponentsEarly = loadShardComponents();
+    if (shardComponentsEarly === null) {
+      console.error(
+        `Coverage gate: ${TEST_RESULTS_PATH} is missing or unreadable. ` +
+          `Cannot determine which scoped components ran on this shard. ` +
+          `Ensure the test step writes test-results.json before invoking check-coverage.`,
+      );
+      if (process.env.GITHUB_ACTIONS === 'true') {
+        console.log(`::error title=Coverage gate failed::missing test-results.json`);
+      }
+      process.exit(1);
+    }
+    if (shardComponentsEarly.size === 0) {
+      console.log(
+        `Shard had no test files to run — nothing to enforce. ` +
+          `Scoped components [${[...HX_COVERAGE_COMPONENTS].join(', ')}] are checked on the shards that ran their tests.`,
+      );
+      process.exit(0);
+    }
+  }
 
   const coverageData = loadCoverageData();
   const components = aggregateByComponent(coverageData);
