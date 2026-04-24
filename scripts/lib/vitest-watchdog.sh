@@ -20,7 +20,7 @@
 #   WATCHDOG_EXIT     — 0 on success (tests passed), 1 on failure
 #
 # Environment overrides:
-#   STALE_TIMEOUT     — seconds of no output before force-kill (default: 15)
+#   STALE_TIMEOUT     — seconds of no output before force-kill (default: 120)
 #   POLL_INTERVAL     — seconds between watchdog polls (default: 3)
 
 run_vitest_with_watchdog() {
@@ -28,7 +28,7 @@ run_vitest_with_watchdog() {
   local logfile="$2"
   shift 2
 
-  local stale_timeout="${STALE_TIMEOUT:-15}"
+  local stale_timeout="${STALE_TIMEOUT:-120}"
   local poll_interval="${POLL_INTERVAL:-3}"
   local start_time
   start_time=$(date +%s)
