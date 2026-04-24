@@ -41,7 +41,7 @@ const _nextCardId = createIdCounter('hx-card');
  * @cssprop [--hx-border-width-medium] - Width.
  * @cssprop [--hx-border-width-thin] - Width.
  * @cssprop [--hx-card-focus-ring-color=var(--hx-focus-ring-color)] - Color.
- * @cssprop [--hx-card-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-card-font-family=var(--hx-font-family-sans)] - Font family for card text content.
  * @cssprop [--hx-color-neutral-0] - Color.
  * @cssprop [--hx-color-neutral-200] - Color.
  * @cssprop [--hx-color-neutral-600] - Color.
@@ -63,7 +63,7 @@ const _nextCardId = createIdCounter('hx-card');
  * @cssprop [--hx-space-3] - Spacing token.
  * @cssprop [--hx-space-4] - Spacing token.
  * @cssprop [--hx-space-6] - Spacing token.
- * @cssprop [--hx-transform-lift-md] - CSS custom property.
+ * @cssprop [--hx-transform-lift-md] - Transform applied on hover to lift the card.
  * @cssprop [--hx-transition-normal] - Transition timing.
  */
 @customElement('hx-card')

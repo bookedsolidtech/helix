@@ -43,7 +43,7 @@ paths = [
     '''\.next/''',
     # Figma inventory — generated design token catalog, contains token names like
     # "duration/slow" that trip generic-api-key rules; no secrets live here
-    '''figma-inventory\.json''',
+    '''^packages/hx-library/figma-inventory\.json$''',
 ]
 
 regexes = [

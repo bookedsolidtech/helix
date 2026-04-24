@@ -32,15 +32,13 @@ const _nextProgressBarId = createIdCounter('hx-progress-bar');
  * @cssprop [--hx-progress-bar-label-font-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-progress-bar-label-font-weight=var(--hx-font-weight-medium)] - Label font weight.
  * @cssprop [--hx-progress-bar-label-color=var(--hx-color-neutral-700)] - Label text color.
- *
- * @fires {CustomEvent} hx-complete - Emitted when progress reaches 100%.
  * @cssprop [--hx-space-1] - Spacing token.
  * @cssprop [--hx-font-family-sans] - Font family.
  * @cssprop [--hx-font-size-sm] - Font size.
  * @cssprop [--hx-font-weight-medium] - Font weight.
  * @cssprop [--hx-color-neutral-700] - Color.
  * @cssprop [--hx-line-height-tight] - Line height.
- * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-border-radius-full] - Border radius.
  * @cssprop [--hx-color-neutral-100] - Color.
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-space-3] - Spacing token.
@@ -49,8 +47,10 @@ const _nextProgressBarId = createIdCounter('hx-progress-bar');
  * @cssprop [--hx-color-success-700] - Color.
  * @cssprop [--hx-color-warning-500] - Color.
  * @cssprop [--hx-color-error-500] - Color.
- * @cssprop [--hx-progress-bar-indeterminate-duration=1.5s] - CSS custom property.
+ * @cssprop [--hx-progress-bar-indeterminate-duration=1.5s] - Animation duration for indeterminate state.
  * @cssprop [--hx-opacity-disabled] - Opacity.
+ *
+ * @fires {CustomEvent} hx-complete - Emitted when progress reaches 100%.
  */
 @customElement('hx-progress-bar')
 export class HelixProgressBar extends HelixElement {

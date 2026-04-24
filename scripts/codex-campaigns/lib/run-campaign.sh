@@ -62,7 +62,7 @@ HEAD_SHA="$(git -C "$REPO_ROOT" rev-parse HEAD)"
 TARGET_LIST="$(mktemp)"
 trap 'rm -f "$TARGET_LIST"' EXIT
 
-grep -vE '^\s*(#|$)' "$TARGETS_FILE" > "$TARGET_LIST"
+grep -vE '^\s*(#|$)' "$TARGETS_FILE" > "$TARGET_LIST" || true
 
 if (( RESUME == 1 )) && [[ -s "$FINDINGS" ]]; then
   SEEN_TAGS="$(jq -r '.tag' "$FINDINGS" | sort -u)"
@@ -83,6 +83,7 @@ fi
 TOTAL="$(wc -l < "$TARGET_LIST" | tr -d ' ')"
 (( TOTAL > 0 )) || { echo "no targets to process" >&2; exit 0; }
 
+: > "$FINDINGS"
 START_COUNT="$(wc -l < "$FINDINGS" | tr -d ' ')"
 
 echo "campaign=$CAMPAIGN targets=$TOTAL head=$HEAD_SHA" | tee -a "$RUN_LOG"

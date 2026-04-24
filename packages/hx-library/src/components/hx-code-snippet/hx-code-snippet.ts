@@ -40,7 +40,7 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  * @cssprop [--hx-code-snippet-inline-padding-x=0.375em] - Padding.
  * @cssprop [--hx-code-snippet-inline-padding-y=0.125em] - Padding.
  * @cssprop [--hx-code-snippet-line-number-color=var(--hx-color-neutral-500)] - Color.
- * @cssprop [--hx-code-snippet-tab-size=2] - CSS custom property.
+ * @cssprop [--hx-code-snippet-tab-size=2] - Number of spaces per tab character.
  * @cssprop [--hx-color-neutral-100] - Color.
  * @cssprop [--hx-color-neutral-200] - Color.
  * @cssprop [--hx-color-neutral-300] - Color.

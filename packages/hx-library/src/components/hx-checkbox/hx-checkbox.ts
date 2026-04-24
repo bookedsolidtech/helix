@@ -53,7 +53,7 @@ export interface HxCheckboxChangeDetail {
  * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
  * @cssprop [--hx-opacity-disabled] - Opacity.
  * @cssprop [--hx-space-1] - Spacing token.
- * @cssprop [--hx-checkbox-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-checkbox-font-family=var(--hx-font-family-sans)] - Font family for checkbox label and help text.
  * @cssprop [--hx-font-family-sans] - Font family.
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-touch-target-min] - Minimum touch target size.

@@ -26,9 +26,9 @@ const DRY_RUN = process.argv.includes('--dry-run');
 interface Finding {
   category: string;
   target: string;
-  tag: string;
-  public_surface: string;
-  evidence: string;
+  tag?: string;
+  public_surface?: string;
+  evidence?: string;
 }
 
 // ─── Fallback extraction ───────────────────────────────────────────────────
@@ -138,13 +138,22 @@ function injectIntoSource(source: string, lines: string[]): string | null {
   if (ceIdx === -1) return null;
 
   const beforeCe = source.slice(0, ceIdx);
-  // Search for " */" (with leading space) so we can re-attach it correctly
-  // and avoid a whitespace-only orphan line that breaks Prettier's format:check.
+
+  // Prefer inserting after the last existing @cssprop line so all @cssprop
+  // entries stay contiguous even when other tags (@fires, @slot) are present.
+  const lastCsspropIdx = beforeCe.lastIndexOf(' * @cssprop ');
+  if (lastCsspropIdx !== -1) {
+    const lineEnd = beforeCe.indexOf('\n', lastCsspropIdx);
+    if (lineEnd !== -1) {
+      const insertion = '\n' + lines.join('\n');
+      return source.slice(0, lineEnd) + insertion + source.slice(lineEnd);
+    }
+  }
+
+  // Fallback: no existing @cssprop — insert before the JSDoc closing " */".
   const closingIdx = beforeCe.lastIndexOf(' */');
   if (closingIdx === -1) return null;
 
-  // source.slice(0, closingIdx) ends with the newline of the last existing line.
-  // We append the new lines, then a newline, then restore " */" from source.
   const insertion = lines.join('\n') + '\n';
   return source.slice(0, closingIdx) + insertion + source.slice(closingIdx);
 }
@@ -166,7 +175,12 @@ async function main() {
     }
 
     if (f.category !== 'cem-completeness') continue;
-    if (!f.public_surface.startsWith('css-property:')) continue;
+    if (typeof f.tag !== 'string' || !f.tag) {
+      console.warn('  SKIP (missing tag field):', line.slice(0, 120));
+      continue;
+    }
+    if (typeof f.public_surface !== 'string' || !f.public_surface.startsWith('css-property:'))
+      continue;
 
     const tokenName = f.public_surface.slice('css-property:'.length);
     if (!tokenName.startsWith('--')) continue;
@@ -176,7 +190,7 @@ async function main() {
     }
     const entry = byTarget.get(f.target)!;
     if (!entry.tokens.has(tokenName)) {
-      entry.tokens.set(tokenName, extractFallback(f.evidence, tokenName));
+      entry.tokens.set(tokenName, extractFallback(f.evidence ?? '', tokenName));
     }
   }
 
