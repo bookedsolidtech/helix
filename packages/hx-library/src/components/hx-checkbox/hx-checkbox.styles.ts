@@ -132,7 +132,7 @@ export const helixCheckboxStyles = css`
     width: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
     height: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
     fill: none;
-    stroke: var(--hx-checkbox-checkmark-color, var(--hx-color-surface-default, #ffffff));
+    stroke: var(--hx-checkbox-checkmark-color, var(--hx-color-text-on-primary, #ffffff));
     stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;

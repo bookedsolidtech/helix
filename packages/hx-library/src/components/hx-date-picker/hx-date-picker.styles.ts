@@ -318,7 +318,7 @@ export const helixDatePickerStyles = css`
 
   .calendar__day--selected {
     background-color: var(--hx-date-picker-selected-bg, var(--hx-color-primary-500, #2563eb));
-    color: var(--hx-date-picker-selected-color, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-date-picker-selected-color, var(--hx-color-text-on-primary, #ffffff));
     font-weight: var(--hx-font-weight-semibold, 600);
   }
 

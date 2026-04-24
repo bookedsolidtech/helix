@@ -77,7 +77,7 @@ export const helixIconButtonStyles = css`
 
   .button--primary {
     --hx-icon-button-bg: var(--hx-color-primary-500);
-    --hx-icon-button-color: var(--hx-color-surface-default);
+    --hx-icon-button-color: var(--hx-color-text-on-primary);
     --hx-icon-button-border-color: transparent;
   }
 
@@ -107,7 +107,7 @@ export const helixIconButtonStyles = css`
 
   .button--danger {
     --hx-icon-button-bg: var(--hx-color-error-500);
-    --hx-icon-button-color: var(--hx-color-surface-default);
+    --hx-icon-button-color: var(--hx-color-text-on-error);
     --hx-icon-button-border-color: transparent;
   }
 

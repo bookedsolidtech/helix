@@ -20,7 +20,7 @@ export const helixToggleButtonStyles = css`
     border: var(--hx-border-width-thin, 1px) solid var(--hx-toggle-button-border-color, transparent);
     border-radius: var(--hx-toggle-button-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-toggle-button-bg, var(--hx-color-primary-500, #2563eb));
-    color: var(--hx-toggle-button-color, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-toggle-button-color, var(--hx-color-text-on-primary, #ffffff));
     font-family: var(--hx-toggle-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-toggle-button-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -80,7 +80,7 @@ export const helixToggleButtonStyles = css`
 
   .button--primary {
     --hx-toggle-button-bg: var(--hx-color-primary-500, #2563eb);
-    --hx-toggle-button-color: var(--hx-color-surface-default, #ffffff);
+    --hx-toggle-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-toggle-button-border-color: transparent;
   }
 
@@ -134,7 +134,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #1e40af));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-surface-default, #ffffff)
+      var(--hx-color-text-on-primary, #ffffff)
     );
     --hx-toggle-button-border-color: transparent;
   }
@@ -147,7 +147,7 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-500, #2563eb));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-surface-default, #ffffff)
+      var(--hx-color-text-on-primary, #ffffff)
     );
     --hx-toggle-button-border-color: var(--hx-color-primary-500, #2563eb);
   }

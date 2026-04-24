@@ -31,7 +31,7 @@ export const helixSplitButtonStyles = css`
     border-radius: var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem)) 0 0
       var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-split-button-bg, var(--hx-color-primary-500, #2563eb));
-    color: var(--hx-split-button-color, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-split-button-color, var(--hx-color-text-on-primary, #ffffff));
     font-family: var(--hx-split-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-split-button-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -84,7 +84,7 @@ export const helixSplitButtonStyles = css`
     border-radius: 0 var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem))
       var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem)) 0;
     background-color: var(--hx-split-button-bg, var(--hx-color-primary-500, #2563eb));
-    color: var(--hx-split-button-color, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-split-button-color, var(--hx-color-text-on-primary, #ffffff));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
@@ -172,7 +172,7 @@ export const helixSplitButtonStyles = css`
   .split-button--primary .split-button__primary,
   .split-button--primary .split-button__trigger {
     --hx-split-button-bg: var(--hx-color-primary-500, #2563eb);
-    --hx-split-button-color: var(--hx-color-surface-default, #ffffff);
+    --hx-split-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-split-button-border-color: transparent;
     --hx-split-button-divider-color: var(--hx-color-primary-400, #60a5fa);
   }
@@ -214,7 +214,7 @@ export const helixSplitButtonStyles = css`
   .split-button--danger .split-button__primary,
   .split-button--danger .split-button__trigger {
     --hx-split-button-bg: var(--hx-color-error-500, #dc2626);
-    --hx-split-button-color: var(--hx-color-surface-default, #ffffff);
+    --hx-split-button-color: var(--hx-color-text-on-error, #ffffff);
     --hx-split-button-border-color: transparent;
     --hx-split-button-divider-color: var(--hx-color-error-400, #f87171);
   }
