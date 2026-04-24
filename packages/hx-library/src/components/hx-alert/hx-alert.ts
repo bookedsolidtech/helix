@@ -50,6 +50,42 @@ export interface HxAlertCloseDetail {
  * @cssprop [--hx-alert-font-family=var(--hx-font-family-sans)] - Alert font family.
  * @cssprop [--hx-touch-target-size=44px] - Minimum touch target size for the close button.
  * @cssprop [--hx-alert-accent-width=4px] - Width of the left border accent stripe.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-error-200] - Color.
+ * @cssprop [--hx-color-error-50] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-800] - Color.
+ * @cssprop [--hx-color-info-200] - Color.
+ * @cssprop [--hx-color-info-50] - Color.
+ * @cssprop [--hx-color-info-500] - Color.
+ * @cssprop [--hx-color-info-800] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-color-success-200] - Color.
+ * @cssprop [--hx-color-success-50] - Color.
+ * @cssprop [--hx-color-success-500] - Color.
+ * @cssprop [--hx-color-success-800] - Color.
+ * @cssprop [--hx-color-warning-200] - Color.
+ * @cssprop [--hx-color-warning-50] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-warning-800] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-opacity-100] - Opacity.
+ * @cssprop [--hx-opacity-75] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-5] - Spacing token.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 @customElement('hx-alert')
 export class HelixAlert extends HelixElement {

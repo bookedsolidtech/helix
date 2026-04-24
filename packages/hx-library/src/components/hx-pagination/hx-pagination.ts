@@ -73,6 +73,27 @@ export interface HxPageSizeChangeDetail {
  *   {{ show_first_last ? 'show-first-last' : '' }}
  * ></hx-pagination>
  * ```
+ * @cssprop [--hx-pagination-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-pagination-focus-ring-color=var(--hx-focus-ring-color)] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-color-neutral-500] - Color.
  */
 @customElement('hx-pagination')
 export class HelixPagination extends HelixElement {

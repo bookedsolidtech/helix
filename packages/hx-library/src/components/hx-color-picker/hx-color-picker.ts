@@ -78,6 +78,35 @@ export interface HxColorPickerDetail {
  *   data-swatches='{{ swatches | json_encode }}'
  * ></hx-color-picker>
  * ```
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-overlay-black-10] - Overlay color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-font-family-mono] - Font family.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-lg] - CSS custom property.
+ * @cssprop [--hx-overlay-black-15] - Overlay color.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-overlay-black-30] - Overlay color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-color-neutral-900] - Color.
  */
 @customElement('hx-color-picker')
 export class HelixColorPicker extends FormMixin(HelixElement) {

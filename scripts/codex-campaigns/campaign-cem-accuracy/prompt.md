@@ -47,6 +47,15 @@ For every public method in the source (anything not `private` or prefixed with `
 
 For every documented method, verify it exists.
 
+#### Out of scope for this campaign
+
+The `@custom-elements-manifest/analyzer` deliberately does **not** surface framework lifecycle overrides. Do NOT flag any of the following as "undocumented methods" — they are audited by a separate lifecycle-correctness campaign, not this one:
+
+- Lit lifecycle: `connectedCallback`, `disconnectedCallback`, `adoptedCallback`, `attributeChangedCallback`, `render`, `createRenderRoot`, `firstUpdated`, `updated`, `willUpdate`, `shouldUpdate`, `getUpdateComplete`, `scheduleUpdate`, `performUpdate`
+- Form-associated mixin hooks (protected, `_`-prefixed): `_onFormReset`, `_onFormStateRestore`, `_onFormDisabled`, `_onFormAssociated`
+- Slot-coordination mixin hooks: `_onSlotChange`, `_onSlotAssign`
+- Private fields (`private` modifier or `_`-prefix). If one leaks into CEM `members[]` anyway, that IS a finding — flag it as `cem-accuracy` against the CEM file, not the source.
+
 ### 3. Dispatched events
 
 Search the source for `dispatchEvent(new CustomEvent(...))`, `dispatchEvent(new Event(...))`, and any helper that wraps event dispatch.
@@ -75,11 +84,14 @@ For every `part="..."` attribute in the render method:
 
 ### 6. CSS custom properties (`--hx-*`)
 
+**Policy: every `--hx-*` token a component consumes must be documented as an `@cssprop` on that component's JSDoc.** Semantic-tier tokens (`--hx-space-*`, `--hx-color-*`, `--hx-transition-*`, `--hx-size-*`, `--hx-focus-ring-*`, `--hx-opacity-*`, `--hx-overlay-*`, etc.) are NOT exempt — if the component consumes them, the component documents them. This is the HELiX authoring standard.
+
 For every `--hx-*` custom property the styles consume (`var(--hx-...)`) or define (`--hx-...:`) on `:host`:
 
 - Is it documented in CEM `cssProperties[]`?
 - Is the description meaningful?
 - Is the default value documented when the styles assign one on `:host`?
+- When the `var()` chains through a semantic fallback (e.g. `var(--hx-button-bg, var(--hx-color-primary-500))`), does the CEM `default` reflect the semantic token (`var(--hx-color-primary-500)`) rather than the raw literal at the end of the chain? A raw-literal `default` that hides the semantic cascade is a `cem-accuracy` finding.
 
 ### 7. `formAssociated` / `ElementInternals`
 
@@ -112,9 +124,9 @@ Emit findings as **JSONL only**. One JSON object per line. No prose between find
 - `codex_run`: the value of `{HEAD_SHA}` exactly as passed in
 - `severity`:
   - `high` — undocumented public property, method, or dispatched event; stale CEM entry that points to nothing
-  - `medium` — undocumented slot, CSS part, or CSS custom property; missing description on a documented surface
-  - `low` — description present but stale, copy-pasted from another component, or visibly placeholder
-  - `info` — opportunity for improved phrasing only
+  - `medium` — undocumented slot, CSS part, or CSS custom property; CEM `default` value that materially diverges from the actual style cascade
+  - `low` — private or underscore-prefixed field leaking into public CEM `members[]`
+  - `info` — description present but missing/stale/copy-pasted/placeholder; phrasing improvement; any documentation-quality issue on an otherwise-correct surface. **Description quality findings are always `info` — they are batched into a later documentation sweep, not triaged with correctness issues.**
 - `category`:
   - `cem-completeness` — surface exists in source but is missing from CEM
   - `cem-accuracy` — surface is documented but the documentation is wrong or stale
@@ -124,8 +136,8 @@ Emit findings as **JSONL only**. One JSON object per line. No prose between find
 - `evidence`: a literal quote from the file at that line (escape quotes properly for JSON)
 - `fix`: concrete and actionable — name the JSDoc tag to add, the CEM key to update, or the source code to change
 - `verdict_for_target`:
-  - `pass` — all findings are `info` only
-  - `concerns` — at least one `low` or `medium` finding
+  - `pass` — zero findings, or all findings are `info` only
+  - `concerns` — at least one `low` or `medium` finding (but no `high`)
   - `blocking` — at least one `high` finding
 
 ### Per-target verdict consistency

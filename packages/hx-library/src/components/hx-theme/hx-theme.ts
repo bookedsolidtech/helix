@@ -254,6 +254,9 @@ function _buildThemeCss(theme: ThemeName): string {
  *   <!-- Clinical dashboard content -->
  * </hx-theme>
  * ```
+ * @cssprop [--hx-color-text-primary] - Color.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-duration-fast] - Animation duration.
  */
 @customElement('hx-theme')
 export class HelixTheme extends HelixElement {

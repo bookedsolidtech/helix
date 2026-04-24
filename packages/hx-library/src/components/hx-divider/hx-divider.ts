@@ -24,6 +24,15 @@ import { helixDividerStyles } from './hx-divider.styles.js';
  * @cssprop [--hx-divider-label-color=var(--hx-color-neutral-500)] - Label text color.
  * @cssprop [--hx-divider-label-font-size=var(--hx-font-size-sm)] - Label font size.
  * @cssprop [--hx-divider-label-gap=var(--hx-space-3)] - Gap between lines and label.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-line-height-tight] - Line height.
  */
 @customElement('hx-divider')
 export class HelixDivider extends HelixElement {

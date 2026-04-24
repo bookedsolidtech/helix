@@ -47,6 +47,48 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-button-inverted-color=#ffffff] - Text color when inverted.
  * @cssprop [--hx-button-inverted-ghost-hover-bg=rgba(255,255,255,0.15)] - Ghost hover bg when inverted.
  * @cssprop [--hx-button-inverted-focus-ring-color=rgba(255,255,255,0.5)] - Focus ring color when inverted.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-filter-brightness-hover] - CSS filter.
+ * @cssprop [--hx-filter-brightness-active] - CSS filter.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-color-primary-600] - Color.
+ * @cssprop [--hx-duration-spinner] - Animation duration.
+ * @cssprop [--hx-opacity-muted] - Opacity.
+ * @cssprop [--hx-overlay-white-50] - Overlay color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-overlay-white-70] - Overlay color.
+ * @cssprop [--hx-overlay-white-15] - Overlay color.
+ * @cssprop [--hx-overlay-white-25] - Overlay color.
+ * @cssprop [--hx-overlay-white-20] - Overlay color.
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {

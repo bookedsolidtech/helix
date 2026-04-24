@@ -26,6 +26,8 @@ import { helixProseScopedCss } from './hx-prose.styles.js';
  * @cssprop [--hx-prose-color=var(--hx-color-text)] - Body text color.
  * @cssprop [--hx-prose-heading-color=var(--hx-color-text-strong)] - Heading color.
  * @cssprop [--hx-prose-link-color=var(--hx-color-primary)] - Link color.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-lg] - Font size.
  */
 @customElement('hx-prose')
 export class HelixProse extends HelixElement {

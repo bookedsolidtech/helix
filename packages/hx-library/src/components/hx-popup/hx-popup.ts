@@ -123,6 +123,7 @@ type ArrowData = { x?: number; y?: number; centerOffset: number };
  * ```twig
  * <hx-popup anchor="#{{ element['#id'] }}" placement="bottom">...</hx-popup>
  * ```
+ * @cssprop [--hx-color-neutral-0] - Color.
  */
 @customElement('hx-popup')
 export class HelixPopup extends HelixElement {

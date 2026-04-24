@@ -32,6 +32,41 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  * @cssprop [--hx-code-snippet-font-size=var(--hx-font-size-sm,0.875rem)] - Font size.
  * @cssprop [--hx-code-snippet-border-radius=var(--hx-border-radius-md,0.375rem)] - Border radius.
  * @cssprop [--hx-code-snippet-padding=var(--hx-space-4,1rem)] - Inner padding (block mode).
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-code-snippet-inline-bg=var(--hx-color-neutral-100)] - Background color.
+ * @cssprop [--hx-code-snippet-inline-color=var(--hx-color-neutral-900)] - Color.
+ * @cssprop [--hx-code-snippet-inline-padding-x=0.375em] - Padding.
+ * @cssprop [--hx-code-snippet-inline-padding-y=0.125em] - Padding.
+ * @cssprop [--hx-code-snippet-line-number-color=var(--hx-color-neutral-500)] - Color.
+ * @cssprop [--hx-code-snippet-tab-size=2] - CSS custom property.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-filter-brightness-active] - CSS filter.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-mono] - Font family.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-relaxed] - Line height.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-8] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 @customElement('hx-code-snippet')
 export class HelixCodeSnippet extends HelixElement {

@@ -37,6 +37,27 @@ import { helixTopNavStyles } from './hx-top-nav.styles.js';
  * @cssprop [--hx-top-nav-padding-x=var(--hx-space-6)] - Horizontal padding.
  * @cssprop [--hx-top-nav-z-index=var(--hx-z-index-sticky)] - Z-index for sticky mode.
  * @cssprop [--hx-top-nav-toggle-color=var(--hx-color-neutral-700)] - Hamburger icon color.
+ * @cssprop [--hx-top-nav-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-z-index-sticky] - Z-index layer.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-16] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-duration-fast] - Animation duration.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
  */
 @customElement('hx-top-nav')
 export class HelixTopNav extends HelixElement {

@@ -46,6 +46,12 @@ export interface HxSelectDetail {
  * @csspart tree - The tree container element with role="tree".
  *
  * @cssprop [--hx-tree-font-family=var(--hx-font-family-sans)] - Tree font family.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
  */
 @customElement('hx-tree-view')
 export class HelixTreeView extends HelixElement {
