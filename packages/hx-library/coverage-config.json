@@ -17,7 +17,7 @@
     "hx-theme": {
       "reason": "Pre-existing branches at ~77.55% from SSR/matchMedia guards (typeof window undefined) and motion='none' vs 'reduced' paths. Surfaced by shard-aware coverage enforcement in the 3.1.0 codex remediation PR; fix is a narrow test-addition task unrelated to the staging→main blocker.",
       "remediationDate": "2026-05-31",
-      "issue": "https://github.com/bookedsolidtech/helix/issues"
+      "issue": "https://github.com/bookedsolidtech/helix/issues/1553"
     }
   }
 }

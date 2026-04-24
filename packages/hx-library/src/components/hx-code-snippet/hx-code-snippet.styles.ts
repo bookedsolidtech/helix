@@ -134,12 +134,15 @@ export const helixCodeSnippetStyles = css`
     font-weight: var(--hx-font-weight-medium, 500);
     text-align: center;
     cursor: pointer;
-    transition: background-color var(--hx-transition-fast, 150ms ease);
+    transition:
+      border-color var(--hx-transition-fast, 150ms ease),
+      filter var(--hx-transition-fast, 150ms ease);
   }
 
   .code-snippet__expand-button:hover {
-    background-color: var(--hx-color-surface-inverse, #0f172a);
-    color: var(--hx-color-text-inverse, #ffffff);
+    /* Hover on inverse terminal surface — lift the top border to border-default and brighten the background; matches the copy-button hover affordance pattern. */
+    border-top-color: var(--hx-color-border-default, #e2e8f0);
+    filter: brightness(var(--hx-filter-brightness-hover, 1.15));
   }
 
   .code-snippet__expand-button:focus-visible {
