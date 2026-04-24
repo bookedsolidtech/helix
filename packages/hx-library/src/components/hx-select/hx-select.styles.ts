@@ -10,14 +10,14 @@ export const helixSelectStyles = css`
     --_color: var(--hx-select-color, var(--hx-color-text-strong, #1e293b));
     --_placeholder-color: var(
       --hx-select-placeholder-color,
-      var(--hx-color-text-placeholder, #94a3b8)
+      var(--hx-color-text-placeholder, #64748b)
     );
 
     /* Label */
-    --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #334155));
+    --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #1e293b));
 
     /* Border */
-    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #cbd5e1));
+    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #94a3b8));
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */

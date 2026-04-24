@@ -98,17 +98,17 @@ export const helixButtonStyles = css`
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--tertiary {
-    --hx-button-bg: var(--hx-color-surface-sunken);
-    --hx-button-color: var(--hx-color-text-primary);
+    --hx-button-bg: var(--hx-color-surface-sunken, #f1f5f9);
+    --hx-button-color: var(--hx-color-text-primary, #0f172a);
     --hx-button-border-color: transparent;
   }
 
   .button--tertiary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--danger {
@@ -128,17 +128,17 @@ export const helixButtonStyles = css`
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--outline {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-text-primary);
-    --hx-button-border-color: var(--hx-color-border-strong);
+    --hx-button-color: var(--hx-color-text-primary, #0f172a);
+    --hx-button-border-color: var(--hx-color-border-strong, #94a3b8);
   }
 
   .button--outline:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   .button--primary:hover {

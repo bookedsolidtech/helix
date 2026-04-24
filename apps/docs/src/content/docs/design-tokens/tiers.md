@@ -105,7 +105,7 @@ The key insight: **dark mode only swaps Semantic references**, not Primitive val
 When authoring a new component's CSS, bind to the correct tier so that Light, Dark, and High-Contrast modes flip correctly. The rule, in priority order:
 
 - **Surfaces, text, and borders** users see globally bind to a **Semantic** token. These are the tokens that swap per mode. Use `--hx-color-surface-*`, `--hx-color-text-*`, and `--hx-color-border-*` — never `--hx-color-neutral-*` directly.
-- **Brand-identity signals** (the ramps at 400–700 for `primary`, `danger`, `success`, `warning`, `info`) bind to the **Primitive**. Brand colors stay constant across modes — a blue "Save" button should read as blue in Dark mode too.
+- **Brand-identity signals** (the ramps at 400–700 for `primary`, `error`, `success`, `warning`, `info`) bind to the **Primitive**. Brand colors stay constant across modes — a blue "Save" button should read as blue in Dark mode too.
 - **Spatial values** (padding, radius, gap, font-size, line-height) bind to the **Primitive**. Sizes don't flip per mode.
 - **Dark-surface components** (tooltips, inverse side-nav, dark-always cards) bind to `--hx-color-surface-inverse` + `--hx-color-text-inverse`. Never hardcode `neutral-900` or `neutral-50` on an inverse surface — those are primitives, and the whole point of `surface-inverse` is that it flips to a light surface in Dark mode.
 - **Loading shimmers and decorative gradients** may bind to primitives so the animation reads identically across modes. Mark these with a one-line CSS comment explaining the carve-out.

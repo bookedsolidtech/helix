@@ -41,7 +41,10 @@ export const helixDrawerStyles = css`
   .drawer-backdrop {
     position: absolute;
     inset: 0;
-    background-color: var(--hx-drawer-backdrop-color, var(--hx-color-surface-overlay));
+    background-color: var(
+      --hx-drawer-backdrop-color,
+      var(--hx-color-surface-overlay, rgba(0, 0, 0, 0.75))
+    );
     opacity: 0;
     transition: opacity var(--hx-duration-slow, 300ms) var(--hx-easing-out, ease-out);
   }
@@ -62,8 +65,8 @@ export const helixDrawerStyles = css`
     position: absolute;
     display: flex;
     flex-direction: column;
-    background-color: var(--hx-drawer-bg, var(--hx-color-surface-default));
-    color: var(--hx-drawer-color, var(--hx-color-text-primary));
+    background-color: var(--hx-drawer-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-drawer-color, var(--hx-color-text-primary, #0f172a));
     box-shadow: var(--hx-drawer-shadow, var(--hx-shadow-xl));
     overflow: hidden;
     outline: none;
@@ -161,7 +164,7 @@ export const helixDrawerStyles = css`
     gap: var(--hx-space-4, 1rem);
     padding: var(--hx-drawer-header-padding, var(--hx-space-5, 1.25rem) var(--hx-space-6, 1.5rem));
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-drawer-header-border-color, var(--hx-color-border-default));
+      var(--hx-drawer-header-border-color, var(--hx-color-border-default, #e2e8f0));
     flex-shrink: 0;
   }
 
@@ -172,7 +175,7 @@ export const helixDrawerStyles = css`
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-tight);
-    color: var(--hx-drawer-title-color, var(--hx-color-text-primary));
+    color: var(--hx-drawer-title-color, var(--hx-color-text-primary, #0f172a));
   }
 
   .drawer-header-actions {
@@ -195,15 +198,15 @@ export const helixDrawerStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
-    color: var(--hx-color-text-muted);
+    color: var(--hx-color-text-muted, #64748b);
     cursor: pointer;
     flex-shrink: 0;
     transition: background-color var(--hx-duration-fast, 100ms) var(--hx-easing-default, ease);
   }
 
   .drawer-close-button:hover {
-    background-color: var(--hx-color-surface-sunken);
-    color: var(--hx-color-text-primary);
+    background-color: var(--hx-color-surface-sunken, #f1f5f9);
+    color: var(--hx-color-text-primary, #0f172a);
   }
 
   .drawer-close-button:focus-visible {
@@ -259,7 +262,7 @@ export const helixDrawerStyles = css`
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-drawer-footer-padding, var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-drawer-footer-border-color, var(--hx-color-border-default));
+      var(--hx-drawer-footer-border-color, var(--hx-color-border-default, #e2e8f0));
     flex-shrink: 0;
   }
 

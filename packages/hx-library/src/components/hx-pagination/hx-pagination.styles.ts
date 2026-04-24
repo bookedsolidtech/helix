@@ -40,7 +40,7 @@ export const helixPaginationStyles = css`
     min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-pagination-border-color, var(--hx-color-border-strong, #cbd5e1));
+      var(--hx-pagination-border-color, var(--hx-color-border-strong, #94a3b8));
     border-radius: var(--hx-pagination-border-radius, var(--hx-border-radius-md, 0.375rem));
     background: var(--hx-pagination-bg, var(--hx-color-surface-default, #ffffff));
     color: var(--hx-pagination-color, var(--hx-color-text-primary, #0f172a));
@@ -118,7 +118,7 @@ export const helixPaginationStyles = css`
     min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-pagination-border-color, var(--hx-color-border-strong, #cbd5e1));
+      var(--hx-pagination-border-color, var(--hx-color-border-strong, #94a3b8));
     border-radius: var(--hx-pagination-border-radius, var(--hx-border-radius-md, 0.375rem));
     background: var(--hx-pagination-bg, var(--hx-color-surface-default, #ffffff));
     color: var(--hx-pagination-color, var(--hx-color-text-primary, #0f172a));

@@ -200,12 +200,12 @@ export const helixSplitButtonStyles = css`
     --hx-split-button-bg: var(--hx-color-surface-sunken, #f1f5f9);
     --hx-split-button-color: var(--hx-color-text-primary, #0f172a);
     --hx-split-button-border-color: transparent;
-    --hx-split-button-divider-color: var(--hx-color-border-default, #cbd5e1);
+    --hx-split-button-divider-color: var(--hx-color-border-default, #e2e8f0);
   }
 
   .split-button--tertiary .split-button__primary:hover,
   .split-button--tertiary .split-button__trigger:hover {
-    --hx-split-button-bg: var(--hx-color-surface-raised, #e2e8f0);
+    --hx-split-button-bg: var(--hx-color-surface-raised, #f8fafc);
     filter: none;
   }
 
@@ -237,7 +237,7 @@ export const helixSplitButtonStyles = css`
 
   .split-button--ghost .split-button__primary:hover,
   .split-button--ghost .split-button__trigger:hover {
-    --hx-split-button-bg: var(--hx-color-surface-raised, #f1f5f9);
+    --hx-split-button-bg: var(--hx-color-surface-raised, #f8fafc);
     filter: none;
   }
 
@@ -247,8 +247,8 @@ export const helixSplitButtonStyles = css`
   .split-button--outline .split-button__trigger {
     --hx-split-button-bg: transparent;
     --hx-split-button-color: var(--hx-color-text-primary, #0f172a);
-    --hx-split-button-border-color: var(--hx-color-border-strong, #cbd5e1);
-    --hx-split-button-divider-color: var(--hx-color-border-default, #cbd5e1);
+    --hx-split-button-border-color: var(--hx-color-border-strong, #94a3b8);
+    --hx-split-button-divider-color: var(--hx-color-border-default, #e2e8f0);
   }
 
   .split-button--outline .split-button__primary:hover,
